@@ -5,13 +5,16 @@ from onegov.form import Form
 from onegov.form.core import DataRequired
 from onegov.form.fields import HtmlField, UploadFileWithORMSupport
 from onegov.org.models.document_form import DocumentFormFile
-from onegov.form.validators import FileSizeLimit, WhitelistedMimeType
+from onegov.form.validators import FileSizeLimit
 from onegov.org import _
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.swissvotes.forms.attachments import PDF_MIME_TYPES
+
 if TYPE_CHECKING:
     from collections.abc import Collection
 
@@ -36,10 +39,11 @@ class DocumentForm(Form):
         label=_('Form PDF'),
         file_class=DocumentFormFile,
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired()
-        ],)
+        ],
+        allowed_mimetypes=PDF_MIME_TYPES,
+    )
 
     group = StringField(
         label=_('Group'),

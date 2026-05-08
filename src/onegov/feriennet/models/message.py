@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from onegov.activity import Period
+from onegov.activity import BookingPeriod
 from onegov.chat import Message
 from onegov.org.models.message import TicketMessageMixin
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.activity.models import PeriodMeta
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from onegov.ticket import Ticket
     from typing import Self
@@ -20,12 +20,12 @@ class PeriodMessage(Message):
     }
 
     def link(self, request: FeriennetRequest) -> str:
-        return request.class_link(Period, {'id': self.channel_id})
+        return request.class_link(BookingPeriod, {'id': self.channel_id})
 
     @classmethod
     def create(
         cls,
-        period: Period | PeriodMeta,
+        period: BookingPeriod | BookingPeriodMeta,
         request: FeriennetRequest,
         action: str
     ) -> Self:

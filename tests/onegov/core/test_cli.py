@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os.path
 import pytest
@@ -8,7 +10,13 @@ from onegov.core.cli import cli, GroupContext
 from unittest.mock import patch, Mock
 
 
-def test_group_context_without_schemas(postgres_dsn):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core import Framework
+    from .conftest import SmtpApp, TestGroup
+
+
+def test_group_context_without_schemas(postgres_dsn: str) -> None:
     ctx = GroupContext('/onegov_test/*', {
         'applications': [{
             'path': '/onegov_test/*',
@@ -27,10 +35,13 @@ def test_group_context_without_schemas(postgres_dsn):
     assert list(ctx.matches) == []
 
 
-def test_group_context_with_schemas(postgres_dsn):
+def test_group_context_with_schemas(postgres_dsn: str) -> None:
     class TestContext(GroupContext):
-
-        def available_schemas(self, *args, **kwargs):
+        def available_schemas(
+            self,
+            *args: object,
+            **kwargs: object
+        ) -> list[str]:
             return ['onegov_test-foo', 'onegov_test-bar']
 
     ctx = TestContext('/onegov_test/*', {
@@ -72,7 +83,11 @@ def test_group_context_with_schemas(postgres_dsn):
 
 
 @pytest.mark.parametrize('cli', [{'singular': True}], indirect=True)
-def test_create_command_group_single_path(cli, cli_config):
+def test_create_command_group_single_path(
+    cli: TestGroup,
+    cli_config: str
+) -> None:
+
     runner = CliRunner()
     schemas = ['foobar-foo', 'foobar-bar']
 
@@ -84,7 +99,11 @@ def test_create_command_group_single_path(cli, cli_config):
 
 
 @pytest.mark.parametrize('cli', [{'creates_path': True}], indirect=True)
-def test_create_command_group_existing_path(cli, cli_config):
+def test_create_command_group_existing_path(
+    cli: TestGroup,
+    cli_config: str
+) -> None:
+
     runner = CliRunner()
     schemas = ['foobar-foo']
 
@@ -96,7 +115,7 @@ def test_create_command_group_existing_path(cli, cli_config):
 
 
 @pytest.mark.parametrize('cli', [{'creates_path': True}], indirect=True)
-def test_create_command_full_path(cli, cli_config):
+def test_create_command_full_path(cli: TestGroup, cli_config: str) -> None:
     runner = CliRunner()
     schemas = ['foobar-foo']
 
@@ -108,12 +127,10 @@ def test_create_command_full_path(cli, cli_config):
 
 
 @pytest.mark.parametrize('cli', [{'creates_path': True}], indirect=True)
-def test_create_command_wildcard(cli, cli_config):
-
+def test_create_command_wildcard(cli: TestGroup, cli_config: str) -> None:
     runner = CliRunner()
-    schemas = []
 
-    with patch.object(GroupContext, 'available_schemas', return_value=schemas):
+    with patch.object(GroupContext, 'available_schemas', return_value=[]):
         result = runner.invoke(cli, [
             '--config', cli_config, '--select', '/foobar/*', 'create'
         ])
@@ -121,12 +138,14 @@ def test_create_command_wildcard(cli, cli_config):
 
 
 @pytest.mark.parametrize('cli', [{'creates_path': True}], indirect=True)
-def test_create_command_request_called(cli, cli_config):
+def test_create_command_request_called(
+    cli: TestGroup,
+    cli_config: str
+) -> None:
 
     runner = CliRunner()
-    schemas = []
 
-    with patch.object(GroupContext, 'available_schemas', return_value=schemas):
+    with patch.object(GroupContext, 'available_schemas', return_value=[]):
         runner.invoke(cli, [
             '--config', cli_config, '--select', '/foobar/foo', 'create'
         ])
@@ -136,7 +155,10 @@ def test_create_command_request_called(cli, cli_config):
 
 
 @pytest.mark.parametrize('cli', [{'default_selector': '*'}], indirect=True)
-def test_create_command_default_selector(cli, cli_config):
+def test_create_command_default_selector(
+    cli: TestGroup,
+    cli_config: str
+) -> None:
 
     runner = CliRunner()
     schemas = ['foobar-foo']
@@ -150,7 +172,12 @@ def test_create_command_default_selector(cli, cli_config):
         assert cli.called_request
 
 
-def test_sendmail(temporary_directory, maildir_app, monkeypatch):
+def test_sendmail(
+    temporary_directory: str,
+    maildir_app: Framework,
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
+
     mock_send = Mock(return_value=None)
     monkeypatch.setattr(
         'onegov.core.mail_processor.PostmarkMailQueueProcessor.send',
@@ -205,11 +232,16 @@ def test_sendmail(temporary_directory, maildir_app, monkeypatch):
     ])
 
     assert result.exit_code == 0
-    assert not mock_send.called
     assert len(os.listdir(maildir)) == 0
+    assert not mock_send.called
 
 
-def test_sendmail_invalid_queue(temporary_directory, maildir_app, monkeypatch):
+def test_sendmail_invalid_queue(
+    temporary_directory: str,
+    maildir_app: Framework,
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
+
     mock_send = Mock(return_value=None)
     monkeypatch.setattr(
         'onegov.core.mail_processor.PostmarkMailQueueProcessor.send',
@@ -240,7 +272,11 @@ def test_sendmail_invalid_queue(temporary_directory, maildir_app, monkeypatch):
     assert len(os.listdir(maildir)) == 1
 
 
-def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
+def test_sendmail_smtp(
+    temporary_directory: str,
+    maildir_smtp_app: SmtpApp
+) -> None:
+
     maildir = os.path.join(temporary_directory, 'mails')
     app = maildir_smtp_app
     smtp = app.smtp
@@ -296,7 +332,12 @@ def test_sendmail_smtp(temporary_directory, maildir_smtp_app):
     assert len(smtp.outbox) == 0
 
 
-def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
+def test_sendmail_limit(
+    temporary_directory: str,
+    maildir_app: Framework,
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
+
     mock_send = Mock(return_value=None)
     monkeypatch.setattr(
         'onegov.core.mail_processor.PostmarkMailQueueProcessor.send',
@@ -346,7 +387,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
         'sendmail',
         '--queue', 'postmark',
-        '--limit', 1
+        '--limit', '1'
     ])
 
     assert result.exit_code == 0
@@ -358,7 +399,7 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
         'sendmail',
         '--queue', 'postmark',
-        '--limit', 2
+        '--limit', '2'
     ])
 
     assert mock_send.call_count == 2
@@ -393,7 +434,12 @@ def test_sendmail_limit(temporary_directory, maildir_app, monkeypatch):
     assert len(os.listdir(maildir)) == 0
 
 
-def test_sendmail_exception(temporary_directory, maildir_app, monkeypatch):
+def test_sendmail_exception(
+    temporary_directory: str,
+    maildir_app: Framework,
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
+
     error = RuntimeError('Failed to send request.')
     mock_send = Mock(side_effect=error)
     monkeypatch.setattr(

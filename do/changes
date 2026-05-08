@@ -158,8 +158,7 @@ class ChangelogCommit:
 
         if link.startswith('ONEGOV-CLOUD-'):
             return (
-                f'https://sentry.io/organizations/seantis-gmbh'
-                f'/issues/?query={link}'
+                f'https://seantis-gmbh.sentry.io/issues/?query={link}'
             )
 
         if link.startswith('STAKA-'):

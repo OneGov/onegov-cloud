@@ -22,6 +22,7 @@ from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
+from wtforms.fields import BooleanField
 from uuid import UUID, uuid4
 from webob import exc
 
@@ -31,10 +32,7 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from typing import TypeVar
     from webob import Response as BaseResponse
-
-    FormT = TypeVar('FormT', bound=Form)
 
 
 def get_session_id(request: OrgRequest) -> str:
@@ -91,11 +89,11 @@ def event_form(
 
 
 @overload
-def event_form(
+def event_form[T: Form](
     model: object,
     request: OrgRequest,
-    form: type[FormT]
-) -> type[FormT]: ...
+    form: type[T]
+) -> type[T]: ...
 
 
 def event_form(
@@ -126,6 +124,20 @@ def event_form(
             form.tags = None
 
     if request.is_manager:
+
+        class WithManagerFields(form):  # type:ignore[misc,valid-type]
+            syndicate = BooleanField(
+                label=_('Syndicate'),
+                description=_('Publish this event externally'),
+                default=False,
+            )
+            highlight = BooleanField(
+                label=_('Highlight'),
+                description=_('Mark as highlighted event'),
+                default=False,
+            )
+
+        form = WithManagerFields
         return AccessExtension().extend_form(form, request)
 
     return form
@@ -208,7 +220,7 @@ def publish_event_from_ticket(
 ) -> RenderData | BaseResponse:
 
     event = self.handler.event
-    if event is None or event.state != 'submitted':
+    if event is None or event.state not in ('submitted', 'withdrawn'):
         raise exc.HTTPNotFound()
 
     return publish_event(
@@ -412,7 +424,8 @@ def view_event(
                         'event': 'browser-notification',
                         'title': request.translate(_('New ticket')),
                         'created': ticket.created.isoformat()
-                    }
+                    },
+                    groupids=request.app.groupids_for_ticket(ticket),
                 )
 
                 if request.auto_accept(ticket):

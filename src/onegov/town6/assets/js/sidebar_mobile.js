@@ -1,4 +1,6 @@
-$('#offCanvasSidebar a').click(function() { $('.off-canvas').foundation('close'); });
+$('#offCanvasSidebar').on('click', 'a', function() {
+    $('.off-canvas').foundation('close');
+});
 
 if (!$('.sidebar-wrapper').length) {
     $('.sidebar-toggler').css('display', 'none');

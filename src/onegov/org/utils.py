@@ -10,6 +10,7 @@ import pytz
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
+from decimal import Decimal
 from email.headerregistry import Address
 from functools import lru_cache
 from isodate import parse_date, parse_datetime
@@ -18,42 +19,44 @@ from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
+from math import isclose
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
-from onegov.file import File, FileCollection
+from onegov.core.security import Secret
+from onegov.file import FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
+from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
-from onegov.user import User, UserGroup
-from operator import add, attrgetter
-from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
+from onegov.user import Auth, User, UserGroup
+from operator import add
+from sqlalchemy import case, nullsfirst
+from webob.exc import HTTPBadRequest
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
-
+from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Sequence)
+    from libres.db.models import ReservationBlocker
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
+    from onegov.form import Form, FormSubmission
     from onegov.org.models import ImageFile
     from onegov.org.request import OrgRequest
+    from onegov.pay import InvoiceItem
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
-    from sqlalchemy.orm import Query
-    from sqlalchemy import Column
-    from typing import Self, TypeAlias, TypeVar
+    from sqlalchemy.orm import InstrumentedAttribute, Query
+    from sqlalchemy.sql.elements import ColumnElement
     from uuid import UUID
 
-    _T = TypeVar('_T')
-    _DeltaT = TypeVar('_DeltaT')
-    _SortT = TypeVar('_SortT', bound='SupportsRichComparison')
-    _TransformedT = TypeVar('_TransformedT')
-    TzInfo: TypeAlias = DstTzInfo | StaticTzInfo
-    DateRange: TypeAlias = tuple[datetime, datetime]
+    type TzInfo = DstTzInfo | StaticTzInfo
+    type DateRange = tuple[datetime, datetime]
 
 
 # for our empty paragraphs approach we don't need a full-blown xml parser
@@ -255,21 +258,28 @@ def set_image_sizes(
             return match.group(1)
         return None
 
-    images_dict = {get_image_id(img): img for img in images}
+    images_dict = {
+        image_id: img
+        for img in images
+        if (image_id := get_image_id(img)) is not None
+    }
 
     if images_dict:
-        q: Query[ImageFile]
-        q = FileCollection(request.session, type='image').query()
-        q = q.with_entities(File.id, File.reference)
-        q = q.filter(File.id.in_(images_dict))
+        collection: FileCollection[ImageFile]
+        collection = FileCollection(request.session, type='image')
+        model_class = collection.model_class
+        uploaded_files = dict(
+            collection.query()
+            .with_entities(model_class.id, model_class.reference)
+            .filter(model_class.id.in_(images_dict))
+            .tuples()
+        )
 
-        sizes = {i.id: i.reference for i in q}
-
-        for id, image in images_dict.items():
-            if id in sizes:
+        for image_id, image in images_dict.items():
+            if (uploaded := uploaded_files.get(image_id)) is not None:
                 with suppress(AttributeError):
-                    image.set('width', sizes[id].size[0])
-                    image.set('height', sizes[id].size[1])
+                    image.set('width', uploaded.size[0])
+                    image.set('height', uploaded.size[1])
 
 
 def parse_fullcalendar_request(
@@ -285,25 +295,32 @@ def parse_fullcalendar_request(
 
     """
     start_str = request.params.get('start')
-    end_str = request.params.get('end')
+    if not isinstance(start_str, str) or not start_str:
+        return None, None
 
-    if start_str and end_str:
-        if 'T' in start_str:
+    end_str = request.params.get('end')
+    if not isinstance(end_str, str) or not end_str:
+        return None, None
+
+    if 'T' in start_str:
+        try:
             start = parse_datetime(start_str)
             end = parse_datetime(end_str)
-        else:
-            start = datetime.combine(parse_date(start_str), time(0, 0))
-            end = datetime.combine(
-                parse_date(end_str),
-                time(23, 59, 59, 999999)
-            )
-
-        start = sedate.replace_timezone(start, timezone)
-        end = sedate.replace_timezone(end, timezone)
-
-        return start, end
+        except Exception:
+            raise HTTPBadRequest() from None
     else:
-        return None, None
+        try:
+            start_date = parse_date(start_str)
+            end_date = parse_date(end_str)
+        except Exception:
+            raise HTTPBadRequest() from None
+        start = datetime.combine(start_date, time(0, 0))
+        end = datetime.combine(end_date, time(23, 59, 59, 999999))
+
+    start = sedate.replace_timezone(start, timezone)
+    end = sedate.replace_timezone(end, timezone)
+
+    return start, end
 
 
 def render_time_range(start: datetime | time, end: datetime | time) -> str:
@@ -316,6 +333,15 @@ def render_time_range(start: datetime | time, end: datetime | time) -> str:
         end_str = f'{end:%H:%M}'
 
     return f'{start:%H:%M} - {end_str}'
+
+
+def complete_url(url: str | None) -> str | None:
+    # fixes erroneous data retrospectively
+    if url == 'https://' or url == 'https://keine':
+        return None
+    if url is None or url.startswith(('http://', 'https://', '/')):
+        return url
+    return f'https://{url}'
 
 
 class ReservationInfo:
@@ -356,10 +382,9 @@ class ReservationInfo:
             zipcodes = map(str, self.resource.zipcode_block['zipcode_list'])
 
             return self.request.translate(_(
-                (
-                    'You can only reserve this allocation before ${date} '
-                    'if you live in the following zipcodes: ${zipcodes}'
-                ), mapping={
+                'You can only reserve this allocation before ${date} '
+                'if you live in the following zipcodes: ${zipcodes}',
+                mapping={
                     'date': layout.format_date(date, 'date_long'),
                     'zipcodes': ', '.join(zipcodes),
                 }
@@ -411,58 +436,50 @@ class ReservationInfo:
 
 class AllocationEventInfo:
 
-    __slots__ = ('resource', 'allocation', 'availability', 'request',
-                 'translate')
+    __slots__ = ('resource', 'allocation', 'availability',
+                 'partitions', 'request', 'translate')
 
     def __init__(
         self,
         resource: Resource,
         allocation: Allocation,
         availability: float,
+        partitions: Sequence[tuple[float, bool]],
         request: OrgRequest
     ) -> None:
 
         self.resource = resource
         self.allocation = allocation
         self.availability = availability
+        self.partitions = partitions
         self.request = request
         self.translate = request.translate
 
     @classmethod
-    def from_allocations(
+    def from_resource_by_range(
         cls,
         request: OrgRequest,
         resource: Resource,
-        allocations: Iterable[Allocation]
+        start: datetime,
+        end: datetime
     ) -> list[Self]:
 
-        events = []
-
         scheduler = resource.scheduler
-        allocations = request.exclude_invisible(allocations)
-
-        for key, group in groupby(allocations, key=attrgetter('_start')):
-            grouped = tuple(group)
-            if len(grouped) == 1 and grouped[0].partly_available:
-                # in this case we might need to normalize the availability
-                availability = grouped[0].normalized_availability
-            else:
-                availability = scheduler.queries.availability_by_allocations(
-                    grouped
-                )
-
-            for allocation in grouped:
-                if allocation.is_master:
-                    events.append(  # noqa: PERF401
-                        cls(
-                            resource,
-                            allocation,
-                            availability,
-                            request
-                        )
-                    )
-
-        return events
+        allocations = scheduler.allocations_with_availability_by_range(
+            start,
+            end
+        )
+        return [
+            cls(
+                resource,
+                allocation,  # type: ignore[arg-type]
+                availability,
+                partitions,
+                request
+            )
+            for allocation, availability, partitions in allocations
+            if request.is_visible(allocation)
+        ]
 
     @property
     def event_start(self) -> str:
@@ -498,7 +515,34 @@ class AllocationEventInfo:
         return int(self.quota * self.availability / 100)
 
     @property
+    def in_past(self) -> bool:
+        return self.allocation.end < sedate.utcnow()
+
+    @property
+    def outside_booking_window(self) -> bool:
+        return not self.request.is_manager and (
+            self.resource.is_past_deadline(
+                # for partly available allocations we use the end of the
+                # allocation, since some small sliver of the allocation
+                # may still be before the deadline, we could get a slightly
+                # more accurate result by subtracting the raster, but it
+                # doesn't seem worth the extra CPU cycles.
+                self.allocation.end
+                if self.allocation.partly_available
+                else self.allocation.start
+            ) or self.resource.is_before_lead_time(
+                self.allocation.start
+            )
+        )
+
+    @property
     def event_title(self) -> str:
+        if self.in_past or self.outside_booking_window:
+            # NOTE: Only show the time slot, since the information for
+            #       why this slot cannot be reserved still/yet is too
+            #       complex to summarize in a single word/short sentence.
+            return self.event_time
+
         if self.allocation.partly_available:
             available = self.translate(_('${percent}% Available', mapping={
                 'percent': int(self.availability)
@@ -527,8 +571,11 @@ class AllocationEventInfo:
 
     @property
     def event_classes(self) -> Iterator[str]:
-        if self.allocation.end < sedate.utcnow():
+        if self.in_past:
             yield 'event-in-past'
+
+        elif self.outside_booking_window:
+            yield 'event-outside-booking-window'
 
         if self.quota > 1:
             if self.quota_left == self.quota:
@@ -577,7 +624,7 @@ class AllocationEventInfo:
                 )),
             )
 
-            if self.availability == 100.0:
+            if isclose(self.availability, 100.0, abs_tol=.005):
                 yield DeleteLink(
                     _('Delete'),
                     self.request.link(self.allocation),
@@ -627,7 +674,7 @@ class AllocationEventInfo:
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
             'quotaLeft': self.quota_left,
-            'partitions': self.allocation.availability_partitions(),
+            'partitions': self.partitions,
             'actions': [
                 link(self.request)
                 for link in self.event_actions
@@ -639,16 +686,14 @@ class AllocationEventInfo:
 
 class AvailabilityEventInfo:
 
-    __slots__ = ('resource', 'allocation', 'request', 'translate')
+    __slots__ = ('allocation', 'request', 'translate')
 
     def __init__(
         self,
-        resource: Resource,
         allocation: Allocation,
         request: OrgRequest
     ) -> None:
 
-        self.resource = resource
         self.allocation = allocation
         self.request = request
         self.translate = request.translate
@@ -657,12 +702,11 @@ class AvailabilityEventInfo:
     def from_allocations(
         cls,
         request: OrgRequest,
-        resource: Resource,
         allocations: Iterable[Allocation]
     ) -> list[Self]:
 
         return [
-            cls(resource, allocation, request)
+            cls(allocation, request)
             for allocation in allocations
             if allocation.is_master
         ]
@@ -675,13 +719,146 @@ class AvailabilityEventInfo:
     def event_end(self) -> str:
         return self.allocation.display_end().isoformat()
 
+    @property
+    def blockable(self) -> bool:
+        if not self.request.is_manager:
+            return False
+        if self.allocation.quota == 1:
+            if self.allocation.partly_available:
+                return self.allocation.availability > 0.0
+            return not self.allocation.reserved_slots
+        return self.allocation.quota_left == self.allocation.quota
+
     def as_dict(self) -> dict[str, Any]:
+        blockable = self.blockable
         return {
             'id': self.allocation.id,
             'start': self.event_start,
             'end': self.event_end,
             'editable': False,
             'display': 'background',
+            # extended properties
+            'blockable': blockable,
+            'blockurl': self.request.csrf_protected_url(
+                self.request.link(self.allocation, name='add-blocker')
+            ) if blockable else None,
+            'partlyAvailable': self.allocation.partly_available,
+            'fullyAvailable': isclose(
+                self.allocation.availability,
+                100.0,
+                abs_tol=.005
+            ),
+            'wholeDay': self.allocation.whole_day,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.allocation.mirror_of),
+            'kind': 'allocation',
+        }
+
+
+class BlockerEventInfo:
+
+    __slots__ = (
+        'resource',
+        'blocker',
+        'css_classes',
+        'include_title',
+        'request',
+        'translate'
+    )
+
+    def __init__(
+        self,
+        resource: Resource,
+        blocker: ReservationBlocker,
+        request: OrgRequest,
+        css_classes: Collection[str] = (),
+        include_title: bool = False
+    ) -> None:
+
+        self.resource = resource
+        self.blocker = blocker
+        self.css_classes = css_classes
+        self.include_title = include_title
+        self.request = request
+        self.translate = request.translate
+
+    @classmethod
+    def from_blockers(
+        cls,
+        request: OrgRequest,
+        resource: Resource,
+        blockers: Iterable[ReservationBlocker],
+        blocking_resources: dict[UUID, Resource]
+    ) -> list[Self]:
+
+        include_title = len(blocking_resources) > 0
+        return [
+            cls(
+                res := blocking_resources.get(blocker.resource, resource),
+                blocker,
+                request,
+                css_classes=() if res is resource else (
+                    'event-blocking-resource',
+                ),
+                include_title=include_title
+            )
+            for blocker in blockers
+        ]
+
+    @property
+    def title(self) -> str:
+        if self.blocker.reason is None:
+            return self.request.translate(_('Blocker'))
+        return self.blocker.reason
+
+    @property
+    def event_start(self) -> str:
+        return self.blocker.display_start().isoformat()
+
+    @property
+    def event_end(self) -> str:
+        return self.blocker.display_end().isoformat()
+
+    @property
+    def editable(self) -> bool:
+        if not self.request.is_manager:
+            return False
+        return self.blocker.display_start() >= sedate.utcnow()
+
+    def as_dict(self) -> dict[str, Any]:
+        is_manager = self.request.is_manager
+        editable = self.editable
+        title = reason = self.title
+        if self.include_title:
+            title = f'{title}\n{self.resource.title}'
+        return {
+            'id': f'blocker-{self.blocker.id}',
+            'start': self.event_start,
+            'end': self.event_end,
+            'title': title,
+            'editable': editable,
+            'classNames': ['event-blocker', *self.css_classes],
+            'display': 'block',
+            # extended properties
+            'reason': reason,
+            'editurl': self.request.csrf_protected_url(self.request.link(
+                self.blocker,
+                name='adjust',
+                query_params={'blocker-id': str(self.blocker.id)}
+            )) if editable and is_manager else None,
+            'deleteurl': self.request.csrf_protected_url(self.request.link(
+                self.blocker
+            )) if editable and is_manager else None,
+            'seturl': self.request.csrf_protected_url(self.request.link(
+                self.blocker,
+                name='set-reason',
+                query_params={'blocker-id': str(self.blocker.id)}
+            )) if is_manager else None,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.resource.id),
+            'kind': 'blocker',
         }
 
 
@@ -701,19 +878,34 @@ def event_color(event_name: str) -> str:
 
 class ReservationEventInfo:
 
-    __slots__ = ('resource', 'reservation', 'ticket', 'request', 'translate')
+    __slots__ = (
+        'resource',
+        'reservation',
+        'ticket',
+        'extra',
+        'css_classes',
+        'include_title',
+        'request',
+        'translate'
+    )
 
     def __init__(
         self,
         resource: Resource,
         reservation: Reservation,
         ticket: Ticket,
+        extra: Sequence[str],
         request: OrgRequest,
+        css_classes: Collection[str] = (),
+        include_title: bool = False,
     ) -> None:
 
         self.resource = resource
         self.reservation = reservation
         self.ticket = ticket
+        self.extra = extra
+        self.css_classes = css_classes
+        self.include_title = include_title
         self.request = request
         self.translate = request.translate
 
@@ -722,34 +914,24 @@ class ReservationEventInfo:
         cls,
         request: OrgRequest,
         resource: Resource,
-        reservations: Iterable[tuple[Reservation, Ticket]]
+        reservations: Iterable[tuple[Reservation, Ticket, *tuple[str, ...]]],
+        blocking_resources: dict[UUID, Resource]
     ) -> list[Self]:
 
+        include_title = len(blocking_resources) > 0
         return [
             cls(
-                resource,
+                res := blocking_resources.get(reservation.resource, resource),
                 reservation,
                 ticket,
-                request
+                extra,
+                request,
+                css_classes=() if res is resource else (
+                    'event-blocking-resource',
+                ),
+                include_title=include_title
             )
-            for reservation, ticket in reservations
-        ]
-
-    @classmethod
-    def from_resources(
-        cls,
-        request: OrgRequest,
-        reservations: Iterable[tuple[Resource, Reservation, Ticket]]
-    ) -> list[Self]:
-
-        return [
-            cls(
-                resource,
-                reservation,
-                ticket,
-                request
-            )
-            for resource, reservation, ticket in reservations
+            for reservation, ticket, *extra in reservations
         ]
 
     @property
@@ -791,12 +973,14 @@ class ReservationEventInfo:
     @property
     def event_title(self) -> str:
         return '\n'.join(part for part in (
-            self.ticket.number,
+            self.ticket.tag or self.reservation.email,
+            *self.extra,
+            self.reservation.email if self.ticket.tag else '',
+            self.resource.title if self.include_title else '',
             self.event_time,
             f'{self.translate(_("Quota"))}: {self.quota}'
             if getattr(self.resource, 'show_quota', False) else '',
-            self.ticket.tag,
-            self.reservation.email,
+            self.ticket.number,
             self.translate(_('Pending approval')) if not self.accepted else '',
         ) if part)
 
@@ -807,10 +991,7 @@ class ReservationEventInfo:
         else:
             yield 'event-pending'
 
-        # HACK: Find event element by id, it would be better if fullcalendar
-        #       generated an element id we could use, but we'll work with
-        #       what we have.
-        yield f'event-{self.reservation.id}'
+        yield from self.css_classes
 
     @property
     def color(self) -> str | None:
@@ -836,6 +1017,8 @@ class ReservationEventInfo:
     def editable(self) -> bool:
         if self.reservation.display_start() < sedate.utcnow():
             return False
+        # NOTE: We don't allow adjusting already accepted reservations
+        #       in this view, since it's easier to happen by accident.
         return not self.accepted
 
     def as_dict(self) -> dict[str, Any]:
@@ -847,8 +1030,7 @@ class ReservationEventInfo:
             'backgroundColor': self.color,
             'title': self.event_title,
             'classNames': list(self.event_classes),
-            'url': self.request.link(self.ticket)
-            if is_manager else self.request.link(self.ticket, name='status'),
+            'url': self.request.link(self.ticket),
             'display': 'block',
             # extended properties
             'wholeDay': self.whole_day,
@@ -858,6 +1040,10 @@ class ReservationEventInfo:
                 name='adjust-reservation',
                 query_params={'reservation-id': str(self.reservation.id)}
             )) if is_manager else None,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.resource.id),
+            'kind': 'reservation',
         }
 
 
@@ -871,6 +1057,7 @@ class MyReservationEventInfo:
         'timezone',
         'accepted',
         'resource',
+        'resource_id',
         'ticket_id',
         'handler_code',
         'ticket_number',
@@ -882,12 +1069,13 @@ class MyReservationEventInfo:
     def __init__(
         self,
         id: int,
-        token: str,
+        token: UUID,
         start: datetime,
         end: datetime,
         accepted: bool,
         timezone: str,
         resource: str,
+        resource_id: UUID,
         ticket_id: UUID,
         handler_code: str,
         ticket_number: str,
@@ -905,6 +1093,7 @@ class MyReservationEventInfo:
         self.timezone = timezone
         self.accepted = accepted
         self.resource = resource
+        self.resource_id = resource_id
         self.ticket_id = ticket_id
         self.handler_code = handler_code
         self.key_code = key_code
@@ -976,6 +1165,7 @@ class MyReservationEventInfo:
             'wholeDay': self.whole_day,
             'editable': False,
             'editurl': None,
+            'kind': 'reservation',
         }
 
 
@@ -1084,7 +1274,7 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability == 100.0 or (
+            if isclose(self.availability, 100.0, abs_tol=.005) or (
                 self.availability > 100.0 and self.adjustable
             ):
                 yield 'event-available'
@@ -1116,7 +1306,9 @@ libres_error_messages = {
     _('An existing reservation would be affected by the requested change.'),
 
     libres_errors.AffectedPendingReservationError:
-    _('A pending reservation would be affected by the requested change.'),
+    _("This change cannot be made because there is still an open reservation "
+      "in someone's cart. The reservation needs to be submitted or expire "
+      "before you can proceed."),
 
     libres_errors.AlreadyReservedError:
     _('The requested period is no longer available.'),
@@ -1261,37 +1453,37 @@ def predict_next_daterange(
 #       to a protocol which implements subtraction and addition, but
 #       __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T](
+    values: Sequence[T],
     min_probability: float = 0.8,
-) -> _T | None: ...
+) -> T | None: ...
 
 
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T, DeltaT](
+    values: Sequence[T],
     min_probability: float,
-    compute_delta: Callable[[_T, _T], _DeltaT],
-    add_delta: Callable[[_T, _DeltaT], _T | None]
-) -> _T | None: ...
+    compute_delta: Callable[[T, T], DeltaT],
+    add_delta: Callable[[T, DeltaT], T | None]
+) -> T | None: ...
 
 
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T, DeltaT](
+    values: Sequence[T],
     min_probability: float = 0.8,
     *,
-    compute_delta: Callable[[_T, _T], _DeltaT],
-    add_delta: Callable[[_T, _DeltaT], _T | None]
-) -> _T | None: ...
+    compute_delta: Callable[[T, T], DeltaT],
+    add_delta: Callable[[T, DeltaT], T | None]
+) -> T | None: ...
 
 
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T](
+    values: Sequence[T],
     min_probability: float = 0.8,
     compute_delta: Callable[[Any, Any], Any] = lambda x, y: y - x,
     add_delta: Callable[[Any, Any], Any | None] = add
-) -> _T | None:
+) -> T | None:
     """ Takes a list of values and tries to predict the next value in the
     series.
 
@@ -1349,44 +1541,44 @@ def predict_next_value(
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
-    transform: Callable[[_T], _T] | None = None
-) -> dict[str, list[_T]]: ...
+    transform: Callable[[T], T] | None = None
+) -> dict[str, list[T]]: ...
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison, TransformedT](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None,
-    transform: Callable[[_T], _TransformedT]
-) -> dict[str, list[_TransformedT]]: ...
+    transform: Callable[[T], TransformedT]
+) -> dict[str, list[TransformedT]]: ...
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison, TransformedT](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
     *,
-    transform: Callable[[_T], _TransformedT]
-) -> dict[str, list[_TransformedT]]: ...
+    transform: Callable[[T], TransformedT]
+) -> dict[str, list[TransformedT]]: ...
 
 
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
     transform: Callable[[Any], Any] | None = None
 ) -> dict[str, list[Any]]:
@@ -1420,10 +1612,10 @@ def group_by_column(
 
     grouped = OrderedDict()
 
-    def group_key(record: _T) -> str:
+    def group_key(record: T) -> str:
         return getattr(record, group_column.name) or default_group
 
-    def sort_key(record: _T) -> _SortT:
+    def sort_key(record: T) -> SortT:
         return getattr(record, sort_column.name)
 
     transform = transform or (lambda v: v)
@@ -1431,10 +1623,15 @@ def group_by_column(
     # groupby expects the input iterable (records) to already be sorted
     records = sorted(records, key=group_key)
     for group, items in groupby(records, group_key):
-        grouped[group] = [
-            transform(i)
+        entries = [
+            t
             for i in sorted(items, key=sort_key)
+            if (t := transform(i)) is not None
         ]
+        # NOTE: Since transform can remove entries we only add the group
+        #       if it is still non-empty.
+        if entries:
+            grouped[group] = entries
 
     return grouped
 
@@ -1504,7 +1701,7 @@ def emails_for_new_ticket(
     # then there can't be any exclusive permissions for any
     # specific group we're not a part of, since then we won't
     # have permission to access the ticket
-    general_condition = TicketPermission.group.is_(None)
+    general_condition: ColumnElement[bool] = TicketPermission.group.is_(None)
     if exclusive_group_ids:
         general_condition &= UserGroup.id.in_(exclusive_group_ids)
     query = query.filter(
@@ -1512,14 +1709,14 @@ def emails_for_new_ticket(
     )
 
     for email, name in query.join(UserGroup.users).with_entities(
-        case([(
+        case((
             UserGroup.meta['shared_email'].isnot(None),
-            UserGroup.meta['shared_email'].astext,
-        )], else_=User.username),
-        case([(
+            UserGroup.meta['shared_email'].astext
+        ), else_=User.username),
+        case((
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.name,
-        )], else_=User.realname),
+        ), else_=User.realname),
     ).distinct():
 
         if email in seen:
@@ -1559,21 +1756,33 @@ def widest_access(*accesses: str) -> str:
     return ORDERED_ACCESS[index]
 
 
+def narrowest_access(*accesses: str) -> str:
+    index = len(ORDERED_ACCESS) - 1
+    for access in accesses:
+        try:
+            # we only want to look at indexes starting with the one
+            # we're already at, otherwise we're lowering the access
+            index = ORDERED_ACCESS.index(access, 0, index)
+        except ValueError:
+            pass
+    return ORDERED_ACCESS[index]
+
+
 @overload
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: Literal[False] = False
 ) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: Literal[True]
 ) -> list[str]: ...
 
 
 def extract_categories_and_subcategories(
-    categories: list[dict[str, list[str]] | str],
+    categories: Sequence[dict[str, list[str]] | str],
     flattened: bool = False
 ) -> tuple[list[str], list[list[str]]] | list[str]:
     """
@@ -1609,8 +1818,13 @@ def extract_categories_and_subcategories(
             sub_cats.append([])
 
     if flattened:
-        return (cats +
-                [item for sublist in sub_cats if sublist for item in sublist])
+        cats.extend(
+            item
+            for sublist in sub_cats
+            if sublist
+            for item in sublist
+        )
+        return cats
 
     return cats, sub_cats
 
@@ -1639,3 +1853,118 @@ def get_current_tickets_url(request: OrgRequest) -> str:
         TicketCollection,
         state or {'handler': 'ALL', 'state': 'open', 'page': 0}
     )
+
+
+def invoice_items_for_submission(
+    request: CoreRequest,
+    form: Form,
+    submission: FormSubmission
+) -> list[InvoiceItemMeta]:
+
+    # NOTE: Eventually we may need something more sophisticated
+    vat_rate = Decimal(org.vat_rate) if (
+        getattr(submission.form, 'show_vat', False)
+        and (org := getattr(request.app, 'org', None))
+        and org.vat_rate
+    ) else None
+    extra = {'submission_id': submission.id}
+    items = form.invoice_items(extra=extra, vat_rate=vat_rate)
+    discounts = form.discount_items(extra=extra, vat_rate=vat_rate)
+
+    # for backwards compatibility we still support a raw price
+    # instead of a more complete invoice item
+    if 'invoice_item' in submission.meta:
+        items.insert(0, InvoiceItemMeta(**submission.meta['invoice_item']))
+    elif 'price' in submission.meta:
+        price = Price(**submission.meta['price'])
+        items.insert(0, InvoiceItemMeta(
+            text=request.translate(_('Lump sum')),
+            group='submission',
+            unit=price.amount,
+            vat_rate=vat_rate,
+        ))
+
+    total = InvoiceItemMeta.total(items)
+    if discounts:
+        remainder = total
+        for discount in discounts:
+            item = discount.apply_discount(total, remainder)
+            remainder += item.amount
+            assert remainder >= 0.0
+            items.append(item)
+        total = remainder
+
+    return items
+
+
+def currency_for_submission(form: Form, submission: FormSubmission) -> str:
+    if 'currency' in submission.meta:
+        return submission.meta['currency']
+
+    if 'price' in submission.meta:
+        return submission.meta['price'].get('currency', 'CHF')
+
+    # We just pick the first currency from any pricing rule we can find
+    # if we can't find any, then we fall back to 'CHF'. Although that
+    # should be an invalid form definition.
+    for field in form._fields.values():
+        if not hasattr(field, 'pricing'):
+            continue
+
+        rules = field.pricing.rules
+        if not rules:
+            continue
+
+        return next(iter(rules.values())).currency or 'CHF'
+    return 'CHF'
+
+
+def group_invoice_items[T: InvoiceItem | InvoiceItemMeta](
+    invoice_items: Iterable[T]
+) -> dict[str, list[T]]:
+
+    def sort_key(item: T) -> tuple[int, str]:
+        match item.group:
+            case 'submission' | 'reservation' | 'migration':
+                return 0, item.group
+            case 'form':
+                return 1, item.group
+            case 'manual' | 'reduced_amount':
+                return 99, 'manual'
+            case _:
+                return 2, item.group
+
+    return {
+        group: list(items)
+        for (__, group), items in groupby(
+            sorted(invoice_items, key=sort_key),
+            key=sort_key
+        )
+    }
+
+
+def can_change_username(
+    user: User,
+    request: OrgRequest,
+    configured_factors: Collection[str] | None = None
+) -> bool:
+    if not request.has_permission(user, Secret):
+        return False
+
+    if user.source:
+        return False
+
+    if user.role not in request.app.settings.user.change_username_roles:
+        return False
+
+    assert request.current_user is not None
+    second_factor = (request.current_user.second_factor or {}).get('type')
+    # NOTE: For now we only allow second factors that don't require multiple
+    #       steps, so we can do it all in a single form
+    if second_factor not in ('yubikey', 'totp'):
+        return False
+
+    if configured_factors is None:
+        configured_factors = Auth.from_request(request).factors
+
+    return second_factor in configured_factors

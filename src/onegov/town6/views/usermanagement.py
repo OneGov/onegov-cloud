@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from onegov.core.security import Secret
 
+from onegov.org.forms import ChangeUsernameForm, NewUserForm
 from onegov.org.views.usermanagement import (
     view_usermanagement, handle_create_signup_link, view_user,
-    handle_manage_user, get_manage_user_form, handle_new_user)
+    handle_manage_user, handle_change_username, get_manage_user_form,
+    handle_new_user)
 from onegov.town6 import TownApp
-from onegov.org.forms import NewUserForm
 from onegov.town6.layout import UserManagementLayout, UserLayout
 from onegov.user import User, UserCollection
 from onegov.user.forms import SignupLinkForm
@@ -52,8 +53,10 @@ def town_handle_create_signup_link(
 
 
 @TownApp.html(model=User, template='user.pt', permission=Secret)
-def town_view_user(self: User, request: TownRequest) -> RenderData:
-    return view_user(self, request, UserLayout(self, request))
+def town_view_user(self: User, request: TownRequest,
+                   layout: UserLayout | None = None) -> RenderData:
+    layout = layout or UserLayout(self, request)
+    return view_user(self, request, layout)
 
 
 @TownApp.form(
@@ -68,7 +71,26 @@ def town_handle_manage_user(
     request: TownRequest,
     form: ManageUserForm
 ) -> RenderData | Response:
+    layout = UserManagementLayout(self, request)
+    layout.edit_mode = True
     return handle_manage_user(
+        self, request, form, layout)
+
+
+@TownApp.form(
+    model=User,
+    template='form.pt',
+    form=ChangeUsernameForm,
+    pass_model=True,
+    permission=Secret,
+    name='change-username'
+)
+def town_handle_change_username(
+    self: User,
+    request: TownRequest,
+    form: ChangeUsernameForm
+) -> RenderData | Response:
+    return handle_change_username(
         self, request, form, UserManagementLayout(self, request))
 
 
@@ -84,5 +106,7 @@ def town_handle_new_user(
     request: TownRequest,
     form: NewUserForm
 ) -> RenderData:
+    layout = UserManagementLayout(self, request)
+    layout.edit_mode = True
     return handle_new_user(
-        self, request, form, UserManagementLayout(self, request))
+        self, request, form, layout)

@@ -1,53 +1,68 @@
+from __future__ import annotations
+
 import datetime
 
 from freezegun import freeze_time
-from sedate import utcnow
-
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template import get_template_default
 from onegov.fsi.models.course_subscription import CourseSubscription
+from sedate import utcnow
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from onegov.user import User
+    from sqlalchemy.orm import Session
+    from .conftest import Factory, FsiScenario
 
 
 def test_attendee(
-        session, attendee, future_course_event, member, course_event):
+    session: Session,
+    attendee: Factory[CourseAttendee],
+    future_course_event: Factory[CourseEvent],
+    member: Callable[[Session], User],
+    course_event: Factory[CourseEvent]
+) -> None:
     # past_event = course_event(session)
-    course_event = future_course_event(session)
-    attendee, data = attendee(session)
-    member = member(session)
-    assert attendee.subscriptions.count() == 0
-    assert attendee.possible_course_events().count() == 1
+    course_event_, _ = future_course_event(session)
+    attendee_, data = attendee(session)
+    member_ = member(session)
+    assert attendee_.subscriptions.count() == 0
+    assert attendee_.possible_course_events().count() == 1
 
-    assert attendee.user == member
-    assert member.attendee == attendee
+    assert attendee_.user == member_
+    assert member_.attendee == attendee_  # type: ignore[attr-defined]
 
     # Add a subscription
     subscription = CourseSubscription(
-        course_event_id=course_event[0].id, attendee_id=attendee.id)
+        course_event_id=course_event_.id, attendee_id=attendee_.id)
     session.add(subscription)
     session.flush()
-    assert attendee.subscriptions.count() == 1
-    assert course_event[0].start > utcnow()
-    assert attendee.course_events.first() == course_event[0]
-    assert attendee.possible_course_events().count() == 0
+    assert attendee_.subscriptions.count() == 1
+    assert course_event_.start > utcnow()
+    assert attendee_.course_events.first() == course_event_
+    assert attendee_.possible_course_events().count() == 0
 
     # Test subscription backref
-    assert subscription.attendee == attendee
+    assert subscription.attendee == attendee_
 
     # Check the event of the the subscription
-    assert attendee.subscriptions[0].course_event == course_event[0]
+    assert attendee_.subscriptions[0].course_event == course_event_
 
     # delete the subscription
-    attendee.subscriptions.remove(subscription)
+    attendee_.subscriptions.remove(subscription)
 
     # and add it differently
-    attendee.subscriptions.append(subscription)
-    assert attendee.subscriptions.count() == 1
+    attendee_.subscriptions.append(subscription)
+    assert attendee_.subscriptions.count() == 1
 
 
-def test_course_event(scenario):
+def test_course_event(scenario: FsiScenario) -> None:
     # if current date is last or second last day of the year, then freeze to
     # 28th of december
+    freeze_date: str | datetime.date
     if utcnow().date().month == 12 and utcnow().date().day in (30, 31):
         freeze_date = '2024-12-28'
     else:
@@ -109,33 +124,44 @@ def test_course_event(scenario):
         assert scenario.latest_course.future_events.count() == 2
 
 
-def test_subscription(session, attendee, course_event):
-    attendee = attendee(session)
-    course_event = course_event(session)
+def test_subscription(
+    session: Session,
+    attendee: Factory[CourseAttendee],
+    course_event: Factory[CourseEvent]
+) -> None:
+    attendee_, _ = attendee(session)
+    course_event_, _ = course_event(session)
     res = CourseSubscription(
-        course_event_id=course_event[0].id,
-        attendee_id=attendee[0].id
+        course_event_id=course_event_.id,
+        attendee_id=attendee_.id
     )
     session.add(res)
     session.flush()
 
     # Test backrefs
-    assert res.course_event == course_event[0]
-    assert res.attendee == attendee[0]
+    assert res.course_event == course_event_
+    assert res.attendee == attendee_
     assert str(res) == 'L, F'
 
 
-def test_cascading_event_deletion(session, db_mock_session):
+def test_cascading_event_deletion(
+    session: Session,
+    db_mock_session: Callable[[Session], Session]
+) -> None:
     # If a course event is deleted, all the subscriptions should be deleted
     session = db_mock_session(session)
     event = session.query(CourseEvent).first()
+    assert event is not None
     assert event.subscriptions.count() == 2
     session.delete(event)
     assert session.query(CourseSubscription).count() == 0
     assert event.subscriptions.count() == 0
 
 
-def test_cascading_attendee_deletion(session, db_mock_session):
+def test_cascading_attendee_deletion(
+    session: Session,
+    db_mock_session: Callable[[Session], Session]
+) -> None:
     # If an attendee is deleted, his reservations should be deleted
     session = db_mock_session(session)
     attendee = session.query(CourseAttendee).first()
@@ -144,7 +170,10 @@ def test_cascading_attendee_deletion(session, db_mock_session):
     assert session.query(CourseSubscription).count() == 1
 
 
-def test_notification_templates(session, course_event):
+def test_notification_templates(
+    session: Session,
+    course_event: Factory[CourseEvent]
+) -> None:
     event, data = course_event(session)
     assert len(event.notification_templates) == 4
     assert event.info_template

@@ -4,11 +4,13 @@ from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion
+from onegov.activity import ActivityInvoiceItem
 from onegov.activity import BookingCollection
-from onegov.activity import Invoice, InvoiceItem, InvoiceReference
-from onegov.activity import InvoiceCollection
+from onegov.activity import BookingPeriodInvoice
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.core.orm import as_selectable, as_selectable_from_path
 from onegov.core.utils import module_path
+from onegov.pay import InvoiceReference
 from onegov.user import User
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -18,11 +20,12 @@ from ulid import ULID
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
-    from onegov.activity.models import Period, PeriodMeta
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
+    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql.selectable import Alias
-    from typing import Self
+    from sqlalchemy.sql import Subquery
+    from typing import Protocol, Self
     from uuid import UUID
 
     class InvoicesByPeriodRow(NamedTuple):
@@ -48,13 +51,23 @@ if TYPE_CHECKING:
         invoice_outstanding: Decimal
         invoice_changes: Literal['possible', 'discouraged', 'impossible']
 
+    class HasBookingAttrs(Protocol):
+        @property
+        def username(self) -> str: ...
+        @property
+        def cost(self) -> Decimal | None: ...
+        @property
+        def occasion_id(self) -> UUID: ...
+        @property
+        def attendee_id(self) -> UUID: ...
+
 
 class BillingCollection:
 
     def __init__(
         self,
         request: FeriennetRequest,
-        period: Period | PeriodMeta,
+        period: BookingPeriod | BookingPeriodMeta,
         username: str | None = None,
         expand: bool = False,
         state: Literal['paid', 'unpaid'] | None = None
@@ -81,7 +94,7 @@ class BillingCollection:
     def period_id(self) -> UUID:
         return self.period.id
 
-    def for_period(self, period: Period) -> Self:
+    def for_period(self, period: BookingPeriod) -> Self:
         return self.__class__(
             self.request, period, self.username, self.expand, self.state)
 
@@ -98,15 +111,15 @@ class BillingCollection:
             self.request, self.period, self.username, self.expand, state)
 
     @property
-    def invoices_by_period_query(self) -> Alias:
+    def invoices_by_period_query(self) -> Subquery:
         return as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/invoices_by_period.sql'))
 
     @property
-    def invoices_by_period(self) -> Query[InvoicesByPeriodRow]:
+    def invoices_by_period(self) -> Result[InvoicesByPeriodRow]:
         invoices = self.invoices_by_period_query.c
 
-        query = select(invoices).where(invoices.period_id == self.period_id)
+        query = select(*invoices).where(invoices.period_id == self.period_id)
 
         if self.username:
             query = query.where(invoices.username == self.username)
@@ -132,7 +145,7 @@ class BillingCollection:
     @property
     def bills(self) -> dict[str, Bill]:
         bills = OrderedDict()
-        invoices = self.invoices_by_period
+        invoices = self.invoices_by_period.tuples()
 
         for username, items_ in groupby(invoices, lambda i: i.username):
             items = tuple(items_)
@@ -190,7 +203,7 @@ class BillingCollection:
                 group=group,
                 text=text,
                 unit=amount,
-                quantity=1,
+                quantity=Decimal('1'),
                 paid=False,
                 family=family
             )
@@ -210,7 +223,7 @@ class BillingCollection:
         text: str,
         user_id: UUID,
         amount: Decimal
-    ) -> InvoiceItem | None:
+    ) -> ActivityInvoiceItem | None:
         """ Includes a donation for the given user and period.
 
         Unlike manual positions, donations are supposed to be off/on per
@@ -224,7 +237,7 @@ class BillingCollection:
             self.invoices.query()
             .outerjoin(User)
             .filter(User.id == user_id)
-            .options(joinedload(Invoice.items))
+            .options(joinedload(BookingPeriodInvoice.items))
             .one()
         )
 
@@ -242,7 +255,7 @@ class BillingCollection:
             group='donation',
             text=text,
             unit=amount,
-            quantity=1,
+            quantity=Decimal('1'),
             paid=False
         )
 
@@ -251,7 +264,7 @@ class BillingCollection:
             self.invoices.query()
             .outerjoin(User)
             .filter(User.id == user_id)
-            .options(joinedload(Invoice.items))
+            .options(joinedload(BookingPeriodInvoice.items))
             .first()
         )
 
@@ -283,35 +296,36 @@ class BillingCollection:
         invoices = self.invoices
 
         # delete all existing invoices
-        invoice_ids = invoices.query().with_entities(Invoice.id).subquery()
+        invoice_ids = invoices.query().with_entities(
+            BookingPeriodInvoice.id).scalar_subquery()
 
         def delete_queries() -> Iterator[Query[Any]]:
             yield session.query(InvoiceReference).filter(
                 InvoiceReference.invoice_id.in_(invoice_ids))
 
-            yield session.query(InvoiceItem).filter(
-                InvoiceItem.invoice_id.in_(invoice_ids))
+            yield session.query(ActivityInvoiceItem).filter(
+                ActivityInvoiceItem.invoice_id.in_(invoice_ids))
 
             yield invoices.query()
 
-        for q in delete_queries():
-            q.delete('fetch')
+        for delete_query in delete_queries():
+            delete_query.delete('fetch')
 
         # regenerate the invoices
         bookings = BookingCollection(session, period_id=period.id)
 
-        q = bookings.query().with_entities(
+        query = bookings.query().with_entities(
             Booking.username,
             Booking.cost,
             Booking.occasion_id,
             Booking.attendee_id,
         )
-        q = q.filter(Booking.state == 'accepted')
+        query = query.filter(Booking.state == 'accepted')
 
         # create the invoices/items
         bridge = BookingInvoiceBridge(self.session, period)
 
-        for booking in q:
+        for booking in query:
             bridge.process(booking)
 
         bridge.complete(all_inclusive_booking_text)
@@ -338,7 +352,7 @@ class BookingInvoiceBridge:
     def __init__(
         self,
         session: Session,
-        period: Period | PeriodMeta
+        period: BookingPeriod | BookingPeriodMeta
     ) -> None:
         # tracks attendees which had at least one booking added through the
         # bridge (even if said booking was free)
@@ -347,7 +361,7 @@ class BookingInvoiceBridge:
         # init auxiliary tools
         self.session = session
         self.period = period
-        self.invoices = InvoiceCollection(session)
+        self.invoices = BookingPeriodInvoiceCollection(session)
 
         # preload data
         self.activities = {
@@ -361,8 +375,8 @@ class BookingInvoiceBridge:
         # holds invoices which existed already
         self.existing = {
             i.user.username: i for i in self.invoices.query()
-             .options(joinedload(Invoice.user))
-             .filter(Invoice.period_id == period.id)
+             .options(joinedload(BookingPeriodInvoice.user))
+             .filter(BookingPeriodInvoice.period_id == period.id)
         }
 
         # holds attendee ids which already had at least one item in this period
@@ -384,7 +398,7 @@ class BookingInvoiceBridge:
         """)
         self.billed_attendees = {
             r.attendee_id for r in session.execute(
-                select(stmt.c).where(stmt.c.period_id == period.id)
+                select(*stmt.c).where(stmt.c.period_id == period.id)
             )
         }
 
@@ -397,9 +411,9 @@ class BookingInvoiceBridge:
             )
         }
 
-        self.users = dict(session.query(User.username, User.id))
+        self.users = dict(session.query(User.username, User.id).tuples())
 
-    def process(self, booking: Booking) -> None:
+    def process(self, booking: HasBookingAttrs) -> None:
         """ Processes a single booking. This may be a tuple that includes
         the following fields, though a model may also work:
 
@@ -429,7 +443,7 @@ class BookingInvoiceBridge:
             text=self.activities[booking.occasion_id][0],
             organizer=self.activities[booking.occasion_id][1],
             unit=booking.cost,
-            quantity=1,
+            quantity=Decimal('1'),
             flush=False
         )
 
@@ -450,6 +464,6 @@ class BookingInvoiceBridge:
                     attendee_id=id,
                     text=all_inclusive_booking_text,
                     unit=self.period.booking_cost,
-                    quantity=1,
+                    quantity=Decimal('1'),
                     flush=False
                 )

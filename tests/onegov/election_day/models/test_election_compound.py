@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
+from decimal import Decimal
 from freezegun import freeze_time
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import CandidateResult
@@ -18,7 +21,15 @@ from pytz import UTC
 from uuid import uuid4
 
 
-def majorz_election():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from io import BytesIO
+    from onegov.election_day.types import DomainOfInfluence, Status
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def majorz_election() -> Election:
     # election
     election = Election(
         title='Majorz',
@@ -29,7 +40,7 @@ def majorz_election():
         number_of_mandates=1,
         absolute_majority=144
     )
-    election.title_translations['it_CH'] = 'Elezione'
+    election.title_translations['it_CH'] = 'Elezione'  # type: ignore[index]
 
     # candidates
     candidate_id_1 = uuid4()
@@ -81,16 +92,16 @@ def majorz_election():
 
 
 def proporz_election(
-        title='Proporz',
-        id='proporz',
-        shortcode='1',
-        domain='federation',
-        date_=None,
-        number_of_mandates=1,
-        absolute_majority=144,
-        status=None,
-        domain_supersegment=''
-):
+        title: str = 'Proporz',
+        id: str = 'proporz',
+        shortcode: str = '1',
+        domain: DomainOfInfluence = 'federation',
+        date_: date | None = None,
+        number_of_mandates: int = 1,
+        absolute_majority: int = 144,
+        status: Status | None = None,
+        domain_supersegment: str = ''
+) -> ProporzElection:
     date_ = date_ or date(2015, 6, 14)
 
     # election
@@ -105,7 +116,7 @@ def proporz_election(
         status=status,
         domain_supersegment=domain_supersegment
     )
-    election.title_translations['it_CH'] = 'Elezione'
+    election.title_translations['it_CH'] = 'Elezione'  # type: ignore[index]
 
     # lists
     list_id_1 = uuid4()
@@ -197,7 +208,7 @@ def proporz_election(
     return election
 
 
-def test_election_compound_model(session):
+def test_election_compound_model(session: Session) -> None:
     session.add(
         ElectionCompound(
             title='Legislative Elections',
@@ -256,7 +267,9 @@ def test_election_compound_model(session):
 
     election_compound.elections = list(session.query(Election).all())
     session.flush()
-    assert set([election.id for election in election_compound.elections]) == {
+    # undo mypy narrowing
+    election_compound = election_compound
+    assert {election.id for election in election_compound.elections} == {
         'first-election', 'second-election'
     }
     assert election_compound.last_result_change == last_result_change
@@ -342,6 +355,8 @@ def test_election_compound_model(session):
             )
         )
 
+    # undo mypy narrowing
+    election_compound = election_compound
     assert election_compound.counted is False
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
@@ -382,7 +397,9 @@ def test_election_compound_model(session):
     assert election_compound.completed is False
 
     # Set results as counted
-    session.query(ElectionResult).first().counted = True
+    session.query(ElectionResult).first().counted = True  # type: ignore[union-attr]
+    # undo mypy narrowing
+    election_compound = election_compound
     assert election_compound.counted is False
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
@@ -422,6 +439,8 @@ def test_election_compound_model(session):
 
     for result in session.query(ElectionResult):
         result.counted = True
+    # undo mypy narrowing
+    election_compound = election_compound
     assert election_compound.counted is True
     assert election_compound.progress == (2, 2)
     assert election_compound.counted_entities == [
@@ -460,12 +479,14 @@ def test_election_compound_model(session):
     election_compound.party_results = [party_result]
     assert election_compound.has_party_results is False
     party_result.votes = 10
+    # undo mypy narrowing
+    election_compound = election_compound
     assert election_compound.has_party_results is True
     party_result.votes = 0
-    party_result.voters_count = 10
+    party_result.voters_count = Decimal('10')
     assert election_compound.has_party_results is True
     party_result.votes = 0
-    party_result.voters_count = 0
+    party_result.voters_count = Decimal('0')
     party_result.number_of_mandates = 1
     assert election_compound.has_party_results is True
 
@@ -479,6 +500,8 @@ def test_election_compound_model(session):
     election_compound.party_panachage_results = [panachage_result]
     assert election_compound.has_party_panachage_results is False
 
+    # undo mypy narrowing
+    election_compound = election_compound
     panachage_result.votes = 10
     assert election_compound.has_party_panachage_results is True
 
@@ -486,6 +509,8 @@ def test_election_compound_model(session):
 
     # Clear results
     election_compound.clear_results(True)
+    # undo mypy narrowing
+    election_compound = election_compound
     assert election_compound.last_result_change is None
     assert election_compound.party_results == []
     assert election_compound.party_panachage_results == []
@@ -518,7 +543,7 @@ def test_election_compound_model(session):
     assert session.query(PartyPanachageResult).first() is None
 
 
-def test_election_compound_id_generation(session):
+def test_election_compound_id_generation(session: Session) -> None:
     election_compound = ElectionCompound(
         title='Legislative Elections',
         domain='canton',
@@ -548,7 +573,7 @@ def test_election_compound_id_generation(session):
     assert election_compound.id == 'leg-els'
 
 
-def test_election_compound_last_modified(session):
+def test_election_compound_last_modified(session: Session) -> None:
     with freeze_time("2001-01-01"):
         compound = ElectionCompound(
             title='Elections',
@@ -559,26 +584,29 @@ def test_election_compound_last_modified(session):
 
         session.add(compound)
         session.flush()
+        # undo mypy narrowing
+        compound = compound
+        assert compound.last_modified is not None
         assert compound.last_modified.isoformat().startswith('2001')
-        assert session.query(ElectionCompound.last_modified).scalar()\
-            .isoformat().startswith('2001')
+        assert session.query(ElectionCompound.last_modified
+            ).scalar().isoformat().startswith('2001')
 
     with freeze_time("2002-01-01"):
         compound.last_result_change = compound.timestamp()
         session.flush()
         assert compound.last_modified.isoformat().startswith('2002')
-        assert session.query(ElectionCompound.last_modified).scalar()\
-            .isoformat().startswith('2002')
+        assert session.query(ElectionCompound.last_modified
+            ).scalar().isoformat().startswith('2002')
 
     with freeze_time("2003-01-01"):
         compound.domain = 'federation'
         session.flush()
         assert compound.last_modified.isoformat().startswith('2003')
-        assert session.query(ElectionCompound.last_modified).scalar()\
-            .isoformat().startswith('2003')
+        assert session.query(ElectionCompound.last_modified
+            ).scalar().isoformat().startswith('2003')
 
 
-def test_related_election_compounds(session):
+def test_related_election_compounds(session: Session) -> None:
     first = ElectionCompound(
         title='First',
         domain='federation',
@@ -641,7 +669,11 @@ def test_related_election_compounds(session):
     assert session.query(ElectionCompoundRelationship).all() == []
 
 
-def test_election_compound_rename(election_day_app_zg, explanations_pdf):
+def test_election_compound_rename(
+    election_day_app_zg: TestApp,
+    explanations_pdf: BytesIO
+) -> None:
+
     session = election_day_app_zg.session()
 
     # Add data
@@ -708,7 +740,7 @@ def test_election_compound_rename(election_day_app_zg, explanations_pdf):
     ).distinct().all()
 
 
-def test_election_compound_manual_completion(session):
+def test_election_compound_manual_completion(session: Session) -> None:
 
     election_compound = ElectionCompound(
         title='Elections',
@@ -753,6 +785,8 @@ def test_election_compound_manual_completion(session):
 
     # Manual completion, not completed
     election_compound.completes_manually = True
+    # undo mypy narrowing
+    election_2 = election_2
     assert election_compound.manually_completed is False
     assert election_compound.completed is False
     assert election_compound.progress == (0, 2)
@@ -768,19 +802,24 @@ def test_election_compound_manual_completion(session):
     # Manual completion, completed
     election_compound.manually_completed = True
     election_1.status = 'interim'
+    # undo mypy narrowing
+    election_2 = election_2
     assert election_compound.completed is False
     assert election_compound.progress == (1, 2)
     assert election_1.completed is False
     assert election_2.completed is True
 
     election_1.status = 'final'
+    # undo mypy narrowing
+    election_compound = election_compound
+    election_1 = election_1
     assert election_compound.completed is True
     assert election_compound.progress == (2, 2)
     assert election_1.completed is True
     assert election_2.completed is True
 
 
-def test_election_compound_supersegment_progress(session):
+def test_election_compound_supersegment_progress(session: Session) -> None:
 
     election_compound = ElectionCompound(
         title='Elections',
@@ -788,7 +827,7 @@ def test_election_compound_supersegment_progress(session):
         domain='canton',
         date=date(2020, 3, 22),
     )
-    elections = [
+    elections: list[Election] = [
         proporz_election(
             title='Election 1',
             id='1',
@@ -830,7 +869,7 @@ def test_election_compound_supersegment_progress(session):
             domain_supersegment=''
         )
     ]
-    session.add_all([election_compound] + elections)
+    session.add_all([election_compound, *elections])
     session.flush()
 
     election_compound.elections = elections
@@ -844,9 +883,12 @@ def test_election_compound_supersegment_progress(session):
 
 
 def test_election_compound_attachments(
-    election_day_app_zg, explanations_pdf, upper_apportionment_pdf,
-    lower_apportionment_pdf
-):
+    election_day_app_zg: TestApp,
+    explanations_pdf: BytesIO,
+    upper_apportionment_pdf: BytesIO,
+    lower_apportionment_pdf: BytesIO
+) -> None:
+
     model = ElectionCompound(
         title='Legislative Elections',
         domain='canton',
@@ -861,20 +903,26 @@ def test_election_compound_attachments(
     del model.upper_apportionment_pdf
     del model.lower_apportionment_pdf
 
+    # undo mypy narrowing
+    model = model
+
     model.explanations_pdf = (explanations_pdf, 'e.pdf')
     file = model.explanations_pdf
+    assert file is not None
     assert file.name == 'explanations_pdf'
     assert file.reference.filename == 'e.pdf'
     assert file.reference.content_type == 'application/pdf'
 
     model.upper_apportionment_pdf = (upper_apportionment_pdf, 'u.pdf')
     file = model.upper_apportionment_pdf
+    assert file is not None
     assert file.name == 'upper_apportionment_pdf'
     assert file.reference.filename == 'u.pdf'
     assert file.reference.content_type == 'application/pdf'
 
     model.lower_apportionment_pdf = (lower_apportionment_pdf, 'l.pdf')
     file = model.lower_apportionment_pdf
+    assert file is not None
     assert file.name == 'lower_apportionment_pdf'
     assert file.reference.filename == 'l.pdf'
     assert file.reference.content_type == 'application/pdf'
@@ -888,7 +936,9 @@ def test_election_compound_attachments(
     assert model.lower_apportionment_pdf is None
 
 
-def test_election_compound_historical_party_strengths(session):
+def test_election_compound_historical_party_strengths(
+    session: Session
+) -> None:
     first = ElectionCompound(
         title='First',
         domain='federation',
@@ -973,7 +1023,9 @@ def test_election_compound_historical_party_strengths(session):
             )
         )
 
-    def extract(compound):
+    def extract(
+        compound: ElectionCompound
+    ) -> list[tuple[str | None, int, str]]:
         return sorted(
             (result.election_compound_id, result.year, result.party_id)
             for result in compound.historical_party_results

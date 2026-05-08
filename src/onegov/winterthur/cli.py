@@ -292,7 +292,7 @@ def import_mission_vehicles(
                 filename = data[id]['filename']
 
                 with symbol_path.open('rb') as f:
-                    vehicle.symbol = MissionReportFile(  # type:ignore[misc]
+                    vehicle.symbol = MissionReportFile(
                         id=random_token(),
                         name=filename,
                         reference=as_fileintent(

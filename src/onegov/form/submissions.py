@@ -8,21 +8,19 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import StrictOptional
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
     from onegov.form import Form
     from typing import TypeGuard
     from wtforms.fields.core import UnboundField
 
-_FormT = TypeVar('_FormT', bound='Form')
 
-
-def prepare_for_submission(
-        form_class: type[_FormT],
+def prepare_for_submission[T: Form](
+        form_class: type[T],
         for_change_request: bool = False,
         force_simple: bool = True,
-) -> type[_FormT]:
+) -> type[T]:
     # force all upload fields to be simple, we do not support the more
     # complex add/keep/replace widget, which is hard to properly support
     # and is not super useful in submissions

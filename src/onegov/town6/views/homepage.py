@@ -25,9 +25,11 @@ def town_view_org(
     # catch redirect
     if isinstance(view, Response):
         return view
-
-    chats = ChatCollection(request.session)
-    chat_link = request.link(chats, 'initiate')
+    if self.enable_chat == 'people_chat':
+        chats = ChatCollection(request.session)
+        chat_link = request.link(chats, 'initiate')
+    else:
+        chat_link = self.chat_link if self.chat_link else '#'
     view['chat_link'] = chat_link
 
     return view

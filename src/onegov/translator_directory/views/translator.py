@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from io import BytesIO
-from onegov.file import File
 from morepath import redirect
+from datetime import datetime
 from morepath.request import Response
 from sedate import utcnow
 from onegov.core.custom import json
@@ -11,7 +12,7 @@ from onegov.core.templates import render_template
 from onegov.file.integration import get_file
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import GeneralFileCollection
+from onegov.org.models import GeneralFile, GeneralFileCollection
 from onegov.org.models import TicketMessage
 from onegov.org.utils import emails_for_new_ticket
 from onegov.ticket import TicketCollection
@@ -19,9 +20,15 @@ from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
+from onegov.translator_directory.utils import (
+    get_accountant_emails_for_finanzstelle
+)
 from onegov.translator_directory.constants import (
     PROFESSIONAL_GUILDS, INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP)
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
+from onegov.translator_directory.forms.time_report import (
+    TranslatorTimeReportForm,
+)
 from onegov.translator_directory.forms.translator import (
     TranslatorForm, TranslatorSearchForm,
     EditorTranslatorForm, MailTemplatesForm)
@@ -29,18 +36,24 @@ from onegov.translator_directory.generate_docx import (
     fill_docx_with_variables, signature_for_mail_templates,
     parse_from_filename, get_ticket_nr_of_translator)
 from onegov.translator_directory.layout import (
-    AddTranslatorLayout, TranslatorCollectionLayout, TranslatorLayout,
-    EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
+    AddTranslatorLayout,
+    TranslatorCollectionLayout,
+    TranslatorLayout,
+    EditTranslatorLayout,
+    ReportTranslatorChangesLayout,
+    MailTemplatesLayout,
+)
+from onegov.translator_directory.models.time_report import TranslatorTimeReport
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import country_code_to_name
 
 from uuid import uuid4
-from xlsxwriter import Workbook  # type:ignore[import-untyped]
+from xlsxwriter import Workbook
 from docx.image.exceptions import UnrecognizedImageError
+from webob.exc import HTTPForbidden
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from datetime import date, datetime
     from collections.abc import Iterable
@@ -191,8 +204,9 @@ def export_translator_directory(
             return ''
         return ', '.join(mapping[n] for n in nationalities)
 
-    worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_('Translator directory'))
+    worksheet = workbook.add_worksheet(
+        request.translate(_('Translator directory'))
+    )
     worksheet.write_row(0, 0, (
         request.translate(_('Personal ID')),
         request.translate(_('Admission')),
@@ -422,9 +436,21 @@ def report_translator_change(
     form: TranslatorMutationForm
 ) -> RenderData | BaseResponse:
 
+    if request.is_member:
+        raise HTTPForbidden()
+
     if form.submitted(request):
         assert request.current_username is not None
         session = request.session
+
+        # Get uploaded files from the form
+        uploaded_files = form.get_files()
+        file_ids: list[str] = []
+        if uploaded_files:
+            self.files.extend(uploaded_files)
+            session.flush()
+            file_ids = [f.id for f in uploaded_files]
+
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
                 handler_code='TRN',
@@ -433,8 +459,9 @@ def report_translator_change(
                     'id': str(self.id),
                     'submitter_email': request.current_username,
                     'submitter_message': form.submitter_message.data,
-                    'proposed_changes': form.proposed_changes
-                }
+                    'proposed_changes': form.proposed_changes,
+                    'file_ids': file_ids,
+                },
             )
             TicketMessage.create(ticket, request, 'opened', 'external')
             ticket.create_snapshot(request)
@@ -463,7 +490,8 @@ def report_translator_change(
                 'event': 'browser-notification',
                 'title': request.translate(_('New ticket')),
                 'created': ticket.created.isoformat()
-            }
+            },
+            groupids=request.app.groupids_for_ticket(ticket),
         )
 
         request.success(_('Thank you for your submission!'))
@@ -491,6 +519,129 @@ def confirm_current_data(
     TranslatorCollection(request.app).confirm_current_data(self)
     request.success(_('Your data has been confirmed'))
     return redirect(request.link(self))
+
+
+@TranslatorDirectoryApp.form(
+    model=Translator,
+    template='form.pt',
+    name='add-time-report',
+    form=TranslatorTimeReportForm,
+    permission=Personal,
+)
+def add_time_report(
+    self: Translator,
+    request: TranslatorAppRequest,
+    form: TranslatorTimeReportForm,
+) -> RenderData | BaseResponse:
+
+    if form.submitted(request):
+
+        session = request.session
+        current_user = request.current_user
+
+        try:
+            accountant_emails = set(
+                get_accountant_emails_for_finanzstelle(
+                    request, form.finanzstelle.data
+                )
+            )
+        except ValueError as e:
+            request.warning(str(e))
+            return redirect(request.link(self))
+
+        report = TranslatorTimeReport(
+            translator=self,
+            created_by=current_user,
+            total_compensation=Decimal('0'),
+        )
+        session.add(report)
+        form.update_model(report)
+        session.flush()
+
+        assert request.current_username is not None
+
+        with session.no_autoflush:
+            ticket = TicketCollection(session).open_ticket(
+                handler_code='TRP',
+                handler_id=uuid4().hex,
+                handler_data={
+                    'translator_id': str(self.id),
+                    'submitter_email': request.current_username,
+                    'time_report_id': str(report.id),
+                },
+            )
+            TicketMessage.create(ticket, request, 'opened', 'external')
+            ticket.create_snapshot(request)
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_('Your ticket has been opened'),
+            receivers=(request.current_username,),
+            ticket=ticket,
+            send_self=True,
+        )
+
+        if self.email:
+            send_ticket_mail(
+                request=request,
+                template='mail_time_report_created_for_translator.pt',
+                subject=_('A time report has been submitted for you'),
+                receivers=(self.email,),
+                ticket=ticket,
+                content={
+                    'model': ticket,
+                    'translator': self,
+                    'time_report': report,
+                },
+            )
+
+        for email in emails_for_new_ticket(request, ticket):
+            if email in accountant_emails:
+                send_ticket_mail(
+                    request=request,
+                    template='mail_ticket_opened_info.pt',
+                    subject=_('New ticket'),
+                    ticket=ticket,
+                    receivers=(email,),
+                    content={'model': ticket},
+                )
+        for accountant_email in accountant_emails:
+            send_ticket_mail(
+                request=request,
+                template='mail_time_report_created_for_accountant.pt',
+                subject=_('New time report for review'),
+                ticket=ticket,
+                receivers=(accountant_email,),
+                content={
+                    'model': ticket,
+                    'translator': self,
+                    'time_report': report,
+                },
+            )
+
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket')),
+                'created': ticket.created.isoformat(),
+            },
+            groupids=request.app.groupids_for_ticket(ticket),
+        )
+
+        request.success(_('Time report submitted for review'))
+        return redirect(request.link(ticket, 'status'))
+
+    layout = TranslatorLayout(self, request)
+
+    return {
+        'layout': layout,
+        'model': self,
+        'form': form,
+        'title': _('Add Time Report'),
+        'button_text': request.translate(_('Submit Time Report')),
+    }
 
 
 @TranslatorDirectoryApp.form(
@@ -562,9 +713,9 @@ def view_mail_templates(
         docx_template_id = (
             GeneralFileCollection(request.session)
             .query()
-            .filter(File.name == template_name)
-            .with_entities(File.id)
-            .first()
+            .filter(GeneralFile.name == template_name)
+            .with_entities(GeneralFile.id)
+            .scalar()
         )
         docx_f = get_file(request.app, docx_template_id)
         assert docx_f is not None

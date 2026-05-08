@@ -6,13 +6,13 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.collections import VotumCollection
 from onegov.landsgemeinde.layouts.default import DefaultLayout
-
+from onegov.landsgemeinde.models import AgendaItem
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.landsgemeinde.models import AgendaItem
     from onegov.landsgemeinde.models import Votum
     from onegov.landsgemeinde.request import LandsgemeindeRequest
 
@@ -22,9 +22,10 @@ class AgendaItemCollectionLayout(DefaultLayout):
     @cached_property
     def title(self) -> str:
         return _(
-            'Agenda items of assembly from ${date}',
+            'Agenda items of ${assembly_type} from ${date}',
             mapping={
-                'date': self.format_date(self.model.date, 'date_long')
+                'date': self.format_date(self.model.date, 'date_long'),
+                'assembly_type': self.assembly_type
             }
         )
 
@@ -37,7 +38,7 @@ class AgendaItemCollectionLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(
@@ -65,6 +66,7 @@ class AgendaItemCollectionLayout(DefaultLayout):
         return None
 
 
+@LandsgemeindeApp.layout(model=AgendaItem)
 class AgendaItemLayout(DefaultLayout):
 
     model: AgendaItem
@@ -92,7 +94,7 @@ class AgendaItemLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Assemblies'),
+                self.assembly_type_plural,
                 self.request.link(self.assembly_collection())
             ),
             Link(

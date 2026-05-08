@@ -1,39 +1,32 @@
 from __future__ import annotations
 
-import uuid
+from datetime import datetime
 from functools import cached_property
-
-from sqlalchemy import exists, func
-from sqlalchemy.ext.hybrid import hybrid_property
-from sedate import utcnow
-
+from markupsafe import Markup
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
-from onegov.core.orm.types import UUID, MarkupText, UTCDateTime
+from onegov.core.orm.mixins import dict_property, content_property
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Text, ForeignKey
-from sqlalchemy.orm import RelationshipProperty, relationship
+from sedate import utcnow
+from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
-    import uuid
-    from datetime import datetime
-    from markupsafe import Markup
-
+    from onegov.org.models import MeetingItem
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
 
-    from onegov.org.models import PoliticalBusiness
-    from onegov.org.models import MeetingItem
-
 
 class Meeting(
-    AccessExtension,  # required??
+    AccessExtension,
     MultiAssociatedFiles,
     Base,
     ContentMixin,
@@ -43,76 +36,75 @@ class Meeting(
 
     __tablename__ = 'par_meetings'
 
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
-
-    __mapper_args__ = {
-        'polymorphic_on': type,
-        'polymorphic_identity': 'generic',
+    fts_type_title = _('Meetings')
+    fts_public = True
+    fts_title_property = 'display_name'
+    fts_properties = {
+        'title_text': {'type': 'text', 'weight': 'A'},
+        'display_name': {'type': 'text', 'weight': 'A'}
     }
 
-    es_public = True
-    es_properties = {'title_text': {'type': 'text'}}
+    @property
+    def fts_suggestion(self) -> list[str]:
+        return [self.title_text, self.display_name]
 
     @property
-    def es_suggestion(self) -> str:
-        return self.title
+    def fts_last_change(self) -> datetime | None:
+        # NOTE: More current meetings should be more relevant
+        # FIXME: Should we de-prioritize meetings without a date
+        #        or maybe even exclude them from search results?
+        #        Currently they would be as relevant as current
+        #        meetings.
+        return self.start_datetime
 
     @property
     def title_text(self) -> str:
-        return f'{self.title} ({self.start_datetime})'
+        if self.start_datetime is not None:
+            return f'{self.title} ({self.start_datetime})'
+        return self.title
+
+    @property
+    def display_name(self) -> str:
+        # return title and start_datetime as dmY
+        if self.start_datetime is not None:
+            return f'{self.title} {self.start_datetime:%d.%m.%Y}'
+        return self.title
 
     #: Internal ID
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
-        default=uuid.uuid4,
+        default=uuid4,
     )
 
     #: The title of the meeting
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: date and time of the meeting start
-    start_datetime: Column[datetime | None]
-    start_datetime = Column(UTCDateTime, nullable=True)
+    start_datetime: Mapped[datetime | None]
 
     #: date and time of the meeting end
-    end_datetime: Column[datetime | None]
-    end_datetime = Column(UTCDateTime, nullable=True)
+    end_datetime: Mapped[datetime | None]
 
     #: location address of meeting
-    address: Column[Markup] = Column(MarkupText, nullable=False)
+    address: Mapped[Markup]
 
-    description: Column[Markup | None] = Column(MarkupText, nullable=True)
+    description: Mapped[Markup | None]
 
-    #: political business id
-    political_business_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('par_political_businesses.id'),
-    )
-
-    #: list of political businesses, "Traktanden"
-    political_businesses: RelationshipProperty[PoliticalBusiness] = (
+    #: The meeting items
+    meeting_items: Mapped[list[MeetingItem]] = (
         relationship(
-            'PoliticalBusiness',
-            back_populates='meetings',
-            order_by='PoliticalBusiness.number',
-            primaryjoin='Meeting.political_business_id == '
-            'PoliticalBusiness.id',
+            'MeetingItem',
+            cascade='all, delete-orphan',
+            back_populates='meeting',
+            order_by='desc(MeetingItem.number)'
         )
     )
 
-    #: The meeting items
-    meeting_items: relationship[list[MeetingItem]]
-    meeting_items = relationship(
-        'MeetingItem',
-        cascade='all, delete-orphan',
-        back_populates='meeting',
-        order_by='desc(MeetingItem.number)'
-    )
+    #: link to audio url
+    audio_link: dict_property[str] = content_property(default='')
+
+    #: link to video url
+    video_link: dict_property[str] = content_property(default='')
 
     @hybrid_property
     def past(self):
@@ -120,7 +112,7 @@ class Meeting(
 
     @past.expression  # type:ignore[no-redef]
     def past(cls):
-        return exists.where(cls.start_datetime < func.now())
+        return cls.start_datetime < func.now()
 
     def __repr__(self) -> str:
         return f'<Meeting {self.title}, {self.start_datetime}>'

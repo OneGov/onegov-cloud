@@ -7,8 +7,7 @@ from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
 from onegov.org.forms.fields import HtmlField
-from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
+from onegov.form.validators import FileSizeLimit, MIME_TYPES_EXCEL
 from wtforms.fields import BooleanField
 from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
@@ -115,12 +114,12 @@ class NewsletterForm(Form):
                     'class_': 'recommended'
                 }
             )
-            show_news_as_tiles = BooleanField(
-                label=_('Show news as tiles'),
+            show_only_previews = BooleanField(
+                label=_('Show only lead of news'),
                 description=_(
-                    'If checked, news are displayed as tiles. Otherwise, '
-                    'news are listed in full length.'),
-                default=True
+                    'Only show the lead of the news and a "read more"'
+                    'link.'),
+                default=False
             )
 
             def update_model(
@@ -131,14 +130,12 @@ class NewsletterForm(Form):
 
                 super().update_model(model, request)
                 model.content['news'] = self.news.data
-                model.content['show_news_as_tiles'] = (
-                    self.show_news_as_tiles.data)
+                model.show_only_previews = self.show_only_previews.data
 
             def apply_model(self, model: Newsletter) -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
-                self.show_news_as_tiles.data = model.content.get(
-                    'show_news_as_tiles', True)
+                self.show_only_previews.data = model.show_only_previews
 
         return NewsletterWithNewsForm
 
@@ -358,21 +355,9 @@ class NewsletterSubscriberImportExportForm(Form):
         label=_('Import'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType({
-                'application/excel',
-                'application/vnd.ms-excel',
-                (
-                    'application/'
-                    'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                ),
-                'application/vnd.ms-office',
-                'application/octet-stream',
-                'application/zip',
-                'text/csv',
-                'text/plain',
-            }),
             FileSizeLimit(10 * 1024 * 1024)
         ],
+        allowed_mimetypes=MIME_TYPES_EXCEL,
         render_kw={'force_simple': True}
     )
 

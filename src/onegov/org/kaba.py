@@ -133,7 +133,8 @@ class KabaClient:
             timeout=(5, 10)
         )
         self.raise_for_status(res)
-        if res.json()['revoked'] is True:
+        data = res.json()
+        if data.get('revoked') is True or data.get('expired') is True:
             return
 
         res = self.session.post(

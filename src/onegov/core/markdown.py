@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import html
 
-from mistletoe import Document, HtmlRenderer  # type:ignore[import-untyped]
+from mistletoe import Document, HtmlRenderer
 from onegov.core.html import sanitize_html
 
 
@@ -12,10 +12,10 @@ if TYPE_CHECKING:
     from mistletoe.span_token import HTMLBlock, HTMLSpan  # type:ignore
 
 
-RENDERER_INSTANCES = {}
+RENDERER_INSTANCES: dict[type[HtmlRenderer], HtmlRenderer] = {}
 
 
-class HTMLRendererWithoutInlineHtml(HtmlRenderer):  # type:ignore[misc]
+class HTMLRendererWithoutInlineHtml(HtmlRenderer):
 
     @staticmethod
     def render_html_block(token: HTMLBlock) -> str:
@@ -42,7 +42,7 @@ def render_untrusted_markdown(
     markdown = markdown.replace('\r\n', '\n')
 
     # render html
-    html = renderer.render(Document(markdown))
+    html = renderer.render(Document(markdown))  # type:ignore[no-untyped-call]
 
     # clean it
     return sanitize_html(html)

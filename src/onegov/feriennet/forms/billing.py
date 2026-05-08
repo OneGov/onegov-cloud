@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from onegov.activity import Invoice
+from onegov.activity import BookingPeriodInvoice
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -19,7 +19,6 @@ from wtforms.validators import InputRequired
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from decimal import Decimal
-    from sqlalchemy.orm import Query
 
 
 class BillingForm(Form):
@@ -107,10 +106,11 @@ class ManualBookingForm(Form):
     def text(self) -> str | None:
         return self.booking_text.data
 
-    @property
-    def available_usernames(self) -> Query[tuple[str, str]]:
-        return (
-            self.usercollection.query()
+    @cached_property
+    def available_usernames(self) -> tuple[tuple[str, str], ...]:
+        return tuple(
+            (username, realname)
+            for username, realname in self.usercollection.query()
             .with_entities(User.username, User.realname)
             .filter(func.trim(func.coalesce(User.realname, '')) != '')
             .filter(User.active == True)
@@ -215,6 +215,6 @@ class PaymentWithDateForm(Form):
                 self.items.data = [i.id.hex for i in self.invoice.items]
 
     @cached_property
-    def invoice(self) -> Invoice:
+    def invoice(self) -> BookingPeriodInvoice:
         return self.request.session.query(
-            Invoice).filter_by(id=self.request.params['invoice-id']).one()
+            BookingPeriodInvoice).filter_by(id=self.request.params['invoice-id']).one()

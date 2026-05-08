@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from enum import Enum
 import inspect
-from operator import itemgetter
-
 import phonenumbers
 import sedate
 
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
 from datetime import timedelta
+from enum import Enum
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
-
+from onegov.core.custom import json
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
@@ -20,7 +18,7 @@ from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.utils import path_to_filename
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidPhoneNumber, WhitelistedMimeType
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import LinkPanelWidget
 from onegov.form.widgets import DurationInput
@@ -32,9 +30,11 @@ from onegov.form.widgets import PanelWidget
 from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
+from onegov.form.widgets import TreeSelectWidget
 from onegov.form.widgets import TypeAheadInput
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
+from operator import itemgetter
 from webcolors import name_to_hex, normalize_hex
 from werkzeug.datastructures import MultiDict
 from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
@@ -57,14 +57,15 @@ from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 
 from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import Collection
     from datetime import datetime
     from onegov.core.types import FileDict as StrictFileDict
     from onegov.file import File
     from onegov.form import Form
     from onegov.form.types import (
         FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
-    from typing import TypedDict, Self
+    from typing import NotRequired, TypedDict, Self
     from webob.request import _FieldStorageWithFile
     from wtforms.form import BaseForm
     from wtforms.meta import (
@@ -76,17 +77,29 @@ if TYPE_CHECKING:
         mimetype: str
         size: int
 
+    class TreeSelectNode(TypedDict):
+        name: str
+        value: str
+        children: Sequence[TreeSelectNode]
+        disabled: NotRequired[bool]
+        isGroupSelectable: NotRequired[bool]
+        htmlAttr: NotRequired[dict[str, str]]
+
     # this is only generic at type checking time
     class UploadMultipleBase(FieldList['UploadField']):
         pass
+
+    _TreeSelectMixinBase = SelectField
 else:
     UploadMultipleBase = FieldList
+    _TreeSelectMixinBase = object
 
 
 FIELDS_NO_RENDERED_PLACEHOLDER = (
     'MultiCheckboxField', 'RadioField', 'OrderedMultiCheckboxField',
     'UploadField', 'ChosenSelectField', 'ChosenSelectMultipleField',
-    'PreviewField', 'PanelField', 'UploadFileWithORMSupport'
+    'PreviewField', 'PanelField', 'UploadFileWithORMSupport',
+    'TreeSelectField', 'TreeSelectMultipleField'
 )
 
 
@@ -160,7 +173,12 @@ class URLField(StringField):
 
         # if no scheme was given, use the default scheme
         value = valuelist[0]
-        if value and self.default_scheme and '://' not in value:
+        if (
+            isinstance(value, str)
+            and value
+            and self.default_scheme
+            and '://' not in value
+        ):
             valuelist[0] = f'{self.default_scheme}://{value}'
 
         super().process_formdata(valuelist)
@@ -261,28 +279,54 @@ class UploadField(FileField):
     file: IO[bytes] | None
     filename: str | None
 
-    if TYPE_CHECKING:
-        def __init__(
-            self,
-            label: str | None = None,
-            validators: Validators[FormT, Self] | None = None,
-            filters: Sequence[Filter] = (),
-            description: str = '',
-            id: str | None = None,
-            default: Sequence[StrictFileDict] = (),
-            widget: Widget[Self] | None = None,
-            render_kw: dict[str, Any] | None = None,
-            name: str | None = None,
-            _form: BaseForm | None = None,
-            _prefix: str = '',
-            _translations: _SupportsGettextAndNgettext | None = None,
-            _meta: DefaultMeta | None = None,
-            # onegov specific kwargs that get popped off
-            *,
-            fieldset: str | None = None,
-            depends_on: Sequence[Any] | None = None,
-            pricing: PricingRules | None = None,
-        ): ...
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: StrictFileDict | None = None,
+        widget: Widget[Self] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        allowed_mimetypes: Collection[str] | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+    ):
+        if validators:
+            assert not any(isinstance(v, WhitelistedMimeType)
+                           for v in validators), (
+                'Use parameter "allowed_mimetypes" instead of adding a '
+                'WhitelistedMimeType validator directly'
+            )
+        if allowed_mimetypes:
+            self.mimetypes = set(allowed_mimetypes)
+        else:
+            self.mimetypes = set(WhitelistedMimeType.whitelist)
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
 
     # this is not quite accurate, since it is either a dictionary with all
     # the keys or none of the keys, which would make type narrowing easier
@@ -371,6 +415,18 @@ class UploadField(FileField):
         finally:
             self.file.seek(0)
 
+    def post_validate(
+        self,
+        form: BaseForm,
+        validation_stopped: bool
+    ) -> None:
+        if validation_stopped:
+            return
+        if self.data and self.mimetypes:
+            if self.data.get('mimetype') not in self.mimetypes:
+                raise ValidationError(_(
+                    'Files of this type are not supported.'))
+
 
 class UploadFileWithORMSupport(UploadField):
     """ Extends the upload field with onegov.file support. """
@@ -389,7 +445,7 @@ class UploadFileWithORMSupport(UploadField):
         self.file.filename = self.filename  # type:ignore[attr-defined]
         self.file.seek(0)
 
-        return self.file_class(  # type:ignore[misc]
+        return self.file_class(
             name=self.filename,
             reference=as_fileintent(self.file, self.filename)
         )
@@ -461,6 +517,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
         upload_widget: Widget[UploadField] | None = None,
+        allowed_mimetypes: Collection[str] | None = None,
         _form: BaseForm | None = None,
         _prefix: str = '',
         _translations: _SupportsGettextAndNgettext | None = None,
@@ -477,13 +534,19 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         if upload_widget is None:
             upload_widget = self.upload_widget
 
+        if allowed_mimetypes:
+            self.mimetypes = set(allowed_mimetypes)
+        else:
+            self.mimetypes = set(WhitelistedMimeType.whitelist)
+
         # a lot of the arguments we just pass through to the subfield
         unbound_field = self.upload_field_class(
-            validators=validators,  # type:ignore[arg-type]
             filters=filters,
             description=description,
             widget=upload_widget,
             render_kw=render_kw,
+            allowed_mimetypes=allowed_mimetypes,
+            validators=validators,  # type: ignore[arg-type]
             **extra_arguments
         )
         super().__init__(
@@ -680,14 +743,20 @@ class TagsField(StringField):
     #        passed in by the form or the object?! This seems like a bug
     data: str | list[str]  # type:ignore[assignment]
 
+    def _value(self) -> str:
+        # Without this override, we had the underlying data corrupted
+        # containing strings like ["['[]']"]
+        if isinstance(self.data, list):
+            return ','.join(self.data)
+        return self.data or ''
+
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
             self.data = []
             return
 
         values_str = valuelist[0]
-        if isinstance(values_str, str) and values_str != '[]':
-            # FIXME: Shouldn't this strip [] from the ends?
+        if isinstance(values_str, str) and values_str != '':
             values = (v.strip() for v in values_str.split(','))
             self.data = [v for v in values if v]
         else:
@@ -728,6 +797,102 @@ class PhoneNumberField(TelField):
             )
         except Exception:
             return self.data
+
+
+class _TreeSelectMixin(_TreeSelectMixinBase):
+
+    widget: TreeSelectWidget
+
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        coerce: Callable[[Any], Any] = str,
+        choices: Iterable[TreeSelectNode] | None = None,
+        validate_choice: bool = True,
+        *,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: object | None = None,
+        widget: Widget[Self] | None = None,
+        option_widget: Widget[SelectField._Option] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+        discount: dict[str, float] | None = None,
+    ) -> None:
+
+        if not render_kw:
+            render_kw = {}
+
+        if choices is None:
+            choices = []
+        elif not isinstance(choices, (list, tuple)):
+            choices = list(choices)
+
+        render_kw['data-choices'] = json.dumps(choices)
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            coerce=coerce,
+            choices=self.flatten_choices(choices) if choices else None,
+            validate_choice=validate_choice,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,
+            widget=widget,
+            option_widget=option_widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
+
+    def flatten_choices(
+        self,
+        choices: Iterable[TreeSelectNode]
+    ) -> Iterator[tuple[str, str]]:
+        multiple = self.widget.multiple
+        for choice in choices:
+            if not choice.get('disabled', False) and (
+                multiple or choice.get('isGroupSelectable', True)
+            ):
+                yield choice['value'], choice['name']
+            yield from self.flatten_choices(choice['children'])
+
+    def set_choices(self, choices: Iterable[TreeSelectNode]) -> None:
+        if not self.render_kw:
+            self.render_kw = {}
+
+        self.render_kw['data-choices'] = json.dumps(choices)
+        self.choices = list(self.flatten_choices(choices))
+        if not self.widget.multiple:
+            # NOTE: Add a blank choice so the field can be cleared
+            self.choices.insert(0, ('', ''))
+
+
+class TreeSelectField(_TreeSelectMixin, SelectField):
+    """ A select field with treeselectjs support. """
+
+    widget = TreeSelectWidget()
+
+
+class TreeSelectMultipleField(_TreeSelectMixin, SelectMultipleField):
+    """ A select field with treeselectjs support. """
+
+    widget = TreeSelectWidget(multiple=True)
 
 
 class ChosenSelectField(SelectField):
@@ -923,8 +1088,8 @@ class ColorField(StringField):
                 value = name_to_hex(value)
             return normalize_hex(value)
         except ValueError:
-            msg = self.gettext(_('Not a valid color.'))
-            raise ValueError(msg) from None
+            msg = _('Not a valid color.')
+            raise ValueError(self.gettext(msg)) from None
 
     def process_data(self, value: object) -> None:
         self.data = self.coerce(value)

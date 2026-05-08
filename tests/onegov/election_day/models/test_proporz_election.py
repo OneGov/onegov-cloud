@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import date
+from decimal import Decimal
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import CandidatePanachageResult
 from onegov.election_day.models import CandidateResult
@@ -15,7 +18,14 @@ from pytest import mark
 from uuid import uuid4
 
 
-def proporz_election():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from io import BytesIO
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
+def proporz_election() -> ProporzElection:
     eid = uuid4()
     pid = uuid4()
     cid = uuid4()
@@ -98,7 +108,7 @@ def proporz_election():
     )
 
     election.party_panachage_results.append(
-        PartyPanachageResult(target=lid, source=1, votes=0)
+        PartyPanachageResult(target=str(lid), source='1', votes=0)
     )
 
     election.last_result_change = election.timestamp()
@@ -106,7 +116,7 @@ def proporz_election():
     return election
 
 
-def test_proporz_election_create_all_models(session):
+def test_proporz_election_create_all_models(session: Session) -> None:
     election = ProporzElection(
         title="Election",
         domain='federation',
@@ -227,13 +237,17 @@ def test_proporz_election_create_all_models(session):
 
     assert connection.election == election
     assert connection.lists == []
-    assert connection.parent is None
-    assert connection.children == [subconnection]
+    if not TYPE_CHECKING:
+        # NOTE: Can't be true at type checking time
+        assert connection.parent is None
+    assert connection.children.all() == [subconnection]
 
-    assert subconnection.election is None
+    if not TYPE_CHECKING:
+        # NOTE: Can't be true at type checking time
+        assert subconnection.election is None
     assert subconnection.lists == [list_]
     assert subconnection.parent == connection
-    assert subconnection.children == []
+    assert subconnection.children.all() == []
 
     assert list_.candidates == [candidate]
     assert list_.results == [list_result]
@@ -255,7 +269,9 @@ def test_proporz_election_create_all_models(session):
 
     assert list_.panachage_results == [list_panachage_result]
 
-    assert list_panachage_result.source is None
+    if not TYPE_CHECKING:
+        # NOTE: Can't be true at type checking time
+        assert list_panachage_result.source is None
     assert list_panachage_result.target == list_
 
     assert candidate_result.election_result == election_result
@@ -275,7 +291,7 @@ def test_proporz_election_create_all_models(session):
     assert session.query(ListPanachageResult).all() == []
 
 
-def test_proporz_election_has_data(session):
+def test_proporz_election_has_data(session: Session) -> None:
     election = ProporzElection(
         title='Legislative Election',
         domain='federation',
@@ -337,6 +353,8 @@ def test_proporz_election_has_data(session):
     )
     assert election.has_lists_panachage_data is False
     list_panachage_result.votes = 10
+    # undo mypy narrowing
+    election = election
     assert election.has_lists_panachage_data is True
 
     # candidate panachage
@@ -355,6 +373,8 @@ def test_proporz_election_has_data(session):
     )
     assert election.has_candidate_panachage_data is False
     candidate_panachage_result.votes = 10
+    # undo mypy narrowing
+    election = election
     assert election.has_candidate_panachage_data is True
 
     # party results
@@ -369,12 +389,14 @@ def test_proporz_election_has_data(session):
     election.party_results = [party_result]
     assert election.has_party_results is False
     party_result.votes = 10
+    # undo mypy narrowing
+    election = election
     assert election.has_party_results is True
     party_result.votes = 0
-    party_result.voters_count = 10
+    party_result.voters_count = Decimal('10')
     assert election.has_party_results is True
     party_result.votes = 0
-    party_result.voters_count = 0
+    party_result.voters_count = Decimal('0')
     party_result.number_of_mandates = 1
     assert election.has_party_results is True
 
@@ -391,7 +413,7 @@ def test_proporz_election_has_data(session):
     assert election.has_party_panachage_results is True
 
 
-def test_proporz_election_results(session):
+def test_proporz_election_results(session: Session) -> None:
     election = ProporzElection(
         title='Election',
         domain='federation',
@@ -746,9 +768,9 @@ def test_proporz_election_results(session):
     votes = session.query(Candidate.votes, Candidate.family_name)
     votes = votes.order_by(Candidate.votes)
     assert [vote[0] for vote in votes] == expected
-    assert sorted(set((
-        (c.party, c.list.name) for c in election.candidates
-    ))) == [
+    assert sorted({
+        (c.party, c.list and c.list.name) for c in election.candidates
+    }) == [
         ('Democratic Party', 'Kwik-E-Major'),
         ('Democratic Party', 'Partey B'),
         ('Republican Party', 'Partey A'),
@@ -823,13 +845,13 @@ def test_proporz_election_results(session):
         ('1', 'Republican Party', 10, 1)
     ]
 
-    assert election.votes_by_district.all() == [
+    assert election.votes_by_district.all() == [  # type: ignore[comparison-overlap]
         ('election', None, [1, 2], True, 677)
     ]
 
 
 @mark.parametrize('clear_all', [True, False])
-def test_proporz_election_clear(clear_all, session):
+def test_proporz_election_clear(clear_all: bool, session: Session) -> None:
     election = proporz_election()
     session.add(election)
     session.flush()
@@ -857,6 +879,8 @@ def test_proporz_election_clear(clear_all, session):
 
     election.clear_results(clear_all)
 
+    # undo mypy narrowing
+    election = election
     assert election.last_result_change is None
     assert election.absolute_majority is None
     assert election.status is None
@@ -890,7 +914,11 @@ def test_proporz_election_clear(clear_all, session):
         assert session.query(ListConnection).first()
 
 
-def test_proporz_election_rename(election_day_app_zg, explanations_pdf):
+def test_proporz_election_rename(
+    election_day_app_zg: TestApp,
+    explanations_pdf: BytesIO
+) -> None:
+
     session = election_day_app_zg.session()
 
     election = proporz_election()
@@ -922,7 +950,11 @@ def test_proporz_election_rename(election_day_app_zg, explanations_pdf):
     ).distinct().scalar() == 'y'
 
 
-def test_proporz_election_attachments(election_day_app_zg, explanations_pdf):
+def test_proporz_election_attachments(
+    election_day_app_zg: TestApp,
+    explanations_pdf: BytesIO
+) -> None:
+
     model = ProporzElection(
         title='Election',
         domain='canton',
@@ -932,6 +964,9 @@ def test_proporz_election_attachments(election_day_app_zg, explanations_pdf):
     assert model.explanations_pdf is None
     del model.explanations_pdf
     model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    # undo mypy narrowing
+    model = model
+    assert model.explanations_pdf is not None
     assert model.explanations_pdf.name == 'explanations_pdf'
     assert model.explanations_pdf.reference.filename == 'explanations.pdf'
     assert model.explanations_pdf.reference.content_type == 'application/pdf'
@@ -939,7 +974,7 @@ def test_proporz_election_attachments(election_day_app_zg, explanations_pdf):
     assert model.explanations_pdf is None
 
 
-def test_proporz_election_historical_party_strengths(session):
+def test_proporz_election_historical_party_strengths(session: Session) -> None:
     first = ProporzElection(
         title='First',
         domain='federation',
@@ -1027,7 +1062,9 @@ def test_proporz_election_historical_party_strengths(session):
             )
         )
 
-    def extract(election):
+    def extract(
+        election: ProporzElection
+    ) -> list[tuple[str | None, int, str]]:
         return sorted(
             (result.election_id, result.year, result.party_id)
             for result in election.historical_party_results

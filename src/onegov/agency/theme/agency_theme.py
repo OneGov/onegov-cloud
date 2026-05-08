@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from onegov.core.utils import module_path
-from onegov.org.theme import OrgTheme
+from onegov.town6.theme import TownTheme
 
 
-class AgencyTheme(OrgTheme):
+class AgencyTheme(TownTheme):
     name = 'onegov.agency.foundation'
 
     @property

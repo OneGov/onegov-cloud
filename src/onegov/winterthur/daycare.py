@@ -788,14 +788,15 @@ class DaycareSubsidyCalculatorForm(Form):
     def daycare_choices(self) -> Iterator[tuple[str, str]]:
 
         def choice(daycare: Daycare) -> tuple[str, str]:
-            label = _((
+            label = _(
                 '${title} / day rate CHF ${rate} / '
-                '${weeks} weeks open per year'
-            ), mapping={
-                'title': daycare.title,
-                'rate': daycare.rate,
-                'weeks': daycare.weeks
-            })
+                '${weeks} weeks open per year',
+                mapping={
+                    'title': daycare.title,
+                    'rate': daycare.rate,
+                    'weeks': daycare.weeks
+                }
+            )
 
             return (daycare.id.hex, self.request.translate(label))
 

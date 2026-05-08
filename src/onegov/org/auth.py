@@ -5,6 +5,7 @@ import morepath
 from onegov.core.utils import relative_url
 from onegov.org import _, log
 from onegov.user.collections import TANCollection
+from onegov.user.models import TAN
 from sedate import utcnow
 
 
@@ -85,8 +86,15 @@ class MTANAuth:
 
         # record date and number in session
         request.browser_session.mtan_verified = utcnow()
-        request.browser_session.mtan_number = result.meta['mobile_number']
+        request.browser_session.mtan_number = mobile_number = result.meta[
+            'mobile_number']
 
-        # expire the tan we just used
+        # expire the TAN we just used
         result.expire()
+
+        # expire any other TANs issued to the same mobile number
+        for tan_obj in collection.query().filter(
+            TAN.meta['mobile_number'] == mobile_number
+        ):
+            tan_obj.expire()
         return result.meta.get('redirect_to', self.to)

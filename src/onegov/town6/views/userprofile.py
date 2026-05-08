@@ -27,10 +27,11 @@ if TYPE_CHECKING:
 def town_handle_user_profile(
     self: Organisation,
     request: TownRequest,
-    form: UserProfileForm
+    form: UserProfileForm,
+    layout: DefaultLayout | None = None
 ) -> RenderData | Response:
     return handle_user_profile(
-        self, request, form, DefaultLayout(self, request)
+        self, request, form, layout or DefaultLayout(self, request)
     )
 
 

@@ -12,33 +12,48 @@ from dateutil.rrule import rrulestr
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
+from math import isclose
+from os.path import splitext, basename
+
 from onegov.chat import TextModuleCollection
+from onegov.core import Framework
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
+from onegov.core.framework import layout_predicate
 from onegov.form.collection import SurveyCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify, paragraphify
-from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryCollection, Directory, DirectoryEntry
+from onegov.event import Event
+from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id
+from onegov.form import as_internal_id
+from onegov.form import FormCollection
+from onegov.form import FormDefinition
 from onegov.org.models.document_form import (
     FormDocument,
     FormDocumentCollection)
-from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.newsletter import Newsletter
+from onegov.newsletter import NewsletterCollection
+from onegov.newsletter import RecipientCollection
 from onegov.org import _
 from onegov.org import utils
+from onegov.org.app import OrgApp
 from onegov.org.exports.base import OrgExport
 from onegov.org.models import CitizenDashboard
+from onegov.org.models import Clipboard
 from onegov.org.models import ExportCollection, Editor
+from onegov.org.models import GeneralFile
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
+from onegov.org.models import ImageSet
 from onegov.org.models import ImageSetCollection
 from onegov.org.models import News
 from onegov.org.models import PageMove
@@ -47,27 +62,31 @@ from onegov.org.models import PublicationCollection
 from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models import Search
 from onegov.org.models import SiteCollection
+from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
 from onegov.org.theme.org_theme import user_options
-from onegov.org.utils import IMG_URLS, get_current_tickets_url
+from onegov.org.utils import can_change_username, get_current_tickets_url
+from onegov.org.utils import IMG_URLS
 from onegov.pay import PaymentCollection, PaymentProviderCollection
-from onegov.people import PersonCollection
+from onegov.people import PersonCollection, Person
 from onegov.qrcode import QrCode
+from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import Ticket
+from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
-from onegov.user import Auth, UserCollection, UserGroupCollection
+from onegov.user import Auth, User, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
 from operator import itemgetter
 from sedate import to_timezone
 from translationstring import TranslationString
 
-
 from typing import overload, Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -77,25 +96,19 @@ if TYPE_CHECKING:
     from onegov.core.security.permissions import Intent
     from onegov.core.templates import MacrosLookup
     from onegov.directory import DirectoryEntryCollection
-    from onegov.event import Event, Occurrence
-    from onegov.form import FormDefinition, FormSubmission
+    from onegov.form import FormSubmission
     from onegov.form.models.definition import (
         SurveySubmission, SurveyDefinition)
     from onegov.org.models import (
-        ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
-    from onegov.org.app import OrgApp
-    from onegov.org.request import OrgRequest, PageMeta
-    from onegov.reservation import Resource
-    from onegov.ticket import Ticket
-    from onegov.user import User, UserGroup
+        ExtendedDirectory, ExtendedDirectoryEntry, Organisation)
+    from onegov.org.request import OrgRequest
+    from onegov.org.request import PageMeta
+    from onegov.user import UserGroup
     from sedate.types import TzInfoOrName
-    from typing import TypeAlias, TypeVar
     from webob import Response
     from wtforms import Field
 
-    _T = TypeVar('_T')
-
-    AnyFormDefinitionOrCollection: TypeAlias = (
+    type AnyFormDefinitionOrCollection = (
         FormDefinition | FormCollection | SurveyCollection | SurveyDefinition
         | FormDocumentCollection | FormDocument)
 
@@ -288,6 +301,21 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         ]
 
     @cached_property
+    def files_url(self) -> str:
+        """ Returns the url to the files view. """
+        url = self.request.link(
+            GeneralFileCollection(self.request.session)
+        )
+        return self.csrf_protected_url(url)
+
+    def files_url_with_anchor(self, file: GeneralFile | None) -> str:
+        """ Returns the url to the files view including anchor. """
+        if file is None:
+            return self.files_url
+
+        return f'{self.files_url}#{file.name}'
+
+    @cached_property
     def file_upload_url(self) -> str:
         """ Returns the url to the file upload action. """
         url = self.request.link(
@@ -372,6 +400,15 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def newsletter_url(self) -> str:
         return self.request.class_link(NewsletterCollection)
+
+    def publications_url(self, year: int | str | None = None) -> str:
+        if year:
+            return self.request.class_link(
+                PublicationCollection,
+                variables={'year': str(year)},
+            )
+
+        return self.request.class_link(PublicationCollection)
 
     @cached_property
     def vat_rate(self) -> Decimal:
@@ -606,11 +643,28 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
         return time_range
 
+    def format_event_time_range(
+        self,
+        start: datetime | time,
+        end: datetime | time
+    ) -> str:
+
+        time_range = utils.render_time_range(start, end)
+
+        if time_range in ('00:00 - 24:00', '00:00 - 23:59'):
+            return self.request.translate(_('all day'))
+
+        suffix = self.request.translate(_("o'clock"))
+        return f'{time_range} {suffix}'
+
     def format_date_range(
         self,
-        start: date | datetime,
-        end: date | datetime
+        start: date | datetime | None,
+        end: date | datetime | None
     ) -> str:
+
+        if start is None and end is None:
+            return ''
 
         if start == end:
             return self.format_date(start, 'date')
@@ -773,11 +827,26 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         versions, hence this only works for town6.
         """
         default_icon = 'fa-file'
-        if '.' not in filename:
-            return default_icon
-
-        ext = filename.split('.')[1].lower()
+        ext = self.get_filename_extension(filename)
         return self.file_extension_fa_icon_mapping.get(ext, default_icon)
+
+    def get_filename_extension(self, filename: str) -> str:
+        """ Returns the filename extension. """
+        base = self.get_filename_without_extension(filename)
+        ext = filename.removeprefix(base).lstrip('.')
+        return ext.lower()
+
+    def get_filename_without_extension(self, filename: str) -> str:
+        """ Returns the filename stem (no extension)."""
+        name = basename(filename)
+        lower = name.lower()
+
+        # handle common compound extensions
+        for ext in ('.tar.gz', '.tar.bz2', '.tar.xz'):
+            if lower.endswith(ext):
+                return name[:-len(ext)]
+
+        return splitext(filename)[0]
 
 
 class DefaultLayoutMixin:
@@ -847,7 +916,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
         """ Returns the breadcrumbs for the current page. """
         return [Link(_('Homepage'), self.homepage_url)]
 
-    def exclude_invisible(self, items: Iterable[_T]) -> Sequence[_T]:
+    def exclude_invisible[T](self, items: Iterable[T]) -> Sequence[T]:
         items = self.request.exclude_invisible(items)
         if not self.request.is_manager:
             return tuple(i for i in items if getattr(i, 'published', True))
@@ -880,6 +949,17 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
                 url=self.request.link(self.model),
                 attrs={'class': 'cancel-link'}
             ),]
+
+
+# registers the `DefaultLayout` as the default layout for all models in
+# org. Look for this kind of decorator `@TownApp.layout(model=<ModelName>)`
+@OrgApp.predicate_fallback(Framework.get_layout, layout_predicate)
+def layout_not_found(
+    self: OrgApp,
+    obj: object,
+    request: OrgRequest
+) -> Layout:
+    return DefaultLayout(obj, request)
 
 
 class DefaultMailLayoutMixin:
@@ -1015,6 +1095,8 @@ class SettingsLayout(DefaultLayout):
 
         self.setting = setting
 
+    edit_mode = True
+
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         bc = [
@@ -1028,6 +1110,7 @@ class SettingsLayout(DefaultLayout):
         return bc
 
 
+@OrgApp.layout(model=Topic)
 class PageLayout(AdjacencyListLayout):
 
     @cached_property
@@ -1048,6 +1131,7 @@ class PageLayout(AdjacencyListLayout):
         return tuple(self.get_sidebar(type='topic'))
 
 
+@OrgApp.layout(model=News)
 class NewsLayout(AdjacencyListLayout):
 
     @cached_property
@@ -1310,6 +1394,22 @@ class FormCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=FormDefinition)
+class FormDefinitionLayout(DefaultLayout):
+
+    @property
+    def forms_url(self) -> str:
+        return self.request.class_link(FormCollection)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Forms'), self.forms_url),
+            Link(self.model.title, '#')
+        ]
+
+
 class SurveySubmissionWindowLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -1533,6 +1633,7 @@ class SurveyCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=FormDocument)
 class FormDocumentLayout(DefaultLayout):
 
     @cached_property
@@ -1628,7 +1729,11 @@ class PersonCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=Person)
 class PersonLayout(DefaultLayout):
+
+    model: Person
+    request: OrgRequest
 
     @cached_property
     def collection(self) -> PersonCollection:
@@ -1641,6 +1746,47 @@ class PersonLayout(DefaultLayout):
             Link(_('People'), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model))
         ]
+
+    @cached_property
+    def organisation_texts(self) -> list[str]:
+        excluded = self.request.app.org.excluded_person_fields(self.request)
+        if 'organisation' in excluded:
+            return []
+        person = self.model
+        parts: list[str] = []
+        if person.organisations_multiple:
+            parent_org: str | None = None
+            suborgs: list[str] = []
+
+            def add_part() -> None:
+                if parent_org is None:
+                    return
+
+                if suborgs:
+                    parts.append(f'{parent_org} - {", ".join(suborgs)}')
+                else:
+                    parts.append(parent_org)
+
+            for org in person.organisations_multiple:
+                if org.startswith('-'):
+                    suborgs.append(org.lstrip('-'))
+                elif parent_org is None:
+                    parent_org = org
+                    suborgs = []
+                else:
+                    add_part()
+                    parent_org = org
+                    suborgs = []
+            add_part()  # add final part
+            return parts
+
+        if person.organisation and person.sub_organisation:
+            parts.append(f'{person.organisation} - {person.sub_organisation}')
+        elif person.organisation:
+            parts.append(person.organisation)
+        elif person.sub_organisation:
+            parts.append(person.sub_organisation)
+        return parts
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -1690,7 +1836,11 @@ class ArchivedTicketsLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), '#')
+            Link(_('Tickets'), self.request.class_link(
+                TicketCollection,
+                {'handler': self.model.handler, 'state': 'open'}
+            )),
+            Link(_('Archived Tickets'), '#')
         ]
 
     @cached_property
@@ -1725,8 +1875,8 @@ class ArchivedTicketsLayout(DefaultLayout):
         return links
 
 
+@OrgApp.layout(model=Ticket)
 class TicketLayout(DefaultLayout):
-
     model: Ticket
 
     def __init__(self, model: Ticket, request: OrgRequest) -> None:
@@ -1747,12 +1897,17 @@ class TicketLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        if self.request.is_manager_for_model(self.model):
-
-            links: list[Link | LinkGroup]
+        links: list[Link | LinkGroup] = []
+        if is_manager := self.request.is_manager_for_model(self.model):
 
             # only show the model related links when the ticket is pending
-            if self.model.state == 'pending':
+            # or if the handler explicitly allows it for closed tickets
+            show_links_when_closed = getattr(
+                self.model.handler, 'show_links_when_closed', False
+            )
+            if self.model.state == 'pending' or (
+                self.model.state == 'closed' and show_links_when_closed
+            ):
                 # FIXME: This is a weird discrepancy where we unsafely change
                 #        the API for Handler.get_links inside onegov.org, not
                 #        sure what to do about this. We should probably move
@@ -1777,37 +1932,47 @@ class TicketLayout(DefaultLayout):
                 ))
 
             elif self.model.state == 'pending':
-                traits: Sequence[Trait] = ()
+                if self.model.handler_code != 'TRP':
+                    traits: Sequence[Trait] = ()
 
-                if self.model.handler.undecided:
-                    traits = (
-                        Block(
-                            _("This ticket can't be closed."),
-                            _(
-                                'This ticket requires a decision, but no '
-                                'decision has been made yet.'
+                    if self.model.handler.undecided:
+                        traits = (
+                            Block(
+                                _("This ticket can't be closed."),
+                                _(
+                                    'This ticket requires a decision, '
+                                    'but no decision has been made yet.'
+                                ),
+                                _('Cancel'),
                             ),
-                            _('Cancel')
-                        ),
+                        )
+
+                    links.append(
+                        Link(
+                            text=_('Close ticket'),
+                            url=self.request.link(self.model, 'close'),
+                            attrs={'class': ('ticket-button', 'ticket-close')},
+                            traits=traits,
+                        )
                     )
 
-                links.append(Link(
-                    text=_('Close ticket'),
-                    url=self.request.link(self.model, 'close'),
-                    attrs={'class': ('ticket-button', 'ticket-close')},
-                    traits=traits
-                ))
-
             elif self.model.state == 'closed':
-                links.append(Link(
-                    text=_('Reopen ticket'),
-                    url=self.request.link(self.model, 'reopen'),
-                    attrs={'class': ('ticket-button', 'ticket-reopen')}
-                ))
-                links.append(Link(
-                    text=_('Archive ticket'),
-                    url=self.request.link(self.model, 'archive'),
-                    attrs={'class': ('ticket-button', 'ticket-archive')})
+                if self.model.handler.reopenable:
+                    links.append(
+                        Link(
+                            text=_('Reopen ticket'),
+                            url=self.request.link(self.model, 'reopen'),
+                            attrs={
+                                'class': ('ticket-button', 'ticket-reopen')
+                            },
+                        )
+                    )
+                links.append(
+                    Link(
+                        text=_('Archive ticket'),
+                        url=self.request.link(self.model, 'archive'),
+                        attrs={'class': ('ticket-button', 'ticket-archive')},
+                    )
                 )
             elif self.model.state == 'archived':
                 links.append(Link(
@@ -1830,6 +1995,7 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': ('ticket-button', 'ticket-assign')},
                 ))
 
+        if self.request.is_logged_in:
             # ticket notes are always enabled
             links.append(
                 Link(
@@ -1838,24 +2004,43 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'new-note'}
                 )
             )
-            links.append(
-                Link(
-                    text=_('PDF'),
-                    url=self.request.link(self.model, 'pdf'),
-                    attrs={'class': 'ticket-pdf'}
-                )
-            )
-            if self.has_submission_files:
+            if getattr(self.model, 'order_id', None) is not None:
+                links.append(LinkGroup(
+                    title=_('PDF'),
+                    links=[
+                        Link(
+                            text=_('Only this ticket'),
+                            url=self.request.link(self.model, 'pdf'),
+                            attrs={'class': 'ticket-pdf'}
+                        ),
+                        Link(
+                            text=_('With related tickets'),
+                            url=self.request.link(
+                                self.model, 'related-tickets-pdf'),
+                            attrs={'class': 'ticket-pdf'}
+                        ),
+                    ],
+                    classes=['ticket-pdf']
+                ))
+            else:
                 links.append(
                     Link(
-                        text=_('Download files'),
-                        url=self.request.link(self.model, 'files'),
-                        attrs={'class': 'ticket-files'}
+                        text=_('PDF'),
+                        url=self.request.link(self.model, 'pdf'),
+                        attrs={'class': 'ticket-pdf'}
                     )
                 )
 
-            return links
-        return None
+        if is_manager and self.has_submission_files:
+            links.append(
+                Link(
+                    text=_('Download files'),
+                    url=self.request.link(self.model, 'files'),
+                    attrs={'class': 'ticket-files'}
+                )
+            )
+
+        return links or None
 
     @cached_property
     def has_submission_files(self) -> bool:
@@ -1950,6 +2135,50 @@ class TicketChatMessageLayout(DefaultLayout):
             Link(_('Ticket Status'), self.request.link(self.model, 'status')),
             Link(_('New Message'), '#')
         ]
+
+
+class TicketInvoiceLayout(DefaultLayout):
+
+    model: Ticket
+
+    def __init__(self, model: Ticket, request: OrgRequest) -> None:
+        super().__init__(model, request)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Tickets'), get_current_tickets_url(self.request)),
+            Link(self.model.number, self.request.link(self.model)),
+            Link(_('Invoice'), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager_for_model(self.model):
+            payment = self.model.payment
+            if payment is not None and (
+                payment.source != 'manual'
+                or payment.state != 'open'
+            ):
+                return None
+
+            return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Discount / Surcharge'),
+                            url=self.request.link(
+                                self.model,
+                                name='add-invoice-item'
+                            ),
+                            attrs={'class': 'new-invoice-item'}
+                        )
+                    ]
+                ),
+            ]
+        return None
 
 
 class TextModulesLayout(DefaultLayout):
@@ -2191,8 +2420,8 @@ class ResourceRecipientsFormLayout(DefaultLayout):
         ]
 
 
+@OrgApp.layout(model=Resource)
 class ResourceLayout(DefaultLayout):
-
     model: Resource
 
     def __init__(self, model: Resource, request: OrgRequest) -> None:
@@ -2395,7 +2624,7 @@ class AllocationEditFormLayout(DefaultLayout):
             if not self.request.is_manager:
                 return
 
-            if self.model.availability == 100.0:
+            if isclose(self.model.availability, 100.0, abs_tol=.005):
                 yield Link(
                     _('Delete'),
                     self.csrf_protected_url(
@@ -2527,8 +2756,8 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
         return list(links())
 
 
+@OrgApp.layout(model=Occurrence)
 class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
-
     app: OrgApp
     request: OrgRequest
     model: Occurrence
@@ -2642,8 +2871,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
         return None
 
 
+@OrgApp.layout(model=Event)
 class EventLayout(EventLayoutMixin, DefaultLayout):
-
     app: OrgApp
     request: OrgRequest
     model: Event
@@ -2756,6 +2985,7 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
         return [edit_link, delete_link]
 
 
+@OrgApp.layout(model=Newsletter)
 class NewsletterLayout(DefaultLayout):
 
     @cached_property
@@ -2778,6 +3008,12 @@ class NewsletterLayout(DefaultLayout):
                 Link(_('Homepage'), self.homepage_url),
                 Link(_('Newsletter'), self.request.link(self.collection)),
                 Link(_('New'), '#')
+            ]
+        if self.is_collection and self.view_name == 'new-paste':
+            return [
+                Link(_('Homepage'), self.homepage_url),
+                Link(_('Newsletter'), self.request.link(self.collection)),
+                Link(_('Paste'), '#'),
             ]
         if self.is_collection and self.view_name == 'update':
             return [
@@ -2803,7 +3039,7 @@ class NewsletterLayout(DefaultLayout):
             return None
 
         if self.is_collection:
-            return [
+            links: list[Link | LinkGroup] = [
                 Link(
                     text=_('Subscribers'),
                     url=self.request.link(self.recipients),
@@ -2815,6 +3051,23 @@ class NewsletterLayout(DefaultLayout):
                         self.request.app.org, 'newsletter-settings'),
                     attrs={'class': 'settings-link'}
                 ),
+            ]
+
+            if self.request.browser_session.has('clipboard_url'):
+                clipboard = Clipboard.from_session(self.request)
+                source = clipboard.get_object()
+                if source is None:
+                    clipboard.clear()
+                elif isinstance(source, Newsletter):
+                    links.append(
+                        Link(
+                            text=_('Paste'),
+                            url=self.request.link(self.model, 'new-paste'),
+                            attrs={'class': 'paste-link'},
+                        )
+                    )
+
+            links.append(
                 LinkGroup(
                     title=_('Add'),
                     links=[
@@ -2827,8 +3080,10 @@ class NewsletterLayout(DefaultLayout):
                             attrs={'class': 'new-newsletter'}
                         ),
                     ]
-                ),
-            ]
+                )
+            )
+
+            return links
         else:
             if self.view_name == 'send':
                 return []
@@ -2845,6 +3100,15 @@ class NewsletterLayout(DefaultLayout):
                     attrs={'class': 'test-link'}
                 ),
                 Link(
+                    text=_('Copy'),
+                    url=self.request.link(
+                        Clipboard.from_url(
+                            self.request, self.request.path_info or ''
+                        )
+                    ),
+                    attrs={'class': 'copy-link'},
+                ),
+                Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
@@ -2857,9 +3121,10 @@ class NewsletterLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete "{}"?'.format(
-                                self.model.title
-                            )),
+                            _(
+                                'Do you really want to delete "${title}"?',
+                                mapping={'title': self.model.title}
+                            ),
                             _('This cannot be undone.'),
                             _('Delete newsletter'),
                             _('Cancel')
@@ -2942,8 +3207,8 @@ class ImageSetCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=ImageSet)
 class ImageSetLayout(DefaultLayout):
-
     model: ImageSet
 
     def __init__(self, model: ImageSet, request: OrgRequest) -> None:
@@ -2987,9 +3252,10 @@ class ImageSetLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete "{}"?'.format(
-                                self.model.title
-                            )),
+                            _(
+                                'Do you really want to delete "${title}"?',
+                                mapping={'title': self.model.title}
+                            ),
                             _('This cannot be undone.'),
                             _('Delete photo album'),
                             _('Cancel')
@@ -3010,7 +3276,10 @@ class UserManagementLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Usermanagement'), self.request.class_link(UserCollection))
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
         ]
 
     @cached_property
@@ -3049,8 +3318,8 @@ class UserManagementLayout(DefaultLayout):
         return links
 
 
+@OrgApp.layout(model=User)
 class UserLayout(DefaultLayout):
-
     if TYPE_CHECKING:
         model: User
 
@@ -3060,21 +3329,33 @@ class UserLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Usermanagement'), self.request.class_link(UserCollection)),
+            Link(_('Usermanagement'), self.request.class_link(
+                UserCollection,
+                variables={'active': '1'}
+        )),
             Link(self.model.title, self.request.link(self.model))
         ]
 
     @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup] | None:
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
         if self.request.is_admin and not self.model.source:
-            return [
+            links.append(
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
-                ),
-            ]
-        return None
+                )
+            )
+        if can_change_username(self.model, self.request):
+            links.append(
+                Link(
+                    text=_('Change username'),
+                    url=self.request.link(self.model, 'change-username'),
+                    attrs={'class': 'edit-link'}
+                )
+            )
+        return links
 
 
 class UserGroupCollectionLayout(DefaultLayout):
@@ -3266,6 +3547,37 @@ class PaymentCollectionLayout(DefaultLayout):
         return links
 
 
+class TicketInvoiceCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Invoices'), self.request.class_link(
+                TicketInvoiceCollection
+            ))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
+
+        if self.request.is_manager_for_model(self.model):
+
+            links.append(
+                Link(
+                    text=_('Export Bill run as PDF'),
+                    url=self.request.link(
+                        self.model,
+                        query_params={'format': 'pdf'}
+                    ),
+                    attrs={'class': 'ticket-pdf'}
+                )
+            )
+
+        return links
+
+
 class MessageCollectionLayout(DefaultLayout):
     def __init__(self, model: Any, request: OrgRequest) -> None:
         super().__init__(model, request)
@@ -3302,7 +3614,7 @@ class DirectoryCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Directories'), '#')
+            Link(_('Directories'), '#'),
         ]
 
     @cached_property
@@ -3324,6 +3636,20 @@ class DirectoryCollectionLayout(DefaultLayout):
                 ),
             ]
         return None
+
+
+@OrgApp.layout(model=Directory)
+class DirectoryLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Directories'), self.request.class_link(
+                DirectoryCollection
+            )),
+            Link(self.model.title, '#')
+        ]
 
 
 class DirectoryEntryMixin:
@@ -3560,6 +3886,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         )
 
 
+@OrgApp.layout(model=DirectoryEntry)
 class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
     request: OrgRequest
     model: ExtendedDirectoryEntry
@@ -3696,8 +4023,33 @@ class DashboardLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Dashboard'), '#')
+            Link(_('Overview'), '#')
         ]
+
+
+@OrgApp.layout(model=GeneralFile)
+class GeneralFileLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> Sequence[Link]:
+        name = self.model.name[:40]
+        if len(name) == 40:
+            name = name[:37] + '...'
+
+        links = [Link(_('Homepage'), self.homepage_url)]
+        if self.request.is_manager:
+            links.append(Link(_('Files'), self.files_url))
+
+        if (
+            self.model.published
+            and self.model.publication
+            and self.model.claimed_extension == 'pdf'
+        ):
+            year = self.model.created.strftime('%Y')
+            links.append(Link(_('Publications'), self.publications_url(year)))
+
+        links.append(Link(name, '#'))
+        return links
 
 
 class GeneralFileCollectionLayout(DefaultLayout):
@@ -3763,14 +4115,30 @@ class HomepageLayout(DefaultLayout):
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
                 ),
-                Link(
-                    _('Add'),
-                    self.request.link(Editor('new-root', self.model, 'page')),
-                    attrs={'class': ('new-page')},
-                    classes=(
-                        'new-page',
-                        'show-new-content-placeholder'
-                    ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=(
+                        Link(
+                            _('Topic'),
+                            self.request.link(
+                                Editor('new-root', self.model, 'page')),
+                            attrs={'class': ('new-page')},
+                            classes=(
+                                'new-page',
+                                'show-new-content-placeholder'
+                            ),
+                        ),
+                        Link(
+                            _('Link'),
+                            self.request.link(
+                                Editor('new-root', self.model, 'link')),
+                            attrs={'class': 'new-root-link'},
+                            classes=(
+                                'new-root-link',
+                                'show-new-content-placeholder'
+                            )
+                        )
+                    )
                 ),
             ]
         return None

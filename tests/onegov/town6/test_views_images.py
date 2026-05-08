@@ -1,9 +1,15 @@
-from webtest import Upload
+from __future__ import annotations
 
+from webtest import Upload
 from tests.shared.utils import create_image, get_meta
 
 
-def test_view_images(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_view_images(client: Client) -> None:
     assert client.get('/images', expect_errors=True).status_code == 403
 
     client.login_admin()
@@ -24,7 +30,7 @@ def test_view_images(client):
     img_url = images_page.pyquery('.image-container a').attr('href')
 
     # Test Open Graph meta properties
-    social_media = client.get('/social-media-settings')
+    social_media = client.get('/appearance-settings')
 
     social_media.form['og_logo_default'] = img_url
     social_media.form.submit().follow()

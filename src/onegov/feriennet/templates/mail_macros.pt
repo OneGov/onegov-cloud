@@ -14,7 +14,7 @@
             </p>
             <p>
                 <a href="${sponsors[0].mail_url}" style="margin-bottom: 0; display: flex;" class="banner-mail">
-                    <img src="${sponsors[0].banners.src}">
+                    <img src="${sponsors[0].banners.narrow}">
                 </a>
             </p>
             <p style="margin-bottom: 0;">

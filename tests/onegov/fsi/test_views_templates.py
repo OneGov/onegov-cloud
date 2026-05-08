@@ -1,12 +1,20 @@
+from __future__ import annotations
+
 import os
 
 from onegov.fsi.models.course_notification_template import InfoTemplate
 
 
-def test_send_template(client_with_db):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_send_template(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     info_template = session.query(InfoTemplate).first()
+    assert info_template is not None
     view = f'/fsi/template/{info_template.id}/send'
     client.login_editor()
     client.get(view, status=403)
@@ -23,10 +31,11 @@ def test_send_template(client_with_db):
         assert "Bitte beachten sie die untenstehenden Informationen." in text
 
 
-def test_embed_template(client_with_db):
+def test_embed_template(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()
     info_template = session.query(InfoTemplate).first()
+    assert info_template is not None
     view = f'/fsi/template/{info_template.id}/embed'
     client.login_editor()
     client.get(view, status=403)

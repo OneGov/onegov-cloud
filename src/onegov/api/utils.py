@@ -30,11 +30,7 @@ def authenticate(request: CoreRequest) -> ApiKey:
         except jwt.ExpiredSignatureError as exception:
             raise HTTPUnauthorized() from exception
 
-    # NOTE: This leads to a new query every time we call this function
-    #       which is not ideal. But it will be fixed with SQLAlchemy 1.4+
-    #       since we then can use `session.get(ApiKey, data['id'])`
-    #       which uses a cache, so the query will only be emitted once.
-    api_key = request.session.query(ApiKey).get(data['id'])
+    api_key = request.session.get(ApiKey, data['id'])
     if api_key is None:
         raise HTTPClientError()
 

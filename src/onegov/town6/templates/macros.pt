@@ -90,7 +90,7 @@
 </metal:navigation>
 
 <metal:navigation define-macro="side-navigation">
-    <ul class="vertical menu side-navigation drilldown"  data-drildown data-auto-height="true" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
+    <ul class="vertical menu side-navigation drilldown" data-auto-height="true" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
         <li tal:repeat="(nav_page, link, children) links" data-sortable-id="${nav_page.id}">
             <metal:b use-macro="layout.macros['side_navigation_nested']" />
         </li>
@@ -130,7 +130,7 @@
         <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links">
             <li tal:repeat="group editbar_links|layout.editbar_links">
                 <tal:b condition="group.links|nothing">
-                    <a href="#">${group.title}</a>
+                    <a href="#" class="${' '.join(group.classes or ())}">${group.title}</a>
                     <ul class="menu">
                         <li tal:repeat="link group.links">
                             <tal:b replace="link(layout)" />
@@ -181,7 +181,9 @@
 <metal:footer_columns define-macro="footer_columns">
     <tal:b define="contact layout.org.contact_html|nothing;
         contact_url layout.org.contact_url|nothing;
+        contact_url_label layout.org.contact_url_label|nothing;
         opening_hours layout.org.opening_hours_html|nothing;
+        opening_hours_url_label layout.org.opening_hours_url_label|nothing;
         opening_hours_url layout.org.opening_hours_url|nothing;
         facebook layout.org.facebook_url|nothing;
         twitter layout.org.twitter_url|nothing;
@@ -222,27 +224,32 @@
 <metal:footer_custom_links define-macro="footer_custom_links">
     <tal:b define="custom_links layout.custom_links">
         <tal:b tal:condition="custom_links" tal:repeat="link custom_links">
-            <h5 class="custom-links"><a href="${link[1]}">${link[0]}</a></h5>
+            <h5 class="custom-links"><a class="footer-link" href="${link[1]}">${link[0]}</a></h5>
         </tal:b>
     </tal:b>
 </metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
 <div class="medium-4 cell"></div>
-<div class="small-12 medium-4 cell footer-links">
-    <tal:b tal:condition="not request.app.org.hide_onegov_footer|True">
+<div class="small-12 medium-6 cell footer-links">
+    <tal:b condition="not request.app.org.hide_onegov_footer|True">
         <span>
-            <a href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
+            <a class="footer-link" href="https://www.admin.digital">OneGov Cloud</a> | <a class="footer-link" href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
         <br/>
         <span>
-            <a href="https://www.admin.digital/datenschutz" i18n:translate>
+            <a class="footer-link" href="https://www.admin.digital/datenschutz" i18n:translate>
                 Privacy Protection
+            </a>
+        </span>
+        <span tal:condition="request.app.org.impressum_url|None">
+            <a class="footer-link" href="${request.app.org.impressum_url}" i18n:translate>
+                Impressum
             </a>
         </span>
     </tal:b>
     <span tal:condition="not request.is_logged_in">
-        <a href="${layout.login_from_path()}" i18n:translate>
+        <a class="footer-link" href="${layout.login_from_path()}" i18n:translate>
             Login
         </a>
     </span>
@@ -252,7 +259,7 @@
         </a>
     </span>
     <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
-        <a href="${about_url}" i18n:translate>
+        <a class="footer-link" href="${about_url}" i18n:translate>
             About
         </a>
     </span>
@@ -262,13 +269,23 @@
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="contact or contact_url">Contact</h5>
     <div tal:content="layout.org.contact_html" />
-    <a tal:condition="contact_url" tal:attributes="href contact_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url">
+        <strong>
+            <tal:b tal:condition="not contact_url_label|nothing" i18n:translate>more</tal:b>…
+            <tal:b tal:condition="contact_url_label|nothing" i18n:translate tal:content="contact_url_label" />…
+        </strong>
+    </a>
 </metal:footer_contact>
 
 <metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h5>
     <div tal:content="opening_hours" />
-    <a tal:condition="opening_hours_url" tal:attributes="href opening_hours_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
+    <a class="footer-link" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">
+        <strong>
+            <tal:b tal:condition="not opening_hours_url_label|nothing" i18n:translate>more</tal:b>…
+            <tal:b tal:condition="opening_hours_url_label|nothing" i18n:translate tal:content="opening_hours_url_label" />…
+        </strong>
+    </a>
 </metal:footer_opening_hours>
 
 <metal:footer_social_media define-macro="footer_social_media">
@@ -284,32 +301,32 @@
         <h5 i18n:translate>Social Media</h5>
         <ul class="social-media-links">
             <li tal:condition="facebook">
-                <a tal:attributes="href facebook">
+                <a class="footer-link" tal:attributes="href facebook">
                     <i class="fab fa-facebook fa-fw"></i> Facebook
                 </a>
             </li>
             <li tal:condition="twitter">
-                <a tal:attributes="href twitter">
+                <a class="footer-link" tal:attributes="href twitter">
                     <i class="fab fa-twitter fa-fw"></i> Twitter
                 </a>
             </li>
             <li tal:condition="instagram">
-                <a tal:attributes="href instagram">
+                <a class="footer-link" tal:attributes="href instagram">
                     <i class="fab fa-instagram fa-fw"></i> Instagram
                 </a>
             </li>
             <li tal:condition="youtube">
-                <a tal:attributes="href youtube">
+                <a class="footer-link" tal:attributes="href youtube">
                     <i class="fab fa-youtube fa-fw"></i> YouTube
                 </a>
             </li>
             <li tal:condition="linkedin">
-                <a tal:attributes="href linkedin">
+                <a class="footer-link" tal:attributes="href linkedin">
                     <i class="fab fa-linkedin fa-fw"></i> LinkedIn
                 </a>
             </li>
             <li tal:condition="tiktok">
-                <a tal:attributes="href tiktok">
+                <a class="footer-link" tal:attributes="href tiktok">
                     <i class="fab fa-tiktok fa-fw"></i> TikTok
                 </a>
             </li>
@@ -322,8 +339,8 @@
         <h5>Languages</h5>
         <div class="text-links">
             <tal:b repeat="(name, url) layout.locales">
-                <a tal:condition="request.locale not in url" href="${url}">${name}</a>
-                <a tal:condition="request.locale in url" style="cursor: default"><strong>${name}</strong></a>
+                <a class="footer-link" tal:condition="request.locale not in url" href="${url}">${name}</a>
+                <a class="footer-link" tal:condition="request.locale in url" style="cursor: default"><strong>${name}</strong></a>
             </tal:b>
         </div>
     </div>
@@ -447,7 +464,7 @@
             <tal:b condition="button_text|nothing">
                 <input type="submit" value="${button_text}" class="button" role="button">
             </tal:b>
-            <a tal:condition="not hide_cancel|False" class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
+            <a tal:condition="not hide_cancel|False" class="cancel-link" href="#" data-back-link> <span i18n:translate="">Cancel</span></a>
         </tal:b>
     </form>
 </metal:form>
@@ -591,12 +608,12 @@
 
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
-    <div tal:condition="newsletter.show_news_as_tiles|True and news" class="newslist grid-x grid-padding-x align-center" >
+    <div tal:condition="newsletter.show_only_previews|True and news" class="newslist grid-x grid-padding-x align-center" >
         <div class="cell small-12 medium-${md_span|6} large-${lg_span|4} news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
     </div>
-    <div tal:condition="not: newsletter.show_news_as_tiles|True" class="newslist grid-x align-center" tal:repeat="item news">
+    <div tal:condition="not: newsletter.show_only_previews|True" class="newslist grid-x align-center" tal:repeat="item news">
         <metal:newlist use-macro="layout.macros['news-item-full']" tal:define="heading 'h4'" />
     </div>
     <div class="newslist grid-x align-center">
@@ -719,10 +736,10 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
-    <div class="small-12 medium-4 cell sidebar medium-offset-1 ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
+    <div tal:condition="no_sidebar_offset|False" class="small-12 medium-4 cell sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
     tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <div class="sidebar-wrapper">
-            <div metal:define-slot="before-panels"></div>
+            <tal:b metal:define-slot="before-panels"></tal:b>
             <div tal:define="hide page.hide_contact|hide_contact|False" class="side-panel contact-panel" tal:condition="not hide and contact or coordinates or location">
                 <div tal:condition="contact and not hide">
                     <h3 i18n:translate>Contact</h3>
@@ -740,7 +757,7 @@
                 </div>
                 <br tal:condition="coordinates and contact" />
                 <h3 i18n:translate tal:condition="not contact">Map</h3>
-                <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
+                <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br>
                 <div class="location" tal:condition="location">${location}</div>
             </div>
             <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
@@ -774,7 +791,7 @@
                     <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
                         <a class="list-link" title="${file.name}" href="${request.link(file)}">
                             <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                            <span class="list-title">${file.name.split('.')[0]}</span>
+                            <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
                         </a>
                     </li>
                 </ul>
@@ -832,7 +849,10 @@
                     </li>
                 </ul>
             </div>
-
+            <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}">
+                <h3 i18n:translate>Content</h3>
+                <ul class="more-list"></ul>
+            </div>
             <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
 
         </div>
@@ -840,7 +860,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None;">
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
@@ -895,7 +915,7 @@
                     </div>
                 </div>
             </div>
-            <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False" />
+            <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
         </tal:b>
     </div>
 </metal:page_content>
@@ -909,7 +929,11 @@
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
         </tal:b>
     </div>
-    <tal:b condition="price|nothing">
+    <tal:b tal:condition="invoice_items|nothing">
+        <h2 i18n:translate>Invoice Items</h2>
+        <tal:b metal:use-macro="layout.macros['invoice_items']" />
+    </tal:b>
+    <tal:b tal:condition="price|nothing">
         <dl class="field-display">
             <dt i18n:translate>Total Amount</dt>
             <dd><metal:b use-macro="layout.macros['price']" /></dd>
@@ -1249,7 +1273,7 @@
     </div>
 </metal:payment_status>
 
-<metal:payment_status define-macro="payment_source" i18n:domain="onegov.town6">
+<metal:payment_source define-macro="payment_source" i18n:domain="onegov.town6">
     <div i18n:translate tal:condition="payment.source == 'manual'">
         Manual
     </div>
@@ -1268,7 +1292,7 @@
             Worldline Saferpay
         </a>
     </div>
-</metal:payment_status>
+</metal:payment_source>
 
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.town6">
     <div tal:condition="ticket">
@@ -1278,7 +1302,7 @@
 </metal:ticket_callout>
 
 <metal:pagination define-macro="pagination" i18n:domain="onegov.town6">
-    <nav  aria-label="Pagination" tal:define="centered pagination_centered|False; name collection.name_of_view">
+    <nav aria-label="Pagination" tal:define="centered pagination_centered|False; name collection.name_of_view">
         <ul class="pagination ${'text-center' if centered else ''}" tal:condition="collection.pages_count > 1">
             <tal:b repeat="page collection.pages">
                 <tal:b define="
@@ -1451,7 +1475,7 @@
         <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
-                <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
+                <ul tal:repeat="filter event.filter_keywords_ordered().items()" class="no-margin-bottom">
                     <li tal:condition="filter[1]">
                         <span>${filter[0].title()}:</span>
                         <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
@@ -1542,14 +1566,13 @@
 <metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
     <div class="occurrence subpage-cards medium-12 small-12 cell" tal:define="use_links use_links|True">
         <div class="card">
-            <a href="${use_links and request.link(occurrence)}">
-                <div class="show-for-small-only" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: cover;"></div>
+            <a tal:attributes="href request.link(occurrence) if use_links else None">
+                <div class="show-for-small-only" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat;"></div>
                 <div class="grid-x align-middle">
                     <div class="cell medium-7 card-section">
                         <h5>${occurrence.title}</h5>
                         <tal:b tal:define="
                             date occurrence.localized_start;
-                            link use_links and request.link(occurrence)
                         ">
                             <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
 
@@ -1569,7 +1592,7 @@
                                     <div class="cell small-1 medium-2">
                                         <i class="fa fa-clock"></i>
                                     </div>
-                                    <div class="cell small-11 medium-10" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
+                                    <div class="cell small-11 medium-10" tal:define="time layout.format_event_time_range(occurrence.localized_start, occurrence.localized_end)">
                                         <div> ${time[0].upper()}${time[1:]}</div>
                                     </div>
                                 </div>
@@ -1601,7 +1624,7 @@
                         </tal:b>
                     </div>
                     <div class="cell medium-5 align-self-top">
-                        <div class="show-for-medium" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: cover; border-radius: 0 .7rem;"></div>
+                        <div class="show-for-medium" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat; border-radius: 0 .7rem;"></div>
                         <span class="button hollow event-more-link" style="margin: 1.5rem 1rem 1.5rem 0.7rem; display: block;" i18n:translate="">Learn more</span>
                     </div>
                 </div>
@@ -1728,31 +1751,55 @@
 </metal:photoswipe>
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
-    <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}"
-    >
-        <video id="autoplay-video" autoplay playsinline loop muted
-            data-link-mp4="${link_mp4}"
-            data-link-mp4-low-res="${link_mp4_low_res}"
-            data-link-webm="${link_webm}"
-            data-link-webm-low-res="${link_webm_low_res}"
-        >
-            Your browser does not support the video tag.
-        </video>
-        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
-            <div class="dark-overlay" tal:condition="text"></div>
-            <div class="grid-container" tal:condition="text">
-                <div class="text">
-                    <p tal:condition="text and button_url">
-                        <tal:b >
-                            <span>${text}</span>
-                        </tal:b>
-                    </p>
-                    <tal:b tal:condition="text and not button_url">
-                        <span>${text}</span>
-                    </tal:b>
-                    <tal:b tal:condition="button_url|False">
-                        <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
-                    </tal:b>
+    <div class="homepage-video-container">
+        <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}" tal:define="searchbox searchbox|'true';">
+            <video id="autoplay-video" autoplay playsinline loop muted
+                data-link-mp4="${link_mp4}"
+                data-link-mp4-low-res="${link_mp4_low_res}"
+                data-link-webm="${link_webm}"
+                data-link-webm-low-res="${link_webm_low_res}"
+            >
+                Your browser does not support the video tag.
+            </video>
+            <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
+                <div class="dark-overlay" tal:condition="text">
+                    <div class="grid-container text-container" tal:condition="text">
+                        <div class="text">
+                            <p tal:condition="text and button_url">
+                                <tal:b >
+                                    <span>${text}</span>
+                                </tal:b>
+                            </p>
+                            <tal:b tal:condition="text and not button_url">
+                                <span>${text}</span>
+                            </tal:b>
+                            <tal:b tal:condition="button_url|False">
+                                <a class="button" href="${button_url}">${button_text}<tal:b condition="not: button_text" i18n:translate="">Show more</tal:b></a>
+                            </tal:b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homepage-searchbox-wrapper ${searchbox_position|''}" tal:condition="not searchbox == 'false'|True">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x">
+                    <div class="cell small-12 medium-6 large-5">
+                        <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                            <div class="input-group">
+                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                                <div class="typeahead">
+                                    <div class="cell small-12" data-typeahead-container>
+                                    </div>
+                                </div>
+                                <div class="input-group-button">
+                                    <button class="button" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1790,8 +1837,8 @@
         </div>
 </metal:icon_links>
 
-<metal:slider define-macro="slider" i18n:domain="onegov.town6">
-    <div tal:condition="images" class="orbit slider homepage-image-slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
+<metal:slider define-macro="slider" i18n:domain="onegov.town6" tal:define="searchbox searchbox|'true';">
+    <div tal:condition="images" class="orbit slider homepage-image-slider ${'' if searchbox == 'false' else 'with-searchbox'}" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
         <div class="orbit-wrapper">
             <div tal:condition="images and len(images) > 1" class="orbit-controls show-for-medium">
                 <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
@@ -1802,11 +1849,11 @@
                     <figure class="orbit-figure">
                         <div class="orbit-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
                         <div class="dark-overlay" tal:condition="image.note"></div>
-                        <div class="grid-container" tal:condition="image.note">
+                        <div class="grid-container text-container" tal:condition="image.note">
                             <div class="text">
                                 <span>${image.note}</span>
                             </div>
-                        </div>
+                      </div>
                     </figure>
                 </li>
             </ul>
@@ -1819,6 +1866,28 @@
                 This space holds images from your photo-albums. To show photos add a few
                 photos to an album and mark it as available for the homepage.
             </tal:b>
+        </div>
+    </div>
+    <div class="homepage-searchbox-wrapper" tal:condition="len(images) and not searchbox == 'false'|True">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x">
+                <div class="cell small-12 medium-6 large-7">
+                    <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                        <div class="input-group">
+                            <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                            <div class="typeahead">
+                                <div class="cell small-12" data-typeahead-container>
+                                </div>
+                            </div>
+                            <div class="input-group-button">
+                                <button class="button" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </metal:slider>
@@ -1895,15 +1964,40 @@
     </div>
 </metal:bullets>
 
+<metal:search_results define-macro="search_results" i18n:domain="onegov.town6">
+    <ul class="more-list search-results">
+        <tal:b repeat="result model.load_batch_results">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
+                <tal:b
+                    define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
+                    metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
+                />
+            </li>
+        </tal:b>
+    </ul>
+</metal:search_results>
+
+<metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
+    <div tal:condition="result_layout and len(result_layout.breadcrumbs) > 1" tal:define="links result_layout.breadcrumbs">
+        <ul class="breadcrumbs search-breadcrumbs">
+            <tal:b repeat="link links">
+                <li class="breadcrumb-item">
+                    ${link(result_layout).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
+                </li>
+            </tal:b>
+        </ul>
+    </div>
+</metal:search_breadcrumbs>
+
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
     <a href="${request.return_here(request.link(result))}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-    <p class="search-preview">
+    <div class="search-preview">
         ${translate(result.role.capitalize())}
-    </p>
+    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_users>
-
 
 <metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.town6">
     <a class="list-link" href="${request.return_here(request.link(result))}">
@@ -1912,7 +2006,7 @@
         </h5>
     </a>
     <a href="${request.return_here(request.link(result))}">
-        <p class="search-preview">
+        <div class="search-preview">
             <tal:b condition="result.signed">
                 <span i18n:translate>Has a digital seal</span>,
             </tal:b>
@@ -1925,10 +2019,10 @@
                     <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
                 </tal:b>
             </span>
-        </p>
+        </div>
     </a>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_files>
-
 
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town6">
     <a class="list-link" href="${request.link(result)}">
@@ -1944,6 +2038,7 @@
             <tal:b tal:content="result.subtitle"></tal:b>
         </p>
     </a>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_tickets>
 
 
@@ -1988,6 +2083,7 @@
                 </div></li>
         </ul>
     </tal:b>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result.latest_occurrence)" />
 </metal:search_result_events>
 
 
@@ -1995,9 +2091,57 @@
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-        <p class="search-preview" tal:condition="result.function|nothing">${result.function}</p>
-        <p class="search-preview" tal:condition="not:result.function|nothing" i18n:translate>People</p>
+    <div class="search-preview" tal:condition="result.function|nothing"><i>${result.function}</i></div>
+    <tal:b tal:define="result_layout request.get_layout(result)">
+        <div class="search-preview" tal:condition="result_layout.organisation_texts|nothing" tal:repeat="org result_layout.organisation_texts">
+            <span i18n:attributes="title" title="Organisation">${org}</span>
+        </div>
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" />
+    </tal:b>
 </metal:search_result_people>
+
+
+<metal:search_result_par_parliamentarians define-macro="search_result_par_parliamentarians" i18n:domain="onegov.town6">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.function|nothing">${result.function}</div>
+    <div class="search-preview" tal:condition="not:result.active|nothing" i18n:translate>Former member or parliament</div>
+    <div class="search-preview" tal:condition="result.roles|nothing" tal:repeat="role result.roles">
+        <div class="search-preview" tal:condition="role.role_label">
+            <span>${role.role_label}</span> <span i18n:translate>Parliament</span>
+        </div>
+        <div tal:condition="role.parliamentary_group">
+            ${role.parliamentary_group_role_label}
+            <span i18n:translate>Parliamentary Group</span>
+            ${role.parliamentary_group.title}
+        </div>
+    </div>
+    <div class="search-preview" tal:condition="result.commission_memberships|nothing" tal:repeat="role result.commission_memberships">
+        <span>${role.role_label}</span> <span>${role.commission.title}
+    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
+</metal:search_result_par_parliamentarians>
+
+
+<metal:search_result_par_political_businesses define-macro="search_result_par_political_businesses" i18n:domain="onegov.town6">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.number|nothing">
+        <span><tal:b i18n:translate>Number</tal:b>:</span>
+        <span>${result.number}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.entry_date|nothing">
+        <span><tal:b i18n:translate>Date</tal:b>:</span>
+        <span>${layout.format_date(result.entry_date, 'date')}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.status|nothing">
+        <span><tal:b i18n:translate>Status</tal:b>:</span>
+        <span>${result.status.capitalize()}</span>
+    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
+</metal:search_result_par_political_businesses>
 
 
 <metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
@@ -2018,10 +2162,11 @@
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
     <a tal:condition="result.lead|None" href="${request.link(result)}">
-        <p class="search-preview">
-            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-        </p>
+        <div class="search-preview">
+            ${result.lead[:260]}<tal:b condition="len(result.lead) > 260">…</tal:b>
+        </div>
     </a>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_default>
 
 
@@ -2061,7 +2206,7 @@
             </dd>
         </dl>
 
-        <tal:b condition="price" switch="'cc' if price.credit_card_payment else payment_method">
+        <tal:b tal:condition="price" switch="'cc' if price.credit_card_payment else payment_method">
             <tal:b case="'manual'">
                 <label style="display: none;">
                     <input type="radio" name="payment_method" value="manual" checked>
@@ -2113,7 +2258,7 @@
 </metal:checkout_form>
 
 <metal:tags define-macro="tags">
-    <ul class="tags">
+    <ul class="tags" >
         <li tal:repeat="link tags" class="click-through">
             <span tal:content="link(layout)"
                 class="${link.active and 'active' or ''} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
@@ -2153,18 +2298,11 @@
     </div>
 </metal:generic_message>
 
-<metal:payment_link_fallback define-macro="payment_link_fallback" i18n:domain="onegov.town6">
-    <!--! pass -->
-</metal:payment_link_fallback>
-
 <metal:payments define-macro="payments" i18n:domain="onegov.town6">
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
-                <th class="select-all-checkbox-cell">
-                    <input type="checkbox" aria-label="Select all payments" />
-                </th>
-                <th i18n:translate tal:condition="payment_links|nothing">
+                <th i18n:translate tal:condition="tickets|nothing">
                     Object
                 </th>
                 <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
@@ -2193,38 +2331,21 @@
         </thead>
         <tbody>
             <tr tal:repeat="payment payments">
-                <td class="payment-checkbox-cell">
-                    <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" />
-                </td>
-                <td tal:condition="payment_links|nothing">
+                <td tal:condition="tickets|nothing">
                     <tal:b define="ticket tickets[payment.id] | nothing">
-                        <tal:b repeat="link payment_links[payment.id]">
-                            <tal:b switch="link.__tablename__">
-                                <tal:b case="'submissions'">
-                                    <div>
-                                        <a tal:condition="ticket" href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong> - ${ticket.group}
-                                        </a>
-                                        <div>
-                                            ${link.title}
-                                        </div>
-                                    </div>
-                                </tal:b>
-                                <tal:b case="'reservations'" condition="repeat.link.start">
-                                    <div>
-                                        <a tal:condition="ticket" href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong> - ${ticket.group}
-                                        </a>
-                                        <div>
-                                            ${link.title}
-                                        </div>
-                                    </div>
-                                </tal:b>
-                                <tal:b case="default">
-                                    <metal:b use-macro="layout.macros['payment_link_fallback']" />
-                                </tal:b>
+                        <div tal:condition="ticket">
+                            <a tal:condition="ticket" href="${request.link(ticket)}">
+                                <strong>${ticket.number}</strong> - ${ticket.group}
+                            </a>
+                            <tal:b tal:switch="ticket.handler_code">
+                                <div tal:case="'RSV'">
+                                    ${ticket.ticket_email}
+                                </div>
+                                <div tal:case="default">
+                                    ${ticket.title}
+                                </div>
                             </tal:b>
-                        </tal:b>
+                        </div>
                     </tal:b>
                 </td>
                 <!-- Cell for Reservation Dates -->
@@ -2266,6 +2387,92 @@
     </table>
 </metal:payments>
 
+<metal:invoices define-macro="invoices" i18n:domain="onegov.town6">
+    <table class="invoices-table" tal:condition="invoices">
+        <thead>
+            <tr>
+                <th class="select-all-checkbox-cell">
+                    <input type="checkbox" aria-label="Select all invoices" />
+                </th>
+                <th i18n:translate>
+                    Object
+                </th>
+                <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
+                    Reservation
+                </th>
+                <th i18n:translate>
+                    Net Amount
+                </th>
+                <th i18n:translate>
+                    Invoiced
+                </th>
+                <th i18n:translate>
+                    Paid
+                </th>
+                <th i18n:translate>
+                    Created
+                </th>
+                <th tal:condition="invoice_actions|nothing"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="invoice invoices" class="${'' if invoice.invoiced else 'un'}invoiced ${'' if invoice.paid else 'un'}paid">
+                <td class="invoice-checkbox-cell">
+                    <input type="checkbox" name="selected_invoices" value="${invoice.id}" aria-label="Select this invoice" i18n:attributes="aria-label" />
+                </td>
+                <td>
+                    <div>
+                        <a href="${request.link(invoice.ticket)}">
+                            <strong>${invoice.ticket.number}</strong> - ${invoice.ticket.group}
+                        </a>
+                        <tal:b tal:switch="invoice.ticket.handler_code">
+                            <div tal:case="'RSV'">
+                                ${invoice.ticket.ticket_email}
+                            </div>
+                            <div tal:case="default">
+                                ${invoice.ticket.title}
+                            </div>
+                        </tal:b>
+                    </div>
+                </td>
+                <!-- Cell for Reservation Dates -->
+                <td tal:condition="reservation_dates_formatted|nothing">
+                    <span tal:replace="reservation_dates_formatted.get(invoice.id, '')" />
+                </td>
+                <td>${'{0:.2f}'.format(invoice.total_amount)}</td>
+                <td class="invoiced-state">
+                    <tal:b tal:condition="invoice.invoiced">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Invoiced" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Invoiced</span>
+                    </tal:b>
+                    <tal:b tal:condition="not:invoice.invoiced">
+                        <i class="fa fa-times-circle" aria-hidden="true" title="Uninvoiced" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Uninvoiced</span>
+                    </tal:b>
+                </td>
+                <td class="paid-state">
+                    <tal:b tal:condition="invoice.paid">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Paid</span>
+                    </tal:b>
+                    <tal:b tal:condition="not:invoice.paid">
+                        <i class="fa fa-times-circle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                    </tal:b>
+                </td>
+                <td>
+                    ${layout.format_date(invoice.ticket.created, 'datetime')}
+                </td>
+                <td tal:condition="invoice_actions|nothing" class="text-links">
+                    <tal:b repeat="link invoice_actions(invoice)">
+                        <tal:b replace="link(layout)" />
+                    </tal:b>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</metal:invoices>
+
 <metal:directory_error define-macro="directory_error" i18n:domain="onegov.town6">
     <ul class="dense">
         <li tal:repeat="(field_id, messages) error.errors.items()">
@@ -2305,13 +2512,9 @@
                 <span class="h5 list-title">${record.title}</span>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
         </a>
-        <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
-                tal:content="lead" tal:condition="lead">
-            <p class="list-lead preview" >
-            </p>
-            <div class="list-hint hints" tal:define="hint hint(record)|False"
-                tal:content="hint" tal:condition="hint">
-            </div>
+        <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))">
+            <p class="list-lead preview" tal:condition="lead">${lead}</p>
+            <div class="list-hint hints" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
         </a>
         <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
     </li>
@@ -2409,14 +2612,16 @@
                 >
                 <div tal:condition="file.published" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       ic-target="#button-${file.id}"
+                       ic-success-action="change"
                        class="is-published">
                         <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
                     </a>
                 </div>
                 <div tal:condition="not:file.published" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       ic-target="#button-${file.id}"
+                       ic-success-action="change"
                        class="is-not-published">
                         <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
                     </a>
@@ -2429,16 +2634,16 @@
                                 <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
                                 <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
                                 <div class="publication-settings-input">
-                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
+                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
 
-                                    <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <select name="hour" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change">
                                         <option tal:condition="not:publish_date"></option>
                                         <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
                                             <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
                                         </tal:b>
                                     </select>
 
-                                    <a ic-post-to="${post_url}&clear_start_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <a ic-post-to="${post_url}&clear_start_date=1" ic-target="#button-${file.id}" ic-success-action="change">
                                         <i class="far fa-times-circle"></i>
                                         <span class="show-for-sr" i18n:translate>Reset</span>
                                     </a>
@@ -2449,16 +2654,16 @@
                             <legend tal:condition="publish_end_date" i18n:translate>Will be published until:</legend>
                             <legend tal:condition="not:publish_end_date" i18n:translate>Publication end date:</legend>
                             <div class="publication-settings-input">
-                                <input type="date" name="end-date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_end_date and publish_end_date.date().isoformat() or ''}" required="required">
+                                <input type="date" name="end-date" class="small" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change" value="${publish_end_date and publish_end_date.date().isoformat() or ''}" required="required">
 
-                                <select name="end-hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                <select name="end-hour" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change">
                                     <option tal:condition="not:publish_end_date"></option>
                                     <tal:b repeat="hour range(24)" tal:define="publish_end_time publish_end_date and '{:0>2}:00'.format(publish_end_date.hour)">
                                         <option tal:define="end_time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_end_time == end_time" value="${end_time}">${end_time}</option>
                                     </tal:b>
                                 </select>
 
-                                <a ic-post-to="${post_url}&clear_end_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                <a ic-post-to="${post_url}&clear_end_date=1" ic-target="#button-${file.id}" ic-success-action="change">
                                     <i class="far fa-times-circle"></i>
                                     <span class="show-for-sr" i18n:translate>Reset</span>
                                 </a>
@@ -2476,7 +2681,8 @@
                 >
                 <div tal:condition="file.publication" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       ic-target="#button-${file.id}"
+                       ic-success-action="change"
                        class="is-a-publication">
                         <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
                     </a>
@@ -2484,7 +2690,8 @@
 
                 <div tal:condition="not:file.publication" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       ic-target="#button-${file.id}"
+                       ic-success-action="change"
                        class="is-not-a-publication">
                         <i class="far fa-fw fa-times-circle" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
                     </a>
@@ -2534,23 +2741,8 @@
     <div class="file-actions">
         <a class="button secondary confirm delete" role="button"
             ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
-            ic-on-success="
-                var cfd = $(elt).closest('tr');  // current file details row
-                var cfi = cfd.prev();  // current file info row
-                var rbfi = cfi.prev();  // row before current file info
-                var rafd = cfd.next();  // row after current file details
-
-                cfi.remove();  // remove current file info row
-                cfd.remove();  // remove current file details row
-
-                // if file is last in group, remove the group tr as well
-                if (!rbfi.is('[id^=\'details-\']') &&
-                    !rbfi.hasClass('file-info') &&
-                    !rafd.is('[id^=\'details-\']') &&
-                    !rafd.hasClass('file-info')) {
-                    rbfi.remove();  // remove line before file-info row
-                }
-            "
+            ic-target="closest tbody"
+            ic-success-action="remove"
             data-confirm="Do you really want to delete this file?"
             data-confirm-extra="${file.name}"
             data-confirm-yes="Delete File"
@@ -2560,25 +2752,15 @@
             <span i18n:translate >Delete</span>
         </a>
         <a class="button secondary rename prompt" role="button"
+            ic-post-to="${request.csrf_protected_url(request.link(file, 'rename'))}"
+            ic-include='.dialog [name="name"]'
+            ic-target="#button-${file.id}"
+            ic-success-action="change"
             data-prompt="Please provide the new name for the file"
             data-prompt-ok="Rename"
             data-prompt-cancel="Cancel"
+            data-prompt-name="name"
             data-prompt-value="${file.name}"
-            data-prompt-success="(function(value) {
-                var url = '${request.link(file, 'rename')}?csrf-token=${layout.csrf_token}';
-                var ext = '.${file.name.split('.')[-1].strip()}';
-                var elt = $(this);
-
-                value = value.substring(value.length - ext.length, value.length) === ext && value || value + ext;
-
-                jQuery.post(url, {'name': value}, function() {
-                    var actions = elt;
-
-                    actions.closest('tr').prev().find('td:first').text(value);
-                    actions.find('a.prompt').data('prompt-value', value);
-                    actions.find('a.delete').data('confirm-extra', value);
-                });
-            })"
             i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel" >
            <span class="fa fa-edit" aria-hidden="true"></span>
            <span i18n:translate>Rename</span>
@@ -2590,18 +2772,15 @@
         <a class="button secondary" role="button"
            ic-get-from="${request.link(file, 'links')}"
            ic-target="#links-${id}"
-           ic-on-success="
-               var modal = $('#links-${id}-modal');
-               modal.foundation();
-               modal.foundation('open');
-               modal.focus();
-           ">
+           ic-action-target="#links-${id}-modal-opener"
+           ic-success-action="click">
             <span class="fa fa-link" aria-hidden="true"></span>
             <span i18n:translate>Linked Pages</span>
             <span class="ic-indicator fa fa-spinner fa-spin" style="display: none"></span>
        </a>
     </div>
     <div style="display:none;">
+        <button id="links-${id}-modal-opener" data-open="links-${id}-modal" tabindex="-1" aria-hidden="true"></button>
         <div id="links-${id}-modal" class="reveal large dialog" data-reveal>
             <h2 i18n:translate>Links to <tal:b i18n:name="filename">${file.name}</tal:b></h2>
             <ul id="links-${id}"></ul>
@@ -2612,7 +2791,7 @@
 <metal:file_links define-macro="file-links" i18n:domain="onegov.town6">
     <ul class="more-list">
         <tal:b repeat="result file.links">
-            <li class="search-result-${result.es_type_name}" tal:condition="result">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
                 <tal:b
                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
@@ -2640,28 +2819,18 @@
         <tal:b condition="not file.signed and may_sign">
             <a tal:condition="not:file.signed" class="is-not-signed signature-status"
                 role="button"
+                ic-post-to="${request.csrf_protected_url(request.link(file, 'sign'))}"
+                ic-include='.dialog [name="token"]'
+                ic-target="closest .file-status-tag"
+                ic-action-target="this"
+                ic-beforeSend-action="addClass:signing"
+                ic-complete-action="removeClass:signing"
                 data-prompt="Please enter your yubikey to apply a digital seal to this file"
+                data-prompt-name="token"
                 data-prompt-ok="Sign"
                 data-prompt-cancel="Cancel"
                 data-prompt-placeholder="Plug your YubiKey into a USB slot and press it."
                 data-prompt-info="Published documents with a digital seal can be discovered through the site-search and in the list of documents with a digital seal. This action will be logged and cannot be undone."
-                data-prompt-success="(function(value) {
-                    var url = '${request.link(file, 'sign')}?csrf-token=${layout.csrf_token}';
-                    var elt = $(this);
-                    var row = elt.closest('tr');
-
-                    elt.toggleClass('signing', true);
-                    window.elt = elt;
-
-                    jQuery.post(url, {'token': value}, function(data) {
-                        var target = elt.closest('.signature-status').parent();
-                        target.html(data);
-                        processCommonNodes(target);
-                        row.prev().addClass('signed');
-                    }).always(function() {
-                        elt.toggleClass('signing', false);
-                    });
-                })"
                 i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel;data-prompt-info;data-prompt-placeholder"
             >
                 <i class="fa fa-fw fa-unlock" aria-hidden="true"></i>
@@ -2693,16 +2862,15 @@
 
 <metal:file_info define-macro="file-info" i18n:domain="onegov.town6">
     <tal:b define="
-        file_number file.number|file.id;
         file_upload file.upload_date|file.created;
         file_publish_end file.publish_end_date|None;
     ">
-        <tr class="file-info ${'signed' if file.signed else ''}">
+        <tr class="file-info ${'signed' if file.signed else ''}" id="${file.name}">
             <td>
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}" data-toggle="details-${file_number}">
+                <a id="button-${file.id}" data-ogc-toggle="#details-${file.id}">
                     <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
                 </a>
             </td>
@@ -2717,10 +2885,10 @@
             </td>
         </tr>
         <!-- Hidden Detail-Row -->
-        <tr id="details-${file_number}" class="hidden">
+        <tr id="details-${file.id}" class="hidden">
             <td colspan="5">
-                <div ic-trigger-from="#button-${file_number}"
-                     ic-trigger-on="click once"
+                <div ic-trigger-from="#button-${file.id}"
+                     ic-trigger-on="click once, change"
                      ic-get-from="${actions_url(file.id)}"
                      class="file-preview-wrapper"
                 >
@@ -2737,8 +2905,9 @@
             <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
         </a>
         <a class="delete confirm"
-           ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}"
-           ic-on-success="$('#image-${index}').remove();"
+           ic-delete-from="${request.csrf_protected_url(image.url)}"
+           ic-target="#image-${index}"
+           ic-success-action="remove"
            data-confirm="Do you really want to delete the image?"
            data-confirm-yes="Delete Image"
            data-confirm-no="Cancel"
@@ -2891,14 +3060,27 @@
         </div>
 </metal:focus>
 
-<metal:chat define-macro="chat">
-    <div tal:condition="layout.org.meta.get('enable_chat', False) and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
-        <div class="grid-container">
-            <a class="chat-button" href="${chat_link}">
-                <p><i class="fas fa-comments"></i> Chat</p>
-            </a>
+<metal:chat define-macro="chat" i18n:domain="onegov.town6">
+    <tal:b define="enable_chat layout.org.meta.get('enable_chat', 'disabled')">
+        <div tal:condition="enable_chat == 'chatbot' or enable_chat == 'people_chat' and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
+            <div class="grid-container">
+                <a tal:condition="enable_chat == 'people_chat'" class="chat-button no-icon" href="${chat_link}">
+                    <p><i class="fas fa-comments"></i> Chat</p>
+                </a>
+                <!-- Left Bottom -->
+                <a tal:condition="enable_chat == 'chatbot'" class="chat-button no-icon"  type="button" data-toggle="example-dropdown-left-bottom"><p><i class="fas fa-comments"></i> Chat</p></a>
+                <div class="dropdown-pane" data-position="top" data-alignment="right" id="example-dropdown-left-bottom" data-dropdown data-auto-focus="true">
+                    <!-- Close-->
+                    <button class="close-button" data-close aria-label="Close" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 i18n:translate="">Experimental AI Chatbot</h4>
+                    <p i18n:translate="">This chatbot is experimental and may produce incorrect or misleading information. Please verify any information provided by the chatbot with official sources.</p>
+                    <a href="${chat_link}" class="button" i18n:translate>Try it out</a>
+                </div>
+            </div>
         </div>
-    </div>
+    </tal:b>
 </metal:chat>
 
 <metal:progress_indicator define-macro="progress_indicator">
@@ -3205,3 +3387,116 @@
 
     </tal:b>
 </metal:b>
+
+<metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.town6">
+    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_cost_object any(item.cost_object for items in invoice_items.values() for item in items); show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
+        <thead>
+            <tr>
+                <th i18n:translate>Booking Text</th>
+                <th tal:condition="show_cost_object" i18n:translate>Cost center / cost unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Quantity</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT Rate</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT</th>
+                <th class="centered" i18n:translate>Amount</th>
+                <th tal:condition="item_actions">
+                    <span i18n:translate class="show-for-sr">Actions</span>
+                </th>
+            </tr>
+        </thead>
+        <tal:b tal:repeat="(group, items) invoice_items.items()">
+            <thead>
+                <tr class="group">
+                    <th tal:switch="group" colspan="${2 + (1 if show_cost_object else 0) + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
+                        <tal:b tal:case="'reservation'" i18n:translate>
+                            Reservations
+                        </tal:b>
+                        <tal:b tal:case="'submission'" i18n:translate>
+                            Submission
+                        </tal:b>
+                        <tal:b tal:case="'form'" i18n:translate>
+                            Selected Options
+                        </tal:b>
+                        <tal:b tal:case="'manual'" i18n:translate>
+                            Discounts / Surcharges
+                        </tal:b>
+                        <tal:b tal:case="'migration'" i18n:translate>
+                            Lump sum
+                        </tal:b>
+                        <tal:b tal:case="default">
+                            ${item.group}
+                        </tal:b>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:b tal:repeat="item items">
+                    <tr tal:define="groupid hash(str(item.group) + str(repeat.item.index)); paid total_paid or item.paid|False" tal:attributes="class ('paid' if paid else 'unpaid') if show_payment_state else None">
+                        <td>${item.text}</td>
+                        <td tal:condition="show_cost_object" class="cost-object">${item.cost_object}</td>
+                        <td tal:condition="show_quantity" class="unit">${'{:.2f}'.format(item.unit)}</td>
+                        <td tal:condition="show_quantity" class="quantity">${'{:.2f}'.format(item.quantity)}</td>
+                        <td tal:condition="show_vat" class="vat-rate">${'{:.1f}%'.format(item.vat_rate or 0.0)}</td>
+                        <td tal:condition="show_vat" class="vat">${'{:.2f}'.format(item.vat)}</td>
+                        <td class="amount">
+                            ${'{:.2f}'.format(item.amount)}
+                            <tal:b tal:condition="show_payment_state and paid">
+                                <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                                <span i18n:translate class="show-for-sr">Paid</span>
+                            </tal:b>
+                            <tal:b tal:condition="show_payment_state and not paid">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                                <span i18n:translate class="show-for-sr">Unpaid</span>
+                            </tal:b>
+                        </td>
+                        <td class="actions" tal:condition="item_actions">
+                            <tal:b tal:repeat="action actions" tal:define="actions item_actions(item)">
+                                ${action(layout)}
+                            </tal:b>
+                        </td>
+                    </tr>
+                </tal:b>
+            </tbody>
+        </tal:b>
+        <tfoot tal:condition="total_amount is not None">
+            <tr class="total${(' paid' if total_paid else ' unpaid') if show_payment_state else ''}">
+                <td i18n:translate>Total</td>
+                <td tal:condition="show_cost_object"></td>
+                <td tal:condition="show_quantity" class="unit"></td>
+                <td tal:condition="show_quantity" class="quantity"></td>
+                <td tal:condition="show_vat" class="vat-rate"></td>
+                <td tal:condition="show_vat" class="vat">
+                    ${'{:.2f}'.format(total_vat)}
+                </td>
+                <td class="amount">
+                    ${'{:.2f}'.format(total_amount)}
+                    <tal:b tal:condition="show_payment_state and total_paid">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Paid</span>
+                    </tal:b>
+                    <tal:b tal:condition="show_payment_state and not total_paid">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                    </tal:b>
+                </td>
+                <td tal:condition="item_actions"></td>
+            </tr>
+        </tfoot>
+    </table>
+</metal:invoice_items>
+
+<metal:globals-left define-macro="globals-left">
+    <ul tal:condition="modules and modules.links|nothing" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+        <li>
+            <a href="#" data-dropdown="modules-dropdown" class="dropdown modules" i18n:translate>Modules</a>
+            <ul id="modules-dropdown" data-dropdown-content class="vertical menu">
+                <li tal:repeat="link modules.links">
+                    <tal:b replace="link(layout)" />
+                </li>
+            </ul>
+        </li>
+        <li>
+            <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
+        </li>
+    </ul>
+</metal:globals-left>

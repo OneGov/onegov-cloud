@@ -15,17 +15,22 @@ filterwarnings = [
     # potential issue for future upgrades
     # unfortunately it's not possible to filter escape sequence warnings in
     # specific modules, but we should be covered by Ruff for our own code
-    '''ignore:invalid escape sequence '[^']+':::''',
+    '''ignore:"[^"]+" is an invalid escape sequence:::''',
     '''ignore:'crypt':DeprecationWarning:passlib.*:''',
+    # Until pysaml2 is compatible with newer versions of xmlschema
+    # we are stuck with this DeprecationWarning
+    # See: https://github.com/IdentityPython/pysaml2/issues/947
+    '''ignore:pathlib\.PurePath\.as_uri\(\) is deprecated:DeprecationWarning:xmlschema.*:''',
+    # See: https://github.com/amol-/depot/issues/90
+    '''ignore:datetime\.datetime\.utcnow\(\) is deprecated:DeprecationWarning:depot.*:''',
     # fixed upstream
-    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:pyasn1.*:''',
-    '''ignore:'cgi':DeprecationWarning:webob.*:''',
+    '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:ldap3.*:''',
 ]
 
 [tool.coverage.run]
 data_file = "/tmp/.coverage"
 include = ["*/onegov/*"]
-omit = ["*/tests/*", "**/upgrade.py"]
+omit = ["*/tests/*"]
 
 [tool.coverage.report]
 ignore_errors = true
@@ -39,11 +44,12 @@ exclude_lines = [
     "raise NotImplementedError",
     "raise AssertionError[(].unreachable.[)]",
     "if TYPE_CHECKING:",
-    "if __name__ == .__main__."
+    "if __name__ == .__main__.",
+    '''\A(?s:.*# pragma: exclude file.*)\Z'''
 ]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.14"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
@@ -51,9 +57,7 @@ strict = true
 implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
-# FIXME: remove sqlalchemy when upgrading to SQlAlchemy 2.0
-untyped_calls_exclude = "sqlalchemy,pycurl,onegov.core.types"
-plugins = "sqlmypy"
+untyped_calls_exclude = "icalendar,pycurl,selenium.webdriver.chrome.webdriver"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
@@ -65,6 +69,8 @@ module = [
     "isodate.*",
     # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
+    # FIXME: Remove after https://github.com/jmcnamara/XlsxWriter/issues/1123
+    "xlsxwriter.*"
 ]
 ignore_missing_imports = true
 
@@ -122,7 +128,7 @@ include = [
 ]
 line-length = 79
 indent-width = 4
-target-version = "py311"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = [
@@ -204,6 +210,8 @@ ignore = [
     "RUF031",
     "RUF052",
     "RUF056",
+    # TODO: Brings lots of violations, needs cleanup in all __init__.py files
+    "RUF067",
     # TODO: We would like to enable SIM102, but it has a ton of
     #       violations, so it's a big job to clean it up
     "SIM102",
@@ -222,7 +230,6 @@ ignore = [
     "UP009",
     "UP012",
     "UP032",
-    "UP038",
 ]
 unfixable = []
 external = ["TC"]
@@ -232,6 +239,7 @@ preview = true
 [tool.ruff.lint.extend-per-file-ignores]
 "src/onegov/core/types.py" = ["B018"]
 "reportlab_settings.py" = ["N", "I002"]
+"*/__init__.py" = ["I002"]
 "*.pyi" = [
     "E501",
     "FURB",
@@ -257,7 +265,6 @@ preview = true
     "F841",
     "FLY002",
     "FURB",
-    "I002",
     "ISC",
     "N",
     "Q",

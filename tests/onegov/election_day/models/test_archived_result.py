@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import datetime
 from datetime import timezone
@@ -6,7 +8,12 @@ from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_archived_result(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_archived_result(session: Session) -> None:
     result = ArchivedResult()
     result.date = date(2007, 1, 1)
     result.last_modified = datetime(2007, 1, 2, 0, 0, tzinfo=timezone.utc)
@@ -15,7 +22,7 @@ def test_archived_result(session):
     result.external_id = 'id'
     result.url = 'url'
     result.title = 'title'
-    result.title_translations['en'] = 'title'
+    result.title_translations['en'] = 'title'  # type: ignore[index]
     result.domain = 'canton'
     result.type = 'vote'
     result.name = 'name'
@@ -81,7 +88,7 @@ def test_archived_result(session):
     assert result.progress == (5, 10)
 
     # Test display functions
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert result.display_answer(request) == 'rejected'
     assert result.display_nays_percentage(request) == 20.5
     assert result.display_yeas_percentage(request) == 79.5
@@ -148,7 +155,7 @@ def test_archived_result(session):
     assert copied.shortcode == 'shortcode'
 
 
-def test_archived_result_local_results(session):
+def test_archived_result_local_results(session: Session) -> None:
     result = ArchivedResult()
 
     assert result.answer == ''
@@ -159,7 +166,7 @@ def test_archived_result_local_results(session):
     assert result.local_nays_percentage == 100.0
     assert result.local_yeas_percentage == 0.0
 
-    request = DummyRequest()
+    request: Any = DummyRequest()
     assert result.display_answer(request) == ''
     assert result.display_nays_percentage(request) == 100.0
     assert result.display_yeas_percentage(request) == 0.0

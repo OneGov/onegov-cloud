@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from uuid import uuid4
 
 from onegov.core.orm.abstract import MoveDirection
@@ -6,7 +8,12 @@ from onegov.people.collections import AgencyMembershipCollection
 from onegov.people.collections import PersonCollection
 
 
-def test_people(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_people(session: Session) -> None:
     people = PersonCollection(session)
 
     tom = people.add(
@@ -66,11 +73,11 @@ def test_people(session):
     assert george_2 is george
 
     assert people.by_id(george.id) is george_2
-    assert people.by_id('123') is None
+    assert people.by_id('123') is None  # type: ignore[arg-type]
     assert people.by_id(uuid4()) is None
 
 
-def test_agencies(session):
+def test_agencies(session: Session) -> None:
     agencies = AgencyCollection(session)
     root = agencies.add_root(
         title="Root Agency"
@@ -84,7 +91,7 @@ def test_agencies(session):
     assert agencies.roots[0].children == [child]
 
 
-def test_memberships(session):
+def test_memberships(session: Session) -> None:
     people = PersonCollection(session)
     tom = people.add(
         first_name='Tom',
@@ -112,11 +119,13 @@ def test_memberships(session):
         order_within_person=1
     )
 
-    assert [m.title for m in memberships.query('order_within_agency')] ==\
-           ["Director", "Member"]
+    assert [
+        m.title
+        for m in memberships.query('order_within_agency')
+    ] == ["Director", "Member"]
 
 
-def test_memberships_move(session):
+def test_memberships_move(session: Session) -> None:
     people = PersonCollection(session)
     person = people.add(first_name='First', last_name='Name')
 

@@ -19,9 +19,20 @@
 
         <tal:b condition="show_submission|nothing">
             <hr class="large">
+            <table class="field-display">
+                <tr><td><b i18n:translate>E-Mail</b></td></tr>
+                <tr><td>${model.email}</td></tr>
+                <tr tal:condition="ticket.tag"><td height="5"></td></tr>
+                <tr tal:condition="ticket.tag"><td><b i18n:translate>Tag</b></td></tr>
+                <tr tal:condition="ticket.tag"><td>${ticket.tag}</td></tr>
+            </table>
             <metal:b use-macro="layout.macros['display_form']"/>
             <hr class="large">
         </tal:b>
+
+        <p i18n:translate>
+            See Ticket <a href="${request.link(model)}" i18n:name="link">${ticket_reference}</a> for additional information.
+        </p>
         <p i18n:translate>Have a great day!</p>
     </tal:b>
     <tal:b metal:fill-slot="above-footer">

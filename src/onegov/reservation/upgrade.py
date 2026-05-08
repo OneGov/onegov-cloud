@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from libres.db.models import Allocation, Reservation
@@ -9,7 +10,7 @@ from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
-from sqlalchemy import Column, Text
+from sqlalchemy import text, Column, Enum, ForeignKey, Text, UUID
 
 
 from typing import TYPE_CHECKING
@@ -113,9 +114,9 @@ def make_resource_polymorphic_type_non_nullable(
     context: UpgradeContext
 ) -> None:
     if context.has_table('reservations'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE resources SET type = 'generic' WHERE type IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('resources', 'type', nullable=False)
 
@@ -154,13 +155,98 @@ def translate_default_views_to_their_new_names(
     context: UpgradeContext
 ) -> None:
     if context.has_table('resources'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE resources SET content = jsonb_set(
                 content, '{default_view}', '"dayGridMonth"'
             ) WHERE content->>'default_view' = 'month';
-        """)
-        context.operations.execute("""
+        """))
+        context.operations.execute(text("""
             UPDATE resources SET content = jsonb_set(
                 content, '{default_view}', '"timeGridWeek"'
             ) WHERE content->>'default_view' = 'agendaWeek';
-        """)
+        """))
+
+
+@upgrade_task('Add source_type column to reserved_slots')
+def add_source_type_column_to_reserved_slots(context: UpgradeContext) -> None:
+    if (
+        context.has_table('reserved_slots')
+        and not context.has_column('reserved_slots', 'source_type')
+    ):
+        context.operations.add_column(
+          'reserved_slots',
+          Column(
+            'source_type',
+            Enum(
+                'reservation', 'blocker',
+                name='reserved_slot_source_type'
+            ),
+            nullable=False,
+            server_default='reservation'
+          )
+        )
+        context.operations.alter_column(
+          'reserved_slots',
+          'source_type',
+          server_default=None
+        )
+
+
+@upgrade_task('Make Reservation/Allocation.type not nullable')
+def make_allocation_and_reservation_type_not_nullable(
+    context: UpgradeContext
+) -> None:
+    if (
+        context.has_table('allocations')
+        and context.has_column('allocations', 'type')
+    ):
+        context.operations.execute(text("""
+            UPDATE allocations
+               SET type = 'generic'
+             WHERE type IS NULL;
+        """))
+        context.operations.alter_column('allocations', 'type', nullable=False)
+    if (
+        context.has_table('reservations')
+        and context.has_column('reservations', 'type')
+    ):
+        context.operations.execute(text("""
+            UPDATE reservations
+               SET type = 'generic'
+             WHERE type IS NULL;
+        """))
+        context.operations.alter_column('reservations', 'type', nullable=False)
+
+
+@upgrade_task('Add resource parent_id column')
+def add_resource_parent_id_column(context: UpgradeContext) -> None:
+    if (
+        context.has_table('resources')
+        and not context.has_column('resources', 'parent_id')
+    ):
+        context.operations.add_column(
+            'resources',
+            Column(
+                'parent_id',
+                UUID(as_uuid=True),
+                ForeignKey('resources.id', ondelete='SET NULL'),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task('Add additional indeces to reserved_slots')
+def add_reserved_slots_indeces(context: UpgradeContext) -> None:
+    context.operations.create_index(
+        'ix_reserved_slots_source_type',
+        'reserved_slots',
+        columns=['source_type'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'start_end_tsrange_ix',
+        'reserved_slots',
+        columns=[text('tsrange(start, "end")')],
+        postgresql_using='gist',
+        if_not_exists=True
+    )

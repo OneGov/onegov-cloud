@@ -1,11 +1,20 @@
+from __future__ import annotations
+
 import os
+import pytest
 import re
 
+from typing import TYPE_CHECKING
 
-def test_directory_prev_next(client):
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from .conftest import Client
+
+
+def test_directory_prev_next(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -52,11 +61,10 @@ def test_directory_prev_next(client):
     assert 'Susan Light' not in zak_page
 
 
-def test_newline_in_directory_header(client):
-
+def test_newline_in_directory_header(client: Client) -> None:
     client.login_admin()
     page = client.get('/directories')
-    page = page.click('Verzeichnis')
+    page = page.click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['lead'] = 'this is a multiline\nlead'
     page.form['structure'] = """
@@ -74,10 +82,10 @@ def test_newline_in_directory_header(client):
     assert "this is a multiline<br>lead" in page
 
 
-def test_change_directory_url(client):
+def test_change_directory_url(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -93,7 +101,7 @@ def test_change_directory_url(client):
     assert sr.request.url.endswith('/sr')
 
     # now attempt to change url to a directory url which already exists
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['structure'] = """
         Name *= ___
@@ -109,12 +117,12 @@ def test_change_directory_url(client):
     assert 'Das Formular enthält Fehler' in page
 
 
-def test_directory_entry_subscription(client):
+def test_directory_entry_subscription(client: Client) -> None:
     client.login_admin()
 
     assert len(os.listdir(client.app.maildir)) == 0
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -137,12 +145,12 @@ def test_directory_entry_subscription(client):
 
     assert len(os.listdir(client.app.maildir)) == 3
     message = client.get_email(0)['TextBody']
-    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     message_2 = client.get_email(1)['TextBody']
-    confirm_2 = re.search(
+    confirm_2 = re.search(  # type: ignore[union-attr]
         r'Anmeldung bestätigen\]\(([^\)]+)', message_2).group(1)
     message_3 = client.get_email(2)['TextBody']
-    confirm_3 = re.search(
+    confirm_3 = re.search(  # type: ignore[union-attr]
         r'Anmeldung bestätigen\]\(([^\)]+)', message_3).group(1)
 
     illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
@@ -172,26 +180,85 @@ def test_directory_entry_subscription(client):
     message = client.get_email(3)['TextBody']
     assert 'Emily Larlham' in message
 
-    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)  # type: ignore[union-attr]
     page = client.get(unsubscribe).follow().follow()
     assert "wurde erfolgreich abgemeldet" in page
 
 
-def test_create_directory_accordion_layout(client):
+@pytest.mark.parametrize(
+    'index,content_labels,hide_labels', [
+    ('A1', '', ''),
+    ('A2', 'Question', ''),
+    ('A3', 'Answer', ''),
+    ('A4', 'Question\nAnswer', ''),
 
-    def create_directory(client, title):
-        page = (client.get('/directories').
-                click('Verzeichnis'))
-        page.form['title'] = title
+    ('B1', '', 'Question'),
+    ('B2', 'Question', 'Question'),
+    ('B3', 'Answer', 'Question'),
+    ('B4', 'Question\nAnswer', 'Question'),
+
+    ('C1', '', 'Answer'),
+    ('C2', 'Question', 'Answer'),
+    ('C3', 'Answer', 'Answer'),
+    ('C4', 'Question\nAnswer', 'Answer'),
+
+    ('D1', '', 'Question\nAnswer'),
+    ('D2', 'Question', 'Question\nAnswer'),
+    ('D3', 'Answer', 'Question\nAnswer'),
+    ('D4', 'Question\nAnswer', 'Question\nAnswer'),
+])
+def test_create_directory_accordion_layout(
+    index: str,
+    content_labels: str,
+    hide_labels: str,
+    client: Client
+) -> None:
+    question_label = '<strong>Question</strong>:'
+    answer_label = '<strong>Answer</strong>:'
+
+    def create_directory(
+        client: Client,
+        title: str,
+        hide_labels: str
+    ) -> ExtendedResponse:
+        page = (client.get('/directories').click('^Verzeichnis$'))
+        page.form['title'] = title + f' {index}'
         page.form['structure'] = "Question *= ___\nAnswer *= ___"
         page.form['title_format'] = '[Question]'
         page.form['layout'] = 'accordion'
+        page.form['content_fields'] = content_labels
+        page.form['content_hide_labels'] = hide_labels
         return page.form.submit().follow()
+
+    def test_labels() -> None:
+        assert question in page  # question always appears as accordion title
+        if 'Question' in content_labels:
+            assert page.text.count(question) == 2
+            if 'Question' in hide_labels:
+                assert question_label not in page
+            else:
+                assert question_label in page
+        else:
+            assert page.text.count(question) == 1
+            assert question_label not in page
+
+        if 'Answer' in content_labels:
+            assert answer in page
+            if 'Answer' in hide_labels:
+                assert answer_label not in page
+            else:
+                assert answer_label in page
+        else:
+            assert answer not in page
+            assert answer_label not in page
+
+        # test edit link
+        assert page.pyquery('.accordion .edit-link').attr('href')
 
     client.login_admin()
     title = "Questions and Answers about smurfs"
 
-    faq_dir = create_directory(client, title)
+    faq_dir = create_directory(client, title, hide_labels)
     assert title in faq_dir
 
     question = "Are smurfs real?"
@@ -199,14 +266,17 @@ def test_create_directory_accordion_layout(client):
     q1 = faq_dir.click('Eintrag')
     q1.form['question'] = question
     q1.form['answer'] = answer
-    q1 = q1.form.submit().follow()
-    assert question in q1
-    assert answer not in q1
+    q1.form.submit().follow()
+
+    page = client.get(
+        f'/directories/questions-and-answers-about-smurfs-{index.lower()}')
+    test_labels()
 
     question = "Who is the boss of the smurfs?"
     q2 = faq_dir.click('Eintrag')
     q2.form['question'] = question
     q2.form['answer'] = 'Papa Schlumpf'
-    q2 = q2.form.submit().follow()
-    assert question in q2
-    assert answer not in q2
+    q2.form.submit().follow()
+    page = client.get(
+        f'/directories/questions-and-answers-about-smurfs-{index.lower()}')
+    test_labels()

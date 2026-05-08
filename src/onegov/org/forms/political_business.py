@@ -5,7 +5,7 @@ from itertools import zip_longest
 from markupsafe import Markup
 from onegov.core.templates import render_macro
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TranslatedSelectField
 from onegov.org import _
 from onegov.org.models import PoliticalBusiness
@@ -164,14 +164,13 @@ class PoliticalBusinessForm(Form):
     )
 
     entry_date = DateField(
-        label=_('Entry Date'),
+        label=_('Submission/publication date'),
         validators=[InputRequired()],
         default=date.today,
     )
 
-    # FIXME : make multiple groups possible ChosenSelectMultipleField
-    parliamentary_group_id = ChosenSelectField(
-        label=_('Parliamentary Group'),
+    parliamentary_groups = ChosenSelectMultipleField(
+        label=_('Parliamentary Group(s)'),
         validators=[Optional()],
         choices=[],
     )
@@ -207,6 +206,10 @@ class PoliticalBusinessForm(Form):
     )
 
     def on_request(self) -> None:
+        # prevent showing access field as all ris information is public
+        if hasattr(self, 'access'):
+            self.delete_field('access')
+
         selectable_participants = (
             self.request.session.query(RISParliamentarian)
             .filter(RISParliamentarian.active)
@@ -223,7 +226,7 @@ class PoliticalBusinessForm(Form):
             choices: list[_Choice] = [
                 (
                     str(participant.id),
-                    participant.display_name,
+                    participant.title,
                     {'data-role': selected.get(participant.id) or ''}
                 )
                 for participant in selectable_participants
@@ -243,7 +246,7 @@ class PoliticalBusinessForm(Form):
                     render_kw['data-no_results_text'])
 
                 field.form.participant_type.meta = self.meta
-                field.form.participant_type.choices = [  # type: ignore[misc]
+                field.form.participant_type.choices = [  # type:ignore
                     (value, self.request.translate(label) if label else label)
                     for value, label in field.form.participant_type.choices
                 ]
@@ -259,17 +262,22 @@ class PoliticalBusinessForm(Form):
             .order_by(RISParliamentaryGroup.name)
             .all()
         )
-        self.parliamentary_group_id.choices = [
-            (str(g.id.hex), g.name) for g in groups
-        ]
-        self.parliamentary_group_id.choices.insert(0, ('', '-'))
+        if not groups:
+            self.parliamentary_groups.choices.insert(  # type:ignore[union-attr]
+                0, ('', _('No active parliamentary groups')))
+        else:
+            self.parliamentary_groups.choices = [
+                (str(g.id), g.name) for g in groups
+            ]
 
-    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        result = super().get_useful_data()
-        result.pop('participants', None)
-        result['parliamentary_group_id'] = (
-            result.get('parliamentary_group_id') or None)
-        return result
+    def process_obj(self, obj: PoliticalBusiness) -> None:  # type:ignore[override]
+        super().process_obj(obj)
+
+        # only populate from model when the form did not receive formdata
+        if self.parliamentary_groups.raw_data is None:
+            self.parliamentary_groups.data = [
+                str(group.id) for group in obj.parliamentary_groups
+            ]
 
     def populate_obj(  # type: ignore[override]
         self,
@@ -280,10 +288,19 @@ class PoliticalBusinessForm(Form):
         super().populate_obj(
             obj,
             exclude={
-                'parliamentary_group_id',
+                'parliamentary_groups',
                 *(exclude or ())
             },
             include=include
         )
 
-        obj.parliamentary_group_id = self.parliamentary_group_id.data or None
+        # convert multi-select ids into model instances
+        data = self.parliamentary_groups.data or []
+        if data and data != ['']:
+            obj.parliamentary_groups = (
+                self.request.session.query(RISParliamentaryGroup)
+                .filter(RISParliamentaryGroup.id.in_(data))
+                .all()
+            )
+        else:
+            obj.parliamentary_groups = []

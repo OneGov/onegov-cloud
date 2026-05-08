@@ -18,6 +18,11 @@
         <tal:b metal:use-macro="layout.macros['reservations']"></tal:b>
         <p tal:condition="code"><b><tal:b i18n:translate>Key Code</tal:b>:</b> ${code}</p>
 
+        <tal:b tal:condition="resource.confirmation_text">
+            <p><b i18n:translate>Additional Information</b></p>
+            ${resource.confirmation_text}
+        </tal:b>
+
         <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
         </p>

@@ -25,7 +25,7 @@ rc.defaultOptions = {
         The visible time range
     */
     minTime: '07:00:00',
-    maxTime: '22:00:00',
+    maxTime: '24:00:00',
 
     /*
         True if the calendar may be edited (by editors/admins)
@@ -88,6 +88,8 @@ rc.events = [
     'rc-reservation-error',
     'rc-reservations-changed'
 ];
+
+rc.targetEvent = null;
 
 rc.passEventsToCalendar = function(calendar, target, source) {
     var cal = $(calendar);
@@ -371,9 +373,10 @@ rc.request = function(calendar, url, attribute) {
 
     el.on('complete.ic', function() {
         el.remove();
+        rc.targetEvent = null;
     });
 
-    var source = $(calendar).find('.has-popup');
+    var source = rc.targetEvent || $(calendar).find('.has-popup');
     rc.passEventsToCalendar(calendar, el, source);
 
     el.click();
@@ -407,7 +410,7 @@ rc.shouldRenderReservationForm = function(event, previousReservationState) {
             previousReservationState.end !== moment(event.end).format('HH:mm')
         );
     const showPreviousTime = (showTimeRange || showWholeDay) && hasPreviousTimeToOffer;
-    const showQuota = !event.extendedProps.partlyAvailable && (event.extendedProps.quotaLeft > 1);
+    const showQuota = !event.extendedProps.partlyAvailable && (event.extendedProps.quotaLeft > 0) && (event.extendedProps.quota > 1);
 
     // Determine if any fields need to be rendered
     return (
@@ -431,12 +434,13 @@ rc.showActionsPopup = function(calendar, element, event) {
     // Check if the reservation form needs to be rendered
     if (!event.extendedProps.actions.length && !rc.shouldRenderReservationForm(event, rc.previousReservationState)) {
         // Directly submit the reservation if no fields or actions are present
+        rc.targetEvent = $(element);
         rc.reserve(
             calendar,
             event.extendedProps.reserveurl,
             moment(event.start).format('HH:mm'),
             moment(event.end).format('HH:mm'),
-            event.extendedProps.quota,
+            event.extendedProps.quotaLeft,
             event.extendedProps.wholeDay
         );
         return;
@@ -448,6 +452,7 @@ rc.showActionsPopup = function(calendar, element, event) {
         event,
         rc.previousReservationState,
         function(state) {
+            rc.targetEvent = $(element);
             rc.reserve(
                 calendar,
                 event.extendedProps.reserveurl,
@@ -675,29 +680,34 @@ rc.setupResourceSwitch = function(options, resourcesUrl, active) {
 
             var lookup = {};
 
-            var switcher = $('<select>').append(
-                _.map(choices, function(resources, group) {
-                    return $('<optgroup>').attr('label', group || '').append(
-                        _.map(resources, function(resource) {
-                            lookup[resource.name] = resource.url;
+            if (Object.keys(choices).length >= 1) {
 
-                            return $('<option>')
-                                .attr('value', resource.name)
-                                .attr('selected', resource.name === active)
-                                .text(resource.title);
-                        })
-                    );
-                })
-            );
+                var switcher = $('<select>').append(
+                    _.map(choices, function(resources, group) {
+                        return $('<optgroup>').attr('label', group || '').append(
+                            _.map(resources, function(resource) {
+                                lookup[resource.name] = resource.url;
 
-            switcher.change(function() {
-                var url = new Url(lookup[$(this).val()]);
-                url.query = (new Url(window.location.href)).query;
+                                return $('<option>')
+                                    .attr('value', resource.name)
+                                    .attr('selected', resource.name === active)
+                                    .text(resource.title);
+                            })
+                        );
+                    })
+                );
 
-                window.location = url;
-            });
+                switcher.change(function() {
+                    var url = new Url(lookup[$(this).val()]);
+                    url.query = (new Url(window.location.href)).query;
 
-            container.append(switcher);
+                    window.location = url;
+                });
+
+                container.append(switcher);
+            } else {
+                container.hide();
+            }
         };
 
         $.getJSON(resourcesUrl, setup);
@@ -738,8 +748,6 @@ rc.renderPartitions = function(event, element, view) {
     }
 
     var calendar = view.calendar;
-    var free = _.template('<div style="height:<%= height %>%;" class="partition-free"></div>');
-    var used = _.template('<div style="height:<%= height %>%;" class="partition-occupied"></div>');
 
     // build the individual partitions
     var event_partitions = rc.adjustPartitions(
@@ -752,9 +760,9 @@ rc.renderPartitions = function(event, element, view) {
     _.each(event_partitions, function(partition) {
         var reserved = partition[1];
         if (reserved === false) {
-            partitions += free({height: partition[0]});
+            partitions += '<div style="height:'+partition[0]+'%;" class="partition-free"></div>';
         } else {
-            partitions += used({height: partition[0]});
+            partitions += '<div style="height:'+partition[0]+'%;" class="partition-occupied"></div>';
         }
     });
 
@@ -797,6 +805,12 @@ rc.renderPartitions = function(event, element, view) {
 // for that fact. This function takes the event, and the range of
 // the calendar and adjusts the partitions if necessary.
 rc.adjustPartitions = function(event, min_hour, max_hour) {
+
+    // if the max time is 24:00:00, then hour will be 0, which will
+    // give us incorrect partitions
+    if (max_hour === 0) {
+        max_hour = 24;
+    }
 
     if (_.isUndefined(event.extendedProps.partitions)) {
         return event.extendedProps.partitions;

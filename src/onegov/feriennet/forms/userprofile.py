@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import string
 
+from wtforms import BooleanField
+
 from onegov.feriennet import _
 from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
@@ -37,7 +39,8 @@ class UserProfileForm(Form):
         'ticket_statistics',
         'bank_account',
         'bank_beneficiary',
-        'political_municipality'
+        'political_municipality',
+        'show_contact_data_to_others',
     )
 
     ticket_statistics = RadioField(
@@ -143,6 +146,12 @@ class UserProfileForm(Form):
     bank_beneficiary = StringField(
         label=_('Beneficiary'),
         fieldset=_('Personal'),
+    )
+
+    show_contact_data_to_others = BooleanField(
+        label=_('Allow contact for carpooling'),
+        fieldset=_('Privacy'),
+        default=False
     )
 
     @property

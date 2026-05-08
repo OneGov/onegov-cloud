@@ -1,15 +1,35 @@
-from uuid import UUID
+from __future__ import annotations
+
 from markupsafe import Markup
-from onegov.core.request import CoreRequest
 from onegov.org.models import Topic
+from onegov.org.request import OrgRequest
 from onegov.org.views.people import person_functions_by_organization
 from onegov.people import Person
+from uuid import UUID
 
 
-def test_people_view(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from .conftest import Client, TestOrgApp
+
+
+def test_people_view(client: Client) -> None:
     client.login_admin()
     settings = client.get('/people-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'profession']
+    settings.form['organisation_hierarchy'] = """
+    - Organisation 1:
+    """
+    assert 'Ungültiges Format.' in settings.form.submit()
+
+    settings.form['organisation_hierarchy'] = """
+    - Organisation 1:
+      - a
+      -
+    """
+    assert 'Ungültiges Format.' in settings.form.submit()
+
     settings.form['organisation_hierarchy'] = """
     - Organisation 1
     - Organisation 2:
@@ -24,7 +44,7 @@ def test_people_view(client):
     people = client.get('/people')
     assert 'Keine Personen' in people
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['academic_title'] = 'Dr.'
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
@@ -74,17 +94,17 @@ def test_people_view(client):
     assert 'Keine Personen' in people
 
 
-def test_with_people(client):
+def test_with_people(client: Client) -> None:
     client.login_editor()
 
     people = client.get('/people')
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Merciless'
     new_person.form['last_name'] = 'Ming'
     new_person.form.submit()
@@ -112,7 +132,7 @@ def test_with_people(client):
     assert edit_page.form['people-1-context_specific_function'].value == ''
 
 
-def test_people_view_organisation_fiter(client):
+def test_people_view_organisation_filter(client: Client) -> None:
     org_1 = 'The Nexus'
     sub_org_11 = 'Nexus Innovators'
     sub_org_12 = 'Nexus Guardians'
@@ -138,9 +158,15 @@ def test_people_view_organisation_fiter(client):
 
     client.login_editor()
 
-    def add_person(first_name, last_name, function, org, sub_org):
+    def add_person(
+        first_name: str,
+        last_name: str,
+        function: str,
+        org: str,
+        sub_org: str
+    ) -> None:
         people = client.get('/people')
-        new_person = people.click('Person')
+        new_person = people.click('Person', index=1)
         new_person.form['first_name'] = first_name
         new_person.form['last_name'] = last_name
         new_person.form['function'] = function
@@ -296,19 +322,21 @@ def test_people_view_organisation_fiter(client):
     assert 'Vanguard Capital' in people
 
 
-def test_delete_linked_person_issue_149(client):
+def test_delete_linked_person_issue_149(client: Client) -> None:
     client.login_editor()
 
     people = client.get('/people')
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    gordon = client.app.session().query(Person) \
-        .filter(Person.last_name == 'Gordon') \
+    gordon = (
+        client.app.session().query(Person)
+        .filter(Person.last_name == 'Gordon')
         .one()
+    )
 
     new_page = client.get('/topics/organisation').click('Thema')
     new_page.form['title'] = 'About Flash'
@@ -325,7 +353,11 @@ def test_delete_linked_person_issue_149(client):
     edit_page.form.submit().follow()
 
 
-def test_context_specific_function(session, org_app):
+def test_context_specific_function(
+    session: Session,
+    org_app: TestOrgApp
+) -> None:
+
     organizations = ["Forum der Ortsparteien und Quartiervereine", "Urnenbüro"]
     context_specific_functions = [
         "Präsidentin Urnenbüro",
@@ -352,7 +384,7 @@ def test_context_specific_function(session, org_app):
     session.add(topic1)
     session.add(topic2)
     topics = [topic1, topic2]
-    request = CoreRequest(
+    request = OrgRequest(
         environ={
             "wsgi.url_scheme": "https",
             "PATH_INFO": "/",

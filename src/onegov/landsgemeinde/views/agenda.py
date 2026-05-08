@@ -10,6 +10,7 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.forms import AgendaItemForm
+from onegov.landsgemeinde.forms.agenda import AgendaItemUploadForm
 from onegov.landsgemeinde.layouts import AgendaItemCollectionLayout
 from onegov.landsgemeinde.layouts import AgendaItemLayout
 from onegov.landsgemeinde.models import AgendaItem
@@ -25,12 +26,22 @@ if TYPE_CHECKING:
     from webob import Response
 
 
+def get_agenda_item_form_class(
+    model: object,
+    request: LandsgemeindeRequest
+) -> type[AgendaItemForm]:
+
+    if isinstance(model, AgendaItem):
+        return model.with_content_extensions(AgendaItemForm, request)
+    return AgendaItem().with_content_extensions(AgendaItemForm, request)
+
+
 @LandsgemeindeApp.form(
     model=AgendaItemCollection,
     name='new',
     template='form.pt',
     permission=Private,
-    form=AgendaItemForm
+    form=get_agenda_item_form_class
 )
 def add_agenda_item(
     self: AgendaItemCollection,
@@ -39,7 +50,12 @@ def add_agenda_item(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        agenda_item = self.add(**form.get_useful_data())
+        agenda_item = self.add(
+            number=form.number.data,
+            assembly_id=self.assembly.id,  # type: ignore
+            state=form.state.data,
+        )
+        form.populate_obj(agenda_item)
         updated = ensure_states(agenda_item)
         updated.add(agenda_item.assembly)
         update_ticker(request, updated)
@@ -54,6 +70,35 @@ def add_agenda_item(
     layout.include_editor()
     layout.edit_mode = True
     layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+
+    return {
+        'layout': layout,
+        'title': _('New agenda item'),
+        'form': form,
+    }
+
+
+@LandsgemeindeApp.form(
+    model=AgendaItemCollection,
+    name='new-import',
+    template='form.pt',
+    permission=Private,
+    form=AgendaItemUploadForm
+)
+def import_agenda_item(
+    self: AgendaItemCollection,
+    request: LandsgemeindeRequest,
+    form: AgendaItemUploadForm
+) -> RenderData | Response:
+
+    if form.submitted(request):
+        agenda_item = form.import_agenda_item(self)
+        request.success(_('Imported a new agenda item'))
+        return redirect(request.link(agenda_item, 'edit'))
+
+    layout = AgendaItemCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Import'), '#'))
+    layout.editbar_links = []
 
     return {
         'layout': layout,
@@ -112,7 +157,7 @@ def view_agenda_item(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=AgendaItemForm
+    form=get_agenda_item_form_class
 )
 def edit_agenda_item(
     self: AgendaItem,

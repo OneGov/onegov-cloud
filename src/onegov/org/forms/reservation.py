@@ -30,10 +30,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Sequence
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
-    from typing import TypeAlias
     from .allocation import DateContainer
 
-    StrKeyFunc: TypeAlias = Callable[[str], SupportsRichComparison]
+    type StrKeyFunc = Callable[[str], SupportsRichComparison]
 
 # include all fields used below so we can filter them out
 # when we merge this form with the custom form definition
@@ -120,6 +119,76 @@ class ReservationAdjustmentForm(Form):
         validators=[InputRequired()],
         fieldset=_('Time'),
     )
+
+
+class AddReservationForm(Form):
+
+    date = DateField(
+        label=_('Date'),
+        description=_('HH:MM'),
+        validators=[InputRequired()],
+        fieldset=_('Date'),
+    )
+
+    whole_day = RadioField(
+        label=_('Whole day'),
+        choices=[
+            ('yes', _('Yes')),
+            ('no', _('No'))
+        ],
+        default='no',
+        fieldset=_('Time'),
+    )
+
+    start_time = TimeField(
+        label=_('Starting at'),
+        description=_('HH:MM'),
+        fieldset=_('Time'),
+        validators=[InputRequired()],
+        depends_on=('whole_day', 'no')
+    )
+
+    end_time = TimeField(
+        label=_('Ending at'),
+        description=_('HH:MM'),
+        fieldset=_('Time'),
+        validators=[InputRequired()],
+        depends_on=('whole_day', 'no')
+    )
+
+    quota_room = IntegerField(
+        label=_('Quota'),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_('Time'),
+        default=1,
+        depends_on=('whole_day', 'no')
+    )
+
+    quota_other = IntegerField(
+        label=_('Quota'),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_('Time'),
+        default=1,
+    )
+
+    def apply_resource(self, resource: Resource) -> None:
+        if resource.type == 'room':
+            self.delete_field('quota_other')
+        else:
+            self.delete_field('start_time')
+            self.delete_field('end_time')
+            self.delete_field('whole_day')
+            self.delete_field('quota_room')
+
+    @property
+    def quota(self) -> IntegerField:
+        return self.quota_room if 'quota_room' in self else self.quota_other
 
 
 class KabaEditForm(Form):

@@ -1,25 +1,34 @@
+from __future__ import annotations
+
 import pytest
 
 from datetime import date, datetime, time, UTC
 from decimal import Decimal
 from onegov.core.custom import msgpack
 from onegov.core.i18n.translation_string import TranslationMarkup
+from onegov.core.orm import ModelBase, SessionManager
 from markupsafe import Markup
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from translationstring import TranslationString
-from typing import NamedTuple
 from uuid import uuid4
+
+
+from typing import NamedTuple
 
 
 class Point:
 
     __slots__ = ('x', 'y')
 
-    def __init__(self, x, y):
+    def __init__(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
 
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, Point)
+            and self.x == other.x and self.y == other.y
+        )
 
 
 class PointTuple(NamedTuple):
@@ -27,7 +36,7 @@ class PointTuple(NamedTuple):
     y: int
 
 
-def test_custom_msgpack():
+def test_custom_msgpack() -> None:
 
     dt = datetime(2015, 6, 25, 12, 0)
 
@@ -65,16 +74,38 @@ def test_custom_msgpack():
     ),
     {'a': Decimal(1), None: Decimal(2)}
 ])
-def test_roundtrip(data):
+def test_roundtrip(data: object) -> None:
     assert msgpack.unpackb(msgpack.packb(data)) == data
 
 
-def test_not_serializable():
+def test_sqlalchemy_row_roundtrip(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        body: Mapped[str | None]
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('msgpack')
+    session = mgr.session()
+    doc = Document(id=1, body='test')
+    session.add(doc)
+    session.flush()
+
+    result = session.query(Document.id, Document.body).one()
+    roundtripped = msgpack.unpackb(msgpack.packb(result))
+    assert result == roundtripped
+    assert result._asdict() == roundtripped._asdict()
+
+
+def test_not_serializable() -> None:
     with pytest.raises(TypeError):
         msgpack.packb({'x': object()})
 
 
-def test_string_serializer():
+def test_string_serializer() -> None:
     s = msgpack.StringSerializer(
         tag=0,
         target=str,
@@ -86,7 +117,7 @@ def test_string_serializer():
     assert s.decode(b'TEST') == 'test'
 
 
-def test_dictionary_serializer():
+def test_dictionary_serializer() -> None:
 
     d = msgpack.DictionarySerializer(
         tag=0,
@@ -97,7 +128,7 @@ def test_dictionary_serializer():
     assert d.decode(d.encode(Point(1, 2))) == Point(1, 2)
 
 
-def test_make_serializable():
+def test_make_serializable() -> None:
     serializers = msgpack.Serializers()
 
     msgpack.make_serializable(tag=0, serializers=serializers)(Point)
@@ -114,7 +145,7 @@ def test_make_serializable():
     assert serializers.decode(tag, b) == PointTuple(1, 2)
 
 
-def test_serializers():
+def test_serializers() -> None:
     serializers = msgpack.Serializers()
 
     serializers.register(msgpack.StringSerializer(
@@ -138,7 +169,7 @@ def test_serializers():
     assert serializers.decode(tag, s.encode(Point(1, 2))) == Point(1, 2)
 
 
-def test_serializable():
+def test_serializable() -> None:
     serializers = msgpack.Serializers()
 
     class SerializablePoint(
@@ -149,7 +180,7 @@ def test_serializable():
     ):
 
         @classmethod
-        def serializers(cls):
+        def serializers(cls) -> msgpack.Serializers:
             return serializers  # for testing
 
     tag, s = serializers.by_type[SerializablePoint]

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from lxml import etree
@@ -31,9 +33,17 @@ from onegov.election_day.screen_widgets import (
 from tests.onegov.election_day.common import DummyRequest
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.widgets import Widget
+    from ..conftest import ImportTestDatasets, TestApp
+
+
 def test_election_compound_part_widgets(
-    election_day_app_bl, import_test_datasets
-):
+    election_day_app_bl: TestApp,
+    import_test_datasets: ImportTestDatasets
+) -> None:
+
     structure = """
         <model-title class="class-for-title"/>
         <model-progress class="class-for-progress"/>
@@ -74,7 +84,7 @@ def test_election_compound_part_widgets(
             class="class-for-party-strengths-table-2"
             year="2019"/>
     """
-    widgets = [
+    widgets: list[Widget] = [
         CountedEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
         ElectionCompoundDistrictsMapWidget(),
@@ -106,7 +116,7 @@ def test_election_compound_part_widgets(
     )
     compound = session.query(ElectionCompound).one()
     model = ElectionCompoundPart(compound, 'superregion', 'Region 3')
-    request = DummyRequest(app=election_day_app_bl, session=session)
+    request: Any = DummyRequest(app=election_day_app_bl, session=session)
     layout = ElectionCompoundPartLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
@@ -161,7 +171,7 @@ def test_election_compound_part_widgets(
     # Add final results (actually final, but not manually completed)
     with freeze_time('2022-01-01 12:00'):
         session.delete(compound)
-        compound, errors = import_test_datasets(
+        results = import_test_datasets(
             app_session=session,
             api_format='internal',
             model='election_compound',
@@ -212,6 +222,8 @@ def test_election_compound_part_widgets(
             date_=date(2019, 3, 31),
             dataset_name='landratswahlen-2019'
         )
+        assert len(results) == 1
+        compound, errors = next(iter(results.values()))
         assert not errors
         compound.completes_manually = True
         compound.manually_completed = False
@@ -343,16 +355,17 @@ def test_election_compound_part_widgets(
 
     # Add final results (actually, set final and add party results)
     with freeze_time('2022-01-02 12:00'):
-        errors = import_test_datasets(
+        results_ = import_test_datasets(
             'internal',
             'parties',
             'bl',
             'region',
-            'proporz',
             election=model.election_compound,
             dataset_name='landratswahlen-2019-parteien',
         )
-        assert not errors
+        assert len(results) == 1
+        errors_ = next(iter(results_.values()))
+        assert not errors_
         model.election_compound.manually_completed = True
         session.flush()
 

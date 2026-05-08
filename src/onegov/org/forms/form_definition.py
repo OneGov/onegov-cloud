@@ -9,6 +9,7 @@ from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm
 from wtforms.fields import BooleanField
+from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -49,7 +50,7 @@ class FormDefinitionBaseForm(Form):
         fieldset=_('Form Definition'),
         render_kw={'readonly': True},
         validators=[Optional()],
-        text='https://onegov.github.io/onegov-cloud/formcode.html',
+        text='https://docs.admin.digital/module/formulare',
         kind='panel',
         hide_label=False
     )
@@ -60,6 +61,22 @@ class FormDefinitionBaseForm(Form):
         description=_('Describes how this resource can be picked up. '
                       'This text is used on the ticket status page to '
                       'inform the user')
+    )
+
+    reply_to = EmailField(
+        label=_('E-Mail Reply Address (Reply-To)'),
+        fieldset=_('Tickets'),
+        description=_('Replies to automated e-mails go to this address.')
+    )
+
+    custom_above_footer = TextAreaField(
+        label=_('Custom text above the footer'),
+        fieldset=_('Tickets'),
+        description=_(
+            'This text is shown above the footer in the ticket '
+            'opening notification e-mail.'
+        ),
+        render_kw={'rows': 4}
     )
 
     show_vat = BooleanField(

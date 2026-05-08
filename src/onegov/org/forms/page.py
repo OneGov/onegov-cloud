@@ -68,6 +68,11 @@ class PageForm(PageBaseForm):
 class IframeForm(PageBaseForm):
     """ Defines the form for pages with the 'iframe' trait. """
 
+    lead = TextAreaField(
+        label=_('Lead'),
+        description=_('Describes what this page is about'),
+        render_kw={'rows': 4})
+
     allowed_domains: list[str] = []
 
     domain_hint = PanelField(
@@ -125,7 +130,11 @@ class IframeForm(PageBaseForm):
             return
 
         domain = '/'.join(field.data.split('/', 3)[:3])
-        if domain not in self.allowed_domains:
+        allowed_domains = {
+            d.rstrip('/')
+            for d in self.allowed_domains
+        }
+        if domain not in allowed_domains:
             raise ValidationError(
                 _('The domain of the URL is not allowed for iFrames.')
             )

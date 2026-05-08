@@ -3,8 +3,8 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="row">
-            <div class="columns medium-7 small-12">
+        <div class="grid-x grid-padding-x">
+            <div class="cell medium-7 small-12">
 
                 <div class="panel callout" tal:condition="model.username != request.current_username">
                     <i class="fa fa-warning" aria-hidden="true"></i>
@@ -13,16 +13,14 @@
                     </tal:b>
                 </div>
 
-                <div class="occasion-panel">
-                    <h3>
-                        <a href="${request.link(model.occasion.activity)}">
-                            ${model.occasion.activity.title}
-                        </a>
-                    </h3>
+                <h3>
+                    <a href="${request.link(model.occasion.activity)}">
+                        ${model.occasion.activity.title}
+                    </a>
+                </h3>
 
-                    <div class="occasions">
-                        <metal:b use-macro="layout.macros['occasion']" tal:define="show_enroll False"/>
-                    </div>
+                <div class="occasions">
+                    <metal:b use-macro="layout.macros['occasion']" tal:define="show_enroll False"/>
                 </div>
 
                 <p i18n:translate class="panel" tal:condition="model.occasion.period.active|False">
@@ -35,26 +33,38 @@
                     This group is from an inactive period.
                 </div>
 
-                <div class="inline-top-bar">
-                    <h2 class="h3-size" i18n:translate>
+                <div class="children-group">
+                    <h2 class="h3" i18n:translate>
                         Own Children
                     </h2>
 
+                    <p tal:condition="not:existing" i18n:translate>
+                        None of own children in group.
+                    </p>
+
+                    <ul tal:condition="existing" class="more-list own-children">
+                        <li tal:repeat="attendee existing">
+                            <b>${attendee.gender == 'male' and '👦' or '👧'} ${attendee.name}</b>
+                            <tal:b replace="group_action(attendee, 'leave')(layout)" />
+                        </li>
+                    </ul>
+
                     <!--! Show a drop down if there's at least one child -->
                     <tal:b condition="possible or existing">
-                        <button href="#" data-dropdown="add-possible" aria-controls="add-possible" aria-expanded="false" class="button dropdown small secondary">
-                            <i class="fa fa-fw fa-plus-circle" aria-hidden="true"></i>
+                        <button type="button" data-ogc-toggle="#add-possible" aria-controls="add-possible" aria-expanded="false" class="button hollow">
                             <tal:b i18n:translate>
                                 Add own child
                             </tal:b>
+                            <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
                         </button>
-                        <ul id="add-possible" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                        <ul id="add-possible" class="more-list hidden" aria-hidden="true">
                             <li tal:repeat="attendee possible">
+                                <b>${attendee.gender == 'male' and '👦' or '👧'} ${attendee.name}</b>
                                 <tal:b replace="group_action(attendee, 'join')(layout)" />
                             </li>
-                            <li>
-                                <a href="${signup_url()}" i18n:translate>
-                                    Add new own child
+                            <li class="add-own-child">
+                                <a href="${signup_url()}">
+                                    <i class="fa fa-plus"></i> <b i18n:translate>Add new own child</b>
                                 </a>
                             </li>
                         </ul>
@@ -62,7 +72,7 @@
 
                     <!--! Show a simple button if there's no child yet -->
                     <tal:b condition="not possible and not existing">
-                        <a href="${signup_url()}" class="button small secondary">
+                        <a href="${signup_url()}" class="button hollow">
                             <i class="fa fa-fw fa-plus-circle" aria-hidden="true"></i>
                             <tal:b i18n:translate>
                                 Add own child
@@ -71,48 +81,33 @@
                     </tal:b>
                 </div>
 
-                <p tal:condition="not:existing" i18n:translate>
-                    None of own children in group.
-                </p>
-
-                <ul tal:condition="existing" class="dense with-margin own-children">
-                    <li tal:repeat="attendee existing">
-                        <div class="with-icon with-small-margin">
-                            <div>${attendee.gender == 'male' and '👦' or '👧'}</div>
-                            <div>
-                                ${attendee.name}<br>
-                                <i class="fa fa-fw fa-sign-out" aria-hidden="true"></i>
-                                <tal:b replace="group_action(attendee, 'leave')(layout)" />
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-
-                <div class="inline-top-bar">
-                    <h2 class="h3-size" i18n:translate>
+                <div class="children-group">
+                    <h2 class="h3" i18n:translate>
                         Other Children
                     </h2>
-                    <a href="${mailto}" class="button small secondary">
+                    <a href="${mailto}" class="button hollow">
                         <i class="fa fa-fw fa-envelope" aria-hidden="true"></i>
                         <tal:b i18n:translate>
                             Invite other children
                         </tal:b>
                     </a>
-                </div>
-                <p>
-                    <tal:b condition="not:external" i18n:translate>
-                        No other children in group
-                    </tal:b>
+                    <p>
+                        <tal:b condition="not:external" i18n:translate>
+                            No other children in group
+                        </tal:b>
 
-                    <ul tal:condition="external" class="dense other-children">
-                        <li tal:repeat="attendee external" class="with-small-margin">
-                            ${attendee.gender == 'male' and '👦' or '👧'} ${attendee.name}
-                        </li>
-                    </ul>
-                </p>
+                        <ul tal:condition="external" class="more-list other-children">
+                            <li tal:repeat="attendee external">
+                                <b>${attendee.gender == 'male' and '👦' or '👧'} ${attendee.name}</b>
+                            </li>
+                        </ul>
+                    </p>
+                </div>
             </div>
-            <div class="columns medium-4 small-12 end">
-                <tal:b metal:use-macro="layout.macros.users" />
+            <div class="cell medium-3 medium-offset-1 small-12 sidebar">
+                <div class="sidebar-wrapper">
+                    <tal:b metal:use-macro="layout.macros.users" />
+                </div>
             </div>
         </div>
     </tal:b>

@@ -118,15 +118,6 @@ class VotumForm(NamedFileForm):
     calculated_timestamp = StringField(
         label=_('Calculated video timestamp'),
         fieldset=_('Progress'),
-        render_kw={
-            'long_description': _(
-                'Calculated automatically based on the start time of the '
-                'votum and the start time of of the livestream of the assembly'
-                '.'
-            ),
-            'readonly': True,
-            'step': 1
-        },
         validators=[
             Optional()
         ],
@@ -172,9 +163,9 @@ class VotumForm(NamedFileForm):
         people = PersonCollection(self.request.session).query()
         people_choices: list[_Choice] = [(
             (
-                f'{p.first_name} {p.last_name}, {p.function}, '
+                (f'{p.first_name} {p.last_name}, {p.function}, '
                 f'{p.political_party}, {p.location_code_city}, '
-                f'{p.picture_url}',
+                f'{p.picture_url}'),
                 f'{p.first_name} ' + ', '.join(filter(None, [
                     p.last_name,
                     p.function,
@@ -185,11 +176,21 @@ class VotumForm(NamedFileForm):
         self.person_choices.choices = people_choices
 
     def on_request(self) -> None:
-        DefaultLayout(self.model, self.request)
+        layout = DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('person_votum')
         self.populate_person_choices()
+        self.calculated_timestamp.render_kw = {
+            'long_description': _(
+                'Calculated automatically based on the start time of the '
+                'votum and the start time of of the livestream of the '
+                '${assembly_type}.',
+                mapping={'assembly_type': layout.assembly_type}
+            ),
+            'readonly': True,
+            'step': 1
+        }
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude={

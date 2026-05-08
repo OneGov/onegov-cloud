@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 
 import morepath
 
@@ -19,16 +20,15 @@ from onegov.org.forms.allocation import (
     DailyItemAllocationForm, DailyItemAllocationEditForm)
 from onegov.org.layout import AllocationEditFormLayout
 from onegov.org.layout import AllocationRulesLayout
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.elements import BackLink, Link, Confirm, Intercooler
 from onegov.reservation import Allocation
 from onegov.reservation import Reservation
 from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from purl import URL
 from sedate import utcnow
-from sqlalchemy import not_, func
+from sqlalchemy import or_, func
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.orm import defer, defaultload
 from uuid import uuid4
 from webob import exc
 
@@ -38,23 +38,21 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query
-    from typing import TypeAlias
     from webob import Response
 
-    AllocationForm: TypeAlias = (
+    type AllocationForm = (
         DaypassAllocationForm
         | RoomAllocationForm
         | DailyItemAllocationForm
     )
-    AllocationEditForm: TypeAlias = (
+    type AllocationEditForm = (
         DaypassAllocationEditForm
         | RoomAllocationEditForm
         | DailyItemAllocationEditForm
     )
 
 
-@OrgApp.json(model=Resource, name='slots', permission=Public)
+@OrgApp.json(model=Resource, name='slots', permission=Public, open_data=False)
 def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the allocations in a fullcalendar compatible events feed.
 
@@ -68,23 +66,9 @@ def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         return ()
 
-    # get all allocations (including mirrors), for the availability calculation
-    query: Query[Allocation]
-    query = self.scheduler.allocations_in_range(  # type:ignore[assignment]
-        start, end, masters_only=False)
-    query = query.order_by(Allocation._start)
-    query = query.options(defer(Allocation.data))
-    query = query.options(defer(Allocation.group))
-    query = query.options(
-        defaultload('reserved_slots')
-        .defer('reservation_token')
-        .defer('allocation_id')
-        .defer('end'))
-
-    # but only return the master allocations
     return tuple(
-        e.as_dict() for e in utils.AllocationEventInfo.from_allocations(
-            request, self, tuple(query)
+        e.as_dict() for e in utils.AllocationEventInfo.from_resource_by_range(
+            request, self, start, end
         )
     )
 
@@ -319,6 +303,7 @@ def handle_edit_allocation(
 
     layout = layout or AllocationEditFormLayout(self, request)
     layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
@@ -337,11 +322,27 @@ def handle_delete_allocation(self: Allocation, request: OrgRequest) -> None:
 
     resource = request.app.libres_resources.by_allocation(self)
     assert resource is not None
-    resource.scheduler.remove_allocation(id=self.id)
+    try:
+        resource.scheduler.remove_allocation(id=self.id)
+    except LibresError as e:
+        message: JSON_ro = {
+            'message': utils.get_libres_error(e, request),
+            'success': False
+        }
 
-    @request.after
-    def trigger_calendar_update(response: Response) -> None:
-        response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
+        @request.after
+        def trigger(response: Response) -> None:
+            response.headers.add('X-IC-Trigger', 'rc-reservation-error')
+            response.headers.add(
+                'X-IC-Trigger-Data',
+                json.dumps(message, ensure_ascii=True)
+            )
+    else:
+        request.success(_('The allocation was deleted'))
+
+        @request.after
+        def trigger_calendar_update(response: Response) -> None:
+            response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
 
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
@@ -433,15 +434,45 @@ def handle_edit_rule(
             ) == rule_id
         )
         # .. without the ones with slots
-        candidates = candidates.filter(
-            not_(Allocation.id.in_(slots.subquery())))
+        deletable_candidates = candidates.filter(
+            Allocation.id.notin_(slots.scalar_subquery()))
 
         # .. without the ones with reservations
-        candidates = candidates.filter(
-            not_(Allocation.group.in_(reservations.subquery())))
+        deletable_candidates = deletable_candidates.filter(
+            Allocation.group.notin_(reservations.scalar_subquery()))
 
         # delete the allocations
-        deleted_count = candidates.delete('fetch')
+        deleted_count = deletable_candidates.delete('fetch')
+
+        # we need to update any undeletedable allocations with
+        # the new rule_id and the new access
+        updatable_candidates = candidates.filter(or_(
+            Allocation.id.in_(slots.scalar_subquery()),
+            Allocation.group.in_(reservations.scalar_subquery())
+        ))
+
+        # .. but only future ones (so we don't keep an ever-growing
+        # rat's tail of ancient allocations we no longer care about)
+        updatable_candidates = updatable_candidates.filter(
+            Allocation._end >= utcnow())
+
+        # update the allocations
+        # NOTE: For now we only update the rule_id to keep the link
+        #       as well as the access, everything else is left alone
+        #       since it could otherwise result in inconsistent data
+        new_data = {'rule': form.rule_id}
+        if 'access' in form:
+            new_data['access'] = form['access'].data
+
+        # NOTE: This is a little bit dodgy, but since allocations aren't
+        #       searchable and we don't have any other use-cases currently
+        #       where we would want to know about changes to allocations
+        #       the speed increase outweighs any future potential for
+        #       bugs related to this bulk update
+        with request.app.session_manager.ignore_bulk_updates():
+            updated_count = updatable_candidates.update({
+                Allocation.data: Allocation.data.op('||')(new_data)
+            }, 'fetch')
 
         # Update the rule itself
         rules = self.content.get('rules', [])
@@ -460,9 +491,11 @@ def handle_edit_rule(
         request.success(
             _(
                 'Availability period updated. ${deleted} allocations removed, '
-                '${created} new allocations created.',
+                '${updated} allocations adjusted and ${created} new '
+                'allocations created.',
                 mapping={
                     'deleted': deleted_count,
+                    'updated': updated_count,
                     'created': new_allocations_count,
                 },
             )
@@ -483,6 +516,13 @@ def handle_edit_rule(
         return request.redirect(request.link(self, name='rules'))
 
     form.rule = existing_rule
+
+    layout.edit_mode = True
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.link(self, name='rules'),
+        attrs={'class': 'cancel-link'}
+    )
     return {
         'layout': layout,
         'title': _('Edit availabilty period'),
@@ -665,14 +705,15 @@ def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
 
     # .. without the ones with slots
     candidates = candidates.filter(
-        not_(Allocation.id.in_(slots.subquery())))
+        Allocation.id.notin_(slots.scalar_subquery()))
 
     # .. without the ones with reservations
     candidates = candidates.filter(
-        not_(Allocation.group.in_(reservations.subquery())))
+        Allocation.group.notin_(reservations.scalar_subquery()))
 
     # delete the allocations
-    count = candidates.delete('fetch')
+    for count, candidate in enumerate(candidates, start=1):
+        request.session.delete(candidate)
 
     delete_rule(self, rule_id)
 

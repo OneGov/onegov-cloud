@@ -1,49 +1,57 @@
 from __future__ import annotations
-
 from onegov.activity import BookingCollection
-from onegov.activity import PeriodCollection
+from onegov.activity import BookingPeriodCollection
 from onegov.activity import VolunteerCollection
+from onegov.core.utils import Bunch
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
+from onegov.form import FormDefinition
 from onegov.org.custom import get_global_tools as get_base_tools
-from onegov.core.elements import Link, LinkGroup
+from onegov.core.elements import LinkGroup, Link
 from onegov.org.models import Dashboard, ExportCollection
 
 
 from typing import TYPE_CHECKING
+
+from onegov.org.models.file import ImageSetCollection
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
+    from onegov.town6.layout import NavigationEntry
 
 
 @FeriennetApp.template_variables()
 def get_template_variables(request: FeriennetRequest) -> RenderData:
-    return {
+    links = {
         'global_tools': tuple(get_global_tools(request)),
-        'top_navigation': tuple(get_top_navigation(request))
+        'top_navigation': tuple(get_top_navigation(request)),
+        'volunteer_link': None
     }
+
+    if request.app.show_volunteers(request):
+        links['volunteer_link'] = Link(
+            text=_('Help us'),
+            url=request.class_link(
+                VacationActivityCollection, name='volunteer'
+            ),
+            attrs={'id': ('help-us')}
+        )  # type:ignore[assignment]
+
+    return links
 
 
 def get_global_tools(
     request: FeriennetRequest
 ) -> Iterator[Link | LinkGroup]:
-    yield from get_base_tools(request)
+    yield from get_base_tools(request, invoicing=False)
     yield from get_personal_tools(request)
     yield from get_admin_tools(request)
-
-    if request.app.show_volunteers(request):
-        yield Link(
-            text=_('Help us'),
-            url=request.class_link(
-                VacationActivityCollection, name='volunteer'
-            ),
-            attrs={'class': ('volunteer', 'highlighted')}
-        )
 
 
 def get_admin_tools(
@@ -58,7 +66,7 @@ def get_admin_tools(
         if request.is_admin:
             links.append(
                 Link(
-                    text=_('Dashboard'),
+                    text=_('Overview'),
                     url=request.class_link(Dashboard),
                     attrs={'class': 'show-dashboard'}
                 )
@@ -67,7 +75,7 @@ def get_admin_tools(
             links.append(
                 Link(
                     text=_('Periods'),
-                    url=request.class_link(PeriodCollection),
+                    url=request.class_link(BookingPeriodCollection),
                     attrs={'class': 'manage-periods'}
                 )
             )
@@ -217,12 +225,45 @@ def get_personal_tools(
             )
 
 
-def get_top_navigation(request: FeriennetRequest) -> Iterator[Link]:
+def get_top_navigation(
+        request: FeriennetRequest) -> Iterator[NavigationEntry]:
     # inject an activites link in front of all top navigation links
-    yield Link(
-        text=_('Activities'),
-        url=request.class_link(VacationActivityCollection)
+    form = request.session.query(FormDefinition).first()
+    yield (  # type:ignore[misc]
+        Bunch(id=-1, access='public', published=True),
+        Link(
+            text=_('Activities'),
+            url=request.class_link(VacationActivityCollection)
+        ),
+        ()
     )
+    yield (  # type:ignore[misc]
+        Bunch(id=1, access='public', published=True),
+        Link(
+            text=_('Contact'),
+            url=request.link(form)
+        ),
+        ()
+    )
+    yield (  # type:ignore[misc]
+        Bunch(id=2, access='public', published=True),
+        Link(
+            text=_('Photo Albums'),
+            url=request.class_link(ImageSetCollection)
+        ),
+        ()
+    )
+    if request.app.show_volunteers(request):
+        yield (  # type:ignore[misc]
+            Bunch(id=3, access='public', published=True),
+            Link(
+                text=_('Help us'),
+                url=request.class_link(
+                    VacationActivityCollection, name='volunteer'
+                )
+            ),
+            ()
+        )
 
     layout = DefaultLayout(request.app.org, request)
     yield from layout.top_navigation or ()

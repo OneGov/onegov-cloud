@@ -1244,7 +1244,7 @@ msgid "d-3-938"
 msgstr "Animal protection"
 
 msgid "d-1-10"
-msgstr "Social policy"
+msgstr "Social and societal policy"
 
 msgid "d-2-101"
 msgstr "Health"
@@ -1294,31 +1294,31 @@ msgid "d-3-1028"
 msgstr "Welfare"
 
 msgid "d-2-103"
-msgstr "Social groups"
+msgstr "Societal issues"
 
 msgid "d-3-1031"
-msgstr "Immigration policy"
+msgstr "Migration and integration policy"
 
 msgid "d-3-1032"
-msgstr "Refugees"
+msgstr "Asylum policy"
 
 msgid "d-3-1033"
-msgstr "Status of women"
+msgstr "Women and gender equality policy"
 
 msgid "d-3-1034"
 msgstr "Family policy"
 
 msgid "d-3-1035"
-msgstr "Children and young people"
+msgstr "Children and youth policy"
 
 msgid "d-3-1036"
-msgstr "Senior citizens"
+msgstr "Age policy"
 
 msgid "d-3-1037"
-msgstr "Persons with disabilities"
+msgstr "People with disabilities"
 
 msgid "d-3-1038"
-msgstr "Homosexuals"
+msgstr "LGBTQIA+"
 
 msgid "d-1-11"
 msgstr "Education and research"

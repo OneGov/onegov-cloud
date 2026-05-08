@@ -182,7 +182,7 @@ class DefaultLayout(ChameleonLayout):
         self,
         number: Number | Decimal | float | str | None,
         decimal_places: int | None = None,
-        padding: str = ''
+        padding: str | int = ''
     ) -> str:
         """ Takes the given numer and formats it according to locale.
 

@@ -21,14 +21,10 @@ if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable
     from collections.abc import Iterable
-    from onegov.core.directives import _RequestT
     from onegov.core.request import CoreRequest
     from typing import Protocol
-    from typing import TypeAlias
     from webob import Response as BaseResponse
     from wtforms import Form
-
-    FormCallable: TypeAlias = Callable[[Any, _RequestT], type[Form]]
 
     class InputScreenWidget(Protocol):
         @property
@@ -49,12 +45,12 @@ class ManageHtmlAction(HtmlAction):
 
     """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
+        render: Callable[[Any, RequestT], BaseResponse] | str | None = None,
         template: StrOrBytesPath | None = None,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any,
@@ -78,13 +74,13 @@ class ManageFormAction(HtmlHandleFormAction):
 
     """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        form: type[Form] | FormCallable[_RequestT] = EmptyForm,
-        render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
+        form: type[Form] | Callable[[Any, RequestT], type[Form]] = EmptyForm,
+        render: Callable[[Any, RequestT], BaseResponse] | str | None = None,
         template: StrOrBytesPath = 'form.pt',
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any,
@@ -143,20 +139,29 @@ def render_pdf(content: dict[str, Any], request: CoreRequest) -> Response:
 def render_json(content: dict[str, Any], request: CoreRequest) -> Response:
     data = content.get('data', {})
     name = content.get('name', 'data')
-    return Response(
+    response = Response(
         json.dumps_bytes(data, sort_keys=True, indent=2),
         content_type='application/json; charset=utf-8',
-        content_disposition=f'inline; filename={name}.json')
+        content_disposition=f'inline; filename={name}.json',
+    )
+    if request.method in ('GET', 'HEAD'):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+
+    return response
 
 
 def render_csv(content: dict[str, Any], request: CoreRequest) -> Response:
     data = content.get('data', {})
     name = content.get('name', 'data')
-    return Response(
+    response = Response(
         convert_list_of_dicts_to_csv(data),
         content_type='text/csv',
-        content_disposition=f'inline; filename={name}.csv'
+        content_disposition=f'inline; filename={name}.csv',
     )
+    if request.method in ('GET', 'HEAD'):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+
+    return response
 
 
 class SvgFileViewAction(ViewAction):
@@ -164,10 +169,10 @@ class SvgFileViewAction(ViewAction):
     """ View directive for viewing SVG files from filestorage. The SVGs
     are created using a cronjob and might not be available. """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -189,10 +194,10 @@ class PdfFileViewAction(ViewAction):
     """ View directive for viewing PDF files from filestorage. The PDFs
     are created using a cronjob and might not be available. """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -213,10 +218,10 @@ class JsonFileAction(ViewAction):
 
     """ View directive for viewing JSON data as file. """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,
@@ -237,10 +242,10 @@ class CsvFileAction(ViewAction):
 
     """ View directive for viewing CSV data as file. """
 
-    def __init__(
+    def __init__[RequestT: CoreRequest](
         self,
         model: type | str,
-        load: Callable[[_RequestT], Any] | str | None = None,
+        load: Callable[[RequestT], Any] | str | None = None,
         permission: object | str = Public,
         internal: bool = False,
         **predicates: Any,

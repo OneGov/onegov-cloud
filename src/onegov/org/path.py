@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import sedate
 from datetime import date, datetime
+from libres.db.models import ReservationBlocker
 from onegov.api.models import ApiKey
 from onegov.chat import MessageCollection
 from onegov.chat import TextModule
@@ -44,7 +45,10 @@ from onegov.newsletter import Subscription
 from onegov.org.app import OrgApp
 from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
+from onegov.org.forms.payments import get_ticket_group_choices
 from onegov.org.models import AtoZPages, PushNotificationCollection
+from onegov.org.models import RISCommissionMembershipCollection
+from onegov.org.models import RISCommissionMembership
 from onegov.org.models import CitizenDashboard, Dashboard
 from onegov.org.models import Clipboard
 from onegov.org.models import DirectorySubmissionAction
@@ -90,21 +94,25 @@ from onegov.org.models import (
     PoliticalBusiness,
     PoliticalBusinessCollection,
 )
-from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
+from onegov.org.models.political_business import PoliticalBusinessStatus
+from onegov.org.models.political_business import PoliticalBusinessType
 from onegov.org.models.resource import FindYourSpotCollection
+from onegov.org.models.ticket import FilteredArchivedTicketCollection
+from onegov.org.models.ticket import FilteredTicketCollection
 from onegov.page import PageCollection
-from onegov.pay import PaymentProvider, Payment, PaymentCollection
-from onegov.pay import PaymentProviderCollection
+from onegov.pay import Payment, PaymentCollection
+from onegov.pay import PaymentProvider, PaymentProviderCollection
 from onegov.people import Person, PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import Allocation
 from onegov.reservation import Reservation
 from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket, TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
@@ -115,6 +123,8 @@ from webob import exc, Response
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+    from onegov.form.fields import TreeSelectNode
     from onegov.org.request import OrgRequest
     from onegov.ticket.collection import ExtendedTicketState
 
@@ -165,8 +175,7 @@ def get_users(
 ) -> UserCollection:
     return UserCollection(
         app.session(),
-        active=active, role=role, tag=tag, provider=provider,
-        source=source
+        active=active, role=role, tag=tag, provider=provider, source=source
     )
 
 
@@ -448,26 +457,31 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
     )}
 )
 def get_tickets(
-    app: OrgApp,
+    request: OrgRequest,
     handler: str = 'ALL',
     state: ExtendedTicketState | None = 'open',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
+    submitter: str | None = None,
+    q: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> TicketCollection | None:
 
     if state is None:
         return None
 
-    return TicketCollection(
-        app.session(),
+    return FilteredTicketCollection(
+        request.session,
         handler=handler,
         state=state,
         page=page,
         group=group,
         owner=owner or '*',
+        submitter=submitter or '*',
+        term=q,
         extra_parameters=extra_parameters,
+        request=request,
     )
 
 
@@ -477,21 +491,26 @@ def get_tickets(
     converters={'page': int}
 )
 def get_archived_tickets(
-    app: OrgApp,
+    request: OrgRequest,
     handler: str = 'ALL',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
+    submitter: str | None = None,
+    q: str | None = None,
     extra_parameters: dict[str, str] | None = None
 ) -> ArchivedTicketCollection:
-    return ArchivedTicketCollection(
-        app.session(),
+    return FilteredArchivedTicketCollection(
+        request.session,
         handler=handler,
         state='archived',
         page=page,
         group=group,
         owner=owner or '*',
-        extra_parameters=extra_parameters
+        submitter=submitter or '*',
+        term=q,
+        extra_parameters=extra_parameters,
+        request=request,
     )
 
 
@@ -577,6 +596,27 @@ def get_reservation(
         query = query.filter(Reservation.id == id)
 
         return query.first()  # type:ignore[return-value]
+    return None
+
+
+@OrgApp.path(
+    model=ReservationBlocker,
+    path='/reservation-blocker/{resource}/{id}',
+    converters={'resource': UUID, 'id': int}
+)
+def get_reservation_blocker(
+    app: OrgApp,
+    resource: UUID,
+    id: int
+) -> ReservationBlocker | None:
+
+    res = app.libres_resources.by_id(resource)
+
+    if res is not None:
+        query = res.scheduler.managed_blockers()
+        query = query.filter(ReservationBlocker.id == id)
+
+        return query.first()
     return None
 
 
@@ -745,6 +785,12 @@ def get_occurrences(
     else:
         search_widget = None
 
+    role = getattr(request.identity, 'role', 'anonymous')
+    available_accesses = {
+        'admin': (),  # can see everything
+        'editor': (),  # can see everything
+        'member': ('member', 'mtan', 'public')
+    }.get(role, ('mtan', 'public'))
     return OccurrenceCollection(
         app.session(),
         page=page,
@@ -754,7 +800,7 @@ def get_occurrences(
         tags=tags,
         filter_keywords=filter_keywords,
         locations=locations,
-        only_public=(not request.is_manager),
+        available_accesses=available_accesses,
         search_widget=search_widget,
     )
 
@@ -769,13 +815,21 @@ def get_event(app: OrgApp, name: str) -> Event | None:
     return EventCollection(app.session()).by_name(name)
 
 
-@OrgApp.path(model=Search, path='/search', converters={'page': int})
+@OrgApp.path(
+    model=Search,
+    path='/search',
+    converters={
+        'type': [str],
+        'page': int
+    }
+)
 def get_search(
     request: OrgRequest,
     q: str = '',
+    type: list[str] | None = None,
     page: int = 0
-) -> Search[Any]:
-    return Search(request, q, page)
+) -> Search:
+    return Search(request, q, types=type, page=page)
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')
@@ -890,6 +944,38 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
     return PaymentCollection(app.session()).by_id(id)
 
 
+def get_expand_ticket_group(
+    request: OrgRequest
+) -> Callable[[list[str]], list[str]]:
+
+    def expand_ticket_group(groups: list[str]) -> list[str]:
+        group_lookup = set(groups)
+        new_groups = []
+
+        def expand_subnodes(
+            nodes: Sequence[TreeSelectNode],
+            include: bool = False
+        ) -> None:
+
+            for node in nodes:
+                if include or node['value'] in group_lookup:
+                    if node['children']:
+                        expand_subnodes(node['children'], include=True)
+                    else:
+                        new_groups.append(node['value'])
+                else:
+                    expand_subnodes(node['children'])
+
+        for node in get_ticket_group_choices(request):
+            # we don't expand the first level
+            if node['value'] in group_lookup:
+                new_groups.append(node['value'])
+            else:
+                expand_subnodes(node['children'])
+        return new_groups
+    return expand_ticket_group
+
+
 @OrgApp.path(
     model=PaymentCollection,
     path='/payments',
@@ -899,37 +985,100 @@ def get_payment(app: OrgApp, id: UUID) -> Payment | None:
         'end': datetime_converter,
         'status': str,
         'payment_type': str,
-        'ticket_start': datetime_converter,
-        'ticket_end': datetime_converter,
-        'reservation_start': datetime_converter,
-        'reservation_end': datetime_converter
+        'g': [str],
+        'ticket_group': [str],
+        'ticket_start': extended_date_converter,
+        'ticket_end': extended_date_converter,
+        'reservation_start': extended_date_converter,
+        'reservation_end': extended_date_converter,
+        'reservation_reference_date': LiteralConverter('final', 'any'),
     }
 )
 def get_payments(
-    app: OrgApp,
+    request: OrgRequest,
     source: str = '*',
     page: int = 0,
     start: datetime | None = None,
     end: datetime | None = None,
     status: str | None = None,
     payment_type: str | None = None,
-    ticket_start: datetime | None = None,
-    ticket_end: datetime | None = None,
-    reservation_start: datetime | None = None,
-    reservation_end: datetime | None = None
+    g: list[str] | None = None,
+    ticket_start: date | None = None,
+    ticket_end: date | None = None,
+    reservation_start: date | None = None,
+    reservation_end: date | None = None,
+    reservation_reference_date: Literal['final', 'any'] | None = None,
+    extra_parameters: dict[str, Any] | None = None,
 ) -> PaymentCollection:
+
+    if not g and extra_parameters and 'ticket_group' in extra_parameters:
+        # allow the full parameter name as a fallback
+        g = extra_parameters['ticket_group']
+
     return PaymentCollection(
-        session=app.session(),
+        session=request.session,
         source=source,
         page=page,
         start=start,
         end=end,
         status=status,
         payment_type=payment_type,
+        ticket_group=g,
         ticket_start=ticket_start,
         ticket_end=ticket_end,
         reservation_start=reservation_start,
-        reservation_end=reservation_end
+        reservation_end=reservation_end,
+        reservation_reference_date=reservation_reference_date,
+        expand_ticket_group=get_expand_ticket_group(request)
+    )
+
+
+@OrgApp.path(
+    model=TicketInvoiceCollection,
+    path='/invoices',
+    converters={
+        'page': int,
+        'g': [str],
+        'ticket_group': [str],
+        'ticket_start': extended_date_converter,
+        'ticket_end': extended_date_converter,
+        'reservation_start': extended_date_converter,
+        'reservation_end': extended_date_converter,
+        'reservation_reference_date': LiteralConverter('final', 'any'),
+        'has_payment': bool,
+        'invoiced': bool,
+    }
+)
+def get_invoices(
+    request: OrgRequest,
+    page: int = 0,
+    g: list[str] | None = None,
+    ticket_start: date | None = None,
+    ticket_end: date | None = None,
+    reservation_start: date | None = None,
+    reservation_end: date | None = None,
+    reservation_reference_date: Literal['final', 'any'] | None = None,
+    has_payment: bool | None = None,
+    invoiced: bool | None = None,
+    extra_parameters: dict[str, Any] | None = None,
+) -> TicketInvoiceCollection:
+
+    if not g and extra_parameters and 'ticket_group' in extra_parameters:
+        # allow the full parameter name as a fallback
+        g = extra_parameters['ticket_group']
+
+    return TicketInvoiceCollection(
+        session=request.session,
+        page=page,
+        ticket_group=g,
+        ticket_start=ticket_start,
+        ticket_end=ticket_end,
+        reservation_start=reservation_start,
+        reservation_end=reservation_end,
+        reservation_reference_date=reservation_reference_date,
+        has_payment=has_payment,
+        invoiced=invoiced,
+        expand_ticket_group=get_expand_ticket_group(request)
     )
 
 
@@ -1192,13 +1341,21 @@ def get_sent_notification_collection(
 @OrgApp.path(
     model=RISParliamentarianCollection,
     path='/parliamentarians',
-    converters={'active': bool}
+    converters={
+        'active': [bool],
+        'party': [str]
+    }
 )
 def get_parliamentarians(
     app: OrgApp,
-    active: bool = True
+    active: list[bool] | None = None,
+    party: list[str] | None = None
 ) -> RISParliamentarianCollection:
-    return RISParliamentarianCollection(app.session(), active)
+    return RISParliamentarianCollection(
+        app.session(),
+        active=active or [True],
+        party=party
+    )
 
 
 @OrgApp.path(
@@ -1274,13 +1431,22 @@ def get_commissions(
 @OrgApp.path(
     model=RISCommission,
     path='/commission/{id}',
-    converters={'id': UUID}
+    converters={'id': UUID, 'active_members': bool}
 )
 def get_commission(
     app: OrgApp,
-    id: UUID
+    id: UUID,
+    active_members: bool | None = None
 ) -> RISCommission | None:
-    return RISCommissionCollection(app.session()).by_id(id)
+    # NOTE: This ensures the parameter is only in generated URLs if we
+    #       look for inactive members, if it were always there by default
+    #       it would be a bit of a bother.
+    if active_members is True:
+        active_members = None
+    comission = RISCommissionCollection(app.session()).by_id(id)
+    if comission is not None:
+        comission.active_members = active_members
+    return comission
 
 
 @OrgApp.path(
@@ -1312,20 +1478,22 @@ def get_meeting(
     path='/political-businesses',
     converters={
         'page': int,
-        'status': [str],
-        'types': [str],
+        'status': [LiteralConverter(PoliticalBusinessStatus)],
+        'types': [LiteralConverter(PoliticalBusinessType)],
         'years': [int],
     }
 )
 def get_political_businesses(
-    app: OrgApp,
+    request: OrgRequest,
     page: int = 0,
-    status: list[str] | None = None,
-    types: list[str] | None = None,
+    q: str | None = None,
+    status: list[PoliticalBusinessStatus] | None = None,
+    types: list[PoliticalBusinessType] | None = None,
     years: list[int] | None = None,
 ) -> PoliticalBusinessCollection:
     return PoliticalBusinessCollection(
-        app.session(),
+        request,
+        term=q,
         page=page,
         status=status,
         types=types,
@@ -1339,10 +1507,10 @@ def get_political_businesses(
     converters={'id': UUID}
 )
 def get_political_business(
-    app: OrgApp,
+    request: OrgRequest,
     id: UUID
 ) -> PoliticalBusiness | None:
-    return PoliticalBusinessCollection(app.session()).by_id(id)
+    return PoliticalBusinessCollection(request).by_id(id)
 
 
 @OrgApp.path(
@@ -1357,3 +1525,15 @@ def get_meeting_item(
     session = app.session()
     res = session.query(MeetingItem).filter(MeetingItem.id == id).first()
     return res
+
+
+@OrgApp.path(
+    model=RISCommissionMembership,
+    path='/commission-membership/{id}',
+    converters={'id': UUID}
+)
+def get_commission_membership(
+    app: OrgApp,
+    id: UUID
+) -> RISCommissionMembership | None:
+    return RISCommissionMembershipCollection(app.session()).by_id(id)

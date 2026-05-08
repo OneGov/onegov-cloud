@@ -70,6 +70,14 @@ msgstr ""
 "Vous ne pouvez pas vous connecter car votre utilisateur n'a pas de groupes. "
 "Contactez votre administrateur système SAML2."
 
+msgid "OpenID Connect"
+msgstr "OpenID Connect"
+
+msgid ""
+"Can't login because your user has no group. Contact your OpenID system "
+"administrator"
+msgstr ""
+
 #, python-format
 msgid "${mtan} - mTAN for ${organisation}."
 msgstr "${mtan} - mTAN pour ${organisation}."
@@ -77,13 +85,15 @@ msgstr "${mtan} - mTAN pour ${organisation}."
 msgid ""
 "We sent an mTAN to the number linked with this account. Please enter it "
 "below."
-msgstr "Nous avons envoyé un mTAN au numéro lié à ce compte. Veuillez le saisir ci-dessous."
+msgstr ""
+"Nous avons envoyé un mTAN au numéro lié à ce compte. Veuillez le saisir ci-"
+"dessous."
 
 msgid "Name"
 msgstr "Nom"
 
 msgid "E-Mail Address"
-msgstr "E-mail"
+msgstr "Adresse e-mail"
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -100,8 +110,8 @@ msgstr "mTAN"
 msgid "Phone number"
 msgstr "Numéro de téléphone"
 
-msgid "The password must be at least eight characters long"
-msgstr "Le mot de passe doit comporter au minimum 8 caractères"
+msgid "The password must be at least ten characters long"
+msgstr "Le mot de passe doit comporter au minimum 10 caractères"
 
 msgid "Password Confirmation"
 msgstr "Confirmation du mot de passe"
@@ -122,7 +132,7 @@ msgid "Role"
 msgstr "Rôle"
 
 msgid "Editor"
-msgstr "Éditeur"
+msgstr "Rédacteur"
 
 msgid "Admin"
 msgstr "Admin"
@@ -144,3 +154,9 @@ msgstr "30 jours"
 
 msgid "Number of Signups"
 msgstr "Nombre d'inscriptions"
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Users"
+msgstr "Utilisateurs"

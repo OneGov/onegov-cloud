@@ -73,10 +73,10 @@
 
             <tal:block tal:condition="children">
                 <h3 i18n:translate>Suborganizations</h3>
-                <ul class="children">
+                <ul class="children more-list">
                     <tal:block tal:repeat="child children">
                         <li tal:condition="(child.access == 'public' and child.published) or request.is_logged_in">
-                            <a href="${request.link(child)}">${child.title}</a>
+                            <a class="list-link" href="${request.link(child)}">${child.title}</a>
                         </li>
                     </tal:block>
                 </ul>
@@ -84,7 +84,7 @@
 
             <tal:block tal:condition="memberships">
                 <h3 i18n:translate>People</h3>
-                <ul class="memberships">
+                <ul class="memberships list-lines">
                     <tal:block tal:repeat="membership memberships">
                         <li tal:condition="(membership.access == 'public' and membership.published and membership.person and membership.person.access == 'public' and membership.person.published) or request.is_logged_in">
                             <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>, <a href="${request.link(membership)}">${membership.title}</a>
@@ -97,8 +97,24 @@
         </div>
     </metal:agency_card>
 
+    <metal:atoz define-macro="atoz" i18n:domain="onegov.town6">
+        <div class="atoz-block" tal:repeat="item items">
+            <h2>${item[0]}</h2>
+            <div class="subpage-cards">
+                <tal:b tal:repeat="detail item[1]">
+                    <div class="card">
+                        <div metal:define-slot="item-detail">
+                            <a href="${request.link(detail)}">${detail.title}</a>
+                            <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
+                        </div>
+                    </div>
+                </tal:b>
+            </div>
+        </div>
+    </metal:atoz>
+
     <metal:person_list_card define-macro="person_list_card" i18n:domain="onegov.agency">
-        <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
+        <div class="person-card person-list-card card-section" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
             <ul>
                 <li class="person-card-title">
                     <a href="${request.link(person)}">${person.title}</a>
@@ -124,15 +140,15 @@
 
     <metal:person_card define-macro="person_card" i18n:domain="onegov.agency">
         <div class="person-card person-single-item" tal:define="memberships person.memberships_by_agency; exclude request.app.org.excluded_person_fields(request)">
-            <div class="row">
-                <div tal:condition="person.picture_url" class="columns medium-4">
+            <div class="grid-x grid-padding-x">
+                <div tal:condition="person.picture_url" class="cell medium-4">
                     <div aria-hidden="true" >
                         <div class="person-card-portrait">
                             <div class="cover-image" style='background-image: url("${person.picture_url}");'></div>
                         </div>
                     </div>
                 </div>
-                <div tal:define="size 8 if person.picture_url else 12" tal:attributes="class 'columns medium-{}'.format(size)">
+                <div tal:define="size 8 if person.picture_url else 12" tal:attributes="class 'cell medium-{}'.format(size)">
                     <dl>
                         <tal:block tal:condition="person.salutation and 'salutation' not in exclude">
                             <dt i18n:translate>Salutation</dt>
@@ -215,7 +231,7 @@
                         </tal:block>
                         <dt tal:condition="memberships" i18n:translate>Memberships</dt>
                         <dd>
-                            <ul>
+                            <ul class="list-lines">
                                 <tal:block tal:repeat="membership memberships">
                                     <li tal:condition="(membership.access == 'public' and membership.published) or request.is_logged_in" tal:define="full_path request.app.org.agency_path_display_on_people" class="person-card-membership">
                                         <a tal:condition="not: full_path" href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)}">${membership.agency.title}</a>
@@ -332,7 +348,7 @@
     <metal:agency_nav_item_content define-macro="agency_nav_item_content" i18n:domain="onegov.agency">
           <tal:b tal:define="memberships agency.memberships; children agency.children">
             <div class="details">
-                <a href="${request.link(agency)}" i18n:translate="">Show agency</a>
+                <a class="button hollow narrow" href="${request.link(agency)}" i18n:translate>Show agency</a>
             </div>
             <ul class="memberships fa-ul" tal:condition="memberships">
                 <tal:block tal:repeat="membership memberships" >
@@ -355,7 +371,7 @@
         <tal:b tal:define="agency_id str(agency.id)" tal:condition="(agency.access == 'public' and agency.published) or request.is_logged_in">
             <div
                 tal:condition="not: content_only|False"
-                class="collapsible"
+                class="collapsible ${'active' if layout.prerender_content(agency_id) else ''}"
                 id="trigger-${agency_id}"
                 ic-action="toggleClass:active">
 

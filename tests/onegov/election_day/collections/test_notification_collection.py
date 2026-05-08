@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.collections import NotificationCollection
@@ -7,7 +9,12 @@ from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_notification_collection_trigger(session):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_notification_collection_trigger(session: Session) -> None:
     collection = NotificationCollection(session)
     all_ = ('email', 'sms', 'webhooks', 'nonexistent')
 
@@ -50,7 +57,7 @@ def test_notification_collection_trigger(session):
         assert collection.by_model(vote, current=False) == []
 
         # No notifications configured
-        request = DummyRequest()
+        request: Any = DummyRequest()
         collection.trigger(request, election, all_)
         collection.trigger(request, election_compound, all_)
         collection.trigger(request, vote, all_)
@@ -72,18 +79,21 @@ def test_notification_collection_trigger(session):
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].election_id == election.id
+        assert notifications[0].last_modified is not None
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
         notifications = collection.by_model(election_compound)
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].election_compound_id == election_compound.id
+        assert notifications[0].last_modified is not None
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
         notifications = collection.by_model(vote)
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].vote_id == vote.id
+        assert notifications[0].last_modified is not None
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
         # 'webhooks' not selected
@@ -123,7 +133,7 @@ def test_notification_collection_trigger(session):
             'email', 'sms', 'webhooks'
         ]
         assert all(n.election_id == election.id for n in notifications)
-        assert all(n.last_modified.year == 2009 for n in notifications)
+        assert all(n.last_modified.year == 2009 for n in notifications)  # type: ignore[union-attr]
 
         notifications = collection.by_model(election_compound)
         assert [n.type for n in notifications] == [
@@ -133,14 +143,14 @@ def test_notification_collection_trigger(session):
             n.election_compound_id == election_compound.id
             for n in notifications
         )
-        assert all(n.last_modified.year == 2009 for n in notifications)
+        assert all(n.last_modified.year == 2009 for n in notifications)  # type: ignore[union-attr]
 
         notifications = collection.by_model(vote)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks'
         ]
         assert all(n.vote_id == vote.id for n in notifications)
-        assert all(n.last_modified.year == 2009 for n in notifications)
+        assert all(n.last_modified.year == 2009 for n in notifications)  # type: ignore[union-attr]
 
         # email not selected
         collection.trigger(request, election, ('sms', 'webhooks'))
@@ -167,7 +177,7 @@ def test_notification_collection_trigger(session):
     assert len(collection.by_model(vote, current=False)) == 6
 
 
-def test_notification_collection_trigger_summarized(session):
+def test_notification_collection_trigger_summarized(session: Session) -> None:
     collection = NotificationCollection(session)
     all_ = ('email', 'sms', 'webhooks', 'nonexistent')
 
@@ -207,7 +217,7 @@ def test_notification_collection_trigger_summarized(session):
         assert collection.by_model(vote) == []
 
         # No notifications configured
-        request = DummyRequest()
+        request: Any = DummyRequest()
         collection.trigger_summarized(request, [], [], [], all_)
         collection.trigger_summarized(
             request, [election], [election_compound], [vote], all_
@@ -227,18 +237,21 @@ def test_notification_collection_trigger_summarized(session):
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].election_id == election.id
+        assert notifications[0].last_modified is not None
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
         notifications = collection.by_model(election_compound)
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].election_compound_id == election_compound.id
+        assert notifications[0].last_modified is not None
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
         notifications = collection.by_model(vote)
         assert len(notifications) == 1
         assert notifications[0].type == 'webhooks'
         assert notifications[0].vote_id == vote.id
+        assert notifications[0].last_modified is not None
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
         # 'webhooks' not selected
@@ -277,7 +290,7 @@ def test_notification_collection_trigger_summarized(session):
             'email', 'sms', 'webhooks'
         ]
         assert all(n.election_id == election.id for n in notifications)
-        assert all(n.last_modified.year == 2009 for n in notifications)
+        assert all(n.last_modified.year == 2009 for n in notifications)  # type: ignore[union-attr]
 
         notifications = collection.by_model(election_compound)
         assert [n.type for n in notifications] == [
@@ -287,14 +300,14 @@ def test_notification_collection_trigger_summarized(session):
             n.election_compound_id == election_compound.id
             for n in notifications
         )
-        assert all(n.last_modified.year == 2009 for n in notifications)
+        assert all(n.last_modified.year == 2009 for n in notifications)  # type: ignore[union-attr]
 
         notifications = collection.by_model(vote)
         assert [n.type for n in notifications] == [
             'email', 'sms', 'webhooks'
         ]
         assert all(n.vote_id == vote.id for n in notifications)
-        assert all(n.last_modified.year == 2009 for n in notifications)
+        assert all(n.last_modified.year == 2009 for n in notifications)  # type: ignore[union-attr]
 
         # email not selected
         collection.trigger_summarized(

@@ -2,3 +2,7 @@
     // the redactor also contains a footer which doesn't need a specific height
     height: auto;
 }
+
+.re-superscript {
+    font-family: $body-font-family !important;
+}

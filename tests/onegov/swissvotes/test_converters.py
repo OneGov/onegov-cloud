@@ -1,7 +1,8 @@
+from __future__ import annotations
 from onegov.swissvotes.converters import PolicyAreaListConverter
 
 
-def test_policy_area_converter():
+def test_policy_area_converter() -> None:
     converter = PolicyAreaListConverter(str)
 
     assert converter.decode(['']) == []

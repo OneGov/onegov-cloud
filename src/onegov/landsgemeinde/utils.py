@@ -110,18 +110,19 @@ def ensure_states(
         children: Iterable[AgendaItem] | Iterable[Votum]
     ) -> None:
         if all(x.state == 'scheduled' for x in children):
-            if parent.state != 'ongoing':
+            if not isinstance(parent, Assembly):
                 set_state(parent, 'scheduled')
         elif all(x.state == 'completed' for x in children):
             set_state(parent, 'completed')
-        else:
+        elif any(x.state in ('ongoing', 'completed') for x in children):
             set_state(parent, 'ongoing')
             if isinstance(parent, AgendaItem):
                 parent.start()
 
     def set_vota(vota: Iterable[Votum], state: VotumState) -> None:
         for votum in vota:
-            set_state(votum, state)
+            if votum.state != 'draft':
+                set_state(votum, state)
 
     def clear_start_time(agenda_item: AgendaItem) -> None:
         if agenda_item.start_time:
@@ -139,13 +140,14 @@ def ensure_states(
     ) -> None:
 
         for agenda_item in agenda_items:
-            set_state(agenda_item, state)
-            set_vota(agenda_item.vota, state)
-            if state == 'scheduled':
-                clear_start_time(agenda_item)
+            if agenda_item.state != 'draft':
+                set_state(agenda_item, state)
+                set_vota(agenda_item.vota, state)
+                if state == 'scheduled' or state == 'draft':
+                    clear_start_time(agenda_item)
 
     if isinstance(item, Assembly):
-        if item.state in ('scheduled', 'completed'):
+        if item.state in ('draft', 'scheduled', 'completed'):
             set_agenda_items(item.agenda_items, item.state)
         elif item.state == 'ongoing':
             pass
@@ -154,6 +156,9 @@ def ensure_states(
         assembly = item.assembly
         prev = [x for x in assembly.agenda_items if x.number < item.number]
         next = [x for x in assembly.agenda_items if x.number > item.number]
+        if item.state == 'draft':
+            set_vota(item.vota, 'draft')
+            clear_start_time(item)
         if item.state == 'scheduled':
             set_vota(item.vota, 'scheduled')
             set_agenda_items(next, 'scheduled')

@@ -14,7 +14,6 @@ from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results
 from onegov.election_day.utils.election.lists import get_list_results
 from onegov.election_day.utils.parties import get_party_results
-from sqlalchemy.orm import object_session
 
 
 from typing import TYPE_CHECKING
@@ -59,7 +58,8 @@ def view_election(
 @ElectionDayApp.json(
     model=Election,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_json(
     self: Election,
@@ -72,7 +72,6 @@ def view_election_json(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     embed = defaultdict(list)
@@ -160,7 +159,7 @@ def view_election_json(
         }
     }
 
-    session = object_session(self)
+    session = request.session
 
     if self.type == 'majorz':
         if self.majority_type == 'absolute':
@@ -231,7 +230,8 @@ def view_election_json(
 @ElectionDayApp.json(
     model=Election,
     name='summary',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_summary(
     self: Election,
@@ -241,7 +241,6 @@ def view_election_summary(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return get_election_summary(self, request)

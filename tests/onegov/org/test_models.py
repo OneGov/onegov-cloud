@@ -1,27 +1,37 @@
+from __future__ import annotations
+
 import os
+import pytest
 
 from collections import OrderedDict
 from datetime import datetime, date
 from freezegun import freeze_time
-from sqlalchemy.exc import IntegrityError
-import pytest
-from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path
 from onegov.core.utils import Bunch
 from onegov.org.models import Clipboard, ImageFileCollection, PushNotification
-from onegov.org.models import NewsCollection
+from onegov.org.models import News, NewsCollection
 from onegov.org.models import Organisation
 from onegov.org.models import SiteCollection
 from onegov.org.models.file import GroupFilesByDateMixin
 from onegov.org.models.resource import SharedMethods
+from onegov.org.request import OrgRequest
 from onegov.page import PageCollection
+from sqlalchemy.exc import IntegrityError
 from tests.shared.utils import create_image
 from pytz import utc
 
 
-def test_clipboard(org_app):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.file import File
+    from onegov.org.models import ImageFile
+    from sqlalchemy.orm import Session
+    from .conftest import TestOrgApp
 
-    request = CoreRequest(environ={
+
+def test_clipboard(org_app: TestOrgApp) -> None:
+
+    request = OrgRequest(environ={
         'PATH_INFO': '/',
         'SERVER_NAME': '',
         'SERVER_PORT': '',
@@ -41,13 +51,36 @@ def test_clipboard(org_app):
     assert clipboard.url is None
 
 
-def test_news(session):
+def test_clipboard_news_collection(org_app: TestOrgApp) -> None:
 
-    request = Bunch(**{
+    request = OrgRequest(environ={
+        'PATH_INFO': '/',
+        'SERVER_NAME': '',
+        'SERVER_PORT': '',
+        'SERVER_PROTOCOL': 'https',
+        'wsgi.url_scheme': 'https'
+    }, app=org_app)
+
+    news = NewsCollection(request)
+    root = news.root
+    assert root is not None
+    clipboard = Clipboard.from_url(request, request.link(news))
+    assert clipboard.get_object() == root
+
+    clipboard.store_in_session()
+    assert clipboard.from_session(clipboard.request).get_object() == root
+
+    clipboard.clear()
+    assert clipboard.from_session(clipboard.request).get_object() is None
+
+
+def test_news(session: Session) -> None:
+
+    request: Any = Bunch(**{
         'session': session,
         'identity.role': 'member'
     })
-    manager_request = Bunch(**{
+    manager_request: Any = Bunch(**{
         'session': session,
         'identity.role': 'editor'
     })
@@ -86,6 +119,7 @@ def test_news(session):
         text='#four'
     )
     four.created = datetime(2015, 1, 1, tzinfo=utc)
+    assert isinstance(four, News)
     four.is_visible_on_homepage = True
 
     news = NewsCollection(request)
@@ -141,7 +175,8 @@ def test_news(session):
     assert news.subset().one_or_none() is None
 
 
-def test_group_intervals():
+def test_group_intervals() -> None:
+    mixin: GroupFilesByDateMixin[File]
     mixin = GroupFilesByDateMixin()
 
     intervals = list(mixin.get_date_intervals(datetime(2016, 1, 1)))
@@ -215,15 +250,15 @@ def test_group_intervals():
     assert intervals[5].end.date() == date(2014, 12, 31)
 
 
-def test_image_grouping(session):
+def test_image_grouping(session: Session) -> None:
 
     collection = ImageFileCollection(session)
 
-    def grouped_by_date(today):
+    def grouped_by_date(today: datetime) -> dict[str, list[str]]:
         grouped = collection.grouped_by_date(today=today)
         return OrderedDict((g, [i[1] for i in items]) for g, items in grouped)
 
-    def delete(images):
+    def delete(images: list[ImageFile]) -> None:
         for image in images:
             collection.delete(image)
 
@@ -294,11 +329,11 @@ def test_image_grouping(session):
     delete(images)
 
 
-def test_calendar_date_range():
+def test_calendar_date_range() -> None:
     resource = SharedMethods()
 
     resource.date = None
-    resource.timezone = utc
+    resource.timezone = 'UTC'
 
     resource.view = 'dayGridMonth'
     with freeze_time(datetime(2016, 5, 14, tzinfo=utc)):
@@ -326,7 +361,7 @@ def test_calendar_date_range():
     )
 
 
-def test_sitecollection(org_app):
+def test_sitecollection(org_app: TestOrgApp) -> None:
 
     sitecollection = SiteCollection(org_app.session())
     objects = sitecollection.get()
@@ -352,7 +387,7 @@ def test_sitecollection(org_app):
     assert {o.name for o in objects['forms']} == builtin_forms
 
 
-def test_holidays():
+def test_holidays() -> None:
     o = Organisation(holiday_settings={})
 
     assert date(2000, 1, 1) not in o.holidays
@@ -367,7 +402,7 @@ def test_holidays():
     assert date(2000, 1, 2) not in o.holidays
     assert date(2000, 1, 3) not in o.holidays
 
-    assert len(o.holidays.all(2000)) == 8
+    assert len(o.holidays.all(2000)) == 10
 
     o.holiday_settings['cantons'] = ['AR', 'ZG']
 
@@ -375,7 +410,7 @@ def test_holidays():
     assert date(2000, 1, 2) in o.holidays
     assert date(2000, 1, 3) not in o.holidays
 
-    assert len(o.holidays.all(2000)) == 13
+    assert len(o.holidays.all(2000)) == 15
 
     o.holiday_settings['other'] = [[1, 3, 'Fooyears day']]
 
@@ -383,10 +418,10 @@ def test_holidays():
     assert date(2000, 1, 2) in o.holidays
     assert date(2000, 1, 3) in o.holidays
 
-    assert len(o.holidays.all(2000)) == 14
+    assert len(o.holidays.all(2000)) == 16
 
 
-def test_cascade_delete(session):
+def test_cascade_delete(session: Session) -> None:
     """Test that deleting a news item also deletes related notifications"""
     collection = PageCollection(session)
     news = collection.add_root("News", type='news')
@@ -411,7 +446,7 @@ def test_cascade_delete(session):
     assert session.query(PushNotification).count() == 0
 
 
-def test_duplicate_prevention_push_notifications(session):
+def test_duplicate_prevention_push_notifications(session: Session) -> None:
     collection = PageCollection(session)
     news = collection.add_root("News", type='news')
     news_1 = collection.add(

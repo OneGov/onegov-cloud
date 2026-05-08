@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from onegov.org.models.political_business import (
+    par_political_business_parliamentary_groups
+)
+from onegov.org.i18n import _
 from onegov.parliament.collections import CommissionCollection
 from onegov.parliament.collections import CommissionMembershipCollection
 from onegov.parliament.collections import ParliamentarianCollection
@@ -13,7 +17,7 @@ from onegov.parliament.models import ParliamentaryGroup
 from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import and_, or_, exists
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
@@ -22,6 +26,7 @@ if TYPE_CHECKING:
     from onegov.org.models import PoliticalBusiness
     from onegov.org.models import PoliticalBusinessParticipation
     from sqlalchemy.orm import Query, Session
+    from sqlalchemy.sql import ColumnElement
 
 
 class RISCommission(Commission, ORMSearchable):
@@ -30,13 +35,32 @@ class RISCommission(Commission, ORMSearchable):
         'polymorphic_identity': 'ris_commission',
     }
 
-    es_type_name = 'ris_commission'
-    es_public = True
-    es_properties = {'name': {'type': 'text'}}
+    fts_type_title = _('Commissions')
+    fts_public = True
+    fts_title_property = 'name'
+    fts_properties = {
+        'name': {'type': 'text', 'weight': 'A'},
+        'description': {'type': 'text', 'weight': 'B'}
+    }
+
+    if TYPE_CHECKING:
+        # NOTE: This is for filtering for active/inactive members, we don't
+        #       really want to store this in the database
+        active_members: bool | None
+        # NOTE: Our memberships should always be RISCommissionMembership
+        memberships: Mapped[list[RISCommissionMembership]]  # type: ignore[assignment]
+    else:
+        active_members = None
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.name
+
+    # NOTE: When a commission was last changed should not influence how
+    #       relevant they are in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
 
 
 class RISCommissionCollection(CommissionCollection[RISCommission]):
@@ -51,6 +75,15 @@ class RISCommissionMembership(CommissionMembership):
     __mapper_args__ = {
         'polymorphic_identity': 'ris_commission_membership'
     }
+
+    @hybrid_property
+    def active(self) -> bool:
+        return self.end is None or self.end >= utcnow().date()
+
+    @active.inplace.expression
+    @classmethod
+    def _active_expression(cls) -> ColumnElement[bool]:
+        return or_(cls.end.is_(None), cls.end >= utcnow().date())
 
 
 class RISCommissionMembershipCollection(
@@ -73,17 +106,9 @@ class RISCommissionMembershipCollection(
         query = super().query()
 
         if self.active is not None:
-            if self.active:
-                query = query.filter(
-                    or_(
-                        RISCommissionMembership.end.is_(None),
-                        RISCommissionMembership.end >= utcnow()
-                    )
-                )
-            else:
-                query = query.filter(
-                    RISCommissionMembership.end < utcnow()
-                )
+            query = query.filter(
+                RISCommissionMembership.active.is_(self.active)
+            )
 
         return query
 
@@ -100,46 +125,74 @@ class RISParliamentarian(Parliamentarian, ORMSearchable):
         'polymorphic_identity': 'ris_parliamentarian',
     }
 
-    es_type_name = 'ris_parliamentarian'
-    es_public = False
-    es_properties = {
-        'first_name': {'type': 'text'},
-        'last_name': {'type': 'text'},
+    fts_type_title = _('Parliamentarians')
+    fts_public = True
+    fts_title_property = 'title'
+    fts_properties = {
+        'first_name': {'type': 'text', 'weight': 'A'},
+        'last_name': {'type': 'text', 'weight': 'A'},
+        'title': {'type': 'text', 'weight': 'A'},
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, ...]:
+    def fts_suggestion(self) -> tuple[str, ...]:
         return (
             f'{self.first_name} {self.last_name}',
             f'{self.last_name} {self.first_name}'
         )
 
+    # NOTE: When a parliamentarian was last changed should not influence how
+    #       relevant they are in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
+
+    @property
+    def title(self) -> str:
+        return f'{self.last_name} {self.first_name}'
+
     #: political businesses participations [0..n]
-    political_businesses: relationship[list[PoliticalBusinessParticipation]]
-    political_businesses = relationship(
-        'PoliticalBusinessParticipation',
-        back_populates='parliamentarian',
-        lazy='joined'
+    political_businesses: Mapped[list[PoliticalBusinessParticipation]] = (
+        relationship(back_populates='parliamentarian')
     )
 
     @hybrid_property
     def active(self) -> bool:
         # Wil: every parliamentarian is active if in a parliamentary
-        # group, which leads to a role
+        # group (which leads to a role) or in a commission
+        # this will be changed to the parents class implementation
+        # once the inactive parliamentarians have end dates defined
         for role in self.roles:
             if role.end is None or role.end >= utcnow().date():
                 return True
+
+        for membership in self.commission_memberships:
+            if membership.end is None or membership.end >= utcnow().date():
+                return True
+
         return False
 
-    @active.expression  # type:ignore[no-redef]
-    def active(cls):
+    @active.inplace.expression
+    @classmethod
+    def _active_expression(cls) -> ColumnElement[bool]:
 
-        return exists().where(
-            and_(
-                ParliamentarianRole.parliamentarian_id == cls.id,
-                or_(
-                    ParliamentarianRole.end.is_(None),
-                    ParliamentarianRole.end >= utcnow()
+        return or_(
+            exists().where(
+                and_(
+                    RISParliamentarianRole.parliamentarian_id == cls.id,
+                    or_(
+                        RISParliamentarianRole.end.is_(None),
+                        RISParliamentarianRole.end >= utcnow()
+                    )
+                )
+            ),
+            exists().where(
+                and_(
+                    RISCommissionMembership.parliamentarian_id == cls.id,
+                    or_(
+                        RISCommissionMembership.end.is_(None),
+                        RISCommissionMembership.end >= utcnow()
+                    )
                 )
             )
         )
@@ -176,19 +229,29 @@ class RISParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
         'polymorphic_identity': 'ris_parliamentary_group',
     }
 
-    es_type_name = 'ris_parliamentary_group'
-    es_public = True
-    es_properties = {'name': {'type': 'text'}}
-
-    political_businesses: relationship[list[PoliticalBusiness]]
-    political_businesses = relationship(
-        'PoliticalBusiness',
-        back_populates='parliamentary_group'
-    )
+    fts_type_title = _('Parliamentary groups')
+    fts_public = True
+    fts_title_property = 'name'
+    fts_properties = {
+        'name': {'type': 'text', 'weight': 'A'},
+        'description': {'type': 'text', 'weight': 'B'}
+    }
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.name
+
+    # NOTE: When a parliamentary group was last changed should not
+    #       influence how relevant they are in the search results
+    @property
+    def fts_last_change(self) -> None:
+        return None
+
+    political_businesses: Mapped[list[PoliticalBusiness]] = relationship(
+        secondary=par_political_business_parliamentary_groups,
+        back_populates='parliamentary_groups',
+        passive_deletes=True,
+    )
 
 
 class RISParliamentaryGroupCollection(

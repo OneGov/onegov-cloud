@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from datetime import date
 from onegov.election_day.formats import export_election_internal_proporz
@@ -13,7 +15,12 @@ from onegov.election_day.models import ProporzElection
 from uuid import uuid4
 
 
-def test_export_election_internal_proporz(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_export_election_internal_proporz(session: Session) -> None:
     election = ProporzElection(
         title='Wahl',
         short_title='W',
@@ -22,8 +29,8 @@ def test_export_election_internal_proporz(session):
         number_of_mandates=1,
         absolute_majority=144
     )
-    election.title_translations['it_CH'] = 'Elezione'
-    election.short_title_translations['it_CH'] = 'E'
+    election.title_translations['it_CH'] = 'Elezione'  # type: ignore[index]
+    election.short_title_translations['it_CH'] = 'E'  # type: ignore[index]
     election.colors = {
         'Kwik-E-Major': '#112233',
         'Democratic Party': '#223344'

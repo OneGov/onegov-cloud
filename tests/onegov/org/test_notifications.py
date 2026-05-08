@@ -1,6 +1,6 @@
-import os
-from pathlib import Path
+from __future__ import annotations
 
+import os
 import transaction
 
 from datetime import datetime
@@ -8,11 +8,17 @@ from freezegun import freeze_time
 from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from pathlib import Path
 from sedate import utcnow
 from tests.shared.utils import add_reservation
 
 
-def test_new_reservation_notification(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client, TestOrgApp
+
+
+def test_new_reservation_notification(client: Client[TestOrgApp]) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     resource.definition = 'Email = ___'
@@ -74,6 +80,7 @@ def test_new_reservation_notification(client):
 
     mails = [client.get_email(i) for i in range(3)]
     for mail in mails:
+        assert mail is not None
         if mail['To'] == 'jessie@example.org':  # email to customer
             assert ("Ihre Anfrage wurde erfasst" in mail['Subject']
                     or "Ihre Reservationen wurden bestätigt" in
@@ -93,7 +100,10 @@ def test_new_reservation_notification(client):
             assert mail['To'] != "paul@example.org"
 
 
-def test_reservation_ticket_new_note_sends_email(client):
+def test_reservation_ticket_new_note_sends_email(
+    client: Client[TestOrgApp]
+) -> None:
+
     resources = ResourceCollection(client.app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')

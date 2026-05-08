@@ -15,16 +15,19 @@ from onegov.core.templates import render_macro
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
+from onegov.form.core import FieldDependency
 from onegov.form.fields import (ChosenSelectField, URLPanelField,
                                 ChosenSelectMultipleEmailField)
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
-from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import URLField
+from onegov.form.validators import If
 from onegov.form.validators import StrictOptional
+from onegov.form.validators import ValidHostname
 from onegov.gis import CoordinatesField
 from onegov.org import _, log
 from onegov.org.forms.fields import (
@@ -55,11 +58,13 @@ from wtforms.utils import unset_value
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import Regexp
 from wtforms.validators import URL as URLValidator
 from wtforms.validators import ValidationError
-
+from wtforms.widgets import TextInput
 
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.org.models import Organisation
@@ -76,8 +81,7 @@ ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 COLOR_RE = re.compile(r'^#?(?:[0-9a-fA-F]{3}){1,2}$')
 
 
-class GeneralSettingsForm(Form):
-    """ Defines the settings form for onegov org. """
+class OrganisationProfileSettingsForm(Form):
 
     if TYPE_CHECKING:
         request: OrgRequest
@@ -85,6 +89,26 @@ class GeneralSettingsForm(Form):
     name = StringField(
         label=_('Name'),
         validators=[InputRequired()])
+
+    reply_to = EmailField(
+        _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
+        description=_('Replies to automated e-mails go to this address.'))
+
+    locales = RadioField(
+        label=_('Languages'),
+        choices=(
+            ('de_CH', _('German')),
+            ('fr_CH', _('French')),
+            ('it_CH', _('Italian'))
+        ),
+        validators=[InputRequired()]
+    )
+
+
+class AppearanceSettingsForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     logo_url = StringField(
         label=_('Logo'),
@@ -96,9 +120,37 @@ class GeneralSettingsForm(Form):
         description=_('URL pointing to the logo'),
         render_kw={'class_': 'image-url'})
 
-    reply_to = EmailField(
-        _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
-        description=_('Replies to automated e-mails go to this address.'))
+    favicon_win_url = StringField(
+        label=_('Icon 16x16 PNG (Windows)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_mac_url = StringField(
+        label=_('Icon 32x32 PNG (Mac)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_apple_touch_url = StringField(
+        label=_('Icon 57x57 PNG (iPhone, iPod, iPad)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_pinned_tab_safari_url = StringField(
+        label=_('Icon SVG 20x20 (Safari)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    og_logo_default = StringField(
+        label=_('Image'),
+        description=_('Default social media preview image for rich link '
+                      'previews. Optimal size is 1200:630 px.'),
+        fieldset='OpenGraph',
+        render_kw={'class_': 'image-url'}
+    )
 
     primary_color = ColorField(
         label=_('Primary Color'))
@@ -106,16 +158,6 @@ class GeneralSettingsForm(Form):
     font_family_sans_serif = ChosenSelectField(
         label=_('Default Font Family'),
         choices=[],
-        validators=[InputRequired()]
-    )
-
-    locales = RadioField(
-        label=_('Languages'),
-        choices=(
-            ('de_CH', _('German')),
-            ('fr_CH', _('French')),
-            ('it_CH', _('Italian'))
-        ),
         validators=[InputRequired()]
     )
 
@@ -130,6 +172,18 @@ class GeneralSettingsForm(Form):
         fieldset=_('Images'),
         label=_('Standard Image'),
         render_kw={'class_': 'image-url'}
+    )
+
+    level_table_of_contents = RadioField(
+        label=_('Table of Contents'),
+        choices=(
+            ('none', _('No Table of Contents')),
+            ('h2', _('1 Level')),
+            ('h3', _('2 Levels')),
+            ('h4', _('3 Levels')),
+            ('h5', _('4 Levels')),
+        ),
+        default='h5',
     )
 
     @property
@@ -219,6 +273,13 @@ class FooterSettingsForm(Form):
         render_kw={'rows': 8},
         fieldset=_('Information'))
 
+    contact_url_label = StringField(
+        label=_('Contact Link Label'),
+        description=_("Label for Contact Link. Default: 'more'"),
+        fieldset=_('Information'),
+        validators=[Optional()],
+    )
+
     contact_url = URLField(
         label=_('Contact Link'),
         description=_('URL pointing to a contact page'),
@@ -232,6 +293,13 @@ class FooterSettingsForm(Form):
         description=_('The opening hours of the municipality'),
         render_kw={'rows': 8},
         fieldset=_('Information'))
+
+    opening_hours_url_label = StringField(
+        label=_('Opening Hours Link Label'),
+        description=_("Label for Opening Hours Link. Default: 'more'"),
+        fieldset=_('Information'),
+        validators=[Optional()],
+    )
 
     opening_hours_url = URLField(
         label=_('Opening Hours Link'),
@@ -289,6 +357,13 @@ class FooterSettingsForm(Form):
         label=_('TikTok'),
         description=_('URL pointing to the TikTok site'),
         fieldset=_('Social Media'),
+        validators=[Optional()]
+    )
+
+    impressum_url = URLField(
+        label=_('Impressum'),
+        description=_('URL pointing to the Impressum site'),
+        fieldset=_('Impressum'),
         validators=[Optional()]
     )
 
@@ -430,43 +505,6 @@ class FooterSettingsForm(Form):
                 )
             return False
         return None
-
-
-class SocialMediaSettingsForm(Form):
-    og_logo_default = StringField(
-        label=_('Image'),
-        description=_('Default social media preview image for rich link '
-                      'previews. Optimal size is 1200:630 px.'),
-        fieldset='OpenGraph',
-        render_kw={'class_': 'image-url'}
-    )
-
-
-class FaviconSettingsForm(Form):
-
-    favicon_win_url = StringField(
-        label=_('Icon 16x16 PNG (Windows)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_mac_url = StringField(
-        label=_('Icon 32x32 PNG (Mac)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_apple_touch_url = StringField(
-        label=_('Icon 57x57 PNG (iPhone, iPod, iPad)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_pinned_tab_safari_url = StringField(
-        label=_('Icon SVG 20x20 (Safari)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
 
 
 class LinksSettingsForm(Form):
@@ -713,7 +751,7 @@ class HomepageSettingsForm(Form):
                 raise ValidationError(correct_msg) from exception
 
 
-class ModuleSettingsForm(Form):
+class AccessSettingsForm(Form):
 
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
@@ -747,6 +785,11 @@ class MapSettingsForm(Form):
 
     default_map_view = CoordinatesField(
         label=_('The default map view. This should show the whole town'),
+        description=_("Wherever there's an option to choose a location on a "
+                      "map, this will be the default view. You can change the "
+                      "view by dragging the map and zooming in or out. The "
+                      "coordinates of the center of the map and the zoom "
+                      "level will then be saved as the default view."),
         render_kw={
             'data-map-type': 'crosshair'
         })
@@ -767,10 +810,59 @@ class MapSettingsForm(Form):
 
 class AnalyticsSettingsForm(Form):
 
-    analytics_code = MarkupField(
-        label=_('Analytics Code'),
-        description=_('JavaScript for web statistics support'),
-        render_kw={'rows': 10, 'data-editor': 'html'})
+    analytics_provider_name = TranslatedSelectField(
+        label=_('Analytics Provider'),
+        choices=(),
+    )
+
+    # NOTE: We will set up field dependencies for the following provider
+    #       specific fields in `on_request` based on the registered
+    #       providers, we may also remove completely unused fields.
+    plausible_domain = StringField(
+        label=_('Domain name'),
+        description=_(
+            'This should match the domain defined in plausible '
+            'you may also leave this empty, in which case we '
+            'will submit the domain of the current request.'
+        ),
+        validators=[Optional(), ValidHostname()],
+    )
+
+    matomo_site_id = IntegerField(
+        label=_('Matomo Site ID'),
+        validators=[InputRequired(), NumberRange(min=1)],
+        widget=TextInput(),
+        render_kw={
+            'inputmode': 'numeric',
+            'pattern': r'[1-9][0-9]*'
+        }
+    )
+
+    siteimprove_site_id = IntegerField(
+        label=_('Siteimprove Site ID'),
+        validators=[InputRequired(), NumberRange(min=1)],
+        widget=TextInput(),
+        render_kw={
+            'inputmode': 'numeric',
+            'pattern': r'[1-9][0-9]*'
+        }
+    )
+
+    google_tag_id = StringField(
+        label=_('Google Tag ID'),
+        description=_(
+            'This should match the domain defined in plausible '
+            'you may also leave this empty, in which case we '
+            'will submit the domain of the current request.'
+        ),
+        validators=[
+            InputRequired(),
+            Regexp(
+                r'^[A-Z]{1,3}-[A-Z0-9-]+$',
+                message=_('Not a valid Google Tag ID')
+            )
+        ],
+    )
 
     # Points the user to the analytics url e.g. matomo or plausible
     analytics_url = URLPanelField(
@@ -783,24 +875,59 @@ class AnalyticsSettingsForm(Form):
         hide_label=False
     )
 
-    def derive_analytics_url(self) -> str:
-        analytics_code = self.analytics_code.data or ''
+    def on_request(self) -> None:
+        available = self.request.app.available_analytics_providers
+        choices = self.analytics_provider_name.choices = [
+            (name, provider.display_name)
+            for name, provider in available.items()
+        ]
+        choices.insert(0, ('', _('None')))
+        for provider_name, dependent_fields in (
+            ('plausible', ['plausible_domain']),
+            ('matomo', ['matomo_site_id']),
+            ('siteimprove', ['siteimprove_site_id']),
+            ('google_analytics', ['google_tag_id']),
+        ):
+            providers = {
+                name
+                for name, provider in available.items()
+                if provider.name == provider_name
+            }
+            if not providers:
+                for field_name in dependent_fields:
+                    self.delete_field(field_name)
+                continue
 
-        if 'analytics.seantis.ch' in analytics_code:
-            data_domain = analytics_code.split(
-                'data-domain="', 1)[1].split('"', 1)[0]
-            return f'https://analytics.seantis.ch/{data_domain}'
-        elif 'matomo' in analytics_code:
-            return 'https://stats.seantis.ch'
-        else:
-            return ''
-
-    def populate_obj(self, model: Organisation) -> None:  # type:ignore
-        super().populate_obj(model)
+            # NOTE: In order to get an OR we need to use the AND
+            #       of all the choices it can't be instead.
+            dependency = FieldDependency(*(  # type: ignore
+                arg
+                for name, _ in choices
+                if name not in providers
+                for arg in ('analytics_provider_name', f'!{name}')
+            ))
+            for field_name in dependent_fields:
+                field = self[field_name]
+                field.validators = (
+                    If(
+                        dependency.fulfilled,
+                        *field.validators
+                    ),
+                    If(
+                        dependency.unfulfilled,
+                        StrictOptional()
+                    ),
+                )
+                if field.render_kw:
+                    field.render_kw = field.render_kw.copy()
+                else:
+                    field.render_kw = {}
+                field.render_kw.update(dependency.html_data(self._prefix))
 
     def process_obj(self, model: Organisation) -> None:  # type:ignore
         super().process_obj(model)
-        self.analytics_url.text = self.derive_analytics_url()
+        if provider := self.request.analytics_provider:
+            self.analytics_url.text = provider.url(self.request) or ''
 
 
 class HolidaySettingsForm(Form):
@@ -1002,6 +1129,14 @@ class OrgTicketSettingsForm(Form):
         fieldset=_('General')
     )
 
+    hide_submitter_email = BooleanField(
+        label=_('Hide submitter email address'),
+        description=_('Hide the email address of the ticket submitter '
+                      'in the ticket status page'),
+        fieldset=_('Data Protection'),
+        default=True
+    )
+
     ticket_auto_accept_style = RadioField(
         label=_('Accept request and close ticket automatically based on:'),
         choices=(
@@ -1068,7 +1203,6 @@ class OrgTicketSettingsForm(Form):
     mute_all_tickets = BooleanField(
         label=_('Mute all tickets'),
         fieldset=_('Notifications'),
-
     )
 
     ticket_always_notify = BooleanField(
@@ -1339,11 +1473,6 @@ class OrgTicketSettingsForm(Form):
 
 class NewsletterSettingsForm(Form):
 
-    show_newsletter = BooleanField(
-        label=_('Enable newsletter'),
-        default=False
-    )
-
     secret_content_allowed = BooleanField(
         label=_('Allow secret content in newsletter'),
         default=False
@@ -1384,6 +1513,23 @@ class NewsletterSettingsForm(Form):
         'who subscribed to the daily newsletter will receive it, independent '
         'of their selected categories if there are any.'),
         fieldset=_('Automatic newsletters'),
+        default=False
+    )
+
+    daily_newsletter_title = StringField(
+        label=_('Title for daily newsletters'),
+        fieldset=_('Automatic newsletters'),
+        description=_('Daily news from our town'),
+        depends_on=('enable_automatic_newsletters', 'y'),
+    )
+
+    show_only_previews = BooleanField(
+        label=_('Show only lead of news'),
+        fieldset=_('Automatic newsletters'),
+        description=_(
+            'Only show the lead of the news and a "read more"'
+            'link.'),
+        depends_on=('enable_automatic_newsletters', 'y'),
         default=False
     )
 
@@ -1430,9 +1576,12 @@ class NewsletterSettingsForm(Form):
                     for topic, sub_topic in item.items():
                         if not isinstance(sub_topic, list):
                             self.newsletter_categories.errors.append(
-                                _(f'Invalid format. Please define '
-                                  f"subtopic(s) for '{topic}' "
-                                  f"or remove the ':'.")
+                                _(
+                                    "Invalid format. Please define "
+                                    "subtopic(s) for '${topic}' "
+                                    "or remove the ':'.",
+                                    mapping={'topic': topic}
+                                )
                             )
                             return False
 
@@ -1746,24 +1895,28 @@ class KabaSettingsForm(Form):
 
             if site_id in seen:
                 assert isinstance(self.kaba_configurations.errors, list)
-                self.kaba_configurations.errors.append(_(
+                msg = _(
                     'Duplicate site ID ${site_id}',
                     mapping={'site_id': site_id}
-                ))
+                )
+                self.kaba_configurations.errors.append(
+                    self.kaba_configurations.gettext(msg)
+                )
                 return False
 
             seen.add(site_id)
 
             if not field.form.api_key.data:
                 assert isinstance(self.kaba_configurations.errors, list)
+                msg = _(
+                    '${field} for site ID ${site_id} is required',
+                    mapping={
+                        'field': 'API_KEY',
+                        'site_id': field.form.site_id.data
+                    }
+                )
                 self.kaba_configurations.errors.append(
-                    self.kaba_configurations.gettext(_(
-                        '${field} for site ID ${site_id} is required',
-                        mapping={
-                            'field': 'API_KEY',
-                            'site_id': field.form.site_id.data
-                        }
-                    ))
+                    self.kaba_configurations.gettext(msg)
                 )
                 return False
 
@@ -1771,14 +1924,15 @@ class KabaSettingsForm(Form):
                 api_secret = field.form.api_secret.data
             elif (cfg := self.model.get_kaba_configuration(site_id)) is None:
                 assert isinstance(self.kaba_configurations.errors, list)
+                msg = _(
+                    '${field} for site ID ${site_id} is required',
+                    mapping={
+                        'field': 'API_SECRET',
+                        'site_id': field.form.site_id.data
+                    }
+                )
                 self.kaba_configurations.errors.append(
-                    self.kaba_configurations.gettext(_(
-                        '${field} for site ID ${site_id} is required',
-                        mapping={
-                            'field': 'API_SECRET',
-                            'site_id': field.form.site_id.data
-                        }
-                    ))
+                    self.kaba_configurations.gettext(msg)
                 )
                 return False
             elif cfg.api_key == field.form.api_key.data:
@@ -1798,11 +1952,13 @@ class KabaSettingsForm(Form):
                 client.site_name()
             except KabaApiError:
                 assert isinstance(self.kaba_configurations.errors, list)
-                error = _(
+                msg = _(
                     'Invalid credentials for site ID ${site_id}',
                     mapping={'site_id': site_id}
                 )
-                self.kaba_configurations.errors.append(error)
+                self.kaba_configurations.errors.append(
+                    self.kaba_configurations.gettext(msg)
+                )
                 return False
             except Exception:
                 self.request.alert(
@@ -1870,6 +2026,17 @@ class EventSettingsForm(Form):
     event_files = UploadOrSelectExistingMultipleFilesField(
         label=_('Documents'),
         fieldset=_('General event documents')
+    )
+
+
+class ResourceSettingsForm(Form):
+
+    resource_header_html = HtmlField(
+        label=_('General information above the resource list'),
+    )
+
+    resource_footer_html = HtmlField(
+        label=_('General information below the resource list'),
     )
 
 
@@ -2100,12 +2267,12 @@ class PeopleSettingsForm(Form):
             'format. Note: Deeper structures are not supported.'
             '\n'
             '```\n'
-            '- Organisation:\n'
-            '  - Sub-Organisation 1\n'
-            '  - Sub-Organisation 2\n'
-            '- Organisation 2:\n'
-            '  - Sub-Organisation 1\n'
-            '  - Sub-Organisation 2\n'
+            '- Organisation 1:\n'
+            '  - Sub-Organisation 1.1\n'
+            '  - Sub-Organisation 1.2\n'
+            '- Organisation 2\n'
+            '- Organisation 3:\n'
+            '  - Sub-Organisation 3.1\n'
             '```'
         ),
         render_kw={
@@ -2171,9 +2338,11 @@ class PeopleSettingsForm(Form):
                     for topic, sub_topic in item.items():
                         if not isinstance(sub_topic, list):
                             self.organisation_hierarchy.errors.append(
-                                _(f'Invalid format. Please define '
-                                  f"sub-organisations(s) for '{topic}' "
-                                  f"or remove the ':'.")
+                                _('Invalid format. Please define at least '
+                                  "one sub-organisation for '${topic}' "
+                                  "or remove the ':'",
+                                    mapping={'topic': topic}
+                                )
                             )
                             return False
 
@@ -2202,7 +2371,13 @@ class PeopleSettingsForm(Form):
             self.organisation_hierarchy.data = ''
             return
 
-        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        yaml_data = yaml.safe_dump(
+            categories,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+            indent=2
+        )
         self.organisation_hierarchy.data = yaml_data
 
 
@@ -2216,9 +2391,19 @@ class VATSettingsForm(Form):
     )
 
 
-class CitizenLoginSettingsForm(Form):
+class ModuleActivationSettingsForm(Form):
+    show_newsletter = BooleanField(
+        label=_('Enable newsletter'),
+        description=_('Enables the newsletter module for admins and show a '
+                      '"Subscribe to newsletter" option for the users on the '
+                      'news page.'),
+        default=False
+    )
 
     citizen_login_enabled = BooleanField(
         label=_('Enable Citizen Login'),
+        description=_('Enables the citizen login. This will show a "citizen '
+        'login" link in the footer, where users can view their reservations '
+        'using their email-address.'),
         default=False,
     )

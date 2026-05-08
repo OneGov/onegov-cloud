@@ -99,7 +99,8 @@ def request_accreditation(
                 'event': 'browser-notification',
                 'title': request.translate(_('New ticket')),
                 'created': ticket.created.isoformat()
-            }
+            },
+            groupids=request.app.groupids_for_ticket(ticket),
         )
 
         request.success(_('Thank you for your submission!'))
@@ -142,7 +143,7 @@ def grant_accreditation(
         # store a PDF of the ticket on the translator
         pdf_content = TicketPdf.from_ticket(request, self.ticket)
         self.target.files.append(
-            File(  # type:ignore[misc]
+            File(
                 id=random_token(),
                 name='Ticket.pdf',
                 note='Antrag',

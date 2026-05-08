@@ -28,6 +28,16 @@ if TYPE_CHECKING:
     from webob import Response
 
 
+def get_assembly_form_class(
+    model: object,
+    request: LandsgemeindeRequest
+) -> type[AssemblyForm]:
+
+    if isinstance(model, Assembly):
+        return model.with_content_extensions(AssemblyForm, request)
+    return Assembly().with_content_extensions(AssemblyForm, request)
+
+
 @LandsgemeindeApp.html(
     model=AssemblyCollection,
     template='assemblies.pt',
@@ -43,7 +53,7 @@ def view_assemblies(
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'assemblies': self.query().all(),
+        'assemblies': request.exclude_invisible(self.query()),
         'title': layout.title,
     }
 
@@ -53,7 +63,7 @@ def view_assemblies(
     name='new',
     template='form.pt',
     permission=Private,
-    form=AssemblyForm
+    form=get_assembly_form_class
 )
 def add_assembly(
     self: AssemblyCollection,
@@ -61,20 +71,26 @@ def add_assembly(
     form: AssemblyForm
 ) -> RenderData | Response:
 
-    if form.submitted(request):
-        assembly = self.add(**form.get_useful_data())
-        request.success(_('Added a new assembly'))
-
-        return redirect(request.link(assembly))
-
     layout = AssemblyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
+    if form.submitted(request):
+        assembly = self.add(
+            date=form.date.data,
+            state=form.state.data,
+        )
+        form.populate_obj(assembly)
+        request.success(_('Added a new ${assembly}',
+                          mapping={'assembly': layout.assembly_type}))
+
+        return redirect(request.link(assembly))
+
     return {
         'layout': layout,
-        'title': _('New assembly'),
+        'title': _('New ${assembly}',
+                   mapping={'assembly': layout.assembly_type}),
         'form': form,
     }
 
@@ -182,7 +198,8 @@ def view_assembly_states(
     name='edit',
     template='form.pt',
     permission=Private,
-    form=AssemblyForm
+    form=AssemblyForm,
+    pass_model=True
 )
 def edit_assembly(
     self: Assembly,
@@ -197,8 +214,6 @@ def edit_assembly(
         update_ticker(request, updated)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
-
-    form.process(obj=self)
 
     layout = AssemblyLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))

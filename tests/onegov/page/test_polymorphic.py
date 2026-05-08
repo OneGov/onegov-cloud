@@ -1,12 +1,19 @@
+from __future__ import annotations
+
 import pytest
 from onegov.page import Page, PageCollection
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 
 class Article(Page):
     __mapper_args__ = {'polymorphic_identity': 'article'}
 
 
-def test_article(session):
+def test_article(session: Session) -> None:
     pages = PageCollection(session)
     root = pages.add_root("Root")
     assert pages.query().filter(

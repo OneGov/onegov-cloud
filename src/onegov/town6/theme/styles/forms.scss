@@ -29,10 +29,49 @@ form {
         &[type="checkbox"],
         &[type="radio"] {
             margin-bottom: .25rem;
+
+            &:checked + label .with-count::before {
+                background-color: $primary-color;
+                color: $white;
+            }
+
+            + label .with-count::before {
+                background-color: $secondary-color;
+                color: $body-font-color;
+                border: 0px solid #000;
+                border-radius: 1000px;
+                box-sizing: content-box;
+                content: attr(data-count);
+                display: inline-block;
+                font-size: .75rem;
+                line-height: 22px;
+                min-width: 4ex;
+                padding: 0 .5rem;
+                text-align: right;
+                margin-right: 1ex;
+            }
+        }
+    }
+
+    .two-columns ul {
+        -moz-column-count: 2;
+        -moz-column-gap: 2em;
+        -webkit-column-count: 2;
+        -webkit-column-gap: 2em;
+        column-count: 2;
+        column-gap: 2em;
+        max-width: calc(100% - 2em);
+        margin-left: 0;
+
+        li {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            break-inside: avoid;
         }
     }
 
     label {
+        margin-top: .5rem;
 
         &.error, .upload-widget.error {
             color: $alert-color;
@@ -53,6 +92,10 @@ form {
         li input[type="radio"] {
             margin-bottom: .25rem;
         }
+    }
+
+    .group-label {
+        margin-top: .5rem;
     }
 
     .duration-widget label {
@@ -350,8 +393,20 @@ input.has-field-help {
     }
 }
 
-.button.datetimepicker {
+.many-plus-minus {
+    align-items: center;
+    display:flex;
+}
+
+.many-fields a.button.datetimepicker {
     @include input-button;
+    padding: 0 !important;
+    margin: 0 .5rem !important;
+
+    &:hover {
+        padding: 0 !important;
+        margin: 0 .5rem !important;
+    }
 }
 
 .fieldset-display {
@@ -496,11 +551,11 @@ dl.field-display > dt {
 }
 
 .many-fields a.button {
-    margin: 0 .5rem !important;
+    margin: 1rem .2rem !important;
     padding: .5rem !important;
 
     &:hover {
-        margin: 0 .5rem !important;
+        margin: 1rem .2rem !important;
         padding: .5rem !important;
     }
 }
@@ -515,13 +570,6 @@ dl.field-display > dt {
     input.button + a.button {
         margin-left: .5rem;
     }
-}
-
-a.category-anchor {
-    display: block;
-    position: relative;
-    top: -150px;
-    visibility: hidden;
 }
 
 .checkout-button {

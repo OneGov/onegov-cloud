@@ -5,26 +5,21 @@ from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.utils import toggle
 from onegov.directory.models import DirectoryEntry
 from onegov.form import as_internal_id
-from sqlalchemy import and_, desc
+from sqlalchemy import and_
 from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
 
-from typing import Any, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, Protocol, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Mapping
     from markupsafe import Markup
     from onegov.directory.models import Directory
     from sqlalchemy.orm import Query
-    from typing import Self
 
 
-T = TypeVar('T')
-DirectoryEntryT = TypeVar('DirectoryEntryT', bound=DirectoryEntry)
-
-
-class DirectorySearchWidget(Protocol[DirectoryEntryT]):
+class DirectorySearchWidget[DirectoryEntryT: DirectoryEntry](Protocol):
     @property
     def name(self) -> str: ...
     @property
@@ -38,7 +33,7 @@ class DirectorySearchWidget(Protocol[DirectoryEntryT]):
     def html(self, layout: Any) -> Markup: ...
 
 
-class DirectoryEntryCollection(
+class DirectoryEntryCollection[DirectoryEntryT: DirectoryEntry](
     GenericCollection[DirectoryEntryT],
     Pagination[DirectoryEntryT]
 ):
@@ -50,16 +45,36 @@ class DirectoryEntryCollection(
 
     """
 
+    @overload
+    def __init__(
+        self: DirectoryEntryCollection[DirectoryEntry],
+        directory: Directory,
+        type: Literal['*', 'generic'] = '*',
+        keywords: Mapping[str, list[str]] | None = None,
+        page: int = 0,
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        directory: Directory,
+        type: str,
+        keywords: Mapping[str, list[str]] | None = None,
+        page: int = 0,
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
+    ) -> None: ...
+
     def __init__(
         self,
         directory: Directory,
         type: str = '*',
         keywords: Mapping[str, list[str]] | None = None,
         page: int = 0,
-        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None
+        search_widget: DirectorySearchWidget[DirectoryEntryT] | None = None,
     ) -> None:
 
-        super().__init__(object_session(directory))
+        super().__init__(object_session(directory))  # type: ignore[arg-type]
         self.type = type
         self.directory = directory
         self.keywords = keywords or {}
@@ -99,7 +114,7 @@ class DirectoryEntryCollection(
             self.directory,
             self.type,
             self.keywords,
-            page=index
+            page=index,
         )
 
     def by_name(self, name: str) -> DirectoryEntryT | None:
@@ -121,15 +136,15 @@ class DirectoryEntryCollection(
         ]
         values.sort(key=keyword_group)
 
-        values = [
-            cls._keywords.has_any(array(group_values))  # type:ignore
+        value_filters = [
+            cls._keywords.has_any(array(group_values))
             for group, group_values in groupby(values, key=keyword_group)
         ]
-        if values:
-            query = query.filter(and_(*values))
+        if value_filters:
+            query = query.filter(and_(*value_filters))
 
         if self.directory.configuration.direction == 'desc':
-            query = query.order_by(desc(cls.order))
+            query = query.order_by(cls.order.desc())
         else:
             query = query.order_by(cls.order)
 
@@ -138,7 +153,7 @@ class DirectoryEntryCollection(
 
         return query
 
-    def valid_keywords(
+    def valid_keywords[T](
         self,
         parameters: Mapping[str, T]
     ) -> dict[str, T]:
@@ -211,7 +226,7 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             search_widget=self.search_widget,
-            keywords=keywords
+            keywords=keywords,
         )
 
     def for_toggled_keyword_value(
@@ -242,7 +257,7 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             search_widget=self.search_widget,
-            keywords=parameters
+            keywords=parameters,
         )
 
     def without_keywords(self) -> Self:
@@ -250,5 +265,5 @@ class DirectoryEntryCollection(
             directory=self.directory,
             type=self.type,
             page=self.page,
-            search_widget=self.search_widget
+            search_widget=self.search_widget,
         )

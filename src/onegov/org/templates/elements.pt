@@ -21,7 +21,7 @@
 </metal:b>
 
 <metal:b define-macro="back_link">
-    <a class="cancel-link" tal:attributes="e.attrs" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;">
+    <a class="cancel-link" tal:attributes="e.attrs" href="#" data-back-link>
         <tal:b condition="e.text">
             ${e.text}
         </tal:b>

@@ -1,40 +1,52 @@
+from __future__ import annotations
+
 import json
 from base64 import b64encode
+from collection_json import Collection, Template  # type: ignore[import-untyped]
+from freezegun import freeze_time
+from tests.onegov.api.test_views import patch_collection_json  # noqa: F401
 from unittest.mock import patch
 
-from collection_json import Collection, Template
-from freezegun import freeze_time
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from onegov.agency import AgencyApp
+    from tests.shared.client import Client
+    from unittest.mock import MagicMock
 
 
-def get_base64_encoded_json_string(data):
-    data = json.dumps(data)
-    data = b64encode(data.encode('ascii'))
-    data = data.decode('ascii')
-    return data
+def get_base64_encoded_json_string(data: Any) -> str:
+    return b64encode(json.dumps(data).encode('ascii')).decode('ascii')
 
 
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')
-def test_view_api(authenticate, broadcast, connect, client):
+def test_view_api(
+    authenticate: MagicMock,
+    broadcast: MagicMock,
+    connect: MagicMock,
+    client: Client[AgencyApp]
+) -> None:
+
     client.login_admin()  # prevent rate limit
 
-    def collection(url):
+    def collection(url: str) -> Collection:
         return Collection.from_json(client.get(url).body)
 
-    def data(item):
+    def data(item: Any) -> Any:
         return {x.name: x.value for x in item.data}
 
-    def links(item):
+    def links(item: Any) -> Any:
         return {x.rel: x.href for x in item.links}
 
-    def template(item):
+    def template(item: Any) -> Any:
         return {x.name for x in item.template.data}
 
     # Endpoints with query hints
     endpoints = collection('/api')
     assert endpoints.queries[0].rel == 'agencies'
-    assert endpoints.queries[0].href == 'http://localhost/api/agencies'
+    assert endpoints.queries[0].href == 'http://localhost/api/agencies?page=0'
     assert data(endpoints.queries[0]) == {
         'parent': None,
         'title': None,
@@ -45,7 +57,7 @@ def test_view_api(authenticate, broadcast, connect, client):
         'updated_lt': None,
     }
     assert endpoints.queries[1].rel == 'people'
-    assert endpoints.queries[1].href == 'http://localhost/api/people'
+    assert endpoints.queries[1].href == 'http://localhost/api/people?page=0'
     assert data(endpoints.queries[1]) == {
         'first_name': None,
         'last_name': None,
@@ -56,7 +68,9 @@ def test_view_api(authenticate, broadcast, connect, client):
         'updated_lt': None
     }
     assert endpoints.queries[2].rel == 'memberships'
-    assert endpoints.queries[2].href == 'http://localhost/api/memberships'
+    assert endpoints.queries[2].href == (
+        'http://localhost/api/memberships?page=0'
+    )
     assert data(endpoints.queries[2]) == {
         'agency': None,
         'person': None,
@@ -147,6 +161,7 @@ def test_view_api(authenticate, broadcast, connect, client):
         'website': '',
         'geo_location': dict(lon=1.1, lat=-2.2, zoom=3),
     }
+    assert links(hospital)['html'] == 'http://localhost/organization/hospital'
     assert not links(hospital)['organigram']
     assert not links(hospital)['parent']
     assert not collection(links(hospital)['children']).items
@@ -368,6 +383,7 @@ def test_view_api(authenticate, broadcast, connect, client):
 
     nick_collection = collection(people['Rivera Nick'])
     nick = nick_collection.items[0]
+    nick_id = nick.href.split('/')[-1]
     assert data(nick) == {
         'academic_title': 'Dr.',
         'location_address': '',
@@ -390,6 +406,7 @@ def test_view_api(authenticate, broadcast, connect, client):
         'title': 'Rivera Nick',
         'website': '',
     }
+    assert links(nick)['html'] == f'http://localhost/person/{nick_id}'
     assert not links(nick)['picture_url']
     assert not links(nick)['website']
     assert data(collection(links(nick)['memberships']).items[0]) == {
@@ -644,10 +661,12 @@ def test_view_api(authenticate, broadcast, connect, client):
     assert set(memberships) == {'Doctor', 'Teacher'}
 
     doctor = collection(memberships['Doctor']).items[0]
+    doctor_id = doctor.href.split('/')[-1]
     assert data(doctor) == {
         'title': 'Doctor',
         'modified': '2023-05-08T01:02:00+00:00',
     }
+    assert links(doctor)['html'] == f'http://localhost/membership/{doctor_id}'
     assert data(collection(links(doctor)['agency']).items[0])['title'] == \
            'Hospital'
     assert data(collection(links(doctor)['person']).items[0])['title'] == \

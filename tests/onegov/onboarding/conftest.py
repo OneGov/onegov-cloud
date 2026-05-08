@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import morepath
-import onegov.core
 import onegov.onboarding
 import os.path
 import pytest
@@ -8,9 +9,18 @@ from onegov.core.utils import scan_morepath_modules
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+
 @pytest.fixture(scope="function")
-def onboarding_app(postgres_dsn, temporary_directory, maildir, es_url,
-                   redis_url):
+def onboarding_app(
+    postgres_dsn: str,
+    temporary_directory: str,
+    maildir: str,
+    redis_url: str
+) -> Iterator[onegov.onboarding.OnboardingApp]:
 
     scan_morepath_modules(onegov.onboarding.OnboardingApp)
     morepath.commit(onegov.onboarding.OnboardingApp)
@@ -36,7 +46,7 @@ def onboarding_app(postgres_dsn, temporary_directory, maildir, es_url,
                 }
             }
         },
-        elasticsearch_hosts=[es_url]
+        enable_search=False
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
@@ -50,6 +60,6 @@ def onboarding_app(postgres_dsn, temporary_directory, maildir, es_url,
             'sender': 'mails@govikon.ch'
         }
     }
-    app.maildir = maildir
+    app.maildir = maildir  # type: ignore[attr-defined]
 
     yield app

@@ -3,6 +3,7 @@ from __future__ import annotations
 import weakref
 
 from collections import OrderedDict
+from contextlib import nullcontext
 from decimal import Decimal
 from itertools import chain, groupby
 from markupsafe import Markup
@@ -13,7 +14,7 @@ from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import If, StrictOptional
-from onegov.pay import Price
+from onegov.pay import InvoiceDiscountMeta, InvoiceItemMeta, Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
 from wtforms.fields import EmailField
@@ -22,10 +23,11 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, DataRequired
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
+    from contextlib import AbstractContextManager as ContextManager
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
     from typing import TypedDict, Self
@@ -39,8 +41,6 @@ if TYPE_CHECKING:
         raw_choice: object
         invert: bool
         choice: object
-
-_FormT = TypeVar('_FormT', bound='Form')
 
 
 class Form(BaseForm):
@@ -405,6 +405,16 @@ class Form(BaseForm):
         If None is returned, the field is not rendered.
 
         """
+        if self.is_hidden(field):
+            return None
+        if (
+            # NOTE: It's a little sus to render fields that are not part
+            #       of our form at all, but for now we'll allow it.
+            field.id in self
+            and hasattr(self.__class__, field.id)
+            and not self.is_visible_through_dependencies(field.id)
+        ):
+            return None
         return render_field(field)
 
     def is_visible_through_dependencies(self, field_id: str) -> bool:
@@ -469,6 +479,32 @@ class Form(BaseForm):
 
         return prices
 
+    def invoice_items(
+        self,
+        group: str = 'form',
+        cost_object: str | None = None,
+        vat_rate: Decimal | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> list[InvoiceItemMeta]:
+        """ Returns the invoice items for all selected items depending
+        on the formdata. """
+        return [
+            InvoiceItemMeta(
+                # NOTE: In some rare cases we may get a static field that has
+                #       a label with a translation string instead of a static
+                #       string defined through form code.
+                text=label if type(label := self[field_id].label.text) is str
+                           else self.request.translate(label),
+                group=group,
+                family=f'price-{field_id}',
+                cost_object=cost_object,
+                unit=price.amount,
+                extra=extra,
+                vat_rate=vat_rate,
+            )
+            for field_id, price in self.prices()
+        ]
+
     def total(self) -> Price | None:
         """ Returns the total amount of all prices. """
         prices = self.prices()
@@ -485,20 +521,9 @@ class Form(BaseForm):
             )
         )
 
-    def total_discount(self) -> Decimal | None:
-        """ Returns the discounts of all selected items.
-
-        The discount is returned as a multiplier between `-Inf` and `1`.
-        Discounts above `1` are clamped to `1`, since we can't discount
-        more than 100% of the price.
-
-        Negative discounts are allowed, but are generally discouraged.
-
-        This discount will not be automatically be applied to the price
-        of this form, since there may be external factors increasing the
-        price of your submission. Also the discount may not apply to
-        the options selected in the form.
-        """
+    def discounts(self) -> list[tuple[str, Decimal]]:
+        """ Returns the discounts of all selected items depending on the
+        formdata. """
 
         discounts = []
 
@@ -513,13 +538,61 @@ class Form(BaseForm):
             if not isinstance(values, list):
                 values = [values]
 
-            for value in values:
-                discount = field.discount.get(value)
+            field_discounts = [
+                discount
+                for value in values
+                if (discount := field.discount.get(value))
+            ]
+            if field_discounts:
+                discount = sum(field_discounts, start=Decimal('0'))
+                discounts.append((field_id, discount))
 
-                if discount:
-                    discounts.append(discount)
+        return discounts
 
-        total = sum(discounts)
+    def discount_items(
+        self,
+        group: str = 'form',
+        cost_object: str | None = None,
+        vat_rate: Decimal | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> list[InvoiceDiscountMeta]:
+        """ Returns the discount items for all selected items depending
+        on the formdata. """
+        return [
+            InvoiceDiscountMeta(
+                # NOTE: In some rare cases we may get a static field that has
+                #       a label with a translation string instead of a static
+                #       string defined through form code.
+                text=label if type(label := self[field_id].label.text) is str
+                           else self.request.translate(label),
+                group=group,
+                family=f'discount-{field_id}',
+                cost_object=cost_object,
+                discount=discount,
+                vat_rate=vat_rate,
+                extra=extra
+            )
+            for field_id, discount in self.discounts()
+        ]
+
+    def total_discount(self) -> Decimal | None:
+        """ Returns the total amount of all discounts.
+
+        The discount is returned as a multiplier between `-Inf` and `1`.
+        Discounts above `1` are clamped to `1`, since we can't discount
+        more than 100% of the price.
+
+        Negative discounts are allowed, but are generally discouraged.
+
+        This discount will not be automatically be applied to the price
+        of this form, since there may be external factors increasing the
+        price of your submission. Also the discount may not apply to
+        the options selected in the form.
+        """
+
+        discounts = self.discounts()
+
+        total = sum(discount for field_id, discount in discounts)
         if not total:
             return None
 
@@ -641,6 +714,16 @@ class Form(BaseForm):
 
         return {k: v for k, v in self.data.items() if k not in exclude}
 
+    @property
+    def no_autoflush(self) -> ContextManager[object]:
+        """ A convenience attribute for handling a no_autoflush when there
+        may not yet be a request bound to the form.
+
+        """
+        if hasattr(self, 'request'):
+            return self.request.session.no_autoflush
+        return nullcontext(None)
+
     def populate_obj(
         self,
         obj: object,
@@ -659,9 +742,15 @@ class Form(BaseForm):
         include = include or set(self._fields.keys())
         exclude = exclude or set()
 
-        for name, field in self._fields.items():
-            if name in include and name not in exclude:
-                field.populate_obj(obj, name)
+        # NOTE: We've observed some issues starting with SQLAlchemy 1.4 where
+        #       a flush could occur mid-object-population, this is not only
+        #       inefficient, but also error-prone for fields that rely on
+        #       the original object state being correct (observers and other
+        #       subscribers could mutate that state during the flush).
+        with self.no_autoflush:
+            for name, field in self._fields.items():
+                if name in include and name not in exclude:
+                    field.populate_obj(obj, name)
 
     def process(
         self,
@@ -975,7 +1064,7 @@ class Pricing:
 # TODO: We should create a mypy plugin that properly infers the return-type
 #       this will also take care of dynamic base class errors. For now we
 #       forward the type of the first form that was passed in
-def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
+def merge_forms[T: Form](form: type[T], /, *forms: type[Form]) -> type[T]:
     """ Takes a list of forms and merges them.
 
     In doing so, a new class is created which inherits from all the forms in
@@ -1009,10 +1098,10 @@ def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
     return enforce_order(MergedForm, fields_in_order)
 
 
-def enforce_order(
-    form_class: type[_FormT],
+def enforce_order[T: Form](
+    form_class: type[T],
     fields_in_order: Iterable[str]
-) -> type[_FormT]:
+) -> type[T]:
     """ Takes a list of fields used in a form_class and enforces the
     order of those fields.
 
@@ -1040,12 +1129,12 @@ def enforce_order(
     return EnforcedOrderForm
 
 
-def move_fields(
-    form_class: type[_FormT],
+def move_fields[T: Form](
+    form_class: type[T],
     fields: Collection[str],
     after: str | None = None,
     before: str | None = None,
-) -> type[_FormT]:
+) -> type[T]:
     """ Reorders the given fields (given by name) by inserting them directly
     after the given field.
 

@@ -4,45 +4,47 @@ import datetime
 import secrets
 
 from decimal import Decimal
+from dataclasses import replace
 from functools import lru_cache
 from libres import new_scheduler
-from libres.db.models import Allocation, Reservation
+from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm import ModelBase
-from onegov.core.orm.mixins import content_property, dict_property
+from onegov.core.orm.mixins import (
+    content_property, dict_property, meta_property)
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.file import MultiAssociatedFiles
 from onegov.form import parse_form
-from onegov.pay import Price, process_payment
+from onegov.pay import InvoiceItemMeta, Price, process_payment
 from sedate import align_date_to_day, utcnow
-from sqlalchemy import Column, Text
-from sqlalchemy.orm import relationship, undefer
-from uuid import uuid4
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 
-from typing import cast, Any, Literal, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     # type gets shadowed by type in model, so we use Type as an alias
     from builtins import type as type_t
-    from collections.abc import Sequence
+    from collections.abc import Collection, Sequence
     from libres.context.core import Context
     from libres.db.scheduler import Scheduler
     from onegov.form import Form
     from onegov.reservation.models import CustomReservation
-    from onegov.pay import Payment, PaymentError, PaymentProvider
+    from onegov.pay import (
+        InvoiceDiscountMeta, Payment, PaymentError, PaymentProvider)
     from onegov.pay.types import PaymentMethod
-    from typing import TypeAlias
+    from sqlalchemy.orm import Session
 
-    DeadlineUnit: TypeAlias = Literal['d', 'h']
+    type DeadlineUnit = Literal['d', 'h']
 
     # HACK: We pass a UUID as a name and have a custom uuid_generator
     #       which directly uses it, so in order to get the correct
     #       type checking on Scheduler.name, we have to pretend we
     #       created a subclass
     class _OurScheduler(Scheduler):
-        name: uuid.UUID  # type:ignore[assignment]
+        name: UUID  # type:ignore[assignment]
+        blocking_names: Collection[UUID]  # type:ignore[assignment]
 
 
 @lru_cache(maxsize=1)
@@ -79,39 +81,39 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     __tablename__ = 'resources'
 
     #: the unique id
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
+    #: the id of the parent resource (optional)
+    parent_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('resources.id', ondelete='SET NULL')
+    )
+
     #: a nice id for the url, readable by humans
     # FIXME: This probably should've been nullable=False
-    name: Column[str | None] = Column(Text, primary_key=False, unique=True)
+    name: Mapped[str | None] = mapped_column(unique=True)
 
     #: the title of the resource
-    title: Column[str] = Column(Text, primary_key=False, nullable=False)
+    title: Mapped[str]
 
     #: the timezone this resource resides in
-    timezone: Column[str] = Column(Text, nullable=False)
+    timezone: Mapped[str]
 
     #: the custom form definition used when creating a reservation
-    definition: Column[str | None] = Column(Text, nullable=True)
+    definition: Mapped[str | None]
 
     #: the group to which this resource belongs to (may be any kind of string)
-    group: Column[str | None] = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: the subgroup to which this resource belongs to
-    subgroup: Column[str | None] = Column(Text, nullable=True)
+    subgroup: Mapped[str | None]
 
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: the payment method
     payment_method: dict_property[PaymentMethod | None] = content_property()
@@ -129,15 +131,37 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     price_per_hour: dict_property[float | None] = content_property()
 
     #: the reservations cost a given amount per unit (allocations * quota)
-    price_per_item: dict_property[float | None]
-    price_per_item = content_property('price_per_reservation')
+    price_per_item: dict_property[float | None] = (
+        content_property('price_per_reservation')
+    )
+
+    #: the invoicing party for this resource
+    invoicing_party: dict_property[str | None] = content_property()
+
+    #: the cost center / cost unit identifier for this resource
+    cost_object: dict_property[str | None] = content_property()
+
+    #: extra field values to include in the occupancy view
+    occupancy_fields: dict_property[list[str]] = content_property(default=list)
+
+    #: extra field values to include in the ical event description
+    ical_fields: dict_property[list[str]] = content_property(default=list)
 
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
-    deadline: dict_property[tuple[int, DeadlineUnit] | None]
-    deadline = content_property()
+    deadline: dict_property[tuple[int, DeadlineUnit] | None] = (
+        content_property()
+    )
+
+    #: reservation lead time (in days)
+    lead_time: dict_property[int | None] = content_property()
 
     #: the pricing method to use for extras defined in formcode
-    extras_pricing_method: dict_property[str | None] = content_property()
+    extras_pricing_method: dict_property[str] = (
+        content_property(default='per_item')
+    )
+
+    #: the discount method to use
+    discount_method: dict_property[str] = content_property(default='resource')
 
     #: the default view
     default_view: dict_property[str | None] = content_property()
@@ -163,29 +187,40 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
 
+    #: the reply_to address to supersede the global reply_to address for
+    #: tickets created through this form
+    reply_to: dict_property[str | None] = meta_property()
+
     __mapper_args__ = {
         'polymorphic_on': 'type',
         'polymorphic_identity': 'generic'
     }
 
-    allocations: relationship[list[Allocation]] = relationship(
-        Allocation,
+    allocations: Mapped[list[Allocation]] = relationship(
         cascade='all, delete-orphan',
         primaryjoin='Resource.id == Allocation.resource',
         foreign_keys='Allocation.resource'
     )
 
+    if TYPE_CHECKING:
+        # NOTE: We don't want these to end up in __annotations__
+        #       since they should not be mapped by SQLAlchemy
+        date: datetime.date | None
+        highlights_min: int | None
+        highlights_max: int | None
+        view: str | None
+
     #: the date to jump to in the view (if not None) -> not in the db!
-    date: datetime.date | None = None
+    date = None
 
     #: a range of allocation ids to highlight in the view (if not None)
-    highlights_min: int | None = None
-    highlights_max: int | None = None
+    highlights_min = None
+    highlights_max = None
 
     #: the view to open in the calendar (fullCalendar view name)
-    view: str | None = 'dayGridMonth'
+    view = 'dayGridMonth'
 
-    @deadline.setter
+    @deadline.inplace.setter
     def set_deadline(self, value: tuple[int, DeadlineUnit] | None) -> None:
         value = value or None
 
@@ -221,6 +256,36 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         self.date = allocations[0].start.date()
 
+    def blocking_resource_ids(
+        self,
+        libres_context: Context | None = None
+    ) -> set[UUID]:
+        assert self.id, 'the id needs to be set'
+        if libres_context is None:
+            assert hasattr(
+                self, 'libres_context'
+            ), 'not bound to libres context'
+            libres_context = self.libres_context
+
+        return libres_context.get_service('get_blocking_resource_ids')(self.id)
+
+    def blocking_resources(self) -> dict[UUID, Resource]:
+        resource_ids = self.blocking_resource_ids()
+        if not resource_ids:
+            return {}
+        session: Session = self.libres_context.get_service(
+            'session_provider'
+        ).session()
+        blocking_resources = {
+            resource.id: resource
+            for resource in session.query(Resource).filter(
+                Resource.id.in_(resource_ids)
+            )
+        }
+        for resource in blocking_resources.values():
+            resource.bind_to_libres_context(self.libres_context)
+        return blocking_resources
+
     def get_scheduler(self, libres_context: Context) -> _OurScheduler:
         assert self.id, 'the id needs to be set'
         assert self.timezone, 'the timezone needs to be set'
@@ -231,6 +296,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
             libres_context,
             self.id,  # type:ignore[arg-type]
             self.timezone,
+            blocking_names=self.blocking_resource_ids(libres_context),  # type:ignore[arg-type]
             **extra_scheduler_arguments()
         )
 
@@ -251,53 +317,37 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         return parse_form(self.definition)
 
-    def price_of_reservation(
+    def invoice_items_for_reservation(
         self,
-        token: uuid.UUID,
-        extra: Price | None = None,
-        discount: Decimal | None = None,
-    ) -> Price:
+        reservations: Sequence[CustomReservation],
+        extras: Sequence[InvoiceItemMeta] | None = None,
+        discounts: Sequence[InvoiceDiscountMeta] | None = None,
+        *,
+        # HACK: This isn't great, but similarly adding i18n to
+        #       the reservation module for a single translation
+        #       string is similarly not great. For now we'll
+        #       live with this, even if it's ugly.
+        reduced_amount_label: str,
+    ) -> list[InvoiceItemMeta]:
 
-        # FIXME: libres is very laissez faire with the polymorphic
-        #        classes and always uses the base classes for queries
-        #        rather than the ones supplied to the Scheduler, so
-        #        we can't actually assume we get our Reservation class
-        #        unless we only ever create instances of our own class
-        #        inside the current context, this is not really acceptable
-        #        for type checking. We could pretend that the Scheduler
-        #        always gives us the class we bound do it, but that's
-        #        not technically true...
-        reservations = cast(
-            'list[CustomReservation]',
-            self.scheduler.reservations_by_token(token)
-            .options(undefer(Reservation.data))
-            .all()
-        )
-        if reservations:
-            reservation = reservations[0]
-            meta = (reservation.data or {}).get('ticket_tag_meta', {})
-            # HACK: This is not very robust, we should probably come up
-            #       with something better to handle price reductions for
-            #       specific tags
-            try:
-                reduced_amount = Decimal(meta.get('Price', meta.get('Preis')))
-                assert reduced_amount >= Decimal('0')
-            except Exception:
-                reduced_amount = None
-        else:
-            reduced_amount = None
+        if not reservations:
+            return []
 
-        total = Price.zero()
-        extras_total = Price.zero()
+        items: list[InvoiceItemMeta] = []
+        extras_quantity = Decimal('0')
         for reservation in reservations:
-            price = reservation.price(self)
-            if price:
-                total += price
+            # FIXME: We could speed this up by loading all of the
+            #        targeted allocations ahead of time and passing
+            #        the correct allocation here. Right now there's
+            #        a N+1 situation for loading target allocations.
+            item = reservation.invoice_item(self)
+            if item is not None:
+                items.append(item)
 
-            if extra:
+            if extras:
                 match self.extras_pricing_method:
                     case 'one_off':
-                        extras_total = extra
+                        extras_quantity = Decimal('1')
 
                     case 'per_hour':
                         # FIXME: Should we assert here or instead use
@@ -310,30 +360,72 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                         else:
                             duration = datetime.timedelta(seconds=0)
 
-                        extras_total += extra * (
+                        extras_quantity += (
                             Decimal(duration.total_seconds())
                             / Decimal('3600')
                         )
 
-                    case 'per_item' | None:
-                        extras_total += extra * reservation.quota
+                    case 'per_item':
+                        extras_quantity += Decimal(reservation.quota)
 
                     case _:  # pragma: unreachable
                         raise ValueError('unhandled extras pricing method')
 
-        if discount and total:
-            total = total.apply_discount(discount)
+        extras = [
+            replace(extra, quantity=extras_quantity)
+            for extra in (extras or ())
+        ]
+        total = InvoiceItemMeta.total(items)
+        extras_total = InvoiceItemMeta.total(extras)
+
+        match self.discount_method:
+            case 'resource':
+                discount_total = total
+            case 'extras':
+                discount_total = extras_total
+            case 'everything':
+                discount_total = total + extras_total
+            case _:  # pragma: unreachable
+                raise ValueError('unhandled extras pricing method')
 
         if extras_total and total:
             total += extras_total
         elif extras_total:
             total = extras_total
 
-        if reduced_amount is not None and reduced_amount < total.amount:
-            # return the reduced amount instead
-            return Price(reduced_amount, total.currency)
+        discount_items: list[InvoiceItemMeta] = []
+        if discounts:
+            remainder = discount_total
+            for discount in discounts:
+                item = discount.apply_discount(discount_total, remainder)
+                remainder += item.amount
+                assert remainder >= Decimal('0')
+                # update the total amount
+                total += item.amount
+                discount_items.append(item)
 
-        return total
+        items = items + discount_items + extras
+
+        reservation = reservations[0]
+        meta = (reservation.data or {}).get('ticket_tag_meta', {})
+        # HACK: This is not very robust, we should probably come up
+        #       with something better to handle price reductions for
+        #       specific tags
+        try:
+            reduced_amount = Decimal(meta.get('Price', meta.get('Preis')))
+            assert reduced_amount >= Decimal('0')
+        except Exception:
+            reduced_amount = None
+
+        if reduced_amount is not None and reduced_amount < total:
+            items.append(InvoiceItemMeta(
+                text=reduced_amount_label,
+                group='reduced_amount',
+                cost_object=self.cost_object,
+                unit=reduced_amount-total
+            ))
+
+        return items
 
     def process_payment(
         self,
@@ -352,6 +444,21 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         #        make use of it or can we change this to None?
         return True
 
+    def is_before_lead_time(self, dt: datetime.datetime) -> bool:
+        if not self.lead_time:
+            return False
+
+        if not dt.tzinfo:
+            raise RuntimeError(f'The given date has no timezone: {dt}')
+
+        if not self.timezone:
+            raise RuntimeError('No timezone set on the resource')
+
+        return (
+            align_date_to_day(dt, self.timezone, 'down')
+            - datetime.timedelta(days=self.lead_time)
+        ) > utcnow()
+
     def is_past_deadline(self, dt: datetime.datetime) -> bool:
         if not self.deadline:
             return False
@@ -364,18 +471,22 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         n, unit = self.deadline
 
-        # hours result in a simple offset
-        def deadline_using_h() -> datetime.datetime:
-            return dt - datetime.timedelta(hours=n)
+        match unit:
+            case 'h':
+                # hours result in a simple offset
+                deadline = dt - datetime.timedelta(hours=n)
 
-        # days require that we align the date to the beginning of the date
-        def deadline_using_d() -> datetime.datetime:
-            return (
-                align_date_to_day(dt, self.timezone, 'down')
-                - datetime.timedelta(days=(n - 1))
-            )
+            case 'd':
+                # days require that we align the date
+                # to the beginning of the date
+                deadline = (
+                    align_date_to_day(dt, self.timezone, 'down')
+                    - datetime.timedelta(days=n - 1)
+                )
 
-        deadline = locals()[f'deadline_using_{unit}']()
+            case _:  # pragma: unreachable
+                raise AssertionError('unreachable')
+
         return deadline <= utcnow()
 
     def is_zip_blocked(self, date: datetime.date) -> bool:

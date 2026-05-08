@@ -70,6 +70,7 @@ def add_parliamentary_group(
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -85,9 +86,14 @@ def view_parliamentary_group(
     layout: RISParliamentaryGroupLayout | PASParliamentaryGroupLayout
 ) -> RenderData | Response:
 
+    active_roles = [
+        role for role in self.roles if not role.end
+    ]
+
     return {
         'layout': layout,
         'parliamentary_group': self,
+        'active_roles': active_roles,
         'title': layout.title,
     }
 
@@ -109,6 +115,7 @@ def edit_parliamentary_group(
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,

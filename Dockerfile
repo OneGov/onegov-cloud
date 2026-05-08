@@ -20,6 +20,7 @@ RUN apt -qq update \
     golang \
     iproute2 \
     libcairo2 \
+    libcairo2-dev \
     libcurl4 \
     libcurl4-openssl-dev \
     libev-dev \
@@ -35,13 +36,14 @@ RUN apt -qq update \
     libsqlite3-0 \
     libxmlsec1 \
     libxmlsec1-openssl \
+    libxt-dev \
     nodejs \
     openssl \
     pkg-config \
     python3-pip \
-    python3.11 \
-    python3.11-dev \
-    python3.11-venv \
+    python3.14 \
+    python3.14-dev \
+    python3.14-venv \
     tzdata \
     weasyprint \
     xmlsec1 \
@@ -89,7 +91,7 @@ COPY .git /app/.git
 WORKDIR /app
 RUN git rev-parse --short HEAD > .commit \
     && git rev-parse HEAD > .commit-long \
-    && python3.11 -m venv . > /dev/null \
+    && python3.14 -m venv . > /dev/null \
     && mkdir -p /var/cache/wheels \
     && mkdir -p /var/cache/pip \
     && bin/pip install --cache-dir /var/cache/pip --upgrade pip setuptools wheel --quiet \

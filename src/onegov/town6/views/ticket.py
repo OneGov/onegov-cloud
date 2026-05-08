@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Personal, Private, Secret
 from onegov.form import Form
 from onegov.org.views.ticket import (
     view_ticket, handle_new_note, handle_edit_note, message_to_submitter,
     view_ticket_status, view_tickets, view_archived_tickets,
     view_pending_tickets, assign_ticket, view_send_to_gever,
     view_delete_all_archived_tickets, delete_ticket, change_tag,
-    view_my_tickets)
+    view_my_tickets, view_ticket_invoice, add_invoice_item)
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import (
     TicketNoteForm, TicketAssignmentForm, TicketChangeTagForm,
-    ExtendedInternalTicketChatMessageForm)
+    ExtendedInternalTicketChatMessageForm, ManualInvoiceItemForm)
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.models import TicketNote
 from onegov.org.models.resource import FindYourSpotCollection
@@ -20,8 +20,9 @@ from onegov.ticket import Ticket
 from onegov.ticket.collection import TicketCollection
 from onegov.town6 import _
 from onegov.town6.layout import (
-    DefaultLayout, FindYourSpotLayout, TicketLayout, TicketNoteLayout,
-    TicketChatMessageLayout, TicketsLayout, ArchivedTicketsLayout)
+    ArchivedTicketsLayout, DefaultLayout, FindYourSpotLayout,
+    TicketInvoiceLayout, TicketLayout, TicketNoteLayout,
+    TicketChatMessageLayout, TicketsLayout)
 
 
 from typing import TYPE_CHECKING
@@ -31,13 +32,13 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-@TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
+@TownApp.html(model=Ticket, template='ticket.pt', permission=Personal)
 def town_view_ticket(self: Ticket, request: TownRequest) -> RenderData:
     return view_ticket(self, request, TicketLayout(self, request))
 
 
 @TownApp.form(
-    model=Ticket, name='note', permission=Private,
+    model=Ticket, name='note', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def town_handle_new_note(
@@ -50,7 +51,7 @@ def town_handle_new_note(
 
 
 @TownApp.form(
-    model=TicketNote, name='edit', permission=Private,
+    model=TicketNote, name='edit', permission=Personal,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def town_handle_edit_note(
@@ -116,6 +117,34 @@ def town_view_ticket_status(
 ) -> RenderData | Response:
     return view_ticket_status(
         self, request, form, TicketChatMessageLayout(self, request))
+
+
+@TownApp.html(
+    model=Ticket,
+    name='invoice',
+    template='ticket_invoice.pt',
+    permission=Private
+)
+def town_view_ticket_invoice(self: Ticket, request: TownRequest) -> RenderData:
+    return view_ticket_invoice(
+        self, request, TicketInvoiceLayout(self, request))
+
+
+@TownApp.form(
+    model=Ticket,
+    name='add-invoice-item',
+    template='form.pt',
+    permission=Private,
+    form=ManualInvoiceItemForm
+)
+def town_add_invoice_item(
+    self: Ticket,
+    request: TownRequest,
+    form: ManualInvoiceItemForm,
+    layout: TicketInvoiceLayout | None = None
+) -> RenderData | Response:
+    return add_invoice_item(
+        self, request, form, TicketInvoiceLayout(self, request))
 
 
 @TownApp.html(

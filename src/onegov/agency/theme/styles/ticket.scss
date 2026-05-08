@@ -1,25 +1,5 @@
 $agn-handler-icon: '\f0e8';
 $per-handler-icon: '\f007';
-$ticket-icon: '\f145';
-
-
-.globals {
-    .tickets::before {
-        @include icon($ticket-icon);
-    }
-
-    .open-tickets::before {
-        @include icon($open-ticket-icon);
-    }
-
-    .pending-tickets::before {
-        @include icon($pending-ticket-icon);
-    }
-
-    .closed-tickets::before {
-        @include icon($closed-ticket-icon);
-    }
-}
 
 .AGN-link::before {
     @include icon($agn-handler-icon);
@@ -28,22 +8,22 @@ $ticket-icon: '\f145';
 }
 
 .PER-link::before {
-    @include icon($per-handler-icon);
+    @include icon-bold($per-handler-icon);
     display: inline-block;
     margin-right: 1ex;
 }
 
 .ticket-handler-AGN td:first-child::before {
-    @include icon($agn-handler-icon);
+    @include icon-bold($agn-handler-icon);
 }
 
 .ticket-handler-PER td:first-child::before {
-    @include icon($per-handler-icon);
+    @include icon-bold($per-handler-icon);
 }
 
 button {
     .AGN-sub-link::before {
-        @include icon($agn-handler-icon);
+        @include icon-bold($agn-handler-icon);
         display: inline-block;
         margin-right: 1ex;
     }

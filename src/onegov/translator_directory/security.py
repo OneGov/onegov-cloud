@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from onegov.translator_directory.models.ticket import TimeReportTicket
+
 from onegov.core.security import Public, Personal
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)
+from onegov.user import UserGroup
 from onegov.file import File
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.ticket import Ticket, TicketCollection
@@ -203,13 +206,15 @@ def disable_translator_docs_coll_access_anon(
 
 @TranslatorDirectoryApp.permission_rule(
     model=TicketCollection, permission=object)
-def restricts_ticket(
+def restrict_tickets(
     app: TranslatorDirectoryApp,
     identity: Identity,
     model: TicketCollection,
     permission: object
 ) -> bool:
-    return identity.role == 'admin'
+    if identity.role not in ('admin', 'editor'):
+        return False
+    return permission in getattr(app.settings.roles, identity.role)
 
 
 @TranslatorDirectoryApp.permission_rule(
@@ -285,3 +290,48 @@ def restrict_translator_mutation_ticket(
         return model.handler.email == identity.userid
 
     return identity.role == 'admin'
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=TimeReportTicket, permission=object)
+def restrict_translator_time_report_ticket(
+    app: TranslatorDirectoryApp,
+    identity: Identity,
+    model: TimeReportTicket,
+    permission: object
+) -> bool:
+    def find_group_which_maps() -> UserGroup | None:
+        time_report = model.handler.time_report  # type: ignore[attr-defined]
+        if time_report and time_report.finanzstelle:
+            user_groups = (
+                app.session()
+                .query(UserGroup)
+                .filter(UserGroup.meta['finanzstelle'].astext.isnot(None))
+                .all()
+            )
+            for group in user_groups:
+                group_finanzstelle = (
+                    group.meta.get('finanzstelle') if group.meta else None
+                )
+                if group_finanzstelle == time_report.finanzstelle:
+                    return group
+        return None
+
+    if permission == Public:
+        return True
+
+    if (
+        identity.role in ('member', 'translator')
+        and model.handler
+    ):
+        if model.handler.email == identity.userid:
+            return True
+        return False
+
+    if identity.role == 'editor':
+        group = find_group_which_maps()
+        if group:
+            return identity.userid in group.meta.get('accountant_emails', [])
+        return False
+
+    return identity.role in {'editor', 'admin'}

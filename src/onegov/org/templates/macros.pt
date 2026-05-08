@@ -65,7 +65,7 @@
                 <div class="edit-bar clearfix">
                     <tal:b repeat="group editbar_links">
                         <tal:b condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
-                            <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
+                            <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown ${' '.join(group.classes or ())}">
                                 ${group.title}
                             </button>
                             <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
@@ -642,7 +642,11 @@
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
         </tal:b>
     </div>
-    <tal:b condition="price|nothing">
+    <tal:b tal:condition="invoice_items|nothing">
+        <h2 i18n:translate>Invoice Items</h2>
+        <tal:b metal:use-macro="layout.macros['invoice_items']" />
+    </tal:b>
+    <tal:b tal:condition="price|nothing">
         <dl class="field-display">
             <dt i18n:translate>Total Amount</dt>
             <dd><metal:b use-macro="layout.macros['price']" /></dd>
@@ -951,7 +955,7 @@
     </div>
 </metal:payment_status>
 
-<metal:payment_status define-macro="payment_source" i18n:domain="onegov.org">
+<metal:payment_source define-macro="payment_source" i18n:domain="onegov.org">
     <div i18n:translate tal:condition="payment.source == 'manual'">
         Manual
     </div>
@@ -970,7 +974,7 @@
             Worldline Saferpay
         </a>
     </div>
-</metal:payment_status>
+</metal:payment_source>
 
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.org">
     <div class="borderless-side-panel" tal:condition="ticket">
@@ -1086,7 +1090,9 @@
         </tal:b>
 
         <dt i18n:translate>Title</dt>
-        <dd>${event.title}</dd>
+        <dd>
+            <tal:b condition="event.highlight|nothing"><i class="fa fa-star" aria-hidden="true"></i> </tal:b>${event.title}
+        </dd>
 
         <dt i18n:translate>Description</dt>
         <dd tal:content="escape(event.description).replace('\n', Markup('<br>'))" />
@@ -1154,7 +1160,7 @@
         <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
-                <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
+                <ul tal:repeat="filter event.filter_keywords_ordered().items()" class="no-margin-bottom">
                     <li tal:condition="filter[1]">
                         <span>${filter[0].title()}:</span>
                         <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
@@ -1247,19 +1253,18 @@
                 tal:define="
                     date occurrence.localized_start;
                     image occurrence.event.image;
-                    link use_links and request.link(occurrence)
                 "
                 use-macro="layout.macros['calendar-day']"
             />
         </div>
         <div class="large-9 medium-8 small-7 columns calendar-text-column">
             <h3>
-                <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
+                <tal:b condition="occurrence.event.highlight|nothing"><i class="fa fa-star" aria-hidden="true"></i> </tal:b><a tal:attributes="href request.link(occurrence) if use_links else None">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
             </h3>
             <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
             <div class="occurrence-location">${occurrence.location}</div>
-            <div class="occurrence-time" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
+            <div class="occurrence-time" tal:define="time layout.format_event_time_range(occurrence.localized_start, occurrence.localized_end)">
                 ${time[0].upper()}${time[1:]}
             </div>
             <div tal:condition="occurrence.tags and show_tags" class="occurrence-tags" >
@@ -1412,6 +1417,20 @@
 </metal:slider>
 
 
+<metal:search_results define-macro="search_results" i18n:domain="onegov.org">
+    <ul class="search-results">
+        <tal:b repeat="result model.load_batch_results">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
+                <tal:b
+                    define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
+                    metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
+                />
+            </li>
+        </tal:b>
+    </ul>
+</metal:search_results>
+
+
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.org">
     <a href="${request.return_here(request.link(result))}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <ul>
@@ -1499,7 +1518,6 @@
 <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <p tal:condition="result.function|nothing">${result.function}</p>
-    <p tal:condition="not:result.function|nothing" i18n:translate>People</p>
 </metal:search_result_people>
 
 
@@ -1664,14 +1682,14 @@
     <div class="identicon">
         <metal:b use-macro="layout.macros.identicon"
                  tal:define="
-                    initials owner.initials if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email[0];
-                    username owner.username if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email;
+                    initials owner.initials;
+                    username owner.username;
                     size 'large';
                 "
         />
     </div>
     <div class="timestamp">
-        <b>${owner.name if not layout.org.hide_personal_email or model.meta.get('origin') == 'external' or request.is_logged_in else layout.org.general_email}</b>
+        <b>${owner.name}</b>
         <tal:b i18n:translate>
             at <tal:b i18n:name="time">${layout.format_date(model.created, 'time')}</tal:b>
         </tal:b>
@@ -1687,18 +1705,11 @@
     </div>
 </metal:generic_message>
 
-<metal:payment_link_fallback define-macro="payment_link_fallback" i18n:domain="onegov.org">
-    <!--! pass -->
-</metal:payment_link_fallback>
-
 <metal:payments define-macro="payments" i18n:domain="onegov.org">
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
-                <th class="select-all-checkbox-cell">
-                    <input type="checkbox" aria-label="Select all payments" />
-                </th>
-                <th i18n:translate tal:condition="payment_links|nothing">
+                <th i18n:translate tal:condition="tickets|nothing">
                     Object
                 </th>
                 <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
@@ -1727,38 +1738,21 @@
         </thead>
         <tbody>
             <tr tal:repeat="payment payments">
-                <td class="payment-checkbox-cell">
-                    <input type="checkbox" name="selected_payments" value="${payment.id}" aria-label="Select this payment" />
-                </td>
-                <td tal:condition="payment_links|nothing">
-                    <tal:b define="ticket tickets[payment.id] | nothing">
-                        <tal:b repeat="link payment_links[payment.id]">
-                            <tal:b switch="link.__tablename__">
-                                <tal:b case="'submissions'">
-                                    <div>
-                                        <a tal:condition="ticket" href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong> - ${ticket.group}
-                                        </a>
-                                        <div>
-                                            ${link.title}
-                                        </div>
-                                    </div>
-                                </tal:b>
-                                <tal:b case="'reservations'" condition="repeat.link.start">
-                                    <div>
-                                        <a tal:condition="ticket" href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong> - ${ticket.group}
-                                        </a>
-                                        <div>
-                                            ${link.title}
-                                        </div>
-                                    </div>
-                                </tal:b>
-                                <tal:b case="default">
-                                    <metal:b use-macro="layout.macros['payment_link_fallback']" />
-                                </tal:b>
+                <td tal:condition="tickets|nothing">
+                    <tal:b define="ticket tickets[payment.id]|nothing">
+                        <div tal:condition="ticket">
+                            <a tal:condition="ticket" href="${request.link(ticket)}">
+                                <strong>${ticket.number}</strong> - ${ticket.group}
+                            </a>
+                            <tal:b tal:switch="ticket.handler_code">
+                                <div tal:case="'RSV'">
+                                    ${ticket.ticket_email}
+                                </div>
+                                <div tal:case="default">
+                                    ${ticket.title}
+                                </div>
                             </tal:b>
-                        </tal:b>
+                        </div>
                     </tal:b>
                 </td>
                 <!-- Cell for Reservation Dates -->
@@ -1799,6 +1793,92 @@
         </tbody>
     </table>
 </metal:payments>
+
+<metal:invoices define-macro="invoices" i18n:domain="onegov.org">
+    <table class="invoices-table" tal:condition="invoices">
+        <thead>
+            <tr>
+                <th class="select-all-checkbox-cell">
+                    <input type="checkbox" aria-label="Select all invoices" />
+                </th>
+                <th i18n:translate>
+                    Object
+                </th>
+                <th i18n:translate tal:condition="reservation_dates_formatted|nothing">
+                    Reservation
+                </th>
+                <th i18n:translate>
+                    Net Amount
+                </th>
+                <th i18n:translate>
+                    Invoiced
+                </th>
+                <th i18n:translate>
+                    Paid
+                </th>
+                <th i18n:translate>
+                    Created
+                </th>
+                <th tal:condition="invoice_actions|nothing"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="invoice invoices" class="${'' if invoice.invoiced else 'un'}invoiced ${'' if invoice.paid else 'un'}paid">
+                <td class="invoice-checkbox-cell">
+                    <input type="checkbox" name="selected_invoices" value="${invoice.id}" aria-label="Select this invoice" i18n:attributes="aria-label" />
+                </td>
+                <td>
+                    <div>
+                        <a href="${request.link(invoice.ticket)}">
+                            <strong>${invoice.ticket.number}</strong> - ${invoice.ticket.group}
+                        </a>
+                        <tal:b tal:switch="invoice.ticket.handler_code">
+                            <div tal:case="'RSV'">
+                                ${invoice.ticket.ticket_email}
+                            </div>
+                            <div tal:case="default">
+                                ${invoice.ticket.title}
+                            </div>
+                        </tal:b>
+                    </div>
+                </td>
+                <!-- Cell for Reservation Dates -->
+                <td tal:condition="reservation_dates_formatted|nothing">
+                    <span tal:replace="reservation_dates_formatted.get(invoice.id, '')" />
+                </td>
+                <td>${'{0:.2f}'.format(invoice.total_amount)}</td>
+                <td class="invoiced-state">
+                    <tal:b tal:condition="invoice.invoiced">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Invoiced" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Invoiced</span>
+                    </tal:b>
+                    <tal:b tal:condition="not:invoice.invoiced">
+                        <i class="fa fa-times-circle" aria-hidden="true" title="Uninvoiced" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Uninvoiced</span>
+                    </tal:b>
+                </td>
+                <td class="paid-state">
+                    <tal:b tal:condition="invoice.paid">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Paid</span>
+                    </tal:b>
+                    <tal:b tal:condition="not:invoice.paid">
+                        <i class="fa fa-times-circle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                    </tal:b>
+                </td>
+                <td>
+                    ${layout.format_date(invoice.ticket.created, 'datetime')}
+                </td>
+                <td tal:condition="invoice_actions|nothing" class="text-links">
+                    <tal:b repeat="link invoice_actions(invoice)">
+                        <tal:b replace="link(layout)" />
+                    </tal:b>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</metal:invoices>
 
 <metal:directory_error define-macro="directory_error" i18n:domain="onegov.org">
     <ul class="dense">
@@ -1947,14 +2027,16 @@
                     >
                     <div tal:condition="file.published" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           ic-target="#button-${file.id}"
+                           ic-success-action="change"
                            class="is-published">
                             <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
                         </a>
                     </div>
                     <div tal:condition="not:file.published" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           ic-target="#button-${file.id}"
+                           ic-success-action="change"
                            class="is-not-published">
                             <i class="fa fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
                         </a>
@@ -1967,16 +2049,16 @@
                                 <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
 
                                 <div class="publication-settings-input">
-                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
+                                    <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
 
-                                    <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <select name="hour" ic-post-to="${post_url}" ic-target="#button-${file.id}" ic-success-action="change">
                                         <option tal:condition="not:publish_date"></option>
                                         <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
                                             <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
                                         </tal:b>
                                     </select>
 
-                                    <a ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <a ic-post-to="${post_url}&clear=1" ic-target="#button-${file.id}" ic-success-action="change">
                                         <i class="fa fa-times-circle" aria-hidden="true"></i>
                                         <span class="show-for-sr" i18n:translate>Reset</span>
                                     </a>
@@ -1993,14 +2075,16 @@
                     >
                     <div tal:condition="file.publication" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           ic-target="#button-${file.id}"
+                           ic-success-action="change"
                            class="is-a-publication">
                             <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
                         </a>
                     </div>
                     <div tal:condition="not:file.publication" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
-                           ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                           ic-target="#button-${file.id}"
+                           ic-success-action="change"
                            class="is-not-a-publication">
                             <i class="fa fa-fw fa-times-circle" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
                         </a>
@@ -2041,11 +2125,8 @@
         <div class="columns small-2 file-actions">
             <a class="button secondary confirm delete" role="button"
                 ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
-                ic-on-success="
-                    var info = $(elt).closest('tr');
-                    info.prev().remove();
-                    info.remove();
-                "
+                ic-target="closest tbody"
+                ic-success-action="remove"
                 data-confirm="Do you really want to delete this file?"
                 data-confirm-extra="${file.name}"
                 data-confirm-yes="Delete File"
@@ -2055,25 +2136,15 @@
                 <span i18n:translate >Delete</span>
             </a>
             <a class="button secondary rename prompt" role="button"
+                ic-post-to="${request.csrf_protected_url(request.link(file, 'rename'))}"
+                ic-include='.dialog [name="name"]'
+                ic-target="#button-${file.id}"
+                ic-success-action="change"
                 data-prompt="Please provide the new name for the file"
                 data-prompt-ok="Rename"
                 data-prompt-cancel="Cancel"
+                data-prompt-name="name"
                 data-prompt-value="${file.name}"
-                data-prompt-success="(function(value) {
-                    var url = '${request.link(file, 'rename')}?csrf-token=${layout.csrf_token}';
-                    var ext = '.${file.name.split('.')[-1].strip()}';
-                    var elt = $(this);
-
-                    value = value.substring(value.length - ext.length, value.length) === ext && value || value + ext;
-
-                    jQuery.post(url, {'name': value}, function() {
-                        var actions = elt;
-
-                        actions.closest('tr').prev().find('td:first').text(value);
-                        actions.find('a.prompt').data('prompt-value', value);
-                        actions.find('a.delete').data('confirm-extra', value);
-                    });
-                })"
                 i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel">
                 <span class="fa fa-edit" aria-hidden="true"></span>
                 <span i18n:translate>Rename</span>
@@ -2085,11 +2156,8 @@
             <a class="button secondary" role="button"
                ic-get-from="${request.link(file, 'links')}"
                ic-target="#links-${id}"
-               ic-on-success="
-                   var modal = $('#links-${id}-modal');
-                   modal.foundation('reveal', 'open');
-                   modal.focus();
-               ">
+               ic-action-target="#links-${id}-modal-opener"
+               ic-success-action="click">
                 <span class="fa fa-link" aria-hidden="true"></span>
                 <span i18n:translate>Linked Pages</span>
                 <span class="ic-indicator fa fa-spinner fa-spin" style="display: none"></span>
@@ -2097,6 +2165,7 @@
         </div>
     </div>
     <div style="display:none;">
+        <button id="links-${id}-modal-opener" data-reveal-id="links-${id}-modal" tabindex="-1" aria-hidden="true"></button>
         <div id="links-${id}-modal" class="reveal-modal medium dialog" data-reveal role="dialog" aria-hidden="true">
             <h2 i18n:translate>Links to <tal:b i18n:name="filename">${file.name}</tal:b></h2>
             <ul id="links-${id}"></ul>
@@ -2107,7 +2176,7 @@
 <metal:file_links define-macro="file-links" i18n:domain="onegov.org">
     <ul class="search-results">
         <tal:b repeat="result file.links">
-            <li class="search-result-${result.es_type_name}" tal:condition="result">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
                 <tal:b
                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
@@ -2135,28 +2204,18 @@
         <tal:b condition="not file.signed and may_sign">
             <a tal:condition="not:file.signed" class="is-not-signed signature-status"
                 role="button"
+                ic-post-to="${request.csrf_protected_url(request.link(file, 'sign'))}"
+                ic-include='.dialog [name="token"]'
+                ic-target="closest .file-status-tag"
+                ic-action-target="this"
+                ic-beforeSend-action="addClass:signing"
+                ic-complete-action="removeClass:signing"
                 data-prompt="Please enter your yubikey to apply a digital seal to this file"
+                data-prompt-name="token"
                 data-prompt-ok="Sign"
                 data-prompt-cancel="Cancel"
                 data-prompt-placeholder="Plug your YubiKey into a USB slot and press it."
                 data-prompt-info="Published documents with a digital seal can be discovered through the site-search and in the list of documents with a digital seal. This action will be logged and cannot be undone."
-                data-prompt-success="(function(value) {
-                    var url = '${request.link(file, 'sign')}?csrf-token=${layout.csrf_token}';
-                    var elt = $(this);
-                    var row = elt.closest('tr');
-
-                    elt.toggleClass('signing', true);
-                    window.elt = elt;
-
-                    jQuery.post(url, {'token': value}, function(data) {
-                        var target = elt.closest('.signature-status').parent();
-                        target.html(data);
-                        processCommonNodes(target);
-                        row.prev().addClass('signed');
-                    }).always(function() {
-                        elt.toggleClass('signing', false);
-                    });
-                })"
                 i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel;data-prompt-info;data-prompt-placeholder"
             >
                 <i class="fa fa-fw fa-unlock" aria-hidden="true"></i>
@@ -2187,16 +2246,13 @@
 </metal:signature_status>
 
 <metal:file_info define-macro="file-info" i18n:domain="onegov.org">
-    <tal:b define="
-        file_number file.number|file.id;
-        file_upload file.upload_date|file.created
-    ">
+    <tal:b define="file_upload file.upload_date|file.created">
         <tr class="file-info ${'signed' if file.signed else ''}">
             <td>
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}" data-toggle="#details-${file_number}" class="untoggled">
+                <a id="button-${file.id}" data-toggle="#details-${file.id}" class="untoggled">
                     <i class="fa fa-chevron-down" aria-hidden="true"></i>
                 </a>
             </td>
@@ -2207,15 +2263,14 @@
                 ${format_date(file_upload)}
             </td>
         </tr>
-        <tr id="details-${file_number}" style="display: none;">
+        <tr id="details-${file.id}" style="display: none;">
             <td colspan="4">
-                <div ic-trigger-from="#button-${file_number}"
-                     ic-trigger-on="click once"
+                <div ic-trigger-from="#button-${file.id}"
+                     ic-trigger-on="click once, change"
                      ic-get-from="${actions_url(file.id)}">
                 </div>
             </td>
         </tr>
-        <tr style="display: none"></tr> <!--! keeps odd/even shading on track -->
     </tal:b>
 </metal:file_info>
 
@@ -2226,8 +2281,9 @@
             <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
         </a>
         <a class="delete confirm"
-           ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}"
-           ic-on-success="$('#image-${index}').remove();"
+           ic-delete-from="${request.csrf_protected_url(image.url)}"
+           ic-target="#image-${index}"
+           ic-success-action="remove"
            data-confirm="Do you really want to delete the image?"
            data-confirm-yes="Delete Image"
            data-confirm-no="Cancel"
@@ -2348,7 +2404,7 @@
 </metal:tickets_table_row>
 
 <metal:open_graph_tags define-macro="open_graph_tags">
-<meta property="og:title" tal:attributes="content og_title" tal:define="og_title layout.og_title | title | None" tal:condition="og_title" />
+<meta property="og:title" tal:attributes="content og_title" tal:define="og_title og_title | layout.og_title | title | None" tal:condition="og_title" />
 <meta property="og:type" tal:attributes="content layout.og_type" />
 <meta property="og:url" tal:attributes="content layout.og_url" />
 <tal:b tal:define="og_image layout.og_image" tal:condition="og_image">
@@ -2383,6 +2439,103 @@
         tal:condition="not: layout.org.disable_page_refs"
     ></div>
 </metal:pageref>
+
+<metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.org">
+    <table class="invoice-items" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_cost_object any(item.cost_object for items in invoice_items.values() for item in items); show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
+        <thead>
+            <tr>
+                <th i18n:translate>Booking Text</th>
+                <th tal:condition="show_cost_object" i18n:translate>Cost center / cost unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Unit</th>
+                <th tal:condition="show_quantity" class="centered" i18n:translate>Quantity</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT Rate</th>
+                <th tal:condition="show_vat" class="centered" i18n:translate>VAT</th>
+                <th class="centered" i18n:translate>Amount</th>
+                <th tal:condition="item_actions">
+                    <span i18n:translate class="show-for-sr">Actions</span>
+                </th>
+            </tr>
+        </thead>
+        <tal:b tal:repeat="(group, items) invoice_items.items()">
+            <thead>
+                <tr class="group">
+                    <th tal:switch="group" colspan="${2 + (1 if show_cost_object else 0) + (2 if show_quantity else 0) + (2 if show_vat else 0) + (1 if item_actions else 0)}">
+                        <tal:b tal:case="'reservation'" i18n:translate>
+                            Reservations
+                        </tal:b>
+                        <tal:b tal:case="'submission'" i18n:translate>
+                            Submission
+                        </tal:b>
+                        <tal:b tal:case="'form'" i18n:translate>
+                            Selected Options
+                        </tal:b>
+                        <tal:b tal:case="'manual'" i18n:translate>
+                            Discounts / Surcharges
+                        </tal:b>
+                        <tal:b tal:case="'migration'" i18n:translate>
+                            Lump sum
+                        </tal:b>
+                        <tal:b tal:case="default">
+                            ${item.group}
+                        </tal:b>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:b tal:repeat="item items">
+                    <tr tal:define="groupid hash(str(item.group) + str(repeat.item.index)); paid total_paid or item.paid|False" tal:attributes="class ('paid' if paid else 'unpaid') if show_payment_state else None">
+                        <td>${item.text}</td>
+                        <td tal:condition="show_cost_object" class="cost-object">${item.cost_object}</td>
+                        <td tal:condition="show_quantity" class="unit">${'{:.2f}'.format(item.unit)}</td>
+                        <td tal:condition="show_quantity" class="quantity">${'{:.2f}'.format(item.quantity)}</td>
+                        <td tal:condition="show_vat" class="vat-rate">${'{:.1f}%'.format(item.vat_rate or 0.0)}</td>
+                        <td tal:condition="show_vat" class="vat">${'{:.2f}'.format(item.vat)}</td>
+                        <td class="amount">
+                            ${'{:.2f}'.format(item.amount)}
+                            <tal:b tal:condition="show_payment_state and paid">
+                                <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                                <span i18n:translate class="show-for-sr">Paid</span>
+                            </tal:b>
+                            <tal:b tal:condition="show_payment_state and not paid">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                                <span i18n:translate class="show-for-sr">Unpaid</span>
+                            </tal:b>
+                        </td>
+                        <td class="actions" tal:condition="item_actions">
+                            <tal:b tal:repeat="action actions" tal:define="actions item_actions(item)">
+                                ${action(layout)}
+                            </tal:b>
+                        </td>
+                    </tr>
+                </tal:b>
+            </tbody>
+        </tal:b>
+        <tfoot tal:condition="total_amount is not None">
+            <tr class="total${(' paid' if total_paid else ' unpaid') if show_payment_state else ''}">
+                <td i18n:translate>Total</td>
+                <td tal:condition="show_cost_object"></td>
+                <td tal:condition="show_quantity" class="unit"></td>
+                <td tal:condition="show_quantity" class="quantity"></td>
+                <td tal:condition="show_vat" class="vat-rate"></td>
+                <td tal:condition="show_vat" class="vat">
+                    ${'{:.2f}'.format(total_vat)}
+                </td>
+                <td class="amount">
+                    ${'{:.2f}'.format(total_amount)}
+                    <tal:b tal:condition="show_payment_state and total_paid">
+                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Paid</span>
+                    </tal:b>
+                    <tal:b tal:condition="show_payment_state and not total_paid">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                    </tal:b>
+                </td>
+                <td tal:condition="item_actions"></td>
+            </tr>
+        </tfoot>
+    </table>
+</metal:invoice_items>
 
 <metal:display_results define-macro="display_results" i18n:domain="onegov.org">
     <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>

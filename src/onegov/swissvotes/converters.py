@@ -39,12 +39,12 @@ class PolicyAreaListConverter(PolicyAreaConverterBase):
 
         return self.verify_format(s) and self.verify_components(s)
 
-    def decode(self, s: str) -> list[str]:  # type: ignore[override]
+    def decode(self, s: list[str | None]) -> list[str]:  # type: ignore[override]
         if not s:
             return []
-        return [item for item in s if self.validate(item)]
+        return [item for item in s if item and self.validate(item)]
 
-    def encode(self, l: list[str]) -> list[str]:  # type: ignore[override]
+    def encode(self, l: list[str] | str | None) -> list[str]:
         if not l:
             return []
         return [item for item in l if item]

@@ -3,9 +3,11 @@ from __future__ import annotations
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.core.elements import Link
+from onegov.core.elements import Link, LinkGroup
+from onegov.form.collection import FormCollection
+from onegov.core.utils import Bunch
 from onegov.org.custom import get_global_tools as get_global_tools_base
-from onegov.org.layout import DefaultLayout
+from onegov.town6.layout import DefaultLayout
 from onegov.org.models import Organisation
 
 
@@ -13,7 +15,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.agency.request import AgencyRequest
-    from onegov.core.elements import LinkGroup
+    from onegov.town6.layout import NavigationEntry
 
 
 def get_global_tools(request: AgencyRequest) -> Iterator[Link | LinkGroup]:
@@ -31,13 +33,54 @@ def get_global_tools(request: AgencyRequest) -> Iterator[Link | LinkGroup]:
         yield item
 
 
-def get_top_navigation(request: AgencyRequest) -> Iterator[Link]:
-    yield Link(
-        text=_('People'),
-        url=request.class_link(ExtendedPersonCollection)
+def get_modules(request: AgencyRequest) -> LinkGroup:
+    links = []
+    if request.is_logged_in:
+        links.append(
+            Link(
+                _('Agencies'),
+                request.class_link(
+                    ExtendedAgencyCollection),
+                attrs={'class': 'agencies'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('People'),
+                request.class_link(
+                    ExtendedPersonCollection),
+                attrs={'class': 'people'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Forms'),
+                request.class_link(
+                    FormCollection),
+                attrs={'class': 'forms'}
+            )
+        )
+
+    return LinkGroup(_('Modules'), classes=('modules', ), links=links)
+
+
+def get_top_navigation(request: AgencyRequest) -> Iterator[NavigationEntry]:
+    yield (
+        Bunch(id=-2, access='public', published=True),
+        Link(  # type:ignore[misc]
+            text=_('People'),
+            url=request.class_link(ExtendedPersonCollection)
+        ),
+        ()
     )
-    yield Link(
-        text=_('Agencies'),
-        url=request.class_link(ExtendedAgencyCollection)
+    yield (
+        Bunch(id=-1, access='public', published=True),
+        Link(  # type:ignore[misc]
+            text=_('Agencies'),
+            url=request.class_link(ExtendedAgencyCollection)
+        ),
+        ()
     )
     yield from DefaultLayout(request.app.org, request).top_navigation or ()

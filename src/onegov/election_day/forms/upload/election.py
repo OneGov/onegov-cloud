@@ -6,7 +6,6 @@ from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from wtforms.fields import RadioField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -36,9 +35,9 @@ class UploadElectionBaseForm(Form):
         label=_('Results'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
         depends_on=('file_format', '!wabsti_c'),
     )
@@ -64,9 +63,9 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         label='WM_Gemeinden.csv',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         depends_on=('file_format', 'wabsti_c'),
         render_kw={'force_simple': True}
     )
@@ -75,9 +74,9 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         label='WM_Kandidaten.csv',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         depends_on=('file_format', 'wabsti_c'),
         render_kw={'force_simple': True}
     )
@@ -86,9 +85,9 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         label='WM_KandidatenGde.csv',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         depends_on=('file_format', 'wabsti_c'),
         render_kw={'force_simple': True}
     )
@@ -97,9 +96,9 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         label='WM_Wahl',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         depends_on=('file_format', 'wabsti_c'),
         render_kw={'force_simple': True}
     )
@@ -108,9 +107,9 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         label='WMStatic_Gemeinden.csv',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         depends_on=('file_format', 'wabsti_c'),
         render_kw={'force_simple': True}
     )
@@ -122,9 +121,9 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         label='WP_Gemeinden',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
@@ -133,9 +132,9 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         label='WP_Kandidaten',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
@@ -144,9 +143,9 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         label='WP_KandidatenGde',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
@@ -155,9 +154,9 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         label='WP_Listen',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
@@ -166,9 +165,9 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         label='WP_ListenGde',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
@@ -177,9 +176,9 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         label='WP_Wahl',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         depends_on=('file_format', 'wabsti_c'),
         render_kw={'force_simple': True}
     )
@@ -188,9 +187,9 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         label='WPStatic_Gemeinden',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
@@ -199,9 +198,9 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         label='WPStatic_Kandidaten',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )

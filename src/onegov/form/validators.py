@@ -3,40 +3,50 @@ from __future__ import annotations
 import humanize
 import importlib
 import phonenumbers
-import re
 
 from babel.dates import format_date
+from bad_passwords import is_bad_password
 from cgi import FieldStorage
 from datetime import date
 from datetime import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
+
+from onegov.file.utils import get_supported_image_mime_types
 from onegov.form import _
-from onegov.form.errors import (DuplicateLabelError, InvalidIndentSyntax,
-                                EmptyFieldsetError)
+from onegov.form.errors import (
+    DuplicateLabelError,
+    InvalidIndentSyntax,
+    EmptyFieldsetError,
+    InvalidCommentIndentSyntax,
+    InvalidCommentLocationSyntax,
+    RequiredFieldAddedError,
+    NestedFieldsetError
+)
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
-from onegov.form.types import BaseFormT, FieldT
 from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
-from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
+from wtforms import DateField, DateTimeLocalField, RadioField, TimeField, Field
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import HostnameValidation
+from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import Generic, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
-    from onegov.core.orm import Base
     from onegov.form import Form
     from onegov.form.types import BaseValidator, FieldCondition
-    from wtforms import Field
+    from sqlalchemy.orm import DeclarativeBase
+    from wtforms import Field, StringField
     from wtforms.form import BaseForm
 
 
@@ -47,21 +57,21 @@ if TYPE_CHECKING:
 types_map.setdefault('.mp3', 'audio/mpeg')
 
 
-class If(Generic[BaseFormT, FieldT]):
+class If[FormT: BaseForm, FieldT: Field]:
     """ Wraps a single validator or a list of validators, which will
     only be executed if the supplied condition callback returns `True`.
 
     """
     def __init__(
         self,
-        condition: FieldCondition[BaseFormT, FieldT],
-        *validators: BaseValidator[BaseFormT, FieldT]
+        condition: FieldCondition[FormT, FieldT],
+        *validators: BaseValidator[FormT, FieldT]
     ):
         assert len(validators) > 0, 'Need to supply at least one validator'
         self.condition = condition
         self.validators = validators
 
-    def __call__(self, form: BaseFormT, field: FieldT) -> None:
+    def __call__(self, form: FormT, field: FieldT) -> None:
         if not self.condition(form, field):
             return
 
@@ -113,11 +123,87 @@ class FileSizeLimit:
         if not field.data:
             return
 
+        if isinstance(field.data, list):  # UploadMultipleField
+            for data in field.data:
+                if not data:
+                    continue  # in case of file deletion
         if field.data.get('size', 0) > self.max_bytes:
             message = field.gettext(self.message).format(
                 humanize.naturalsize(self.max_bytes)
             )
             raise ValidationError(message)
+
+
+MIME_TYPES_PDF = {
+    'application/pdf',
+}
+
+# for now not allowed by default
+MIME_TYPES_JSON = {
+    'application/json',
+}
+
+MIME_TYPES_DOCUMENT = {
+    'application/msword',  # doc
+    'application/rtf',
+    *MIME_TYPES_PDF,
+    'application/excel',
+    'application/vnd.ms-excel',  # xls
+    ('application/vnd.openxmlformats-officedocument.'
+     'presentationml.presentation'),  # pptx
+    ('application/vnd.openxmlformats-officedocument.'
+     'spreadsheetml.sheet'),  # xlsx
+    ('application/vnd.openxmlformats-officedocument.'
+     'wordprocessingml.document'),  # docx
+    'application/vnd.ms-office',
+    'application/CDFV2',  # old ms office docs
+    'application/x-ole-storage',  # old ms office docs
+    'application/CDFV2-unknown'  # old ms office docs
+}
+
+MIME_TYPES_EXCEL = {
+    'application/excel',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-office',
+    'application/octet-stream',
+    'application/x-ole-storage',
+}
+
+MIME_TYPES_XML = {
+    'application/xml',
+}
+
+MIME_TYPES_ARCHIVE = {
+    'application/zip',
+}
+
+MIME_TYPES_TEXT_DATA = {
+    'text/csv',
+    'text/plain',
+}
+
+MIME_TYPES_IMAGE = {
+    # allowed types based on PIL
+    *get_supported_image_mime_types(),
+    'image/svg+xml',
+}
+
+MIME_TYPES_AUDIO = {
+    'audio/mp4',
+    'audio/mpeg',
+    'audio/wav',
+    'audio/webm',  # weba
+}
+
+MIME_TYPES_VIDEO = {
+    'video/mp4',
+    'video/mpeg',  # mpg, mpeg
+    'video/ogg',
+    'video/quicktime',  # mov
+    'video/webm',  # webm
+    'video/x-msvideo',  # avi
+}
 
 
 class WhitelistedMimeType:
@@ -128,17 +214,13 @@ class WhitelistedMimeType:
     """
 
     whitelist: Collection[str] = {
-        'application/excel',
-        'application/vnd.ms-excel',
-        'application/msword',
-        'application/pdf',
-        'application/zip',
-        'image/gif',
-        'image/jpeg',
-        'image/png',
-        'image/x-ms-bmp',
-        'text/plain',
-        'text/csv'
+        *MIME_TYPES_DOCUMENT,
+        *MIME_TYPES_XML,
+        *MIME_TYPES_ARCHIVE,
+        *MIME_TYPES_TEXT_DATA,
+        *MIME_TYPES_IMAGE,
+        *MIME_TYPES_AUDIO,
+        *MIME_TYPES_VIDEO,
     }
 
     message = _('Files of this type are not supported.')
@@ -181,6 +263,30 @@ class ExpectedExtensions(WhitelistedMimeType):
         super().__init__(whitelist=mimetypes)
 
 
+class ValidPassword(Length):
+    """
+    Makes sure the given password is not part of a list of commonly used
+    passwords.
+    """
+    def __init__(
+        self,
+        min_length: int = 10,
+        length_message: str | None = None
+    ) -> None:
+        assert min_length >= 10
+        super().__init__(min=min_length, message=length_message)
+
+    def __call__(self, form: BaseForm, field: StringField) -> None:
+        super().__call__(form, field)
+        assert field.data is not None
+        if is_bad_password(field.data):
+            raise ValidationError(_(
+                'The password you wanted to use was found on '
+                'list of commonly used passwords, please use '
+                'a more secure password.'
+            ))
+
+
 class ValidFormDefinition:
     """ Makes sure the given text is a valid onegov.form definition. """
 
@@ -189,6 +295,13 @@ class ValidFormDefinition:
     syntax = _('The syntax on line {line} is not valid.')
     indent = _('The indentation on line {line} is not valid. '
                'Please use a multiple of 4 spaces')
+    comment_indent = _('The indentation on line {line} is not valid. '
+                       'Comments must be indented to the same level as '
+                       'the field definition (`=`) they belong to.')
+    comment_location = _('Incorrect placement of the field description on '
+                         'line {line}. The field description must be placed '
+                         'below the field definition (`=`) and with the same '
+                         'indentation.')
     duplicate = _("The field '{label}' exists more than once.")
     reserved = _("'{label}' is a reserved name. Please use a different name.")
     required = _('Define at least one required field')
@@ -203,6 +316,9 @@ class ValidFormDefinition:
     empty_fieldset = _(
         "The '{label}' group is empty and will not be visible. Either remove "
         "the empty group or add fields to it.")
+    nested_fieldsets = _(
+        'Nested fieldsets (`#`) are not supported, please remove line {line}.'
+    )
 
     def __init__(
         self,
@@ -221,7 +337,7 @@ class ValidFormDefinition:
             return None
 
         try:
-            parsed_form = self._parse_form(field)
+            parsed_form = self._parse_form(field, enable_edit_checks=True)
         except InvalidFormSyntax as exception:
             field.render_kw = field.render_kw or {}
             field.render_kw['data-highlight-line'] = exception.line
@@ -231,6 +347,14 @@ class ValidFormDefinition:
         except InvalidIndentSyntax as exception:
             raise ValidationError(
                 field.gettext(self.indent).format(line=exception.line)
+            ) from exception
+        except InvalidCommentIndentSyntax as exception:
+            raise ValidationError(
+                field.gettext(self.comment_indent).format(line=exception.line)
+            ) from exception
+        except InvalidCommentLocationSyntax as exception:
+            raise ValidationError(
+                field.gettext(self.comment_location).format(line=exception.line)
             ) from exception
         except EmptyFieldsetError as exception:
             raise ValidationError(
@@ -245,9 +369,24 @@ class ValidFormDefinition:
             raise ValidationError(
                 exception.field_name
             ) from exception
+        except NestedFieldsetError as exception:
+            raise ValidationError(
+                field.gettext(self.nested_fieldsets).format(line=exception.line)
+            ) from exception
         except AttributeError as exception:
             raise ValidationError(
                 field.gettext(self.message)
+            ) from exception
+        except RequiredFieldAddedError as exception:
+            message = _(
+                '${fields}: New fields cannot be required initially. '
+                'Require them in a separate migration step.', mapping={
+                    'fields': ', '.join(f'"{f}"' for f in
+                                        exception.field_names)
+                }
+            )
+            raise ValidationError(
+                field.gettext(message)
             ) from exception
 
         if self.require_email_field:
@@ -386,8 +525,9 @@ class ValidSurveyDefinition(ValidFormDefinition):
         for field in parsed_form._fields.values():
             if isinstance(field, (UploadField, DateField, TimeField,
                                   DateTimeLocalField)):
-                error = field.gettext(self.invalid_field_type %
-                                      {'label': field.label.text})
+                message = self.invalid_field_type % {
+                    'label': field.label.text}
+                error = field.gettext(message)
                 errors = form['definition'].errors
                 if not isinstance(errors, list):
                     errors = form['definition'].process_errors
@@ -501,9 +641,6 @@ class ValidPhoneNumber:
             raise ValidationError(self.message)
 
 
-swiss_ssn_rgxp = re.compile(r'756\.\d{4}\.\d{4}\.\d{2}$')
-
-
 class ValidSwissSocialSecurityNumber:
     """ Makes sure the given input is a valid swiss social security number.
 
@@ -513,12 +650,17 @@ class ValidSwissSocialSecurityNumber:
 
     message = _('Not a valid swiss social security number.')
 
+    def __init__(self) -> None:
+        self.stdnum_validator = Stdnum(format='ch.ssn')
+
     def __call__(self, form: Form, field: Field) -> None:
         if not field.data:
             return
 
-        if not re.match(swiss_ssn_rgxp, field.data):
-            raise ValidationError(self.message)
+        try:
+            self.stdnum_validator(form, field)
+        except ValidationError:
+            raise ValidationError(self.message) from None
 
 
 class UniqueColumnValue:
@@ -534,11 +676,11 @@ class UniqueColumnValue:
 
     """
 
-    def __init__(self, table: type[Base]):
+    def __init__(self, table: type[DeclarativeBase]):
         self.table = table
 
     def __call__(self, form: Form, field: Field) -> None:
-        if field.name not in self.table.__table__.columns:  # type:ignore
+        if field.name not in self.table.__table__.columns:
             raise RuntimeError('The field name must match a column!')
 
         if hasattr(form, 'model'):
@@ -676,3 +818,20 @@ class ValidDateRange:
             raise ValidationError(
                 field.gettext(self.message).format(date=max_str)
             )
+
+
+class ValidHostname(HostnameValidation):
+    """ Makes sure the given input is a valid hostname.
+
+    Expects an :class:`wtforms.StringField` instance.
+
+    """
+
+    message = _('Not a valid domain.')
+
+    def __call__(self, form: Form, field: Field) -> None:  # type: ignore[override]
+        if not field.data:
+            return
+
+        if not super().__call__(field.data):
+            raise ValidationError(self.message)

@@ -7,7 +7,7 @@ from onegov.user import User
 
 from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.activity.models import Period, PeriodMeta
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from sqlalchemy.orm import Query, Session
     from typing import TypedDict, Self
     from uuid import UUID
@@ -29,7 +29,7 @@ class OccasionAttendeeCollection(OccasionCollection):
     def __init__(
         self,
         session: Session,
-        period: Period | PeriodMeta,
+        period: BookingPeriod | BookingPeriodMeta,
         activity: Activity,
         username: str | None = None
     ) -> None:
@@ -46,7 +46,7 @@ class OccasionAttendeeCollection(OccasionCollection):
     def activity_name(self) -> str:
         return self.activity.name
 
-    def for_period(self, period: Period | PeriodMeta) -> Self:
+    def for_period(self, period: BookingPeriod | BookingPeriodMeta) -> Self:
         return self.__class__(
             self.session, period, self.activity, self.username)
 

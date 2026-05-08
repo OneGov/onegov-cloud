@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from morepath import Identity
 from morepath.authentication import NO_IDENTITY
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -18,7 +20,18 @@ from onegov.user.models import User
 from onegov.user.models import UserGroup
 
 
-def create_user(name, role='anonymous', groups=None):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency import AgencyApp
+    from sqlalchemy.orm import Session
+
+
+def create_user(
+    name: str,
+    role: str = 'anonymous',
+    groups: list[UserGroup] | None = None
+) -> User:
+
     return User(
         realname=name,
         username=f'{name}@example.org',
@@ -28,18 +41,24 @@ def create_user(name, role='anonymous', groups=None):
     )
 
 
-def test_security_get_current_role(session):
+def test_security_get_current_role(session: Session) -> None:
     admin = Identity(
+        application_id='test',
+        uid='1',
         userid='admin@example.org',
         role='admin',
         groupids=frozenset()
     )
     editor = Identity(
+        application_id='test',
+        uid='2',
         userid='editor@example.org',
         role='editor',
         groupids=frozenset()
     )
     member = Identity(
+        application_id='test',
+        uid='3',
         userid='member@example.org',
         role='member',
         groupids=frozenset()
@@ -78,7 +97,7 @@ def test_security_get_current_role(session):
     assert get_current_role(session, member) == 'editor'
 
 
-def test_security_permissions(agency_app):
+def test_security_permissions(agency_app: AgencyApp) -> None:
     session = agency_app.session()
 
     # Remove existing users
@@ -89,8 +108,8 @@ def test_security_permissions(agency_app):
     roles = ('admin', 'editor', 'member', 'anonymous')
 
     # ... agencies
-    agencies = {}
-    agn_tickets = {}
+    agencies: dict[str, ExtendedAgency] = {}
+    agn_tickets: dict[str, AgencyMutationTicket] = {}
     for name in names:
         agency = agencies.setdefault(
             name, ExtendedAgency(title=name, name=name)
@@ -98,7 +117,7 @@ def test_security_permissions(agency_app):
         session.add(agency)
         session.flush()
 
-        ticket = agn_tickets.setdefault(
+        agn_ticket = agn_tickets.setdefault(
             name,
             AgencyMutationTicket(
                 title=f'AGN-{name}',
@@ -110,7 +129,7 @@ def test_security_permissions(agency_app):
             )
 
         )
-        session.add(ticket)
+        session.add(agn_ticket)
         session.flush()
     agencies['b-1'].parent = agencies['b']
     agencies['b-2'].parent = agencies['b']
@@ -118,9 +137,9 @@ def test_security_permissions(agency_app):
     agencies['b-2-2'].parent = agencies['b-2']
 
     # people & memberships
-    people = {}
+    people: dict[str, ExtendedPerson] = {}
     memberships = {}
-    per_tickets = {}
+    per_tickets: dict[str, PersonMutationTicket] = {}
     for name in names:
         person = people.setdefault(
             name, ExtendedPerson(first_name=name, last_name=name)
@@ -131,7 +150,7 @@ def test_security_permissions(agency_app):
         agencies[name].add_person(person.id, name)
         memberships[name] = person.memberships.one()
 
-        ticket = per_tickets.setdefault(
+        per_ticket = per_tickets.setdefault(
             name,
             PersonMutationTicket(
                 title=f'PER-{name}',
@@ -143,11 +162,11 @@ def test_security_permissions(agency_app):
             )
 
         )
-        session.add(ticket)
+        session.add(per_ticket)
         session.flush()
 
     # ... groups
-    groups = {}
+    groups: dict[str, UserGroup] = {}
     for role in roles:
         for name in names:
             group_name = f'{name}-{role}s'
@@ -229,9 +248,10 @@ def test_security_permissions(agency_app):
         session.add(user)
     session.flush()
 
-    def permits(user, model, permission):
+    def permits(user: User, model: object, permission: object) -> bool:
         return agency_app._permits(
             Identity(
+                uid=user.id.hex,
                 userid=user.username,
                 groupids=frozenset(group.id.hex for group in user.groups),
                 role=user.role,
@@ -241,25 +261,25 @@ def test_security_permissions(agency_app):
             permission
         )
 
-    def assert_admin(user, model):
+    def assert_admin(user: User, model: object) -> None:
         assert permits(user, model, Public)
         assert permits(user, model, Personal)
         assert permits(user, model, Private)
         assert permits(user, model, Secret)
 
-    def assert_editor(user, model):
+    def assert_editor(user: User, model: object) -> None:
         assert permits(user, model, Public)
         assert permits(user, model, Personal)
         assert permits(user, model, Private)
         assert not permits(user, model, Secret)
 
-    def assert_member(user, model):
+    def assert_member(user: User, model: object) -> None:
         assert permits(user, model, Public)
         assert permits(user, model, Personal)
         assert not permits(user, model, Private)
         assert not permits(user, model, Secret)
 
-    def assert_anonymous(user, model):
+    def assert_anonymous(user: User, model: object) -> None:
         assert permits(user, model, Public)
         assert not permits(user, model, Personal)
         assert not permits(user, model, Private)
@@ -366,7 +386,7 @@ def test_security_permissions(agency_app):
     assert permits(users['a-editor-1'], person, Private)
 
     # ExtendedAgencyCollection
-    model = ExtendedAgencyCollection(session)
+    model: object = ExtendedAgencyCollection(session)
     for name in names:
         assert_admin(users['admin'], model)
         assert_member(users[f'{name}-admin'], model)
@@ -390,7 +410,7 @@ def test_security_permissions(agency_app):
         session,
         subject_id=agencies['a'].id,
         target_id=agencies['b'].id,
-        direction=None
+        direction=None  # type: ignore[arg-type]
     )
     assert permits(users['admin'], model, Private)
     assert permits(users['a-b-admin'], model, Private)
@@ -418,7 +438,7 @@ def test_security_permissions(agency_app):
         session,
         memberships['a'].id,
         memberships['b'].id,
-        'below'
+        'below'  # type: ignore[arg-type]
     )
     assert permits(users['admin'], model, Private)
     assert permits(users['a-b-admin'], model, Private)
@@ -446,7 +466,7 @@ def test_security_permissions(agency_app):
         session,
         memberships['a'].id,
         memberships['b'].id,
-        'below'
+        'below'  # type: ignore[arg-type]
     )
     assert permits(users['admin'], model, Private)
     assert permits(users['a-b-admin'], model, Private)
@@ -470,23 +490,23 @@ def test_security_permissions(agency_app):
     assert not permits(users['b-anonymous-2'], model, Private)
 
     # # AgencyMutationTicket
-    for name, ticket in agn_tickets.items():
-        assert_admin(users['admin'], ticket)
-        assert_member(users[f'{name}-admin'], ticket)
-        assert_member(users[f'{name}-admin-1'], ticket)
-        assert_member(users[f'{name}-admin-2'], ticket)
-        assert_editor(users['editor'], ticket)
-        assert_member(users[f'{name}-editor'], ticket)
-        assert_editor(users[f'{name}-editor-1'], ticket)  # elevated
-        assert_editor(users[f'{name}-editor-2'], ticket)  # elevated
-        assert_member(users['member'], ticket)
-        assert_member(users[f'{name}-member'], ticket)
-        assert_member(users[f'{name}-member-1'], ticket)
-        assert_member(users[f'{name}-member-2'], ticket)
-        assert_anonymous(users['anonymous'], ticket)
-        assert_anonymous(users[f'{name}-anonymous'], ticket)
-        assert_anonymous(users[f'{name}-anonymous-1'], ticket)
-        assert_anonymous(users[f'{name}-anonymous-2'], ticket)
+    for name, agn_ticket in agn_tickets.items():
+        assert_admin(users['admin'], agn_ticket)
+        assert_member(users[f'{name}-admin'], agn_ticket)
+        assert_member(users[f'{name}-admin-1'], agn_ticket)
+        assert_member(users[f'{name}-admin-2'], agn_ticket)
+        assert_editor(users['editor'], agn_ticket)
+        assert_member(users[f'{name}-editor'], agn_ticket)
+        assert_editor(users[f'{name}-editor-1'], agn_ticket)  # elevated
+        assert_editor(users[f'{name}-editor-2'], agn_ticket)  # elevated
+        assert_member(users['member'], agn_ticket)
+        assert_member(users[f'{name}-member'], agn_ticket)
+        assert_member(users[f'{name}-member-1'], agn_ticket)
+        assert_member(users[f'{name}-member-2'], agn_ticket)
+        assert_anonymous(users['anonymous'], agn_ticket)
+        assert_anonymous(users[f'{name}-anonymous'], agn_ticket)
+        assert_anonymous(users[f'{name}-anonymous-1'], agn_ticket)
+        assert_anonymous(users[f'{name}-anonymous-2'], agn_ticket)
 
     # ... traversal
     assert not permits(users['a-editor'], agn_tickets['b-2-1'], Private)
@@ -500,23 +520,23 @@ def test_security_permissions(agency_app):
 
     # PersonMutationTicket
     # ExtendedPerson
-    for name, ticket in per_tickets.items():
-        assert_admin(users['admin'], ticket)
-        assert_member(users[f'{name}-admin'], ticket)
-        assert_member(users[f'{name}-admin-1'], ticket)
-        assert_member(users[f'{name}-admin-2'], ticket)
-        assert_editor(users['editor'], ticket)
-        assert_member(users[f'{name}-editor'], ticket)
-        assert_editor(users[f'{name}-editor-1'], ticket)  # elevated
-        assert_editor(users[f'{name}-editor-2'], ticket)  # elevated
-        assert_member(users['member'], ticket)
-        assert_member(users[f'{name}-member'], ticket)
-        assert_member(users[f'{name}-member-1'], ticket)
-        assert_member(users[f'{name}-member-2'], ticket)
-        assert_anonymous(users['anonymous'], ticket)
-        assert_anonymous(users[f'{name}-anonymous'], ticket)
-        assert_anonymous(users[f'{name}-anonymous-1'], ticket)
-        assert_anonymous(users[f'{name}-anonymous-2'], ticket)
+    for name, per_ticket in per_tickets.items():
+        assert_admin(users['admin'], per_ticket)
+        assert_member(users[f'{name}-admin'], per_ticket)
+        assert_member(users[f'{name}-admin-1'], per_ticket)
+        assert_member(users[f'{name}-admin-2'], per_ticket)
+        assert_editor(users['editor'], per_ticket)
+        assert_member(users[f'{name}-editor'], per_ticket)
+        assert_editor(users[f'{name}-editor-1'], per_ticket)  # elevated
+        assert_editor(users[f'{name}-editor-2'], per_ticket)  # elevated
+        assert_member(users['member'], per_ticket)
+        assert_member(users[f'{name}-member'], per_ticket)
+        assert_member(users[f'{name}-member-1'], per_ticket)
+        assert_member(users[f'{name}-member-2'], per_ticket)
+        assert_anonymous(users['anonymous'], per_ticket)
+        assert_anonymous(users[f'{name}-anonymous'], per_ticket)
+        assert_anonymous(users[f'{name}-anonymous-1'], per_ticket)
+        assert_anonymous(users[f'{name}-anonymous-2'], per_ticket)
 
     # ... traversal
     assert not permits(users['a-editor'], per_tickets['b-2-1'], Private)

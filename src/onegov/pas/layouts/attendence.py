@@ -29,25 +29,42 @@ class AttendenceCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[LinkGroup] | None:
-        if self.request.is_manager:
-            return [
-                LinkGroup(
-                    title=_('Add'),
-                    links=[
-                        Link(
-                            text=_('New Attendence'),
-                            url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-attendence'}
-                        ),
-                        Link(
-                            text=_('Plenary session (bulk)'),
-                            url=self.request.link(self.model, 'new-bulk'),
-                            attrs={'class': 'new-attendence'}
-                        ),
-                    ]
+        links = [
+            Link(
+                text=_('New Attendence'),
+                url=self.request.link(self.model, 'new'),
+                attrs={'class': 'new-attendence'},
+            ),
+        ]
+        if self.request.is_admin:
+            links.extend([
+                Link(
+                    text=_('Plenary session (bulk)'),
+                    url=self.request.link(self.model, 'new-bulk'),
+                    attrs={'class': 'new-attendence'},
                 ),
-            ]
-        return None
+                Link(
+                    text=_('Commission session (bulk)'),
+                    url=self.request.link(
+                        self.model, 'new-commission-bulk'
+                    ),
+                    attrs={'class': 'new-attendence'},
+                ),
+            ])
+        elif self.request.is_commission_president:
+            links.append(
+                Link(
+                    text=_('Commission session (bulk)'),
+                    url=self.request.link(self.model, 'new-commission-bulk'),
+                    attrs={'class': 'new-attendence'},
+                ),
+            )
+        return [
+            LinkGroup(
+                title=_('Add'),
+                links=links,
+            ),
+        ]
 
 
 class AttendenceLayout(DefaultLayout):
@@ -77,33 +94,44 @@ class AttendenceLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link] | None:
-        if self.request.is_manager:
+        if not self.request.is_admin:
+            return None
+
+        if self.model.bulk_edit_id:
+            name = (
+                'edit-plenary-bulk-attendences'
+                if self.model.type == 'plenary'
+                else 'edit-commission-bulk-attendences'
+            )
             return [
                 Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
-                ),
-                Link(
-                    text=_('Delete'),
-                    url=self.csrf_protected_url(
-                        self.request.link(self.model)
-                    ),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _('Do you really want to delete this meeting?'),
-                            _('This cannot be undone.'),
-                            _('Delete meeting'),
-                            _('Cancel')
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(
-                                self.collection
-                            )
-                        )
-                    )
+                    text=_('Edit bulk'),
+                    url=self.request.link(self.model, name),
+                    attrs={'class': 'edit-link'},
                 )
             ]
-        return None
+
+        return [
+            Link(
+                text=_('Edit'),
+                url=self.request.link(self.model, 'edit'),
+                attrs={'class': 'edit-link'},
+            ),
+            Link(
+                text=_('Delete'),
+                url=self.csrf_protected_url(self.request.link(self.model)),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _('Do you really want to delete this meeting?'),
+                        _('This cannot be undone.'),
+                        _('Delete meeting'),
+                        _('Cancel'),
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(self.collection),
+                    ),
+                ),
+            ),
+        ]

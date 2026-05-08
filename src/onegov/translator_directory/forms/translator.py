@@ -148,17 +148,23 @@ class EditorTranslatorForm(Form, FormChoicesMixin):
         validators=[Optional()]
     )
 
+    contract_number = StringField(
+        label=_('Contract Number'), validators=[Optional()]
+    )
+
     def update_model(self, model: Translator) -> None:
         model.pers_id = self.pers_id.data or None
+        model.contract_number = self.contract_number.data or None
 
 
 class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     request: TranslatorAppRequest
 
-    pers_id = IntegerField(
-        label=_('Personal ID'),
-        validators=[Optional()]
+    pers_id = IntegerField(label=_('Personal ID'), validators=[Optional()])
+
+    contract_number = StringField(
+        label=_('Contract Number'), validators=[Optional()]
     )
 
     admission = RadioField(
@@ -250,7 +256,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[ValidSwissSocialSecurityNumber(), InputRequired()],
+        validators=[ValidSwissSocialSecurityNumber(), Optional()],
         fieldset=_('Identification / bank account')
     )
 
@@ -268,7 +274,8 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     iban = StringField(
         label=_('IBAN'),
-        validators=[Optional(), Stdnum(format='iban')]
+        validators=[Optional(), Stdnum(format='iban')],
+        fieldset=_('Identification / bank account'),
     )
 
     email = EmailField(
@@ -486,6 +493,24 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
             raise ValidationError(
                 _('A translator with this email already exists'))
 
+    def validate_iban(self, field: StringField) -> None:
+        if self.self_employed.data and not field.data:
+            raise ValidationError(
+                _('IBAN is required for self-employed translators')
+            )
+
+    def validate_address(self, field: StringField) -> None:
+        if self.self_employed.data and not field.data:
+            raise ValidationError(
+                _('Address is required for self-employed translators')
+            )
+
+    def validate_city(self, field: StringField) -> None:
+        if self.self_employed.data and not field.data:
+            raise ValidationError(
+                _('City is required for self-employed translators')
+            )
+
     def update_association(
         self,
         model: Translator,
@@ -510,6 +535,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.last_name = self.last_name.data
         model.iban = self.iban.data
         model.pers_id = self.pers_id.data or None
+        model.contract_number = self.contract_number.data or None
         model.admission = self.admission.data
         model.withholding_tax = self.withholding_tax.data
         model.self_employed = self.self_employed.data
@@ -606,6 +632,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         default=False,
     )
 
+    show_all_including_hidden = BooleanField(
+        label=_('Show all translators including hidden'),
+        default=False,
+    )
+
     order_by = RadioField(
         label=_('Order by'),
         choices=(
@@ -652,6 +683,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.guilds.data = model.guilds or []
         self.admission.data = model.admissions or []
         self.include_hidden.data = model.include_hidden
+        self.show_all_including_hidden.data = model.show_all_including_hidden
 
     def update_model(self, model: TranslatorCollection) -> None:
         model.spoken_langs = self.spoken_langs.data
@@ -665,6 +697,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         model.admissions = self.admission.data or []
         model.genders = self.genders.data or []
         model.include_hidden = self.include_hidden.data
+        model.show_all_including_hidden = self.show_all_including_hidden.data
 
     def on_request(self) -> None:
         self.spoken_langs.choices = self.language_choices
@@ -676,6 +709,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.genders.choices = self.gender_choices
         if not self.request.is_admin:
             self.hide(self.include_hidden)
+            self.hide(self.show_all_including_hidden)
 
 
 class MailTemplatesForm(Form):

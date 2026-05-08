@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
+from onegov.newsletter.collection import RecipientCollection
 from onegov.org.forms import ParliamentarianForm
 from onegov.org.forms import ParliamentarianRoleForm
-from onegov.org.models import RISParliamentarian
+from onegov.org.forms.commission_role import ParliamentarianCommissionRoleForm
+from onegov.org.models import RISParliamentarian, PoliticalBusinessCollection
 from onegov.org.models import RISParliamentarianCollection
 from onegov.org.models import PoliticalBusinessParticipationCollection
 from onegov.parliament.collections import ParliamentarianCollection
 from onegov.parliament.models import ParliamentarianRole
+from onegov.parliament.models import CommissionMembership
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import (
@@ -23,12 +26,14 @@ if TYPE_CHECKING:
     from onegov.pas.forms.parliamentarian import PASParliamentarianForm
     from onegov.parliament.models import Parliamentarian
     from onegov.pas.layouts import PASParliamentarianCollectionLayout
+    from onegov.pas.collections.parliamentarian import (
+            PASParliamentarianCollection)
     from onegov.pas.layouts import PASParliamentarianLayout
     from onegov.town6.request import TownRequest
 
 
 def view_parliamentarians(
-    self: ParliamentarianCollection,
+    self: ParliamentarianCollection | PASParliamentarianCollection,
     request: TownRequest,
     layout: RISParliamentarianCollectionLayout
             | PASParliamentarianCollectionLayout
@@ -38,12 +43,19 @@ def view_parliamentarians(
     filters['active'] = [
         Link(
             text=request.translate(title),
-            active=self.active == value,
+            active=value in self.active,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
             (_('Active'), True),
             (_('Inactive'), False)
         )
+    ]
+    filters['party'] = [
+        Link(
+            text=value,
+            active=value in self.party,
+            url=request.link(self.for_filter(party=value))
+        ) for value in self.party_values()
     ]
 
     return {
@@ -64,12 +76,27 @@ def add_parliamentarian(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        parliamentarian = self.add(**form.get_useful_data())
+        parliamentarian = self.add(
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+        )
+        form.populate_obj(parliamentarian)
         request.success(_('Added a new parliamentarian'))
+
+        email = form.email_primary.data
+        recipients = RecipientCollection(request.session)
+        if email and not recipients.by_address(email):
+            recipients.add(
+                address=email,
+                confirmed=True
+            )
+            request.success(_('Parliamentarian has been automatically '
+                              'subscribed to the newsletter.'))
 
         return request.redirect(request.link(parliamentarian))
 
     layout.breadcrumbs.append(Link(_('New'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -85,9 +112,13 @@ def view_parliamentarian(
     layout: RISParliamentarianLayout | PASParliamentarianLayout
 ) -> RenderData | Response:
 
+    political_businesses = (PoliticalBusinessCollection(request)
+                            .by_parliamentarian(self.id))
+
     return {
         'layout': layout,
         'parliamentarian': self,
+        'political_businesses': political_businesses,
         'title': layout.title,
     }
 
@@ -100,14 +131,26 @@ def edit_parliamentarian(
 ) -> RenderData | Response:
 
     if form.submitted(request):
+        old_email = self.email_primary
+        new_email = form.email_primary.data
+        if old_email and new_email and old_email != new_email:
+            recipient = RecipientCollection(
+                request.session).by_address(old_email)
+            if recipient:
+                recipient.address = new_email
+                request.success(
+                    _('The newsletter subscription has been updated.'))
+
         form.populate_obj(self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
-    form.process(obj=self)
+    elif not request.POST:
+        form.process(obj=self)
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -125,7 +168,12 @@ def delete_parliamentarian(
     request.assert_valid_csrf_token()
 
     businesses = PoliticalBusinessParticipationCollection(request.session)
-    businesses.by_parliamentarian_id(self.id).delete()
+    # NOTE: I'm not really sure why this is necessary for this specific
+    #       query. Similar bulk deletes work just fine, but since we don't
+    #       put participations themselves into the search index, we can
+    #       do this bulk delete more efficiently this way anyways.
+    with request.app.session_manager.ignore_bulk_deletes():
+        businesses.by_parliamentarian_id(self.id).delete()
 
     parliamentarians = ParliamentarianCollection(request.session)
     parliamentarians.delete(self)
@@ -133,7 +181,7 @@ def delete_parliamentarian(
     request.success(_('The parliamentarian has been deleted.'))
 
 
-def add_commission_membership(
+def add_parliamentary_group_membership(
     self: Parliamentarian,
     request: TownRequest,
     form: ParliamentarianRoleForm,
@@ -155,12 +203,47 @@ def add_commission_membership(
         request.success(_('Added a new role'))
         return request.redirect(request.link(self))
 
-    layout.breadcrumbs.append(Link(_('New role'), '#'))
+    layout.breadcrumbs.append(
+        Link(_('New parliamentary group function'), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _('New role'),
+        'title': _('New parliamentary group function'),
+        'form': form,
+        'form_width': 'large'
+    }
+
+
+def add_commission_membership(
+    self: Parliamentarian,
+    request: TownRequest,
+    form: ParliamentarianCommissionRoleForm,
+    layout: RISParliamentarianLayout
+) -> RenderData | Response:
+    form.delete_field('parliamentarian_id')
+
+    if form.submitted(request):
+        self.commission_memberships.append(
+            CommissionMembership.get_polymorphic_class(
+                # FIXME: We should probably just use `ris` and `pas`
+                #        as the polymorphic types on every model
+                #        then we can directly use them
+                'ris_commission_membership',
+                CommissionMembership
+            )(**form.get_useful_data())
+        )
+        request.success(_('Added a new role'))
+        return request.redirect(request.link(self))
+
+    layout.breadcrumbs.append(Link(_('New commission function'), '#'))
+    layout.include_editor()
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'title': _('New commission function'),
         'form': form,
         'form_width': 'large'
     }
@@ -243,15 +326,32 @@ def ris_delete_parliamentarian(
 
 @TownApp.form(
     model=RISParliamentarian,
-    name='new-role',
+    name='new-role',  # change to 'add-group-role'
     template='form.pt',
     permission=Private,
     form=ParliamentarianRoleForm
 )
-def ris_add_commission_membership(
+def ris_add_parliamentary_group_membership(
     self: RISParliamentarian,
     request: TownRequest,
     form: ParliamentarianRoleForm
+) -> RenderData | Response:
+
+    layout = RISParliamentarianLayout(self, request)
+    return add_parliamentary_group_membership(self, request, form, layout)
+
+
+@TownApp.form(
+    model=RISParliamentarian,
+    name='new-commission-role',  # change to 'add-group-role'
+    template='form.pt',
+    permission=Private,
+    form=ParliamentarianCommissionRoleForm
+)
+def ris_add_commission_membership(
+    self: RISParliamentarian,
+    request: TownRequest,
+    form: ParliamentarianCommissionRoleForm
 ) -> RenderData | Response:
 
     layout = RISParliamentarianLayout(self, request)

@@ -1,12 +1,21 @@
+from __future__ import annotations
+
 from datetime import date
 from decimal import Decimal
-from onegov.activity.collections import InvoiceCollection
+from onegov.activity.collections import BookingPeriodInvoiceCollection
 from onegov.activity.iso20022 import extract_transactions
 from onegov.activity.iso20022 import match_iso_20022_to_usernames
 from onegov.activity.utils import generate_xml
 
 
-def test_extract_transactions(postfinance_xml):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.activity import BookingPeriod
+    from onegov.user import User
+    from sqlalchemy.orm import Session
+
+
+def test_extract_transactions(postfinance_xml: str) -> None:
     transactions = extract_transactions(postfinance_xml, 'feriennet-v1')
 
     t = next(transactions)
@@ -18,8 +27,8 @@ def test_extract_transactions(postfinance_xml):
     assert t.debitor_account is None
     assert t.credit is False
     assert t.reference is None
-    assert t.booking_text \
-        == "UEBRIGE: 25-9034-2 FÜR KONTOAUSZUG PAPIER TÄGLICH"
+    assert t.booking_text == (
+        "UEBRIGE: 25-9034-2 FÜR KONTOAUSZUG PAPIER TÄGLICH")
 
     t = next(transactions)
     assert t.amount == Decimal('328.75')
@@ -93,7 +102,7 @@ def test_extract_transactions(postfinance_xml):
     ])
 
 
-def test_extract_transactions_qr(postfinance_qr_xml):
+def test_extract_transactions_qr(postfinance_qr_xml: str) -> None:
     # TODO extend xml file with short esr
     transactions = extract_transactions(postfinance_qr_xml, 'feriennet-v1')
 
@@ -108,7 +117,7 @@ def test_extract_transactions_qr(postfinance_qr_xml):
     assert t.tid == '416717412098789269137325213'
 
 
-def test_unique_transaction_ids(postfinance_xml):
+def test_unique_transaction_ids(postfinance_xml: str) -> None:
     seen = set()
 
     for transaction in extract_transactions(postfinance_xml, 'feriennet-v1'):
@@ -116,22 +125,28 @@ def test_unique_transaction_ids(postfinance_xml):
         seen.add(transaction.tid)
 
 
-def test_invoice_matching(session, owner, member,
-                          prebooking_period, inactive_period):
+def test_invoice_matching(
+    session: Session,
+    owner: User,
+    member: User,
+    prebooking_period: BookingPeriod,
+    inactive_period: BookingPeriod
+) -> None:
+
     schema = 'feriennet-v1'
     p1 = prebooking_period
     p2 = inactive_period
 
-    invoices = InvoiceCollection(session)
+    invoices = BookingPeriodInvoiceCollection(session)
 
     own_i1 = invoices.add(user_id=owner.id, period_id=p1.id)
     mem_i1 = invoices.add(user_id=member.id, period_id=p1.id)
     mem_i2 = invoices.add(user_id=member.id, period_id=p2.id)
 
-    i1 = own_i1.add('Aaron', 'Billard', 250, 1)
-    i2 = own_i1.add('Baron', 'Pokemon', 250, 1)
-    i3 = mem_i1.add('Connie', 'Swimming', 250, 1)
-    i4 = mem_i2.add('Donnie', 'Football', 250, 1)
+    i1 = own_i1.add('Aaron', 'Billard', Decimal('250'), Decimal('1'))
+    i2 = own_i1.add('Baron', 'Pokemon', Decimal('250'), Decimal('1'))
+    i3 = mem_i1.add('Connie', 'Swimming', Decimal('250'), Decimal('1'))
+    i4 = mem_i2.add('Donnie', 'Football', Decimal('250'), Decimal('1'))
 
     # match against a perfect match and one with a wrong amount
     xml = generate_xml([
@@ -145,9 +160,8 @@ def test_invoice_matching(session, owner, member,
     assert len(transactions) == 2
     assert transactions[0].amount == Decimal(500.00)
     assert transactions[0].username == owner.username
-    assert transactions[0].note \
-        == i1.invoice.references[0].reference \
-        == i2.invoice.references[0].reference
+    assert transactions[0].note == i1.invoice.references[0].reference
+    assert transactions[0].note == i2.invoice.references[0].reference
     assert transactions[0].confidence == 1.0
     assert transactions[1].amount == Decimal(500.00)
     assert transactions[1].username == member.username
@@ -393,18 +407,23 @@ def test_invoice_matching(session, owner, member,
     assert transactions[1].paid is False
 
 
-def test_invoice_matching_multischema(session, owner, prebooking_period):
+def test_invoice_matching_multischema(
+    session: Session,
+    owner: User,
+    prebooking_period: User
+) -> None:
+
     period = prebooking_period
 
     # create an invoice with two possible references
-    invoices = InvoiceCollection(
+    invoices = BookingPeriodInvoiceCollection(
         session,
         period_id=period.id,
         user_id=owner.id,
         schema='feriennet-v1')
 
     i = invoices.add()
-    i.add('Aaron', 'Billard', 250, 1)
+    i.add('Aaron', 'Billard', Decimal('250'), Decimal('1'))
 
     invoices.for_schema('esr-v1').schema.link(session, i)
 

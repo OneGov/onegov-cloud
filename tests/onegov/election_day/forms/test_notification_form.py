@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import TriggerNotificationsForm
@@ -9,9 +11,14 @@ from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 
 
-def test_notification_form():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_notification_form() -> None:
     form = TriggerNotificationForm()
-    form.request = DummyRequest()
+    form.request = DummyRequest()  # type: ignore[assignment]
     form.on_request()
     assert form.notifications.choices == []
     assert not form.validate()
@@ -19,14 +26,14 @@ def test_notification_form():
     form.request.app.principal.email_notification = True
     form.on_request()
     assert form.notifications.choices == [('email', 'Email')]
-    assert 'email' in form.notifications.default
+    assert 'email' in form.notifications.default  # type: ignore[operator]
 
     form.request.app.principal.sms_notification = 'http://example.com'
     form.on_request()
     assert form.notifications.choices == [('email', 'Email'), ('sms', 'SMS')]
-    assert 'sms' in form.notifications.default
+    assert 'sms' in form.notifications.default  # type: ignore[operator]
 
-    form.request.app.principal.webhooks = {'https://example.org/1': None}
+    form.request.app.principal.webhooks = {'https://example.org/1': {}}
     form.on_request()
     assert form.notifications.choices == [
         ('email', 'Email'),
@@ -34,12 +41,12 @@ def test_notification_form():
         ('webhooks', 'Webhooks')
     ]
     assert form.notifications.data == ['email', 'sms', 'webhooks']
-    assert 'webhooks' in form.notifications.default
+    assert 'webhooks' in form.notifications.default  # type: ignore[operator]
 
 
-def test_notifications_form(session):
+def test_notifications_form(session: Session) -> None:
     form = TriggerNotificationsForm()
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.on_request()
     assert form.notifications.choices == []
     assert form.elections.choices == []
@@ -51,7 +58,7 @@ def test_notifications_form(session):
     # Enable notification
     form.request.app.principal.email_notification = True
     form.request.app.principal.sms_notification = 'http://example.com'
-    form.request.app.principal.webhooks = {'https://example.org/1': None}
+    form.request.app.principal.webhooks = {'https://example.org/1': {}}
 
     # Add votes and elections
     session.add(
@@ -120,6 +127,7 @@ def test_notifications_form(session):
     assert form.notifications.data == [
         'email', 'sms', 'webhooks'
     ]
+    assert form.notifications.default is not None
     assert 'email' in form.notifications.default
     assert 'sms' in form.notifications.default
     assert 'webhooks' in form.notifications.default
@@ -143,7 +151,7 @@ def test_notifications_form(session):
     form = TriggerNotificationsForm(
         DummyPostData({'notifications': ['email']})
     )
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.app.principal.email_notification = True
     form.on_request()
     assert not form.validate()
@@ -156,7 +164,7 @@ def test_notifications_form(session):
             'election_compounds': ['elections']
         })
     )
-    form.request = DummyRequest(session=session)
+    form.request = DummyRequest(session=session)  # type: ignore[assignment]
     form.request.app.principal.email_notification = True
     form.on_request()
     assert form.validate()

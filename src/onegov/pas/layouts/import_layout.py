@@ -8,15 +8,15 @@ from onegov.pas.layouts import DefaultLayout
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.town6.app import TownApp
-    from onegov.town6.request import TownRequest
+    from onegov.pas.app import PasApp
+    from onegov.pas.request import PasRequest
 
 
 class ImportLayout(DefaultLayout):
 
     if TYPE_CHECKING:
-        app: TownApp
-        request: TownRequest
+        app: PasApp
+        request: PasRequest
 
     @cached_property
     def title(self) -> str:

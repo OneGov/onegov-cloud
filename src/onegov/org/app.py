@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import re
+
+import requests
 import yaml
 
 import morepath
@@ -11,6 +13,7 @@ from functools import wraps
 from more.content_security import SELF
 from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
+from onegov.api import ApiApp
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
@@ -20,16 +23,20 @@ from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
-from onegov.org import directives
+from onegov.org import _, directives
+from onegov.org.api import (
+    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
+    DirectoryEntryApiEndpoint)
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
+from onegov.org.models.directory import ExtendedDirectory
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
 from onegov.pay import PayApp, log as pay_log
 from onegov.reservation import LibresIntegration
-from onegov.search import ElasticsearchApp
+from onegov.search import SearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
@@ -47,15 +54,17 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Sequence)
     from more.content_security import ContentSecurityPolicy
     from morepath.authentication import Identity, NoIdentity
+    from onegov.api import ApiEndpoint
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
+    from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
 
 
-class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
+class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
+             PayApp, FormApp, UserApp, WebsocketsApp, ApiApp):
 
     serve_static_files = True
     request_class = OrgRequest
@@ -66,7 +75,6 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     userlinks = directive(directives.UserlinkAction)
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
     event_search_widget = directive(directives.EventSearchWidgetAction)
-    settings_view = directive(directives.SettingsView)
     boardlet = directive(directives.Boardlet)
 
     #: cronjob settings
@@ -135,13 +143,24 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         self.plausible_api_token = plausible_api_token
 
     def configure_stadt_wil_azizi_api_token(
-            self,
-            *,
-            azizi_api_token: str = '',
-            ** cfg: Any
+        self,
+        *,
+        azizi_api_token: str = '',
+        ** cfg: Any
     ) -> None:
 
         self.azizi_api_token = azizi_api_token
+
+    def configure_infomaniak_api_token(
+        self,
+        *,
+        infomaniak_api_token: str | None = None,
+        infomaniak_product_id: str | None = None,
+        **cfg: Any
+    ) -> None:
+
+        self.infomaniak_api_token = infomaniak_api_token
+        self.infomaniak_product_id = infomaniak_product_id
 
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
@@ -240,15 +259,35 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         return {
             handler_code: {
-                group: group_perms
+                group: group_perms if exclusive else
+                # if we treated a non-exclusive group as exclusive it also
+                # needs to include all of the members of the exclusive handler
+                # scoped group, otherwise we'll incorrectly restrict their
+                # access to these groups.
+                list({*group_perms, *handler_perms[None][1]})
                 for group, (exclusive, group_perms) in handler_perms.items()
                 # the permission is only exclusive, if at least one user group
                 # has exclusive permissions. But user groups with non-exclusive
                 # permissions still have permission to access the ticket.
-                if exclusive
+                if exclusive or (
+                    # if there is exclusive access to the whole handler code
+                    # we need to treat non-exclusive access to a group as
+                    # exclusive, so the users with non-exclusive access
+                    # to this group keep their access rights.
+                    group is not None
+                    and handler_perms.get(None, (False, ))[0]
+                )
             }
             for handler_code, handler_perms in permissions.items()
         }
+
+    def groupids_for_ticket(self, ticket: Ticket) -> list[str] | None:
+        handler_perms = self.ticket_permissions.get(ticket.handler_code)
+        if handler_perms is None:
+            return None
+
+        group_perms = handler_perms.get(ticket.group)
+        return handler_perms.get(None) if group_perms is None else group_perms
 
     @orm_cached(policy='on-table-change:files')
     def publications_count(self) -> int:
@@ -378,6 +417,37 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         with fs.open('eventsettings.yml', 'r') as f:
             return yaml.safe_load(f).get('event_form_lead', None)
 
+    def load_formcode_specification(self) -> str:
+        response = requests.get(
+            'https://raw.githubusercontent.com/seantis/docs-admin-digital'
+            '/refs/heads/main/content/module/formulare/index.md',
+            timeout=(5, 10)
+        )
+        if not response.ok:
+            # Fallback to our docstring
+            import onegov.form.parser.core as parser
+            return parser.__doc__
+
+        specification = response.text
+
+        # try to extend specification with examples
+        response = requests.get(
+            'https://raw.githubusercontent.com/seantis/docs-admin-digital'
+            '/refs/heads/main/content/module/formulare/beispiele.md',
+            timeout=(5, 10)
+        )
+        if not response.ok:
+            return specification
+        return f'{specification}\n\n{response.text}'
+
+    @property
+    def formcode_specification(self) -> str:
+        return self.cache.get_or_create(
+            'formcode_specification',
+            self.load_formcode_specification,
+            expiration_time=86400
+        )
+
     def checkout_button(
         self,
         button_label: str,
@@ -396,6 +466,23 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         if self.org.square_logo_url:
             extra['image'] = self.org.square_logo_url
+
+        if provider.type == 'worldline_saferpay':
+            # add confirm dialog
+            extra['confirm'] = request.translate(
+                _('Important information regarding online payments')
+            )
+            extra['confirm_extra'] = request.translate(_(
+                'The payment process is only complete once you are '
+                'redirected back to our site and receive a request number. '
+                'Any success messages the payment provider generates '
+                'before then, do not indicate completion. Transactions '
+                'in this semi-successful state will usually be refunded '
+                'within one hour, although it might take longer depending '
+                'on the chosen payment method.'
+            ))
+            extra['confirm_yes'] = request.translate(_('Ok'))
+            extra['confirm_no'] = request.translate(_('Cancel'))
 
         try:
             return provider.checkout_button(
@@ -460,7 +547,7 @@ def get_shared_assets_path() -> str:
 
 @OrgApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @OrgApp.setting(section='i18n', name='localedirs')
@@ -517,6 +604,10 @@ def get_theme() -> OrgTheme:
 def org_content_security_policy() -> ContentSecurityPolicy:
     policy = default_content_security_policy()
 
+    policy.script_src.add('https://checkout.stripe.com')
+    policy.script_src.add('https://pay.datatrans.com')
+    policy.script_src.add('https://pay.sandbox.datatrans.com')
+
     policy.child_src.add(SELF)
     policy.child_src.add('https://*.youtube.com')
     policy.child_src.add('https://*.vimeo.com')
@@ -527,22 +618,15 @@ def org_content_security_policy() -> ContentSecurityPolicy:
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
-    policy.connect_src.add('https://*.google-analytics.com')
-    policy.connect_src.add('https://stats.g.doubleclick.net')
     policy.connect_src.add('https://map.geo.bs.ch')
     policy.connect_src.add('https://wmts.geo.bs.ch')
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
-    policy.connect_src.add('https://stats.seantis.ch')
-    policy.connect_src.add('https://analytics.seantis.ch')
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
-    policy.connect_src.add('https://*.projuventute.ch')
+    # FIXME: which one do we need this for?
     policy.connect_src.add('https://cdn.jsdelivr.net')
-    policy.connect_src.add('https://*.usercentrics.eu')
-
-    policy.script_src.add('https:')
 
     return policy
 
@@ -619,6 +703,30 @@ def get_citizen_login_enabled() -> bool:
     return True
 
 
+@OrgApp.setting(section='api', name='endpoints')
+def get_api_endpoints_handler(
+) -> Callable[[OrgRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: OrgRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield EventApiEndpoint(request, extra_parameters, page)
+        yield NewsApiEndpoint(request, extra_parameters, page)
+        yield TopicApiEndpoint(request, extra_parameters, page)
+        directories = request.exclude_invisible(
+            request.session.query(ExtendedDirectory))
+        for directory in directories:
+            yield DirectoryEntryApiEndpoint(
+                request=request,
+                page=page,
+                name=directory.name,
+                extra_parameters=extra_parameters)
+
+    return get_api_endpoints
+
+
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
@@ -640,6 +748,7 @@ def get_render_mtan_access_limit_exceeded(
     return render_mtan_access_limit_exceeded
 
 
+# FIXME: It might be a little more robust to override apply_policy instead
 @OrgApp.tween_factory(under=content_security_policy_tween_factory)
 def enable_iframes_tween_factory(
     app: OrgApp,
@@ -858,6 +967,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'notifications.js'
     yield 'foundation.accordion.js'
     yield 'chosen_select_hierarchy.js'
+    yield 'ai_formcoder.js'
 
 
 @OrgApp.webasset('fontpreview')

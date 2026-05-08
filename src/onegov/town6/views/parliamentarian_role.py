@@ -49,6 +49,7 @@ def edit_parliamentarian_role(
 
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -99,6 +100,7 @@ def ris_edit_parliamentarian_role(
 ) -> RenderData | Response:
 
     layout = RISParliamentarianRoleLayout(self, request)
+    layout.edit_mode = True
     return edit_parliamentarian_role(self, request, form, layout)
 
 

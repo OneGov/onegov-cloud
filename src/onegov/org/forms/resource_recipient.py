@@ -60,6 +60,14 @@ class ResourceRecipientForm(Form):
                       "at 06:00."),
     )
 
+    customer_messages = BooleanField(
+        label=_('Customer Messages'),
+        fieldset=_('Notifications *'),
+        description=_('Each time a customer adds a message to the ticket for '
+                      'a reservation, a notification is sent to the recipient '
+                      'above.'),
+    )
+
     internal_notes = BooleanField(
         label=_('Internal Notes'),
         fieldset=_('Notifications *'),
@@ -92,32 +100,27 @@ class ResourceRecipientForm(Form):
         choices=None
     )
 
-    def validate(self) -> bool:  # type:ignore[override]
-        result = super().validate()
+    def ensure_at_least_one_notification(self) -> bool | None:
         if not (
             self.new_reservations.data
             or self.daily_reservations.data
+            or self.customer_messages.data
             or self.internal_notes.data
             or self.rejected_reservations.data
         ):
-            assert isinstance(self.daily_reservations.errors, list)
-            self.daily_reservations.errors.append(
-                _('Please add at least one notification.')
-            )
-            result = False
-        return result
+            self.request.alert(_('Please add at least one notification.'))
+            return False
+        return None
 
     def on_request(self) -> None:
-        self.populate_resources()
-
-    def populate_resources(self) -> None:
-        q = ResourceCollection(self.request.app.libres_context).query()
-        q = q.order_by(Resource.group, Resource.name)
-        q = q.with_entities(Resource.group, Resource.title, Resource.id)
-
         default_group = self.request.translate(_('General'))
 
         self.resources.choices = [
-            (r.id.hex, f'{r.group or default_group} - {r.title}')
-            for r in q
+            (resource_id.hex, f'{group or default_group} - {title}')
+            for group, title, resource_id in (
+                ResourceCollection(self.request.app.libres_context).query()
+                .with_entities(Resource.group, Resource.title, Resource.id)
+                .order_by(Resource.group, Resource.name)
+                .tuples()
+            )
         ]

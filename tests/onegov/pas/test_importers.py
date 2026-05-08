@@ -2,18 +2,29 @@ from __future__ import annotations
 
 import pytest
 
-from onegov.pas.models import (
-    PASCommission,
-    PASParliamentarian,
-    Party,
-)
 from onegov.pas.importer.json_import import (
+    MembershipImporter,
     PeopleImporter,
     OrganizationImporter,
 )
+from onegov.pas.models import (
+    PASCommission,
+    PASCommissionMembership,
+    PASParliamentarian,
+    Party,
+)
 
 
-def test_people_importer_successful_import(session, people_json):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_people_importer_successful_import(
+    session: Session,
+    people_json: dict[str, Any]
+) -> None:
+
     importer = PeopleImporter(session)
     parliamentarian_map, details, processed_count = importer.bulk_import(
         people_json['results']
@@ -54,7 +65,10 @@ def test_people_importer_successful_import(session, people_json):
         assert person['id'] in parliamentarian_map
 
 
-def test_people_importer_existing_parliamentarian(session, people_json):
+def test_people_importer_existing_parliamentarian(
+    session: Session,
+    people_json: dict[str, Any]
+) -> None:
     """Test importing data for a parliamentarian that already exists."""
     importer = PeopleImporter(session)
 
@@ -87,18 +101,16 @@ def test_people_importer_existing_parliamentarian(session, people_json):
 
     assert updated_parliamentarian is not None
     # Check that the first name was updated
-    assert updated_parliamentarian.first_name == \
-    existing_person_data['firstName']
+    assert updated_parliamentarian.first_name == (
+        existing_person_data['firstName'])
     # Check that the email was updated
-    assert (
-        updated_parliamentarian.email_primary
-        == existing_person_data['primaryEmail']['email']
-    )
+    assert updated_parliamentarian.email_primary == (
+        existing_person_data['primaryEmail']['email'])
     # Check other attributes remain consistent
-    assert updated_parliamentarian.last_name == \
-    existing_person_data['officialName']
-    assert updated_parliamentarian.salutation == \
-    existing_person_data['salutation']
+    assert updated_parliamentarian.last_name == (
+        existing_person_data['officialName'])
+    assert updated_parliamentarian.salutation == (
+        existing_person_data['salutation'])
 
     # Ensure no duplicate parliamentarian was created
     count = session.query(PASParliamentarian).filter_by(
@@ -107,9 +119,10 @@ def test_people_importer_existing_parliamentarian(session, people_json):
     assert count == 1
 
 
-def test_organization_importer_existing(session,
-                                        organization_json_with_fraktion):
-
+def test_organization_importer_existing(
+    session: Session,
+    organization_json_with_fraktion: dict[str, Any]
+) -> None:
     """Test importing organization data when some organizations already exist.
     """
     organization_json = organization_json_with_fraktion
@@ -197,8 +210,121 @@ def test_organization_importer_existing(session,
     assert party_count == 1
 
 
+def test_membership_importer_role_transition(
+    session: Session,
+) -> None:
+    """Same person promoted from Mitglied to Präsident in same
+    commission. Both memberships must be imported — the old key
+    (parliamentarian_id, commission_id) collapsed them into one."""
+
+    from uuid import UUID
+
+    person_kub_id = 'person-lustenberger'
+    commission_kub_id = 'commission-gesundheit'
+
+    parl = PASParliamentarian(
+        first_name='Andreas',
+        last_name='Lustenberger',
+        external_kub_id=UUID('d6cdb745-6b69-4df7-afc0-46a81b47b8f7'),
+    )
+    commission = PASCommission(
+        name='Kommission Gesundheit und Soziales',
+        external_kub_id=UUID('a8e8fd19-d0aa-42f7-9515-22cdc26b89e3'),
+    )
+    session.add_all([parl, commission])
+    session.flush()
+
+    importer = MembershipImporter(session)
+    importer.init(
+        session=session,
+        parliamentarian_map={person_kub_id: parl},
+        commission_map={commission_kub_id: commission},
+        parliamentary_group_map={},
+        party_map={},
+        other_organization_map={},
+    )
+
+    memberships_data: list[Any] = [
+        {
+            'id': 'membership-president',
+            'organization': {
+                'id': commission_kub_id,
+                'name': 'Kommission Gesundheit und Soziales',
+                'organizationTypeTitle': 'Kommission',
+            },
+            'person': {
+                'id': person_kub_id,
+                'firstName': 'Andreas',
+                'officialName': 'Lustenberger',
+                'fullName': 'Lustenberger Andreas',
+                'salutation': 'Herr',
+                'title': '',
+                'isActive': True,
+                'primaryEmail': False,
+                'thirdPartyId': '58',
+                'username': False,
+            },
+            'role': 'Präsident/-in',
+            'start': '2024-07-03',
+            'end': None,
+            'primaryAddress': False,
+            'primaryEmail': False,
+        },
+        {
+            'id': 'membership-member',
+            'organization': {
+                'id': commission_kub_id,
+                'name': 'Kommission Gesundheit und Soziales',
+                'organizationTypeTitle': 'Kommission',
+            },
+            'person': {
+                'id': person_kub_id,
+                'firstName': 'Andreas',
+                'officialName': 'Lustenberger',
+                'fullName': 'Lustenberger Andreas',
+                'salutation': 'Herr',
+                'title': '',
+                'isActive': True,
+                'primaryEmail': False,
+                'thirdPartyId': '58',
+                'username': False,
+            },
+            'role': 'Mitglied',
+            'start': '2024-04-15',
+            'end': '2024-07-02',
+            'primaryAddress': False,
+            'primaryEmail': False,
+        },
+    ]
+
+    importer.bulk_import(memberships_data)
+    session.flush()
+
+    cms = (
+        session.query(PASCommissionMembership)
+        .filter_by(parliamentarian_id=parl.id)
+        .order_by(PASCommissionMembership.start)
+        .all()
+    )
+
+    assert len(cms) == 2, (
+        f'Expected 2 memberships, got {len(cms)}: '
+        f'{[(c.role, str(c.start)) for c in cms]}'
+    )
+
+    member_cm = cms[0]
+    assert member_cm.role == 'member'
+    assert str(member_cm.start) == '2024-04-15'
+    assert str(member_cm.end) == '2024-07-02'
+
+    president_cm = cms[1]
+    assert president_cm.role == 'president'
+    assert str(president_cm.start) == '2024-07-03'
+    assert president_cm.end is None
+
+
 @pytest.fixture
-def sample_memberships():
+def sample_memberships() -> list[dict[str, Any]]:
     """Provide test membership data covering all organization types and
     role patterns."""
     return [

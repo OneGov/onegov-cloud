@@ -1,17 +1,19 @@
+from __future__ import annotations
+
 from onegov.activity.iso20022 import get_esr
 from onegov.activity.utils import merge_ranges
 from onegov.activity.utils import extract_municipality
 
 
-def test_merge_ranges():
-    assert merge_ranges([[1, 2]]) == [(1, 2)]
-    assert merge_ranges([[1, 2], [2, 3]]) == [(1, 3)]
-    assert merge_ranges([[1, 2], [2, 3]]) == [(1, 3)]
-    assert merge_ranges([[1, 2], [3, 4]]) == [(1, 2), (3, 4)]
-    assert merge_ranges([[1, 2], [1, 2], [2, 3]]) == [(1, 3)]
+def test_merge_ranges() -> None:
+    assert merge_ranges([(1, 2)]) == [(1, 2)]
+    assert merge_ranges([(1, 2), (2, 3)]) == [(1, 3)]
+    assert merge_ranges([(1, 2), (2, 3)]) == [(1, 3)]
+    assert merge_ranges([(1, 2), (3, 4)]) == [(1, 2), (3, 4)]
+    assert merge_ranges([(1, 2), (1, 2), (2, 3)]) == [(1, 3)]
 
 
-def test_extract_municipality():
+def test_extract_municipality() -> None:
     assert extract_municipality("6004 Luzern") == (6004, 'Luzern')
     assert extract_municipality("9000 St. Gallen") == (9000, 'St. Gallen')
     assert extract_municipality("""
@@ -30,18 +32,16 @@ def test_extract_municipality():
     assert extract_municipality("4653 Obergösgen") == (4653, "Obergösgen")
 
 
-def test_get_esr():
+def test_get_esr() -> None:
     # Test case 1: Valid 26 character ESR
     input_string = (
         'Gutschrift QRR Instant-Zahlung: 26 99029 05678 18860 27295 3705'
     )
-    expected = '269902905678188602729537054'
-    assert get_esr(input_string) == expected
+    assert get_esr(input_string) == '269902905678188602729537054'
 
     # Test case 2: No valid ESR number
     input_string = "This string doesn't contain a valid ESR number"
-    expected = None
-    assert get_esr(input_string) == expected
+    assert get_esr(input_string) is None
 
     # Test case 3: ESR number with any length
     input_string = 'Any length: 00 99029 05678 18860 27295 3705'
@@ -62,7 +62,7 @@ def test_get_esr():
     assert get_esr(input_string) == '123456789012345678901234567'
 
 
-def test_get_esr_with_different_prefix():
+def test_get_esr_with_different_prefix() -> None:
     input_string = 'Different prefix: 12 34567 89012 34567 89012 3456'
     assert get_esr(input_string) == '123456789012345678901234567'
 
@@ -70,7 +70,7 @@ def test_get_esr_with_different_prefix():
     assert get_esr(input_string) == '123456789012345678901234567'
 
 
-def test_get_esr_with_extra_spaces():
+def test_get_esr_with_extra_spaces() -> None:
     # Test if string contains more whitespace
     input_string = 'Extra spaces:  26  99029  05678  18860  27295  3705 '
     assert get_esr(input_string) == '269902905678188602729537054'
@@ -83,7 +83,7 @@ def test_get_esr_with_extra_spaces():
     assert get_esr(input_string) == '269902905678188602729537054'
 
 
-def test_get_esr_with_extra_newlines():
+def test_get_esr_with_extra_newlines() -> None:
     """ Example with newline found in slip (number changed):
     'Gutschrift QRR Instant-Zahlung: 26 99029 05678
                     18860 27295 3705
@@ -96,7 +96,7 @@ def test_get_esr_with_extra_newlines():
     assert get_esr(input_string) == '279802905678188612729437068'
 
 
-def test_get_esr_no_spaces():
+def test_get_esr_no_spaces() -> None:
     input_string = 'Gutschrift QRR:  26980290567818861272943706'
     assert get_esr(input_string) == '269802905678188612729437061'
 

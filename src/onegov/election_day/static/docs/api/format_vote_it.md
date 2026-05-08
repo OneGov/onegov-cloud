@@ -51,6 +51,7 @@ Nome|Descrizione
 `empty`|Numero di voti in bianco
 `eligible_voters`|Numero di aventi diritto di voto
 `expats`|Numero di espatriati dell'unità. Facoltativo.
+`received`|Numero di schede di voto ricevute. Facoltativo.
 
 
 #### Risultati temporanei

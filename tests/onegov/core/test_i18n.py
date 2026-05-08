@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import os.path
 import polib
@@ -11,7 +13,7 @@ from translationstring import TranslationString
 from webob.acceptparse import create_accept_language_header
 
 
-def test_pofiles(temporary_directory):
+def test_pofiles(temporary_directory: str) -> None:
     os.makedirs(os.path.join(temporary_directory, 'de/LC_MESSAGES'))
     utils.touch(
         os.path.join(temporary_directory, 'de/LC_MESSAGES/onegov.test.po'))
@@ -21,21 +23,21 @@ def test_pofiles(temporary_directory):
     assert result[0][1].endswith('onegov.test.po')
 
 
-def test_merge_translations():
+def test_merge_translations() -> None:
     t1 = GNUTranslations()
-    t1._catalog = {
+    t1._catalog = {  # type: ignore[attr-defined]
         'We are here': 'Hier sind wir',
         'Welcome': 'Willkommen'
     }
 
     t2 = GNUTranslations()
-    t2._catalog = {
+    t2._catalog = {  # type: ignore[attr-defined]
         'We are here': 'Wir sind hier',
         'Hi': 'Hallo'
     }
 
     t3 = GNUTranslations()
-    t3._catalog = {
+    t3._catalog = {  # type: ignore[attr-defined]
         'We are here': 'Sind wir hier',
         'Morning': 'Moin'
     }
@@ -46,19 +48,19 @@ def test_merge_translations():
     with pytest.raises(AssertionError):
         i18n.merge([i18n.clone(t1)])
 
-    assert i18n.merge([i18n.clone(t1), i18n.clone(t2)])._catalog == {
+    assert i18n.merge([i18n.clone(t1), i18n.clone(t2)])._catalog == {  # type: ignore[attr-defined]
         'We are here': 'Hier sind wir',
         'Welcome': 'Willkommen',
         'Hi': 'Hallo'
     }
 
-    assert i18n.merge([i18n.clone(t2), i18n.clone(t3)])._catalog == {
+    assert i18n.merge([i18n.clone(t2), i18n.clone(t3)])._catalog == {  # type: ignore[attr-defined]
         'We are here': 'Wir sind hier',
         'Morning': 'Moin',
         'Hi': 'Hallo'
     }
 
-    assert i18n.merge(
+    assert i18n.merge(  # type: ignore[attr-defined]
         [i18n.clone(t1), i18n.clone(t2), i18n.clone(t3)])._catalog == {
         'We are here': 'Hier sind wir',
         'Welcome': 'Willkommen',
@@ -67,7 +69,7 @@ def test_merge_translations():
     }
 
 
-def test_get_translations(temporary_directory):
+def test_get_translations(temporary_directory: str) -> None:
     os.makedirs(os.path.join(temporary_directory, '1/de/LC_MESSAGES'))
     po = polib.POFile()
     po.append(polib.POEntry(
@@ -121,35 +123,35 @@ def test_get_translations(temporary_directory):
     assert translations['fr'].gettext('Welcome') == 'Bienvenue'
 
 
-def test_default_locale_negotiator():
+def test_default_locale_negotiator() -> None:
 
     negotiate = i18n.default_locale_negotiator
     request = Request.blank('/')
 
     request.accept_language = create_accept_language_header('fr')
-    assert negotiate(['en', 'de'], request) is None
+    assert negotiate(['en', 'de'], request) is None  # type: ignore[arg-type]
 
     request.accept_language = create_accept_language_header('en')
-    assert negotiate(['en', 'de'], request) == 'en'
+    assert negotiate(['en', 'de'], request) == 'en'  # type: ignore[arg-type]
 
     request.accept_language = create_accept_language_header('de')
-    assert negotiate(['en', 'de'], request) == 'de'
+    assert negotiate(['en', 'de'], request) == 'de'  # type: ignore[arg-type]
 
     request.accept_language = create_accept_language_header('de')
     request.cookies['locale'] = 'en'
-    assert negotiate(['en', 'de'], request) == 'en'
+    assert negotiate(['en', 'de'], request) == 'en'  # type: ignore[arg-type]
 
 
-def test_get_translation_bound_form():
+def test_get_translation_bound_form() -> None:
 
     class MockTranslation:
 
         _fallback = None
 
-        def add_fallback(self, translation):
+        def add_fallback(self, translation: MockTranslation) -> None:
             self._fallback = translation
 
-        def gettext(self, text):
+        def gettext(self, text: str) -> str:
             return text[::-1]  # inverse the string
 
     default = MockTranslation()
@@ -157,12 +159,16 @@ def test_get_translation_bound_form():
 
     class MetaMeta:
 
-        def render_field(self, field, render_kw):
+        def render_field(
+            self,
+            field: TranslatedMockField | UntranslatedMockField,
+            render_kw: object
+        ) -> str:
             return field.label.text
 
     class MockMeta(MetaMeta):
 
-        def get_translations(self, form):
+        def get_translations(self, form: object) -> MockTranslation:
             return default
 
     class MockForm:
@@ -171,15 +177,15 @@ def test_get_translation_bound_form():
 
     class TranslatedMockField:
 
-        def __init__(self, label):
+        def __init__(self, label: str) -> None:
             self.label = Label('x', TranslationString(label))
 
     class UntranslatedMockField:
 
-        def __init__(self, label):
+        def __init__(self, label: str) -> None:
             self.label = Label('x', label)
 
-    form_class = i18n.get_translation_bound_form(MockForm, translate)
+    form_class = i18n.get_translation_bound_form(MockForm, translate)  # type: ignore[arg-type, type-var]
 
     assert form_class.Meta().get_translations(None) is translate
     assert form_class.Meta().get_translations(None)._fallback is default

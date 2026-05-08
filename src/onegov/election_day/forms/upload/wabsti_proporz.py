@@ -5,7 +5,6 @@ from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from wtforms.validators import DataRequired
 
 
@@ -15,9 +14,9 @@ class UploadWabstiProporzElectionForm(Form):
         label='WP_Gemeinden',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )
 
@@ -25,9 +24,9 @@ class UploadWabstiProporzElectionForm(Form):
         label='WP_Kandidaten',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )
 
@@ -35,9 +34,9 @@ class UploadWabstiProporzElectionForm(Form):
         label='WP_KandidatenGde',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )
 
@@ -45,9 +44,9 @@ class UploadWabstiProporzElectionForm(Form):
         label='WP_Listen',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )
 
@@ -55,9 +54,9 @@ class UploadWabstiProporzElectionForm(Form):
         label='WP_ListenGde',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )
 
@@ -65,9 +64,9 @@ class UploadWabstiProporzElectionForm(Form):
         label='WP_Wahl',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )
 
@@ -75,9 +74,9 @@ class UploadWabstiProporzElectionForm(Form):
         label='WPStatic_Gemeinden',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )
 
@@ -85,8 +84,8 @@ class UploadWabstiProporzElectionForm(Form):
         label='WPStatic_Kandidaten',
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
+        allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True}
     )

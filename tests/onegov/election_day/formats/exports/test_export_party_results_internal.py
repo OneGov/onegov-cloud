@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from decimal import Decimal
 from onegov.election_day.formats import export_parties_internal
@@ -7,7 +9,12 @@ from onegov.election_day.models import PartyResult
 from onegov.election_day.models import ProporzElection
 
 
-def test_proporz_election_export_parties(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_proporz_election_export_parties(session: Session) -> None:
     session.add(
         ProporzElection(
             title='Wahl',
@@ -279,7 +286,7 @@ def test_proporz_election_export_parties(session):
     ]
 
 
-def test_election_compound_export_parties(session):
+def test_election_compound_export_parties(session: Session) -> None:
     session.add(
         ElectionCompound(
             title='Elections',

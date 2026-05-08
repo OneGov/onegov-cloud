@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import transaction
 
 from datetime import date
@@ -15,7 +17,12 @@ from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 
 
-def test_upload_vote_form(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_upload_vote_form(session: Session) -> None:
     principal = Canton(name='be', canton='be')
     vote = Vote(title='Vote', date=date(2017, 1, 1), domain='canton')
 
@@ -44,7 +51,7 @@ def test_upload_vote_form(session):
     assert form.validate()
 
 
-def test_upload_election_form(session):
+def test_upload_election_form(session: Session) -> None:
     principal = Canton(name='be', canton='be')
     election = Election(
         title='Election', date=date(2017, 1, 1), domain='canton', type='majorz'
@@ -85,14 +92,14 @@ def test_upload_election_form(session):
     assert form.validate()
 
     # Test required fields (proporz)
-    form = UploadProporzElectionForm()
-    form.adjust(principal, election)
-    form.process(DummyPostData({'file_format': 'internal'}))
-    form.results.data = {'mimetype': 'text/plain'}
-    assert form.validate()
+    form2 = UploadProporzElectionForm()
+    form2.adjust(principal, election)
+    form2.process(DummyPostData({'file_format': 'internal'}))
+    form2.results.data = {'mimetype': 'text/plain'}
+    assert form2.validate()
 
 
-def test_upload_party_results_form():
+def test_upload_party_results_form() -> None:
     form = UploadPartyResultsForm()
     assert not form.validate()
 
@@ -103,7 +110,7 @@ def test_upload_party_results_form():
     assert form.validate()
 
 
-def test_upload_rest_form(session):
+def test_upload_rest_form(session: Session) -> None:
     form = UploadRestForm()
     assert not form.validate()
 
@@ -116,7 +123,7 @@ def test_upload_rest_form(session):
     assert form.validate()
 
 
-def test_upload_election_compound_form(session):
+def test_upload_election_compound_form(session: Session) -> None:
     form = UploadElectionCompoundForm()
     assert not form.validate()
 

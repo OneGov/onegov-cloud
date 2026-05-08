@@ -1,0 +1,114 @@
+.treeselect {
+    .treeselect-input {
+        @include smooth-edges;
+        border: $input-border;
+        padding: .4rem 2rem .4rem .4rem !important;
+        min-height: 2.5rem;
+        background-color: $input-background;
+
+        &.treeselect-input--opened {
+            border: $input-border-focus;
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+
+        &.treeselect-input--focused {
+            background-color: $input-background-focus !important;
+            border: $input-border-focus;
+            box-shadow: $input-shadow-focus !important;
+        }
+
+        .treeselect-input__edit {
+            font-size: 1rem;
+            max-width: calc(100% - 2rem);
+        }
+
+        .treeselect-input__tags-element {
+            background-color: $gray !important;
+            padding: 0 .25rem !important;
+            font-size: .875rem !important;
+
+            &:hover {
+                background-color: darken($gray, 5%) !important;
+
+                .treeselect-input__tags-cross svg {
+                    stroke: $primary-color-ui;
+                }
+            }
+        }
+
+        .treeselect-input__operators {
+            right: .5rem;
+            span {
+                font-size: .875rem;
+
+                &:not(:last-child) {
+                    margin-right: .5rem;
+                }
+            }
+        }
+    }
+
+    .treeselect-list {
+        border: $input-border;
+        border-radius: 0 !important;
+        border-top-color: transparent !important;
+        background-color: $input-background;
+
+        &.treeselect-list--focused {
+            background-color: $input-background-focus !important;
+            border: $input-border-focus;
+        }
+
+        &.treeselect-list--single-select .treeselect-list__item--single-selected {
+            background-color: darken($input-background, 2%) !important;
+        }
+
+        .treeselect-list__item {
+            padding: .4rem;
+            font-size: 1rem !important;
+            height: 2.5rem !important;
+        }
+
+        .treeselect-list__item--focused {
+          background-color: $gray !important;
+        }
+
+        .treeselect-list__item--checked {
+          background-color: darken($input-background, 2%);
+        }
+
+        .treeselect-list__item--checked,
+        .treeselect-list__item--partial-checked {
+            .treeselect-list__item-checkbox-container {
+                background-color: $primary-color-ui !important;
+            }
+        }
+
+        .treeselect-list__item--disabled {
+            .treeselect-list__item-checkbox-container {
+                background-color: $input-background-disabled;
+            }
+
+            .treeselect-list__item-label {
+                color: darken($input-background, 2%);
+            }
+
+        }
+
+        .treeselect-list__item-icon {
+            font-size: .875rem !important;
+            padding: 0 .4rem !important;
+        }
+
+        .treeselect-list__item-label {
+            font-family: $input-font-family !important;
+            font-size: $input-font-size !important;
+        }
+
+        .treeselect-list__empty-text {
+            font-size: 1rem !important;
+            padding-left: .5rem !important;
+        }
+    }
+}

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-16 11:38+0200\n"
+"POT-Creation-Date: 2025-08-14 07:32+0200\n"
 "PO-Revision-Date: 2025-07-15 16:51+0200\n"
 "Last-Translator: David Salvisberg <david@seantis-dave>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -36,7 +36,7 @@ msgid "Extended Member"
 msgstr "Membro esteso"
 
 msgid "President"
-msgstr "Presidente"
+msgstr "Presidente/a"
 
 msgid "male"
 msgstr "maschile"
@@ -63,13 +63,13 @@ msgid "none"
 msgstr "nessuno"
 
 msgid "Vote counter"
-msgstr "Contatore di voti"
+msgstr "Contatore/a di voti"
 
 msgid "Vice president"
-msgstr "Vice presidente"
+msgstr "Vice presidente/a"
 
 msgid "Media Manager"
 msgstr "Responsabile Media e Campagne"
 
 msgid "President of the parliamentary group"
-msgstr "Presidente del gruppo parlamentare"
+msgstr "Presidente/a del gruppo parlamentare"

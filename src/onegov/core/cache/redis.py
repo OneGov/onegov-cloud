@@ -53,7 +53,7 @@ class RedisCacheRegion(CacheRegion):
     def key_mangler(self, key: str) -> bytes:  # type:ignore[override]
         return f'{self.namespace}:{key}'.encode('utf-8')
 
-    def keys(self) -> list[str]:
+    def keys(self) -> list[bytes]:
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
         return self.backend.reader_client.eval(

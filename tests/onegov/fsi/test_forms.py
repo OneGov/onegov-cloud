@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from onegov.fsi.forms.course import InviteCourseForm
 
 
-def test_course_invite_form():
+def test_course_invite_form() -> None:
     form = InviteCourseForm(
         data={
             'attendees': '\n'.join((

@@ -14,12 +14,12 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.core.security import Private
-from onegov.org import _
-from onegov.org.layout import AdjacencyListLayout
-from onegov.org.layout import DefaultLayout
-from onegov.org.layout import PageLayout as OrgPageLayout
-from onegov.org.layout import PersonCollectionLayout
-from onegov.org.layout import PersonLayout as OrgPersonLayout
+from onegov.town6 import _
+from onegov.town6.layout import AdjacencyListLayout
+from onegov.town6.layout import DefaultLayout
+from onegov.town6.layout import PageLayout as TownPageLayout
+from onegov.town6.layout import PersonCollectionLayout
+from onegov.town6.layout import PersonLayout as TownPersonLayout
 
 
 from typing import Any
@@ -29,18 +29,22 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from collections.abc import Sequence
     from onegov.agency.models import ExtendedAgency
+    from onegov.agency.models import ExtendedPerson
     from onegov.agency.request import AgencyRequest
-    from onegov.org.elements import Trait
+    from onegov.core.elements import Trait
 
 
-class PageLayout(OrgPageLayout):
+class PageLayout(TownPageLayout):
 
     @cached_property
     def sidebar_links(self) -> None:  # type:ignore[override]
         return None
 
 
-class PersonLayout(OrgPersonLayout):
+class PersonLayout(TownPersonLayout):
+    model: ExtendedPerson
+    request: AgencyRequest
+
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
@@ -376,7 +380,7 @@ class AgencyLayout(
         return None
 
     @cached_property
-    def move_membership_within_agency_url_template(self) -> str:
+    def move_membership_url_template(self) -> str:
         return self.csrf_protected_url(
             self.request.class_link(
                 AgencyMembershipMoveWithinAgency,
@@ -470,6 +474,10 @@ class ExtendedPersonCollectionLayout(
 
     request: AgencyRequest
 
+    def __init__(self, model: Any, request: AgencyRequest) -> None:
+        super().__init__(model, request)
+        request.include('people-select')
+
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
@@ -506,7 +514,7 @@ class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
         return ExtendedPersonCollection(self.request.session)
 
     @cached_property
-    def move_membership_within_person_url_template(self) -> str:
+    def move_membership_url_template(self) -> str:
         return self.csrf_protected_url(
             self.request.class_link(
                 AgencyMembershipMoveWithinPerson,

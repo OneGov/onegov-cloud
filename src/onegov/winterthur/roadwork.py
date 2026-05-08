@@ -81,7 +81,7 @@ class RoadworkConfig:
             'hostname': None,
             'endpoint': None,
             'username': None,
-            'password': None,
+            'password': None,  # nosec: B105
         }
 
         with path.open('r') as file:

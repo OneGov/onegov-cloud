@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from onegov.core.crypto import (
@@ -8,7 +10,7 @@ from onegov.core.crypto import (
 )
 
 
-def test_hash_password(monkeysession):
+def test_hash_password(monkeysession: pytest.MonkeyPatch) -> None:
     monkeysession.undo()
 
     # because we use random salts we won't get the same result twice
@@ -24,7 +26,7 @@ def test_hash_password(monkeysession):
     ))
 
 
-def test_random_token():
+def test_random_token() -> None:
     assert random_token() != random_token()
     assert len(random_token()) == 64
     assert len(random_token(nbytes=1024)) == 64
@@ -33,7 +35,7 @@ def test_random_token():
         random_token(nbytes=511)
 
 
-def test_no_null_bytes():
+def test_no_null_bytes() -> None:
     with pytest.raises(AssertionError):
         assert hash_password("\0")
 
@@ -41,6 +43,6 @@ def test_no_null_bytes():
         assert verify_password("\0", "hash")
 
 
-def test_random_password():
+def test_random_password() -> None:
     assert len(random_password(16)) == 16
     assert len(random_password(32)) == 32

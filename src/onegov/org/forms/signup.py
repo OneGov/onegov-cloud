@@ -71,12 +71,12 @@ class SignupForm(Form):
         if self.request.app.org.enable_automatic_newsletters:
             times = self.request.app.org.newsletter_times or []
             self.daily_newsletter.description = self.request.translate(
-                _(('If there are any new news items since the last '
-                   'sending time you will receive the newsletter at '
-                   'the following times: ${joined}:00.')
-                , mapping={
-                    'joined': ':00, '.join(times)
-                })
+                _(
+                    'If there are any new news items since the last '
+                    'sending time you will receive the newsletter at '
+                    'the following times: ${joined}:00.',
+                    mapping={'joined': ':00, '.join(times)}
+                )
             )
 
         else:

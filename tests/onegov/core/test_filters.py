@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from io import StringIO
 from onegov.core.filters import JsxFilter
 
 
-def test_jsx_filter():
+def test_jsx_filter() -> None:
     filter = JsxFilter()
     filter.setup()
 

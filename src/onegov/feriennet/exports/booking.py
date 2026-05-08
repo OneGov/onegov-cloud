@@ -12,7 +12,7 @@ from sqlalchemy.orm import contains_eager, undefer
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import Period
+    from onegov.activity.models import BookingPeriod
     from sqlalchemy.orm import Query, Session
 
 
@@ -43,7 +43,7 @@ class BookingExport(FeriennetExport):
 
         return self.rows(session, form.selected_period)
 
-    def query(self, session: Session, period: Period) -> Query[Booking]:
+    def query(self, session: Session, period: BookingPeriod) -> Query[Booking]:
         q = session.query(Booking)
         q = q.filter(Booking.period_id == period.id)
 
@@ -71,7 +71,7 @@ class BookingExport(FeriennetExport):
     def rows(
         self,
         session: Session,
-        period: Period
+        period: BookingPeriod
     ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for booking in self.query(session, period):
@@ -79,7 +79,7 @@ class BookingExport(FeriennetExport):
 
     def fields(
         self,
-        period: Period,
+        period: BookingPeriod,
         booking: Booking
     ) -> Iterator[tuple[str, Any]]:
 

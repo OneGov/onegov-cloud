@@ -3,6 +3,7 @@ from __future__ import annotations
 from onegov.chat.collections import ChatCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.custom import get_global_tools as get_global_tools_base
+from onegov.org.custom import get_modules as get_modules_base
 from onegov.town6 import _
 
 
@@ -21,7 +22,8 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 
         yield item
 
-    if request.is_logged_in and request.app.org.meta.get('enable_chat', False):
+    if request.is_logged_in and request.app.org.meta.get(
+        'enable_chat', 'disabled') == 'people_chat':
         chat_staff = request.app.org.meta.get('chat_staff', [])
         assert request.current_user is not None
         if request.current_user.id.hex in chat_staff:
@@ -44,3 +46,18 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
                     }
                 )
             ))
+
+
+def get_modules(request: TownRequest) -> LinkGroup:
+    modules = get_modules_base(request)
+    links = list(modules.links)
+    if request.is_admin and request.app.org.ris_enabled:
+        links.append(
+            Link(
+                _('RIS Settings'),
+                request.link(request.app.org, 'ris-overview'),
+                attrs={'class': 'ris-settings'}
+            ),
+        )
+    modules.links = links
+    return modules

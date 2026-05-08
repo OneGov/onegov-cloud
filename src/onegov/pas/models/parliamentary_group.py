@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.parliament.models import ParliamentaryGroup
+from onegov.pas.i18n import _
 from onegov.search import ORMSearchable
 
 
@@ -10,10 +11,11 @@ class PASParliamentaryGroup(ParliamentaryGroup, ORMSearchable):
         'polymorphic_identity': 'pas_parliamentary_group',
     }
 
-    es_type_name = 'pas_parliamentary_group'
-    es_public = False
-    es_properties = {'name': {'type': 'text'}}
+    fts_type_title = _('Parliamentary groups')
+    fts_public = False
+    fts_title_property = 'name'
+    fts_properties = {'name': {'type': 'text', 'weight': 'A'}}
 
     @property
-    def es_suggestion(self) -> str:
+    def fts_suggestion(self) -> str:
         return self.name

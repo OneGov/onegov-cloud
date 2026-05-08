@@ -9,21 +9,26 @@ import yaml
 
 from blinker import ANY
 from contextlib import contextmanager
+from depot.io.interfaces import StoredFile
+from depot.io.local import LocalStoredFile
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
+from depot.utils import make_content_disposition
 from more.transaction.main import transaction_tween_factory
 from morepath import App
 from onegov.core.custom import json
 from onegov.core.security import Private, Public
 from onegov.core.utils import is_valid_yubikey, yubikey_public_id
+from onegov.file import log
 from onegov.file.collection import FileCollection
 from onegov.file.errors import AlreadySignedError
 from onegov.file.errors import InvalidTokenError
 from onegov.file.errors import TokenConfigurationError
 from onegov.file.models import File
 from onegov.file.sign import SigningService
-from onegov.file.utils import digest, current_dir
+from onegov.file.utils import (
+    digest, current_dir, get_supported_image_mime_types)
 from pathlib import Path
 from sedate import utcnow
 from sqlalchemy.orm import object_session
@@ -47,6 +52,30 @@ SUPPORTED_STORAGE_BACKENDS = (
     'depot.io.local.LocalFileStorage',
     'depot.io.memory.MemoryFileStorage'
 )
+
+# HACK: Patch __repr__ so it works even if the file raises in __init__
+_StoredFile__repr__ = StoredFile.__repr__
+# HACK: Patch close so that it won't raise if the file doesn't exist
+_LocalStoredFile_close = LocalStoredFile.close
+
+
+def _safe_StoredFile__repr__(self: Any) -> str:  # noqa: N802
+    try:
+        return _StoredFile__repr__(self)
+    except Exception:
+        return f'<{self.__class__.__name__}>'
+
+
+def _safe_LocalStoredFile_close(self: LocalStoredFile) -> None:  # noqa: N802
+    try:
+        _LocalStoredFile_close(self)
+    except FileNotFoundError:
+        # NOTE: If the file doesn't exist, that's okay
+        pass
+
+
+StoredFile.__repr__ = _safe_StoredFile__repr__  # type: ignore[method-assign]
+LocalStoredFile.close = _safe_LocalStoredFile_close  # type: ignore[method-assign]
 
 
 class DepotApp(App):
@@ -76,7 +105,7 @@ class DepotApp(App):
         depot_backend: str | None = None,
         depot_storage_path: str | None = None,
         frontend_cache_buster: str | None = None,
-        frontend_cache_bust_delay: int = 2,
+        frontend_cache_bust_delay: float = 2,
         signing_services: str | None = None,
         **cfg: Any
     ) -> None:
@@ -173,7 +202,12 @@ class DepotApp(App):
 
             @self.session_manager.on_update.connect_via(ANY, weak=False)
             @self.session_manager.on_delete.connect_via(ANY, weak=False)
-            def on_file_change(schema: str, obj: object) -> None:
+            def on_file_change(
+                schema: str,
+                obj: object,
+                # NOTE: This parameter is required by `on_delete`
+                session: Session | None = None
+            ) -> None:
                 if isinstance(obj, File):
                     self.bust_frontend_cache(obj.id)
 
@@ -315,6 +349,7 @@ class DepotApp(App):
 
         mb = 1024 ** 2
         session = object_session(file)
+        assert session is not None
 
         with SpooledTemporaryFile(max_size=16 * mb, mode='wb') as signed:
             old_digest = digest(file.reference.file)
@@ -351,7 +386,7 @@ class DepotApp(App):
 
     @property
     def signing_service_config(self) -> SigningServiceConfig:
-        if not self.signing_services:
+        if not getattr(self, 'signing_services', None):
             raise RuntimeError('No signing service config path set')
 
         paths = (
@@ -451,6 +486,23 @@ def render_depot_file(
         FileServeApp(file, cache_max_age=3600 * 24 * 7))
 
 
+def respond_with_content_disposition(file: File, request: CoreRequest) -> None:
+    # NOTE: Technically `FileServeApp` already sets the `Content-Disposition`
+    #       header, but it will always be `inline`. We only really want that
+    #       for images, videos and PDFs, the rest should be `attachment`.
+    @request.after
+    def include_content_disposition(response: Response) -> None:
+        response.headers['Content-Disposition'] = make_content_disposition(
+            'inline' if file.reference.content_type in {
+                'application/pdf',
+                'video/mp4',
+                'video/webm',
+                *get_supported_image_mime_types()
+            } else 'attachment',
+            file.reference.filename
+        )
+
+
 def respond_with_alt_text(reference: File, request: CoreRequest) -> None:
     @request.after
     def include_alt_text(response: Response) -> None:
@@ -461,24 +513,27 @@ def respond_with_alt_text(reference: File, request: CoreRequest) -> None:
         ))
 
 
-def respond_with_caching_header(
-    reference: File,
-    request: CoreRequest
-) -> None:
-    if not reference.published:
+def respond_with_caching_header(file: File, request: CoreRequest) -> None:
+    if not file.published:
         @request.after
         def include_private_header(response: Response) -> None:
             response.headers['Cache-Control'] = 'private'
 
 
-def respond_with_x_robots_tag_header(
-    reference: File,
-    request: CoreRequest
-) -> None:
-    if getattr(reference, 'access', None) in ('secret', 'secret_mtan'):
+def respond_with_x_robots_tag_header(file: File, request: CoreRequest) -> None:
+    if getattr(file, 'access', None) in ('secret', 'secret_mtan'):
         @request.after
         def include_x_robots_tag_header(response: Response) -> None:
-            response.headers.add('X-Robots-Tag', 'noindex')
+            response.headers['X-Robots-Tag'] = 'noindex'
+
+
+def respond_with_x_content_type_options_header(
+    file: File,
+    request: CoreRequest
+) -> None:
+    @request.after
+    def include_x_content_type_options(response: Response) -> None:
+        response.headers['X-Content-Type-Options'] = 'nosniff'
 
 
 @DepotApp.path(model=File, path='/storage/{id}')
@@ -488,9 +543,11 @@ def get_file(app: DepotApp, id: str) -> File | None:
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public)
 def view_file(self: File, request: CoreRequest) -> StoredFile:
+    respond_with_content_disposition(self, request)
     respond_with_alt_text(self, request)
     respond_with_caching_header(self, request)
     respond_with_x_robots_tag_header(self, request)
+    respond_with_x_content_type_options_header(self, request)
     return self.reference.file
 
 
@@ -518,6 +575,8 @@ def view_thumbnail(
     if not thumbnail_id:
         return morepath.redirect(request.link(self))
 
+    respond_with_content_disposition(self, request)
+    respond_with_x_content_type_options_header(self, request)
     return request.app.bound_depot.get(thumbnail_id)  # type:ignore
 
 
@@ -577,8 +636,20 @@ def handle_rename(self: File, request: CoreRequest) -> None:
     if not isinstance(name, str) or not name:
         return
 
+    _, old_ext = os.path.splitext(self.name)
+    _, new_ext = os.path.splitext(name)
+    if old_ext and new_ext != old_ext:
+        # prevent changing the file extension (adding one is allowed)
+        name = f'{name}{old_ext}'
+
     self.name = name
-    self._update_metadata(filename=self.name)
+    try:
+        self._update_metadata(filename=self.name)
+    except NotImplementedError:
+        log.warning(
+            'Failed to update file metadata for current storage backend',
+            exc_info=True
+        )
 
     # when updating the name we offer the option not to update the
     # modified date, which is helpful if the files are in modified order

@@ -12,16 +12,18 @@ from onegov.landsgemeinde.models import PersonNameSuggestion
 from onegov.landsgemeinde.models import PersonPlaceSuggestion
 from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
+from onegov.org.models import Search
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
 
 
 @LandsgemeindeApp.path(
     model=AssemblyCollection,
-    path='/landsgemeinden'
+    path='/assemblies'
 )
 def get_assemblies(app: LandsgemeindeApp) -> AssemblyCollection:
     return AssemblyCollection(app.session())
@@ -29,7 +31,7 @@ def get_assemblies(app: LandsgemeindeApp) -> AssemblyCollection:
 
 @LandsgemeindeApp.path(
     model=Assembly,
-    path='/landsgemeinde/{date}',
+    path='/assembly/{date}',
     converters={'date': extended_date_converter}
 )
 def get_assembly(app: LandsgemeindeApp, date: date) -> Assembly | None:
@@ -139,3 +141,24 @@ def get_person_political_affiliation_suggestion(
     term: str | None = None
 ) -> PersonPoliticalAffiliationSuggestion:
     return PersonPoliticalAffiliationSuggestion(app.session(), term)
+
+
+@LandsgemeindeApp.path(
+    model=Search,
+    path='/search',
+    converters={
+        'type': [str],
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+        'page': int
+    }
+)
+def get_search(
+    request: LandsgemeindeRequest,
+    q: str = '',
+    type: list[str] | None = None,
+    start: date | None = None,
+    end: date | None = None,
+    page: int = 0
+) -> Search:
+    return Search(request, q, start=start, end=end, types=type, page=page)

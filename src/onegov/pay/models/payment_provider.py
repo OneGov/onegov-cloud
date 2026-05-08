@@ -3,20 +3,15 @@ from __future__ import annotations
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.pay.models.payment import Payment
-from sqlalchemy import Boolean
-from sqlalchemy import Column
 from sqlalchemy import column
 from sqlalchemy import Index
-from sqlalchemy import Text
-from sqlalchemy.orm import relationship
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     # we are shadowing type below
     from builtins import type as _type
     from collections.abc import Mapping
@@ -26,33 +21,28 @@ if TYPE_CHECKING:
     from onegov.pay import Price
     from onegov.pay.types import PaymentState
 
-_P = TypeVar('_P', bound=Payment)
 
-
-class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
+class PaymentProvider[PaymentT: Payment = Payment](
+    Base, TimestampMixin, ContentMixin
+):
     """ Represents a payment provider. """
 
     __tablename__ = 'payment_providers'
 
     #: the public id of the payment provider
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the polymorphic type of the provider
-    type: Column[str] = Column(
-        Text,
-        nullable=False,
-        default=lambda: 'generic'
-    )
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: true if this is the default provider (can only ever be one)
-    default: Column[bool] = Column(Boolean, nullable=False, default=False)
+    default: Mapped[bool] = mapped_column(default=False)
 
     #: true if this provider is enabled
-    enabled: Column[bool] = Column(Boolean, nullable=False, default=True)
+    enabled: Mapped[bool] = mapped_column(default=True)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -66,8 +56,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         ),
     )
 
-    payments: relationship[list[Payment]] = relationship(
-        'Payment',
+    payments: Mapped[list[Payment]] = relationship(
         order_by='Payment.created',
         back_populates='provider',
         passive_deletes=True
@@ -75,7 +64,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
 
     if TYPE_CHECKING:
         @property
-        def payment_class(self) -> _type[_P]: ...
+        def payment_class(self) -> _type[PaymentT]: ...
     else:
         @property
         def payment_class(self) -> _type[Payment]:
@@ -93,7 +82,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         #        but we need to make sure, we don't use any other
         #        one somewhere first
         **kwargs: Any
-    ) -> _P:
+    ) -> PaymentT:
         """ Creates a new payment using the correct model. """
 
         payment = self.payment_class(

@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 from markupsafe import Markup
 from onegov.form import Form
 from onegov.quill.fields import QuillField
 
 
-def test_field_clean():
+def test_field_clean() -> None:
     form = Form()
 
     field = QuillField(tags=[])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = None
     assert field.validate(form)
 
@@ -39,7 +41,7 @@ def test_field_clean():
     """
 
     field = QuillField(tags=[])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert isinstance(field.data, Markup)
@@ -48,7 +50,7 @@ def test_field_clean():
     )
 
     field = QuillField(tags=['strong'])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == Markup(
@@ -56,7 +58,7 @@ def test_field_clean():
     )
 
     field = QuillField(tags=['em', 'ol', 'ul'])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == Markup(
@@ -66,7 +68,7 @@ def test_field_clean():
     )
 
     field = QuillField(tags=['ol'])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == Markup(
@@ -76,7 +78,7 @@ def test_field_clean():
     )
 
     field = QuillField(tags=['strong', 'ul'])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == Markup(
@@ -86,7 +88,7 @@ def test_field_clean():
     )
 
     field = QuillField(tags=['blockquote'])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == Markup(
@@ -94,7 +96,7 @@ def test_field_clean():
     )
 
     field = QuillField(tags=['h2'])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == Markup(
@@ -102,7 +104,7 @@ def test_field_clean():
     )
 
     field = QuillField()
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == Markup(
@@ -113,7 +115,7 @@ def test_field_clean():
     )
 
     field = QuillField(tags=['i', 'b'])
-    field = field.bind(form, 'html')
+    field = field.bind(form, 'html')  # type: ignore[attr-defined]
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == Markup(

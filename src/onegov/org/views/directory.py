@@ -6,6 +6,7 @@ import morepath
 import transaction
 
 from collections import defaultdict
+from decimal import Decimal
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -50,6 +51,7 @@ from typing import cast, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence, Iterator
     from onegov.core.types import JSON_ro, RenderData, EmailJsonDict
+    from onegov.directory.migration import DirectoryMigration
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
@@ -232,15 +234,15 @@ def handle_edit_directory(
                             'The requested change cannot be performed, '
                             'as it is incompatible with existing entries'
                         ))
+                        alert_migration_errors(migration, request)
                     else:
                         if not request.params.get('confirm'):
                             form.action += '&confirm=1'
                             save_changes = False
 
             if save_changes:
-                form.populate_obj(self.directory)
-
                 try:
+                    form.populate_obj(self.directory)
                     self.session.flush()
                 except ValidationError as e:
                     error = e
@@ -295,6 +297,52 @@ def handle_edit_directory(
         'error_translate': lambda text: request.translate(_(text)),
         'directory': self.directory,
     }
+
+
+def alert_migration_errors(
+    migration: DirectoryMigration,
+    request: OrgRequest
+) -> None:
+    if migration.multiple_option_changes_in_one_step():
+        request.alert(
+            _(
+                'Do not mix adding, removing, and renaming options in the '
+                'same migration. Please use separate migrations for each '
+                'option.'
+            )
+        )
+
+    if migration.added_required_fields():
+        field_names = migration.get_added_required_field_ids()
+        request.alert(_(
+            '${fields}: New fields cannot be required initially. '
+            'Require them in a separate migration step.', mapping={
+                'fields': ', '.join(f'"{f}"' for f in field_names)
+            }
+        ))
+
+    if len(migration.changes.renamed_options) > 1:
+        request.alert(
+            _(
+                'Renaming multiple options in the same migration is not '
+                'supported. Please use separate migrations for each option.'
+            )
+        )
+
+    # check for incompatible type changes
+    for changed in migration.changes.changed_fields:
+        old = migration.changes.old[changed]
+        new = migration.changes.new[changed]
+
+        if not migration.fieldtype_migrations.possible(old.type, new.type):
+            request.alert(_(
+                'Cannot convert field "${field}" from type "${old_type}" '
+                'to "${new_type}".', mapping={
+                    'field': changed,
+                    'old_type': old.type,
+                    'new_type': new.type
+                }
+            ))
 
 
 @OrgApp.view(
@@ -411,39 +459,11 @@ def get_filters(
                 rounded=singular
             )
             for value in values
-            if keyword_counts.get(  # type:ignore[union-attr]
-                keyword, {}).get(value, 0)
+            if keyword_counts is None
+            or keyword_counts.get(keyword, {}).get(value, 0)
         )))
 
     return filters
-
-
-def keyword_count(
-    request: OrgRequest,
-    collection: ExtendedDirectoryEntryCollection
-) -> dict[str, dict[str, int]]:
-
-    self = collection
-    keywords = tuple(
-        as_internal_id(k)
-        for k in self.directory.configuration.keywords or ()
-    )
-    fields = {f.id: f for f in self.directory.fields if f.id in keywords}
-    counts: dict[str, dict[str, int]] = {}
-
-    # NOTE: The counting can get incredibly expensive with many entries
-    #       so we should skip it when we know we can skip it
-    if not fields:
-        return counts
-
-    # FIXME: This is incredibly slow. We need to think of a better way.
-    for model in request.exclude_invisible(self.without_keywords().query()):
-        for entry in model.keywords:
-            field_id, value = entry.split(':', 1)
-            if field_id in fields:
-                f_count = counts.setdefault(field_id, defaultdict(int))
-                f_count[value] += 1
-    return counts
 
 
 @OrgApp.html(
@@ -467,7 +487,14 @@ def view_directory(
             e.number = i + 1
         else:
             e.number = None
-    keyword_counts = keyword_count(request, self)
+    # HACK: Makes sure keyword counts are accurate, it would be more robust
+    #       if we attached the request in the path configuration or do what
+    #       we did in events and allow leaking a bit of access extension
+    #       logic into the base class. Although for directory entries it can
+    #       be a little bit more complex, since they also have to take
+    #       publication status into account.
+    self.request = request
+    keyword_counts = self.keyword_counts()
     filters = get_filters(request, self, keyword_counts)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     if request.is_manager:
@@ -501,7 +528,9 @@ def view_directory(
 @OrgApp.json(
     model=ExtendedDirectoryEntryCollection,
     permission=Public,
-    name='geojson')
+    name='geojson',
+    open_data=False
+)
 def view_geojson(
     self: ExtendedDirectoryEntryCollection,
     request: OrgRequest
@@ -639,9 +668,8 @@ def handle_new_directory_entry(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        entry: ExtendedDirectoryEntry
         try:
-            entry = self.directory.add_by_form(  # type:ignore[assignment]
+            entry = self.directory.add_by_form(
                 form,
                 type='extended'
             )
@@ -736,7 +764,7 @@ def handle_submit_directory_entry(
 
         # the price per submission
         if self.directory.price == 'paid':
-            amount = self.directory.price_per_submission
+            amount = self.directory.price_per_submission or 0.0
         else:
             amount = 0.0
 
@@ -749,10 +777,13 @@ def handle_submit_directory_entry(
             meta={
                 'handler_code': 'DIR',
                 'directory': self.directory.id.hex,
-                'price': {
-                    'amount': amount,
-                    'currency': self.directory.currency
+                'invoice_item': {
+                    'text': request.translate(_('Lump sum')),
+                    'group': 'submission',
+                    'unit': Decimal(amount),
+                    'quantity': Decimal('1'),
                 },
+                'currency': self.directory.currency,
                 'extensions': tuple(
                     ext for ext in self.directory.extensions
                     if ext != 'submitter'
@@ -932,7 +963,14 @@ def view_export(
 
         return request.redirect(url.as_string())
 
-    filters = get_filters(request, self, keyword_count(request, self),
+    # HACK: Makes sure keyword counts are accurate, it would be more robust
+    #       if we attached the request in the path configuration or do what
+    #       we did in events and allow leaking a bit of access extension
+    #       logic into the base class. Although for directory entries it can
+    #       be a little bit more complex, since they also have to take
+    #       publication status into account.
+    self.request = request
+    filters = get_filters(request, self, self.keyword_counts(),
                           view_name='+export')
 
     if filters:
@@ -1116,13 +1154,11 @@ def new_recipient(
                                        directory_id=self.directory.id)
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
-            title = request.translate(
-                _('Registration for notifications on new entries in the '
-                  'directory "${directory}"',
-                  mapping={
-                      'directory': self.directory.title
-                  })
-            )
+            title = request.translate(_(
+                'Registration for notifications on new entries in the '
+                'directory "${directory}"',
+                mapping={'directory': self.directory.title}
+            ))
 
             confirm_mail = render_template(
                 'mail_confirm_directory_subscription.pt',
@@ -1144,10 +1180,11 @@ def new_recipient(
                 },
             )
 
-        request.success(_((
+        request.success(_(
             "Success! We have sent a confirmation link to "
-            "${address}, if we didn't send you one already."
-        ), mapping={'address': form.address.data}))
+            "${address}, if we didn't send you one already.",
+            mapping={'address': form.address.data}
+        ))
         return request.redirect(request.link(self))
 
     return {

@@ -7,7 +7,7 @@ from webob.exc import HTTPForbidden, HTTPNotFound
 from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
-from onegov.org.forms.page import MovePageForm, PageUrlForm, PageForm
+from onegov.org.forms.page import MovePageForm, PageUrlForm, PageForm, LinkForm
 from onegov.org.layout import EditorLayout, PageLayout
 from onegov.org.management import PageNameChange
 from onegov.org.models import Clipboard, Editor
@@ -43,8 +43,12 @@ def get_form_class(
     if editor.action == 'move':
         return MovePageForm
     if editor.action == 'new-root':
-        # this is the case when adding a new 'root' page (parent = None)
-        return PageForm
+        if editor.trait == 'page':
+            # this is the case when adding a new 'root' page (parent = None)
+            return PageForm
+        if editor.trait == 'link':
+            # this is the case when adding a new 'root' link (parent = None)
+            return LinkForm
 
     assert editor.page is not None
     return editor.page.get_form_class(editor.trait, editor.action, request)
@@ -131,7 +135,7 @@ def handle_new_root_page(
     form: Form,
     layout: EditorLayout | PageLayout | None = None
 ) -> RenderData | Response:
-    site_title = _('New Topic')
+    site_title = _('New Topic') if self.trait == 'page' else _('New Link')
 
     if layout:
         layout.site_title = site_title  # type:ignore[union-attr]
@@ -141,12 +145,15 @@ def handle_new_root_page(
         page = pages.add(
             parent=None,  # root page
             title=form['title'].data,
-            type='topic',
-            meta={'trait': 'page'},
+            type='topic',  # also for links
+            meta={'trait': self.trait},
         )
         form.populate_obj(page)
 
-        request.success(_('Added a new topic'))
+        if self.trait == 'link':
+            request.success(_('Added a new link'))
+        else:
+            request.success(_('Added a new topic'))
         return morepath.redirect(request.link(page))
 
     if not request.POST:

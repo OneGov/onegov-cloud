@@ -9,9 +9,8 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from typing import TypeAlias
 
-    ColumnItem: TypeAlias = tuple[
+    type ColumnItem = tuple[
         str,         # attribute
         str,         # column
         str | None,  # type
@@ -777,8 +776,8 @@ class ColumnMapperMetadata:
             ('t:t:title', 'Titel des Dokuments'),
             ('t:t:position', 'Position zur Vorlage'),
             ('t:t:author', 'AutorIn (Nachname Vorname) des Dokuments'),
-            ('t:t:editor', 'AuftraggeberIn/HerausgeberIn des Dokuments '
-                           '(typischerweise Komitee/Verband/Partei)'),
+            ('t:t:editor', ('AuftraggeberIn/HerausgeberIn des Dokuments '
+                           '(typischerweise Komitee/Verband/Partei)')),
             ('i:t:date_year', 'Datum Jahr'),
             ('i:t:date_month', 'Datum Monat'),
             ('i:t:date_day', 'Datum Tag'),

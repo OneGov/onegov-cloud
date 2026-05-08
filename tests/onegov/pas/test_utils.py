@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from onegov.pas.models import (
     Attendence,
@@ -10,7 +12,12 @@ from onegov.pas.utils import get_parliamentarians_with_settlements
 from uuid import uuid4
 
 
-def test_get_parliamentarians_with_settlements(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_get_parliamentarians_with_settlements(session: Session) -> None:
     # Create test data
     start_date = date(2024, 1, 1)
     end_date = date(2024, 12, 31)
@@ -133,7 +140,7 @@ def test_get_parliamentarians_with_settlements(session):
     assert len(result) == 0
 
 
-def test_get_parties_with_settlements(session):
+def test_get_parties_with_settlements(session: Session) -> None:
     # Create test data
     start_date = date(2024, 1, 1)
     end_date = date(2024, 12, 31)

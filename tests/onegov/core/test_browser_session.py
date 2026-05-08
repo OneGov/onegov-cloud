@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from dogpile.cache import make_region
@@ -6,21 +8,21 @@ from onegov.core.browser_session import BrowserSession
 from onegov.core import cache
 
 
-def test_browser_session_mangle():
-    session = BrowserSession({}, 'token')
-    assert session._cache.mangle('test')\
-        == 'e352b6fc45b2bc144082d507d6a51faec0bbeab5313974f7:test'
+def test_browser_session_mangle() -> None:
+    session = BrowserSession({}, 'token')  # type: ignore[arg-type]
+    assert session._cache.mangle('test') == (
+        'e352b6fc45b2bc144082d507d6a51faec0bbeab5313974f7:test')
 
     with pytest.raises(AssertionError):
         session._cache.mangle('')
 
     with pytest.raises(AssertionError):
-        session._cache.mangle(None)
+        session._cache.mangle(None)  # type: ignore[arg-type]
 
 
-def test_browser_session_cache():
+def test_browser_session_cache() -> None:
     cache = make_region().configure('dogpile.cache.memory')
-    session = BrowserSession(cache, 'token')
+    session = BrowserSession(cache, 'token')  # type: ignore[arg-type]
     key = 'e352b6fc45b2bc144082d507d6a51faec0bbeab5313974f7:name'
 
     assert not session.has('name')
@@ -54,26 +56,26 @@ def test_browser_session_cache():
     assert cache.get(key) is NO_VALUE
 
 
-def test_browser_session_cache_prefix():
+def test_browser_session_cache_prefix() -> None:
     cache = make_region().configure('dogpile.cache.memory')
 
-    session = BrowserSession(cache, 'foo')
+    session = BrowserSession(cache, 'foo')  # type: ignore[arg-type]
     session.name = 'test'
     assert session.name == 'test'
 
-    session = BrowserSession(cache, 'foo')
+    session = BrowserSession(cache, 'foo')  # type: ignore[arg-type]
     assert session.name == 'test'
 
-    session = BrowserSession(cache, 'bar')
+    session = BrowserSession(cache, 'bar')  # type: ignore[arg-type]
     with pytest.raises(AttributeError):
         session.name
 
-    session = BrowserSession(cache, 'bar')
+    session = BrowserSession(cache, 'bar')  # type: ignore[arg-type]
     with pytest.raises(AttributeError):
         session.name
 
 
-def test_browser_session_count(redis_url):
+def test_browser_session_count(redis_url: str) -> None:
     session = BrowserSession(cache.get('sessions', 60, redis_url), 'token')
 
     assert session.count() == 0

@@ -82,6 +82,7 @@ def select_images(
 
     layout = layout or ImageSetLayout(self, request)
     layout.breadcrumbs.append(Link(_('Select'), '#'))
+    layout.edit_mode = True
 
     action = URL(request.link(self, 'select')).query_param(
         'csrf-token', request.new_csrf_token())
@@ -167,6 +168,7 @@ def handle_edit_imageset(
     layout = layout or ImageSetLayout(self, request)
     layout.include_editor()
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,

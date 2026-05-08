@@ -3,9 +3,9 @@ from __future__ import annotations
 from onegov.activity import ActivityFilter
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import InvoiceCollection, InvoiceItem
+from onegov.activity import ActivityInvoiceItem, BookingPeriodInvoiceCollection
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
-from onegov.activity import Period, PeriodCollection
+from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.activity import Volunteer, VolunteerCollection
 from onegov.activity.utils import is_valid_group_code
 from onegov.feriennet import FeriennetApp
@@ -28,7 +28,7 @@ from uuid import UUID
 
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.activity.models import PeriodMeta
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
 
 
@@ -85,18 +85,18 @@ def get_occasion(request: FeriennetRequest, id: UUID) -> Occasion | None:
 
 
 @FeriennetApp.path(
-    model=PeriodCollection,
+    model=BookingPeriodCollection,
     path='/periods')
-def get_periods(request: FeriennetRequest) -> PeriodCollection:
-    return PeriodCollection(request.session)
+def get_periods(request: FeriennetRequest) -> BookingPeriodCollection:
+    return BookingPeriodCollection(request.session)
 
 
 @FeriennetApp.path(
-    model=Period,
+    model=BookingPeriod,
     path='/period/{id}',
     converters={'id': UUID})
-def get_period(request: FeriennetRequest, id: UUID) -> Period | None:
-    return PeriodCollection(request.session).by_id(id)
+def get_period(request: FeriennetRequest, id: UUID) -> BookingPeriod | None:
+    return BookingPeriodCollection(request.session).by_id(id)
 
 
 @FeriennetApp.path(
@@ -159,11 +159,11 @@ def get_matches(
 ) -> MatchCollection | None:
 
     # the default period is the active period or the first we can find
-    period: Period | PeriodMeta | None
+    period: BookingPeriod | BookingPeriodMeta | None
     if not period_id:
         period = app.default_period
     else:
-        period = PeriodCollection(app.session()).by_id(period_id)
+        period = BookingPeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None
@@ -190,11 +190,11 @@ def get_billing(
 ) -> BillingCollection | None:
 
     # the default period is the active period or the first we can find
-    period: Period | PeriodMeta | None
+    period: BookingPeriod | BookingPeriodMeta | None
     if not period_id:
         period = app.default_period
     else:
-        period = PeriodCollection(app.session()).by_id(period_id)
+        period = BookingPeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None
@@ -232,7 +232,7 @@ def get_invoice_action(
 
 
 @FeriennetApp.path(
-    model=InvoiceCollection,
+    model=BookingPeriodInvoiceCollection,
     path='/my-bills',
     converters={'invoice': UUID})
 def get_my_invoices(
@@ -240,7 +240,7 @@ def get_my_invoices(
     app: FeriennetApp,
     username: str | None = None,
     invoice: UUID | None = None
-) -> InvoiceCollection | None:
+) -> BookingPeriodInvoiceCollection | None:
 
     # only admins can actually specify the username/invoice
     if not request.is_admin:
@@ -267,14 +267,14 @@ def get_my_invoices(
 
 
 @FeriennetApp.path(
-    model=InvoiceItem,
+    model=ActivityInvoiceItem,
     path='/invoice-item/{id}',
     converters={'id': UUID})
 def get_my_invoice_item(
     request: FeriennetRequest,
     id: UUID
-) -> InvoiceItem | None:
-    return request.session.query(InvoiceItem).filter_by(id=id).first()
+) -> ActivityInvoiceItem | None:
+    return request.session.query(ActivityInvoiceItem).filter_by(id=id).first()
 
 
 @FeriennetApp.path(
@@ -295,11 +295,11 @@ def get_occasion_attendee_collection(
         return None
 
     # the default period is the active period or the first we can find
-    period: Period | PeriodMeta | None
+    period: BookingPeriod | BookingPeriodMeta | None
     if not period_id:
         period = app.default_period
     else:
-        period = PeriodCollection(app.session()).by_id(period_id)
+        period = BookingPeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None

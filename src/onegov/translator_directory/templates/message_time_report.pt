@@ -1,0 +1,10 @@
+<tal:b i18n:domain="onegov.translator_directory">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b i18n:translate>Time report edited</tal:b>
+        </metal:b>
+    </metal:b>
+</tal:b>

@@ -6,8 +6,6 @@ from onegov.ticket import TicketCollection
 
 
 from typing import Any
-from typing import Generic
-from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -23,8 +21,6 @@ if TYPE_CHECKING:
     from .person import ExtendedPerson  # noqa: F401
 
 
-_M = TypeVar('_M', bound='Base')
-_IdT_contra = TypeVar('_IdT_contra', bound='UUID | int')
 _NOT_FOUND = object()
 
 AGENCY_MUTATION_LABELS = {
@@ -41,12 +37,12 @@ AGENCY_MUTATION_LABELS = {
 }
 
 
-class Mutation(Generic[_M, _IdT_contra]):
+class Mutation[M: Base, IdT_contra: UUID | int]:
 
     def __init__(
         self,
         session: Session,
-        target_id: _IdT_contra,
+        target_id: IdT_contra,
         ticket_id: UUID
     ) -> None:
         self.session = session
@@ -54,11 +50,11 @@ class Mutation(Generic[_M, _IdT_contra]):
         self.ticket_id = ticket_id
 
     @cached_property
-    def collection(self) -> SupportsById[_M, _IdT_contra]:
+    def collection(self) -> SupportsById[M, IdT_contra]:
         raise NotImplementedError
 
     @cached_property
-    def target(self) -> _M | None:
+    def target(self) -> M | None:
         return self.collection.by_id(self.target_id)
 
     @cached_property

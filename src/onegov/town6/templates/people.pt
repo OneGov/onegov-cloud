@@ -7,13 +7,13 @@
         <div class="grid-x">
             <div class="cell small-12 medium-6 large-4">
                 <form method="get"  tal:condition="organisations" id="people-filters">
-                    <select name="organisation" i18n:attributes="title" title="Select organisation" onchange="this.form.submit()">
+                    <select name="organisation" i18n:attributes="title" title="Select organisation" data-auto-submit>
                         <option value="" i18n:translate="">Select organisation</option>
                         <tal:block tal:repeat="org organisations">
                             <option tal:attributes="value org; selected python:org == selected_organisation">${org}</option>
                         </tal:block>
                     </select>
-                    <select name="sub_organisation" i18n:attributes="title" title="Select sub organisation" onchange="this.form.submit()">
+                    <select name="sub_organisation" i18n:attributes="title" title="Select sub organisation" data-auto-submit>
                         <option value="" i18n:translate="">Select sub organisation</option>
                         <tal:block tal:repeat="sub_org sub_organisations">
                             <option tal:attributes="value sub_org; selected python:sub_org == selected_sub_organisation">${sub_org}</option>

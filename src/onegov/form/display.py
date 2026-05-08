@@ -1,6 +1,7 @@
 """ Contains renderers to display form fields. """
 from __future__ import annotations
 
+from datetime import datetime, date
 import humanize
 import re
 
@@ -127,7 +128,8 @@ class VideoURLFieldRenderer(BaseRenderer):
     video_template = Markup("""
         <div class="video">
             <div class="videowrapper">
-                <iframe allow="fullscreen" frameborder="0" src="{url}"
+                <iframe referrerpolicy="strict-origin-when-cross-origin"
+                allow="fullscreen" frameborder="0" src="{url}"
                 sandbox="allow-scripts allow-same-origin
                 allow-presentation" referrerpolicy="no-referrer"></iframe>
             </div>
@@ -190,7 +192,10 @@ class DateFieldRenderer(BaseRenderer):
     date_format = '%d.%m.%Y'
 
     def __call__(self, field: Field) -> Markup:
-        return self.escape(field.data.strftime(self.date_format))
+        if isinstance(field.data, (date, datetime)):
+            return self.escape(field.data.strftime(self.date_format))
+        else:
+            return self.escape(field.data)
 
 
 @registry.register_for('DateTimeLocalField')

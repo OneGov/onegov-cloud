@@ -11,20 +11,28 @@ from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.town6.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import TicketLayout as TownTicketLayout
 from onegov.org.models import Organisation
+from onegov.org.utils import get_current_tickets_url
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection,
+)
 from onegov.translator_directory.constants import (
     member_can_see, editor_can_see, translator_can_see,
-    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES)
+    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS,
+    INTERPRETING_TYPES, TIME_REPORT_INTERPRETING_TYPES)
 
 
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from decimal import Decimal
+    from onegov.translator_directory.collections.time_report import (
+        TimeReportCollection,
+    )
     from onegov.translator_directory.models.language import Language
     from markupsafe import Markup
     from onegov.translator_directory.models.translator import (
@@ -89,7 +97,16 @@ class DefaultLayout(BaseLayout):
     def format_interpreting_type(self, key: str) -> str:
         if key in INTERPRETING_TYPES:
             return self.request.translate(INTERPRETING_TYPES[key])
+        if key in TIME_REPORT_INTERPRETING_TYPES:
+            return self.request.translate(TIME_REPORT_INTERPRETING_TYPES[key])
         return key
+
+    @staticmethod
+    def format_currency(amount: Decimal | float | None) -> str:
+        """Format amount as Swiss Francs."""
+        if amount is None:
+            return 'CHF 0.00'
+        return f'CHF {amount:.2f}'
 
 
 class TranslatorLayout(DefaultLayout):
@@ -179,6 +196,11 @@ class TranslatorLayout(DefaultLayout):
                     ),
                     attrs={'class': 'envelope'}
                 ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.request.is_editor:
             return [
@@ -193,15 +215,20 @@ class TranslatorLayout(DefaultLayout):
                     _('Report change'),
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
-                )
+                ),
+                Link(
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.request.is_member:
             return [
                 Link(
-                    _('Report change'),
-                    self.request.link(self.model, name='report-change'),
-                    attrs={'class': 'report-change'}
-                )
+                    _('Add Time Report'),
+                    url=self.request.link(self.model, name='add-time-report'),
+                    attrs={'class': 'plus'},
+                ),
             ]
         elif self.translator_data_outdated():
             return [
@@ -384,7 +411,6 @@ class TranslatorCollectionLayout(DefaultLayout):
                         ),
                     )
                 ),
-                # Link removed from here
                 Link(
                     _('Mail to all translators'),
                     url=self.request.app.mailto_link,
@@ -616,4 +642,78 @@ class RefuseAccreditationLayout(DefaultLayout):
             )
         )
         links.append(Link(_('Refuse admission')))
+        return links
+
+
+class TimeReportCollectionLayout(DefaultLayout):
+
+    if TYPE_CHECKING:
+        model: TimeReportCollection
+
+    @cached_property
+    def title(self) -> str:
+        return _('Time Reports')
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        links = super().breadcrumbs
+        assert isinstance(links, list)
+        links.append(Link(_('Time Reports')))
+        return links
+
+
+class TicketLayout(TownTicketLayout):
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        from onegov.translator_directory.models.ticket import (
+            TimeReportHandler,
+        )
+
+        links = super().editbar_links
+        if links is None:
+            return None
+
+        if not self.request.is_manager:
+            return links
+
+        if self.model.handler_code != 'TRP':
+            return links
+
+        if self.model.state != 'open':
+            return links
+
+        handler = self.model.handler
+        if not isinstance(handler, TimeReportHandler):
+            return links
+
+        if not handler.can_delete_time_report(
+            self.request  # type: ignore[arg-type]
+        ):
+            return links
+
+        if handler.time_report is None:
+            return links
+
+        delete_link = Link(
+            text=_('Delete Time Report'),
+            url=self.csrf_protected_url(
+                self.request.link(handler.time_report)
+            ),
+            attrs={'class': ('ticket-button', 'ticket-delete')},
+            traits=(
+                Confirm(
+                    _('Do you really want to delete this time report?'),
+                    _('This cannot be undone.'),
+                    _('Delete time report'),
+                    _('Cancel'),
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=get_current_tickets_url(self.request),
+                ),
+            ),
+        )
+
+        links.append(delete_link)
         return links

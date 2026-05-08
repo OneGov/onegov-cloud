@@ -1,8 +1,12 @@
-import pytest
+from __future__ import annotations
 
 
-@pytest.mark.skip('todo: generic categories seems are listed on the server??')
-def test_view_user_groups(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_view_user_groups(client: Client) -> None:
     client.login_admin()
 
     # create

@@ -1,14 +1,21 @@
-from datetime import timedelta, datetime
+from __future__ import annotations
 
 import transaction
-from sedate import utcnow
 
+from datetime import timedelta, datetime
+from onegov.org.models import News
 from onegov.page import PageCollection
+from sedate import utcnow
 from tests.onegov.org.common import edit_bar_links
 from tests.shared.utils import get_meta
 
 
-def test_news(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_news(client: Client) -> None:
     client.login_admin().follow()
     anon = client.spawn()
 
@@ -77,7 +84,7 @@ def test_news(client):
     assert "It is lots of fun" not in page.text
 
 
-def test_news_on_homepage(client):
+def test_news_on_homepage(client: Client) -> None:
     client.login_admin()
     anon = client.spawn()
 
@@ -108,6 +115,7 @@ def test_news_on_homepage(client):
 
     # sticky news don't count toward that limit
     foo = PageCollection(client.app.session()).by_path('news/foo')
+    assert isinstance(foo, News)
     foo.is_visible_on_homepage = True
 
     transaction.commit()
@@ -119,6 +127,7 @@ def test_news_on_homepage(client):
 
     # hidden news don't count for anonymous users
     baz = PageCollection(client.app.session()).by_path('news/baz')
+    assert isinstance(baz, News)
     baz.access = 'private'
 
     transaction.commit()
@@ -135,6 +144,7 @@ def test_news_on_homepage(client):
 
     # even if they are stickied
     baz = PageCollection(client.app.session()).by_path('news/baz')
+    assert isinstance(baz, News)
     baz.access = 'private'
     baz.is_visible_on_homepage = True
     baz.publication_end = utcnow() - timedelta(minutes=5)
@@ -152,12 +162,13 @@ def test_news_on_homepage(client):
     assert "Foo" in homepage
 
     baz = PageCollection(client.app.session()).by_path('news/baz')
+    assert isinstance(baz, News)
     baz.access = 'public'
     transaction.commit()
     assert "Baz" not in anon.get('/')
 
 
-def test_hide_news(client):
+def test_hide_news(client: Client) -> None:
     client.login_editor()
 
     new_page = client.get('/news').click('Nachricht')
@@ -183,10 +194,10 @@ def test_hide_news(client):
     response = anonymous.get(page.request.url)
     assert response.status_code == 200
     tomorrow = datetime.now() + timedelta(days=1)
-    tomorrow = tomorrow.strftime("%Y-%m-%dT%H:%M")
+    tomorrow_str = tomorrow.strftime("%Y-%m-%dT%H:%M")
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['publication_start'] = tomorrow
+    edit_page.form['publication_start'] = tomorrow_str
     page = edit_page.form.submit().follow()
 
     overview = client.get("/news")
@@ -195,7 +206,7 @@ def test_hide_news(client):
     assert "Test" not in overview
 
 
-def test_news_filter_invalid_years(client):
+def test_news_filter_invalid_years(client: Client) -> None:
 
     page = client.get('/news?filter_years=20263', status=400)
     assert 'Cannot decode URL parameter' in page

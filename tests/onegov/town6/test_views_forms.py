@@ -1,26 +1,40 @@
-import textwrap
-from itertools import chain, repeat
-from datetime import date
+from __future__ import annotations
 
+import textwrap
+import transaction
+import zipfile
+
+from datetime import date
+from freezegun import freeze_time
+from io import BytesIO
+from itertools import chain, repeat
 from onegov.file import FileCollection
 from onegov.form import FormCollection
 from onegov.org.models import TicketNote
 from onegov.ticket import Ticket
 from onegov.user import UserCollection
 from tests.onegov.town6.common import step_class
-import transaction
-import zipfile
 from webtest import Upload
-from io import BytesIO
-from freezegun import freeze_time
-from collections import namedtuple
 from unittest.mock import patch
+
+
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared.client import ExtendedResponse
+    from unittest.mock import MagicMock
+    from .conftest import Client
 
 
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
-def test_form_steps(broadcast, authenticate, connect, client):
+def test_form_steps(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
     page = client.get('/form/familienausweis')
     assert step_class(page, 1) == 'is-current'
 
@@ -59,7 +73,7 @@ def test_form_steps(broadcast, authenticate, connect, client):
     assert broadcast.call_args[0][3]['created']
 
 
-def test_registration_ticket_workflow(client):
+def test_registration_ticket_workflow(client: Client) -> None:
     collection = FormCollection(client.app.session())
     users = UserCollection(client.app.session())
 
@@ -81,9 +95,12 @@ def test_registration_ticket_workflow(client):
     count = 0
 
     def register(
-        client, data_in_email,
-        accept_ticket=True, url='/form/meetup'
-    ):
+        client: Client,
+        data_in_email: bool,
+        accept_ticket: bool = True,
+        url: str = '/form/meetup'
+    ) -> ExtendedResponse:
+
         nonlocal count
         count += 1
         with freeze_time(f'2018-01-01 00:00:{count:02d}'):
@@ -201,6 +218,7 @@ def test_registration_ticket_workflow(client):
         .order_by(TicketNote.created.desc())
         .first()
     )
+    assert latest_ticket_note is not None
     assert "Neue E-Mail" in latest_ticket_note.text
 
     mail = client.get_email(-1)
@@ -213,8 +231,11 @@ def test_registration_ticket_workflow(client):
 
     # Try deleting the form with active registrations window
     form_page = client.get('/form/meetings')
-    assert 'Dies kann nicht rückgängig gemacht werden.' in \
-           form_page.pyquery('.delete-link.confirm').attr('data-confirm-extra')
+    assert 'Dies kann nicht rückgängig gemacht werden.' in (
+           form_page
+           .pyquery('.delete-link.confirm')
+           .attr('data-confirm-extra')
+    )
 
     form_delete_link = form_page.pyquery(
         '.delete-link.confirm').attr('ic-delete-from')
@@ -222,7 +243,7 @@ def test_registration_ticket_workflow(client):
     client.delete(form_delete_link, status=200)
 
 
-def test_form_group_sort(client):
+def test_form_group_sort(client: Client) -> None:
     client.login_editor()
 
     groups = ['Aaaantelope', 'Allgemein', 'Apple', 'Zzzebra']
@@ -263,10 +284,17 @@ def test_form_group_sort(client):
         '.page-content-main h2').text().strip().split(' ')
 
 
-def test_forms_without_group_are_displayed(client, forms):
+def test_forms_without_group_are_displayed(
+    client: Client,
+    forms: list[tuple[str, str, str]]
+) -> None:
 
-    Form = namedtuple('Form', ['name', 'title', 'definition'])
-    forms = [Form(*t) for t in forms]
+    class Form(NamedTuple):
+        name: str
+        title: str
+        definition: str
+
+    forms_ = [Form(*t) for t in forms]
 
     groups = {
         'Abstimmungen und Wahlen': 2,
@@ -284,9 +312,9 @@ def test_forms_without_group_are_displayed(client, forms):
     }
     total = sum(value for value in groups.values())
     # the numbers above are random, but make sure the sum is the total length:
-    assert total == len(forms)
+    assert total == len(forms_)
 
-    def expand_groups_i_times(_groups):
+    def expand_groups_i_times(_groups: dict[str, int]) -> list[str]:
         """ Returns list that repeats each key the desired amount of times"""
         return list(chain.from_iterable(
             repeat(key, i) for key, i in _groups.items())
@@ -295,14 +323,14 @@ def test_forms_without_group_are_displayed(client, forms):
     group_stream = expand_groups_i_times(groups)
 
     client.login_admin()
-    for form, group in zip(forms, group_stream):
+    for form, group in zip(forms_, group_stream):
         form_page = client.get(f"/form/{form.name}/edit")
         if group:
             form_page.form['group'] = group
             form_page.form.submit()
 
     form_page = client.get('/forms')
-    titles = [form.title for form in forms]
+    titles = [form.title for form in forms_]
     for t in titles:
         assert t in form_page
 
@@ -319,7 +347,7 @@ def test_forms_without_group_are_displayed(client, forms):
         assert t in form_page
 
 
-def test_navbar_links_visibility(client):
+def test_navbar_links_visibility(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         First name * = ___
@@ -352,7 +380,11 @@ def test_navbar_links_visibility(client):
     assert "Hochladen auf Gever" in page
 
 
-def test_file_export_for_ticket(client, temporary_directory):
+def test_file_export_for_ticket(
+    client: Client,
+    temporary_directory: str
+) -> None:
+
     collection = FormCollection(client.app.session())
     collection.definitions.add('Statistics', definition=textwrap.dedent("""
         E-Mail * = @@@
@@ -391,8 +423,8 @@ def test_file_export_for_ticket(client, temporary_directory):
         assert {'README1.txt', 'README2.txt'}.issubset(file_names)
 
         for file_name, content in zip(file_names, [b'first', b'second']):
-            with zip_file.open(file_name) as file:
-                extracted_file_content = file.read()
+            with zip_file.open(file_name) as fp:
+                extracted_file_content = fp.read()
                 assert extracted_file_content == content
 
     # test one where the file got deleted
@@ -428,12 +460,12 @@ def test_file_export_for_ticket(client, temporary_directory):
         assert 'README3.txt' not in file_names
 
         for file_name, content in zip(file_names, [b'fourth']):
-            with zip_file.open(file_name) as file:
-                extracted_file_content = file.read()
+            with zip_file.open(file_name) as fp:
+                extracted_file_content = fp.read()
                 assert extracted_file_content == content
 
 
-def test_save_and_cancel_in_editbar(client):
+def test_save_and_cancel_in_editbar(client: Client) -> None:
     client.login_admin()
     page = client.get('/editor/edit/page/1')
     assert 'save-link' in page
@@ -456,7 +488,7 @@ def test_save_and_cancel_in_editbar(client):
     assert 'cancel-link' in page
 
 
-def test_copy_event(client):
+def test_copy_event(client: Client) -> None:
     with freeze_time('2025-04-28 08:00:00'):
         client.login_admin()
 

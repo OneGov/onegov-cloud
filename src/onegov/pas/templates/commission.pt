@@ -21,11 +21,26 @@
                 <dt i18n:translate>Description</dt>
                 <dd><div tal:content="commission.description"></div></dd>
             </div>
-            <div tal:condition="commission.memberships">
-                <dt i18n:translate>Parliamentarians</dt>
+            <div tal:condition="president">
+                <dt i18n:translate>President</dt>
+                <dd>
+                    <strong>
+                        <a href="${request.link(president.parliamentarian)}">${president.parliamentarian.title}</a>
+                    </strong>
+                    <span tal:condition="president.start">
+                        <br>${layout.format_date(president.start, 'date')}
+                    </span>
+                    <span tal:condition="president.end">
+                        -
+                        ${layout.format_date(president.end, 'date')}
+                    </span>
+                </dd>
+            </div>
+            <div tal:condition="other_members">
+                <dt i18n:translate>Members</dt>
                 <dd>
                     <ul>
-                        <li tal:repeat="membership commission.memberships">
+                        <li tal:repeat="membership other_members">
                             <span>
                                 <a href="${request.link(membership.parliamentarian)}">${membership.parliamentarian.title}</a>
                                 (<a href="${request.link(membership)}">${membership.role_label}</a>)

@@ -5,7 +5,7 @@ from collections import OrderedDict
 from markupsafe import Markup
 
 
-from onegov.activity import PeriodCollection
+from onegov.activity import BookingPeriodCollection
 from onegov.core.elements import BackLink
 from onegov.core.html import html_to_text, sanitize_html
 from onegov.core.security import Secret
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 
 def get_variables(request: FeriennetRequest) -> dict[str, str]:
-    period = PeriodCollection(request.session).active()
+    period = BookingPeriodCollection(request.session).active()
     variables = TemplateVariables(request, period).bound
 
     return OrderedDict(
@@ -56,11 +56,6 @@ def view_notification_templates(
             return
 
         yield Link(
-            text=_('Mailing'),
-            url=request.link(notification, 'send')
-        )
-
-        yield Link(
             text=_('Edit'),
             url=request.link(notification, 'edit')
         )
@@ -73,6 +68,11 @@ def view_notification_templates(
             }),
             target=f'#{notification.id.hex}',
             yes_button_text=_('Delete Notification Template')
+        )
+
+        yield Link(
+            text=_('Use Template'),
+            url=request.link(notification, 'send')
         )
 
     return {
@@ -180,7 +180,7 @@ def handle_send_notification(
     form: NotificationTemplateSendForm
 ) -> RenderData | Response:
 
-    period = PeriodCollection(request.session).active()
+    period = BookingPeriodCollection(request.session).active()
     variables = TemplateVariables(request, period)
     layout = NotificationTemplateLayout(self, request)
 

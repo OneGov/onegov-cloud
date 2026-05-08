@@ -5,7 +5,6 @@ from datetime import datetime
 import pytz
 from sedate import replace_timezone
 
-from onegov.api import ApiApp
 from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.templates import render_template
@@ -13,9 +12,7 @@ from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
-from onegov.town6.api import (
-    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint)
-from onegov.town6.custom import get_global_tools
+from onegov.town6.custom import get_global_tools, get_modules
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
 from webob import Response
@@ -24,14 +21,13 @@ from webob import Response
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
-    from onegov.api import ApiEndpoint
     from onegov.core.types import RenderData
     from onegov.org.exceptions import MTANAccessLimitExceeded
     from onegov.org.models import Organisation
     from onegov.town6.request import TownRequest
 
 
-class TownApp(OrgApp, FoundationApp, ApiApp):
+class TownApp(OrgApp, FoundationApp):
 
     def configure_organisation(
         self,
@@ -92,7 +88,8 @@ def get_template_directory() -> str:
 @TownApp.template_variables()
 def get_template_variables(request: TownRequest) -> RenderData:
     return {
-        'global_tools': tuple(get_global_tools(request))
+        'global_tools': tuple(get_global_tools(request)),
+        'modules': get_modules(request)
     }
 
 
@@ -103,7 +100,7 @@ def get_theme() -> TownTheme:
 
 @TownApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'it_CH'}
 
 
 @TownApp.setting(section='i18n', name='localedirs')
@@ -223,15 +220,6 @@ def get_render_mtan_access_limit_exceeded(
     return render_mtan_access_limit_exceeded
 
 
-@TownApp.setting(section='api', name='endpoints')
-def get_api_endpoints() -> list[type[ApiEndpoint[Any]]]:
-    return [
-        EventApiEndpoint,
-        NewsApiEndpoint,
-        TopicApiEndpoint,
-    ]
-
-
 @TownApp.webasset_path()
 def get_js_path() -> str:
     return 'assets/js'
@@ -262,7 +250,6 @@ def get_common_asset() -> Iterator[str]:
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
-    yield 'many.jsx'
     yield 'pay'
     yield 'moment.js'
     yield 'moment.de-ch.js'
@@ -273,14 +260,15 @@ def get_common_asset() -> Iterator[str]:
     yield 'jquery.load.js'
     yield 'videoframe.js'
     yield 'datetimepicker.js'
+    yield 'many.jsx'
     yield 'url.js'
     yield 'date-range-selector.js'
     yield 'lazyalttext.js'
     yield 'lazysizes.js'
+    yield 'button-toggler.js'
     yield 'common.js'
     yield '_blank.js'
     yield 'homepage_video_or_slider.js'
-    yield 'file-table-row-toggler.js'
     yield 'animate.js'
     yield 'forms.js'
     yield 'internal_link_check.js'
@@ -294,8 +282,11 @@ def get_common_asset() -> Iterator[str]:
     yield 'sidebar_fixed.js'
     yield 'ResizeSensor.js'
     yield 'theia-sticky-sidebar.js'
+    yield 'apply-filters.js'
+    yield 'foundation-intercooler.js'
     yield 'chosen_select_hierarchy.js'
     yield 'iframe_request_parameters.js'
+    yield 'ai_formcoder.js'
 
 
 @TownApp.webasset('editor')
@@ -339,6 +330,9 @@ def get_staff_client_asset() -> Iterator[str]:
     yield 'chat-client.js'
 
 
-@TownApp.webasset('invoicing')
-def get_invoicing() -> Iterator[str]:
-    yield 'invoicing.js'
+@TownApp.webasset('d3-charts')
+def get_d3_chart_assets() -> Iterator[str]:
+    yield 'd3.v7.min.js'
+    yield 'd3-flextree.js'
+    yield 'd3-org-chart.js'
+    yield 'd3-display.js'

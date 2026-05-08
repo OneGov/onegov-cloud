@@ -1,11 +1,19 @@
-import transaction
-from freezegun import freeze_time
+from __future__ import annotations
+
 import json
+import transaction
+
+from freezegun import freeze_time
 from onegov.org.models import PushNotification
 from onegov.page import PageCollection
 
 
-def test_push_notification_overview(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_push_notification_overview(client: Client) -> None:
     transaction.begin()
     session = client.app.session()
     collection = PageCollection(session)

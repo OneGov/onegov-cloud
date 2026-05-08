@@ -48,15 +48,16 @@ def view_resource_recipients(
             yes_button_text=_('Delete Recipient')
         )
 
-    q = ResourceCollection(request.app.libres_context).query()
-    q = q.order_by(Resource.group, Resource.name)
-    q = q.with_entities(Resource.group, Resource.title, Resource.id)
-
     default_group = request.translate(_('General'))
 
     resources = {
-        r.id.hex: f'{r.group or default_group} - {r.title}'
-        for r in q
+        resource_id.hex: f'{group or default_group} - {title}'
+        for group, title, resource_id in (
+            ResourceCollection(request.app.libres_context).query()
+            .with_entities(Resource.group, Resource.title, Resource.id)
+            .order_by(Resource.group, Resource.name)
+            .tuples()
+        )
     }
 
     return {
@@ -89,6 +90,7 @@ def handle_new_resource_recipient(
             address=form.address.data,
             daily_reservations=form.daily_reservations.data,
             new_reservations=form.new_reservations.data,
+            customer_messages=form.customer_messages.data,
             internal_notes=form.internal_notes.data,
             send_on=form.send_on.data,
             resources=form.resources.data,
@@ -101,9 +103,12 @@ def handle_new_resource_recipient(
     if layout:
         layout.title = title
 
+    layout = layout or ResourceRecipientsFormLayout(self, request, title)
+    layout.edit_mode = True
+
     return {
         'title': title,
-        'layout': layout or ResourceRecipientsFormLayout(self, request, title),
+        'layout': layout,
         'form': form
     }
 

@@ -1204,7 +1204,7 @@ msgid "d-3-938"
 msgstr "Protection des animaux"
 
 msgid "d-1-10"
-msgstr "Politique sociale"
+msgstr "Politique sociale et sociétale"
 
 msgid "d-2-101"
 msgstr "Santé"
@@ -1252,31 +1252,31 @@ msgid "d-3-1028"
 msgstr "Aide sociale"
 
 msgid "d-2-103"
-msgstr "Groupes sociaux"
+msgstr "Questions de société"
 
 msgid "d-3-1031"
-msgstr "Politique des étranger·ère·s"
+msgstr "Politique en matière de migration et d’intégration"
 
 msgid "d-3-1032"
-msgstr "Réfugié·e·s"
+msgstr "Politique d’asile"
 
 msgid "d-3-1033"
-msgstr "Condition de la femme"
+msgstr "Femmes et politique de l’égalité"
 
 msgid "d-3-1034"
 msgstr "Politique familiale"
 
 msgid "d-3-1035"
-msgstr "Enfants et jeunes"
+msgstr "Politique de l’enfance et de la jeunesse"
 
 msgid "d-3-1036"
-msgstr "Personnes âgées"
+msgstr "Politique de la vieillesse"
 
 msgid "d-3-1037"
-msgstr "Handicapés"
+msgstr "Personnes handicapées"
 
 msgid "d-3-1038"
-msgstr "Homosexuels"
+msgstr "LGBTQIA+"
 
 msgid "d-1-11"
 msgstr "Formation et recherche"

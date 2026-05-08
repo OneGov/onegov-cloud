@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import gc
 
 from onegov.core import cache
@@ -7,17 +9,17 @@ from onegov.core.framework import Framework
 CALL_COUNT = 0
 
 
-def test_instance_lru_cache():
+def test_instance_lru_cache() -> None:
     count = 0
 
     class Adder:
         @cache.instance_lru_cache(maxsize=1)
-        def add(self, x, y):
+        def add(self, x: int, y: int) -> int:
             nonlocal count
             count += 1
             return x + y
 
-    def function():
+    def function() -> None:
         a = Adder()
         assert a.add(1, 2) == 3
         assert a.add(1, 3) == 4
@@ -39,22 +41,24 @@ def test_instance_lru_cache():
     assert objects == 0
 
 
-def test_cache_key(redis_url):
+def test_cache_key(redis_url: str) -> None:
     region = cache.get(namespace='ns', expiration_time=60, redis_url=redis_url)
     region.set('x' * 500, 'y')  # used to fail on the old memcached system
 
 
-def test_redis(redis_url):
+def test_redis(redis_url: str) -> None:
     app = Framework()
     app.namespace = 'towns'
     app.set_application_id('towns/detroit')
     app.configure_application(redis_url=redis_url)
     app.cache.set('foobar', dict(foo='bar'))
 
-    assert app.cache.get('foobar')['foo'] == 'bar'
+    result = app.cache.get('foobar')
+    assert result
+    assert result['foo'] == 'bar'
 
 
-def test_cache_independence(redis_url):
+def test_cache_independence(redis_url: str) -> None:
     app = Framework()
     app.namespace = 'towns'
     app.set_application_id('towns/washington')
@@ -75,7 +79,7 @@ def test_cache_independence(redis_url):
     assert app.cache.get('foo')
 
 
-def test_cache_flush(redis_url):
+def test_cache_flush(redis_url: str) -> None:
     bar = Framework()
     bar.namespace = 'foo'
     bar.set_application_id('foo/bar')

@@ -1,9 +1,16 @@
+from __future__ import annotations
+
 import pytest
 from onegov.ticket import Handler
 from onegov.ticket.errors import DuplicateHandlerError
 
 
-def test_invalid_handler_code(handlers):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ticket.handler import HandlerRegistry
+
+
+def test_invalid_handler_code(handlers: HandlerRegistry) -> None:
 
     # it's possible for the registry to not be empty due to other tests
     count = len(handlers.registry)
@@ -17,7 +24,7 @@ def test_invalid_handler_code(handlers):
     assert len(handlers.registry) == count
 
 
-def test_register_handler(handlers):
+def test_register_handler(handlers: HandlerRegistry) -> None:
 
     class FooHandler(Handler):
         pass

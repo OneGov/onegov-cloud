@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from onegov.landsgemeinde.models import Assembly
 from transaction import commit
 
 
-def test_ticker(browser, assembly):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import WebsocketBrowser
+
+
+def test_ticker(browser: WebsocketBrowser, assembly: Assembly) -> None:
     app = browser.wsgi_server.app
     app.session().add(assembly)
     commit()
@@ -21,7 +28,7 @@ def test_ticker(browser, assembly):
         'event': 'refresh',
         'assembly': '2023-05-06'
     })
-    assert 'Lorem ipsum' not in browser.html
+    assert not browser.is_text_present('Lorem ipsum')
     assert 'Adipiscing elit' not in browser.html
 
     # ... correct date
@@ -29,7 +36,7 @@ def test_ticker(browser, assembly):
         'event': 'refresh',
         'assembly': '2023-05-07'
     })
-    assert 'Lorem ipsum' in browser.html
+    assert browser.is_text_present('Lorem ipsum')
     assert 'Adipiscing elit' in browser.html
 
     # update
@@ -45,7 +52,7 @@ def test_ticker(browser, assembly):
         'node': 'agenda-item-2',
         'content': 'Consectetur'
     })
-    assert 'Lorem ipsum' in browser.html
+    assert browser.is_text_present('Lorem ipsum')
     assert 'Dolor sit amet' not in browser.html
     assert 'Adipiscing elit' in browser.html
     assert 'Eiusmod tempor' not in browser.html
@@ -58,7 +65,7 @@ def test_ticker(browser, assembly):
         'node': 'agenda-item-2',
         'content': 'Consectetur'
     })
-    assert 'Lorem ipsum' in browser.html
+    assert browser.is_text_present('Lorem ipsum')
     assert 'Dolor sit amet' not in browser.html
     assert 'Adipiscing elit' in browser.html
     assert 'Eiusmod tempor' not in browser.html

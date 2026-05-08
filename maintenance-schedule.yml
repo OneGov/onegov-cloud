@@ -1,0 +1,23 @@
+schedule:
+  - date: Next Tuesday at 12:00
+    nodes:
+      - loxo
+      - pherusa
+      - tyche
+  - date: Next Tuesday at 14:00
+    nodes:
+      - aether
+      - alecto
+      - theros
+      - arete
+      - calais
+  - date: Next Tuesday at 15:00
+    nodes:
+      - caicias
+      - caicinus
+      - caicus
+      - carcinus
+  - date: Next Monday +7 days at 7:00
+    nodes:
+      - ister
+      - istrus

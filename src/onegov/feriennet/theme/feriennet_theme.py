@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from onegov.core.utils import module_path
-from onegov.org.theme import OrgTheme
+from onegov.town6.theme import TownTheme
 
 
 # options editable by the user
@@ -10,7 +10,7 @@ user_options = {
 }
 
 
-class FeriennetTheme(OrgTheme):
+class FeriennetTheme(TownTheme):
     name = 'onegov.feriennet.foundation'
 
     @property

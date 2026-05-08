@@ -1,0 +1,37 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div metal:use-macro="layout.macros['form']" tal:define="form_two_columns True"/>
+
+        <p i18n:translate tal:condition="not invoices">
+            No invoices yet.
+        </p>
+
+        <metal:b use-macro="layout.macros['invoices']" />
+
+        <div class="batch-actions callout" tal:condition="invoices">
+            <div class="grid-x grid-margin-x align-middle">
+                <div class="cell medium-4">
+                    <label for="batch-invoice-state" i18n:translate="">Batch Action</label>
+                    <select id="batch-invoice-state" name="batch-invoice-state">
+                        <option value="invoiced" i18n:translate="">Mark as Invoiced</option>
+                        <option value="uninvoiced" i18n:translate="">Mark as Uninvoiced</option>
+                        <option value="paid" i18n:translate="">Mark as Paid</option>
+                        <option value="open" i18n:translate="">Mark as Unpaid</option>
+                    </select>
+                </div>
+                <div class="cell medium-8">
+                    <button class="button batch-action-button" data-action-url="${layout.csrf_protected_url(request.link(layout.model, name='batch-set'))}">
+                        <span i18n:translate="">Apply to selected</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div metal:use-macro="layout.macros['pagination']" tal:define="
+            collection layout.model; current_page layout.model; pagination_centered True" />
+
+    </tal:b>
+</div>

@@ -37,12 +37,13 @@ class HtmlField(HtmlFieldBase):
 def file_choices_from_collection(
     collection: FileCollection[Any]
 ) -> list[tuple[str, str]]:
+    model_class = collection.model_class
     return sorted(
         (
             (file_id, name)
             for file_id, name in collection.query().with_entities(
-                File.id,
-                File.name,
+                model_class.id,
+                model_class.name,
             )
         ),
         key=itemgetter(1)

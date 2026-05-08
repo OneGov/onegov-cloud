@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from freezegun import freeze_time
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_complex_vote
@@ -5,7 +7,12 @@ from tests.onegov.election_day.common import upload_vote
 from webtest import TestApp as Client
 
 
-def test_view_vote_redirect(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_vote_redirect(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -23,7 +30,7 @@ def test_view_vote_redirect(election_day_app_zg):
     assert 'complex-vote/proposal-entities' in response.headers['Location']
 
 
-def test_view_vote_entities(election_day_app_zg):
+def test_view_vote_entities(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -51,7 +58,7 @@ def test_view_vote_entities(election_day_app_zg):
         assert data_url in client.get(url).follow()
 
 
-def test_view_vote_districts(election_day_app_gr):
+def test_view_vote_districts(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -78,7 +85,7 @@ def test_view_vote_districts(election_day_app_gr):
         assert data_url in client.get(url).follow()
 
 
-def test_view_vote_statistics(election_day_app_gr):
+def test_view_vote_statistics(election_day_app_gr: TestApp) -> None:
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -98,7 +105,7 @@ def test_view_vote_statistics(election_day_app_gr):
         assert '13’828' in response
 
 
-def test_view_vote_json(election_day_app_zg):
+def test_view_vote_json(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -141,7 +148,7 @@ def test_view_vote_json(election_day_app_zg):
     assert data['url'] == 'http://localhost/vote/vote'
 
 
-def test_view_vote_summary(election_day_app_zg):
+def test_view_vote_summary(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -168,7 +175,7 @@ def test_view_vote_summary(election_day_app_zg):
         }
 
 
-def test_view_vote_data(election_day_app_zg):
+def test_view_vote_data(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -207,7 +214,7 @@ def test_view_vote_data(election_day_app_zg):
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
 
-def test_views_vote_embedded_widgets(election_day_app_zg):
+def test_views_vote_embedded_widgets(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 

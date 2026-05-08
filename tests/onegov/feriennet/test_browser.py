@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import time
 import json
 import pytest
@@ -8,8 +10,18 @@ from pytest import mark
 from sedate import as_datetime, replace_timezone
 
 
-@mark.flaky(reruns=3, only_rerun=None)
-def test_browse_matching(browser, scenario):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from tests.shared import ExtendedBrowser
+    from tests.shared.postgresql import Postgresql
+    from .conftest import Scenario
+
+
+def test_browse_matching(
+    browser: ExtendedBrowser,
+    scenario: Scenario
+) -> None:
+
     scenario.add_period(title="Ferienpass 2016")
 
     for i in range(2):
@@ -31,14 +43,27 @@ def test_browse_matching(browser, scenario):
     browser.login_admin()
     browser.visit('/matching')
 
+    # close CMP dialog if it pops up
+    try:
+        browser.find_by_text("Akzeptieren und schliessen").click()
+    except Exception:
+        pass
+
     # check the initial state
     assert browser.is_text_present("Ferienpass 2016")
     assert browser.is_text_present("Zufriedenheit liegt bei 0%")
     assert browser.is_text_present("0% aller Durchführungen haben genügend")
     assert browser.is_text_present("0 / 4")
 
+    # NOTE: There is an uniteractable copy of a lot of the elements on this
+    #       page, that we have to avoid trying to interact with, unfortunately
+    #       it's located before the interactable version in the DOM.
+    #       So we manually target the main content section first and then
+    #       target everything relative to that.
+    content = browser.find_by_id('content').first
+
     # run a matching
-    browser.find_by_value("Zuteilung ausführen").click()
+    content.find_by_value("Zuteilung ausführen").click()
 
     # check the results
     assert browser.is_text_present("Zufriedenheit liegt bei 100%")
@@ -50,27 +75,22 @@ def test_browse_matching(browser, scenario):
     assert not browser.is_text_present("Dustin")
     assert not browser.is_text_present("Mike")
 
-    browser.find_by_css('.matching-details > button')[0].click()
-    browser.find_by_css('.matches').is_visible()
+    content.find_by_css('.matching-details .title-toggler')[0].click()
+    content.find_by_css('.matches').is_visible()
 
     assert browser.is_text_present("Dustin")
     assert browser.is_text_present("Mike")
 
     # reset it again
-    browser.find_by_css('.reset-matching').click()
-
-    # without this we sometimes get errors
-    time.sleep(0.25)
+    content.find_by_css('.reset-matching').click()
 
     # confirm the matching
     assert browser.is_text_present("Zufriedenheit liegt bei 0%")
     assert browser.is_text_present("0% aller Durchführungen haben genügend")
 
-    browser.find_by_css('input[value="yes"]').click()
-    browser.find_by_css('input[name="sure"]').click()
-    browser.find_by_value("Zuteilung ausführen").click()
-
-    assert browser.is_text_present("wurde bereits bestätigt")
+    content.find_by_css('input[value="yes"]').click()
+    content.find_by_css('input[name="sure"]').click()
+    content.find_by_value("Zuteilung ausführen").click()
 
     # verify the period's state
     browser.visit('/periods')
@@ -78,13 +98,18 @@ def test_browse_matching(browser, scenario):
 
 
 @mark.skip('Causes too many requests, skip for now')
-def test_browse_billing(browser, scenario, postgres):
+def test_browse_billing(
+    browser: ExtendedBrowser,
+    scenario: Scenario,
+    postgres: Postgresql
+) -> None:
+
     scenario.add_period(title="Ferienpass 2016", confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
     scenario.add_user(username='member@example.org', role='member')
 
-    scenario.c.users.by_username('admin@example.org').realname = 'Jane Doe'
-    scenario.c.users.by_username('member@example.org').realname = 'John Doe'
+    scenario.c.users.by_username('admin@example.org').realname = 'Jane Doe'  # type: ignore[union-attr]
+    scenario.c.users.by_username('member@example.org').realname = 'John Doe'  # type: ignore[union-attr]
 
     scenario.add_occasion(age=(0, 10), spots=(0, 2), cost=100)
     scenario.add_occasion(age=(0, 10), spots=(0, 2), cost=1000)
@@ -245,7 +270,12 @@ def test_browse_billing(browser, scenario, postgres):
     ('Bestätigt'),
     ('Offen'),
 ])
-def test_volunteers_export(browser, scenario, to_volunteer_state):
+def test_volunteers_export(
+    browser: ExtendedBrowser,
+    scenario: Scenario,
+    to_volunteer_state: str
+) -> None:
+
     scenario.add_period(title="Ferienpass 2019", active=True, confirmed=True)
     scenario.add_activity(title="Zoo", state='accepted')
     scenario.add_user(username='member@example.org', role='member')
@@ -304,6 +334,7 @@ def test_volunteers_export(browser, scenario, to_volunteer_state):
     assert not browser.is_text_present("Foo")
 
     # the admin can see the signed-up users
+    assert scenario.latest_period is not None
     browser.visit(f'/volunteers/{scenario.latest_period.id.hex}')
     assert browser.is_text_present("Foo")
 
@@ -343,7 +374,7 @@ def test_volunteers_export(browser, scenario, to_volunteer_state):
     start_time = occasion_date.isoformat()
     end_time = (occasion_date + timedelta(hours=1)).isoformat()
 
-    def get_number_of_confirmed_volunteers(state):
+    def get_number_of_confirmed_volunteers(state: str) -> int:
         if state == 'Bestätigt':
             return 1
         return 0

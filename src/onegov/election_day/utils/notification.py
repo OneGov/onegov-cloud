@@ -14,9 +14,8 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Vote
     from sqlalchemy.sql import ColumnElement
     from typing import Literal
-    from typing import TypeAlias
 
-    DomainSubset: TypeAlias = Literal['canton', 'municipality'] | None
+    type DomainSubset = Literal['canton', 'municipality'] | None
 
 
 class ModelGroup(NamedTuple):

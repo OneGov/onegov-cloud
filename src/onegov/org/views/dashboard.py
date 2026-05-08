@@ -27,7 +27,7 @@ def dashboard(
     """
     layout = layout or DashboardLayout(self, request)
     return {
-        'title': _('Dashboard'),
+        'title': _('Overview'),
         'model': self,
         'layout': layout
     }
@@ -53,7 +53,7 @@ def citizen_dashboard(
 
     layout = layout or DashboardLayout(self, request)
     return {
-        'title': _('Dashboard'),
+        'title': _('Overview'),
         'model': self,
         'layout': layout
     }

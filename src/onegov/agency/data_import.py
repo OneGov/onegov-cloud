@@ -9,17 +9,15 @@ import click
 from email_validator import (
     validate_email, EmailNotValidError, EmailUndeliverableError)
 from markupsafe import Markup
-
 from onegov.agency.collections import (
     ExtendedAgencyCollection, ExtendedPersonCollection)
 from onegov.core.csv import CSVFile
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
 
-from typing import TypeVar, Any
-from typing import TypeVarTuple
-from typing import TYPE_CHECKING
 
+from typing import Any
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable, Iterable
@@ -33,11 +31,8 @@ if TYPE_CHECKING:
     from onegov.people import AgencyMembership
     from sqlalchemy.orm import Session
 
-T = TypeVar('T')
-Ts = TypeVarTuple('Ts')
 
-
-def with_open(
+def with_open[*Ts, T](
     func: Callable[[CSVFile[DefaultRow], *Ts], T]
 ) -> Callable[[StrOrBytesPath, *Ts], T]:
 
@@ -59,7 +54,7 @@ def v_(string: str | None) -> str | None:
     return string.strip()
 
 
-def cleaned(
+def cleaned[T](
     func: Callable[[str], T]
 ) -> Callable[[str | None], T | None]:
 
@@ -179,7 +174,6 @@ def import_bs_agencies(
     added_agencies = {}
     children = defaultdict(list)
     roots = []
-    added_count = 0
 
     click.echo(f'Treated as root agencies: {", ".join(treat_as_root)}')
     for line in csvfile.lines:
@@ -214,11 +208,6 @@ def import_bs_agencies(
         parent: ExtendedAgency | None = None
     ) -> None:
 
-        nonlocal added_count
-        added_count += 1
-        if added_count % 50 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
         line = lines_by_id[basisid]
         agency = parse_agency(line, parent=parent)
         for child_id in children.get(line.verzorgeinheitid, []):
@@ -292,9 +281,6 @@ def import_bs_persons(
                     f'agency id {agency_id} not found in agencies', err=True)
 
     for ix, line in enumerate(csvfile.lines):
-        if ix % 50 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
         parse_person(line)
 
     return persons
@@ -515,10 +501,6 @@ def import_lu_people(
                 click.echo(f'Error agency id {agency_id} not found', err=True)
 
     for ix, line in enumerate(csvfile.lines):
-        if ix % 1000 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
-
         if not check_skip(line) and not check_skip_people(line):
             parse_person(line)
 
@@ -538,10 +520,6 @@ def import_lu_agencies(
     # Hierarchy: Hierarchie: Department, Dienststelle, Abteilung,
     # Unterabteilung, Unterabteilung 2, Unterabteilung 3
     for ix, line in enumerate(csvfile.lines):
-        if ix % 1000 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
-
         if check_skip(line):
             continue
 
@@ -796,10 +774,7 @@ def match_person_membership_title(
                 if agency in agencies_by_name:
                     set_membership_title(membership, function)
 
-    for ix, line in enumerate(csvfile.lines):
-        if ix % 50 == 0:
-            app.es_indexer.process()
-            app.psql_indexer.bulk_process(session)
+    for line in csvfile.lines:
         total_entries += 1
         match_membership_title(line, agencies)
 

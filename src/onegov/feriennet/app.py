@@ -1,23 +1,24 @@
 from __future__ import annotations
 
 from functools import cached_property
-from markupsafe import Markup
-from onegov.activity import (
-    Period, PeriodCollection, PeriodMeta, InvoiceCollection)
-from onegov.activity.models.invoice_reference import Schema
+from onegov.activity import BookingPeriod
+from onegov.activity import BookingPeriodMeta
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.core import utils
-from onegov.org.app import org_content_security_policy
 from onegov.core.orm import orm_cached
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
 from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.sponsors import load_sponsors
 from onegov.feriennet.theme import FeriennetTheme
-from onegov.org import OrgApp
-from onegov.org.app import get_common_asset as default_common_asset
-from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
-from onegov.org.app import (
+from onegov.org.app import org_content_security_policy
+from onegov.town6 import TownApp
+from onegov.town6.app import get_common_asset as default_common_asset
+from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
+from onegov.town6.app import (
     get_public_ticket_messages as default_public_ticket_messages)
+from onegov.pay.models.invoice_reference import Schema
 from onegov.user import User, UserCollection
 
 
@@ -31,73 +32,62 @@ if TYPE_CHECKING:
     from more.content_security import ContentSecurityPolicy
 
 
-BANNER_TEMPLATE = Markup("""
-<div class="sponsor-banner">
-    <div class="sponsor-banner-{id}">
-        <a href="{url}">
-            <img src="{src}">
-            <p class="banner-info">{info}</p>
-        </a>
-    </div>
-</div>
-""")
-
-
-class FeriennetApp(OrgApp):
+class FeriennetApp(TownApp):
 
     request_class = FeriennetRequest
 
-    def es_may_use_private_search(
+    def fts_may_use_private_search(
         self,
         request: FeriennetRequest  # type:ignore[override]
     ) -> bool:
         return request.is_admin
 
     @orm_cached(policy='on-table-change:periods')
-    def active_period(self) -> PeriodMeta | None:
+    def active_period(self) -> BookingPeriodMeta | None:
         for period in self.periods:
             if period.active:
                 return period
         return None
 
     @orm_cached(policy='on-table-change:periods')
-    def periods(self) -> tuple[PeriodMeta, ...]:
-        query: Query[PeriodMeta] = (
-            PeriodCollection(self.session())
+    def periods(self) -> tuple[BookingPeriodMeta, ...]:
+        query: Query[BookingPeriodMeta] = (
+            BookingPeriodCollection(self.session())
             .query()
-            .order_by(Period.execution_start)
+            .order_by(BookingPeriod.execution_start)
             .with_entities(
-                Period.id,
-                Period.title,
-                Period.active,
-                Period.confirmed,
-                Period.confirmable,
-                Period.finalized,
-                Period.finalizable,
-                Period.archived,
-                Period.prebooking_start,
-                Period.prebooking_end,
-                Period.booking_start,
-                Period.booking_end,
-                Period.execution_start,
-                Period.execution_end,
-                Period.max_bookings_per_attendee,
-                Period.booking_cost,
-                Period.all_inclusive,
-                Period.pay_organiser_directly,
-                Period.minutes_between,
-                Period.alignment,
-                Period.deadline_days,
-                Period.book_finalized,
-                Period.cancellation_date,
-                Period.cancellation_days,
-                Period.age_barrier_type,
+                BookingPeriod.id,
+                BookingPeriod.title,
+                BookingPeriod.active,
+                BookingPeriod.confirmed,
+                BookingPeriod.confirmable,
+                BookingPeriod.with_group_code,
+                BookingPeriod.finalized,
+                BookingPeriod.finalizable,
+                BookingPeriod.archived,
+                BookingPeriod.prebooking_start,
+                BookingPeriod.prebooking_end,
+                BookingPeriod.booking_start,
+                BookingPeriod.booking_end,
+                BookingPeriod.execution_start,
+                BookingPeriod.execution_end,
+                BookingPeriod.max_bookings_per_attendee,
+                BookingPeriod.booking_cost,
+                BookingPeriod.all_inclusive,
+                BookingPeriod.pay_organiser_directly,
+                BookingPeriod.minutes_between,
+                BookingPeriod.alignment,
+                BookingPeriod.deadline_days,
+                BookingPeriod.book_finalized,
+                BookingPeriod.cancellation_date,
+                BookingPeriod.cancellation_days,
+                BookingPeriod.age_barrier_type,
             )
         )
-        return tuple(PeriodMeta(*row) for row in query)
+        return tuple(BookingPeriodMeta(*row) for row in query)
 
     @orm_cached(policy='on-table-change:periods')
-    def periods_by_id(self) -> dict[str, PeriodMeta]:
+    def periods_by_id(self) -> dict[str, BookingPeriodMeta]:
         return {
             p.id.hex: p for p in self.periods
         }
@@ -105,12 +95,12 @@ class FeriennetApp(OrgApp):
     @orm_cached(policy='on-table-change:users')
     def user_titles_by_name(self) -> dict[str, str]:
         return dict(UserCollection(self.session()).query().with_entities(
-            User.username, User.title))
+            User.username, User.title).tuples())
 
     @orm_cached(policy='on-table-change:users')
     def user_ids_by_name(self) -> dict[str | None, UUID]:
         return dict(UserCollection(self.session()).query().with_entities(
-            User.username, User.id))
+            User.username, User.id).tuples())
 
     @cached_property
     def sponsors(self) -> list[Sponsor]:
@@ -123,13 +113,13 @@ class FeriennetApp(OrgApp):
         ]
 
         if sponsors:
-            sponsors[0].banners['src'] = sponsors[0].url_for(
-                request, sponsors[0].banners['src'])
+            sponsors[0].banners['narrow'] = sponsors[0].url_for(
+                request, sponsors[0].banners['narrow'])
 
         return sponsors
 
     @property
-    def default_period(self) -> PeriodMeta | None:
+    def default_period(self) -> BookingPeriodMeta | None:
         if self.active_period:
             return self.active_period
         return self.periods[0] if self.periods else None
@@ -210,14 +200,14 @@ class FeriennetApp(OrgApp):
         self,
         period_id: UUID | None = None,
         user_id: UUID | None = None
-    ) -> InvoiceCollection:
+    ) -> BookingPeriodInvoiceCollection:
         """ Returns the invoice collection guaranteed to be configured
         according to the organisation's settings.
 
         """
         schema_name, schema_config = self.invoice_schema_config()
 
-        return InvoiceCollection(
+        return BookingPeriodInvoiceCollection(
             self.session(),
             period_id=period_id,
             user_id=user_id,
@@ -326,7 +316,7 @@ def get_citizen_login_enabled() -> bool:
 def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.feriennet', 'locale'),
-        *default_i18n_localedirs()
+        *get_town6_i18n_localedirs()
     ]
 
 
@@ -353,7 +343,6 @@ def get_volunteer_cart() -> Iterator[str]:
 @FeriennetApp.webasset('common')
 def get_common_asset() -> Iterator[str]:
     yield from default_common_asset()
-    yield 'reloadfrom.js'
     yield 'printthis.js'
     yield 'print.js'
     yield 'click-to-load.js'
@@ -363,5 +352,19 @@ def get_common_asset() -> Iterator[str]:
 @FeriennetApp.setting(section='content_security_policy', name='default')
 def feriennet_content_security_policy() -> ContentSecurityPolicy:
     policy = org_content_security_policy()
-    policy.connect_src.add('https://*.piwik.pro')
+    policy.connect_src.add('https://*.projuventute.ch')
+    policy.connect_src.add('https://*.googletagmanager.com')
+    policy.connect_src.add('https://*.analytics.google.com')
+    policy.connect_src.add('https://*.google-analytics.com')
+    policy.connect_src.add('https://*.usercentrics.eu')
+    # NOTE: This one may be out of date, but until somebody complains
+    #       we won't worry about it.
+    policy.connect_src.add('https://stats.g.doubleclick.net')
+
+    policy.script_src.add('https://*.projuventute.ch')
+    policy.script_src.add('https://*.googletagmanager.com')
+    policy.script_src.add('https://*.analytics.google.com')
+    policy.script_src.add('https://*.google-analytics.com')
+    policy.script_src.add('https://*.usercentrics.eu')
+    policy.script_src.add('https://stats.g.doubleclick.net')
     return policy

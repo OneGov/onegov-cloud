@@ -65,10 +65,6 @@ def view_people(
     request: AgencyRequest
 ) -> RenderData:
 
-    request.include('common')
-    request.include('chosen')
-    request.include('people-select')
-
     people_xlsx_link = None
     last_modified = request.app.people_xlsx_modified
     if last_modified is not None:
@@ -242,7 +238,7 @@ def view_sort_person(
         'items': (
             (
                 _('Memberships'),
-                layout.move_membership_within_person_url_template,
+                layout.move_membership_url_template,
                 (
                     (
                         membership.id,
@@ -384,6 +380,10 @@ def do_report_person_change(
             'title': request.translate(_('New ticket')),
             'created': ticket.created.isoformat()
         }
+        # FIXME: set groupids to all groups which are linked
+        #        to the agencies of this person or the first
+        #        parent agency for each agency with links to
+        #        one or more groups, to mirror email notifications
     )
 
     return ticket

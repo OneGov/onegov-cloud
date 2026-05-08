@@ -1,21 +1,17 @@
 from __future__ import annotations
 
-import warnings
-
-from datetime import datetime
-
+from datetime import datetime, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
-
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.event.models.occurrence import Occurrence
 from onegov.file import File
@@ -28,37 +24,65 @@ from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone, utcnow
 from sqlalchemy import and_
-from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
-from sqlalchemy import Text
+from sqlalchemy import ForeignKey
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.associationproxy import AssociationProxy
+from sqlalchemy.orm import composite
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm.attributes import set_committed_value
+from translationstring import TranslationString
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import IO
+from typing import Literal
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Query
-    from typing import Literal
-    from typing import TypeAlias
 
-    EventState: TypeAlias = Literal[
-        'initiated',
-        'submitted',
-        'published',
-        'withdrawn'
-    ]
+
+type EventState = Literal[
+    'initiated',
+    'submitted',
+    'published',
+    'withdrawn'
+]
 
 
 class EventFile(File):
     __mapper_args__ = {'polymorphic_identity': 'eventfile'}
+
+
+class FilterItem(NamedTuple):
+    keyword: str
+    value: str
+
+    def __composite_values__(self) -> tuple[str, str]:
+        return self
+
+
+class EventFilterValue(Base):
+
+    __tablename__ = 'event_filter_values'
+
+    event_id: Mapped[UUID] = mapped_column(
+        ForeignKey('events.id', ondelete='CASCADE'),
+        primary_key=True
+    )
+
+    keyword: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[str] = mapped_column(primary_key=True)
+    item = composite(FilterItem, keyword, value)
 
 
 class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
@@ -78,19 +102,17 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     occurrence_dates_year_limit = 2
 
     #: Internal number of the event
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: State of the event
-    state: Column[EventState] = Column(
-        Enum(  # type: ignore[arg-type]
+    state: Mapped[EventState] = mapped_column(
+        Enum(
             'initiated', 'submitted', 'published', 'withdrawn',
             name='event_state'
         ),
-        nullable=False,
         default='initiated'
     )
 
@@ -122,12 +144,18 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     source_updated: dict_property[str | None] = meta_property()
 
     #: Recurrence of the event (RRULE, see RFC2445)
-    recurrence: Column[str | None] = Column(Text, nullable=True)
+    recurrence: Mapped[str | None]
 
     #: The access property of the event, taken from onegov.org. Not ideal to
     #: have this defined here, instead of using an AccessExtension, but that
     #: would only be possible with deeper changes to the Event model.
     access: dict_property[str] = meta_property(default='public')
+
+    #: Whether the event is marked for external publication (syndication)
+    syndicate: dict_property[bool] = meta_property(default=False)
+
+    #: Whether the event is highlighted (featured)
+    highlight: dict_property[bool] = meta_property(default=False)
 
     #: The associated image
     image = associated(
@@ -137,6 +165,21 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #: The associated PDF
     pdf = associated(
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
+    )
+
+    #: The associated filter keywords
+    filter_keyword_objects: Mapped[list[EventFilterValue]] = relationship(
+        cascade='all, delete-orphan',
+        lazy='selectin'
+    )
+
+    #: The associated filter keywords as a simple list of key-value tuples
+    filter_keyword_list: AssociationProxy[
+        list[tuple[str, str]]
+    ] = association_proxy(
+        'filter_keyword_objects',
+        'item',
+        creator=lambda item: EventFilterValue(keyword=item[0], value=item[1])
     )
 
     def set_image(
@@ -173,7 +216,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         else:
             try:
-                setattr(self, blob, EventFile(  # type: ignore[misc]
+                setattr(self, blob, EventFile(
                     name=filename,
                     reference=as_fileintent(content, filename)
                 ))
@@ -181,28 +224,52 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
                 setattr(self, blob, None)
 
     #: Occurrences of the event
-    occurrences: relationship[list[Occurrence]] = relationship(
-        'Occurrence',
+    occurrences: Mapped[list[Occurrence]] = relationship(
         cascade='all, delete-orphan',
         back_populates='event',
-        lazy='joined',
+        lazy='selectin',
     )
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'description': {'type': 'localized'},
-        'location': {'type': 'localized'},
-        'organizer': {'type': 'localized'},
-        'filter_keywords': {'type': 'keyword'}
+    # HACK: We don't want to set up translations in this module for this single
+    #       string, we know we already have a translation in a different domain
+    #       so we just manually specify it for now.
+    fts_type_title = TranslationString('Events', domain='onegov.org')
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'description': {'type': 'localized', 'weight': 'B'},
+        'location': {'type': 'localized', 'weight': 'B'},
+        'organizer': {'type': 'localized', 'weight': 'B'},
+        # FIXME: Should we move this to fts_tags?
+        'filter_keywords': {'type': 'keyword', 'weight': 'A'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return self.state == 'published'
 
     @property
-    def es_skip(self) -> bool:
+    def fts_skip(self) -> bool:
         return self.state != 'published' or getattr(self, '_es_skip', False)
+
+    @property
+    def fts_last_change(self) -> datetime:
+        latest = self.latest_occurrence
+        if latest is None:
+            # NOTE: if there are no occurrences at all we want to deprioritize
+            #       this by a lot, so we pretend the latest occurrence was four
+            #       years ago, which results in a factor of around 8%
+            return utcnow() - timedelta(days=1461)
+        elif latest.start < utcnow():
+            # NOTE: if the occurrence is in the past, we want to deprioritize
+            #       it over upcoming events, we use a gaussian time decay so
+            #       being in the future by x days would be deprioritized the
+            #       same as being in the past by x days, so we subtract one
+            #       year to make past events less relevant. For an event that
+            #       just happened this results in a factor of around 85%, so
+            #       still relevant, but not as relevant as the upcoming events.
+            return latest.start - timedelta(days=365)
+        return latest.start
 
     def source_url(self, request: CoreRequest) -> str | None:
         """ Returns an url pointing to the external event if imported. """
@@ -216,6 +283,14 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         """ Automatically update the occurrences if shared attributes change
         """
 
+        # FIXME: This is insanely messy, since we delete and add all the
+        #        occurrences for every attribute we change, for one, we
+        #        could optimize this by only deleting existing occurences
+        #        if occurence_dates no longer matches the existing
+        #        occurrences, and we could do this only once at the end
+        #        when the new state is flushed, instead of for every
+        #        individual attribute change. An observer would probably
+        #        get us there.
         super().__setattr__(name, value)
         if name in ('state', 'title', 'name', 'location', 'tags',
                     'filter_keywords', 'start', 'end', 'timezone',
@@ -225,6 +300,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     @property
     def base_query(self) -> Query[Occurrence]:
         session = object_session(self)
+        assert session is not None
         return session.query(Occurrence).filter_by(event_id=self.id)
 
     @property
@@ -376,12 +452,11 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         end = start + (self.end - self.start)
         name = f'{self.name}-{start.date().isoformat()}'
 
-        return Occurrence(  # type:ignore[misc]
+        return Occurrence(
             title=self.title,
             name=name,
             location=self.location,
             tags=self.tags,
-            filter_keywords=self.filter_keywords,
             start=start,
             end=end,
             timezone=self.timezone,
@@ -399,13 +474,9 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         for start in self.occurrence_dates(limit=False):
             occurrence = self.spawn_occurrence(start)
-            occurrence.event = self
+            set_committed_value(occurrence, 'event', self)
 
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    'ignore', 'Object of type <Occurrence> not in session')
-
-                session = object_session(self)
+            if session := object_session(occurrence):
                 session.expunge(occurrence)
                 session.flush()
 
@@ -434,10 +505,10 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         # create all occurrences for this and next year
         for start in self.occurrence_dates():
-            self.occurrences.append(self.spawn_occurrence(start))
-
-        for occ in self.occurrences:
-            occ.filter_keywords = self.filter_keywords
+            occ = self.spawn_occurrence(start)
+            if session := object_session(self):
+                session.add(occ)
+            self.occurrences.append(occ)
 
     def submit(self) -> None:
         """ Submit the event. """

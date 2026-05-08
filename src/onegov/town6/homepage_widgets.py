@@ -58,7 +58,7 @@ class RowWidgetWide:
 class ColumnWidget:
     template = """
         <xsl:template match="column">
-            <div class="small-12 medium-{@span} cell">
+            <div class="small-12 medium-{@span} cell {@class}">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
@@ -85,8 +85,7 @@ class AutoplayVideoWidget:
             link_mp4_low_res '{@link_mp4_low_res}';
             link_webm '{@link_webm}'; button_url '{@button_url}';
             link_webm_low_res '{@link_webm_low_res}'; text '{@text}';
-            button_text '{@button_text}';
-            "
+            button_text '{@button_text}'; searchbox '{@searchbox}';"
             />
         </xsl:template>
     """
@@ -197,7 +196,7 @@ class EventsWidget:
                 subtitle=(
                     layout.format_date(
                         o.localized_start, 'event_short').title() + ', '
-                    + layout.format_time_range(
+                    + layout.format_event_time_range(
                         o.localized_start, o.localized_end).title()),
                 image_url=(
                     layout.request.link(o.event.image)

@@ -600,6 +600,9 @@ class WsgiServer(FileSystemEventHandler):
         if src_path.endswith('~'):
             return
 
+        if '.tmp.' in src_path:
+            return
+
         click.echo(f'changed: {src_path}')
 
         self.restart()

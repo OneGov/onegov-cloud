@@ -1,28 +1,26 @@
 from __future__ import annotations
 
 import enum
+
 from onegov.core.utils import normalize_for_url
 from onegov.reservation.models import Resource
 from uuid import uuid4, UUID
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from libres.context.core import Context
-    from libres.db.models import Allocation, Reservation
-    from sqlalchemy.orm import Query
-    from typing import TypeAlias
-
-
-_R = TypeVar('_R', bound=Resource)
+    from libres.db.models import Allocation, Reservation, ReservationBlocker
+    from libres.db.scheduler import Scheduler
+    from sqlalchemy.orm import Query, Session
 
 
 class _Marker(enum.Enum):
     any_type = enum.auto()
 
 
-any_type_t: TypeAlias = Literal[_Marker.any_type]  # noqa: PYI042
+type any_type_t = Literal[_Marker.any_type]  # noqa: PYI042
 any_type: any_type_t = _Marker.any_type
 
 
@@ -30,6 +28,9 @@ class ResourceCollection:
     """ Manages a list of resources.
 
     """
+
+    session: Session
+
     def __init__(self, libres_context: Context):
         assert hasattr(libres_context, 'get_service'), """
             The ResourceCollection expected the libres_contex, not the session.
@@ -79,11 +80,11 @@ class ResourceCollection:
         return self.bind(resource)
 
     @overload
-    def bind(self, resource: _R) -> _R: ...
+    def bind[T: Resource](self, resource: T) -> T: ...
     @overload
     def bind(self, resource: None) -> None: ...
 
-    def bind(self, resource: _R | None) -> _R | None:
+    def bind[T: Resource](self, resource: T | None) -> T | None:
         if resource:
             resource.bind_to_libres_context(self.libres_context)
 
@@ -121,26 +122,36 @@ class ResourceCollection:
     def by_reservation(self, reservation: Reservation) -> Resource | None:
         return self.by_id(reservation.resource)
 
+    def by_blocker(self, blocker: ReservationBlocker) -> Resource | None:
+        return self.by_id(blocker.resource)
+
+    def ordered_by_type(self) -> Query[Resource]:
+        return self.query().order_by(Resource.type, Resource.title)
+
     def delete(
         self,
         resource: Resource,
         including_reservations: bool = False,
-        handle_reservation: Callable[[Reservation], Any] | None = None
+        handle_linked_objects: (
+            Callable[[Scheduler, Session], Any] | None
+        ) = None,
     ) -> None:
 
         scheduler = resource.get_scheduler(self.libres_context)
 
+        session_manager = self.libres_context.get_service('session_provider')
         if not including_reservations:
             assert not scheduler.managed_reserved_slots().first()
             assert not scheduler.managed_reservations().first()
 
-            scheduler.managed_allocations().delete('fetch')
+            with session_manager.ignore_bulk_deletes():
+                scheduler.managed_allocations().delete('fetch')
         else:
-            if callable(handle_reservation):
-                for res in scheduler.managed_reservations():
-                    # e.g. create a ticket snapshot
-                    handle_reservation(res)
-            scheduler.extinguish_managed_records()
+            if callable(handle_linked_objects):
+                handle_linked_objects(scheduler, self.session)
+
+            with session_manager.ignore_bulk_deletes():
+                scheduler.extinguish_managed_records()
 
         if resource.files:
             # unlink any linked files

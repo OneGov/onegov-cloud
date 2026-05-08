@@ -36,7 +36,6 @@ __all__ = (
     'ElectionForm',
     'EmailSubscriptionForm',
     'EmptyForm',
-    'EmptyForm',
     'ScreenForm',
     'SmsSubscriptionForm',
     'SubscribersCleanupForm',

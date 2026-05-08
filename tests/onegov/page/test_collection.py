@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 import pytest
 from onegov.page import PageCollection
 
 
-def test_add_page(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_add_page(session: Session) -> None:
 
     pages = PageCollection(session)
     root = pages.add_root(title='Test')
@@ -33,7 +40,7 @@ def test_add_page(session):
     assert repr(grandchild) == "Page(name='grandchild', id=3, parent_id=2)"
 
 
-def test_add_unique_page(session):
+def test_add_unique_page(session: Session) -> None:
 
     pages = PageCollection(session)
     r1 = pages.add_root(title='Test')
@@ -53,7 +60,7 @@ def test_add_unique_page(session):
     assert c3.name == 'test-2'
 
 
-def test_add_or_get_page(session):
+def test_add_or_get_page(session: Session) -> None:
 
     pages = PageCollection(session)
     root = pages.add_or_get_root(title='Wurzel', name='root')
@@ -67,7 +74,7 @@ def test_add_or_get_page(session):
     assert root.name == 'root'
 
 
-def test_copy_page(session):
+def test_copy_page(session: Session) -> None:
 
     pages = PageCollection(session)
     news = pages.add_root('News')
@@ -81,7 +88,7 @@ def test_copy_page(session):
     ]
 
 
-def test_page_by_path(session):
+def test_page_by_path(session: Session) -> None:
 
     pages = PageCollection(session)
 
@@ -100,7 +107,7 @@ def test_page_by_path(session):
     assert pages.by_path('/news/jah-toast') is None
 
 
-def test_delete(session):
+def test_delete(session: Session) -> None:
     pages = PageCollection(session)
 
     news = pages.add_root('News')

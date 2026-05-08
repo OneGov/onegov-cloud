@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
-    from sqlalchemy.orm import Query
 
 
 cli = command_group()
@@ -105,7 +104,10 @@ def delete(username: str) -> Callable[[CoreRequest, Framework], None]:
     return delete_user
 
 
-@cli.command(context_settings={'default_selector': '*'})
+@cli.command(context_settings={
+    'default_selector': '*',
+    'skip_search_indexing': True
+})
 @click.argument('username')
 @click.option('-r', '--recursive', is_flag=True, default=False)
 def exists(
@@ -131,7 +133,7 @@ def exists(
     return find_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command(context_settings={'singular': True, 'skip_search_indexing': True})
 @click.argument('username')
 def activate(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Activates the given user. """
@@ -148,7 +150,7 @@ def activate(username: str) -> Callable[[CoreRequest, Framework], None]:
     return activate_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command(context_settings={'singular': True, 'skip_search_indexing': True})
 @click.argument('username')
 def deactivate(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Deactivates the given user. """
@@ -166,7 +168,7 @@ def deactivate(username: str) -> Callable[[CoreRequest, Framework], None]:
     return deactivate_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command(context_settings={'singular': True, 'skip_search_indexing': True})
 @click.argument('username')
 def logout(username: str) -> Callable[[CoreRequest, Framework], None]:
     """ Logs out the given user on all sessions. """
@@ -183,7 +185,10 @@ def logout(username: str) -> Callable[[CoreRequest, Framework], None]:
     return logout_user
 
 
-@cli.command(name='logout-all', context_settings={'singular': True})
+@cli.command(name='logout-all', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
 def logout_all() -> Callable[[CoreRequest, Framework], None]:
     """ Logs out all users on all sessions. """
 
@@ -196,7 +201,10 @@ def logout_all() -> Callable[[CoreRequest, Framework], None]:
     return logout_user
 
 
-@cli.command(context_settings={'default_selector': '*'})
+@cli.command(context_settings={
+    'default_selector': '*',
+    'skip_search_indexing': True
+})
 @click.option('--active-only', help='Only show active users', is_flag=True)
 @click.option('--inactive-only', help='Only show inactive users', is_flag=True)
 @click.option('--sources', help='Display sources', is_flag=True, default=False)
@@ -211,14 +219,13 @@ def list(
 
     def list_users(request: CoreRequest, app: Framework) -> None:
 
-        users: Query[tuple[str, str, bool, str | None]]
         users = UserCollection(app.session()).query().with_entities(
             User.username, User.role, User.active, User.source
         )
         users = users.order_by(User.username, User.role)
 
         click.echo(f'{app.schema}:')
-        for username, role, active, source in users.all():
+        for username, role, active, source in users.tuples():
             if active_only and not active:
                 continue
 
@@ -237,7 +244,62 @@ def list(
     return list_users
 
 
-@cli.command(name='change-password', context_settings={'singular': True})
+@cli.command(name='change-username', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
+@click.argument('old_username')
+@click.argument('new_username')
+def change_username(
+    old_username: str,
+    new_username: str
+) -> Callable[[CoreRequest, Framework], None]:
+    """ Changes the password of the given username. """
+
+    # normalize the new_username, so we print back what we're
+    # actually going to store in the database
+    new_username = new_username.lower()
+
+    def change(request: CoreRequest, app: Framework) -> None:
+        users = UserCollection(app.session())
+
+        user = users.by_username(old_username)
+        if user is None:
+            abort(f'{old_username} does not exist')
+
+        if new_username.lower() == old_username:
+            abort(
+                'The old and new username are the same. '
+                'Usernames are case insensitive.'
+            )
+
+        if user.source:
+            abort('Users from an external user source cannot change username')
+
+        if user.role not in app.settings.user.change_username_roles:
+            abort(f'Users with role {user.role} cannot change username')
+
+        if users.exists(new_username):
+            abort(f'{new_username} already exists')
+
+        user.logout_all_sessions(request.app)
+        user.username = new_username
+
+        # Run application-specific callback
+        app.settings.user.change_username_callback(user, request)
+
+        click.secho(
+            f'{old_username} was changed to {new_username}',
+            fg='green'
+        )
+
+    return change
+
+
+@cli.command(name='change-password', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
 @click.argument('username')
 @click.option('--password', help='Password to use', default=None)
 def change_password(
@@ -264,7 +326,10 @@ def change_password(
     return change
 
 
-@cli.command(name='change-yubikey', context_settings={'singular': True})
+@cli.command(name='change-yubikey', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
 @click.argument('username')
 @click.option('--yubikey', help='Yubikey to use', default=None)
 def change_yubikey(
@@ -298,7 +363,10 @@ def change_yubikey(
     return change
 
 
-@cli.command(name='change-mtan', context_settings={'singular': True})
+@cli.command(name='change-mtan', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
 @click.argument('username')
 @click.option('--phone-number', help='Phone number to use', default=None)
 def change_mtan(
@@ -347,7 +415,10 @@ def change_mtan(
     return change
 
 
-@cli.command(name='change-totp', context_settings={'singular': True})
+@cli.command(name='change-totp', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
 @click.argument('username')
 @click.option('--secret', help='TOTP secret to use', default=None)
 @click.option(
@@ -394,7 +465,10 @@ def change_totp(
     return change
 
 
-@cli.command(name='transfer-yubikey', context_settings={'singular': True})
+@cli.command(name='transfer-yubikey', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
 @click.argument('source')
 @click.argument('target')
 def transfer_yubikey(
@@ -433,7 +507,10 @@ def transfer_yubikey(
     return transfer
 
 
-@cli.command(name='change-role', context_settings={'singular': True})
+@cli.command(name='change-role', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
 @click.argument('username')
 @click.argument('role')
 def change_role(
@@ -460,7 +537,10 @@ def change_role(
     return change
 
 
-@cli.command(name='list-sessions', context_settings={'singular': True})
+@cli.command(name='list-sessions', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
 def list_sessions() -> Callable[[CoreRequest, Framework], None]:
     """ Lists all sessions of all users. """
 

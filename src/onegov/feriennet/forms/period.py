@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from functools import cached_property
 from datetime import date, datetime
-from onegov.activity import Activity, Period, Occasion, OccasionDate
-from onegov.activity import PeriodCollection
+from onegov.activity import Activity, BookingPeriod, Occasion, OccasionDate
+from onegov.activity import BookingPeriodCollection
 from onegov.core.utils import Bunch
 from onegov.feriennet import _
 from onegov.form import Form, merge_forms
@@ -22,7 +22,7 @@ from wtforms.validators import InputRequired, Optional, NumberRange
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.activity.models import PeriodMeta
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from wtforms.fields.choices import _Choice
 
@@ -38,19 +38,22 @@ class PeriodSelectForm(Form):
 
     @property
     def period_choices(self) -> list[_Choice]:
-        q = PeriodCollection(self.request.session).query()
-        q = q.with_entities(Period.id, Period.title)
-        q = q.order_by(Period.execution_start)
-
-        return [(row.id.hex, row.title) for row in q]
+        return [
+            (row.id.hex, row.title)
+            for row in (
+                BookingPeriodCollection(self.request.session).query()
+                .with_entities(BookingPeriod.id, BookingPeriod.title)
+                .order_by(BookingPeriod.execution_start)
+            )
+        ]
 
     @property
-    def selected_period(self) -> Period | None:
-        return PeriodCollection(self.request.session).by_id(
+    def selected_period(self) -> BookingPeriod | None:
+        return BookingPeriodCollection(self.request.session).by_id(
             self.period.data)
 
     @property
-    def active_period(self) -> PeriodMeta | None:
+    def active_period(self) -> BookingPeriodMeta | None:
         return self.request.app.active_period
 
     def on_request(self) -> None:
@@ -91,6 +94,16 @@ class PeriodForm(Form):
         ),
         kind='callout',
         depends_on=('confirmable', '!y')
+    )
+
+    with_group_code = BooleanField(
+        label=_('With group codes'),
+        description=_(
+            'Attendees can get group codes via the link "invite a companion" '
+            'in their booking. Bookings with a group code are preferred in '
+            'the matching process.'
+        ),
+        default=True
     )
 
     finalizable = BooleanField(
@@ -135,15 +148,48 @@ class PeriodForm(Form):
         validators=[InputRequired()]
     )
 
+    deadline = RadioField(
+        label=_('Stop accepting bookings'),
+        fieldset=_('Deadline'),
+        choices=[
+            ('fix', _('At the end of the booking phase')),
+            ('rel', _('X days before each occasion')),
+        ],
+        default='fix',
+    )
+
+    deadline_days = IntegerField(
+        label=_('X Days Before'),
+        fieldset=_('Deadline'),
+        validators=[
+            InputRequired(),
+            NumberRange(0, 360),
+        ],
+        depends_on=('deadline', 'rel')
+    )
+
+    book_finalized = BooleanField(
+        label=_('Allow bookings after the bills have been created.'),
+        fieldset=_('Deadline'),
+        description=_(
+            'By default, only admins can create bookings after the billing '
+            'has been confirmed. With this setting, every user can create new '
+            'bookings after confirmation and before the deadline. Booking '
+            'costs incurred after confirmation will be added to the existing '
+            'bill.', markup=True
+        ),
+        depends_on=('deadline', 'rel'),
+    )
+
     execution_start = DateField(
         label=_('Execution Start'),
-        fieldset=_('Dates'),
+        fieldset=_('Execution phase'),
         validators=[InputRequired()]
     )
 
     execution_end = DateField(
         label=_('Execution End'),
-        fieldset=_('Dates'),
+        fieldset=_('Execution phase'),
         validators=[InputRequired()]
     )
 
@@ -245,38 +291,6 @@ class PeriodForm(Form):
         default='no'
     )
 
-    deadline = RadioField(
-        label=_('Stop accepting bookings'),
-        fieldset=_('Deadline'),
-        choices=[
-            ('fix', _('At the end of the booking phase')),
-            ('rel', _('X days before each occasion')),
-        ],
-        default='fix',
-    )
-
-    deadline_days = IntegerField(
-        label=_('X Days Before'),
-        fieldset=_('Deadline'),
-        validators=[
-            InputRequired(),
-            NumberRange(0, 360),
-        ],
-        depends_on=('deadline', 'rel')
-    )
-
-    book_finalized = BooleanField(
-        label=_('Allow bookings after the bills have been created.'),
-        description=_(
-            'By default, only admins can create bookings after the billing '
-            'has been confirmed. With this setting, every user can create new '
-            'bookings after confirmation and before the deadline. Booking '
-            'costs incurred after confirmation will be added to the existing '
-            'bill.'
-        ),
-        depends_on=('deadline', 'rel'),
-    )
-
     cancellation = RadioField(
         label=_('Allow members to cancel confirmed bookings'),
         fieldset=_('Cancellation Deadline'),
@@ -335,7 +349,7 @@ class PeriodForm(Form):
 
     @property
     def is_new(self) -> bool:
-        return isinstance(self.model, PeriodCollection)
+        return isinstance(self.model, BookingPeriodCollection)
 
     def on_request(self) -> None:
 
@@ -350,7 +364,7 @@ class PeriodForm(Form):
             self.confirmable.data = self.model.confirmable
         return super().validate()
 
-    def populate_obj(self, model: Period) -> None:  # type:ignore[override]
+    def populate_obj(self, model: BookingPeriod) -> None:  # type:ignore[override]
         adjust_defaults = model.booking_start != self.booking_start.data
         also_exclude: tuple[str, ...]
         if not self.confirmable.data and not adjust_defaults:
@@ -416,7 +430,7 @@ class PeriodForm(Form):
         else:
             model.pay_organiser_directly = False
 
-    def process_obj(self, model: Period) -> None:  # type:ignore[override]
+    def process_obj(self, model: BookingPeriod) -> None:  # type:ignore[override]
         super().process_obj(model)
 
         if model.all_inclusive:
@@ -460,7 +474,7 @@ class PeriodForm(Form):
 
     @cached_property
     def conflicting_activities(self) -> tuple[Activity, ...] | None:
-        if not isinstance(self.model, Period):
+        if not isinstance(self.model, BookingPeriod):
             return None
 
         session = self.request.session
@@ -489,10 +503,10 @@ class PeriodForm(Form):
         q = session.query(OccasionDate).join(Occasion)
         q = q.with_entities(distinct(Occasion.activity_id))
         q = q.filter(Occasion.period == self.model)
-        q = q.filter(Occasion.id.in_(qd.subquery()))
+        q = q.filter(Occasion.id.in_(qd.scalar_subquery()))
 
         return tuple(
-            session.query(Activity).filter(Activity.id.in_(q.subquery()))
+            session.query(Activity).filter(Activity.id.in_(q.scalar_subquery()))
             .order_by(Activity.order)
         )
 
@@ -570,7 +584,7 @@ class PeriodForm(Form):
         return None
 
     def ensure_no_payment_changes_after_confirmation(self) -> bool | None:
-        if isinstance(self.model, Period) and self.model.confirmed:
+        if isinstance(self.model, BookingPeriod) and self.model.confirmed:
             preview: Any = Bunch(
                 confirmable=self.model.confirmable,
                 booking_start=self.model.booking_start

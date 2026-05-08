@@ -106,7 +106,8 @@ class WebsocketsApp(WebassetsApp):
     def send_websocket(
         self,
         message: JSON_ro,
-        channel: str | None = None
+        channel: str | None = None,
+        groupids: list[str] | None = None,
     ) -> bool:
         """ Sends an application-bound broadcast message to all connected
         clients.
@@ -123,7 +124,8 @@ class WebsocketsApp(WebassetsApp):
                     websocket,
                     self.schema,
                     channel,
-                    message
+                    message,
+                    groupids
                 )
 
         try:

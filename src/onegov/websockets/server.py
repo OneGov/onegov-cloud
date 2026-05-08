@@ -38,15 +38,15 @@ if TYPE_CHECKING:
     from onegov.server.config import Config
 
 
-CONNECTIONS: dict[str, set[ServerConnection]] = {}
+CONNECTIONS: dict[str, set[WebSocketServer]] = {}
 TOKEN = ''  # nosec: B105
 
 NOTFOUND = object()
 SESSIONS: dict[str, Session] = {}
-STAFF_CONNECTIONS: dict[str, set[ServerConnection]] = {}
+STAFF_CONNECTIONS: dict[str, set[WebSocketServer]] = {}
 STAFF: dict[str, dict[str, User]] = {}  # For Authentication of User
 ACTIVE_CHATS: dict[str, dict[UUID, Chat]] = {}  # For DB
-CHANNELS: dict[str, dict[str, set[ServerConnection]]] = {}
+CHANNELS: dict[str, dict[str, set[WebSocketServer]]] = {}
 
 
 class WebSocketServer(ServerConnection):
@@ -66,12 +66,14 @@ class WebSocketServer(ServerConnection):
     """
     schema: str
     user_id: str | None
+    role: str | None
+    groupids: frozenset[str]
     signed_session_id: str | None
 
     def __init__(
         self,
-        config: Config,
-        session_manager: SessionManager,
+        config: Config | None,
+        session_manager: SessionManager | None,
         host: str,
         *args: Any,
         **kwargs: Any
@@ -150,6 +152,7 @@ class WebSocketServer(ServerConnection):
 
     @property
     def session(self) -> Session:
+        assert self.session_manager is not None
         self.session_manager.set_current_schema(self.schema)
 
         session = self.session_manager.session()
@@ -179,6 +182,9 @@ class WebSocketServer(ServerConnection):
 
     @cached_property
     def application_config(self) -> dict[str, Any]:
+        if self.config is None:
+            return {}
+
         for c in self.config.applications:
             if c.namespace == self.namespace:
                 return c.configuration
@@ -187,7 +193,7 @@ class WebSocketServer(ServerConnection):
 
     @cached_property
     def browser_session(self) -> BrowserSession | dict[str, Any]:
-        if self.signed_session_id is None:
+        if self.config is None or self.signed_session_id is None:
             return {}
         session_id = self.unsign(self.signed_session_id)
         if session_id is None:
@@ -241,7 +247,7 @@ async def acknowledge(websocket: ServerConnection) -> None:
 
 
 async def handle_listen(
-    websocket: ServerConnection,
+    websocket: WebSocketServer,
     payload: JSONObject_ro
 ) -> None:
     """ Handles listening clients. """
@@ -294,7 +300,7 @@ async def handle_authentication(
 
 
 async def handle_status(
-    websocket: ServerConnection,
+    websocket: WebSocketServer,
     payload: JSONObject_ro
 ) -> None:
     """ Handles status requests. """
@@ -319,7 +325,7 @@ async def handle_status(
 
 
 async def handle_broadcast(
-    websocket: ServerConnection,
+    websocket: WebSocketServer,
     payload: JSONObject_ro
 ) -> None:
     """ Handles broadcasts. """
@@ -329,6 +335,7 @@ async def handle_broadcast(
     message = payload.get('message')
     schema = payload.get('schema')
     channel = payload.get('channel')
+    groupids = payload.get('groupids')
     if not schema or not isinstance(schema, str):
         await error(websocket, f'invalid schema: {schema}')
         return
@@ -343,6 +350,13 @@ async def handle_broadcast(
 
     schema_channel = f'{schema}-{channel}' if channel else schema
     connections = CONNECTIONS.get(schema_channel, set())
+    if isinstance(groupids, list):
+        connections = {
+            connection
+            for connection in connections
+            if connection.role == 'admin'
+            or not connection.groupids.isdisjoint(groupids)
+        }
     if connections:
         broadcast(
             connections,
@@ -359,7 +373,7 @@ async def handle_broadcast(
 
 
 async def handle_manage(
-    websocket: ServerConnection,
+    websocket: WebSocketServer,
     authentication_payload: JSONObject_ro
 ) -> None:
     """ Handles managing clients. """
@@ -513,7 +527,7 @@ async def handle_staff_chat(
         all_channels = CHANNELS.setdefault(schema, {})
         staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
         staff_connections.add(websocket)
-        channel_connections: set[ServerConnection] = set()
+        channel_connections: set[WebSocketServer] = set()
         open_channel = ''
 
         log.debug(f'added {websocket.id} to staff-connections')
@@ -687,6 +701,7 @@ async def handle_staff_chat(
 
 
 async def handle_start(websocket: ServerConnection) -> None:
+    assert isinstance(websocket, WebSocketServer)
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
     payload = get_payload(message, ('authenticate', 'register',
@@ -696,9 +711,9 @@ async def handle_start(websocket: ServerConnection) -> None:
     elif payload and payload['type'] == 'register':
         await handle_listen(websocket, payload)
     elif payload and (payload['type'] == 'customer_chat'):
-        await handle_customer_chat(websocket, payload)  # type: ignore
+        await handle_customer_chat(websocket, payload)
     elif payload and (payload['type'] == 'staff_chat'):
-        await handle_staff_chat(websocket, payload)  # type: ignore
+        await handle_staff_chat(websocket, payload)
     else:
         # FIXME: technically message can be bytes
         await error(websocket, f'invalid command: {message}')  # type:ignore
@@ -724,29 +739,33 @@ def process_request(
     assert isinstance(self, WebSocketServer)
     url = urlparse(request.path)
 
-    if '/chats' not in url.path:
-        # For non-chat requests (e.g., ticker) we'll skip the dance below
-        # and let the protocol handle authentication
-        # (handle_authentication).
-        return None
-
     try:
         cookie = SimpleCookie(request.headers.get_all('Cookie')[0])
         session_id = cookie['session_id'].value
     except IndexError:
-        log.error(
-            'No session cookie found in request. '
-            'Check that you sent the request from the same origin as '
-            f'the WebSocket server ({self.host})'
-        )
+        if '/chats' in url.path:
+            log.error(
+                'No session cookie found in request. '
+                'Check that you sent the request from the same origin as '
+                f'the WebSocket server ({self.host})'
+            )
 
-        return self.respond(http.HTTPStatus.BAD_REQUEST, '')
+            return self.respond(http.HTTPStatus.BAD_REQUEST, '')
+        session_id = None
 
     self.signed_session_id = session_id
 
     try:
         self.schema = param_from_path('schema', request.path)
     except ValueError as err:
+        if '/chats' not in url.path:
+            # For non-chat requests we'll treat this as a non-critical error
+            # FIXME: This should only happen for internal message sent through
+            #        the management channel, ideally we route those through
+            #        a different path, so we can keep this validation for user
+            #        connections.
+            return None
+
         log.error(
             f'Unable to retrieve schema from path: {request.path}',
             exc_info=err
@@ -756,6 +775,14 @@ def process_request(
 
     # browser_session requires self.schema
     self.user_id = self.browser_session.get('userid')
+    self.role = self.browser_session.get('role')
+    self.groupids = self.browser_session.get('groupids', frozenset())
+
+    if '/chats' not in url.path:
+        # For non-chat requests (e.g., ticker) we'll skip the dance below
+        # and let the protocol handle authentication
+        # (handle_authentication).
+        return None
 
     try:
         # Consume the presented token or deny the connection. The token
@@ -797,15 +824,13 @@ async def main(
             Base,
             session_config={'autoflush': False}
         )
-
-        # TODO: Pass in valid origins. Is there already a list of allowed
-        # origins?
-        async with serve(handle_start, host, port,
-                         process_request=process_request,
-                         create_connection=partial(WebSocketServer, config,  # type: ignore[arg-type]
-                                                   session_manager, host)):
-            await Future()
-
     else:
-        async with serve(handle_start, host, port):
-            await Future()
+        session_manager = None
+
+    # TODO: Pass in valid origins. Is there already a list of allowed
+    # origins?
+    async with serve(handle_start, host, port,
+                     process_request=process_request,
+                     create_connection=partial(WebSocketServer, config,  # type: ignore[arg-type]
+                                               session_manager, host)):
+        await Future()

@@ -37,15 +37,18 @@ from dectate import directive
 from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
 from libres.db.models import ORMBase
+from morepath import dispatch_method
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
-from more.content_security import NONE, SELF, UNSAFE_INLINE, UNSAFE_EVAL
+from more.content_security import NONE, SELF, UNSAFE_INLINE
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
+from reg import ClassIndex
+
 from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
@@ -67,7 +70,7 @@ from urllib.parse import urlencode
 from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -79,17 +82,14 @@ if TYPE_CHECKING:
     from morepath.settings import SettingRegistry
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
-    from typing_extensions import ParamSpec
     from webob import Response
 
+    from .analytics import AnalyticsProvider
+    from .layout import Layout
     from .mail import Attachment
     from .metadata import Metadata
     from .security.permissions import Intent
     from .types import EmailJsonDict, SequenceOrScalar
-
-    _P = ParamSpec('_P')
-
-_T = TypeVar('_T')
 
 # Monkey patch
 # https://linear.app/onegovcloud/issue/OGC-853/404-navigation-js-fehler
@@ -123,10 +123,13 @@ class Framework(
     #: framework directives
     form = directive(directives.HtmlHandleFormAction)
     cronjob = directive(directives.CronjobAction)
+    analytics_provider = directive(directives.AnalyticsProviderAction)
     static_directory = directive(directives.StaticDirectoryAction)
     template_variables = directive(directives.TemplateVariablesAction)
     replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
+    layout = directive(directives.Layout)
+    json = directive(directives.ExtendedJsonAction)  # type: ignore[assignment]
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
     same_site_cookie_policy: str | None = 'Lax'
@@ -177,13 +180,13 @@ class Framework(
 
         return fn
 
-    def with_query_report(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_query_report[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_query_report_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
 
             assert isinstance(self.sql_query_report, str)
             with debug.analyze_sql_queries(self.sql_query_report):
@@ -191,13 +194,13 @@ class Framework(
 
         return with_query_report_wrapper
 
-    def with_profiler(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_profiler[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_profiler_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             filename = '{:%Y-%m-%d %H:%M:%S}.profile'.format(datetime.now())
 
             with utils.profile(filename):
@@ -205,28 +208,28 @@ class Framework(
 
         return with_profiler_wrapper
 
-    def with_request_cache(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_request_cache[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_request_cache_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             self.clear_request_cache()
             return fn(*args, **kwargs)
 
         return with_request_cache_wrapper
 
-    def with_print_exceptions(
+    def with_print_exceptions[**P, T](
         self,
-        fn: Callable[_P, _T]
-    ) -> Callable[_P, _T]:
+        fn: Callable[P, T]
+    ) -> Callable[P, T]:
 
         @wraps(fn)
         def with_print_exceptions_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             try:
                 return fn(*args, **kwargs)
             except Exception:
@@ -643,6 +646,7 @@ class Framework(
         content_security_policy_report_uri: str | None = None,
         content_security_policy_report_only: bool = False,
         content_security_policy_report_sample_rate: float = 0.0,
+        content_security_policy_extra_script_src: list[str] | None = None,
         **cfg: Any
     ) -> None:
 
@@ -653,6 +657,9 @@ class Framework(
             content_security_policy_report_only)
         self.content_security_policy_report_sample_rate = (
             content_security_policy_report_sample_rate)
+        self.content_security_policy_extra_script_src = (
+            content_security_policy_extra_script_src or []
+        )
 
     def configure_sentry(
         self,
@@ -666,6 +673,22 @@ class Framework(
     @property
     def is_sentry_supported(self) -> bool:
         return getattr(self, 'sentry_dsn', None) and True or False
+
+    def configure_analytics_providers(self, **cfg: Any) -> None:
+        self.analytics_providers_configs = cfg.get('analytics_providers', {})
+
+    @cached_property
+    def available_analytics_providers(self) -> dict[str, AnalyticsProvider]:
+        return {
+            name: provider
+            for name, _provider_cfg in self.analytics_providers_configs.items()
+            if (cls := self.config.analytics_provider_registry.get(
+                (provider_cfg := _provider_cfg or {}).get('provider', name)
+            )) is not None
+            if (
+                provider := cls.configure(name=name, **provider_cfg)
+            ) is not None
+        }
 
     def set_application_id(self, application_id: str) -> None:
         """ Set before the request is handled. Gets the schema from the
@@ -1530,6 +1553,28 @@ class Framework(
             self.hashed_identity_key
         ).decrypt(cyphertext).decode('utf-8')
 
+    @dispatch_method()
+    def get_layout(
+        self,
+        obj: object,
+        request: CoreRequest
+    ) -> Layout | None:
+        return None
+
+
+@Framework.predicate(
+    Framework.get_layout,
+    name='model',
+    default=None,
+    index=ClassIndex
+)
+def layout_predicate(
+    self: type[Framework],
+    obj: object,
+    request: CoreRequest
+) -> type[object]:
+    return obj.__class__
+
 
 @Framework.webasset_url()
 def get_webasset_url() -> str:
@@ -1633,17 +1678,21 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         # enable inline styles and external stylesheets
         style_src={SELF, 'https:', UNSAFE_INLINE},
 
-        # enable inline scripts, eval and external scripts
+        # enable inline scripts and external scripts for sentry
         script_src={
             SELF,
             'https://browser.sentry-cdn.com',
             'https://js.sentry-cdn.com',
-            UNSAFE_INLINE,
-            UNSAFE_EVAL
         },
 
         # by default limit to self (allow pdf viewer etc)
         object_src={NONE},
+
+        # only allow setting <base> to self
+        base_uri={SELF},
+
+        # only allow submitting forms to self
+        form_action={SELF},
 
         # disable all mixed content (https -> http)
         block_all_mixed_content=True,
@@ -1676,6 +1725,16 @@ def default_policy_apply_factory(
 
         policy.report_uri = report_uri or ''
         policy.report_only = report_only
+
+        if script_srcs := request.app.content_security_policy_extra_script_src:
+            # NOTE: We don't want to modify the original CSP
+            #       we don't care with report_uri and report_only
+            #       since we set it for every request, but if this
+            #       setting changes we would no longer produce the
+            #       correct CSP, if we modified it previously.
+            policy = policy.copy()
+            for script_src in script_srcs:
+                policy.script_src.add(script_src)
 
         policy.apply(response)
 
@@ -1801,3 +1860,35 @@ def spawn_cronjob_thread_tween_factory(
         return handler(request)
 
     return spawn_cronjob_thread_tween
+
+
+@Framework.tween_factory(under=webassets_injector_tween)
+def cache_control_tween_factory(
+    app: Framework,
+    handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
+
+    def set_cache_control_header_tween(request: CoreRequest) -> Response:
+        response = handler(request)
+        if (
+            (
+                # logged in as a user
+                request.is_logged_in
+                # logged in as a citizen
+                or getattr(request, 'authenticated_email', None)
+            )
+            # original headers take precedence
+            and 'Cache-Control' not in response.headers
+            # files have their own cache control handling
+            and '/storage/' not in request.path
+        ):
+            response.headers['Cache-Control'] = 'no-store'
+        return response
+
+    return set_cache_control_header_tween
+
+
+@Framework.template_variables()
+def get_template_variables(request: CoreRequest) -> dict[str, Any]:
+    return {
+    }

@@ -10,6 +10,10 @@
       called with a q parameter if a search is executed, an option lucky
       parameter is passed, if the first result should be opened straight away.
 
+    * data-typeahead-filter-params (on the form), an optional array of extra
+      form field names that should be included in the searchUrl as query
+      params.
+
     * data-typeahead-subject is set on the element which should trigger
       the typeahead (that would be a text input element)
 
@@ -18,7 +22,13 @@
 */
 
 var getSearchUrl = function(target, query, lucky) {
-    return target + (lucky && '?lucky&q=' || '?q=') + encodeURIComponent(query);
+    var url = new URL(target);
+    url.searchParams.delete('page');
+    url.searchParams.set('q', query);
+    if (lucky) {
+        url.searchParams.set('lucky', '1');
+    }
+    return url.toString();
 };
 
 /*
@@ -42,7 +52,7 @@ var TypeaheadList = React.createClass({
                         </li>
                     );
                 })}
-                <li class="dots"><button type="submit">…</button></li>
+                <li className="dots"><button type="submit">…</button></li>
             </ul>
         );
     },
@@ -85,6 +95,7 @@ var TypeaheadList = React.createClass({
 var TypeAhead = function(form) {
     var source = form.data('typeahead-source');
     var target = form.data('typeahead-target');
+    var filter_params = form.data('typeahead-filter-params') || [];
     var subject = form.find('[data-typeahead-subject]');
     var container = form.find('[data-typeahead-container]');
     var typeahead = null;
@@ -109,6 +120,7 @@ var TypeAhead = function(form) {
         });
     }, 100);
 
+    // eslint-disable-next-line complexity
     $(subject).on('keydown', function(event) {
         // enter
         if (event.keyCode === 13) {
@@ -143,6 +155,30 @@ var TypeAhead = function(form) {
             event.preventDefault();
         }
     });
+
+    if (filter_params.length > 0) {
+        form.on('change', function() {
+            var source_url = new URL(source);
+            var target_url = new URL(target);
+            // clear filter params
+            _.each(filter_params, function(field_name) {
+                source_url.searchParams.delete(field_name);
+                target_url.searchParams.delete(field_name);
+            });
+            // repopulate with form values
+            _.each(form.serializeArray(), function(data) {
+                if (_.contains(filter_params, data.name)) {
+                    source_url.searchParams.append(data.name, data.value);
+                    target_url.searchParams.append(data.name, data.value);
+                }
+            });
+            source = source_url.toString();
+            target = target_url.toString();
+            if (typeahead !== null) {
+                update_typeahead(typeahead.props.results);
+            }
+        });
+    }
 };
 
 jQuery.fn.typeahead = function() {

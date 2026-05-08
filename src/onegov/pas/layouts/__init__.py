@@ -27,10 +27,20 @@ from onegov.pas.layouts.parliamentary_group import (
 from onegov.pas.layouts.parliamentary_group import PASParliamentaryGroupLayout
 from onegov.pas.layouts.party import PartyCollectionLayout
 from onegov.pas.layouts.party import PartyLayout
+from onegov.pas.layouts.presidential_allowance import (
+    PresidentialAllowanceCollectionLayout,
+)
+from onegov.pas.layouts.presidential_allowance import (
+    PresidentialAllowanceFormLayout,
+)
 from onegov.pas.layouts.rate_set import RateSetCollectionLayout
 from onegov.pas.layouts.rate_set import RateSetLayout
 from onegov.pas.layouts.settlement_run import SettlementRunCollectionLayout
 from onegov.pas.layouts.settlement_run import SettlementRunLayout
+from onegov.pas.layouts.user import UserManagementLayout
+from onegov.pas.layouts.user import UserLayout
+from onegov.pas.layouts.user import UserGroupCollectionLayout
+from onegov.pas.layouts.user import UserGroupLayout
 
 
 __all__ = (
@@ -45,7 +55,6 @@ __all__ = (
     'ImportLayout',
     'LegislativePeriodCollectionLayout',
     'LegislativePeriodLayout',
-    'PASCommissionMembershipLayout',
     'PASParliamentarianCollectionLayout',
     'PASParliamentarianLayout',
     'PASParliamentarianRoleLayout',
@@ -53,8 +62,14 @@ __all__ = (
     'PASParliamentaryGroupLayout',
     'PartyCollectionLayout',
     'PartyLayout',
+    'PresidentialAllowanceCollectionLayout',
+    'PresidentialAllowanceFormLayout',
     'RateSetCollectionLayout',
     'RateSetLayout',
     'SettlementRunCollectionLayout',
     'SettlementRunLayout',
+    'UserManagementLayout',
+    'UserLayout',
+    'UserGroupCollectionLayout',
+    'UserGroupLayout',
 )

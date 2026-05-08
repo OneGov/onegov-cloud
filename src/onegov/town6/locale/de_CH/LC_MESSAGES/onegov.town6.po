@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-07-24 13:54+0200\n"
+"POT-Creation-Date: 2026-04-16 09:07+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -17,6 +17,15 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Events"
+msgstr "Veranstaltungen"
+
+msgid "Latest news"
+msgstr "Aktuelles"
+
+msgid "Topics"
+msgstr "Themen"
+
 msgid "Chats"
 msgstr "Chats"
 
@@ -25,6 +34,9 @@ msgstr "Meine Chats"
 
 msgid "Archived Chats"
 msgstr "Archivierte Chats"
+
+msgid "RIS Settings"
+msgstr "Ratsinformationssystem"
 
 msgid "Name"
 msgstr "Name"
@@ -83,6 +95,21 @@ msgstr "Wird für alle Titel verwendet"
 
 msgid "Enable the chat"
 msgstr "Chat aktivieren"
+
+msgid "Disable chat"
+msgstr "Chat deaktivieren"
+
+msgid "Enable chat for chosen people"
+msgstr "Chat für ausgewählte Personen aktivieren"
+
+msgid "Enable AI chatbot"
+msgstr "KI-Chatbot aktivieren"
+
+msgid "Link to chat service"
+msgstr "Link zum Chat-Service"
+
+msgid "https://govikonchatbot.seantis.ch"
+msgstr "https://govikonchatbot.seantis.ch"
 
 msgid "Show chat for chosen people"
 msgstr "Chat für folgende Personen anzeigen"
@@ -154,14 +181,28 @@ msgstr "Sa"
 msgid "Su"
 msgstr "So"
 
-msgid "Enable RIS"
-msgstr "RIS aktivieren"
+msgid "URL path for the RIS main page"
+msgstr "URL-Pfad für die RIS-Hauptseite"
+
+msgid "The URL path for the RIS main page for non-logged-in users."
+msgstr "Der URL-Pfad für die RIS-Hauptseite für nicht angemeldete Benutzer."
+
+msgid "Predefined categories for interest ties"
+msgstr "Vordefinierte Kategorien für Interessensbindungen"
+
+msgid ""
+"Enter a list of categories for interest ties. Each category should be "
+"separated by a semicolon. Example: Cat 1 text; Cat 2 text; Cat 3 text"
+msgstr ""
+"Geben Sie eine Liste von Kategorien für Interessensbindungen ein. Jede "
+"Kategorie sollte durch ein Semikolon getrennt sein. Beispiel: Kat 1 Text; "
+"Kat 2 Text; Kat 3 Text"
+
+msgid "Enable Ratsinformationssystem (RIS)"
+msgstr "Ratsinformationssystem (RIS) aktivieren"
 
 msgid "Enables the RIS integration for this organisation."
 msgstr "Aktiviert die RIS-Integration für diese Organisation."
-
-msgid "Events"
-msgstr "Veranstaltungen"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -174,9 +215,6 @@ msgstr "Formulare und Gesuche"
 
 msgid "Publications"
 msgstr "Publikationen"
-
-msgid "Official Documents"
-msgstr "Amtliche Dokumente"
 
 msgid "Reservations"
 msgstr "Reservationen"
@@ -283,14 +321,14 @@ msgstr "iFrame"
 msgid "Homepage"
 msgstr "Startseite"
 
+msgid "Files"
+msgstr "Dateien"
+
 msgid "Chat Archive"
 msgstr "Chat-Archiv"
 
 msgid "Meetings"
 msgstr "Sitzungen"
-
-msgid "RIS Settings"
-msgstr "Ratsinformationssystem"
 
 msgid "Meeting"
 msgstr "Sitzung"
@@ -308,19 +346,22 @@ msgid "Delete meeting"
 msgstr "Sitzung löschen"
 
 msgid "Parliamentarians"
-msgstr "Parlamentarierinnen und Parlamentarier"
+msgstr "Parlamentsmitglieder"
 
 msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
-
-msgid "Role (as a group member)"
-msgstr "Rolle (als Fraktionsmitglied)"
+msgstr "Parlamentsmitglied"
 
 msgid "Do you really want to delete this parliamentarian?"
-msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
+msgstr "Möchten Sie dieses Parlamentsmitglied wirklich löschen?"
 
 msgid "Delete parliamentarian"
-msgstr "Parlamentarier:in löschen"
+msgstr "Parlamentsmitglied löschen"
+
+msgid "New parliamentary group function"
+msgstr "Neue Fraktionsfunktion"
+
+msgid "New commission function"
+msgstr "Neue Kommissionsfunktion"
 
 msgid "Do you really want to remove this role?"
 msgstr "Rolle wirklich entfernen?"
@@ -340,7 +381,7 @@ msgstr "Möchten Sie diese Fraktion wirklich löschen?"
 msgid "Delete parliamentary group"
 msgstr "Fraktion löschen"
 
-msgid "Parties"
+msgid "Political Parties"
 msgstr "Parteien"
 
 msgid "Political Party"
@@ -370,17 +411,35 @@ msgstr "Möchten Sie das politische Geschäft wirklich löschen?"
 msgid "Delete political business"
 msgstr "Politisches Geschäft löschen"
 
+msgid "RIS settings"
+msgstr "RIS Einstellungen"
+
+msgid "Commission membership"
+msgstr "Kommissionsmitgliedschaft"
+
+msgid "Do you really want to remove this commission membership?"
+msgstr "Möchten Sie diese Kommissionsmitgliedschaft wirklich entfernen?"
+
+msgid "Remove commission membership"
+msgstr "Kommissionsmitgliedschaft entfernen"
+
 msgid "No availability periods defined."
 msgstr "Keine Verfügbarkeitszeiträume definiert."
 
 msgid "State:"
 msgstr "Status:"
 
+msgid "Submitter"
+msgstr "Antragsteller/in"
+
 msgid "Owner:"
 msgstr "Besitzer:"
 
 msgid "Kind:"
 msgstr "Art:"
+
+msgid "Search"
+msgstr "Suche"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
@@ -440,6 +499,9 @@ msgstr "Keine aktiven Chats."
 
 msgid "Contact"
 msgstr "Kontakt"
+
+msgid "Function"
+msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
@@ -559,6 +621,13 @@ msgstr "Umbenannt:"
 msgid "Changed:"
 msgstr "Verändert:"
 
+msgid ""
+"Please note, that data for existing entries that use the removed option will "
+"be lost."
+msgstr ""
+"Bitte beachten Sie, dass Daten für bestehende Einträge, die die entfernte "
+"Option verwenden, verloren gehen."
+
 msgid "Confirm"
 msgstr "Bestätigen"
 
@@ -623,14 +692,14 @@ msgstr "Erweiterung"
 msgid "Upload Date"
 msgstr "Hochlade-Datum"
 
+msgid "Published until"
+msgstr "Publiziert bis"
+
 msgid "All Files"
 msgstr "Alle Dateien"
 
 msgid "No files uploaded yet"
 msgstr "Noch keine Dateien hochgeladen"
-
-msgid "Published until"
-msgstr "Publiziert bis"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Ihnen fehlt die nötige Berechtigung um diese Seite zu öffnen."
@@ -663,6 +732,27 @@ msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
+
+msgid "No invoices yet."
+msgstr "Noch keine Rechnungen."
+
+msgid "Batch Action"
+msgstr "Massenbearbeitung"
+
+msgid "Mark as Invoiced"
+msgstr "Als fakturiert markieren"
+
+msgid "Mark as Uninvoiced"
+msgstr "Als unfakturiert markieren"
+
+msgid "Mark as Paid"
+msgstr "Als bezahlt markieren"
+
+msgid "Mark as Unpaid"
+msgstr "Als offen markieren"
+
+msgid "Apply to selected"
+msgstr "Auf Auswahl anwenden"
 
 msgid "Search term"
 msgstr "Suchbegriff"
@@ -703,6 +793,9 @@ msgstr "Sie sind hier"
 
 msgid "Privacy Protection"
 msgstr "Datenschutz"
+
+msgid "Impressum"
+msgstr "Impressum"
 
 msgid "Login"
 msgstr "Anmelden"
@@ -783,6 +876,12 @@ msgstr "Vorheriger Eintrag"
 
 msgid "Next Entry"
 msgstr "Nächster Eintrag"
+
+msgid "Content"
+msgstr "Inhalt"
+
+msgid "Invoice Items"
+msgstr "Rechnungspositionen"
 
 msgid "Total Amount"
 msgstr "Totalbetrag"
@@ -908,9 +1007,6 @@ msgstr "Veröffentlicht"
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
 
-msgid "Submitter"
-msgstr "Antragsteller/in"
-
 msgid "Title"
 msgstr "Titel"
 
@@ -1010,6 +1106,9 @@ msgstr "Zoom"
 msgid "Show more"
 msgstr "Mehr anzeigen"
 
+msgid "What are you searching for?"
+msgstr "Wonach suchen Sie?"
+
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
 "photos to an album and mark it as available for the homepage."
@@ -1032,6 +1131,24 @@ msgstr "${count} Seiten"
 
 msgid "Further occurrences:"
 msgstr "Weitere Termine:"
+
+msgid "Former member or parliament"
+msgstr "Ehemaliges Parlamentsmitglied"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Status"
+msgstr "Status"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
@@ -1088,6 +1205,15 @@ msgstr "Erstellt"
 msgid "Disbursed"
 msgstr "Ausbezahlt"
 
+msgid "Select this invoice"
+msgstr "Diese Rechnung auswählen"
+
+msgid "Uninvoiced"
+msgstr "Unfakturiert"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
 msgid "Find Your Spot"
 msgstr "Terminsuche / Serienreservation"
 
@@ -1120,9 +1246,6 @@ msgstr "keine Publikation"
 
 msgid "Digital seal"
 msgstr "Digitales Siegel"
-
-msgid "Content"
-msgstr "Inhalt"
 
 msgid "1 page"
 msgstr "1 Seite"
@@ -1215,8 +1338,59 @@ msgstr "Fokus"
 msgid "Available options for the focus widget:"
 msgstr "Verfügbare Optionen für das Fokus-Widget:"
 
+msgid "Experimental AI Chatbot"
+msgstr "Experimenteller AI-Chatbot"
+
+msgid ""
+"This chatbot is experimental and may produce incorrect or misleading "
+"information. Please verify any information provided by the chatbot with "
+"official sources."
+msgstr ""
+"Dieser Chatbot ist experimentell und kann ungenaue oder irreführende "
+"Informationen liefern. Bitte überprüfen Sie alle vom Chatbot "
+"bereitgestellten Informationen mit offiziellen Quellen."
+
+msgid "Try it out"
+msgstr "Ausprobieren"
+
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
+
+msgid "Booking Text"
+msgstr "Buchungstext"
+
+msgid "Cost center / cost unit"
+msgstr "Kostenstelle / Kostenträger"
+
+msgid "Unit"
+msgstr "Einheit"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "VAT Rate"
+msgstr "Mehrwertsteuersatz"
+
+msgid "VAT"
+msgstr "MwSt"
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "Submission"
+msgstr "Eintrag"
+
+msgid "Selected Options"
+msgstr "Ausgewählte Optionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Lump sum"
+msgstr "Pauschalbetrag"
+
+msgid "Total"
+msgstr "Total"
 
 msgid "Hello!"
 msgstr "Guten Tag"
@@ -1307,6 +1481,30 @@ msgid ""
 msgstr ""
 "Falls Sie sich nicht für diese Benachrichtigungen angemeldet haben, können "
 "Sie diese Nachricht ignorieren."
+
+msgid "New customer message in Ticket ${link}"
+msgstr "Neue Kunden Nachricht in Ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+#. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
+msgid "Please ${link} to reply."
+msgstr "Bitte ${link} um zu antworten"
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the request page"
+msgstr "öffnen Sie die Anfrage"
+
+msgid ""
+"This is the notification for customer messages on reservations for ${request."
+"app.org.title}. If you no longer want to receive this e-mail please contact "
+"an administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie "
+"dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
+"Administrator damit dieser Sie von der Empfängerliste streichen kann."
 
 msgid "Good morning,"
 msgstr "Guten Morgen"
@@ -1407,9 +1605,6 @@ msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 msgid "New note in Ticket ${link}"
 msgstr "Neue Notiz in Ticket ${link}"
 
-msgid "${author} wrote"
-msgstr "${author} schrieb"
-
 msgid ""
 "This is the notification for notes on reservations for ${request.app.org."
 "title}. If you no longer want to receive this e-mail please contact an "
@@ -1423,9 +1618,6 @@ msgstr ""
 msgid "Pending approval"
 msgstr "Noch nicht akzeptiert"
 
-msgid "VAT"
-msgstr "MwSt"
-
 msgid "A new entry has been added to the \"${directory}\" directory:"
 msgstr "Ein neuer Eintrag wurde im Verzeichnis \"${directory}\" hinzugefügt:"
 
@@ -1434,6 +1626,12 @@ msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden bestätigt:"
+
+msgid "Tag"
+msgstr "Schlagwort"
+
+msgid "See Ticket ${link} for additional information."
+msgstr "Siehe Ticket ${link} für zusätzliche Informationen."
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1468,9 +1666,6 @@ msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
 "${number}"
-
-msgid "Latest news"
-msgstr "Aktuelles"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -1569,18 +1764,9 @@ msgstr "Abgelehnt"
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
 
-#. Canonical text for ${link} is: "visit the request status page"
-#. Canonical text for ${link} is: "visit the request page"
-msgid "Please ${link} to reply."
-msgstr "Bitte ${link} um zu antworten"
-
 #. Used in sentence: "Please ${link} to reply."
 msgid "visit the request status page"
 msgstr "öffnen Sie den Anfragestatus"
-
-#. Used in sentence: "Please ${link} to reply."
-msgid "visit the request page"
-msgstr "öffnen Sie die Anfrage"
 
 msgid "Your request has been closed."
 msgstr "Ihre Anfrage wurde abgeschlossen"
@@ -1622,8 +1808,20 @@ msgstr "Datum/Zeit"
 msgid "Agenda"
 msgstr "Traktanden"
 
+msgid "No agenda items defined yet."
+msgstr "Es wurden noch keine Traktanden erfasst."
+
 msgid "No meetings defined yet."
 msgstr "Noch keine Sitzungen definiert."
+
+msgid "Next Meeting"
+msgstr "Nächste Sitzung"
+
+msgid "Upcoming Meetings"
+msgstr "Künftige Sitzungen"
+
+msgid "Past Meetings"
+msgstr "Vergangene Sitzungen"
 
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
@@ -1686,6 +1884,12 @@ msgstr "1 Reservation abgelehnt."
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
 
+msgid "1 reservation added."
+msgstr "1 Reservation hinzugefügt."
+
+msgid "${count} reservations added."
+msgstr "${count} Reservationen hinzugefügt."
+
 msgid "1 reservation adjusted:"
 msgstr "1 Reservation angepasst:"
 
@@ -1721,6 +1925,9 @@ msgstr "Ticket E-Mails aktiviert."
 
 msgid "Payment amount changed."
 msgstr "Zahlungsbetrag geändert."
+
+msgid "Submitter e-mail changed."
+msgstr "E-Mail Adresse des Antragstellers geändert."
 
 msgid "Ticket archived."
 msgstr "Ticket archiviert."
@@ -1859,17 +2066,29 @@ msgstr "Dies ist eine importierte Veranstaltung"
 msgid "General information about the event calendar"
 msgstr "Allgemeine Informationen zum Veranstaltungskalender"
 
-msgid "Tag"
-msgstr "Schlagwort"
-
-msgid "Date"
-msgstr "Datum"
-
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"
 msgstr "Veranstaltung erfassen"
+
+msgid "Functions"
+msgstr "Funktionen"
+
+msgid "in"
+msgstr "der"
+
+msgid "Interest ties"
+msgstr "Interessensbindungen"
+
+msgid "Personal details"
+msgstr "Personalien"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -1877,11 +2096,11 @@ msgstr "Personalnummer"
 msgid "Contract number"
 msgstr "Vertragsnummer"
 
-msgid "Picture"
-msgstr "Bild"
-
 msgid "Private address"
 msgstr "Privatadresse"
+
+msgid "Place of residence"
+msgstr "Wohnort"
 
 msgid "Date of birth"
 msgstr "Geburtsdatum"
@@ -1931,20 +2150,12 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
-msgid "Roles"
-msgstr "Mitgliedschaften"
-
-msgid "Parliament"
-msgstr "Parlament"
-
-msgid "Interests"
-msgstr "Interessensbindungen"
-
 msgid "Role"
 msgstr "Rolle"
 
-msgid "No parliamentarians defined yet."
-msgstr "Noch keine Parlamentarier erfasst."
+msgid "No filter results found or no parliamentarians defined yet."
+msgstr ""
+"Keine Filterergebnisse gefunden oder noch keine Parlamentarier erfasst."
 
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
@@ -1964,26 +2175,8 @@ msgstr "Aktiviert:"
 msgid "Fee:"
 msgstr "Gebühr:"
 
-msgid "Export Bill run as PDF"
-msgstr "Fakturierte Belege als PDF exportieren"
-
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
-
-msgid "Batch Action"
-msgstr "Massenbearbeitung"
-
-msgid "Mark as Invoiced"
-msgstr "Als fakturiert markieren"
-
-msgid "Mark as Paid"
-msgstr "Als bezahlt markieren"
-
-msgid "Mark as Unpaid"
-msgstr "Als offen markieren"
-
-msgid "Apply to selected"
-msgstr "Auf Auswahl anwenden"
 
 msgid "Select organisation"
 msgstr "Organisation wählen"
@@ -2000,35 +2193,29 @@ msgstr "Filter zurücksetzen"
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
-msgid "Number"
-msgstr "Nummer"
+msgid "Information"
+msgstr "Information"
 
 msgid "Business Type"
 msgstr "Geschäftsart"
 
-msgid "Status"
-msgstr "Status"
+msgid "Submission/publication date"
+msgstr "Einreichungs-/Publikationsdatum"
 
 msgid "Participants"
 msgstr "Verfasser/Beteiligte"
 
-msgid "Parliamentary Group"
-msgstr "Fraktion"
+msgid "Parliamentary Group(s)"
+msgstr "Fraktion(en)"
 
 msgid "No political businesses defined yet."
 msgstr "Es wurden noch keine politischen Geschäfte erfasst."
-
-msgid "Datum"
-msgstr "Datum"
 
 msgid "Year"
 msgstr "Jahr"
 
 msgid "No publications"
 msgstr "Keine Publikationen"
-
-msgid "Information"
-msgstr "Information"
 
 msgid ""
 "You can search through the content of all listed files by using the search "
@@ -2106,17 +2293,27 @@ msgstr ""
 "dass jeder, der diesen Link kennt, einen permanenten Zugriff auf diese "
 "Information hat."
 
-msgid "Reservations must be made at least one day in advance."
-msgstr "Reservationen müsen mindestens ein Tag im Voraus gemacht werden."
+msgid "Reservations must be made at least ${n} ${unit} in advance."
+msgstr "Reservationen müssen spätestens ${n} ${unit} im Voraus gemacht werden."
 
-msgid "Reservations must be made at least one hour in advance."
-msgstr "Reservationen müssen mindestens eine Stunde im Voraus gemacht werden."
+msgid "days"
+msgstr "Tage"
 
-msgid "Reservations must be made at least ${n} days in advance."
-msgstr "Reservationen müssen mindestens ${n} Tage im Voraus gemacht werden."
+msgid "hour"
+msgstr "Stunde"
 
-msgid "Reservations must be made at least ${n} hours in advance."
-msgstr "Reservationen müssen mindestens ${n} Stunden im Voraus gemacht werden."
+msgid "hours"
+msgstr "Stunden"
+
+msgid "Reservations can only be made at most ${n} ${unit} in advance."
+msgstr "Reservationen können frühestens ${n} ${unit} im Voraus gemacht werden."
+
+msgid ""
+"Reservations must be made at least ${n1} ${unit1} and at most ${n2} ${unit2} "
+"in advance."
+msgstr ""
+"Reservationen müssen spätestens ${n1} ${unit1} und frühestens ${n2} ${unit2} "
+"im Voraus gemacht werden."
 
 msgid ""
 "Select a free time span in the calendar to create an availability period."
@@ -2144,6 +2341,9 @@ msgid ""
 msgstr ""
 "Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
 
+msgid "Receives notifications for customer messages on reservations."
+msgstr "Erhält Benachrichtigungen für Kunden Nachrichten zu Reservationen."
+
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."
 
@@ -2156,6 +2356,9 @@ msgstr "Erhält Benachrichtigungen für neue Reservationen."
 msgid "Notifications for following Resources"
 msgstr "Benachrichtigungen für die folgenden Reservationen"
 
+msgid "General information about resources"
+msgstr "Allgemeine Informationen zu Reservationen"
+
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 
@@ -2167,14 +2370,8 @@ msgstr ""
 "Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später "
 "wieder."
 
-msgid "Search"
-msgstr "Suche"
-
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
-
-msgid "Confirm selection"
-msgstr "Auswahl bestätigen"
 
 msgid "This newsletter has not been sent yet."
 msgstr "Dieser Newsletter wurde noch nicht gesendet."
@@ -2313,8 +2510,11 @@ msgstr "${count} Notiz"
 msgid "${count} notes"
 msgstr "${count} Notizen"
 
-msgid "Amount"
-msgstr "Betrag"
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "View Invoice"
+msgstr "Rechnung anzeigen"
 
 msgid "Group"
 msgstr "Gruppe"
@@ -2333,6 +2533,15 @@ msgstr "Reaktionszeit"
 
 msgid "Process Time"
 msgstr "Bearbeitungszeit"
+
+msgid "Related Tickets"
+msgstr "Verknüpfte Tickets"
+
+msgid "Disable E-Mails for all related tickets"
+msgstr "E-Mails für alle verknüpften Tickets deaktivieren"
+
+msgid "Enable E-Mails for all related tickets"
+msgstr "E-Mails für alle verknüpften Tickets aktivieren"
 
 msgid "Summary"
 msgstr "Zusammenfassung"
@@ -2496,17 +2705,17 @@ msgstr "Die Kommission wurde gelöscht."
 msgid "Sort"
 msgstr "Sortieren"
 
-msgid "Past Meetings"
-msgstr "Vergangene"
-
-msgid "Upcoming Meetings"
-msgstr "Zukünftige"
-
 msgid "Added a new meeting"
 msgstr "Neue Sitzung hinzugefügt"
 
 msgid "New meeting"
 msgstr "Neue Sitzung"
+
+msgid "Listen to parliamentary debate"
+msgstr "Parlamentsdebatte anhören"
+
+msgid "Watch parliamentary debate"
+msgstr "Parlamentsdebatte ansehen"
 
 msgid "Edit meeting"
 msgstr "Sitzung bearbeiten"
@@ -2514,20 +2723,40 @@ msgstr "Sitzung bearbeiten"
 msgid "The meeting has been deleted."
 msgstr "Die Sitzung wurde gelöscht."
 
+msgid "No documents are assigned to the following agenda items:"
+msgstr "Keine Dokumente sind den folgenden Traktanden zugewiesen:"
+
+msgid "Export meeting documents"
+msgstr "Sitzungsdokumente exportieren"
+
+msgid ""
+"Select the meeting and agenda item documents you want to export. The "
+"resulting zipfile contains the documents per meeting item."
+msgstr ""
+"Wählen Sie die Sitzungs- und Traktandendokumente aus, die Sie exportieren "
+"möchten. Die resultierende Zip-Datei enthält die Dokumente pro Traktanden."
+
+msgid "The commission membership has been deleted."
+msgstr "Die Kommissionsmitgliedschaft wurde gelöscht."
+
 msgid "Added a new parliamentarian"
-msgstr "Parlamentarier:in hinzugefügt"
+msgstr "Parlamentsmitglied hinzugefügt"
+
+msgid "Parliamentarian has been automatically subscribed to the newsletter."
+msgstr ""
+"Das Parlamentsmitglied wurde automatisch für den Newsletter angemeldet."
 
 msgid "New parliamentarian"
-msgstr "Neue/r Parlamentarier/in"
+msgstr "Neues Parlamentsmitglied"
+
+msgid "The newsletter subscription has been updated."
+msgstr "Die Newsletter-Anmeldung wurde aktualisiert."
 
 msgid "The parliamentarian has been deleted."
-msgstr "Der Parlamentarier/in wurde gelöscht."
+msgstr "Das Parlamentsmitglied wurde gelöscht."
 
 msgid "Added a new role"
 msgstr "Neue Rolle hinzugefügt"
-
-msgid "New role"
-msgstr "Neue Rolle"
 
 msgid "The parliamentarian role has been deleted."
 msgstr "Die Rolle des Parlamentariers wurde gelöscht."
@@ -2553,33 +2782,6 @@ msgstr "Neuer Empfänger"
 msgid "Edit Recipient"
 msgstr "Empfänger Bearbeiten"
 
-msgid "Online Counter Label"
-msgstr "Onlineschalter Label"
-
-msgid "Hide Online Counter on Homepage"
-msgstr "Online-Schalter auf der Homepage ausblenden"
-
-msgid "Reservations Label"
-msgstr "Reservationen Label"
-
-msgid "Hide Reservations on Homepage"
-msgstr "Reservationen auf der Homepage ausblenden"
-
-msgid "SBB Daypass Label"
-msgstr "SBB Tageskarte Label"
-
-msgid "Publications Label"
-msgstr "Publikationen Label"
-
-msgid "Hide Publications on Homepage"
-msgstr "Publikationen auf der Homepage ausblenden"
-
-msgid "E-Move Label"
-msgstr "E-Umzug Label"
-
-msgid "E-Move Url"
-msgstr "E-Umzug Url"
-
 msgid "News and Events"
 msgstr "News und Events"
 
@@ -2598,41 +2800,20 @@ msgstr "Zeige die Fusszeile auf allen Seiten, ausser für Administratoren"
 msgid "Partner display"
 msgstr "Anzeige Partner"
 
-msgid "Favicon"
-msgstr "Favicon"
+msgid "Organisation Profile"
+msgstr "Organisationsprofil"
 
-msgid "Social Media"
-msgstr "Soziale Medien"
+msgid "Tickets"
+msgstr "Tickets"
 
-msgid "Chat"
-msgstr "Chat"
+msgid "Appearance"
+msgstr "Erscheinungsbild"
 
 msgid "Header"
 msgstr "Kopfzeile"
 
 msgid "Footer"
 msgstr "Fusszeile"
-
-msgid "Modules"
-msgstr "Module"
-
-msgid "Analytics"
-msgstr "Web-Statistik"
-
-msgid "Holidays"
-msgstr "Feiertage / Schulferien"
-
-msgid "Tickets"
-msgstr "Tickets"
-
-msgid "Newsletter"
-msgstr "Newsletter"
-
-msgid "Link Migration"
-msgstr "Migration Links"
-
-msgid "OneGov API"
-msgstr "OneGov API"
 
 msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"
@@ -2644,8 +2825,32 @@ msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
 
-msgid "Push Notification Overview"
-msgstr "Übersicht Push-Benachrichtigungen"
+msgid "Access (mTAN)"
+msgstr "Zugang (mTAN)"
+
+msgid "Holidays"
+msgstr "Feiertage / Schulferien"
+
+msgid "Analytics"
+msgstr "Web-Statistik"
+
+msgid "Optional modules"
+msgstr "Optionale Module"
+
+msgid "Modules"
+msgstr "Module"
+
+msgid "Newsletter"
+msgstr "Newsletter"
+
+msgid "Resources"
+msgstr "Reservationen"
+
+msgid "People directory"
+msgstr "Personenverzeichnis"
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Ratsinformationssystem"
 msgstr "Ratsinformationssystem"
@@ -2653,564 +2858,71 @@ msgstr "Ratsinformationssystem"
 msgid "Ratsinformationssystem (RIS)"
 msgstr "Ratsinformationssystem (RIS)"
 
+msgid "Advanced Settings"
+msgstr "Erweiterte Einstellungen"
+
+msgid "OneGov API"
+msgstr "OneGov API"
+
+msgid "Firebase (App)"
+msgstr "Firebase (App)"
+
+msgid "Push Notification Overview"
+msgstr "Übersicht Push-Benachrichtigungen"
+
 msgid "New Note"
 msgstr "Neue Notiz"
 
-#~ msgid "Inquiry"
-#~ msgstr "Anfrage"
+#~ msgid "Activate/deactivate modules"
+#~ msgstr "Module aktivieren/deaktivieren"
 
-#~ msgid "Proposal"
-#~ msgstr "Vorschlag"
+#~ msgid "Enable RIS"
+#~ msgstr "RIS aktivieren"
 
-#~ msgid "Mandate"
-#~ msgstr "Mandat"
+#~ msgid "Confirm selection"
+#~ msgstr "Auswahl bestätigen"
 
-#~ msgid "Report"
-#~ msgstr "Bericht"
+#~ msgid "Online Counter Label"
+#~ msgstr "Onlineschalter Label"
 
-#~ msgid "Report and Proposal"
-#~ msgstr "Bericht und Vorschlag"
+#~ msgid "Hide Online Counter on Homepage"
+#~ msgstr "Online-Schalter auf der Homepage ausblenden"
 
-#~ msgid "Decision"
-#~ msgstr "Entscheid"
+#~ msgid "Reservations Label"
+#~ msgstr "Reservationen Label"
 
-#~ msgid "Message"
-#~ msgstr "Botschaft"
+#~ msgid "Hide Reservations on Homepage"
+#~ msgstr "Reservationen auf der Homepage ausblenden"
 
-#~ msgid "Urgent Interpellation"
-#~ msgstr "Dringliche Interpellation"
+#~ msgid "SBB Daypass Label"
+#~ msgstr "SBB Tageskarte Label"
 
-#~ msgid "Invitation"
-#~ msgstr "Einladung"
+#~ msgid "Publications Label"
+#~ msgstr "Publikationen Label"
 
-#~ msgid "Interpellation"
-#~ msgstr "Interpellation"
+#~ msgid "Official Documents"
+#~ msgstr "Amtliche Dokumente"
 
-#~ msgid "Commission Report"
-#~ msgstr "Kommissionsbericht"
+#~ msgid "Hide Publications on Homepage"
+#~ msgstr "Publikationen auf der Homepage ausblenden"
 
-#~ msgid "Communication"
-#~ msgstr "Mitteilung"
+#~ msgid "E-Move Label"
+#~ msgstr "E-Umzug Label"
 
-#~ msgid "Motion"
-#~ msgstr "Motion"
+#~ msgid "E-Move Url"
+#~ msgstr "E-Umzug Url"
 
-#~ msgid "Postulate"
-#~ msgstr "Postulat"
+#~ msgid "Favicon"
+#~ msgstr "Favicon"
 
-#~ msgid "Resolution"
-#~ msgstr "Resolution"
+#~ msgid "Social Media"
+#~ msgstr "Soziale Medien"
 
-#~ msgid "Regulation"
-#~ msgstr "Verordnung"
+#~ msgid "Link Migration"
+#~ msgstr "Migration Links"
 
-#~ msgid "Miscellaneous"
-#~ msgstr "Verschiedenes"
+#~ msgid "Cannot display"
+#~ msgstr "Kann nicht anzeigen"
 
-#~ msgid "Elections"
-#~ msgstr "Wahlen"
-
-#~ msgid "First signatory"
-#~ msgstr "Erstunterzeichner/in"
-
-#~ msgid "Co-signatory"
-#~ msgstr "Mitunterzeichner/in"
-
-#~ msgid "Select additional person"
-#~ msgstr "Zusätzliche Person auswählen"
-
-#~ msgid "Participations"
-#~ msgstr "Verfasser / Beteiligte"
-
-#~ msgid "Parliamentarian is not in this commission."
-#~ msgstr "Parlamentarier:in ist nicht in dieser Kommission."
-
-#~ msgid "Basic properties"
-#~ msgstr "Grundeigenschaften"
-
-#~ msgid "Gender"
-#~ msgstr "Geschlecht"
-
-#~ msgid "Additional information"
-#~ msgstr "Zusatzinformationen"
-
-#~ msgid "Party role"
-#~ msgstr "Rolle in der Partei"
-
-#~ msgid "Parliamentary group role"
-#~ msgstr "Rolle in der Fraktion"
-
-#~ msgid "President"
-#~ msgstr "Präsident:in"
-
-#~ msgid "Commission meeting"
-#~ msgstr "Kommissionsitzung"
-
-#~ msgid "intercantonal commission"
-#~ msgstr "interkantonale Kommission"
-
-#~ msgid "Vice president"
-#~ msgstr "Vize-Präsident:in"
-
-#~ msgid "End must be after start"
-#~ msgstr "Ende muss nach dem Start liegen"
-
-#~ msgid "Do you really want to remove this parliamentarian?"
-#~ msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
-
-#~ msgid "Remove parliamentarian"
-#~ msgstr "Parlamentarier:in entfernen"
-
-#~ msgid "Extended Member"
-#~ msgstr "erweitertes Mitglied"
-
-#~ msgid "male"
-#~ msgstr "männlich"
-
-#~ msgid "female"
-#~ msgstr "weiblich"
-
-#~ msgid "Vote counter"
-#~ msgstr "Stimmenzähler"
-
-#~ msgid "Media Manager"
-#~ msgstr "Leiter Medien und Kampagnen"
-
-#~ msgid "President of the parliamentary group"
-#~ msgstr "Fraktionsschef"
-
-#~ msgid "No meeting defined yet."
-#~ msgstr "Noch keine Sitzung erfasst."
-
-#~ msgid "Comission"
-#~ msgstr "Kommission"
-
-#~ msgid "Added commission meeting"
-#~ msgstr "Kommissionsitzung hinzugefügt"
-
-#~ msgid "New commission meeting"
-#~ msgstr "Neue Kommissionsitzung"
-
-#~ msgid "All Parties"
-#~ msgstr "Alle Parteien"
-
-#~ msgid "Addition"
-#~ msgstr "Adresszusatz"
-
-#~ msgid "Zip code"
-#~ msgstr "PLZ"
-
-#~ msgid "City"
-#~ msgstr "Ort"
-
-#~ msgid "Sign up"
-#~ msgstr "Anmelden"
-
-#~ msgid "Notify on newsletter unsubscription"
-#~ msgstr "Benachrichtigung bei Abmeldung vom Newsletter"
-
-#~ msgid ""
-#~ "Send an email notification when a user unsubscribes from the newsletter"
-#~ msgstr ""
-#~ "Sende eine E-Mail-Benachrichtigung, wenn sich ein Benutzer vom Newsletter "
-#~ "abmeldet"
-
-#~ msgid ""
-#~ "The user with the address <strong>${address}</strong> just unsubscribed "
-#~ "from the newsletter subscriber list."
-#~ msgstr ""
-#~ "Der Benutzer mit der Adresse <strong>${address}</strong> hat sich soeben "
-#~ "von der Newsletter-Abonnentenliste abgemeldet."
-
-#~ msgid "Change Request"
-#~ msgstr "Änderung vorschlagen"
-
-#~ msgid "Found an error? Propose a change to this entry."
-#~ msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
-
-#~ msgid "Propose entry"
-#~ msgstr "Eintrag vorschlagen"
-
-#~ msgid "Something missing? Propose a new entry."
-#~ msgstr ""
-#~ "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
-
-#~ msgid "Newsletter Subscription"
-#~ msgstr "Newsletter-Abonnement"
-
-#~ msgid "Update Newsletter Subscription"
-#~ msgstr "Newsletter-Abonnement aktualisieren"
-
-#~ msgid "Update your newsletter subscription categories:"
-#~ msgstr "Aktualisieren Sie Ihre Newsletter-Abonnementkategorien:"
-
-#~ msgid "Rejection withdrawn."
-#~ msgstr "Ablehnung zurückgezogen."
-
-#~ msgid ""
-#~ "Select newsletter categories your are interested in. You will receive the "
-#~ "newsletter if it reports on at least one of the subscribed categories."
-#~ msgstr ""
-#~ "Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert sind. "
-#~ "Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
-#~ "abonnierten Kategorien berichtet."
-
-#~ msgid ""
-#~ "Select categories the newsletter reports on. The users will receive the "
-#~ "newsletter only if it reports on at least one of the categories the user "
-#~ "subscribed to."
-#~ msgstr ""
-#~ "Wählen Sie die Kategorien aus, über die der Newsletter berichtet. Die "
-#~ "Benutzer erhalten den Newsletter nur, wenn er über mindestens eine der "
-#~ "Kategorien berichtet, die der Benutzer abonniert hat."
-
-#~ msgid "Newsletter categories"
-#~ msgstr "Newsletter-Kategorien"
-
-#~ msgid ""
-#~ "Example for newsletter topics with subtopics in yaml format. Note: Deeper "
-#~ "structures are not supported.\n"
-#~ "```\n"
-#~ "Organisation:\n"
-#~ "  - Topic 1:\n"
-#~ "    - Subtopic 1.1\n"
-#~ "    - Subtopic 1.2\n"
-#~ "  - Topic 2\n"
-#~ "  - Topic 3:\n"
-#~ "    - Subtopic 3.1\n"
-#~ "```"
-#~ msgstr ""
-#~ "Beispiel für Newsletter-Themen mit Unterthemen im yaml-Format. Hinweis: "
-#~ "Tiefere Strukturen werden nicht unterstützt.\n"
-#~ "```\n"
-#~ "Organisation:\n"
-#~ "  - Thema 1:\n"
-#~ "    - Unterthema 1.1\n"
-#~ "    - Unterthema 1.2\n"
-#~ "  - Thema 2\n"
-#~ "  - Thema 3:\n"
-#~ "    - Unterthema 3.1\n"
-#~ "```"
-
-#~ msgid "Sign up to our newsletter to always stay up to date:"
-#~ msgstr ""
-#~ "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
-
-#~ msgid "Error: No custom texts found"
-#~ msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
-
-#, python-format
-#~ msgid "Error: No custom text found for '${key}'"
-#~ msgstr "Fehler: Kein benutzerdefinierter Text gefunden für '${key}'"
-
-#~ msgid "Subscribe to Selection as RSS"
-#~ msgstr "Hashtags abonnieren"
-
-#~ msgid "Save"
-#~ msgstr "Speichern"
-
-#~ msgid "This event can't be edited."
-#~ msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
-
-#~ msgid "Imported events can not be edited."
-#~ msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
-
-#~ msgid "Withdraw event"
-#~ msgstr "Veranstaltung zurückziehen"
-
-#~ msgid "Do you really want to withdraw this event?"
-#~ msgstr "Wollen sie diese Veranstaltung zurückziehen? "
-
-#~ msgid "You can re-publish an imported event later."
-#~ msgstr ""
-#~ "Sie können importierte Veranstaltungen später wieder veröffentlichen."
-
-#~ msgid "Re-publish event"
-#~ msgstr "Veranstaltung wieder veröffentlichen"
-
-#~ msgid "Do you really want to delete this event?"
-#~ msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
-
-#~ msgid "This event can't be deleted."
-#~ msgstr "Diese Veranstaltung kann nicht gelöscht werden."
-
-#~ msgid "To remove this event, go to the ticket and reject it."
-#~ msgstr ""
-#~ "Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie "
-#~ "zu entfernen."
-
-#~ msgid "Show news as tiles"
-#~ msgstr "Aktuelles als Kacheln anzeigen"
-
-#~ msgid ""
-#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
-#~ "full length."
-#~ msgstr ""
-#~ "Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
-#~ "angezeigt. Anderfalls werden die Nachrichten in voller Länge "
-#~ "untereinander aufgelistet."
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
-
-#~ msgid "Forms"
-#~ msgstr "Formulare"
-
-#~ msgid "This form can't be deleted."
-#~ msgstr "Das Formular kann nicht gelöscht werden."
-
-#~ msgid ""
-#~ "There are submissions associated with the form. Those need to be removed "
-#~ "first."
-#~ msgstr ""
-#~ "Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen "
-#~ "Sie diese Eingaben bevor Sie das Formular löschen."
-
-#~ msgid "Do you really want to delete this form?"
-#~ msgstr "Möchten Sie das Formular wirklich löschen?"
-
-#~ msgid "Delete form"
-#~ msgstr "Formular löschen"
-
-#~ msgid "Registration Windows"
-#~ msgstr "Anmeldezeitraum"
-
-#~ msgid "External form"
-#~ msgstr "Externes Formular"
-
-#~ msgid "New external form"
-#~ msgstr "Neues externes Formular"
-
-#~ msgid "Person"
-#~ msgstr "Person"
-
-#~ msgid "Do you really want to delete this person?"
-#~ msgstr "Möchten Sie die Person wirklich löschen?"
-
-#~ msgid "Delete person"
-#~ msgstr "Person löschen"
-
-#~ msgid "Delete archived tickets"
-#~ msgstr "Archivierte Tickets löschen"
-
-#~ msgid "Do you really want to delete all archived tickets?"
-#~ msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
-
-#~ msgid "Accept ticket"
-#~ msgstr "Ticket annehmen"
-
-#~ msgid "This ticket can't be closed."
-#~ msgstr "Dieses Ticket kann nicht abgeschlossen werden."
-
-#~ msgid "This ticket requires a decision, but no decision has been made yet."
-#~ msgstr ""
-#~ "Dieses Ticket verlangt nach einer Entscheidung, aber bisher wurde keine "
-#~ "Entscheidung gefällt."
-
-#~ msgid "Assign ticket"
-#~ msgstr "Ticket zuweisen"
-
-#~ msgid "Close ticket"
-#~ msgstr "Ticket abschliessen"
-
-#~ msgid "Reopen ticket"
-#~ msgstr "Ticket wieder öffnen"
-
-#~ msgid "Archive ticket"
-#~ msgstr "Ticket archivieren"
-
-#~ msgid "Recover from archive"
-#~ msgstr "Aus dem Archiv holen"
-
-#~ msgid "Delete Ticket"
-#~ msgstr "Ticket löschen"
-
-#~ msgid "PDF"
-#~ msgstr "PDF"
-
-#~ msgid "Download files"
-#~ msgstr "Dateien herunterladen"
-
-#~ msgid "New Message"
-#~ msgstr "Neue Nachricht"
-
-#~ msgid "Ticket Status"
-#~ msgstr "Ticket Status"
-
-#~ msgid "Text modules"
-#~ msgstr "Textbausteine"
-
-#~ msgid "Text module"
-#~ msgstr "Textbaustein"
-
-#~ msgid "Do you really want to delete this text module?"
-#~ msgstr "Möchten Sie diesen Textbaustein wirklich löschen"
-
-#~ msgid "Delete text module"
-#~ msgstr "Textbaustein löschen"
-
-#~ msgid "Room"
-#~ msgstr "Raum"
-
-#~ msgid "Daypass"
-#~ msgstr "Tageskarte"
-
-#~ msgid "Resource Item"
-#~ msgstr "Gegenstand"
-
-#~ msgid "External resource link"
-#~ msgstr "Externer Reservationslink"
-
-#~ msgid "New external resource"
-#~ msgstr "Neue externe Reservation"
-
-#~ msgid "Export All"
-#~ msgstr "Alles exportieren"
-
-#~ msgid "Notifications"
-#~ msgstr "Mitteilungen"
-
-#~ msgid "E-Mail Recipient"
-#~ msgstr "E-Mail Empfänger"
-
-#~ msgid "Do you really want to delete this resource?"
-#~ msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
-
-#~ msgid "Delete resource"
-#~ msgstr "Reservations-Ressource löschen"
-
-#~ msgid "This resource can't be deleted."
-#~ msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
-
-#~ msgid "There are existing reservations associated with this resource"
-#~ msgstr "Es existieren Reservationen für diese Reservations-Ressource"
-
-#~ msgid "Clean up"
-#~ msgstr "Aufräumen"
-
-#~ msgid "Rules"
-#~ msgstr "Regeln"
-
-#~ msgid "Rule"
-#~ msgstr "Regel"
-
-#~ msgid "Edit allocation"
-#~ msgstr "Einteilung bearbeiten"
-
-#~ msgid "Do you really want to delete this allocation?"
-#~ msgstr "Möchten Sie diese Einteilung wirklich löschen?"
-
-#~ msgid "Delete allocation"
-#~ msgstr "Einteilung löschen"
-
-#, python-format
-#~ msgid "Every ${days} until ${end}"
-#~ msgstr "Jeden ${days} bis zum ${end}."
-
-#~ msgid "Subscribers"
-#~ msgstr "Abonnenten"
-
-#~ msgid "Test"
-#~ msgstr "Test"
-
-#~ msgid "Delete newsletter"
-#~ msgstr "Newsletter löschen"
-
-#~ msgid "Photo Albums"
-#~ msgstr "Fotoalben"
-
-#~ msgid "Manage images"
-#~ msgstr "Bilder verwalten"
-
-#~ msgid "Photo Album"
-#~ msgstr "Fotoalbum"
-
-#~ msgid "Choose images"
-#~ msgstr "Bilder auswählen"
-
-#~ msgid "Delete photo album"
-#~ msgstr "Fotoalbum löschen"
-
-#~ msgid "Usermanagement"
-#~ msgstr "Benutzerverwaltung"
-
-#~ msgid "Create Signup Link"
-#~ msgstr "Neuer Registrationslink"
-
-#~ msgid "User"
-#~ msgstr "Benutzer"
-
-#~ msgid "User groups"
-#~ msgstr "Benutzergruppen"
-
-#~ msgid "Do you really want to delete this user group?"
-#~ msgstr "Möchten Sie diese Benutzergruppe wirklich löschen"
-
-#~ msgid "Delete user group"
-#~ msgstr "Benutzergruppe löschen"
-
-#~ msgid "Payment Providers"
-#~ msgstr "Zahlungsanbieter"
-
-#~ msgid "Payments"
-#~ msgstr "Zahlungen"
-
-#~ msgid "Synchronise"
-#~ msgstr "Synchronisieren"
-
-#~ msgid "Upcoming"
-#~ msgstr "Demnächst"
-
-#~ msgid "Past"
-#~ msgstr "Vergangen"
-
-#~ msgid "Choose filter"
-#~ msgstr "Filter wählen"
-
-#~ msgid "Delete entry"
-#~ msgstr "Eintrag löschen"
-
-#~ msgid "Dashboard"
-#~ msgstr "Dashboard"
-
-#~ msgid "Do you really want to delete this external link?"
-#~ msgstr "Wollen sie die externe Verknüpfung wirklich löschen?"
-
-#~ msgid "Delete external link"
-#~ msgstr "Verknüpfung löschen"
-
-#~ msgid "Chat with"
-#~ msgstr "Chat mit"
-
-#~ msgid "Please add a day and times to each opening hour entry."
-#~ msgstr ""
-#~ "Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu."
-
-#~ msgid "The chat is currently in a test-phase. Activate at your own risk."
-#~ msgstr ""
-#~ "Der Chat befindet sich aktuell in einer Test-Phase. Auf eigenes Risiko "
-#~ "aktivieren."
-
-#~ msgid "Chat title"
-#~ msgstr "Chat Titel"
-
-#~ msgid "Chat background color"
-#~ msgstr "Chat Hintegrundfarbe"
-
-#~ msgid "Customer-ID"
-#~ msgstr "Kunden-Identifier"
-
-#~ msgid "Admin"
-#~ msgstr "Admin"
-
-#~ msgid "Disable the chat"
-#~ msgstr "Chat deaktivieren"
-
-#~ msgid "Supported Chat Integrations"
-#~ msgstr "Unterstützte Chat Integration"
-
-#~ msgid "Straight to ..."
-#~ msgstr "Direkt zu ..."
-
-#~ msgid "Perform Search"
-#~ msgstr "Suchen"
+#~ msgid "Party"
+#~ msgstr "Party"

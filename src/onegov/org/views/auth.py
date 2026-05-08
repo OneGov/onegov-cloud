@@ -31,6 +31,7 @@ from onegov.user.forms import RegistrationForm
 from onegov.user.forms import RequestMTANForm
 from onegov.user.forms import RequestPasswordResetForm
 from onegov.user.forms import TOTPForm
+from onegov.user.models import TAN
 from purl import URL
 from webob import exc
 
@@ -190,7 +191,7 @@ def handle_registration(
             )
             request.success(_(
                 'Thank you for registering. Please follow the instructions '
-                'on the activiation e-mail sent to you. Please check your '
+                'on the activation e-mail sent to you. Please check your '
                 'spam folder if you have not received the email.'
             ))
 
@@ -331,9 +332,11 @@ def handle_password_reset_request(
 
         response = morepath.redirect(request.link(self, name='login'))
         request.success(
-            _(('A password reset link has been sent to ${email}, provided an '
-               'active account exists for this email address.'),
-              mapping={'email': form.email.data})
+            _(
+                'A password reset link has been sent to ${email}, provided an '
+                'active account exists for this email address.',
+                mapping={'email': form.email.data}
+            )
         )
         return response
 
@@ -817,9 +820,16 @@ def handle_confirm_citizen_login(
             request.alert(_('Invalid or expired login token provided.'))
             return morepath.redirect(request.link(self, 'citizen-login'))
         else:
-            request.browser_session['authenticated_email'] = (
+            request.browser_session['authenticated_email'] = email = (
                 tan_obj.meta['email'])
+
+            # expire the TAN we just used
             tan_obj.expire()
+            # expire any other TANs issued to the same email
+            for tan_obj in collection.query().filter(
+                TAN.meta['email'] == email
+            ):
+                tan_obj.expire()
             return self.redirect(
                 request,
                 tan_obj.meta.get('redirect_to', self.to)
@@ -857,5 +867,14 @@ def handle_citizen_logout(
 
     if request.authenticated_email:
         del request.browser_session['authenticated_email']
+
+    # NOTE: We don't perform a full logout here, since you can currently
+    #       be logged in as both a citizen and a regular user at the same
+    #       time for convenience. We may revisit that decision in the
+    #       future, but until then we at least make sure to clear the
+    #       browser cache on citizen logout.
+    @request.after
+    def clear_site_data(response: Response) -> None:
+        response.headers['Clear-Site-Data'] = '"cache"'
 
     return self.redirect(request, self.to)

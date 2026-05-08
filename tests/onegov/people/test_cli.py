@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from click.testing import CliRunner
 from onegov.people.cli import cli
 from onegov.people.models import Person
@@ -5,7 +7,17 @@ from pathlib import Path
 from transaction import commit
 
 
-def test_cli(cfg_path, session_manager, temporary_directory):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
+
+
+def test_cli(
+    cfg_path: str,
+    session_manager: SessionManager,
+    temporary_directory: str
+) -> None:
+
     runner = CliRunner()
 
     # Clear

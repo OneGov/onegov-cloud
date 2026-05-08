@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 import pytest
 from onegov.user.auth.provider import RolesMapping
 
 
 class MockApp:
-    def __init__(self, application_id, namespace):
+    def __init__(self, application_id: str, namespace: str) -> None:
         self.application_id = application_id
         self.namespace = namespace
 
 
 @pytest.fixture
-def roles_mapping():
+def roles_mapping() -> RolesMapping:
     roles = {
         '__default__': {
             'admins': 'default_admins',
@@ -39,7 +41,7 @@ def roles_mapping():
     return RolesMapping(roles)
 
 
-def test_app_specific(roles_mapping):
+def test_app_specific(roles_mapping: RolesMapping) -> None:
     app = MockApp('onegov_org/govikon', 'onegov_org')
     assert roles_mapping.app_specific(app) == {
         'admins': 'govikon_admins',
@@ -73,7 +75,7 @@ def test_app_specific(roles_mapping):
     }
 
 
-def test_match(roles_mapping):
+def test_match(roles_mapping: RolesMapping) -> None:
     roles = roles_mapping.roles['__default__']
 
     groups = ['unknown_group']

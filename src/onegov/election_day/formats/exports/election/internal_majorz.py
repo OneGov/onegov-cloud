@@ -30,6 +30,7 @@ def export_election_internal_majorz(
     """
 
     session = object_session(election)
+    assert session is not None
 
     ids = session.query(ElectionResult.id)
     ids = ids.filter(ElectionResult.election_id == election.id)

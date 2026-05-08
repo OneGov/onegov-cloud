@@ -52,6 +52,17 @@
                     <div tal:condition="name == 'coordinates' and change[2]" class="marker-map" data-map-type="thumbnail" data-lat="${change[2].lat}" data-lon="${change[2].lon}" data-zoom="${change[2].zoom}"></div>
                 </div>
             </dd>
+
+            <dt tal:condition="uploaded_files" i18n:translate>Documents</dt>
+            <dd tal:condition="uploaded_files">
+                <ul>
+                    <li tal:repeat="file uploaded_files">
+                        <a href="${request.link(file)}" tal:condition="file">
+                            <i class="far fa-file-pdf"></i> ${file.name}
+                        </a>
+                    </li>
+                </ul>
+            </dd>
         </dl>
     </metal:display_translator_mutation>
 
@@ -278,5 +289,13 @@
             </tal:b>
         </tal:b>
     </metal:access_hint_long>
+
+    <metal:globals-left define-macro="globals-left">
+        <ul class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+            <li>
+                <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
+            </li>
+        </ul>
+    </metal:globals-left>
 
 </body>

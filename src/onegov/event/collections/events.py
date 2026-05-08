@@ -6,8 +6,10 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
+import click
 import logging
 import requests
+
 from dateutil.parser import parse
 from html import unescape
 
@@ -371,18 +373,13 @@ class EventCollection(Pagination[Event]):
 
         We assume the timezone to be Europe/Zurich!
         :param ical: ical to be imported
-        :type ical: str
         :param future_events_only: if set only events in the future will be
         imported
-        :type future_events_only: bool
         :param event_image: image file
         :param event_image_name: image name
-        :type event_image_name: str
         :param default_categories: categories applied if non is given in ical
-        :type default_categories: [str]
         :param default_filter_keywords: default filter keywords, see event
         filter settings app.org.event_filter_type
-        :type default_filter_keywords: dict(str, [str] | None)
 
         """
         items = []
@@ -466,7 +463,7 @@ class EventCollection(Pagination[Event]):
 
             items.append(
                 EventImportItem(
-                    event=Event(  # type:ignore[misc]
+                    event=Event(
                         state='initiated',
                         title=title,
                         start=start,
@@ -499,6 +496,7 @@ class EventCollection(Pagination[Event]):
         organizers = {}
         items = []
         items_to_purge = []
+        source_ids = []
         h2t_config = {'ignore_emphasis': True}
 
         root = etree.fromstring(xml_stream)
@@ -516,8 +514,10 @@ class EventCollection(Pagination[Event]):
             if not dates:
                 return None
 
-            rdates = [start.strftime('%Y%m%dT%H%M%SZ') for start in dates]
-            return '\n'.join(f'RDATE:{start}' for start in rdates)
+            return '\n'.join(
+                f'RDATE:{to_timezone(start, "UTC"):%Y%m%dT%H%M%SZ}'
+                for start in dates
+            )
 
         def find_element_text(parent: etree._Element, key: str) -> str:
             element = parent.find(f'ns:{key}', namespaces=ns)
@@ -591,7 +591,7 @@ class EventCollection(Pagination[Event]):
             location_data = locations.get(location_id, {})
             location = ', '.join(
                 location_data[i] for i in ['title', 'street', 'zip', 'city']
-                if location_data[i]
+                if location_data.get(i)
             )
             coordinates = None
             if (location_data.get('lat', None) and
@@ -611,9 +611,10 @@ class EventCollection(Pagination[Event]):
                 provider_url = find_element_text(provider_ref, 'url')
 
             tags = []
-            if event.find('ns:tags', namespaces=ns) is not None:
-                tags = [
-                    tag.text for tag in event.find('ns:tags', namespaces=ns)]
+            category = event.find('ns:category', namespaces=ns)
+            if category is not None:
+                tag = find_element_text(category, 'mainCategory')
+                tags.append(tag) if tag else None
 
             timezone = 'Europe/Zurich'
             for schedule in event.find('ns:schedules', namespaces=ns):
@@ -621,7 +622,7 @@ class EventCollection(Pagination[Event]):
                 start = parse(find_element_text(schedule, 'start'))
                 end_text = find_element_text(schedule, 'end')
                 end = (parse(end_text) if end_text else
-                       start + timedelta(hours=1))
+                       start + timedelta(hours=2))
 
                 recurrence_start_dates: list[datetime] = []
                 recurrence = schedule.find('ns:recurrence', namespaces=ns)
@@ -664,7 +665,7 @@ class EventCollection(Pagination[Event]):
                 # Multiple 'single' frequency schedule lead to single events.
                 items.append(
                     EventImportItem(
-                        event=Event(  # type:ignore[misc]
+                        event=Event(
                             state='published',
                             title=title,
                             start=start,
@@ -692,6 +693,19 @@ class EventCollection(Pagination[Event]):
                         pdf_filename=None,
                     )
                 )
+
+                source_ids.append(schedule_id)
+
+        # ogc-2447 imported events with source ids not in this `xml_stream`
+        # can be removed to prevent duplicates as the xml stream represents
+        # a complete set of events
+        for event in (
+                self.session.query(Event)
+                .filter(Event.source.not_in(source_ids))):
+            if event.source:
+                items_to_purge.append(event.source)
+                click.echo(f' - removing event as not in xml stream '
+                           f'{event.title} {event.start}')
 
         return self.from_import(
             items,
@@ -816,13 +830,9 @@ class EventCollection(Pagination[Event]):
             if e.filter_keywords:
                 for k, v in e.filter_keywords.items():
                     if k == 'kalender':
-                        assert isinstance(v, str)
                         hr_text = v
                     else:
-                        if isinstance(v, list):
-                            tags.extend(v)
-                        else:
-                            tags.append(v)
+                        tags.append(v)
                 top_category = SubElement(event, 'hauptrubrik',
                                           attrib={'name': hr_text} if
                                           hr_text else None)

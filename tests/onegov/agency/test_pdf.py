@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date
 from datetime import timedelta
 
@@ -11,7 +13,12 @@ from onegov.pdf.utils import extract_pdf_info
 from sedate import utcnow
 
 
-def test_agency_pdf_default(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_agency_pdf_default(session: Session) -> None:
     people = ExtendedPersonCollection(session)
     aeschi = people.add(
         last_name="Aeschi",
@@ -128,7 +135,7 @@ def test_agency_pdf_default(session):
     assert 'Aeschi Thomas' in pdf
 
 
-def test_agency_pdf_default_hidden_by_access(session):
+def test_agency_pdf_default_hidden_by_access(session: Session) -> None:
     people = ExtendedPersonCollection(session)
     aeschi = people.add(
         last_name="Aeschi",
@@ -177,7 +184,7 @@ def test_agency_pdf_default_hidden_by_access(session):
     assert "Eder" not in pdf
 
 
-def test_agency_pdf_default_hidden_by_publication(session):
+def test_agency_pdf_default_hidden_by_publication(session: Session) -> None:
     then = utcnow() + timedelta(days=7)
 
     people = ExtendedPersonCollection(session)
@@ -229,7 +236,7 @@ def test_agency_pdf_default_hidden_by_publication(session):
 
 
 @freeze_time("2018-01-01")
-def test_agency_pdf_ar(session):
+def test_agency_pdf_ar(session: Session) -> None:
     people = ExtendedPersonCollection(session)
     aeschi = people.add(
         last_name="Aeschi",
@@ -291,7 +298,7 @@ def test_agency_pdf_ar(session):
     assert '2' in pdf
 
 
-def test_agency_pdf_zg(session):
+def test_agency_pdf_zg(session: Session) -> None:
     people = ExtendedPersonCollection(session)
     aeschi = people.add(
         last_name="Aeschi",
@@ -357,7 +364,7 @@ def test_agency_pdf_zg(session):
 
 
 @freeze_time("2025-02-17")
-def test_agency_pdf_lu(session):
+def test_agency_pdf_lu(session: Session) -> None:
     people = ExtendedPersonCollection(session)
     aeschi = people.add(
         last_name="Sutter",

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2025-02-18 09:27+0100\n"
+"POT-Creation-Date: 2026-03-24 19:31-0400\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -20,6 +20,9 @@ msgid "Invalid number of hours"
 msgstr ""
 
 msgid "Invalid number of minutes"
+msgstr ""
+
+msgid "Files of this type are not supported."
 msgstr ""
 
 msgid "Not a valid email"
@@ -144,11 +147,16 @@ msgstr ""
 msgid "Markdown"
 msgstr ""
 
+msgid "Invalid input."
+msgstr ""
+
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr ""
 
-msgid "Files of this type are not supported."
+msgid ""
+"The password you wanted to use was found on list of commonly used passwords, "
+"please use a more secure password."
 msgstr ""
 
 msgid "The form could not be parsed."
@@ -165,6 +173,19 @@ msgstr ""
 msgid ""
 "The indentation on line {line} is not valid. Please use a multiple of 4 "
 "spaces"
+msgstr ""
+
+#, python-format
+msgid ""
+"The indentation on line {line} is not valid. Comments must be indented to "
+"the same level as the field definition (`=`) they belong to."
+msgstr ""
+
+#, python-format
+msgid ""
+"Incorrect placement of the field description on line {line}. The field "
+"description must be placed below the field definition (`=`) and with the "
+"same indentation."
 msgstr ""
 
 #, python-format
@@ -193,6 +214,17 @@ msgstr ""
 msgid ""
 "The '{label}' group is empty and will not be visible. Either remove the "
 "empty group or add fields to it."
+msgstr ""
+
+#, python-format
+msgid ""
+"Nested fieldsets (`#`) are not supported, please remove line {line}."
+msgstr ""
+
+#, python-format
+msgid ""
+"${fields}: New fields cannot be required initially. Require them in a "
+"separate migration step."
 msgstr ""
 
 #, python-format
@@ -226,6 +258,9 @@ msgstr ""
 
 #, python-format
 msgid "Needs to be on or before {date}."
+msgstr ""
+
+msgid "Not a valid domain."
 msgstr ""
 
 msgid "Uploaded file"

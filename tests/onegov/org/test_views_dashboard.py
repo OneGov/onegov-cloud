@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import transaction
 
 from onegov.org.boardlets import OrgBoardlet
@@ -6,15 +8,21 @@ from onegov.ticket import TicketCollection, Ticket
 from onegov.user import User
 from tests.onegov.org.conftest import EchoHandler
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import pytest
+    from onegov.ticket.handler import HandlerRegistry
+    from .conftest import Client
 
-def test_view_dashboard_no_access(client):
+
+def test_view_dashboard_no_access(client: Client) -> None:
     # user cannot see the dashboard
     response = client.get('/dashboard', expect_errors=True)
     assert response.status_code == 403
     assert 'Zugriff verweigert' in response
 
 
-def test_view_dashboard_no_ticket(client):
+def test_view_dashboard_no_ticket(client: Client) -> None:
     client.login_admin()
 
     page = client.get('/dashboard')
@@ -39,10 +47,14 @@ def test_view_dashboard_no_ticket(client):
     assert 'Zuletzt bearbeitete News' in page
 
 
-def test_view_dashboard_tickets(handlers, client, org_app):
+def test_view_dashboard_tickets(
+    handlers: HandlerRegistry,
+    client: Client
+) -> None:
+
     handlers.register('EVN', EchoHandler)
 
-    session = org_app.session()
+    session = client.app.session()
 
     session.add(User(
         username='user',
@@ -50,6 +62,7 @@ def test_view_dashboard_tickets(handlers, client, org_app):
         role='admin'
     ))
     user = session.query(User).filter_by(username='user').first()
+    assert user is not None
 
     tickets = [
         Ticket(
@@ -83,10 +96,10 @@ def test_view_dashboard_tickets(handlers, client, org_app):
 
     collection = TicketCollection(session)
 
-    collection.by_handler_id('2').accept_ticket(user)
-    collection.by_handler_id('3').accept_ticket(user)
+    collection.by_handler_id('2').accept_ticket(user)  # type: ignore[union-attr]
+    collection.by_handler_id('3').accept_ticket(user)  # type: ignore[union-attr]
 
-    collection.by_handler_id('3').close_ticket()
+    collection.by_handler_id('3').close_ticket()  # type: ignore[union-attr]
 
     transaction.commit()
 
@@ -116,7 +129,11 @@ def test_view_dashboard_tickets(handlers, client, org_app):
     assert page.pyquery('.closed-tickets').attr('data-count') == '1'
 
 
-def test_view_dashboard_topics_news(handlers, client):
+def test_view_dashboard_topics_news(
+    handlers: HandlerRegistry,
+    client: Client
+) -> None:
+
     client.login_admin()
     page = client.get('/dashboard')
 
@@ -139,7 +156,10 @@ def test_view_dashboard_topics_news(handlers, client):
     assert link_texts[4] == 'Aktuelles'
 
 
-def test_view_dashboard_web_stats(client, monkeypatch):
+def test_view_dashboard_web_stats(
+    client: Client,
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
 
     page_metrics = [10, 15, 20, 25, 30]
     pages = [

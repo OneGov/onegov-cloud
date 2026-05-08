@@ -15,18 +15,16 @@ jobs:
     permissions:
       contents: read
       packages: write
-      attestations: write
-      id-token: write
 
     outputs:
       version: ${{ steps.meta.outputs.version }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Log in to the container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -34,31 +32,25 @@ jobs:
 
       - name: Extract metadata (tags, labels) for docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/onegov/onegov-cloud
 
       - name: Build and push docker image
         id: push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/onegov/onegov-cloud
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          provenance: false
 
   test-image:
     needs: build-and-push-image
     strategy:
       matrix:
-        group: [1, 2, 3, 4, 5, 6]
+        group: [1, 2, 3, 4, 5, 6, 7, 8]
 
     runs-on: ubuntu-latest
 
@@ -87,34 +79,29 @@ jobs:
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
           libasound2t64 \
+          libcairo2-dev \
           libdrm2 \
           libgbm1 \
           libnspr4 \
           libnss3 \
+          libpq-dev \
           libu2f-udev \
           libvulkan1 \
           libx11-xcb1 \
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          libxt-dev \
           unzip \
           xdg-utils
 
-    - name: Install Chrome
-      uses: browser-actions/setup-chrome@v1
-      with:
-        # FIXME: Unpin once selenium works with newer version
-        chrome-version: 127
-        install-chromedriver: true
-
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Get branch name (merge)
       if: github.event_name != 'pull_request'
@@ -145,6 +132,10 @@ jobs:
         # add unprivileged test user
         adduser --disabled-password --gecos "" test
         redis-server --daemonize yes
+        PG_DATA_DIR="$(pg_config --sharedir)/tsearch_data"
+        cp "${PG_DATA_DIR}/unaccent.rules" "${PG_DATA_DIR}/german.rules"
+        sed -i 's/^\([ÄÖÜäöü]\t.*\)/\1e/' "${PG_DATA_DIR}/german.rules"
+        run-as "$(id -u test)":test /app/bin/playwright install chromium
 
     - name: Run tests
       run: |
@@ -153,15 +144,16 @@ jobs:
           -o cache_dir=/tmp/pytest \
           -r fER \
           --dist loadgroup \
-          --splits "6" \
+          --splits "8" \
           --group "${{matrix.group}}" \
           --reruns 3 \
           --reruns-delay 1 \
           --only-rerun "AttributeError: 'SessionManager'" \
           --only-rerun "AttributeError: 'DefaultLayout'" \
-          --only-rerun "ReferenceError: $ is not defined" \
-          --only-rerun "FileNotFoundError: [Errno 2] No such file" \
+          --only-rerun ".*ReferenceError: [$] is not defined" \
+          --only-rerun "FileNotFoundError:" \
           --only-rerun "Bad response: 404 Not Found" \
+          --only-rerun "playwright[.]_impl[.]_errors[.]TimeoutError" \
           --junit-xml=/tmp/junit.xml \
           -o junit_family=legacy \
           --cov \
@@ -175,7 +167,6 @@ jobs:
       env:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
-        JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
         SKIP_DRIVER_MANAGER: '1'
 
   cleanup-images:
@@ -207,5 +198,5 @@ jobs:
           package-name: 'onegov-cloud'
           package-type: 'container'
           min-versions-to-keep: 20
-          ignore-versions: '^release-.*$'
+          ignore-versions: '^(release-.*|master)$'
           ignore-versions-include-tags: true

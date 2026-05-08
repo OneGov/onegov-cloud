@@ -28,6 +28,8 @@ from wtforms.validators import Optional
 
 
 from typing import TYPE_CHECKING
+
+from onegov.town6.layout import SettingsLayout
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
@@ -100,14 +102,6 @@ class FeriennetSettingsForm(Form):
         description=_('The text will be shown below the '
                 'confirmation text for an activity in the mail'),
         render_kw={'rows': 10}
-    )
-
-    show_related_contacts = BooleanField(
-        label=_(
-            'Parents can see the contacts of other parents in '
-            'the same activity'
-        ),
-        fieldset=_('Privacy')
     )
 
     public_organiser_data = MultiCheckboxField(
@@ -240,7 +234,6 @@ class FeriennetSettingsForm(Form):
             ('require_swisspass', False),
             ('cancellation_conditions', ''),
             ('require_full_age_for_registration', False),
-            ('show_related_contacts', False),
             ('public_organiser_data', self.request.app.public_organiser_data),
             ('bank_account', ''),
             ('bank_beneficiary', ''),
@@ -276,7 +269,6 @@ class FeriennetSettingsForm(Form):
             'require_swisspass',
             'cancellation_conditions',
             'require_full_age_for_registration',
-            'show_related_contacts',
             'public_organiser_data',
             'bank_account',
             'bank_beneficiary',
@@ -311,4 +303,5 @@ def custom_handle_settings(
     request: FeriennetRequest,
     form: FeriennetSettingsForm
 ) -> RenderData | Response:
-    return handle_generic_settings(self, request, form, _('Feriennet'))
+    return handle_generic_settings(self, request, form, _('Feriennet'),
+                                   SettingsLayout(self, request))

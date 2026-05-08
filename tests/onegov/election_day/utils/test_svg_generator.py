@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from freezegun import freeze_time
 from io import StringIO
@@ -13,22 +15,33 @@ from unittest.mock import patch
 from pytest import mark
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from ..conftest import TestApp
+
+
 class PatchedSvgGenerator(SvgGenerator):
-    def __init__(self, app):
-        super(PatchedSvgGenerator, self).__init__(app)
+    def __init__(self, app: TestApp) -> None:
+        super().__init__(app)
         self.renderer = PatchedD3Renderer(app)
 
 
 @mark.flaky(reruns=3, only_rerun=None)
-def test_generate_svg(election_day_app_gr, session):
+def test_generate_svg(
+    election_day_app_gr: TestApp,
+    session: Session
+) -> None:
 
+    assert election_day_app_gr.filestorage is not None
     election_day_app_gr.filestorage.makedir('svg')
     generator = SvgGenerator(election_day_app_gr)
 
-    def generate(item, type_, locale):
+    def generate(item: Any, type_: str, locale: str) -> int:
         filename = svg_filename(item, type_, locale)
         return generator.generate_svg(item, type_, filename, locale)
 
+    item: object
     svg = StringIO('<svg></svg>')
     with patch.object(generator.renderer, 'get_chart', return_value=svg) as gc:
 
@@ -59,7 +72,7 @@ def test_generate_svg(election_day_app_gr, session):
             item = add_election_compound(
                 session, elections=[item], pukelsheim=True,
             )
-            item.horizontal_party_stengths = True
+            item.horizontal_party_stengths = True  # type: ignore[attr-defined]
             assert generate(item, 'list-groups', 'de_CH') == 1
             assert generate(item, 'lists', 'de_CH') == 0
             assert generate(item, 'candidates', 'de_CH') == 0
@@ -131,17 +144,18 @@ def test_generate_svg(election_day_app_gr, session):
         ])
 
 
-def test_create_svgs(election_day_app_gr):
+def test_create_svgs(election_day_app_gr: TestApp) -> None:
     generator = SvgGenerator(election_day_app_gr)
     session = election_day_app_gr.session()
     fs = election_day_app_gr.filestorage
+    assert fs is not None
 
     svg = StringIO('<svg></svg>')
     with patch.object(generator.renderer, 'get_chart', return_value=svg):
 
         # no data yet
         assert generator.create_svgs() == (0, 0)
-        assert election_day_app_gr.filestorage.listdir('svg') == []
+        assert fs.listdir('svg') == []
 
         with freeze_time("2014-04-04 14:00"):
             majorz = add_majorz_election(session)

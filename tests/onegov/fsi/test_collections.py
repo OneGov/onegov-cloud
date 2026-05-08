@@ -1,28 +1,39 @@
+from __future__ import annotations
+
 from datetime import timedelta
-from uuid import uuid4
-
-from sedate import utcnow
-
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.models import CourseAttendee
-
 from onegov.fsi.models.course_event import CourseEvent
+from sedate import utcnow
 from tests.onegov.fsi.common import collection_attr_eq_test
+from uuid import uuid4
 
 
-class authAttendee:
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Query, Session
+    from uuid import UUID
+    from .conftest import FsiScenario
 
-    def __init__(self, role=None, id=None, permissions=None):
+
+class AuthAttendee:
+
+    def __init__(
+        self,
+        role: str | None = None,
+        id: UUID | None = None,
+        permissions: list[str] | None = None
+    ) -> None:
         self.role = role or 'admin'
         self.id = id or uuid4()
         self.permissions = permissions or []
 
 
-def test_course_collection(scenario):
+def test_course_collection(scenario: FsiScenario) -> None:
     scenario.add_course(hidden_from_public=True, name='Hidden')
     scenario.add_course()
     course1 = scenario.latest_course
@@ -36,7 +47,11 @@ def test_course_collection(scenario):
     assert coll.query().count() == 2
 
 
-def test_course_event_collection(session, scenario):
+def test_course_event_collection(
+    session: Session,
+    scenario: FsiScenario
+) -> None:
+
     now = utcnow()
     course_id = scenario.add_course()
     new_course_events = (
@@ -81,14 +96,14 @@ def test_course_event_collection(session, scenario):
     assert event_coll.query().count() == 1
 
 
-def test_event_collection_add_placeholder(scenario):
+def test_event_collection_add_placeholder(scenario: FsiScenario) -> None:
     # Test add_placeholder method
     scenario.add_course()
     scenario.add_course_event(course=scenario.latest_course)
     assert scenario.latest_event.attendees.count() == 0
 
 
-def test_attendee_collection(scenario):
+def test_attendee_collection(scenario: FsiScenario) -> None:
 
     scenario.add_attendee()
     scenario.add_attendee(organisation='A', username='A@A.com')
@@ -97,7 +112,7 @@ def test_attendee_collection(scenario):
 
     session = scenario.session
 
-    auth_admin = authAttendee(role='admin')
+    auth_admin: Any = AuthAttendee(role='admin')
 
     coll = CourseAttendeeCollection(session, auth_attendee=auth_admin)
     collection_attr_eq_test(coll, coll.page_by_index(1))
@@ -118,7 +133,7 @@ def test_attendee_collection(scenario):
     assert coll.query().count() == 0
 
     # Test for role editor
-    auth_editor = authAttendee(role='editor')
+    auth_editor: Any = AuthAttendee(role='editor')
     coll = CourseAttendeeCollection(session, auth_attendee=auth_editor)
 
     # Get all of them, but himself does not exist
@@ -136,7 +151,7 @@ def test_attendee_collection(scenario):
     assert coll.query().count() == 2
 
 
-def test_reservation_collection_query(scenario):
+def test_reservation_collection_query(scenario: FsiScenario) -> None:
     session = scenario.session
     scenario.add_attendee(role='admin')
 
@@ -155,7 +170,7 @@ def test_reservation_collection_query(scenario):
     scenario.add_subscription(scenario.latest_event, scenario.latest_attendee)
     scenario.commit()
 
-    auth_attendee = authAttendee()
+    auth_attendee: Any = AuthAttendee()
 
     # unfiltered for admin, must yield all
     coll = SubscriptionsCollection(session, auth_attendee=auth_attendee)
@@ -176,12 +191,13 @@ def test_reservation_collection_query(scenario):
     assert coll.query().count() == 3
 
     # Test for editor with no permissions should see just his own
-    auth_attendee = authAttendee(role='editor', id=editor.id)
+    auth_attendee = AuthAttendee(role='editor', id=editor.id)
     coll = SubscriptionsCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 1
 
     # Add an organisation
     att.organisation = 'A'
+    assert coll.auth_attendee is not None
     coll.auth_attendee.permissions = ['A']
     assert coll.query().count() == 1
 
@@ -191,13 +207,14 @@ def test_reservation_collection_query(scenario):
     assert coll.query().count() == 1
 
     # member user_role
-    coll.auth_attendee.role = 'member'
+    assert coll.auth_attendee is not None
+    coll.auth_attendee.role = 'member'  # type: ignore[misc]
     # coll.attendee_id will be set in path like
     coll.attendee_id = att.id
     assert coll.query().count() == 1
 
 
-def test_ranked_subscription_query(scenario):
+def test_ranked_subscription_query(scenario: FsiScenario) -> None:
     scenario.add_attendee(role='member')
     scenario.add_course(
         mandatory_refresh=True,
@@ -217,7 +234,7 @@ def test_ranked_subscription_query(scenario):
     scenario.commit()
     scenario.refresh()
 
-    fake_admin = authAttendee()
+    fake_admin: Any = AuthAttendee()
     audits = AuditCollection(
         scenario.session, scenario.latest_course.id,
         fake_admin
@@ -230,7 +247,7 @@ def test_ranked_subscription_query(scenario):
     assert result[0].start != scenario.latest_event.start
 
 
-def test_audit_collection(scenario):
+def test_audit_collection(scenario: FsiScenario) -> None:
 
     scenario.add_course(
         mandatory_refresh=True,
@@ -268,8 +285,8 @@ def test_audit_collection(scenario):
     scenario.refresh()
 
     # ---- Check preparing query last_subscriptions ----
-    fake_admin = authAttendee()
-    fake_editor = authAttendee(role='editor', permissions=['AA'])
+    fake_admin: Any = AuthAttendee()
+    fake_editor: Any = AuthAttendee(role='editor', permissions=['AA'])
 
     audits = AuditCollection(
         scenario.session, scenario.latest_course.id,
@@ -314,7 +331,7 @@ def test_audit_collection(scenario):
 
     # Check filtering for admin obtaining all records
 
-    def get_filtered():
+    def get_filtered() -> Query[CourseAttendee]:
         return audits.filter_attendees_by_role(all_atts_in_db)
 
     all_atts_in_db = scenario.session.query(CourseAttendee)

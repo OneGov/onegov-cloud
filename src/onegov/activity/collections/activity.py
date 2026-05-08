@@ -5,7 +5,8 @@ import sedate
 
 from copy import copy
 from enum import IntEnum
-from onegov.activity.models import Activity, Occasion, OccasionDate, Period
+from onegov.activity.models import Activity, BookingPeriod
+from onegov.activity.models import Occasion, OccasionDate
 from onegov.activity.utils import date_range_decode
 from onegov.activity.utils import date_range_encode
 from onegov.activity.utils import merge_ranges
@@ -29,20 +30,19 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import UUID
 
 
-from typing import overload, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator
     from datetime import date
     from markupsafe import Markup
-    from onegov.activity.models import PeriodMeta
+    from onegov.activity.models import BookingPeriodMeta
     from onegov.activity.models.activity import ActivityState
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import TypedDict, Unpack
-    from typing import Self, TypeAlias
+    from typing import TypedDict, Unpack, Self
 
-    AvailabilityType: TypeAlias = Literal['none', 'few', 'many']
-    FilterKey: TypeAlias = Literal[
+    type AvailabilityType = Literal['none', 'few', 'many']
+    type FilterKey = Literal[
         'age_ranges',
         'available',
         'price_ranges',
@@ -91,7 +91,6 @@ if TYPE_CHECKING:
         volunteer: bool
 
 
-ActivityT = TypeVar('ActivityT', bound=Activity)
 AVAILABILITY_VALUES: set[AvailabilityType] = {'none', 'few', 'many'}
 
 
@@ -259,7 +258,7 @@ class ActivityFilter:
         return self.contains_num_range(price_range, self.price_ranges)
 
 
-class ActivityCollection(RangedPagination[ActivityT]):
+class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):
 
     @overload
     def __init__(
@@ -334,8 +333,8 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         if self.filter.tags:
             query = query.filter(
-                model_class._tags.has_any(  # type:ignore[attr-defined]
-                    array(self.filter.tags)))  # type:ignore[call-overload]
+                model_class._tags.has_any(array(self.filter.tags))
+            )
 
         if self.filter.states:
             query = query.filter(
@@ -373,6 +372,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         now = utcnow()
 
+        filters_applied = False
         if self.filter.timelines:
             conditions = []
 
@@ -391,30 +391,36 @@ class ActivityCollection(RangedPagination[ActivityT]):
             # when we apply the occasion conditions to the activites query
             # since we'd be looking for activities without occasions
             if conditions:
+                filters_applied = True
                 o = o.filter(or_(*conditions))
 
         if self.filter.volunteers:
+            filters_applied = True
             o = o.filter(Occasion.seeking_volunteers.in_(
                 self.filter.volunteers))
 
         if self.filter.period_ids:
+            filters_applied = True
             o = o.filter(Occasion.period_id.in_(self.filter.period_ids))
 
         if self.filter.durations:
+            filters_applied = True
             o = o.filter(Occasion.duration.in_(
                 int(d) for d in self.filter.durations))
 
         if self.filter.age_ranges:
+            filters_applied = True
             o = o.filter(or_(
                 *(
-                    Occasion.age.overlaps(  # type:ignore[attr-defined]
+                    Occasion.age.overlaps(
                         func.int4range(min_age, max_age + 1))
                     for min_age, max_age in self.filter.age_ranges
                 )
             ))
 
         if self.filter.price_ranges:
-            o = o.join(Period)
+            filters_applied = True
+            o = o.join(BookingPeriod)
             o = o.filter(or_(
                 *(
                     and_(
@@ -425,20 +431,22 @@ class ActivityCollection(RangedPagination[ActivityT]):
             ))
 
         if self.filter.dateranges:
-            o = o.filter(Occasion.active_days.op('&&')(array(  # type:ignore
-                tuple(
+            filters_applied = True
+            o = o.filter(Occasion.active_days.op('&&')(array(
                     dt.toordinal()
                     for start, end in self.filter.dateranges
                     for dt in sedate.dtrange(start, end)
-                )))
+                ))
             )
 
         if self.filter.weekdays:
+            filters_applied = True
             o = o.filter(
-                Occasion.weekdays.op('<@')(array(  # type:ignore[call-overload]
-                    self.filter.weekdays)))
+                Occasion.weekdays.op('<@')(array(self.filter.weekdays))
+            )
 
         if self.filter.available:
+            filters_applied = True
             conditions = []
 
             for amount in self.filter.available:
@@ -455,8 +463,8 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         # if no filter was applied to the occasion subquery, we ignore it since
         # we would otherwise get zero results
-        if o._criterion is not None:
-            query = query.filter(model_class.id.in_(o.subquery()))
+        if filters_applied:
+            query = query.filter(model_class.id.in_(o.scalar_subquery()))
 
         return query.order_by(self.model_class.order)
 
@@ -504,10 +512,10 @@ class ActivityCollection(RangedPagination[ActivityT]):
         base = self.query_base().with_entities(
             func.skeys(self.model_class._tags).label('keys'))
 
-        query = select([func.array_agg(column('keys'))], distinct=True)
+        query = select(func.array_agg(column('keys')))  # type: ignore[var-annotated]
         query = query.select_from(base.subquery())
 
-        tags = self.session.execute(query).scalar()
+        tags = self.session.execute(query.distinct()).scalar()
 
         return set(tags) if tags else set()
 
@@ -581,12 +589,12 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
     def available_weeks(
         self,
-        period: Period | PeriodMeta | None
+        period: BookingPeriod | BookingPeriodMeta | None
     ) -> Iterator[tuple[date, date]]:
         if not period:
             return
 
-        weeknumbers = {n[:2] for n in self.session.execute(text("""
+        weeknumbers_weeks = {n[:2] for n in self.session.execute(text("""
             SELECT DISTINCT
                 EXTRACT(week FROM start::date),
                 EXTRACT(week FROM "end"::date)
@@ -596,13 +604,13 @@ class ActivityCollection(RangedPagination[ActivityT]):
             WHERE period_id = :period_id
         """), {'period_id': period.id})}
 
-        weeknumbers = {
+        weeknumbers_weeks = {
             tuple(
                 range(int(start), int(end) + 1)
-            ) for start, end in weeknumbers
+            ) for start, end in weeknumbers_weeks
         }
 
-        weeknumbers = {week for weeks in weeknumbers for week in weeks}
+        weeknumbers = {week for weeks in weeknumbers_weeks for week in weeks}
 
         weeks = sedate.weekrange(period.execution_start, period.execution_end)
 
@@ -625,4 +633,4 @@ class ActivityCollection(RangedPagination[ActivityT]):
 
         ages = self.session.execute(query).first()
 
-        return ages and ages or None
+        return ages._tuple() if ages else None

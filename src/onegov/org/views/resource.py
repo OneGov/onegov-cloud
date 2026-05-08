@@ -11,12 +11,15 @@ from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import islice
+from libres.db.models import ReservationBlocker
+from libres.modules import rasterizer
 from libres.modules.errors import LibresError
+from math import isclose
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
 from onegov.core.utils import module_path, Bunch
 from onegov.core.orm import as_selectable_from_path
-from onegov.form import FormSubmission
+from onegov.form import as_internal_id, FormSubmission
 from onegov.org.cli import close_ticket
 from onegov.org.forms.resource import AllResourcesExportForm
 from onegov.org import _, OrgApp, utils
@@ -26,20 +29,23 @@ from onegov.org.forms import (
 from onegov.org.layout import (
     DefaultLayout, FindYourSpotLayout, ResourcesLayout, ResourceLayout)
 from onegov.org.models.dashboard import CitizenDashboard
-from onegov.org.models.resource import (
-    DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
+from onegov.org.models.resource import (
+    DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
+from onegov.org.models.ticket import ReservationTicket
+from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.org.views.utils import assert_citizen_logged_in
-from onegov.reservation import ResourceCollection, Resource, Reservation
-from onegov.ticket import Ticket, TicketCollection
-from onegov.pay import PaymentCollection
+from onegov.reservation import Allocation, Reservation
+from onegov.reservation import Resource, ResourceCollection
+from onegov.ticket import Ticket, TicketInvoice
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, select
-from sqlalchemy.orm import object_session, undefer
+from sqlalchemy import and_, cast as sa_cast, func, or_, select
+from sqlalchemy import Boolean, UUID as UUIDType
+from sqlalchemy.orm import undefer, joinedload, Session
 from webob import exc
 
 
@@ -48,19 +54,17 @@ if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Mapping
     from libres.db.models import Reservation as BaseReservation
+    from libres.db.scheduler import Scheduler
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Allocation
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
-    from typing import TypeAlias, TypedDict, TypeVar
+    from typing import TypedDict
     from uuid import UUID
     from webob import Response as BaseResponse
 
-    T = TypeVar('T')
-    KT = TypeVar('KT')
-    RoomSlots: TypeAlias = dict[UUID, list[utils.FindYourSpotEventInfo]]
-    ReservationTicketRow: TypeAlias = tuple[
+    type RoomSlots = dict[UUID, list[utils.FindYourSpotEventInfo]]
+    type ReservationTicketRow = tuple[
         datetime,               # Reservation.start
         datetime,               # Reservation.end
         int,                    # Reservation.quota
@@ -68,7 +72,7 @@ if TYPE_CHECKING:
         str | None,             # Ticket.subtitle
         UUID                    # Ticket.id
     ]
-    ReservationExportRow: TypeAlias = tuple[
+    type ReservationExportRow = tuple[
         datetime,       # Reservation.start
         datetime,       # Reservation.end
         int,            # Reservation.quota
@@ -115,7 +119,7 @@ RESOURCE_TYPES: dict[str, ResourceDict] = {
 
 # NOTE: This function is inherently not type safe since we modify the original
 #       items that have been passed in, but this way is more memory efficient
-def combine_grouped(
+def combine_grouped[KT, T](
     items: dict[KT, list[T]],
     external_links: dict[KT, list[ExternalLink]],
     sort: Callable[[T | ExternalLink], SupportsRichComparison] | None = None
@@ -187,9 +191,11 @@ class ResourceGroup(NamedTuple):
         for group, items in grouped.items():
             entries: dict[str, Any] = {}
             group_has_find_your_spot = False
+            rooms: dict[tuple[UUID, str], Resource] = {}
             for item in items:
                 is_room = isinstance(item, Resource) and item.type == 'room'
                 if is_room:
+                    rooms[item.id, item.subgroup or ''] = item  # type: ignore
                     group_has_find_your_spot = True
 
                 if subgroup_name := getattr(item, 'subgroup', None):
@@ -208,12 +214,36 @@ class ResourceGroup(NamedTuple):
                         title = f'{title} '
                     entries[title] = item
 
+            # sorts parents before their children in the same subgroup
+            def subgroup_sort_key(item: Any) -> tuple[str, ...]:
+                key = [item.title]
+                if isinstance(item, Resource):
+                    seen = {item.id}
+                    while (
+                        item.parent_id is not None
+                        # avoid infinite loop when there is a cycle
+                        and item.parent_id not in seen
+                        and (parent := rooms.get((  # noqa: B023
+                            item.parent_id,
+                            item.subgroup or ''
+                        ))) is not None
+                    ):
+                        item = parent
+                        seen.add(item.id)
+                        key.append(item.title)
+                return tuple(reversed(key))
+
+            def group_sort_key(item: tuple[str, Any]) -> tuple[str, ...]:
+                if isinstance(item[1], Resource):
+                    return subgroup_sort_key(item[1])
+                return (item[0],)
+
             result.append(cls(
                 title=group,
                 entries=[
                     ResourceSubgroup(
                         title=subgroup,
-                        entries=sorted(entry[1], key=attrgetter('title')),
+                        entries=sorted(entry[1], key=subgroup_sort_key),
                         find_your_spot=FindYourSpotCollection(
                             request.app.libres_context,
                             group=None if group == default_group else group,
@@ -222,7 +252,7 @@ class ResourceGroup(NamedTuple):
                     ) if isinstance(entry, tuple) else entry
                     for subgroup, entry in sorted(
                         entries.items(),
-                        key=itemgetter(0)
+                        key=group_sort_key
                     )
                 ],
                 find_your_spot=FindYourSpotCollection(
@@ -315,6 +345,8 @@ def view_resources(
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
+        'header_html': request.app.org.resource_header_html,
+        'footer_html': request.app.org.resource_footer_html,
     }
 
 
@@ -335,13 +367,30 @@ def view_find_your_spot(
     form.action += '#results'
     room_slots: dict[date_t, RoomSlots] | None = None
     missing_dates: dict[date_t, list[Resource] | None] | None = None
-    rooms = sorted(
-        request.exclude_invisible(self.query()),
-        key=attrgetter('title')
-    )
+    rooms = request.exclude_invisible(self.query())
     if not rooms:
         # we'll treat categories without rooms as non-existant
         raise exc.HTTPNotFound()
+
+    # NOTE: We make sure to sort parent rooms before their children
+    #       so they get picked first when auto-reserving
+    rooms_dict = {room.id: room for room in rooms}
+
+    def sort_key(item: Resource) -> tuple[str, ...]:
+        key = [item.title]
+        seen = {item.id}
+        while (
+            item.parent_id is not None
+            # avoid infinite loop when there is a cycle
+            and item.parent_id not in seen
+            and (parent := rooms_dict.get(item.parent_id)) is not None
+        ):
+            item = parent
+            seen.add(item.id)
+            key.append(item.title)
+        return tuple(reversed(key))
+
+    rooms.sort(key=sort_key)
 
     form.apply_rooms(rooms)
     if form.submitted(request):
@@ -430,11 +479,20 @@ def view_find_your_spot(
         }
         for room in rooms:
             room.bind_to_libres_context(request.app.libres_context)
-            for allocation in request.exclude_invisible(
-                room.scheduler.search_allocations(
+            scheduler = room.scheduler
+            allocations = request.exclude_invisible(
+                scheduler.search_allocations(
                     start, end, days=form.weekdays.data, strict=True
                 )
-            ):
+            )
+            if not allocations:
+                continue
+
+            reserved, blocked = scheduler.reserved_slots_by_range(
+                min(a._start for a in allocations),
+                max(a._end for a in allocations),
+            )
+            for allocation in allocations:
                 # FIXME: libres isn't super careful about polymorphism yet
                 #        whenever we clean that up we can make Scheduler
                 #        generic and bind our subclass, so we don't have to
@@ -456,7 +514,20 @@ def view_find_your_spot(
                 )
 
                 if not allocation.partly_available:
-                    quota_left = allocation.quota_left
+                    quota_used = max(
+                        (
+                            allocation.quota
+                            if slot in blocked
+                            else reserved.get(slot, 0)
+                            for slot, __ in rasterizer.iterate_span(
+                                allocation._start,
+                                allocation._end,
+                                rasterizer.MIN_RASTER
+                            )
+                        ),
+                        default=0
+                    )
+                    quota_left = max(0, allocation.quota - quota_used)
                     availability = (
                         allocation.display_end() - allocation.display_start()
                     ) / duration * 100.0
@@ -491,10 +562,20 @@ def view_find_your_spot(
 
                     target_slot_end = target_slot_start + duration
 
-                    free = allocation.free_slots(
-                        target_slot_start,
-                        target_slot_end
-                    )
+                    free = [
+                        slot
+                        for slot in allocation.all_slots(
+                            target_slot_start,
+                            target_slot_end
+                        )
+                        if not any(
+                            s in reserved or s in blocked
+                            for s, __ in rasterizer.iterate_span(
+                                *slot,
+                                rasterizer.MIN_RASTER
+                            )
+                        )
+                    ]
                     if not free:
                         if (
                             allocation.display_start() <= target_slot_start
@@ -568,10 +649,20 @@ def view_find_your_spot(
                     slots.append(spot_infos[0])
                     added_slots += 1
 
-                free = allocation.free_slots(
-                    target_start,
-                    target_end
-                )
+                free = [
+                    slot
+                    for slot in allocation.all_slots(
+                        target_start,
+                        target_end
+                    )
+                    if not any(
+                        s in reserved or s in blocked
+                        for s, __ in rasterizer.iterate_span(
+                            *slot,
+                            rasterizer.MIN_RASTER
+                        )
+                    )
+                ]
                 if not free:
                     continue
 
@@ -584,7 +675,17 @@ def view_find_your_spot(
                         # span, as long as it overlaps with our target
                         # so people can reserve a slot that's slightly
                         # outside their selected range if they want
-                        allocation.free_slots(),
+                        [
+                            slot
+                            for slot in allocation.all_slots()
+                            if not any(
+                                s in reserved or s in blocked
+                                for s, __ in rasterizer.iterate_span(
+                                    *slot,
+                                    rasterizer.MIN_RASTER
+                                )
+                            )
+                        ],
                         duration,
                         adjustable=True
                     )
@@ -635,7 +736,8 @@ def view_find_your_spot(
                 ) else room_slots.items()
             ):
                 skipped = skipped_due_to_existing_reservation[date]
-                reserved_dates[date] = skipped
+                reserved_dates[date] = skipped.copy()
+                blocked_rooms = skipped.copy()
                 if skipped and (
                     auto_reserve != 'for_every_room'
                     or len(skipped) == len(date_room_slots)
@@ -651,8 +753,25 @@ def view_find_your_spot(
                         # already fully reserved
                         continue
 
+                    if not blocked_rooms.isdisjoint(
+                        request.app.get_blocking_resource_ids(room_id)
+                    ):
+                        # we already reserved another room that blocks us
+                        # since parent rooms are usually sorted before
+                        # child rooms, this ensures we first try to
+                        # reserve the entire thing and then fall back
+                        # to individual subrooms.
+                        # if we didn't skip due to existing reservations
+                        # we add ourselves to the list of reserved rooms
+                        # since we implicitly are reserved through the other
+                        # room, but we don't add to the set of blocked
+                        # rooms, since we otherwise might block rooms
+                        # we're not supposed to block
+                        reserved_dates[date].add(room_id)
+                        continue
+
                     for slot in slots:
-                        if slot.availability == 100.0:
+                        if isclose(slot.availability, 100.0, abs_tol=.005):
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
@@ -678,7 +797,8 @@ def view_find_your_spot(
                         # no slot reserved, move on to the next room
                         continue
 
-                    reserved_dates.setdefault(date, set()).add(room_id)
+                    blocked_rooms.add(room_id)
+                    reserved_dates[date].add(room_id)
 
                     # since we managed to reserve a slot and we're not
                     # making a reservation for every room, we need to
@@ -723,7 +843,8 @@ def view_find_your_spot(
 @OrgApp.json(
     model=FindYourSpotCollection,
     name='reservations',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def get_find_your_spot_reservations(
     self: FindYourSpotCollection,
@@ -754,7 +875,8 @@ def get_find_your_spot_reservations(
     model=FindYourSpotCollection,
     name='reservations',
     request_method='DELETE',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def delete_all_find_your_spot_reservations(
     self: FindYourSpotCollection,
@@ -797,17 +919,38 @@ def delete_all_find_your_spot_reservations(
     }
 
 
-@OrgApp.json(model=ResourceCollection, permission=Public, name='json')
+@OrgApp.json(
+    model=ResourceCollection,
+    permission=Public,
+    name='json',
+    open_data=False
+)
 def view_resources_json(
     self: ResourceCollection,
     request: OrgRequest
 ) -> JSON_ro:
 
-    def transform(resource: Resource) -> JSON_ro:
+    view = request.GET.get('view', '')
+    is_occupancy = view == 'occupancy'
+    if is_occupancy and not request.is_logged_in:
+        # NOTE: Only logged in users can see occupancy
+        return {}
+
+    filter_occupancy = is_occupancy and request.has_role('member')
+
+    def transform(resource: Resource) -> JSON_ro | None:
+        # NOTE: Exclude resources where members are not allowed to see
+        #       the occupancy
+        if (
+            filter_occupancy
+            and not getattr(self, 'occupancy_is_visible_to_members', False)
+        ):
+            return None
+
         return {
             'name': resource.name,
             'title': resource.title,
-            'url': request.link(resource),
+            'url': request.link(resource, name=view),
         }
 
     @request.after
@@ -897,6 +1040,7 @@ def handle_new_resource(
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(RESOURCE_TYPES[type]['title'], '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -950,6 +1094,9 @@ def view_resource(
     layout: ResourceLayout | None = None
 ) -> RenderData:
 
+    if hasattr(self, 'photo_album_id') and self.photo_album_id:
+        request.include('photoswipe')
+
     return {
         'title': self.title,
         'files': getattr(self, 'files', None),
@@ -964,26 +1111,66 @@ def view_resource(
 def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
 
     request.assert_valid_csrf_token()
-    tickets = TicketCollection(request.session)
 
-    def handle_reservation_tickets(reservation: BaseReservation) -> None:
-        ticket = tickets.by_handler_id(reservation.token.hex)
-        if ticket:
-            assert request.current_user is not None
+    def handle_reservation_tickets(
+        scheduler: Scheduler,
+        session: Session
+    ) -> None:
+
+        assert request.current_user is not None
+
+        stmt = (
+            session.query(ReservationTicket)
+            .options(
+                joinedload(ReservationTicket.payment),
+                joinedload(ReservationTicket.invoice).selectinload(
+                    TicketInvoice.items
+                ),
+            )
+            .filter(
+                sa_cast(ReservationTicket.handler_id, UUIDType).in_(
+                    scheduler.managed_reservations().with_entities(
+                        Reservation.token
+                    )
+                )
+            )
+        )
+
+        for ticket in stmt:
+            if not ticket:
+                continue
 
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
-            payment = ticket.handler.payment
-            if (payment and PaymentCollection(request.session).query()
-                    .filter_by(id=payment.id).first()):
-                PaymentCollection(request.session).delete(payment)
+            # unlink payment from invoice items, delete invoice
+            # items and finally delete invoice and unlink from ticket
+            if ticket.invoice:
+                for invoice_item in ticket.invoice.items:
+                    invoice_item.payments = []
+                    session.delete(invoice_item)
+
+                session.delete(ticket.invoice)
+
+                # unlink invoice from ticket
+                ticket.invoice = None
+                ticket.invoice_id = None
+
+            if ticket.payment:
+                # unlink payment from reservation
+                for reservation in ticket.handler.reservations:
+                    reservation.payment = None
+
+                # delete payment from ticket
+                session.delete(ticket.payment)
+                ticket.payment = None
+                ticket.payment_id = None
 
     collection = ResourceCollection(request.app.libres_context)
     collection.delete(
         self,
         including_reservations=True,
-        handle_reservation=handle_reservation_tickets
+        handle_linked_objects=handle_reservation_tickets,
     )
 
 
@@ -1060,7 +1247,12 @@ def predict_next_reservation(
     }
 
 
-@OrgApp.json(model=Resource, name='reservations', permission=Public)
+@OrgApp.json(
+    model=Resource,
+    name='reservations',
+    permission=Public,
+    open_data=False
+)
 def get_reservations(self: Resource, request: OrgRequest) -> RenderData:
 
     # FIXME: Maybe we should move bound_reservations to the base
@@ -1119,7 +1311,12 @@ def assert_visible_by_members(self: Resource, request: OrgRequest) -> None:
         raise exc.HTTPForbidden()
 
 
-@OrgApp.json(model=Resource, name='occupancy-json', permission=Personal)
+@OrgApp.json(
+    model=Resource,
+    name='occupancy-json',
+    permission=Personal,
+    open_data=False
+)
 def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the reservations in a fullcalendar compatible events feed.
 
@@ -1134,29 +1331,102 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         return ()
 
+    scheduler = self.scheduler
+
     # get all reservations and tickets
-    query: Query[tuple[Reservation, Ticket]]
+    query: Query[tuple[Reservation, Ticket, *tuple[str, ...]]]
     query = self.reservations_with_tickets_query(  # type:ignore[attr-defined]
-        start, end, exclude_pending=False
+        start, end,
+        exclude_pending=False,
+        only_managed=False
     ).with_entities(Reservation, Ticket)
     query = query.options(undefer(Reservation.data))
+    if self.occupancy_fields:
+        query = query.outerjoin(
+            FormSubmission,
+            FormSubmission.id == Reservation.token
+        ).add_columns(*(
+            FormSubmission.data[as_internal_id(field)].astext.label(field)
+            for field in self.occupancy_fields
+        ))
 
+    # get all blockers
+    blockers = scheduler.visible_blockers()
+    blockers = blockers.filter(start <= ReservationBlocker.start)
+    blockers = blockers.filter(ReservationBlocker.end <= end)
+
+    blocking_resources = self.blocking_resources()
     return *(
         res.as_dict()
         for res in utils.ReservationEventInfo.from_reservations(
             request,
             self,
-            query.with_entities(Reservation, Ticket)
+            query,
+            blocking_resources
+        )
+    ), *(
+        blk.as_dict()
+        for blk in utils.BlockerEventInfo.from_blockers(
+            request,
+            self,
+            blockers,
+            blocking_resources
         )
     ), *(
         av.as_dict()
         for av in utils.AvailabilityEventInfo.from_allocations(
             request,
-            self,
             # get all all master allocations
-            self.scheduler.allocations_in_range(start, end)  # type: ignore[arg-type]
+            scheduler.allocations_in_range(start, end)  # type: ignore[arg-type]
         )
     )
+
+
+@OrgApp.json(
+    model=Resource,
+    name='occupancy-stats',
+    permission=Personal,
+    open_data=False
+)
+def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
+    """ Returns stats for the selected date range.
+
+    """
+    assert_visible_by_members(self, request)
+
+    start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
+
+    if not (start and end):
+        raise exc.HTTPBadRequest()
+
+    scheduler = self.scheduler
+    accepted = func.coalesce(Reservation.data['accepted'] == True, False)
+    stats = dict(
+        scheduler.visible_reservations()
+        .filter(Reservation.status == 'approved')
+        .filter(or_(
+            and_(
+                Reservation.start <= start,
+                start <= Reservation.end
+            ),
+            and_(
+                start <= Reservation.start,
+                Reservation.start <= end
+            )
+        ))
+        .group_by(accepted)
+        .with_entities(accepted, func.count(Reservation.id))
+        .tuples()
+    )
+
+    layout = DefaultLayout(self, request)
+
+    return {
+        'range': layout.format_date_range(start.date(), end.date()),
+        'count': stats.get(True, 0) + stats.get(False, 0),
+        'pending': stats.get(False, 0),
+        'utilization': 100.0 - scheduler.availability(start, end),
+    }
 
 
 @OrgApp.html(
@@ -1180,13 +1450,20 @@ def view_occupancy(
         'resource': self,
         'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='occupancy-json'),
+        'stats_url': request.link(self, name='occupancy-stats'),
+        'resources_url': request.class_link(
+            ResourceCollection,
+            name='json',
+            query_params={'view': 'occupancy'}
+        )
     }
 
 
 @OrgApp.json(
     model=ResourceCollection,
     name='my-reservations-json',
-    permission=Public
+    permission=Public,
+    open_data=False,
 )
 def view_my_reservations_json(
     self: ResourceCollection,
@@ -1212,8 +1489,8 @@ def view_my_reservations_json(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
-        stmt.c.email == request.authenticated_email,
+    records = request.session.execute(select(*stmt.c).where(and_(
+        func.lower(stmt.c.email) == request.authenticated_email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end
     )))
@@ -1227,6 +1504,7 @@ def view_my_reservations_json(
             accepted=r.accepted,
             timezone=r.timezone,
             resource=r.resource,
+            resource_id=r.resource_id,
             ticket_id=r.ticket_id,
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
@@ -1234,6 +1512,71 @@ def view_my_reservations_json(
             request=request
         ).as_dict() for r in records
     ]
+
+
+@OrgApp.html(
+    model=ResourceCollection,
+    name='my-reservations-pdf',
+    permission=Public
+)
+def view_my_reservations_pdf(
+    self: ResourceCollection,
+    request: OrgRequest
+) -> Response:
+    """ Returns the reservations as PDF. """
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    if not request.authenticated_email:
+        raise exc.HTTPForbidden()
+
+    start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
+
+    if not (start and end):
+        raise exc.HTTPBadRequest()
+
+    path = module_path('onegov.org', 'queries/my-reservations.sql')
+    stmt = as_selectable_from_path(path)
+
+    conditions = [
+        func.lower(stmt.c.email) == request.authenticated_email.lower(),
+        start <= stmt.c.start,
+        stmt.c.start <= end,
+    ]
+
+    if request.GET.get('accepted') == '1':
+        conditions.append(stmt.c.accepted.is_(True))
+
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
+
+    content = MyReservationsPdf.from_reservations(request, [
+        utils.MyReservationEventInfo(
+            id=r.id,
+            token=r.token,
+            start=r.start,
+            end=r.end,
+            accepted=r.accepted,
+            timezone=r.timezone,
+            resource=r.resource,
+            resource_id=r.resource_id,
+            ticket_id=r.ticket_id,
+            handler_code=r.handler_code,
+            ticket_number=r.ticket_number,
+            key_code=r.key_code,
+            request=request
+        ) for r in records
+    ], start, end)
+
+    return Response(
+        content.read(),
+        content_type='application/pdf',
+        content_disposition='attachment; filename='
+        'my-reservations-{}-{}-{}.pdf'.format(
+            request.authenticated_email,
+            start.strftime('%Y%m%d'),
+            end.strftime('%Y%m%d')
+        )
+    )
 
 
 @OrgApp.html(
@@ -1260,7 +1603,7 @@ def view_my_reservations(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
-        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
+        Link(_('Overview'), request.class_link(CitizenDashboard)),
         Link(_('My Reservations'), '#')
     ]
 
@@ -1281,6 +1624,7 @@ def view_my_reservations(
         'title': _('My Reservations'),
         'resource': Bunch(
             type='room',
+            name='',
             date=date,
             view=request.GET.get('view'),
             highlights_min=request.GET.get('highlights_min'),
@@ -1289,6 +1633,7 @@ def view_my_reservations(
         ),
         'layout': layout,
         'feed': request.link(self, name='my-reservations-json'),
+        'pdf_url': request.link(self, name='my-reservations-pdf'),
     }
 
 
@@ -1317,7 +1662,7 @@ def view_my_reservations_subscribe(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
-        Link(_('Dashboard'), request.class_link(CitizenDashboard)),
+        Link(_('Overview'), request.class_link(CitizenDashboard)),
         Link(_('My Reservations'), request.url.replace('-subscribe', '')),
         Link(_('Subscribe'), '#')
     ]
@@ -1389,20 +1734,25 @@ def view_my_reservations_ical(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(stmt.c).where(and_(
-        stmt.c.email == email,
+    records = request.session.execute(select(*stmt.c).where(and_(
+        func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file
         stmt.c.accepted.is_(True)
     )))
 
+    ticket_label = request.translate(_('Check request status'))
     key_code_label = request.translate(_('Key Code'))
 
     for r in records:
         start = r.start
         end = r.end + timedelta(microseconds=1)
 
-        description = r.ticket_number
+        url = request.class_link(Ticket, {
+            'handler_code': r.handler_code,
+            'id': r.ticket_id
+        }, name='status')
+        description = f'{r.ticket_number}\n{ticket_label}: {url}'
         if include_key_code and r.key_code:
             description = f'{description}\n{key_code_label}: {r.key_code}'
 
@@ -1414,10 +1764,7 @@ def view_my_reservations_ical(
         evt.add('dtstart', standardize_date(start, 'UTC'))
         evt.add('dtend', standardize_date(end, 'UTC'))
         evt.add('dtstamp', date)
-        evt.add('url', request.class_link(Ticket, {
-            'handler_code': r.handler_code,
-            'id': r.ticket_id
-        }, name='status'))
+        evt.add('url', url)
 
         cal.add_component(evt)
 
@@ -1470,8 +1817,8 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
     if request.params.get('access-token') != self.access_token:
         raise exc.HTTPForbidden()
 
-    s = utcnow() - timedelta(days=30)
-    e = utcnow() + timedelta(days=30 * 12)
+    start = utcnow() - timedelta(days=30)
+    end = utcnow() + timedelta(days=730)
 
     cal = icalendar.Calendar()
     cal.add('prodid', '-//OneGov//onegov.org//')
@@ -1481,34 +1828,72 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
     cal.add('x-wr-calname', self.title)
     cal.add('x-wr-relcalid', self.id.hex)
 
-    # refresh every 120 minutes by default (Outlook and maybe others)
-    cal.add('x-published-ttl', 'PT120M')
+    # refresh every 30 minutes by default (Outlook and maybe others)
+    # this is a higher frequency than my-reservations, since it can
+    # have quite a bit of activity on busy days
+    cal.add('x-published-ttl', 'PT30M')
 
     # add allocations/reservations
     date = utcnow()
-    path = module_path('onegov.org', 'queries/resource-ical.sql')
-    stmt = as_selectable_from_path(path)
+    query = (
+        request.session.query(Reservation)
+        .join(
+            Ticket,
+            sa_cast(Ticket.handler_id, UUIDType) == Reservation.token
+        )
+        .with_entities(
+            Reservation.id.label('id'),
+            Reservation.token.label('token'),
+            Ticket.subtitle.label('title'),
+            Ticket.number.label('description'),
+            Reservation.start.label('start'),
+            Reservation.end.label('end'),
+            Ticket.id.label('ticket_id'),
+            Ticket.handler_code.label('handler_code'),
+            *(
+                FormSubmission.data[as_internal_id(field)].astext.label(field)
+                for field in self.ical_fields
+            )
+        )
+        .filter(Reservation.status == 'approved')
+        .filter(Reservation.resource == self.id)
+        .filter(sa_cast(Reservation.data['accepted'], Boolean).is_(True))
+        .filter(Reservation.start >= start)
+        .filter(Reservation.start <= end)
+    )
+    if self.ical_fields:
+        query = query.outerjoin(
+            FormSubmission,
+            FormSubmission.id == Reservation.token
+        )
 
-    records = object_session(self).execute(select(stmt.c).where(and_(
-        stmt.c.resource == self.id, s <= stmt.c.start, stmt.c.start <= e
-    )))
-
-    for r in records:
+    ticket_label = request.translate(_('Ticket'))
+    for r in query:
         start = r.start
         end = r.end + timedelta(microseconds=1)
 
+        url = request.class_link(Ticket, {
+            'handler_code': r.handler_code,
+            'id': r.ticket_id
+        })
+        description = '\n'.join((
+            r.description,
+            *(
+                f'{field}: {value}'
+                for field in self.ical_fields
+                if (value := getattr(r, field))
+            ),
+            f'{ticket_label}: {url}'
+        ))
         evt = icalendar.Event()
         evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.title)
         evt.add('location', self.title)
-        evt.add('description', r.description)
+        evt.add('description', description)
         evt.add('dtstart', standardize_date(start, 'UTC'))
         evt.add('dtend', standardize_date(end, 'UTC'))
         evt.add('dtstamp', date)
-        evt.add('url', request.class_link(Ticket, {
-            'handler_code': r.handler_code,
-            'id': r.ticket_id
-        }))
+        evt.add('url', url)
 
         cal.add_component(evt)
 
@@ -1584,6 +1969,7 @@ def view_export_all(
     self.title = _('Export All')  # type:ignore
     layout = layout or ResourceLayout(self, request)  # type:ignore
     layout.editbar_links = None
+    layout.edit_mode = True
 
     if form.submitted(request):
 
@@ -1689,7 +2075,10 @@ def run_export(
 
     query: Query[ReservationExportRow]
     query = resource.reservations_with_tickets_query(start, end)  # type:ignore
-    query = query.join(FormSubmission, Reservation.token == FormSubmission.id)
+    # FormSubmission is optional
+    query = query.outerjoin(
+        FormSubmission, Reservation.token == FormSubmission.id
+    )
     query = query.with_entities(
         Reservation.start,
         Reservation.end,

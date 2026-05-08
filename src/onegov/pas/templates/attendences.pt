@@ -5,29 +5,81 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
-                <p tal:condition="not:attendences" i18n:translate="">No meeting defined yet.</p>
-                <table tal:condition="attendences" class="attendences">
+                <p tal:condition="python:len(attendences) == 0" i18n:translate="">No meeting defined yet.</p>
+                <table tal:condition="python:len(attendences) > 0" class="attendences hover">
                     <thead>
-                    <tr>
-                        <th i18n:translate>Date</th>
-                            <th i18n:translate>Type</th>
+                        <tr>
+                            <th i18n:translate>Session date</th>
+                            <th i18n:translate>Duration</th>
                             <th i18n:translate>Parliamentarian</th>
-                            <th i18n:translate>Comission</th>
+                            <th i18n:translate>Type</th>
+                            <th tal:condition="can_edit_attendences"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr tal:repeat="attendence attendences">
-                        <td><a href="${request.link(attendence)}" i18n:translate>${layout.format_date(attendence.date, 'date')}</a></td>
-                            <td>${attendence.type_label}</td>
+                            <td>${layout.format_date(attendence.date, 'date')}
+                                <tal:b tal:condition="attendence.modified"><br>
+                                    <small class="muted"><tal:b i18n:translate>edited</tal:b>: ${layout.format_date(attendence.modified, 'date')}</small>
+                                </tal:b>
+                            </td>
+                            <td>${(attendence.duration/60)} h</td>
                             <td>${attendence.parliamentarian.title}</td>
-                            <td><tal:block tal:condition="attendence.commission">${attendence.commission.title}</tal:block></td>
-                    </tr>
+                            <td>${attendence.type_label}
+                                <tal:block tal:condition="attendence.commission"><br>
+                                    <i>${attendence.commission.title}</i></tal:block>
+                                <tal:b tal:condition="attendence.bulk_edit_id">
+                                    <span tal:define="hue python: int(str(attendence.bulk_edit_id).replace('-','')[:8], 16) % 360"
+                                          class="bulk-badge"
+                                          tal:attributes="style string:background-color: hsl(${hue}, 45%, 90%);; color: hsl(${hue}, 50%, 28%);; border-color: hsl(${hue}, 40%, 75%)">Massenbuchung</span>
+                                </tal:b></td>
+                            <td tal:condition="can_edit_attendences"><a href="${edit_links[attendence.id]}"><i class="fa fa-edit"></i></a></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-
-            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+            <div class="medium-5 cell" tal:define="has_filters filters|nothing; has_bulk_edits python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups)" tal:condition="python:has_filters or has_bulk_edits">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel" tal:condition="python: filters.get('settlement_run')">
+                        <h3 i18n:translate>Settlement run</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['settlement_run']" />
+                    </div>
+                    <div class="side-panel" tal:condition="python: filters.get('type')">
+                        <h3 i18n:translate>Filters</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['type']" />
+                    </div>
+                    <div class="side-panel" tal:condition="python: filters.get('plenary_session')">
+                        <h3 i18n:translate>Plenary session</h3>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['plenary_session']" />
+                    </div>
+                    <div class="side-panel" tal:condition="python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups)">
+                        <h3 i18n:translate>Bulk edits</h3>
+                        <ul class="more-list">
+                            <tal:b tal:repeat="group bulk_edit_groups">
+                                <li tal:define="attendence group[0]; name 'edit-plenary-bulk-attendences' if attendence.type == 'plenary' else 'edit-commission-bulk-attendences'; has_abschluss python:all(a.abschluss for a in group)" tal:condition="attendence.bulk_edit_id">
+                                    <a class="list-link" href="${request.link(attendence, name)}">
+                                        <i class="fa fa-edit"></i>
+                                        <span class="list-title">${layout.format_date(attendence.date, 'date')}, <tal:b i18n:translate>${attendence.type_label}</tal:b></span>
+                                    </a>
+                                    <a href="${request.link(attendence, name)}">
+                                        <p class="list-lead preview">
+                                            <tal:b tal:condition="attendence.commission">
+                                                ${attendence.commission.title}<br>
+                                            </tal:b>
+                                            ${len(group)} <tal:b i18n:translate>Attendences</tal:b>, ${attendence.duration/60} h<br>
+                                            <tal:b i18n:translate>edited</tal:b>: ${layout.format_date(attendence.modified or attendence.created, 'datetime')}
+                                            <tal:b tal:condition="has_abschluss"><br>
+                                                <span class="abschluss-badge" i18n:translate>Abschluss</span>
+                                            </tal:b>
+                                        </p>
+                                    </a>
+                                </li>
+                            </tal:b>
+                        </ul>
+                    </div>
+                </div>
             </div>
+
         </div>
 
     </tal:b>

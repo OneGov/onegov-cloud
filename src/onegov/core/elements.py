@@ -98,9 +98,11 @@ class Element:
             and self.props == other.props)
 
     def __getattr__(self, name: str) -> Any:
+        # Handle special attributes that deepcopy looks for
+        if name.startswith('__') and name.endswith('__'):
+            raise AttributeError(name)
         if name in self.props:
             return self.props[name]
-
         raise AttributeError(name)
 
     def __call__(

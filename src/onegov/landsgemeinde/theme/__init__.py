@@ -12,7 +12,8 @@ class LandsgemeindeTheme(TownTheme):
         return [
             *super().post_imports,
             'landsgemeinde',
-            'ticker'
+            'ticker',
+            'landsgemeinde_print',
         ]
 
     @property

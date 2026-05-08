@@ -26,6 +26,10 @@
                         </tal:b>
                     </li>
 
+                    <li tal:condition="recipient.customer_messages">
+                        <span class="fa-li"><i class="fas fa-envelope"></i></span>
+                        <tal:b i18n:translate="">Receives notifications for customer messages on reservations.</tal:b>
+                    </li>
                     <li tal:condition="recipient.internal_notes">
                         <span class="fa-li"><i class="fas fa-envelope"></i></span>
                         <tal:b i18n:translate="">Receives notifications for internal notes on reservations.</tal:b>

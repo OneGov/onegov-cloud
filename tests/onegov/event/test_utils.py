@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from dateutil.parser import parse
 from lxml import etree
@@ -9,7 +11,20 @@ from pytest import raises
 from sedate import replace_timezone
 
 
-def tzdatetime(year, month, day, hour, minute, seconds=0, microseconds=0):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def tzdatetime(
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int,
+    seconds: int = 0,
+    microseconds: int = 0,
+) -> datetime:
     return replace_timezone(
         datetime(year, month, day, hour, minute, seconds, microseconds),
         timezone='Europe/Zurich'
@@ -19,7 +34,7 @@ def tzdatetime(year, month, day, hour, minute, seconds=0, microseconds=0):
 @mark.parametrize("xml", [
     module_path('tests.onegov.event', 'fixtures/guidle.xml'),
 ])
-def test_import_guidle(session, xml):
+def test_import_guidle(session: Session, xml: str) -> None:
     offers = list(GuidleExportData(etree.parse(xml)).offers())
     assert len(offers) == 1
 
@@ -44,6 +59,7 @@ def test_import_guidle(session, xml):
     assert offers[0].location == (
         "Zentrum Schützenmatt, Luegetenstrasse 3, 6313 Menzingen"
     )
+    assert offers[0].coordinates is not None
     assert int(offers[0].coordinates.lat) == 47
     assert int(offers[0].coordinates.lon) == 8
     assert offers[0].tags() == (
@@ -80,7 +96,7 @@ def test_import_guidle(session, xml):
     )
 
 
-def test_as_rdates():
+def test_as_rdates() -> None:
     with raises(AssertionError):
         as_rdates('RRULE:FREQ=DAILY;COUNT=1\nRDATE:20190223T000000\n')
 

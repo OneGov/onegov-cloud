@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import shutil
 from pathlib import Path
 from unittest.mock import patch
@@ -16,7 +18,12 @@ from tests.shared.utils import create_image
 from tempfile import NamedTemporaryFile
 
 
-def test_archive_create(session, temporary_path):
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_archive_create(session: Session, temporary_path: Path) -> None:
     directories = DirectoryCollection(session)
     businesses = directories.add(
         title="Businesses",
@@ -68,7 +75,7 @@ def test_archive_create(session, temporary_path):
 
     transaction.commit()
 
-    businesses = directories.by_name('businesses')
+    businesses = directories.by_name('businesses')  # type: ignore[assignment]
 
     collection = DirectoryEntryCollection(businesses)
     query = collection.query().limit(1)
@@ -82,8 +89,8 @@ def test_archive_create(session, temporary_path):
 
     archive.write(businesses)
 
-    metadata = json.loads((temporary_path / 'metadata.json').open().read())
-    data = json.loads((temporary_path / 'data.json').open().read())
+    metadata = json.loads((temporary_path / 'metadata.json').read_text())
+    data = json.loads((temporary_path / 'data.json').read_text())
 
     assert metadata['title'] == businesses.title
     assert metadata['lead'] == businesses.lead
@@ -117,7 +124,12 @@ def test_archive_create(session, temporary_path):
 
 
 @pytest.mark.parametrize('archive_format', ['json', 'csv', 'xlsx'])
-def test_archive_import(session, temporary_path, archive_format):
+def test_archive_import(
+    session: Session,
+    temporary_path: Path,
+    archive_format: Literal['json', 'csv', 'xlsx']
+) -> None:
+
     directories = DirectoryCollection(session)
     businesses = directories.add(
         title="Businesses",
@@ -176,9 +188,9 @@ def test_archive_import(session, temporary_path, archive_format):
 
     transaction.commit()
 
-    businesses = directories.by_name('businesses')
+    businesses = directories.by_name('businesses')  # type: ignore[assignment]
 
-    def transform(key, value):
+    def transform(key: str, value: object) -> tuple[str, object]:
         if isinstance(value, date):
             return key, value.strftime('%d.%m.%Y')
 
@@ -218,7 +230,11 @@ def test_archive_import(session, temporary_path, archive_format):
     assert initech.files[2].name == 'initech_2.png'
 
 
-def test_zip_archive_from_buffer(session, temporary_path):
+def test_zip_archive_from_buffer(
+    session: Session,
+    temporary_path: Path
+) -> None:
+
     directories = DirectoryCollection(session)
     businesses = directories.add(
         title="Businesses",
@@ -233,7 +249,7 @@ def test_zip_archive_from_buffer(session, temporary_path):
     businesses.add(values=dict(name="Aesir Corp."))
     transaction.commit()
 
-    businesses = directories.by_name('businesses')
+    businesses = directories.by_name('businesses')  # type: ignore[assignment]
 
     archive = DirectoryZipArchive(temporary_path / 'archive.zip', 'json')
     archive.write(businesses)
@@ -249,8 +265,11 @@ def test_zip_archive_from_buffer(session, temporary_path):
 
 
 @pytest.mark.parametrize('archive_format', ['json', 'csv', 'xlsx'])
-def test_zip_archive_from_buffer_with_folder_in_zip(session, temporary_path,
-                                                    archive_format):
+def test_zip_archive_from_buffer_with_folder_in_zip(
+    session: Session,
+    temporary_path: Path,
+    archive_format: Literal['json', 'csv', 'xlsx']
+) -> None:
 
     directories = DirectoryCollection(session)
     businesses = directories.add(
@@ -266,13 +285,13 @@ def test_zip_archive_from_buffer_with_folder_in_zip(session, temporary_path,
     businesses.add(values=dict(name="Aesir Corp."))
     transaction.commit()
 
-    businesses = directories.by_name('businesses')
+    businesses = directories.by_name('businesses')  # type: ignore[assignment]
 
     original_zip = temporary_path / 'archive.zip'
     archive = DirectoryZipArchive(original_zip, archive_format)
     archive.write(businesses)
 
-    def create_new_zip_containing_directory(original_zip):
+    def create_new_zip_containing_directory(original_zip: Path) -> Path:
         """ Takes the zip and puts a top-level directory in it. """
         working_directory = temporary_path / "extracted"
         working_directory.mkdir(parents=True, exist_ok=True)
@@ -280,7 +299,7 @@ def test_zip_archive_from_buffer_with_folder_in_zip(session, temporary_path,
         root_dir = temporary_path / "top"
         wrapper = root_dir / "container"
         shutil.copytree(working_directory, wrapper)
-        zip_destination = temporary_path / 'archive_with_root'
+        zip_destination = str(temporary_path / 'archive_with_root')
         return Path(shutil.make_archive(zip_destination, "zip", root_dir))
 
     new_zip = create_new_zip_containing_directory(original_zip)
@@ -294,7 +313,7 @@ def test_zip_archive_from_buffer_with_folder_in_zip(session, temporary_path,
     assert len(directory.entries) == 1
 
 
-def test_corodinates(session, temporary_path):
+def test_corodinates(session: Session, temporary_path: Path) -> None:
     directories = DirectoryCollection(session)
     points = directories.add(
         title="Points of interest",
@@ -311,8 +330,9 @@ def test_corodinates(session, temporary_path):
 
     transaction.commit()
 
+    points = directories.by_name('points-of-interest')  # type: ignore[assignment]
     archive = DirectoryArchive(temporary_path, 'json')
-    archive.write(directories.by_name('points-of-interest'))
+    archive.write(points)
 
     directory = archive.read()
     assert directory.title == "Points of interest"
@@ -323,7 +343,7 @@ def test_corodinates(session, temporary_path):
     }
 
 
-def test_import_duplicates(session, temporary_path):
+def test_import_duplicates(session: Session, temporary_path: Path) -> None:
     directories = DirectoryCollection(session)
     foos = directories.add(
         title="Foos",

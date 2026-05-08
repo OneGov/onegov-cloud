@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from freezegun import freeze_time
 from onegov.user import RoleMapping
 from onegov.user import User
@@ -6,23 +8,28 @@ from unittest.mock import call
 from unittest.mock import patch
 
 
-class DummyBrowserSession():
-    def __init__(self, token):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+class DummyBrowserSession:
+    def __init__(self, token: str) -> None:
         self._token = token
 
-    def flush(self):
+    def flush(self) -> None:
         pass
 
 
-class DummyRequest():
-    def __init__(self, token):
+class DummyRequest:
+    def __init__(self, token: str) -> None:
         self.client_addr = '127.0.0.1'
         self.user_agent = 'Mozilla/5.0'
         self.browser_session = DummyBrowserSession(token)
         self.app = None
 
 
-def test_user_initials():
+def test_user_initials() -> None:
     user = User(username='admin')
     assert user.initials == 'A'
 
@@ -32,6 +39,12 @@ def test_user_initials():
     user = User(username='a.b.c.d.e.f')
     assert user.initials == 'AB'
 
+    user = User(username='.a..b...c..')
+    assert user.initials == 'AB'
+
+    user = User(username='.@example.org')
+    assert user.initials == '?'
+
     user = User(username='victor', realname='Victor Sullivan')
     assert user.initials == 'VS'
 
@@ -39,7 +52,7 @@ def test_user_initials():
     assert user.initials == 'CB'
 
 
-def test_user_title(session):
+def test_user_title(session: Session) -> None:
     user = User(username='admin')
     assert user.title == 'admin'
 
@@ -47,7 +60,7 @@ def test_user_title(session):
     assert user.title == "Nathan Drake"
 
 
-def test_user_group(session):
+def test_user_group(session: Session) -> None:
     session.add(User(username='nathan', password='pwd', role='editor'))
     session.add(UserGroup(name='group'))
     session.flush()
@@ -62,7 +75,7 @@ def test_user_group(session):
     assert group.users.one() == user
 
 
-def test_polymorphism_user(session):
+def test_polymorphism_user(session: Session) -> None:
 
     class MyUser(User):
         __mapper_args__ = {'polymorphic_identity': 'my'}
@@ -80,7 +93,7 @@ def test_polymorphism_user(session):
     assert session.query(MyOtherUser).one().username == 'other'
 
 
-def test_polymorphism_group(session):
+def test_polymorphism_group(session: Session) -> None:
 
     class MyGroup(UserGroup):
         __mapper_args__ = {'polymorphic_identity': 'my'}
@@ -98,7 +111,7 @@ def test_polymorphism_group(session):
     assert session.query(MyOtherGroup).one().name == 'other'
 
 
-def test_user_save_session():
+def test_user_save_session() -> None:
     user = User()
     assert not user.sessions
 
@@ -106,10 +119,10 @@ def test_user_save_session():
         remembered.return_value = True
 
         with freeze_time('2016-09-01 12:00'):
-            user.save_current_session(DummyRequest('xxx'))
+            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
 
         with freeze_time('2016-10-01 12:00'):
-            user.save_current_session(DummyRequest('yyy'))
+            user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
 
         assert user.sessions == {
             'xxx': {
@@ -125,24 +138,25 @@ def test_user_save_session():
         }
 
 
-def test_user_remove_session():
+def test_user_remove_session() -> None:
     user = User()
     assert not user.sessions
 
     with patch('onegov.user.models.user.remembered') as remembered:
         remembered.return_value = True
 
-        user.save_current_session(DummyRequest('xxx'))
-        user.save_current_session(DummyRequest('yyy'))
+        user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+        user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
+        assert user.sessions is not None
         assert 'xxx' in user.sessions
         assert 'yyy' in user.sessions
 
-        user.remove_current_session(DummyRequest('xxx'))
+        user.remove_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
         assert 'xxx' not in user.sessions
         assert 'yyy' in user.sessions
 
 
-def test_user_logout_all_sessions():
+def test_user_logout_all_sessions() -> None:
     user = User()
     assert not user.sessions
 
@@ -150,18 +164,19 @@ def test_user_logout_all_sessions():
         with patch('onegov.user.models.user.forget') as forget:
             remembered.return_value = True
 
-            user.save_current_session(DummyRequest('xxx'))
-            user.save_current_session(DummyRequest('yyy'))
+            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+            user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
+            assert user.sessions is not None
             assert 'xxx' in user.sessions
             assert 'yyy' in user.sessions
 
-            count = user.logout_all_sessions(DummyRequest('zzz').app)
+            count = user.logout_all_sessions(DummyRequest('zzz').app)  # type: ignore[arg-type]
             assert count == 2
             assert call(None, 'xxx') in forget.mock_calls
             assert call(None, 'yyy') in forget.mock_calls
 
 
-def test_user_cleanup_sessions():
+def test_user_cleanup_sessions() -> None:
     user = User()
     assert not user.sessions
 
@@ -169,49 +184,50 @@ def test_user_cleanup_sessions():
         with patch('onegov.user.models.user.forget'):
             # ... implicit
             remembered.return_value = True
-            user.save_current_session(DummyRequest('xxx'))
+            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+            assert user.sessions is not None
             assert 'xxx' in user.sessions
 
             remembered.return_value = False
-            user.cleanup_sessions(DummyRequest('zzz').app)
+            user.cleanup_sessions(DummyRequest('zzz').app)  # type: ignore[arg-type]
             assert 'xxx' not in user.sessions
 
             # ... while adding
             remembered.return_value = True
-            user.save_current_session(DummyRequest('xxx'))
+            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
             assert 'xxx' in user.sessions
 
             remembered.return_value = False
-            user.save_current_session(DummyRequest('yyy'))
+            user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
             assert 'xxx' not in user.sessions
             assert 'yyy' not in user.sessions
 
             # ... while removing
             remembered.return_value = True
-            user.save_current_session(DummyRequest('xxx'))
-            user.save_current_session(DummyRequest('yyy'))
+            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+            user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
             assert 'xxx' in user.sessions
             assert 'yyy' in user.sessions
 
             remembered.return_value = False
-            user.remove_current_session(DummyRequest('xxx'))
+            user.remove_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
             assert 'xxx' not in user.sessions
             assert 'yyy' not in user.sessions
 
             # ... while logging out
             remembered.return_value = True
-            user.save_current_session(DummyRequest('xxx'))
-            user.save_current_session(DummyRequest('yyy'))
+            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+            user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
             assert 'xxx' in user.sessions
             assert 'yyy' in user.sessions
 
             remembered.return_value = False
-            user.logout_all_sessions(DummyRequest('zzz').app)
+            user.logout_all_sessions(DummyRequest('zzz').app)  # type: ignore[arg-type]
             assert 'xxx' not in user.sessions
             assert 'yyy' not in user.sessions
 
 
-def test_role_mapping(session):
+def test_role_mapping(session: Session) -> None:
     user = User(username='nathan', password='pwd', role='editor')
     group = UserGroup(name='group')
     session.add(user)

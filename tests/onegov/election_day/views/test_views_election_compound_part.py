@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionCompoundPartLayout
 from tests.onegov.election_day.common import create_election_compound
@@ -8,7 +10,14 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
-def test_view_election_compound_part_redirect(election_day_app_bl):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_election_compound_part_redirect(
+    election_day_app_bl: TestApp
+) -> None:
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 
@@ -17,11 +26,13 @@ def test_view_election_compound_part_redirect(election_day_app_bl):
 
     response = client.get('/elections-part/elections/superregion/region-1')
     assert response.status == '302 Found'
-    assert '/elections-part/elections/superregion/region-1/districts' in \
-        response.headers['Location']
+    assert '/elections-part/elections/superregion/region-1/districts' in (
+        response.headers['Location'])
 
 
-def test_view_election_compound_part_districts(election_day_app_bl):
+def test_view_election_compound_part_districts(
+    election_day_app_bl: TestApp
+) -> None:
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 
@@ -58,7 +69,9 @@ def test_view_election_compound_part_districts(election_day_app_bl):
     }
 
 
-def test_view_election_compound_part_elected_candidates(election_day_app_bl):
+def test_view_election_compound_part_elected_candidates(
+    election_day_app_bl: TestApp
+) -> None:
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 
@@ -73,7 +86,9 @@ def test_view_election_compound_part_elected_candidates(election_day_app_bl):
     assert "Allschwil" in candidates
 
 
-def test_view_election_compound_part_party_strengths(election_day_app_bl):
+def test_view_election_compound_part_party_strengths(
+    election_day_app_bl: TestApp
+) -> None:
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 
@@ -95,8 +110,7 @@ def test_view_election_compound_part_party_strengths(election_day_app_bl):
     # chart data
     parties = client.get(
         '/elections-part/elections/superregion/region-1/party-strengths-data'
-    )
-    parties = parties.json
+    ).json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
     assert parties['labels'] == ['2022']
     assert parties['maximum']['back'] == 100
@@ -183,8 +197,7 @@ def test_view_election_compound_part_party_strengths(election_day_app_bl):
 
     parties = client.get(
         '/elections-part/elections/superregion/region-1/party-strengths-data'
-    )
-    parties = parties.json
+    ).json
     assert parties['groups'] == ['BDP', 'Die Mitte', 'FDP']
     assert parties['labels'] == ['2018', '2022']
     assert parties['maximum']['back'] == 100
@@ -348,7 +361,9 @@ def test_view_election_compound_part_party_strengths(election_day_app_bl):
     assert data['results'][0]['percentage'] == True
 
 
-def test_view_election_compound_part_statistics(election_day_app_bl):
+def test_view_election_compound_part_statistics(
+    election_day_app_bl: TestApp
+) -> None:
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 
@@ -366,7 +381,9 @@ def test_view_election_compound_part_statistics(election_day_app_bl):
     assert ">42<" in statistics
 
 
-def test_view_election_compound_part_json(election_day_app_bl):
+def test_view_election_compound_part_json(
+    election_day_app_bl: TestApp
+) -> None:
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 
@@ -409,7 +426,9 @@ def test_view_election_compound_part_json(election_day_app_bl):
     assert data['url']
 
 
-def test_view_election_compound_part_summary(election_day_app_bl):
+def test_view_election_compound_part_summary(
+    election_day_app_bl: TestApp
+) -> None:
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 
@@ -441,7 +460,9 @@ def test_view_election_compound_part_summary(election_day_app_bl):
         }
 
 
-def test_views_election_compound_embedded_tables(election_day_app_bl):
+def test_views_election_compound_embedded_tables(
+    election_day_app_bl: TestApp
+) -> None:
     client = Client(election_day_app_bl)
     client.get('/locale/de_CH').follow()
 

@@ -21,6 +21,10 @@
                         <dt i18n:translate>Personal ID</dt>
                         <dd>${model.pers_id}</dd>
                     </dl>
+                    <dl class="field-display" tal:condition="model.contract_number is not None and layout.show('contract_number')">
+                        <dt i18n:translate>Contract Number</dt>
+                        <dd>${model.contract_number}</dd>
+                    </dl>
                     <dl class="field-display" tal:condition="layout.show('admission')">
                         <dt i18n:translate>Admission</dt>
                         <dd>${layout.format_admission(model.admission)}</dd>

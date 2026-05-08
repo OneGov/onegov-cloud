@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from datetime import datetime
-from onegov.reservation import ResourceCollection
+from onegov.reservation import Reservation, ResourceCollection
 
 
-def test_per_hour_pricing(libres_context):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from libres.context.core import Context
+
+
+def test_per_hour_pricing(libres_context: Context) -> None:
     collection = ResourceCollection(libres_context)
 
     resource = collection.add('Executive Lounge', 'Europe/Zurich')
@@ -16,14 +23,18 @@ def test_per_hour_pricing(libres_context):
 
     token = scheduler.reserve('info@example.org', dates)
     reservation = scheduler.reservations_by_token(token).one()
+    assert isinstance(reservation, Reservation)
+    price = reservation.price()
+    assert price is not None
+    assert price.amount == 60
+    assert price.currency == 'CHF'
+    price = reservation.price(resource)
+    assert price is not None
+    assert price.amount == 60
+    assert price.currency == 'CHF'
 
-    assert reservation.price().amount == 60
-    assert reservation.price().currency == 'CHF'
-    assert reservation.price(resource).amount == 60
-    assert reservation.price(resource).currency == 'CHF'
 
-
-def test_multiple_allocations(libres_context):
+def test_multiple_allocations(libres_context: Context) -> None:
     collection = ResourceCollection(libres_context)
 
     resource = collection.add('Executive Lounge', 'Europe/Zurich')
@@ -41,17 +52,27 @@ def test_multiple_allocations(libres_context):
     token = scheduler.reserve('info@example.org', dates)
     reservations = scheduler.reservations_by_token(token).all()
 
-    assert reservations[0].price().amount == 60
-    assert reservations[0].price().currency == 'CHF'
-    assert reservations[1].price().amount == 60
-    assert reservations[1].price().currency == 'CHF'
-    assert reservations[0].price(resource).amount == 60
-    assert reservations[0].price(resource).currency == 'CHF'
-    assert reservations[1].price(resource).amount == 60
-    assert reservations[1].price(resource).currency == 'CHF'
+    assert isinstance(reservations[0], Reservation)
+    price = reservations[0].price()
+    assert price is not None
+    assert price.amount == 60
+    assert price.currency == 'CHF'
+    assert isinstance(reservations[1], Reservation)
+    price = reservations[1].price()
+    assert price is not None
+    assert price.amount == 60
+    assert price.currency == 'CHF'
+    price = reservations[0].price(resource)
+    assert price is not None
+    assert price.amount == 60
+    assert price.currency == 'CHF'
+    price = reservations[1].price(resource)
+    assert price is not None
+    assert price.amount == 60
+    assert price.currency == 'CHF'
 
 
-def test_per_reservation_pricing(libres_context):
+def test_per_reservation_pricing(libres_context: Context) -> None:
     collection = ResourceCollection(libres_context)
 
     resource = collection.add('Executive Lounge', 'Europe/Zurich')
@@ -65,8 +86,12 @@ def test_per_reservation_pricing(libres_context):
 
     token = scheduler.reserve('info@example.org', dates, quota=2)
     reservation = scheduler.reservations_by_token(token).one()
-
-    assert reservation.price().amount == 20
-    assert reservation.price().currency == 'CHF'
-    assert reservation.price(resource).amount == 20
-    assert reservation.price(resource).currency == 'CHF'
+    assert isinstance(reservation, Reservation)
+    price = reservation.price()
+    assert price is not None
+    assert price.amount == 20
+    assert price.currency == 'CHF'
+    price = reservation.price(resource)
+    assert price is not None
+    assert price.amount == 20
+    assert price.currency == 'CHF'

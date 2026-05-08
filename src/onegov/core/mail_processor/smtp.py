@@ -49,7 +49,14 @@ class SMTPMailQueueProcessor(MailQueueProcessor):
                 message['from'] = item['From']
                 message['to'] = item['To']
                 message['date'] = formatdate()
-                message['message-id'] = make_msgid()
+
+                has_message_id = any(
+                    h['Name'].lower() == 'message-id'
+                    for h in item.get('Headers', [])
+                )
+                if not has_message_id:
+                    message['message-id'] = make_msgid()
+
                 if 'ReplyTo' in item:
                     message['reply-to'] = item['ReplyTo']
                 if 'Cc' in item:

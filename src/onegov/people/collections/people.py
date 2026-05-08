@@ -7,18 +7,15 @@ from onegov.core.collection import GenericCollection
 from onegov.people.models import Person
 
 from typing import Any
-from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from uuid import UUID
 
-PersonT = TypeVar('PersonT', bound=Person)
 
-
-class BasePersonCollection(GenericCollection[PersonT]):
+class BasePersonCollection[T: Person](GenericCollection[T]):
 
     @property
-    def model_class(self) -> type[PersonT]:
+    def model_class(self) -> type[T]:
         raise NotImplementedError()
 
     def add(  # type:ignore[override]
@@ -26,7 +23,7 @@ class BasePersonCollection(GenericCollection[PersonT]):
         first_name: str,
         last_name: str,
         **optional: Any
-    ) -> PersonT:
+    ) -> T:
         person = self.model_class(
             first_name=first_name,
             last_name=last_name,
@@ -44,7 +41,7 @@ class BasePersonCollection(GenericCollection[PersonT]):
         last_name: str,
         compare_names_only: bool = False,
         **optional: Any
-    ) -> PersonT:
+    ) -> T:
         """
         Adds a person if it does not exist yet, otherwise returns the
         existing.
@@ -64,7 +61,7 @@ class BasePersonCollection(GenericCollection[PersonT]):
         else:
             return self.add(first_name, last_name, **optional)
 
-    def by_id(self, id: UUID) -> PersonT | None:  # type:ignore[override]
+    def by_id(self, id: UUID) -> T | None:  # type:ignore[override]
         if utils.is_uuid(id):
             return self.query().filter(self.model_class.id == id).first()
         return None

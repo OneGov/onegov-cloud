@@ -327,6 +327,7 @@
 				deleted: 'Deleted',
 				anchor: 'Anchor',
 				link_new_tab: 'Open link in new tab',
+				link_select_page: 'Select a page...',
 				underline: 'Underline',
 				alignment: 'Alignment',
 				filename: 'Name (optional)',

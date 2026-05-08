@@ -26,17 +26,16 @@ from pyparsing import (
 )
 from pyparsing.util import _collapse_string_to_ranges
 
-from typing import Any, TypeVar, TYPE_CHECKING
+
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from pyparsing.results import ParseResults
     from re import Pattern
 
-_T = TypeVar('_T')
-
 
 # we want newlines to be significant
-ParserElement.setDefaultWhitespaceChars(' \t')
+ParserElement.set_default_whitespace_chars(' \t')
 
 printables = pyparsing_unicode.Latin1.printables
 text = Word(printables)
@@ -63,7 +62,7 @@ def matches(character: str) -> Callable[[ParseResults], bool]:
     return lambda tokens: tokens and tokens[0] == character or False
 
 
-def literal(value: _T) -> Callable[[ParseResults], _T]:
+def literal[T](value: T) -> Callable[[ParseResults], T]:
     """" Returns the given value, ignoring the tokens alltogether. """
     return lambda tokens: value
 
@@ -280,7 +279,7 @@ def code() -> ParserElement:
     """
 
     code = choices_enclosed_in('<>', ('markdown', ))('syntax')
-    code.addParseAction(tag(type='code'))
+    code.add_parse_action(tag(type='code'))
 
     return code
 
@@ -514,7 +513,7 @@ def range_field(
 
     r = (value_expression + Suppress('..') + value_expression)
     r = r.set_parse_action(parse_action)
-    r = r.addParseAction(tag(type=type))
+    r = r.add_parse_action(tag(type=type))
 
     return r
 
@@ -646,7 +645,7 @@ def fieldset_title() -> ParserElement:
 
     """
 
-    label = with_whitespace_inside(text).setResultsName('label')
+    label = with_whitespace_inside(text).set_results_name('label')
 
     fieldset_title = Suppress('#') + (Suppress('...') | label)
     fieldset_title = fieldset_title.set_parse_action(tag(type='fieldset'))

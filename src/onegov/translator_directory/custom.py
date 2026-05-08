@@ -5,15 +5,23 @@ from onegov.core.utils import Bunch
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.org.models import GeneralFileCollection
-from onegov.ticket import TicketCollection
+from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket.collection import TicketCount
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.time_report import (
+    TimeReportCollection,
+)
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
+from onegov.translator_directory.models.time_report import (
+    TranslatorTimeReport,
+)
 from onegov.translator_directory import _
 from onegov.translator_directory.layout import DefaultLayout
 from onegov.user import Auth
-from onegov.user import UserCollection
+from onegov.user import UserCollection, UserGroup, UserGroupCollection
+from sqlalchemy import and_, func
 
 
 from typing import TYPE_CHECKING
@@ -22,6 +30,58 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
     from onegov.town6.layout import NavigationEntry
+
+
+def get_accountant_ticket_count(
+    request: TranslatorAppRequest,
+) -> TicketCount:
+    """Get ticket count filtered by accountant's finanzstelle."""
+    session = request.session
+    user = request.current_user
+
+    if not user:
+        return TicketCount()
+
+    user_finanzstelles: list[str] = []
+    groups = (
+        session.query(UserGroup)
+        .filter(UserGroup.meta['finanzstelle'].astext.isnot(None))
+        .all()
+    )
+
+    for group in groups:
+        accountant_emails = group.meta.get('accountant_emails', [])
+        if user.username in accountant_emails:
+            finanzstelle = group.meta.get('finanzstelle')
+            if finanzstelle:
+                user_finanzstelles.append(finanzstelle)
+
+    if not user_finanzstelles:
+        return TicketCount()
+
+    time_report_ids = (
+        session.query(TranslatorTimeReport.id)
+        .filter(TranslatorTimeReport.finanzstelle.in_(user_finanzstelles))
+        .all()
+    )
+    time_report_id_strs = [str(tr_id[0]) for tr_id in time_report_ids]
+
+    query = (
+        session.query(Ticket.state, func.count(Ticket.state))
+        .filter(
+            and_(
+                Ticket.handler_code == 'TRP',
+                Ticket.handler_data['handler_data'][
+                    'time_report_id'
+                ].astext.in_(time_report_id_strs),
+                Ticket.state != 'archived',
+            )
+        )
+        .group_by(Ticket.state)
+        .tuples()
+    )
+
+    return TicketCount(**dict(query))
 
 
 def get_global_tools(
@@ -71,15 +131,27 @@ def get_global_tools(
                     Link(
                         _('Users'), request.class_link(UserCollection),
                         attrs={'class': 'user'}
-                    )
-                )
+                    ),
+                    Link(
+                        _('User groups'),
+                        request.class_link(UserGroupCollection),
+                        attrs={'class': 'users'},
+                    ),
+                    Link(
+                        _('Time Reports'),
+                        request.class_link(TimeReportCollection),
+                        attrs={'class': 'time-reports'},
+                    ),
+                ),
             )
 
         # Tickets
-        if request.is_admin:
+        if request.is_admin or request.is_editor:
             assert request.current_user is not None
-            # Tickets
-            ticket_count = request.app.ticket_count
+            if request.is_accountant:
+                ticket_count = get_accountant_ticket_count(request)
+            else:
+                ticket_count = request.app.ticket_count
             screen_count = ticket_count.open or ticket_count.pending
             if screen_count:
                 css = ticket_count.open and 'alert' or 'info'
@@ -198,5 +270,5 @@ def get_template_variables(request: TranslatorAppRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
-        'hide_search_header': not request.is_logged_in
+        'hide_search_header': not request.is_logged_in,
     }

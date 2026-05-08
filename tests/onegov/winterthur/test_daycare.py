@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import textwrap
 import transaction
@@ -6,16 +8,24 @@ from decimal import Decimal
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.org.models import Organisation
-from onegov.winterthur.daycare import DaycareSubsidyCalculator, Services
+from onegov.winterthur.daycare import (
+    DaycareSubsidyCalculator, Services, SERVICE_DAYS)
 from sqlalchemy.orm.session import close_all_sessions
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.models import ExtendedDirectory
+    from .conftest import TestApp
+
+
 @pytest.fixture(scope='function')
-def app(winterthur_app):
+def app(winterthur_app: TestApp) -> TestApp:
     app = winterthur_app
 
     session = app.session()
 
+    dirs: DirectoryCollection[ExtendedDirectory]
     dirs = DirectoryCollection(session, type='extended')
     directory = dirs.add(
         title="Daycare Centers",
@@ -27,7 +37,7 @@ def app(winterthur_app):
         """),
         configuration=DirectoryConfiguration(
             title="[Name]",
-            order=('Name', ),
+            order=['Name'],
         ))
 
     # Some actual daycare centers in Winterthur
@@ -112,15 +122,15 @@ def app(winterthur_app):
     return app
 
 
-def test_calculate_example_1(app):
+def test_calculate_example_1(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mittagessen', 'mo')
-    services.select('ganzer-tag-inkl-mittagessen', 'di')
-    services.select('ganzer-tag-inkl-mittagessen', 'mi')
-    services.select('ganzer-tag-inkl-mittagessen', 'do')
-    services.select('ganzer-tag-inkl-mittagessen', 'fr')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['di'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mi'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['do'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['fr'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Fantasia"),
@@ -170,15 +180,15 @@ def test_calculate_example_1(app):
     ]
 
 
-def test_calculate_example_2(app):
+def test_calculate_example_2(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mittagessen', 'mo')
-    services.select('ganzer-tag-inkl-mittagessen', 'di')
-    services.select('ganzer-tag-inkl-mittagessen', 'mi')
-    services.select('ganzer-tag-inkl-mittagessen', 'do')
-    services.select('ganzer-tag-inkl-mittagessen', 'fr')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['di'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mi'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['do'])
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['fr'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Apfelblüte"),
@@ -227,11 +237,11 @@ def test_calculate_example_2(app):
     ]
 
 
-def test_calculate_example_3(app):
+def test_calculate_example_3(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mittagessen', 'mo')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Pinochio"),
@@ -281,11 +291,11 @@ def test_calculate_example_3(app):
     ]
 
 
-def test_caclulate_example_4(app):
+def test_caclulate_example_4(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mittagessen', 'mo')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Luftibus"),
@@ -335,13 +345,13 @@ def test_caclulate_example_4(app):
     ]
 
 
-def test_calculate_example_5(app):
+def test_calculate_example_5(app: TestApp) -> None:
     calculator = DaycareSubsidyCalculator(app.session())
 
     services = Services.from_org(app.org)
-    services.select('ganzer-tag-inkl-mittagessen', 'mo')
-    services.select('vor-oder-nachmittag-inkl-mittagessen', 'di')
-    services.select('vor-oder-nachmittag-inkl-mittagessen', 'mi')
+    services.select('ganzer-tag-inkl-mittagessen', SERVICE_DAYS['mo'])
+    services.select('vor-oder-nachmittag-inkl-mittagessen', SERVICE_DAYS['di'])
+    services.select('vor-oder-nachmittag-inkl-mittagessen', SERVICE_DAYS['mi'])
 
     calculation = calculator.calculate(
         daycare=calculator.daycare_by_title("Am Park"),

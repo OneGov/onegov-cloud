@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 import transaction
 
 from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
 
 
-def test_resource_recipient_overview(client):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .conftest import Client
+
+
+def test_resource_recipient_overview(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
@@ -38,7 +45,10 @@ def test_resource_recipient_overview(client):
     assert "Meeting" not in page
 
 
-def test_resource_recipient_overview_with_notes_notification(client):
+def test_resource_recipient_overview_with_notes_notification(
+    client: Client
+) -> None:
+
     resources = ResourceCollection(client.app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')

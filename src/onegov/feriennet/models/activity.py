@@ -25,53 +25,71 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
     __mapper_args__ = {'polymorphic_identity': 'vacation'}
 
-    es_type_name = 'vacation'
-
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'},
-        'organiser': {'type': 'text'}
+    fts_type_title = _('Activities')
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+        'text': {'type': 'localized', 'weight': 'C'},
+        'organizer_name': {'type': 'text', 'weight': 'B'},
+        'organization_text': {'type': 'text', 'weight': 'B'},
+        'organizer_details_text': {'type': 'text', 'weight': 'D'}
     }
 
     @property
-    def es_public(self) -> bool:
+    def fts_public(self) -> bool:
         return self.state == 'accepted'
 
     @property
-    def es_skip(self) -> bool:
+    def fts_skip(self) -> bool:
         return self.state == 'preview'
 
     @property
-    def organiser(self) -> list[str]:
-        organiser: list[str] = [
-            self.user.username,
-            # FIXME: For now we assume this is always set, if it
-            #        is sometimes not set, then perhaps we should
-            #        only append it when it is set.
-            self.user.realname  # type:ignore[list-item]
-        ]
+    def organizer_name(self) -> str:
+        if self.user.realname:
+            return self.user.realname
 
-        userprofile_keys = (
+        return self.user.username
+
+    @property
+    def organization_text(self) -> str:
+
+        organization_keys = (
             'organisation',
             'address',
             'zip_code',
             'place',
             'email',
             'phone',
-            'emergency',
             'website',
+        )
+
+        if not self.user.data:
+            return ''
+
+        return ' '.join(
+            value
+            for key in organization_keys
+            if (value := self.user.data.get(key))
+        )
+
+    @property
+    def organizer_details_text(self) -> str:
+
+        details_keys = (
+            'emergency',
             'bank_account',
             'bank_beneficiary',
         )
 
-        for key in userprofile_keys:
-            if not self.user.data:
-                continue
-            if value := self.user.data.get(key):
-                organiser.append(value)
+        if not self.user.data:
+            return ''
 
-        return organiser
+        return ' '.join(
+            value
+            for key in details_keys
+            if (value := self.user.data.get(key))
+        )
 
     def ordered_tags(
         self,
@@ -102,8 +120,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
 
 class ActivityTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FER'}  # type:ignore
-    es_type_name = 'activity_tickets'
+    __mapper_args__ = {'polymorphic_identity': 'FER'}
 
     def reference_group(
         self,

@@ -24,9 +24,8 @@ if TYPE_CHECKING:
     from onegov.core.cli.core import GroupContext
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.request import ElectionDayRequest
-    from typing import TypeAlias
 
-    Processor: TypeAlias = Callable[[ElectionDayRequest, ElectionDayApp], None]
+    type Processor = Callable[[ElectionDayRequest, ElectionDayApp], None]
 
 
 cli = command_group()
@@ -207,6 +206,24 @@ def update_archived_results(host: str, scheme: str) -> Processor:
     """ Update the archive results, e.g. after a database transfer. """
 
     def generate(request: ElectionDayRequest, app: ElectionDayApp) -> None:
+        if (
+            app.principal is not None
+            and app.principal.official_host is None
+            or host == 'localhost:8080'
+        ):
+            click.secho(
+                'Official host is not set! Do not run this command on '
+                'staging environment. Uploading results later may create '
+                'duplicate archived result entries.',
+                fg='red',
+            )
+            click.secho(
+                'Use `/update-results` view or `update archive` '
+                'menu, both available for admins only on the UI',
+                fg='yellow',
+            )
+            return
+
         click.secho(f'Updating {app.schema}', fg='yellow')
         request.host = host
         request.environ['wsgi.url_scheme'] = scheme

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
 
@@ -9,16 +10,14 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from markupsafe import Markup
     from onegov.core.request import CoreRequest
-    from onegov.pay import Payment
-    from onegov.ticket.model import Ticket
+    from onegov.pay import InvoiceItemMeta, Payment
+    from onegov.ticket.models import Ticket
     from sqlalchemy.orm import Query, Session
-    from typing import TypeAlias
     from uuid import UUID
 
-    _LinkOrCallback: TypeAlias = tuple[str, str] | Callable[[CoreRequest], str]
+    type _LinkOrCallback = tuple[str, str] | Callable[[CoreRequest], str]
 
 _H = TypeVar('_H', bound='Handler')
-_Q = TypeVar('_Q', bound='Query[Any]')
 
 
 class Handler:
@@ -55,7 +54,9 @@ class Handler:
 
     @property
     def session(self) -> Session:
-        return object_session(self.ticket)
+        session = object_session(self.ticket)
+        assert session is not None
+        return session
 
     def refresh(self) -> None:
         """ Updates the current ticket with the latest data from the handler.
@@ -89,9 +90,70 @@ class Handler:
         if self.ticket.payment_id != payment_id:
             self.ticket.payment_id = payment_id
 
+    def invoice_items(self, request: CoreRequest) -> list[InvoiceItemMeta]:
+        """ Returns the generated invoice items based on the current state
+        of the ticket.
+        """
+        raise NotImplementedError
+
+    def refresh_invoice_items(self, request: CoreRequest) -> None:
+        """ Updates the invoice items with the latest data from the handler.
+        """
+        raise NotImplementedError
+
+    def refreshing_invoice_is_safe(self, request: CoreRequest) -> bool:
+        """ Whether or not is safe to refresh the invoice.
+
+        Currently we disallow changing the total amount for a
+        non-manual non-open payment.
+        """
+        payment = self.payment
+        if payment is None:
+            return True
+
+        if payment.state == 'open' and payment.source == 'manual':
+            return True
+
+        invoice = self.ticket.invoice
+        if invoice is None:
+            expected = Decimal('0')
+        elif invoice.invoiced:
+            # If it has already been invoiced no changes should be made
+            return False
+        else:
+            expected = invoice.total_excluding_manual_entries
+
+        # if the total doesn't change, we're fine
+        # TODO: What if we have a manual discount that results in a negative
+        #       total and we end up with a new non-positive total? Either way
+        #       we don't get a change in payment, so it should be fine. But
+        #       it also seems a little bit fragile to allow this.
+        # FIXME: circular import
+        from onegov.pay import InvoiceItemMeta
+        return InvoiceItemMeta.total(self.invoice_items(request)) == expected
+
     @property
     def email(self) -> str | None:
         """ Returns the email address behind the ticket request. """
+        raise NotImplementedError
+
+    @property
+    def email_changeable(self) -> bool:
+        """ Returns whether or not the email address behind the ticket request
+        may be changed.
+        """
+        return False
+
+    def change_email(self, email: str) -> None:
+        """ Handles the logic for changing the email.
+
+        Every handler is tied to a different set of objects, which may or
+        may not store the email redundantly. So they all need to be changed
+        in order for data to remain consistent.
+
+        This method is only expected to work for handlers that return ``True``
+        for `email_changeable`.
+        """
         raise NotImplementedError
 
     @property
@@ -188,13 +250,35 @@ class Handler:
 
         return False
 
+    @property
+    def reopenable(self) -> bool:
+        """Whether or not this ticket can be reopened once closed.
+
+        By default, all tickets can be reopened. Handlers may override
+        this to prevent reopening for specific ticket types.
+        """
+        return True
+
+    @property
+    def reply_to(self) -> str | None:
+        """ An optional email address which will be used as a Reply-To
+        in mails instead of any global setting.
+
+        For example for a certain subset of forms you may want replies
+        to end up with the department in charge of those specific forms
+        instead of a global bucket.
+
+        """
+
+        return None
+
     @classmethod
-    def handle_extra_parameters(
+    def handle_extra_parameters[T: Query[Any]](
         cls,
         session: Session,
-        query: _Q,
+        query: T,
         extra_parameters: dict[str, Any]
-    ) -> _Q:
+    ) -> T:
         """ Takes a dictionary of extra parameters and uses it to optionally
         modifiy the query used for the collection.
 

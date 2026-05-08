@@ -6,84 +6,83 @@ import ormsgpack
 
 from decimal import Decimal
 from markupsafe import Markup
-from sqlalchemy.util import lightweight_named_tuple
-from sqlalchemy.util._collections import AbstractKeyedTuple
+from sqlalchemy.engine.result import result_tuple
+from sqlalchemy.engine.row import Row
 from types import GeneratorType
 from uuid import UUID
 
 
-from typing import Any, ClassVar, Generic, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterable
 
-_T = TypeVar('_T')
-_TypeT = TypeVar('_TypeT', bound=type[object])
+    _TypeT = TypeVar('_TypeT', bound=type[object])
 
 
-class Serializer(Generic[_T]):
+class Serializer[T]:
     """ Provides a way to encode all objects of a given class or its
     subclasses to and from MessagePack using extension types.
 
     """
 
-    def __init__(self, tag: int, target: type[_T]):
+    def __init__(self, tag: int, target: type[T]):
         assert isinstance(target, type), 'expects a class'
         assert 0 <= tag <= 127, 'needs to be between 0 and 127'
         self.tag = tag
         self.target = target
 
-    def encode(self, obj: _T) -> bytes:
+    def encode(self, obj: T) -> bytes:
         raise NotImplementedError
 
-    def decode(self, value: bytes) -> _T:
+    def decode(self, value: bytes) -> T:
         raise NotImplementedError
 
 
-class BytesSerializer(Serializer[_T]):
+class BytesSerializer[T](Serializer[T]):
     """ Serializes objects to a byte string. """
 
     def __init__(
         self,
         tag: int,
-        target: type[_T],
-        encode: Callable[[_T], bytes],
-        decode: Callable[[bytes], _T],
+        target: type[T],
+        encode: Callable[[T], bytes],
+        decode: Callable[[bytes], T],
     ):
         super().__init__(tag, target)
 
         self._encode = encode
         self._decode = decode
 
-    def encode(self, obj: _T) -> bytes:
+    def encode(self, obj: T) -> bytes:
         return self._encode(obj)
 
-    def decode(self, value: bytes) -> _T:
+    def decode(self, value: bytes) -> T:
         return self._decode(value)
 
 
-class StringSerializer(Serializer[_T]):
+class StringSerializer[T](Serializer[T]):
     """ Serializes objects to a string. """
 
     def __init__(
         self,
         tag: int,
-        target: type[_T],
-        encode: Callable[[_T], str],
-        decode: Callable[[str], _T],
+        target: type[T],
+        encode: Callable[[T], str],
+        decode: Callable[[str], T],
     ):
         super().__init__(tag, target)
 
         self._encode = encode
         self._decode = decode
 
-    def encode(self, obj: _T) -> bytes:
+    def encode(self, obj: T) -> bytes:
         return self._encode(obj).encode('utf-8')
 
-    def decode(self, value: bytes) -> _T:
+    def decode(self, value: bytes) -> T:
         return self._decode(value.decode('utf-8'))
 
 
-class DictionarySerializer(Serializer[_T]):
+class DictionarySerializer[T](Serializer[T]):
     """ Serializes objects that can be built with keyword arguments.
 
     For example::
@@ -115,17 +114,17 @@ class DictionarySerializer(Serializer[_T]):
 
     """
 
-    def __init__(self, tag: int, target: type[_T], keys: Iterable[str]):
+    def __init__(self, tag: int, target: type[T], keys: Iterable[str]):
         super().__init__(tag, target)
 
         self.keys = keys = tuple(keys)
         assert len(keys) == len(set(keys)), 'duplicate keys given'
         self.constructor = getattr(target, 'from_dict', target)
 
-    def encode(self, obj: _T) -> bytes:
+    def encode(self, obj: T) -> bytes:
         return packb([getattr(obj, k) for k in self.keys])
 
-    def decode(self, value: bytes) -> _T:
+    def decode(self, value: bytes) -> T:
         values = unpackb(value)
         assert isinstance(values, list)
         return self.constructor(**dict(zip(self.keys, values, strict=True)))
@@ -163,8 +162,8 @@ class Serializers:
         if tag_and_serializer is None:
             if isinstance(value, dict):
                 return dict(value)
-            elif isinstance(value, AbstractKeyedTuple):
-                tag_and_serializer = self.by_type[AbstractKeyedTuple]
+            elif isinstance(value, Row):
+                tag_and_serializer = self.by_type[Row]
             elif isinstance(value, GeneratorType):
                 tag_and_serializer = self.by_type[tuple]
             else:
@@ -243,20 +242,23 @@ default_serializers.register(BytesSerializer(
 
 
 # NOTE: SQLAlchemy result support
-def load_keyed_tuple(b: bytes) -> AbstractKeyedTuple[Any]:
-    name, items = unpackb(b)
-    cls = lightweight_named_tuple(name, items.keys())
-    return cls(**items)
+def store_sqlalchemy_row(r: Row[Any]) -> bytes:
+    fields = list(r._fields)
+    data = [getattr(r, name) for name in fields]
+    return packb([fields, data])
+
+
+def load_sqlalchemy_row(b: bytes) -> Row[Any]:
+    fields, data = unpackb(b)
+    cls = result_tuple(fields)
+    return cls(data)
 
 
 default_serializers.register(BytesSerializer(
     tag=7,
-    target=AbstractKeyedTuple,
-    encode=lambda t: packb([
-        t.__class__.__name__,
-        {key: getattr(t, key) for key in t.keys()},
-    ]),
-    decode=load_keyed_tuple
+    target=Row,
+    encode=store_sqlalchemy_row,
+    decode=load_sqlalchemy_row
 ))
 
 default_serializers.register(StringSerializer(

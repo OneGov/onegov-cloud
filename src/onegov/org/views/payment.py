@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-import decimal
 from collections import OrderedDict
-from decimal import Decimal
 from onegov.core.security import Private
 from onegov.core.utils import append_query_param
 from onegov.form import merge_forms
 from onegov.org import OrgApp, _
-from onegov.org.forms import DateRangeForm, ExportForm
-from onegov.org.forms.payments_search_form import PaymentSearchForm
-from onegov.org.layout import PaymentCollectionLayout, DefaultLayout
+from onegov.org.forms import (
+    DateRangeForm, ExportForm, PaymentSearchForm, TicketInvoiceSearchForm)
+from onegov.org.layout import (
+    PaymentCollectionLayout, TicketInvoiceCollectionLayout)
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import PaymentMessage, TicketMessage
+from onegov.org.models import PaymentMessage
 from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.org.pdf.ticket import TicketsPdf
@@ -19,12 +18,13 @@ from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.errors import DatatransApiError, SaferpayApiError
-from onegov.pay.models.payment import ManualPayment
 from onegov.pay.models.payment_providers.datatrans import DatatransPayment
 from onegov.pay.models.payment_providers.stripe import StripePayment
 from onegov.pay.models.payment_providers.worldline_saferpay import (
     SaferpayPayment)
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import TicketInvoice, TicketInvoiceItem
+from onegov.ticket import TicketInvoiceCollection
+from sqlalchemy.orm import joinedload
 from webob.response import Response
 from webob import exc, Response as WebobResponse
 
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from onegov.pay.types import AnyPayableBase
+    from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Session
     from typing import type_check_only
     from webob import Response
@@ -52,82 +52,59 @@ EMAIL_SUBJECTS = {
 }
 
 
-def ticket_by_link(
-    tickets: TicketCollection,
-    link: Any
-) -> Ticket | None:
-
-    # FIXME: We should probably do isinstance checks so type checkers
-    #        can understand that a Reservation has a token and a
-    #        FormSubmission has a id...
-    if link.__tablename__ == 'reservations':
-        return tickets.by_handler_id(link.token.hex)
-    elif link.__tablename__ == 'submissions':
-        return tickets.by_handler_id(link.id.hex)
-    return None
-
-
 def send_ticket_notifications(
     payment: Payment,
     request: OrgRequest,
     change: str
 ) -> None:
 
-    session = request.session
-    tickets = TicketCollection(session)
+    ticket = payment.ticket
 
-    for link in payment.links:
-        ticket = ticket_by_link(tickets, link)
+    if not ticket:
+        return
 
-        if not ticket:
-            continue
+    # create a notification in the chat
+    PaymentMessage.create(payment, ticket, request, change)
 
-        # create a notification in the chat
-        PaymentMessage.create(payment, ticket, request, change)
+    if change == 'captured':
+        return
 
-        if change == 'captured':
-            continue
+    # send an e-mail
+    email = ticket.snapshot.get('email') or ticket.handler.email
+    assert email is not None
 
-        # send an e-mail
-        email = ticket.snapshot.get('email') or ticket.handler.email
-        assert email is not None
-
-        send_ticket_mail(
-            request=request,
-            template='mail_payment_change.pt',
-            subject=EMAIL_SUBJECTS[change],
-            receivers=(email, ),
-            ticket=ticket,
-            content={
-                'model': ticket,
-                'payment': payment,
-                'change': change
-            }
-        )
+    send_ticket_mail(
+        request=request,
+        template='mail_payment_change.pt',
+        subject=EMAIL_SUBJECTS[change],
+        receivers=(email, ),
+        ticket=ticket,
+        content={
+            'model': ticket,
+            'payment': payment,
+            'change': change
+        }
+    )
 
 
 def handle_pdf_response(
-    self: PaymentCollection,
+    self: TicketInvoiceCollection,
+    form: TicketInvoiceSearchForm,
     request: OrgRequest
 ) -> WebobResponse:
     # Export a pdf of all invoiced, without pagination limit
-    all_payments = list(self.by_state('invoiced').subset())
-
-    if not all_payments:
-        request.warning(_('No payments found for PDF generation'))
-        return request.redirect(request.class_link(PaymentCollection))
-
-    payment_ids = [p.id for p in all_payments]
-    tickets = self.session.query(Ticket).filter(
-        Ticket.payment_id.in_(payment_ids)
-    ).all()
+    tickets = [
+        ticket
+        for invoice in self.by_invoiced(True).subset()
+        if (ticket := invoice.ticket) is not None
+    ]
 
     if not tickets:
         request.warning(_('No tickets found for PDF generation'))
         return request.redirect(request.class_link(PaymentCollection))
 
     filename = 'Payments.pdf'
-    multi_pdf = TicketsPdf.from_tickets(request, tickets)
+    multi_pdf = TicketsPdf.from_tickets(request, tickets, form)
     return Response(
         multi_pdf.read(),
         content_type='application/pdf',
@@ -147,7 +124,7 @@ def view_payments(
     form: PaymentSearchForm,
     layout: PaymentCollectionLayout | None = None
 ) -> RenderData | WebobResponse:
-    request.include('invoicing')
+
     layout = layout or PaymentCollectionLayout(self, request)
 
     if form.submitted(request):
@@ -156,9 +133,6 @@ def view_payments(
 
     if not form.errors:
         form.apply_model(self)
-
-    if request.params.get('format') == 'pdf':
-        return handle_pdf_response(self, request)
 
     providers = {
         provider.id: provider
@@ -176,67 +150,163 @@ def view_payments(
     }
 
     return {
-        'title': _('Receivables'),
+        'title': _('Payments'),
         'form': form,
-        'layout': layout or PaymentCollectionLayout(self, request),
+        'layout': layout,
         'payments': self.batch,
         'tickets': self.tickets_by_batch(),
         'reservation_dates_formatted': reservation_dates_formatted,
         'providers': providers,
-        'payment_links': self.payment_links_by_batch(),
+    }
+
+
+@OrgApp.form(
+    model=TicketInvoiceCollection,
+    template='invoices.pt',
+    form=TicketInvoiceSearchForm,
+    permission=Private
+)
+def view_invoices(
+    self: TicketInvoiceCollection,
+    request: OrgRequest,
+    form: TicketInvoiceSearchForm,
+    layout: TicketInvoiceCollectionLayout | None = None
+) -> RenderData | WebobResponse:
+
+    layout = layout or TicketInvoiceCollectionLayout(self, request)
+
+    if form.submitted(request):
+        form.update_model(self)
+        return request.redirect(request.link(self))
+
+    if not form.errors:
+        form.apply_model(self)
+
+        if request.GET.get('format') == 'pdf':
+            return handle_pdf_response(self, form, request)
+
+    request.include('invoicing')
+
+    # Process reservation dates into a display-ready format
+    reservation_dates = self.reservation_dates_by_batch()
+    reservation_dates_formatted = {
+        payment_id: (
+            f"{layout.format_date(start, 'date')} - "
+            f"{layout.format_date(end, 'date')}"
+        ) if start != end else layout.format_date(start, 'date')
+        for payment_id, (start, end) in reservation_dates.items()
+    }
+
+    return {
+        'title': _('Invoices'),
+        'form': form,
+        'layout': layout,
+        'invoices': self.batch,
+        'reservation_dates_formatted': reservation_dates_formatted,
         'pdf_export_link': append_query_param(request.url, 'format', 'pdf')
     }
 
 
 @OrgApp.json(
-    model=PaymentCollection,
-    name='batch-set-payment-state',
+    model=TicketInvoiceCollection,
+    name='batch-set',
     request_method='POST',
-    permission=Private
+    permission=Private,
+    open_data=False
 )
-def handle_batch_set_payment_state(
-    self: PaymentCollection,
+def handle_batch_set(
+    self: TicketInvoiceCollection,
     request: OrgRequest
 ) -> JSON_ro:
 
     request.assert_valid_csrf_token()
-    payment_ids = request.json_body.get('payment_ids', [])
+    invoice_ids = request.json_body.get('invoice_ids', [])
     state = request.json_body.get('state')
 
-    if state not in ('invoiced', 'paid', 'open'):
+    if state not in ('invoiced', 'uninvoiced', 'paid', 'open'):
         raise exc.HTTPBadRequest()
 
-    payments_query = self.session.query(Payment).distinct().filter(
-        Payment.id.in_(payment_ids)
-    )
-    # State sequence is assumed to be: 'open' -> 'invoiced' - 'paid'
-    updated_count = 0
-    for payment in payments_query:
-        if not isinstance(payment, ManualPayment):
-            continue
-        if payment.state != state:
-            if payment.state == 'open' and state == 'invoiced':
-                payment.state = state
-            if payment.state == 'invoiced' and state == 'paid':
-                payment.state = state
-            # backwards
-            if payment.state == 'invoiced' and state == 'open':
-                payment.state = state
-            if payment.state == 'paid' and state == 'invoiced':
-                payment.state = state
+    invoiced: bool | None
+    payment_state: str | None
+    match state:
+        case 'invoiced':
+            invoiced = True
+            payment_state = 'invoiced'
+            message = _('${count} invoices marked as invoiced.')
+        case 'uninvoiced':
+            invoiced = False
+            payment_state = 'open'
+            message = _('${count} invoices marked as uninvoiced.')
+        case 'open':
+            invoiced = None
+            payment_state = None
+            message = _('${count} invoices marked as unpaid.')
+        case 'paid':
+            invoiced = None
+            payment_state = 'paid'
+            message = _('${count} invoices marked as paid.')
 
-        updated_count += 1
+    invoices_query = self.session.query(TicketInvoice).filter(
+        TicketInvoice.id.in_(invoice_ids)
+    ).options(
+        joinedload(TicketInvoice.items.of_type(TicketInvoiceItem))
+        .selectinload(TicketInvoiceItem.payments)
+    )
+    updated_count = 0
+    for invoice in invoices_query:
+        updated = False
+        if invoiced is not None:
+            if invoice.invoiced is not invoiced:
+                invoice.invoiced = invoiced
+                updated = True
+
+        elif invoice.total_amount <= 0.0:
+            # there should be no payments to update
+            continue
+
+        # update the state of any linked payments, as long as it is
+        # a valid state transition for that kind of payment
+        for item in invoice.items:
+            for payment in item.payments:
+                if payment.source != 'manual':
+                    continue
+
+                if payment_state == 'invoiced':
+                    if payment.state == 'open':
+                        payment.state = 'invoiced'
+                        updated = True
+                elif payment_state == 'open':
+                    if payment.state == 'invoiced':
+                        payment.state = 'open'
+                        updated = True
+                elif payment_state == 'paid':
+                    if payment.state == 'invoiced':
+                        item.paid = True
+                        payment.state = 'paid'
+                        updated = True
+                    elif payment.state == 'paid' and not item.paid:
+                        item.paid = True
+                else:
+                    assert payment_state is None
+                    assert invoiced is None
+                    # NOTE: We're more generous in this direction and allow
+                    #       two state transitions in one action, since it's
+                    #       possible to mark the payment as paid without
+                    #       marking the invoice as invoiced.
+                    target_state: PaymentState
+                    target_state = 'invoiced' if invoice.invoiced else 'open'
+                    if payment.state == 'paid':
+                        payment.state = target_state
+                        item.paid = False
+                        updated = True
+                    elif payment.state == target_state and item.paid:
+                        item.paid = False
+
+        if updated:
+            updated_count += 1
 
     if updated_count > 0:
-        messages = {
-            'invoiced': _('${count} payments marked as invoiced.',
-                          mapping={'count': updated_count}),
-            'paid': _('${count} payments marked as paid.',
-                      mapping={'count': updated_count}),
-            'open': _('${count} payments marked as unpaid.',
-                      mapping={'count': updated_count}),
-        }
-        request.success(messages[state])
+        request.success(message % {'count': updated_count})
 
     return {'status': 'success', 'message': 'OK'}
 
@@ -307,6 +377,11 @@ def run_export(
         r: dict[str, Any] = OrderedDict()
         r['source'] = formatter(payment.source)
         r['source_id'] = formatter(payment.remote_id)
+        r['source_references'] = (
+            tuple(formatter(r) for r in payment.remote_references)
+            if nested
+            else formatter('\n'.join(payment.remote_references))
+        )
         r['state'] = formatter(payment.state)
         r['currency'] = formatter(payment.currency)
         r['gross'] = formatter(payment.amount)
@@ -325,35 +400,6 @@ def run_export(
     return tuple(transform(p, links[p.id]) for p in payments)
 
 
-@OrgApp.json(
-    model=Payment,
-    name='change-net-amount',
-    request_method='POST',
-    permission=Private
-)
-def change_payment_amount(self: Payment, request: OrgRequest) -> JSON_ro:
-    request.assert_valid_csrf_token()
-    assert not self.paid
-    format_ = DefaultLayout(self, request).format_number
-    try:
-        net_amount = Decimal(request.params['netAmount'])  # type:ignore
-    except decimal.InvalidOperation:
-        return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}
-
-    if net_amount <= 0 or (net_amount - self.fee) <= 0:
-        raise exc.HTTPBadRequest('amount negative')
-
-    links = self.links
-    if links:
-        tickets = TicketCollection(request.session)
-        ticket = ticket_by_link(tickets, links[0])
-        if ticket:
-            TicketMessage.create(ticket, request, 'change-net-amount')
-
-    self.amount = net_amount - self.fee
-    return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}
-
-
 @OrgApp.view(
     model=Payment,
     name='mark-as-paid',
@@ -368,6 +414,7 @@ def mark_as_paid(self: Payment, request: OrgRequest) -> None:
 
     assert self.source == 'manual'
     self.state = 'paid'
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -384,6 +431,7 @@ def mark_as_unpaid(self: Payment, request: OrgRequest) -> None:
 
     assert self.source == 'manual'
     self.state = 'open'
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -400,6 +448,7 @@ def capture_stripe(self: StripePayment, request: OrgRequest) -> None:
 
     assert self.source == 'stripe_connect'
     self.charge.capture()
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -416,6 +465,7 @@ def refund_stripe(self: StripePayment, request: OrgRequest) -> None:
 
     assert self.source == 'stripe_connect'
     self.refund()
+    self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -441,6 +491,7 @@ def capture_datatrans(self: DatatransPayment, request: OrgRequest) -> None:
         self.sync(tx)
     else:
         self.provider.client.settle(tx)
+        self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -488,6 +539,7 @@ def capture_saferpay(self: SaferpayPayment, request: OrgRequest) -> None:
         self.sync(tx)
     else:
         self.provider.client.capture(tx)
+        self.sync_invoice_items()
 
 
 @OrgApp.view(
@@ -505,6 +557,7 @@ def refund_saferpay(self: SaferpayPayment, request: OrgRequest) -> None:
     except SaferpayApiError:
         request.alert(_('Could not refund the payment'))
     else:
+        self.sync_invoice_items()
         if new_refund:
             send_ticket_notifications(self, request, 'refunded')
         request.success(_('The payment was refunded'))

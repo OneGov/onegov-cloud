@@ -21,30 +21,36 @@ from onegov.org.models.extensions import (
     DeletableContentExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
+from onegov.org.observer import observes
+from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
-from sqlalchemy import and_
+from sqlalchemy import and_, or_, func, text
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm.attributes import set_committed_value
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
-    from onegov.directory.models.directory import DirectoryEntryForm
+    from onegov.directory.models.directory import (
+        DirectoryEntryForm,
+        InheritType,
+        INHERIT
+    )
     from onegov.directory.collections.directory_entry import (
         DirectorySearchWidget)
     from onegov.form.fields import TimezoneDateTimeField
     from onegov.gis import CoordinatesField
     from onegov.org.request import OrgRequest
     from onegov.pay.types import PaymentMethod
-    from sqlalchemy.orm import Query, Session, relationship
+    from sqlalchemy.orm import Mapped, Query, Session
     from typing import type_check_only
-    from typing import TypeAlias
     from uuid import UUID
     from wtforms import EmailField, Field, StringField, TextAreaField
 
-    ExtendedDirectorySearchWidget: TypeAlias = DirectorySearchWidget[
-        'ExtendedDirectoryEntry'
+    type ExtendedDirectorySearchWidget = DirectorySearchWidget[
+        ExtendedDirectoryEntry
     ]
 
     # we extend this manually with all the form extensions
@@ -379,7 +385,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
                         GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_directories'
+    fts_type_title = _('Directories')
+    fts_public = True
 
     content_fields_containing_links_to_files = {
         'text',
@@ -408,8 +415,9 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     minimum_price_total: dict_property[float | None] = meta_property()
     payment_method: dict_property[PaymentMethod | None] = meta_property()
 
-    search_widget_config: dict_property[dict[str, Any] | None]
-    search_widget_config = content_property()
+    search_widget_config: dict_property[dict[str, Any] | None] = (
+        content_property()
+    )
 
     marker_icon: dict_property[str | None] = content_property()
     marker_color: dict_property[str | None] = content_property()
@@ -424,16 +432,28 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     def entry_cls_name(self) -> str:
         return 'ExtendedDirectoryEntry'
 
-    @property
-    def es_public(self) -> bool:
-        return self.access == 'public'
-
     if TYPE_CHECKING:
+        # FIXME: We should consider making Directory generic, so we
+        #        don't need to overwrite these methods in order to
+        #        get precise types.
+        @property
+        def entry_cls(self) -> type[ExtendedDirectoryEntry]: ...
+        def add(
+            self,
+            values: dict[str, Any],
+            type: str | InheritType = INHERIT
+        ) -> ExtendedDirectoryEntry: ...
+        def add_by_form(
+            self,
+            form: DirectoryEntryForm,
+            type: str | InheritType = INHERIT
+        ) -> ExtendedDirectoryEntry: ...
         def extend_form_class(  # type:ignore[override]
             self,
             form_class: type[DirectoryEntryForm],  # type:ignore[override]
             extensions: Collection[str]
         ) -> type[ExtendedDirectoryEntryForm]: ...
+        entries: Mapped[list[ExtendedDirectoryEntry]]  # type: ignore[assignment]
 
     def form_class_for_submissions(
         self,
@@ -472,8 +492,10 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
         submission_id: UUID
     ) -> DirectorySubmissionAction:
 
+        session = object_session(self)
+        assert session is not None
         return DirectorySubmissionAction(
-            session=object_session(self),
+            session=session,
             directory_id=self.id,
             action=action,
             submission_id=submission_id
@@ -481,6 +503,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
     def remove_old_pending_submissions(self) -> None:
         session = object_session(self)
+        assert session is not None
         horizon = sedate.utcnow() - timedelta(hours=24)
 
         submissions = session.query(FormSubmission).filter(and_(
@@ -498,17 +521,36 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
                              DeletableContentExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
-    es_type_name = 'extended_directory_entries'
-
     internal_notes: dict_property[str | None] = content_property()
 
     if TYPE_CHECKING:
         # technically not enforced, but it should be a given
-        directory: relationship[ExtendedDirectory]
+        directory: Mapped[ExtendedDirectory]
+
+    fts_type_title = _('Directory entries')
+    fts_public = True
 
     @property
-    def es_public(self) -> bool:
-        return self.access == 'public' and self.published
+    def fts_access(self) -> str:
+        self._fetch_if_necessary()
+        return narrowest_access(self.access, self.directory.access)
+
+    # force fts update when access of directory changes
+    @observes('directory.meta')
+    def _force_fts_update(self, *_ignored: object) -> None:
+        self.modified = self.modified
+
+    def _fetch_if_necessary(self) -> None:
+        session = object_session(self)
+        if session is None:
+            return
+
+        if self.directory_id is not None and self.directory is None:
+            set_committed_value(  # type: ignore[unreachable]
+                self,
+                'directory',
+                session.get(ExtendedDirectory, self.directory_id)
+            )
 
     @property
     def display_config(self) -> dict[str, Any]:
@@ -555,6 +597,13 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         return None
 
     @property
+    def content_labels(self) -> set[str]:
+        return {
+            as_internal_id(k)
+            for k in self.display_config.get('content', ())
+        }
+
+    @property
     def hidden_label_fields(self) -> set[str]:
         return {
             as_internal_id(k)
@@ -576,9 +625,14 @@ class ExtendedDirectoryEntryCollection(
         search_widget: ExtendedDirectorySearchWidget | None = None,
         published_only: bool = False,
         past_only: bool = False,
-        upcoming_only: bool = False
+        upcoming_only: bool = False,
+        # FIXME: Consider making this required, since it's more reliable
+        #        than filtering access after the fact, for now we'll only
+        #        use it in the API.
+        request: OrgRequest | None = None,
     ) -> None:
 
+        self.request = request
         super().__init__(directory, type, keywords, page, search_widget)
         self.published_only = published_only
         self.past_only = past_only
@@ -587,9 +641,52 @@ class ExtendedDirectoryEntryCollection(
     if TYPE_CHECKING:
         directory: ExtendedDirectory
 
-    def query(self) -> Query[ExtendedDirectoryEntry]:
-        query = super().query()
-        if self.published_only:
+    def keyword_counts(self) -> dict[str, dict[str, int]]:
+        valid_keywords = tuple(
+            as_internal_id(k)
+            for k in self.directory.configuration.keywords or ()
+        )
+        counts: dict[str, dict[str, int]] = {}
+        for item, count in self.apply_common_filters(
+            self.session.query(
+                func.skeys(ExtendedDirectoryEntry._keywords),
+                func.count(text('1'))
+            )
+            .filter(ExtendedDirectoryEntry.directory_id == self.directory.id)
+            .group_by(func.skeys(ExtendedDirectoryEntry._keywords))
+        ):
+            parts = item.split(':', 1)
+            if len(parts) != 2:
+                # malformed keyword, value pair, for now we just ignore it
+                continue
+
+            keyword, value = parts
+            if keyword not in valid_keywords:
+                continue
+            counts.setdefault(keyword, {})[value] = count
+        return counts
+
+    def apply_common_filters[T](self, query: Query[T]) -> Query[T]:
+        available_accesses: tuple[str, ...]
+        if self.request is None:
+            # assume highest access level or we filter later
+            available_accesses = ()
+        else:
+            role = getattr(self.request.identity, 'role', 'anonymous')
+            available_accesses = {
+                'admin': (),  # can see everything
+                'editor': (),  # can see everything
+                'member': ('member', 'mtan', 'public')
+            }.get(role, ('mtan', 'public'))
+        if available_accesses:
+            query = query.filter(or_(
+                *(
+                    self.model_class.meta['access'].astext == access
+                    for access in available_accesses
+                ),
+                self.model_class.meta['access'].is_(None)
+            ))
+        if self.published_only or available_accesses:
             query = query.filter(
                 self.model_class.publication_started == True,
                 self.model_class.publication_ended == False
@@ -599,3 +696,6 @@ class ExtendedDirectoryEntryCollection(
         elif self.upcoming_only:
             query = query.filter(self.model_class.publication_started == False)
         return query
+
+    def query(self) -> Query[ExtendedDirectoryEntry]:
+        return self.apply_common_filters(super().query())

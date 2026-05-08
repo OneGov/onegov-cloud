@@ -14,7 +14,15 @@ TICKET_STATES: dict[ExtendedTicketState, str] = {
     'pending': _('Pending'),
     'closed': _('Closed'),
     'archived': _('Archived'),
-    'all': _('All')
+    'all': _('All'),
+}
+
+INVOICE_GROUPS = {
+    'reservation': _('Reservations'),
+    'submission': _('Submission'),
+    'form': _('Selected Options'),
+    'manual': _('Discounts / Surcharges'),
+    'migration': _('Lump sum'),
 }
 
 PAYMENT_STATES: dict[PaymentState, str] = {
@@ -22,7 +30,7 @@ PAYMENT_STATES: dict[PaymentState, str] = {
     'paid': _('Paid'),
     'failed': _('Failed'),
     'cancelled': _('Refunded'),
-    'invoiced': _('Invoiced')
+    'invoiced': _('Invoiced'),
 }
 
 PAYMENT_SOURCES = {

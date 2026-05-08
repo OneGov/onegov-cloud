@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from functools import cached_property
 from onegov.activity import Attendee, AttendeeCollection
-from onegov.activity import Booking, BookingCollection, Occasion
-from onegov.activity import InvoiceCollection
+from onegov.activity import Booking, BookingCollection
+from onegov.activity import BookingPeriodInvoiceCollection
+from onegov.activity import Occasion
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
@@ -53,7 +54,7 @@ class AttendeeBase(Form):
 
         # Update name changes on invoice items of current period
         if self.request.app.active_period is not None:
-            invoice_collection = InvoiceCollection(
+            invoice_collection = BookingPeriodInvoiceCollection(
                 session=self.request.session,
                 period_id=self.request.app.active_period.id)
 
@@ -128,7 +129,10 @@ class AttendeeForm(AttendeeBase):
 
     swisspass = StringField(
         label=_('Swisspass ID'),
-        description='XXX-XXX-XXX-X'
+        description='XXX-XXX-XXX-X',
+        render_kw={
+            'data-max-length': 13,
+        }
     )
 
     differing_address = BooleanField(
@@ -182,7 +186,8 @@ class AttendeeForm(AttendeeBase):
             if len(self.swisspass.data) != 13:
                 assert isinstance(self.swisspass.errors, list)
                 self.swisspass.errors.append(_(
-                    'The Swisspass ID must be 13 characters long.'
+                    'The Swisspass ID must be 13 characters long '
+                    '(including dashes).'
                 ))
                 return False
 
@@ -236,7 +241,10 @@ class AttendeeSignupForm(AttendeeBase):
     swisspass = StringField(
         label=_('Swisspass ID'),
         description='XXX-XXX-XXX-X',
-        depends_on=('attendee', 'other')
+        depends_on=('attendee', 'other'),
+        render_kw={
+            'data-max-length': 13,
+        }
     )
 
     differing_address = BooleanField(
@@ -520,12 +528,11 @@ class AttendeeSignupForm(AttendeeBase):
 
             if count >= limit:
                 assert isinstance(self.attendee.errors, list)
-                self.attendee.errors.append(_((
+                self.attendee.errors.append(_(
                     'The attendee already has already reached the maximum '
-                    'number of ${count} bookings'
-                ), mapping={
-                    'count': limit
-                }))
+                    'number of ${count} bookings',
+                    mapping={'count': limit}
+                ))
 
                 return False
         return None
@@ -594,7 +601,8 @@ class AttendeeSignupForm(AttendeeBase):
             if len(self.swisspass.data) != 13:
                 assert isinstance(self.swisspass.errors, list)
                 self.swisspass.errors.append(_(
-                    'The Swisspass ID must be 13 characters long.'
+                    'The Swisspass ID must be 13 characters long '
+                    '(including dashes).'
                 ))
                 return False
 

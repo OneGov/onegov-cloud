@@ -18,10 +18,10 @@ from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Sequence
     from datetime import date
-    from onegov.core.orm.types import UUID
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Query
+    from uuid import UUID
     from webob import Response
 
     class SurveySubmissionRow(NamedTuple):

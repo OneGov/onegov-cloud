@@ -1,7 +1,14 @@
+from __future__ import annotations
+
 from onegov.election_day.collections import UploadTokenCollection
 
 
-def test_upload_token_collection(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_upload_token_collection(session: Session) -> None:
 
     collection = UploadTokenCollection(session)
     assert collection.query().all() == []
@@ -12,7 +19,7 @@ def test_upload_token_collection(session):
     assert collection.by_id(token.id) == token
 
     another_token = collection.create()
-    assert set(collection.query().all()) == set([token, another_token])
+    assert set(collection.query()) == {token, another_token}
 
     collection.delete(token)
     assert collection.query().all() == [another_token]

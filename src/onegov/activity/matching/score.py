@@ -8,14 +8,15 @@ from onegov.user import User
 from sqlalchemy import func
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from onegov.activity import BookingPeriod
+    from onegov.activity.matching.interfaces import MatchableBooking
     from sqlalchemy.orm import Session
-    from typing import Self
 
 
-class Scoring:
+class Scoring[BookingT: Booking | MatchableBooking = Any]:
     """ Provides scoring based on a number of criteria.
 
     A criteria is a callable which takes a booking and returns a score.
@@ -23,40 +24,44 @@ class Scoring:
 
     """
 
-    criteria: list[Callable[[Booking], float]]
+    criteria: list[Callable[[BookingT], float]]
 
     def __init__(
         self,
-        criteria: list[Callable[[Booking], float]] | None = None
+        criteria: list[Callable[[BookingT], float]] | None = None
     ) -> None:
         self.criteria = criteria or [PreferMotivated()]
 
-    def __call__(self, booking: Booking) -> Decimal:
+    def __call__(self, booking: BookingT) -> Decimal:
         return Decimal(sum(criterium(booking) for criterium in self.criteria))
 
+    # NOTE: Some of the preference function are not compatible with our
+    #       minimal interface, so this only works with real bookings.
     @classmethod
     def from_settings(
         cls,
         settings: dict[str, Any],
-        session: Session
+        session: Session,
+        period: BookingPeriod | None = None
     ) -> Self:
 
         scoring = cls()
 
         # always prefer groups
-        scoring.criteria.append(PreferGroups.from_session(session))
+        if (period and period.with_group_code) or not period:
+            scoring.criteria.append(PreferGroups.from_session(session))  # type: ignore[arg-type]
 
         if settings.get('prefer_in_age_bracket'):
             scoring.criteria.append(
-                PreferInAgeBracket.from_session(session))
+                PreferInAgeBracket.from_session(session))  # type: ignore[arg-type]
 
         if settings.get('prefer_organiser'):
             scoring.criteria.append(
-                PreferOrganiserChildren.from_session(session))
+                PreferOrganiserChildren.from_session(session))  # type: ignore[arg-type]
 
         if settings.get('prefer_admins'):
             scoring.criteria.append(
-                PreferAdminChildren.from_session(session))
+                PreferAdminChildren.from_session(session))  # type: ignore[arg-type]
 
         return scoring
 
@@ -88,7 +93,7 @@ class PreferMotivated:
     def from_session(cls, session: Session) -> Self:
         return cls()
 
-    def __call__(self, booking: Booking) -> int:
+    def __call__(self, booking: Booking | MatchableBooking) -> int:
         return booking.priority
 
 
@@ -179,7 +184,7 @@ class PreferOrganiserChildren:
                     .filter(Activity.id.in_(
                         session.query(Occasion.activity_id)
                         .filter(Occasion.period_id == booking.period_id)
-                        .subquery()
+                        .scalar_subquery()
                     ))
                 }
 
@@ -272,11 +277,9 @@ class PreferGroups:
                 )
 
                 group_scores = {
-                    r.group_code:
-                    max(.5, .7 - 0.1 * (r.count - 2))
-                    + unique_score_modifier(r.group_code)
-
-                    for r in query
+                    group_code: max(.5, .7 - 0.1 * (count - 2))
+                                + unique_score_modifier(group_code)
+                    for group_code, count in query
                 }
 
             return group_scores.get(booking.group_code, 0)

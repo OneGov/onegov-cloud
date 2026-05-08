@@ -31,18 +31,13 @@
         "SublimeLinter.linters.flake8.args": ["--stdin-display-name", "${file:stdin}"],
         "SublimeLinter.linters.mypy.executable": "${project_path}/../venv/bin/mypy",
         "SublimeLinter.linters.mypy.python": "${project_path}/../venv/bin/python",
-        "SublimeLinter.linters.mypy.excludes":
-        [
-            "*/tests/*",
-        ],
+        "SublimeLinter.linters.mypy.excludes": [],
         "SublimeLinter.linters.ruff.executable": "${project_path}/../venv/bin/ruff",
         "SublimeLinter.linters.ruff.python": "${project_path}/../venv/bin/python",
         "LSP": {
             "LSP-ruff": {
-                "initializationOptions": {
-                    "settings": {
-                        "lint.enable": true,
-                    }
+                "initialization_options": {
+                    "settings.lint.enable": true,
                 },
                 "command": ["${project_path}/../venv/bin/ruff", "server"],
             },

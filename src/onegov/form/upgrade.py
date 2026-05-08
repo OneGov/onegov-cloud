@@ -2,19 +2,20 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+# pragma: exclude file
 from __future__ import annotations
 
 from depot.io.utils import FileIntent
 from io import BytesIO
 from onegov.core.crypto import random_token
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import dictionary_to_binary
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinitionCollection
 from onegov.form import FormFile
 from onegov.form import FormSubmission
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Text, UUID, text
 from sqlalchemy.engine.reflection import Inspector
 
 
@@ -43,10 +44,10 @@ def migrate_form_submission_files_to_onegov_file(
 ) -> None:
     submission_ids = [
         row[0] for row in
-        context.session.execute("""
+        context.session.execute(text("""
             SELECT submission_id
             FROM submission_files
-        """)
+        """))
     ]
 
     if not submission_ids:
@@ -59,14 +60,14 @@ def migrate_form_submission_files_to_onegov_file(
         )
     }
 
-    for row in context.session.execute("""
+    for row in context.session.execute(text("""
         SELECT submission_id, field_id, filedata
         FROM submission_files
-    """):
+    """)):
         submission_id, field_id, filedata = row
         submission = submissions[submission_id]
 
-        replacement = FormFile(  # type:ignore[misc]
+        replacement = FormFile(
             id=random_token(),
             name=submission.data[field_id]['filename'],
             note=field_id,
@@ -85,7 +86,7 @@ def migrate_form_submission_files_to_onegov_file(
         submission.files.append(replacement)
 
     context.session.flush()
-    context.session.execute('DROP TABLE IF EXISTS submission_files')
+    context.session.execute(text('DROP TABLE IF EXISTS submission_files'))
 
 
 @upgrade_task('Add payment_method to definitions and submissions')
@@ -159,9 +160,9 @@ def add_registration_window_columns(context: UpgradeContext) -> None:
 @upgrade_task('Make form polymorphic type non-nullable')
 def make_form_polymorphic_type_non_nullable(context: UpgradeContext) -> None:
     if context.has_table('forms'):
-        context.operations.execute("""
+        context.operations.execute(text("""
             UPDATE forms SET type = 'generic' WHERE type IS NULL;
-        """)
+        """))
 
         context.operations.alter_column('forms', 'type', nullable=False)
 
@@ -176,7 +177,7 @@ def add_title_to_submission_windows(context: UpgradeContext) -> None:
                 Text,
                 nullable=True
             ),
-            default=None
+            default=None  # type: ignore[arg-type]
         )
 
 

@@ -116,3 +116,15 @@
     max-height: calc(60vh - 90px);
     padding: 1rem;
 }
+
+.dropdown-pane {
+    max-width: calc(100vw - 2rem);
+    opacity: 0;
+    transition: opacity .25s ease-in-out;
+    visibility: visible;
+
+    &.is-open {
+        opacity: 1;
+    }
+}
+

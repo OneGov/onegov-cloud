@@ -252,9 +252,7 @@ def test_ldap(
         if not success:
             click.echo(f'Search not successfull in base {ba}')
             continue
-        for ix, entry in enumerate(
-            sorted(client.connection.entries, key=sort_func)
-        ):
+        for entry in sorted(client.connection.entries, key=sort_func):
             click.echo(json.dumps(entry.entry_attributes_as_dict, indent=4))
             count += 1
     click.echo(f'Found {count} entries')
@@ -306,8 +304,7 @@ def fetch_users_cli(
             app.es_orm_events.stopped = True
 
         fetch_users(
-            app,
-            request.session,
+            request,
             ldap_server,
             ldap_username,
             ldap_password,
@@ -322,8 +319,7 @@ def fetch_users_cli(
 
 
 def fetch_users(
-    app: FsiApp,
-    session: Session,
+    request: FsiRequest,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -336,6 +332,7 @@ def fetch_users(
 ) -> None:
     """ Implements the fetch-users cli command. """
 
+    session = request.session
     admin_group = admin_group.lower()
     editor_group = editor_group.lower()
     sources = ZugUserSource.factory(verbose=verbose)
@@ -371,7 +368,7 @@ def fetch_users(
                 )
             )
         )
-        for ix, user_ in enumerate(inactive):
+        for user_ in inactive:
             if user_.active:
                 log.info(f'Deactivating inactive user {user_.username}')
             user_.active = False
@@ -379,17 +376,11 @@ def fetch_users(
             if att:
                 att.active = False
 
-            if not dry_run:
-                if ix % 200 == 0:
-                    app.es_indexer.process()
-                    app.psql_indexer.bulk_process(session)
-
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
     count = 0
     synced_users = []
-    for ix, data in enumerate(users(client.connection)):
-
+    for data in users(client.connection):
         if data['type'] == 'ldap':
             source = 'ldap'
             source_id = data['source_id']
@@ -403,14 +394,16 @@ def fetch_users(
             raise NotImplementedError()
 
         user = ensure_user(
+            request,
             source=source,
             source_id=source_id,
-            session=session,
             username=data['mail'],
             role=data['role'],
             force_role=force_role,
             force_active=True
         )
+        if user is None:
+            continue
 
         synced_users.append(user.id)
 
@@ -428,10 +421,6 @@ def fetch_users(
             user.attendee.active = user.active
 
         count += 1
-        if not dry_run:
-            if ix % 200 == 0:
-                app.es_indexer.process()
-                app.psql_indexer.bulk_process(session)
 
     log.info(f'Synchronized {count} users')
 

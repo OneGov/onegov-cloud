@@ -1,8 +1,10 @@
 var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError, eventType) {
-    const websocket = new WebSocket(endpoint);
+    const url = new URL(endpoint);
+    url.searchParams.set('schema', schema);
+    const websocket = new WebSocket(url.href);
     websocket.addEventListener("open", function() {
         const payload = {
-            type: eventType||"register",
+            type: eventType || "register",
             schema: schema,
             channel: channel
         };

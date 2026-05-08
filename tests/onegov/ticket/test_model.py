@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 import transaction
 
@@ -12,7 +14,12 @@ from sedate import utcnow
 from sqlalchemy.exc import IntegrityError
 
 
-def test_transitions(session):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_transitions(session: Session) -> None:
 
     # the created timestamp would usually be set as the session is flushed
     ticket = Ticket(state='open', created=Ticket.timestamp())
@@ -29,6 +36,8 @@ def test_transitions(session):
         ticket.reopen_ticket(user)
 
     ticket.accept_ticket(user)
+    # undo mypy narrowing of state
+    ticket = ticket
     assert ticket.state == 'pending'
     assert ticket.user == user
 
@@ -43,6 +52,8 @@ def test_transitions(session):
     assert ticket.state == 'pending'
     assert ticket.user == user
 
+    # undo mypy narrowing of state
+    ticket = ticket
     ticket.close_ticket()
     assert ticket.state == 'closed'
     assert ticket.user == user
@@ -54,6 +65,8 @@ def test_transitions(session):
     with pytest.raises(InvalidStateChange):
         ticket.accept_ticket(user)
 
+    # undo mypy narrowing of state
+    ticket = ticket
     another_user = User()
     ticket.reopen_ticket(another_user)
     assert ticket.state == 'pending'
@@ -67,7 +80,7 @@ def test_transitions(session):
         ticket.reopen_ticket(user)  # ..unless it's another user
 
 
-def test_process_time(session):
+def test_process_time(session: Session) -> None:
 
     user = User()
 
@@ -90,6 +103,7 @@ def test_process_time(session):
 
         ticket.accept_ticket(user)
 
+        ticket = ticket  # undo narrowing
         assert ticket.reaction_time == 10
         assert ticket.process_time is None
         assert ticket.current_process_time == 0
@@ -104,6 +118,7 @@ def test_process_time(session):
 
         ticket.close_ticket()
 
+        ticket = ticket  # undo narrowing
         assert ticket.reaction_time == 10
         assert ticket.process_time == 10
         assert ticket.current_process_time == 10
@@ -138,7 +153,7 @@ def test_process_time(session):
         assert ticket.last_state_change == utcnow()
 
 
-def test_legacy_process_time(session):
+def test_legacy_process_time(session: Session) -> None:
     """ Tests the process_time/response_time for existing tickets, which cannot
     be migrated as this information cannot be inferred.
 
@@ -223,7 +238,7 @@ def test_legacy_process_time(session):
         assert ticket.last_state_change == utcnow()
 
 
-def test_ticket_permission(session):
+def test_ticket_permission(session: Session) -> None:
     user_group = UserGroup(name='group')
     permission = TicketPermission(
         handler_code='PER', group=None, user_group=user_group
@@ -243,7 +258,7 @@ def test_ticket_permission(session):
     assert session.query(TicketPermission).count() == 0
 
 
-def test_ticket_permission_uniqueness(session):
+def test_ticket_permission_uniqueness(session: Session) -> None:
     user_group = UserGroup(name='group')
     permission = TicketPermission(
         handler_code='PER',
@@ -277,7 +292,7 @@ def test_ticket_permission_uniqueness(session):
     assert session.query(TicketPermission).count() == 1
 
 
-def test_invalid_ticket_permission(session):
+def test_invalid_ticket_permission(session: Session) -> None:
     user_group = UserGroup(name='group')
     permission = TicketPermission(
         handler_code='PER',

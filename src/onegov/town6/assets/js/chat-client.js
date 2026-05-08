@@ -26,70 +26,13 @@ document.addEventListener("DOMContentLoaded", function() {
         clearTimeout(endChatTimer);
     }
 
-    if (chatActive == 'True' && messages.length == 2) {
+    if (chatActive === 'True' && messages.length === 2) {
         endChatTimer = setTimeout(notifyChatEnded, firstMessageTimeout);
-    } else if (chatActive == 'True' && messages.length > 2) {
+    } else if (chatActive === 'True' && messages.length > 2) {
         endChatTimer = setTimeout(notifyChatEnded, messageTimeout);
     }
 
-    function browserNotification(message) {
-        if (!("Notification" in window)) {
-            // Check if the browser supports notifications
-            alert("This browser does not support desktop notification");
-        } else if (Notification.permission === "granted") {
-            // Check whether notification permissions have already been granted;
-            // if so, create a notification
-            const notification = new Notification(message);
-        } else if (Notification.permission !== "denied") {
-            // We need to ask the user for permission
-            Notification.requestPermission().then((permission) => {
-            // If the user accepts, let's create a notification
-                if (permission === "granted") {
-                    const notification = new Notification(message);
-                }
-            });
-        }
-    }
-
-    function onWebsocketNotification(message, _websocket) {
-        message = JSON.parse(message);
-
-        if (message.type == 'message') {
-            connecting.style.display = "none";
-            createChatBubble(message, message.userId == 'customer');
-            var message_area = document.getElementById('message-area');
-            message_area.scrollTop = message_area.scrollHeight;
-
-        } else if (message.type == 'accepted') {
-            var notification = accepted.cloneNode(true);
-            chatArea.appendChild(notification);
-            acceptedNotification.style.display = 'block';
-            // browserNotification(acceptedNotification.textContent)
-
-        } else if (message.type == 'end-chat') {
-            clearTimeout(endChatTimer);
-            ended = ended.cloneNode(true);
-            chatArea.appendChild(ended);
-            ended.style.display = 'block';
-            chat.style.display = 'block';
-            chatForm.remove();
-        } else {
-            console.log('unkown message type', message);
-        }
-
-        // Clear and restart the timer
-        clearTimeout(endChatTimer);
-        if (chatActive == true && messages.length == 2) {
-            endChatTimer = setTimeout(notifyChatEnded, firstMessageTimeout);
-        } else {
-            endChatTimer = setTimeout(notifyChatEnded, messageTimeout);
-        }
-    }
-
-    function onWebsocketError(_event, websocket) {
-        websocket.close();
-    }
-
+    // eslint-disable-next-line consistent-this
     function createChatBubble(message, self) {
         var chatCard = document.getElementsByClassName('chat-card')[0].cloneNode(true);
         chatCard.style.display = 'block';
@@ -100,13 +43,48 @@ document.addEventListener("DOMContentLoaded", function() {
         chatArea.appendChild(chatCard);
     }
 
-    if (endpoint && schema && token) {
-        // NOTE: Includes schema with the WebSocket URL because the chat
-        // requires the schema on initiation. This should be already done when
-        // setting the data-websocket-endpoint. That however requires modifying
-        // WebsocketsApp.
-        const chatEndpoint = `${endpoint}/chats?schema=${schema}&token=${token}`;
+    function onWebsocketNotification(message, _websocket) {
+        message = JSON.parse(message);
 
+        if (message.type === 'message') {
+            connecting.style.display = "none";
+            createChatBubble(message, message.userId === 'customer');
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+        } else if (message.type === 'accepted') {
+            var notification = accepted.cloneNode(true);
+            chatArea.appendChild(notification);
+            acceptedNotification.style.display = 'block';
+            // browserNotification(acceptedNotification.textContent)
+
+        } else if (message.type === 'end-chat') {
+            clearTimeout(endChatTimer);
+            ended = ended.cloneNode(true);
+            chatArea.appendChild(ended);
+            ended.style.display = 'block';
+            chat.style.display = 'block';
+            chatForm.remove();
+        } else {
+            // eslint-disable-next-line no-console
+            console.log('unkown message type', message);
+        }
+
+        // Clear and restart the timer
+        clearTimeout(endChatTimer);
+        messages = document.querySelectorAll('.chat-card');
+        if (chatActive === true && messages.length === 2) {
+            endChatTimer = setTimeout(notifyChatEnded, firstMessageTimeout);
+        } else {
+            endChatTimer = setTimeout(notifyChatEnded, messageTimeout);
+        }
+    }
+
+    function onWebsocketError(_event, websocket) {
+        websocket.close();
+    }
+
+    if (endpoint && schema && token) {
+        const chatEndpoint = `${endpoint}/chats?token=${token}`;
         const socket = openWebsocket(
             chatEndpoint,
             schema,
@@ -116,14 +94,13 @@ document.addEventListener("DOMContentLoaded", function() {
             'customer_chat'
         );
 
-
-        var message_area = document.getElementById('message-area');
-        message_area.scrollTop = message_area.scrollHeight;
+        chatArea.scrollTop = chatArea.scrollHeight;
 
         document.getElementById("send").addEventListener("click", () => {
             const chatMessage = chatWindow.value;
 
             if (isEmpty(chatMessage)) {
+                // eslint-disable-next-line no-console
                 console.debug("Not sending empty message.");
                 return;
             }
@@ -134,9 +111,9 @@ document.addEventListener("DOMContentLoaded", function() {
             now = hour + ':' + minute;
             var channelId = chatArea.dataset.chatId;
 
-            var messages = document.querySelectorAll('.chat-card');
+            messages = document.querySelectorAll('.chat-card');
 
-            if (messages.length == 1) {
+            if (messages.length === 1) {
                 connecting.style.display = "block";
                 startInformation.style.display = "none";
             }

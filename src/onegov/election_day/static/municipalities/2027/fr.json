@@ -7,10 +7,6 @@
         "district": "La Broye",
         "name": "Cugy (FR)"
     },
-    "2016": {
-        "district": "La Broye",
-        "name": "F\u00e9tigny"
-    },
     "2022": {
         "district": "La Broye",
         "name": "Gletterens"
@@ -18,10 +14,6 @@
     "2025": {
         "district": "La Broye",
         "name": "Lully (FR)"
-    },
-    "2027": {
-        "district": "La Broye",
-        "name": "M\u00e9ni\u00e8res"
     },
     "2029": {
         "district": "La Broye",
@@ -70,6 +62,10 @@
     "2055": {
         "district": "La Broye",
         "name": "Cheyres-Ch\u00e2bles"
+    },
+    "2056": {
+        "district": "La Broye",
+        "name": "F\u00e9tigny-M\u00e9ni\u00e8res"
     },
     "2063": {
         "district": "La Gl\u00e2ne",
@@ -378,10 +374,6 @@
     "2276": {
         "district": "See / Lac",
         "name": "Ried bei Kerzers"
-    },
-    "2278": {
-        "district": "See / Lac",
-        "name": "Ulmiz"
     },
     "2284": {
         "district": "See / Lac",

@@ -26,7 +26,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import Mapped
     from transaction.interfaces import ITransaction
 
 
@@ -289,7 +289,7 @@ class DatatransPayment(Payment):
         # our provider should always be DatatransProvdider, we could
         # assert if we really wanted to make sure, but it would
         # add a lot of assertions...
-        provider: relationship[DatatransProvider]
+        provider: Mapped[DatatransProvider]
 
     # NOTE: We don't seem to get information about fees from datatrans
     #       so the only thing we know for sure is that a customer will
@@ -311,6 +311,10 @@ class DatatransPayment(Payment):
         return base.format(self.remote_id)
 
     @property
+    def remote_references(self) -> list[str]:
+        return [self.refno] if self.refno else []
+
+    @property
     def transaction(self) -> DatatransTransaction:
         assert self.remote_id
         return self.provider.client.status(self.remote_id)
@@ -323,38 +327,55 @@ class DatatransPayment(Payment):
             flag_modified(self, 'meta')
         return refund
 
-    def sync(self, remote_obj: DatatransTransaction | None = None) -> None:
+    def _sync_state(
+        self,
+        remote_obj: DatatransTransaction | None = None,
+        capture: bool = False
+    ) -> bool:
         if self.refunds:
             refund_tx = self.provider.client.status(self.refunds[-1])
             if refund_tx.status in ('settled', 'transmitted'):
                 # the refund already went through
-                self.state = 'cancelled'
-                return
+                if self.state != 'cancelled':
+                    self.state = 'cancelled'
+                    return True
+                return False
             elif refund_tx.status not in ('failed', 'canceled'):
                 # the refund is still pending, let's not update yet
-                return
+                return False
             # the refund failed or got canceled, so we need to use
             # the status of the original transaction
 
         if remote_obj is None:
             remote_obj = self.transaction
 
+        if capture and remote_obj.status == 'authorized':
+            self.provider.client.settle(remote_obj)
+            remote_obj = self.transaction
+
+        new_state = self.state
         match remote_obj.status:
             case 'transmitted':
-                self.state = 'paid'
+                new_state = 'paid'
 
             case 'settled':
                 # TODO: Do we want a separate state for this?
                 pass
 
             case 'canceled':
-                self.state = 'cancelled'
+                new_state = 'cancelled'
 
             case 'failed':
-                self.state = 'failed'
+                new_state = 'failed'
 
             case _:
-                self.state = 'open'
+                new_state = 'open'
+
+        if self.state != new_state:
+            self.state = new_state
+            return True
+        else:
+            return False
 
 
 class DatatransProvider(PaymentProvider[DatatransPayment]):
@@ -462,6 +483,7 @@ class DatatransProvider(PaymentProvider[DatatransPayment]):
             raise DatatransPaymentError('refno is missing')
 
         session = object_session(self)
+        assert session is not None
         payment = self.payment(
             id=uuid5(DATATRANS_NAMESPACE, tx.refno),
             amount=amount,
@@ -546,6 +568,7 @@ class DatatransProvider(PaymentProvider[DatatransPayment]):
 
     def sync(self) -> None:
         session = object_session(self)
+        assert session is not None
         query = session.query(self.payment_class)
         # TODO: We currenly only sync open payments, although it may
         #       be possible for paid payments to transition to failed

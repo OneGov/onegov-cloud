@@ -70,9 +70,19 @@ class MultiCheckboxWidget(ListWidget):
     def __init__(self, html_tag: Literal['ul', 'ol'] = 'ul'):
         super().__init__(html_tag=html_tag, prefix_label=False)
 
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        if hasattr(field.meta, 'request'):
+            field.meta.request.include('multicheckbox')
+        return super().__call__(field, **kwargs)
+
 
 class OrderedMultiCheckboxWidget(MultiCheckboxWidget, OrderedListWidget):
     """ The sorted list widget with the label behind the checkbox. """
+
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        if hasattr(field.meta, 'request'):
+            field.meta.request.include('multicheckbox')
+        return super().__call__(field, **kwargs)
 
 
 class CoordinateWidget(TextInput):
@@ -211,6 +221,10 @@ class UploadWidget(FileInput):
         else:
             display_size = f' ({humanize.naturalsize(size)})'
 
+        existing_file_label = _('Uploaded file')
+        keep_label = _('Keep file')
+        delete_label = _('Delete file')
+        replace_label = _('Replace file')
         return False, {
             'wrapper_css_class': wrapper_css_class,
             'input_html': input_html,
@@ -220,10 +234,10 @@ class UploadWidget(FileInput):
             'filesize': display_size,
             'filename': field.data['filename'],
             'name': field.id,
-            'existing_file_label': field.gettext(_('Uploaded file')),
-            'keep_label': field.gettext(_('Keep file')),
-            'delete_label': field.gettext(_('Delete file')),
-            'replace_label': field.gettext(_('Replace file')),
+            'existing_file_label': field.gettext(existing_file_label),
+            'keep_label': field.gettext(keep_label),
+            'delete_label': field.gettext(delete_label),
+            'replace_label': field.gettext(replace_label),
         }
 
     def __call__(
@@ -295,7 +309,10 @@ class UploadMultipleWidget(FileInput):
         """)
 
         if force_simple or len(field) == 0:
-            return simple_template.format(input_html)
+            return simple_template.format(input_html) + Markup('\n').join(
+                Markup('<small class="error">{}</small>').format(error)
+                for error in field.errors
+            )
         else:
             existing_html = Markup('').join(
                 subfield(
@@ -325,7 +342,7 @@ class TextAreaWithTextModules(TextArea):
     template = PageTemplate("""
         <div class="textarea-widget">
             <div class="text-module-picker">
-                <span class="text-module-picker-label"
+                <span class="text-module-picker-label button narrow hollow"
                       title="Ctrl+i"
                       role="button"
                       aria-expanded="false"
@@ -367,9 +384,10 @@ class TextAreaWithTextModules(TextArea):
             return input_html
 
         field.meta.request.include('text-module-picker')
+        label = _('Text modules')
         return Markup(self.template.render(  # nosec: B704
             id=field.id,
-            label=field.gettext(_('Text modules')),
+            label=field.gettext(label),
             text_modules=text_modules,
             input_html=input_html
         ))
@@ -467,12 +485,32 @@ class ChosenSelectWidget(Select):
         kwargs['class_'] = '{} chosen-select'.format(
             kwargs.get('class_', '')
         ).strip()
-        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
-        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
         if self.multiple:
-            kwargs['data-placeholder'] = field.gettext(
-                _('Select Some Options')
-            )
+            placeholder = _('Select Some Options')
+        else:
+            placeholder = _('Select an Option')
+        no_results_label = _('No results match')
+        kwargs['data-placeholder'] = field.gettext(placeholder)
+        kwargs['data-no_results_text'] = field.gettext(no_results_label)
+
+        return super().__call__(field, **kwargs)
+
+
+class TreeSelectWidget(Select):
+
+    def __call__(self, field: SelectFieldBase, **kwargs: Any) -> Markup:
+        field.meta.request.include('treeselect')
+
+        kwargs['class_'] = '{} treeselect'.format(
+            kwargs.get('class_', '')
+        ).strip()
+        if self.multiple:
+            placeholder = _('Select Some Options')
+        else:
+            placeholder = _('Select an Option')
+        no_results_label = _('No results match')
+        kwargs['data-placeholder'] = field.gettext(placeholder)
+        kwargs['data-no_results_text'] = field.gettext(no_results_label)
 
         return super().__call__(field, **kwargs)
 
@@ -617,14 +655,16 @@ class DurationInput:
             _hours, _minutes = divmod(_minutes, 60)
             hours = str(_hours)
             minutes = str(_minutes)
+        hours_label = _('hours')
+        minutes_label = _('minutes')
         return Markup("""
             <div class="duration-widget">
             <label>{hours_input} {hours_label}</label>
             <label>{minutes_input} {minutes_label}</label>
             </div>
         """).format(
-            hours_label=field.gettext(_('hours')),
-            minutes_label=field.gettext(_('minutes')),
+            hours_label=field.gettext(hours_label),
+            minutes_label=field.gettext(minutes_label),
             hours_input=self.hours_widget(
                 field, value=hours, size=2, **kwargs
             ),

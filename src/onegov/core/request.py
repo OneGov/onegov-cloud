@@ -15,9 +15,10 @@ from itsdangerous import (
     URLSafeSerializer,
     URLSafeTimedSerializer
 )
-from more.content_security import ContentSecurityRequest
+from more.content_security import ContentSecurityRequest, UNSAFE_EVAL
 from more.webassets.core import IncludeRequest
 from morepath.authentication import NO_IDENTITY
+from morepath.error import LinkError
 from morepath.request import SAME_APP
 from onegov.core import utils
 from onegov.core.crypto import random_token
@@ -25,21 +26,20 @@ from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
 
-from typing import overload, Any, NamedTuple, TypeVar, TYPE_CHECKING
+from typing import cast, overload, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from _typeshed import SupportsItems
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from dectate import Sentinel
     from gettext import GNUTranslations
     from markupsafe import Markup
+    from morepath import App
     from morepath.authentication import Identity, NoIdentity
     from onegov.core import Framework
     from onegov.core.browser_session import BrowserSession
     from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
-    from sqlalchemy import Column
-    from sqlalchemy.orm import relationship, Session
+    from sqlalchemy.orm import Mapped, Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol, TypeGuard
     from webob import Response
@@ -48,6 +48,7 @@ if TYPE_CHECKING:
     from wtforms import Form
     from uuid import UUID
 
+    from .analytics import AnalyticsProvider
     from .templates import TemplateLoader
 
     _BaseRequest = morepath.Request
@@ -57,28 +58,28 @@ if TYPE_CHECKING:
     #       to be present on a user.
     class GroupLike(Protocol):
         @property
-        def id(self) -> UUID | Column[UUID]: ...
+        def id(self) -> Mapped[UUID] | UUID: ...
         @property
-        def name(self) -> str | Column[str | None] | None: ...
+        def name(self) -> Mapped[str | None] | str | None: ...
 
     class UserLike(Protocol):
         @property
-        def id(self) -> UUID | Column[UUID]: ...
+        def id(self) -> Mapped[UUID] | UUID: ...
         @property
-        def username(self) -> str | Column[str]: ...
+        def username(self) -> Mapped[str] | str: ...
         @property
         def groups(self) -> (
-            Sequence[GroupLike]
-            | relationship[Sequence[GroupLike]]
+            Mapped[Sequence[GroupLike]]
+            | Sequence[GroupLike]
         ): ...
         @property
-        def role(self) -> str | Column[str]: ...
+        def role(self) -> Mapped[str] | str: ...
+
+    class SupportsIterableStrItems(Protocol):
+        def items(self) -> Iterable[tuple[str, str]]: ...
 
 else:
     _BaseRequest = object
-
-_T = TypeVar('_T')
-_F = TypeVar('_F', bound='Form')
 
 
 @msgpack.make_serializable(tag=11)
@@ -255,20 +256,20 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         name: str = ...,
         default: None = ...,
         app: Framework | Sentinel = ...,
-        query_params: SupportsItems[str, str] | None = ...,
+        query_params: SupportsIterableStrItems | None = ...,
         fragment: str | None = ...,
     ) -> None: ...
 
     @overload
-    def link(
+    def link[T](
         self,
         obj: None,
         name: str,
-        default: _T,
+        default: T,
         app: Framework | Sentinel = ...,
-        query_params: SupportsItems[str, str] | None = ...,
+        query_params: SupportsIterableStrItems | None = ...,
         fragment: str | None = ...,
-    ) -> _T: ...
+    ) -> T: ...
 
     @overload
     def link(
@@ -277,19 +278,19 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         name: str = ...,
         default: Any = ...,
         app: Framework | Sentinel = ...,
-        query_params: SupportsItems[str, str] | None = ...,
+        query_params: SupportsIterableStrItems | None = ...,
         fragment: str | None = ...,
     ) -> str: ...
 
-    def link(
+    def link[T](
         self,
         obj: object,
         name: str = '',
-        default: _T | None = None,
+        default: T | None = None,
         app: Framework | Sentinel = SAME_APP,
-        query_params: SupportsItems[str, str] | None = None,
+        query_params: SupportsIterableStrItems | None = None,
         fragment: str | None = None,
-    ) -> str | _T | None:
+    ) -> str | T | None:
         """ Extends the default link generating function of Morepath. """
         query_params = query_params or {}
         if hasattr(obj, '__link_alias__'):
@@ -304,20 +305,28 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             result += f'#{fragment}'
         return result
 
-    def class_link(
+    def class_link(  # type:ignore[override]
         self,
         model: type[Any],
         variables: dict[str, Any] | None = None,
         name: str = '',
-        app: Framework | Sentinel = SAME_APP,  # type:ignore[override]
+        app: Framework | Sentinel = SAME_APP,
+        query_params: SupportsIterableStrItems | None = None,
+        fragment: str | None = None,
     ) -> str:
         """ Extends the default class link generating function of Morepath. """
-        return self.transform(super().class_link(
+        query_params = query_params or {}
+        result = self.transform(super().class_link(
             model,
             variables=variables,
             name=name,
             app=app
         ))
+        for key, value in query_params.items():
+            result = append_query_param(result, key, value)
+        if fragment:
+            result += f'#{fragment}'
+        return result
 
     def filestorage_link(self, path: str) -> str | None:
         """ Takes the given filestorage path and returns an url if the path
@@ -440,16 +449,16 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             on_dirty=on_dirty
         )
 
-    def get_form(
+    def get_form[T: Form](
         self,
-        form_class: type[_F],
+        form_class: type[T],
         i18n_support: bool = True,
         csrf_support: bool = True,
         data: dict[str, Any] | None = None,
         model: object = None,
         formdata: MultiDict[str, str | _FieldStorageWithFile] | None = None,
         pass_model: bool = False,
-    ) -> _F:
+    ) -> T:
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
         doesn't work yet).
@@ -612,15 +621,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         template using the messages should call :meth:`consume_messages`.
 
         """
-        if not self.browser_session.has('messages'):
-            self.browser_session.messages = [Message(text, type)]
-        else:
-            # this is a bit akward, but I don't see an easy way for this atm.
-            # (otoh, usually there's going to be one message only)
-            self.browser_session.messages = [
-                *self.browser_session.messages,
-                Message(text, type)
-            ]
+        self.browser_session.messages = [
+            *self.browser_session.get('messages', ()),
+            Message(text, type)
+        ]
 
     def consume_messages(self) -> Iterator[Message]:
         """ Returns the messages, removing them from the session in the
@@ -700,7 +704,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         permission = self.app.permission_by_view(obj, view_name)
         return self.has_permission(obj, permission)
 
-    def exclude_invisible(self, models: Iterable[_T]) -> list[_T]:
+    def exclude_invisible[T](self, models: Iterable[T]) -> list[T]:
         """ Excludes models invisble to the current user from the list. """
         return [m for m in models if self.is_visible(m)]
 
@@ -881,3 +885,67 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns the chameleon template loader. """
         registry = self.app.config.template_engine_registry
         return registry._template_loaders['.pt']
+
+    @property
+    def analytics_provider(self) -> AnalyticsProvider | None:
+        """ Returns the active analytics provider. """
+        return None
+
+    @property
+    def analytics_code(self) -> Markup | None:
+        """ Return the embeddable code for the active analytics provider. """
+        provider = self.analytics_provider
+        if provider is None:
+            return None
+
+        return provider.code(self)
+
+    def require_unsafe_eval(self) -> None:
+        # FIXME: We currently use some intercooler features in some views
+        #        that require unsafe-eval, we should try to get rid of them
+        #        by writing some custom JavaScript handlers (ic-on-XXX).
+        self.content_security_policy.script_src.add(UNSAFE_EVAL)
+
+    # NOTE: We override this so we pass an instance of ourselves
+    #       to resolve_model, rather than a base Request instance
+    #       like in the original implementation, the original
+    #       implementation also doesn't handle query params
+    #       correctly, which can lead to converter errors
+    def resolve_path(
+        self,
+        path: str,
+        app: App | Sentinel = SAME_APP
+    ) -> Any | None:
+        """Resolve a path to a model instance.
+
+        The resulting object is a model instance, or ``None`` if the
+        path could not be resolved.
+
+        :param path: URL path to resolve.
+        :param app: If set, change the application in which the
+          path is resolved. By default the path is resolved in the
+          current application.
+        :return: instance or ``None`` if no path could be resolved.
+        """
+        if app is None:
+            raise LinkError('Cannot path: app is None')
+
+        if app is SAME_APP:
+            app = self.app
+
+        path_info, __, query_string = path.partition('?')
+
+        environ = self.environ.copy()
+        environ.pop('webob._parsed_post_vars', None)
+        request = self.__class__(
+            environ,
+            cast('App', app),
+            method='GET',
+            path_info=path_info,
+            query_string=query_string,
+            body=b''
+        )
+        # try to resolve imports..
+        from morepath.publish import resolve_model
+
+        return resolve_model(request)

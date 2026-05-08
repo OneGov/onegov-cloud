@@ -6,19 +6,19 @@ from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
     ContentMixin, TimestampMixin, dict_property, meta_property)
-from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
+from onegov.org.i18n import _
 from onegov.org.models import AccessExtension
 from onegov.org.observer import observes
 from onegov.search import SearchableContent
-from sqlalchemy import Column, Text
+from sqlalchemy.orm import mapped_column, Mapped
+from uuid import UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from sqlalchemy.orm import Query, Session
     from typing import Self
 
@@ -32,38 +32,56 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     __tablename__ = 'external_links'
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
+    __mapper_args__ = {
+        'polymorphic_on': 'member_of'
     }
 
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    fts_type_title = _('External Link')
+    fts_title_property = 'title'
+    fts_properties = {
+        'title': {'type': 'localized', 'weight': 'A'},
+        'lead': {'type': 'localized', 'weight': 'B'},
+    }
+
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
-    title: Column[str] = Column(Text, nullable=False)
-    url: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
+    url: Mapped[str]
     page_image: dict_property[str | None] = meta_property()
 
-    # The collection name this model should appear in
-    member_of: Column[str | None] = Column(Text, nullable=True)
+    # FIXME: should this actually be nullable?
+    #: The collection name this model should appear in
+    member_of: Mapped[str | None]
     # TODO: Stop passing title (and maybe even to) as url parameters.
-    # Figure out a way to use the member_of attribute instead.
-    group: Column[str | None] = Column(Text, nullable=True)
+    group: Mapped[str | None]
 
     #: The normalized title for sorting
-    order: Column[str] = Column(Text, nullable=False, index=True)
-
-    es_type_name = 'external_links'
-    es_id = 'title'
+    order: Mapped[str] = mapped_column(index=True)
 
     lead: dict_property[str | None] = meta_property()
 
     @observes('title')
     def title_observer(self, title: str) -> None:
         self.order = normalize_for_url(title)
+
+
+class ExternalFormLink(ExternalLink):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'FormCollection'
+    }
+    fts_type_title = _('Forms')
+
+
+class ExternalResourceLink(ExternalLink):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ResourceCollection'
+    }
+    fts_type_title = _('Resources')
 
 
 class ExternalLinkCollection(GenericCollection[ExternalLink]):
@@ -111,7 +129,9 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
 
     @property
     def model_class(self) -> type[ExternalLink]:
-        return ExternalLink
+        if self.member_of is None:
+            return ExternalLink
+        return ExternalLink.get_polymorphic_class(self.member_of, ExternalLink)
 
     @classmethod
     def target(
@@ -123,8 +143,6 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
 
     def query(self) -> Query[ExternalLink]:
         query = super().query()
-        if self.member_of:
-            query = query.filter_by(member_of=self.member_of)
         if self.group:
             query = query.filter_by(group=self.group)
         return query

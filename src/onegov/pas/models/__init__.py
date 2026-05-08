@@ -10,6 +10,7 @@ from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.pas.models.parliamentary_group import PASParliamentaryGroup
 from onegov.pas.models.party import Party
+from onegov.pas.models.presidential_allowance import PresidentialAllowance
 from onegov.pas.models.rate_set import RateSet
 from onegov.pas.models.settlement_run import SettlementRun
 
@@ -25,6 +26,7 @@ __all__ = (
     'PASParliamentarianRole',
     'PASParliamentaryGroup',
     'Party',
+    'PresidentialAllowance',
     'RateSet',
     'SettlementRun',
 )

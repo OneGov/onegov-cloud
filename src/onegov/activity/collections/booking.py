@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.activity.models import Booking, Period
+from onegov.activity.models import Booking, BookingPeriod
 from onegov.core.collection import GenericCollection
 from onegov.activity.matching.utils import unblockable, booking_order
 from onegov.activity.errors import BookingLimitReached
@@ -14,10 +14,10 @@ if TYPE_CHECKING:
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
     from sortedcontainers._typing import SupportsHashableAndRichComparison
-    from typing import Self, TypeAlias
+    from typing import Self
     from uuid import UUID
 
-    ScoreFunction: TypeAlias = Callable[
+    type ScoreFunction = Callable[
         [Booking],
         SupportsHashableAndRichComparison
     ]
@@ -46,7 +46,7 @@ class BookingCollection(GenericCollection[Booking]):
 
         return query.order_by(self.model_class.priority)
 
-    def for_period(self, period: Period) -> Self:
+    def for_period(self, period: BookingPeriod) -> Self:
         return self.__class__(self.session, period.id, self.username)
 
     def for_username(self, username: str) -> Self:
@@ -72,12 +72,20 @@ class BookingCollection(GenericCollection[Booking]):
         query = self.query().with_entities(Booking.id)
 
         if states != '*':
+            # FIXME: This is to deal with the fact, that our argument type
+            #        cannot reject a plain string.
+            if isinstance(states, str):
+                states = (states, )
             query = query.filter(Booking.state.in_(states))
 
         if periods != '*':
             query = query.filter(Booking.period_id.in_(periods))
 
         if usernames != '*':
+            # FIXME: This is to deal with the fact, that our argument type
+            #        cannot reject a plain string.
+            if isinstance(usernames, str):
+                usernames = (usernames, )
             query = query.filter(Booking.username.in_(usernames))
 
         return query.count()
@@ -89,13 +97,13 @@ class BookingCollection(GenericCollection[Booking]):
     ) -> int:
         """ Returns the number of bookings in the active period. """
 
-        periods = self.session.query(Period)
-        periods = periods.with_entities(Period.id)
-        periods = periods.filter(Period.active == True)
+        periods = self.session.query(BookingPeriod)
+        periods = periods.with_entities(BookingPeriod.id)
+        periods = periods.filter(BookingPeriod.active == True)
 
         return self.count(
             usernames=(username, ),
-            periods=periods.subquery(),
+            periods=periods.scalar_subquery(),  # type: ignore[arg-type]
             states=states
         )
 

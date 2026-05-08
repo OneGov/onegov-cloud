@@ -1,42 +1,55 @@
 """ Provides commands used to initialize org websites. """
 from __future__ import annotations
-import base64
-import json
 
+import base64
 import click
 import html
 import isodate
+import json
+import locale
+import pytz
 import re
+import requests
 import shutil
 import sys
 import textwrap
-from functools import wraps
+import transaction
+import yaml
 
-from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
-
-import pytz
-import locale
-import requests
-import transaction
-import yaml
-from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
 from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
+from onegov.core.orm.utils import QueryChain
 from onegov.core.utils import Bunch
-from onegov.directory import DirectoryEntry
+from onegov.directory import (
+    Directory,
+    DirectoryEntry,
+    DirectoryCollection,
+)
 from onegov.directory.models.directory import DirectoryFile
-from onegov.event import Event, Occurrence, EventCollection
+from onegov.event import Event
+from onegov.event import Occurrence
+from onegov.event import EventCollection
+from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
 from onegov.file.collection import FileCollection
-from onegov.form import FormCollection, FormDefinition
+from onegov.form import (
+    FormCollection,
+    FormDefinition,
+    FormSubmission,
+    FormDefinitionCollection,
+    FormSubmissionCollection,
+)
+from onegov.form.errors import FormError
+from onegov.form.utils import remove_empty_links
+from onegov.newsletter.collection import RecipientCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
@@ -48,6 +61,7 @@ from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.models.resource import Resource
 from onegov.org.models import (
     MeetingCollection,
+    Meeting,
     MeetingItem,
     MeetingItemCollection,
     PoliticalBusiness,
@@ -75,11 +89,11 @@ from pathlib import Path
 from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
-from elasticsearch.exceptions import ConnectionError as ESConnectionError
 
 
-from typing import IO, Any, TYPE_CHECKING, TypedDict
+from typing import IO, Any, TypedDict, TYPE_CHECKING
 if TYPE_CHECKING:
+    from bs4 import Tag
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
     from onegov.core.cli.core import GroupContext
@@ -563,6 +577,7 @@ def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
 @click.option('--published-only', is_flag=True, default=False,
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
+@click.option('--include-imported', is_flag=True, default=False)
 def fetch(
     group_context: GroupContext,
     source: Sequence[str],
@@ -571,7 +586,8 @@ def fetch(
     create_tickets: bool,
     state_transfers: Sequence[str],
     published_only: bool,
-    delete_orphaned_tickets: bool
+    delete_orphaned_tickets: bool,
+    include_imported: bool
 ) -> Callable[[OrgRequest, OrgApp], None]:
     r""" Fetches events from other instances.
 
@@ -603,6 +619,12 @@ def fetch(
 
         Delete Tickets, TicketNotes and TicketMessasges if an
         event gets deleted automatically.
+
+    - ``--include-imported``
+
+        By default skip events that have a source attribute, which means they
+        have been imported. If the flag is set, imported events will be
+        included in the fetch transfer.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
@@ -657,16 +679,15 @@ def fetch(
                 assert remote_session.info['schema'] == remote_schema
 
                 query = remote_session.query(Event)
-                query = query.filter(
-                    or_(
-                        Event.meta['source'].astext.is_(None),
-                        Event.meta['source'].astext == ''
-                    )
-                )
-                if tag:
+                if not include_imported:
                     query = query.filter(
-                        Event._tags.has_any(array(tag))  # type:ignore
+                        or_(
+                            Event.meta['source'].astext.is_(None),
+                            Event.meta['source'].astext == ''
+                        )
                     )
+                if tag:
+                    query = query.filter(Event._tags.has_any(array(tag)))
                 if location:
                     query = query.filter(
                         or_(*(
@@ -683,7 +704,7 @@ def fetch(
                     for event_ in query:
                         event_._es_skip = True
                         yield EventImportItem(
-                            event=Event(  # type:ignore[misc]
+                            event=Event(
                                 state=event_.state,
                                 title=event_.title,
                                 start=event_.start,
@@ -834,7 +855,7 @@ def fix_directory_files(
                     file = request.session.query(File).filter_by(
                         id=file_id).first()
                     if file and file.type != 'directory':
-                        new = DirectoryFile(  # type:ignore[misc]
+                        new = DirectoryFile(
                             id=random_token(),
                             name=file.name,
                             note=file.note,
@@ -959,30 +980,21 @@ def delete_invisible_links() -> Callable[[OrgRequest, OrgApp], None]:
             fg='yellow'
         ))
 
-        invisible_links = []
+        invisible_links: list[Tag] = []
         for page in models:
             # Find links with no text, only br tags and/or whitespaces
             for field in page.content_fields_containing_links_to_files:
                 if not page.content.get(field):
                     continue
-                soup = BeautifulSoup(page.content.get(field), 'html.parser')
-                for link in soup.find_all('a'):
-                    if not any(
-                        tag.name != 'br' and (
-                            tag.name or not tag.isspace()
-                        ) for tag in link.contents
-                    ):
-                        invisible_links.append(link)
-                        if all(tag.name == 'br' for tag in link.contents):
-                            link.replace_with(
-                                BeautifulSoup('<br/>', 'html.parser')
-                            )
-                        else:
-                            link.decompose()
+
+                cleaned = remove_empty_links(
+                    page.content.get(field),
+                    invisible_links
+                )
 
                 # Save the modified HTML back to page.text
-                if page.content[field] != str(soup):
-                    page.content[field] = str(soup)
+                if page.content[field] != cleaned:
+                    page.content[field] = cleaned
 
         click.echo(
             click.style(
@@ -2017,17 +2029,6 @@ def import_parliamentary_groups(
     return create_parliamentary_groups
 
 
-def handle_es_connection_error(func: Any) -> Callable[[OrgRequest, OrgApp],
-                                                      None]:
-    @wraps(func)
-    def wrapper(request: OrgRequest, app: OrgApp) -> None:
-        try:
-            return func(request, app)
-        except ESConnectionError:
-            click.echo('Ignoring Elasticsearch Connection error.')
-    return wrapper
-
-
 @cli.command(name='import-political-business')
 @click.argument('path', type=click.Path(exists=True, resolve_path=True))
 @click.option('--dry-run', is_flag=True, default=False)
@@ -2097,10 +2098,9 @@ def import_political_business(
         return (datetime.strptime(date_str, '%d. %B %Y').date()
                 if date_str else None)
 
-    @handle_es_connection_error
     def create_political_businesses(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
-        political_business_collection = PoliticalBusinessCollection(session)
+        political_business_collection = PoliticalBusinessCollection(request)
 
         political_businesses = read_json_files(path)
         import_counter = 0
@@ -2262,14 +2262,14 @@ def import_political_business(
                                             'Creating new parliamentarian: '
                                             f'{first_name} {last_name} for '
                                             f'{article_name} (unlinked)')
+                                        savepoint = transaction.savepoint()
                                         parliamentarian = RISParliamentarian(
                                             first_name=first_name,
                                             last_name=last_name)
                                         session.add(parliamentarian)
                                         try:
-                                            with session.begin_nested():
-                                                # Ensure ID is available
-                                                session.flush()
+                                            # Ensure ID is available
+                                            session.flush()
                                         except Exception as e:
                                             click.secho(
                                                 'Error creating '
@@ -2277,6 +2277,7 @@ def import_political_business(
                                                 f' {last_name}: {e}', fg='red')
                                             parliamentarian = None
                                             # Failed to create
+                                            savepoint.rollback()
 
                                         if (
                                             parliamentarian
@@ -2315,25 +2316,23 @@ def import_political_business(
                         click.secho(f'Warning: Unknown status '
                                     f'"{german_status}" in {article_name}. '
                                     f'Setting to None.', fg='yellow')
-                try:
-                    if '_' not in article_name:
-                        continue
-                    pol_business_id = article_name.split('_')[1].split('.')[0]
-                    political_business_collection.add(
-                        title=political_business['metadata']['title'],
-                        number=data_fields.get('Nummer'),
-                        political_business_type=english_business_type,
-                        status=english_status,
-                        entry_date=parse_german_date(data_fields.get('Datum')),
-                        content={},
-                        meta={
-                            'people_ids': people_ids,
-                            'parliamentary_group_ids': parliamentary_group_ids,
-                            'self_id': pol_business_id
-                        }
-                    )
-                except ESConnectionError:
-                    click.echo('Elasticsearch connection error')
+
+                if '_' not in article_name:
+                    continue
+                pol_business_id = article_name.split('_')[1].split('.')[0]
+                political_business_collection.add(
+                    title=political_business['metadata']['title'],
+                    number=data_fields.get('Nummer'),
+                    political_business_type=english_business_type,
+                    status=english_status,
+                    entry_date=parse_german_date(data_fields.get('Datum')),
+                    content={},
+                    meta={
+                        'people_ids': people_ids,
+                        'parliamentary_group_ids': parliamentary_group_ids,
+                        'self_id': pol_business_id
+                    }
+                )
 
         click.echo(f'{import_counter} political_businesses imported')
         click.echo(f'{overwrite_counter} political_businesses overwritten')
@@ -2564,7 +2563,7 @@ def create_polical_business_participants(
         business_participants = PoliticalBusinessParticipationCollection(
             session)
         people = RISParliamentarianCollection(session)
-        political_businesses = PoliticalBusinessCollection(session)
+        political_businesses = PoliticalBusinessCollection(request)
 
         for political_business in political_businesses.query():
             connect_ids = {}
@@ -2679,7 +2678,7 @@ def connect_political_business_meeting_items(
 
         session = request.session
         meeting_items = MeetingItemCollection(session)
-        political_businesses = PoliticalBusinessCollection(session)
+        political_businesses = PoliticalBusinessCollection(request)
 
         for political_business in political_businesses.query():
             self_id = political_business.meta.get('self_id')
@@ -2770,7 +2769,7 @@ def ris_resolve_parliamentarian_doublette(
     def resolve_doublette(request: OrgRequest, app: OrgApp) -> None:
         session = request.session
         parliamentarians = RISParliamentarianCollection(session)
-        businesses = PoliticalBusinessCollection(session)
+        businesses = PoliticalBusinessCollection(request)
         id = 'c0293891-7694-4da8-b846-844c7d1c7378'
         id_1 = 'dc83ffc4-2683-490f-ae30-1a0ab95fc0cc'
         business_id = '61964b73-f92e-40b4-8157-23c5048ca0d6'
@@ -2834,6 +2833,7 @@ def ris_rename_imported_participation_types_to_english(
         'Erstunterzeichner/in': 'First signatory',
         'Mitunterzeichner/in': 'Co-signatory',
         'Vorstösser/in': 'First signatory',
+        'Vorstösser/-in': 'First signatory',
     }
 
     def rename_participation_types(request: OrgRequest, app: OrgApp) -> None:
@@ -2850,3 +2850,508 @@ def ris_rename_imported_participation_types_to_english(
         transaction.commit()
 
     return rename_participation_types
+
+
+@cli.command(name='ris-rebuild-political-business-links-to-meetings')
+def ris_rebuild_political_business_links_to_meetings(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Rebuilds political business links to meetings. """
+
+    def rebuild_political_business_links(
+        request: OrgRequest, app: OrgApp
+    ) -> None:
+        session = request.session
+        businesses = PoliticalBusinessCollection(request)
+        meetings = MeetingCollection(session)
+        meeting_items = MeetingItemCollection(session)
+        already_ok_counter = 0
+        no_business_link_id_counter = 0
+        assigned_counter = 0
+        no_business_found_counter = 0
+        multiple_meetings_found_counter = 0
+        single_meeting_found_counter = 0
+        no_meeting_found_counter = 0
+
+        for meeting_item in meeting_items.query():
+            if meeting_item.political_business_id:
+                already_ok_counter += 1
+                continue
+
+            if not meeting_item.political_business_link_id:
+                # possible case, especially for new entries (after migration)
+                click.secho(
+                    f'No political business link found for meeting '
+                    f'item {meeting_item.id}', fg='yellow')
+                no_business_link_id_counter += 1
+                continue
+
+            if meeting_item.political_business_link_id:
+                # click.secho(f'Attempt to link political business ..')
+                business = (
+                    businesses.query()
+                    .filter(PoliticalBusiness.meta['self_id'] ==
+                            meeting_item.political_business_link_id)
+                ).first()
+                if business:
+                    click.secho(f'Assign political business id to '
+                                f'{meeting_item.title}', fg='green')
+                    meeting_item.political_business_id = business.id
+                    assigned_counter += 1
+                else:
+                    no_business_found_counter += 1
+                    meeting = meetings.query().filter(
+                        Meeting.id == meeting_item.meeting_id).first()
+                    if meeting:
+                        click.secho(
+                            f'No political business found for '
+                            f'business link id '
+                            f'{meeting_item.political_business_link_id} '
+                            f'for meeting from {meeting.start_datetime}',
+                            fg='red')
+                    else:
+                        click.secho(
+                            f'No political business found for business '
+                            f'link id '
+                            f'{meeting_item.political_business_link_id}',
+                            fg='red')
+        transaction.commit()
+
+        for business in businesses.query():
+            collected_meetings = []
+
+            for meeting_item in business.meeting_items:
+                meeting = meetings.query().get(meeting_item.meeting_id)
+                collected_meetings.append(meeting)
+
+            if len(collected_meetings) > 1:
+                multiple_meetings_found_counter += 1
+                click.secho(f'Multiple meetings found for political business '
+                            f'{business.title}', fg='green')
+            elif len(collected_meetings) == 0:
+                no_meeting_found_counter += 1
+                click.secho(f'No meeting found for political business '
+                            f'{business.title}', fg='yellow')
+            else:
+                single_meeting_found_counter += 1
+                click.secho(f'Set meeting for political business '
+                            f'{business.title}', fg='green')
+
+        # echo counter results
+        click.secho('')
+        click.secho(f'Meeting items with political business link id '
+                    f'{already_ok_counter}', fg='green')
+        click.secho(f'Meeting items with no political business link id '
+                    f'{no_business_link_id_counter}', fg='red')
+        click.secho(f'No business found for {no_business_found_counter} '
+                    f'meeting items', fg='yellow')
+        click.secho(f'Political business links assigned to meeting items '
+                    f'{assigned_counter}', fg='green')
+        click.secho(f'Of totally {meeting_items.query().count()} meeting '
+                    f'items', fg='green')
+
+        click.secho('')
+        click.secho(f'Multiple meetings found for '
+                    f'{multiple_meetings_found_counter} political businesses',
+                    fg='green')
+        click.secho(f'Single meeting found for {single_meeting_found_counter} '
+                    f'political businesses', fg='green')
+        click.secho(f'No meeting found for {no_meeting_found_counter} '
+                    f'political businesses', fg='yellow')
+        click.secho(f'Total number of political businesses '
+                    f'{businesses.query().count()}', fg='green')
+
+        transaction.commit()
+
+    return rebuild_political_business_links
+
+
+@cli.command(name='ris-make-imported-files-general-file')
+def ris_make_imported_files_general_file(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /onegov_town6/wil ris-make-imported-files-general-file
+    """
+
+    def make_general_file(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        businesses = PoliticalBusinessCollection(request)
+        meetings = MeetingCollection(session)
+
+        counter = 0
+        for business in businesses.query():
+            for file in business.files:
+                if file.type == 'generic':
+                    file.type = 'general'
+                    counter += 1
+        click.secho(f'Set {counter} political business files to '
+                    f'type "general"', fg='green')
+        transaction.commit()
+
+        counter = 0
+        for meeting in meetings.query():
+            for file in meeting.files:
+                if file.type == 'generic':
+                    file.type = 'general'
+                    counter += 1
+        click.secho(f'Set {counter} meeting files to type "general"',
+                    fg='green')
+
+    return make_general_file
+
+
+@cli.command(name='ris-wil-meetings-fix-audio-links')
+def ris_wil_meetings_shorten_audio_links(
+) -> Callable[[OrgRequest, OrgApp], None]:
+
+    def ris_wil_meetings_fix_audio_links(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        meetings = MeetingCollection(request.session)
+        recapp_counter = 0
+        http_counter = 0
+        for meeting in meetings.query():
+            if not meeting.audio_link:
+                continue
+
+            if (meeting.audio_link ==
+                    'https://wil.recapp.ch/viewer/default/timeline'):
+                meeting.audio_link = 'https://wil.recapp.ch'
+                recapp_counter += 1
+                continue
+
+            if 'http://wil.recapp.ch' in meeting.audio_link:
+                meeting.audio_link = (
+                    meeting.audio_link.replace('http', 'https'))
+                http_counter += 1
+                continue
+
+            if meeting.audio_link == 'https://wil.recapp.ch':
+                continue
+
+            if 'http://verbalix.stadtwil.ch' in meeting.audio_link:
+                meeting.audio_link = (
+                    meeting.audio_link.replace('http', 'https'))
+                http_counter += 1
+                continue
+
+            if meeting.audio_link == 'https://verbalix.stadtwil.ch/':
+                continue
+
+            if 'https://verbalix.stadtwil.ch/' in meeting.audio_link:
+                continue
+
+            click.secho(
+                f'audio link for meeting {meeting.title} vom '
+                f'{meeting.start_datetime}: {meeting.audio_link}', fg='yellow')
+
+        click.secho(f'Fixed recapp audio links for {recapp_counter} '
+                    f'meetings', fg='green')
+        click.secho(f'Fixed verbalix http audio links for {http_counter} '
+                    f'meetings', fg='green')
+        transaction.commit()
+
+    return ris_wil_meetings_fix_audio_links
+
+
+@cli.command(name='wil-event-tags-to-german-as-we-use-custom-event-tags')
+def wil_event_tags_to_german_as_we_use_custom_event_tags(
+) -> Callable[[OrgRequest, OrgApp], None]:
+
+    map = {
+        'Art': 'Kunst',
+        'Cinema': 'Kino',
+        'Concert': 'Konzert',
+        'Congress': 'Kongress',
+        'Culture': 'Kultur',
+        'Dancing': 'Tanzen',
+        'Education': 'Bildung',
+        'Exhibition': 'Ausstellung',
+        'Gastronomy': 'Gastronomie',
+        'Health': 'Gesundheit',
+        'Library': 'Bibliothek',
+        'Literature': 'Literatur',
+        'Market': 'Markt',
+        'Meetup': 'Treffen',
+        'Misc': 'Verschiedenes',
+        'Music School': 'Musikschule',
+        'Nature': 'Natur',
+        'Music': 'Musik',
+        'Party': 'Party',
+        'Politics': 'Politik',
+        'Reading': 'Lesung',
+        'Religion': 'Religion',
+        'Sports': 'Sport',
+        'Talk': 'Vortrag',
+        'Theater': 'Theater',
+        'Tourism': 'Tourismus',
+        'Toy Library': 'Spielzeugbibliothek',
+        'Tradition': 'Tradition',
+        'Youth': 'Jugend',
+        'Elderly': 'Senioren',
+
+        'Diverses': 'Verschiedenes',
+    }
+
+    def event_tags_to_german(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        click.secho(f'org name: {request.app.org.name}')
+        if request.app.org.name != 'Stadt Wil':
+            return
+
+        events = EventCollection(request.session).query()
+        occurrences = OccurrenceCollection(request.session).query()
+
+        for collection in [events, occurrences]:
+            for item in collection:  # type: ignore[attr-defined]
+                new_tags = []
+                tags = item.tags
+                for tag in tags:
+                    translated = map.get(tag, tag)
+                    new_tags.append(translated)
+                click.secho(f'new tags: {new_tags}', fg='green')
+                item.tags = new_tags
+
+            request.session.flush()
+
+    return event_tags_to_german
+
+
+@cli.command(name='subscribe-parliamentarians-to-newsletter')
+def subscribe_parliamentarians_to_newsletter(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /foo/bar subscribe-parliamentarians-to-newsletter
+    """
+
+    def subscribe_parliamentarians(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+
+        recipients = RecipientCollection(request.session)
+        parliamentarians = RISParliamentarianCollection(
+            request.session).query().all()
+        subscribe_counter = 0
+
+        for p in parliamentarians:
+            if not p.email_primary:
+                continue
+
+            recipient = recipients.by_address(p.email_primary)
+            if not recipient:
+                recipients.add(
+                    address=p.email_primary,
+                    # group='Parlamentarier',
+                    confirmed=True
+                )
+                click.secho(f'Subscribed {p.email_primary}', fg='green')
+                subscribe_counter += 1
+
+    return subscribe_parliamentarians
+
+
+@cli.command(name='wil-rename-imported-meeting-files')
+def wil_rename_imported_meeting_files(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    onegov-org --select /foo/bar wil-rename-imported-meeting-files
+    """
+
+    def rename_imported_meeting_files(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+        if request.app.org.name != 'Stadt Wil':
+            return
+
+        rename_counter = 0
+        meetings = MeetingCollection(request.session)
+        for meeting in meetings.query().order_by(Meeting.start_datetime):
+            if meeting.start_datetime is None:
+                click.secho(f'{meeting.title} has no start date '
+                            f'time set. end date time {meeting.end_datetime}',
+                            fg='yellow')
+                continue
+
+            if meeting.start_datetime > datetime(
+                    2025, 7, 1, tzinfo=pytz.utc):
+                continue
+
+            for file in meeting.files:
+                if '_' in file.name:
+                    click.secho(f'{file.name}', fg='red')
+                    file.name = file.name.replace('_', ' ')
+                    rename_counter += 1
+
+        click.secho(f'Renamed {rename_counter} files', fg='green')
+
+    return rename_imported_meeting_files
+
+
+@cli.command(name='list-resources')
+def list_resources(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    Lists all resources of the selected org ordered by type
+
+    onegov-org --select '/foo/bar' list-resources
+    """
+
+    def list_all_resources(request: OrgRequest, app: OrgApp) -> None:
+        resources = ResourceCollection(app.libres_context)
+
+        click.echo('\n----------------------------------------')
+        click.secho(f'Resources of {request.app.org.name}', fg='blue')
+        type = None
+        for res in resources.ordered_by_type():
+            if type != res.type:
+                click.secho(f'\n{res.type.title()}', fg='blue')
+            type = res.type
+            click.secho(f'- {res.title}', fg='green')
+
+    return list_all_resources
+
+
+@cli.command(name='check-formcode')
+def check_forms(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """Check stored formcode for parseability.
+
+    Scans form definitions, form submissions and directory structures
+    stored in the database and attempts to parse their formcode using
+    `onegov.form.parse_formcode`. This helps detect changes to the
+    parser that would cause existing formcode to fail when loading
+    (`enable_edit_checks=False`).
+
+    NOTE: Currently resource form definition is option input on the form.
+    However this causes an error when parsing the formcode
+
+    Usage:
+        onegov-org --select /onegov_town6/* check-formcode
+
+    """
+    from onegov.form import parse_formcode
+
+    def check_formcode(request: OrgRequest, app: OrgApp) -> None:
+        data_to_parse: list[tuple[str, str]] = []
+        ok_counter = 0
+        notok_counter = 0
+
+        definitions = (
+            FormDefinitionCollection(request.session)
+            .query()
+            .with_entities(
+                FormDefinition.title,
+                FormDefinition.definition
+            )
+        )
+        data_to_parse.extend(
+            (x.title, x.definition) for x in definitions.all()
+        )
+
+        submissions = (
+            FormSubmissionCollection(request.session, None)
+            .query()
+            .with_entities(
+                FormSubmission.title,
+                FormSubmission.definition
+            )
+        )
+        data_to_parse.extend((x.title, x.definition) for x in submissions)
+
+        directories = (
+            DirectoryCollection(request.session)
+            .query()
+            .with_entities(
+                Directory.title,
+                Directory.structure
+            )
+        )
+        data_to_parse.extend((x.title, x.structure) for x in directories.all())
+
+        resources = (
+            ResourceCollection(app.libres_context)
+            .query()
+            .with_entities(Resource.title, Resource.definition)
+        )
+        data_to_parse.extend(
+            (x.title, x.definition) for x in resources.all() if x.definition
+        )
+
+        click.echo(f'\nParsing formcode for "{app.org.name}"')
+        count = len(data_to_parse)
+        for title, formcode in data_to_parse:
+            try:
+                parse_formcode(formcode, enable_edit_checks=False)
+                ok_counter += 1
+            except FormError as e:
+                notok_counter += 1
+                click.secho(
+                    f'Failed parsing formcode for {title}: '
+                    f'{e.__repr__()}', fg='red'
+                )
+
+        click.secho(f'Summary: {ok_counter} of {count} OK, '
+                    f'{notok_counter} of {count} NOK',
+                    fg='yellow' if notok_counter > 0 else 'green')
+
+    return check_formcode
+
+
+@cli.command('migrate-agency', context_settings={'singular': True})
+@pass_group_context
+def migrate_agency(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Migrates the database from an old agency to the new agency like in the
+    upgrades.
+
+    """
+
+    def migrate_to_new_agency(request: OrgRequest, app: OrgApp) -> None:
+        context: UpgradeContext = Bunch(session=app.session())  # type:ignore
+        migrate_theme_options(context)
+        org = context.session.query(Organisation).first()
+
+        if org is None:
+            return
+
+        org.meta['homepage_structure'] = textwrap.dedent("""\
+        <row-wide bgcolor="gray">
+            <column span="12">
+                <row class="columns">
+                    <column span="4">
+                        <icon_link
+                            icon="fa-user"
+                            title="Alle Personen"
+                            link="./people"
+                            text="Personen"
+                        />
+                    </column>
+                    <column span="4">
+                        <icon_link
+                            icon="fa-briefcase"
+                            link="./organizations"
+                            title="Alle Organisationen"
+                            text="Organisationen"
+                        />
+                    </column>
+                    <column span="4">
+                        <icon_link
+                            icon="fa-folder-open"
+                            link="./organizations/pdf"
+                            title="Staatskalender"
+                            text="PDF-Ausdruck inklusive Inhaltsverzeichnis"
+                        />
+                    </column>
+                </row>
+            </column>
+        </row-wide>
+        """)
+
+    return migrate_to_new_agency

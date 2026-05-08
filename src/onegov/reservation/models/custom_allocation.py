@@ -7,11 +7,13 @@ from sqlalchemy.orm import object_session
 
 
 class CustomAllocation(Allocation, ModelBase):
-    __mapper_args__ = {'polymorphic_identity': 'custom'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'custom'}
 
     @property
     def resource_obj(self) -> Resource:
-        return object_session(self).query(
+        session = object_session(self)
+        assert session is not None
+        return session.query(
             Resource).filter_by(id=self.resource).one()
 
     @property

@@ -10,21 +10,16 @@ from ldap3.core.exceptions import LDAPCommunicationError
 from time import sleep
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, Concatenate, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
-    from typing import Concatenate, ParamSpec
-
-    _P = ParamSpec('_P')
-
-_T = TypeVar('_T')
 
 
-def auto_retry(
-    fn: Callable[Concatenate[LDAPClient, _P], _T],
+def auto_retry[**P, T](
+    fn: Callable[Concatenate[LDAPClient, P], T],
     max_tries: int = 5,
     pause: float = 0.1
-) -> Callable[Concatenate[LDAPClient, _P], _T]:
+) -> Callable[Concatenate[LDAPClient, P], T]:
     """ Retries the decorated function if a LDAP connection error occurs, up
     to a given set of retries, using linear backoff.
 
@@ -35,9 +30,9 @@ def auto_retry(
     def retry(
         self: LDAPClient,
         /,
-        *args: _P.args,
-        **kwargs: _P.kwargs
-    ) -> _T:
+        *args: P.args,
+        **kwargs: P.kwargs
+    ) -> T:
         nonlocal tried
 
         try:

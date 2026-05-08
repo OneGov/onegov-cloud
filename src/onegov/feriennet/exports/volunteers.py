@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload, undefer
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models import Period, Volunteer
+    from onegov.activity.models import BookingPeriod, Volunteer
     from sqlalchemy.orm import Query, Session
 
 
@@ -36,14 +36,14 @@ class VolunteerExport(FeriennetExport):
     def query(
         self,
         session: Session,
-        period: Period
+        period: BookingPeriod
     ) -> Query[OccasionNeed]:
 
         q = session.query(OccasionNeed)
         q = q.filter(OccasionNeed.occasion_id.in_(
             session.query(Occasion.id)
             .filter(Occasion.period_id == period.id)
-            .subquery()
+            .scalar_subquery()
         ))
         q = q.join(Occasion)
         q = q.options(
@@ -62,7 +62,7 @@ class VolunteerExport(FeriennetExport):
     def rows(
         self,
         session: Session,
-        period: Period
+        period: BookingPeriod
     ) -> Iterator[Iterator[tuple[str, Any]]]:
 
         for need in self.query(session, period):

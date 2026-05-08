@@ -15,6 +15,10 @@ class ComplexVote(Vote):
     __mapper_args__ = {'polymorphic_identity': 'complex'}
 
     @property
+    def proposal(self) -> Ballot:
+        return self.ballot('proposal')
+
+    @property
     def counter_proposal(self) -> Ballot:
         return self.ballot('counter-proposal')
 

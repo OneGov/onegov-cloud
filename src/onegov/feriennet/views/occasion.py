@@ -4,9 +4,9 @@ from datetime import date
 from markupsafe import Markup
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import InvoiceCollection
+from onegov.activity import BookingPeriodCollection
+from onegov.activity import BookingPeriodInvoiceCollection
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
-from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
 from onegov.core.templates import render_template
 from onegov.feriennet import _
@@ -19,6 +19,7 @@ from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.org.layout import DefaultMailLayout
 from onegov.user import User, UserCollection
+from sqlalchemy import text
 
 
 from typing import TYPE_CHECKING
@@ -50,7 +51,7 @@ def new_occasion(
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
-        periods = PeriodCollection(request.session)
+        periods = BookingPeriodCollection(request.session)
         period = periods.by_id(form.period_id.data)
         assert period is not None
 
@@ -89,7 +90,7 @@ def clone_occasion(
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
-        periods = PeriodCollection(request.session)
+        periods = BookingPeriodCollection(request.session)
         period = periods.by_id(form.period_id.data)
         assert period is not None
 
@@ -107,9 +108,11 @@ def clone_occasion(
         form.process(obj=self)
         form.dates.data = form.dates_to_json(dates=None)
 
+    layout = OccasionFormLayout(self.activity, request, _('Clone Occasion'))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(
-            self.activity, request, _('Clone Occasion')),
+        'layout': layout,
         'title': _('Clone Occasion'),
         'form': form
     }
@@ -199,16 +202,16 @@ def book_occasion(
 ) -> RenderData | Response:
 
     # for the "nth. occasion" title
-    number: int = request.session.execute("""
+    number: int = request.session.execute(text("""
         SELECT count(*) FROM occasions
         WHERE activity_id = :activity_id
           AND "order" <= :order
           AND "period_id" = :period_id
-    """, {
+    """), {
         'activity_id': self.activity_id,
         'order': self.order,
         'period_id': self.period.id
-    }).scalar()
+    }).scalar_one()
 
     if form.submitted(request):
         attendees = AttendeeCollection(request.session)
@@ -346,7 +349,9 @@ def book_occasion(
                 }))
 
         if self.period.finalized:
-            return request.redirect(request.class_link(InvoiceCollection))
+            return request.redirect(
+                request.class_link(BookingPeriodInvoiceCollection)
+            )
         else:
             return request.redirect(request.link(self.activity))
 
@@ -364,11 +369,12 @@ def book_occasion(
     users = []
 
     if request.is_admin:
-        u = UserCollection(request.session).query()
-        u = u.with_entities(User.username, User.title)
-        u = u.order_by(User.title)
-
-        users = u.all()
+        users = (
+            UserCollection(request.session).query()
+            .with_entities(User.username, User.title)
+            .order_by(User.title)
+            .all()
+        )
 
     return {
         'layout': OccasionFormLayout(self.activity, request, title),

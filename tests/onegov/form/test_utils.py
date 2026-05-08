@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from onegov.form import decimal_range
 from wtforms import Form
@@ -5,7 +7,7 @@ from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 
-def test_decimal_range():
+def test_decimal_range() -> None:
     assert list(decimal_range('0', '2')) == [
         Decimal('0'),
         Decimal('1')
@@ -30,9 +32,9 @@ def test_decimal_range():
     assert repr(decimal_range('0', '1')) == "decimal_range('0', '1')"
 
 
-def test_disable_required_attributes():
+def test_disable_required_attributes() -> None:
     field = StringField(validators=[InputRequired()])
-    field = field.bind(Form(), 'field')
+    field = field.bind(Form(), 'field')  # type: ignore[attr-defined]
     field.data = ''
 
     html = field().replace('aria-required', 'aria-req')

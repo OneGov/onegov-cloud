@@ -1,11 +1,19 @@
+from __future__ import annotations
+
 from functools import lru_cache
-from findimports import ModuleGraph
+from findimports import ModuleGraph  # type: ignore[import-untyped]
 from pathlib import Path
 
 from onegov.core import LEVELS
 
 
-def test_hierarchy():
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+    from os import PathLike
+
+
+def test_hierarchy() -> None:
     """ Originally, onegov.* modules were separated into separate repositories
     and deployed individually to PyPI.
 
@@ -61,10 +69,10 @@ def test_hierarchy():
                 f"Invalid import {name} → {import_name} in {imported.filename}"
 
 
-def allowed_imports(levels, module):
+def allowed_imports(levels: Sequence[Sequence[str]], module: str) -> set[str]:
     """ Given a module name, returns an imprtable set of onegov modules. """
 
-    allowed = set()
+    allowed: set[str] = set()
 
     for modules in levels:
         allowed.update(modules)
@@ -75,13 +83,13 @@ def allowed_imports(levels, module):
     raise AssertionError(f"unknown module: {module}")
 
 
-def sources():
+def sources() -> Path:
     """ Returns the path to 'src'. """
     return Path(__file__).parent.parent / 'src'
 
 
 @lru_cache(maxsize=128)
-def module_name(path):
+def module_name(path: PathLike[str]) -> str | None:
     """ Given a path, returns the onegov module, or None, if not a onegov
     module (and therefore not relevant to this analysis).
 
@@ -95,9 +103,10 @@ def module_name(path):
             .split('/', 1)[0]
 
         return f'onegov.{name}'
+    return None
 
 
-def level_by_module(levels):
+def level_by_module(levels: Sequence[Sequence[str]]) -> dict[str, int]:
     """ Returns a dictionary with modules -> level. """
 
     result = {}
@@ -111,7 +120,7 @@ def level_by_module(levels):
     return result
 
 
-def existing_modules():
+def existing_modules() -> Iterator[str]:
     """ Yields the module names found in the src/onegov folder. """
 
     for child in (sources() / 'onegov').iterdir():

@@ -40,6 +40,14 @@ class IdentityPolicy:
 
     def forget(self, response: Response, request: CoreRequest) -> None:
         request.browser_session.flush()
+        # NOTE: While clearing "storage" should probably mostly be fine
+        #       we do use it to store some long-lived preferences like
+        #       search filters in Swissvotes. So it would be inconvenient
+        #       if those disappeared on logout. If we ever start putting
+        #       more sensitive data in localStorage, we may have to revisit
+        #       that decision, or perform a more targeted clear of that
+        #       specific sensitive data.
+        response.headers['Clear-Site-Data'] = '"cache"'
 
 
 @Framework.identity_policy()

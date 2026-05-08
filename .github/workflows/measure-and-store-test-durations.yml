@@ -3,7 +3,7 @@ name: Measure and store test durations for pytest-split
 on:
   workflow_dispatch:  # allow to run manually
   schedule:
-    - cron: '0 6 * * 1'  # run once a week on monday morning
+    - cron: '0 4 * * 1'  # run once a week on monday morning
 
 jobs:
   build:
@@ -33,12 +33,12 @@ jobs:
           git-core \
           postgresql \
           redis \
-          openjdk-8-jre-headless \
           gcc \
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
           libasound2t64 \
+          libcairo2-dev \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -49,18 +49,12 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          libxt-dev \
           unzip \
           xdg-utils
 
-    - name: Install Chrome
-      uses: browser-actions/setup-chrome@v1
-      with:
-        # FIXME: OGC-1857
-        chrome-version: 127
-        install-chromedriver: true
-
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies
       run: |
@@ -82,10 +76,14 @@ jobs:
         # add unprivileged test user
         adduser --disabled-password --gecos "" test
         redis-server --daemonize yes
+        PG_DATA_DIR="$(pg_config --sharedir)/tsearch_data"
+        cp "${PG_DATA_DIR}/unaccent.rules" "${PG_DATA_DIR}/german.rules"
+        sed -i 's/^\([ÄÖÜäöü]\t.*\)/\1e/' "${PG_DATA_DIR}/german.rules"
         # NOTE: Allow the test user to write to this file
         chown test .test_durations
         # NOTE: Avoid dubious ownership error when commiting
         git config --global --add safe.directory $PWD
+        run-as "$(id -u test)":test /app/bin/playwright install chromium
 
     - name: Measure test durations
       run: |
@@ -96,7 +94,6 @@ jobs:
       env:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
-        JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
         SKIP_DRIVER_MANAGER: '1'
 
     - uses: EndBug/add-and-commit@v9

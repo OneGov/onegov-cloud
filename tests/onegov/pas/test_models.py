@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from freezegun import freeze_time
 from datetime import date
 from onegov.core.utils import Bunch
@@ -14,10 +16,19 @@ from onegov.pas.models import (
     RateSet,
     SettlementRun
 )
+from onegov.pas.models.attendence import TYPES
+from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
+    FIBU_KONTEN_MAPPING
+)
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 
 @freeze_time('2022-06-06')
-def test_models(session):
+def test_models(session: Session) -> None:
     rate_set = RateSet(year=2022)
     legislative_period = LegislativePeriod(
         name='2022-2024',
@@ -77,7 +88,7 @@ def test_models(session):
     session.flush()
 
     change = Change.add(
-        request=Bunch(
+        request=Bunch(  # type: ignore[arg-type]
             current_username='user@example.org',
             current_user=Bunch(title='User'),
             session=session
@@ -120,8 +131,12 @@ def test_models(session):
     # ... parliamentarian.active
     assert parliamentarian.active is True
     parliamentarian_role.end = date(2022, 5, 5)
+    commission_membership.end = date(2022, 5, 5)
+    parliamentarian = parliamentarian  # undo mypy narrowing
     assert parliamentarian.active is False
     parliamentarian.roles = []
+    parliamentarian.commission_memberships = []
+    parliamentarian = parliamentarian  # undo mypy narrowing
     assert parliamentarian.active is True
 
     # commission.end_observer
@@ -129,3 +144,83 @@ def test_models(session):
     commission.end = date(2022, 5, 5)
     session.flush()
     assert commission_membership.end == date(2022, 5, 5)
+
+
+def test_fibu_konten_mapping_completeness() -> None:
+    """Test that FIBU_KONTEN_MAPPING has all keys from TYPES.
+
+    This ensures that if new attendance types are added to TYPES,
+    they must also be mapped in FIBU_KONTEN_MAPPING.
+    """
+    missing_keys = TYPES.keys() - FIBU_KONTEN_MAPPING.keys()
+    assert not missing_keys, (
+        f"FIBU_KONTEN_MAPPING is missing keys: {missing_keys}"
+    )
+
+
+def h(hours: float) -> int:
+    return round(hours * 60)
+
+
+def test_attendence_calculate_value_precision(session: Session) -> None:
+    """Test that calculate_value displays 2 decimal places."""
+    parliamentarian = PASParliamentarian(
+        first_name='Test',
+        last_name='User',
+        gender='male',
+        shipping_method='plus',
+    )
+    session.add(parliamentarian)
+    session.flush()
+
+    att_1 = Attendence(
+        date=date(2022, 1, 1),
+        duration=h(1.5),
+        type='commission',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_1)
+    session.flush()
+    assert str(att_1.calculate_value()) == '1.50'
+
+    att_2 = Attendence(
+        date=date(2022, 1, 2),
+        duration=h(2),
+        type='study',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_2)
+    session.flush()
+    assert str(att_2.calculate_value()) == '2.00'
+
+    # 3.25h = 2h + 1.25h, 1.25 rounds to 1.5 → total 3.50
+    att_3 = Attendence(
+        date=date(2022, 1, 3),
+        duration=h(3.25),
+        type='commission',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_3)
+    session.flush()
+    assert str(att_3.calculate_value()) == '3.50'
+
+    # plenary is returned verbatim
+    att_4 = Attendence(
+        date=date(2022, 1, 3),
+        duration=h(3.25),
+        type='plenary',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_4)
+    session.flush()
+    assert str(att_4.calculate_value()) == '3.25'
+
+    att_5 = Attendence(
+        date=date(2022, 1, 4),
+        duration=h(1.25),
+        type='shortest',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_5)
+    session.flush()
+    assert str(att_5.calculate_value()) == '1.25'

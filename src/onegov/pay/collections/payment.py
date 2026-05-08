@@ -1,23 +1,23 @@
 from __future__ import annotations
 
+import sedate
+
 from collections import defaultdict
-
-from sedate import to_timezone
-
+from functools import cached_property
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
+from onegov.ticket.models.ticket import Ticket
 from sqlalchemy.orm import joinedload
-from sqlalchemy import and_, func
+from sqlalchemy import and_, func, or_
 
 
-from typing import Any, TYPE_CHECKING
-from onegov.ticket.model import Ticket
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from datetime import date
-    from collections.abc import Collection, Iterable
-    from datetime import datetime
+    from collections.abc import Callable, Collection, Iterable
+    from datetime import date, datetime
     from decimal import Decimal
     from onegov.pay.types import AnyPayableBase, PaymentState
+    from sedate.types import Direction, TzInfo
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
 
@@ -32,6 +32,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
     """
 
     page: int
+    batch_size = 50
+    extra_parameters = None
 
     def __init__(
         self,
@@ -40,12 +42,15 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         page: int = 0,
         start: datetime | None = None,
         end: datetime | None = None,
-        ticket_start: datetime | None = None,
-        ticket_end: datetime | None = None,
-        reservation_start: datetime | None = None,
-        reservation_end: datetime | None = None,
+        ticket_group: list[str] | None = None,
+        ticket_start: date | None = None,
+        ticket_end: date | None = None,
+        reservation_start: date | None = None,
+        reservation_end: date | None = None,
+        reservation_reference_date: Literal['final', 'any'] | None = None,
         status: str | None = None,
-        payment_type: str | None = None
+        payment_type: str | None = None,
+        expand_ticket_group: Callable[[list[str]], list[str]] | None = None,
     ):
         GenericCollection.__init__(self, session)
         Pagination.__init__(self, page)
@@ -54,14 +59,29 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         self.end = end
         self.status = status
         self.payment_type = payment_type
+        self.ticket_group = ticket_group or []
         self.ticket_start = ticket_start
         self.ticket_end = ticket_end
         self.reservation_start = reservation_start
         self.reservation_end = reservation_end
+        self.reservation_reference_date = reservation_reference_date or 'final'
+        self.expand_ticket_group = expand_ticket_group
 
     @property
     def model_class(self) -> type[Payment]:
         return Payment.get_polymorphic_class(self.source, Payment)
+
+    @property
+    def g(self) -> list[str]:
+        # since this can have many many values
+        # a shorter name can help shorten urls significantly
+        return self.ticket_group
+
+    @cached_property
+    def real_ticket_group(self) -> list[str]:
+        if self.expand_ticket_group is None:
+            return self.ticket_group
+        return self.expand_ticket_group(self.ticket_group)
 
     def add(
         self,
@@ -101,12 +121,26 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             and self.page == other.page
             and self.start == other.start
             and self.end == other.end
+            and self.real_ticket_group == other.real_ticket_group
             and self.ticket_start == other.ticket_start
             and self.ticket_end == other.ticket_end
             and self.reservation_start == other.reservation_start
             and self.reservation_end == other.reservation_end
+            and self.reservation_reference_date
+                == other.reservation_reference_date
             and self.status == other.status
             and self.payment_type == other.payment_type
+        )
+
+    @cached_property
+    def tzinfo(self) -> TzInfo:
+        return sedate.ensure_timezone('Europe/Zurich')
+
+    def align_date(self, value: date, direction: Direction) -> datetime:
+        return sedate.align_date_to_day(
+            sedate.replace_timezone(sedate.as_datetime(value), self.tzinfo),
+            self.tzinfo,
+            direction
         )
 
     def subset(self) -> Query[Payment]:
@@ -129,30 +163,76 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             query = query.filter(Payment.state == self.status)
 
         # Filter payments by each associated ticket creation date
-        if self.ticket_start or self.ticket_end:
+        if self.ticket_start or self.ticket_end or self.real_ticket_group:
             query = query.join(Ticket, Payment.id == Ticket.payment_id)
-
+            if self.real_ticket_group:
+                conditions = []
+                for group in self.real_ticket_group:
+                    handler_code, *remainder = group.split('-', 1)
+                    condition = Ticket.handler_code == handler_code
+                    if remainder:
+                        group, = remainder
+                        condition = and_(condition, Ticket.group == group)
+                    conditions.append(condition)
+                query = query.filter(or_(*conditions))
             if self.ticket_start:
-                query = query.filter(Ticket.created >= self.ticket_start)
+                query = query.filter(Ticket.created >= self.align_date(
+                    self.ticket_start,
+                    'down'
+                ))
             if self.ticket_end:
-                query = query.filter(Ticket.created <= self.ticket_end)
+                query = query.filter(Ticket.created <= self.align_date(
+                    self.ticket_end,
+                    'up'
+                ))
 
         # Filter payments by the reservation dates it belongs to
         if self.reservation_start or self.reservation_end:
             from onegov.reservation import Reservation
 
-            conditions = []
-            if self.reservation_start:
-                conditions.append(
-                    Reservation.end >= self.reservation_start
+            if self.reservation_reference_date == 'any':
+                conditions = []
+                if self.reservation_start:
+                    conditions.append(Reservation.end >= self.align_date(
+                        self.reservation_start,
+                        'down'
+                    ))
+                if self.reservation_end:
+                    conditions.append(Reservation.start <= self.align_date(
+                        self.reservation_end,
+                        'up'
+                    ))
+                query = query.filter(
+                    Payment.linked_reservations.any(and_(*conditions))  # type: ignore[attr-defined]
                 )
-            if self.reservation_end:
-                conditions.append(
-                    Reservation.start <= self.reservation_end
+            else:
+                reservations = self.session.query(
+                    Payment.id.label('payment_id'),
+                    func.max(Reservation.end).label('reference_date'),
+                ).join(
+                    Payment.linked_reservations  # type: ignore[attr-defined]
+                ).group_by(Payment.id).subquery()
+
+                subquery = self.session.query(reservations.c.payment_id)
+                subquery = subquery.filter(
+                    reservations.c.payment_id == Payment.id
                 )
-            query = query.filter(
-                Payment.linked_reservations.any(and_(*conditions))  # type: ignore[attr-defined]
-            )
+
+                if self.reservation_start:
+                    subquery = subquery.filter(
+                        reservations.c.reference_date >= self.align_date(
+                            self.reservation_start,
+                            'down'
+                        )
+                    )
+                if self.reservation_end:
+                    subquery = subquery.filter(
+                        reservations.c.reference_date <= self.align_date(
+                            self.reservation_end,
+                            'up'
+                        )
+                    )
+                query = query.filter(subquery.exists())
 
         return query.order_by(Payment.created.desc())
 
@@ -166,13 +246,16 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
             page=index,
             start=self.start,
             end=self.end,
+            ticket_group=self.ticket_group,
             ticket_start=self.ticket_start,
             ticket_end=self.ticket_end,
             reservation_start=self.reservation_start,
             reservation_end=self.reservation_end,
+            reservation_reference_date=self.reservation_reference_date,
             payment_type=self.payment_type,
             source=self.source,
-            status=self.status
+            status=self.status,
+            expand_ticket_group=self.expand_ticket_group
         )
 
     def tickets_by_batch(self) -> dict[UUID, Ticket]:
@@ -191,8 +274,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         session = self.session
         return {
             payment_id: (
-                to_timezone(start_date, 'Europe/Zurich').date(),
-                to_timezone(end_date, 'Europe/Zurich').date()
+                sedate.to_timezone(start_date, self.tzinfo).date(),
+                sedate.to_timezone(end_date, self.tzinfo).date()
             )
             for payment_id, start_date, end_date in session.query(Reservation)
             .join(Reservation.payment)
@@ -227,7 +310,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
 
             q: Query[AnyPayableBase]
             q = self.session.query(link.cls)
-            q = q.filter(link.cls.id.in_(targets.subquery()))  # type:ignore
+            q = q.filter(link.cls.id.in_(targets.scalar_subquery()))  # type: ignore[attr-defined]
             q = q.options(joinedload(link.class_attribute))
 
             for record in q:
@@ -261,14 +344,11 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
 
     def by_state(self, state: PaymentState) -> PaymentCollection:
         """ Returns a new collection that only contains payments with the
-        given state. Resets all other filters.
+        given state. Resets all other filters except source.
         """
         return self.__class__(
             self.session,
             page=0,
-            start=None,
-            end=None,
-            ticket_start=None,
-            ticket_end=None,
             source=self.source,
-            status=state)
+            status=state
+        )

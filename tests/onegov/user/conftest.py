@@ -1,13 +1,19 @@
+from __future__ import annotations
+
 import base64
 import pytest
-
 from tempfile import NamedTemporaryFile
 
 from onegov.core.utils import module_path
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+
 @pytest.fixture(scope='session')
-def keytab():
+def keytab() -> Iterator[str]:
     """ BASE 64 encoded keytab file for Kerberos integration tests
 
     Principal: HTTP/ogc.example.org@EXAMPLE.ORG
@@ -37,5 +43,5 @@ def keytab():
 
 
 @pytest.fixture(scope='session')
-def idp_metadata():
+def idp_metadata() -> str:
     return module_path('tests.onegov.user', '/fixtures/idp.xml')

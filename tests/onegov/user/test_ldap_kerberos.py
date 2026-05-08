@@ -1,5 +1,6 @@
+from __future__ import annotations
 
-import kerberos
+import kerberos  # type: ignore[import-not-found]
 import morepath
 import pytest
 
@@ -13,9 +14,28 @@ from unittest.mock import patch, DEFAULT
 from tests.shared.client import Client
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.request import CoreRequest
+    from pathlib import Path
+    from tests.shared.client import ExtendedResponse
+    from unittest.mock import Mock
+
+
+class App(Framework, UserApp):
+    pass
+
+
 @pytest.fixture(scope='function')
-def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
-        keytab):
+def app(
+    request: pytest.FixtureRequest,
+    glauth_binary: str,
+    postgres_dsn: str,
+    temporary_path: Path,
+    redis_url: str,
+    keytab: str
+) -> Iterator[App]:
 
     config = f"""
         debug = true
@@ -70,47 +90,47 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
 
     """
 
-    class App(Framework, UserApp):
+    class _App(App):
         pass
 
-    @App.path(path='/private')
+    @_App.path(path='/private')
     class PrivateDocument:
         name = 'private'
 
-    @App.path(path='/secret')
+    @_App.path(path='/secret')
     class SecretDocument:
         name = 'secret'
 
-    @App.path(path='/auth', model=Auth)
-    def get_auth(request, app):
+    @_App.path(path='/auth', model=Auth)
+    def get_auth(request: CoreRequest, app: App) -> Auth:
         return Auth(app)
 
-    @App.view(model=Auth, permission=Public, name='login')
-    def view_auth(self, request):
+    @_App.view(model=Auth, permission=Public, name='login')
+    def view_auth(self: Auth, request: CoreRequest) -> str:
         return 'login-page'
 
-    @App.json(model=PrivateDocument, permission=Private)
-    def view_private(self, request):
+    @_App.json(model=PrivateDocument, permission=Private)
+    def view_private(self: PrivateDocument, request: CoreRequest) -> object:
         return {
             'name': self.name,
             'user': request.identity.userid
         }
 
-    @App.json(model=SecretDocument, permission=Secret)
-    def view_secret(self, request):
+    @_App.json(model=SecretDocument, permission=Secret)
+    def view_secret(self: SecretDocument, request: CoreRequest) -> object:
         return {
             'name': self.name,
             'user': request.identity.userid
         }
 
-    scan_morepath_modules(App)
-    morepath.commit(App)
+    scan_morepath_modules(_App)
+    morepath.commit(_App)
 
     with GLAuth(glauth_binary, config) as ldap_server:
         ldap_host = ldap_server.context.host
         ldap_port = ldap_server.context.port
 
-        app = App()
+        app = _App()
         app.namespace = 'apps'
         app.configure_application(
             dsn=postgres_dsn,
@@ -134,19 +154,19 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
 
 
 @pytest.fixture(scope='function')
-def client(app):
+def client(app: App) -> Iterator[Client]:
     yield Client(app)
 
 
-def test_ldap_kerberos_provider(client):
+def test_ldap_kerberos_provider(client: Client) -> None:
 
-    def set_kerberos_user(methods, username):
+    def set_kerberos_user(methods: dict[str, Mock], username: str) -> None:
         methods['authGSSServerInit'].return_value = 1, None
         methods['authGSSServerStep'].return_value = 1
         methods['authGSSServerResponse'].return_value = 'foobar'
         methods['authGSSServerUserName'].return_value = username
 
-    def get(path):
+    def get(path: str) -> ExtendedResponse:
         url = f'/auth/provider/ldap_kerberos?to={path}'
         headers = {'Authorization': 'Negotiate foobar'}
 

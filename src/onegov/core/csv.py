@@ -22,39 +22,29 @@ from itertools import permutations
 from onegov.core import errors
 from ordered_set import OrderedSet
 from unidecode import unidecode
-from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
+from xlsxwriter.workbook import Workbook
 from onegov.core.utils import normalize_for_url
 
 
-from typing import overload, Any, Generic, IO, TypeVar, TYPE_CHECKING
+from typing import overload, Any, IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Sequence)
     from csv import Dialect
     from openpyxl.worksheet.worksheet import Worksheet
-    from typing import Protocol, TypeAlias
+    from typing import Protocol
 
-    _T = TypeVar('_T')
-    _T_co = TypeVar('_T_co', covariant=True)
-    _SupportsRichComparisonT = TypeVar(
-        '_SupportsRichComparisonT',
-        bound=SupportsRichComparison
-    )
-
-    class _RowType(Protocol[_T_co]):
-        def __call__(self, *, rownumber: int, **kwargs: str) -> _T_co: ...
+    class _RowConstructor[T_co](Protocol):
+        def __call__(self, *, rownumber: int, **kwargs: str) -> T_co: ...
 
     class DefaultRow(Protocol):
         @property
         def rownumber(self) -> int: ...
         def __getattr__(self, name: str) -> str: ...
 
-    KeyFunc: TypeAlias = Callable[[_T], SupportsRichComparison]
-    DefaultCSVFile: TypeAlias = 'CSVFile[DefaultRow]'
-
-
-_RowT = TypeVar('_RowT')
+    type KeyFunc[T] = Callable[[T], SupportsRichComparison]
+    type DefaultCSVFile = CSVFile[DefaultRow]
 
 
 VALID_CSV_DELIMITERS = ',;\t'
@@ -67,7 +57,7 @@ large_chars = 'GHMWQ_'
 max_width = 75
 
 
-class CSVFile(Generic[_RowT]):
+class CSVFile[RowT = DefaultRow]:
     """ Provides access to a csv file.
 
     :param csvfile:
@@ -126,30 +116,7 @@ class CSVFile(Generic[_RowT]):
 
     """
 
-    rowtype: _RowType[_RowT]
-
-    @overload
-    def __init__(
-        self: DefaultCSVFile,
-        csvfile: IO[bytes],
-        expected_headers: Collection[str] | None = None,
-        dialect: type[Dialect] | Dialect | str | None = None,
-        encoding: str | None = None,
-        rename_duplicate_column_names: bool = False,
-        rowtype: None = None
-    ): ...
-
-    @overload
-    def __init__(
-        self: CSVFile[_RowT],
-        csvfile: IO[bytes],
-        expected_headers: Collection[str] | None = None,
-        dialect: type[Dialect] | Dialect | str | None = None,
-        encoding: str | None = None,
-        rename_duplicate_column_names: bool = False,
-        *,
-        rowtype: _RowType[_RowT]
-    ): ...
+    rowtype: _RowConstructor[RowT]
 
     def __init__(
         self,
@@ -158,8 +125,8 @@ class CSVFile(Generic[_RowT]):
         dialect: type[Dialect] | Dialect | str | None = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
-        rowtype: _RowType[_RowT] | None = None
-    ):
+        rowtype: _RowConstructor[RowT] | None = None
+    ) -> None:
 
         # guess the encoding if not already provided
         encoding = encoding or detect_encoding(csvfile)
@@ -216,11 +183,11 @@ class CSVFile(Generic[_RowT]):
             result = result[1:]
         return result
 
-    def __iter__(self) -> Iterator[_RowT]:
+    def __iter__(self) -> Iterator[RowT]:
         yield from self.lines
 
     @property
-    def lines(self) -> Iterator[_RowT]:
+    def lines(self) -> Iterator[RowT]:
         self.csvfile.seek(0)
 
         encountered_empty_line = False
@@ -493,19 +460,19 @@ def estimate_width(text: str) -> float:
 
 
 @overload
-def get_keys_from_list_of_dicts(
-    rows: Iterable[dict[_SupportsRichComparisonT, Any]],
+def get_keys_from_list_of_dicts[T: SupportsRichComparison](
+    rows: Iterable[dict[T, Any]],
     key: None = None,
     reverse: bool = False
-) -> tuple[_SupportsRichComparisonT, ...]: ...
+) -> tuple[T, ...]: ...
 
 
 @overload
-def get_keys_from_list_of_dicts(
-    rows: Iterable[dict[_T, Any]],
-    key: KeyFunc[_T],
+def get_keys_from_list_of_dicts[T](
+    rows: Iterable[dict[T, Any]],
+    key: KeyFunc[T],
     reverse: bool = False
-) -> tuple[_T, ...]: ...
+) -> tuple[T, ...]: ...
 
 
 def get_keys_from_list_of_dicts(

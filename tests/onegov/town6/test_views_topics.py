@@ -1,5 +1,13 @@
+from __future__ import annotations
 
-def test_sort_topics(client):
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from webtest.forms import Select
+    from .conftest import Client
+
+
+def test_sort_topics(client: Client) -> None:
     client.login_admin().follow()
 
     page = client.get('/topics/themen')
@@ -19,7 +27,10 @@ def test_sort_topics(client):
     assert "Topic 2" in page
 
 
-def get_select_option_id_by_text(select_form, search_text):
+def get_select_option_id_by_text(
+    select_form: Select,
+    search_text: str
+) -> str | None:
     found = []
     for option in select_form.options:
         # each option is a tuple (id, bool, select text)
@@ -33,7 +44,7 @@ def get_select_option_id_by_text(select_form, search_text):
         return None
 
 
-def test_move_topics(client):
+def test_move_topics(client: Client) -> None:
     client.login_admin().follow()
 
     page = client.get('/topics/themen')
@@ -96,7 +107,7 @@ def test_move_topics(client):
     assert 'Ungültiger Zielort gewählt' in page
 
 
-def test_contact_info_visible(client):
+def test_contact_info_visible(client: Client) -> None:
     client.login_admin().follow()
 
     page = client.get('/topics/themen')
@@ -119,7 +130,7 @@ def test_contact_info_visible(client):
     assert "Test contact info" in page
 
 
-def test_view_page_as_member(client):
+def test_view_page_as_member(client: Client) -> None:
     admin = client
     client.login_admin()
 

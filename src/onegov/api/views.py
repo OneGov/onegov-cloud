@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING, Any
 
 from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint, ApiException, AuthEndpoint
@@ -12,7 +13,6 @@ from webob.exc import HTTPMethodNotAllowed, HTTPNotFound, HTTPUnauthorized
 from wtforms import HiddenField
 
 
-from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
     from onegov.core.request import CoreRequest
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from wtforms.form import _FormErrors
 
 
-@ApiApp.json(model=ApiException, permission=Public)
+@ApiApp.json(model=ApiException, permission=Public, open_data=True)
 def handle_exception(
     self: ApiException, request: CoreRequest
 ) -> dict[str, dict[str, dict[str, Any] | str]]:
@@ -44,7 +44,8 @@ def handle_exception(
 
 @ApiApp.json(
     model=ApiEndpointCollection,
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_api_endpoints(
     self: ApiEndpointCollection, request: CoreRequest
@@ -59,11 +60,25 @@ def view_api_endpoints(
             'href': request.link(self),
             'queries': [
                 {
-                    'href': request.link(endpoint(request)),
+                    'href': request.link(endpoint),
                     'rel': endpoint.endpoint,
+                    'title': endpoint.title,
+                    'description': endpoint.description,
                     'data': [
-                        {'name': name}
-                        for name in getattr(endpoint, 'filters', [])
+                        {'name': name} if not prompt else {
+                            'name': name,
+                            'prompt': prompt
+                        } if isinstance(prompt, str) else {
+                            'name': name,
+                            'prompt': 'One of the given values '
+                                      '(Can be specified multiple '
+                                      'times or left unspecified)',
+                            # NOTE: This is a custom extension of
+                            #       Collection+JSON, that is a little
+                            #       bit more machine-readable.
+                            'values': list(prompt)
+                        }
+                        for name, prompt in endpoint.filters.items()
                     ]
                 }
                 for endpoint in self.endpoints.values()
@@ -74,7 +89,8 @@ def view_api_endpoints(
 
 @ApiApp.json(
     model=ApiEndpoint,
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_api_endpoint(
     self: ApiEndpoint[Any], request: CoreRequest
@@ -91,6 +107,8 @@ def view_api_endpoint(
             'collection': {
                 'version': '1.0',
                 'href': request.link(self.for_filter()),
+                'title': self.title,
+                'description': self.description,
                 'links': [
                     {
                         'rel': rel,
@@ -139,7 +157,8 @@ def view_api_endpoint(
 
 @ApiApp.json(
     model=ApiEndpointItem,
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_api_endpoint_item(
     self: ApiEndpointItem[Any], request: CoreRequest
@@ -206,7 +225,8 @@ def view_api_endpoint_item(
 @ApiApp.json(
     model=ApiEndpointItem,
     permission=Public,
-    request_method='PUT'
+    request_method='PUT',
+    open_data=False
 )
 def edit_api_endpoint_item(
     self: ApiEndpointItem[Any], request: CoreRequest
@@ -257,7 +277,7 @@ def edit_api_endpoint_item(
         endpoint.apply_changes(self.item, form)
 
 
-@ApiApp.json(model=AuthEndpoint, permission=Public)
+@ApiApp.json(model=AuthEndpoint, permission=Public, open_data=False)
 def get_time_restricted_token(
     self: AuthEndpoint, request: CoreRequest
 ) -> dict[str, str]:

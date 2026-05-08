@@ -8,29 +8,29 @@ from libres.db.models import ReservedSlot
 
 from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property)
-from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
+from onegov.org.i18n import _
 from onegov.org.models.extensions import (
-    ContactExtension, GeneralFileLinkExtension, ResourceValidationExtension)
+    ContactExtension, GeneralFileLinkExtension,
+    InlinePhotoAlbumExtension, ResourceValidationExtension)
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.reservation import Resource, ResourceCollection, Reservation
 from onegov.search import SearchableContent
 from onegov.ticket import Ticket
+from sqlalchemy import UUID as UUIDType
 from sqlalchemy.orm import undefer
 from sqlalchemy.sql.expression import cast
-from uuid import uuid4, uuid5
+from uuid import uuid4, uuid5, UUID
 
 
 from typing import ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from libres.context.core import Context
     from libres.db.scheduler import Scheduler
     from onegov.org.request import OrgRequest
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Mapped, Query
 
 
 class FindYourSpotCollection(ResourceCollection):
@@ -59,11 +59,11 @@ class SharedMethods:
 
     if TYPE_CHECKING:
         title_template: ClassVar[str]
-        id: Column[uuid.UUID]
+        id: Mapped[UUID]
         libres_context: Context
         date: date | None
         view: str | None
-        timezone: Column[str]
+        timezone: Mapped[str]
 
         @property
         def scheduler(self) -> Scheduler: ...
@@ -71,8 +71,10 @@ class SharedMethods:
 
     lead: dict_property[str | None] = meta_property()
     text = dict_markup_property('content')
-    occupancy_is_visible_to_members: dict_property[bool | None]
-    occupancy_is_visible_to_members = meta_property()
+    confirmation_text = dict_markup_property('content')
+    occupancy_is_visible_to_members: dict_property[bool | None] = (
+        meta_property()
+    )
 
     @property
     def deletable(self) -> bool:
@@ -136,13 +138,27 @@ class SharedMethods:
         if expired_sessions:
             query = session.query(Reservation).with_entities(Reservation.token)
             query = query.filter(Reservation.session_id.in_(expired_sessions))
-            tokens = {token for token, in query.all()}
+            tokens = {token for token, in query}
 
             query = session.query(FormSubmission)
             query = query.filter(FormSubmission.name == None)
             query = query.filter(FormSubmission.id.in_(tokens))
 
-            query.delete('fetch')
+            # NOTE: This used to be a batch delete, but since there may be
+            #       files attached to these submissions, we would need to
+            #       emit a batch delete for the file links and any orphaned
+            #       files. For now it's easier to do single deletes so
+            #       SQLAlchemy handles this for us, most of the time this
+            #       will only hit one or two submissions anyways. There
+            #       would need to be a burst of submissions where everyone
+            #       got as far as entering all of their data, but didn't
+            #       end up confirming the reservation and then a long
+            #       period after where no reservations happen at all.
+            for submission in query:
+                # remove file links (also removes orphaned files)
+                submission.files = []
+                session.delete(submission)
+
             queries.remove_expired_reservation_sessions(expiration_date)
 
     def bound_reservations(
@@ -168,9 +184,9 @@ class SharedMethods:
         if with_data:
             res = res.options(undefer(Reservation.data))
 
-        return res
+        return res  # type: ignore[return-value]
 
-    def bound_session_id(self, request: OrgRequest) -> uuid.UUID:
+    def bound_session_id(self, request: OrgRequest) -> UUID:
         """ The session id associated with this resource and user. """
         if not request.browser_session.has('libres_session_id'):
             request.browser_session.libres_session_id = uuid4()
@@ -181,20 +197,24 @@ class SharedMethods:
         self,
         start: datetime | None = None,
         end: datetime | None = None,
-        exclude_pending: bool = True
+        exclude_pending: bool = True,
+        only_managed: bool = True
     ) -> Query[Reservation]:
         """ Returns a query which joins this resource's reservations between
         start and end with the tickets table.
 
         """
-        query = self.scheduler.managed_reservations()
+        if only_managed:
+            query = self.scheduler.managed_reservations()
+        else:
+            query = self.scheduler.visible_reservations()
         if start:
             query = query.filter(start <= Reservation.start)
         if end:
             query = query.filter(Reservation.end <= end)
 
         query = query.join(
-            Ticket, Reservation.token == cast(Ticket.handler_id, UUID))
+            Ticket, Reservation.token == cast(Ticket.handler_id, UUIDType))
 
         query = query.order_by(Reservation.start)
         query = query.order_by(Ticket.subtitle)
@@ -202,7 +222,7 @@ class SharedMethods:
         if exclude_pending:
             query = query.filter(Reservation.data['accepted'] == True)
 
-        return query
+        return query  # type: ignore[return-value]
 
     def reservation_title(self, reservation: Reservation) -> str:
         title = self.title_template.format(
@@ -220,10 +240,11 @@ class SharedMethods:
 class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ContactExtension, PersonLinkExtension,
                       CoordinatesExtension, SharedMethods,
-                      ResourceValidationExtension, GeneralFileLinkExtension):
+                      ResourceValidationExtension, GeneralFileLinkExtension,
+                      InlinePhotoAlbumExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
-    es_type_name = 'daypasses'
+    fts_type_title = _('Resources')
 
     # the selected view
     view = 'dayGridMonth'
@@ -238,10 +259,11 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
 class RoomResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods,
-                   ResourceValidationExtension, GeneralFileLinkExtension):
+                   ResourceValidationExtension, GeneralFileLinkExtension,
+                   InlinePhotoAlbumExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
 
-    es_type_name = 'rooms'
+    fts_type_title = _('Resources')
 
     # the selected view (depends on the resource's default)
     view = None
@@ -252,8 +274,9 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
     # used to render the reservation title
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
 
-    kaba_components: dict_property[list[tuple[str, str]]]
-    kaba_components = meta_property(default=list)
+    kaba_components: dict_property[list[tuple[str, str]]] = (
+        meta_property(default=list)
+    )
 
     @property
     def deletable(self) -> bool:
@@ -269,11 +292,12 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
 class ItemResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods,
-                   ResourceValidationExtension, GeneralFileLinkExtension):
+                   ResourceValidationExtension, GeneralFileLinkExtension,
+                   InlinePhotoAlbumExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'daily-item'}
 
-    es_type_name = 'daily_items'
+    fts_type_title = _('Resources')
 
     view = None
 
@@ -281,5 +305,6 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
 
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M} ({quota})'
 
-    kaba_components: dict_property[list[tuple[str, str]]]
-    kaba_components = meta_property(default=list)
+    kaba_components: dict_property[list[tuple[str, str]]] = (
+        meta_property(default=list)
+    )

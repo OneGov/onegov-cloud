@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 from onegov.election_day.models import Subscriber
@@ -7,7 +9,12 @@ from tests.shared import Client
 from webtest.forms import Upload
 
 
-def test_view_email_subscription(election_day_app_zg):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..conftest import TestApp
+
+
+def test_view_email_subscription(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -59,15 +66,15 @@ def test_view_email_subscription(election_day_app_zg):
     # Check in backend
     manage = Client(election_day_app_zg)
     login(manage)
-    manage = manage.get('/manage/subscribers/email')
-    assert 'howard@example.com' in manage
-    assert 'fr_CH' in manage
-    assert '✔︎' in manage
+    subscribers = manage.get('/manage/subscribers/email')
+    assert 'howard@example.com' in subscribers
+    assert 'fr_CH' in subscribers
+    assert '✔︎' in subscribers
 
     # Unsubscribe using the list-unsubscribe
     Client(election_day_app_zg).post(optout)
-    assert election_day_app_zg.session().query(Subscriber).one().active \
-        is False
+    assert election_day_app_zg.session().query(
+        Subscriber).one().active is False
 
     # Opt-in again
     client.get('/locale/de_CH').follow()
@@ -139,7 +146,7 @@ def test_view_email_subscription(election_day_app_zg):
     assert "Die E-Mail-Benachrichtigung wurde beendet." in unsubscribe
 
 
-def test_view_manage_email_subscription(election_day_app_zg):
+def test_view_manage_email_subscription(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -150,8 +157,8 @@ def test_view_manage_email_subscription(election_day_app_zg):
     message = client.get_email(0, flush_queue=True)
     subscribe = client.get(get_email_link(message, 'optin'))
     assert "E-Mail-Benachrichtigung wurde abonniert" in subscribe
-    assert election_day_app_zg.session().query(Subscriber).one().locale == \
-        'de_CH'
+    assert election_day_app_zg.session().query(
+        Subscriber).one().locale == 'de_CH'
 
     subscribe = client.get('/subscribe-email')
     subscribe.form['email'] = '456@example.org'
@@ -179,8 +186,8 @@ def test_view_manage_email_subscription(election_day_app_zg):
     # Export
     response = client.get('/manage/subscribers/email/export')
     assert response.headers['Content-Type'] == 'text/csv; charset=UTF-8'
-    assert response.headers['Content-Disposition'] == \
-        'inline; filename=email-subscribers.csv'
+    assert response.headers['Content-Disposition'] == (
+        'inline; filename=email-subscribers.csv')
     export = response.text
     assert '123@example.org' in export
     assert '456@example.org' in export
@@ -224,7 +231,7 @@ def test_view_manage_email_subscription(election_day_app_zg):
     assert '456@example.org' not in manage
 
 
-def test_view_sms_subscription(election_day_app_zg):
+def test_view_sms_subscription(election_day_app_zg: TestApp) -> None:
     sms_path = os.path.join(
         election_day_app_zg.sms_directory,
         election_day_app_zg.schema
@@ -265,8 +272,8 @@ def test_view_sms_subscription(election_day_app_zg):
     subscribe = client.get('/subscribe-sms')
     subscribe.form['phone_number'] = '0791112233'
     subscribe = subscribe.form.submit()
-    assert election_day_app_zg.session().query(Subscriber).one().locale == \
-        'fr_CH'
+    assert election_day_app_zg.session().query(
+        Subscriber).one().locale == 'fr_CH'
     assert len(os.listdir(sms_path)) == 2
 
     client.get('/locale/de_CH').follow()
@@ -319,7 +326,7 @@ def test_view_sms_subscription(election_day_app_zg):
     assert len(os.listdir(sms_path)) == 3
 
 
-def test_view_manage_sms_subscription(election_day_app_zg):
+def test_view_manage_sms_subscription(election_day_app_zg: TestApp) -> None:
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -328,8 +335,8 @@ def test_view_manage_sms_subscription(election_day_app_zg):
     subscribe.form['phone_number'] = '0791112233'
     subscribe = subscribe.form.submit()
     assert "SMS-Benachrichtigung wurde abonniert" in subscribe
-    assert election_day_app_zg.session().query(Subscriber).one().locale == \
-        'de_CH'
+    assert election_day_app_zg.session().query(
+        Subscriber).one().locale == 'de_CH'
 
     subscribe = client.get('/subscribe-sms')
     subscribe.form['phone_number'] = '0791112244'
@@ -355,8 +362,8 @@ def test_view_manage_sms_subscription(election_day_app_zg):
     # Export
     response = client.get('/manage/subscribers/sms/export')
     assert response.headers['Content-Type'] == 'text/csv; charset=UTF-8'
-    assert response.headers['Content-Disposition'] == \
-        'inline; filename=sms-subscribers.csv'
+    assert response.headers['Content-Disposition'] == (
+        'inline; filename=sms-subscribers.csv')
     export = response.text
     assert '+41791112233' in export
     assert '+41791112244' in export

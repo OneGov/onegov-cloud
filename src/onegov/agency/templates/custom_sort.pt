@@ -3,22 +3,21 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <div class="row">
-            <div class="columns medium-12">
+        <div class="grid-x grid-padding-x">
+            <div class="cell medium-12">
                 <div class="callout panel">
                     <p i18n:translate="">Sort the items using drag and drop. The new positions are automatically saved directly after moving.</p>
                 </div>
                 <dl tal:repeat="item items">
                     <dt>${item[0]}</dt>
                     <dd>
-                        <ul data-sortable data-sortable-url="${item[1]}">
+                        <ul class="sort-items" data-sortable data-sortable-url="${item[1]}">
                             <li tal:repeat="subitem item[2]" data-sortable-id="${subitem[0]}">
-                                <strong>${subitem[1]}</strong>
+                                <span>${subitem[1]}</span>
                             </li>
                         </ul>
                     </dd>
                 </dl>
-                <a href="${request.link(layout.model)}" class="button" i18n:translate="">Back</a>
             </div>
         </div>
     </tal:block>

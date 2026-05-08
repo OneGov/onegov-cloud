@@ -61,6 +61,16 @@ class SaferpayApiError(SaferpayPaymentError):
         self.details = details
 
     @property
+    def not_started_or_is_expected_failure(self) -> bool:
+        # this is not an expected failure after a redirect
+        # but it is an expected failure when we try to cancel
+        # stale transactions.
+        return (
+            self.name == 'TRANSACTION_NOT_STARTED'
+            or self.is_expected_failure
+        )
+
+    @property
     def is_expected_failure(self) -> bool:
         return self.name in self.EXPECTED_ERROR_NAMES
 
@@ -68,7 +78,7 @@ class SaferpayApiError(SaferpayPaymentError):
 # the following exceptions should be caught and logged - the user should be
 # informed that the payment failed, but not why
 CARD_ERRORS = (
-    stripe.error.CardError,
+    stripe.CardError,
     DatatransPaymentError,
     SaferpayPaymentError,
 )

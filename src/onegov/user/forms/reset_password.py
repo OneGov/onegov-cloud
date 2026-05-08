@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from onegov.form import Form
+from onegov.form.validators import ValidPassword
 from onegov.user import _
 from onegov.user import UserCollection
+from onegov.user.collections import MIN_PASSWORD_LENGTH
 from wtforms.fields import HiddenField
 from wtforms.fields import PasswordField
 from wtforms.fields import StringField
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
-from wtforms.validators import Length
 
 
 from typing import TYPE_CHECKING
@@ -36,7 +37,12 @@ class PasswordResetForm(Form):
     )
     password = PasswordField(
         label=_('New Password'),
-        validators=[InputRequired(), Length(min=8)],
+        validators=[
+            InputRequired(),
+            ValidPassword(MIN_PASSWORD_LENGTH, _(
+                'The password must be at least ten characters long'
+            ))
+        ],
         render_kw={'autocomplete': 'new-password'}
     )
     token = HiddenField()

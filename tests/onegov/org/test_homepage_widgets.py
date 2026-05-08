@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from lxml import etree
 from onegov.core.utils import scan_morepath_modules
 from onegov.core.widgets import transform_structure
 from onegov.org import OrgApp
 
 
-def test_widgets():
+def test_widgets() -> None:
 
     class App(OrgApp):
         pass
@@ -50,7 +52,9 @@ def test_widgets():
     a, small = li.getchildren()
     assert a.tag == 'a'
     assert a.attrib['href'] == '#about'
+    assert a.text is not None
     assert 'Seantis' in a.text
 
     assert small.tag == 'small'
+    assert small.text is not None
     assert 'About' in small.text

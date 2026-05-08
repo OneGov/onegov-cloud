@@ -70,19 +70,15 @@ from threading import Thread
 from urllib.parse import quote_plus, unquote_plus
 
 
-from typing import Any, Generic, Literal, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sedate.types import TzInfo, TzInfoOrName
-    from typing import TypeAlias
 
     from .request import CoreRequest
 
-    Scheduled: TypeAlias = Callable[[], Any]
-    Executor: TypeAlias = Callable[[CoreRequest], Any]
-
-
-_JobFunc = TypeVar('_JobFunc', 'Executor', 'Scheduled')
+    type Scheduled = Callable[[], Any]
+    type Executor = Callable[[CoreRequest], Any]
 
 
 # a job that takes longer than this (seconds) will be reported
@@ -137,7 +133,7 @@ def parse_cron(
     return (v for v in range(size) if v % remainder == 0)
 
 
-class Job(Generic[_JobFunc]):
+class Job[JobFuncT: (Executor, Scheduled)]:
     """ A single cron job. """
 
     __slots__ = (
@@ -154,7 +150,7 @@ class Job(Generic[_JobFunc]):
 
     app: Framework
     name: str
-    function: _JobFunc
+    function: JobFuncT
     hour: int | str
     minute: int | str
     timezone: TzInfo
@@ -164,7 +160,7 @@ class Job(Generic[_JobFunc]):
 
     def __init__(
         self,
-        function: _JobFunc,
+        function: JobFuncT,
         hour: int | str,
         minute: int | str,
         timezone: TzInfoOrName,

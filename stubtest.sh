@@ -11,6 +11,11 @@ fi
 
 # most of our stubs are incomplete so we pass --ignore-missing-stub
 # whenever a package hasn't been fully stubbed out
+echo "Running stubtest on legacy-cgi"
+stubtest cgi \
+         --mypy-config-file pyproject.toml \
+         --allowlist tests/stubtest/cgi_allowlist.txt
+
 echo "Running stubtest on dectate"
 stubtest dectate \
          --mypy-config-file pyproject.toml \
@@ -72,6 +77,11 @@ echo "Running stubtest on webcolors"
 stubtest webcolors \
          --mypy-config-file pyproject.toml \
          --ignore-missing-stub
+
+echo "Running stubtest on webtest"
+stubtest webtest \
+         --mypy-config-file pyproject.toml \
+         --allowlist tests/stubtest/webtest_allowlist.txt
 
 echo "Running stubtest on wtforms"
 stubtest wtforms \

@@ -81,7 +81,8 @@ $.fn.reservationList = function(options) {
                     event.start.format('hh:mm'),
                     event.end.format('hh:mm'),
                     1,
-                    event.wholeDay
+                    event.wholeDay,
+                    !singleSelect
                 );
             }
             e.preventDefault();
@@ -123,12 +124,13 @@ rl.post = function(list, url) {
     rl.request(list, url, 'ic-post-to');
 };
 
-rl.reserve = function(list, url, start, end, quota, wholeDay) {
+rl.reserve = function(list, url, start, end, quota, wholeDay, considerBlocking) {
     url = new Url(url);
     url.query.start = start;
     url.query.end = end;
     url.query.quota = quota;
     url.query.whole_day = wholeDay && '1' || '0';
+    url.query.consider_blocking = considerBlocking && '1' || '0';
 
     rl.post(list, url.toString());
 };
@@ -157,7 +159,8 @@ rl.showActionsPopup = function(list, element, event, singleSelect) {
             state.start,
             state.end,
             state.quota,
-            state.wholeDay
+            state.wholeDay,
+            !singleSelect
         );
         $(this).closest('.popup').popup('hide');
     });
@@ -435,6 +438,7 @@ var ReservationSelection = React.createClass({
             row[0].scrollIntoView();
         }
     },
+    // eslint-disable-next-line complexity
     render: function() {
         var self = this;
 
@@ -445,6 +449,16 @@ var ReservationSelection = React.createClass({
                     this.props.reservations.length === 0 &&
                         <p>{locale("Select allocations in the list to reserve them")}</p>
                 }
+                {this.props.reservations.length > 8 && (
+                    <div>
+                        <a onClick={self.handleRemoveAll} role="button" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button alert'}>
+                            {locale("Remove all")}
+                        </a>
+                        <a onClick={self.handleSubmit} role="button" className={this.props.reservations.length === 0 && this.props.delete_link && 'disabled button secondary' || 'button'}>
+                            {locale("Reserve")}
+                        </a>
+                    </div>
+                )}
                 {
                     this.props.reservations.length > 0 &&
                         <ul>{

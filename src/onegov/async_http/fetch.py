@@ -4,31 +4,41 @@ import asyncio
 from aiohttp import ClientSession, ClientTimeout
 
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import overload, Any, Never, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Sequence
-    from typing import Protocol, TypeVar, TypeAlias
+    from typing import Protocol
 
     class HasUrl(Protocol):
         url: str
 
-    _T = TypeVar('_T')
-    UrlType: TypeAlias = str | HasUrl
-    _UrlTypeT = TypeVar('_UrlTypeT', bound=UrlType)
-    ErrFunc: TypeAlias = Callable[[_UrlTypeT, Exception], Any]
-    HandleExceptionType: TypeAlias = (
-        ErrFunc[_UrlTypeT] | Sequence[ErrFunc[_UrlTypeT]])
-    FetchCallback: TypeAlias = Callable[[_UrlTypeT, Any], _T]
-    FetchFunc: TypeAlias = Callable[[
+    type UrlType = str | HasUrl
+    type UrlAndResult = tuple[UrlType, Any]
+    type ErrFunc[
+        UrlTypeT: UrlType = UrlType,
+        RT = UrlAndResult
+    ] = Callable[[UrlTypeT, Exception], RT]
+    type HandleExceptionType[
+        UrlTypeT: UrlType = UrlType,
+        RT = UrlAndResult
+    ] = ErrFunc[UrlTypeT, RT] | Sequence[ErrFunc[UrlTypeT, RT]]
+    type FetchCallback[
+        UrlTypeT: UrlType = UrlType,
+        RT = UrlAndResult
+    ] = Callable[[UrlTypeT, Any], RT]
+    type FetchFunc[
+        UrlTypeT: UrlType = UrlType,
+        RT = UrlAndResult
+    ] = Callable[[
         UrlType,
         ClientSession,
         str,
-        FetchCallback[_UrlTypeT, _T],
-        ErrFunc[_UrlTypeT] | None
-    ], Awaitable[_T]]
+        FetchCallback[UrlTypeT, RT],
+        ErrFunc[UrlTypeT, RT] | None
+    ], Awaitable[RT]]
 
 
-def raise_by_default(url: Any, exception: Exception) -> None:
+def raise_by_default(url: Any, exception: Exception) -> Never:
     raise exception
 
 
@@ -41,30 +51,30 @@ async def fetch(
     url: UrlType,
     session: ClientSession,
     response_attr: str = 'json',
-    callback: FetchCallback[UrlType, tuple[UrlType, Any]] = default_callback,
-    handle_exceptions: ErrFunc[UrlType] | None = raise_by_default
-) -> tuple[UrlType, Any]: ...
+    callback: FetchCallback = default_callback,
+    handle_exceptions: ErrFunc | None = raise_by_default
+) -> UrlAndResult: ...
 
 
 @overload
-async def fetch(
+async def fetch[T, UrlTypeT: UrlType = UrlType](
     url: UrlType,
     session: ClientSession,
     response_attr: str,
-    callback: FetchCallback[_UrlTypeT, _T],
-    handle_exceptions: ErrFunc[_UrlTypeT] | None = raise_by_default
-) -> _T: ...
+    callback: FetchCallback[UrlTypeT, T],
+    handle_exceptions: ErrFunc[UrlTypeT, T] | None = raise_by_default
+) -> T: ...
 
 
 @overload
-async def fetch(
+async def fetch[T, UrlTypeT: UrlType = UrlType](
     url: UrlType,
     session: ClientSession,
     response_attr: str = 'json',
     *,
-    callback: FetchCallback[_UrlTypeT, _T],
-    handle_exceptions: ErrFunc[_UrlTypeT] | None = raise_by_default
-) -> _T: ...
+    callback: FetchCallback[UrlTypeT, T],
+    handle_exceptions: ErrFunc[UrlTypeT, T] | None = raise_by_default
+) -> T: ...
 
 
 async def fetch(
@@ -72,7 +82,7 @@ async def fetch(
     session: ClientSession,
     response_attr: str = 'json',
     callback: FetchCallback[Any, Any] = default_callback,
-    handle_exceptions: ErrFunc[Any] | None = raise_by_default
+    handle_exceptions: ErrFunc[Any, Any] | None = raise_by_default
 ) -> Any:
     """
     Asynchronous get request. Pass handle_exceptions in order to get your
@@ -106,34 +116,34 @@ async def fetch(
 async def fetch_many(
     urls: Sequence[UrlType],
     response_attr: str = 'json',
-    fetch_func: FetchFunc[UrlType, tuple[UrlType, Any]] = fetch,
-    callback: FetchCallback[UrlType, tuple[UrlType, Any]] = default_callback,
-    handle_exceptions: HandleExceptionType[UrlType] = raise_by_default,
+    fetch_func: FetchFunc = fetch,
+    callback: FetchCallback = default_callback,
+    handle_exceptions: HandleExceptionType = raise_by_default,
     timeout: ClientTimeout | None = None  # noqa: ASYNC109
-) -> list[tuple[UrlType, Any]]: ...
+) -> list[UrlAndResult]: ...
 
 
 @overload
-async def fetch_many(
+async def fetch_many[T, UrlTypeT: UrlType = UrlType](
     urls: Sequence[UrlType],
     response_attr: str,
-    fetch_func: FetchFunc[_UrlTypeT, _T],
-    callback: FetchCallback[_UrlTypeT, _T],
-    handle_exceptions: HandleExceptionType[_UrlTypeT] = raise_by_default,
+    fetch_func: FetchFunc[UrlTypeT, T],
+    callback: FetchCallback[UrlTypeT, T],
+    handle_exceptions: HandleExceptionType[UrlTypeT, T] = raise_by_default,
     timeout: ClientTimeout | None = None  # noqa: ASYNC109
-) -> list[_T]: ...
+) -> list[T]: ...
 
 
 @overload
-async def fetch_many(
+async def fetch_many[T, UrlTypeT: UrlType = UrlType](
     urls: Sequence[UrlType],
     response_attr: str = 'json',
-    fetch_func: FetchFunc[_UrlTypeT, _T] = fetch,
+    fetch_func: FetchFunc[UrlTypeT, T] = fetch,
     *,
-    callback: FetchCallback[_UrlTypeT, _T],
-    handle_exceptions: HandleExceptionType[_UrlTypeT] = raise_by_default,
+    callback: FetchCallback[UrlTypeT, T],
+    handle_exceptions: HandleExceptionType[UrlTypeT, T] = raise_by_default,
     timeout: ClientTimeout | None = None  # noqa: ASYNC109
-) -> list[_T]: ...
+) -> list[T]: ...
 
 
 async def fetch_many(
@@ -141,7 +151,7 @@ async def fetch_many(
     response_attr: str = 'json',
     fetch_func: FetchFunc[Any, Any] = fetch,
     callback: FetchCallback[Any, Any] = default_callback,
-    handle_exceptions: HandleExceptionType[Any] = raise_by_default,
+    handle_exceptions: HandleExceptionType[Any, Any] = raise_by_default,
     timeout: ClientTimeout | None = None  # noqa: ASYNC109
 ) -> list[Any]:
     """ Registers a task per url using the coroutine fetch_func with correct
@@ -169,38 +179,38 @@ async def fetch_many(
 def async_aiohttp_get_all(
     urls: Sequence[UrlType],
     response_attr: str = 'json',
-    callback: FetchCallback[UrlType, tuple[UrlType, Any]] = default_callback,
-    handle_exceptions: HandleExceptionType[UrlType] = raise_by_default,
+    callback: FetchCallback = default_callback,
+    handle_exceptions: HandleExceptionType = raise_by_default,
     timeout: ClientTimeout | None = None
-) -> list[tuple[UrlType, Any]]: ...
+) -> list[UrlAndResult]: ...
 
 
 @overload
-def async_aiohttp_get_all(
+def async_aiohttp_get_all[T, UrlTypeT: UrlType = UrlType](
     urls: Sequence[UrlType],
     response_attr: str,
-    callback: FetchCallback[_UrlTypeT, _T],
-    handle_exceptions: HandleExceptionType[_UrlTypeT] = raise_by_default,
+    callback: FetchCallback[UrlTypeT, T],
+    handle_exceptions: HandleExceptionType[UrlTypeT, T] = raise_by_default,
     timeout: ClientTimeout | None = None
-) -> list[_T]: ...
+) -> list[T]: ...
 
 
 @overload
-def async_aiohttp_get_all(
+def async_aiohttp_get_all[T, UrlTypeT: UrlType = UrlType](
     urls: Sequence[UrlType],
     response_attr: str = 'json',
     *,
-    callback: FetchCallback[_UrlTypeT, _T],
-    handle_exceptions: HandleExceptionType[_UrlTypeT] = raise_by_default,
+    callback: FetchCallback[UrlTypeT, T],
+    handle_exceptions: HandleExceptionType[UrlTypeT, T] = raise_by_default,
     timeout: ClientTimeout | None = None
-) -> list[_T]: ...
+) -> list[T]: ...
 
 
-def async_aiohttp_get_all(
-    urls: Sequence[_UrlTypeT],
+def async_aiohttp_get_all[UrlTypeT: UrlType = UrlType](
+    urls: Sequence[UrlTypeT],
     response_attr: str = 'json',
     callback: FetchCallback[Any, Any] = default_callback,
-    handle_exceptions: HandleExceptionType[Any] = raise_by_default,
+    handle_exceptions: HandleExceptionType[Any, Any] = raise_by_default,
     timeout: ClientTimeout | None = None
 ) -> list[Any]:
     """ Performs asynchronous get requests.

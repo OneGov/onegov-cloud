@@ -1,18 +1,14 @@
 from __future__ import annotations
 
-from wtforms.fields import BooleanField
-from wtforms.fields import DecimalField
-from wtforms.fields import IntegerField
-from wtforms.fields import RadioField
-from wtforms.fields import StringField
-from wtforms.fields import TextAreaField
-from wtforms.validators import InputRequired
-from wtforms.validators import NumberRange
-from wtforms.validators import Optional
-from wtforms.validators import ValidationError
-
-from onegov.form import Form, merge_forms, parse_formcode
+from functools import cached_property
+from onegov.form import as_internal_id
+from onegov.form import flatten_fieldsets
+from onegov.form import merge_forms
+from onegov.form import parse_formcode
+from onegov.form import Form
+from onegov.form.errors import FormError
 from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import TreeSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
@@ -26,13 +22,28 @@ from onegov.org.forms.reservation import (
     RESERVED_FIELDS, ExportToExcelWorksheets)
 from onegov.org.forms.util import WEEKDAYS
 from onegov.org.kaba import KabaApiError, KabaClient
+from onegov.reservation import Resource
+from sqlalchemy import func
+from uuid import UUID
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import EmailField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from markupsafe import Markup
+    from onegov.form.fields import TreeSelectNode
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Resource
+    from wtforms import Field
 
 
 def coerce_component_tuple(value: Any) -> tuple[str, str] | None:
@@ -44,6 +55,18 @@ def coerce_component_tuple(value: Any) -> tuple[str, str] | None:
 
     site_id, component = value
     return site_id, component
+
+
+def coerce_uuid(value: object) -> UUID | None:
+    if isinstance(value, UUID):
+        return value
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise TypeError('Value needs to be a UUID, str or None')
+    if value in ('', 'None'):
+        return None
+    return UUID(value)
 
 
 class ComponentSelectWidget(ChosenSelectWidget):
@@ -85,8 +108,30 @@ class ResourceBaseForm(Form):
         description=_('Used to group the resource in the overview')
     )
 
+    parent_id = TreeSelectField(
+        label=_('Parent Resource'),
+        description=_(
+            "Reservations on parent resources will block reservations "
+            "on this resource and vice versa. They will also show up "
+            "in each other's occupancy views. This will not be used for "
+            "grouping resources, however the parent resource will be "
+            "listed directly before its children if in the same group "
+            "regardless of title."
+        ),
+        coerce=coerce_uuid
+    )
+
     text = HtmlField(
-        label=_('Text'))
+        label=_('Text')
+    )
+
+    confirmation_text = HtmlField(
+        label=_('Additional information for confirmed reservations'),
+        description=_('This text will be included in the confirmation '
+                      'and reservation summary e-mails sent out to '
+                      'customers. As well as displayed on the ticket '
+                      'status page, once reservations have been accepted.')
+    )
 
     pick_up = TextAreaField(
         label=_('Pick-Up'),
@@ -105,6 +150,31 @@ class ResourceBaseForm(Form):
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'}
+    )
+
+    occupancy_fields = TextAreaField(
+        label=_('Extra Field values to include in occupancy'),
+        description=_(
+            'By default the occupancy view displays the tag, e-mail, '
+            'time slot and ticket number. Any fields selected would be '
+            'included directly after the first line which contains '
+            'either the tag or the e-mail.'
+        ),
+        fieldset=_('Occupancy'),
+        render_kw={'class_': 'formcode-select'}
+    )
+
+    ical_fields = TextAreaField(
+        label=_('Extra Field values to include in calendar subscription'),
+        description=_(
+            'By default only the e-mail address and link to the ticket '
+            'is included. You may wish to include additional administrative '
+            'information like a phone number, name or address. Please be '
+            'aware however that this data can be viewed by anyone that '
+            'knows the subscription URL, so only include what you must.'
+        ),
+        fieldset=_('Calendar Subscription'),
+        render_kw={'class_': 'formcode-select'}
     )
 
     deadline_unit = RadioField(
@@ -137,6 +207,30 @@ class ResourceBaseForm(Form):
         label=_('Days'),
         fieldset=_('Closing date'),
         depends_on=('deadline_unit', 'd'),
+        default=1,
+        validators=[
+            InputRequired(),
+            NumberRange(min=1)
+        ]
+    )
+
+    lead_time_unit = RadioField(
+        label=_('Opening date for the public'),
+        fieldset=_('Opening date'),
+        default='n',
+        validators=[InputRequired()],
+        choices=(
+            ('n', _(
+                'No opening date')),
+            ('d', _(
+                'Start accepting reservations days before the allocation')),
+        )
+    )
+
+    lead_time_days = IntegerField(
+        label=_('Days'),
+        fieldset=_('Opening date'),
+        depends_on=('lead_time_unit', 'd'),
         default=1,
         validators=[
             InputRequired(),
@@ -200,6 +294,28 @@ class ResourceBaseForm(Form):
         widget=ComponentSelectWidget(multiple=True)
     )
 
+    reply_to = EmailField(
+        label=_('E-Mail Reply Address (Reply-To)'),
+        fieldset=_('Tickets'),
+        description=_('Replies to automated e-mails go to this address.')
+    )
+
+    invoicing_party = TextAreaField(
+        label=_('Invoicing party'),
+        fieldset=_('Invoicing'),
+        description=_('Will be displayed in invoices'),
+        render_kw={'rows': 3}
+    )
+
+    cost_object = StringField(
+        label=_('Cost center / cost unit'),
+        fieldset=_('Invoicing'),
+        description=_(
+            'Will be displayed in invoices for any costs directly '
+            'associated with reservations on this resource.'
+        )
+    )
+
     pricing_method = RadioField(
         label=_('Price'),
         fieldset=_('Payments'),
@@ -252,17 +368,110 @@ class ResourceBaseForm(Form):
         )
     )
 
+    discount_method = RadioField(
+        label=_('Discounts in extra fields apply to'),
+        fieldset=_('Payments'),
+        default='resource',
+        validators=[InputRequired()],
+        choices=(
+            ('resource', _('Just the price per item/hour')),
+            ('extras', _('Just the prices in extra fields')),
+            ('everything', _('The total price at the end'))
+        ),
+    )
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
+            if self.model.type != 'room':
+                self.delete_field('parent_id')
             if self.model.type == 'daypass':
                 self.delete_field('default_view')
                 self.delete_field('kaba_components')
                 return
         else:
+            if not self.request.view_name.endswith('new-room'):
+                self.delete_field('parent_id')
             if self.request.view_name.endswith('new-daypass'):
                 self.delete_field('default_view')
                 self.delete_field('kaba_components')
                 return
+
+        # NOTE: For now we only allow parent resources for rooms
+        if 'parent_id' in self:
+            default_group = self.request.translate(_('General'))
+            query = self.request.app.libres_resources.query().with_entities(
+                Resource.id,
+                Resource.parent_id,
+                Resource.title,
+                func.coalesce(func.nullif(Resource.group, ''), default_group),
+                Resource.subgroup,
+            ).order_by(
+                func.coalesce(func.nullif(Resource.group, ''), default_group),
+                func.coalesce(
+                    func.nullif(Resource.subgroup, ''),
+                    Resource.title
+                ),
+                Resource.title
+            ).filter(Resource.type == 'room')
+            if isinstance(self.model, Resource):
+                query = query.filter(Resource.id != self.model.id)
+                pruned_parent_ids = {self.model.id}
+            else:
+                pruned_parent_ids = set()
+
+            choices: list[TreeSelectNode] = []
+            current_group: TreeSelectNode | None = None
+            current_group_choices: list[TreeSelectNode] = []
+            current_subgroup: TreeSelectNode | None = None
+            current_subgroup_choices: list[TreeSelectNode] = []
+            for resource_id, parent_id, title, group, subgroup in query:
+                entry: TreeSelectNode = {
+                    'name': title,
+                    'value': str(resource_id),
+                    'children': ()
+                }
+                # NOTE: This avoids circular references between resources
+                #       a parent resource should not appoint one of its
+                #       descendants as a parent.
+                if parent_id in pruned_parent_ids:
+                    pruned_parent_ids.add(resource_id)
+                    entry['disabled'] = True
+
+                if current_group is None or current_group['name'] != group:
+                    current_group_choices = []
+                    current_group = {
+                        'name': group,
+                        'value': group,
+                        'children': current_group_choices,
+                        'isGroupSelectable': False
+                    }
+                    choices.append(current_group)
+                    current_subgroup = None
+
+                if not subgroup:
+                    current_subgroup = None
+                elif (
+                    current_subgroup is None
+                    or current_subgroup['name'] != subgroup
+                ):
+                    current_subgroup_choices = []
+                    current_subgroup = {
+                        'name': subgroup,
+                        'value': f'{group}__{subgroup}',
+                        'children': current_subgroup_choices,
+                        'isGroupSelectable': False
+                    }
+                    current_group_choices.append(current_subgroup)
+
+                if current_subgroup is not None:
+                    current_subgroup_choices.append(entry)
+                else:
+                    current_group_choices.append(entry)
+
+            if choices:
+                self.parent_id.set_choices(choices)
+            else:
+                self.delete_field('parent_id')
 
         clients = KabaClient.from_app(self.request.app)
         if not clients:
@@ -282,6 +491,28 @@ class ResourceBaseForm(Form):
                 'please make sure your credentials are still valid.'
             ))
             self.delete_field('kaba_components')
+
+    @cached_property
+    def known_field_ids(self) -> set[str] | None:
+        # FIXME: We should probably define this in relation to known_fields
+        #        so we don't parse the form twice if we access both properties
+        try:
+            return {
+                field.id for field in
+                flatten_fieldsets(parse_formcode(self.definition.data))
+            }
+        except FormError:
+            return None
+
+    def extract_field_ids(self, field: Field) -> list[str]:
+        if not self.known_field_ids:
+            return []
+
+        return [
+            name
+            for line in field.data.splitlines()
+            if as_internal_id(name := line.strip()) in self.known_field_ids
+        ]
 
     @property
     def zipcodes(self) -> list[int]:
@@ -369,6 +600,17 @@ class ResourceBaseForm(Form):
         else:
             raise NotImplementedError()
 
+    @property
+    def lead_time(self) -> int | None:
+        if self.lead_time_unit.data == 'd':
+            return self.lead_time_days.data
+        return None
+
+    @lead_time.setter
+    def lead_time(self, value: int | None) -> None:
+        self.lead_time_unit.data = 'd' if value else 'n'
+        self.lead_time_days.data = value
+
     # FIXME: Use TypedDict?
     @property
     def zipcode_block(self) -> dict[str, Any] | None:
@@ -395,14 +637,36 @@ class ResourceBaseForm(Form):
             str(i) for i in sorted(value['zipcode_list']))
 
     def populate_obj(self, obj: Resource) -> None:  # type:ignore
-        super().populate_obj(obj, exclude=('deadline', 'zipcode_block'))
+        super().populate_obj(obj, exclude={
+            'deadline',
+            'deadline_unit',
+            'deadline_days',
+            'deadline_hours',
+            'occupancy_fields',
+            'ical_fields',
+            'lead_time',
+            'lead_time_unit',
+            'lead_time_days',
+            'zipcode_block',
+            'zipcode_block_use',
+            'zipcode_field',
+            'zipcode_days',
+            'zipcode_list',
+        })
         obj.deadline = self.deadline
+        obj.lead_time = self.lead_time
         obj.zipcode_block = self.zipcode_block
+        obj.occupancy_fields = list(self.extract_field_ids(
+            self.occupancy_fields))
+        obj.ical_fields = list(self.extract_field_ids(self.ical_fields))
 
     def process_obj(self, obj: Resource) -> None:  # type:ignore
         super().process_obj(obj)
         self.deadline = obj.deadline
+        self.lead_time = obj.lead_time
         self.zipcode_block = obj.zipcode_block
+        self.occupancy_fields.data = '\n'.join(obj.occupancy_fields)
+        self.ical_fields.data = '\n'.join(obj.ical_fields)
 
 
 if TYPE_CHECKING:

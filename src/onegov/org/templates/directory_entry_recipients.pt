@@ -27,9 +27,8 @@
                        data-confirm-no="Cancel"
                        ic-get-from="${request.link(recipient.subscription, 'unsubscribe')}"
                        ic-select-from-response="#ignore-this"
-                       ic-target="#ignore-this"
-                       ic-replace-target="true"
-                       ic-on-success="$('#${recipient.id}').remove();"
+                       ic-target="#${recipient.id}"
+                       ic-success-action="remove"
                        i18n:translate
                        i18n:attributes="data-confirm-extra;data-confirm-yes;data-confirm-no">
                         unsubscribe

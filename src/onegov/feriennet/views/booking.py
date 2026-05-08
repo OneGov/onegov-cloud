@@ -24,7 +24,7 @@ from onegov.feriennet.layout import (
 from onegov.feriennet.models import AttendeeCalendar, GroupInvite
 from onegov.feriennet.utils import decode_name
 from onegov.feriennet.views.shared import users_for_select_element
-from onegov.org.layout import DefaultMailLayout
+from onegov.town6.layout import DefaultMailLayout
 from onegov.user import User
 from purl import URL
 from sortedcontainers import SortedList
@@ -36,12 +36,13 @@ from uuid import UUID
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
-    from onegov.activity.models import Period, PeriodMeta
+    from onegov.activity.models import BookingPeriod, BookingPeriodMeta
     from onegov.activity.models.booking import BookingState
     from onegov.core.elements import Trait
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.engine import Result
+    from sqlalchemy.orm import Session
     from typing import NamedTuple
     from webob import Response
 
@@ -85,7 +86,7 @@ def all_bookings(collection: BookingCollection) -> list[Booking]:
 
 
 def group_bookings(
-    period: Period | PeriodMeta,
+    period: BookingPeriod | BookingPeriodMeta,
     bookings: Iterable[Booking]
 ) -> dict[Attendee, dict[BookingState, SortedList[Booking]]]:
     """ Takes a (small) list of bookings and groups them by attendee and state
@@ -127,7 +128,7 @@ def group_bookings(
 
 
 def total_by_bookings(
-    period: Period | PeriodMeta | None,
+    period: BookingPeriod | BookingPeriodMeta | None,
     bookings: Collection[Booking]
 ) -> Decimal:
 
@@ -154,18 +155,19 @@ def related_attendees(
     stmt = as_selectable_from_path(
         module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
-    related: Query[RelatedAttendeeRow] = session.execute(
-        select(stmt.c).where(
+    related: Result[RelatedAttendeeRow] = session.execute(
+        select(*stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
-                stmt.c.booking_state == 'accepted'
+                stmt.c.booking_state == 'accepted',
+                stmt.c.show_contact_data_to_others == True
             )
         )
     )
 
     result = defaultdict(list)
 
-    for r in related:
+    for r in related.tuples():
         result[r.occasion_id].append(r)
 
     return result
@@ -196,7 +198,7 @@ def get_booking_title(layout: DefaultLayout, booking: Booking) -> str:
 
 def actions_by_booking(
     layout: DefaultLayout,
-    period: Period | PeriodMeta | None,
+    period: BookingPeriod | BookingPeriodMeta | None,
     booking: Booking
 ) -> list[Link]:
 
@@ -205,7 +207,8 @@ def actions_by_booking(
     if not period:
         return actions
 
-    if period.wishlist_phase or booking.state in ('accepted', 'open'):
+    if period.with_group_code and (
+        period.wishlist_phase or booking.state in ('accepted', 'open')):
         if period.wishlist_phase or period.booking_phase:
             if not booking.group_code:
                 actions.append(
@@ -368,9 +371,7 @@ def view_my_bookings(
     bookings = all_bookings(self)
     grouped_bookings = period and group_bookings(period, bookings) or {}
 
-    related = request.app.org.meta.get('show_related_contacts') or None
-
-    if period and period.confirmed and related:
+    if period and period.confirmed:
         related = related_attendees(self.session, occasion_ids={
             b.occasion_id for b in bookings
         })
@@ -434,9 +435,40 @@ def view_my_bookings(
 
         return attendees
 
+    def attendee_delete_link(
+        attendee: Attendee
+    ) -> Link:
+
+        link = Link(
+                text=_(''),
+                url=layout.csrf_protected_url(request.link(attendee)),
+                attrs={'class': 'delete-icon before hide-for-print'},
+                sr_text=_('Delete attendee'),
+                traits=(
+                    Confirm(
+                        _(
+                            'Do you really want to delete "${name}" and all '
+                            'associated bookings?',
+                            mapping={
+                                'name': attendee.name,
+                            }
+                        ),
+                        _('The invoices will not be deleted.'),
+                        _('Delete attendee'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.link(self)
+                    ),
+                ),
+            )
+        return link
+
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
+        'attendee_delete_link': attendee_delete_link,
         'occasion_attendees': occasion_attendees,
         'subscribe_link': subscribe_link,
         'grouped_bookings': grouped_bookings,
@@ -715,17 +747,17 @@ def view_group_invite(
             traits = ()
 
         if action == 'join':
-            text = (
-                ('👦 ' if attendee.gender == 'male' else '👧 ')
-                + attendee.name
-            )
+            text = _('add to group')
+            icon = 'plus-icon'
         else:
-            text = _('Leave Group')
+            text = _('remove from group')
+            icon = 'minus-icon'
 
         return Link(
             text=text,
             url=layout.csrf_protected_url(url),
-            traits=traits
+            traits=traits,
+            attrs={'class': (icon, 'before')}
         )
 
     # https://stackoverflow.com/a/23847977/138103
@@ -733,15 +765,14 @@ def view_group_invite(
     first_name = decode_name(first_child.name)[0]
     subject = occasion.activity.title
     message = _(
-        (
-            'Hi!\n\n'
-            '${first_name} wants to take part in the "${title}" activity by '
-            '${organisation} and would be thrilled to go with a mate.\n\n'
-            'You can add the activity to the wishlist of your child through '
-            'the following link, if you are interested. This way the children '
-            'have a better chance of getting a spot together:\n\n'
-            '${link}'
-        ), mapping={
+        'Hi!\n\n'
+        '${first_name} wants to take part in the "${title}" activity by '
+        '${organisation} and would be thrilled to go with a mate.\n\n'
+        'You can add the activity to the wishlist of your child through '
+        'the following link, if you are interested. This way the children '
+        'have a better chance of getting a spot together:\n\n'
+        '${link}',
+        mapping={
             'first_name': first_name,
             'link': request.link(self.for_username(None)),
             'title': occasion.activity.title,
@@ -763,9 +794,7 @@ def view_group_invite(
 
     return {
         'layout': layout,
-        'title': _('Group for "${title}"', mapping={
-            'title': occasion.activity.title
-        }),
+        'title': _('Group'),
         'occasion': occasion,
         'model': self,
         'group_action': group_action,

@@ -3,12 +3,12 @@ from __future__ import annotations
 from functools import cached_property
 from onegov.core.elements import Link
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.layouts.default import DefaultLayout
-
+from onegov.landsgemeinde.models import Votum
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.landsgemeinde.models import Votum
     from onegov.landsgemeinde.request import LandsgemeindeRequest
 
 
@@ -17,10 +17,11 @@ class VotumCollectionLayout(DefaultLayout):
     @cached_property
     def title(self) -> str:
         return _(
-            'Vota of agenda items ${number} of assembly from ${date}',
+            'Vota of agenda items ${number} of ${assembly_type} from ${date}',
             mapping={
                 'number': self.model.agenda_item_number,
-                'date': self.format_date(self.model.date, 'date_long')
+                'date': self.format_date(self.model.date, 'date_long'),
+                'assembly_type': self.assembly_type
             }
         )
 
@@ -48,6 +49,7 @@ class VotumCollectionLayout(DefaultLayout):
         ]
 
 
+@LandsgemeindeApp.layout(model=Votum)
 class VotumLayout(DefaultLayout):
 
     if TYPE_CHECKING:

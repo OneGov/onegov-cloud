@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-08-06 11:05+0200\n"
+"POT-Creation-Date: 2026-03-25 10:35+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -85,6 +85,18 @@ msgstr "Verhandlungsdolmetschen"
 msgid "Whisper interpreting"
 msgstr "Flüsterdolmetschen"
 
+msgid "telephonic"
+msgstr "telefonisch"
+
+msgid "On Site"
+msgstr "Vor Ort"
+
+msgid "Written"
+msgstr "schriftlich"
+
+msgid "Exceptionally urgent"
+msgstr "Ausserordentlich dringlich"
+
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -102,6 +114,12 @@ msgstr "Verzeichniseinstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "User groups"
+msgstr "Benutzergruppen"
+
+msgid "Time Reports"
+msgstr "Zeiterfassungen"
 
 msgid "Tickets"
 msgstr "Tickets"
@@ -127,6 +145,8 @@ msgstr "Anmelden"
 msgid "Translators"
 msgstr "Übersetzer/innen"
 
+#.
+#. will be filled in on_request
 msgid "Personal Information"
 msgstr "Persönliche Informationen"
 
@@ -233,6 +253,8 @@ msgstr "Telefon Mobile"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
+#. will be set in on_request
+#.
 msgid "Legal"
 msgstr "Rechtliches"
 
@@ -297,6 +319,8 @@ msgstr "Referenzen"
 msgid "Admission course of the high court of the Canton of Zurich available"
 msgstr "Zulassungskurs – Obergericht ZH vorhanden"
 
+#.
+#. will be set in on_request
 msgid "Admission course"
 msgstr "Zulassungskurs"
 
@@ -343,8 +367,8 @@ msgstr "Aktueller Auszug aus dem Zentralstrafregister (PDF)"
 msgid ""
 "Maximum 6 months since issue. Online order at www.strafregister.admin.ch"
 msgstr ""
-"Max. 6 Monate seit Ausstellung. Online-Bestellung unter www.strafregister."
-"admin.ch"
+"Max. 6 Monate seit Ausstellung. Online-Bestellung unter "
+"www.strafregister.admin.ch"
 
 msgid "Certificate of Capability (PDF)"
 msgstr "Handlungsfähigkeitszeugnis (PDF)"
@@ -375,9 +399,6 @@ msgstr "Ein(e) Übersetzer/in mit dieser E-Mail existiert bereits"
 
 msgid "Please confirm the correctness of the above data."
 msgstr "Bitte bestätigen Sie die Richtigkeit der vorstehenden Daten."
-
-msgid "Please provide at least one phone number."
-msgstr "Bitte geben Sie mindestens eine Telefonnummer an."
 
 msgid "Create a user account and publish the translator."
 msgstr "Benutzerkonto erstellen und Übersetzereintrag veröffentlichen."
@@ -412,11 +433,10 @@ msgstr ""
 msgid "Yes"
 msgstr "Ja"
 
+#.
+#. noqa: N806
 msgid "No"
 msgstr "Nein"
-
-msgid "You can use this form to report mutations."
-msgstr "Mit diesem Formular können Sie Mutationen melden."
 
 msgid ""
 "You can either leave us a message or directly suggest changes in the "
@@ -456,10 +476,10 @@ msgstr ""
 "Wenn Sie die E-Mail Adresse ändern möchten, vermerken Sie dies bitte in "
 "Ihrer Nachricht."
 
-msgid "Please enter a message or suggest some changes using the fields below."
+msgid "Please enter a message, suggest changes, or upload documents."
 msgstr ""
-"Bitte geben Sie entweder eine Nachricht oder mindestens einen "
-"Änderungsvorschlag in die unten stehenden Felder ein."
+"Bitte geben Sie eine Nachricht ein, schlagen Sie Änderungen vor oder laden "
+"Sie Dokumente hoch."
 
 msgid "Your message"
 msgstr "Ihre Nachricht"
@@ -467,6 +487,8 @@ msgstr "Ihre Nachricht"
 msgid "Message"
 msgstr "Nachricht"
 
+#.
+#. will be filled in on_request
 msgid "Proposed changes"
 msgstr "Vorgeschlagene Änderungen"
 
@@ -512,6 +534,86 @@ msgstr "Link zur Einverständniserklärung"
 msgid "Accreditation"
 msgstr "Akkreditierung"
 
+msgid ""
+"No user with this email address exists. Please create a user account first."
+msgstr ""
+"Es existiert kein Benutzer mit dieser E-Mail-Adresse. Bitte erstellen Sie "
+"zuerst ein Benutzerkonto."
+
+msgid "Type of translation/interpreting"
+msgstr "Art der Übersetzung/Dolmetschung"
+
+msgid "Assignment Location"
+msgstr "Einsatzort"
+
+msgid "Different place"
+msgstr "Anderer Ort"
+
+msgid "Enter the address of the assignment location"
+msgstr ""
+"Adresse des Einsatzortes. Beispiel: Friedbergstrasse 36, 8200 Schaffhausen"
+
+msgid "Cost center"
+msgstr "Finanzstelle"
+
+msgid "Start date"
+msgstr "Startdatum"
+
+msgid "Start time"
+msgstr "Startzeit"
+
+msgid "End date"
+msgstr "Enddatum"
+
+msgid "End time"
+msgstr "Endzeit"
+
+msgid "Break time"
+msgstr "Pausenzeit, in Stunden"
+
+msgid "Pages"
+msgstr "Seiten"
+
+msgid "Case Number"
+msgstr "Geschäfts- oder Verfahrensnummer"
+
+msgid ""
+"Exceptionally urgent (only for assignments with less than 4 hours advance "
+"notice)"
+msgstr ""
+"Ausserordentlich dringlich (nur bei Aufgeboten mit weniger als 4 Stunden "
+"Vorlaufzeit)"
+
+msgid "25% surcharge"
+msgstr "25% Zuschlag"
+
+msgid "ohne Wegberechnung"
+msgstr "ohne Wegberechnung"
+
+msgid "No travel compensation will be calculated"
+msgstr "Keine Wegentschädigung wird berechnet"
+
+msgid "Notes"
+msgstr "Notizen"
+
+msgid "Please select a location"
+msgstr "Bitte wählen Sie einen Einsatzort"
+
+msgid "This field is required"
+msgstr "Das ist ein Pflichtfeld."
+
+msgid "End time must be after start time"
+msgstr "Endzeit muss nach Startzeit liegen"
+
+msgid "A time report already exists for this start time"
+msgstr "Für diese Startzeit existiert bereits eine Zeiterfassung"
+
+msgid "Other location (please enter address in next field)"
+msgstr "Anderer Ort (bitte Adresse im nächsten Feld eingeben)"
+
+msgid "Contract Number"
+msgstr "Vertragsnummer"
+
 msgid "Address"
 msgstr "Anschrift"
 
@@ -536,8 +638,23 @@ msgstr "Sprachausbildung und Expertise"
 msgid "Hidden"
 msgstr "Versteckt"
 
+msgid "IBAN is required for self-employed translators"
+msgstr "IBAN ist für selbständige Übersetzer/innen erforderlich"
+
+msgid "Address is required for self-employed translators"
+msgstr "Adresse ist für selbständige Übersetzer/innen erforderlich"
+
+msgid "City is required for self-employed translators"
+msgstr "Ort ist für selbständige Übersetzer/innen erforderlich"
+
 msgid "Search in first and last name"
 msgstr "Suche in Vor- und Nachname"
+
+msgid "Hidden only"
+msgstr "Nur versteckte anzeigen"
+
+msgid "Show all translators including hidden"
+msgstr "Alle Dolmetscher inkl. versteckte anzeigen"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -569,6 +686,27 @@ msgstr "Mitglied"
 msgid "Translator"
 msgstr "Übersetzer/in"
 
+msgid "Cost Center (Finanzstelle)"
+msgstr "Finanzstelle"
+
+msgid "Select the cost center this user group is responsible for"
+msgstr "Wählen Sie die Finanzstelle für diese Benutzergruppe aus"
+
+msgid "Accountant Users"
+msgstr "Rechnungsführer:innen"
+
+msgid ""
+"Select users who are accountants for this cost center. Their emails will be "
+"used for notifications."
+msgstr ""
+"Diese Personen sind verantwortlich für für die Zeiterfassung der oben "
+"ausgewählten Finanzstelle. Ihre E-Mail-Adressen werden für "
+"Benachrichtigungen verwendet."
+
+msgid "All accountant users must have the editor or admin role"
+msgstr ""
+"Alle Benutzer des Rechnungswesen müssen Editoren oder Administratoren sein."
+
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -596,6 +734,9 @@ msgstr "Abbrechen"
 msgid "Mail templates"
 msgstr "Briefvorlagen"
 
+msgid "Add Time Report"
+msgstr "Zeit erfassen"
+
 msgid "Report change"
 msgstr "Mutation melden"
 
@@ -610,9 +751,6 @@ msgstr "Vorgeschlagene Änderungen übernehmen"
 
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
-
-msgid "Export Excel"
-msgstr "Export Excel"
 
 msgid "Mail to all translators"
 msgstr "Rundschreiben an alle Übersetzer"
@@ -635,8 +773,95 @@ msgstr "Zulassung erteilen"
 msgid "Refuse admission"
 msgstr "Zulassung verweigern"
 
+msgid "Delete Time Report"
+msgstr "Zeiterfassung löschen"
+
+msgid "Do you really want to delete this time report?"
+msgstr "Möchten Sie diese Zeiterfassung wirklich löschen?"
+
+msgid "Delete time report"
+msgstr "Zeiterfassung löschen"
+
 msgid "Mutation"
 msgstr "Mutation"
+
+msgid "Time Report"
+msgstr "Zeiterfassung"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "Pending"
+msgstr "Noch nicht bestätigt"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Time"
+msgstr "Einsatzzeit"
+
+msgid "Assignment Date"
+msgstr "Einsatzdatum"
+
+msgid "Type"
+msgstr "Art"
+
+msgid "Finanzstelle"
+msgstr "Finanzstelle"
+
+msgid "Per-page rate"
+msgstr "Seitenansatz"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Hourly Rate"
+msgstr "Stundenansatz"
+
+msgid "Day hours"
+msgstr "Tagesstunden"
+
+msgid "Night hours 20-06"
+msgstr "Nachtstunden (20:00 - 06:00 Uhr)"
+
+msgid "Base pay"
+msgstr "Grundlohn"
+
+msgid "Weekend surcharge amount"
+msgstr "Wochenendzuschlag"
+
+msgid "Urgent surcharge"
+msgstr "Zuschlag für Ausserordentlich dringend"
+
+msgid "Subtotal (work compensation)"
+msgstr "Zwischentotal"
+
+msgid "Travel"
+msgstr "Wegentschädigung"
+
+msgid "from"
+msgstr "Von"
+
+msgid "to"
+msgstr "nach"
+
+msgid "Meal Allowance (6+ hours)"
+msgstr "Verpflegungsentschädigung (6+ Stunden)"
+
+msgid "Download PDF"
+msgstr "PDF herunterladen"
+
+msgid "Download QR Bill"
+msgstr "QR-Rechnung herunterladen"
+
+msgid "View translator"
+msgstr "Übersetzer/in anzeigen"
+
+msgid "Accept time report"
+msgstr "Zeiterfassung abschliessen"
 
 msgid "Accreditations"
 msgstr "Akkreditierungen"
@@ -727,6 +952,59 @@ msgstr ""
 "Diese Seite ist nicht öffentlich, kann aber von Mitgliedern eingesehen "
 "werden."
 
+msgid "Hello!"
+msgstr "Guten Tag!"
+
+msgid "Your assignment has been approved by the accounting department."
+msgstr "Ihr Einsatz wurde durch die Rechnungsführung freigegeben."
+
+msgid "Assignment Date:"
+msgstr "Einsatzdatum:"
+
+msgid "Total Compensation:"
+msgstr "Gesamtentschädigung:"
+
+msgid "Travel Distance:"
+msgstr "Wegentschädigung:"
+
+msgid "View the time report"
+msgstr "Zeiterfassung anzeigen"
+
+msgid "A new time report has been submitted for review."
+msgstr "Eine neue Zeiterfassung wurde zur Überprüfung eingereicht."
+
+msgid "Translator:"
+msgstr "Dolmetscher/in:"
+
+msgid "Time:"
+msgstr "Zeit:"
+
+msgid "Please review the details and process accordingly."
+msgstr "Bitte überprüfen Sie die Details und fahren Sie entsprechend fort."
+
+msgid ""
+"A time report has been submitted for you and is now being reviewed by our "
+"internal control office:"
+msgstr ""
+"Eine Zeiterfassung wurde für Sie eingereicht und wird nun durch unsere "
+"interne Kontrollstelle geprüft:"
+
+msgid "Please carefully review and report any discrepancies immediately."
+msgstr "Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden"
+
+msgid ""
+"Once the review is complete, you will be informed again. Thank you for your "
+"service and best regards."
+msgstr ""
+"Sobald die Kontrolle abgeschlossen ist, werden Sie wieder informiert. "
+"Besten Dank für Ihren Einsatz und mit freundlichen Grüssen."
+
+msgid "If you have any questions, please contact:"
+msgstr "Bei Fragen wenden Sie sich bitte an:"
+
+msgid "Time report edited"
+msgstr "Zeiterfassung bearbeitet"
+
 msgid "Admission granted."
 msgstr "Zulassung erteilt."
 
@@ -735,6 +1013,27 @@ msgstr "Zulassung verweigert."
 
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
+
+msgid "Note: Export will only include confirmed reports."
+msgstr "Hinweis: Export enthält nur bestätigte Zeiterfassungen."
+
+msgid "Written translations without page count:"
+msgstr "Schriftliche Übersetzungen ohne Seitenangabe:"
+
+msgid "No time reports found"
+msgstr "Keine Zeiterfassungen gefunden"
+
+msgid "No archived time reports found"
+msgstr "Keine archivierten Zeiterfassungen gefunden"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "Exported"
+msgstr "Exportiert"
+
+msgid "Actions"
+msgstr "Aktionen"
 
 msgid "This translator is in the admission process!"
 msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"
@@ -745,8 +1044,29 @@ msgstr "Zertifikate"
 msgid "User"
 msgstr "Benutzer"
 
+msgid "Export Excel (from filter)"
+msgstr "Excel Export (mit Filter)"
+
 msgid "Phone numbers"
 msgstr "Telefonischer Kontakt"
+
+msgid "Error: No custom texts found"
+msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
+
+#, python-format
+msgid "Error: No custom text found for '${key}'"
+msgstr "Fehler: Keinen benutzerdefinierten Text gefunden für '${key}'"
+
+msgid "No Finanzstelle specified"
+msgstr "Keine Finanzstelle"
+
+#, python-format
+msgid ""
+"No accountant emails configured for Finanzstelle \"${fs}\". Please configure "
+"user groups: ${url}"
+msgstr ""
+"Keine Buchhaltungs-E-Mails für Finanzstelle \"${fs}\" konfiguriert. Bitte "
+"Benutzergruppen konfigurieren: ${url}"
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
@@ -786,6 +1106,95 @@ msgstr "E-Mail / Benutzername / Kürzel"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
+msgid "Show active reports"
+msgstr "Aktive Zeiterfassungen anzeigen"
+
+msgid "Show archived (exported) reports"
+msgstr "Archivierte (exportierte) Zeiterfassungen anzeigen"
+
+#, python-format
+msgid "Export ${count} reports"
+msgstr "${count} Zeiterfassungen exportieren"
+
+#, python-format
+msgid "Export ${count} time reports for accounting?"
+msgstr "${count} Zeiterfassungen für die Buchhaltung exportieren?"
+
+msgid "Reports can only be exported once and will appear in the archive."
+msgstr ""
+"Zeiterfassungen können nur einmal exportiert werden und erscheinen danach im "
+"Archiv."
+
+msgid "Export"
+msgstr "Exportieren"
+
+msgid "Written translation without page count"
+msgstr "Schriftliche Übersetzung ohne Seitenangabe"
+
+msgid "Only pending time reports can be edited"
+msgstr "Nur ausstehende Zeiterfassungen können bearbeitet werden"
+
+msgid "Time report updated successfully"
+msgstr "Zeiterfassung erfolgreich aktualisiert"
+
+msgid "Edit Time Report"
+msgstr "Zeiterfassung bearbeiten"
+
+msgid "Update Time Report"
+msgstr "Zeiterfassung aktualisieren"
+
+msgid "Time report not found"
+msgstr "Zeiterfassung nicht gefunden"
+
+msgid ""
+"Cannot accept time report: Self-employed translator must have valid IBAN"
+msgstr ""
+"Zeiterfassung kann nicht akzeptiert werden: Selbständige Übersetzer/innen "
+"müssen eine gültige IBAN haben"
+
+msgid ""
+"Cannot accept time report: Self-employed translator must have complete "
+"address"
+msgstr ""
+"Zeiterfassung kann nicht akzeptiert werden: Selbständige Übersetzer/innen "
+"müssen eine vollständige Adresse haben"
+
+msgid "Time report accepted"
+msgstr "Zeiterfassung akzeptiert"
+
+msgid "No unexported time reports found"
+msgstr "Keine nicht-exportierten Zeiterfassungen gefunden"
+
+#, python-format
+msgid ""
+"Cannot export: The following translators are missing a personnel number "
+"(Personal-Nr.): ${names}"
+msgstr ""
+"Export nicht möglich: Den folgenden Übersetzern fehlt eine Personalnummer "
+"(Personal-Nr.): ${names}"
+
+#, python-format
+msgid ""
+"Export warning: The following translators are missing a contract number "
+"(Vertragsnummer): ${names}"
+msgstr ""
+"Export-Warnung: Den folgenden Übersetzern fehlt eine Vertragsnummer: ${names}"
+
+msgid "Ticket Number"
+msgstr "Ticket-Nummer"
+
+msgid "QR bill only available for self-employed"
+msgstr "QR-Rechnung nur für selbständige Übersetzer/innen verfügbar"
+
+msgid "QR bill only available for confirmed reports"
+msgstr "QR-Rechnung nur für bestätigte Zeiterfassungen verfügbar"
+
+msgid "Could not generate QR bill"
+msgstr "QR-Rechnung konnte nicht erstellt werden"
+
+msgid "Time report deleted"
+msgstr "Zeiterfassung gelöscht"
+
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
@@ -814,6 +1223,18 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 msgid "Your data has been confirmed"
 msgstr "Ihre Daten wurden bestätigt"
 
+msgid "A time report has been submitted for you"
+msgstr "Eine Zeiterfassung wurde für Sie eingereicht"
+
+msgid "New time report for review"
+msgstr "Neue Zeiterfassung zur Überprüfung"
+
+msgid "Time report submitted for review"
+msgstr "Zeiterfassung zur Überprüfung eingereicht"
+
+msgid "Submit Time Report"
+msgstr "Zeiterfassung einreichen"
+
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
 
@@ -833,21 +1254,3 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
-
-msgid "Export Excel (from filter)"
-msgstr "Excel Export (mit Filter)"
-
-msgid "Hidden only"
-msgstr "Nur versteckte anzeigen"
-
-#~ msgid ""
-#~ "In order for your application for inclusion in the directory to be "
-#~ "processed, a complete application must be submitted. This includes the "
-#~ "following documents:"
-#~ msgstr ""
-#~ "Damit Ihr Antrag um Aufnahme in das Übersetzendenverzeichnis bearbeitet "
-#~ "werden kann, ist ein vollständiger Antrag einzureichen. Dazu gehören "
-#~ "folgende Unterlagen:"
-
-#~ msgid "This field is required."
-#~ msgstr "Dieses Feld wird benötigt."
