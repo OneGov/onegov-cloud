@@ -726,6 +726,86 @@ def test_fetch_commissions_parliamentarians_json(
     assert commission3_id not in data3
 
 
+def test_commissions_view_filtered_by_role(
+    client: Client[TestPasApp],
+) -> None:
+    session = client.app.session()
+
+    commissions = PASCommissionCollection(session)
+    commission_a = commissions.add(name='Finanzkommission')
+    commission_b = commissions.add(name='Bildungskommission')
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='Pia',
+        last_name='Member',
+        email_primary='pia@example.org',
+        zg_username='zgpia',
+    )
+    pres = parliamentarians.add(
+        first_name='Alice',
+        last_name='President',
+        email_primary='alice@example.org',
+        zg_username='zgalice',
+    )
+
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=parl.id,
+            commission_id=commission_a.id,
+            role='member',
+        )
+    )
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=pres.id,
+            commission_id=commission_a.id,
+            role='president',
+        )
+    )
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=pres.id,
+            commission_id=commission_b.id,
+            role='member',
+        )
+    )
+
+    users = UserCollection(session)
+
+    user_parl = users.by_username('zgpia')
+    assert user_parl is not None
+    user_parl.role = 'parliamentarian'
+    user_parl.password = 'test'
+    user_parl.active = True
+
+    user_pres = users.by_username('zgalice')
+    assert user_pres is not None
+    user_pres.role = 'commission_president'
+    user_pres.password = 'test'
+    user_pres.active = True
+
+    transaction.commit()
+
+    # Admin sees all commissions
+    client.login_admin()
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' in page
+
+    # Parliamentarian sees only their commission (A)
+    client.login('zgpia', 'test')
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' not in page
+
+    # Commission president sees both (member of both)
+    client.login('zgalice', 'test')
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' in page
+
+
 def test_add_new_user_without_activation_email(
     client: Client[TestPasApp]
 ) -> None:
