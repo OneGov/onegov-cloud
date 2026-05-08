@@ -282,7 +282,8 @@ def get_global_tools(
 
     # Tickets
     if request.is_manager or request.is_supporter:
-        assert request.current_user is not None
+        if request.current_user is None:
+            return
         ticket_count = request.app.ticket_count
         screen_count = ticket_count.open or ticket_count.pending
 

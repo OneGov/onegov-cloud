@@ -383,8 +383,7 @@ def view_my_bookings(
         user = (request.session.query(User)
                 .filter_by(username=self.username).one())
     else:
-        assert request.current_user is not None
-        users, user = None, request.current_user
+        users, user = None, request.get_current_user()
 
     def subscribe_link(attendee: Attendee) -> str:
         url = request.link(AttendeeCalendar(self.session, attendee))

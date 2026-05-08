@@ -147,7 +147,8 @@ def get_global_tools(
 
         # Tickets
         if request.is_admin or request.is_editor:
-            assert request.current_user is not None
+            if request.current_user is None:
+                return
             if request.is_accountant:
                 ticket_count = get_accountant_ticket_count(request)
             else:

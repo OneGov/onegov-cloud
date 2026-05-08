@@ -1117,7 +1117,7 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
         session: Session
     ) -> None:
 
-        assert request.current_user is not None
+        current_user = request.get_current_user()
 
         stmt = (
             session.query(ReservationTicket)
@@ -1140,7 +1140,7 @@ def handle_delete_resource(self: Resource, request: OrgRequest) -> None:
             if not ticket:
                 continue
 
-            close_ticket(ticket, request.current_user, request)
+            close_ticket(ticket, current_user, request)
             ticket.create_snapshot(request)
 
             # unlink payment from invoice items, delete invoice

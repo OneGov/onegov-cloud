@@ -154,8 +154,8 @@ def get_personal_tools(
     if request.is_logged_in:
         session = request.session
         username = request.current_username
-        assert username is not None
-        assert request.current_user is not None
+        if username is None or request.current_user is None:
+            return
 
         period = request.app.active_period
         periods = request.app.periods

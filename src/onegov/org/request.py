@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sentry_sdk
+
 from functools import cached_property
 from onegov.core.custom import msgpack
 from onegov.core.orm import orm_cached
@@ -12,6 +14,7 @@ from onegov.user import User
 from sedate import utcnow
 from sqlalchemy import inspect
 from sqlalchemy.orm import noload
+from webob.exc import HTTPForbidden
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING
@@ -132,6 +135,22 @@ class OrgRequest(CoreRequest):
         if inspect(self._current_user).detached:
             self._current_user = self.session.merge(self._current_user)
         return self._current_user
+
+    def get_current_user(self) -> User:
+        """ Returns current_user, raising HTTPForbidden if unexpectedly None.
+
+        Use this instead of asserting current_user is not None. Captures a
+        Sentry event with the username to aid debugging.
+        """
+        user = self.current_user
+        if user is None:
+            sentry_sdk.capture_message(
+                'current_user is None despite valid identity',
+                level='warning',
+                extras={'username': self.current_username},
+            )
+            raise HTTPForbidden()
+        return user
 
     @cached_property
     def authenticated_email(self) -> str | None:

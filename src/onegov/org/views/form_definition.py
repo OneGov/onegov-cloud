@@ -350,8 +350,7 @@ def delete_form_definition(
         if ticket is False:
             raise exc.HTTPMethodNotAllowed()
         if ticket is not True:
-            assert request.current_user is not None
-            close_ticket(ticket, request.current_user, request)
+            close_ticket(ticket, request.get_current_user(), request)
             ticket.create_snapshot(request)
 
     def handle_submissions(submissions: Iterable[FormSubmission]) -> None:

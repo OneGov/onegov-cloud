@@ -187,9 +187,9 @@ def signature_for_mail_templates(
     uploaded. It should contain the string 'Unterschrift', as well as the
     first and last name of the user. """
 
-    assert request.current_user is not None
-    assert request.current_user.realname is not None
-    first_name, last_name = request.current_user.realname.split(' ')
+    current_user = request.get_current_user()
+    assert current_user.realname is not None
+    first_name, last_name = current_user.realname.split(' ')
     query = GeneralFileCollection(request.session).query().filter(
         and_(
             GeneralFile.name.like('Unterschrift%'),

@@ -115,8 +115,8 @@ def view_my_invoices(
     users = users_for_select_element(request)
     user = request.session.query(User).filter_by(id=self.user_id).one()
 
-    assert request.current_user is not None
-    if request.current_user.id == self.user_id:
+    current_user = request.get_current_user()
+    if current_user.id == self.user_id:
         title = _('Invoices')
     else:
         title = _('Invoices of ${user}', mapping={
@@ -258,10 +258,10 @@ def handle_donation(
     form: DonationForm
 ) -> RenderData | Response:
 
-    assert request.current_user is not None
+    current_user = request.get_current_user()
     if not self.user_id:
         return request.redirect(request.link(
-            self.for_user_id(request.current_user.id),
+            self.for_user_id(current_user.id),
             name='donation'
         ))
 
@@ -272,7 +272,7 @@ def handle_donation(
             name='donation'
         ))
 
-    if request.current_user.id == self.user_id:
+    if current_user.id == self.user_id:
         title = _('Donation')
     else:
         user = request.session.query(User).filter_by(id=self.user_id).one()

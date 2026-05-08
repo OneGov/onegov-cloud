@@ -355,10 +355,10 @@ class AttendeeSignupForm(AttendeeBase):
             self.attendee.data = self.attendee.choices[0][0]
 
     def populate_tos(self) -> None:
-        assert self.request.current_user is not None
+        current_user = self.request.get_current_user()
 
         url = self.request.app.org.meta.get('tos_url', None)
-        if not url or self.request.current_user.data.get('tos_accepted', None):
+        if not url or current_user.data.get('tos_accepted', None):
             self.delete_field('accept_tos')
             return
 

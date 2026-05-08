@@ -295,8 +295,7 @@ def accept_time_report(
 
     time_report.status = 'confirmed'
     handler.data['state'] = 'accepted'
-    assert request.current_user is not None
-    close_ticket(self, request.current_user, request)
+    close_ticket(self, request.get_current_user(), request)
 
     if translator and translator.email:
         pdf_bytes = generate_time_report_pdf_bytes(

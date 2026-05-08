@@ -285,8 +285,7 @@ def book_occasion(
         # if the TOS have been accepted, record this now
         if hasattr(form, 'accept_tos') and form.accept_tos:
             if form.accept_tos.data:
-                assert request.current_user is not None
-                request.current_user.data['tos_accepted'] = True
+                request.get_current_user().data['tos_accepted'] = True
 
         # to get the final cost, we need to accept bookings without wishlist
         if self.period.confirmed:
