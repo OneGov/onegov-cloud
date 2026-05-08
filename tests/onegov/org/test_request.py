@@ -27,7 +27,7 @@ def test_get_current_user_raises_when_none() -> None:
             OrgRequest.get_current_user(request)
 
         mock_sentry.capture_message.assert_called_once_with(
-            'current_user is None despite valid identity',
+            'current_user is None despite valid identity'
+            ': stale@example.com',
             level='warning',
-            extras={'username': 'stale@example.com'},
         )
