@@ -137,10 +137,12 @@ class OrgRequest(CoreRequest):
         return self._current_user
 
     def get_current_user(self) -> User:
-        """ Returns current_user, raising HTTPForbidden if unexpectedly None.
+        """ Returns current_user, raising HTTPForbidden if it is None.
 
-        Use this instead of asserting current_user is not None. Captures a
-        Sentry event with the username to aid debugging.
+        Use this instead of asserting current_user is not None. Raises for
+        both anonymous requests and cases where a logged-in identity has no
+        corresponding user record. In the latter case a Sentry warning with
+        the username is captured to aid debugging.
         """
         user = self.current_user
         if user is None:
