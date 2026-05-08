@@ -21,8 +21,8 @@ def test_get_current_user_raises_when_none() -> None:
     request.current_username = 'stale@example.com'
 
     from onegov.org.request import OrgRequest
+    import pytest
     with patch('onegov.org.request.sentry_sdk') as mock_sentry:
-        import pytest
         with pytest.raises(HTTPForbidden):
             OrgRequest.get_current_user(request)
 
@@ -31,3 +31,17 @@ def test_get_current_user_raises_when_none() -> None:
             ': stale@example.com',
             level='warning',
         )
+
+
+def test_get_current_user_no_sentry_for_anonymous() -> None:
+    request = MagicMock()
+    request.current_user = None
+    request.identity = None
+
+    from onegov.org.request import OrgRequest
+    import pytest
+    with patch('onegov.org.request.sentry_sdk') as mock_sentry:
+        with pytest.raises(HTTPForbidden):
+            OrgRequest.get_current_user(request)
+
+        mock_sentry.capture_message.assert_not_called()

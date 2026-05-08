@@ -144,11 +144,12 @@ class OrgRequest(CoreRequest):
         """
         user = self.current_user
         if user is None:
-            sentry_sdk.capture_message(
-                f'current_user is None despite valid identity'
-                f': {self.current_username}',
-                level='warning',
-            )
+            if self.identity is not None:
+                sentry_sdk.capture_message(
+                    f'current_user is None despite valid identity'
+                    f': {self.current_username}',
+                    level='warning',
+                )
             raise HTTPForbidden()
         return user
 
