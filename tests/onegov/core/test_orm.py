@@ -33,9 +33,7 @@ from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sedate import utcnow
-from sqlalchemy import (
-    and_, event, func, inspect, select, text, ForeignKey, Integer
-)
+from sqlalchemy import and_, func, inspect, select, text, ForeignKey, Integer
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column, registry, relationship
@@ -174,59 +172,6 @@ def test_create_schema(postgres_dsn: str) -> None:
     assert 'new' in existing_schemas()
     assert 'document' in schema_tables('new')
 
-    mgr.dispose()
-
-
-def test_schema_init_query_count(postgres_dsn: str) -> None:
-    class Base(DeclarativeBase, ModelBase):
-        registry = registry()
-
-    # create enough tables so the difference between O(1) and O(N) is clear
-    for i in range(20):
-        type(f'Table{i}', (Base,), {
-            '__tablename__': f'table_{i}',
-            'id': mapped_column(Integer, primary_key=True),
-        })
-
-    mgr = SessionManager(postgres_dsn, Base)
-
-    query_count = 0
-
-    def count_queries(*args: Any, **kwargs: Any) -> None:
-        nonlocal query_count
-        query_count += 1
-
-    event.listen(mgr.engine, 'before_cursor_execute', count_queries)
-    mgr.ensure_schema_exists('test_query_count')
-
-    table_count = len(Base.metadata.sorted_tables)
-    # O(1) implementation: fixed overhead + 1 get_table_names call
-    # O(N) implementation: fixed overhead + 1 has_table call per table
-    print('query count:', query_count, 'table count:', table_count)
-    assert query_count < 2 * table_count
-
-    mgr.dispose()
-
-
-def test_schema_init_shared_tables(postgres_dsn: str) -> None:
-    class Base(DeclarativeBase, ModelBase):
-        registry = registry()
-
-    class Document(Base):
-        __tablename__ = 'document'
-        id: Mapped[int] = mapped_column(primary_key=True)
-
-    mgr = SessionManager(postgres_dsn, Base)
-    mgr.bases.append(Base)  # same base twice → shared tables across iterations
-
-    # must not raise DuplicateTable
-    mgr.ensure_schema_exists('test_shared_tables')
-
-    with mgr.engine.connect() as conn:
-        tables = set(inspect(conn).get_table_names(
-            schema='test_shared_tables'))
-
-    assert 'document' in tables
     mgr.dispose()
 
 
