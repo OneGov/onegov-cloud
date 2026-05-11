@@ -71,14 +71,12 @@ class DataUriFilter(CSSDataUri):
 
     @property
     def source_url(self) -> str:
-        assert self.ctx is not None
-        return self.ctx.resolver.resolve_source_to_url(
+        return self.ctx.resolver.resolve_source_to_url(  # type:ignore[union-attr]
             self.ctx, self.keywords['source_path'], self.keywords['source'])
 
     @property
     def output_url(self) -> str:
-        assert self.ctx is not None
-        return self.ctx.resolver.resolve_output_to_url(
+        return self.ctx.resolver.resolve_output_to_url(  # type:ignore[union-attr]
             self.ctx, self.keywords['output'])
 
 
@@ -88,7 +86,7 @@ register_filter(DataUriFilter)  # type:ignore[no-untyped-call]
 class RCSSMinFilter(Filter):
     """ Adds the rcssmin filter (not yet included in webassets) """
 
-    name = 'custom-rcssmin'  # type:ignore[assignment]
+    name = 'custom-rcssmin'   # type:ignore[assignment]
 
     def setup(self) -> None:
         self.rcssmin = rcssmin
