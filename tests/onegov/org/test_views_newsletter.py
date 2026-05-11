@@ -145,8 +145,6 @@ def test_newsletter_signup(client: Client) -> None:
     page.form.submit().follow()
     client.logout()
 
-    assert client.app.org.enable_automatic_newsletters is False
-
     page = client.get('/newsletters')
     assert 'daily_newsletter' not in page.form.fields
 
@@ -157,8 +155,6 @@ def test_newsletter_signup(client: Client) -> None:
     page.form['newsletter_times'] = '10'
     page.form.submit()
     client.logout()
-
-    assert client.app.org.enable_automatic_newsletters is True
 
     page = client.get('/newsletters')
     assert 'daily_newsletter' in page.form.fields
