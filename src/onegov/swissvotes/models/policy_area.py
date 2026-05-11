@@ -67,12 +67,15 @@ class PolicyArea:
         """ Validates and constructs a PolicyArea from a URL parameter.
 
         Returns None for empty or invalid values so they can be dropped.
-        A valid value is all-numeric components separated by dots where each
-        component starts with the previous one (e.g. "1", "1.12", "1.12.121").
+        A valid value has at most 3 all-numeric components separated by dots
+        where each component starts with the previous one
+        (e.g. "1", "1.12", "1.12.121").
         """
         if not s or not re.fullmatch(r'\d+(\.\d+)*', s):
             return None
         components = s.split('.')
+        if len(components) > 3:
+            return None
         for i in range(1, len(components)):
             if not components[i].startswith(components[i - 1]):
                 return None

@@ -307,7 +307,8 @@ def test_view_update_external_resources(
 
 
 def test_view_votes_empty_policy_area(swissvotes_app: TestApp) -> None:
-    """ Ensure that the votes view does not crash when the policy area is empty
+    """
+    Ensure that the votes view does not crash when the policy area is empty.
     """
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()

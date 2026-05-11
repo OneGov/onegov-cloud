@@ -14,7 +14,7 @@ def test_policy_area_decode() -> None:
     assert policy_area_decode('10.102') == PolicyArea('10.102')
     assert policy_area_decode('10.103.1035') == PolicyArea('10.103.1035')
     assert policy_area_decode('12.125.1251') == PolicyArea('12.125.1251')
-    assert policy_area_decode('1.12.123.1231') == PolicyArea('1.12.123.1231')
+    assert policy_area_decode('1.12.123.1231') is None  # too many levels
 
     # invalid policy areas
     assert policy_area_decode('z') is None
