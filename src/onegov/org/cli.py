@@ -90,8 +90,8 @@ from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 
-
 from typing import IO, Any, TypedDict, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from bs4 import Tag
     from collections.abc import Callable, Iterator, Sequence
@@ -3355,3 +3355,45 @@ def migrate_agency(
         """)
 
     return migrate_to_new_agency
+
+
+@cli.command(
+    name='feature-statistics',
+    context_settings={'default_selector': '*'}
+)
+@pass_group_context
+def feature_statistics(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Reports which features are active per schema.
+
+    Outputs a JSON object with schema names as keys and a dict of
+    feature->bool as values.
+
+    Example:
+    .. code-block:: bash
+
+        onegov-org feature-statistics
+
+    """
+    results: dict[str, dict[str, bool]] = {}
+
+    def collect(request: OrgRequest, app: OrgApp) -> None:
+        schema = request.session.info['schema']
+        org = request.session.query(Organisation).first()
+
+        newsletter = bool(getattr(org, 'show_newsletter', False))
+        ris = bool(getattr(org, 'ris_enabled', False))
+        citizen_login = bool(getattr(org, 'citizen_login_enabled', False))
+
+        results[schema] = {
+            'newsletter': newsletter,
+            'ris': ris,
+            'citizen_login': citizen_login,
+        }
+
+        click.get_current_context().call_on_close(
+            lambda: click.echo(json.dumps(results, indent=2))
+        )
+
+    return collect
