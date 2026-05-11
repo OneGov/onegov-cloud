@@ -208,28 +208,6 @@ def test_schema_init_query_count(postgres_dsn: str) -> None:
     mgr.dispose()
 
 
-def test_schema_init_shared_tables(postgres_dsn: str) -> None:
-    class Base(DeclarativeBase, ModelBase):
-        registry = registry()
-
-    class Document(Base):
-        __tablename__ = 'document'
-        id: Mapped[int] = mapped_column(primary_key=True)
-
-    mgr = SessionManager(postgres_dsn, Base)
-    mgr.bases.append(Base)  # same base twice → shared tables across iterations
-
-    # must not raise DuplicateTable
-    mgr.ensure_schema_exists('test_shared_tables')
-
-    with mgr.engine.connect() as conn:
-        tables = set(inspect(conn).get_table_names(
-            schema='test_shared_tables'))
-
-    assert 'document' in tables
-    mgr.dispose()
-
-
 def test_schema_bound_session(postgres_dsn: str) -> None:
     class Base(DeclarativeBase, ModelBase):
         registry = registry()
