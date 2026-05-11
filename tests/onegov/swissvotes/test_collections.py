@@ -12,6 +12,7 @@ from io import StringIO
 from onegov.core.orm.abstract import MoveDirection
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
+from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
 from pytz import utc
@@ -109,7 +110,7 @@ def test_votes_default(swissvotes_app: TestApp) -> None:
         to_date=4,  # type: ignore[arg-type]
         legal_form=5,  # type: ignore[arg-type]
         result=6,  # type: ignore[arg-type]
-        policy_area=['7'],
+        policy_area=[PolicyArea('7')],
         term=8,  # type: ignore[arg-type]
         full_text=9,  # type: ignore[arg-type]
         position_federal_council=10,  # type: ignore[arg-type]
@@ -124,7 +125,7 @@ def test_votes_default(swissvotes_app: TestApp) -> None:
         assert votes.to_date == 4
         assert votes.legal_form == 5
         assert votes.result == 6
-        assert votes.policy_area == ['7']
+        assert votes.policy_area == [PolicyArea('7')]
         assert votes.term == 8
         assert votes.full_text == 9
         assert votes.position_federal_council == 10
@@ -470,20 +471,35 @@ def test_votes_query(swissvotes_app: TestApp) -> None:
     assert count(position_national_council=[1, 2]) == 3
     assert count(position_national_council=[3]) == 0
 
-    assert count(policy_area=['1']) == 1
-    assert count(policy_area=['4']) == 1
-    assert count(policy_area=['8']) == 1
-    assert count(policy_area=['10']) == 2
-    assert count(policy_area=['1', '4']) == 2
-    assert count(policy_area=['8', '10']) == 3
-    assert count(policy_area=['1', '8', '10']) == 3
-    assert count(policy_area=['1', '4', '8', '10']) == 3
-    assert count(policy_area=['4.42']) == 1
-    assert count(policy_area=['4.42.421']) == 1
-    assert count(policy_area=['4.42.421', '10']) == 1
-    assert count(policy_area=['4.42.421', '10.103']) == 1
-    assert count(policy_area=['4.42.421', '10.103.1033']) == 1
-    assert count(policy_area=['4.42.421', '10.103.1035']) == 2
+    assert count(policy_area=[PolicyArea('1')]) == 1
+    assert count(policy_area=[PolicyArea('4')]) == 1
+    assert count(policy_area=[PolicyArea('8')]) == 1
+    assert count(policy_area=[PolicyArea('10')]) == 2
+    assert count(policy_area=[PolicyArea('1'), PolicyArea('4')]) == 2
+    assert count(policy_area=[PolicyArea('8'), PolicyArea('10')]) == 3
+    assert count(
+        policy_area=[PolicyArea('1'), PolicyArea('8'), PolicyArea('10')]
+    ) == 3
+    assert count(
+        policy_area=[
+            PolicyArea('1'), PolicyArea('4'),
+            PolicyArea('8'), PolicyArea('10'),
+        ]
+    ) == 3
+    assert count(policy_area=[PolicyArea('4.42')]) == 1
+    assert count(policy_area=[PolicyArea('4.42.421')]) == 1
+    assert count(
+        policy_area=[PolicyArea('4.42.421'), PolicyArea('10')]
+    ) == 1
+    assert count(
+        policy_area=[PolicyArea('4.42.421'), PolicyArea('10.103')]
+    ) == 1
+    assert count(
+        policy_area=[PolicyArea('4.42.421'), PolicyArea('10.103.1033')]
+    ) == 1
+    assert count(
+        policy_area=[PolicyArea('4.42.421'), PolicyArea('10.103.1035')]
+    ) == 2
 
     assert count(term='Abstimmung') == 1
     assert count(term='cette question') == 1
