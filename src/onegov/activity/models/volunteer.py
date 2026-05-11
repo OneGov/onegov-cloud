@@ -3,12 +3,14 @@ from __future__ import annotations
 from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
+from onegov.ticket import Ticket
 from sqlalchemy import Enum, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
 
 
 from typing import Literal, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.activity.models import OccasionNeed
 

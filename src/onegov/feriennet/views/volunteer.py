@@ -12,7 +12,7 @@ from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
 from onegov.org.models import TicketMessage
-from onegov.ticket import TicketCollection
+from onegov.ticket import Ticket, TicketCollection
 from operator import attrgetter
 from uuid import uuid4
 
@@ -60,10 +60,16 @@ def view_volunteers(
     def activity_link(activity_name: str) -> str:
         return request.class_link(VacationActivity, {'name': activity_name})
 
+    tickets = {t.id: t for t in TicketCollection(
+        request.session).query().filter(
+        Ticket.handler_code == 'VOL',
+    ).all()}
+
     return {
         'layout': layout,
         'title': _('Volunteers'),
         'records': records,
+        'tickets': tickets,
         'grouped': grouped,
         'periods': request.app.periods,
         'period': self.period,

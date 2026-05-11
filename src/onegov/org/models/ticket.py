@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from functools import cached_property
 from markupsafe import Markup
 from onegov.activity import Occasion, Volunteer
@@ -35,7 +36,6 @@ from uuid import uuid4
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from datetime import datetime
     from onegov.chat.models import Chat
     from onegov.core.request import CoreRequest
     from onegov.event import Event
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Mapped, Query, Session
     from uuid import UUID
 
-    type DateRange = tuple[datetime, datetime]
+    type DateRange = tuple[date, date]
 
 
 def ticket_submitter(ticket: Ticket) -> str | None:
@@ -1829,7 +1829,7 @@ class VolunteerHandler(Handler):
     @cached_property
     def ticket_deletable(self) -> bool:
         volunteer = self.volunteer
-        need_id = volunteer.need_id
+        need_id = volunteer.need_id if volunteer else None
 
         occasion = self.session.query(Occasion).filter_by(
             need_id=need_id).first()
@@ -1889,10 +1889,33 @@ class VolunteerHandler(Handler):
 
         layout = DefaultLayout(self.volunteer_cart, request)
 
+        def get_confirmed(
+                self: VolunteerHandler,
+                need_id: str
+        ) -> int:
+            return self.session.query(Volunteer).filter(
+                Volunteer.need_id == need_id,
+                Volunteer.state == 'confirmed'
+            ).count()
+
+        def get_age(
+                birth_date: date
+        ) -> int:
+            today = date.today()
+            age = today.year - birth_date.year
+            if (today.month, today.day) < (birth_date.month, birth_date.day):
+                age -= 1
+            return age
+
+
         parts = []
         parts.append(
             render_macro(layout.macros['volunteer_submissions'], request, {
+                'self': self,
+                'volunteer': self.volunteer,
+                'get_age': get_age,
                 'subscriptions': self.volunteer_cart,
+                'get_confirmed': get_confirmed,
                 'layout': layout
             })
         )
