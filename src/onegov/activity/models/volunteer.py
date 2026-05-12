@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.ticket import Ticket
 from sqlalchemy import Enum, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
@@ -18,6 +17,7 @@ type VolunteerState = Literal[
     'open',
     'contacted',
     'confirmed',
+    'cancelled'
 ]
 
 
@@ -41,6 +41,7 @@ class Volunteer(Base, ContentMixin, TimestampMixin):
             'open',
             'contacted',
             'confirmed',
+            'cancelled',
             name='volunteer_state'
         ),
         default='open'

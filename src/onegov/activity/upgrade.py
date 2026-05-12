@@ -834,3 +834,31 @@ def add_group_code_to_periods(context: UpgradeContext) -> None:
         context.add_column_with_defaults('periods', Column(
             'with_group_code', Boolean, nullable=True
         ), default=True)
+
+
+@upgrade_task('Add cancelled state to volunteer_state enum')
+def add_cancelled_state_to_volunteer_state(context: UpgradeContext) -> None:
+    if not context.has_enum('volunteer_state'):
+        return
+
+    new_type = Enum(
+        'open',
+        'contacted',
+        'confirmed',
+        'cancelled',
+        name='volunteer_state'
+    )
+
+    op = context.operations
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state TYPE Text;
+        DROP TYPE volunteer_state;
+    """))
+
+    new_type.create(op.get_bind())
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state
+        TYPE volunteer_state USING state::text::volunteer_state;
+    """))

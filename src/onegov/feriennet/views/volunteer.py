@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from itertools import groupby
+from datetime import date
 from onegov.activity import Volunteer, VolunteerCollection
 from onegov.core.security import Public, Secret
+from onegov.core.templates import render_macro
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.forms import VolunteerForm
 from onegov.feriennet.layout import DefaultLayout
@@ -24,6 +26,16 @@ if TYPE_CHECKING:
     from onegov.activity.collections.volunteer import ReportRow
     from onegov.feriennet.request import FeriennetRequest
     from webob import Response
+
+
+def get_age(
+        birth_date: date
+) -> int:
+    today = date.today()
+    age = today.year - birth_date.year
+    if (today.month, today.day) < (birth_date.month, birth_date.day):
+        age -= 1
+    return age
 
 
 @FeriennetApp.html(
@@ -106,8 +118,7 @@ def handle_contacted(
     request.assert_valid_csrf_token()
     self.state = 'contacted'
 
-    return request.redirect(request.class_link(VolunteerCollection, {
-        'period_id': self.need.occasion.period_id.hex}))
+    return request.redirect(request.link(self, name='ticket_volunteer'))
 
 
 @FeriennetApp.view(
@@ -138,6 +149,122 @@ def handle_remove(self: Volunteer, request: FeriennetRequest) -> Response:
 
     return request.redirect(request.class_link(VolunteerCollection, {
         'period_id': self.need.occasion.period_id.hex}))
+
+
+def get_confirmed(
+        request: FeriennetRequest,
+        need_id: str,
+) -> int:
+    return request.session.query(Volunteer).filter(
+        Volunteer.need_id == need_id,
+        Volunteer.state == 'confirmed'
+    ).count()
+
+
+def state_change(request: FeriennetRequest,
+                 volunteer: Volunteer,
+                 state: str,
+                 layout: DefaultLayout) -> str:
+    assert volunteer.id is not None
+    url = request.class_link(
+        Volunteer, name=state, variables={'id': volunteer.id.hex})
+    return layout.csrf_protected_url(url)
+
+
+@FeriennetApp.view(
+    model=Volunteer,
+    permission=Secret,
+    name='ticket_contacted',
+    request_method='POST')
+def handle_ticket_contacted(self: Volunteer, request: FeriennetRequest) -> str:
+    request.assert_valid_csrf_token()
+    self.state = 'contacted'
+
+    layout = DefaultLayout(self, request)
+
+    return render_macro(
+        layout.macros['volunteer_submission'],
+        request,
+        {
+            'layout': layout,
+            'subscription': self,
+            'get_confirmed': get_confirmed,
+            'get_age': get_age,
+            'state_change': state_change,
+        }
+    )
+
+
+@FeriennetApp.view(
+    model=Volunteer,
+    permission=Secret,
+    name='ticket_open',
+    request_method='POST')
+def handle_ticket_open(self: Volunteer, request: FeriennetRequest) -> str:
+    request.assert_valid_csrf_token()
+    self.state = 'open'
+
+    layout = DefaultLayout(self, request)
+
+    return render_macro(
+        layout.macros['volunteer_submission'],
+        request,
+        {
+            'layout': layout,
+            'subscription': self,
+            'get_confirmed': get_confirmed,
+            'get_age': get_age,
+            'state_change': state_change,
+        }
+    )
+
+
+@FeriennetApp.view(
+    model=Volunteer,
+    permission=Secret,
+    name='ticket_confirmed',
+    request_method='POST')
+def handle_ticket_confirmed(self: Volunteer, request: FeriennetRequest) -> str:
+    request.assert_valid_csrf_token()
+    self.state = 'confirmed'
+
+    layout = DefaultLayout(self, request)
+
+    return render_macro(
+        layout.macros['volunteer_submission'],
+        request,
+        {
+            'layout': layout,
+            'subscription': self,
+            'get_confirmed': get_confirmed,
+            'get_age': get_age,
+            'state_change': state_change,
+        }
+    )
+
+
+@FeriennetApp.view(
+    model=Volunteer,
+    permission=Secret,
+    name='ticket_cancelled',
+    request_method='POST')
+def handle_ticket_cancelled(self: Volunteer, request: FeriennetRequest) -> str:
+    request.assert_valid_csrf_token()
+    self.state = 'cancelled'
+
+    layout = DefaultLayout(self, request)
+
+    return render_macro(
+        layout.macros['volunteer_submission'],
+        request,
+        {
+            'layout': layout,
+            'subscription': self,
+            'get_confirmed': get_confirmed,
+            'get_age': get_age,
+            'state_change': state_change,
+        }
+    )
 
 
 # Public, even though this is personal data -> the storage is limited to the
@@ -205,6 +332,22 @@ def submit_volunteer(
             )
             TicketMessage.create(ticket, request, 'opened', 'external')
         complete = True
+
+        request.app.send_transactional_email(
+            subject=_('Confirmation volunteer subscription'),
+            receivers=(user.username, ),
+            content=render_template(
+                'mail_booking_accepted.pt', request, {
+                    'layout': DefaultMailLayout(self, request),
+                    'title': subject,
+                    'model': self,
+                    'bookings_link': bookings_link,
+                    'cancellation_conditions': cancellation_conditions,
+                    'name': attendee.name,
+                    'dates': self.dates
+                }
+            )
+        )
 
     return {
         'layout': layout,

@@ -3264,3 +3264,34 @@ $booking-left-margin: 1.6rem;
 .subscribe-panel {
     display: none;
 }
+
+
+.volunteer-cards {
+    dt {
+        margin-bottom: 0;
+    }
+
+    .bg-color {
+        padding: 0 .2rem;
+        margin-left: -0.2rem;
+        border-radius: .3rem;
+
+        &.open,
+        &.yellow {
+            background: $red-pastel;
+        }
+
+        &.contacted {
+            background: $blue-pastel;
+        }
+
+        &.confirmed,
+        &.green {
+            background: $green-pastel;
+        }
+
+        &.cancelled {
+            background: $red-pastel;
+        }
+    }
+}

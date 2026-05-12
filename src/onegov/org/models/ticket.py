@@ -45,7 +45,6 @@ if TYPE_CHECKING:
     from onegov.ticket.collection import ExtendedTicketState
     from sqlalchemy.orm import Mapped, Query, Session
     from uuid import UUID
-
     type DateRange = tuple[date, date]
 
 
@@ -1890,16 +1889,25 @@ class VolunteerHandler(Handler):
         layout = DefaultLayout(self.volunteer_cart, request)
 
         def get_confirmed(
-                self: VolunteerHandler,
-                need_id: str
+                request: OrgRequest,
+                need_id: str,
         ) -> int:
-            return self.session.query(Volunteer).filter(
+            return request.session.query(Volunteer).filter(
                 Volunteer.need_id == need_id,
                 Volunteer.state == 'confirmed'
             ).count()
 
+        def state_change(request: OrgRequest,
+                        volunteer: Volunteer,
+                        state: str,
+                        layout: DefaultLayout) -> str:
+            assert volunteer.id is not None
+            url = request.class_link(
+                Volunteer, name=state, variables={'id': volunteer.id.hex})
+            return layout.csrf_protected_url(url)
+
         def get_age(
-                birth_date: date
+            birth_date: date
         ) -> int:
             today = date.today()
             age = today.year - birth_date.year
@@ -1907,13 +1915,13 @@ class VolunteerHandler(Handler):
                 age -= 1
             return age
 
-
         parts = []
         parts.append(
             render_macro(layout.macros['volunteer_submissions'], request, {
                 'self': self,
                 'volunteer': self.volunteer,
                 'get_age': get_age,
+                'state_change': state_change,
                 'subscriptions': self.volunteer_cart,
                 'get_confirmed': get_confirmed,
                 'layout': layout
