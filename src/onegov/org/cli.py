@@ -3382,18 +3382,18 @@ def feature_statistics(
         schema = request.session.info['schema']
         org = request.session.query(Organisation).first()
 
+        citizen_login = bool(getattr(org, 'citizen_login_enabled', False))
         newsletter = bool(getattr(org, 'show_newsletter', False))
         ris = bool(getattr(org, 'ris_enabled', False))
-        citizen_login = bool(getattr(org, 'citizen_login_enabled', False))
 
         results[schema] = {
+            'citizen_login': citizen_login,
             'newsletter': newsletter,
             'ris': ris,
-            'citizen_login': citizen_login,
         }
 
         click.get_current_context().call_on_close(
-            lambda: click.echo(json.dumps(results, indent=2))
+            lambda: click.echo(json.dumps(results))
         )
 
     return collect
