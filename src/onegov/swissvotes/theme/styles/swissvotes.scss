@@ -60,7 +60,7 @@ main {
     Button
 */
 .button.secondary {
-    background-color: $e0e3e5;
+    background-color: #e0e3e5;
     color: $black;
 
     &:hover {
@@ -459,10 +459,6 @@ $modal-padding-md: 70px;
     font-weight: bold;
 }
 
-// .right-off-canvas-menu {
-//     width: 100%;
-// }
-
-// .move-left > .inner-wrap {
-//     transform: translate3d(-100%, 0, 0);
-// }
+.hidden {
+    display: none !important;
+}
