@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from functools import cached_property
-from onegov.core.elements import Confirm
-from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.pas import _
 from onegov.pas.collections import PASParliamentarianCollection
@@ -38,36 +36,3 @@ class PASParliamentarianRoleLayout(DefaultLayout):
             ),
             Link(self.title, self.request.link(self.model))
         ]
-
-    @cached_property
-    def editbar_links(self) -> list[Link] | None:
-        if self.request.is_manager:
-            return [
-                Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
-                ),
-                Link(
-                    text=_('Remove'),
-                    url=self.csrf_protected_url(
-                        self.request.link(self.model)
-                    ),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _('Do you really want to remove this role?'),
-                            _('This cannot be undone.'),
-                            _('Remove role'),
-                            _('Cancel')
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(
-                                self.model.parliamentarian
-                            )
-                        )
-                    )
-                )
-            ]
-        return None

@@ -1829,6 +1829,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-form::before { @include icon($new-form-icon); }
     .new-document-form::before { @include icon($new-document-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
+    .new-root-link::before { @include icon($new-link-icon); }
     .new-iframe::before { @include icon($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }

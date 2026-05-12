@@ -42,11 +42,13 @@ def test_process_credit_card_payment_successfully() -> None:
     assert isinstance(payment, ManualPayment)
     assert payment.source == 'manual'
 
-    payment = process_payment('free', Price(10, 'CHF'), Provider(), 'foobar')
-    assert payment == 'success'  # type: ignore[comparison-overlap]
+    result: Any = process_payment(
+        'free', Price(10, 'CHF'), Provider(), 'foobar'
+    )
+    assert result == 'success'
 
-    payment = process_payment('cc', Price(10, 'CHF'), Provider(), 'foobar')
-    assert payment == 'success'  # type: ignore[comparison-overlap]
+    result = process_payment('cc', Price(10, 'CHF'), Provider(), 'foobar')
+    assert result == 'success'
 
 
 def test_process_credit_card_payment_error(

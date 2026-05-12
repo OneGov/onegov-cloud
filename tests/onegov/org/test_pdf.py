@@ -8,7 +8,7 @@ from onegov.core.utils import Bunch
 from onegov.form import FormCollection
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.models import TicketMessage, TicketChatMessage
-from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.pdf.ticket import TicketBasePdf, TicketPdf
 from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -243,3 +243,22 @@ def test_ticket_pdf_long_message(client: Client) -> None:
     assert pdf.content_type == 'application/pdf'
     _, page_text = extract_pdf_info(BytesIO(pdf.body))
     assert 'John' in page_text
+
+
+def test_ticket_summary_empty_after_cleaning() -> None:
+    pdf = TicketBasePdf(
+        BytesIO(),
+        title='Test',
+        created='01.01.2026',
+        author='localhost',
+        translations={},
+        locale='de_CH',
+    )
+    pdf.init_a4_portrait()
+
+    pdf.ticket_summary('<div></div>')
+
+    # early-exit cases
+    pdf.ticket_summary(None)
+    pdf.ticket_summary('')
+    pdf.ticket_summary('<p></p>')

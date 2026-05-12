@@ -6,6 +6,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from __future__ import annotations
 
 from sqlalchemy import Column
+from sqlalchemy import JSON
 from sqlalchemy import Text
 
 from onegov.core.orm.types import UTCDateTime
@@ -279,3 +280,14 @@ def migrate_into_par_political_business_parliamentary_groups(
         )
         context.operations.drop_column(
             'par_political_businesses', 'parliamentary_group_id')
+
+
+@upgrade_task('Add meta and content columns to parliamentarian roles')
+def add_meta_content_to_parliamentarian_roles(
+    context: UpgradeContext,
+) -> None:
+    table = 'par_parliamentarian_roles'
+    if not context.has_column(table, 'meta'):
+        context.operations.add_column(table, Column('meta', JSON()))
+    if not context.has_column(table, 'content'):
+        context.operations.add_column(table, Column('content', JSON()))

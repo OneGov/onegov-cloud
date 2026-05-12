@@ -15,6 +15,7 @@ from onegov.pas.excel_header_constants import (
     commission_expected_headers_variant_2,
 )
 from onegov.pas.data_import import import_commissions_excel
+from onegov.pas.utils import is_active_kantonsrat_member
 from onegov.pas.log import ClickOutputHandler, CompositeOutputHandler
 from onegov.pas.importer.output_handlers import DatabaseOutputHandler
 from onegov.pas.importer.orchestrator import (
@@ -287,6 +288,98 @@ def import_kub_data(
             raise
 
     return cli_wrapper
+
+
+@cli.command('sync-user-accounts', context_settings={'singular': True})
+@click.option('--dry-run/--no-dry-run', default=False)
+def sync_user_accounts_cli(dry_run: bool) -> Processor:
+    """Sync user accounts for all parliamentarians.
+
+    Example:
+        onegov-pas --select '/onegov_pas/zug' sync-user-accounts
+        onegov-pas --select '/onegov_pas/zug' sync-user-accounts \
+            --dry-run
+    """
+
+    def do_sync(request: PasRequest, app: PasApp) -> None:
+        collection = PASParliamentarianCollection(app)
+        result = collection.sync_user_accounts()
+
+        synced = result.get('synced', 0)
+        skipped = result.get('skipped', 0)
+        created = result.get('created', [])
+
+        click.echo(
+            f'Synced: {synced}, Skipped: {skipped}, '
+            f'Created: {len(created)}'
+        )
+        if created:
+            for username in created:
+                click.echo(f'  New account: {username}')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Dry run - changes aborted', fg='yellow')
+
+    return do_sync
+
+
+@cli.command('list-kantonsrat', context_settings={'singular': True})
+def list_kantonsrat_cli() -> Processor:
+    """List parliamentarians by Kantonsrat membership status.
+
+    Shows who has an active Kantonsrat role (no party, no group,
+    no additional_information, end is NULL or >= today).
+
+    Example:
+        onegov-pas --select '/onegov_pas/zug' list-kantonsrat
+    """
+
+    def do_list(request: PasRequest, app: PasApp) -> None:
+        from onegov.pas.models import PASParliamentarian
+
+        session = request.session
+        today = date.today()
+
+        all_parls = (
+            session.query(PASParliamentarian)
+            .order_by(
+                PASParliamentarian.last_name,
+                PASParliamentarian.first_name,
+            )
+            .all()
+        )
+
+        in_kantonsrat = []
+        not_in_kantonsrat = []
+
+        for p in all_parls:
+            if is_active_kantonsrat_member(p, today):
+                in_kantonsrat.append(p)
+            else:
+                not_in_kantonsrat.append(p)
+
+        click.secho(
+            f'\n=== IN Kantonsrat ({len(in_kantonsrat)}) ===',
+            fg='green',
+        )
+        for p in in_kantonsrat:
+            click.echo(f'  {p.last_name}, {p.first_name}')
+
+        click.secho(
+            f'\n=== NOT in Kantonsrat ({len(not_in_kantonsrat)}) ===',
+            fg='red',
+        )
+        for p in not_in_kantonsrat:
+            click.echo(f'  {p.last_name}, {p.first_name}')
+
+        click.echo(
+            f'\nTotal: {len(all_parls)} | '
+            f'In: {len(in_kantonsrat)} | '
+            f'Not in: {len(not_in_kantonsrat)}'
+        )
+
+    return do_list
 
 
 @cli.command('update-custom-data')

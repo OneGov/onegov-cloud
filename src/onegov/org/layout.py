@@ -643,6 +643,20 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
         return time_range
 
+    def format_event_time_range(
+        self,
+        start: datetime | time,
+        end: datetime | time
+    ) -> str:
+
+        time_range = utils.render_time_range(start, end)
+
+        if time_range in ('00:00 - 24:00', '00:00 - 23:59'):
+            return self.request.translate(_('all day'))
+
+        suffix = self.request.translate(_("o'clock"))
+        return f'{time_range} {suffix}'
+
     def format_date_range(
         self,
         start: date | datetime | None,
@@ -4101,14 +4115,30 @@ class HomepageLayout(DefaultLayout):
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
                 ),
-                Link(
-                    _('Add'),
-                    self.request.link(Editor('new-root', self.model, 'page')),
-                    attrs={'class': ('new-page')},
-                    classes=(
-                        'new-page',
-                        'show-new-content-placeholder'
-                    ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=(
+                        Link(
+                            _('Topic'),
+                            self.request.link(
+                                Editor('new-root', self.model, 'page')),
+                            attrs={'class': ('new-page')},
+                            classes=(
+                                'new-page',
+                                'show-new-content-placeholder'
+                            ),
+                        ),
+                        Link(
+                            _('Link'),
+                            self.request.link(
+                                Editor('new-root', self.model, 'link')),
+                            attrs={'class': 'new-root-link'},
+                            classes=(
+                                'new-root-link',
+                                'show-new-content-placeholder'
+                            )
+                        )
+                    )
                 ),
             ]
         return None
