@@ -13,6 +13,7 @@ from onegov.feriennet.layout import VolunteerLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
+from onegov.org.app import render_template
 from onegov.org.models import TicketMessage
 from onegov.ticket import Ticket, TicketCollection
 from operator import attrgetter
@@ -20,6 +21,8 @@ from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
+
+from onegov.town6.layout import DefaultMailLayout
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.types import JSON_ro, RenderData
@@ -316,14 +319,16 @@ def submit_volunteer(
         volunteers = VolunteerCollection(request.session, period=None)
         cart = VolunteerCart.from_request(request)
         token = uuid4()
+        subscriptions = []
 
         for need_id in cart.ids():
-            volunteers.add(
+            volunteer = volunteers.add(
                 token=token,
                 need_id=need_id,
                 **{
                     k: v for k, v in form.data.items() if k != 'csrf_token'
                 })
+            subscriptions.append(volunteer)
 
         cart.clear()
         with request.session.no_autoflush:
@@ -333,18 +338,16 @@ def submit_volunteer(
             TicketMessage.create(ticket, request, 'opened', 'external')
         complete = True
 
+        subject = _('Subscription as a volunteer')
+
         request.app.send_transactional_email(
-            subject=_('Confirmation volunteer subscription'),
-            receivers=(user.username, ),
+            subject=subject,
+            receivers=(subscriptions[0].email, ),
             content=render_template(
-                'mail_booking_accepted.pt', request, {
+                'mail_volunteer_subscription.pt', request, {
                     'layout': DefaultMailLayout(self, request),
                     'title': subject,
-                    'model': self,
-                    'bookings_link': bookings_link,
-                    'cancellation_conditions': cancellation_conditions,
-                    'name': attendee.name,
-                    'dates': self.dates
+                    'subscriptions': subscriptions,
                 }
             )
         )
