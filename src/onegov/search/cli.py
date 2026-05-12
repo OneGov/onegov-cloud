@@ -25,7 +25,7 @@ cli = command_group()
 
 def psql_index_status(
     app: SearchApp,
-    title: str,
+    title: str | None = None,
     skip_ok: bool = False
 ) -> None:
     """ Prints the percentage of indexed documents per model. """
@@ -73,7 +73,8 @@ def psql_index_status(
             status = click.style('  OK  ', fg='green')
         if not header_printed:
             header_printed = True
-            click.secho(title, underline=True)
+            if title:
+                click.secho(title, underline=True)
             click.echo(f'| Status | {"Tablename": <40} | Indexed | No. docs |')
             click.echo(f'|--------|-{"---------":-<40}-|---------|----------|')
 
