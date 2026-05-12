@@ -3392,8 +3392,8 @@ def feature_statistics(
             'ris': ris,
         }
 
-        click.get_current_context().call_on_close(
-            lambda: click.echo(json.dumps(results))
-        )
+    click.get_current_context().call_on_close(
+        lambda: click.echo(json.dumps(results))
+    )
 
     return collect
