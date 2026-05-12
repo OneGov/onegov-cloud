@@ -313,3 +313,62 @@ def test_view_suggestions(client: Client[TestApp]) -> None:
     assert client.get(
         '/suggestion/person/political-affiliation?term=s'
     ).json == ['SVP', 'jSVP']
+
+
+def test_views_assembly_ticker_sorted_vota(client: Client[TestApp]) -> None:
+    client.login_admin()
+
+    # add assembly
+    page = client.get('/').click('Archiv')
+    page = page.click('Landsgemeinde', index=1)
+    page.form['date'] = '2026-05-03'
+    page.form['state'] = 'ongoing'
+    page.form['overview'] = '<p>Overview</p>'
+    page = page.form.submit().follow()
+
+    # add agenda item 1 with two vota
+    page = page.click('Traktandum')
+    page.form['number'] = 1
+    page.form['state'] = 'completed'
+    page.form['title'] = 'Item 1'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    page.form['number'] = 1
+    page.form['state'] = 'completed'
+    page.form['person_name'] = 'Alice'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    page.form['number'] = 2
+    page.form['state'] = 'completed'
+    page.form['person_name'] = 'Bob'
+    page.form.submit()
+
+    # add agenda item 2 with two vota
+    page = client.get('/assembly/2026-05-03').click('Traktandum')
+    page.form['number'] = 2
+    page.form['state'] = 'completed'
+    page.form['title'] = 'Item 2'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    page.form['number'] = 2
+    page.form['state'] = 'completed'
+    page.form['person_name'] = 'Dave'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    page.form['number'] = 1
+    page.form['state'] = 'completed'
+    page.form['person_name'] = 'Charlie'
+    page.form.submit()
+
+    # ticker renders vota in reverse number order
+    ticker = client.get('/assembly/2026-05-03/ticker')
+    text = ticker.text
+
+    # within item 1: Bob (votum 2) before Alice (votum 1)
+    assert text.index('Bob') < text.index('Alice')
+    # within item 2: Dave (votum 2) before Charlie (votum 1)
+    assert text.index('Dave') < text.index('Charlie')

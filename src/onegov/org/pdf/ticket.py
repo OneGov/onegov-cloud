@@ -110,6 +110,8 @@ class TicketBasePdf(OrgPdf):
         )
         html = cleaner.clean(html)
         # Todo: phone numbers with href="tel:.." are cleaned out
+        if not html.strip():
+            return
 
         tree = etree.parse(StringIO(html), etree.HTMLParser())
 

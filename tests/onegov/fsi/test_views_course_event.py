@@ -140,6 +140,38 @@ def test_duplicate_course_event(client_with_db: Client) -> None:
     assert dup.form['max_attendees'].value == str(event.max_attendees)
 
 
+def test_status_change_to_planned_sends_reminder_email(
+    client_with_db: Client
+) -> None:
+    client = client_with_db
+    session = client.app.session()
+    event = session.query(CourseEvent).filter(
+        CourseEvent.start > utcnow()).first()
+    assert event is not None
+    assert event.status == 'created'
+
+    wanted_count = event.attendees.count()
+    assert wanted_count > 0
+
+    client.login_admin()
+    page = client.get(f'/fsi/event/{event.id}/edit')
+    page.form['max_attendees'] = 10
+    page.form['status'] = 'planned'
+    page.form.submit().follow()
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    for number in range(wanted_count):
+        message = client.get_email(0, number)
+        assert message['Subject'] == 'Erinnerung Kursdurchführung'
+
+    # Re-submit form with status still 'planned' — must not resend
+    page = client.get(f'/fsi/event/{event.id}/edit')
+    assert page.form['status'].value == 'planned'
+    page.form['max_attendees'] = 10
+    page.form.submit().follow()
+    assert len(os.listdir(client.app.maildir)) == 1
+
+
 def test_cancel_course_event(client_with_db: Client) -> None:
     client = client_with_db
     session = client.app.session()

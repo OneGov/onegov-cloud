@@ -6398,7 +6398,7 @@ msgid "Your ${org} Registration"
 msgstr "La tua registrazione a ${org}"
 
 msgid ""
-"Thank you for registering. Please follow the instructions on the activiation "
+"Thank you for registering. Please follow the instructions on the activation "
 "e-mail sent to you. Please check your spam folder if you have not received "
 "the email."
 msgstr ""
@@ -7975,7 +7975,7 @@ msgid "The username can be changed <a href=\"${url}\">here</a>."
 msgstr "L'indirizzo e-mail può essere modificato <a href=\"${url}\">qui</a>."
 
 #, python-format
-msgid "Succesfully changed ${old_username} to ${new_username}"
+msgid "Successfully changed ${old_username} to ${new_username}"
 msgstr "Modifica riuscita da ${old_username} a ${new_username}"
 
 msgid "New User"

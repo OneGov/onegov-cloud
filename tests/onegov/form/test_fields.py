@@ -750,3 +750,26 @@ def test_tags_field() -> None:
     field.process_formdata(['t, ags', 'don\'t care'])
     assert field.data == ['t', 'ags']
     assert field.validate(form)
+
+    # OGC-3135: _value() must return comma-string even when data is list
+    # (post-process_formdata). Without this, validation-failure re-render
+    # puts str(list) into HTML value, corrupting data on resubmit.
+    form = Form()
+    field = TagsField()
+    field = field.bind(form, 'tags')  # type: ignore[attr-defined]
+
+    field.process_formdata(['Psychologie, Exorzismus'])
+    assert field.data == ['Psychologie', 'Exorzismus']
+    assert field._value() == 'Psychologie,Exorzismus'
+
+    field.process_formdata(['single'])
+    assert field._value() == 'single'
+
+    field.process_formdata([])
+    assert field._value() == ''
+
+    field.process_data(['from', 'model'])
+    assert field._value() == 'from,model'
+
+    field.process_data(None)
+    assert field._value() == ''

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from io import BytesIO
+from zipfile import ZipFile
 from webob import Response
 from onegov.core.utils import module_path
 from decimal import Decimal
@@ -336,6 +337,18 @@ def view_settlement_run(
         'parliamentarians': {
             'title': _('Settlements by Parliamentarian'),
             'links': [
+                Link(
+                    _('All Parliamentarians (ZIP)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category=('all-parliamentarians-zip'),
+                        ),
+                        name='run-export',
+                    ),
+                ),
+            ]
+            + [
                 Link(
                     f'{p.last_name} {p.first_name}',
                     request.link(
@@ -1185,6 +1198,35 @@ def view_settlement_run_all_export(
             content_type='text/csv; charset=utf-8',
             content_disposition=f'attachment; filename="{filename}"'
         )
+    elif self.category == 'all-parliamentarians-zip':
+        session = request.session
+        parliamentarians = get_parliamentarians_with_settlements(
+            session,
+            self.settlement_run.start,
+            self.settlement_run.end,
+            settlement_run_id=self.settlement_run.id,
+        )
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, 'w') as zf:
+            for p in parliamentarians:
+                pdf_bytes = generate_parliamentarian_settlement_pdf(
+                    self.settlement_run, request, p
+                )
+                name = f'{p.last_name}_{p.first_name}'.replace(
+                    ',', ' '
+                ).replace('+', ' ')
+                fname = normalize_for_filename(f'Parlamentarier_{name}')
+                zf.writestr(f'{fname}.pdf', pdf_bytes)
+
+        zip_buffer.seek(0)
+        run_name = normalize_for_filename(self.settlement_run.name)
+        filename = f'Parlamentarier_{run_name}.zip'
+        return Response(
+            zip_buffer.read(),
+            content_type='application/zip',
+            content_disposition=(f'attachment; filename="{filename}"'),
+        )
+
     else:
         raise NotImplementedError(
             f'Export category {self.category} not implemented for all exports'

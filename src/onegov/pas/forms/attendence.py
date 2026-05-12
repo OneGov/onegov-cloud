@@ -241,6 +241,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 ]
             else:
                 self.parliamentarian_id.choices = []
+                self.request.warn_no_parliamentarian()  # type:ignore[attr-defined]
         elif (
             hasattr(self.request.identity, 'role')
             and self.request.identity.role == 'commission_president'
@@ -281,6 +282,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 self.parliamentarian_id.choices = list(dict.fromkeys(choices))
             else:
                 self.parliamentarian_id.choices = []
+                self.request.warn_no_parliamentarian()  # type:ignore[attr-defined]
         else:
             self.parliamentarian_id.choices = [
                 (str(parliamentarian.id), parliamentarian.title)
@@ -483,6 +485,8 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         ]
         # JavaScript will handle selection based on commission
         self.parliamentarian_id.data = []
+
+        self.request.warn_no_parliamentarian()  # type: ignore[attr-defined]
 
 
 class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
