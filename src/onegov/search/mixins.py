@@ -40,7 +40,7 @@ class Searchable:
         fts_properties: ClassVar[dict[str, Any]]
         fts_id: ClassVar[str]
         fts_type_title: ClassVar[str | Callable[[AnyRequest], str]]
-        __tablename__: ClassVar[str]
+        __tablename__: str
 
     @classproperty  # type:ignore[no-redef]
     @classmethod

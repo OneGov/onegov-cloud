@@ -282,3 +282,58 @@ def cache_assembly_date_on_landsgemeinde_file(context: UpgradeContext) -> None:
               ) AS linked
              WHERE linked.file_id = files.id
         """))
+
+
+@upgrade_task('Cache fts_public on LandsgemeindeFile.meta')
+def cache_fts_public_on_landsgemeinde_file(context: UpgradeContext) -> None:
+    if context.has_table('files_for_landsgemeinde_assemblies_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{fts_public}',
+                       (linked.state != 'draft')::text::jsonb
+                   )
+              FROM (
+                SELECT assemblies.state AS state,
+                       link.file_id as file_id
+                  FROM landsgemeinde_assemblies AS assemblies
+                  JOIN files_for_landsgemeinde_assemblies_files AS link
+                    ON link.landsgemeinde_assemblies_id = assemblies.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))
+    if context.has_table('files_for_landsgemeinde_agenda_items_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{fts_public}',
+                       (linked.state != 'draft')::text::jsonb
+                   )
+              FROM (
+                SELECT items.state AS state,
+                       link.file_id as file_id
+                  FROM landsgemeinde_agenda_items AS items
+                  JOIN files_for_landsgemeinde_agenda_items_files AS link
+                    ON link.landsgemeinde_agenda_items_id = items.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))
+    if context.has_table('files_for_landsgemeinde_vota_files'):
+        context.operations.execute(text("""
+            UPDATE files
+               SET meta = jsonb_set(
+                       files.meta,
+                       '{fts_public}',
+                       (linked.state != 'draft')::text::jsonb
+                   )
+              FROM (
+                SELECT vota.state AS state,
+                       link.file_id as file_id
+                  FROM landsgemeinde_vota AS vota
+                  JOIN files_for_landsgemeinde_vota_files AS link
+                    ON link.landsgemeinde_vota_id = vota.id
+              ) AS linked
+             WHERE linked.file_id = files.id
+        """))

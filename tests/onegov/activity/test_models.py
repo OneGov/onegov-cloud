@@ -567,7 +567,7 @@ def test_no_orphan_occasions(session: Session, owner: User) -> None:
 
     # Test volunteer and occasion need
     assert tournament.id
-    need = OccasionNeed(  # type: ignore[misc]
+    need = OccasionNeed(
         id=uuid4(),
         name='Helpers',
         number=NumericRange(1, 2),
@@ -1034,20 +1034,24 @@ def test_occasion_owners(
 
 
 def test_attendee_age(session: Session, owner: User) -> None:
-    with freeze_time('2025-02-28'):
+    today = date.today()
 
-        def age(years: int) -> date:
-            return date.today().replace(year=date.today().year - years)
+    def age(years: int) -> date:
+        try:
+            return today.replace(year=today.year - years)
+        except ValueError:
+            # today is Feb 29 and the target year is not a leap year
+            return today.replace(month=2, day=28, year=today.year - years)
 
-        attendees = AttendeeCollection(session)
-        d = attendees.add(owner, "Dustin Henderson", age(13), 'male')
-        m = attendees.add(owner, "Mike Wheeler", age(14), 'male')
+    attendees = AttendeeCollection(session)
+    d = attendees.add(owner, "Dustin Henderson", age(13), 'male')
+    m = attendees.add(owner, "Mike Wheeler", age(14), 'male')
 
-        assert d.age == 13
-        assert m.age == 14
+    assert d.age == 13
+    assert m.age == 14
 
-        assert attendees.query().filter(Attendee.age <= 13).count() == 1
-        assert attendees.query().filter(Attendee.age <= 14).count() == 2
+    assert attendees.query().filter(Attendee.age <= 13).count() == 1
+    assert attendees.query().filter(Attendee.age <= 14).count() == 2
 
 
 def test_booking_collection(session: Session, owner: User) -> None:
@@ -1328,7 +1332,7 @@ def test_happiness(session: Session, owner: User) -> None:
         assert equal(dustin.happiness(period_id))
 
         q = attendees.query().with_entities(Attendee.happiness(period_id))
-        assert equal(q.first().happiness)
+        assert equal(q.first().happiness)  # type: ignore[union-attr]
 
     # no bookings yet
     assert_happiness(period.id, None)
@@ -2569,7 +2573,7 @@ def test_date_changes(
 def test_age_barriers(prebooking_period: BookingPeriod) -> None:
     period = prebooking_period
 
-    o = Occasion(age=NumericRange(6, 9), period=period, dates=[  # type: ignore[misc]
+    o = Occasion(age=NumericRange(6, 9), period=period, dates=[
         OccasionDate(
             start=datetime(2017, 7, 26, 10),
             end=datetime(2017, 7, 26, 16),

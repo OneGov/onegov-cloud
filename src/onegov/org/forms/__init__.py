@@ -41,13 +41,13 @@ from onegov.org.forms.resource import ResourceExportForm
 from onegov.org.forms.resource import ResourceForm
 from onegov.org.forms.resource_recipient import ResourceRecipientForm
 from onegov.org.forms.search import SearchForm
+from onegov.org.forms.settings import AccessSettingsForm
 from onegov.org.forms.settings import AnalyticsSettingsForm
+from onegov.org.forms.settings import AppearanceSettingsForm
 from onegov.org.forms.settings import FooterSettingsForm
-from onegov.org.forms.settings import GeneralSettingsForm
 from onegov.org.forms.settings import HolidaySettingsForm
 from onegov.org.forms.settings import HomepageSettingsForm
 from onegov.org.forms.settings import MapSettingsForm
-from onegov.org.forms.settings import ModuleSettingsForm
 from onegov.org.forms.signup import SignupForm
 from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.forms.text_module import TextModuleForm
@@ -57,6 +57,7 @@ from onegov.org.forms.ticket import TicketAssignmentForm
 from onegov.org.forms.ticket import TicketChangeTagForm
 from onegov.org.forms.ticket import TicketChatMessageForm
 from onegov.org.forms.ticket import TicketNoteForm
+from onegov.org.forms.user import ChangeUsernameForm
 from onegov.org.forms.user import ManageUserForm
 from onegov.org.forms.user import ManageUserGroupForm
 from onegov.org.forms.user import NewUserForm
@@ -64,12 +65,15 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = (
+    'AccessSettingsForm',
     'AddReservationForm',
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
+    'AppearanceSettingsForm',
+    'ChangeUsernameForm',
     'CitizenLoginForm',
-    'ConfirmCitizenLoginForm',
     'CommissionForm',
+    'ConfirmCitizenLoginForm',
     'DateRangeForm',
     'DaypassAllocationEditForm',
     'DaypassAllocationForm',
@@ -78,18 +82,17 @@ __all__ = (
     'EventForm',
     'EventImportForm',
     'ExportForm',
+    'ExtendedInternalTicketChatMessageForm',
     'FindYourSpotForm',
     'FooterSettingsForm',
     'FormDefinitionForm',
     'FormRegistrationWindowForm',
     'FormSubmissionsExport',
-    'GeneralSettingsForm',
     'HolidaySettingsForm',
     'HomepageSettingsForm',
     'IframeForm',
     'ImageSetForm',
     'InternalTicketChatMessageForm',
-    'ExtendedInternalTicketChatMessageForm',
     'KabaEditForm',
     'LinkForm',
     'ManageUserForm',
@@ -97,11 +100,10 @@ __all__ = (
     'ManualInvoiceItemForm',
     'MapSettingsForm',
     'MeetingForm',
-    'ModuleSettingsForm',
+    'NewUserForm',
     'NewsletterForm',
     'NewsletterSendForm',
     'NewsletterTestForm',
-    'NewUserForm',
     'PageForm',
     'ParliamentarianForm',
     'ParliamentarianRoleForm',

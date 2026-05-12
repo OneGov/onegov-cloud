@@ -5,9 +5,10 @@ from onegov.core.security.roles import get_roles_setting as \
     get_roles_setting_base
 from onegov.pas import PasApp
 from onegov.pas.collections import (
-    AttendenceCollection
+    AttendenceCollection,
+    PASCommissionCollection,
 )
-from onegov.org.models import GeneralFileCollection
+from onegov.org.models import GeneralFile, GeneralFileCollection
 
 from datetime import date
 from onegov.pas.models.attendence import Attendence
@@ -111,7 +112,7 @@ def restrict_attendence_access(
                     User.parliamentarian.has(id=model.parliamentarian_id)  # type: ignore[attr-defined]
                 ).first()
 
-                if attendance_owner and attendance_owner.parliamentarian:
+                if attendance_owner and attendance_owner.parliamentarian:  # type: ignore[attr-defined]
                     # Check if president leads any commission where attendance
                     # owner is a member
                     for pres_membership in (
@@ -124,7 +125,7 @@ def restrict_attendence_access(
                             # Check if attendance owner is member of this
                             # commission
                             for member_membership in (
-                                attendance_owner.parliamentarian
+                                attendance_owner.parliamentarian  # type: ignore[attr-defined]
                                 .commission_memberships
                             ):
                                 if (
@@ -222,6 +223,35 @@ def restrict_files_collection_access(
     return permission in getattr(app.settings.roles, identity.role)
 
 
+@PasApp.permission_rule(model=GeneralFile, permission=object)
+def restrict_general_file_access(
+    app: PasApp,
+    identity: Identity,
+    model: GeneralFile,
+    permission: type[Intent],
+) -> bool:
+    if (
+        identity.role in ('parliamentarian', 'commission_president')
+        and isinstance(permission, type)
+        and issubclass(permission, Private)
+    ):
+        return True
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@PasApp.permission_rule(model=PASCommissionCollection, permission=object)
+def restrict_commission_collection_access(
+    app: PasApp,
+    identity: Identity,
+    model: PASCommissionCollection,
+    permission: type[Intent],
+) -> bool:
+    if identity.role in ('parliamentarian', 'commission_president'):
+        if isinstance(permission, type) and issubclass(permission, Private):
+            return True
+    return permission in getattr(app.settings.roles, identity.role)
+
+
 @PasApp.permission_rule(model=Commission, permission=Private)
 def has_private_access_to_commission(
     app: PasApp,
@@ -236,14 +266,11 @@ def has_private_access_to_commission(
     - president of THIS specific commission
     If yes → grants access
     """
-    if identity.role == 'commission_president':
+    if identity.role in ('parliamentarian', 'commission_president'):
         user = app.session().query(User).filter_by(
             username=identity.userid).first()
-        if user:
-            if user.parliamentarian:  # type: ignore[attr-defined]
-                membershps = user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
-                for membership in membershps:
-                    if membership.commission_id == model.id and \
-                            membership.role == 'president':
-                        return True
+        if user and user.parliamentarian:  # type: ignore[attr-defined]
+            for m in user.parliamentarian.commission_memberships:  # type: ignore[attr-defined]
+                if m.commission_id == model.id:
+                    return True
     return permission in getattr(app.settings.roles, identity.role)

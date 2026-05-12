@@ -53,7 +53,7 @@ def test_election_utils_majorz(
     }
 
     # get_candidates_results
-    assert tuple(get_candidates_results(election, session)) == (  # type: ignore[comparison-overlap]
+    assert tuple(get_candidates_results(election, session)) == (
         (24132, 'Hegglin', 'Peter', True, 'CVP', Decimal('62.3'), None, None),
         (23620, 'Eder', 'Joachim', True, 'FDP', Decimal('61.0'), None, None),
         (10997, 'Brandenberg', 'Manuel', False, 'SVP', Decimal('28.4'), None,
@@ -65,7 +65,7 @@ def test_election_utils_majorz(
     )
 
     entities = ['Baar', 'Cham']
-    assert tuple(  # type: ignore[comparison-overlap]
+    assert tuple(
         get_candidates_results(election, session, entities=entities)
     ) == (
         (2905 + 4207, 'Hegglin', 'Peter', True, 'CVP', Decimal('60.2'),
@@ -376,64 +376,66 @@ def test_election_utils_proporz(
     }
 
     # get_candidates_results
+    zero = Decimal('0')
     assert tuple(get_candidates_results(election, session)) == (
-        (3240, 'Lustenberger', 'Andreas', False, '', 0, 'ALG', '1'),
-        (1327, 'Estermann', 'Astrid', False, '', 0, 'ALG', '1'),
-        (1206, 'Schriber-Neiger', 'Hanni', False, '', 0, 'ALG', '1'),
-        (3859, 'Schuler', 'Hubert', False, '', 0, 'SP', '10'),
-        (2987, 'Bürgi Dellsperger', 'Christina', False, '', 0, 'SP', '10'),
-        (1874, 'Sivaganesan', 'Rupan', False, '', 0, 'SP', '10'),
-        (929, 'Hutter Elsener', 'Simone', False, '', 0, 'SP Frauen', '11'),
-        (684, 'Hug', 'Malaika', False, '', 0, 'SP Frauen', '11'),
-        (561, 'Mäder Beglinger', 'Anne', False, '', 0, 'SP Frauen', '11'),
-        (555, 'Spescha', 'Anna', False, '', 0, 'SP Juso', '12'),
-        (550, 'Krasnici', 'Denis', False, '', 0, 'SP Juso', '12'),
-        (218, 'Koepfli', 'Virginia', False, '', 0, 'SP Juso', '12'),
-        (2303, 'Dzaferi', 'Zari', False, '', 0, 'SP Männer', '13'),
-        (545, 'Suter', 'Guido', False, '', 0, 'SP Männer', '13'),
-        (394, 'Freimann', 'Fabian', False, '', 0, 'SP Männer', '13'),
-        (144, 'Coralic', 'Fadila', False, '', 0, 'SP Migrant.', '14'),
-        (117, 'Sönmez', 'Sehriban', False, '', 0, 'SP Migrant.', '14'),
-        (82, 'Simsek', 'Deniz', False, '', 0, 'SP Migrant.', '14'),
-        (17034, 'Aeschi', 'Thomas', True, '', 0, 'SVP', '15'),
-        (7206, 'Werner', 'Thomas', False, '', 0, 'SVP', '15'),
-        (5629, 'Villiger', 'Thomas', False, '', 0, 'SVP', '15'),
-        (269, 'Pfisterer', 'Luc', False, '', 0, 'SVP Int.', '16'),
-        (168, 'Bucher', 'Rinaldo', False, '', 0, 'SVP Int.', '16'),
-        (132, 'Hornickel', 'Alexander', False, '', 0, 'SVP Int.', '16'),
-        (2607, 'Risi', 'Adrian', False, '', 0, 'SVP WuG', '17'),
-        (1159, 'Brunner', 'Philip C.', False, '', 0, 'SVP WuG', '17'),
-        (607, 'Gertsch', 'Beat', False, '', 0, 'SVP WuG', '17'),
-        (345, 'Widmer', 'Fabienne', False, '', 0, 'ALG Junge', '2'),
-        (235, 'Gut', 'Christina', False, '', 0, 'ALG Junge', '2'),
-        (222, 'Perucchi', 'Alessandro', False, '', 0, 'ALG Junge', '2'),
-        (637, 'Odermatt', 'Anastas', False, '', 0, 'ALG Bildung', '3'),
-        (559, 'Haas', 'Esther', False, '', 0, 'ALG Bildung', '3'),
-        (490, 'Zimmermann Gibson', 'Tabea', False, '', 0, 'ALG Bildung', '3'),
-        (16134, 'Pfister', 'Gerhard', True, '', 0, 'CVP', '4'),
-        (4093, 'Barmet-Schelbert', 'Monika', False, '', 0, 'CVP', '4'),
-        (3606, 'Hausheer', 'Andreas', False, '', 0, 'CVP', '4'),
-        (3908, 'Bieri', 'Anna', False, '', 0, 'CVP Junge', '5'),
-        (1394, 'Iten', 'Christoph', False, '', 0, 'CVP Junge', '5'),
-        (1163, 'Kremmel', 'Corina', False, '', 0, 'CVP Junge', '5'),
-        (10174, 'Pezzatti', 'Bruno', True, '', 0, 'FDP Ost', '6'),
-        (3637, 'Ingold', 'Gabriela', False, '', 0, 'FDP Ost', '6'),
-        (2190, 'Mollet', 'Patrick', False, '', 0, 'FDP Ost', '6'),
-        (1706, 'Grüter', 'Arno', False, '', 0, 'FDP West', '7'),
-        (1378, 'Gygli', 'Daniel', False, '', 0, 'FDP West', '7'),
-        (1142, 'Siegrist', 'Birgitt', False, '', 0, 'FDP West', '7'),
-        (1823, 'Stadlin', 'Daniel', False, '', 0, 'glp', '8'),
-        (1256, 'Kottelat Schloesing', 'Michèle', False, '', 0, 'glp', '8'),
-        (1043, 'Soltermann', 'Claus', False, '', 0, 'glp', '8'),
-        (629, 'Mauchle', 'Florian', False, '', 0, 'Piraten', '9'),
-        (488, 'Thöni', 'Stefan', False, '', 0, 'Piraten', '9')
+        (3240, 'Lustenberger', 'Andreas', False, '', zero, 'ALG', '1'),
+        (1327, 'Estermann', 'Astrid', False, '', zero, 'ALG', '1'),
+        (1206, 'Schriber-Neiger', 'Hanni', False, '', zero, 'ALG', '1'),
+        (3859, 'Schuler', 'Hubert', False, '', zero, 'SP', '10'),
+        (2987, 'Bürgi Dellsperger', 'Christina', False, '', zero, 'SP', '10'),
+        (1874, 'Sivaganesan', 'Rupan', False, '', zero, 'SP', '10'),
+        (929, 'Hutter Elsener', 'Simone', False, '', zero, 'SP Frauen', '11'),
+        (684, 'Hug', 'Malaika', False, '', zero, 'SP Frauen', '11'),
+        (561, 'Mäder Beglinger', 'Anne', False, '', zero, 'SP Frauen', '11'),
+        (555, 'Spescha', 'Anna', False, '', zero, 'SP Juso', '12'),
+        (550, 'Krasnici', 'Denis', False, '', zero, 'SP Juso', '12'),
+        (218, 'Koepfli', 'Virginia', False, '', zero, 'SP Juso', '12'),
+        (2303, 'Dzaferi', 'Zari', False, '', zero, 'SP Männer', '13'),
+        (545, 'Suter', 'Guido', False, '', zero, 'SP Männer', '13'),
+        (394, 'Freimann', 'Fabian', False, '', zero, 'SP Männer', '13'),
+        (144, 'Coralic', 'Fadila', False, '', zero, 'SP Migrant.', '14'),
+        (117, 'Sönmez', 'Sehriban', False, '', zero, 'SP Migrant.', '14'),
+        (82, 'Simsek', 'Deniz', False, '', zero, 'SP Migrant.', '14'),
+        (17034, 'Aeschi', 'Thomas', True, '', zero, 'SVP', '15'),
+        (7206, 'Werner', 'Thomas', False, '', zero, 'SVP', '15'),
+        (5629, 'Villiger', 'Thomas', False, '', zero, 'SVP', '15'),
+        (269, 'Pfisterer', 'Luc', False, '', zero, 'SVP Int.', '16'),
+        (168, 'Bucher', 'Rinaldo', False, '', zero, 'SVP Int.', '16'),
+        (132, 'Hornickel', 'Alexander', False, '', zero, 'SVP Int.', '16'),
+        (2607, 'Risi', 'Adrian', False, '', zero, 'SVP WuG', '17'),
+        (1159, 'Brunner', 'Philip C.', False, '', zero, 'SVP WuG', '17'),
+        (607, 'Gertsch', 'Beat', False, '', zero, 'SVP WuG', '17'),
+        (345, 'Widmer', 'Fabienne', False, '', zero, 'ALG Junge', '2'),
+        (235, 'Gut', 'Christina', False, '', zero, 'ALG Junge', '2'),
+        (222, 'Perucchi', 'Alessandro', False, '', zero, 'ALG Junge', '2'),
+        (637, 'Odermatt', 'Anastas', False, '', zero, 'ALG Bildung', '3'),
+        (559, 'Haas', 'Esther', False, '', zero, 'ALG Bildung', '3'),
+        (490, 'Zimmermann Gibson', 'Tabea', False, '', zero,
+            'ALG Bildung', '3'),
+        (16134, 'Pfister', 'Gerhard', True, '', zero, 'CVP', '4'),
+        (4093, 'Barmet-Schelbert', 'Monika', False, '', zero, 'CVP', '4'),
+        (3606, 'Hausheer', 'Andreas', False, '', zero, 'CVP', '4'),
+        (3908, 'Bieri', 'Anna', False, '', zero, 'CVP Junge', '5'),
+        (1394, 'Iten', 'Christoph', False, '', zero, 'CVP Junge', '5'),
+        (1163, 'Kremmel', 'Corina', False, '', zero, 'CVP Junge', '5'),
+        (10174, 'Pezzatti', 'Bruno', True, '', zero, 'FDP Ost', '6'),
+        (3637, 'Ingold', 'Gabriela', False, '', zero, 'FDP Ost', '6'),
+        (2190, 'Mollet', 'Patrick', False, '', zero, 'FDP Ost', '6'),
+        (1706, 'Grüter', 'Arno', False, '', zero, 'FDP West', '7'),
+        (1378, 'Gygli', 'Daniel', False, '', zero, 'FDP West', '7'),
+        (1142, 'Siegrist', 'Birgitt', False, '', zero, 'FDP West', '7'),
+        (1823, 'Stadlin', 'Daniel', False, '', zero, 'glp', '8'),
+        (1256, 'Kottelat Schloesing', 'Michèle', False, '', zero, 'glp', '8'),
+        (1043, 'Soltermann', 'Claus', False, '', zero, 'glp', '8'),
+        (629, 'Mauchle', 'Florian', False, '', zero, 'Piraten', '9'),
+        (488, 'Thöni', 'Stefan', False, '', zero, 'Piraten', '9')
     )
 
     assert tuple(
         get_candidates_results(election, session, entities=['Baar', 'Cham'])
     )[:2] == (
-        (290 + 948, 'Lustenberger', 'Andreas', False, '', 0, 'ALG', '1'),
-        (135 + 255, 'Estermann', 'Astrid', False, '', 0, 'ALG', '1'),
+        (290 + 948, 'Lustenberger', 'Andreas', False, '', zero, 'ALG', '1'),
+        (135 + 255, 'Estermann', 'Astrid', False, '', zero, 'ALG', '1'),
     )
 
     # get_candidates_data

@@ -5,7 +5,7 @@ from onegov.file.models.file import File
 from onegov.file.utils import as_fileintent
 
 
-from typing import overload, IO, TypeVar, TYPE_CHECKING
+from typing import overload, IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Protocol
     from typing import Self
@@ -14,10 +14,7 @@ if TYPE_CHECKING:
         files: list[File]
 
 
-_F = TypeVar('_F', bound=File)
-
-
-class NamedFile:
+class NamedFile[T: File = File]:
 
     """ Helper for managing files using static names together with
     AssociatedFiles.
@@ -39,7 +36,7 @@ class NamedFile:
 
     """
 
-    def __init__(self, cls: type[_F] | None = None):
+    def __init__(self, cls: type[T] | None = None):
         self.cls = cls or File
 
     def __set_name__(self, owner: type[object], name: str) -> None:
@@ -57,7 +54,7 @@ class NamedFile:
         self,
         instance: HasFiles,
         owner: type[object] | None = None
-    ) -> File | None: ...
+    ) -> T | None: ...
 
     def __get__(
         self,

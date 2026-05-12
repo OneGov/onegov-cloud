@@ -90,7 +90,7 @@ class OccasionNeedExport(FeriennetExport):
         q = q.filter(OccasionNeed.occasion_id.in_(
             session.query(Occasion.id)
             .filter(Occasion.period_id == period.id)
-            .scalar_subquery()  # type: ignore[attr-defined]
+            .scalar_subquery()
         ))
         q = q.join(Occasion)
         q = q.options(

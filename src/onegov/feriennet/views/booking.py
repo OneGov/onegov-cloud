@@ -41,7 +41,8 @@ if TYPE_CHECKING:
     from onegov.core.elements import Trait
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.engine import Result
+    from sqlalchemy.orm import Session
     from typing import NamedTuple
     from webob import Response
 
@@ -154,7 +155,7 @@ def related_attendees(
     stmt = as_selectable_from_path(
         module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
-    related: Query[RelatedAttendeeRow] = session.execute(
+    related: Result[RelatedAttendeeRow] = session.execute(
         select(*stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
@@ -166,7 +167,7 @@ def related_attendees(
 
     result = defaultdict(list)
 
-    for r in related:
+    for r in related.tuples():
         result[r.occasion_id].append(r)
 
     return result
@@ -206,7 +207,8 @@ def actions_by_booking(
     if not period:
         return actions
 
-    if period.wishlist_phase or booking.state in ('accepted', 'open'):
+    if period.with_group_code and (
+        period.wishlist_phase or booking.state in ('accepted', 'open')):
         if period.wishlist_phase or period.booking_phase:
             if not booking.group_code:
                 actions.append(
@@ -763,15 +765,14 @@ def view_group_invite(
     first_name = decode_name(first_child.name)[0]
     subject = occasion.activity.title
     message = _(
-        (
-            'Hi!\n\n'
-            '${first_name} wants to take part in the "${title}" activity by '
-            '${organisation} and would be thrilled to go with a mate.\n\n'
-            'You can add the activity to the wishlist of your child through '
-            'the following link, if you are interested. This way the children '
-            'have a better chance of getting a spot together:\n\n'
-            '${link}'
-        ), mapping={
+        'Hi!\n\n'
+        '${first_name} wants to take part in the "${title}" activity by '
+        '${organisation} and would be thrilled to go with a mate.\n\n'
+        'You can add the activity to the wishlist of your child through '
+        'the following link, if you are interested. This way the children '
+        'have a better chance of getting a spot together:\n\n'
+        '${link}',
+        mapping={
             'first_name': first_name,
             'link': request.link(self.for_username(None)),
             'title': occasion.activity.title,

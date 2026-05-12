@@ -165,6 +165,7 @@ def test_event_image(test_app: TestApp, path: str) -> None:
 
     event.set_image(BytesIO(content), 'file.png')
     session.flush()
+    event = event   # undo narrowing
     assert event.image is not None
     assert event.image.reference.file.read() == content
 
@@ -468,7 +469,7 @@ def test_occurrence_filter_keywords(session: Session) -> None:
 
     # adjust filter (value as string instead of list)
     event.filter_keywords = {'Filter': 'TheOnlyFilter'}
-    assert event.filter_keywords_ordered() == {'Filter': 'TheOnlyFilter'}
+    assert event.filter_keywords_ordered() == {'Filter': ['TheOnlyFilter']}
 
 
 def test_update_event(session: Session) -> None:
@@ -627,7 +628,7 @@ def test_delete_event(session: Session) -> None:
 
 def test_as_ical() -> None:
     url = 'https://example.org/my-event'
-    event = Event(  # type: ignore[misc]
+    event = Event(
         state='initiated',
         timezone='Europe/Zurich',
         start=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),

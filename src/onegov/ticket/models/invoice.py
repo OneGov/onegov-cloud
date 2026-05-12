@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 from onegov.pay import Invoice
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 
 
 from typing import Any, TYPE_CHECKING
@@ -23,14 +23,12 @@ class TicketInvoice(Invoice):
     #       the invoices of multiple related tickets, so this
     #       might become a list later on.
     #: the ticket to which this invoice belongs to
-    ticket: relationship[Ticket | None] = relationship(
-        'Ticket',
-        back_populates='invoice',
-        uselist=False
+    ticket: Mapped[Ticket | None] = relationship(
+        back_populates='invoice'
     )
 
     if TYPE_CHECKING:
-        items: relationship[list[TicketInvoiceItem]]  # type: ignore[assignment]
+        items: Mapped[list[TicketInvoiceItem]]  # type: ignore[assignment]
 
     def add(
         self,

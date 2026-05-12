@@ -5,7 +5,6 @@ import logging
 import queue
 import requests
 import threading
-import urllib3
 import uuid
 from dataclasses import dataclass
 from urllib.parse import urlparse, urlunparse
@@ -32,10 +31,6 @@ log = logging.getLogger('onegov.pas.orchestrator')
 
 class APIAccessibilityError(Exception):
     """Raised when the KUB API is not accessible."""
-
-
-# Disable SSL warnings for self-signed certificates
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 @dataclass
@@ -142,20 +137,20 @@ class KubImporter:
         self,
         token: str,
         base_url: str,
-        output: OutputHandler | None = None
+        output: OutputHandler | None = None,
+        cert: tuple[str, str] | None = None
     ):
         self.token = token
         self.base_url = base_url.rstrip('/')  # Normalize
         self.output = output
 
-        # Shared requests session for connection pooling
         self.session = requests.Session()
         self.session.headers.update({
             'Authorization': f'Token {token}',
             'Accept': 'application/json'
         })
-        # Disable SSL verification for self-signed certificates
-        self.session.verify = False
+        if cert:
+            self.session.cert = cert
 
     def __enter__(self) -> Self:
         return self
@@ -449,7 +444,7 @@ class KubImporter:
                                 f'⊘ {result.title}: Person not found in API'
                             )
                         else:
-                            self.output.error(
+                            self.output.info(
                                 f'✗ Failed to fetch {result.title}: '
                                 f'{result.error}'
                             )
@@ -604,6 +599,24 @@ class KubImporter:
             if self.output:
                 self.output.info('Fetching people data...')
             people_raw = self._fetch_api_data_with_pagination('people')
+            if not people_raw:
+                error_msg = 'Fetched 0 people records — aborting import'
+                log.warning(error_msg)
+                import_log.details.update(
+                    {'error': error_msg, 'status': 'failed'}
+                )
+                flag_modified(import_log, 'details')
+                import_log.status = 'failed'
+                if self.output:
+                    self.output.error(error_msg)
+                request.session.flush()
+                return (
+                    {},
+                    people_data,
+                    organization_data,
+                    membership_data,
+                    import_log_id,
+                )
             if self.output:
                 self.output.success(
                     f'Fetched {len(people_raw)} people records'

@@ -19,14 +19,18 @@ def instance_lru_cache(*, maxsize: int | None = ...) -> Callable[[_F], _F]:
 
 
 @overload
-def instance_lru_cache(method: _F, *, maxsize: int | None = ...) -> _F: ...
+def instance_lru_cache[F: Callable[..., Any]](
+    method: F,
+    *,
+    maxsize: int | None = ...
+) -> F: ...
 
 
-def instance_lru_cache(
-    method: _F | None = None,
+def instance_lru_cache[F: Callable[..., Any]](
+    method: F | None = None,
     *,
     maxsize: int | None = 128
-) -> _F | Callable[[_F], _F]:
+) -> F | Callable[[F], F]:
     """ Least-recently-used cache decorator for class methods.
 
     The cache follows the lifetime of an object (it is stored on the object,
@@ -39,7 +43,7 @@ def instance_lru_cache(
 
     """
 
-    def decorator(wrapped: _F) -> _F:
+    def decorator(wrapped: F) -> F:
         def wrapper(self: Any) -> Any:
             return lru_cache(maxsize=maxsize)(
                 update_wrapper(partial(wrapped, self), wrapped)

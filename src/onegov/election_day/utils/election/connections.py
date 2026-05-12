@@ -18,14 +18,12 @@ if TYPE_CHECKING:
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
     from onegov.election_day.models import Election
-    from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import TypeAlias
     from uuid import UUID
 
-    Sublist: TypeAlias = tuple[str, int, str]
-    Subconnection: TypeAlias = tuple[str, int, list[Sublist]]
-    Connection: TypeAlias = tuple[str, int, list[Sublist], list[Subconnection]]
+    type Sublist = tuple[str, int, str]
+    type Subconnection = tuple[str, int, list[Sublist]]
+    type Connection = tuple[str, int, list[Sublist], list[Subconnection]]
 
 
 def to_int(value: str) -> int | str:
@@ -87,7 +85,7 @@ def get_connection_results(
     if election.type != 'proporz':
         return []
 
-    parents: Query[tuple[UUID, str, int]] = session.query(
+    parents = session.query(
         ListConnection.id,
         ListConnection.connection_id,
         ListConnection.votes
@@ -98,7 +96,6 @@ def get_connection_results(
     )
     parents = parents.order_by(ListConnection.connection_id)
 
-    children_query: Query[tuple[UUID | None, str, int, UUID]]
     children_query = session.query(
         ListConnection.parent_id,
         ListConnection.connection_id,
@@ -115,7 +112,7 @@ def get_connection_results(
     )
     children = dict(groupbylist(children_query, lambda x: str(x[0])))
 
-    sublists_query: Query[tuple[UUID, str, int, str]] = session.query(
+    sublists_query = session.query(
         List.connection_id,
         List.name,
         List.votes,

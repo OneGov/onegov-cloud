@@ -1,34 +1,31 @@
 """ Provides commands used to initialize org websites. """
 from __future__ import annotations
-import base64
-import json
 
+import base64
 import click
 import html
 import isodate
+import json
+import locale
+import pytz
 import re
+import requests
 import shutil
 import sys
 import textwrap
-
-from bs4 import BeautifulSoup
-from collections import defaultdict
-from datetime import date, datetime, timedelta
-from io import BytesIO
-
-import pytz
-import locale
-import requests
 import transaction
 import yaml
 
-from onegov.core.orm.utils import QueryChain
+from collections import defaultdict
+from datetime import date, datetime, timedelta
+from io import BytesIO
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
 from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
+from onegov.core.orm.utils import QueryChain
 from onegov.core.utils import Bunch
 from onegov.directory import (
     Directory,
@@ -51,6 +48,7 @@ from onegov.form import (
     FormSubmissionCollection,
 )
 from onegov.form.errors import FormError
+from onegov.form.utils import remove_empty_links
 from onegov.newsletter.collection import RecipientCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
@@ -92,9 +90,10 @@ from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 
-from typing import IO, Any, TYPE_CHECKING, TypedDict
 
+from typing import IO, Any, TypedDict, TYPE_CHECKING
 if TYPE_CHECKING:
+    from bs4 import Tag
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
     from onegov.core.cli.core import GroupContext
@@ -578,6 +577,7 @@ def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
 @click.option('--published-only', is_flag=True, default=False,
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
+@click.option('--include-imported', is_flag=True, default=False)
 def fetch(
     group_context: GroupContext,
     source: Sequence[str],
@@ -586,7 +586,8 @@ def fetch(
     create_tickets: bool,
     state_transfers: Sequence[str],
     published_only: bool,
-    delete_orphaned_tickets: bool
+    delete_orphaned_tickets: bool,
+    include_imported: bool
 ) -> Callable[[OrgRequest, OrgApp], None]:
     r""" Fetches events from other instances.
 
@@ -618,6 +619,12 @@ def fetch(
 
         Delete Tickets, TicketNotes and TicketMessasges if an
         event gets deleted automatically.
+
+    - ``--include-imported``
+
+        By default skip events that have a source attribute, which means they
+        have been imported. If the flag is set, imported events will be
+        included in the fetch transfer.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
@@ -672,16 +679,15 @@ def fetch(
                 assert remote_session.info['schema'] == remote_schema
 
                 query = remote_session.query(Event)
-                query = query.filter(
-                    or_(
-                        Event.meta['source'].astext.is_(None),
-                        Event.meta['source'].astext == ''
-                    )
-                )
-                if tag:
+                if not include_imported:
                     query = query.filter(
-                        Event._tags.has_any(array(tag))  # type:ignore
+                        or_(
+                            Event.meta['source'].astext.is_(None),
+                            Event.meta['source'].astext == ''
+                        )
                     )
+                if tag:
+                    query = query.filter(Event._tags.has_any(array(tag)))
                 if location:
                     query = query.filter(
                         or_(*(
@@ -698,7 +704,7 @@ def fetch(
                     for event_ in query:
                         event_._es_skip = True
                         yield EventImportItem(
-                            event=Event(  # type:ignore[misc]
+                            event=Event(
                                 state=event_.state,
                                 title=event_.title,
                                 start=event_.start,
@@ -849,7 +855,7 @@ def fix_directory_files(
                     file = request.session.query(File).filter_by(
                         id=file_id).first()
                     if file and file.type != 'directory':
-                        new = DirectoryFile(  # type:ignore[misc]
+                        new = DirectoryFile(
                             id=random_token(),
                             name=file.name,
                             note=file.note,
@@ -974,30 +980,21 @@ def delete_invisible_links() -> Callable[[OrgRequest, OrgApp], None]:
             fg='yellow'
         ))
 
-        invisible_links = []
+        invisible_links: list[Tag] = []
         for page in models:
             # Find links with no text, only br tags and/or whitespaces
             for field in page.content_fields_containing_links_to_files:
                 if not page.content.get(field):
                     continue
-                soup = BeautifulSoup(page.content.get(field), 'html.parser')
-                for link in soup.find_all('a'):
-                    if not any(
-                        tag.name != 'br' and (
-                            tag.name or not tag.isspace()
-                        ) for tag in link.contents
-                    ):
-                        invisible_links.append(link)
-                        if all(tag.name == 'br' for tag in link.contents):
-                            link.replace_with(
-                                BeautifulSoup('<br/>', 'html.parser')
-                            )
-                        else:
-                            link.decompose()
+
+                cleaned = remove_empty_links(
+                    page.content.get(field),
+                    invisible_links
+                )
 
                 # Save the modified HTML back to page.text
-                if page.content[field] != str(soup):
-                    page.content[field] = str(soup)
+                if page.content[field] != cleaned:
+                    page.content[field] = cleaned
 
         click.echo(
             click.style(
@@ -3277,16 +3274,14 @@ def check_forms(
         )
         data_to_parse.extend((x.title, x.structure) for x in directories.all())
 
-        # NOTE: the formcode for resources can be empty but causing
-        # an InvalidFormSyntax
-        # resources = (
-        #     ResourceCollection(app.libres_context)
-        #     .query()
-        #     .with_entities(Resource.title, Resource.definition)
-        # )
-        # data_to_parse.extend(
-        #     (x.title, x.definition) for x in resources.all()
-        # )
+        resources = (
+            ResourceCollection(app.libres_context)
+            .query()
+            .with_entities(Resource.title, Resource.definition)
+        )
+        data_to_parse.extend(
+            (x.title, x.definition) for x in resources.all() if x.definition
+        )
 
         click.echo(f'\nParsing formcode for "{app.org.name}"')
         count = len(data_to_parse)
@@ -3306,3 +3301,57 @@ def check_forms(
                     fg='yellow' if notok_counter > 0 else 'green')
 
     return check_formcode
+
+
+@cli.command('migrate-agency', context_settings={'singular': True})
+@pass_group_context
+def migrate_agency(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Migrates the database from an old agency to the new agency like in the
+    upgrades.
+
+    """
+
+    def migrate_to_new_agency(request: OrgRequest, app: OrgApp) -> None:
+        context: UpgradeContext = Bunch(session=app.session())  # type:ignore
+        migrate_theme_options(context)
+        org = context.session.query(Organisation).first()
+
+        if org is None:
+            return
+
+        org.meta['homepage_structure'] = textwrap.dedent("""\
+        <row-wide bgcolor="gray">
+            <column span="12">
+                <row class="columns">
+                    <column span="4">
+                        <icon_link
+                            icon="fa-user"
+                            title="Alle Personen"
+                            link="./people"
+                            text="Personen"
+                        />
+                    </column>
+                    <column span="4">
+                        <icon_link
+                            icon="fa-briefcase"
+                            link="./organizations"
+                            title="Alle Organisationen"
+                            text="Organisationen"
+                        />
+                    </column>
+                    <column span="4">
+                        <icon_link
+                            icon="fa-folder-open"
+                            link="./organizations/pdf"
+                            title="Staatskalender"
+                            text="PDF-Ausdruck inklusive Inhaltsverzeichnis"
+                        />
+                    </column>
+                </row>
+            </column>
+        </row-wide>
+        """)
+
+    return migrate_to_new_agency

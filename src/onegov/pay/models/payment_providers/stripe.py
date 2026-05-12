@@ -18,17 +18,13 @@ from sqlalchemy.orm import object_session
 from uuid import UUID, uuid4, uuid5
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Callable, Iterator, Mapping
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
-    from sqlalchemy.orm import relationship, Query, Session
+    from sqlalchemy.orm import Mapped, Query, Session
     from transaction.interfaces import ITransaction
-    from typing_extensions import ParamSpec
-
-    _R = TypeVar('_R', bound=stripe.ListableAPIResource[Any])
-    _P = ParamSpec('_P')
 
 
 @contextmanager
@@ -139,7 +135,7 @@ class StripePayment(Payment):
         # our provider should always be StripeConnect, we could
         # assert if we really wanted to make sure, but it would
         # add a lot of assertions...
-        provider: relationship[StripeConnect]
+        provider: Mapped[StripeConnect]
 
     @property
     def fee(self) -> Decimal:
@@ -315,6 +311,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
     ) -> StripePayment:
 
         session = object_session(self)
+        assert session is not None
         payment = self.payment(
             id=uuid5(STRIPE_NAMESPACE, token),
             amount=amount,
@@ -484,6 +481,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
     def sync(self) -> None:
         session = object_session(self)
+        assert session is not None
         self.sync_payment_states(session)
         self.sync_payouts(session)
 
@@ -557,12 +555,12 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
         self.latest_payout = latest_payout.id if latest_payout else None
 
-    def paged(
+    def paged[**P, R: stripe.ListableAPIResource[Any]](
         self,
-        method: Callable[_P, stripe.ListObject[_R]],
-        *args: _P.args,
-        **kwargs: _P.kwargs
-    ) -> Iterator[_R]:
+        method: Callable[P, stripe.ListObject[R]],
+        *args: P.args,
+        **kwargs: P.kwargs
+    ) -> Iterator[R]:
         with stripe_api_key(self.access_token):
             list_obj = method(*args, **kwargs)
             yield from list_obj.auto_paging_iter()

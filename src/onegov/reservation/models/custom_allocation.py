@@ -11,7 +11,9 @@ class CustomAllocation(Allocation, ModelBase):
 
     @property
     def resource_obj(self) -> Resource:
-        return object_session(self).query(
+        session = object_session(self)
+        assert session is not None
+        return session.query(
             Resource).filter_by(id=self.resource).one()
 
     @property

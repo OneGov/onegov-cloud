@@ -4,23 +4,16 @@ from onegov.core.collection import GenericCollection
 from onegov.core.utils import toggle
 from onegov.parliament.models import Parliamentarian
 
-from typing import Any, TYPE_CHECKING
-from typing_extensions import TypeVar
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Self
 
 
-ParliamentarianT = TypeVar(
-    'ParliamentarianT',
-    bound=Parliamentarian,
-    default=Any
-)
-
-
-class ParliamentarianCollection(GenericCollection[ParliamentarianT]):
+class ParliamentarianCollection[ParliamentarianT: Parliamentarian = Any](
+    GenericCollection[ParliamentarianT]
+):
 
     def __init__(
         self,

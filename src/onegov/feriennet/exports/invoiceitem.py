@@ -59,8 +59,7 @@ class InvoiceItemExport(FeriennetExport):
             Activity._tags.label('tags')
         ).join(Occasion).filter(
             Occasion.period_id == period.id
-        )
-        activities = activities.subquery()
+        ).subquery()
 
         q = session.query(ActivityInvoiceItem, activities.c.tags, Attendee)
         q = q.join(BookingPeriodInvoice).join(User)
@@ -70,7 +69,7 @@ class InvoiceItemExport(FeriennetExport):
             Attendee, ActivityInvoiceItem.attendee_id == Attendee.id
         )
         q = q.options(
-            contains_eager(ActivityInvoiceItem.invoice)
+            contains_eager(ActivityInvoiceItem.invoice.of_type(BookingPeriodInvoice))
             .contains_eager(BookingPeriodInvoice.user)
             .undefer(User.data))
         q = q.filter(BookingPeriodInvoice.period_id == period.id)

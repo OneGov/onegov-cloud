@@ -109,7 +109,8 @@ class Transaction:
         if self.confidence == 1:
             return 'success'
 
-        if self.confidence == 0.5:
+        # NOTE: This value is never calculated we set it exactly
+        if self.confidence == 0.5:  # noqa: RUF069
             return 'warning'
 
         return 'unknown'
@@ -282,7 +283,7 @@ def match_iso_20022_to_usernames(
     username_by_ref = dict(q2.with_entities(
         InvoiceReference.reference,
         User.username
-    ))
+    ).tuples())
 
     # Get the items matching the given period
     q3 = items(period_id=period_id).outerjoin(InvoiceReference).with_entities(

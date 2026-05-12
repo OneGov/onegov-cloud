@@ -7,10 +7,18 @@ from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
 )
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
 from onegov.pas.custom import get_current_rate_set
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from onegov.pas.models.attendence import TYPES
-from onegov.pas.utils import is_commission_president
+from onegov.pas.models.presidential_allowance import (
+    FIBU_KONTO_ALLOWANCE,
+    LOHNART_ALLOWANCE_NR,
+    LOHNART_ALLOWANCE_TEXT,
+)
+from onegov.pas.utils import is_commission_president, round_to_five_rappen
 
 
 from typing import TYPE_CHECKING
@@ -25,31 +33,31 @@ if TYPE_CHECKING:
 
 
 NEW_LOHNART_MAPPING = {
-    'plenary': {'nr': '2405', 'text': 'Plenarsitzungen'},
+    'plenary': {'nr': '2405', 'text': 'Plenarsitzung KR'},
     'commission': {
         'nr': '2410',
-        'text': 'Kommissionsitzungen'
+        'text': 'Kommissionsitzung KR'
     },
-    'study': {'nr': '2421', 'text': 'Aktenstudium'},
+    'study': {'nr': '2421', 'text': 'Aktenstudium KR'},
     'shortest': {
-        'nr': '2410',
-        'text': 'Kommissionsitzungen'
+        'nr': '2415',
+        'text': 'Kürzesitzung KR'
     }
 }
 
 """
-Hier noch die Infos bezüglich den FibU-Konten:
-    3000.2 für Plenarsitzungen
-    3000.3 für Kommissionsitzungen & Aktenstudium
-    3000.3 amtlichen Missionen Kantonsratspräsidiums
+    FibU-Konten:
+    3000.20 für Plenarsitzungen
+    3000.30 für Kommissionsitzungen & Aktenstudium
+    3000.30 amtlichen Missionen Kantonsratspräsidiums
     3170.1 Fahr- und Verpflegungsspesen
 """
 
 FIBU_KONTEN_MAPPING = {
-    'plenary': '3000.2',
-    'commission': '3000.3',
-    'study': '3000.3',
-    'shortest': '3000.3',
+    'plenary': '3000.20',
+    'commission': '3000.30',
+    'study': '3000.30',
+    'shortest': '3000.30',
     # Note: 3170.1 for Fahr- und Verpflegungsspesen would need to be mapped
     # to a specific attendance type. But Spesen (expenses) not yet implemented
 }
@@ -117,8 +125,8 @@ def generate_fibu_export_rows(
                 attendance.commission.type if attendance.commission else None
             )
         )
-        rate_with_cola = (Decimal(str(base_rate)) * cola_multiplier).quantize(
-            Decimal('0.01'), rounding=ROUND_HALF_UP
+        rate_with_cola = round_to_five_rappen(
+            Decimal(str(base_rate)) * cola_multiplier
         )
 
         # Get fibu konto based on attendance type
@@ -130,4 +138,44 @@ def generate_fibu_export_rows(
             '', '', '', '', '', '', '', '', '', rate_with_cola,
                 '', '', '', lohnart_text, '', fibu_konto, '1000',
             '', '', '', '', '', year_quarter_str, utcnow().strftime('%d.%m.%Y')
+        ]
+
+    # Presidential allowances linked to this settlement run
+    allowances = PresidentialAllowanceCollection(
+        session,
+        settlement_run_id=settlement_run.id,
+    ).query()
+
+    for allowance in allowances:
+        parliamentarian = allowance.parliamentarian
+        yield [
+            parliamentarian.personnel_number or '',
+            parliamentarian.contract_number or '',
+            LOHNART_ALLOWANCE_NR,
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            round_to_five_rappen(
+                Decimal(str(allowance.amount)) * cola_multiplier
+            ),
+            '',
+            '',
+            '',
+            LOHNART_ALLOWANCE_TEXT,
+            '',
+            FIBU_KONTO_ALLOWANCE,
+            '1000',
+            '',
+            '',
+            '',
+            '',
+            '',
+            year_quarter_str,
+            utcnow().strftime('%d.%m.%Y'),
         ]

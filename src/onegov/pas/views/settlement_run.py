@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from io import BytesIO
+from zipfile import ZipFile
 from webob import Response
 from onegov.core.utils import module_path
 from decimal import Decimal
@@ -42,6 +43,7 @@ from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
     is_commission_president,
+    round_to_five_rappen,
 )
 from onegov.pas.views.abschlussliste import (
     generate_abschlussliste_xlsx,
@@ -49,19 +51,25 @@ from onegov.pas.views.abschlussliste import (
 )
 from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
         generate_fibu_export_rows)
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
+from onegov.pas.models.presidential_allowance import (
+    LOHNART_ALLOWANCE_TEXT,
+)
 
 
-from typing import Any, Literal, TypeAlias, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from datetime import date
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
 
-    SettlementDataRow: TypeAlias = tuple[
-        'date', PASParliamentarian, str, Decimal, Decimal, Decimal
+    type SettlementDataRow = tuple[
+        date, PASParliamentarian, str, Decimal, Decimal, Decimal
     ]
-    TotalRow: TypeAlias = tuple[
+    type TotalRow = tuple[
         str, Decimal, Decimal, Decimal, Decimal, Decimal
     ]
 
@@ -267,9 +275,8 @@ def view_settlement_run(
         session, self.start, self.end
     )
 
-    # Get parliamentarians active during settlement run period with settlements
     parliamentarians = get_parliamentarians_with_settlements(
-        session, self.start, self.end
+        session, self.start, self.end, settlement_run_id=self.id
     )
 
     # Get commission closure status for the control list
@@ -330,6 +337,18 @@ def view_settlement_run(
         'parliamentarians': {
             'title': _('Settlements by Parliamentarian'),
             'links': [
+                Link(
+                    _('All Parliamentarians (ZIP)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category=('all-parliamentarians-zip'),
+                        ),
+                        name='run-export',
+                    ),
+                ),
+            ]
+            + [
                 Link(
                     f'{p.last_name} {p.first_name}',
                     request.link(
@@ -628,17 +647,21 @@ def generate_settlement_pdf(
     entity_type: Literal['all', 'commission', 'party', 'parliamentarian'],
     entity: PASCommission | Party | PASParliamentarian | None = None,
 ) -> bytes:
-    """ Entry point for almost all settlement PDF generations. """
+    """ Entry point for almost all settlement PDF generations excluding
+    parliamentarians addressed personally"""
     font_config = FontConfiguration()
     css_path = module_path('onegov.pas', 'views/templates/settlement_pdf.css')
     with open(css_path) as f:
         css = CSS(string=f.read())
+
+    subtitle = 'Einträge Journal'
 
     if entity_type == 'commission' and isinstance(entity, PASCommission):
         settlement_data = _get_commission_settlement_data(
             settlement_run, request, entity
         )
         totals = _get_commission_totals(settlement_run, request, entity)
+        subtitle = f'Einträge Sitzungen: «{entity.name}»'
 
     elif entity_type == 'party' and isinstance(entity, Party):
         settlement_data = _get_party_settlement_data(
@@ -653,10 +676,37 @@ def generate_settlement_pdf(
     else:
         raise ValueError(f'Unsupported entity type: {entity_type}')
 
+    allowances = (
+        PresidentialAllowanceCollection(
+            request.session,
+            settlement_run_id=settlement_run.id,
+        )
+        .query()
+        .all()
+    )
+    if allowances:
+        rate_set = get_current_rate_set(request.session, settlement_run)
+        cola_multiplier = Decimal(
+            str(1 + (rate_set.cost_of_living_adjustment / 100))
+        )
+        for a in allowances:
+            base = Decimal(str(a.amount))
+            with_cola = base * cola_multiplier
+            settlement_data.append(
+                (
+                    settlement_run.end,
+                    a.parliamentarian,
+                    LOHNART_ALLOWANCE_TEXT,
+                    Decimal('0'),
+                    base,
+                    with_cola,
+                )
+            )
+
     html = _generate_settlement_html(
         settlement_data=settlement_data,
         totals=totals,
-        subtitle='Einträge Journal',
+        subtitle=subtitle,
     )
 
     return HTML(string=html).write_pdf(
@@ -726,19 +776,16 @@ def _generate_settlement_html(
        <html>
        <head><meta charset="utf-8"></head>
        <body>
+           <div class="table-title">{subtitle}</div>
            <table class="journal-table">
                <thead>
                    <tr>
-                       <th colspan="7">{subtitle}</th>
-                   </tr>
-                   <tr>
-                       <th>Datum</th>
-                       <th>Pers-Nr</th>
-                       <th>Person</th>
-                       <th>Typ</th>
-                       <th>Wert</th>
-                       <th>CHF</th>
-                       <th>CHF + TZ</th>
+                       <th style="width:40pt">Datum</th>
+                       <th style="width:90pt">Person</th>
+                       <th style="width:252pt">Typ</th>
+                       <th style="width:15pt">Wert</th>
+                       <th style="width:35pt">CHF</th>
+                       <th style="width:35pt">CHF + TZ</th>
                    </tr>
                </thead>
                <tbody>
@@ -746,15 +793,17 @@ def _generate_settlement_html(
 
     for settlement_row in settlement_data:
         name = f'{settlement_row[1].first_name} {settlement_row[1].last_name}'
+        chf_rounded = round_to_five_rappen(settlement_row[4])
+        chf_cola_rounded = round_to_five_rappen(settlement_row[5])
         html += f"""
            <tr>
                <td>{settlement_row[0].strftime('%d.%m.%Y')}</td>
-               <td>{settlement_row[1].personnel_number}</td>
                <td>{name}</td>
                <td>{settlement_row[2]}</td>
                <td class="numeric">{settlement_row[3]}</td>
-               <td class="numeric">{settlement_row[4]:,.2f}</td>
-               <td class="numeric">{settlement_row[5]:,.2f}</td>
+               <td class="numeric">{format_swiss_number(chf_rounded)}</td>
+               <td class="numeric">{format_swiss_number(
+                   chf_cola_rounded)}</td>
            </tr>
        """
 
@@ -779,11 +828,16 @@ def _generate_settlement_html(
         html += f"""
            <tr>
                <td>{total_row[0]}</td>
-               <td class="numeric">{format_swiss_number(total_row[1])}</td>
-               <td class="numeric">{format_swiss_number(total_row[2])}</td>
-               <td class="numeric">{format_swiss_number(total_row[3])}</td>
-               <td class="numeric">{format_swiss_number(total_row[4])}</td>
-               <td class="numeric">{format_swiss_number(total_row[5])}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[1]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[2]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[3]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[4]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(total_row[5]))}</td>
            </tr>
        """
 
@@ -793,11 +847,16 @@ def _generate_settlement_html(
         html += f"""
            <tr class="total-row">
                <td>{final_row[0]}</td>
-               <td class="numeric">{format_swiss_number(final_row[1])}</td>
-               <td class="numeric">{format_swiss_number(final_row[2])}</td>
-               <td class="numeric">{format_swiss_number(final_row[3])}</td>
-               <td class="numeric">{format_swiss_number(final_row[4])}</td>
-               <td class="numeric">{format_swiss_number(final_row[5])}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[1]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[2]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[3]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[4]))}</td>
+               <td class="numeric">{format_swiss_number(
+                   round_to_five_rappen(final_row[5]))}</td>
            </tr>
        """
 
@@ -1129,7 +1188,7 @@ def view_settlement_run_all_export(
                             '\n' in str_value):
                         str_value = f'"{str_value}"'
                     row_strings.append(str_value)
-            csv_string += ','.join(row_strings) + '\n'
+            csv_string += ';'.join(row_strings) + '\n'
 
         # Encode to bytes with BOM for Excel compatibility
         csv_bytes = '\ufeff'.encode('utf-8') + csv_string.encode('utf-8')
@@ -1139,6 +1198,35 @@ def view_settlement_run_all_export(
             content_type='text/csv; charset=utf-8',
             content_disposition=f'attachment; filename="{filename}"'
         )
+    elif self.category == 'all-parliamentarians-zip':
+        session = request.session
+        parliamentarians = get_parliamentarians_with_settlements(
+            session,
+            self.settlement_run.start,
+            self.settlement_run.end,
+            settlement_run_id=self.settlement_run.id,
+        )
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, 'w') as zf:
+            for p in parliamentarians:
+                pdf_bytes = generate_parliamentarian_settlement_pdf(
+                    self.settlement_run, request, p
+                )
+                name = f'{p.last_name}_{p.first_name}'.replace(
+                    ',', ' '
+                ).replace('+', ' ')
+                fname = normalize_for_filename(f'Parlamentarier_{name}')
+                zf.writestr(f'{fname}.pdf', pdf_bytes)
+
+        zip_buffer.seek(0)
+        run_name = normalize_for_filename(self.settlement_run.name)
+        filename = f'Parlamentarier_{run_name}.zip'
+        return Response(
+            zip_buffer.read(),
+            content_type='application/zip',
+            content_disposition=(f'attachment; filename="{filename}"'),
+        )
+
     else:
         raise NotImplementedError(
             f'Export category {self.category} not implemented for all exports'
@@ -1167,7 +1255,8 @@ def view_settlement_run_export(
             entity_type='party',
             entity=self.entity,
         )
-        filename = normalize_for_filename(f'Partei_{self.entity.name}')
+        name = self.entity.name.replace(',', ' ').replace('+', ' ')
+        filename = normalize_for_filename(f'Partei_{name}')
 
     elif self.category == 'commission':
         assert isinstance(self.entity, PASCommission)
@@ -1178,16 +1267,17 @@ def view_settlement_run_export(
             entity_type='commission',
             entity=self.entity,
         )
-        filename = normalize_for_filename(f'commission_{self.entity.name}')
+        name = self.entity.name.replace(',', ' ').replace('+', ' ')
+        filename = normalize_for_filename(f'commission_{name}')
 
     elif self.category == 'parliamentarian':
         assert isinstance(self.entity, PASParliamentarian)
-        # PASParliamentarian specific export has it's own rendering function
         pdf_bytes = generate_parliamentarian_settlement_pdf(
             self.settlement_run, request, self.entity
         )
+        name = f'{self.entity.last_name}_{self.entity.first_name}'
         filename = normalize_for_filename(
-            f'Parlamentarier_{self.entity.last_name}_{self.entity.first_name}'
+            'Parlamentarier_' + name.replace(',', ' ').replace('+', ' ')
         )
         return Response(
             pdf_bytes,

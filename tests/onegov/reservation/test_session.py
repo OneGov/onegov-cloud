@@ -8,28 +8,25 @@ from onegov.core.framework import Framework
 from onegov.core.orm import Base as CoreBase
 from onegov.core.utils import scan_morepath_modules
 from onegov.reservation import LibresIntegration, ResourceCollection
-from sqlalchemy import text, Column, Integer
-from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
+from sqlalchemy import text
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from uuid import uuid4
 from webtest import TestApp as Client
 
 
-from typing import Any, TYPE_CHECKING
-if TYPE_CHECKING:
-    from onegov.core.orm import Base  # noqa: F401
+from typing import Any
 
 
 def test_setup_database(postgres_dsn: str, redis_url: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, LibresIntegration):
         pass
 
     class Document(Base):
         __tablename__ = 'documents'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     @App.path(path='/')
     class Root:
@@ -57,19 +54,19 @@ def test_setup_database(postgres_dsn: str, redis_url: str) -> None:
     c = Client(app)
     c.get('/')
 
-    tables = app.session().execute(text(
+    result = app.session().execute(text(
         "SELECT table_name FROM information_schema.tables "
         "WHERE table_schema = 'public'"
     ))
 
-    assert not tables.fetchall()
+    assert not result.all()
 
-    tables = app.session().execute(text(
+    result = app.session().execute(text(
         "SELECT table_name FROM information_schema.tables "
         "WHERE table_schema = 'libres-foo'"
     ))
 
-    tables = set(r[0] for r in tables.fetchall())
+    tables = set(result.scalars())
 
     assert 'documents' in tables
     assert 'payments_for_reservations_payment' in tables
@@ -82,9 +79,8 @@ def test_setup_database(postgres_dsn: str, redis_url: str) -> None:
 
 
 def test_libres_context(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, LibresIntegration):
         pass
@@ -96,12 +92,12 @@ def test_libres_context(postgres_dsn: str) -> None:
     app.set_application_id('libres/foo')
     app.session_manager.set_current_schema('libres-foo')
 
-    tables = app.session().execute(text(
+    result = app.session().execute(text(
         "SELECT table_name FROM information_schema.tables "
         "WHERE table_schema = 'libres-foo'"
     ))
 
-    tables = set(r[0] for r in tables.fetchall())
+    tables = set(result.scalars())
 
     assert 'payments_for_reservations_payment' in tables
     assert 'resources' in tables
@@ -120,16 +116,15 @@ def test_libres_context(postgres_dsn: str) -> None:
 
 
 def test_transaction_integration(postgres_dsn: str, redis_url: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base()
+    class Base(DeclarativeBase):
+        registry = registry()
 
     class App(Framework, LibresIntegration):
         pass
 
     class Document(Base):
         __tablename__ = 'documents'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     @App.path(path='/')
     class Root:

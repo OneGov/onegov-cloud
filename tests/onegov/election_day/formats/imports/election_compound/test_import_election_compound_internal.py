@@ -169,21 +169,21 @@ def test_import_internal_compound_regional_gr(
 
 
 def test_import_internal_compound_missing_headers(session: Session) -> None:
-    election_1 = ProporzElection(  # type: ignore[misc]
+    election_1 = ProporzElection(
         title='election-1',
         domain='district',
         domain_segment='St. Gallen',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    election_2 = ProporzElection(  # type: ignore[misc]
+    election_2 = ProporzElection(
         title='election-2',
         domain='district',
         domain_segment='Rorschach',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    compound = ElectionCompound(  # type: ignore[misc]
+    compound = ElectionCompound(
         title='election',
         domain='canton',
         domain_elections='district',
@@ -232,21 +232,21 @@ def test_import_internal_compound_missing_headers(session: Session) -> None:
 
 
 def test_import_internal_compound_invalid_values(session: Session) -> None:
-    election_1 = ProporzElection(  # type: ignore[misc]
+    election_1 = ProporzElection(
         title='election-1',
         domain='district',
         domain_segment='St. Gallen',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    election_2 = ProporzElection(  # type: ignore[misc]
+    election_2 = ProporzElection(
         title='election-2',
         domain='district',
         domain_segment='Rorschach',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    compound = ElectionCompound(  # type: ignore[misc]
+    compound = ElectionCompound(
         title='election',
         domain='canton',
         domain_elections='district',
@@ -408,21 +408,21 @@ def test_import_internal_compound_invalid_values(session: Session) -> None:
 
 
 def test_import_internal_compound_expats(session: Session) -> None:
-    election_1 = ProporzElection(  # type: ignore[misc]
+    election_1 = ProporzElection(
         title='election-1',
         domain='district',
         domain_segment='St. Gallen',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    election_2 = ProporzElection(  # type: ignore[misc]
+    election_2 = ProporzElection(
         title='election-2',
         domain='district',
         domain_segment='Rorschach',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    compound = ElectionCompound(  # type: ignore[misc]
+    compound = ElectionCompound(
         title='election',
         domain='canton',
         domain_elections='district',
@@ -504,21 +504,21 @@ def test_import_internal_compound_expats(session: Session) -> None:
 
 
 def test_import_internal_compound_temporary_results(session: Session) -> None:
-    election_1 = ProporzElection(  # type: ignore[misc]
+    election_1 = ProporzElection(
         title='election-1',
         domain='district',
         domain_segment='St. Gallen',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    election_2 = ProporzElection(  # type: ignore[misc]
+    election_2 = ProporzElection(
         title='election-2',
         domain='district',
         domain_segment='Rorschach',
         date=date(2022, 10, 18),
         number_of_mandates=6,
     )
-    compound = ElectionCompound(  # type: ignore[misc]
+    compound = ElectionCompound(
         title='election',
         domain='canton',
         domain_elections='district',

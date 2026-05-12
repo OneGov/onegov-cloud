@@ -125,6 +125,7 @@ def update_metadata(
 
     if form.submitted(request):
         added, updated = self.update_metadata(form.metadata.data)
+
         request.message(
             _(
                 'Metadata updated (${added} added, ${updated} updated)',

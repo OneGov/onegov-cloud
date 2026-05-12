@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from tests.onegov.election_day.conftest import ImportTestDatasets
+    from uuid import UUID
 
 
 def test_import_internal_proporz_cantonal_zg(
@@ -975,7 +976,8 @@ def test_import_internal_proporz_panachage(session: Session) -> None:
             ]
         )
     )
-    list_ids = dict(session.query(List.list_id, List.id))
+    list_ids: dict[str, UUID | None]
+    list_ids = dict(session.query(List.list_id, List.id).tuples())
     list_ids['999'] = None
     assert not errors
     assert lquery.count() == 4
@@ -1000,7 +1002,7 @@ def test_import_internal_proporz_panachage(session: Session) -> None:
             ]
         )
     )
-    list_ids = dict(session.query(List.list_id, List.id))
+    list_ids = dict(session.query(List.list_id, List.id).tuples())
     list_ids['999'] = None
     assert not errors
     assert lquery.count() == 4
@@ -1027,11 +1029,13 @@ def test_import_internal_proporz_panachage(session: Session) -> None:
         )
     )
     result_ids = dict(
-        session.query(ElectionResult.entity_id, ElectionResult.id)
+        session.query(ElectionResult.entity_id, ElectionResult.id).tuples()
     )
-    list_ids = dict(session.query(List.list_id, List.id))
+    list_ids = dict(session.query(List.list_id, List.id).tuples())
     list_ids['999'] = None
-    candidate_ids = dict(session.query(Candidate.candidate_id, Candidate.id))
+    candidate_ids = dict(
+        session.query(Candidate.candidate_id, Candidate.id).tuples()
+    )
     assert not errors
     assert cquery.count() == 14
     for candidate_id, result_id, list_id, votes in (
@@ -1103,7 +1107,7 @@ def test_import_internal_proporz_panachage(session: Session) -> None:
             ]
         )
     )
-    list_ids = dict(session.query(List.list_id, List.id))
+    list_ids = dict(session.query(List.list_id, List.id).tuples())
     list_ids['999'] = None
     assert not errors
     assert lquery.count() == 4

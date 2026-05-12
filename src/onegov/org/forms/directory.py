@@ -19,7 +19,6 @@ from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidFormDefinition
-from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm, ChangeAdjacencyListUrlForm
@@ -98,20 +97,20 @@ class DirectoryBaseForm(Form):
         render_kw={'rows': 32, 'data-editor': 'form'})
 
     enable_map = RadioField(
-        label=_('Coordinates'),
+        label=_('Map'),
         fieldset=_('General'),
         choices=[
             (
                 'no',
-                _('Entries have no coordinates')
+                _('Do not show map')
             ),
             (
                 'entry',
-                _('Coordinates are shown on each entry')
+                _('Show map only on entries')
             ),
             (
                 'everywhere',
-                _('Coordinates are shown on the directory and on each entry')
+                _('Show map in directory overview and on entries')
             ),
         ],
         default='everywhere')
@@ -710,12 +709,12 @@ class DirectoryImportForm(Form):
         label=_('Import'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType({
-                'application/zip',
-                'application/octet-stream'
-            }),
             FileSizeLimit(500 * 1024 * 1024)
         ],
+        allowed_mimetypes=(
+            'application/zip',
+            'application/octet-stream'
+        ),
         render_kw={'force_simple': True}
     )
 
@@ -729,6 +728,7 @@ class DirectoryImportForm(Form):
 
     def run_import(self, target: ExtendedDirectory) -> int:
         session = object_session(target)
+        assert session is not None
 
         count = 0
 

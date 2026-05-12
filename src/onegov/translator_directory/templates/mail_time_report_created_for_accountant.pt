@@ -22,8 +22,8 @@
         </p>
 
         <p tal:condition="time_report and time_report.start and time_report.end"
-           tal:define="start_date python:time_report.start.date();
-                       end_date python:time_report.end.date();
+           tal:define="start_date python:time_report.start.date() if time_report and time_report.start else None;
+                       end_date python:time_report.end.date() if time_report and time_report.end else None;
                        same_day python:start_date == end_date">
             <strong i18n:translate>Time:</strong>
             <span tal:condition="same_day">

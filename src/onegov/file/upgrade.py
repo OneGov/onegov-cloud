@@ -84,11 +84,11 @@ def add_files_by_type_and_name_index(context: UpgradeContext) -> None:
 
 @upgrade_task('Migrate file metadata to JSONB')
 def migrate_file_metadata_to_jsonb(context: UpgradeContext) -> None:
-    context.session.execute("""
+    context.session.execute(text("""
         ALTER TABLE files
         ALTER COLUMN reference
         TYPE JSONB USING reference::jsonb
-    """)
+    """))
 
     context.operations.drop_index('files_by_type_and_name')
 
@@ -192,7 +192,7 @@ def reclassify_office_documents(context: UpgradeContext) -> None:
 
     files = (
         FileCollection(context.session).query()
-        .options(load_only('reference'))
+        .options(load_only(File.reference))
     )
 
     with context.stop_search_updates():
@@ -255,7 +255,7 @@ def add_stats_column(context: UpgradeContext) -> None:
 
     pages = {
         f.id: f.pages for f in context.session.execute(
-            select(selectable.c)
+            select(*selectable.c)
         )
     }
 

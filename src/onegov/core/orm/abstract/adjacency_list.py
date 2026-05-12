@@ -7,30 +7,28 @@ from itertools import chain
 from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
 from onegov.core.orm import Base, observes
 from onegov.core.utils import is_sorted, normalize_for_url, increment_name
-from sqlalchemy import Column, ForeignKey, Integer, Text, Numeric
+from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
-    backref,
     object_session,
+    mapped_column,
     relationship,
-    validates
+    validates,
+    Mapped
 )
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column, nullsfirst
 
 
-from typing import overload, Any, Generic, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from sqlalchemy.orm.query import Query
     from sqlalchemy.orm.session import Session
     from typing import Self
     from _typeshed import SupportsRichComparison
-
-
-_L = TypeVar('_L', bound='AdjacencyList')
 
 
 class MoveDirection(Enum):
@@ -46,9 +44,9 @@ class MoveDirection(Enum):
     below = 2
 
 
-def sort_siblings(
-    siblings: Sequence[_L],
-    key: Callable[[_L], SupportsRichComparison],
+def sort_siblings[L: AdjacencyList](
+    siblings: Sequence[L],
+    key: Callable[[L], SupportsRichComparison],
     reverse: bool = False
 ) -> None:
     """ Sorts the siblings by the given key, writing the order to the
@@ -68,76 +66,83 @@ class AdjacencyList(Base):
 
     #: the id fo the db record (only relevant internally)
     #: do not change this id after creation as that would destroy the tree
-    id: Column[int] = Column(Integer, primary_key=True)
-
-    if TYPE_CHECKING:
-        parent_id: Column[int | None]
-        # subclasses need to override with the correct relationship
-        # with generics there's an issue with class vs instance access
-        # technically AdjacencyList is abstract, so as long as we force
-        # subclasses to bind a type we could make this type safe, but
-        # there is no way to express this in mypy, we could write a
-        # mypy plugin to ensure these relationships get generated
-        # properly...
-        parent: relationship[AdjacencyList | None]
-        children: relationship[Sequence[AdjacencyList]]
+    id: Mapped[int] = mapped_column(primary_key=True)
 
     #: the id of the parent
-    @declared_attr  # type:ignore[no-redef]
-    def parent_id(cls) -> Column[int | None]:
-        return Column(Integer, ForeignKey('{}.id'.format(cls.__tablename__)))
+    @declared_attr
+    @classmethod
+    def parent_id(cls) -> Mapped[int | None]:
+        return mapped_column(
+            ForeignKey(f'{cls.__tablename__}.id')
+        )
 
     #: the name of the item - think of this as the id or better yet
     #: the url segment e.g. ``parent-item/child-item``
     #:
     #: automatically generated from the title if not provided
-    name: Column[str] = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: the human readable title of the item
-    title: Column[str] = Column(Text, nullable=False)
+    title: Mapped[str]
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type: Column[str] = Column(
-        Text, nullable=False, default=lambda: 'generic')
+    type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
-    @declared_attr  # type:ignore[no-redef]
-    def children(cls) -> relationship[list[Self]]:
+    # subclasses need to override with the correct relationship
+    # with generics there's an issue with class vs instance access
+    # technically AdjacencyList is abstract, so as long as we force
+    # subclasses to bind a type we could make this type safe, but
+    # there is no way to express this in mypy, we could write a
+    # mypy plugin to ensure these relationships get generated
+    # properly...
+    @declared_attr
+    @classmethod
+    def children(cls) -> Mapped[list[Self]]:
         return relationship(
-            cls.__name__,  # type:ignore[attr-defined]
+            cls.__name__,
             order_by=cls.order,
-
             # cascade deletions - it's not the job of this model to prevent
             # the user from deleting all his content
             cascade='all, delete-orphan',
+            back_populates='parent'
+        )
 
+    @declared_attr
+    @classmethod
+    def parent(cls) -> Mapped[Self | None]:
+        return relationship(
+            cls.__name__,
             # many to one + adjacency list - remote_side
             # is required to reference the 'remote'
             # column in the join condition.
-            backref=backref('parent', remote_side=cls.id)
+            remote_side=cls.id,
+            back_populates='children'
         )
 
     #: the order of the items - items are added at the end by default
     # FIXME: This should probably have been nullable=False
-    order: Column[Decimal] = Column(
+    order: Mapped[Decimal] = mapped_column(
         Numeric(precision=30, scale=15),
         default=Decimal('65536')  # Default middle value (2**16)
     )
 
     # default sort order is order, id
-    @declared_attr
-    def __mapper_args__(cls):  # type:ignore
+    @declared_attr.directive
+    @classmethod
+    def __mapper_args__(cls) -> dict[str, Any]:
         return {
             'polymorphic_on': cls.type,
             'polymorphic_identity': 'generic'
         }
 
-    @declared_attr
-    def __table_args__(cls):  # type:ignore
+    @declared_attr.directive
+    @classmethod
+    def __table_args__(cls) -> tuple[Any, ...]:
 
-        prefix: str = cls.__name__.lower()  # type:ignore[attr-defined]
+        prefix: str = cls.__name__.lower()
         return (
             # make sure that no children of a single parent share a name
             Index(
@@ -176,14 +181,9 @@ class AdjacencyList(Base):
         """
         return AdjacencyListCollection.sort_key
 
-    if TYPE_CHECKING:
-        @observes('title')
-        def sort_on_title_change(self, title: str) -> None: ...
-
-    @declared_attr  # type:ignore[no-redef]
-    def sort_on_title_change(
-        cls
-    ) -> Callable[[Self, str], None]:
+    @declared_attr.directive
+    @classmethod
+    def sort_on_title_change(cls) -> Callable[[Self, str], None]:
         """ Makes sure the A-Z sorting is kept when a title changes. """
 
         class OldItemProxy(Proxy):  # type:ignore[misc]
@@ -215,6 +215,10 @@ class AdjacencyList(Base):
                 calculuate_midpoint_order(siblings, self, self.sort_key)
 
         return sort_on_title_change
+
+    if not TYPE_CHECKING:
+        # NOTE: Avoids confusing SQLAlchemy
+        del sort_on_title_change.fget.__annotations__
 
     def __init__(
         self,
@@ -257,6 +261,8 @@ class AdjacencyList(Base):
         itself.
 
         """
+        session = object_session(self)
+        assert session is not None
 
         # FIXME: There is a subtle issue here if we use this mixin in a
         #        polymorphic class, since it will only return siblings of
@@ -265,7 +271,7 @@ class AdjacencyList(Base):
         #        ancestors, parent, children, etc. We could use inspect
         #        to determine whether or not the model is polymorphic
         #        and to retrieve the base class.
-        query = object_session(self).query(self.__class__)
+        query = session.query(self.__class__)
         query = query.order_by(self.__class__.order)
         query = query.filter(self.__class__.parent == self.parent)
 
@@ -301,8 +307,10 @@ class AdjacencyList(Base):
         )
 
 
-def calculuate_midpoint_order(
-    siblings: list[_L], new_item: _L, key: Callable[[_L], Any]
+def calculuate_midpoint_order[L: AdjacencyList](
+    siblings: list[L],
+    new_item: L,
+    key: Callable[[L], Any]
 ) -> None:
     """Insert/update an item's order """
     left, right = None, None
@@ -353,11 +361,11 @@ def calculuate_midpoint_order(
         new_item.order = Decimal('65536')  # Default middle value
 
 
-class AdjacencyListCollection(Generic[_L]):
+class AdjacencyListCollection[L: AdjacencyList]:
     """ A base class for collections working with :class:`AdjacencyList`. """
 
     @property
-    def __listclass__(self) -> type[_L]:
+    def __listclass__(self) -> type[L]:
         """ The list class this collection handles. Must inherit from
         :class:`AdjacencyList`.
 
@@ -368,13 +376,13 @@ class AdjacencyListCollection(Generic[_L]):
         self.session = session
 
     @staticmethod
-    def sort_key(item: _L) -> SupportsRichComparison:
+    def sort_key(item: L) -> SupportsRichComparison:
         """ The sort key with which the items are sorted into their siblings.
 
         """
         return normalize_for_url(item.title)
 
-    def query(self, ordered: bool = True) -> Query[_L]:
+    def query(self, ordered: bool = True) -> Query[L]:
         """ Returns a query using
         :attr:`AdjacencyListCollection.__listclass__`.
 
@@ -385,13 +393,13 @@ class AdjacencyListCollection(Generic[_L]):
         return query
 
     @property
-    def roots(self) -> list[_L]:
+    def roots(self) -> list[L]:
         """ Returns the root elements. """
         return self.query().filter(
             self.__listclass__.parent_id.is_(None)
         ).all()
 
-    def by_id(self, item_id: int) -> _L | None:
+    def by_id(self, item_id: int) -> L | None:
         """ Takes the given page id and returns the page. Try to keep this
         id away from the public. It's not a security problem if it leaks, but
         it's not something the public can necessarly count on.
@@ -403,7 +411,7 @@ class AdjacencyListCollection(Generic[_L]):
         item = query.filter(self.__listclass__.id == item_id).first()
         return item
 
-    def by_path(self, path: str, ensure_type: str | None = None) -> _L | None:
+    def by_path(self, path: str, ensure_type: str | None = None) -> L | None:
         """ Takes a path and returns the page associated with it.
 
         For example, given this hierarchy::
@@ -457,7 +465,7 @@ class AdjacencyListCollection(Generic[_L]):
             return item
         return None
 
-    def get_unique_child_name(self, name: str, parent: _L | None) -> str:
+    def get_unique_child_name(self, name: str, parent: L | None) -> str:
         """ Takes the given name or title, normalizes it and makes sure
         that it's unique among the siblings of the item.
 
@@ -488,12 +496,12 @@ class AdjacencyListCollection(Generic[_L]):
     #       but you can still set `type` to whatever you want...
     def add(
         self,
-        parent: _L | None,
+        parent: L | None,
         title: str,
         name: str | None = None,
         type: str | None = None,
         **kwargs: Any,
-    ) -> _L:
+    ) -> L:
         """Adds a child.
         - If order is explicit, uses it.
         - If siblings are sorted by sort_key, inserts starting form mid
@@ -520,8 +528,8 @@ class AdjacencyListCollection(Generic[_L]):
 
         # If order was NOT explicitly provided, decide insertion strategy
         if explicit_order is None:
-            siblings: list[_L] = child.siblings.all()
-            existing_siblings: list[_L] = [s for s in siblings if s != child]
+            siblings: list[L] = child.siblings.all()
+            existing_siblings: list[L] = [s for s in siblings if s != child]
 
             if not existing_siblings or is_sorted(
                 existing_siblings, key=self.sort_key
@@ -546,16 +554,16 @@ class AdjacencyListCollection(Generic[_L]):
         title: str,
         name: str | None = None,
         **kwargs: Any
-    ) -> _L:
+    ) -> L:
         return self.add(None, title, name, **kwargs)
 
     def add_or_get(
         self,
-        parent: _L | None,
+        parent: L | None,
         title: str,
         name: str | None = None,
         **kwargs: Any
-    ) -> _L:
+    ) -> L:
 
         name = name or normalize_for_url(title)
 
@@ -575,21 +583,21 @@ class AdjacencyListCollection(Generic[_L]):
         title: str,
         name: str | None = None,
         **kwargs: Any
-    ) -> _L:
+    ) -> L:
         return self.add_or_get(None, title, name, **kwargs)
 
-    def delete(self, item: _L) -> None:
+    def delete(self, item: L) -> None:
         """ Deletes the given item and *all* it's desecendants!. """
         self.session.delete(item)
         self.session.flush()
 
-    def move_above(self, subject: _L, target: _L) -> None:
+    def move_above(self, subject: L, target: L) -> None:
         return self.move(subject, target, MoveDirection.above)
 
-    def move_below(self, subject: _L, target: _L) -> None:
+    def move_below(self, subject: L, target: L) -> None:
         return self.move(subject, target, MoveDirection.below)
 
-    def move(self, subject: _L, target: _L, direction: MoveDirection) -> None:
+    def move(self, subject: L, target: L, direction: MoveDirection) -> None:
         """ Takes the given subject and moves it somehwere in relation to the
         target.
 

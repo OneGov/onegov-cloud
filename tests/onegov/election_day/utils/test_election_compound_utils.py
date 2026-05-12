@@ -203,7 +203,7 @@ def test_election_compound_utils_parties(
     assert not errors
     session.add(election)
 
-    election_compound = ElectionCompound(  # type: ignore[misc]
+    election_compound = ElectionCompound(
         title='Compound',
         domain='canton',
         date=date(2014, 1, 1),
@@ -702,7 +702,8 @@ def test_election_compound_utils_parties(
     assert parties['0']['2014']['votes']['total'] == 43062
 
     deltas = get_party_results_deltas(election_compound, years, parties)
-    assert deltas[1]['2014'][0][2] == 43062  # type: ignore[comparison-overlap]
+    if not TYPE_CHECKING:
+        assert deltas[1]['2014'][0][2] == 43062
 
     data = get_party_results_data(election_compound, False)
     assert isinstance(data, dict)

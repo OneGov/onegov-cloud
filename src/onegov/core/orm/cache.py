@@ -31,7 +31,7 @@ from sqlalchemy.orm.query import Query
 from time import time
 
 
-from typing import cast, overload, Any, Generic, TypeVar, TYPE_CHECKING
+from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from morepath.request import Request
@@ -47,45 +47,40 @@ if TYPE_CHECKING:
     # NOTE: it would be more correct to make OrmCacheApp the first
     #       argument, but this gets a bit complicated for actually
     #       using the decorator
-    Creator = Callable[[Any], '_T']
-    CachePolicy = str | Callable[[Base], bool]
+    type Creator[T] = Callable[[Any], T]
+    type CachePolicy = str | Callable[[Base], bool]
 
-    _T_co = TypeVar('_T_co', covariant=True)
-    _FrameworkT = TypeVar('_FrameworkT', bound=Framework, contravariant=True)
-
-    class _RequestCached(Protocol[_FrameworkT, _T_co]):
+    class _RequestCached[AppT: Framework, T_co](Protocol):
         @overload
         def __get__(
             self,
             instance: None,
-            owner: type[_FrameworkT]
+            owner: type[AppT]
         ) -> property: ...
         @overload
         def __get__(
             self,
-            instance: _FrameworkT,
-            owner: type[_FrameworkT]
-        ) -> _T_co: ...
+            instance: AppT,
+            owner: type[AppT]
+        ) -> T_co: ...
 
     class _OrmCacheDecorator(Protocol):
         @overload
-        def __call__(
+        def __call__[T](
             self,
-            fn: Creator[Query[_T]]
-        ) -> OrmCacheDescriptor[tuple[_T, ...]]: ...
+            fn: Creator[Query[T]]
+        ) -> OrmCacheDescriptor[tuple[T, ...]]: ...
 
         @overload
-        def __call__(
+        def __call__[T](
             self,
-            fn: Creator[_T]
-        ) -> OrmCacheDescriptor[_T]: ...
+            fn: Creator[T]
+        ) -> OrmCacheDescriptor[T]: ...
 
     class _HasApp(Protocol):
         @property
         def app(self) -> OrmCacheApp: ...
 
-_T = TypeVar('_T')
-_QT = TypeVar('_QT')
 unset = object()
 
 
@@ -201,7 +196,7 @@ class OrmCacheApp:
                 yield member
 
 
-class OrmCacheDescriptor(Generic[_T]):
+class OrmCacheDescriptor[T]:
     """ The descriptor implements the protocol for fetching the objects
     either from cache or creating them using the :param:``creator``.
 
@@ -214,25 +209,25 @@ class OrmCacheDescriptor(Generic[_T]):
     used_cache_keys: set[str]
 
     @overload
-    def __init__(
-        self: OrmCacheDescriptor[tuple[_QT, ...]],
+    def __init__[QT](
+        self: OrmCacheDescriptor[tuple[QT, ...]],
         cache_policy: CachePolicy,
-        creator: Creator[Query[_QT]],
+        creator: Creator[Query[QT]],
         by_role: bool = False
     ): ...
 
     @overload
     def __init__(
-        self: OrmCacheDescriptor[_T],
+        self,
         cache_policy: CachePolicy,
-        creator: Creator[_T],
+        creator: Creator[T],
         by_role: bool = False
     ): ...
 
     def __init__(
         self,
         cache_policy: CachePolicy,
-        creator: Creator[Query[Any]] | Creator[_T],
+        creator: Creator[Query[Any]] | Creator[T],
         by_role: bool = False
     ):
         self.cache_policy = cache_policy
@@ -279,7 +274,7 @@ class OrmCacheDescriptor(Generic[_T]):
             for child in obj:
                 self.assert_no_orm_objects(obj, depth + 1)
 
-    def create(self, instance: OrmCacheApp | _HasApp) -> _T:
+    def create(self, instance: OrmCacheApp | _HasApp) -> T:
         """ Uses the creator to load the object to be cached.
 
         Since the return value of the creator might not be something we want
@@ -291,12 +286,12 @@ class OrmCacheDescriptor(Generic[_T]):
         result = self.creator(instance)
 
         if isinstance(result, Query):
-            result = cast('_T', tuple(result))
+            result = cast('T', tuple(result))
 
         self.assert_no_orm_objects(result)
         return result
 
-    def load(self, instance: OrmCacheApp | _HasApp) -> _T:
+    def load(self, instance: OrmCacheApp | _HasApp) -> T:
         """ Loads the object from the database or cache. """
 
         if isinstance(instance, OrmCacheApp):
@@ -376,13 +371,13 @@ class OrmCacheDescriptor(Generic[_T]):
         self,
         instance: Any,
         owner: type[Any]
-    ) -> _T: ...
+    ) -> T: ...
 
     def __get__(
         self,
         instance: Any | None,
         owner: type[Any]
-    ) -> Self | _T:
+    ) -> Self | T:
         """ Handles the object/cache access. """
 
         if instance is None:
@@ -402,23 +397,23 @@ def orm_cached(
     """
 
     @overload
-    def orm_cache_decorator(
-        fn: Creator[Query[_T]]
-    ) -> OrmCacheDescriptor[tuple[_T, ...]]: ...
+    def orm_cache_decorator[T](
+        fn: Creator[Query[T]]
+    ) -> OrmCacheDescriptor[tuple[T, ...]]: ...
 
     @overload
-    def orm_cache_decorator(
-        fn: Creator[_T]
-    ) -> OrmCacheDescriptor[_T]: ...
+    def orm_cache_decorator[T](
+        fn: Creator[T]
+    ) -> OrmCacheDescriptor[T]: ...
 
     def orm_cache_decorator(fn: Creator[Any]) -> OrmCacheDescriptor[Any]:
         return OrmCacheDescriptor(policy, fn, by_role)
     return orm_cache_decorator
 
 
-def request_cached(
-    appmethod: Callable[[_FrameworkT], _T]
-) -> _RequestCached[_FrameworkT, _T]:
+def request_cached[AppT: Framework, T](
+    appmethod: Callable[[AppT], T]
+) -> _RequestCached[AppT, T]:
     """ This is like a request scoped :func:`orm_cached`.
 
     This may store ORM objects in contrast to :func:`orm_cached`, which
@@ -429,7 +424,7 @@ def request_cached(
     cache_key = appmethod.__qualname__
 
     @wraps(appmethod)
-    def wrapper(self: _FrameworkT) -> _T:
+    def wrapper(self: AppT) -> T:
         session = self.session()
 
         # before accessing any cached values we need to make sure that all

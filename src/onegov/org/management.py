@@ -183,7 +183,9 @@ class PageNameChange(ModelsWithLinksMixin):
             return count
 
         if test:
-            with object_session(page).no_autoflush:
+            session = object_session(page)
+            assert session is not None
+            with session.no_autoflush:
                 counter = run()
                 page.name = old_name
                 transaction.abort()

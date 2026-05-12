@@ -3,31 +3,26 @@ from __future__ import annotations
 import math
 
 from functools import cached_property
-from sqlalchemy import or_
+from sqlalchemy import func, literal_column, or_
 from sqlalchemy.inspection import inspect
 
-from onegov.core.orm import func
 
-
-from typing import Any, Generic, Literal, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsItems
     from abc import abstractmethod
     from collections.abc import Collection, Iterable, Iterator, Sequence
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Query, Session
-    from sqlalchemy.sql.elements import ClauseElement
+    from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
+    from sqlalchemy.orm import DeclarativeBase, Query, Session
     from typing import Protocol
     from typing import Self
     from uuid import UUID
 
-    from onegov.core.orm import Base
-
     # TODO: Maybe PKType should be generic as well? Or if we always
     #       use the same kind of primary key, then we can reduce
     #       this type union to something more specific
-    PKType = UUID | str | int
-    TextColumn = Column[str] | Column[str | None]
+    type PKType = UUID | str | int
+    type TextColumn = ColumnElement[str] | ColumnElement[str | None]
 
     # NOTE: To avoid referencing onegov.form from onegov.core and
     #       introducing a cross-dependency, we use a Protocol to
@@ -38,36 +33,32 @@ if TYPE_CHECKING:
         def get_useful_data(self) -> SupportsItems[str, Any]: ...
 
 
-_M = TypeVar('_M', bound='Base')
-
-
-class GenericCollection(Generic[_M]):
+class GenericCollection[M: DeclarativeBase]:
 
     def __init__(self, session: Session, **kwargs: Any):
         self.session = session
 
     @property
-    def model_class(self) -> type[_M]:
+    def model_class(self) -> type[M]:
         raise NotImplementedError
 
     @cached_property
-    def primary_key(self) -> Column[str] | Column[UUID] | Column[int]:
+    def primary_key(self) -> (
+        ColumnElement[str]
+        | ColumnElement[UUID]
+        | ColumnElement[int]
+    ):
         return inspect(self.model_class).primary_key[0]
 
-    def query(self) -> Query[_M]:
+    def query(self) -> Query[M]:
         return self.session.query(self.model_class)
 
-    def by_id(self, id: PKType) -> _M | None:
+    def by_id(self, id: PKType) -> M | None:
         return self.query().filter(self.primary_key == id).first()
 
-    def by_ids(self, ids: Collection[PKType]) -> list[_M]:
-        # FIXME: This type error is a bug in the sqlalchemy-stubs
-        #        plugin, it might go away with SQLAlchemy 2.0, since
-        #        Column is being treated like a descriptor, even though
-        #        it is not, and there's a hidden descriptor inserted
-        #        into the DeclarativeBase to wrap the Column.
+    def by_ids(self, ids: Collection[PKType]) -> list[M]:
         return self.query().filter(
-            self.primary_key.in_(ids)  # type:ignore[union-attr]
+            self.primary_key.in_(ids)
         ).all() if ids else []
 
     # NOTE: Subclasses should be more specific, so we get type
@@ -75,7 +66,7 @@ class GenericCollection(Generic[_M]):
     #       subclasses also set kwargs to Never at that point
     #       so we get an error if we use an argument that doesn't
     #       exist for the given model
-    def add(self, **kwargs: Any) -> _M:
+    def add(self, **kwargs: Any) -> M:
         item = self.model_class(**kwargs)
 
         self.session.add(item)
@@ -87,7 +78,7 @@ class GenericCollection(Generic[_M]):
         self,
         form: _FormThatSupportsGetUsefulData,
         properties: Iterable[str] | None = None
-    ) -> _M:
+    ) -> M:
 
         cls = self.model_class
         return self.add(**{
@@ -98,12 +89,12 @@ class GenericCollection(Generic[_M]):
             k: getattr(form, k) for k in properties or ()
         })
 
-    def delete(self, item: _M) -> None:
+    def delete(self, item: M) -> None:
         self.session.delete(item)
         self.session.flush()
 
 
-class SearcheableCollection(GenericCollection[_M]):
+class SearcheableCollection[M: DeclarativeBase](GenericCollection[M]):
 
     """
     Requires a self.locale and self.term
@@ -111,17 +102,18 @@ class SearcheableCollection(GenericCollection[_M]):
 
     @staticmethod
     def match_term(
-        column: Column[str] | Column[str | None],
+        column: SQLCoreOperations[str | None],
         language: str,
         term: str
-    ) -> ClauseElement:
+    ) -> ColumnElement[bool]:
         """
         Usage:
         model.filter(match_term(model.col, 'german', 'my search term'))
 
         """
-        document_tsvector = func.to_tsvector(language, column)  # type:ignore
-        ts_query_object = func.to_tsquery(language, term)  # type:ignore
+        lang: ColumnElement[str] = literal_column(repr(language))
+        document_tsvector = func.to_tsvector(lang, column)
+        ts_query_object = func.to_tsquery(lang, term)
         return document_tsvector.op('@@')(ts_query_object)
 
     @staticmethod
@@ -146,10 +138,10 @@ class SearcheableCollection(GenericCollection[_M]):
 
     def filter_text_by_locale(
         self,
-        column: Column[str] | Column[str | None],
+        column: SQLCoreOperations[str | None],
         term: str,
         locale: str | None = None
-    ) -> ClauseElement:
+    ) -> ColumnElement[bool]:
         """
         Returns an SqlAlchemy filter statement based on the search term.
         If no locale is provided, it will use english as language.
@@ -194,7 +186,7 @@ class SearcheableCollection(GenericCollection[_M]):
             raise NotImplementedError
 
     @property
-    def term_filter(self) -> Iterator[ClauseElement]:
+    def term_filter(self) -> Iterator[ColumnElement[bool]]:
         assert self.term_filter_cols
         term = self.__class__.term_to_tsquery_string(self.term)
 
@@ -204,7 +196,7 @@ class SearcheableCollection(GenericCollection[_M]):
             for col in self.term_filter_cols
         )
 
-    def query(self) -> Query[_M]:
+    def query(self) -> Query[M]:
         if not self.term or not self.locale:
             return super().query()
         return super().query().filter(or_(*self.term_filter))
@@ -214,7 +206,7 @@ class SearcheableCollection(GenericCollection[_M]):
 #        and what's a mixin and how we use it downstream, we should
 #        probably try to clean that up a bit, so we always do it the
 #        same way...
-class Pagination(Generic[_M]):
+class Pagination[M: DeclarativeBase]:
     """ Provides collections with pagination, if they implement a few
     documented properties and methods.
 
@@ -235,7 +227,7 @@ class Pagination(Generic[_M]):
         """
         raise NotImplementedError
 
-    def subset(self) -> Query[_M]:
+    def subset(self) -> Query[M]:
         """ Returns an SQLAlchemy query containing all records that should
         be considered for pagination.
 
@@ -243,7 +235,7 @@ class Pagination(Generic[_M]):
         raise NotImplementedError
 
     @cached_property
-    def cached_subset(self) -> Query[_M]:
+    def cached_subset(self) -> Query[M]:
         return self.subset()
 
     if TYPE_CHECKING:
@@ -265,7 +257,7 @@ class Pagination(Generic[_M]):
         """
         raise NotImplementedError
 
-    def transform_batch_query(self, query: Query[_M]) -> Query[_M]:
+    def transform_batch_query(self, query: Query[M]) -> Query[M]:
         """ Allows subclasses to transform the given query before it is
         used to retrieve the batch. This is a good place to add additional
         loading that should only apply to the batch (say joining other
@@ -285,7 +277,7 @@ class Pagination(Generic[_M]):
         return self.cached_subset.order_by(None).count()
 
     @cached_property
-    def batch(self) -> tuple[_M, ...]:
+    def batch(self) -> tuple[M, ...]:
         """ Returns the elements on the current page. """
         query = self.cached_subset.slice(
             self.offset, self.offset + self.batch_size
@@ -331,7 +323,7 @@ class Pagination(Generic[_M]):
         return None
 
 
-class RangedPagination(Generic[_M]):
+class RangedPagination[M: DeclarativeBase]:
     """ Provides a pagination that supports loading multiple pages at once.
 
     This is useful in a context where a single button is used to 'load more'
@@ -347,7 +339,7 @@ class RangedPagination(Generic[_M]):
     # may be clipped by using `limit_range`.
     range_limit = 5
 
-    def subset(self) -> Query[_M]:
+    def subset(self) -> Query[M]:
         """ Returns an SQLAlchemy query containing all records that should
         be considered for pagination.
 
@@ -355,7 +347,7 @@ class RangedPagination(Generic[_M]):
         raise NotImplementedError
 
     @cached_property
-    def cached_subset(self) -> Query[_M]:
+    def cached_subset(self) -> Query[M]:
         return self.subset()
 
     @property
@@ -401,7 +393,7 @@ class RangedPagination(Generic[_M]):
 
         return (s, e)
 
-    def transform_batch_query(self, query: Query[_M]) -> Query[_M]:
+    def transform_batch_query(self, query: Query[M]) -> Query[M]:
         """ Allows subclasses to transform the given query before it is
         used to retrieve the batch. This is a good place to add additional
         loading that should only apply to the batch (say joining other
@@ -421,7 +413,7 @@ class RangedPagination(Generic[_M]):
         return self.cached_subset.order_by(None).count()
 
     @cached_property
-    def batch(self) -> tuple[_M, ...]:
+    def batch(self) -> tuple[M, ...]:
         """ Returns the elements on the current page range. """
         s, e = self.page_range
 

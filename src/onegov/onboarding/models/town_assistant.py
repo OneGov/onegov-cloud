@@ -177,40 +177,42 @@ class TownAssistant(Assistant):
             schema = self.get_schema(name)
             custom_config = self.config['configuration']
 
-            self.app.session_manager.set_current_schema(schema)
-            session = self.app.session_manager.session()
+            with self.app.session_manager.disable_change_signals():
+                self.app.session_manager.set_current_schema(schema)
+                session = self.app.session_manager.session()
 
-            if session.query(Organisation).first():
-                raise AlreadyExistsError
+                if session.query(Organisation).first():
+                    raise AlreadyExistsError
 
-            with self.app.temporary_depot(schema, **custom_config):
-                create_new_organisation(self.app, name=name, reply_to=user)
+                with self.app.temporary_depot(schema, **custom_config):
+                    create_new_organisation(self.app, name=name, reply_to=user)
 
-            org = session.query(Organisation).first()
-            assert org is not None and org.theme_options is not None
-            org.theme_options['primary-color-ui'] = color
+                org = session.query(Organisation).first()
+                assert org is not None and org.theme_options is not None
+                org.theme_options['primary-color-ui'] = color
 
-            users = UserCollection(self.app.session_manager.session())
-            assert not users.query().first()
+                users = UserCollection(self.app.session_manager.session())
+                assert not users.query().first()
 
-            users.add(user, password, 'admin')
+                users.add(user, password, 'admin')
 
-            title = request.translate(_('Welcome to OneGov Cloud'))
-            welcome_mail = render_template('mail_welcome.pt', request, {
-                'url': 'https://{}'.format(self.get_domain(name)),
-                'mail': user,
-                'layout': MailLayout(self, request),
-                'title': title,
-                'org': name
-            })
+                title = request.translate(_('Welcome to OneGov Cloud'))
+                welcome_mail = render_template('mail_welcome.pt', request, {
+                    'url': 'https://{}'.format(self.get_domain(name)),
+                    'mail': user,
+                    'layout': MailLayout(self, request),
+                    'title': title,
+                    'org': name
+                })
 
-            self.app.perform_reindex()
-            self.app.send_transactional_email(
-                subject=title,
-                receivers=(user, ),
-                content=welcome_mail,
-                reply_to='onegov@seantis.ch'
-            )
+                self.app.perform_reindex()
+                self.app.send_transactional_email(
+                    subject=title,
+                    receivers=(user, ),
+                    content=welcome_mail,
+                    reply_to='onegov@seantis.ch'
+                )
+                session.flush()
 
         finally:
             self.app.session_manager.set_current_schema(current_schema)

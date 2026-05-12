@@ -28,7 +28,7 @@ def test_export_abschlussliste_xlsx(client: Client[TestPasApp]) -> None:
 
     transaction.begin()
     # Setup test data
-    rate_set = RateSet(  # type: ignore[misc]
+    rate_set = RateSet(
         year=2024,
         cost_of_living_adjustment=Decimal('2.0'),  # 2%
         plenary_none_member_halfday=Decimal('100'),

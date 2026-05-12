@@ -220,6 +220,14 @@ def import_vote_wabstic(
         except ValueError as e:
             line_errors.append(e.args[0])
 
+        # Parse the received votes (optional)
+        try:
+            received = validate_integer(
+                line, 'stmabgegeben', optional=True, default=None
+            )
+        except ValueError as e:
+            line_errors.append(e.args[0])
+
         # Parse the yeas
         yeas = {}
         try:
@@ -273,7 +281,8 @@ def import_vote_wabstic(
                         'invalid': invalid,
                         'yeas': yeas[ballot_type],
                         'nays': nays[ballot_type],
-                        'empty': empty[ballot_type]
+                        'empty': empty[ballot_type],
+                        'received': received,
                     }
                 )
 
@@ -317,9 +326,11 @@ def import_vote_wabstic(
     ballot_ids = {b: vote.ballot(b).id for b in used_ballot_types}
 
     session = object_session(vote)
+    assert session is not None
     session.flush()
+    # FIXME: Switch to regular `session.execute` with insert statements
     session.bulk_insert_mappings(
-        BallotResult,
+        BallotResult,  # type: ignore[arg-type]
         (
             dict(**result, ballot_id=ballot_ids[ballot_type])
             for ballot_type in used_ballot_types

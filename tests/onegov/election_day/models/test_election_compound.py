@@ -105,7 +105,7 @@ def proporz_election(
     date_ = date_ or date(2015, 6, 14)
 
     # election
-    election = ProporzElection(  # type: ignore[misc]
+    election = ProporzElection(
         title=title,
         id=id,
         shortcode=shortcode,
@@ -245,7 +245,7 @@ def test_election_compound_model(session: Session) -> None:
     # Add two elections
     last_result_change = datetime(2015, 6, 14, 14, 1, tzinfo=UTC)
     session.add(
-        Election(  # type: ignore[misc]
+        Election(
             title="First election",
             domain='region',
             domain_segment='First district',
@@ -255,7 +255,7 @@ def test_election_compound_model(session: Session) -> None:
         )
     )
     session.add(
-        Election(  # type: ignore[misc]
+        Election(
             title="Second election",
             domain='region',
             domain_segment='Second district',
@@ -869,7 +869,7 @@ def test_election_compound_supersegment_progress(session: Session) -> None:
             domain_supersegment=''
         )
     ]
-    session.add_all([election_compound] + elections)
+    session.add_all([election_compound, *elections])
     session.flush()
 
     election_compound.elections = elections
@@ -939,19 +939,19 @@ def test_election_compound_attachments(
 def test_election_compound_historical_party_strengths(
     session: Session
 ) -> None:
-    first = ElectionCompound(  # type: ignore[misc]
+    first = ElectionCompound(
         title='First',
         domain='federation',
         date=date(2014, 1, 1),
         colors={'a': 'x'}
     )
-    second = ElectionCompound(  # type: ignore[misc]
+    second = ElectionCompound(
         title='Second',
         domain='federation',
         date=date(2018, 1, 1),
         colors={'a': 'y', 'b': 'y'}
     )
-    third = ElectionCompound(  # type: ignore[misc]
+    third = ElectionCompound(
         title='Third',
         domain='federation',
         date=date(2022, 1, 1),

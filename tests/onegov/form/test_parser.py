@@ -6,16 +6,21 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
-from onegov.form.errors import (
-    InvalidIndentSyntax,
-    InvalidCommentIndentSyntax,
-    InvalidCommentLocationSyntax,
-)
 from onegov.form.fields import (
-    DateTimeLocalField, MultiCheckboxField, TimeField, URLField, VideoURLField)
+    DateTimeLocalField,
+    MultiCheckboxField,
+    TimeField,
+    URLField,
+    VideoURLField,
+)
 from onegov.form.parser.grammar import field_help_identifier
-from onegov.form.validators import LaxDataRequired
-from onegov.form.validators import ValidDateRange
+from onegov.form.validators import (
+    LaxDataRequired,
+    WhitelistedMimeType,
+    FileSizeLimit,
+    StrictOptional,
+    ValidDateRange
+)
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -32,10 +37,18 @@ from wtforms.validators import Regexp
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pyparsing import ParserElement, ParseResults
+    from wtforms import Field
 
 
 def parse(expr: ParserElement, text: str) -> ParseResults:
     return expr.parse_string(text)
+
+
+def find_validator[T](
+    field: Field,
+    cls: type[T]
+) -> T | None:
+    return next((v for v in field.validators if isinstance(v, cls)), None)
 
 
 @pytest.mark.parametrize('comment,output', [
@@ -53,6 +66,7 @@ def test_parse_text() -> None:
         First name * = ___
         << Fill in all in UPPER case >>
         Last name = ___
+        << Don't use your maiden name >>
         Country = ___[50]
         Comment = ...[8]
         Zipcode = ___[4]/[0-9]*
@@ -74,6 +88,7 @@ def test_parse_text() -> None:
 
     assert isinstance(form['last_name'], StringField)
     assert form['last_name'].label.text == 'Last name'
+    assert form['last_name'].description == "Don't use your maiden name"
     assert len(form['last_name'].validators) == 1
     assert isinstance(form['last_name'].validators[0], Optional)
 
@@ -345,6 +360,28 @@ def test_parse_fileinput() -> None:
     assert isinstance(form['file'], FileField)
     assert form['file'].widget.multiple is False  # type: ignore[attr-defined]
 
+    assert form.validate()
+    assert form['file'].mimetypes == {'application/pdf', 'application/msword'}  # type: ignore[attr-defined]
+    assert form['file'].validators
+    assert find_validator(form['file'], FileSizeLimit) is not None
+
+    form = parse_form("File *= *.*")()
+
+    assert form['file'].label.text == 'File'
+    assert isinstance(form['file'], FileField)
+    assert form['file'].widget.multiple is False  # type:ignore[attr-defined]
+
+    assert not form.validate()
+    assert form.errors == {'file': ['This field is required.']}
+    assert form['file'].validators
+    assert form['file'].mimetypes == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
+    assert find_validator(form['file'], FileSizeLimit) is not None
+
+    # ensure nickname field did not get validators from the upload field
+    form = parse_form("Nickname = ___\nFile = *.pdf|*.doc")()
+    assert find_validator(form['nickname'], StrictOptional)
+    assert not find_validator(form['nickname'], WhitelistedMimeType)
+
 
 def test_parse_multiplefileinput() -> None:
     form = parse_form("Files = *.pdf|*.doc (multiple)")()
@@ -353,9 +390,23 @@ def test_parse_multiplefileinput() -> None:
     assert isinstance(form['files'], FileField)
     assert form['files'].widget.multiple is True  # type: ignore[attr-defined]
 
+    assert form.validate()
+    assert form['files'].mimetypes == {'application/pdf', 'application/msword'}  # type:ignore[attr-defined]
+    assert not form['files'].validators
+    assert not find_validator(form['files'], FileSizeLimit)
+
+    form = parse_form("My files *= *.* (multiple)")()
+    assert form['my_files'].label.text == 'My files'
+    assert isinstance(form['my_files'], FileField)
+    assert form['my_files'].widget.multiple is True  # type:ignore[attr-defined]
+
+    assert form.validate()
+    assert form['my_files'].mimetypes == WhitelistedMimeType.whitelist  # type:ignore[attr-defined]
+    assert not form['my_files'].validators
+    assert not find_validator(form['my_files'], FileSizeLimit)
+
 
 def test_parse_radio() -> None:
-
     text = dedent("""
         Gender =
             ( ) Male
@@ -542,6 +593,59 @@ def test_dependent_validation() -> None:
             **form['payment_credit_card_number'].render_kw
         )
     )
+
+    # dependency with upload field
+    text = dedent("""
+            method *=
+                (x) Drop off
+                    Estimated drop off time = HH:MM
+                ( ) Upload
+                    Attachment *= *.pdf|*.doc
+        """)
+
+    form_class = parse_form(text)
+
+    # drop off: no file required
+    form = form_class(MultiDict([('method', 'Drop off')]))
+    assert form.validate()
+    assert not form.errors
+
+    # upload selected but no file provided
+    form = form_class(MultiDict([('method', 'Upload')]))
+    assert not form.validate()
+    assert form.errors == {'method_attachment': ['This field is required.']}
+
+    # upload selected with large attachment and wrong type
+    from io import BytesIO
+    from werkzeug.datastructures import FileStorage
+
+    fs_text = FileStorage(
+        stream=BytesIO(b'Hello, this is plain text\n' +
+                       b'A' * 101 * 1000 ** 2),
+        filename='test.txt',
+        content_type='text/plain'
+    )
+    form = form_class(
+        MultiDict([('method', 'Upload'), ('method_attachment', fs_text)]))
+    assert not form.validate()
+    assert form.errors == {
+        'method_attachment': [
+            'The file is too large, please provide a file smaller '
+            'than 100.0 MB.',
+            'Files of this type are not supported.',
+        ]
+    }
+
+    # upload selected
+    fs_pdf = FileStorage(
+        stream=BytesIO(b'%PDF-1.4\n%'),
+        filename='test.pdf',
+        content_type='application/pdf'
+    )
+    form = form_class(
+        MultiDict([('method', 'Upload'), ('method_attachment', fs_pdf)]))
+    assert form.validate()
+    assert not form.errors
 
 
 def test_nested_regression() -> None:
@@ -1128,7 +1232,7 @@ def test_indentation_error(
     )
 
     if shall_raise:
-        with pytest.raises(InvalidIndentSyntax) as excinfo:
+        with pytest.raises(errors.InvalidIndentSyntax) as excinfo:
             parse_formcode(text, enable_edit_checks=edit_checks)
 
         assert excinfo.value.line == 6
@@ -1182,7 +1286,21 @@ def test_indentation_error_for_identifier() -> None:
         """
     )
 
-    with pytest.raises(InvalidIndentSyntax):
+    with pytest.raises(errors.InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    # wrong indent
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+            Bemerkungen = ___
+        """
+    )
+
+    with pytest.raises(errors.InvalidIndentSyntax):
         parse_formcode(text, enable_edit_checks=True)
 
     text = dedent(
@@ -1198,8 +1316,27 @@ def test_indentation_error_for_identifier() -> None:
         """
     )
 
-    with pytest.raises(InvalidIndentSyntax):
+    with pytest.raises(errors.InvalidIndentSyntax):
         parse_formcode(text, enable_edit_checks=True)
+
+    # NOTE: Although a little weird, this is allowed, since each fieldset
+    #       opens its own dictionary in the generated YAML text, so the
+    #       indentation levels no longer need to necessarily match the
+    #       ones from the previous fieldset
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+        # New fieldset
+            Auswahl 2 =
+                (x) A
+                ( ) B
+                ( ) C
+        """
+    )
+    parse_formcode(text, enable_edit_checks=True)
 
 
 def test_indentation_error_for_identifier_2() -> None:
@@ -1233,6 +1370,50 @@ def test_indentation_error_for_identifier_2() -> None:
     assert parse_formcode(text, enable_edit_checks=True)
 
 
+def test_indentation_error_for_checkbox() -> None:
+    text = dedent(
+        """
+        (x) A
+        """
+    )
+    with pytest.raises(errors.InvalidFormSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Auswahl =
+        (x) A
+        """
+    )
+    with pytest.raises(errors.InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            ( ) B
+            ( ) C
+                (x) 1
+                ( ) 2
+        """
+    )
+    with pytest.raises(errors.InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
+
+
+def test_error_mixed_checkboxes() -> None:
+    text = dedent(
+        """
+        Auswahl =
+            (x) A
+            [ ] B
+        """
+    )
+    with pytest.raises(errors.MixedTypeError):
+        parse_formcode(text, enable_edit_checks=True)
+
+
 def test_help_indentation_error() -> None:
     text = dedent(
         """
@@ -1252,7 +1433,7 @@ def test_help_indentation_error() -> None:
             << Name of the contact person >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
         assert excinfo.value.line == 2
 
@@ -1265,7 +1446,7 @@ def test_help_indentation_error() -> None:
             << Name of the contact person >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
         assert excinfo.value.line == 5
 
@@ -1281,7 +1462,7 @@ def test_help_indentation_error() -> None:
             ( ) I DONT accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 7
 
@@ -1296,7 +1477,7 @@ def test_help_indentation_error() -> None:
             << Please select all your preferred sports >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 7
 
@@ -1312,7 +1493,7 @@ def test_help_indentation_error() -> None:
             << Please enter your name >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 8
 
@@ -1335,7 +1516,7 @@ def test_help_indentation_error() -> None:
             << Please enter your name >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 14
 
@@ -1362,7 +1543,7 @@ def test_help_indentation_error() -> None:
                     << badly indented >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 18
 
@@ -1386,7 +1567,7 @@ def test_help_indentation_error() -> None:
                 << Please enter your name >>
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentIndentSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 14
 
@@ -1405,12 +1586,26 @@ def test_help_location_error() -> None:
 
     text = dedent(
         """
+        Lieferung * =
+            (x) Pickup
+            ( ) Delivery
+                Address * = ___
+                Zip Code * = ___[4]/^[0-9]+$
+                City * = ___
+                Delivery time * = HH:MM
+        << Select delivery or pickup. >>
+        """
+    )
+    assert parse_formcode(text, enable_edit_checks=True)
+
+    text = dedent(
+        """
         # Comment
         << Put your personal email >>
         Email *= @@@
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 2
 
@@ -1424,7 +1619,7 @@ def test_help_location_error() -> None:
             ( ) I accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 5
 
@@ -1439,7 +1634,7 @@ def test_help_location_error() -> None:
             ( ) I accept the Terms of Use / User Agreement
         """
     ).lstrip('\n')
-    with pytest.raises(InvalidCommentLocationSyntax) as excinfo:
+    with pytest.raises(errors.InvalidCommentLocationSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 6
 
@@ -1488,3 +1683,19 @@ def test_empty_fieldset_error() -> None:
         )), enable_edit_checks=True)
 
     assert e.value.field_name == 'Section 2'
+
+
+def test_nested_fieldset_error() -> None:
+    with pytest.raises(errors.NestedFieldsetError) as e:
+        parse_formcode('\n'.join((
+            "# Personal information",
+            "Last name *= ___",
+            "First name *= ___",
+            "Options *=",
+            "    (x) Private",
+            "    ( ) Business",
+            "        # Nested fieldset",
+            "        Organisation = ___",
+        )), enable_edit_checks=True)
+
+    assert e.value.line == 7

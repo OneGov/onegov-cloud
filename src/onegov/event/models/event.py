@@ -9,9 +9,9 @@ from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.event.models.occurrence import Occurrence
 from onegov.file import File
@@ -25,38 +25,64 @@ from sedate import standardize_date
 from sedate import to_timezone, utcnow
 from sqlalchemy import and_
 from sqlalchemy import desc
-from sqlalchemy import Column
 from sqlalchemy import Enum
-from sqlalchemy import Text
+from sqlalchemy import ForeignKey
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.associationproxy import AssociationProxy
+from sqlalchemy.orm import composite
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm.attributes import set_committed_value
 from translationstring import TranslationString
 from uuid import uuid4
+from uuid import UUID
 
 
 from typing import IO
+from typing import Literal
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Query
-    from typing import Literal
-    from typing import TypeAlias
 
-    EventState: TypeAlias = Literal[
-        'initiated',
-        'submitted',
-        'published',
-        'withdrawn'
-    ]
+
+type EventState = Literal[
+    'initiated',
+    'submitted',
+    'published',
+    'withdrawn'
+]
 
 
 class EventFile(File):
     __mapper_args__ = {'polymorphic_identity': 'eventfile'}
+
+
+class FilterItem(NamedTuple):
+    keyword: str
+    value: str
+
+    def __composite_values__(self) -> tuple[str, str]:
+        return self
+
+
+class EventFilterValue(Base):
+
+    __tablename__ = 'event_filter_values'
+
+    event_id: Mapped[UUID] = mapped_column(
+        ForeignKey('events.id', ondelete='CASCADE'),
+        primary_key=True
+    )
+
+    keyword: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[str] = mapped_column(primary_key=True)
+    item = composite(FilterItem, keyword, value)
 
 
 class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
@@ -76,19 +102,17 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     occurrence_dates_year_limit = 2
 
     #: Internal number of the event
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: State of the event
-    state: Column[EventState] = Column(
-        Enum(  # type: ignore[arg-type]
+    state: Mapped[EventState] = mapped_column(
+        Enum(
             'initiated', 'submitted', 'published', 'withdrawn',
             name='event_state'
         ),
-        nullable=False,
         default='initiated'
     )
 
@@ -120,12 +144,18 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     source_updated: dict_property[str | None] = meta_property()
 
     #: Recurrence of the event (RRULE, see RFC2445)
-    recurrence: Column[str | None] = Column(Text, nullable=True)
+    recurrence: Mapped[str | None]
 
     #: The access property of the event, taken from onegov.org. Not ideal to
     #: have this defined here, instead of using an AccessExtension, but that
     #: would only be possible with deeper changes to the Event model.
     access: dict_property[str] = meta_property(default='public')
+
+    #: Whether the event is marked for external publication (syndication)
+    syndicate: dict_property[bool] = meta_property(default=False)
+
+    #: Whether the event is highlighted (featured)
+    highlight: dict_property[bool] = meta_property(default=False)
 
     #: The associated image
     image = associated(
@@ -135,6 +165,21 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #: The associated PDF
     pdf = associated(
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
+    )
+
+    #: The associated filter keywords
+    filter_keyword_objects: Mapped[list[EventFilterValue]] = relationship(
+        cascade='all, delete-orphan',
+        lazy='selectin'
+    )
+
+    #: The associated filter keywords as a simple list of key-value tuples
+    filter_keyword_list: AssociationProxy[
+        list[tuple[str, str]]
+    ] = association_proxy(
+        'filter_keyword_objects',
+        'item',
+        creator=lambda item: EventFilterValue(keyword=item[0], value=item[1])
     )
 
     def set_image(
@@ -171,7 +216,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         else:
             try:
-                setattr(self, blob, EventFile(  # type: ignore[misc]
+                setattr(self, blob, EventFile(
                     name=filename,
                     reference=as_fileintent(content, filename)
                 ))
@@ -179,11 +224,10 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
                 setattr(self, blob, None)
 
     #: Occurrences of the event
-    occurrences: relationship[list[Occurrence]] = relationship(
-        'Occurrence',
+    occurrences: Mapped[list[Occurrence]] = relationship(
         cascade='all, delete-orphan',
         back_populates='event',
-        lazy='joined',
+        lazy='selectin',
     )
 
     # HACK: We don't want to set up translations in this module for this single
@@ -256,6 +300,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     @property
     def base_query(self) -> Query[Occurrence]:
         session = object_session(self)
+        assert session is not None
         return session.query(Occurrence).filter_by(event_id=self.id)
 
     @property
@@ -407,12 +452,11 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         end = start + (self.end - self.start)
         name = f'{self.name}-{start.date().isoformat()}'
 
-        return Occurrence(  # type:ignore[misc]
+        return Occurrence(
             title=self.title,
             name=name,
             location=self.location,
             tags=self.tags,
-            filter_keywords=self.filter_keywords,
             start=start,
             end=end,
             timezone=self.timezone,
@@ -465,9 +509,6 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             if session := object_session(self):
                 session.add(occ)
             self.occurrences.append(occ)
-
-        for occ in self.occurrences:
-            occ.filter_keywords = self.filter_keywords
 
     def submit(self) -> None:
         """ Submit the event. """

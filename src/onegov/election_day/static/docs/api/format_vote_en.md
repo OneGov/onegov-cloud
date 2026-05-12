@@ -53,6 +53,7 @@ Name|Description
 `empty`|The number of blank votes.
 `eligible_voters`|The number of persons eligible to vote.
 `expats`|Number of expats. Optional.
+`received`|Number of ballots received. Optional.
 
 #### Temporary results
 

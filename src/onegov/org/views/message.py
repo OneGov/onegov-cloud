@@ -69,7 +69,12 @@ class Owner(NamedTuple):
         return self.realname or self.username
 
 
-@OrgApp.json(model=MessageCollection, permission=Private, name='feed')
+@OrgApp.json(
+    model=MessageCollection,
+    permission=Private,
+    name='feed',
+    open_data=False
+)
 def view_messages_feed(
     self: MessageCollection[Message],
     request: OrgRequest,
@@ -95,16 +100,21 @@ def view_messages_feed(
     submitter_name = request.translate(_('Submitter'))
 
     if usernames:
-        q = request.session.query(User)
-        q = q.with_entities(User.username, User.realname)
-        q = q.filter(User.username.in_(usernames))
+        query = request.session.query(User.username, User.realname)
+        query = query.filter(User.username.in_(usernames))
 
-        owners = {u.username: Owner(
-            general if hide_personal_email else u.username, u.realname
-        ) for u in q}
+        owners = {
+            username: Owner(
+                general if hide_personal_email else username,
+                realname
+            )
+            for username, realname in query.tuples()
+        }
         owners.update({
             username: Owner(
-                submitter_name if hide_submitter_email else username, None)
+                submitter_name if hide_submitter_email else username,
+                None
+            )
             for username in usernames
             if username not in owners
         })

@@ -70,7 +70,9 @@ def test_resource_slots(client: Client) -> None:
     transaction.commit()
 
     url = '/resource/foo/slots'
-    assert client.get(url).json == []
+    response = client.get(url)
+    assert 'Access-Control-Allow-Origin' not in response.headers
+    assert response.json == []
 
     url = '/resource/foo/slots?start=2015-08-04&end=2015-08-05'
     result = client.get(url).json
@@ -169,7 +171,7 @@ def test_resources_person_link_extension(client: Client) -> None:
 
     # add person
     people_page = client.get('/people')
-    new_person_page = people_page.click('Person')
+    new_person_page = people_page.click('Person', index=1)
     assert "Neue Person" in new_person_page
 
     new_person_page.form['first_name'] = 'Franz'
@@ -253,18 +255,27 @@ def test_find_your_spot(client: Client) -> None:
 
     resources = client.get('/resources')
     new = resources.click('Raum')
-    new.form['title'] = 'Meeting 1'
+    new.form['title'] = 'Grand Meeting Room'
     new.form['group'] = 'Meeting Rooms'
     new.form.submit().follow()
 
     # with only one room in the group there should be no room filter
     find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
+    assert 'Access-Control-Allow-Origin' not in find_your_spot.headers
     assert 'Räume' not in find_your_spot
     assert 'An Feiertagen' not in find_your_spot
     assert 'Während Schulferien' not in find_your_spot
 
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting 1'
+    new.form['group'] = 'Meeting Rooms'
+    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.submit().follow()
+
     new.form['title'] = 'Meeting 2'
     new.form['group'] = 'Meeting Rooms'
+    new.form.select('parent_id', text='Grand Meeting Room')
     new.form.submit().follow()
 
     find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
@@ -336,6 +347,20 @@ def test_find_your_spot(client: Client) -> None:
     # create a blocked and an unblocked allocation
     transaction.begin()
 
+    scheduler_parent = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('grand-meeting-room')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_parent.allocate(
+        dates=(
+            (datetime(2020, 1, 1), datetime(2020, 1, 1)),
+            (datetime(2020, 1, 2), datetime(2020, 1, 2)),
+        ),
+        whole_day=True,
+        partly_available=True
+    )
+
     scheduler_1 = (
         ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
         .by_name('meeting-1')
@@ -382,7 +407,7 @@ def test_find_your_spot(client: Client) -> None:
     ).json
     assert len(result['reservations']) == 1
     reservation = result['reservations'][0]
-    assert reservation['resource'] == 'meeting-1'
+    assert reservation['resource'] == 'grand-meeting-room'
     assert reservation['date'].startswith('2020-01-01')
     assert reservation['time'] == '07:00 - 08:00'
 
@@ -394,7 +419,7 @@ def test_find_your_spot(client: Client) -> None:
     ).json
     assert len(result['reservations']) == 1
     reservation = result['reservations'][0]
-    assert reservation['resource'] == 'meeting-1'
+    assert reservation['resource'] == 'grand-meeting-room'
     assert reservation['date'].startswith('2020-01-01')
     assert reservation['time'] == '07:00 - 08:00'
 
@@ -405,11 +430,17 @@ def test_find_your_spot(client: Client) -> None:
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
     assert len(result['reservations']) == 5
-    for idx, reservation in enumerate(result['reservations'][:-1]):
-        assert reservation['resource'] == 'meeting-1'
+    # the first two go to the grand meeting room
+    for idx, reservation in enumerate(result['reservations'][:2]):
+        assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx+1}')
         assert reservation['time'] == '07:00 - 08:00'
-    # the final reservation only works for the other room
+    # the next two go to the first partition
+    for idx, reservation in enumerate(result['reservations'][2:4]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+3}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the the second partition
     reservation = result['reservations'][-1]
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')
@@ -422,11 +453,17 @@ def test_find_your_spot(client: Client) -> None:
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
     assert len(result['reservations']) == 5
-    for idx, reservation in enumerate(result['reservations'][:-1]):
-        assert reservation['resource'] == 'meeting-1'
+    # the first two go to the grand meeting room
+    for idx, reservation in enumerate(result['reservations'][:2]):
+        assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx+1}')
         assert reservation['time'] == '07:00 - 08:00'
-    # the final reservation only works for the other room
+    # the next two go to the first partition
+    for idx, reservation in enumerate(result['reservations'][2:4]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+3}')
+        assert reservation['time'] == '07:00 - 08:00'
+    # the final reservation only works for the the second partition
     reservation = result['reservations'][-1]
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')
@@ -438,16 +475,24 @@ def test_find_your_spot(client: Client) -> None:
     result = client.get(
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
-    assert len(result['reservations']) == 8
-    for idx, reservation in enumerate(result['reservations'][::2]):
-        assert reservation['resource'] == 'meeting-1'
+    assert len(result['reservations']) == 6
+    # the first two days go into the grand meeting room
+    for idx, reservation in enumerate(result['reservations'][:2]):
+        assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx+1}')
         assert reservation['time'] == '07:00 - 08:00'
 
-    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
-        assert reservation['resource'] == 'meeting-2'
-        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+    # the third and fourth day go the first partition
+    for idx, reservation in enumerate(result['reservations'][2::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+3}')
         assert reservation['time'] == '07:00 - 08:00'
+
+    # the third and fifth day go the second partition
+    reservation = result['reservations'][-3]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-03')
+    assert reservation['time'] == '07:00 - 08:00'
     reservation = result['reservations'][-1]
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')
@@ -459,16 +504,24 @@ def test_find_your_spot(client: Client) -> None:
     result = client.get(
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
-    assert len(result['reservations']) == 8
-    for idx, reservation in enumerate(result['reservations'][::2]):
-        assert reservation['resource'] == 'meeting-1'
+    assert len(result['reservations']) == 6
+    # the first two days go into the grand meeting room
+    for idx, reservation in enumerate(result['reservations'][:2]):
+        assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx+1}')
         assert reservation['time'] == '07:00 - 08:00'
 
-    for idx, reservation in enumerate(result['reservations'][1:-1:2]):
-        assert reservation['resource'] == 'meeting-2'
-        assert reservation['date'].startswith(f'2020-01-0{idx+1}')
+    # the third and fourth day go the first partition
+    for idx, reservation in enumerate(result['reservations'][2::2]):
+        assert reservation['resource'] == 'meeting-1'
+        assert reservation['date'].startswith(f'2020-01-0{idx+3}')
         assert reservation['time'] == '07:00 - 08:00'
+
+    # the third and fifth day go the second partition
+    reservation = result['reservations'][-3]
+    assert reservation['resource'] == 'meeting-2'
+    assert reservation['date'].startswith('2020-01-03')
+    assert reservation['time'] == '07:00 - 08:00'
     reservation = result['reservations'][-1]
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')
@@ -2496,10 +2549,15 @@ def test_reservation_export_all_view(client: Client) -> None:
     export.form['end'] = date(2023, 8, 28)
 
     response = export.form.submit()
+
     with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmp:
         tmp.write(response.body)
+        # NOTE: Python 3.14 has optimizations for re-using open file-handles
+        #       so if we don't seek back to the start of the file, openpyxl
+        #       will fail to read it properly.
+        tmp.seek(0)
 
-        wb = load_workbook(Path(tmp.name))
+        wb = load_workbook(tmp.name)
 
         daypass_sheet_name = wb.sheetnames[1]
         daypass_sheet = wb[daypass_sheet_name]
@@ -2616,6 +2674,10 @@ def test_reservation_export_all_view_normalizes_sheet_names(
 
     with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmp:
         tmp.write(response.body)
+        # NOTE: Python 3.14 has optimizations for re-using open file-handles
+        #       so if we don't seek back to the start of the file, openpyxl
+        #       will fail to read it properly.
+        tmp.seek(0)
         wb = load_workbook(Path(tmp.name))
         actual_sheet_name_room = wb.sheetnames[0]
         actual_sheet_name_daypass = wb.sheetnames[1]
@@ -4095,14 +4157,14 @@ def test_allocation_rules_copy_paste(client: Client) -> None:
 
     # Copy the rule
     edit_page = client.get('/resource/room-1').click('Verfügbarkeitszeiträume')
-    copy_links = edit_page.html.find_all('a', string='Kopieren')
+    copy_links = edit_page.html.find_all('a', string='Kopieren')  # type: ignore[call-overload]
     client.post(copy_links[0].attrs['ic-post-to'])
     edit_page = client.get(edit_page.request.path)
     assert 'in die Zwischenablage kopiert' in edit_page
 
     # Paste the rule in the other room
     edit_page = client.get('/resource/room-2').click('Verfügbarkeitszeiträume')
-    paste_links = edit_page.html.find_all('a', string='Einfügen')
+    paste_links = edit_page.html.find_all('a', string='Einfügen')  # type: ignore[call-overload]
     client.post(paste_links[0].attrs['ic-post-to'])
     edit_page = client.get(edit_page.request.path)
     assert 'wurde eingefügt' in edit_page
@@ -4213,20 +4275,20 @@ def test_allocation_rules_with_holidays(client: Client) -> None:
     page.form['on_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Verfügbarkeitszeitraum aktiv, 352 Verfügbarkeiten erstellt' in page
-    assert count_allocations() == 352
+    assert 'Verfügbarkeitszeitraum aktiv, 350 Verfügbarkeiten erstellt' in page
+    assert count_allocations() == 350
 
     # running the cronjob on an ordinary day will not change anything
     with freeze_time('2019-01-31 22:00:00'):
         run_cronjob()
 
-    assert count_allocations() == 352
+    assert count_allocations() == 350
 
     # only run at the end of the year does it work
     with freeze_time('2019-12-31 22:00:00'):
         run_cronjob()
 
-    assert count_allocations() == 705
+    assert count_allocations() == 701
 
 
 def test_allocation_rules_with_school_holidays(client: Client) -> None:
@@ -4532,7 +4594,8 @@ def test_my_reservations_view(client: Client) -> None:
     # let's enable it
     admin = client.spawn()
     admin.login_admin()
-    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings = admin.get('/').click(
+        'Module aktivieren/deaktivieren')
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 
@@ -4554,6 +4617,7 @@ def test_my_reservations_view(client: Client) -> None:
         '/resources/my-reservations-json?start=2015-08-28&end=2015-08-29'
     )
     assert reservations.status_code == 200
+    assert 'Access-Control-Allow-Origin' not in reservations.headers
 
     # accessing the PDF without a date filter is not allowed
     client.get('/resources/my-reservations-pdf', status=400)

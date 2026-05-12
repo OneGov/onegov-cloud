@@ -120,7 +120,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
 
 class ActivityTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FER'}  # type:ignore
+    __mapper_args__ = {'polymorphic_identity': 'FER'}
 
     def reference_group(
         self,

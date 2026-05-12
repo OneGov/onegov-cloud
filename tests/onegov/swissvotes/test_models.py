@@ -147,7 +147,7 @@ def test_model_file_subcollection() -> None:
 
 def test_model_page(session: Session) -> None:
     session.add(
-        TranslatablePage(  # type: ignore[misc]
+        TranslatablePage(
             id='page',
             title_translations={'de_CH': "Titel", 'en': "Title"},
             content_translations={'de_CH': "Inhalt", 'en': "Content"},
@@ -1067,9 +1067,9 @@ def test_model_vote_attachments(
     assert vote.voting_text.extract == 'Abstimmungstext'
     assert vote.voting_text.stats == {'pages': 1, 'words': 1}
     assert vote.voting_text.language == 'german'
-    assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurzbeschreib" in vote.searchable_text_de_CH
-    assert "parlamentdebatt" in vote.searchable_text_de_CH
+    assert "abstimmungstex" in vote.searchable_text_de_CH  # type: ignore[operator]
+    assert "kurzbeschreib" in vote.searchable_text_de_CH  # type: ignore[operator]
+    assert "parlamentdebatt" in vote.searchable_text_de_CH  # type: ignore[operator]
     assert vote.searchable_text_fr_CH == ''
     assert vote.search('Inserateanalysen') == [vote.ad_analysis]
     assert vote.search('Kurzbeschreibung') == [vote.brief_description]
@@ -1091,10 +1091,10 @@ def test_model_vote_attachments(
         assert vote.realization.stats == {'pages': 1, 'words': 1}
         assert vote.realization.language == 'french'
 
-        assert "abstimmungstex" in vote.searchable_text_de_CH
-        assert "kurzbeschreib" in vote.searchable_text_de_CH
-        assert "parlamentdebatt" in vote.searchable_text_de_CH
-        assert "réalis" in vote.searchable_text_fr_CH
+        assert "abstimmungstex" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "kurzbeschreib" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "parlamentdebatt" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "réalis" in vote.searchable_text_fr_CH  # type: ignore[operator]
         assert vote.search('Réalisation') == [vote.realization]
 
         del vote.realization
@@ -1119,12 +1119,12 @@ def test_model_vote_attachments(
         assert vote.voting_booklet.name == 'voting_booklet-fr_CH'
         assert vote.voting_booklet.stats == {'pages': 1, 'words': 2}
         assert vote.voting_booklet.language == 'french'
-        assert "abstimmungstex" in vote.searchable_text_de_CH
-        assert "kurzbeschreib" in vote.searchable_text_de_CH
-        assert "parlamentdebatt" in vote.searchable_text_de_CH
-        assert "réalis" not in vote.searchable_text_fr_CH
-        assert "conseil" in vote.searchable_text_fr_CH
-        assert "fédéral" in vote.searchable_text_fr_CH
+        assert "abstimmungstex" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "kurzbeschreib" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "parlamentdebatt" in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert "réalis" not in vote.searchable_text_fr_CH  # type: ignore[operator]
+        assert "conseil" in vote.searchable_text_fr_CH  # type: ignore[operator]
+        assert "fédéral" in vote.searchable_text_fr_CH  # type: ignore[operator]
         assert vote.search('Conseil fédéral') == [vote.federal_council_message]
         assert vote.search('Messages') == [vote.federal_council_message]
         assert vote.search('constatant') == [vote.resolution]
@@ -1202,9 +1202,9 @@ def test_model_vote_attachments(
         assert files['legal'].language == 'french'
         assert files['legal'].extract == 'Juridique'
         assert files['legal'].stats == {'pages': 1, 'words': 1}
-        assert 'abhandl' in vote.searchable_text_de_CH
-        assert 'volantin' in vote.searchable_text_it_CH
-        assert 'articl' in vote.searchable_text_en_US
+        assert 'abhandl' in vote.searchable_text_de_CH  # type: ignore[operator]
+        assert 'volantin' in vote.searchable_text_it_CH  # type: ignore[operator]
+        assert 'articl' in vote.searchable_text_en_US  # type: ignore[operator]
         assert vote.search('Abhandlung') == [files['essay']]
         assert vote.search('Abhandlungen') == [files['essay']]
         assert vote.search('Volantino') == [files['leaflet']]

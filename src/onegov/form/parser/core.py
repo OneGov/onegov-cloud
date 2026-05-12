@@ -432,27 +432,24 @@ from onegov.form.parser.grammar import video_url
 from onegov.form.utils import as_internal_id
 
 
-from typing import final, Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
+from typing import final, Any, ClassVar, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from onegov.form.types import PricingRules
     from onegov.form.utils import decimal_range
     from pyparsing import ParseResults
     from re import Pattern
-    from typing import TypeAlias
     from yaml.nodes import ScalarNode
 
     # tagged unions so we can type narrow by type field
-    BasicParsedField: TypeAlias = (
-        'PasswordField | EmailField | UrlField | VideoURLField | DateField | '
-        'DatetimeField | TimeField | StringField | TextAreaField | '
-        'CodeField | StdnumField | IntegerRangeField | '
-        'DecimalRangeField | RadioField | CheckboxField | ChipNrField'
+    type BasicParsedField = (
+        PasswordField | EmailField | UrlField | VideoURLField | DateField
+        | DatetimeField | TimeField | StringField | TextAreaField
+        | CodeField | StdnumField | IntegerRangeField | DecimalRangeField
+        | RadioField | CheckboxField | ChipNrField
     )
-    FileParsedField: TypeAlias = 'FileinputField | MultipleFileinputField'
-    ParsedField: TypeAlias = BasicParsedField | FileParsedField
-
-_FieldT = TypeVar('_FieldT', bound='ParsedField')
+    type FileParsedField = FileinputField | MultipleFileinputField
+    type ParsedField = BasicParsedField | FileParsedField
 
 
 # cache the parser elements
@@ -810,14 +807,14 @@ class Field:
         return self._human_id
 
     @classmethod
-    def create(  # type:ignore[misc]
-        cls: type[_FieldT],
+    def create[T: ParsedField](  # type:ignore[misc]
+        cls: type[T],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> _FieldT:
+    ) -> T:
 
         return cls(  # type:ignore[return-value]
             label=identifier.label,
@@ -1103,14 +1100,14 @@ class FileinputBase:
     extensions: list[str]
 
     @classmethod
-    def create(  # type:ignore[misc]
-        cls: type[_FieldT],
+    def create[T: ParsedField](  # type:ignore[misc]
+        cls: type[T],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> _FieldT:
+    ) -> T:
         return cls(  # type:ignore[return-value]
             label=identifier.label,
             required=identifier.required,
@@ -1137,14 +1134,14 @@ class OptionsField:
     discount: dict[str, float]
 
     @classmethod
-    def create(  # type:ignore[misc]
-        cls: type[_FieldT],
+    def create[T: ParsedField](  # type:ignore[misc]
+        cls: type[T],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: ParsedField | None = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> _FieldT:
+    ) -> T:
 
         choices = [
             Choice(
@@ -1381,6 +1378,68 @@ def validate_indent(indent: str) -> bool:
     return True
 
 
+class IndentStack(list[int]):
+    """ Handles the indentation logic for formcode.
+
+    Identifiers are always followed by options and vice versa, so we can
+    handle these in the same stack and apply logic based on the current
+    size of the stack.
+
+    """
+    __slots__ = ('enable_edit_checks', )
+
+    def __init__(self, *, enable_edit_checks: bool = False) -> None:
+        super().__init__()
+        self.enable_edit_checks = enable_edit_checks
+
+    def is_identifier(self, indent: int) -> bool:
+        try:
+            return self.index(indent) % 2 == 0
+        except ValueError:
+            return False
+
+    def handle_indent(
+        self,
+        line: int,  # for error messages
+        indent: int,
+        *,
+        is_option: bool = False
+    ) -> None:
+        if not self.enable_edit_checks:
+            return
+
+        if not self:
+            # the first indentation cannot be an option
+            if is_option:
+                raise errors.InvalidIndentSyntax(line=line)
+            self.append(indent)
+            return
+
+        previous_indent = self[-1]
+        if previous_indent < indent:
+            # add new level
+            expect_option = len(self) % 2 == 1
+            if is_option is not expect_option:
+                raise errors.InvalidIndentSyntax(line=line)
+            self.append(indent)
+            return
+
+        if previous_indent > indent:
+            while len(self) > 1:
+                self.pop()
+                previous_indent = self[-1]
+                if previous_indent == indent:
+                    break
+            else:
+                # the desired indentation matches no previous
+                # indentation
+                raise errors.InvalidIndentSyntax(line=line)
+
+        expect_option = len(self) % 2 == 0
+        if is_option is not expect_option:
+            raise errors.InvalidIndentSyntax(line=line)
+
+
 def translate_to_yaml(
     text: str,
     enable_edit_checks: bool = False
@@ -1397,8 +1456,7 @@ def translate_to_yaml(
     expect_nested = False
     actual_fields = 0
     ix = 0
-    identifier_indent_stack: list[int] = []
-    option_indent_stack: list[int] = []
+    indent_stack = IndentStack(enable_edit_checks=enable_edit_checks)
     expect_option = False
 
     def escape_single(text: str) -> str:
@@ -1406,33 +1464,6 @@ def translate_to_yaml(
 
     def escape_double(text: str) -> str:
         return text.replace('"', '\\"')
-
-    def handle_indent_stack(
-        stack: list[int],
-        ix: int,
-        current_indent: int,
-        enable_edit_checks: bool = False,
-    ) -> list[int]:
-        """ Handle indentation changes and return updated stack. """
-        if not enable_edit_checks:
-            return stack  # skip stack handling
-
-        previous_indent = stack[-1] if stack else -1
-
-        if previous_indent < current_indent:
-            # add new level
-            stack.append(current_indent)
-            return stack
-
-        elif previous_indent > current_indent:
-            # pop back last level
-            if current_indent not in stack:
-                raise errors.InvalidIndentSyntax(line=ix + 1)
-            return stack[:stack.index(current_indent) + 1]
-
-        else:
-            # same level, nothing to do
-            return stack
 
     for ix, line in lines:
         len_indent = len(line) - len(line.lstrip())
@@ -1443,8 +1474,11 @@ def translate_to_yaml(
 
         # the top level are the fieldsets
         if match(ELEMENTS.fieldset_title, line):
+            if enable_edit_checks and len_indent > 4:
+                raise errors.NestedFieldsetError(line=ix + 1)
             yield '- "{}":'.format(escape_double(line.lstrip('# ').rstrip()))
             expect_nested = False
+            indent_stack.clear()
             continue
 
         # fields are nested lists of dictionaries
@@ -1463,33 +1497,25 @@ def translate_to_yaml(
             expect_nested = len(indent) > 4
             actual_fields += 1
 
-            identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent, enable_edit_checks
-            )
+            indent_stack.handle_indent(ix + 1, len_indent)
             continue
 
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
-            if enable_edit_checks and not identifier_indent_stack:
-                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+            if enable_edit_checks:
+                if expect_option or not indent_stack:
+                    raise errors.InvalidCommentLocationSyntax(line=ix + 1)
 
-            # check for a valid indentation level
-            if (enable_edit_checks and
-                    len_indent not in identifier_indent_stack):
-                raise errors.InvalidCommentIndentSyntax(line=ix + 1)
-
-            if enable_edit_checks and expect_option:
-                raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+                if not indent_stack.is_identifier(len_indent):
+                    raise errors.InvalidCommentIndentSyntax(line=ix + 1)
 
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
                 identifier='field_help',
-                message=parse_result.message
+                message=escape_single(parse_result.message)
             )
-            identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent, enable_edit_checks
-            )
+            indent_stack.handle_indent(ix + 1, len_indent)
             continue
 
         # checkboxes/radios come without identifier
@@ -1505,13 +1531,7 @@ def translate_to_yaml(
                 definition=escape_single(line.strip())
             )
 
-            # check for a valid indentation level
-            if enable_edit_checks and len_indent in identifier_indent_stack:
-                raise errors.InvalidIndentSyntax(line=ix + 1)
-
-            option_indent_stack = handle_indent_stack(
-                option_indent_stack, ix, len_indent, enable_edit_checks
-            )
+            indent_stack.handle_indent(ix + 1, len_indent, is_option=True)
             expect_option = False
             continue
 
@@ -1530,12 +1550,7 @@ def translate_to_yaml(
             expect_nested = True
             actual_fields += 1
 
-            if enable_edit_checks and len_indent in option_indent_stack:
-                raise errors.InvalidIndentSyntax(line=ix + 1)
-
-            identifier_indent_stack = handle_indent_stack(
-                identifier_indent_stack, ix, len_indent, enable_edit_checks
-            )
+            indent_stack.handle_indent(ix + 1, len_indent)
             expect_option = True
             continue
 

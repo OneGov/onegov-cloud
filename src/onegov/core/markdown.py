@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from mistletoe.span_token import HTMLBlock, HTMLSpan  # type:ignore
 
 
-RENDERER_INSTANCES = {}
+RENDERER_INSTANCES: dict[type[HtmlRenderer], HtmlRenderer] = {}
 
 
 class HTMLRendererWithoutInlineHtml(HtmlRenderer):

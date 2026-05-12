@@ -55,7 +55,8 @@ def candidate_options(
 @ElectionDayApp.json(
     model=Candidate,
     name='by-entity',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_candidate_by_entity(
     self: Candidate,

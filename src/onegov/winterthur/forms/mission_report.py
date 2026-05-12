@@ -7,7 +7,6 @@ from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import Form
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from onegov.winterthur import _
 from onegov.winterthur.models import MissionReportFile
 from wtforms.fields import BooleanField
@@ -133,9 +132,10 @@ class MissionReportVehicleForm(Form):
         file_class=MissionReportFile,
         validators=[
             Optional(),
-            WhitelistedMimeType(IMAGE_MIME_TYPES_AND_SVG),
             FileSizeLimit(1 * 1024 * 1024)
-        ])
+        ],
+        allowed_mimetypes=IMAGE_MIME_TYPES_AND_SVG,
+    )
 
     website = URLField(
         _('Website'),

@@ -98,7 +98,7 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
 
     def update_generator_registry(
         self,
-        mapper: Mapper,
+        mapper: Mapper[Any],
         class_: type[Any]
     ) -> None:
 
@@ -158,4 +158,4 @@ if hasattr(sqlalchemy_utils.observer, 'observer'):
     # so we call register_listeners to make sure we can remove them
     sqlalchemy_utils.observer.observer.register_listeners()
     sqlalchemy_utils.observer.observer.remove_listeners()
-    delattr(sqlalchemy_utils.observer, 'observer')
+    del sqlalchemy_utils.observer.observer

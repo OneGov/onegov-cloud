@@ -27,11 +27,8 @@ if TYPE_CHECKING:
     from fs.subfs import FS
     from fs.subfs import SubFS
     from onegov.election_day import ElectionDayApp
-    from typing import TypeVar
-    from typing import TypeAlias
 
-    Entity: TypeAlias = Election | ElectionCompound | Vote
-    EntityT = TypeVar('EntityT', bound=Entity)
+    type Entity = Election | ElectionCompound | Vote
 
 
 class ArchiveGenerator:
@@ -109,10 +106,10 @@ class ArchiveGenerator:
             for vote_record in export_internal(vote, locales)
         ]
 
-    def group_by_year(
+    def group_by_year[T: Entity](
         self,
-        entities: Iterable[EntityT]
-    ) -> list[list[EntityT]]:
+        entities: Iterable[T]
+    ) -> list[list[T]]:
         """Creates a list of lists, grouped by year.
 
         :param entities: Iterable of entities
@@ -192,10 +189,10 @@ class ArchiveGenerator:
         )
         return self.filter_by_final_results(query)
 
-    def filter_by_final_results(
+    def filter_by_final_results[T: Entity](
         self,
-        all_entities: Iterable[EntityT]
-    ) -> list[EntityT]:
+        all_entities: Iterable[T]
+    ) -> list[T]:
 
         return [
             entity
@@ -225,7 +222,7 @@ class ArchiveGenerator:
                 dst_path=match.path,
             )
 
-    def export_item(self, item: EntityT, dir: str) -> None:
+    def export_item(self, item: Entity, dir: str) -> None:
         locales = sorted(self.app.locales)
         assert self.app.default_locale
         default_locale = self.app.default_locale

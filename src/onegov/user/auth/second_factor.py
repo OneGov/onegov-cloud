@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user import User
     from onegov.user.auth import Auth
-    from typing import TypeAlias, TypedDict
+    from typing import TypedDict
     from webob import Response
 
     class YubikeyConfig(TypedDict):
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     class TOTPConfig(TypedDict):
         totp_enabled: bool
 
-    AnySecondFactor: TypeAlias = 'SingleStepSecondFactor | TwoStepSecondFactor'
+    type AnySecondFactor = SingleStepSecondFactor | TwoStepSecondFactor
 
 
 SECOND_FACTORS: dict[str, type[AnySecondFactor]] = {}

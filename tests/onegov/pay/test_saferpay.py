@@ -29,7 +29,7 @@ def test_worldline_fee_policy() -> None:
 
 def test_saferpay_capture_good_tx() -> None:
     mock_session = mock.Mock()
-    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')  # type: ignore[misc]
+    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')
     client = provider.client
     client.session = mock_session
     tx = SaferpayTransaction(
@@ -55,7 +55,7 @@ def test_saferpay_capture_good_tx() -> None:
 
 def test_datatrans_settle_bad_tx(caplog: pytest.LogCaptureFixture) -> None:
     mock_session = mock.Mock()
-    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')  # type: ignore[misc]
+    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')
     client = provider.client
     client.session = mock_session
     tx = SaferpayTransaction(
@@ -84,7 +84,7 @@ def test_datatrans_settle_bad_tx(caplog: pytest.LogCaptureFixture) -> None:
 
 def test_datatrans_settle_negative_vote() -> None:
     mock_session = mock.Mock()
-    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')  # type: ignore[misc]
+    provider = WorldlineSaferpay(customer_id='foo', terminal_id='bar')
     client = provider.client
     client.session = mock_session
     tx = SaferpayTransaction(

@@ -362,8 +362,8 @@ def test_cli_reindex(
     commit()
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstext" in vote.searchable_text_de_CH
-    assert "abhandl" in vote.searchable_text_de_CH
+    assert "abstimmungstext" in vote.searchable_text_de_CH  # type: ignore[operator]
+    assert "abhandl" in vote.searchable_text_de_CH  # type: ignore[operator]
 
     # Reindex
     result = run_command(cfg_path, 'govikon', ['reindex'])
@@ -371,8 +371,8 @@ def test_cli_reindex(
     assert "Reindexing vote 1.00" in result.output
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstext" in vote.searchable_text_de_CH
-    assert "abhandl" in vote.searchable_text_de_CH
+    assert "abstimmungstext" in vote.searchable_text_de_CH  # type: ignore[operator]
+    assert "abhandl" in vote.searchable_text_de_CH  # type: ignore[operator]
     assert vote.voting_text is not None
 
     # Change file contents
@@ -388,8 +388,8 @@ def test_cli_reindex(
             pdf.generate()
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstext" in vote.searchable_text_de_CH
-    assert "abhandl" in vote.searchable_text_de_CH
+    assert "abstimmungstext" in vote.searchable_text_de_CH  # type: ignore[operator]
+    assert "abhandl" in vote.searchable_text_de_CH  # type: ignore[operator]
 
     # Reindex
     result = run_command(cfg_path, 'govikon', ['reindex'])
@@ -397,8 +397,8 @@ def test_cli_reindex(
     assert "Reindexing vote 1.00" in result.output
 
     vote = session.query(SwissVote).one()
-    assert "realisation" in vote.searchable_text_de_CH
-    assert "kampagnenmaterial" in vote.searchable_text_de_CH
+    assert "realisation" in vote.searchable_text_de_CH  # type: ignore[operator]
+    assert "kampagnenmaterial" in vote.searchable_text_de_CH  # type: ignore[operator]
 
 
 @patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, {4, 5}))

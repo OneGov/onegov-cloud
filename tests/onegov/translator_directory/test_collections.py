@@ -310,3 +310,34 @@ def test_translator_collection_visibility(translator_app: TestApp) -> None:
     )
     assert hidden_translator in coll_admin_include_true.query().all()
     assert len(coll_admin_include_true.query().all()) == 1
+
+    # Add a visible (non-hidden) translator for the combined scenario
+    visible_translator = create_translator(
+        translator_app,
+        email='visible@example.com',
+        last_name='Visible',
+        for_admins_only=False,
+    )
+
+    # Scenario 3: show_all_including_hidden for admin
+    # Both translators should appear
+    coll_admin_all = TranslatorCollection(
+        translator_app,
+        user_role='admin',
+        show_all_including_hidden=True,
+    )
+    results = coll_admin_all.query().all()
+    assert hidden_translator in results
+    assert visible_translator in results
+    assert len(results) == 2
+
+    # show_all_including_hidden has no effect for non-admins
+    coll_non_admin_all = TranslatorCollection(
+        translator_app,
+        user_role='member',
+        show_all_including_hidden=True,
+    )
+    results_non_admin = coll_non_admin_all.query().all()
+    assert hidden_translator not in results_non_admin
+    assert visible_translator in results_non_admin
+    assert len(results_non_admin) == 1

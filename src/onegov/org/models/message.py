@@ -21,8 +21,7 @@ if TYPE_CHECKING:
     from onegov.org.layout import DefaultLayout
     from onegov.org.request import OrgRequest
     from onegov.pay import Payment
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Mapped, Session
     from typing import Self
 
 # 👉 when adding new ticket messages be sure to evaluate if they should
@@ -33,7 +32,7 @@ if TYPE_CHECKING:
 class TicketMessageMixin:
 
     if TYPE_CHECKING:
-        meta: Column[dict[str, Any]]
+        meta: Mapped[dict[str, Any]]
 
         @classmethod
         def bound_messages(cls, session: Session) -> MessageCollection[Any]:
@@ -47,7 +46,9 @@ class TicketMessageMixin:
 
     @cached_property
     def ticket(self) -> Ticket | None:
-        return TicketCollection(object_session(self)).by_id(
+        session = object_session(self)
+        assert session is not None
+        return TicketCollection(session).by_id(
             self.meta['id'],
             self.meta['handler_code']
         )
@@ -90,7 +91,7 @@ class TicketNote(Message, TicketMessageMixin):
 
     if TYPE_CHECKING:
         # text is not optional for TicketNote
-        text: Column[str]
+        text: Mapped[str]
 
     @classmethod
     def create(  # type:ignore[override]

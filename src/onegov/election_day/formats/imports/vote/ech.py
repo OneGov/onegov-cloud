@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.formats.imports.common import ECHImportResultType
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Municipality
     from sqlalchemy.orm import Session
     from xsdata_ech.e_ch_0252_1_0 import Delivery as DeliveryV1
@@ -43,9 +45,18 @@ def import_votes_ech(
     if not delivery.vote_base_delivery:
         return [], set(), set()
 
+    errors = []
     vote_base_delivery = delivery.vote_base_delivery
     assert vote_base_delivery.polling_day is not None
     polling_day = vote_base_delivery.polling_day.to_date()
+
+    if polling_day.year not in principal.entities:
+        errors.append(
+            FileImportError(
+                _('Cannot import votes. Year ${year} does not exist.',
+                  mapping={'year': polling_day.year})
+            ))
+        return errors, set(), set()
     entities = principal.entities[polling_day.year]
 
     # extract vote and ballot structure
@@ -91,10 +102,10 @@ def import_votes_ech(
         votes[identification] = vote
 
     # delete obsolete votes
+    deleted: set[ElectionCompound | Election | Vote]
     deleted = {vote for vote in existing_votes if vote not in votes.values()}
 
     # update information and add results
-    errors = []
     for vote_info in vote_base_delivery.vote_info:
 
         # titles and domain
@@ -188,6 +199,7 @@ def import_votes_ech(
             ballot_result.empty = 0
             ballot_result.yeas = 0
             ballot_result.nays = 0
+            ballot_result.received = None
             if (
                 circle_info.result_data
                 and circle_info.result_data.fully_counted_true
@@ -217,6 +229,7 @@ def import_votes_ech(
                 )
                 ballot_result.yeas = result_data.count_of_yes_votes or 0
                 ballot_result.nays = result_data.count_of_no_votes or 0
+                ballot_result.received = result_data.received_votes
 
         # add missing the missing entitites
         remaining = set(entities.keys())

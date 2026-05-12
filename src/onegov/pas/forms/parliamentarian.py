@@ -4,7 +4,10 @@ from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import (
+    ValidPhoneNumber,
+    MIME_TYPES_IMAGE
+)
 from onegov.parliament.models.parliamentarian import GENDERS
 from onegov.parliament.models.parliamentarian import SHIPPING_METHODS
 from onegov.pas.collections.parliamentarian import (
@@ -42,6 +45,12 @@ class PASParliamentarianForm(NamedFileForm):
         fieldset=_('Basic properties'),
     )
 
+    # FIXME: temporary — remove once KUB sync is sole source
+    zg_username = StringField(
+        label=_('ZG Username'),
+        fieldset=_('Basic properties'),
+    )
+
     gender = TranslatedSelectField(
         label=_('Gender'),
         fieldset=_('Basic properties'),
@@ -65,6 +74,7 @@ class PASParliamentarianForm(NamedFileForm):
     picture = UploadField(
         label=_('Picture'),
         fieldset=_('Basic properties'),
+        allowed_mimetypes=MIME_TYPES_IMAGE,
     )
 
     shipping_method = TranslatedSelectField(
@@ -226,7 +236,8 @@ class PASParliamentarianForm(NamedFileForm):
     def update_model(self, model: PASParliamentarian) -> None:
         app = cast('PasApp', self.request.app)
         parliamentarians = PASParliamentarianCollection(app)
-        parliamentarians.update_user(model, self.email_primary.data)
+        if model.zg_username:
+            parliamentarians.update_user(model, model.zg_username)
 
         for field_name, field in self._fields.items():
             if field_name in ('csrf_token', 'picture'):

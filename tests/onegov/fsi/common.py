@@ -262,7 +262,7 @@ def notification_template_factory(
     }
     data.update(**kwargs)
     type = data.pop('type')
-    template = session.query(
+    template: AnyTemplate | None = session.query(  # type: ignore[assignment]
         TEMPLATE_MODEL_MAPPING[type]).filter_by(**data).first()
     if template is None:
         template = TEMPLATE_MODEL_MAPPING[type](**data)

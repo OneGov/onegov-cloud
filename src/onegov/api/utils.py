@@ -30,7 +30,7 @@ def authenticate(request: CoreRequest) -> ApiKey:
         except jwt.ExpiredSignatureError as exception:
             raise HTTPUnauthorized() from exception
 
-    api_key = request.session.get(ApiKey, data['id'])  # type: ignore[attr-defined]
+    api_key = request.session.get(ApiKey, data['id'])
     if api_key is None:
         raise HTTPClientError()
 

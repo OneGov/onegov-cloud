@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-from onegov.core.orm.types import UUID
 from onegov.pay import InvoiceItem
-from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from onegov.ticket.models import TicketInvoice
-    from sqlalchemy.orm import relationship
 
 
 class TicketInvoiceItem(InvoiceItem):
@@ -22,10 +20,8 @@ class TicketInvoiceItem(InvoiceItem):
     }
 
     #: the submission, if the item is related to a form submission
-    submission_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type:ignore[arg-type]
+    submission_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('submissions.id'),
-        nullable=True,
         index=True
     )
 
@@ -34,11 +30,7 @@ class TicketInvoiceItem(InvoiceItem):
     #       have a foreign key constraint between those two worlds (at least
     #       not without considerable additional effort)
     #: the reservation if the item is related to a reservation
-    reservation_id: Column[int | None] = Column(
-        Integer(),
-        nullable=True,
-        index=True
-    )
+    reservation_id: Mapped[int | None] = mapped_column(index=True)
 
     if TYPE_CHECKING:
-        invoice: relationship[TicketInvoice]
+        invoice: Mapped[TicketInvoice]

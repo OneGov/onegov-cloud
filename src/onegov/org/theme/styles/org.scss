@@ -338,6 +338,8 @@ $globals-height: 2.5rem;
     .payment-provider::before { @include icon('\f283'); }
     .profile::before { @include icon('\f2c3'); }
     .management::before { @include icon('\f013'); }
+    .docs::before { @include icon('\f02d');}
+    .modules::before { @include icon('\f009');}
     .images::before { @include icon('\f03e'); }
     .files::before { @include icon('\f016'); }
     .text-modules::before { @include icon('\f249'); }
@@ -351,6 +353,12 @@ $globals-height: 2.5rem;
     .citizen-login::before { @include icon('\f090'); }
     .citizen-tickets::before { @include icon('\f145'); }
     .citizen-reservations::before { @include icon('\f133'); }
+    .reservations::before { @include icon('\f133'); }
+    .directories::before { @include icon('\f03a'); }
+    .people::before { @include icon('\f0c0'); }
+    .events::before { @include icon('\f073'); }
+    .news::before { @include icon('\f1ea'); }
+    .newsletter::before { @include icon('\f0e0'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -913,6 +921,7 @@ form {
         li {
             white-space: nowrap;
             text-overflow: ellipsis;
+            break-inside: avoid;
         }
     }
 
@@ -1820,6 +1829,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-form::before { @include icon($new-form-icon); }
     .new-document-form::before { @include icon($new-document-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
+    .new-root-link::before { @include icon($new-link-icon); }
     .new-iframe::before { @include icon($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
@@ -5377,9 +5387,16 @@ h2 + div.timeline {
     text-align: right;
 }
 
+.formcoder-trigger {
+    float: right;
+    padding: 0;
+    margin: 0;
+}
+
 .formcode-toolbar-element {
     color: $body-font-color;
     position: relative;
+    clear: both;
 
     > span {
         display: inline-block;

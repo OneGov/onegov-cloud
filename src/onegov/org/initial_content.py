@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import codecs
 import os
 import yaml
 
@@ -152,7 +151,7 @@ def builtin_form_definitions(
 def load_definition(path: str) -> tuple[str, str]:
     """ Loads the title and the form definition from the given file. """
 
-    with codecs.open(path, 'r', encoding='utf-8') as formfile:
+    with open(path, encoding='utf-8') as formfile:
         formlines = formfile.readlines()
 
         title = formlines[0].strip()

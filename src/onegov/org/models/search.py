@@ -12,7 +12,6 @@ from markupsafe import Markup
 from operator import itemgetter
 from sedate import align_date_to_day, as_datetime, replace_timezone, utcnow
 from sqlalchemy import case, func, inspect, type_coerce
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import escape_like
 
 
@@ -23,6 +22,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.search import Searchable
     from sqlalchemy.orm import Query
+    from uuid import UUID
     from wtforms.fields.choices import _Choice
 
 
@@ -305,8 +305,8 @@ class Search(Pagination[Any]):
                 # FIXME: We could probably improve performance a lot if
                 #        we stored the time decay in the search table and
                 #        recomputed it once a day in a crobjob
-                * func.greatest(
-                    func.exp(
+                * func.exp(
+                    func.greatest(
                         -func.greatest(
                             func.abs(
                                 func.extract(
@@ -318,9 +318,10 @@ class Search(Pagination[Any]):
                                 )
                             ) - offset,
                             0
-                        ).op('^')(2) / two_times_variance_squared
-                    ),
-                    1e-6
+                        ).op('^')(2) / two_times_variance_squared,
+                        # NOTE: Avoids the modifier getting smaller than 1e-6
+                        math.log(1e-6)
+                    )
                 )
                 # HACK: We may want to add some fts_rank_modifier property
                 #       to searchable models instead and add a column to
@@ -328,7 +329,7 @@ class Search(Pagination[Any]):
                 #       results per type more effectively. Currently files
                 #       are he most egregious offender though, so we just
                 #       hardcode this into the query.
-                * case(  # type: ignore[call-overload]
+                * case(
                     (SearchIndex.owner_tablename == 'files', 0.1),
                     # NOTE: Tickets may be excluded entirely in the
                     #       future but for now we'll de-prioritize them
@@ -384,7 +385,7 @@ class Search(Pagination[Any]):
                 #       since been removed.
                 continue
 
-            primary_key, = inspect(base_model).primary_key
+            primary_key, = inspect(base_model).primary_key  # type: ignore[union-attr]
 
             results_by_id.update(
                 self.request.session.query(primary_key, base_model)
@@ -449,8 +450,9 @@ class Search(Pagination[Any]):
                 ).distinct()
             ).subquery()
             # FIXME: This could be a lot faster if suggestions were
-            #        their own table, we also don't handle normalization
-            #        of accents/umlauts yet for auto-complete
+            #        their own table, we also don't handle language
+            #        specific normalization of accents/umlauts yet
+            #        for auto-complete
             return tuple(
                 suggestion
                 for suggestion, in self.request.session

@@ -42,7 +42,8 @@ def get_list_results(
     """ Returns the aggregated list results as list. """
 
     session = object_session(election)
-    result = session.query(
+    assert session is not None
+    result: Query[ListResultRow] = session.query(  # type: ignore[assignment]
         func.sum(ListResult.votes).label('votes'),
         List.name,
         List.number_of_mandates
@@ -55,8 +56,7 @@ def get_list_results(
         election_result_id = session.query(ElectionResult.id).filter(
             ElectionResult.election_id == election.id,
             ElectionResult.name.in_(entities)
-        )
-        election_result_id = [result.id for result in election_result_id]
+        ).scalar_subquery()
         result = result.filter(
             ListResult.election_result_id.in_(election_result_id)
         )
@@ -66,7 +66,7 @@ def get_list_results(
     )
     order: list[ColumnElement[Any]] = [desc('votes')]
     if names and sort_by_names:
-        order.insert(0, case(  # type: ignore[call-overload]
+        order.insert(0, case(
             *(
                 (List.name == name, index)
                 for index, name in enumerate(names, 1)

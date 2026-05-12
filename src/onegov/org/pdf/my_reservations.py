@@ -6,9 +6,10 @@ from io import BytesIO
 
 from itertools import groupby
 from markupsafe import Markup
+from onegov.core.templates import render_macro
 from onegov.org import _
-from onegov.org.layout import DefaultLayout
-from onegov.org.pdf.core import OrgPdf
+from onegov.org.layout import DefaultLayout, TicketLayout
+from onegov.org.pdf.ticket import TicketBasePdf
 from onegov.org.utils import MyReservationEventInfo
 from onegov.reservation import Resource
 from pdfdocument.document import MarkupParagraph
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
 
 
-class MyReservationsPdf(OrgPdf):
+class MyReservationsPdf(TicketBasePdf):
 
     def add_reservations(
         self,
@@ -87,6 +88,24 @@ class MyReservationsPdf(OrgPdf):
                     )
                 ], [.2, .8], ratios=True, first_bold=False)
 
+    def ticket_submission(
+        self,
+        ticket: ReservationTicket,
+        request: OrgRequest
+    ) -> None:
+        submission = ticket.handler.submission
+        if submission is None:
+            return
+
+        form = submission.form_class(data=submission.data)
+        layout = DefaultLayout(ticket.handler.resource, request)
+        self.spacer()
+        self.ticket_summary(render_macro(
+            layout.macros['display_form'],
+            request,
+            {'form': form, 'layout': layout}
+        ))
+
     def resource_infos(self, resources: list[Resource]) -> None:
         first = True
         for resource in resources:
@@ -97,7 +116,7 @@ class MyReservationsPdf(OrgPdf):
             self.story.append(PageBreak())
             if first:
                 first = False
-                self.h1('Appendix')
+                self.h1(_('Appendix'))
             else:
                 self.spacer()
             self.h2(resource.title)
@@ -202,6 +221,11 @@ class MyReservationsPdf(OrgPdf):
             subtitle,
             request
         )
+
+        pdf.ticket_submission(ticket, request)
+        layout = TicketLayout(ticket, request)
+        pdf.ticket_invoice(ticket, layout)
+        pdf.ticket_payment(ticket, layout)
 
         pdf.resource_infos([resource])
 

@@ -44,24 +44,24 @@ def count_political_businesses_by_type(
     request: TownRequest
 ) -> dict[str, int]:
     session = request.session
-    result = session.query(
+    query = session.query(
         PoliticalBusiness.political_business_type,
         func.count(PoliticalBusiness.id).label('count')
-    ).group_by(PoliticalBusiness.political_business_type).all()
+    ).group_by(PoliticalBusiness.political_business_type)
 
-    return dict(result)
+    return dict(query.tuples())
 
 
 def count_political_businesses_by_status(
     request: TownRequest
-) -> dict[str, int]:
+) -> dict[str | None, int]:
     session = request.session
-    result = session.query(
+    query = session.query(
         PoliticalBusiness.status,
         func.count(PoliticalBusiness.id).label('count')
-    ).group_by(PoliticalBusiness.status).all()
+    ).group_by(PoliticalBusiness.status)
 
-    return dict(result)
+    return dict(query.tuples())
 
 
 def count_political_businesses_by_year(

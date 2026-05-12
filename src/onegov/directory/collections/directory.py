@@ -7,16 +7,15 @@ from onegov.directory.models.directory import EntryRecipient
 from onegov.directory.types import DirectoryConfiguration
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
 
 
-DirectoryT = TypeVar('DirectoryT', bound=Directory)
-
-
-class DirectoryCollection(GenericCollection[DirectoryT]):
+class DirectoryCollection[DirectoryT: Directory](
+    GenericCollection[DirectoryT]
+):
 
     @overload
     def __init__(

@@ -17,8 +17,11 @@ def test_parliamentarians(client: Client) -> None:
     assert client.get('/parliamentarian/new', status=404)
 
     # enable ris and configure interest tie categories
-    settings = client.get('/ris-enable')
+    settings = client.get('/module-activation-settings')
     settings.form['ris_enabled'] = True
+    settings.form.submit()
+
+    settings = client.get('/ris-settings')
     settings.form['ris_interest_tie_categories'] = 'Work; Leisure and Fun;'
     settings.form.submit()
 
@@ -116,6 +119,7 @@ def test_parliamentarians(client: Client) -> None:
         assert 'Neue Rolle hinzugefügt' in parliamentarian
         assert 'Mitglied Parlament' in parliamentarian
         assert 'Mitglied Fraktion' in parliamentarian
+        assert 'Partei' in parliamentarian  # ensure proper translation
         assert 'Die Moderne Fraktion' in parliamentarian
 
         # add commission

@@ -51,7 +51,8 @@ def list_options(
 @ElectionDayApp.json(
     model=List,
     name='by-entity',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_list_by_entity(
     self: List,

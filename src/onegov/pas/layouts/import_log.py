@@ -33,7 +33,6 @@ class ImportLogCollectionLayout(DefaultLayout):
     @cached_property
     def kub_token_configured(self) -> bool:
         return bool(
-            getattr(self.request.app, 'kub_test_api_token', None) or
             getattr(self.request.app, 'kub_api_token', None)
         )
 

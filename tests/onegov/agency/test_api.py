@@ -7,8 +7,8 @@ from freezegun import freeze_time
 from tests.onegov.api.test_views import patch_collection_json  # noqa: F401
 from unittest.mock import patch
 
-
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.agency import AgencyApp
     from tests.shared.client import Client
@@ -161,6 +161,7 @@ def test_view_api(
         'website': '',
         'geo_location': dict(lon=1.1, lat=-2.2, zoom=3),
     }
+    assert links(hospital)['html'] == 'http://localhost/organization/hospital'
     assert not links(hospital)['organigram']
     assert not links(hospital)['parent']
     assert not collection(links(hospital)['children']).items
@@ -382,6 +383,7 @@ def test_view_api(
 
     nick_collection = collection(people['Rivera Nick'])
     nick = nick_collection.items[0]
+    nick_id = nick.href.split('/')[-1]
     assert data(nick) == {
         'academic_title': 'Dr.',
         'location_address': '',
@@ -404,6 +406,7 @@ def test_view_api(
         'title': 'Rivera Nick',
         'website': '',
     }
+    assert links(nick)['html'] == f'http://localhost/person/{nick_id}'
     assert not links(nick)['picture_url']
     assert not links(nick)['website']
     assert data(collection(links(nick)['memberships']).items[0]) == {
@@ -658,10 +661,12 @@ def test_view_api(
     assert set(memberships) == {'Doctor', 'Teacher'}
 
     doctor = collection(memberships['Doctor']).items[0]
+    doctor_id = doctor.href.split('/')[-1]
     assert data(doctor) == {
         'title': 'Doctor',
         'modified': '2023-05-08T01:02:00+00:00',
     }
+    assert links(doctor)['html'] == f'http://localhost/membership/{doctor_id}'
     assert data(collection(links(doctor)['agency']).items[0])['title'] == \
            'Hospital'
     assert data(collection(links(doctor)['person']).items[0])['title'] == \

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import datetime
+
+from collections.abc import Mapping
 from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -22,18 +25,16 @@ from onegov.election_day.models.party_result.mixins import (
     PartyResultsOptionsMixin)
 from onegov.file import NamedFile
 from operator import itemgetter
-from sqlalchemy import Column, Boolean
-from sqlalchemy import Date
-from sqlalchemy import Text
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import DynamicMapped
+from sqlalchemy.orm import Mapped
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from collections.abc import Mapping
-    from onegov.core.types import AppenderQuery
     from onegov.election_day.models import Election
     from onegov.election_day.models import ElectionCompoundRelationship
     from onegov.election_day.models import Notification
@@ -41,9 +42,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import PartyResult
     from onegov.election_day.models import Screen
     from onegov.election_day.types import DomainOfInfluence
-    import datetime
-
-    rel = relationship
+    from sqlalchemy.orm import AppenderQuery
 
 
 class ElectionCompound(
@@ -61,25 +60,21 @@ class ElectionCompound(
         return ElectionCompound
 
     #: Identifies the election compound, may be used in the url
-    id: Column[str] = Column(Text, primary_key=True)
+    id: Mapped[str] = mapped_column(primary_key=True)
 
     #: external identifier
-    external_id: Column[str | None] = Column(Text, nullable=True)
+    external_id: Mapped[str | None]
 
     #: all translations of the title
-    title_translations: Column[Mapping[str, str]] = Column(
-        HSTORE,
-        nullable=False
-    )
+    title_translations: Mapped[Mapping[str, str]] = mapped_column(HSTORE)
 
     #: the translated title (uses the locale of the request, falls back to the
     #: default locale of the app)
     title = translation_hybrid(title_translations)
 
     #: all translations of the short title
-    short_title_translations: Column[Mapping[str, str] | None] = Column(
-        HSTORE,
-        nullable=True
+    short_title_translations: Mapped[Mapping[str, str] | None] = mapped_column(
+        HSTORE
     )
 
     #: the translated short title (uses the locale of the request, falls back
@@ -93,68 +88,54 @@ class ElectionCompound(
         short_title_translations: Mapping[str, str]
     ) -> None:
         if not self.id:
-            self.id = self.id_from_title(object_session(self))
+            session = object_session(self)
+            assert session is not None
+            self.id = self.id_from_title(session)
 
     #: Shortcode for cantons that use it
-    shortcode: Column[str | None] = Column(Text, nullable=True)
+    shortcode: Mapped[str | None]
 
     #: The date of the elections
-    date: Column[datetime.date] = Column(Date, nullable=False)
+    date: Mapped[datetime.date]
 
     #: Doppelter Pukelsheim
-    pukelsheim: Column[bool] = Column(Boolean, nullable=False, default=False)
+    pukelsheim: Mapped[bool] = mapped_column(default=False)
 
     #: Allow setting the status of the compound and its elections manually
-    completes_manually: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    completes_manually: Mapped[bool] = mapped_column(default=False)
 
     #: Status of the compound and its elections
-    manually_completed: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    manually_completed: Mapped[bool] = mapped_column(default=False)
 
     #: An election compound may contains n party results
-    party_results: relationship[list[PartyResult]] = relationship(
-        'PartyResult',
+    party_results: Mapped[list[PartyResult]] = relationship(
         cascade='all, delete-orphan',
         back_populates='election_compound',
-        overlaps='party_results'  # type: ignore[call-arg]
+        overlaps='party_results'
     )
 
     #: An election compound may contains n party panachage results
-    party_panachage_results: rel[list[PartyPanachageResult]] = (
-        relationship(
-            'PartyPanachageResult',
-            cascade='all, delete-orphan',
-            back_populates='election_compound',
-            overlaps='panachage_results'  # type: ignore[call-arg]
-        )
+    party_panachage_results: Mapped[list[PartyPanachageResult]] = relationship(
+        cascade='all, delete-orphan',
+        back_populates='election_compound',
+        overlaps='panachage_results'
     )
 
     #: An election compound may have related election compounds
-    related_compounds: rel[AppenderQuery[ElectionCompoundRelationship]] = (
+    related_compounds: DynamicMapped[ElectionCompoundRelationship] = (
         relationship(
-            'ElectionCompoundRelationship',
             foreign_keys='ElectionCompoundRelationship.source_id',
             cascade='all, delete-orphan',
             back_populates='source',
-            lazy='dynamic'
         )
     )
 
     #: An election compound may be related by other election compounds
-    referencing_compounds: rel[AppenderQuery[ElectionCompoundRelationship]] = (
+    referencing_compounds: DynamicMapped[ElectionCompoundRelationship] = (
         relationship(
-            'ElectionCompoundRelationship',
             foreign_keys='ElectionCompoundRelationship.target_id',
             cascade='all, delete-orphan',
             back_populates='target',
-            lazy='dynamic'
         )
     )
 
@@ -171,8 +152,7 @@ class ElectionCompound(
     )
 
     #: An election compound may contain n elections
-    elections: relationship[list[Election]] = relationship(
-        'Election',
+    elections: Mapped[list[Election]] = relationship(
         cascade='all',
         back_populates='election_compound',
         order_by='Election.shortcode'
@@ -241,17 +221,13 @@ class ElectionCompound(
         return result
 
     #: notifcations linked to this election compound
-    notifications: relationship[AppenderQuery[Notification]] = (
-        relationship(  # type:ignore[misc]
-            'onegov.election_day.models.notification.Notification',
-            back_populates='election_compound',
-            lazy='dynamic'
-        )
+    notifications: DynamicMapped[Notification] = relationship(
+        'onegov.election_day.models.notification.Notification',
+        back_populates='election_compound',
     )
 
     #: screens linked to this election compound
-    screens: relationship[AppenderQuery[Screen]] = relationship(
-        'Screen',
+    screens: DynamicMapped[Screen] = relationship(
         back_populates='election_compound',
     )
 

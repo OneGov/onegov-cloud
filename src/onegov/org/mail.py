@@ -14,8 +14,7 @@ if TYPE_CHECKING:
     from onegov.core.mail import Attachment
     from onegov.core.types import SequenceOrScalar
     from onegov.org.request import OrgRequest
-    from typing import TypedDict, Required
-    from typing_extensions import Unpack
+    from typing import Required, TypedDict, Unpack
 
     class TicketEmailExtraArguments(TypedDict, total=False):
         reply_to: Address | str | None
@@ -185,6 +184,7 @@ def send_ticket_mail(
         for customer_message_ids, in TicketCollection(request.session)
         .by_order(ticket.order_id)
         .with_entities(Ticket.customer_message_ids)
+        if customer_message_ids
         for customer_message_id in customer_message_ids
     ) if ticket.order_id else ticket.customer_message_ids
 

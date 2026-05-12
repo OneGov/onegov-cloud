@@ -30,10 +30,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Sequence
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
-    from typing import TypeAlias
     from .allocation import DateContainer
 
-    StrKeyFunc: TypeAlias = Callable[[str], SupportsRichComparison]
+    type StrKeyFunc = Callable[[str], SupportsRichComparison]
 
 # include all fields used below so we can filter them out
 # when we merge this form with the custom form definition

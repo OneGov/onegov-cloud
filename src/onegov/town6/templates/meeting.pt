@@ -39,7 +39,7 @@
             <p tal:condition="not:meeting_items_with_links" i18n:translate="">No agenda items defined yet.</p>
             <dd tal:condition="meeting_items_with_links">
                 <ul class="more-list">
-                    <li tal:repeat="item meeting_items_with_links">
+                    <li id="${item.title}" tal:repeat="item meeting_items_with_links">
                         <a href="${item.political_business_link or '#'}" class="list-link ${'' if item.political_business_link else 'no-link'}">
                             <span class="list-title">
                                 ${item.number} ${item.title}

@@ -318,7 +318,9 @@ def get_custom_text(request: OrgRequest, key: str) -> str:
         return _('Error: No custom texts found')
 
     return custom_texts.get(
-        key, _(f"Error: No custom text found for '{key}'"))
+        key,
+        _("Error: No custom text found for '${key}'", mapping={'key': key})
+    )
 
 
 def get_accountant_emails_for_finanzstelle(

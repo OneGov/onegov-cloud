@@ -7,25 +7,20 @@ from onegov.reservation.models import Resource
 from uuid import uuid4, UUID
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from libres.context.core import Context
     from libres.db.models import Allocation, Reservation, ReservationBlocker
     from libres.db.scheduler import Scheduler
-
     from sqlalchemy.orm import Query, Session
-    from typing import TypeAlias
-
-
-_R = TypeVar('_R', bound=Resource)
 
 
 class _Marker(enum.Enum):
     any_type = enum.auto()
 
 
-any_type_t: TypeAlias = Literal[_Marker.any_type]  # noqa: PYI042
+type any_type_t = Literal[_Marker.any_type]  # noqa: PYI042
 any_type: any_type_t = _Marker.any_type
 
 
@@ -33,6 +28,9 @@ class ResourceCollection:
     """ Manages a list of resources.
 
     """
+
+    session: Session
+
     def __init__(self, libres_context: Context):
         assert hasattr(libres_context, 'get_service'), """
             The ResourceCollection expected the libres_contex, not the session.
@@ -82,11 +80,11 @@ class ResourceCollection:
         return self.bind(resource)
 
     @overload
-    def bind(self, resource: _R) -> _R: ...
+    def bind[T: Resource](self, resource: T) -> T: ...
     @overload
     def bind(self, resource: None) -> None: ...
 
-    def bind(self, resource: _R | None) -> _R | None:
+    def bind[T: Resource](self, resource: T | None) -> T | None:
         if resource:
             resource.bind_to_libres_context(self.libres_context)
 

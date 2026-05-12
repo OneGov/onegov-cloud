@@ -111,7 +111,7 @@ from onegov.fsi.models.course_notification_template import (
 from onegov.user import User
 
 
-from typing import TypeVarTuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.csv import DefaultRow
@@ -120,11 +120,7 @@ if TYPE_CHECKING:
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Session
     from typing import TypedDict, NotRequired
-    from typing_extensions import TypeVar
     from uuid import UUID
-
-    T = TypeVar('T')
-    DefaultT = TypeVar('DefaultT', default=None)
 
     class SubscriptionDict(TypedDict):
         course_event_id: UUID
@@ -145,8 +141,6 @@ if TYPE_CHECKING:
         first_name: str | None
         last_name: str | None
         subscriptions: list[SubscriptionDict]
-
-Ts = TypeVarTuple('Ts')
 
 
 class InconsistencyError(BaseException):
@@ -175,7 +169,7 @@ def parse_email(email: str) -> str | None:
     return email
 
 
-def parse_date(
+def parse_date[DefaultT = None](
     val: str | None,
     # NOTE: Seems like PEP-696 does not allow assigning a TypeVar to its
     #       default value yet, this should probably be allowed
@@ -208,7 +202,7 @@ def validate_integer(
     return int(val)
 
 
-def with_open(
+def with_open[*Ts, T](
     func: Callable[[CSVFile[DefaultRow], *Ts], T]
 ) -> Callable[[str, *Ts], T]:
     def _read(filename: str, /, *args: *Ts) -> T:

@@ -39,6 +39,7 @@ from onegov.ticket import TicketCollection, TicketInvoice
 from onegov.user import Auth
 from onegov.user.collections import TANCollection
 from purl import URL
+from sqlalchemy import and_, or_
 from uuid import uuid4
 from webob import exc, Response
 from wtforms import HiddenField
@@ -122,7 +123,8 @@ def respond_with_error(request: OrgRequest, error: str) -> JSON_ro:
     model=Allocation,
     name='reserve',
     request_method='POST',
-    permission=Public
+    permission=Public,
+    open_data=False
 )
 def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
     """ Adds a single reservation to the list of reservations bound to the
@@ -146,6 +148,7 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
 
     quota = int(quota_str)
     whole_day = request.params.get('whole_day') == '1'
+    consider_blocking = request.params.get('consider_blocking') == '1'
 
     if self.partly_available:
         if self.whole_day and whole_day:
@@ -222,10 +225,11 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         return respond_with_error(request, err)
 
     # ...otherwise, try to reserve
+    scheduler = resource.scheduler
     try:
         # Todo: This entry created remained after a reservation
         # and the session id got lost
-        resource.scheduler.reserve(
+        scheduler.reserve(
             email='0xdeadbeef@example.org',  # will be set later
             dates=(start, end),
             quota=quota,
@@ -234,11 +238,44 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         )
     except LibresError as e:
         return respond_with_error(request, utils.get_libres_error(e, request))
-    else:
-        return respond_with_success(request)
+
+    if consider_blocking and scheduler.blocking_names:
+        blocking_resources = resource.blocking_resources()
+        # Remove all the temporary reservations that would overlap this one
+        for reservation in scheduler.session.query(Reservation).filter(
+            Reservation.resource.in_(blocking_resources)
+        ).filter(Reservation.status != 'approved').filter(
+            or_(
+                and_(
+                    Reservation.start <= start,
+                    start < Reservation.end
+                ),
+                and_(
+                    start <= Reservation.start,
+                    Reservation.start < end
+                )
+            )
+        ):
+            blocking_resource = blocking_resources[reservation.resource]
+            # we ignore reservations from different sessions
+            session_id = blocking_resource.bound_session_id(request)  # type: ignore[attr-defined]
+            if reservation.session_id != session_id:
+                continue
+
+            blocking_resource.scheduler.remove_reservation(
+                reservation.token,
+                reservation.id
+            )
+
+    return respond_with_success(request)
 
 
-@OrgApp.json(model=Reservation, request_method='DELETE', permission=Public)
+@OrgApp.json(
+    model=Reservation,
+    request_method='DELETE',
+    permission=Public,
+    open_data=False
+)
 def delete_reservation(self: Reservation, request: OrgRequest) -> JSON_ro:
 
     # anonymous users do not get a csrf token (it's bound to the identity)
@@ -820,11 +857,18 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     )
 
     if request.auto_accept(ticket):
+        # NOTE: If we encounter an error the transaction may go into
+        #       an invalid state, regardless we would also want to
+        #       revert any partial changes, so a savepoint makes sense
+        #       we flush first to make sure the savepoint is accurate
+        request.session.flush()
+        savepoint = transaction.savepoint()
         try:
             assert request.auto_accept_user is not None
             ticket.accept_ticket(request.auto_accept_user)
             request.view(reservations[0], name='accept')
         except Exception:
+            savepoint.rollback()
             request.warning(_('Your request could not be '
                               'accepted automatically!'))
         else:
@@ -1222,26 +1266,40 @@ def reject_reservation(
     view_ticket: ReservationTicket | None = None
 ) -> Response | None:
 
+    def respond() -> Response | None:
+        # return none on intercooler js requests
+        if not request.headers.get('X-IC-Request'):
+            if view_ticket is not None:
+                return request.redirect(request.link(view_ticket))
+            return request.redirect(request.link(self))
+        return None
+
     token = self.token
     resource = request.app.libres_resources.by_reservation(self)
     assert resource is not None
     reservation_id_str = request.params.get('reservation-id')
-    if isinstance(reservation_id_str, str) and reservation_id_str.isdigit():
-        reservation_id = int(reservation_id_str)
-    else:
-        reservation_id = 0
-
     all_reservations: list[Reservation] = (
         resource.scheduler.reservations_by_token(token)  # type:ignore
         .order_by(Reservation.start).all()
     )
-
     targeted: Sequence[Reservation]
-    targeted = tuple(r for r in all_reservations if r.id == reservation_id)
-    targeted = targeted or all_reservations
-    excluded = tuple(r for r in all_reservations if r.id not in {
-        r.id for r in targeted
-    })
+    if reservation_id_str is not None:
+        if not (
+            isinstance(reservation_id_str, str)
+            and reservation_id_str.isdigit()
+        ):
+            raise exc.HTTPBadRequest()
+
+        reservation_id = int(reservation_id_str)
+        targeted = tuple(r for r in all_reservations if r.id == reservation_id)
+        if not targeted:
+            request.warning(_('The targeted reservation no longer exists'))
+            return respond()
+    else:
+        targeted = all_reservations
+
+    targeted_ids = {r.id for r in targeted}
+    excluded = tuple(r for r in all_reservations if r.id not in targeted_ids)
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
@@ -1264,12 +1322,7 @@ def reject_reservation(
             'to be refunded before the reservation can be rejected'
         ))
 
-        if not request.headers.get('X-IC-Request'):
-            if view_ticket is not None:
-                return request.redirect(request.link(view_ticket))
-            return request.redirect(request.link(self))
-
-        return None
+        return respond()
 
     savepoint = transaction.savepoint()
     ReservationMessage.create(targeted, ticket, request, 'rejected')
@@ -1375,14 +1428,19 @@ def reject_reservation(
             # flush, just in case, otherwise `remove_reservation` may fail
             request.session.flush()
 
-        if clients and (kaba := (reservation.data or {}).get('kaba')):
-            lead_delta = timedelta(
-                minutes=ticket.handler.data['key_code_lead_time']
-            )
+        if (
+            clients
+            and (kaba := (reservation.data or {}).get('kaba'))
+            and (visit_ids := kaba.get('visit_ids'))
+        ):
+            lead_delta = timedelta(minutes=ticket.handler.data.get(
+                'key_code_lead_time',
+                request.app.org.default_key_code_lead_time
+            ))
             start = reservation.display_start() - lead_delta
             # we can only revoke future visits
             if start > sedate.utcnow():
-                kaba_visits_to_revoke.extend(kaba['visit_ids'].items())
+                kaba_visits_to_revoke.extend(visit_ids.items())
         resource.scheduler.remove_reservation(token, reservation.id)
 
     if len(excluded) == 0 and submission:
@@ -1423,12 +1481,7 @@ def reject_reservation(
             'but the payment is no longer open.'
         ))
 
-    # return none on intercooler js requests
-    if not request.headers.get('X-IC-Request'):
-        if view_ticket is not None:
-            return request.redirect(request.link(view_ticket))
-        return request.redirect(request.link(self))
-    return None
+    return respond()
 
 
 @OrgApp.view(
@@ -1715,19 +1768,26 @@ def add_reservation(
         data['accepted'] = True
 
         clients = KabaClient.from_resource(resource, request.app)
-        if clients and (lead := timedelta(
-            minutes=ticket.handler.data['key_code_lead_time']
-        )) is not None and (
-            (start := reservation.display_start() - lead) > sedate.utcnow()
-        ):
+        if clients:
+            lead_delta = timedelta(minutes=ticket.handler.data.setdefault(
+                'key_code_lead_time',
+                request.app.org.default_key_code_lead_time
+            ))
+            start = reservation.display_start() - lead_delta
+        if clients and start > sedate.utcnow():
             # add visit
             components: dict[str, list[str]] = {}
             for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
                 components.setdefault(site_id, []).append(component)
 
-            code = ticket.handler.data['key_code']
-            lag = timedelta(minutes=ticket.handler.data['key_code_lag_time'])
-            end = reservation.display_end() + lag
+            code = ticket.handler.data.setdefault(
+                'key_code', next(iter(clients.values())).random_code()
+            )
+            lag_delta = timedelta(minutes=ticket.handler.data.setdefault(
+                'key_code_lag_time',
+                request.app.org.default_key_code_lag_time
+            ))
+            end = reservation.display_end() + lag_delta
             visit_ids = {}
             for site_id, group in components.items():
                 try:
@@ -1979,12 +2039,14 @@ def adjust_reservation(
             for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
                 components.setdefault(site_id, []).append(component)
 
-            lead_delta = timedelta(
-                minutes=ticket.handler.data['key_code_lead_time']
-            )
-            lag_delta = timedelta(
-                minutes=ticket.handler.data['key_code_lag_time']
-            )
+            lead_delta = timedelta(minutes=ticket.handler.data.get(
+                'key_code_lead_time',
+                request.app.org.default_key_code_lead_time
+            ))
+            lag_delta = timedelta(minutes=ticket.handler.data.get(
+                'key_code_lag_time',
+                request.app.org.default_key_code_lag_time
+            ))
             old_start = reservation.display_start() - lead_delta
             start = new_reservation.display_start() - lead_delta
             end = new_reservation.display_end() + lag_delta
@@ -2129,9 +2191,10 @@ def edit_kaba(
     for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
         components.setdefault(site_id, []).append(component)
 
-    old_lead_delta = timedelta(
-        minutes=ticket.handler.data.get('key_code_lead_time', 30)
-    )
+    old_lead_delta = timedelta(minutes=ticket.handler.data.setdefault(
+        'key_code_lead_time',
+        request.app.org.default_key_code_lead_time
+    ))
     now = sedate.utcnow()
     future_reservations = [
         reservation
@@ -2175,9 +2238,6 @@ def edit_kaba(
         for name in field_names
     }:
 
-        old_lead_delta = timedelta(
-            minutes=ticket.handler.data['key_code_lead_time']
-        )
         ticket.handler.data.update(form.data)
         ticket.handler.refresh()
 

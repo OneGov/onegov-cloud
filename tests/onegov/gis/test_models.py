@@ -3,25 +3,23 @@ from __future__ import annotations
 from onegov.core.orm import ModelBase
 from onegov.core.orm import SessionManager
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.types import JSON
 from onegov.gis.models import Coordinates, CoordinatesMixin
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
+from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import Base  # noqa: F401
 
 
 def test_mutable_coordinates(postgres_dsn: str) -> None:
-    # avoids confusing mypy
-    if not TYPE_CHECKING:
-        Base = declarative_base(cls=ModelBase)
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry(type_annotation_map={dict[str, Any]: JSON})
 
     class Monument(Base, ContentMixin, CoordinatesMixin):
         __tablename__ = 'monument'
-        id: Column[int] = Column(Integer, primary_key=True)
+        id: Mapped[int] = mapped_column(primary_key=True)
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('foo')

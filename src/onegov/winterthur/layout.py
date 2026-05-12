@@ -17,9 +17,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.winterthur.request import WinterthurRequest
-    from typing import TypeAlias
 
-    MissionReportContext: TypeAlias = (
+    type MissionReportContext = (
         MissionReport | MissionReportVehicle
         | MissionReportCollection | MissionReportVehicleCollection
         | MissionReportFileCollection

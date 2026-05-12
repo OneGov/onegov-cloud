@@ -7,7 +7,6 @@ from collections import OrderedDict
 from functools import cached_property
 
 from markupsafe import Markup
-
 from onegov.core.i18n import get_translation_bound_meta
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
@@ -46,16 +45,14 @@ from wtforms.utils import unset_value
 from wtforms.validators import InputRequired, ValidationError
 
 
-from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
+from typing import cast, Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
-    from onegov.form.types import FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
     from onegov.org.models import ImageSet
-    from sqlalchemy import Column
-    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm import Mapped
     from typing import type_check_only, Protocol
     from wtforms import Field
     from wtforms.fields.choices import _Choice
@@ -63,16 +60,11 @@ if TYPE_CHECKING:
     from wtforms.meta import _MultiDictLikeWithGetlist
 
     class SupportsExtendForm(Protocol):
-        def extend_form(
+        def extend_form[T: Form](
             self,
-            form_class: type[FormT],
+            form_class: type[T],
             request: OrgRequest
-        ) -> type[FormT]: ...
-
-    _ExtendedWithPersonLinkT = TypeVar(
-        '_ExtendedWithPersonLinkT',
-        bound='PersonLinkExtension'
-    )
+        ) -> type[T]: ...
 
 
 def json_to_links(
@@ -97,8 +89,8 @@ class ContentExtension:
 
     if TYPE_CHECKING:
         # forward declare content attributes
-        meta: Column[dict[str, Any]]
-        content: Column[dict[str, Any]]
+        meta: Mapped[dict[str, Any]]
+        content: Mapped[dict[str, Any]]
 
     @property
     def content_extensions(self) -> Iterator[type[ContentExtension]]:
@@ -110,12 +102,12 @@ class ContentExtension:
             if ContentExtension in cls.__bases__:
                 yield cls
 
-    def with_content_extensions(
+    def with_content_extensions[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest,
         extensions: Iterable[type[SupportsExtendForm]] | None = None
-    ) -> type[FormT]:
+    ) -> type[T]:
         """ Takes the given form and request and extends the form with
         all content extensions in the order in which they occur in the base
         class list.
@@ -131,11 +123,11 @@ class ContentExtension:
 
         return form_class
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
         """ Must be implemented by each ContentExtension. Takes the form
         class without extension and adds the required fields to it.
 
@@ -164,11 +156,11 @@ class AccessExtension(ContentExtension):
 
     access: dict_property[str] = meta_property(default='public')
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         access_choices = [
             ('public', _('Public')),
@@ -222,11 +214,11 @@ class CoordinatesExtension(ContentExtension, CoordinatesMixin):
 
     """
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
         return CoordinatesFormExtension(form_class).create()
 
 
@@ -238,11 +230,11 @@ class VisibleOnHomepageExtension(ContentExtension):
 
     is_visible_on_homepage: dict_property[bool | None] = meta_property()
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         # do not show on root pages
         if self.parent_id is None:  # type:ignore[attr-defined]
@@ -265,8 +257,8 @@ class ContactExtension(ContentExtension):
 
     contact: dict_property[str | None] = content_property()
 
-    @contact.setter  # type:ignore[no-redef]
-    def contact(self, value: str | None) -> None:
+    @contact.inplace.setter
+    def _contact_setter(self, value: str | None) -> None:
         self.content['contact'] = value
         if self.inherit_contact:
             # no need to update the cache
@@ -279,8 +271,8 @@ class ContactExtension(ContentExtension):
 
     inherit_contact: dict_property[bool] = content_property(default=False)
 
-    @inherit_contact.setter  # type:ignore[no-redef]
-    def inherit_contact(self, value: bool) -> None:
+    @inherit_contact.inplace.setter
+    def _inherit_contact_setter(self, value: bool) -> None:
         self.content['inherit_contact'] = value
 
         # clear cache (don't update eagerly since it involves a query)
@@ -289,8 +281,8 @@ class ContactExtension(ContentExtension):
 
     contact_inherited_from: dict_property[int | None] = content_property()
 
-    @contact_inherited_from.setter  # type:ignore[no-redef]
-    def contact_inherited_from(self, value: int | None) -> None:
+    @contact_inherited_from.inplace.setter
+    def _contact_inherited_from_setter(self, value: int | None) -> None:
         self.content['contact_inherited_from'] = value
         if not self.inherit_contact:
             # no need to clear the cache
@@ -306,7 +298,9 @@ class ContactExtension(ContentExtension):
             if self.contact_inherited_from is None:
                 return None
 
-            pages = PageCollection(object_session(self))
+            session = object_session(self)
+            assert session is not None
+            pages = PageCollection(session)
             page = pages.by_id(self.contact_inherited_from)
             contact = getattr(page, 'contact', None)
         else:
@@ -316,11 +310,11 @@ class ContactExtension(ContentExtension):
             return None
         return to_html_ul(contact, convert_dashes=True, with_title=True)
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         query = PageCollection(request.session).query()
         query = query.filter(Page.type == 'topic')
@@ -384,11 +378,11 @@ class ContactHiddenOnPageExtension(ContentExtension):
 
     hide_contact: dict_property[bool] = meta_property(default=False)
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class ContactHiddenOnPageForm(form_class):  # type:ignore
             hide_contact = BooleanField(
@@ -408,11 +402,11 @@ class PeopleShownOnMainPageExtension(ContentExtension):
     show_people_on_main_page: dict_property[bool] = (
         meta_property(default=False))
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class PeopleShownOnMainPageForm(form_class):  # type:ignore
             show_people_on_main_page = BooleanField(
@@ -461,14 +455,16 @@ class PersonLinkExtension(ContentExtension):
         if not (people_items := self.content.get('people')):
             return None
 
+        session = object_session(self)
+        assert session is not None
         people = OrderedDict(people_items)
-        query = PersonCollection(object_session(self)).query()
+        query = PersonCollection(session).query()
         query = query.filter(Person.id.in_(people.keys()))
 
         result = []
 
-        person: PersonWithFunction
-        for person in query.all():  # type:ignore[assignment]
+        for person in query:
+            person = cast('PersonWithFunction', person)
             function, show_function = people[person.id.hex]
             person.person = person.id.hex
             person.context_specific_function = function
@@ -534,11 +530,11 @@ class PersonLinkExtension(ContentExtension):
 
         self.content['people'] = list(new_order())
 
-    def extend_form(
-        self: _ExtendedWithPersonLinkT,
-        form_class: type[FormT],
+    def extend_form[T: Form](
+        self,
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         selectable_people = self.get_selectable_people(request)
         if not selectable_people:
@@ -720,11 +716,11 @@ class PersonLinkExtension(ContentExtension):
 
 class ResourceValidationExtension(ContentExtension):
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class WithResourceValidation(form_class):  # type:ignore
 
@@ -743,21 +739,21 @@ class ResourceValidationExtension(ContentExtension):
 
 class PublicationExtension(ContentExtension):
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
         return PublicationFormExtension(form_class).create()
 
 
 class PushNotificationExtension(ContentExtension):
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
         return PushNotificationFormExtension(form_class).create()
 
 
@@ -765,11 +761,11 @@ class HoneyPotExtension(ContentExtension):
 
     honeypot = meta_property(default=True)
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class HoneyPotForm(form_class):  # type:ignore
 
@@ -788,11 +784,11 @@ class ImageExtension(ContentExtension):
     show_preview_image = meta_property(default=True)
     show_page_image = meta_property(default=True)
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class PageImageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
@@ -841,6 +837,7 @@ def _files_observer(
 
     # remove ourselves if the link has been deleted
     state = inspect(self)
+    assert state is not None
     for file in state.attrs.files.history.deleted or ():
         if key in file.meta.get('linked_accesses', ()):
             del file.meta['linked_accesses'][key]
@@ -894,6 +891,7 @@ def _content_file_link_observer(
 
     key = str(self.id)
     session = object_session(self)
+    assert session is not None
     collection = FileCollection['GeneralFile'](session, type='general')
     files = collection.query().filter(File.id.in_(file_ids))
     published = getattr(self, 'published', True)
@@ -929,7 +927,7 @@ class GeneralFileLinkExtension(ContentExtension):
     if TYPE_CHECKING:
         # forward declare required attributes
         id: Any
-        files: relationship[list[File]]
+        files: Mapped[list[File]]
         access: dict_property[str]
 
         def files_observer(
@@ -957,11 +955,11 @@ class GeneralFileLinkExtension(ContentExtension):
         def content_file_link_observer(cls):
             return observes('content')(_content_file_link_observer)
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class GeneralFileForm(form_class):  # type:ignore
             files = UploadOrSelectExistingMultipleFilesField(
@@ -1014,11 +1012,11 @@ class SidebarLinksExtension(ContentExtension):
 
     sidepanel_links = content_property()
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class SidebarLinksForm(form_class):  # type:ignore
 
@@ -1103,11 +1101,11 @@ class SidebarContactLinkExtension(ContentExtension):
 
     sidepanel_contact = content_property()
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class SidebarContactLinkForm(form_class):  # type:ignore
 
@@ -1204,11 +1202,11 @@ class DeletableContentExtension(ContentExtension):
 
     delete_when_expired: dict_property[bool] = content_property(default=False)
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         class DeletableContentForm(form_class):  # type:ignore
             delete_when_expired = BooleanField(
@@ -1234,15 +1232,17 @@ class InlinePhotoAlbumExtension(ContentExtension):
         from onegov.org.models import ImageSetCollection
         if not self.photo_album_id:
             return None
-        return ImageSetCollection(object_session(self)).by_id(
+        session = object_session(self)
+        assert session is not None
+        return ImageSetCollection(session).by_id(
             self.photo_album_id
         )
 
-    def extend_form(
+    def extend_form[T: Form](
         self,
-        form_class: type[FormT],
+        form_class: type[T],
         request: OrgRequest
-    ) -> type[FormT]:
+    ) -> type[T]:
 
         from onegov.org.models import ImageSetCollection
         from onegov.org.models import ImageSet

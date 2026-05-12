@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import re
+
+import requests
 import yaml
 
 import morepath
@@ -11,6 +13,7 @@ from functools import wraps
 from more.content_security import SELF
 from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
+from onegov.api import ApiApp
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
@@ -21,9 +24,13 @@ from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
 from onegov.org import _, directives
+from onegov.org.api import (
+    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
+    DirectoryEntryApiEndpoint)
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
+from onegov.org.models.directory import ExtendedDirectory
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
@@ -47,6 +54,7 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Sequence)
     from more.content_security import ContentSecurityPolicy
     from morepath.authentication import Identity, NoIdentity
+    from onegov.api import ApiEndpoint
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
@@ -55,8 +63,8 @@ if TYPE_CHECKING:
     from reg.dispatch import _KeyLookup
 
 
-class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
+class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
+             PayApp, FormApp, UserApp, WebsocketsApp, ApiApp):
 
     serve_static_files = True
     request_class = OrgRequest
@@ -67,7 +75,6 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
     userlinks = directive(directives.UserlinkAction)
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
     event_search_widget = directive(directives.EventSearchWidgetAction)
-    settings_view = directive(directives.SettingsView)
     boardlet = directive(directives.Boardlet)
 
     #: cronjob settings
@@ -136,13 +143,24 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         self.plausible_api_token = plausible_api_token
 
     def configure_stadt_wil_azizi_api_token(
-            self,
-            *,
-            azizi_api_token: str = '',
-            ** cfg: Any
+        self,
+        *,
+        azizi_api_token: str = '',
+        ** cfg: Any
     ) -> None:
 
         self.azizi_api_token = azizi_api_token
+
+    def configure_infomaniak_api_token(
+        self,
+        *,
+        infomaniak_api_token: str | None = None,
+        infomaniak_product_id: str | None = None,
+        **cfg: Any
+    ) -> None:
+
+        self.infomaniak_api_token = infomaniak_api_token
+        self.infomaniak_product_id = infomaniak_product_id
 
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
@@ -399,6 +417,37 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         with fs.open('eventsettings.yml', 'r') as f:
             return yaml.safe_load(f).get('event_form_lead', None)
 
+    def load_formcode_specification(self) -> str:
+        response = requests.get(
+            'https://raw.githubusercontent.com/seantis/docs-admin-digital'
+            '/refs/heads/main/content/module/formulare/index.md',
+            timeout=(5, 10)
+        )
+        if not response.ok:
+            # Fallback to our docstring
+            import onegov.form.parser.core as parser
+            return parser.__doc__
+
+        specification = response.text
+
+        # try to extend specification with examples
+        response = requests.get(
+            'https://raw.githubusercontent.com/seantis/docs-admin-digital'
+            '/refs/heads/main/content/module/formulare/beispiele.md',
+            timeout=(5, 10)
+        )
+        if not response.ok:
+            return specification
+        return f'{specification}\n\n{response.text}'
+
+    @property
+    def formcode_specification(self) -> str:
+        return self.cache.get_or_create(
+            'formcode_specification',
+            self.load_formcode_specification,
+            expiration_time=86400
+        )
+
     def checkout_button(
         self,
         button_label: str,
@@ -654,6 +703,30 @@ def get_citizen_login_enabled() -> bool:
     return True
 
 
+@OrgApp.setting(section='api', name='endpoints')
+def get_api_endpoints_handler(
+) -> Callable[[OrgRequest], Iterator[ApiEndpoint[Any]]]:
+
+    def get_api_endpoints(
+            request: OrgRequest,
+            page: int = 0,
+            extra_parameters: dict[str, Any] | None = None
+    ) -> Iterator[ApiEndpoint[Any]]:
+        yield EventApiEndpoint(request, extra_parameters, page)
+        yield NewsApiEndpoint(request, extra_parameters, page)
+        yield TopicApiEndpoint(request, extra_parameters, page)
+        directories = request.exclude_invisible(
+            request.session.query(ExtendedDirectory))
+        for directory in directories:
+            yield DirectoryEntryApiEndpoint(
+                request=request,
+                page=page,
+                name=directory.name,
+                extra_parameters=extra_parameters)
+
+    return get_api_endpoints
+
+
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, OrgRequest], Response]:
@@ -894,6 +967,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'notifications.js'
     yield 'foundation.accordion.js'
     yield 'chosen_select_hierarchy.js'
+    yield 'ai_formcoder.js'
 
 
 @OrgApp.webasset('fontpreview')

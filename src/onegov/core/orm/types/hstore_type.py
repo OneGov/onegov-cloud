@@ -8,4 +8,4 @@ class HSTORE(HSTOREBase):
     """ Extends the default HSTORE type to make it mutable by default. """
 
 
-MutableDict.associate_with(HSTORE)  # type:ignore[no-untyped-call]
+MutableDict.associate_with(HSTORE)

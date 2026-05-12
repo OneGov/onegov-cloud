@@ -50,7 +50,7 @@ class FormDefinitionBaseForm(Form):
         fieldset=_('Form Definition'),
         render_kw={'readonly': True},
         validators=[Optional()],
-        text='https://onegov.github.io/onegov-cloud/formcode.html',
+        text='https://docs.admin.digital/module/formulare',
         kind='panel',
         hide_label=False
     )

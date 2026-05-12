@@ -50,7 +50,7 @@ from translationstring import Translator
 from translationstring import TranslationString
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from collections.abc import (
@@ -58,18 +58,15 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.core.request import CoreRequest
     from translationstring import _ChameleonTranslate
-    from typing import Self, TypeAlias
+    from typing import Self
     from webob import Response
     from wtforms import Field, Form
     from wtforms.meta import DefaultMeta
 
-    LocaleNegotiator: TypeAlias = Callable[
+    type LocaleNegotiator = Callable[
         [Collection[str], CoreRequest],
         str | None
     ]
-
-_F = TypeVar('_F', bound='Form')
-_M = TypeVar('_M', bound='DefaultMeta')
 
 
 # the language codes must be written thusly: de_CH, en_GB, en, fr and so on
@@ -252,10 +249,10 @@ def translation_chain(
             stack.append(fallback)
 
 
-def get_translation_bound_meta(
-    meta_class: type[_M],
+def get_translation_bound_meta[T: DefaultMeta](
+    meta_class: type[T],
     translations: gettext.GNUTranslations | None
-) -> type[_M]:
+) -> type[T]:
     """ Takes a wtforms Meta class and combines our translate class with
     the one provided by WTForms itself.
 
@@ -347,10 +344,10 @@ def get_translation_bound_meta(
     return TranslationBoundMeta
 
 
-def get_translation_bound_form(
-    form_class: type[_F],
+def get_translation_bound_form[T: Form](
+    form_class: type[T],
     translate: gettext.GNUTranslations | None
-) -> type[_F]:
+) -> type[T]:
     """ Returns a form setup with the given translate function. """
 
     class TranslationBoundForm(form_class):  # type:ignore

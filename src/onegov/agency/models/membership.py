@@ -8,6 +8,7 @@ from onegov.org.models.extensions import PublicationExtension
 from onegov.org.utils import narrowest_access
 from onegov.people import AgencyMembership
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm.attributes import set_committed_value
 
 
@@ -16,7 +17,6 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.agency.models import ExtendedAgency
     from onegov.agency.models import ExtendedPerson
-    from sqlalchemy.orm import relationship
 
 
 class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
@@ -91,9 +91,9 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
     addition: dict_property[str | None] = meta_property()
 
     if TYPE_CHECKING:
-        # NOTE: We only relate extended versions
-        agency: relationship[ExtendedAgency]
-        person: relationship[ExtendedPerson]
+        # NOTE: We only relate to extended versions
+        agency: Mapped[ExtendedAgency]
+        person: Mapped[ExtendedPerson]
 
     # force fts update when access/published of agency/person changes
     @observes(

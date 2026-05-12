@@ -19,9 +19,6 @@ if TYPE_CHECKING:
     from onegov.core.orm.mixins import TimestampMixin
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query
-    from typing import TypeVar
-
-    _T = TypeVar('_T')
 
 
 def handle_empty_p_tags(html: Markup) -> Markup:
@@ -123,14 +120,14 @@ def get_html_paragraph_with_line_breaks(text: object) -> Markup:
     )
 
 
-def filter_modified_or_created(
-    query: Query[_T],
+def filter_modified_or_created[T](
+    query: Query[T],
     relate: Literal['>', '<', '>=', '<=', '=='],
     # FIXME: This is a bit lax about types, SQLAlchemy is doing the heavy
     #        lifting here, auto casting ISO formatted date strings
     comparison_property: datetime | str,
     collection_class: type[TimestampMixin]
-) -> Query[_T]:
+) -> Query[T]:
 
     ops = {
         '>': operator.gt,

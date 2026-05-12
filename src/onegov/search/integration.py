@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.core.orm import Base, SessionManager
     from onegov.core.request import CoreRequest
     from sqlalchemy.engine import Connection
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import DeclarativeBase, Session
 
 
 class SearchApp(morepath.App):
@@ -136,12 +136,13 @@ class SearchApp(morepath.App):
                     dict_name = 'german_unaccent'
                 else:
                     try:
-                        connection.execute(text("""
-                            CREATE TEXT SEARCH DICTIONARY german_unaccent (
-                                template = unaccent,
-                                rules = 'german'
-                            )
-                        """))
+                        with connection.begin_nested():
+                            connection.execute(text("""
+                                CREATE TEXT SEARCH DICTIONARY german_unaccent (
+                                    template = unaccent,
+                                    rules = 'german'
+                                )
+                            """))
                     except Exception:
                         index_log.exception(
                             'Failed to create german_unaccent dictionary '
@@ -211,7 +212,7 @@ class SearchApp(morepath.App):
             for model in searchable_sqlalchemy_models(base)
         }
 
-    def indexable_base_models(self) -> set[type[Searchable | Base]]:
+    def indexable_base_models(self) -> set[type[Searchable | DeclarativeBase]]:
         return {
             get_polymorphic_base(model)
             for model in self.searchable_models()
@@ -248,7 +249,7 @@ class SearchApp(morepath.App):
                     task
                     for obj in query
                     if (
-                        task := self.fts_orm_events.index_task(schema, obj)
+                        task := self.fts_orm_events.index_task(schema, obj)  # type: ignore[arg-type]
                     ) is not None
                 ), session)
                 session.execute(text('COMMIT'))
@@ -261,10 +262,12 @@ class SearchApp(morepath.App):
                 )
             finally:
                 session.invalidate()
-                session.bind.dispose()
+                if session.bind and hasattr(session.bind, 'dispose'):
+                    session.bind.dispose()
 
         with ThreadPoolExecutor() as executor:
             executor.map(reindex_model, self.indexable_base_models())
 
         session.invalidate()
-        session.bind.dispose()
+        if session.bind and hasattr(session.bind, 'dispose'):
+            session.bind.dispose()

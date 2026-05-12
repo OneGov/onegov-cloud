@@ -373,18 +373,13 @@ class EventCollection(Pagination[Event]):
 
         We assume the timezone to be Europe/Zurich!
         :param ical: ical to be imported
-        :type ical: str
         :param future_events_only: if set only events in the future will be
         imported
-        :type future_events_only: bool
         :param event_image: image file
         :param event_image_name: image name
-        :type event_image_name: str
         :param default_categories: categories applied if non is given in ical
-        :type default_categories: [str]
         :param default_filter_keywords: default filter keywords, see event
         filter settings app.org.event_filter_type
-        :type default_filter_keywords: dict(str, [str] | None)
 
         """
         items = []
@@ -468,7 +463,7 @@ class EventCollection(Pagination[Event]):
 
             items.append(
                 EventImportItem(
-                    event=Event(  # type:ignore[misc]
+                    event=Event(
                         state='initiated',
                         title=title,
                         start=start,
@@ -670,7 +665,7 @@ class EventCollection(Pagination[Event]):
                 # Multiple 'single' frequency schedule lead to single events.
                 items.append(
                     EventImportItem(
-                        event=Event(  # type:ignore[misc]
+                        event=Event(
                             state='published',
                             title=title,
                             start=start,
@@ -706,7 +701,7 @@ class EventCollection(Pagination[Event]):
         # a complete set of events
         for event in (
                 self.session.query(Event)
-                .filter(Event.source.notin_(source_ids))):  # type:ignore[union-attr]
+                .filter(Event.source.not_in(source_ids))):
             if event.source:
                 items_to_purge.append(event.source)
                 click.echo(f' - removing event as not in xml stream '
@@ -835,13 +830,9 @@ class EventCollection(Pagination[Event]):
             if e.filter_keywords:
                 for k, v in e.filter_keywords.items():
                     if k == 'kalender':
-                        assert isinstance(v, str)
                         hr_text = v
                     else:
-                        if isinstance(v, list):
-                            tags.extend(v)
-                        else:
-                            tags.append(v)
+                        tags.append(v)
                 top_category = SubElement(event, 'hauptrubrik',
                                           attrib={'name': hr_text} if
                                           hr_text else None)

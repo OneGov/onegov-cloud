@@ -5,6 +5,7 @@ from onegov.agency.api import MembershipApiEndpoint
 from onegov.agency.api import PersonApiEndpoint
 from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
+from onegov.agency.custom import get_modules
 from onegov.agency.forms import UserGroupForm
 from onegov.agency.initial_content import create_new_organisation
 from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs, AgencyPdfLu
@@ -12,16 +13,15 @@ from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
-from onegov.api import ApiApp
 from onegov.core import utils
-from onegov.org import OrgApp
-from onegov.org.app import get_editor_asset as editor_assets
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
-from onegov.org.app import get_redactor_asset as redactor_assets
+from onegov.town6 import TownApp
+from onegov.town6.app import get_editor_asset as editor_assets
+from onegov.town6.app import get_i18n_localedirs as get_org_i18n_localedirs
 
 
 from typing import Any
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRead
     from collections.abc import Callable
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from onegov.org.models import Organisation
 
 
-class AgencyApp(OrgApp, ApiApp):
+class AgencyApp(TownApp):
 
     request_class = AgencyRequest
 
@@ -121,6 +121,21 @@ class AgencyApp(OrgApp, ApiApp):
     def enable_yubikey(self, value: bool) -> None:
         self._enable_yubikey = value
 
+    def configure_organisation(
+        self,
+        *,
+        enable_user_registration: bool = False,
+        enable_yubikey: bool = False,
+        disable_password_reset: bool = False,
+        **cfg: Any
+    ) -> None:
+        super().configure_organisation(
+            enable_user_registration=enable_user_registration,
+            enable_yubikey=enable_yubikey,
+            disable_password_reset=disable_password_reset,
+            **cfg
+        )
+
 
 @AgencyApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
@@ -138,6 +153,7 @@ def get_template_variables(request: AgencyRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
+        'modules': get_modules(request)
     }
 
 
@@ -192,14 +208,8 @@ def get_people_select_asset() -> Iterator[str]:
 
 @AgencyApp.webasset('sortable-multi-checkbox')
 def get_sortable_multi_checkbox_asset() -> Iterator[str]:
-    yield 'jquery.js'
     yield 'sortable.js'
     yield 'sortable-multi-checkbox.js'
-
-
-@AgencyApp.webasset('redactor', filters={'js': None})
-def get_redactor_asserts() -> Iterator[str]:
-    yield from redactor_assets()
 
 
 @AgencyApp.webasset('editor')

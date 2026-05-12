@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from onegov.election_day.models.election_compound.mixins import \
-    DerivedAttributesMixin
-from onegov.election_day.models.party_result.mixins import \
-    HistoricalPartyResultsMixin
-from onegov.election_day.models.party_result.mixins import \
-    PartyResultsCheckMixin
+from onegov.election_day.models.election_compound.mixins import (
+    DerivedAttributesMixin)
+from onegov.election_day.models.party_result.mixins import (
+    HistoricalPartyResultsMixin)
+from onegov.election_day.models.party_result.mixins import (
+    PartyResultsCheckMixin)
 
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
     from onegov.election_day.models import Election
@@ -20,10 +20,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
 
 
-T = TypeVar('T')
-
-
-class inherited_attribute(Generic[T]):  # noqa: N801
+class inherited_attribute[T]:  # noqa: N801
 
     def __set_name__(
         self,

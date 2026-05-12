@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from decimal import Decimal
 from typing import NamedTuple
-from typing import TypeAlias
 from onegov.translator_directory import _
 
 full_text_max_chars = 25
@@ -35,7 +34,8 @@ member_can_see = (
     'expertise_interpreting_types',
     'expertise_professional_guilds',
     'expertise_professional_guilds_other',
-    'expertise_professional_guilds_all'
+    'expertise_professional_guilds_all',
+    'operation_comments'
 )
 
 editor_can_see = (
@@ -171,7 +171,7 @@ LOHNART_EXPENSES = '8102'
 
 TRANSLATOR_FA_ICON = 'translator'
 
-LocationMapping: TypeAlias = tuple[str, str]
+type LocationMapping = tuple[str, str]
 
 
 class Finanzstelle(NamedTuple):
@@ -188,6 +188,10 @@ ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
     'staatsanwaltschaft': (
         'Staatsanwaltschaft Allgemeine Abteilung',
         'Beckenstube 5, 8200 Schaffhausen'
+    ),
+    'staatsanwaltschaft_postgebaeude': (
+        'Staatsanwaltschaft Allgemeine Abteilung Postgebäude',
+        'Bahnhofstrasse 34, 8200 Schaffhausen',
     ),
     'verkehrsabteilung_staatsanwaltschaft': (
         'Verkehrsabteilung der Staatsanwaltschaft',

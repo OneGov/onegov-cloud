@@ -43,9 +43,9 @@ var datetimepicker_i18n = {
 
 var convert_date = function(value, from_format, to_format) {
     if (value) {
-        var as_date = moment(value, from_format).toDate();
-        if (as_date) {
-            return as_date.dateFormat(to_format);
+        var as_date = moment(value, from_format);
+        if (as_date.isValid()) {
+            return as_date.format(to_format);
         }
     }
     return value;
@@ -109,10 +109,10 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
             format: i18n_options.dateformat,
             placeholder: i18n_options.placeholder_date,
             server_to_client: function(value) {
-                return convert_date(value, 'YYYY-MM-DD', i18n_options.dateformat);
+                return convert_date(value, 'YYYY-MM-DD', i18n_options.dateformat_momentjs);
             },
             client_to_server: function(value) {
-                return convert_date(value, i18n_options.dateformat_momentjs, 'Y-m-d');
+                return convert_date(value, i18n_options.dateformat_momentjs, 'YYYY-MM-DD');
             }
         },
         datetime: {
@@ -120,10 +120,10 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
             format: i18n_options.datetimeformat,
             placeholder: i18n_options.placeholder_datetime,
             server_to_client: function(value) {
-                return convert_date(value, 'YYYY-MM-DD HH:mm', i18n_options.datetimeformat);
+                return convert_date(value, 'YYYY-MM-DD HH:mm', i18n_options.datetimeformat_momentjs);
             },
             client_to_server: function(value) {
-                return convert_date(value, i18n_options.datetimeformat_momentjs, 'Y-m-d H:i:00');
+                return convert_date(value, i18n_options.datetimeformat_momentjs, 'YYYY-MM-DD HH:mm:00');
             }
         },
         'datetime-local': {
@@ -131,10 +131,10 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
             format: i18n_options.datetimeformat,
             placeholder: i18n_options.placeholder_datetime,
             server_to_client: function(value) {
-                return convert_date(value, 'YYYY-MM-DD HH:mm', i18n_options.datetimeformat);
+                return convert_date(value, 'YYYY-MM-DD HH:mm', i18n_options.datetimeformat_momentjs);
             },
             client_to_server: function(value) {
-                return convert_date(value, i18n_options.datetimeformat_momentjs, 'Y-m-d H:i:00');
+                return convert_date(value, i18n_options.datetimeformat_momentjs, 'YYYY-MM-DD HH:mm:00');
             }
         }
     }[type];

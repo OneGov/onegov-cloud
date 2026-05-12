@@ -6,34 +6,26 @@ import re
 
 from functools import cached_property
 from pyquery import PyQuery as pq  # type: ignore[import-untyped]
+from webtest import TestApp as BaseTestApp
 
 
-from typing import Any, Generic, Self, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import MaybeNone
     from onegov.core.framework import Framework
     from onegov.core.types import EmailJsonDict
-    from typing import type_check_only, TypeVar
-    from webtest.app import TestApp as BaseTestApp
+    from typing import type_check_only
     from webtest.response import _Pattern, TestResponse
     from webtest.forms import Form
 
-    _AppT = TypeVar(
-        '_AppT',
-        bound=Framework,
-        default=Framework,
-        covariant=True
-    )
     BaseExtension = TestResponse
-    class TestApp(BaseTestApp['ExtendedResponse', _AppT]):
+    class TestApp[AppT: Framework = Framework](
+        BaseTestApp['ExtendedResponse', AppT]
+    ):
         ...
 else:
-    from typing import TypeVar
-    from webtest import TestApp as BaseTestApp
-
-    _AppT = TypeVar('_AppT')
     BaseExtension = object
-    class TestApp(BaseTestApp, Generic[_AppT]):
+    class TestApp[AppT: Framework = Framework](BaseTestApp):
         ...
 
 
@@ -42,7 +34,7 @@ EXTRACT_HREF = re.compile(
     r'(?:href|ic-get-from|ic-post-to|ic-delete-from)="([^"]+)')
 
 
-class Client(TestApp[_AppT]):
+class Client[AppT: Framework = Framework](TestApp[AppT]):
     skip_n_forms = 0
     use_intercooler = False
 

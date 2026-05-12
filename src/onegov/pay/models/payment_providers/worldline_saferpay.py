@@ -11,7 +11,6 @@ from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID as UUIDType
 from onegov.core.utils import append_query_param
 from onegov.pay import log
 from onegov.pay.errors import SaferpayPaymentError, SaferpayApiError
@@ -29,8 +28,8 @@ from pydantic import (
 from pydantic.alias_generators import to_pascal
 from pydantic_extra_types.currency_code import Currency  # noqa: TC002
 from sedate import utcnow
-from sqlalchemy import Column, Enum, Integer, Text
-from sqlalchemy.orm import object_session
+from sqlalchemy import Enum
+from sqlalchemy.orm import mapped_column, object_session, Mapped
 from sqlalchemy.orm.attributes import flag_modified
 from uuid import uuid4, uuid5, UUID
 from wtforms.widgets import html_params
@@ -40,7 +39,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
-    from sqlalchemy.orm import relationship, Session
+    from sqlalchemy.orm import Session
     from transaction.interfaces import ITransaction
 
 
@@ -109,27 +108,25 @@ class InitiatedSaferpayTransaction(Base, TimestampMixin):
     __tablename__ = 'initiated_saferpay_transactions'
 
     #: the order id of the transaction (set by us)
-    order_id: Column[UUID] = Column(
-        UUIDType,  # type: ignore[arg-type]
+    order_id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the token of the transaction (set by them)
-    token: Column[str] = Column(Text, nullable=False)
+    token: Mapped[str]
 
     #: the customer e-mail, mostly useful for error reporting
-    email: Column[str | None] = Column(Text)
+    email: Mapped[str | None]
 
-    retry_count: Column[int] = Column(Integer, nullable=False, default=0)
+    retry_count: Mapped[int] = mapped_column(default=0)
 
     #: the state of the transaction
-    state: Column[Literal['open', 'processed', 'cancelled']] = Column(
-        Enum(  # type:ignore[arg-type]
+    state: Mapped[Literal['open', 'processed', 'cancelled']] = mapped_column(
+        Enum(
             'open', 'processed', 'cancelled',
             name='saferpay_transaction_state'
         ),
-        nullable=False,
         default='open'
     )
 
@@ -570,7 +567,7 @@ class SaferpayPayment(Payment):
         # our provider should always be WordlineSaferpayProvdider, we could
         # assert if we really wanted to make sure, but it would
         # add a lot of assertions...
-        provider: relationship[WorldlineSaferpay]
+        provider: Mapped[WorldlineSaferpay]
 
     # NOTE: We don't seem to get information about fees from datatrans
     #       so the only thing we know for sure is that a customer will
@@ -817,6 +814,7 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
     ) -> SaferpayPayment:
 
         session = object_session(self)
+        assert session is not None
 
         # ensure the transaction can be settled
         tx = self.client.assert_transaction(session, token)
@@ -924,6 +922,7 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
         # FIXME: This may lead to complaints, since it might look like
         #        we're polling payments
         session = object_session(self)
+        assert session is not None
         query = session.query(self.payment_class)
         query = query.filter(self.payment_class.state == 'open')
         for payment in query:

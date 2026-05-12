@@ -38,7 +38,6 @@ class TestRequest(BaseRequest):
 
 class TestApp(Generic[_ResponseT, _AppT]):
     RequestClass: type[TestRequest]
-    app: _AppT
     lint: bool
     relative_to: str | None
     extra_environ: WSGIEnvironment
@@ -61,6 +60,11 @@ class TestApp(Generic[_ResponseT, _AppT]):
         json_encoder: json.JSONEncoder | None = None,
         lint: bool = True,
     ) -> None: ...
+    # NOTE: This isn't technically a property at runtime, but we need
+    #       to make this read-only so the inferred variance of _AppT
+    #       will be correct in subclasses that use PEP-695.
+    @property
+    def app(self) -> _AppT: ...
     def get_authorization(self) -> tuple[str, str | tuple[str, str]]: ...
     def set_authorization(self, value: tuple[str, str | tuple[str, str]]) -> None: ...
     @property

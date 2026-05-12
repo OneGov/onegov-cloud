@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import TypedDict
-    from typing_extensions import Unpack
+    from typing import Unpack
 
     class FilterParams(TypedDict, total=False):
         letter: str | None

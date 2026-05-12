@@ -157,7 +157,7 @@ def send_daily_newsletter(request: OrgRequest) -> None:
             )
             if request.app.org.secret_content_allowed:
                 news = news.filter(
-                    News.access.in_(('public', 'secret'))  # type: ignore[union-attr]
+                    News.access.in_(('public', 'secret'))
                 )
             else:
                 news = news.filter(News.access == 'public')
@@ -204,7 +204,7 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
 
     search_enabled = getattr(request.app, 'fts_search_enabled', False)
     publication_models: set[type[UTCPublicationMixin]] = {
-        poly_base if issubclass(
+        poly_base if issubclass(  # type: ignore[misc]
             poly_base := get_polymorphic_base(model),
             UTCPublicationMixin
         ) else model
@@ -835,12 +835,15 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
 
     name = request.app.org.title or 'unknown'
     for base in request.app.session_manager.bases:
-        for model in find_models(base, lambda cls: issubclass(
+        model: type[DeletableContentExtension]
+        for model in find_models(base, lambda cls: issubclass(  # type: ignore[assignment]
                 cls, DeletableContentExtension)):
 
-            query = request.session.query(model)
-            query = query.filter(model.delete_when_expired == True)
-            for obj in query:
+            generic_query = request.session.query(model)
+            generic_query = generic_query.filter(
+                model.delete_when_expired == True
+            )
+            for obj in generic_query:
                 # delete entry if the end date passed
                 if isinstance(obj, (News, ExtendedDirectoryEntry)):
                     if obj.publication_end and obj.publication_end < now:
@@ -852,17 +855,17 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
     # check on past events and its occurrences
     cutoff = now - timedelta(days=2)  # only delete with cutoff of 2 days
     if request.app.org.delete_past_events:
-        query = request.session.query(Occurrence)
-        query = query.filter(Occurrence.end < cutoff)
-        for occ in query:
+        occ_query = request.session.query(Occurrence)
+        occ_query = occ_query.filter(Occurrence.end < cutoff)
+        for occ in occ_query:
             log.info(f'Cron: Delete past occurrence for {name}: '
                      f'{occ.title} - {occ.end}')
             request.session.delete(occ)
             count += 1
 
-        query = request.session.query(Event)
-        query = query.filter(Event.end < cutoff)
-        for event in query:
+        event_query = request.session.query(Event)
+        event_query = event_query.filter(Event.end < cutoff)
+        for event in event_query:
             if not event.occurrences:
                 log.info(f'Cron: Delete past event for {name}: '
                          f'{event.title} - {event.end}')
@@ -1015,7 +1018,7 @@ def get_news_for_push_notification(session: Session) -> Query[News]:
 
     news_with_sent_notifications = session.query(
         PushNotification.news_id
-    ).scalar_subquery()  # type: ignore[attr-defined]
+    ).scalar_subquery()
     query = query.filter(~News.id.in_(news_with_sent_notifications))
     only_public_news = query.filter(
         or_(
@@ -1223,7 +1226,7 @@ def normalize_adjacency_list_order(request: OrgRequest) -> None:
             len(mapper.primary_key) != 1):
             continue
 
-        table_name = table.name
+        table_name = getattr(table, 'name', model.__tablename__)
 
         # Check if already processed or missing required columns
         if table_name in processed_tables:

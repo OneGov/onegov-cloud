@@ -60,7 +60,7 @@ class DummyRequest(BaseRequest):
         self.locale = 'de_CH'
         self.time_zone = 'Europe/Zurich'
         self.permissions = permissions or {}
-        self.current_user = current_user
+        self.current_user = current_user  # type: ignore[misc]
         self.client_addr = '1.1.1.1'  # type: ignore[misc]
 
     def is_private(self, model: object) -> bool:
@@ -262,6 +262,7 @@ def test_move_agency_form(session: Session) -> None:
     form = MoveAgencyForm(DummyPostData({'parent_id': '10'}))
     form.request = DummyRequest(session, permissions=all_permissions)
     form.update_model(model)
+    model = model  # undo narrowing
     assert model.parent_id == 10
 
     # update with rename

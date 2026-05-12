@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from ldap3.core.connection import Connection as LDAPConnection
     from onegov.translator_directory.app import TranslatorDirectoryApp
     from onegov.translator_directory.request import TranslatorAppRequest
-    from sqlalchemy.orm import Session
     from uuid import UUID
 
 
@@ -33,8 +32,7 @@ cli = command_group()
 
 
 def fetch_users(
-    app: TranslatorDirectoryApp,
-    session: Session,
+    request: TranslatorAppRequest,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -46,6 +44,8 @@ def fetch_users(
 ) -> None:
     """ Implements the fetch-users cli command. """
 
+    app = request.app
+    session = request.session
     admin_group = admin_group.lower()
     editor_group = editor_group.lower()
 
@@ -113,14 +113,16 @@ def fetch_users(
             raise NotImplementedError()
 
         user = ensure_user(
+            request,
             source=source,
             source_id=source_id,
-            session=session,
             username=data['mail'],
             role=data['role'],
             force_role=force_role,
             force_active=True
         )
+        if user is None:
+            continue
 
         synced_users.append(user.id)
 
@@ -178,8 +180,7 @@ def fetch_users_cli(
     ) -> None:
 
         fetch_users(
-            app,
-            request.session,
+            request,
             ldap_server,
             ldap_username,
             ldap_password,
@@ -912,3 +913,106 @@ def import_contract_numbers_cli(
                 transaction.abort()
 
     return do_import
+
+
+@cli.command(name='change-finanzstelle', context_settings={'singular': True})
+@click.option(
+    '--ticket-id',
+    '-t',
+    required=True,
+    type=str,
+    help='Ticket number (e.g., TRP-2024-00123)',
+)
+@click.option(
+    '--finanzstelle',
+    '-f',
+    required=True,
+    type=click.Choice(
+        [
+            'migrationsamt_und_passbuero',
+            'staatsanwaltschaft',
+            'gefaengnisverwaltung',
+            'polizei',
+            'obergericht',
+            'kantonsgericht',
+            'verkehrsabteilung_staatsanwaltschaft',
+            'jugendanwaltschaft',
+        ]
+    ),
+    help='New finanzstelle key',
+)
+@click.option('--dry-run/-no-dry-run', default=False)
+def change_finanzstelle_cli(
+    ticket_id: str, finanzstelle: str, dry_run: bool
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    r"""Change the finanzstelle of a time report by ticket ID.
+
+    Example:
+        onegov-translator --select /translator_directory/schaffhausen \
+            change-finanzstelle -t TRP-2024-00123 -f polizei --dry-run
+    """
+
+    def do_change(
+        request: TranslatorAppRequest, app: TranslatorDirectoryApp
+    ) -> None:
+        from onegov.ticket import Ticket
+        from onegov.translator_directory.models.time_report import (
+            TranslatorTimeReport,
+        )
+        from onegov.translator_directory.constants import FINANZSTELLE
+
+        ticket = (
+            request.session.query(Ticket)
+            .filter(Ticket.number == ticket_id)
+            .first()
+        )
+
+        if not ticket:
+            click.secho(f'Ticket {ticket_id} not found', fg='red')
+            return
+
+        handler_data = ticket.handler_data.get('handler_data', {})
+        time_report_id = handler_data.get('time_report_id')
+        if not time_report_id:
+            click.secho(f'Ticket {ticket_id} has no time report', fg='red')
+            return
+
+        time_report = (
+            request.session.query(TranslatorTimeReport)
+            .filter(TranslatorTimeReport.id == time_report_id)
+            .first()
+        )
+
+        if not time_report:
+            click.secho(
+                f'Time report with ID {time_report_id} not found', fg='red'
+            )
+            return
+
+        old_finanzstelle = time_report.finanzstelle
+        new_finanzstelle = finanzstelle
+
+        old_name = (
+            FINANZSTELLE[old_finanzstelle].name
+            if old_finanzstelle in FINANZSTELLE
+            else old_finanzstelle
+        )
+        new_name = FINANZSTELLE[new_finanzstelle].name
+
+        time_report.finanzstelle = new_finanzstelle
+
+        click.secho(
+            f'✓ Ticket {ticket_id}: finanzstelle changed',
+            fg='green',
+        )
+        click.secho(f'  From: {old_name} ({old_finanzstelle})')
+        click.secho(f'  To:   {new_name} ({new_finanzstelle})')
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Dry run: transaction aborted', fg='yellow')
+        else:
+            request.session.flush()
+            click.secho('Changes committed', fg='green')
+
+    return do_change

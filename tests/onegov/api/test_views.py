@@ -59,8 +59,22 @@ def patch_collection_json(monkeypatch: pytest.MonkeyPatch) -> None:
         self.prompt = prompt
         self.data = data
 
+    def Data__init__(
+        self: Any,
+        name: str,
+        value: Any | None = None,
+        prompt: str | None = None,
+        values: list[str] | None = None,
+        **extra: Any,
+    ) -> None:
+        self.name = name
+        self.value = value
+        self.prompt = prompt
+        self.values = values
+
     monkeypatch.setattr(Collection, '__init__', Collection__init__)
     monkeypatch.setattr('collection_json.Query.__init__', Query__init__)
+    monkeypatch.setattr('collection_json.Data.__init__', Data__init__)
 
 
 def test_view_api(client: Client, app: App) -> None:
@@ -322,6 +336,7 @@ def test_view_private_field(client: Client) -> None:
     # Test non public field
     session = client.app.session()  # Get fresh session after commit
     people = ExtendedPersonCollection(session)
+    person: Person | None
     person = people.add(
         first_name='vorname', last_name='nachname', external_user_id='123456'
     )
@@ -330,7 +345,7 @@ def test_view_private_field(client: Client) -> None:
     transaction.commit()
 
     session = client.app.session()  # Get fresh session
-    person = session.get(Person, person_id)  # type: ignore[attr-defined]  # Reload person with new
+    person = session.get(Person, person_id)  # Reload person with new
 
     # Authorize
     headers = {"Authorization": f"Bearer {uuid}"}

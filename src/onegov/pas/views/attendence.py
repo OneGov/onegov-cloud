@@ -1,20 +1,23 @@
 from __future__ import annotations
 
-from itertools import groupby
-from operator import attrgetter
+from collections import defaultdict
 import uuid
+from datetime import datetime
 
-from more_itertools import flatten
+from sqlalchemy import distinct
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import (AttendenceCollection,
-                                    PASParliamentarianCollection)
+from onegov.pas.collections import (
+    AttendenceCollection,
+    PASParliamentarianCollection,
+    SettlementRunCollection,
+)
 from onegov.pas.custom import (
     validate_attendance_date,
-    has_user_set_abschluss_for_settlement_run,
+    notify_admins_finalized,
 )
 from onegov.pas.forms import AttendenceAddCommissionBulkForm, AttendenceAddForm
 from onegov.pas.forms import AttendenceAddPlenaryForm
@@ -26,6 +29,7 @@ from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
 from onegov.pas.models import SettlementRun
+from onegov.pas.models.attendence import TYPES
 from onegov.pas.models.commission_membership import PASCommissionMembership
 
 
@@ -46,46 +50,180 @@ def view_attendences(
     self: AttendenceCollection,
     request: PasRequest
 ) -> RenderData:
-
     layout = AttendenceCollectionLayout(self, request)
 
-    # Apply role-based filtering, then re-sort for bulk edit grouping
-    filtered_attendences = self.view_for_parliamentarian(request)
-    bulk_edit_attendences = sorted(
-        filtered_attendences,
-        key=lambda x: (str(x.bulk_edit_id) if x.bulk_edit_id else '',
-                      x.created or x.modified),
-        reverse=True
+    attendences = self.query_for_current_user(request)
+
+    groups: dict[str, list[Attendence]] = defaultdict(list)
+    for a in attendences:
+        if a.bulk_edit_id:
+            groups[str(a.bulk_edit_id)].append(a)
+
+    bulk_edit_groups = sorted(
+        groups.values(),
+        key=lambda g: max(a.modified or a.created for a in g),
+        reverse=True,
     )
 
-    bulk_edit_groups = [
-        sorted(group, key=attrgetter('created', 'modified'), reverse=True)
-        for bulk_edit_id, group in groupby(
-            bulk_edit_attendences, key=attrgetter('bulk_edit_id'))
+    attendences_sorted = sorted(
+        attendences,
+        key=lambda a: a.created or a.modified or datetime.min,
+        reverse=True,
+    )
+
+    type_filters = [
+        Link(
+            text=request.translate(_('All')),
+            active=self.type is None,
+            url=request.link(
+                self.for_filter(
+                    settlement_run_id=self.settlement_run_id,
+                    date_from=self.date_from,
+                    date_to=self.date_to,
+                    type=None,
+                    parliamentarian_id=self.parliamentarian_id,
+                    commission_id=self.commission_id,
+                    party_id=self.party_id,
+                    plenary_date=self.plenary_date,
+                )
+            ),
+        )
     ]
+    for key, label in TYPES.items():
+        if not request.is_admin and key == 'plenary':
+            continue
+        type_filters.append(
+            Link(
+                text=request.translate(label),
+                active=self.type == key,
+                url=request.link(
+                    self.for_filter(
+                        settlement_run_id=self.settlement_run_id,
+                        date_from=self.date_from,
+                        date_to=self.date_to,
+                        type=key,
+                        parliamentarian_id=self.parliamentarian_id,
+                        commission_id=self.commission_id,
+                        party_id=self.party_id,
+                        plenary_date=self.plenary_date,
+                    )
+                ),
+            )
+        )
 
-    non_null_groups = [g for g in bulk_edit_groups if getattr(
-        g[0], 'bulk_edit_id', None) is not None]
-    null_groups = [g for g in bulk_edit_groups if getattr(
-        g[0], 'bulk_edit_id', None) is None]
-
-    non_null_groups.sort(
-        key=lambda group: max(  # type: ignore
-            (attendence.modified or attendence.created
-             for attendence in group),
-            default=None
-        ),
-        reverse=True
+    settlement_runs = (
+        SettlementRunCollection(request.session).query().all()
     )
+    run_filters = [
+        Link(
+            text=request.translate(_('All')),
+            active=self.settlement_run_id is None,
+            url=request.link(
+                self.for_filter(
+                    settlement_run_id='all',
+                    date_from=self.date_from,
+                    date_to=self.date_to,
+                    type=self.type,
+                    parliamentarian_id=self.parliamentarian_id,
+                    commission_id=self.commission_id,
+                    party_id=self.party_id,
+                    plenary_date=self.plenary_date,
+                )
+            ),
+        )
+    ]
+    for run in settlement_runs:
+        run_id = str(run.id)
+        run_filters.append(
+            Link(
+                text=run.name,
+                active=self.settlement_run_id == run_id,
+                url=request.link(
+                    self.for_filter(
+                        settlement_run_id=run_id,
+                        date_from=self.date_from,
+                        date_to=self.date_to,
+                        type=self.type,
+                        parliamentarian_id=self.parliamentarian_id,
+                        commission_id=self.commission_id,
+                        party_id=self.party_id,
+                        plenary_date=self.plenary_date,
+                    )
+                ),
+            )
+        )
 
-    bulk_edit_groups = non_null_groups + null_groups
+    plenary_filters: list[Link] = []
+    if request.is_admin:
+        plenary_dates = (
+            request.session.query(distinct(Attendence.date))
+            .filter(Attendence.type == 'plenary')
+            .order_by(Attendence.date.desc())
+            .all()
+        )
+        plenary_filters = [
+            Link(
+                text=request.translate(_('All')),
+                active=self.plenary_date is None,
+                url=request.link(
+                    self.for_filter(
+                        settlement_run_id=self.settlement_run_id,
+                        date_from=self.date_from,
+                        date_to=self.date_to,
+                        type=self.type,
+                        parliamentarian_id=(self.parliamentarian_id),
+                        commission_id=self.commission_id,
+                        party_id=self.party_id,
+                        plenary_date=None,
+                    )
+                ),
+            )
+        ]
+        for (d,) in plenary_dates:
+            plenary_filters.append(
+                Link(
+                    text=layout.format_date(d, 'date'),
+                    active=self.plenary_date == d,
+                    url=request.link(
+                        self.for_filter(
+                            settlement_run_id=(self.settlement_run_id),
+                            date_from=self.date_from,
+                            date_to=self.date_to,
+                            type=self.type,
+                            parliamentarian_id=(self.parliamentarian_id),
+                            commission_id=(self.commission_id),
+                            party_id=self.party_id,
+                            plenary_date=d,
+                        )
+                    ),
+                )
+            )
+
+    edit_links: dict[uuid.UUID, str] = {}
+    for a in attendences_sorted:
+        if a.bulk_edit_id:
+            name = (
+                'edit-plenary-bulk-attendences'
+                if a.type == 'plenary'
+                else 'edit-commission-bulk-attendences'
+            )
+            edit_links[a.id] = request.link(a, name)
+        else:
+            edit_links[a.id] = request.link(a)
 
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'attendences': list(flatten(bulk_edit_groups)),
+        'attendences': attendences_sorted,
+        'edit_links': edit_links,
         'title': layout.title,
-        'bulk_edit_groups': bulk_edit_groups
+        'bulk_edit_groups': bulk_edit_groups,
+        'can_edit_attendences': request.is_admin,
+        'filters': {
+            'settlement_run': run_filters,
+            'type': type_filters,
+            'plenary_session': plenary_filters,
+        },
     }
 
 
@@ -115,29 +253,6 @@ def add_attendence(
                     'form_width': 'large',
                 }
 
-            if not request.is_admin:
-                assert form.parliamentarian_id.data is not None
-                assert form.date.data is not None
-                if has_user_set_abschluss_for_settlement_run(
-                    request.session,
-                    form.parliamentarian_id.data,
-                    form.date.data,
-                ):
-                    request.alert(
-                        _(
-                            'Cannot book attendance - abschluss already '
-                            'set for this settlement run'
-                        )
-                    )
-                    return {
-                        'layout': AttendenceCollectionLayout(
-                            self, request
-                        ),
-                        'title': _('New attendence'),
-                        'form': form,
-                        'form_width': 'large',
-                    }
-
         attendence = self.add(**form.get_useful_data())
         Change.add(request, 'add', attendence)
         request.success(_('Added a new attendence'))
@@ -165,10 +280,16 @@ def add_attendence(
 )
 def add_bulk_attendence(
     self: AttendenceCollection,
-    request: TownRequest,
+    request: PasRequest,
     form: AttendenceAddCommissionBulkForm
 ) -> RenderData | Response:
     request.include('custom')
+
+    if not request.is_admin and not request.is_commission_president:
+        request.alert(_('Only admins can add bulk attendance records.'))
+        return request.redirect(request.class_link(AttendenceCollection))
+
+    title = _('New commission session (bulk)')
 
     if form.submitted(request):
         if form.date.data:
@@ -178,71 +299,43 @@ def add_bulk_attendence(
                 request.alert(error)
                 return {
                     'layout': AttendenceCollectionLayout(self, request),
-                    'title': _('New commission session'),
+                    'title': title,
                     'form': form,
                     'form_width': 'large',
                 }
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-            if not request.is_admin:
-                assert form.date.data is not None
-                blocked_parls = []
-                for parl_id in raw_parl_ids:
-                    assert isinstance(parl_id, str)
-                    if has_user_set_abschluss_for_settlement_run(
-                        request.session, parl_id, form.date.data
-                    ):
-                        parl = PASParliamentarianCollection(request.app).by_id(
-                            parl_id
-                        )
-                        if parl:
-                            blocked_parls.append(parl.title)
-
-                if blocked_parls:
-                    request.alert(
-                        _(
-                            'Cannot book attendance - abschluss already set '
-                            'for: ${names}',
-                            mapping={'names': ', '.join(blocked_parls)},
-                        )
-                    )
-                    return {
-                        'layout': AttendenceCollectionLayout(self, request),
-                        'title': _('New commission session'),
-                        'form': form,
-                        'form_width': 'large',
-                    }
-
-            # Remove static field; choices are set dynamically via JS
             data.pop('parliamentarian_id', None)
             bulk_edit_id = uuid.uuid4()
+            notify_attendence = None
             for parliamentarian_id in raw_parl_ids:
                 attendence = self.add(
                     parliamentarian_id=parliamentarian_id, **data
                 )
                 attendence.bulk_edit_id = bulk_edit_id
-                # Note: If abschluss is set in this bulk operation, the
-                # members in raw_parl_ids will be immediately blocked from
-                # adding new attendances in this settlement run
                 Change.add(request, 'add', attendence)
+                if attendence.abschluss and notify_attendence is None:
+                    notify_attendence = attendence
+            if notify_attendence is not None:
+                notify_admins_finalized(request, notify_attendence)
         else:
             request.warning(_('No parliamentarians selected'))
             return request.redirect(request.class_link(AttendenceCollection))
 
-        request.success(_('Added commission session'))
+        request.success(_('Added session'))
 
         return request.redirect(request.link(self))
 
     layout = AttendenceCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New commission session'), '#'))
+    layout.breadcrumbs.append(Link(title, '#'))
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _('New commission session'),
+        'title': title,
         'form': form,
-        'form_width': 'large'
+        'form_width': 'large',
     }
 
 
@@ -282,7 +375,7 @@ def edit_plenary_bulk_attendence(
                 request.alert(error)
                 return {
                     'layout': AttendenceCollectionLayout(self, request),
-                    'title': _('Edit plenary session'),
+                    'title': _('Edit bulk: plenary session'),
                     'form': form,
                     'form_width': 'large'
                 }
@@ -358,7 +451,7 @@ def edit_plenary_bulk_attendence(
 
     return {
         'layout': layout,
-        'title': _('Edit plenary session'),
+        'title': _('Edit bulk: plenary session'),
         'form': form,
         'form_width': 'large'
     }
@@ -378,6 +471,13 @@ def edit_commission_bulk_attendence(
 ) -> RenderData | Response:
     request.include('custom')
 
+    if not request.is_admin:
+        request.alert(_('Only admins can edit attendance records.'))
+        return request.redirect(request.class_link(AttendenceCollection))
+
+    type_label = request.translate(self.type_label)
+    title = _('Edit bulk: ${type}', mapping={'type': type_label})
+
     if form.submitted(request):
         if form.date.data:
             if error := validate_attendance_date(
@@ -386,39 +486,13 @@ def edit_commission_bulk_attendence(
                 request.alert(error)
                 return {
                     'layout': AttendenceCollectionLayout(self, request),
-                    'title': _('Edit commission session'),
+                    'title': title,
                     'form': form,
                     'form_width': 'large'
                 }
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-            if not request.is_admin:
-                assert form.date.data is not None
-                blocked_parls = []
-                for parl_id in raw_parl_ids:
-                    assert isinstance(parl_id, str)
-                    if has_user_set_abschluss_for_settlement_run(
-                        request.session, parl_id, form.date.data
-                    ):
-                        parl = PASParliamentarianCollection(request.app).by_id(
-                            parl_id
-                        )
-                        if parl:
-                            blocked_parls.append(parl.title)
-
-                if blocked_parls:
-                    request.alert(
-                        _(
-                            'Cannot edit attendance - abschluss already set '
-                            'for: ${names}',
-                            mapping={'names': ', '.join(blocked_parls)},
-                        )
-                    )
-                    return request.redirect(
-                        request.class_link(AttendenceCollection)
-                    )
-
             data.pop('parliamentarian_id', None)
             collection = AttendenceCollection(request.session)
             memberships = request.session.query(
@@ -443,19 +517,31 @@ def edit_commission_bulk_attendence(
                     Change.add(request, 'delete', attendence)
                     collection.delete(attendence)
 
+            notify_attendence = None
             for parliamentarian_id in raw_parl_ids:
                 attendence = collection.query().filter(
                         Attendence.parliamentarian_id == parliamentarian_id,
                         Attendence.bulk_edit_id == form.bulk_edit_id.data,
                     ).first()
                 if attendence:
+                    was_abschluss = attendence.abschluss
                     form.populate_obj(attendence)
                     Change.add(request, 'edit', attendence)
+                    if (
+                        attendence.abschluss
+                        and not was_abschluss
+                        and notify_attendence is None
+                    ):
+                        notify_attendence = attendence
                 else:
                     attendence = collection.add(
                         parliamentarian_id=parliamentarian_id, **data
                     )
                     Change.add(request, 'add', attendence)
+                    if attendence.abschluss and notify_attendence is None:
+                        notify_attendence = attendence
+            if notify_attendence is not None:
+                notify_admins_finalized(request, notify_attendence)
 
         request.success(_('Edited attendences'))
 
@@ -498,7 +584,7 @@ def edit_commission_bulk_attendence(
 
     return {
         'layout': layout,
-        'title': _('Edit commission session'),
+        'title': title,
         'form': form,
         'form_width': 'large'
     }
@@ -514,6 +600,7 @@ def add_plenary_attendence(self: AttendenceCollection,
     request: PasRequest,
     form: AttendenceAddPlenaryForm
 ) -> RenderData | Response:
+    request.include('custom')
 
     if not request.is_admin:
         request.alert(_('You do not have permission to add plenary sessions.'))
@@ -592,6 +679,18 @@ def edit_attendence(
     form: AttendenceForm
 ) -> RenderData | Response:
 
+    if not request.is_admin:
+        request.alert(_('Only admins can edit attendance records.'))
+        return request.redirect(request.class_link(AttendenceCollection))
+
+    if self.bulk_edit_id:
+        name = (
+            'edit-plenary-bulk-attendences'
+            if self.type == 'plenary'
+            else 'edit-commission-bulk-attendences'
+        )
+        return request.redirect(request.link(self, name))
+
     if form.submitted(request):
         if form.date.data:
             if error := validate_attendance_date(
@@ -605,28 +704,11 @@ def edit_attendence(
                     'form_width': 'large'
                 }
 
-            if not request.is_admin:
-                assert form.date.data is not None
-                if has_user_set_abschluss_for_settlement_run(
-                    request.session,
-                    str(self.parliamentarian_id),
-                    form.date.data,
-                ):
-                    request.alert(
-                        _(
-                            'Cannot edit attendance - abschluss already set '
-                            'for this settlement run'
-                        )
-                    )
-                    return {
-                        'layout': AttendenceLayout(self, request),
-                        'title': AttendenceLayout(self, request).title,
-                        'form': form,
-                        'form_width': 'large',
-                    }
-
+        was_abschluss = self.abschluss
         form.populate_obj(self)
         Change.add(request, 'edit', self)
+        if self.abschluss and not was_abschluss:
+            notify_admins_finalized(request, self)
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
@@ -654,6 +736,14 @@ def delete_attendence(
 ) -> None:
 
     request.assert_valid_csrf_token()
+
+    if not request.is_admin:
+        request.alert(_('Only admins can delete attendance records.'))
+        return
+
+    if self.bulk_edit_id:
+        request.alert(_('Cannot delete individual bulk attendance.'))
+        return
 
     # Check if attendance is in a closed settlement run
     settlement_run = request.session.query(SettlementRun).filter(
@@ -685,6 +775,10 @@ def delete_attendences(
 ) -> None:
 
     request.assert_valid_csrf_token()
+
+    if not request.is_admin:
+        request.alert(_('Only admins can delete attendance records.'))
+        return
 
     attendences = request.session.query(Attendence).filter(
         Attendence.bulk_edit_id == self.bulk_edit_id

@@ -310,7 +310,7 @@ def test_ticket_states_idempotent(client: Client) -> None:
 def test_ticket_states_directory_entry(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Vereinsverzeichnis"
     page.form['structure'] = "Vereinsname *= ___"
     page.form['title_format'] = "[Vereinsname]"
@@ -1104,7 +1104,7 @@ def test_my_tickets_view(client: Client) -> None:
     client.get('/tickets/ALL/all/my-tickets', status=404)
 
     # let's enable it
-    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings = admin.get('/').click('Module aktivieren/deaktivieren')
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 

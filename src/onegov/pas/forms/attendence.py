@@ -241,6 +241,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 ]
             else:
                 self.parliamentarian_id.choices = []
+                self.request.warn_no_parliamentarian()  # type:ignore[attr-defined]
         elif (
             hasattr(self.request.identity, 'role')
             and self.request.identity.role == 'commission_president'
@@ -281,6 +282,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 self.parliamentarian_id.choices = list(dict.fromkeys(choices))
             else:
                 self.parliamentarian_id.choices = []
+                self.request.warn_no_parliamentarian()  # type:ignore[attr-defined]
         else:
             self.parliamentarian_id.choices = [
                 (str(parliamentarian.id), parliamentarian.title)
@@ -419,13 +421,26 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         ]
 
 
+BULK_MEETING_TYPES: dict[str, str] = {
+    'commission': _('Commission meeting'),
+    'shortest': _('Shortest meeting'),
+}
+
+
 class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
-    """ Kind of like AttendenceAddPlenaryForm but for commissions. """
+    """Bulk form for commission-based meetings (commission or shortest)."""
 
     date = DateField(
         label=_('Date'),
         validators=[InputRequired()],
         default=datetime.date.today
+    )
+
+    type = RadioField(
+        label=_('Type'),
+        choices=list(BULK_MEETING_TYPES.items()),
+        validators=[InputRequired()],
+        default='commission',
     )
 
     duration = FloatField(
@@ -452,7 +467,6 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['duration'] = int(60 * (result.get('duration') or 0))
-        result['type'] = 'commission'
         return result
 
     def on_request(self) -> None:
@@ -471,6 +485,8 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         ]
         # JavaScript will handle selection based on commission
         self.parliamentarian_id.data = []
+
+        self.request.warn_no_parliamentarian()  # type: ignore[attr-defined]
 
 
 class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):

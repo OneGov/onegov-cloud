@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from sqlalchemy.dialects.postgresql.json import JSONB
-import uuid
-from sqlalchemy import Column, Text, ForeignKey
-from sqlalchemy.orm import relationship, deferred
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from onegov.core.orm.types import JSON
 from onegov.pas import _
+from sqlalchemy import ForeignKey
+from sqlalchemy.dialects.postgresql.json import JSONB
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import Any
@@ -33,37 +31,38 @@ class ImportLog(Base, TimestampMixin):
     _('automatic')
     _('upload')
 
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type: ignore[arg-type]
-        nullable=False,
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
-        default=uuid.uuid4
+        default=uuid4
     )
 
     # user_id can be null if import is triggered by system/cron
-    user_id: Column[uuid.UUID | None] = Column(
-        UUID,  # type: ignore[arg-type]
-        ForeignKey('users.id'),
-        nullable=True
-    )
-    user: relationship[User | None] = relationship('User')
+    user_id: Mapped[UUID | None] = mapped_column(ForeignKey('users.id'))
+    user: Mapped[User | None] = relationship()
 
     # Store summary counts or potentially full details JSON
-    details: Column[dict[str, Any]] = Column(JSON, nullable=False)
+    details: Mapped[dict[str, Any]]
 
     # 'completed' or 'failed'
-    status: Column[str] = Column(Text, nullable=False)
+    status: Mapped[str]
 
     # 'cli', 'upload', or 'automatic'
-    import_type: Column[str] = Column(Text, nullable=False)
+    import_type: Mapped[str]
 
     # This is the json response from the api, we store it to be able to
     # reconstruct how certain imports were run. This will be useful to
     # debug issues. But we don't want to store it every time, as these are
     # several MBs of text and the sync cronjob runs regularly.
     # These are deferred by default to avoid loading large JSON data
-    people_source: Column[Any] = deferred(Column(JSONB, nullable=True))
-    organizations_source: Column[Any] = deferred(Column(
-        JSONB, nullable=True
-    ))
-    memberships_source: Column[Any] = deferred(Column(JSONB, nullable=True))
+    people_source: Mapped[Any | None] = mapped_column(
+        JSONB,
+        deferred=True
+    )
+    organizations_source: Mapped[Any | None] = mapped_column(
+        JSONB,
+        deferred=True
+    )
+    memberships_source: Mapped[Any | None] = mapped_column(
+        JSONB,
+        deferred=True
+    )

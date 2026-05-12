@@ -9,7 +9,7 @@ from email_validator import validate_email, EmailNotValidError
 from io import BytesIO
 from markupsafe import Markup
 from morepath import Response
-from onegov.chat import Message, MessageCollection
+from onegov.chat import Message, MessageCollection, TextModuleCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
@@ -746,6 +746,10 @@ def reopen_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     user = request.current_user
     assert user is not None
 
+    if not self.handler.reopenable:
+        request.alert(_('This ticket cannot be reopened'))
+        return morepath.redirect(request.link(self))
+
     was_closed = self.state == 'closed'
 
     try:
@@ -953,7 +957,8 @@ def assign_ticket(
     model=Ticket,
     name='change-email',
     request_method='POST',
-    permission=Private
+    permission=Private,
+    open_data=False
 )
 def change_email(self: Ticket, request: OrgRequest) -> JSON_ro:
     request.assert_valid_csrf_token()
@@ -1192,8 +1197,10 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
     not_existing = []
     with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for f in form_submission.files:
+            file = None
             try:
-                zipf.writestr(f.name, f.reference.file.read())
+                file = f.reference.file
+                zipf.writestr(f.name, file.read())
             except OSError:
                 not_existing.append(f.name)
 
@@ -1204,8 +1211,10 @@ def view_ticket_files(self: Ticket, request: OrgRequest) -> BaseResponse:
 
     if not_existing:
         count = len(not_existing)
-        request.alert(_(f"{count} file(s) not found:"
-                        f" {', '.join(not_existing)}"))
+        request.alert(_(
+            '${count} file(s) not found: ${files}',
+            mapping={'count': count, 'files': ', '.join(not_existing)}
+        ))
     else:
         request.info(_('Zip archive created successfully'))
 
@@ -1734,6 +1743,20 @@ def view_tickets(
     owner = next((o for o in owners if o.active), None)
     submitter = next((s for s in submitters if s.active), None)
     layout = layout or TicketsLayout(self, request)
+    layout.editbar_links = [
+        Link(
+            _('Archived Tickets'),
+            request.class_link(
+                ArchivedTicketCollection, {
+                    'handler': self.handler, 'group': self.group}),
+            attrs={'class': 'ticket-archive'}
+        ),
+        Link(
+                _('Text modules'), request.class_link(
+                    TextModuleCollection),
+                attrs={'class': 'text-modules'}
+            )
+    ]
 
     def archive_link(ticket: Ticket) -> str:
         return layout.csrf_protected_url(request.link(ticket, name='archive'))
@@ -1761,10 +1784,7 @@ def view_tickets(
             if self.group is None
             else f'{self.handler}-sub-link ticket-group-filter'
         ),
-        'owner': owner,
-        # NOTE: Not all submitters will be valid for every filter so
-        #       if it's not valid we fallback to whatever we were given
-        #       there should be zero results, but that's fine
+        'owner': owner.text if owner else '-',
         'submitter': submitter.text if submitter else self.submitter,
         'action_link': archive_link
     }
@@ -1816,7 +1836,7 @@ def view_archived_tickets(
             if self.group is None
             else f'{self.handler}-sub-link ticket-group-filter'
         ),
-        'owner': owner,
+        'owner': owner.text if owner else '-',
         # NOTE: Not all submitters will be valid for every filter so
         #       if it's not valid we fallback to whatever we were given
         #       there should be zero results, but that's fine

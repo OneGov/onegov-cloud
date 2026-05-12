@@ -3,11 +3,20 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <ul class="org-settings">
-            <li tal:repeat="setting settings" class="${setting.name}">
-                <i class="fa ${setting.icon}" aria-hidden="true"></i>
-                <a href="${setting.link}">${setting.title}</a>
-            </li>
-        </ul>
+
+            <div tal:repeat="item settings_by_category" class="settings-category">
+                <h3 tal:content="item[0]" />
+                <ul class="org-settings">
+                    <li tal:repeat="setting item[1]" class="${setting.name} cell">
+                        <a href="${setting.link}">
+                            <i class="fa ${setting.icon}" aria-hidden="true"></i>
+                            <span>
+                                ${setting.title}
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
     </tal:b>
 </div>

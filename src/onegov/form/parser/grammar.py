@@ -26,13 +26,12 @@ from pyparsing import (
 )
 from pyparsing.util import _collapse_string_to_ranges
 
-from typing import Any, TypeVar, TYPE_CHECKING
+
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from pyparsing.results import ParseResults
     from re import Pattern
-
-_T = TypeVar('_T')
 
 
 # we want newlines to be significant
@@ -63,7 +62,7 @@ def matches(character: str) -> Callable[[ParseResults], bool]:
     return lambda tokens: tokens and tokens[0] == character or False
 
 
-def literal(value: _T) -> Callable[[ParseResults], _T]:
+def literal[T](value: T) -> Callable[[ParseResults], T]:
     """" Returns the given value, ignoring the tokens alltogether. """
     return lambda tokens: value
 

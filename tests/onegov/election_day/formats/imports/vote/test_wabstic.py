@@ -584,3 +584,156 @@ def test_import_wabstic_vote_regional(session: Session) -> None:
     )
     assert not errors
     assert vote.progress == (1, 1)
+
+
+def test_import_wabstic_vote_received(session: Session) -> None:
+    session.add(
+        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+    principal = Canton(canton='sg')
+
+    # Test without StmAbgegeben (should still work, received is None)
+    errors = import_vote_wabstic(
+        vote, principal, '0', '0',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'Ausmittlungsstand',
+                    'AnzGdePendent'
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    '0',
+                    '0'
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'BfsNrGemeinde',
+                    'Sperrung',
+                    'Stimmberechtigte',
+                    'StmUngueltig',
+                    'StmLeer',
+                    'StmHGJa',
+                    'StmHGNein',
+                    'StmHGOhneAw',
+                    'StmN1Ja',
+                    'StmN1Nein',
+                    'StmN1OhneAw',
+                    'StmN2Ja',
+                    'StmN2Nein',
+                    'StmN2OhneAw',
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    '3203',  # BfsNrGemeinde
+                    '2000',  # Sperrung
+                    '100',  # Stimmberechtigte
+                    '0',  # StmUngueltig
+                    '1',  # StmLeer
+                    '10',  # StmHGJa
+                    '5',  # StmHGNein
+                    '',  # StmHGOhneAw
+                    '',  # StmN1Ja
+                    '',  # StmN1Nein
+                    '',  # StmN1OhneAw
+                    '',  # StmN2Ja
+                    '',  # StmN2Nein
+                    '',  # StmN2OhneAw
+                ))
+            ))
+        ).encode('utf-8')),
+        'text/plain'
+    )
+    assert not errors
+    result = next(r for r in vote.proposal.results if r.entity_id == 3203)
+    assert result.received is None
+    assert result.cast_ballots == 16  # 10 + 5 + 1 + 0 (fallback)
+
+    # Test with StmAbgegeben
+    errors = import_vote_wabstic(
+        vote, principal, '0', '0',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'Ausmittlungsstand',
+                    'AnzGdePendent'
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    '0',
+                    '0'
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'BfsNrGemeinde',
+                    'Sperrung',
+                    'Stimmberechtigte',
+                    'StmUngueltig',
+                    'StmAbgegeben',
+                    'StmLeer',
+                    'StmHGJa',
+                    'StmHGNein',
+                    'StmHGOhneAw',
+                    'StmN1Ja',
+                    'StmN1Nein',
+                    'StmN1OhneAw',
+                    'StmN2Ja',
+                    'StmN2Nein',
+                    'StmN2OhneAw',
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    '3203',  # BfsNrGemeinde
+                    '2000',  # Sperrung
+                    '100',  # Stimmberechtigte
+                    '0',  # StmUngueltig
+                    '20',  # StmAbgegeben
+                    '1',  # StmLeer
+                    '10',  # StmHGJa
+                    '5',  # StmHGNein
+                    '',  # StmHGOhneAw
+                    '',  # StmN1Ja
+                    '',  # StmN1Nein
+                    '',  # StmN1OhneAw
+                    '',  # StmN2Ja
+                    '',  # StmN2Nein
+                    '',  # StmN2OhneAw
+                ))
+            ))
+        ).encode('utf-8')),
+        'text/plain'
+    )
+    assert not errors
+    result = next(r for r in vote.proposal.results if r.entity_id == 3203)
+    assert result.received == 20
+    assert result.cast_ballots == 20  # Uses stored value

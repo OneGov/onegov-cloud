@@ -101,7 +101,7 @@ def view_my_invoices(
     q = q.order_by(
         BookingPeriod.execution_start,
         BookingPeriodInvoice.id,
-        case(  # type: ignore[call-overload]
+        case(
             (ActivityInvoiceItem.group == 'donation', 2),
             (ActivityInvoiceItem.family != None, 1),
             else_=0
@@ -311,7 +311,7 @@ def handle_donation(
         if donation:
             amount = f'{donation.amount:.2f}'
 
-            for key, value in form.amount.choices:  # type:ignore[misc]
+            for key, value in form.amount.choices:  # type:ignore
                 if key == amount:
                     form.amount.data = amount
                     break

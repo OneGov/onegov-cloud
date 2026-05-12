@@ -25,7 +25,7 @@ from onegov.org.observer import observes
 from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, func, text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.attributes import set_committed_value
 
@@ -44,14 +44,13 @@ if TYPE_CHECKING:
     from onegov.gis import CoordinatesField
     from onegov.org.request import OrgRequest
     from onegov.pay.types import PaymentMethod
-    from sqlalchemy.orm import Query, Session, relationship
+    from sqlalchemy.orm import Mapped, Query, Session
     from typing import type_check_only
-    from typing import TypeAlias
     from uuid import UUID
     from wtforms import EmailField, Field, StringField, TextAreaField
 
-    ExtendedDirectorySearchWidget: TypeAlias = DirectorySearchWidget[
-        'ExtendedDirectoryEntry'
+    type ExtendedDirectorySearchWidget = DirectorySearchWidget[
+        ExtendedDirectoryEntry
     ]
 
     # we extend this manually with all the form extensions
@@ -454,7 +453,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
             form_class: type[DirectoryEntryForm],  # type:ignore[override]
             extensions: Collection[str]
         ) -> type[ExtendedDirectoryEntryForm]: ...
-        entries: relationship[list[ExtendedDirectoryEntry]]  # type: ignore[assignment]
+        entries: Mapped[list[ExtendedDirectoryEntry]]  # type: ignore[assignment]
 
     def form_class_for_submissions(
         self,
@@ -493,8 +492,10 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
         submission_id: UUID
     ) -> DirectorySubmissionAction:
 
+        session = object_session(self)
+        assert session is not None
         return DirectorySubmissionAction(
-            session=object_session(self),
+            session=session,
             directory_id=self.id,
             action=action,
             submission_id=submission_id
@@ -502,6 +503,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
     def remove_old_pending_submissions(self) -> None:
         session = object_session(self)
+        assert session is not None
         horizon = sedate.utcnow() - timedelta(hours=24)
 
         submissions = session.query(FormSubmission).filter(and_(
@@ -523,7 +525,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
 
     if TYPE_CHECKING:
         # technically not enforced, but it should be a given
-        directory: relationship[ExtendedDirectory]
+        directory: Mapped[ExtendedDirectory]
 
     fts_type_title = _('Directory entries')
     fts_public = True
@@ -639,8 +641,32 @@ class ExtendedDirectoryEntryCollection(
     if TYPE_CHECKING:
         directory: ExtendedDirectory
 
-    def query(self) -> Query[ExtendedDirectoryEntry]:
-        query = super().query()
+    def keyword_counts(self) -> dict[str, dict[str, int]]:
+        valid_keywords = tuple(
+            as_internal_id(k)
+            for k in self.directory.configuration.keywords or ()
+        )
+        counts: dict[str, dict[str, int]] = {}
+        for item, count in self.apply_common_filters(
+            self.session.query(
+                func.skeys(ExtendedDirectoryEntry._keywords),
+                func.count(text('1'))
+            )
+            .filter(ExtendedDirectoryEntry.directory_id == self.directory.id)
+            .group_by(func.skeys(ExtendedDirectoryEntry._keywords))
+        ):
+            parts = item.split(':', 1)
+            if len(parts) != 2:
+                # malformed keyword, value pair, for now we just ignore it
+                continue
+
+            keyword, value = parts
+            if keyword not in valid_keywords:
+                continue
+            counts.setdefault(keyword, {})[value] = count
+        return counts
+
+    def apply_common_filters[T](self, query: Query[T]) -> Query[T]:
         available_accesses: tuple[str, ...]
         if self.request is None:
             # assume highest access level or we filter later
@@ -670,3 +696,6 @@ class ExtendedDirectoryEntryCollection(
         elif self.upcoming_only:
             query = query.filter(self.model_class.publication_started == False)
         return query
+
+    def query(self) -> Query[ExtendedDirectoryEntry]:
+        return self.apply_common_filters(super().query())

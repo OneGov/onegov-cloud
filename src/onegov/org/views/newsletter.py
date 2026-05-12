@@ -122,7 +122,7 @@ def newsletter_news_by_access(
     access_levels = ORDERED_ACCESS[ORDERED_ACCESS.index(access):]
 
     query = request.session.query(News)
-    query = query.filter(News.access.in_(access_levels))  # type: ignore
+    query = query.filter(News.access.in_(access_levels))
     query = query.filter(News.published == True)
     query = query.order_by(News.created.desc())
     query = query.options(undefer(News.created))
@@ -237,17 +237,19 @@ def handle_newsletters(
                 recipient.confirmed = True
 
                 if subscribed:
-                    request.success(_((
+                    request.success(_(
                         'Success! We have added ${address} to the list of '
-                        'recipients. Subscribed categories are ${subscribed}.'
-                    ), mapping={
-                        'address': form.address.data,
-                        'subscribed': ', '.join(subscribed)
-                    }))
+                        'recipients. Subscribed categories are ${subscribed}.',
+                        mapping={
+                            'address': form.address.data,
+                            'subscribed': ', '.join(subscribed)
+                        }
+                    ))
                 else:
                     request.success(_(
                         'Success! We have added ${address} to the list of '
-                        'recipients.', mapping={'address': form.address.data}
+                        'recipients.',
+                        mapping={'address': form.address.data}
                     ))
             else:
                 # send out confirmation mail
@@ -271,14 +273,15 @@ def handle_newsletters(
                     },
                 )
 
-                request.success(_((
+                request.success(_(
                     "Success! We have sent a confirmation link to "
                     "${address}, if we didn't send you one already. Your "
-                    "subscribed categories are ${subscribed}."
-                ), mapping={
-                    'address': form.address.data,
-                    'subscribed': ', '.join(subscribed)
-                }))
+                    "subscribed categories are ${subscribed}.",
+                    mapping={
+                        'address': form.address.data,
+                        'subscribed': ', '.join(subscribed)
+                    }
+                ))
 
             return morepath.redirect(layout.homepage_url)
 
@@ -289,10 +292,9 @@ def handle_newsletters(
             form.daily_newsletter) else False
             request.success(
                 request.translate(_(
-                    (
-                        'Success! We have updated your subscribed '
-                        'categories to ${subscribed}.'
-                    ), mapping={
+                    'Success! We have updated your subscribed '
+                    'categories to ${subscribed}.',
+                    mapping={
                         'subscribed': ', '.join(subscribed)
                     }
                 ))

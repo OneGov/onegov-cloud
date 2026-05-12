@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2025-12-10 15:02+0100\n"
+"POT-Creation-Date: 2026-04-23 15:50+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -12,6 +12,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 3.0\n"
+
+msgid "Google Analytics (Global site tag)"
+msgstr "Google Analytics (Global site tag)"
 
 msgid "No active period"
 msgstr "Nessun periodo attivo"
@@ -28,6 +31,8 @@ msgstr "Periodo di prenotazione: ${dates}"
 msgid "Execution: ${dates}"
 msgstr "Evento: ${dates}"
 
+#.
+#. FIXME: This breadcrumb seems wrong for VacationActivity
 msgid "Activities"
 msgstr "Attività"
 
@@ -132,6 +137,12 @@ msgstr "Fatture"
 
 msgid "Wishlist"
 msgstr "Lista dei desideri"
+
+msgid "Contact"
+msgstr "Contatto"
+
+msgid "Photo Albums"
+msgstr "Album fotografico"
 
 msgid "Activity Title"
 msgstr "Titolo dell'attività"
@@ -425,6 +436,8 @@ msgstr "Anteprima"
 msgid "Proposed"
 msgstr "Richiesto"
 
+#.
+#. users like the term 'Published' better
 msgid "Published"
 msgstr "Pubblicato"
 
@@ -877,6 +890,9 @@ msgstr "Me stesso"
 msgid "Organisers with an occasion"
 msgstr "Organizzatori con eventi"
 
+msgid "Organisers without occasions"
+msgstr "Organizzatori senza eventi"
+
 msgid "Users of a given role"
 msgstr "Utente con un ruolo specifico"
 
@@ -885,6 +901,9 @@ msgstr "Utenti con desideri"
 
 msgid "Users with accepted bookings"
 msgstr "Utenti con prenotazioni accettate"
+
+msgid "Users with attendees that have no wishes or bookings"
+msgstr "Utenti con partecipanti senza desideri o prenotazioni"
 
 msgid "Users with unpaid bills"
 msgstr "Utenti con fatture non pagate"
@@ -916,6 +935,9 @@ msgstr "Utenti attivi"
 
 msgid "Inactive users"
 msgstr "Utenti inattivi"
+
+msgid "State"
+msgstr "Stato"
 
 msgid ""
 "I hereby confirm that this message is relevant to the recipients and is not "
@@ -1082,6 +1104,17 @@ msgstr ""
 "successivamente in un periodo con una fase desiderio. In caso di dubbio, è "
 "meglio creare un periodo con una fase desiderio e poi chiuderlo manualmente."
 
+msgid "With group codes"
+msgstr "Con codici gruppo"
+
+msgid ""
+"Attendees can get group codes via the link \"invite a companion\" in their "
+"booking. Bookings with a group code are preferred in the matching process."
+msgstr ""
+"I partecipanti possono ottenere codici gruppo tramite il link "
+"\"Invitare gli amici\" nella loro prenotazione. Le prenotazioni con un "
+"codice gruppo sono preferite nel processo di assegnazione."
+
 msgid "With billing"
 msgstr "Con fatturazione"
 
@@ -1120,6 +1153,23 @@ msgstr "X giorni prima di ogni evento"
 
 msgid "X Days Before"
 msgstr "X giorni prima"
+
+msgid "Allow bookings after the bills have been created."
+msgstr "Permettere le prenotazioni post-fatturazione."
+
+msgid ""
+"By default, only admins can create bookings after the billing has been "
+"confirmed. With this setting, every user can create new bookings after "
+"confirmation and before the deadline. Booking costs incurred after "
+"confirmation will be added to the existing bill."
+msgstr ""
+"Normalmente solo gli amministratori possono prenotare dopo la fatturazione. "
+"Con questa impostazione, gli utenti regolari possono ancora prenotare dopo "
+"la fatturazione. I costi di queste prenotazioni vengono aggiunti alla "
+"fattura esistente. < br>< br>Quando si attiva questa opzione, si raccomanda "
+"di permettere agli amministratori di cancellare solo le prenotazioni "
+"confermate sotto \"Chiusura cancellazione\", poiché le cancellazioni non "
+"vengono automaticamente detratte dalla fattura esistente."
 
 msgid "Execution Start"
 msgstr "Inizio evento"
@@ -1192,23 +1242,6 @@ msgstr "Sì"
 
 msgid "No"
 msgstr "No"
-
-msgid "Allow bookings after the bills have been created."
-msgstr "Permettere le prenotazioni post-fatturazione."
-
-msgid ""
-"By default, only admins can create bookings after the billing has been "
-"confirmed. With this setting, every user can create new bookings after "
-"confirmation and before the deadline. Booking costs incurred after "
-"confirmation will be added to the existing bill."
-msgstr ""
-"Normalmente solo gli amministratori possono prenotare dopo la fatturazione. "
-"Con questa impostazione, gli utenti regolari possono ancora prenotare dopo "
-"la fatturazione. I costi di queste prenotazioni vengono aggiunti alla "
-"fattura esistente. < br>< br>Quando si attiva questa opzione, si raccomanda "
-"di permettere agli amministratori di cancellare solo le prenotazioni "
-"confermate sotto \"Chiusura cancellazione\", poiché le cancellazioni non "
-"vengono automaticamente detratte dalla fattura esistente."
 
 msgid "Allow members to cancel confirmed bookings"
 msgstr "Permettere ai membri di cancellare le prenotazioni confermate"
@@ -1507,6 +1540,9 @@ msgstr "Registrazione come aiutante"
 
 msgid "Sort"
 msgstr "Tipo"
+
+msgid "Change username"
+msgstr "Cambiare nome utente"
 
 msgid "Delete"
 msgstr "Cancellare"
@@ -1841,14 +1877,19 @@ msgstr "Gratuito"
 msgid "This occasion does not have enough attendees yet."
 msgstr "Questo evento non ha ancora abbastanza partecipanti."
 
+msgid "carpool"
+msgstr "condivisione dell'auto"
+
+msgid "The following persons can be asked to form carpools."
+msgstr ""
+"Le seguenti persone possono essere contattate per richieste di tragitti "
+"condivisi."
+
 msgid "Parent"
 msgstr "Genitore"
 
 msgid "Children"
 msgstr "Bambini"
-
-msgid "Contact"
-msgstr "Contatto"
 
 msgid "E-Mail ${name}"
 msgstr "Scrivere a ${name}"
@@ -2255,9 +2296,6 @@ msgstr ""
 msgid "Years"
 msgstr "Anni"
 
-msgid "State"
-msgstr "Stato"
-
 msgid "Automatic Matching"
 msgstr "Assegnazione automatica"
 
@@ -2465,6 +2503,7 @@ msgstr "Organizzatore"
 msgid "Only by privileged users"
 msgstr "Riservato agli amministratori"
 
+#. XXX hacky way of showing "Termine" instead of "Opening Hours"
 msgid "Opening Hours"
 msgstr "Date"
 
@@ -2650,6 +2689,7 @@ msgstr ""
 "L'attendente non può essere cancellato perché ci sono prenotazioni esistenti "
 "nel periodo attuale."
 
+#. type:ignore[attr-defined]
 msgid "The user account must be opened by a parent or guardian of full age."
 msgstr ""
 "L'account utente deve essere aperto da una persona maggiorenne con autorità "
@@ -2749,6 +2789,7 @@ msgstr "${count} I pagamenti sono stati importati"
 msgid "No payments could be imported"
 msgstr "Nessun pagamento può essere importato"
 
+#. FIXME: Should we evict this from the browser session first?
 msgid "The submitted xml data could not be decoded"
 msgstr "I dati inviati non possono essere decodificati"
 
@@ -3260,6 +3301,9 @@ msgstr "Prenotazioni ${period}"
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
 
+msgid "Admin accounts cannot be deleted."
+msgstr "Gli account amministratore non possono essere cancellati."
+
 msgid ""
 "The user cannot be deleted because they are organizers of existing "
 "activities."
@@ -3273,8 +3317,8 @@ msgid ""
 "bookings first."
 msgstr ""
 "L'account non può essere cancellato perché ci sono partecipanti con "
-"prenotazioni esistenti nel periodo corrente. Attendere la fine del periodo "
-"o cancellare prima le prenotazioni."
+"prenotazioni esistenti nel periodo corrente. Attendere la fine del periodo o "
+"cancellare prima le prenotazioni."
 
 msgid ""
 "The account cannot be deleted because there are unpaid invoices associated "
@@ -3288,9 +3332,32 @@ msgstr ""
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} è stato cancellato, inclusi tutti i dati associati."
 
-msgid "Could not delete account; try again or contact an administrator."
-msgstr ""
-"Impossibile cancellare l'account; riprovi o contatti un amministratore."
+#~ msgid ""
+#~ "Attendees can get group codes via the button \"invite a companion\". "
+#~ "Bookings with a group code are preferred in the matching process."
+#~ msgstr ""
+#~ "I partecipanti possono ottenere codici gruppo tramite il pulsante "
+#~ "\"Invitare gli amici\". Le prenotazioni con un codice gruppo sono "
+#~ "preferite nel processo di assegnazione."
+
+#~ msgid ""
+#~ "Bookings can get group codes via the button \"invite a \"companion\". "
+#~ "Bookings with a group code are preferred in the matching process."
+#~ msgstr ""
+#~ "Le prenotazioni possono ricevere codici gruppo tramite il pulsante "
+#~ "\"invitare un \"compagno\". Le prenotazioni con un codice gruppo sono "
+#~ "preferite nel processo di assegnazione."
+
+#~ msgid ""
+#~ "Whether the period should support group codes. Bookings with a group code "
+#~ "are preferred in the matching process."
+#~ msgstr ""
+#~ "Se il periodo supporta i codici gruppo. Le prenotazioni con un codice "
+#~ "gruppo sono preferite durante l'assegnazione."
+
+#~ msgid "Could not delete account; try again or contact an administrator."
+#~ msgstr ""
+#~ "Impossibile cancellare l'account; riprovi o contatti un amministratore."
 
 #~ msgid "Parents can see the contacts of other parents in the same activity"
 #~ msgstr ""

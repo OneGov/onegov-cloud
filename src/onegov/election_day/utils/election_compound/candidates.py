@@ -43,7 +43,7 @@ def get_elected_candidates(
 
     election_ids = [election.id for election in election_compound.elections]
 
-    elected = session.query(
+    elected: Query[ElectedCandidateRow] = session.query(  # type: ignore[assignment]
         Candidate.family_name,
         Candidate.first_name,
         Candidate.party,
@@ -74,6 +74,7 @@ def get_candidate_statistics(
 
     if elected_candidates is None:
         session = object_session(election_compound)
+        assert session is not None
         elected_candidates = get_elected_candidates(election_compound, session)
 
     year = election_compound.date.year

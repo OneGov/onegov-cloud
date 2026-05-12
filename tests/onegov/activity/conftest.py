@@ -27,17 +27,13 @@ from sqlalchemy import inspect
 from tests.shared.scenario import BaseScenario
 
 
-from typing import overload, Any, Generic, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from sqlalchemy.orm import Session
 
-    ActivityT = TypeVar('ActivityT', bound=Activity, default=Activity)
-else:
-    ActivityT = TypeVar('ActivityT', bound=Activity)
 
-
-class Collections(Generic[ActivityT]):
+class Collections[ActivityT: Activity = Activity]:
 
     @overload
     def __init__(
@@ -82,7 +78,7 @@ class Collections(Generic[ActivityT]):
         return PaymentProviderCollection(self.session)
 
 
-class Scenario(BaseScenario, Generic[ActivityT]):
+class Scenario[ActivityT: Activity = Activity](BaseScenario):
     """ Helper class to ease the setup of testing fixtures for Feriennet.
 
     Feriennet has often repetitive steps to get to a test scenario. A period
@@ -139,7 +135,7 @@ class Scenario(BaseScenario, Generic[ActivityT]):
     ) -> None:
         super().__init__(session, test_password)
         self.activity_model = activity_model
-        self.activity_type = inspect(activity_model).polymorphic_identity
+        self.activity_type = inspect(activity_model).polymorphic_identity  # type: ignore[assignment]
 
         self.faker = Faker()
 
@@ -255,8 +251,9 @@ class Scenario(BaseScenario, Generic[ActivityT]):
         user.data['email'] = email if email else ''
 
         if complete_profile:
-            user.realname = (
-                f'{self.faker.first_name()}\u00A0{self.faker.last_name()}')
+            if user.realname is None:
+                user.realname = (f'{self.faker.first_name()}'
+                                f'\u00A0{self.faker.last_name()}')
             user.data = user.data or {}
             user.data['salutation'] = self.faker.random_element(('mr', 'ms'))
             user.data['address'] = self.faker.address()

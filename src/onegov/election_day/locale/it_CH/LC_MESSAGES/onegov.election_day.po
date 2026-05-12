@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-10 16:58+0100\n"
+"POT-Creation-Date: 2026-03-25 09:38+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -24,9 +24,15 @@ msgstr "Nuovi risultati disponibili"
 msgid "New results are available on ${url}"
 msgstr "Nuovi risultati disponibili su ${url}"
 
+#. even though this is technically a transactional e-mail we send it as
+#. marketing, since the actual subscription is sent as a marketing e-mail as
+#. well
 msgid "Please confirm your email"
 msgstr "La preghiamo di confermare il Suo indirizzo e-mail"
 
+#. even though this is technically a transactional e-mail we send it as
+#. marketing, since the actual subscription is sent as a marketing e-mail as
+#. well
 msgid "Please confirm your unsubscription"
 msgstr "La preghiamo di confermare la disiscrizione"
 
@@ -105,11 +111,23 @@ msgstr "Colore non valido: ${col}"
 msgid "File not supported"
 msgstr "Formato file non supportato"
 
+#, python-format
+msgid "Cannot import election information. Year ${year} does not exist."
+msgstr ""
+"Non è possibile importare le informazioni sull'elezione. L'anno ${year} non "
+"esiste."
+
 msgid "Domain not supported"
 msgstr "Livello non supportato"
 
 msgid "Changing types is not supported"
 msgstr "l cambiamento di tipi non è supportato"
+
+#, python-format
+msgid "Cannot import election results. Year ${year} does not exist."
+msgstr ""
+"Non è possibile importare i risultati dell'elezione. L'anno ${year} non "
+"esiste."
 
 msgid "Election does not exist"
 msgstr "L'elezione non esiste"
@@ -207,6 +225,10 @@ msgstr "Nessun risultato di partito per l'anno ${year}"
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids e id non coerente"
 
+#, python-format
+msgid "Cannot import votes. Year ${year} does not exist."
+msgstr "Non è possibile importare i voti. L'anno ${year} non esiste."
+
 msgid "Vote type not supported"
 msgstr "Tipo di votazione non supportato"
 
@@ -251,6 +273,8 @@ msgstr "Risultato elettorale"
 msgid "Accepted"
 msgstr "Accolto"
 
+#.
+#. Answer
 msgid "Rejected"
 msgstr "Respinto"
 
@@ -688,6 +712,8 @@ msgstr "Candidati"
 msgid "Parties"
 msgstr "Parti"
 
+#.
+#. Statistics
 msgid "Election statistics"
 msgstr "Statistiche delle elezioni"
 
@@ -758,12 +784,17 @@ msgstr "Iscritti"
 msgid "Mappings"
 msgstr "Mapping"
 
+#.
+#. Statistics
 msgid "Statistics"
 msgstr "Statistiche"
 
 msgid "Proposal"
 msgstr "Oggetto della votazione"
 
+#.
+#. type:ignore
+#. type:ignore
 msgid "Tie-Breaker"
 msgstr "Domanda risolutiva"
 
@@ -803,9 +834,6 @@ msgstr "Controprogetto %"
 #, python-format
 msgid "Regional (${on})"
 msgstr "Regionale (${on})"
-
-msgid "Other"
-msgstr "Altro"
 
 msgid "district_label_bl"
 msgstr "Distretto elettorale"
@@ -1229,6 +1257,8 @@ msgstr "Iniziativa e controprogetto sono state rifiutate"
 msgid "Proposal accepted"
 msgstr "Iniziativa accettata"
 
+#.
+#. type:ignore[attr-defined]
 msgid "Tie breaker in favor of the proposal"
 msgstr "Spareggio a favore della iniziativa"
 
@@ -1401,6 +1431,9 @@ msgstr "Titolo"
 msgid "New election"
 msgstr "Nuova elezione"
 
+msgid "Other"
+msgstr "Altro"
+
 msgid "New screen"
 msgstr "Nuova schermata"
 
@@ -1515,6 +1548,7 @@ msgstr "Risultati prov."
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "Risultati provvisori: ${counted} de ${total} ${entities}"
 
+#. type:ignore
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"
 
@@ -1526,12 +1560,13 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an account exists "
 "for this email address."
 msgstr ""
-"Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-"${email} (se si tratta di un account esistente)."
+"Il collegamento per reimpostare la password è stato inviato all'indirizzo $"
+"{email} (se si tratta di un account esistente)."
 
 msgid "Password changed."
 msgstr "La password è stata modificata."
 
+#. type:ignore[attr-defined]
 msgid "Wrong username or password reset link not valid any more."
 msgstr ""
 "Il collegamento per reimpostare il nuome utente o la password errati non è "
@@ -1805,40 +1840,40 @@ msgid ""
 "Final results of the cantonal vote \"${title}\", ${date}, ${principal}, "
 "broken down by municipalities."
 msgstr ""
-"Risultati finali della votazione cantonale \"${title}\", ${date}, "
-"${principal}, suddivisi per municipalit."
+"Risultati finali della votazione cantonale \"${title}\", ${date}, $"
+"{principal}, suddivisi per municipalit."
 
 #, python-format
 msgid ""
 "Final results of the federal vote \"${title}\", ${date}, ${principal}, "
 "broken down by municipalities."
 msgstr ""
-"Risultati finali della votazione federale \"${title}\", ${date}, "
-"${principal}, suddivisi per municipalit."
+"Risultati finali della votazione federale \"${title}\", ${date}, $"
+"{principal}, suddivisi per municipalit."
 
 #, python-format
 msgid ""
 "Final results of the cantonal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Risultati finali della elezione cantonale \"${title}\", ${date}, "
-"${principal}, suddivisi per municipalit e candidati."
+"Risultati finali della elezione cantonale \"${title}\", ${date}, $"
+"{principal}, suddivisi per municipalit e candidati."
 
 #, python-format
 msgid ""
 "Final results of the regional election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Risultati finali della elezione regionale \"${title}\", ${date}, "
-"${principal}, suddivisi per municipalit e candidati."
+"Risultati finali della elezione regionale \"${title}\", ${date}, $"
+"{principal}, suddivisi per municipalit e candidati."
 
 #, python-format
 msgid ""
 "Final results of the federal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Risultati finali della elezione federale \"${title}\", ${date}, "
-"${principal}, suddivisi per municipalit e candidati."
+"Risultati finali della elezione federale \"${title}\", ${date}, $"
+"{principal}, suddivisi per municipalit e candidati."
 
 msgid ""
 "You will receive an email as soon as new results have been published. You "
@@ -1893,6 +1928,13 @@ msgstr ""
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'anno ${year} non viene ancora supportato"
+
+msgid ""
+"A file was submitted instead of a string. Use --form \"type=xml\" instead of "
+"--form \"type=@file\""
+msgstr ""
+"È stato inviato un file anziché una stringa. Utilizza --form \"type=xml\" "
+"invece di --form \"type=@file\""
 
 msgid "Invalid id"
 msgstr "ID non valido"

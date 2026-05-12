@@ -9,13 +9,13 @@ from __future__ import annotations
 from abc import abstractmethod, ABCMeta
 
 
-from typing import Any, ClassVar, Self, TypeAlias, TYPE_CHECKING
+from typing import Any, ClassVar, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from markupsafe import Markup
 
     from .types import RenderData
 
-    AnyRequest: TypeAlias = Any
+    type AnyRequest = Any
 
 
 class AnalyticsProvider(metaclass=ABCMeta):

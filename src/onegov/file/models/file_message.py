@@ -16,7 +16,9 @@ class FileMessage(Message):
 
     @classmethod
     def log_signature(cls, file: File, signee: str) -> None:
-        cls.bound_messages(object_session(file)).add(
+        session = object_session(file)
+        assert session is not None
+        cls.bound_messages(session).add(
             channel_id=file.id,
             owner=signee,
             meta={
@@ -32,7 +34,9 @@ class FileMessage(Message):
         file: File,
         username: str | None
     ) -> None:
-        cls.bound_messages(object_session(file)).add(
+        session = object_session(file)
+        assert session is not None
+        cls.bound_messages(session).add(
             channel_id=file.id,
             owner=username,
             meta={

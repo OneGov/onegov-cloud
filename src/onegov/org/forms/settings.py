@@ -81,8 +81,7 @@ ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 COLOR_RE = re.compile(r'^#?(?:[0-9a-fA-F]{3}){1,2}$')
 
 
-class GeneralSettingsForm(Form):
-    """ Defines the settings form for onegov org. """
+class OrganisationProfileSettingsForm(Form):
 
     if TYPE_CHECKING:
         request: OrgRequest
@@ -90,6 +89,26 @@ class GeneralSettingsForm(Form):
     name = StringField(
         label=_('Name'),
         validators=[InputRequired()])
+
+    reply_to = EmailField(
+        _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
+        description=_('Replies to automated e-mails go to this address.'))
+
+    locales = RadioField(
+        label=_('Languages'),
+        choices=(
+            ('de_CH', _('German')),
+            ('fr_CH', _('French')),
+            ('it_CH', _('Italian'))
+        ),
+        validators=[InputRequired()]
+    )
+
+
+class AppearanceSettingsForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     logo_url = StringField(
         label=_('Logo'),
@@ -101,9 +120,37 @@ class GeneralSettingsForm(Form):
         description=_('URL pointing to the logo'),
         render_kw={'class_': 'image-url'})
 
-    reply_to = EmailField(
-        _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
-        description=_('Replies to automated e-mails go to this address.'))
+    favicon_win_url = StringField(
+        label=_('Icon 16x16 PNG (Windows)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_mac_url = StringField(
+        label=_('Icon 32x32 PNG (Mac)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_apple_touch_url = StringField(
+        label=_('Icon 57x57 PNG (iPhone, iPod, iPad)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    favicon_pinned_tab_safari_url = StringField(
+        label=_('Icon SVG 20x20 (Safari)'),
+        description=_('URL pointing to the icon'),
+        render_kw={'class_': 'image-url'},
+    )
+
+    og_logo_default = StringField(
+        label=_('Image'),
+        description=_('Default social media preview image for rich link '
+                      'previews. Optimal size is 1200:630 px.'),
+        fieldset='OpenGraph',
+        render_kw={'class_': 'image-url'}
+    )
 
     primary_color = ColorField(
         label=_('Primary Color'))
@@ -111,16 +158,6 @@ class GeneralSettingsForm(Form):
     font_family_sans_serif = ChosenSelectField(
         label=_('Default Font Family'),
         choices=[],
-        validators=[InputRequired()]
-    )
-
-    locales = RadioField(
-        label=_('Languages'),
-        choices=(
-            ('de_CH', _('German')),
-            ('fr_CH', _('French')),
-            ('it_CH', _('Italian'))
-        ),
         validators=[InputRequired()]
     )
 
@@ -470,43 +507,6 @@ class FooterSettingsForm(Form):
         return None
 
 
-class SocialMediaSettingsForm(Form):
-    og_logo_default = StringField(
-        label=_('Image'),
-        description=_('Default social media preview image for rich link '
-                      'previews. Optimal size is 1200:630 px.'),
-        fieldset='OpenGraph',
-        render_kw={'class_': 'image-url'}
-    )
-
-
-class FaviconSettingsForm(Form):
-
-    favicon_win_url = StringField(
-        label=_('Icon 16x16 PNG (Windows)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_mac_url = StringField(
-        label=_('Icon 32x32 PNG (Mac)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_apple_touch_url = StringField(
-        label=_('Icon 57x57 PNG (iPhone, iPod, iPad)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-    favicon_pinned_tab_safari_url = StringField(
-        label=_('Icon SVG 20x20 (Safari)'),
-        description=_('URL pointing to the icon'),
-        render_kw={'class_': 'image-url'},
-    )
-
-
 class LinksSettingsForm(Form):
     disable_page_refs = BooleanField(
         label=_('Disable page references'),
@@ -751,7 +751,7 @@ class HomepageSettingsForm(Form):
                 raise ValidationError(correct_msg) from exception
 
 
-class ModuleSettingsForm(Form):
+class AccessSettingsForm(Form):
 
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
@@ -785,6 +785,11 @@ class MapSettingsForm(Form):
 
     default_map_view = CoordinatesField(
         label=_('The default map view. This should show the whole town'),
+        description=_("Wherever there's an option to choose a location on a "
+                      "map, this will be the default view. You can change the "
+                      "view by dragging the map and zooming in or out. The "
+                      "coordinates of the center of the map and the zoom "
+                      "level will then be saved as the default view."),
         render_kw={
             'data-map-type': 'crosshair'
         })
@@ -895,7 +900,7 @@ class AnalyticsSettingsForm(Form):
 
             # NOTE: In order to get an OR we need to use the AND
             #       of all the choices it can't be instead.
-            dependency = FieldDependency(*(  # type: ignore[misc]
+            dependency = FieldDependency(*(  # type: ignore
                 arg
                 for name, _ in choices
                 if name not in providers
@@ -1468,11 +1473,6 @@ class OrgTicketSettingsForm(Form):
 
 class NewsletterSettingsForm(Form):
 
-    show_newsletter = BooleanField(
-        label=_('Enable newsletter'),
-        default=False
-    )
-
     secret_content_allowed = BooleanField(
         label=_('Allow secret content in newsletter'),
         default=False
@@ -1576,9 +1576,12 @@ class NewsletterSettingsForm(Form):
                     for topic, sub_topic in item.items():
                         if not isinstance(sub_topic, list):
                             self.newsletter_categories.errors.append(
-                                _(f'Invalid format. Please define '
-                                  f"subtopic(s) for '{topic}' "
-                                  f"or remove the ':'.")
+                                _(
+                                    "Invalid format. Please define "
+                                    "subtopic(s) for '${topic}' "
+                                    "or remove the ':'.",
+                                    mapping={'topic': topic}
+                                )
                             )
                             return False
 
@@ -1892,24 +1895,28 @@ class KabaSettingsForm(Form):
 
             if site_id in seen:
                 assert isinstance(self.kaba_configurations.errors, list)
-                self.kaba_configurations.errors.append(_(
+                msg = _(
                     'Duplicate site ID ${site_id}',
                     mapping={'site_id': site_id}
-                ))
+                )
+                self.kaba_configurations.errors.append(
+                    self.kaba_configurations.gettext(msg)
+                )
                 return False
 
             seen.add(site_id)
 
             if not field.form.api_key.data:
                 assert isinstance(self.kaba_configurations.errors, list)
+                msg = _(
+                    '${field} for site ID ${site_id} is required',
+                    mapping={
+                        'field': 'API_KEY',
+                        'site_id': field.form.site_id.data
+                    }
+                )
                 self.kaba_configurations.errors.append(
-                    self.kaba_configurations.gettext(_(
-                        '${field} for site ID ${site_id} is required',
-                        mapping={
-                            'field': 'API_KEY',
-                            'site_id': field.form.site_id.data
-                        }
-                    ))
+                    self.kaba_configurations.gettext(msg)
                 )
                 return False
 
@@ -1917,14 +1924,15 @@ class KabaSettingsForm(Form):
                 api_secret = field.form.api_secret.data
             elif (cfg := self.model.get_kaba_configuration(site_id)) is None:
                 assert isinstance(self.kaba_configurations.errors, list)
+                msg = _(
+                    '${field} for site ID ${site_id} is required',
+                    mapping={
+                        'field': 'API_SECRET',
+                        'site_id': field.form.site_id.data
+                    }
+                )
                 self.kaba_configurations.errors.append(
-                    self.kaba_configurations.gettext(_(
-                        '${field} for site ID ${site_id} is required',
-                        mapping={
-                            'field': 'API_SECRET',
-                            'site_id': field.form.site_id.data
-                        }
-                    ))
+                    self.kaba_configurations.gettext(msg)
                 )
                 return False
             elif cfg.api_key == field.form.api_key.data:
@@ -1944,11 +1952,13 @@ class KabaSettingsForm(Form):
                 client.site_name()
             except KabaApiError:
                 assert isinstance(self.kaba_configurations.errors, list)
-                error = _(
+                msg = _(
                     'Invalid credentials for site ID ${site_id}',
                     mapping={'site_id': site_id}
                 )
-                self.kaba_configurations.errors.append(error)
+                self.kaba_configurations.errors.append(
+                    self.kaba_configurations.gettext(msg)
+                )
                 return False
             except Exception:
                 self.request.alert(
@@ -2381,9 +2391,19 @@ class VATSettingsForm(Form):
     )
 
 
-class CitizenLoginSettingsForm(Form):
+class ModuleActivationSettingsForm(Form):
+    show_newsletter = BooleanField(
+        label=_('Enable newsletter'),
+        description=_('Enables the newsletter module for admins and show a '
+                      '"Subscribe to newsletter" option for the users on the '
+                      'news page.'),
+        default=False
+    )
 
     citizen_login_enabled = BooleanField(
         label=_('Enable Citizen Login'),
+        description=_('Enables the citizen login. This will show a "citizen '
+        'login" link in the footer, where users can view their reservations '
+        'using their email-address.'),
         default=False,
     )

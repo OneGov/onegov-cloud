@@ -434,7 +434,7 @@ def test_find_your_spot_form_single_room() -> None:
     assert form.start_time.data == time(8, 0)
     assert form.end_time.data == time(9, 0)
     assert not form.rooms
-    assert 'for_every_room' not in (  # type: ignore[misc]
+    assert 'for_every_room' not in (  # type: ignore
         value
         for value, _label in form.auto_reserve_available_slots.choices
     )
@@ -962,7 +962,7 @@ def test_ticket_assignment_form(session: Session) -> None:
     form.request = request
     form.on_request()
 
-    assert sorted(name for id_, name in form.user.choices) == ['a', 'e']  # type: ignore[misc]
+    assert sorted(name for id_, name in form.user.choices) == ['a', 'e']  # type: ignore
     assert form.username == 'a'
 
 
@@ -973,7 +973,6 @@ def test_price_submission_vat_not_set(client: Client[TestOrgApp]) -> None:
     expected_values = [
         'abbafan@swisscom.ch',
         '1',
-        'Stück(e)',
         'Totalbetrag',
         '128.00 CHF',
     ]
@@ -1017,7 +1016,6 @@ def test_price_submission_vat_set(client: Client[TestOrgApp]) -> None:
     expected_values = [
         'black@bear.ch',
         '1',
-        'Stück(e)',
         'Totalbetrag',
         '99.00 CHF'
     ]

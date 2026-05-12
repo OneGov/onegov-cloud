@@ -61,6 +61,7 @@ class FeriennetApp(TownApp):
                 BookingPeriod.active,
                 BookingPeriod.confirmed,
                 BookingPeriod.confirmable,
+                BookingPeriod.with_group_code,
                 BookingPeriod.finalized,
                 BookingPeriod.finalizable,
                 BookingPeriod.archived,
@@ -94,12 +95,12 @@ class FeriennetApp(TownApp):
     @orm_cached(policy='on-table-change:users')
     def user_titles_by_name(self) -> dict[str, str]:
         return dict(UserCollection(self.session()).query().with_entities(
-            User.username, User.title))
+            User.username, User.title).tuples())
 
     @orm_cached(policy='on-table-change:users')
     def user_ids_by_name(self) -> dict[str | None, UUID]:
         return dict(UserCollection(self.session()).query().with_entities(
-            User.username, User.id))
+            User.username, User.id).tuples())
 
     @cached_property
     def sponsors(self) -> list[Sponsor]:
@@ -359,4 +360,11 @@ def feriennet_content_security_policy() -> ContentSecurityPolicy:
     # NOTE: This one may be out of date, but until somebody complains
     #       we won't worry about it.
     policy.connect_src.add('https://stats.g.doubleclick.net')
+
+    policy.script_src.add('https://*.projuventute.ch')
+    policy.script_src.add('https://*.googletagmanager.com')
+    policy.script_src.add('https://*.analytics.google.com')
+    policy.script_src.add('https://*.google-analytics.com')
+    policy.script_src.add('https://*.usercentrics.eu')
+    policy.script_src.add('https://stats.g.doubleclick.net')
     return policy

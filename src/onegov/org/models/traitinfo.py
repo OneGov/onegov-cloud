@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.core.elements import Link as BaseLink
     from onegov.form import Form
     from onegov.org.request import OrgRequest
-    from sqlalchemy import Column
+    from sqlalchemy.orm import Mapped
 
 
 #: Contains the messages that differ for each trait (the handling of all traits
@@ -81,8 +81,8 @@ class TraitInfo:
 
     if TYPE_CHECKING:
         # forward declare Page attributes we rely on
-        title: Column[str]
-        meta: Column[dict[str, Any]]
+        title: Mapped[str]
+        meta: Mapped[dict[str, Any]]
 
         @property
         def editable(self) -> bool: ...

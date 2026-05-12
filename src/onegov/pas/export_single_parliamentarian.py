@@ -6,11 +6,19 @@ from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
 )
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
 from onegov.pas.custom import get_current_rate_set
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.attendence import TYPES
+from onegov.pas.models.presidential_allowance import (
+    LOHNART_ALLOWANCE_TEXT,
+    PresidentialAllowance,
+)
 from onegov.pas.utils import is_commission_president
 from onegov.pas.utils import format_swiss_number
+from onegov.pas.utils import round_to_five_rappen
 from onegov.core.utils import module_path
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
@@ -70,27 +78,60 @@ def generate_parliamentarian_settlement_pdf(
     )
     with open(css_path) as f:
         css = CSS(string=f.read())
+    logo_path = module_path('onegov.agency', 'static/logos/canton-zg-bw.svg')
+    logo_css = CSS(
+        string=f"""
+        @page {{
+            @top-left {{
+                content: url('file://{logo_path}');
+                width: 3cm;
+            }}
+        }}
+    """
+    )
 
     data = _get_parliamentarian_settlement_data(
         settlement_run, request, parliamentarian, rate_set
+    )
+    allowances = (
+        PresidentialAllowanceCollection(
+            session,
+            settlement_run_id=settlement_run.id,
+        )
+        .query()
+        .filter(PresidentialAllowance.parliamentarian_id == parliamentarian.id)
+        .all()
+    )
+    cola_multiplier = Decimal(
+        str(1 + (rate_set.cost_of_living_adjustment / 100))
+    )
+    allowance_total = (
+        Decimal(sum(a.amount for a in allowances)) * cola_multiplier
+    )
+    full_name = (
+        f'{parliamentarian.first_name} '
+        f'{parliamentarian.last_name}'
     )
     html = f"""
         <!DOCTYPE html>
         <html>
         <head><meta charset="utf-8"></head>
         <body>
-            <div class="first-line">
-                <p>Staatskanzlei, Seestrasse 2, 6300 Zug</p><br>
-            </div>
-            <div class="address">
-                {parliamentarian.formal_greeting}<br>
-                {parliamentarian.shipping_address}<br>
-                {parliamentarian.shipping_address_zip_code}
-                {parliamentarian.shipping_address_city}
+            <div class="address-block">
+                <div class="first-line">
+                    Staatskanzlei, Seestrasse 2, 6300 Zug
+                </div>
+                <div class="address">
+                    {parliamentarian.formal_greeting.split()[0]}<br>
+                    {full_name}<br>
+                    {parliamentarian.shipping_address}<br>
+                    {parliamentarian.shipping_address_zip_code}
+                    {parliamentarian.shipping_address_city}
+                </div>
             </div>
 
             <div class="date">
-                Zug {settlement_run.end.strftime('%d.%m.%Y')}
+                Zug, {settlement_run.end.strftime('%d.%m.%Y')}
             </div>
 
             <h2 class="title">
@@ -123,13 +164,27 @@ def generate_parliamentarian_settlement_pdf(
                 <td>{entry.date.strftime('%d.%m.%Y')}</td>
                 <td>{entry.type_description}</td>
                 <td class="numeric">{format_swiss_number(
-                    entry.calculated_value)}</td>
-                <td class="numeric">{format_swiss_number(entry.base_rate)}</td>
+                    round_to_five_rappen(entry.calculated_value))}</td>
+                <td class="numeric">{format_swiss_number(
+                    round_to_five_rappen(entry.base_rate))}</td>
             </tr>
         """
         if entry.type_description not in ['Total', 'Auszahlung']:
             type_totals[entry.attendance_type]['entries'].append(entry)
             type_totals[entry.attendance_type]['total'] += entry.base_rate
+
+    for allowance in allowances:
+        amount = Decimal(str(allowance.amount))
+        html += f"""
+            <tr>
+                <td>{settlement_run.end.strftime('%d.%m.%Y')}</td>
+                <td>{LOHNART_ALLOWANCE_TEXT}</td>
+                <td class="numeric">{format_swiss_number(
+                    round_to_five_rappen(amount))}</td>
+                <td class="numeric">{format_swiss_number(
+                    round_to_five_rappen(amount))}</td>
+            </tr>
+        """
 
     html += """
         </tbody>
@@ -163,25 +218,41 @@ def generate_parliamentarian_settlement_pdf(
             entry.calculated_value
             for entry in type_totals[type_key]['entries']
         )
+        total_value_rounded = round_to_five_rappen(total_value)
         total_value_str = (
-            format_swiss_number(total_value) if type_key != 'expenses' else '-'
+            format_swiss_number(total_value_rounded)
+            if type_key != 'expenses'
+            else '-'
         )
         base_total = type_totals[type_key]['total']
-        # Apply cost of living adjustment
         total_chf = base_total * cola_multiplier
-        total += total_chf
+        total_chf_rounded = round_to_five_rappen(total_chf)
+        total += total_chf_rounded
         html += f"""
             <tr>
                 <td>{type_name}</td>
                 <td class="numeric">{total_value_str}</td>
-                <td class="numeric">{format_swiss_number(total_chf)}</td>
+                <td class="numeric">{format_swiss_number(
+                    total_chf_rounded)}</td>
             </tr>
         """
+    if allowance_total:
+        allowance_total_rounded = round_to_five_rappen(allowance_total)
+        total += allowance_total_rounded
+        html += f"""
+            <tr>
+                <td>Total {LOHNART_ALLOWANCE_TEXT}</td>
+                <td class="numeric">-</td>
+                <td class="numeric">{format_swiss_number(
+                    allowance_total_rounded)}</td>
+            </tr>
+        """
+
     html += f"""
             <tr class="merge-cells">
                 <td>Auszahlung</td>
-                <td colspan="2" class="numeric">{format_swiss_number(total)}
-                </td>
+                <td colspan="2" class="numeric">{format_swiss_number(
+                    total)}</td>
             </tr>
         </tbody>
     </table>
@@ -189,7 +260,7 @@ def generate_parliamentarian_settlement_pdf(
     </html>
     """
     return HTML(string=html).write_pdf(
-        stylesheets=[css], font_config=font_config
+        stylesheets=[css, logo_css], font_config=font_config
     )
 
 

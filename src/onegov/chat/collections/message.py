@@ -5,17 +5,14 @@ from onegov.core.collection import GenericCollection
 from sqlalchemy import desc
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
     from onegov.chat.models import MessageFile
     from sqlalchemy.orm import Query, Session
 
 
-_M = TypeVar('_M', bound=Message)
-
-
-class MessageCollection(GenericCollection[_M]):
+class MessageCollection[MessageT: Message](GenericCollection[MessageT]):
 
     @overload
     def __init__(
@@ -62,7 +59,7 @@ class MessageCollection(GenericCollection[_M]):
         assert self.load in ('older-first', 'newer-first')
 
     @property
-    def model_class(self) -> type[_M]:
+    def model_class(self) -> type[MessageT]:
         if not isinstance(self.type, str):
             return Message  # type:ignore[return-value]
         return Message.get_polymorphic_class(self.type, Message)  # type:ignore
@@ -80,10 +77,10 @@ class MessageCollection(GenericCollection[_M]):
         updated: datetime | None = ...,
         file: MessageFile | None = None,
         **kwargs: Any
-    ) -> _M: ...
+    ) -> MessageT: ...
 
     @overload
-    def add(self, **kwargs: Any) -> _M: ...
+    def add(self, **kwargs: Any) -> MessageT: ...
 
     def add(
         self,
@@ -105,7 +102,7 @@ class MessageCollection(GenericCollection[_M]):
 
         return super().add(type=_type, **kwargs)
 
-    def query(self) -> Query[_M]:
+    def query(self) -> Query[MessageT]:
         """ Queries the messages with the given parameters. """
 
         q = self.session.query(self.model_class)
@@ -142,7 +139,7 @@ class MessageCollection(GenericCollection[_M]):
     #        be wrong with a channel or type filter, we should probably
     #        at least apply the type and channel filters and potentially
     #        the older_than and limit filters...
-    def latest_message(self, offset: int = 0) -> _M | None:
+    def latest_message(self, offset: int = 0) -> MessageT | None:
         """ Returns the latest message in descending order (newest first)."""
         q = self.session.query(self.model_class)
         q = q.order_by(desc(self.model_class.id))

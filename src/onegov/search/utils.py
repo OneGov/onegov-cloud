@@ -8,17 +8,12 @@ from onegov.core.orm import find_models
 from sqlalchemy import inspect
 
 
-from typing import Any, Generic, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from lingua import ConfidenceValue
-    from onegov.core.orm import Base
     from onegov.search.mixins import Searchable
-    from sqlalchemy.orm import Query
-
-
-T = TypeVar('T')
-T_co = TypeVar('T_co', covariant=True)
+    from sqlalchemy.orm import DeclarativeBase, Query
 
 
 # XXX this is doubly defined in onegov.org.utils, maybe move to a common
@@ -45,7 +40,7 @@ def language_from_locale(locale: str | None) -> str:
     return LANGUAGE_MAP.get(locale, 'simple')
 
 
-def searchable_sqlalchemy_models(
+def searchable_sqlalchemy_models[T](
     base: type[T]
 ) -> Iterator[type[Searchable]]:
     """ Searches through the given SQLAlchemy base and returns the classes
@@ -63,20 +58,21 @@ def searchable_sqlalchemy_models(
 
 
 def get_polymorphic_base(
-    model: type[Searchable]
-) -> type[Base | Searchable]:
+    model: type[DeclarativeBase | Searchable]
+) -> type[DeclarativeBase | Searchable]:
     """
     Filter out models that are polymorphic subclasses of other
     models in order to save on queries.
 
     """
     mapper = inspect(model)
+    assert mapper is not None
     if mapper.polymorphic_on is None:
         return model
     return mapper.base_mapper.class_
 
 
-def apply_searchable_polymorphic_filter(
+def apply_searchable_polymorphic_filter[T](
     query: Query[T],
     model: Any,
     order_by_polymorphic_identity: bool = False
@@ -108,7 +104,7 @@ def extract_hashtags(text: str) -> list[str]:
     return HASHTAG.findall(html.unescape(text))
 
 
-class classproperty(Generic[T_co]):  # noqa: N801
+class classproperty[T_co]:  # noqa: N801
     def __init__(self, f: Callable[[type[Any]], T_co]) -> None:
         if isinstance(f, classmethod):
             # unwrap classmethod decorator which is used for typing

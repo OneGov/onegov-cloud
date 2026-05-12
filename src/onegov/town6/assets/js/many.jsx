@@ -95,7 +95,7 @@ var ManyDates = React.createClass({
         var state = JSON.parse(JSON.stringify(this.state));
         var date = moment(e.target.value, $(e.target).data('dateformat'), true);
 
-        state.values[index][name] = date.toDate().dateFormat('Y-m-d');
+        state.values[index][name] = date.format('YYYY-MM-DD');
         this.setState(state);
 
         e.preventDefault();
@@ -196,7 +196,7 @@ var ManyDateTimeRanges = React.createClass({
 
         state.values[index][name] = moment(
             e.target.value, $(e.target).data('dateformat')
-        ).toDate().dateFormat('Y-m-d H:i:00').replace(' ', 'T');
+        ).format('YYYY-MM-DD HH:mm:00').replace(' ', 'T');
 
         this.setState(state);
 

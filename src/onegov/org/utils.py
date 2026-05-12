@@ -19,25 +19,28 @@ from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from markupsafe import escape, Markup
+from math import isclose
 from onegov.core.layout import Layout
 from onegov.core.mail import coerce_address
-from onegov.file import File, FileCollection
+from onegov.core.security import Secret
+from onegov.file import FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
-from onegov.user import User, UserGroup
-from operator import add, attrgetter
-from sqlalchemy import case, nullsfirst  # type:ignore[attr-defined]
+from onegov.user import Auth, User, UserGroup
+from operator import add
+from sqlalchemy import case, nullsfirst
 from webob.exc import HTTPBadRequest
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Sequence)
     from libres.db.models import ReservationBlocker
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
@@ -48,18 +51,12 @@ if TYPE_CHECKING:
     from onegov.pay.types import PriceDict
     from onegov.reservation import Allocation, Reservation
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
-    from sqlalchemy.orm import Query
-    from sqlalchemy import Column
-    from typing import Self, TypeAlias, TypeVar
+    from sqlalchemy.orm import InstrumentedAttribute, Query
+    from sqlalchemy.sql.elements import ColumnElement
     from uuid import UUID
 
-    _T = TypeVar('_T')
-    _DeltaT = TypeVar('_DeltaT')
-    _SortT = TypeVar('_SortT', bound='SupportsRichComparison')
-    _TransformedT = TypeVar('_TransformedT')
-    _ItemT = TypeVar('_ItemT', bound=InvoiceItem | InvoiceItemMeta)
-    TzInfo: TypeAlias = DstTzInfo | StaticTzInfo
-    DateRange: TypeAlias = tuple[datetime, datetime]
+    type TzInfo = DstTzInfo | StaticTzInfo
+    type DateRange = tuple[datetime, datetime]
 
 
 # for our empty paragraphs approach we don't need a full-blown xml parser
@@ -261,21 +258,28 @@ def set_image_sizes(
             return match.group(1)
         return None
 
-    images_dict = {get_image_id(img): img for img in images}
+    images_dict = {
+        image_id: img
+        for img in images
+        if (image_id := get_image_id(img)) is not None
+    }
 
     if images_dict:
-        q: Query[ImageFile]
-        q = FileCollection(request.session, type='image').query()
-        q = q.with_entities(File.id, File.reference)
-        q = q.filter(File.id.in_(images_dict))
+        collection: FileCollection[ImageFile]
+        collection = FileCollection(request.session, type='image')
+        model_class = collection.model_class
+        uploaded_files = dict(
+            collection.query()
+            .with_entities(model_class.id, model_class.reference)
+            .filter(model_class.id.in_(images_dict))
+            .tuples()
+        )
 
-        sizes = {i.id: i.reference for i in q}
-
-        for id, image in images_dict.items():
-            if id in sizes:
+        for image_id, image in images_dict.items():
+            if (uploaded := uploaded_files.get(image_id)) is not None:
                 with suppress(AttributeError):
-                    image.set('width', sizes[id].size[0])
-                    image.set('height', sizes[id].size[1])
+                    image.set('width', uploaded.size[0])
+                    image.set('height', uploaded.size[1])
 
 
 def parse_fullcalendar_request(
@@ -291,30 +295,32 @@ def parse_fullcalendar_request(
 
     """
     start_str = request.params.get('start')
-    end_str = request.params.get('end')
-
-    if start_str and end_str:
-        if 'T' in start_str:
-            try:
-                start = parse_datetime(start_str)
-                end = parse_datetime(end_str)
-            except Exception:
-                raise HTTPBadRequest() from None
-        else:
-            try:
-                start_date = parse_date(start_str)
-                end_date = parse_date(end_str)
-            except Exception:
-                raise HTTPBadRequest() from None
-            start = datetime.combine(start_date, time(0, 0))
-            end = datetime.combine(end_date, time(23, 59, 59, 999999))
-
-        start = sedate.replace_timezone(start, timezone)
-        end = sedate.replace_timezone(end, timezone)
-
-        return start, end
-    else:
+    if not isinstance(start_str, str) or not start_str:
         return None, None
+
+    end_str = request.params.get('end')
+    if not isinstance(end_str, str) or not end_str:
+        return None, None
+
+    if 'T' in start_str:
+        try:
+            start = parse_datetime(start_str)
+            end = parse_datetime(end_str)
+        except Exception:
+            raise HTTPBadRequest() from None
+    else:
+        try:
+            start_date = parse_date(start_str)
+            end_date = parse_date(end_str)
+        except Exception:
+            raise HTTPBadRequest() from None
+        start = datetime.combine(start_date, time(0, 0))
+        end = datetime.combine(end_date, time(23, 59, 59, 999999))
+
+    start = sedate.replace_timezone(start, timezone)
+    end = sedate.replace_timezone(end, timezone)
+
+    return start, end
 
 
 def render_time_range(start: datetime | time, end: datetime | time) -> str:
@@ -376,10 +382,9 @@ class ReservationInfo:
             zipcodes = map(str, self.resource.zipcode_block['zipcode_list'])
 
             return self.request.translate(_(
-                (
-                    'You can only reserve this allocation before ${date} '
-                    'if you live in the following zipcodes: ${zipcodes}'
-                ), mapping={
+                'You can only reserve this allocation before ${date} '
+                'if you live in the following zipcodes: ${zipcodes}',
+                mapping={
                     'date': layout.format_date(date, 'date_long'),
                     'zipcodes': ', '.join(zipcodes),
                 }
@@ -431,58 +436,50 @@ class ReservationInfo:
 
 class AllocationEventInfo:
 
-    __slots__ = ('resource', 'allocation', 'availability', 'request',
-                 'translate')
+    __slots__ = ('resource', 'allocation', 'availability',
+                 'partitions', 'request', 'translate')
 
     def __init__(
         self,
         resource: Resource,
         allocation: Allocation,
         availability: float,
+        partitions: Sequence[tuple[float, bool]],
         request: OrgRequest
     ) -> None:
 
         self.resource = resource
         self.allocation = allocation
         self.availability = availability
+        self.partitions = partitions
         self.request = request
         self.translate = request.translate
 
     @classmethod
-    def from_allocations(
+    def from_resource_by_range(
         cls,
         request: OrgRequest,
         resource: Resource,
-        allocations: Iterable[Allocation]
+        start: datetime,
+        end: datetime
     ) -> list[Self]:
 
-        events = []
-
         scheduler = resource.scheduler
-        allocations = request.exclude_invisible(allocations)
-
-        for key, group in groupby(allocations, key=attrgetter('_start')):
-            grouped = tuple(group)
-            if len(grouped) == 1 and grouped[0].partly_available:
-                # in this case we might need to normalize the availability
-                availability = grouped[0].normalized_availability
-            else:
-                availability = scheduler.queries.availability_by_allocations(
-                    grouped
-                )
-
-            for allocation in grouped:
-                if allocation.is_master:
-                    events.append(  # noqa: PERF401
-                        cls(
-                            resource,
-                            allocation,
-                            availability,
-                            request
-                        )
-                    )
-
-        return events
+        allocations = scheduler.allocations_with_availability_by_range(
+            start,
+            end
+        )
+        return [
+            cls(
+                resource,
+                allocation,  # type: ignore[arg-type]
+                availability,
+                partitions,
+                request
+            )
+            for allocation, availability, partitions in allocations
+            if request.is_visible(allocation)
+        ]
 
     @property
     def event_start(self) -> str:
@@ -523,7 +520,7 @@ class AllocationEventInfo:
 
     @property
     def outside_booking_window(self) -> bool:
-        return self.request.is_manager and (
+        return not self.request.is_manager and (
             self.resource.is_past_deadline(
                 # for partly available allocations we use the end of the
                 # allocation, since some small sliver of the allocation
@@ -627,7 +624,7 @@ class AllocationEventInfo:
                 )),
             )
 
-            if self.availability == 100.0:
+            if isclose(self.availability, 100.0, abs_tol=.005):
                 yield DeleteLink(
                     _('Delete'),
                     self.request.link(self.allocation),
@@ -677,7 +674,7 @@ class AllocationEventInfo:
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
             'quotaLeft': self.quota_left,
-            'partitions': self.allocation.availability_partitions(),
+            'partitions': self.partitions,
             'actions': [
                 link(self.request)
                 for link in self.event_actions
@@ -689,16 +686,14 @@ class AllocationEventInfo:
 
 class AvailabilityEventInfo:
 
-    __slots__ = ('resource', 'allocation', 'request', 'translate')
+    __slots__ = ('allocation', 'request', 'translate')
 
     def __init__(
         self,
-        resource: Resource,
         allocation: Allocation,
         request: OrgRequest
     ) -> None:
 
-        self.resource = resource
         self.allocation = allocation
         self.request = request
         self.translate = request.translate
@@ -707,12 +702,11 @@ class AvailabilityEventInfo:
     def from_allocations(
         cls,
         request: OrgRequest,
-        resource: Resource,
         allocations: Iterable[Allocation]
     ) -> list[Self]:
 
         return [
-            cls(resource, allocation, request)
+            cls(allocation, request)
             for allocation in allocations
             if allocation.is_master
         ]
@@ -749,25 +743,43 @@ class AvailabilityEventInfo:
                 self.request.link(self.allocation, name='add-blocker')
             ) if blockable else None,
             'partlyAvailable': self.allocation.partly_available,
-            'fullyAvailable': self.allocation.availability == 100.0,
+            'fullyAvailable': isclose(
+                self.allocation.availability,
+                100.0,
+                abs_tol=.005
+            ),
             'wholeDay': self.allocation.whole_day,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.allocation.mirror_of),
             'kind': 'allocation',
         }
 
 
 class BlockerEventInfo:
 
-    __slots__ = ('resource', 'blocker', 'request', 'translate')
+    __slots__ = (
+        'resource',
+        'blocker',
+        'css_classes',
+        'include_title',
+        'request',
+        'translate'
+    )
 
     def __init__(
         self,
         resource: Resource,
         blocker: ReservationBlocker,
-        request: OrgRequest
+        request: OrgRequest,
+        css_classes: Collection[str] = (),
+        include_title: bool = False
     ) -> None:
 
         self.resource = resource
         self.blocker = blocker
+        self.css_classes = css_classes
+        self.include_title = include_title
         self.request = request
         self.translate = request.translate
 
@@ -776,11 +788,21 @@ class BlockerEventInfo:
         cls,
         request: OrgRequest,
         resource: Resource,
-        blockers: Iterable[ReservationBlocker]
+        blockers: Iterable[ReservationBlocker],
+        blocking_resources: dict[UUID, Resource]
     ) -> list[Self]:
 
+        include_title = len(blocking_resources) > 0
         return [
-            cls(resource, blocker, request)
+            cls(
+                res := blocking_resources.get(blocker.resource, resource),
+                blocker,
+                request,
+                css_classes=() if res is resource else (
+                    'event-blocking-resource',
+                ),
+                include_title=include_title
+            )
             for blocker in blockers
         ]
 
@@ -807,20 +829,24 @@ class BlockerEventInfo:
     def as_dict(self) -> dict[str, Any]:
         is_manager = self.request.is_manager
         editable = self.editable
+        title = reason = self.title
+        if self.include_title:
+            title = f'{title}\n{self.resource.title}'
         return {
             'id': f'blocker-{self.blocker.id}',
             'start': self.event_start,
             'end': self.event_end,
-            'title': self.title,
+            'title': title,
             'editable': editable,
-            'classNames': 'event-blocker',
+            'classNames': ['event-blocker', *self.css_classes],
             'display': 'block',
             # extended properties
+            'reason': reason,
             'editurl': self.request.csrf_protected_url(self.request.link(
                 self.blocker,
                 name='adjust',
                 query_params={'blocker-id': str(self.blocker.id)}
-            )) if is_manager else None,
+            )) if editable and is_manager else None,
             'deleteurl': self.request.csrf_protected_url(self.request.link(
                 self.blocker
             )) if editable and is_manager else None,
@@ -829,6 +855,9 @@ class BlockerEventInfo:
                 name='set-reason',
                 query_params={'blocker-id': str(self.blocker.id)}
             )) if is_manager else None,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.resource.id),
             'kind': 'blocker',
         }
 
@@ -854,6 +883,8 @@ class ReservationEventInfo:
         'reservation',
         'ticket',
         'extra',
+        'css_classes',
+        'include_title',
         'request',
         'translate'
     )
@@ -865,12 +896,16 @@ class ReservationEventInfo:
         ticket: Ticket,
         extra: Sequence[str],
         request: OrgRequest,
+        css_classes: Collection[str] = (),
+        include_title: bool = False,
     ) -> None:
 
         self.resource = resource
         self.reservation = reservation
         self.ticket = ticket
         self.extra = extra
+        self.css_classes = css_classes
+        self.include_title = include_title
         self.request = request
         self.translate = request.translate
 
@@ -879,16 +914,22 @@ class ReservationEventInfo:
         cls,
         request: OrgRequest,
         resource: Resource,
-        reservations: Iterable[tuple[Reservation, Ticket, *tuple[str, ...]]]
+        reservations: Iterable[tuple[Reservation, Ticket, *tuple[str, ...]]],
+        blocking_resources: dict[UUID, Resource]
     ) -> list[Self]:
 
+        include_title = len(blocking_resources) > 0
         return [
             cls(
-                resource,
+                res := blocking_resources.get(reservation.resource, resource),
                 reservation,
                 ticket,
                 extra,
-                request
+                request,
+                css_classes=() if res is resource else (
+                    'event-blocking-resource',
+                ),
+                include_title=include_title
             )
             for reservation, ticket, *extra in reservations
         ]
@@ -935,6 +976,7 @@ class ReservationEventInfo:
             self.ticket.tag or self.reservation.email,
             *self.extra,
             self.reservation.email if self.ticket.tag else '',
+            self.resource.title if self.include_title else '',
             self.event_time,
             f'{self.translate(_("Quota"))}: {self.quota}'
             if getattr(self.resource, 'show_quota', False) else '',
@@ -948,6 +990,8 @@ class ReservationEventInfo:
             yield 'event-accepted'
         else:
             yield 'event-pending'
+
+        yield from self.css_classes
 
     @property
     def color(self) -> str | None:
@@ -996,6 +1040,9 @@ class ReservationEventInfo:
                 name='adjust-reservation',
                 query_params={'reservation-id': str(self.reservation.id)}
             )) if is_manager else None,
+            # NOTE: We can switch to `resourceId`if we decide to include
+            #       premium features
+            'resource': str(self.resource.id),
             'kind': 'reservation',
         }
 
@@ -1227,7 +1274,7 @@ class FindYourSpotEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability == 100.0 or (
+            if isclose(self.availability, 100.0, abs_tol=.005) or (
                 self.availability > 100.0 and self.adjustable
             ):
                 yield 'event-available'
@@ -1406,37 +1453,37 @@ def predict_next_daterange(
 #       to a protocol which implements subtraction and addition, but
 #       __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T](
+    values: Sequence[T],
     min_probability: float = 0.8,
-) -> _T | None: ...
+) -> T | None: ...
 
 
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T, DeltaT](
+    values: Sequence[T],
     min_probability: float,
-    compute_delta: Callable[[_T, _T], _DeltaT],
-    add_delta: Callable[[_T, _DeltaT], _T | None]
-) -> _T | None: ...
+    compute_delta: Callable[[T, T], DeltaT],
+    add_delta: Callable[[T, DeltaT], T | None]
+) -> T | None: ...
 
 
 @overload
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T, DeltaT](
+    values: Sequence[T],
     min_probability: float = 0.8,
     *,
-    compute_delta: Callable[[_T, _T], _DeltaT],
-    add_delta: Callable[[_T, _DeltaT], _T | None]
-) -> _T | None: ...
+    compute_delta: Callable[[T, T], DeltaT],
+    add_delta: Callable[[T, DeltaT], T | None]
+) -> T | None: ...
 
 
-def predict_next_value(
-    values: Sequence[_T],
+def predict_next_value[T](
+    values: Sequence[T],
     min_probability: float = 0.8,
     compute_delta: Callable[[Any, Any], Any] = lambda x, y: y - x,
     add_delta: Callable[[Any, Any], Any | None] = add
-) -> _T | None:
+) -> T | None:
     """ Takes a list of values and tries to predict the next value in the
     series.
 
@@ -1494,44 +1541,44 @@ def predict_next_value(
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
-    transform: Callable[[_T], _T] | None = None
-) -> dict[str, list[_T]]: ...
+    transform: Callable[[T], T] | None = None
+) -> dict[str, list[T]]: ...
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison, TransformedT](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None,
-    transform: Callable[[_T], _TransformedT]
-) -> dict[str, list[_TransformedT]]: ...
+    transform: Callable[[T], TransformedT]
+) -> dict[str, list[TransformedT]]: ...
 
 
 @overload
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison, TransformedT](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
     *,
-    transform: Callable[[_T], _TransformedT]
-) -> dict[str, list[_TransformedT]]: ...
+    transform: Callable[[T], TransformedT]
+) -> dict[str, list[TransformedT]]: ...
 
 
-def group_by_column(
+def group_by_column[T, SortT: SupportsRichComparison](
     request: OrgRequest,
-    query: Query[_T],
-    group_column: Column[str] | Column[str | None],
-    sort_column: Column[_SortT],
+    query: Query[T],
+    group_column: InstrumentedAttribute[str | None],
+    sort_column: InstrumentedAttribute[SortT],
     default_group: str | None = None,
     transform: Callable[[Any], Any] | None = None
 ) -> dict[str, list[Any]]:
@@ -1565,10 +1612,10 @@ def group_by_column(
 
     grouped = OrderedDict()
 
-    def group_key(record: _T) -> str:
+    def group_key(record: T) -> str:
         return getattr(record, group_column.name) or default_group
 
-    def sort_key(record: _T) -> _SortT:
+    def sort_key(record: T) -> SortT:
         return getattr(record, sort_column.name)
 
     transform = transform or (lambda v: v)
@@ -1654,7 +1701,7 @@ def emails_for_new_ticket(
     # then there can't be any exclusive permissions for any
     # specific group we're not a part of, since then we won't
     # have permission to access the ticket
-    general_condition = TicketPermission.group.is_(None)
+    general_condition: ColumnElement[bool] = TicketPermission.group.is_(None)
     if exclusive_group_ids:
         general_condition &= UserGroup.id.in_(exclusive_group_ids)
     query = query.filter(
@@ -1666,7 +1713,7 @@ def emails_for_new_ticket(
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.meta['shared_email'].astext
         ), else_=User.username),
-        case((  # type: ignore[arg-type]
+        case((
             UserGroup.meta['shared_email'].isnot(None),
             UserGroup.name,
         ), else_=User.realname),
@@ -1872,11 +1919,11 @@ def currency_for_submission(form: Form, submission: FormSubmission) -> str:
     return 'CHF'
 
 
-def group_invoice_items(
-    invoice_items: Iterable[_ItemT]
-) -> dict[str, list[_ItemT]]:
+def group_invoice_items[T: InvoiceItem | InvoiceItemMeta](
+    invoice_items: Iterable[T]
+) -> dict[str, list[T]]:
 
-    def sort_key(item: _ItemT) -> tuple[int, str]:
+    def sort_key(item: T) -> tuple[int, str]:
         match item.group:
             case 'submission' | 'reservation' | 'migration':
                 return 0, item.group
@@ -1894,3 +1941,30 @@ def group_invoice_items(
             key=sort_key
         )
     }
+
+
+def can_change_username(
+    user: User,
+    request: OrgRequest,
+    configured_factors: Collection[str] | None = None
+) -> bool:
+    if not request.has_permission(user, Secret):
+        return False
+
+    if user.source:
+        return False
+
+    if user.role not in request.app.settings.user.change_username_roles:
+        return False
+
+    assert request.current_user is not None
+    second_factor = (request.current_user.second_factor or {}).get('type')
+    # NOTE: For now we only allow second factors that don't require multiple
+    #       steps, so we can do it all in a single form
+    if second_factor not in ('yubikey', 'totp'):
+        return False
+
+    if configured_factors is None:
+        configured_factors = Auth.from_request(request).factors
+
+    return second_factor in configured_factors

@@ -66,20 +66,16 @@ from sqlalchemy import Table
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import object_session
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, relationship, Mapped
 
 
-from typing import overload, Any, ClassVar, Literal, NamedTuple, TypeVar
+from typing import overload, Any, Literal, NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy.orm.query import Query
+    from sqlalchemy.orm import Query
     from .. import Base
 
-    Cardinality = Literal['one-to-many', 'one-to-one', 'many-to-many']
-    rel = relationship
-
-
-_M = TypeVar('_M', bound='Associable')
+    type Cardinality = Literal['one-to-many', 'one-to-one', 'many-to-many']
 
 
 class RegisteredLink(NamedTuple):
@@ -95,66 +91,66 @@ class RegisteredLink(NamedTuple):
 
 
 @overload
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Literal['one-to-many', 'many-to-many'] = ...,
     *,
     uselist: Literal['auto'] = ...,
     backref_suffix: str = ...,
     onupdate: str | None = ...,
-    order_by: str | None = ...
-) -> rel[list[_M]]: ...
+    order_by: str | Literal[False] = ...
+) -> declared_attr[list[M]]: ...
 
 
 @overload
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Literal['one-to-one'],
     *,
     uselist: Literal['auto'] = ...,
     backref_suffix: str = ...,
     onupdate: str | None = ...,
-    order_by: str | None = ...
-) -> rel[_M | None]: ...
+    order_by: str | Literal[False] = ...
+) -> declared_attr[M | None]: ...
 
 
 @overload
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Cardinality = ...,
     *,
     uselist: Literal[True],
     backref_suffix: str = ...,
     onupdate: str | None = ...,
-    order_by: str | None = ...
-) -> rel[list[_M]]: ...
+    order_by: str | Literal[False] = ...
+) -> declared_attr[list[M]]: ...
 
 
 @overload
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Cardinality = ...,
     *,
     uselist: Literal[False],
     backref_suffix: str = ...,
     onupdate: str | None = ...,
-    order_by: str | None = ...
-) -> rel[_M | None]: ...
+    order_by: str | Literal[False] = ...
+) -> declared_attr[M | None]: ...
 
 
-def associated(
-    associated_cls: type[_M],
+def associated[M: Associable](
+    associated_cls: type[M],
     attribute_name: str,
     cardinality: Cardinality = 'one-to-many',
     uselist: Literal['auto'] | bool = 'auto',
     backref_suffix: str = '__tablename__',
     onupdate: str | None = None,
-    order_by: str | None = None
-) -> rel[list[_M]] | rel[_M | None]:
+    order_by: str | Literal[False] = False
+) -> declared_attr[Any]:
     """ Creates an associated attribute. This attribute is supposed to be
     defined on the mixin class that will establish the generic association
     if inherited by a model.
@@ -195,20 +191,21 @@ def associated(
 
     assert cardinality in ('one-to-one', 'one-to-many', 'many-to-many')
 
-    cascade: str | bool
+    cascade: str
     if cardinality in ('one-to-one', 'one-to-many'):
         cascade = 'all, delete-orphan'
         single_parent = True
         passive_deletes = False
     else:
-        cascade = False
+        # NOTE: This is the default cascade
+        cascade = 'save-update, merge'
         single_parent = False
         passive_deletes = True
 
     if uselist == 'auto':
         uselist = not cardinality.endswith('to-one')
 
-    def descriptor(cls: type[Base]) -> rel[list[_M]] | rel[_M | None]:
+    def descriptor(cls: type[Base]) -> Mapped[list[M]] | Mapped[M | None]:
         # HACK: forms is one of the only tables which doesn't use id as
         #       its primary key, we probably should just use id everywhere
         #       consistently
@@ -308,7 +305,14 @@ def associated(
             order_by=order_by
         )
 
-    return declared_attr(descriptor)  # type:ignore[return-value]
+    # NOTE: We manually set the  return type on __annotations__ so
+    #       that SQLAlchemy can actually understand what it means
+    if not TYPE_CHECKING:
+        descriptor.__annotations__['return'] = Mapped[
+            list[associated_cls] if uselist else associated_cls
+        ]
+
+    return declared_attr(descriptor)
 
 
 class Associable:
@@ -323,10 +327,10 @@ class Associable:
         # FIXME: This should probably be abstract in some way so that
         #        we can enforce that the class that is Associable has
         #        an id column...
-        id: Column[Any]
+        id: Mapped[Any]
 
         # HACK: let mypy know that this will have a __tablename__ set
-        __tablename__: ClassVar[str]
+        __tablename__: str
 
     @classmethod
     def association_base(cls) -> type[Associable]:
@@ -385,6 +389,7 @@ class Associable:
         assert self.registered_links is not None, 'No links registered'
 
         session = object_session(self)
+        assert session is not None
 
         def query(link: RegisteredLink) -> Query[Base]:
             column = getattr(link.cls, link.attribute)

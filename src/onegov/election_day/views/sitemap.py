@@ -69,7 +69,8 @@ def view_sitemap_xml(
 @ElectionDayApp.json(
     model=Principal,
     name='sitemap.json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_sitemap_json(
     self: Principal,

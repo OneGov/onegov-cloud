@@ -14,24 +14,16 @@ from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
 
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.orm import Session
     from tests.onegov.activity.conftest import Scenario as BaseScenario
     from tests.shared.browser import ExtendedBrowser
 
-    _AppT = TypeVar(
-        '_AppT',
-        bound=FeriennetApp,
-        default='TestApp',
-        covariant=True
-    )
     Scenario = BaseScenario[VacationActivity]
 else:
     from tests.onegov.activity.conftest import Scenario
-
-    _AppT = TypeVar('_AppT', bound=FeriennetApp)
 
 
 class TestApp(FeriennetApp):
@@ -39,7 +31,7 @@ class TestApp(FeriennetApp):
     maildir: str
 
 
-class Client(BaseClient[_AppT]):
+class Client[AppT: FeriennetApp = TestApp](BaseClient[AppT]):
     skip_n_forms = 1
     use_intercooler = True
 

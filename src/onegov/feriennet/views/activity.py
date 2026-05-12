@@ -569,7 +569,8 @@ def view_activity_filters(
 @FeriennetApp.json(
     model=VacationActivityCollection,
     name='json',
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_activities_as_json(
     self: VacationActivityCollection,
@@ -746,6 +747,8 @@ def view_activities_for_volunteers(
         needed = need.number.upper - 1
         current = sum(v.state == 'confirmed' for v in need.volunteers)
         return current < needed
+
+    self.batch_size = 24
 
     return {
         'activities': self.batch if show_activities else None,
@@ -936,7 +939,7 @@ def view_activity(
         phases.append(
             f'{text} {layout.format_date(date, "date_long")}')
     # Pre booking date
-    if (active_period and active_period.wishlist_phase
+    if (active_period and active_period.confirmable
         ) and not active_period.is_prebooking_in_past:
         text = text_until
         date = active_period.prebooking_end

@@ -4,16 +4,19 @@ import hashlib
 import re
 import wtforms.widgets.core
 
-from decimal import Decimal
 from bs4 import BeautifulSoup
+from decimal import Decimal
 from unidecode import unidecode
 
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from bs4 import NavigableString, Tag
     from onegov.form import Form
     from typing import Self
     from wtforms.fields.core import UnboundField
+
+    type _TagOrString = NavigableString | Tag
 
 
 _unwanted_characters = re.compile(r'[^a-zA-Z0-9]+')
@@ -156,17 +159,28 @@ def path_to_filename(path: str | None) -> str | None:
     return path
 
 
-def remove_empty_links(text: str) -> str:
+def remove_empty_links(
+    text: str,
+    invisible_links: list[Tag] | None = None
+) -> str:
     # Find links with no text or other tags
     # only br tags and/or whitespaces
+    # if you pass in a list, the invisible links will be
+    # appended to it
     soup = BeautifulSoup(str(text), 'html.parser')
     for link in soup.find_all('a'):
         if not any(
-            tag.name != 'br' and (
-                tag.name or not tag.isspace()
-            ) for tag in link.contents
+            tag.name != 'br' and not (
+                tag.name is None and tag.isspace()
+            )
+            for tag in cast('list[_TagOrString]', link.contents)
         ):
-            if all(tag.name == 'br' for tag in link.contents):
+            if invisible_links is not None:
+                invisible_links.append(link)
+            if all(
+                tag.name == 'br'
+                for tag in cast('list[_TagOrString]', link.contents)
+            ):
                 link.replace_with(
                     BeautifulSoup('<br/>', 'html.parser')
                 )

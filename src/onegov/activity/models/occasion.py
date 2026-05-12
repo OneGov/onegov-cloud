@@ -5,30 +5,27 @@ import sedate
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from onegov.activity.models.occasion_date import DAYS
+from onegov.activity.types import BoundedIntegerRange
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from onegov.activity.types import BoundedIntegerRange
-from sqlalchemy import Boolean
 from sqlalchemy import case
-from sqlalchemy import Column
-from sqlalchemy import ForeignKey
 from sqlalchemy import func
+from sqlalchemy import text
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
-from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import ARRAY, INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.functions import coalesce
-from sqlalchemy.orm import relationship, object_session, validates
+from sqlalchemy.orm import mapped_column, relationship, Mapped
+from sqlalchemy.orm import object_session, validates
 from sqlalchemy_utils import aggregated
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
-    from collections.abc import Collection, Sequence
+    from collections.abc import Collection
     from sqlalchemy.sql import ColumnElement
     from .activity import Activity
     from .booking import Booking
@@ -51,38 +48,35 @@ class Occasion(Base, TimestampMixin):
         return hash(self.id)
 
     #: the public id of this occasion
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: Describes the meeting point of the occasion
-    meeting_point: Column[str | None] = Column(Text, nullable=True)
+    meeting_point: Mapped[str | None]
 
     #: The expected age of participants
-    age: Column[BoundedIntegerRange] = Column(
+    age: Mapped[BoundedIntegerRange] = mapped_column(
         INT4RANGE,
-        nullable=False,
         default=BoundedIntegerRange(6, 17, bounds='[]')
     )
 
     #: The expected number of participants
-    spots: Column[BoundedIntegerRange] = Column(
+    spots: Mapped[BoundedIntegerRange] = mapped_column(
         INT4RANGE,
         nullable=False,
         default=BoundedIntegerRange(0, 10, bounds='[]')
     )
 
     #: A note about the occurrence
-    note: Column[str | None] = Column(Text, nullable=True)
+    note: Mapped[str | None]
 
     #: The cost of the occasion (max value is 100'000.00), the currency is
     #: assumed to be CHF as this system will probably never be used outside
     #: Switzerland
-    cost: Column[Decimal | None] = Column(
-        Numeric(precision=8, scale=2),
-        nullable=True
+    cost: Mapped[Decimal | None] = mapped_column(
+        Numeric(precision=8, scale=2)
     )
 
     #: The administrative cost of the occasion, this shadows the same column
@@ -90,24 +84,19 @@ class Occasion(Base, TimestampMixin):
     #: means that the period's booking cost is taken.
     #:
     #: In all-inclusive periods, this value is ignored.
-    booking_cost: Column[Decimal | None] = Column(
-        Numeric(precision=8, scale=2),
-        nullable=True
+    booking_cost: Mapped[Decimal | None] = mapped_column(
+        Numeric(precision=8, scale=2)
     )
 
     #: The activity this occasion belongs to
-    activity_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('activities.id', use_alter=True),
-        nullable=False
+    activity_id: Mapped[UUID] = mapped_column(
+        ForeignKey('activities.id', use_alter=True)
     )
-    activity: relationship[Activity] = relationship(
-        'Activity',
+    activity: Mapped[Activity] = relationship(
         back_populates='occasions'
     )
 
-    accepted: relationship[Sequence[Booking]] = relationship(
-        'Booking',
+    accepted: Mapped[list[Booking]] = relationship(
         primaryjoin=("""and_(
             Booking.occasion_id == Occasion.id,
             Booking.state == 'accepted'
@@ -116,87 +105,68 @@ class Occasion(Base, TimestampMixin):
     )
 
     #: The period this occasion belongs to
-    period_id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
-        ForeignKey('periods.id', use_alter=True),
-        nullable=False
+    period_id: Mapped[UUID] = mapped_column(
+        ForeignKey('periods.id', use_alter=True)
     )
-    period: relationship[BookingPeriod] = relationship(
-        'BookingPeriod',
+    period: Mapped[BookingPeriod] = relationship(
         back_populates='occasions'
     )
 
     #: True if the occasion has been cancelled
-    cancelled: Column[bool] = Column(Boolean, nullable=False, default=False)
+    cancelled: Mapped[bool] = mapped_column(default=False)
 
     #: The duration defined by the associated dates
     # FIXME: should these be nullable=False?
-    duration: Column[int | None] = Column(Integer, default=0)
+    duration: Mapped[int | None] = mapped_column(default=0)
 
     #: The default order
     # FIXME: should these be nullable=False?
-    order: Column[int | None] = Column(Integer, default=0)
+    order: Mapped[int | None] = mapped_column(default=0)
 
     #: Pretend like this occasion doesn't use any time
-    exclude_from_overlap_check: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    exclude_from_overlap_check: Mapped[bool] = mapped_column(default=False)
 
     #: This occasion can be booked, even if the booking limit has been reached
     #: (does not currently apply to the matching, only to confirmed periods)
-    exempt_from_booking_limit: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    exempt_from_booking_limit: Mapped[bool] = mapped_column(default=False)
 
     #: Days of the year on which this occasion is active (1 - 365)
     #: January 1st - 2nd would be [1, 2], February 1st would be [32]
-    active_days: Column[list[int]] = Column(
+    active_days: Mapped[list[int]] = mapped_column(
         ARRAY(Integer),
         nullable=False,
         default=list
     )
 
     #: Weekdays on which this occasion is active
-    weekdays: Column[list[int]] = Column(
+    weekdays: Mapped[list[int]] = mapped_column(
         ARRAY(Integer),
-        nullable=False,
         default=list
     )
 
     #: Indicates if an occasion needs volunteers or not
-    seeking_volunteers: Column[bool] = Column(
-        Boolean,
-        nullable=False,
-        default=False
-    )
+    seeking_volunteers: Mapped[bool] = mapped_column(default=False)
 
-    @aggregated('accepted', Column(Integer, default=0))
+    @aggregated('accepted', mapped_column(Integer, default=0))
     def attendee_count(self) -> ColumnElement[int]:
-        return func.count('1')
+        return func.count(text('1'))
 
     #: The bookings linked to this occasion
-    bookings: relationship[list[Booking]] = relationship(
-        'Booking',
+    bookings: Mapped[list[Booking]] = relationship(
         order_by='Booking.created',
         back_populates='occasion'
     )
 
     #: The dates associated with this occasion (loaded eagerly)
-    dates: relationship[list[OccasionDate]] = relationship(
-        'OccasionDate',
+    dates: Mapped[list[OccasionDate]] = relationship(
         cascade='all,delete',
         order_by='OccasionDate.start',
         back_populates='occasion',
-        lazy='joined',
+        lazy='selectin',
     )
 
     #: The needs associated with this occasion
-    needs: relationship[list[OccasionNeed]] = relationship(
-        'OccasionNeed',
+    needs: Mapped[list[OccasionNeed]] = relationship(
         cascade='all,delete',
         order_by='OccasionNeed.name',
         back_populates='occasion',
@@ -225,10 +195,7 @@ class Occasion(Base, TimestampMixin):
 
         return (self.activity_id.hex, self.period_id.hex)
 
-    if TYPE_CHECKING:
-        total_cost: Column[Decimal]
-
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def total_cost(self) -> Decimal:
         """ Calculates the cost of booking a single occasion, including all
         costs only relevant to this occasion (i.e. excluding the all-inclusive
@@ -249,8 +216,9 @@ class Occasion(Base, TimestampMixin):
 
         return base
 
-    @total_cost.expression  # type:ignore[no-redef]
-    def total_cost(cls) -> ColumnElement[Decimal]:
+    @total_cost.inplace.expression
+    @classmethod
+    def _total_cost_expression(cls) -> ColumnElement[Decimal]:
         from onegov.activity.models.period import BookingPeriod
 
         return coalesce(Occasion.cost, 0) + case(
@@ -323,27 +291,23 @@ class Occasion(Base, TimestampMixin):
         else:
             self.seeking_volunteers = False
 
-    if TYPE_CHECKING:
-        operable: Column[bool]
-        full: Column[bool]
-        available_spots: Column[int]
-
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def operable(self) -> bool:
         return self.attendee_count >= self.spots.lower
 
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def full(self) -> bool:
         return self.attendee_count == self.spots.upper - 1
 
-    @hybrid_property  # type:ignore[no-redef]
+    @hybrid_property
     def available_spots(self) -> int:
         if self.cancelled:
             return 0
         return self.spots.upper - 1 - self.attendee_count
 
-    @available_spots.expression  # type:ignore[no-redef]
-    def available_spots(cls) -> ColumnElement[int]:
+    @available_spots.inplace.expression
+    @classmethod
+    def _available_spots_expression(cls) -> ColumnElement[int]:
         return case(
             (
                 cls.cancelled == False,
@@ -408,7 +372,9 @@ class Occasion(Base, TimestampMixin):
             def cancel(booking: Booking) -> None:
                 booking.state = 'cancelled'
         else:
-            bookings = BookingCollection(object_session(self))
+            session = object_session(self)
+            assert session is not None
+            bookings = BookingCollection(session)
             scoring = period.scoring
 
             def cancel(booking: Booking) -> None:

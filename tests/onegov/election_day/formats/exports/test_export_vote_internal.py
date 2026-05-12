@@ -88,7 +88,8 @@ def test_vote_export_internal(session: Session) -> None:
             'invalid': 0,
             'empty': 0,
             'eligible_voters': 0,
-            'expats': ''
+            'expats': '',
+            'received': '',
         },
         {
             'id': "a",
@@ -115,6 +116,7 @@ def test_vote_export_internal(session: Session) -> None:
             'empty': 10,
             'eligible_voters': 150,
             'expats': 30,
+            'received': '',
         },
         {
             'id': "a",
@@ -140,6 +142,7 @@ def test_vote_export_internal(session: Session) -> None:
             'invalid': 0,
             'empty': 0,
             'eligible_voters': 0,
-            'expats': ''
+            'expats': '',
+            'received': '',
         },
     ]

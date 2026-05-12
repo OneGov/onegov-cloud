@@ -15,20 +15,11 @@ from onegov.core.crypto import hash_password
 from yaml import dump
 
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.orm import SessionManager
     from tests.shared.client import ExtendedResponse
-
-    _AppT = TypeVar(
-        '_AppT',
-        bound=TranslatorDirectoryApp,
-        default='TestApp',
-        covariant=True
-    )
-else:
-    _AppT = TypeVar('_AppT', bound=TranslatorDirectoryApp)
 
 
 class TestApp(TranslatorDirectoryApp):
@@ -36,7 +27,7 @@ class TestApp(TranslatorDirectoryApp):
     maildir: str
 
 
-class Client(BaseClient[_AppT]):
+class Client[AppT: TranslatorDirectoryApp = TestApp](BaseClient[AppT]):
 
     use_intercooler = True
     skip_n_forms = 1

@@ -6,14 +6,14 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.layouts.default import DefaultLayout
-
+from onegov.landsgemeinde.models import Assembly
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from onegov.landsgemeinde.models import Assembly
     from onegov.landsgemeinde.request import LandsgemeindeRequest
 
 
@@ -52,6 +52,7 @@ class AssemblyCollectionLayout(DefaultLayout):
         return None
 
 
+@LandsgemeindeApp.layout(model=Assembly)
 class AssemblyLayout(DefaultLayout):
 
     if TYPE_CHECKING:

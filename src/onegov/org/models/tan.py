@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from uuid import uuid4
-
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
-from sqlalchemy import func, Column, Index, Text
+from sqlalchemy import func, Index
+from sqlalchemy.orm import mapped_column, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from sqlalchemy.orm import Query, Session
 
 
@@ -34,25 +32,16 @@ class TANAccess(Base, TimestampMixin):
         Index('ix_tan_accesses_created', 'created'),
     )
 
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type: ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     # for an mTAN session this would be the phone number
-    session_id: Column[str] = Column(
-        Text,
-        index=True,
-        nullable=False
-    )
+    session_id: Mapped[str] = mapped_column(index=True)
 
     # The url that was accessed
-    url: Column[str] = Column(
-        Text,
-        index=True,
-        nullable=False
-    )
+    url: Mapped[str] = mapped_column(index=True)
 
 
 class TANAccessCollection(GenericCollection[TANAccess]):

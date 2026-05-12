@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.translator_directory.forms.translator import (
         TranslatorSearchForm)
     from sqlalchemy.orm import Query
-    from sqlalchemy.sql import ColumnElement
+    from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
     from typing import Self
 
 
@@ -49,7 +49,8 @@ class TranslatorCollection(
         state: str | None = 'published',
         admissions: list[str] | None = None,
         genders: list[str] | None = None,
-        include_hidden: bool = False
+        include_hidden: bool = False,
+        show_all_including_hidden: bool = False,
     ) -> None:
         super().__init__(app.session())
         self.app = app
@@ -62,6 +63,7 @@ class TranslatorCollection(
         self.admissions = admissions or []
         self.genders = genders or []
         self.include_hidden = include_hidden
+        self.show_all_including_hidden = show_all_including_hidden
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)
@@ -97,6 +99,8 @@ class TranslatorCollection(
             and self.admissions == other.admissions
             and self.genders == other.genders
             and self.include_hidden == other.include_hidden
+            and self.show_all_including_hidden
+            == other.show_all_including_hidden
         )
 
     def add(
@@ -298,11 +302,12 @@ class TranslatorCollection(
             state=self.state,
             admissions=self.admissions,
             genders=self.genders,
-            include_hidden=self.include_hidden
+            include_hidden=self.include_hidden,
+            show_all_including_hidden=self.show_all_including_hidden,
         )
 
     @property
-    def search_columns(self) -> list[ColumnElement[Any]]:
+    def search_columns(self) -> list[SQLCoreOperations[str | None]]:
         """ The columns used for text search. """
 
         return [
@@ -322,7 +327,9 @@ class TranslatorCollection(
         if self.monitor_langs:
             query = query.filter(and_(*self.by_monitor_lang_expression))
 
-        if self.include_hidden and self.user_role == 'admin':
+        if self.show_all_including_hidden and self.user_role == 'admin':
+            pass  # no filter: show all translators
+        elif self.include_hidden and self.user_role == 'admin':
             # Admins can request to see only items marked for admins
             query = query.filter(Translator.for_admins_only == True)
         else:

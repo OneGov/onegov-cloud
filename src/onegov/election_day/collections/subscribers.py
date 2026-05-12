@@ -14,21 +14,17 @@ from sqlalchemy import func
 
 from typing import Any
 from typing import IO
-from typing import TypeVar
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.formats.imports.common import FileImportError
     from onegov.election_day.request import ElectionDayRequest
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Self
     from uuid import UUID
 
 
-_S = TypeVar('_S', bound=Subscriber)
-
-
-class SubscriberCollection(Pagination[_S]):
+class SubscriberCollection[SubscriberT: Subscriber](Pagination[SubscriberT]):
 
     page: int
 
@@ -45,7 +41,7 @@ class SubscriberCollection(Pagination[_S]):
         self.active_only = active_only
 
     @property
-    def model_class(self) -> type[_S]:
+    def model_class(self) -> type[SubscriberT]:
         return Subscriber  # type:ignore[return-value]
 
     def __eq__(self, other: object) -> bool:
@@ -56,7 +52,7 @@ class SubscriberCollection(Pagination[_S]):
             and self.active_only == other.active_only
         )
 
-    def subset(self) -> Query[_S]:
+    def subset(self) -> Query[SubscriberT]:
         return self.query()
 
     @property
@@ -76,7 +72,7 @@ class SubscriberCollection(Pagination[_S]):
         domain_segment: str | None,
         locale: str,
         active: bool
-    ) -> _S:
+    ) -> SubscriberT:
         subscriber = self.model_class(
             address=address,
             domain=domain,
@@ -88,7 +84,7 @@ class SubscriberCollection(Pagination[_S]):
         self.session.flush()
         return subscriber
 
-    def query(self, active_only: bool | None = None) -> Query[_S]:
+    def query(self, active_only: bool | None = None) -> Query[SubscriberT]:
         query = self.session.query(self.model_class)
 
         active_only = self.active_only if active_only is None else active_only
@@ -103,7 +99,7 @@ class SubscriberCollection(Pagination[_S]):
 
         return query
 
-    def by_id(self, id: UUID) -> _S | None:
+    def by_id(self, id: UUID) -> SubscriberT | None:
         """ Returns the subscriber by its id. """
 
         query = self.query(active_only=False)
@@ -115,7 +111,7 @@ class SubscriberCollection(Pagination[_S]):
         address: str,
         domain: str | None,
         domain_segment: str | None,
-    ) -> _S | None:
+    ) -> SubscriberT | None:
         """ Returns the (first) subscriber by its address. """
 
         query = self.query(active_only=False)
@@ -132,7 +128,7 @@ class SubscriberCollection(Pagination[_S]):
         domain: str | None,
         domain_segment: str | None,
         request: ElectionDayRequest
-    ) -> _S:
+    ) -> SubscriberT:
         """ Initiate the subscription process.
 
         Might be used to change the locale by re-subscribing.
@@ -153,7 +149,7 @@ class SubscriberCollection(Pagination[_S]):
 
     def handle_subscription(
         self,
-        subscriber: _S,
+        subscriber: SubscriberT,
         domain: str | None,
         domain_segment: str | None,
         request: ElectionDayRequest
@@ -177,7 +173,7 @@ class SubscriberCollection(Pagination[_S]):
 
     def handle_unsubscription(
         self,
-        subscriber: _S,
+        subscriber: SubscriberT,
         request: ElectionDayRequest
     ) -> None:
         """ Send the subscriber a request to confirm the unsubscription. """

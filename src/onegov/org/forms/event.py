@@ -21,8 +21,12 @@ from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import (
-    FileSizeLimit, ValidPhoneNumber, ValidFilterFormDefinition)
-from onegov.form.validators import WhitelistedMimeType
+    FileSizeLimit,
+    ValidPhoneNumber,
+    ValidFilterFormDefinition,
+    MIME_TYPES_EXCEL,
+    MIME_TYPES_PDF,
+)
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.utils import complete_url
@@ -124,13 +128,13 @@ class EventForm(Form):
         file_class=EventFile,
         validators=[
             Optional(),
-            WhitelistedMimeType({
-                'image/gif',
-                'image/jpeg',
-                'image/png'
-            }),
             FileSizeLimit(5 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=(
+            'image/gif',
+            'image/jpeg',
+            'image/png',
+        )
     )
 
     pdf = UploadFileWithORMSupport(
@@ -138,11 +142,9 @@ class EventForm(Form):
         file_class=EventFile,
         validators=[
             Optional(),
-            WhitelistedMimeType({
-                'application/pdf',
-            }),
             FileSizeLimit(5 * 1024 * 1024)
-        ]
+        ],
+        allowed_mimetypes=MIME_TYPES_PDF,
     )
 
     location = StringField(
@@ -432,8 +434,6 @@ class EventForm(Form):
 
             if filter_keywords:
                 model.filter_keywords = filter_keywords
-                for occ in model.occurrences:
-                    occ.filter_keywords = filter_keywords
 
     def process_obj(self, model: Event) -> None:  # type:ignore[override]
         """ Stores the page values on the form. """
@@ -475,12 +475,17 @@ class EventForm(Form):
             keywords = model.filter_keywords
 
             for field in self.request.app.org.event_filter_fields:
-                form_field = getattr(self, field.id, None)
-
-                if form_field is None:
+                if field.id not in self:
                     continue
 
-                form_field.data = keywords.get(field.id, None)
+                form_field = self[field.id]
+                if not form_field.raw_data:
+                    # HACK: This is to get around the fact that we don't know
+                    #       whether the field expects a list of values or a
+                    #       single value, so we exploit the fact, that the
+                    #       field handles that for us when processing formdata
+                    form_field.raw_data = valuelist = keywords.getall(field.id)
+                    form_field.process_formdata(valuelist)
 
     @cached_property
     def parsed_dates(self) -> list[date]:
@@ -537,21 +542,9 @@ class EventImportForm(Form):
         label=_('Import'),
         validators=[
             DataRequired(),
-            WhitelistedMimeType({
-                'application/excel',
-                'application/vnd.ms-excel',
-                (
-                    'application/'
-                    'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                ),
-                'application/vnd.ms-office',
-                'application/octet-stream',
-                'application/zip',
-                'text/csv',
-                'text/plain',
-            }),
             FileSizeLimit(10 * 1024 * 1024)
         ],
+        allowed_mimetypes=MIME_TYPES_EXCEL,
         render_kw={'force_simple': True}
     )
 
@@ -574,6 +567,7 @@ class EventImportForm(Form):
             'tags': self.request.translate(_('Tags')),
             'start': self.request.translate(_('From')),
             'end': self.request.translate(_('To')),
+            'created': self.request.translate(_('Created')),
         }
 
     def custom_tags(self) -> list[str] | None:
@@ -590,6 +584,9 @@ class EventImportForm(Form):
                 getattr(occurrence, attribute, None)
                 or getattr(occurrence.event, attribute, None)
             )
+            if attribute == 'created' and isinstance(result, datetime):
+                result = to_timezone(
+                    result, occurrence.timezone or 'Europe/Zurich')
             if isinstance(result, datetime):
                 result = result.strftime('%d.%m.%Y %H:%M')
             if attribute == 'tags':
@@ -612,6 +609,8 @@ class EventImportForm(Form):
 
     def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers
+        expected_headers = headers.copy()
+        expected_headers.pop('created')  # not mandatory for the import
         session = self.request.session
         events = EventCollection(session)
         all_tags = chain(
@@ -634,7 +633,7 @@ class EventImportForm(Form):
         assert self.file.file is not None
         csvfile = convert_excel_to_csv(self.file.file)
         try:
-            csv = CSVFile(csvfile, expected_headers=headers.values())
+            csv = CSVFile(csvfile, expected_headers=expected_headers.values())
         except Exception:
             error_string = self.request.translate(
                 _('Expected header line with the following columns:')
@@ -665,6 +664,7 @@ class EventImportForm(Form):
                     for attribute, column in columns.items()
                 }
                 kwargs['timezone'] = 'Europe/Zurich'
+                kwargs.pop('created', None)  # ignore created column
                 event = events.add(**kwargs)
                 event.meta['submitter_email'] = self.request.current_username
                 event.submit()
@@ -692,6 +692,7 @@ class EventConfigurationForm(Form):
                 require_title_fields=False,
                 reserved_fields={name for name, _ in
                                  get_fields_from_class(EventForm)}
+                | {'syndicate', 'highlight'}
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})

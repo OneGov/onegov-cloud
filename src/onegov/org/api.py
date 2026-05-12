@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+from datetime import date
 from functools import cached_property
-from uuid import UUID
-
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
+from onegov.api.models import ApiInvalidParamException
 from onegov.core.collection import Pagination
+from onegov.core.converters import extended_date_decode
 from onegov.event.collections import OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.form.models import FormDefinition
 from onegov.gis import Coordinates
+from onegov.org import _
 from onegov.org.models.directory import (
     ExtendedDirectory, ExtendedDirectoryEntry,
     ExtendedDirectoryEntryCollection)
@@ -26,23 +28,22 @@ from onegov.people import Person
 from onegov.people.collections import PersonCollection
 from onegov.reservation.collection import ResourceCollection
 from onegov.reservation.models import Resource
-from onegov.town6 import _
-from sqlalchemy import or_
+from onegov.search import SearchIndex
+from onegov.search.utils import language_from_locale
+from sqlalchemy import and_, func
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.inspection import inspect as sa_inspect
+from uuid import UUID
 
-from typing import Any, Generic, Self, TypeAlias, TypeVar
-from typing import TYPE_CHECKING
-T = TypeVar('T')
 
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from onegov.town6.app import TownApp
-    from onegov.town6.request import TownRequest
-    from onegov.event.models import Occurrence
+    from collections.abc import Collection, Mapping
+    from onegov.core.collection import PKType
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from onegov.core.collection import PKType
+    from onegov.event.models import Occurrence
+    from onegov.org.app import OrgApp
+    from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Query
 
 
@@ -61,307 +62,42 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
     return item.last_change.isoformat()
 
 
-API_BATCH_SIZE = 25
-MANAGER_ROLES = {'admin', 'editor'}
-LISTING_ACCESSES = {
-    'member': ('member', 'mtan', 'public'),
-}
-
-
-def role_for_request(request: TownRequest) -> str:
-    return getattr(request.identity, 'role', 'anonymous')
-
-
-def available_accesses(request: TownRequest) -> tuple[str, ...]:
-    role = role_for_request(request)
-    if role in MANAGER_ROLES:
-        return ()
-    return LISTING_ACCESSES.get(role, ('mtan', 'public'))
-
-
-def apply_visibility_filters(
-    request: TownRequest,
-    query: Query[T],
-    model_class: Any,
-) -> Query[T]:
-    accesses = available_accesses(request)
-    if accesses and hasattr(model_class, 'meta'):
-        query = query.filter(or_(
-            *(
-                model_class.meta['access'].astext == access
-                for access in accesses
-            ),
-            model_class.meta['access'].is_(None)
-        ))
-
-    if (
-        role_for_request(request) not in MANAGER_ROLES
-        and hasattr(model_class, 'publication_started')
-        and hasattr(model_class, 'publication_ended')
-    ):
-        query = query.filter(
-            model_class.publication_started == True,
-            model_class.publication_ended == False
-        )
-
-    return query
-
-
-def apply_api_ordering(
-    query: Query[T],
-    order_by: Any | None,
-) -> Query[T]:
-    if order_by is None:
-        return query
-    return query.order_by(None).order_by(order_by)
-
-
-def filtered_query(
-    request: TownRequest,
-    query: Query[T],
-    model_class: type[T],
-    *,
-    order_by: Any | None = None,
-) -> Query[T]:
-    query = apply_visibility_filters(request, query, model_class)
-    return apply_api_ordering(query, order_by)
-
-
-def normalize_id(id: PKType) -> PKType:
-    if isinstance(id, str):
-        try:
-            return UUID(id)
-        except ValueError:
-            return id
-    return id
-
-
-def access_for_item(item: object) -> str | None:
-    access = getattr(item, 'access', None)
-    if isinstance(access, str):
-        return access
-
-    meta = getattr(item, 'meta', None)
-    if isinstance(meta, dict):
-        access = meta.get('access')
-        if isinstance(access, str):
-            return access
-
-    return None
-
-
-def has_api_detail_access(request: TownRequest, item: object) -> bool:
-    if role_for_request(request) in MANAGER_ROLES:
-        return True
-
-    return request.is_visible(item) and access_for_item(item) != 'mtan'
-
-
-class PaginatedCollection(Pagination[T], Generic[T]):
-
-    def __init__(
-        self,
-        request: TownRequest,
-        collection: Any,
-        model_class: type[T],
-        page: int = 0,
-        batch_size: int = API_BATCH_SIZE,
-        *,
-        order_by: Any | None = None,
-    ) -> None:
-        self.request = request
-        self.collection = collection
-        self.model_class = model_class
-        self.order_by = order_by
-        self.page = page
-        self.batch_size = batch_size
-
-    def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, self.__class__)
-            and self.request is other.request
-            and self.collection == other.collection
-            and self.model_class is other.model_class
-            and self.order_by == other.order_by
-            and self.page == other.page
-        )
-
-    def by_id(self, id: PKType) -> T | None:
-        try:
-            normalized_id = normalize_id(id)
-            by_id = getattr(self.collection, 'by_id', None)
-            if callable(by_id):
-                item = by_id(normalized_id)
-                if item is not None:
-                    return item
-
-            primary_key = sa_inspect(self.model_class).primary_key[0]
-            return filtered_query(
-                self.request,
-                self.collection.query(),
-                self.model_class,
-                order_by=self.order_by,
-            ).filter(primary_key == normalized_id).first()
-        except SQLAlchemyError:
-            return None
-
-    def subset(self) -> Query[T]:
-        return filtered_query(
-            self.request,
-            self.collection.query(),
-            self.model_class,
-            order_by=self.order_by,
-        )
-
-    def page_by_index(self, index: int) -> PaginatedCollection[T]:
-        return self.__class__(
-            self.request,
-            self.collection,
-            self.model_class,
-            page=index,
-            batch_size=self.batch_size,
-            order_by=self.order_by,
-        )
-
-    @property
-    def page_index(self) -> int:
-        return self.page
-
-
-class PaginatedSumCollection(Pagination[T], Generic[T]):
-
-    def __init__(
-        self,
-        request: TownRequest,
-        collections: Sequence[tuple[Any, type[T], Any | None]],
-        page: int = 0,
-        batch_size: int = API_BATCH_SIZE,
-    ) -> None:
-        self.request = request
-        self.collections = tuple(collections)
-        self.page = page
-        self.batch_size = batch_size
-
-    def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, self.__class__)
-            and self.request is other.request
-            and self.collections == other.collections
-            and self.page == other.page
-        )
-
-    def by_id(self, id: PKType) -> T | None:
-        normalized_id = normalize_id(id)
-
-        for collection, model_class, order_by in self.collections:
-            try:
-                by_id = getattr(collection, 'by_id', None)
-                if callable(by_id):
-                    item = by_id(normalized_id)
-                    if item is not None:
-                        return item
-
-                primary_key = sa_inspect(model_class).primary_key[0]
-                item = filtered_query(
-                    self.request,
-                    collection.query(),
-                    model_class,
-                    order_by=order_by,
-                ).filter(primary_key == normalized_id).first()
-                if item is not None:
-                    return item
-            except SQLAlchemyError:
-                continue
-
-        return None
-
-    def subset(self) -> Query[T]:
-        raise NotImplementedError(
-            'PaginatedSumCollection does not expose a single subset query'
-        )
-
-    @cached_property
-    def cached_subset(self) -> Query[T]:
-        raise NotImplementedError(
-            'PaginatedSumCollection does not expose a single cached subset'
-        )
-
-    @cached_property
-    def counts(self) -> tuple[int, ...]:
-        return tuple(
-            filtered_query(
-                self.request,
-                collection.query(),
-                model_class,
-                order_by=order_by,
-            ).order_by(None).count()
-            for collection, model_class, order_by in self.collections
-        )
-
-    @cached_property
-    def subset_count(self) -> int:
-        return sum(self.counts)
-
-    @cached_property
-    def batch(self) -> tuple[T, ...]:
-        offset = self.offset
-        remaining = self.batch_size
-        items: list[T] = []
-
-        for (
-            collection,
-            model_class,
-            order_by,
-        ), count in zip(self.collections, self.counts):
-            if remaining <= 0:
-                break
-            if offset >= count:
-                offset -= count
-                continue
-
-            query = filtered_query(
-                self.request,
-                collection.query(),
-                model_class,
-                order_by=order_by,
-            ).offset(offset).limit(remaining)
-            batch = tuple(query)
-            items.extend(batch)
-            remaining -= len(batch)
-            offset = 0
-
-        return tuple(items)
-
-    def page_by_index(self, index: int) -> PaginatedSumCollection[T]:
-        return self.__class__(
-            self.request,
-            self.collections,
-            page=index,
-            batch_size=self.batch_size,
-        )
-
-    @property
-    def page_index(self) -> int:
-        return self.page
-
-
-class TownApiEndpoint(ApiEndpoint[T], Generic[T]):
-
-    def by_id(self, id: PKType) -> T | None:
-        try:
-            item = self.collection.by_id(id)
-        except SQLAlchemyError:
-            return None
-
-        if item is None:
-            return None
-
-        return item if has_api_detail_access(self.request, item) else None
-
-
 class EventApiEndpoint(ApiEndpoint['Occurrence']):
-    app: TownApp
+    app: OrgApp
     endpoint = 'events'
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        collection = self._base_collection
+        filters: dict[str, Collection[str] | str | None] = {
+            'search': 'Performs a full-text search for the given term',
+            'start': 'Earliest event date '
+            '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
+            'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
+            'locations': 'Can be specified multiple times',
+            'sources': sorted(collection.used_sources),
+            'syndicate': ('true', 'false'),
+            'highlight': ('true', 'false'),
+        }
+        if not self.app.fts_search_enabled:
+            del filters['search']
+
+        filter_type = self.app.org.event_filter_type
+        if filter_type in ('tags', 'tags_and_filters'):
+            used_tags = collection.used_tags
+            if not self.app.custom_event_tags:
+                # built-in tags need to be translated
+                used_tags = {
+                    self.request.translate(_(tag))
+                    for tag in used_tags
+                }
+            filters['tags'] = sorted(used_tags)
+
+        filters.update(
+            (name, choices)
+            for name, __, choices in collection.available_filters()
+        )
+        return filters
 
     @property
     def title(self) -> str:
@@ -371,19 +107,113 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
     def description(self) -> str | None:
         return self.app.org.event_header_html or self.app.org.event_footer_html
 
-    @property
-    def collection(self) -> Any:
+    # NOTE: Since we need the collection in order to determine which
+    #       filters are available we cannot call `assert_valid_filter`
+    #       in the same property that gets accessed by filters. So we
+    #       split creating the collection into two steps, since the first
+    #       step is sufficient for determining the filters.
+    @cached_property
+    def _base_collection(self) -> OccurrenceCollection:
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),  # can see everything
+            'editor': (),  # can see everything
+            'member': ('member', 'mtan', 'public')
+        }.get(role, ('mtan', 'public'))
         result = OccurrenceCollection(
             self.session,
             page=self.page or 0,
-            only_public=True
+            available_accesses=available_accesses
         )
 
+        filter_type = self.app.org.event_filter_type
+        filter_config = self.app.org.event_filter_configuration
+        if (
+            filter_type in ('filters', 'tags_and_filters')
+            and filter_config.get('keywords', None)
+        ):
+            result.set_event_filter_configuration(filter_config)
+            result.set_event_filter_fields(self.app.org.event_filter_fields)
+        return result
+
+    def get_date_filter(self, key: str, values: list[str]) -> date | None:
+        value = self.scalarize_value(key, values)
+        if value is None:
+            return None
+        try:
+            return extended_date_decode(value)
+        except Exception:
+            raise ApiInvalidParamException(
+                f'Invalid ISO-8601 date for parameter {key!r}'
+            ) from None
+
+    @property
+    def collection(self) -> OccurrenceCollection:
+        result = self._base_collection
+        filter_keywords = {}
+        for key, values in self.extra_parameters.items():
+            self.assert_valid_filter(key)
+            if key == 'search':
+                term = self.scalarize_value(key, values)
+                result = result.for_filter(term=term)
+            elif key == 'start':
+                value = self.get_date_filter(key, values)
+                result = result.for_filter(
+                    start=value,
+                    outdated=value < date.today() if value else False,
+                )
+            elif key == 'end':
+                value = self.get_date_filter(key, values)
+                result = result.for_filter(end=value)
+            elif key == 'tags':
+                if not self.app.custom_event_tags:
+                    # FIXME: circular import
+                    from onegov.org.forms.event import TAGS
+                    # built-in tags are translated and need to be
+                    # transformed back to the stored tag name
+                    translated_to_orginal = {
+                        self.request.translate(tag): str(tag)
+                        for tag in TAGS
+                    }
+                    values = [
+                        translated_to_orginal.get(value, value)
+                        for value in values
+                    ]
+                result = result.for_filter(tags=values)
+            elif key == 'sources':
+                result = result.for_filter(sources=values)
+            elif key == 'locations':
+                result = result.for_filter(locations=values)
+            elif key == 'syndicate':
+                syn = self.scalarize_value(key, values)
+                if syn and syn.lower() == 'true':
+                    result = result.for_filter(syndicate=True)
+                elif syn and syn.lower() == 'false':
+                    result = result.for_filter(
+                        syndicate=False
+                    )
+            elif key == 'highlight':
+                hl = self.scalarize_value(key, values)
+                if hl and hl.lower() == 'true':
+                    result = result.for_filter(highlight=True)
+                elif hl and hl.lower() == 'false':
+                    result = result.for_filter(highlight=False)
+            else:
+                filter_keywords[key] = values
+
+        if filter_keywords:
+            result = result.for_keywords(**filter_keywords)
+
+        result.page = self.page or 0
         result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: Occurrence) -> dict[str, Any]:
-        return {
+        source = item.event.source
+        if source:
+            # Only include the source prefix
+            source = '-'.join(source.split('-', 2)[:2])
+        data: dict[str, Any] = {
             'title': item.title,
             'description': item.event.description,
             'organizer': item.event.organizer,
@@ -392,27 +222,48 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
             'external_event_url': item.event.external_event_url,
             'event_registration_url': item.event.event_registration_url,
             'price': item.event.price,
-            'tags': item.event.tags,
             'start': item.start.isoformat(),
             'end': item.end.isoformat(),
             'location': item.location,
+            'source': source,
             'coordinates': get_geo_location(item),
-            'created': item.created.isoformat(),
-            'modified': get_modified_iso_format(item),
         }
+
+        filter_type = self.app.org.event_filter_type
+        if filter_type in ('tags', 'tags_and_filters'):
+            tags = item.event.tags
+            if not self.app.custom_event_tags:
+                # built-in tags need to be translated
+                tags = [self.request.translate(_(tag)) for tag in tags]
+            data['tags'] = tags
+
+        if filter_type in ('filters', 'tags_and_filters'):
+            data.update(item.event.filter_keywords_ordered())
+
+        data['syndicate'] = item.event.syndicate or False
+        data['highlight'] = item.event.highlight or False
+        data['created'] = item.created.isoformat()
+        data['modified'] = get_modified_iso_format(item)
+        return data
 
     def item_links(self, item: Occurrence) -> dict[str, Any]:
         return {
             'html': item,
             'image': item.event.image,
-            'pfd': item.event.pdf
+            'pdf': item.event.pdf
         }
 
 
-class NewsApiEndpoint(TownApiEndpoint[News]):
-    app: TownApp
+class NewsApiEndpoint(ApiEndpoint[News]):
+    app: OrgApp
+    request: OrgRequest
     endpoint = 'news'
-    filters = set()
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     @property
     def title(self) -> str:
@@ -424,6 +275,10 @@ class NewsApiEndpoint(TownApiEndpoint[News]):
             self.request,
             page=self.page or 0,
         )
+        for key, values in self.extra_parameters.items():
+            self.assert_valid_filter(key)
+            if key == 'search':
+                result.term = self.scalarize_value(key, values)
         result.batch_size = 25
         return result
 
@@ -437,8 +292,7 @@ class NewsApiEndpoint(TownApiEndpoint[News]):
             publication_end = item.publication_end.isoformat()
         else:
             publication_end = None
-
-        return {
+        data = {
             'title': item.title,
             'lead': item.lead,
             'text': item.text,
@@ -448,6 +302,10 @@ class NewsApiEndpoint(TownApiEndpoint[News]):
             'created': item.created.isoformat(),
             'modified': get_modified_iso_format(item),
         }
+        if item.access == 'mtan' and not self.request.is_manager:
+            # remove the part that should not be public
+            del data['text']
+        return data
 
     def item_links(self, item: News) -> dict[str, Any]:
         return {
@@ -456,11 +314,16 @@ class NewsApiEndpoint(TownApiEndpoint[News]):
         }
 
 
-class TopicApiEndpoint(TownApiEndpoint[Topic]):
-    request: TownRequest
-    app: TownApp
+class TopicApiEndpoint(ApiEndpoint[Topic]):
+    request: OrgRequest
+    app: OrgApp
     endpoint = 'topics'
-    filters = set()
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     @property
     def title(self) -> str:
@@ -469,10 +332,13 @@ class TopicApiEndpoint(TownApiEndpoint[Topic]):
     @property
     def collection(self) -> Any:
         result = TopicCollection(
-            self.session,
-            page=self.page or 0,
-            only_public=True
+            self.request,
+            page=self.page or 0
         )
+        for key, values in self.extra_parameters.items():
+            self.assert_valid_filter(key)
+            if key == 'search':
+                result.term = self.scalarize_value(key, values)
         result.batch_size = 25
         return result
 
@@ -487,7 +353,7 @@ class TopicApiEndpoint(TownApiEndpoint[Topic]):
         else:
             publication_end = None
 
-        return {
+        data = {
             'title': item.title,
             'lead': item.lead,
             'text': item.text,
@@ -496,6 +362,10 @@ class TopicApiEndpoint(TownApiEndpoint[Topic]):
             'created': item.created.isoformat(),
             'modified': get_modified_iso_format(item),
         }
+        if item.access == 'mtan' and not self.request.is_manager:
+            # remove the part that should not be public
+            del data['text']
+        return data
 
     def item_links(self, item: Topic) -> dict[str, Any]:
         return {
@@ -507,17 +377,52 @@ class TopicApiEndpoint(TownApiEndpoint[Topic]):
         }
 
 
+# NOTE: The only thing we make use of is `adapt` to inject fulltext search
+class DummyDirectorySearchWidget:
+    name: str
+    search_query: Query[ExtendedDirectoryEntry]
+
+    def __init__(self, request: OrgRequest, term: str | None) -> None:
+        self.request = request
+        self.term = term
+
+    def adapt[T](self, query: Query[T]) -> Query[T]:
+        if self.term:
+            language = self.request.locale
+            if language_from_locale(language) == 'simple':
+                language = 'simple'
+            query = query.join(
+                SearchIndex,
+                and_(
+                    SearchIndex.owner_id_uuid == ExtendedDirectoryEntry.id,
+                    SearchIndex.owner_type == 'ExtendedDirectoryEntry'
+                )
+            )
+            query = query.filter(SearchIndex.data_vector.op('@@')(
+                func.websearch_to_tsquery(language, self.term)
+            ))
+        return query
+
+    def html(self, layout: Any) -> Any:
+        raise NotImplementedError()
+
+
 class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
-    request: TownRequest
-    app: TownApp
-    filters = set()
+    request: OrgRequest
+    app: OrgApp
     endpoint: str
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     def __init__(
         self,
-        request: TownRequest,
+        request: OrgRequest,
         name: str,
-        extra_parameters: dict[str, str | None] | None = None,
+        extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
     ):
         super().__init__(request, extra_parameters, page)
@@ -545,6 +450,14 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
             page=self.page or 0,
             published_only=True
         )
+        for key, values in self.extra_parameters.items():
+            self.assert_valid_filter(key)
+            if key == 'search':
+                term = self.scalarize_value(key, values)
+                result.search_widget = DummyDirectorySearchWidget(
+                    self.request,
+                    term
+                )
         result.batch_size = 25
         return result
 
@@ -565,9 +478,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
 
         return self.__class__(self.request, self.endpoint, filters)
 
-    def by_id(
-            self, id: PKType
-              ) -> ExtendedDirectoryEntry | None:
+    def by_id(self, id: PKType) -> ExtendedDirectoryEntry | None:
         """ Return the item with the given ID from the collection. """
 
         try:

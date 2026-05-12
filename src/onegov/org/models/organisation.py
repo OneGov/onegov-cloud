@@ -9,21 +9,20 @@ from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property, TimestampMixin)
-from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.core.utils import linkify, paragraphify
 from onegov.file.models.file import File
 from onegov.form import flatten_fieldsets, parse_formcode
 from onegov.org.theme import user_options
 from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
-from sqlalchemy import Column, Text
-from uuid import uuid4
+from sqlalchemy.orm import mapped_column, Mapped
+from uuid import uuid4, UUID
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
     from collections.abc import Iterator
+    from datetime import datetime
     from markupsafe import Markup
     from onegov.core.framework import Framework
     from onegov.form.parser.core import ParsedField
@@ -63,29 +62,25 @@ class Organisation(Base, TimestampMixin):
     __tablename__ = 'organisations'
 
     #: the id of the organisation, an automatically generated uuid
-    id: Column[uuid.UUID] = Column(
-        UUID,  # type:ignore[arg-type]
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
     )
 
     #: the name of the organisation
-    name: Column[str] = Column(Text, nullable=False)
+    name: Mapped[str]
 
     #: the logo of the organisation
-    logo_url: Column[str | None] = Column(Text, nullable=True)
+    logo_url: Mapped[str | None]
 
     #: the theme options of the organisation
-    theme_options: Column[dict[str, Any] | None] = Column(
-        JSON,
-        nullable=True,
+    theme_options: Mapped[dict[str, Any] | None] = mapped_column(
         default=user_options.copy
     )
 
     #: additional data associated with the organisation
-    # FIXME: This should probably not be nullable
-    meta: Column[dict[str, Any]] = Column(  # type:ignore[assignment]
-        JSON,
+    # FIXME: This should probably not be nullable (requires migration)
+    meta: Mapped[dict[str, Any]] = mapped_column(
         nullable=True,
         default=dict
     )
@@ -342,8 +337,9 @@ class Organisation(Base, TimestampMixin):
     ogd_publisher_name: dict_property[str | None] = meta_property()
 
     # cron jobs
-    hourly_maintenance_tasks_last_run: (
-        dict_property)[UTCDateTime | None] = (meta_property(default=None))
+    hourly_maintenance_tasks_last_run: dict_property[datetime | None] = (
+        meta_property(default=None)
+    )
 
     firebase_adminsdk_credential: dict_property[str | None] = meta_property()
     selectable_push_notification_options: dict_property[list[list[str]]] = (
@@ -403,8 +399,8 @@ class Organisation(Base, TimestampMixin):
         for y1, m1, d1, y2, m2, d2 in self.holiday_settings.get('school', ()):
             yield date(y1, m1, d1), date(y2, m2, d2)
 
-    @contact.setter  # type:ignore[no-redef]
-    def contact(self, value: str | None) -> None:
+    @contact.inplace.setter
+    def _contact_setter(self, value: str | None) -> None:
         self.meta['contact'] = value
         # update cache
         self.__dict__['contact_html'] = paragraphify(linkify(value))
@@ -413,8 +409,8 @@ class Organisation(Base, TimestampMixin):
     def contact_html(self) -> Markup:
         return paragraphify(linkify(self.contact))
 
-    @opening_hours.setter  # type:ignore[no-redef]
-    def opening_hours(self, value: str | None) -> None:
+    @opening_hours.inplace.setter
+    def _opening_hours_setter(self, value: str | None) -> None:
         self.meta['opening_hours'] = value
         # update cache
         self.__dict__['opening_hours_html'] = paragraphify(linkify(value))

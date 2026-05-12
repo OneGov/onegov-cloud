@@ -632,6 +632,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         default=False,
     )
 
+    show_all_including_hidden = BooleanField(
+        label=_('Show all translators including hidden'),
+        default=False,
+    )
+
     order_by = RadioField(
         label=_('Order by'),
         choices=(
@@ -678,6 +683,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.guilds.data = model.guilds or []
         self.admission.data = model.admissions or []
         self.include_hidden.data = model.include_hidden
+        self.show_all_including_hidden.data = model.show_all_including_hidden
 
     def update_model(self, model: TranslatorCollection) -> None:
         model.spoken_langs = self.spoken_langs.data
@@ -691,6 +697,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         model.admissions = self.admission.data or []
         model.genders = self.genders.data or []
         model.include_hidden = self.include_hidden.data
+        model.show_all_including_hidden = self.show_all_including_hidden.data
 
     def on_request(self) -> None:
         self.spoken_langs.choices = self.language_choices
@@ -702,6 +709,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.genders.choices = self.gender_choices
         if not self.request.is_admin:
             self.hide(self.include_hidden)
+            self.hide(self.show_all_including_hidden)
 
 
 class MailTemplatesForm(Form):

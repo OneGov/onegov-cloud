@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-29 01:23+0100\n"
+"POT-Creation-Date: 2026-03-25 10:35+0100\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -145,6 +145,8 @@ msgstr "Anmelden"
 msgid "Translators"
 msgstr "Übersetzer/innen"
 
+#.
+#. will be filled in on_request
 msgid "Personal Information"
 msgstr "Persönliche Informationen"
 
@@ -251,6 +253,8 @@ msgstr "Telefon Mobile"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
+#. will be set in on_request
+#.
 msgid "Legal"
 msgstr "Rechtliches"
 
@@ -315,6 +319,8 @@ msgstr "Referenzen"
 msgid "Admission course of the high court of the Canton of Zurich available"
 msgstr "Zulassungskurs – Obergericht ZH vorhanden"
 
+#.
+#. will be set in on_request
 msgid "Admission course"
 msgstr "Zulassungskurs"
 
@@ -361,8 +367,8 @@ msgstr "Aktueller Auszug aus dem Zentralstrafregister (PDF)"
 msgid ""
 "Maximum 6 months since issue. Online order at www.strafregister.admin.ch"
 msgstr ""
-"Max. 6 Monate seit Ausstellung. Online-Bestellung unter www.strafregister."
-"admin.ch"
+"Max. 6 Monate seit Ausstellung. Online-Bestellung unter "
+"www.strafregister.admin.ch"
 
 msgid "Certificate of Capability (PDF)"
 msgstr "Handlungsfähigkeitszeugnis (PDF)"
@@ -427,6 +433,8 @@ msgstr ""
 msgid "Yes"
 msgstr "Ja"
 
+#.
+#. noqa: N806
 msgid "No"
 msgstr "Nein"
 
@@ -479,6 +487,8 @@ msgstr "Ihre Nachricht"
 msgid "Message"
 msgstr "Nachricht"
 
+#.
+#. will be filled in on_request
 msgid "Proposed changes"
 msgstr "Vorgeschlagene Änderungen"
 
@@ -536,16 +546,12 @@ msgstr "Art der Übersetzung/Dolmetschung"
 msgid "Assignment Location"
 msgstr "Einsatzort"
 
-msgid "Location Override (manual entry)"
-msgstr "Ortsangabe überschreiben (manuelle Eingabe)"
+msgid "Different place"
+msgstr "Anderer Ort"
 
-msgid ""
-"Enter a custom location address. Travel compensation will be calculated "
-"based on the geocoded location. Example: Beckenstube 1, 8200 Schaffhausen"
+msgid "Enter the address of the assignment location"
 msgstr ""
-"Geben Sie eine benutzerdefinierte Ortsadresse ein. Die "
-"Reisekostenentschädigung wird basierend auf dem geokodierten Standort "
-"berechnet. Beispiel: Beckenstube 1, 8200 Schaffhausen"
+"Adresse des Einsatzortes. Beispiel: Friedbergstrasse 36, 8200 Schaffhausen"
 
 msgid "Cost center"
 msgstr "Finanzstelle"
@@ -565,8 +571,18 @@ msgstr "Endzeit"
 msgid "Break time"
 msgstr "Pausenzeit, in Stunden"
 
+msgid "Pages"
+msgstr "Seiten"
+
 msgid "Case Number"
 msgstr "Geschäfts- oder Verfahrensnummer"
+
+msgid ""
+"Exceptionally urgent (only for assignments with less than 4 hours advance "
+"notice)"
+msgstr ""
+"Ausserordentlich dringlich (nur bei Aufgeboten mit weniger als 4 Stunden "
+"Vorlaufzeit)"
 
 msgid "25% surcharge"
 msgstr "25% Zuschlag"
@@ -581,10 +597,19 @@ msgid "Notes"
 msgstr "Notizen"
 
 msgid "Please select a location"
-msgstr "Bitte wählen Sie einen Standort"
+msgstr "Bitte wählen Sie einen Einsatzort"
+
+msgid "This field is required"
+msgstr "Das ist ein Pflichtfeld."
 
 msgid "End time must be after start time"
 msgstr "Endzeit muss nach Startzeit liegen"
+
+msgid "A time report already exists for this start time"
+msgstr "Für diese Startzeit existiert bereits eine Zeiterfassung"
+
+msgid "Other location (please enter address in next field)"
+msgstr "Anderer Ort (bitte Adresse im nächsten Feld eingeben)"
 
 msgid "Contract Number"
 msgstr "Vertragsnummer"
@@ -627,6 +652,9 @@ msgstr "Suche in Vor- und Nachname"
 
 msgid "Hidden only"
 msgstr "Nur versteckte anzeigen"
+
+msgid "Show all translators including hidden"
+msgstr "Alle Dolmetscher inkl. versteckte anzeigen"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -676,7 +704,8 @@ msgstr ""
 "Benachrichtigungen verwendet."
 
 msgid "All accountant users must have the editor or admin role"
-msgstr "Alle Benutzer des Rechnungswesen müssen Editoren oder Administratoren sein."
+msgstr ""
+"Alle Benutzer des Rechnungswesen müssen Editoren oder Administratoren sein."
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -780,11 +809,17 @@ msgstr "Art"
 msgid "Finanzstelle"
 msgstr "Finanzstelle"
 
-msgid "Hourly Rate"
-msgstr "Stundenansatz"
+msgid "Per-page rate"
+msgstr "Seitenansatz"
 
 msgid "Duration"
 msgstr "Dauer"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Hourly Rate"
+msgstr "Stundenansatz"
 
 msgid "Day hours"
 msgstr "Tagesstunden"
@@ -815,9 +850,6 @@ msgstr "nach"
 
 msgid "Meal Allowance (6+ hours)"
 msgstr "Verpflegungsentschädigung (6+ Stunden)"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Download PDF"
 msgstr "PDF herunterladen"
@@ -950,11 +982,22 @@ msgstr "Zeit:"
 msgid "Please review the details and process accordingly."
 msgstr "Bitte überprüfen Sie die Details und fahren Sie entsprechend fort."
 
-msgid "A time report has been submitted for you and is now under review."
-msgstr "Eine Zeiterfassung wurde für Sie eingereicht und wird nun geprüft."
+msgid ""
+"A time report has been submitted for you and is now being reviewed by our "
+"internal control office:"
+msgstr ""
+"Eine Zeiterfassung wurde für Sie eingereicht und wird nun durch unsere "
+"interne Kontrollstelle geprüft:"
 
 msgid "Please carefully review and report any discrepancies immediately."
 msgstr "Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden"
+
+msgid ""
+"Once the review is complete, you will be informed again. Thank you for your "
+"service and best regards."
+msgstr ""
+"Sobald die Kontrolle abgeschlossen ist, werden Sie wieder informiert. "
+"Besten Dank für Ihren Einsatz und mit freundlichen Grüssen."
 
 msgid "If you have any questions, please contact:"
 msgstr "Bei Fragen wenden Sie sich bitte an:"
@@ -971,6 +1014,12 @@ msgstr "Zulassung verweigert."
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
 
+msgid "Note: Export will only include confirmed reports."
+msgstr "Hinweis: Export enthält nur bestätigte Zeiterfassungen."
+
+msgid "Written translations without page count:"
+msgstr "Schriftliche Übersetzungen ohne Seitenangabe:"
+
 msgid "No time reports found"
 msgstr "Keine Zeiterfassungen gefunden"
 
@@ -980,14 +1029,11 @@ msgstr "Keine archivierten Zeiterfassungen gefunden"
 msgid "Created"
 msgstr "Erstellt"
 
-msgid "Actions"
-msgstr "Aktionen"
-
 msgid "Exported"
 msgstr "Exportiert"
 
-msgid "View Ticket"
-msgstr "Ticket anzeigen"
+msgid "Actions"
+msgstr "Aktionen"
 
 msgid "This translator is in the admission process!"
 msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"
@@ -1006,6 +1052,10 @@ msgstr "Telefonischer Kontakt"
 
 msgid "Error: No custom texts found"
 msgstr "Fehler: Keine benutzerdefinierten Texte gefunden"
+
+#, python-format
+msgid "Error: No custom text found for '${key}'"
+msgstr "Fehler: Keinen benutzerdefinierten Text gefunden für '${key}'"
 
 msgid "No Finanzstelle specified"
 msgstr "Keine Finanzstelle"
@@ -1077,6 +1127,9 @@ msgstr ""
 
 msgid "Export"
 msgstr "Exportieren"
+
+msgid "Written translation without page count"
+msgstr "Schriftliche Übersetzung ohne Seitenangabe"
 
 msgid "Only pending time reports can be edited"
 msgstr "Nur ausstehende Zeiterfassungen können bearbeitet werden"
@@ -1201,66 +1254,3 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
-
-#~ msgid "Showing archived (exported) time reports."
-#~ msgstr "Zeigt archivierte (exportierte) Zeiterfassungen an."
-
-#~ msgid ""
-#~ "No confirmed time reports available for export. Time reports must be "
-#~ "confirmed before they can be exported."
-#~ msgstr ""
-#~ "Keine bestätigten Zeiterfassungen für den Export verfügbar. "
-#~ "Zeiterfassungen müssen bestätigt werden, bevor sie exportiert werden "
-#~ "können."
-
-#~ msgid "Month"
-#~ msgstr "Monat"
-
-#~ msgid "Year"
-#~ msgstr "Jahr"
-
-#~ msgid "Export für Buchhaltung"
-#~ msgstr "Export für Buchhaltung"
-
-#~ msgid "January"
-#~ msgstr "Januar"
-
-#~ msgid "February"
-#~ msgstr "Februar"
-
-#~ msgid "March"
-#~ msgstr "März"
-
-#~ msgid "April"
-#~ msgstr "April"
-
-#~ msgid "May"
-#~ msgstr "Mai"
-
-#~ msgid "June"
-#~ msgstr "Juni"
-
-#~ msgid "July"
-#~ msgstr "Juli"
-
-#~ msgid "August"
-#~ msgstr "August"
-
-#~ msgid "September"
-#~ msgstr "September"
-
-#~ msgid "October"
-#~ msgstr "Oktober"
-
-#~ msgid "November"
-#~ msgstr "November"
-
-#~ msgid "December"
-#~ msgstr "Dezember"
-
-#~ msgid "Invalid form data"
-#~ msgstr "Ungültige Formulardaten"
-
-#, python-format
-#~ msgid "No confirmed time reports found for ${month}/${year}"
-#~ msgstr "Keine bestätigten Zeiterfassungen gefunden für ${month}/${year}"

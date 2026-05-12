@@ -15,16 +15,10 @@ if TYPE_CHECKING:
     from onegov.activity.matching.interfaces import MatchableOccasion
     from sortedcontainers._typing import SupportsHashableAndRichComparison
     from sortedcontainers.sortedset import SortedKeySet
-    from typing_extensions import TypeVar
     from uuid import UUID
 
-    BookingT = TypeVar('BookingT', bound=MatchableBooking | Booking)
-    OccasionT = TypeVar('OccasionT', bound=MatchableOccasion | Occasion)
-    OrderT = TypeVar(
-        'OrderT',
-        bound=SupportsHashableAndRichComparison,
-        default=tuple[Decimal, int, UUID]
-    )
+
+type DefaultOrder = tuple[Decimal, int, SupportsRichComparison]
 
 
 def overlaps(
@@ -132,7 +126,10 @@ def booking_order(
     return booking.score * - 1, booking.priority * -1, booking.id
 
 
-def unblockable(
+def unblockable[
+    BookingT: Booking | MatchableBooking,
+    OrderT: SupportsHashableAndRichComparison = DefaultOrder
+](
     accepted: Iterable[BookingT],
     blocked: Iterable[BookingT],
     # NOTE: value defaults don't yet have an exception for type params
