@@ -8,7 +8,7 @@
             <p i18n:translate>Hello!</p>
             <p i18n:translate>You have subscribed to the following needs:</p>
         </tal:b>
-        <ul>
+        <ul class="normal">
             <tal:needs repeat="subscription subscriptions">
                 <li>
                     <b>${subscription.need.name}</b> - <a href="${request.link(subscription.need.occasion.activity)}">

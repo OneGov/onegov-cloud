@@ -189,6 +189,14 @@
         Margin-bottom: 10px;
     }
 
+    ul.normal li {
+        list-style-position: outside;
+    }
+
+    ul.normal {
+        margin-left: 10px;
+    }
+
     hr {
         border: 1px solid #ddd;
         border-width: 1px 0 0 0;
