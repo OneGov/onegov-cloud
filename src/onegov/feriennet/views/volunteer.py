@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from itertools import groupby
 from datetime import date
+
+from markupsafe import Markup
 from onegov.activity import Volunteer, VolunteerCollection
 from onegov.core.security import Public, Secret
 from onegov.core.templates import render_macro
@@ -339,6 +341,10 @@ def submit_volunteer(
         complete = True
 
         subject = _('Subscription as a volunteer')
+        custom_text_before_list = Markup(
+            request.app.org.meta.get('before_list_text', '').strip())
+        custom_text_after_list = Markup(
+            request.app.org.meta.get('after_list_text', '').strip())
 
         request.app.send_transactional_email(
             subject=subject,
@@ -348,6 +354,8 @@ def submit_volunteer(
                     'layout': DefaultMailLayout(self, request),
                     'title': subject,
                     'subscriptions': subscriptions,
+                    'custom_text_before_list': custom_text_before_list,
+                    'custom_text_after_list': custom_text_after_list,
                 }
             )
         )

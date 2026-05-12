@@ -11,7 +11,7 @@ from onegov.feriennet.qrbill import swiss_iban
 from onegov.feriennet.utils import format_donation_amounts
 from onegov.feriennet.utils import parse_donation_amounts
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import MultiCheckboxField, PanelField
 from onegov.form.validators import Stdnum
 from onegov.org.forms.fields import HtmlField
 from onegov.org.models import Organisation
@@ -144,7 +144,7 @@ class FeriennetSettingsForm(Form):
 
     volunteers = RadioField(
         label=_('Volunteer registration'),
-        fieldset=_('Experimental'),
+        fieldset=_('Volunteers'),
         choices=[
             ('disabled', _('Disabled')),
             ('admins', _('Only for Admins')),
@@ -152,6 +152,33 @@ class FeriennetSettingsForm(Form):
         ],
         default='disabled'
     )
+
+    custom_text_info = PanelField(
+        label=_('Custom volunteer subscription mail text'),
+        hide_label=False,
+        fieldset=_('Volunteers'),
+        text=(
+            'You can overwrite the standard volunteer subscription mail '
+            'text before and after the list of subscriptions. The standard '
+            'text is:\n\n'
+            '"Hello!\n'
+            'You have subscribed to the following needs:\n'
+            '[List of subscriptions]\n'
+            'Thank you for offering to volunteer! We will have a look at your '
+            'request and get back to you."'
+        ),
+        kind='',
+    )
+
+    before_list_text = HtmlField(
+        label=_('Before list text'),
+        fieldset=_('Volunteers'),
+        render_kw={'rows': 10})
+
+    after_list_text = HtmlField(
+        label=_('After list text'),
+        fieldset=_('Volunteers'),
+        render_kw={'rows': 10})
 
     def ensure_beneificary_if_bank_account(self) -> bool | None:
         if self.bank_account.data and not self.bank_beneficiary.data:
@@ -246,6 +273,8 @@ class FeriennetSettingsForm(Form):
             ('donation_amounts', DEFAULT_DONATION_AMOUNTS),
             ('donation_description', ''),
             ('volunteers', 'disabled'),
+            ('before_list_text', ''),
+            ('after_list_text', '')
         )
 
         for attr, default in attributes:
@@ -253,7 +282,8 @@ class FeriennetSettingsForm(Form):
 
             if attr == 'donation_amounts':
                 value = format_donation_amounts(value)
-            elif attr == 'donation_description':
+            elif attr in ('donation_description', 
+                          'before_list_text', 'after_list_text'):
                 # NOTE: We need to treat this as Markup
                 # TODO: It would be cleaner if we had a proxy object
                 #       with all the attributes as dict_property, then
@@ -281,6 +311,8 @@ class FeriennetSettingsForm(Form):
             'donation_amounts',
             'donation_description',
             'volunteers',
+            'before_list_text',
+            'after_list_text'
         )
 
         super().populate_obj(obj, exclude=attributes)
