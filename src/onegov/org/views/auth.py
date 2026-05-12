@@ -191,7 +191,7 @@ def handle_registration(
             )
             request.success(_(
                 'Thank you for registering. Please follow the instructions '
-                'on the activiation e-mail sent to you. Please check your '
+                'on the activation e-mail sent to you. Please check your '
                 'spam folder if you have not received the email.'
             ))
 

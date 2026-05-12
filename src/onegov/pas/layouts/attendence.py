@@ -51,6 +51,14 @@ class AttendenceCollectionLayout(DefaultLayout):
                     attrs={'class': 'new-attendence'},
                 ),
             ])
+        elif self.request.is_commission_president:
+            links.append(
+                Link(
+                    text=_('Commission session (bulk)'),
+                    url=self.request.link(self.model, 'new-commission-bulk'),
+                    attrs={'class': 'new-attendence'},
+                ),
+            )
         return [
             LinkGroup(
                 title=_('Add'),
