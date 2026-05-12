@@ -16,35 +16,35 @@ from onegov.org.models.directory import (
     ExtendedDirectoryEntryCollection)
 from onegov.org.models.external_link import (
     ExternalFormLink, ExternalLinkCollection, ExternalResourceLink)
-from onegov.org.models.meeting import Meeting, MeetingCollection
 from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
-from onegov.org.models.parliament import (
-    RISCommission, RISCommissionCollection,
-    RISParliamentarian, RISParliamentarianCollection,
-    RISParliamentaryGroup, RISParliamentaryGroupCollection)
-from onegov.org.models.political_business import (
-    PoliticalBusiness, PoliticalBusinessCollection)
 from onegov.people import Person
 from onegov.people.collections import PersonCollection
 from onegov.reservation.collection import ResourceCollection
 from onegov.reservation.models import Resource
 from onegov.search import SearchIndex
 from onegov.search.utils import language_from_locale
-from sqlalchemy import and_, func
+from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
-from uuid import UUID
 
 
-from typing import Any, Self, TYPE_CHECKING
+from typing import Any, Protocol, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Collection, Mapping
+    from collections.abc import Collection, Mapping, Sequence
     from onegov.core.collection import PKType
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
     from onegov.event.models import Occurrence
     from onegov.org.app import OrgApp
     from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import DeclarativeBase, Query
+
+    class CollectionLike[T: DeclarativeBase](Protocol):
+        def query(self) -> Query[T]: ...
+        def by_id(self, id: Any, /) -> T | None: ...
+
+
+type FormOrExternalLink = FormDefinition | ExternalFormLink
+type ResourceOrExternalLink = Resource | ExternalResourceLink
 
 
 def get_geo_location(item: ContentMixin) -> dict[str, Any]:
@@ -60,6 +60,190 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
     :return: str iso representation of item last modification
     """
     return item.last_change.isoformat()
+
+
+def apply_visibility_filters[T: DeclarativeBase](
+    request: OrgRequest,
+    query: Query[T],
+    model_class: type[T],
+) -> Query[T]:
+    role = getattr(request.identity, 'role', 'anonymous')
+    available_accesses = {
+        'admin': (),  # can see everything
+        'editor': (),  # can see everything
+        'member': ('member', 'mtan', 'public')
+    }.get(role, ('mtan', 'public'))
+    if hasattr(model_class, 'meta') and available_accesses:
+        query = query.filter(or_(
+            *(
+                model_class.meta['access'].astext == access  # type: ignore[attr-defined]
+                for access in available_accesses
+            ),
+            model_class.meta['access'].is_(None)  # type: ignore[attr-defined]
+        ))
+
+    if (
+        role not in ('admin', 'editor')
+        and hasattr(model_class, 'publication_started')
+        and hasattr(model_class, 'publication_ended')
+    ):
+        query = query.filter(
+            model_class.publication_started == True,  # type: ignore[attr-defined]
+            model_class.publication_ended == False  # type: ignore[attr-defined]
+        )
+
+    return query
+
+
+class PaginatedCollection[T: DeclarativeBase](Pagination[T]):
+
+    def __init__(
+        self,
+        request: OrgRequest,
+        collection: CollectionLike[T],
+        model_class: type[T],
+        batch_size: int,
+        page: int = 0,
+    ) -> None:
+        self.request = request
+        self.collection = collection
+        self.model_class = model_class
+        self.page = page
+        self.batch_size = batch_size
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, self.__class__)
+            and self.request is other.request
+            and self.collection == other.collection
+            and self.model_class is other.model_class
+            and self.page == other.page
+        )
+
+    def by_id(self, id: PKType) -> T | None:
+        result = self.collection.by_id(id)
+        if result and self.request.is_visible(result):
+            return result
+        return None
+
+    def subset(self) -> Query[T]:
+        return apply_visibility_filters(
+            self.request,
+            self.collection.query(),
+            self.model_class,
+        )
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.request,
+            self.collection,
+            self.model_class,
+            batch_size=self.batch_size,
+            page=index,
+        )
+
+    @property
+    def page_index(self) -> int:
+        return self.page
+
+
+class PaginatedSumCollection[T: DeclarativeBase](Pagination[T]):
+
+    def __init__(
+        self,
+        request: OrgRequest,
+        collections: Sequence[tuple[CollectionLike[T], type[T]]],
+        batch_size: int,
+        page: int = 0,
+    ) -> None:
+        self.request = request
+        self.collections = tuple(collections)
+        self.batch_size = batch_size
+        self.page = page
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, self.__class__)
+            and self.request is other.request
+            and self.collections == other.collections
+            and self.page == other.page
+        )
+
+    def by_id(self, id: PKType) -> T | None:
+        for collection, model_class in self.collections:
+            result = collection.by_id(id)
+            if result is not None:
+                break
+
+        if result and self.request.is_visible(result):
+            return result
+        return None
+
+    def subset(self) -> Query[T]:
+        raise NotImplementedError(
+            'PaginatedSumCollection does not expose a single subset query'
+        )
+
+    @cached_property
+    def cached_subset(self) -> Query[T]:
+        raise NotImplementedError(
+            'PaginatedSumCollection does not expose a single cached subset'
+        )
+
+    @cached_property
+    def counts(self) -> tuple[int, ...]:
+        return tuple(
+            apply_visibility_filters(
+                self.request,
+                collection.query().order_by(None),
+                model_class,
+            ).count()
+            for collection, model_class in self.collections
+        )
+
+    @cached_property
+    def subset_count(self) -> int:
+        return sum(self.counts)
+
+    @cached_property
+    def batch(self) -> tuple[T, ...]:
+        offset = self.offset
+        remaining = self.batch_size
+        items: list[T] = []
+
+        for (
+            collection,
+            model_class,
+        ), count in zip(self.collections, self.counts):
+            if remaining <= 0:
+                break
+            if offset >= count:
+                offset -= count
+                continue
+
+            query = apply_visibility_filters(
+                self.request,
+                collection.query(),
+                model_class,
+            ).offset(offset).limit(remaining)
+            batch = tuple(query)
+            items.extend(batch)
+            remaining -= len(batch)
+            offset = 0
+
+        return tuple(items)
+
+    def page_by_index(self, index: int) -> Self:
+        return self.__class__(
+            self.request,
+            self.collections,
+            page=index,
+            batch_size=self.batch_size,
+        )
+
+    @property
+    def page_index(self) -> int:
+        return self.page
 
 
 class EventApiEndpoint(ApiEndpoint['Occurrence']):
@@ -532,12 +716,9 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
         return data
 
 
-FormOrExternalLink: TypeAlias = FormDefinition | ExternalFormLink
-ResourceOrExternalLink: TypeAlias = Resource | ExternalResourceLink
-
-
-class FormApiEndpoint(TownApiEndpoint[FormOrExternalLink]):
-    app: TownApp
+class FormApiEndpoint(ApiEndpoint[FormOrExternalLink]):
+    app: OrgApp
+    request: OrgRequest
     endpoint = 'forms'
 
     @property
@@ -551,19 +732,17 @@ class FormApiEndpoint(TownApiEndpoint[FormOrExternalLink]):
             (
                 (
                     FormCollection(self.session).definitions,
-                    FormDefinition,
-                    FormDefinition.order,
+                    FormDefinition
                 ),
                 (
                     ExternalLinkCollection.for_model(
                         self.session, FormCollection
                     ),
-                    ExternalFormLink,
-                    ExternalFormLink.order,
+                    ExternalFormLink
                 ),
             ),
-            page=self.page or 0,
-            batch_size=API_BATCH_SIZE,
+            batch_size=self.batch_size,
+            page=self.page or 0
         )
 
     def item_data(self, item: FormOrExternalLink) -> dict[str, Any]:
@@ -571,17 +750,21 @@ class FormApiEndpoint(TownApiEndpoint[FormOrExternalLink]):
             return {
                 'title': item.title,
                 'lead': item.lead,
-                'group': item.group,
                 'url': item.url,
+                'group': item.group,
                 'type': 'external',
             }
-        return {
+        data = {
             'title': item.title,
             'lead': item.lead,
-            'text': str(item.text) if item.text else None,
+            'text': item.text,
             'group': item.group,
             'type': 'internal',
         }
+        if item.meta.get('access') == 'mtan' and not self.request.is_manager:
+            # remove the part that should not be public
+            del data['text']
+        return data
 
     def item_links(self, item: FormOrExternalLink) -> dict[str, Any]:
         if isinstance(item, ExternalFormLink):
@@ -589,8 +772,9 @@ class FormApiEndpoint(TownApiEndpoint[FormOrExternalLink]):
         return {'html': item}
 
 
-class ResourceApiEndpoint(TownApiEndpoint[ResourceOrExternalLink]):
-    app: TownApp
+class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink]):
+    app: OrgApp
+    request: OrgRequest
     endpoint = 'resources'
 
     @property
@@ -604,19 +788,17 @@ class ResourceApiEndpoint(TownApiEndpoint[ResourceOrExternalLink]):
             (
                 (
                     ResourceCollection(self.app.libres_context),
-                    Resource,
-                    Resource.title,
+                    Resource
                 ),
                 (
                     ExternalLinkCollection.for_model(
                         self.session, ResourceCollection
                     ),
-                    ExternalResourceLink,
-                    ExternalResourceLink.order,
+                    ExternalResourceLink
                 ),
             ),
+            batch_size=self.batch_size,
             page=self.page or 0,
-            batch_size=API_BATCH_SIZE,
         )
 
     def item_data(
@@ -646,8 +828,9 @@ class ResourceApiEndpoint(TownApiEndpoint[ResourceOrExternalLink]):
         return {'html': item}
 
 
-class PersonApiEndpoint(TownApiEndpoint[Person]):
-    app: TownApp
+class PersonApiEndpoint(ApiEndpoint[Person]):
+    app: OrgApp
+    request: OrgRequest
     endpoint = 'people'
 
     _public_fields: tuple[str, ...] = (
@@ -683,8 +866,8 @@ class PersonApiEndpoint(TownApiEndpoint[Person]):
             self.request,
             PersonCollection(self.session),
             Person,
+            batch_size=self.batch_size,
             page=self.page or 0,
-            batch_size=API_BATCH_SIZE,
         )
 
     def item_data(self, item: Person) -> dict[str, Any]:
@@ -705,165 +888,3 @@ class PersonApiEndpoint(TownApiEndpoint[Person]):
         if 'website' not in hidden:
             result['website'] = item.website
         return result
-
-
-class MeetingApiEndpoint(TownApiEndpoint[Meeting]):
-    app: TownApp
-    endpoint = 'meetings'
-
-    @property
-    def title(self) -> str:
-        return self.request.translate(_('Meetings'))
-
-    @property
-    def collection(self) -> Any:
-        return PaginatedCollection(
-            self.request,
-            MeetingCollection(self.session),
-            Meeting,
-            page=self.page or 0,
-            batch_size=API_BATCH_SIZE,
-        )
-
-    def item_data(self, item: Meeting) -> dict[str, Any]:
-        return {
-            'title': item.title,
-            'start_datetime': (
-                item.start_datetime.isoformat()
-                if item.start_datetime else None
-            ),
-            'end_datetime': (
-                item.end_datetime.isoformat()
-                if item.end_datetime else None
-            ),
-            'address': str(item.address) if item.address else None,
-            'description': str(item.description) if item.description else None,
-            'audio_link': item.audio_link or None,
-            'video_link': item.video_link or None,
-        }
-
-    def item_links(self, item: Meeting) -> dict[str, Any]:
-        return {'html': item}
-
-
-class PoliticalBusinessApiEndpoint(TownApiEndpoint[PoliticalBusiness]):
-    app: TownApp
-    endpoint = 'political_businesses'
-
-    @property
-    def title(self) -> str:
-        return self.request.translate(_('Political Businesses'))
-
-    @property
-    def collection(self) -> Any:
-        result = PoliticalBusinessCollection(
-            self.request,
-            page=self.page or 0,
-        )
-        result.batch_size = API_BATCH_SIZE
-        return result
-
-    def item_data(self, item: PoliticalBusiness) -> dict[str, Any]:
-        return {
-            'title': item.title,
-            'number': item.number,
-            'political_business_type': item.political_business_type,
-            'status': item.status,
-            'entry_date': (
-                item.entry_date.isoformat() if item.entry_date else None
-            ),
-            'display_name': item.display_name,
-        }
-
-    def item_links(self, item: PoliticalBusiness) -> dict[str, Any]:
-        return {'html': item}
-
-
-class RISParliamentarianApiEndpoint(ApiEndpoint[RISParliamentarian]):
-    app: TownApp
-    endpoint = 'parliamentarians'
-
-    @property
-    def title(self) -> str:
-        return self.request.translate(_('Parliamentarians'))
-
-    @property
-    def collection(self) -> Any:
-        return PaginatedCollection(
-            self.request,
-            RISParliamentarianCollection(self.session),
-            RISParliamentarian,
-            page=self.page or 0,
-            batch_size=API_BATCH_SIZE,
-        )
-
-    def item_data(self, item: RISParliamentarian) -> dict[str, Any]:
-        return {
-            'first_name': item.first_name,
-            'last_name': item.last_name,
-            'title': item.title,
-            'party': item.party,
-            'active': item.active,
-        }
-
-    def item_links(self, item: RISParliamentarian) -> dict[str, Any]:
-        return {
-            'html': item,
-            'picture': item.picture,
-        }
-
-
-class RISCommissionApiEndpoint(ApiEndpoint[RISCommission]):
-    app: TownApp
-    endpoint = 'commissions'
-
-    @property
-    def title(self) -> str:
-        return self.request.translate(_('Commissions'))
-
-    @property
-    def collection(self) -> Any:
-        return PaginatedCollection(
-            self.request,
-            RISCommissionCollection(self.session),
-            RISCommission,
-            page=self.page or 0,
-            batch_size=API_BATCH_SIZE,
-        )
-
-    def item_data(self, item: RISCommission) -> dict[str, Any]:
-        return {
-            'name': item.name,
-            'description': str(item.description) if item.description else None,
-        }
-
-    def item_links(self, item: RISCommission) -> dict[str, Any]:
-        return {'html': item}
-
-
-class RISParliamentaryGroupApiEndpoint(ApiEndpoint[RISParliamentaryGroup]):
-    app: TownApp
-    endpoint = 'parliamentary_groups'
-
-    @property
-    def title(self) -> str:
-        return self.request.translate(_('Parliamentary groups'))
-
-    @property
-    def collection(self) -> Any:
-        return PaginatedCollection(
-            self.request,
-            RISParliamentaryGroupCollection(self.session),
-            RISParliamentaryGroup,
-            page=self.page or 0,
-            batch_size=API_BATCH_SIZE,
-        )
-
-    def item_data(self, item: RISParliamentaryGroup) -> dict[str, Any]:
-        return {
-            'name': item.name,
-            'description': str(item.description) if item.description else None,
-        }
-
-    def item_links(self, item: RISParliamentaryGroup) -> dict[str, Any]:
-        return {'html': item}
