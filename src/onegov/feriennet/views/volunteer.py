@@ -379,7 +379,7 @@ def submit_volunteer(
 
 @FeriennetApp.view(
     model=VolunteerTicket,
-    name='send-reservation-summary',
+    name='send-status-mail',
     permission=Private
 )
 def send_final_submission_states(
@@ -390,36 +390,42 @@ def send_final_submission_states(
     if self.handler.deleted:
         raise exc.HTTPNotFound()
 
-    recipient = self.handler.email
-    if recipient:
-        assert request.current_username
-        TicketChatMessage.create(
-            self,
-            request,
-            text=request.translate(_('Final submission states')),
-            owner=request.current_username,
-            recipient=recipient,
-            notify=False,
-            origin='internal'
-        )
-        send_ticket_mail(
-            request=request,
-            template='mail_final_submission_states.pt',
-            subject=_('Final submission states'),
-            receivers=(recipient, ),
-            ticket=self,
-            force=True,
-            content={
-                'model': self,
-                'subscriptions': self.handler.volunteer_cart,
-            }
-        )
-        request.success(_(
-            'Successfully sent ${count} emails',
-            mapping={'count': 1}
-        ))
+    if any(v.state in (
+        'open', 'contacted') for v in self.handler.volunteer_cart):
+        request.alert(_(
+            'Not all subscriptions are in a final state. Please '
+            'make sure all subscriptions are either confirmed or rejected.'))
     else:
-        request.alert(_('The submitter email is not available'))
+        recipient = self.handler.email
+        if recipient:
+            assert request.current_username
+            TicketChatMessage.create(
+                self,
+                request,
+                text=request.translate(_('Final submission states')),
+                owner=request.current_username,
+                recipient=recipient,
+                notify=False,
+                origin='internal'
+            )
+            send_ticket_mail(
+                request=request,
+                template='mail_final_submission_states.pt',
+                subject=_('Final submission states'),
+                receivers=(recipient, ),
+                ticket=self,
+                force=True,
+                content={
+                    'model': self,
+                    'subscriptions': self.handler.volunteer_cart,
+                }
+            )
+            request.success(_(
+                'Successfully sent ${count} emails',
+                mapping={'count': 1}
+            ))
+        else:
+            request.alert(_('The submitter email is not available'))
 
     if request.headers.get('X-IC-Request'):
         return None

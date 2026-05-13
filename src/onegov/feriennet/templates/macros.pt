@@ -1203,7 +1203,7 @@
                         Confirmed volunteers
                     </dt>
                     <dd>
-                        <span class="bg-color ${'yellow' if get_confirmed(request, subscription.need.id) < subscription.need.number.lower else 'green'}">
+                        <span class="bg-color ${'not-enough' if get_confirmed(request, subscription.need.id) < subscription.need.number.lower else 'enough'}">
                             ${get_confirmed(request, subscription.need.id)}
                         </span>
                     </dd>

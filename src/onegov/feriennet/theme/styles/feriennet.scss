@@ -3276,9 +3276,8 @@ $booking-left-margin: 1.6rem;
         margin-left: -0.2rem;
         border-radius: .3rem;
 
-        &.open,
-        &.yellow {
-            background: $red-pastel;
+        &.open {
+            background: $black-pastel;
         }
 
         &.contacted {
@@ -3286,12 +3285,13 @@ $booking-left-margin: 1.6rem;
         }
 
         &.confirmed,
-        &.green {
+        &.enough {
             background: $green-pastel;
         }
 
-        &.cancelled {
-            background: $red-pastel;
+        &.cancelled,
+        &.not-enough {
+            background: $orange-pastel;
         }
     }
 }

@@ -1943,7 +1943,7 @@ class VolunteerHandler(Handler):
 
         links.append(Link(
                 text=_('Status mail'),
-                url=request.link(self.ticket, 'send-reservation-summary'),
+                url=request.link(self.ticket, 'send-status-mail'),
                 attrs={'class': ('envelope')},
                 traits=(
                     Confirm(
