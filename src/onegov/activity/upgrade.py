@@ -924,6 +924,7 @@ def add_indexes_to_speed_up_activity_filters(context: UpgradeContext) -> None:
             'ix_occasions_active_days',
             'occasions',
             ['active_days'],
+            postgresql_ops={'active_days': 'gist__intbig_ops'},
             postgresql_using='gist',
             if_not_exists=True
         )

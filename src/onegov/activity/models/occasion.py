@@ -182,6 +182,7 @@ class Occasion(Base, TimestampMixin):
         Index(
             'ix_occasions_active_days',
             active_days,
+            postgresql_ops={'active_days': 'gist__intbig_ops'},
             postgresql_using='gist'
         ),
         Index('ix_occasions_weekdays', weekdays, postgresql_using='gist'),
