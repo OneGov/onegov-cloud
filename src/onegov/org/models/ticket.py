@@ -1790,7 +1790,7 @@ class VolunteerHandler(Handler):
     def volunteer_cart(self) -> list[Volunteer]:
         query = self.session.query(Volunteer).filter(
             Volunteer.token == self.id
-        )
+        ).order_by(Volunteer.need_id)
 
         return query.all()
 
@@ -1806,7 +1806,6 @@ class VolunteerHandler(Handler):
 
     @property
     def email(self) -> str:
-        # the e-mail is the same over all reservations
         if self.deleted:
             return self.ticket.snapshot.get('email', '')
         if self.volunteer is None:
@@ -1834,7 +1833,6 @@ class VolunteerHandler(Handler):
             need_id=need_id).first()
         if not occasion:
             return True
-        # TODO: We should do this for each occasion
 
         return not occasion.period.active
 
@@ -1843,43 +1841,16 @@ class VolunteerHandler(Handler):
         if self.volunteer:
             return f'{self.volunteer.first_name} {self.volunteer.last_name}'
         else:
-            return 'Volunteer'
+            return _('Volunteer')
 
     @property
     def subtitle(self) -> None:
         return None
-    # TODO: We should probably also include the occasion in the subtitle, but that
-    #       would require a join to the occasion table
 
     @property
     def group(self) -> str:
         return _('Volunteer')
 
-    @classmethod
-    def handle_extra_parameters[T: Query[Any]](
-        cls,
-        session: Session,
-        query: T,
-        extra_parameters: dict[str, Any]
-    ) -> T:
-
-        if 'allocation_id' in extra_parameters:
-            allocations = session.query(Allocation.group)
-            allocations = allocations.filter(
-                Allocation.id == int(extra_parameters['allocation_id']))
-
-            tokens = session.query(Reservation.token)
-            tokens = tokens.filter(
-                Reservation.target.in_(allocations.scalar_subquery()))
-
-            handler_ids = tuple(t[0].hex for t in tokens)
-
-            if handler_ids:
-                query = query.filter(Ticket.handler_id.in_(handler_ids))
-            else:
-                query = query.filter(text('1 = 0'))
-
-        return query
 
     def get_summary(
         self,
@@ -1924,7 +1895,8 @@ class VolunteerHandler(Handler):
                 'state_change': state_change,
                 'subscriptions': self.volunteer_cart,
                 'get_confirmed': get_confirmed,
-                'layout': layout
+                'layout': layout,
+                'ticket_state': self.ticket.state,
             })
         )
 
@@ -1949,8 +1921,8 @@ class VolunteerHandler(Handler):
                     Confirm(
                         _('Do you really want to send the current status?'),
                         _(
-                            'A status mail will be sent to the volunteer'
-                            'containing the final status of his '
+                            'A mail will be sent to the volunteer '
+                            'containing the status of his '
                             'subscriptions. Only send this if these are the '
                             'final states ofthe subscriptions.'
                         ),

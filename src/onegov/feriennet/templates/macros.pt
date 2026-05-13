@@ -1225,7 +1225,8 @@
         </div>
 
         </p>
-        <li class="state-transitions" tal:condition="subscription.state != 'open'">
+        <ul tal:condition="ticket_state == 'pending'">
+            <li class="state-transitions" tal:condition="subscription.state != 'open'">
                 <a ic-post-to="${state_change(request, subscription, 'ticket_open', layout)}"
                 ic-target="#${subscription.need.id.hex}"
                 ic-select-from-response="#${subscription.need.id.hex}">
@@ -1261,10 +1262,11 @@
                 ic-select-from-response="#${subscription.need.id.hex}">
                     <i class="fa fa-fw fa-times-circle" aria-hidden="true"></i>
                     <tal:b i18n:translate>
-                        Mark as cancelled
+                        Mark as denied
                     </tal:b>
                 </a>
             </li>
+        </ul>
     </div>
 </div>
 </metal:volunteer_submission>

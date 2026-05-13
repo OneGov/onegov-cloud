@@ -199,6 +199,7 @@ def handle_ticket_contacted(self: Volunteer, request: FeriennetRequest) -> str:
             'get_confirmed': get_confirmed,
             'get_age': get_age,
             'state_change': state_change,
+            'ticket_state': 'pending'
         }
     )
 
@@ -223,6 +224,7 @@ def handle_ticket_open(self: Volunteer, request: FeriennetRequest) -> str:
             'get_confirmed': get_confirmed,
             'get_age': get_age,
             'state_change': state_change,
+            'ticket_state': 'pending'
         }
     )
 
@@ -247,6 +249,7 @@ def handle_ticket_confirmed(self: Volunteer, request: FeriennetRequest) -> str:
             'get_confirmed': get_confirmed,
             'get_age': get_age,
             'state_change': state_change,
+            'ticket_state': 'pending'
         }
     )
 
@@ -271,6 +274,7 @@ def handle_ticket_cancelled(self: Volunteer, request: FeriennetRequest) -> str:
             'get_confirmed': get_confirmed,
             'get_age': get_age,
             'state_change': state_change,
+            'ticket-state': 'pending'
         }
     )
 
@@ -343,24 +347,26 @@ def submit_volunteer(
             TicketMessage.create(ticket, request, 'opened', 'external')
         complete = True
 
-        subject = _('Subscription as a volunteer')
+        subject = request.translate(_('Subscription as a volunteer'))
         custom_text_before_list = Markup(
             request.app.org.meta.get('before_list_text', '').strip())
         custom_text_after_list = Markup(
             request.app.org.meta.get('after_list_text', '').strip())
 
-        request.app.send_transactional_email(
+        send_ticket_mail(
+            request=request,
+            template='mail_volunteer_subscription.pt',
             subject=subject,
             receivers=(subscriptions[0].email, ),
-            content=render_template(
-                'mail_volunteer_subscription.pt', request, {
-                    'layout': DefaultMailLayout(self, request),
-                    'title': subject,
-                    'subscriptions': subscriptions,
-                    'custom_text_before_list': custom_text_before_list,
-                    'custom_text_after_list': custom_text_after_list,
-                }
-            )
+            ticket=ticket,
+            force=True,
+            content={
+                'layout': DefaultMailLayout(self, request),
+                'title': subject,
+                'subscriptions': subscriptions,
+                'custom_text_before_list': custom_text_before_list,
+                'custom_text_after_list': custom_text_after_list,
+            }
         )
 
     return {
@@ -402,7 +408,9 @@ def send_final_submission_states(
             TicketChatMessage.create(
                 self,
                 request,
-                text=request.translate(_('Final submission states')),
+                text=request.translate(_(
+                    'The subscriptions have been processed and the status '
+                    'mail has been sent to the volunteer.')),
                 owner=request.current_username,
                 recipient=recipient,
                 notify=False,
@@ -411,7 +419,8 @@ def send_final_submission_states(
             send_ticket_mail(
                 request=request,
                 template='mail_final_submission_states.pt',
-                subject=_('Final submission states'),
+                subject=_(
+                    'Your subscriptions as a volunteer have been processed.'),
                 receivers=(recipient, ),
                 ticket=self,
                 force=True,

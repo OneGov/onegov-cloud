@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-23 15:50+0200\n"
+"POT-Creation-Date: 2026-05-13 11:38+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1111,9 +1111,9 @@ msgid ""
 "Attendees can get group codes via the link \"invite a companion\" in their "
 "booking. Bookings with a group code are preferred in the matching process."
 msgstr ""
-"I partecipanti possono ottenere codici gruppo tramite il link "
-"\"Invitare gli amici\" nella loro prenotazione. Le prenotazioni con un "
-"codice gruppo sono preferite nel processo di assegnazione."
+"I partecipanti possono ottenere codici gruppo tramite il link \"Invitare gli "
+"amici\" nella loro prenotazione. Le prenotazioni con un codice gruppo sono "
+"preferite nel processo di assegnazione."
 
 msgid "With billing"
 msgstr "Con fatturazione"
@@ -2249,6 +2249,27 @@ msgstr "La mia lista"
 msgid "All activities"
 msgstr "Tutte le attività"
 
+msgid "Volunteer"
+msgstr "Aiutante"
+
+msgid "Confirmed volunteers"
+msgstr "Aiutanti confermati"
+
+msgid "Required volunteers"
+msgstr "Aiutanti richiesti"
+
+msgid "Mark as open"
+msgstr "Segna come aperto"
+
+msgid "Mark as contacted"
+msgstr "Segna come contattato"
+
+msgid "Mark as confirmed"
+msgstr "Segna come confermato"
+
+msgid "Mark as denied"
+msgstr "Segna come rifiutato"
+
 msgid "Hello!"
 msgstr "Buongiorno"
 
@@ -2279,8 +2300,21 @@ msgstr "Condizioni di cancellazione:"
 msgid "We have received your deregistration for ${name}."
 msgstr "Abbiamo ricevuto la sua cancellazione per ${name}."
 
+msgid "Your subscription states have been updated, this is the final list:"
+msgstr "Le sue iscrizioni sono state aggiornate, questa è la lista finale:"
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET è sostenuta da:"
+
+msgid "You have signed up to volunteer for the following activities:"
+msgstr "Si è registrato come volontario per le seguenti attività:"
+
+msgid ""
+"Thank you for offering to volunteer! We will have a look at your request and "
+"get back to you."
+msgstr ""
+"Grazie mille per averci offerto il vostro aiuto! Esamineremo la sua "
+"richiesta e le faremo sapere."
 
 msgid "The average happiness is ${happiness}."
 msgstr "La soddisfazione media è ${happiness}."
@@ -2454,13 +2488,6 @@ msgstr "Attivo"
 msgid "Inactive"
 msgstr "Inattivo"
 
-msgid ""
-"Thank you for offering to volunteer! We will have a look at your request and "
-"get back to you."
-msgstr ""
-"Grazie mille per averci offerto il vostro aiuto! Esamineremo la sua "
-"richiesta e le faremo sapere."
-
 msgid "No activities needing volunteers found."
 msgstr "Nessuna attività trovata che abbia bisogno di aiutanti."
 
@@ -2473,6 +2500,9 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
+msgid "View ticket"
+msgstr "Mostra biglietto"
+
 msgid "Contact by e-mail"
 msgstr "Contattare per e-mail"
 
@@ -2481,15 +2511,6 @@ msgstr "Contattare per telefono"
 
 msgid "Hide Details"
 msgstr "Nascondere i dettagli"
-
-msgid "Mark as open"
-msgstr "Segna come aperto"
-
-msgid "Mark as contacted"
-msgstr "Segna come contattato"
-
-msgid "Mark as confirmed"
-msgstr "Segna come confermato"
 
 msgid "Do you really want to remove this volunteer?"
 msgstr "Vuole davvero rimuovere l'aiutante?"
@@ -3248,9 +3269,6 @@ msgstr "Un importo per riga"
 msgid "Volunteer registration"
 msgstr "Registrazione aiutante"
 
-msgid "Experimental"
-msgstr "Sperimentale"
-
 msgid "Disabled"
 msgstr "Disattivato"
 
@@ -3259,6 +3277,38 @@ msgstr "Solo per gli amministratori"
 
 msgid "Enabled"
 msgstr "Attiva"
+
+msgid "Custom volunteer subscription mail text"
+msgstr "Testo personalizzato per la mail di registrazione degli aiutanti"
+
+msgid ""
+"You can overwrite the standard volunteer subscription mail text before and "
+"after the list of subscriptions. The standard text is:\n"
+"\n"
+"\"Hello!\n"
+"You have signed up to volunteer for the following activities:\n"
+"\n"
+"[List of subscriptions]\n"
+"\n"
+"Thank you for offering to volunteer! We will have a look at your request and "
+"get back to you.\""
+msgstr ""
+"Puoi sovrascrivere il testo standard della mail di registrazione degli "
+"aiutanti prima e dopo la lista delle registrazioni. Il testo standard è:\n"
+"\n"
+"\"Buongiorno\n"
+"Si è registrato come volontario per le seguenti attività:\n"
+"\n"
+"[Lista delle registrazioni]\n"
+"\n"
+"Grazie mille per averci offerto il vostro aiuto! Esamineremo la sua "
+"richiesta e le faremo sapere."
+
+msgid "Before list text"
+msgstr "Testo prima della lista"
+
+msgid "After list text"
+msgstr "Testo dopo la lista"
 
 msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Il numero di identificazione PVR deve essere di 3-6 caratteri"
@@ -3331,6 +3381,40 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} è stato cancellato, inclusi tutti i dati associati."
+
+msgid "Subscription as a volunteer"
+msgstr "Registrazione come aiutante"
+
+msgid ""
+"Not all subscriptions are in a final state. Please make sure all "
+"subscriptions are either confirmed or rejected."
+msgstr ""
+"Non tutte le registrazioni sono in uno stato finale. Assicurati che tutte le "
+"registrazioni siano confermate o rifiutate."
+
+msgid ""
+"The subscriptions have been processed and the status mail has been sent to "
+"the volunteer."
+msgstr ""
+"Le registrazioni sono state elaborate e la mail di stato è stata inviata "
+"all'aiutante."
+
+msgid "Your subscriptions as a volunteer have been processed."
+msgstr "Le sue registrazioni come aiutante sono state elaborate."
+
+#, python-format
+msgid "Successfully sent ${count} emails"
+msgstr "${count} email inviate con successo"
+
+msgid "The submitter email is not available"
+msgstr "L'email del mittente non è disponibile"
+
+#~ msgid ""
+#~ "You have You have signed up to volunteer for the following activities:"
+#~ msgstr "Hai accettato di aiutare nelle seguenti attività:"
+
+#~ msgid "Experimental"
+#~ msgstr "Sperimentale"
 
 #~ msgid ""
 #~ "Attendees can get group codes via the button \"invite a companion\". "

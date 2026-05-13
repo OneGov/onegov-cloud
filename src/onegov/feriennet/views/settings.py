@@ -157,13 +157,14 @@ class FeriennetSettingsForm(Form):
         label=_('Custom volunteer subscription mail text'),
         hide_label=False,
         fieldset=_('Volunteers'),
-        text=(
+        text=_(
             'You can overwrite the standard volunteer subscription mail '
             'text before and after the list of subscriptions. The standard '
             'text is:\n\n'
             '"Hello!\n'
-            'You have subscribed to the following needs:\n'
-            '[List of subscriptions]\n'
+            'You have signed up to volunteer for the following '
+            'activities:\n\n'
+            '[List of subscriptions]\n\n'
             'Thank you for offering to volunteer! We will have a look at your '
             'request and get back to you."'
         ),

@@ -6,7 +6,7 @@
         <tal:b tal:replace="custom_text_before_list" />
         <tal:b condition="not custom_text_before_list">
             <p i18n:translate>Hello!</p>
-            <p i18n:translate>You have subscribed to the following needs:</p>
+            <p i18n:translate>You have signed up to volunteer for the following activities:</p>
         </tal:b>
         <ul class="normal">
             <tal:needs repeat="subscription subscriptions">

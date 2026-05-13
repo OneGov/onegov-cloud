@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-23 15:50+0200\n"
+"POT-Creation-Date: 2026-05-13 11:38+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2269,6 +2269,27 @@ msgstr "Ma liste"
 msgid "All activities"
 msgstr "Toutes les activités"
 
+msgid "Volunteer"
+msgstr "Bénévole"
+
+msgid "Confirmed volunteers"
+msgstr "Bénévoles confirmés"
+
+msgid "Required volunteers"
+msgstr "Bénévoles requis"
+
+msgid "Mark as open"
+msgstr "Marquer  comme ouvert"
+
+msgid "Mark as contacted"
+msgstr "Marquer comme contacté"
+
+msgid "Mark as confirmed"
+msgstr "Marquer comme confirmé"
+
+msgid "Mark as denied"
+msgstr "Marquer comme refusé"
+
 msgid "Hello!"
 msgstr "Bonjour"
 
@@ -2299,8 +2320,23 @@ msgstr "Conditions d'annulation:"
 msgid "We have received your deregistration for ${name}."
 msgstr "Nous avons reçu votre annulation pour ${name}."
 
+msgid "Your subscription states have been updated, this is the final list:"
+msgstr "Vos états d'inscription ont été mis à jour, voici la liste finale:"
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Réseau vacances de Pro Juventute est soutenu par :"
+
+msgid "You have signed up to volunteer for the following activities:"
+msgstr ""
+"Vous vous êtes inscrit·e pour faire du bénévolat pour les activités "
+"suivantes :"
+
+msgid ""
+"Thank you for offering to volunteer! We will have a look at your request and "
+"get back to you."
+msgstr ""
+"Merci de proposer de faire du bénévolat ! Nous examinerons votre demande et "
+"nous vous contacterons."
 
 msgid "The average happiness is ${happiness}."
 msgstr "Le taux de satisfaction est de ${happiness}."
@@ -2475,13 +2511,6 @@ msgstr "Actif"
 msgid "Inactive"
 msgstr "Inactif"
 
-msgid ""
-"Thank you for offering to volunteer! We will have a look at your request and "
-"get back to you."
-msgstr ""
-"Merci de proposer de faire du bénévolat ! Nous examinerons votre demande et "
-"nous vous contacterons."
-
 msgid "No activities needing volunteers found."
 msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."
 
@@ -2494,6 +2523,9 @@ msgstr "Prénom"
 msgid "Last name"
 msgstr "Nom de famille"
 
+msgid "View ticket"
+msgstr "Afficher le ticket"
+
 msgid "Contact by e-mail"
 msgstr "Contacter par e-mail"
 
@@ -2502,15 +2534,6 @@ msgstr "Contacter par téléphone"
 
 msgid "Hide Details"
 msgstr "Masquer les détails"
-
-msgid "Mark as open"
-msgstr "Marquer  comme ouvert"
-
-msgid "Mark as contacted"
-msgstr "Marquer comme contacté"
-
-msgid "Mark as confirmed"
-msgstr "Marquer comme confirmé"
 
 msgid "Do you really want to remove this volunteer?"
 msgstr "Voulez-vous vraiment supprimer cette personne ?"
@@ -3270,9 +3293,6 @@ msgstr "Un montant par ligne"
 msgid "Volunteer registration"
 msgstr "Inscription des bénévoles"
 
-msgid "Experimental"
-msgstr "Expérimental"
-
 msgid "Disabled"
 msgstr "Désactivé"
 
@@ -3281,6 +3301,39 @@ msgstr "Uniquement pour administrateurs·trices"
 
 msgid "Enabled"
 msgstr "Activé"
+
+msgid "Custom volunteer subscription mail text"
+msgstr "Texte personnalisé pour les mails d'inscription des bénévoles"
+
+msgid ""
+"You can overwrite the standard volunteer subscription mail text before and "
+"after the list of subscriptions. The standard text is:\n"
+"\n"
+"\"Hello!\n"
+"You have signed up to volunteer for the following activities:\n"
+"\n"
+"[List of subscriptions]\n"
+"\n"
+"Thank you for offering to volunteer! We will have a look at your request and "
+"get back to you.\""
+msgstr ""
+"Vous pouvez personnaliser le texte standard des mails d'inscription des "
+"bénévoles avant et après la liste des inscriptions. Le texte standard est:\n"
+"\n"
+"\"Bonjour\n"
+"Vous vous êtes inscrit·e pour faire du bénévolat pour les activités "
+"suivantes :\n"
+"\n"
+"[Liste des inscriptions]\n"
+"\n"
+"Merci de proposer de faire du bénévolat ! Nous examinerons votre demande et "
+"nous vous contacterons.\""
+
+msgid "Before list text"
+msgstr "Texte avant la liste"
+
+msgid "After list text"
+msgstr "Texte après la liste"
 
 msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Le numéro de référence BVR doit être composé de 3 à 6 caractères"
@@ -3353,6 +3406,42 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} a été supprimé·e, y compris toutes les données associées."
+
+msgid "Subscription as a volunteer"
+msgstr "Inscription en tant que bénévole"
+
+msgid ""
+"Not all subscriptions are in a final state. Please make sure all "
+"subscriptions are either confirmed or rejected."
+msgstr ""
+"Toutes les inscriptions ne sont pas dans un état final. Veuillez vous "
+"assurer que toutes les inscriptions sont soit confirmées, soit rejetées."
+
+msgid ""
+"The subscriptions have been processed and the status mail has been sent to "
+"the volunteer."
+msgstr ""
+"Les inscriptions ont été traitées et le mail de statut a été envoyé au "
+"bénévole."
+
+msgid "Your subscriptions as a volunteer have been processed."
+msgstr "Vos inscriptions en tant que bénévole ont été traitées."
+
+#, python-format
+msgid "Successfully sent ${count} emails"
+msgstr "${count} e-mails envoyés avec succès"
+
+msgid "The submitter email is not available"
+msgstr "L'e-mail de l'expéditeur n'est pas disponible"
+
+#~ msgid ""
+#~ "You have You have signed up to volunteer for the following activities:"
+#~ msgstr ""
+#~ "Vous vous êtes inscrit·e pour faire du bénévolat pour les activités "
+#~ "suivantes :"
+
+#~ msgid "Experimental"
+#~ msgstr "Expérimental"
 
 #~ msgid ""
 #~ "Attendees can get group codes via the button \"invite a companion\". "
