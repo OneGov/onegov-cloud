@@ -7,8 +7,10 @@ from enum import IntEnum
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import event
+from sqlalchemy import func
 from sqlalchemy import CheckConstraint
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm import Mapped, Session
@@ -74,16 +76,21 @@ class OccasionDate(Base, TimestampMixin):
     timezone: Mapped[str]
 
     #: The start of the range
-    start: Mapped[datetime]
+    start: Mapped[datetime] = mapped_column()
 
     #: The end of the range
-    end: Mapped[datetime]
+    end: Mapped[datetime] = mapped_column()
 
     #: The associated occasion
     occasion_id: Mapped[UUID] = mapped_column(ForeignKey('occasions.id'))
     occasion: Mapped[Occasion] = relationship(back_populates='dates')
 
     __table_args__ = (
+        Index('ix_occasion_dates_start', start),
+        Index('ix_occasion_dates_end', end),
+        Index('ix_occasion_dates_start_week', func.extract('week', start)),
+        Index('ix_occasion_dates_end_week', func.extract('week', end)),
+        Index('ix_occasion_dates_occasion_id', occasion_id),
         CheckConstraint('"start" <= "end"', name='start_before_end'),
     )
 

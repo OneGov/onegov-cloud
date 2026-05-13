@@ -12,6 +12,7 @@ from sqlalchemy import case
 from sqlalchemy import func
 from sqlalchemy import text
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy.dialects.postgresql import ARRAY, INT4RANGE
@@ -170,6 +171,25 @@ class Occasion(Base, TimestampMixin):
         cascade='all,delete',
         order_by='OccasionNeed.name',
         back_populates='occasion',
+    )
+    __table_args__ = (
+        Index('ix_occasions_activity_id', activity_id),
+        Index('ix_occasions_period_id', period_id),
+        Index('ix_occasions_cancelled', cancelled),
+        Index('ix_occasions_duration', duration),
+        Index('ix_occasions_cost', cost),
+        Index('ix_occasions_booking_cost', booking_cost),
+        Index(
+            'ix_occasions_active_days',
+            active_days,
+            postgresql_using='gist'
+        ),
+        Index('ix_occasions_weekdays', weekdays, postgresql_using='gist'),
+        Index('ix_occasions_age', age, postgresql_using='gist'),
+        Index('ix_occasions_age_lower', func.lower(age)),
+        Index('ix_occasions_age_upper', func.upper(age)),
+        Index('ix_occasions_seeking_volunteers', seeking_volunteers),
+        Index('ix_occasions_attendee_count', 'attendee_count'),
     )
 
     def on_date_change(self) -> None:
