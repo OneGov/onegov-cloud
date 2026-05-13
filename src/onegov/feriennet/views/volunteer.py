@@ -5,21 +5,24 @@ from datetime import date
 
 from markupsafe import Markup
 from onegov.activity import Volunteer, VolunteerCollection
-from onegov.core.security import Public, Secret
+from onegov.core.security import Public, Secret, Private
 from onegov.core.templates import render_macro
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.forms import VolunteerForm
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.layout import VolunteerFormLayout
 from onegov.feriennet.layout import VolunteerLayout
+from onegov.org.mail import send_ticket_mail
 from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
 from onegov.org.app import render_template
-from onegov.org.models import TicketMessage
+from onegov.org.models import TicketMessage, TicketChatMessage
+from onegov.org.models.ticket import VolunteerTicket
 from onegov.ticket import Ticket, TicketCollection
 from operator import attrgetter
 from uuid import uuid4
+from webob import exc, Response
 
 
 from typing import TYPE_CHECKING
@@ -372,3 +375,53 @@ def submit_volunteer(
             'target': 'target',
         }),
     }
+
+
+@FeriennetApp.view(
+    model=VolunteerTicket,
+    name='send-reservation-summary',
+    permission=Private
+)
+def send_final_submission_states(
+    self: VolunteerTicket,
+    request: FeriennetRequest
+) -> Response | None:
+
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    recipient = self.handler.email
+    if recipient:
+        assert request.current_username
+        TicketChatMessage.create(
+            self,
+            request,
+            text=request.translate(_('Final submission states')),
+            owner=request.current_username,
+            recipient=recipient,
+            notify=False,
+            origin='internal'
+        )
+        send_ticket_mail(
+            request=request,
+            template='mail_final_submission_states.pt',
+            subject=_('Final submission states'),
+            receivers=(recipient, ),
+            ticket=self,
+            force=True,
+            content={
+                'model': self,
+                'subscriptions': self.handler.volunteer_cart,
+            }
+        )
+        request.success(_(
+            'Successfully sent ${count} emails',
+            mapping={'count': 1}
+        ))
+    else:
+        request.alert(_('The submitter email is not available'))
+
+    if request.headers.get('X-IC-Request'):
+        return None
+    return request.redirect(request.link(self))
+

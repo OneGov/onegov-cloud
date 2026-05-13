@@ -1930,130 +1930,6 @@ class VolunteerHandler(Handler):
 
         return Markup('').join(parts)
 
-    def get_changes(
-        self,
-        request: OrgRequest
-    ) -> dict[DateRange, DateRange | None]:
-        """ Returns a compressed set of changes of reservations.
-
-        If a reservation is moved multiple times and then rejected, then
-        this will only contain the rejection (orginal start/end -> None).
-
-        If there is a chain of time adjustments, only the orginal and
-        current start/end will be included.
-        """
-
-        messages = MessageCollection(
-            request.session,
-            type=('reservation', 'reservation_adjusted'),
-            channel_id=self.ticket.number
-        )
-        changes: dict[DateRange, DateRange | None] = {}
-        # maps current start/end to its original start/end
-        origin: dict[DateRange, DateRange] = {}
-        for message in messages.query():
-            if message.type == 'reservation':
-                if message.meta['change'] != 'rejected':
-                    continue
-
-                for reservation in message.meta['reservations']:
-                    # for old messages we can't reconstruct the change
-                    # so we just return an empty changelog
-                    if not isinstance(reservation, dict):
-                        return {}
-
-                    key = reservation['start'], reservation['end']
-                    key = origin.pop(key, key)
-                    changes[key] = None
-            else:
-                assert message.type == 'reservation_adjusted'
-                key = message.meta['old_start'], message.meta['old_end']
-                current = message.meta['new_start'], message.meta['new_end']
-                # if we have been moved previously map back to the origin
-                key = origin.pop(key, key)
-                origin[current] = key
-                if key == current:
-                    # if we changed a reservation back to its original
-                    # state, then we remove it from the changes,
-                    changes.pop(key, None)
-                else:
-                    changes[key] = current
-
-        return changes
-
-    def get_reservation_links(
-        self,
-        reservation: Reservation,
-        request: OrgRequest
-    ) -> list[Link]:
-
-        links: list[Link] = []
-
-        url_obj = URL(request.link(self.ticket, 'reject-reservation'))
-        url_obj = url_obj.query_param(
-            'reservation-id', str(reservation.id))
-        url = url_obj.as_string()
-
-        title = self.get_reservation_title(reservation)
-        links.append(Link(
-            text=_('Reject'),
-            url=url,
-            attrs={'class': 'delete-link'},
-            traits=(
-                Confirm(
-                    _('Do you really want to reject this reservation?'),
-                    _("Rejecting ${title} can't be undone.", mapping={
-                        'title': title
-                    }),
-                    _('Reject reservation'),
-                    _('Cancel')
-                ),
-                Intercooler(
-                    request_method='GET',
-                    redirect_after=request.url
-                )
-            )
-        ))
-
-        if reservation.is_adjustable and (
-            # NOTE: Only managers may adjust accepted reservations
-            request.is_manager
-            or not (reservation.data and reservation.data.get('accepted'))
-        ):
-            url_obj = URL(request.link(self.ticket, 'adjust-reservation'))
-            url_obj = url_obj.query_param(
-                'reservation-id', str(reservation.id))
-            url = url_obj.as_string()
-            links.append(Link(
-                text=_('Adjust'),
-                url=url,
-                attrs={'class': 'edit-link'}
-            ))
-
-        return links
-
-    def get_occupancy_url(
-        self,
-        reservation: Reservation,
-        request: OrgRequest
-    ) -> str | None:
-
-        if self.deleted:
-            return None
-
-        if not request.is_manager_for_model(self.ticket):
-            return None
-
-        assert self.resource is not None
-        return request.class_link(
-            Resource,
-            {
-                'name': self.resource.name,
-                'date': reservation.display_start(),
-                'view': 'timeGridDay'
-            },
-            name='occupancy'
-        )
 
     def get_links(  # type:ignore[override]
         self,
@@ -2065,36 +1941,18 @@ class VolunteerHandler(Handler):
 
         links: list[Link | LinkGroup] = []
 
-        accepted = tuple(
-            r.data and r.data.get('accepted') or False
-            for r in self.reservations
-        )
-
-        if not all(accepted):
-            links.append(
-                Link(
-                    text=_('Accept all reservations'),
-                    url=request.link(self.ticket, 'accept-reservation'),
-                    attrs={'class': 'accept-link'}
-                )
-            )
-
-        advanced_links = []
-
-        if self.reservations:
-            advanced_links.append(Link(
-                text=_('Send reservation summary'),
+        links.append(Link(
+                text=_('Status mail'),
                 url=request.link(self.ticket, 'send-reservation-summary'),
-                attrs={'class': ('envelope', 'border')},
+                attrs={'class': ('envelope')},
                 traits=(
                     Confirm(
-                        _('Do you really want to send a reservation summary?'),
+                        _('Do you really want to send the current status?'),
                         _(
-                            'This will always be sent via e-mail, even when '
-                            'ticket updates have been disabled. Make sure to '
-                            'only use this to inform customers, when '
-                            'significant changes have been made to the '
-                            'reservations, they need to be aware of.'
+                            'A status mail will be sent to the volunteer'
+                            'containing the final status of his '
+                            'subscriptions. Only send this if these are the '
+                            'final states ofthe subscriptions.'
                         ),
                         _('Send'),
                         _('Cancel')
@@ -2105,81 +1963,6 @@ class VolunteerHandler(Handler):
                     )
                 )
             ))
-
-        if self.submission:
-            url_obj = URL(request.link(self.ticket, 'submission'))
-            url_obj = url_obj.query_param('edit', '')
-            url_obj = url_obj.query_param('title', request.translate(
-                _('Details about the reservation')))
-            url = url_obj.as_string()
-
-            advanced_links.append(
-                Link(
-                    text=_('Edit details'),
-                    url=url,
-                    attrs={'class': ('edit-link', 'border')}
-                )
-            )
-
-        now = utcnow()
-        if getattr(self.resource, 'kaba_components', None) and any(
-            True
-            for reservation in self.reservations
-            if reservation.display_start() > now
-        ):
-            advanced_links.append(
-                Link(
-                    text=_('Edit key code'),
-                    url=request.link(self.ticket, 'edit-kaba'),
-                    attrs={'class': ('edit-link', 'border')}
-                )
-            )
-
-        if not all(accepted):
-            advanced_links.append(
-                Link(
-                    text=_('Accept all with message'),
-                    url=request.link(
-                        self.ticket, 'accept-reservation-with-message'),
-                    attrs={'class': 'accept-link'}
-                )
-            )
-
-        advanced_links.append(Link(
-            text=_('Reject all'),
-            url=request.link(self.ticket, 'reject-reservation'),
-            attrs={'class': 'delete-link'},
-            traits=(
-                Confirm(
-                    _('Do you really want to reject all reservations?'),
-                    _("Rejecting these reservations can't be undone."),
-                    _('Reject reservations'),
-                    _('Cancel')
-                ),
-                Intercooler(
-                    request_method='GET',
-                    redirect_after=request.url
-                )
-            )
-        ))
-
-        advanced_links.append(Link(
-            text=_('Reject all with message'),
-            url=request.link(self.ticket, 'reject-reservation-with-message'),
-            attrs={'class': ('delete-link', 'border')},
-        ))
-
-        advanced_links.append(Link(
-            text=_('Add reservation'),
-            url=request.link(self.ticket, 'add-reservation'),
-            attrs={'class': 'new-reservation'}
-        ))
-
-        links.append(LinkGroup(
-            _('Advanced'),
-            links=advanced_links,
-            right_side=False
-        ))
 
         return links
 
