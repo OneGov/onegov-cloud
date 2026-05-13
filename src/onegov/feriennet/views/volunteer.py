@@ -16,7 +16,6 @@ from onegov.org.mail import send_ticket_mail
 from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
-from onegov.org.app import render_template
 from onegov.org.models import TicketMessage, TicketChatMessage
 from onegov.org.models.ticket import VolunteerTicket
 from onegov.ticket import Ticket, TicketCollection
@@ -439,4 +438,3 @@ def send_final_submission_states(
     if request.headers.get('X-IC-Request'):
         return None
     return request.redirect(request.link(self))
-

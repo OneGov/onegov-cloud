@@ -1851,7 +1851,6 @@ class VolunteerHandler(Handler):
     def group(self) -> str:
         return _('Volunteer')
 
-
     def get_summary(
         self,
         request: OrgRequest  # type:ignore[override]
@@ -1901,7 +1900,6 @@ class VolunteerHandler(Handler):
         )
 
         return Markup('').join(parts)
-
 
     def get_links(  # type:ignore[override]
         self,

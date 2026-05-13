@@ -283,7 +283,7 @@ class FeriennetSettingsForm(Form):
 
             if attr == 'donation_amounts':
                 value = format_donation_amounts(value)
-            elif attr in ('donation_description', 
+            elif attr in ('donation_description',
                           'before_list_text', 'after_list_text'):
                 # NOTE: We need to treat this as Markup
                 # TODO: It would be cleaner if we had a proxy object
