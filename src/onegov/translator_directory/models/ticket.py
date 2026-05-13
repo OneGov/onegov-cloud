@@ -197,6 +197,10 @@ class TimeReportHandler(Handler):
     handler_title = _('Time Report')
     code_title = _('Time Reports')
 
+    @property
+    def reopenable(self) -> bool:
+        return False
+
     @cached_property
     def translator(self) -> Translator | None:
         return (

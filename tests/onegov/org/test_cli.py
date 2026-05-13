@@ -355,6 +355,18 @@ def test_fetch(
     assert result.exit_code == 0
     assert "0 added, 0 updated, 2 deleted" in result.output
 
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/qux',
+        'fetch',
+        '--source', 'bar',
+        '--tag', 'A',
+        '--tag', 'B',
+        '--include-imported'
+    ])
+    assert result.exit_code == 0
+    assert "1 added, 0 updated, 0 deleted" in result.output
+
     # Bar[C], Baz[C] -> Qux
     result = runner.invoke(cli, [
         '--config', cfg_path,
@@ -365,7 +377,7 @@ def test_fetch(
         '--tag', 'C',
     ])
     assert result.exit_code == 0
-    assert "2 added, 0 updated, 2 deleted" in result.output
+    assert "2 added, 0 updated, 3 deleted" in result.output
 
     # Baz['bar'] qux['bar'] -> Bar
     result = runner.invoke(cli, [

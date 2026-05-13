@@ -7,7 +7,6 @@ import transaction
 from datetime import timedelta
 from onegov.org.models import PushNotification
 from onegov.org.models.page import News
-import json
 from onegov.org.notification_service import (
     TestNotificationService,
     set_test_notification_service,
@@ -19,7 +18,7 @@ from tests.onegov.org.test_cronjobs import register_echo_handler
 from tests.shared import ExtendedBrowser
 
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
     from onegov.ticket.handler import HandlerRegistry
@@ -33,8 +32,6 @@ def test_firebase_settings_form_and_push_notification_flow(
     town_app: TestTownApp,
     handlers: HandlerRegistry
 ) -> None:
-    # Adding patches until either the test passes or we run out of monkeys
-    monkey_patch_fill_for_element_not_interactable(browser)
     monkey_patch_visit_to_ignore_console_errors(browser)
 
     browser.login_admin()
@@ -53,16 +50,19 @@ def test_firebase_settings_form_and_push_notification_flow(
         # Missing other required fields
     }
     assert browser.is_element_present_by_name('firebase_adminsdk_credential')
-    browser.fill('firebase_adminsdk_credential', invalid_credentials)  # type: ignore[arg-type]
+    browser.interact_with_ace_editor(
+        invalid_credentials,
+        name='firebase_adminsdk_credential'
+    )
 
-    browser.find_by_value('Speichern').click()
+    browser.find_by_text('Speichern').click()
     assert browser.is_text_present(
         'Error validating Firebase credentials: Missing required keys'
     )
 
     # 4. Test with valid json
     assert browser.is_element_present_by_name('firebase_adminsdk_credential')
-    browser.fill('firebase_adminsdk_credential', {  # type: ignore[arg-type]
+    browser.interact_with_ace_editor({
         "type": "service_account",
         "project_id": "test-project",
         "private_key_id": "test-key-id",
@@ -77,11 +77,11 @@ def test_firebase_settings_form_and_push_notification_flow(
         "client_x509_cert_url":
             "https://www.googleapis.com/robot/v1/metadata/x509/test%40example.com",
         "universe_domain": "googleapis.com"
-    })
+    }, name='firebase_adminsdk_credential')
 
 
     # send with default topic (all News have it by default)
-    browser.find_by_value('Speichern').click()
+    browser.find_by_text('Speichern').click()
     assert not browser.is_text_present('Ungültiges JSON-Format')
 
     now = utcnow()
@@ -116,11 +116,11 @@ def test_firebase_settings_form_and_push_notification_flow(
 
     # Deleting the news should be no problem
     browser.visit('/news/foo')
-    browser.find_by_value('Löschen').click()
+    browser.find_by_text('Löschen').click()
 
     # and delete the push notification
     browser.visit('/push-notifications')
-    browser.find_by_value('Keine Benachrichtigungen')
+    browser.find_by_text('Keine Benachrichtigungen')
 
 
 def create_news_with_push_notification(
@@ -138,6 +138,7 @@ def create_news_with_push_notification(
     new_news_link = browser.find_by_css(
         'a.new-news.show-new-content-placeholder'
     ).first['href']
+    assert new_news_link is not None
     browser.visit(new_news_link)
     browser.fill('title', title)
     browser.set_datetime_element(
@@ -154,7 +155,7 @@ def create_news_with_push_notification(
     assert browser.find_by_id('push_notifications-0').checked is True
     # Save the news item
 
-    browser.find_by_value('Speichern').click()
+    browser.find_by_text('Speichern').click()
 
 
 @pytest.mark.xdist_group(name="browser")
@@ -165,7 +166,6 @@ def test_firebase_push_notifications_date_in_future_should_not_send(
 ) -> None:
 
     session = town_app.session()
-    monkey_patch_fill_for_element_not_interactable(browser)
     monkey_patch_visit_to_ignore_console_errors(browser)
 
     browser.login_admin()
@@ -173,7 +173,7 @@ def test_firebase_push_notifications_date_in_future_should_not_send(
     browser.visit('/firebase')
 
     assert browser.is_element_present_by_name('firebase_adminsdk_credential')
-    browser.fill('firebase_adminsdk_credential', {  # type: ignore[arg-type]
+    browser.interact_with_ace_editor({
         "type": "service_account",
         "project_id": "test-project",
         "private_key_id": "test-key-id",
@@ -188,10 +188,10 @@ def test_firebase_push_notifications_date_in_future_should_not_send(
         "client_x509_cert_url":
             "https://www.googleapis.com/robot/v1/metadata/x509/test%40example.com",
         "universe_domain": "googleapis.com"
-    })
+    }, name='firebase_adminsdk_credential')
 
     # send with default topic (all News have it by default)
-    browser.find_by_value('Speichern').click()
+    browser.find_by_text('Speichern').click()
     assert not browser.is_text_present('Ungültiges JSON-Format')
 
     # Create a publication some time in the future
@@ -227,44 +227,12 @@ def test_send_push_notification_checkbox_not_present_by_default(
     new_news_link = browser.find_by_css(
         'a.new-news.show-new-content-placeholder'
     ).first['href']
+    assert new_news_link is not None
     browser.visit(new_news_link)
 
     # By default the push notification checkbox should not be present at all
     # Because it's a disabled extension
     assert not browser.find_by_id('send_push_notifications_to_app')
-
-
-def monkey_patch_fill_for_element_not_interactable(
-    browser: ExtendedBrowser
-) -> None:
-    """ Prevent `ElementNotInteractableException` error for text in textarea.
-
-    The caller is not aware of this, but if we can't fill in text we do the
-    following: Clicking the element and literally simulating the keypresses
-    for each char in the text to fill.
-
-     """
-    original_fill = browser.__class__.fill
-    def custom_fill(
-        self: ExtendedBrowser,
-        name: str,
-        value: str | dict[str, Any]
-    ) -> Any:
-        if name == 'firebase_adminsdk_credential':
-            if isinstance(value, dict):
-                value = json.dumps(value, indent=2)
-
-            # If the element exists, use the specialized method
-            if self.is_element_present_by_name(name):
-                ace_editor_present = self.is_element_present_by_css(
-                    '.ace_editor'
-                )
-                if ace_editor_present:
-                    return self.interact_with_ace_editor(content=value)
-
-        return original_fill(self, name, value)  # type: ignore[arg-type]
-
-    browser.__class__.fill = custom_fill  # type: ignore[assignment, method-assign]
 
 
 def monkey_patch_visit_to_ignore_console_errors(

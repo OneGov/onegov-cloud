@@ -7,15 +7,16 @@ from onegov.pas import _
 from onegov.pas.models import PASParliamentarianRole, SettlementRun
 from onegov.pas.models.presidential_allowance import (
     ALLOWANCE_ROLES,
+    MAX_ALLOWANCES_PER_RUN,
     PRESIDENT_QUARTERLY,
     PRESIDENT_YEARLY_ALLOWANCE,
     VICE_PRESIDENT_QUARTERLY,
     VICE_PRESIDENT_YEARLY_ALLOWANCE,
     PresidentialAllowance,
 )
+from sqlalchemy import extract, func
 from uuid import UUID
-from wtforms.fields import IntegerField
-from wtforms.validators import InputRequired, NumberRange
+from wtforms.validators import InputRequired
 
 from typing import TYPE_CHECKING
 
@@ -37,22 +38,24 @@ QUARTERLY_AMOUNTS: dict[str, int] = {
 
 class PresidentialAllowanceForm(Form):
 
-    year = IntegerField(
-        label=_('Year'),
+    settlement_run = ChosenSelectField(
+        label=_('Settlement run'),
         validators=[InputRequired()],
-    )
-
-    quarter = IntegerField(
-        label=_('Quarter'),
-        validators=[
-            InputRequired(), NumberRange(min=1, max=4)
-        ],
     )
 
     recipient = ChosenSelectField(
         label=_('Recipient'),
         validators=[InputRequired()],
     )
+
+    def _settlement_run_choices(self) -> list[Any]:
+        runs = (
+            self.request.session.query(SettlementRun)
+            .filter(SettlementRun.closed.is_(False))
+            .order_by(SettlementRun.end.desc())
+            .all()
+        )
+        return [(str(r.id), r.name) for r in runs]
 
     def _role_holder_choices(self) -> list[Any]:
         today = date.today()
@@ -82,35 +85,34 @@ class PresidentialAllowanceForm(Form):
         return choices
 
     def on_request(self) -> None:
+        self.settlement_run.choices = self._settlement_run_choices()
         self.recipient.choices = self._role_holder_choices()
-
-        if self.submitted(self.request):
-            return
-
-        self.year.data = self.year.data or date.today().year
-
-    @property
-    def current_settlement_run(
-        self,
-    ) -> SettlementRun | None:
-        return (
-            self.request.session.query(SettlementRun)
-            .filter(SettlementRun.closed.is_(False))
-            .order_by(SettlementRun.end.desc())
-            .first()
-        )
 
     def _yearly_total(self, year: int, role: str) -> int:
         total = (
-            self.request.session.query(PresidentialAllowance)
+            self.request.session.query(
+                func.coalesce(
+                    func.sum(PresidentialAllowance.amount),
+                    0,
+                )
+            )
+            .join(SettlementRun)
             .filter(
-                PresidentialAllowance.year == year,
+                extract('year', SettlementRun.end) == year,
                 PresidentialAllowance.role == role,
             )
-            .with_entities(PresidentialAllowance.amount)
-            .all()
+            .scalar()
         )
-        return sum(row[0] for row in total)
+        return int(total)
+
+    def _count_for_run(self, run_id: UUID) -> int:
+        return (
+            self.request.session.query(PresidentialAllowance)
+            .filter(
+                PresidentialAllowance.settlement_run_id == run_id,
+            )
+            .count()
+        )
 
     def validate(
         self,
@@ -122,14 +124,31 @@ class PresidentialAllowanceForm(Form):
         if not result:
             return False
 
-        year = self.year.data
-        quarter = self.quarter.data
-        assert year is not None
-        assert quarter is not None
-
+        run_id = UUID(self.settlement_run.data)
         _parl_id, role = self.parsed_recipient
         amount = QUARTERLY_AMOUNTS[role]
         limit = YEARLY_LIMITS[role]
+
+        count = self._count_for_run(run_id)
+        if count >= MAX_ALLOWANCES_PER_RUN:
+            assert isinstance(self.settlement_run.errors, list)
+            self.settlement_run.errors.append(
+                _(
+                    'Maximum of ${max} allowances per'
+                    ' settlement run reached.',
+                    mapping={
+                        'max': str(MAX_ALLOWANCES_PER_RUN),
+                    },
+                )
+            )
+            return False
+
+        run = (
+            self.request.session.query(SettlementRun)
+            .filter(SettlementRun.id == run_id)
+            .one()
+        )
+        year = run.end.year
         existing = self._yearly_total(year, role)
 
         if existing + amount > limit:
@@ -147,30 +166,6 @@ class PresidentialAllowanceForm(Form):
                         'limit': str(limit),
                         'existing': str(existing),
                         'remaining': str(remaining),
-                    },
-                )
-            )
-            return False
-
-        existing_quarter = (
-            self.request.session.query(PresidentialAllowance)
-            .filter(
-                PresidentialAllowance.year == year,
-                PresidentialAllowance.quarter == quarter,
-                PresidentialAllowance.role == role,
-            )
-            .first()
-        )
-        if existing_quarter is not None:
-            assert isinstance(self.quarter.errors, list)
-            self.quarter.errors.append(
-                _(
-                    'Allowance for Q${quarter}'
-                    ' ${year} already exists'
-                    ' for this role',
-                    mapping={
-                        'quarter': str(quarter),
-                        'year': str(year),
                     },
                 )
             )

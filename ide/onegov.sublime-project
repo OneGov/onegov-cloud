@@ -36,10 +36,8 @@
         "SublimeLinter.linters.ruff.python": "${project_path}/../venv/bin/python",
         "LSP": {
             "LSP-ruff": {
-                "initializationOptions": {
-                    "settings": {
-                        "lint.enable": true,
-                    }
+                "initialization_options": {
+                    "settings.lint.enable": true,
                 },
                 "command": ["${project_path}/../venv/bin/ruff", "server"],
             },

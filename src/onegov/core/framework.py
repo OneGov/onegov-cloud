@@ -1886,3 +1886,9 @@ def cache_control_tween_factory(
         return response
 
     return set_cache_control_header_tween
+
+
+@Framework.template_variables()
+def get_template_variables(request: CoreRequest) -> dict[str, Any]:
+    return {
+    }

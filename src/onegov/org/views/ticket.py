@@ -9,7 +9,7 @@ from email_validator import validate_email, EmailNotValidError
 from io import BytesIO
 from markupsafe import Markup
 from morepath import Response
-from onegov.chat import Message, MessageCollection
+from onegov.chat import Message, MessageCollection, TextModuleCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
@@ -745,6 +745,10 @@ def close_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
 def reopen_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     user = request.current_user
     assert user is not None
+
+    if not self.handler.reopenable:
+        request.alert(_('This ticket cannot be reopened'))
+        return morepath.redirect(request.link(self))
 
     was_closed = self.state == 'closed'
 
@@ -1739,6 +1743,20 @@ def view_tickets(
     owner = next((o for o in owners if o.active), None)
     submitter = next((s for s in submitters if s.active), None)
     layout = layout or TicketsLayout(self, request)
+    layout.editbar_links = [
+        Link(
+            _('Archived Tickets'),
+            request.class_link(
+                ArchivedTicketCollection, {
+                    'handler': self.handler, 'group': self.group}),
+            attrs={'class': 'ticket-archive'}
+        ),
+        Link(
+                _('Text modules'), request.class_link(
+                    TextModuleCollection),
+                attrs={'class': 'text-modules'}
+            )
+    ]
 
     def archive_link(ticket: Ticket) -> str:
         return layout.csrf_protected_url(request.link(ticket, name='archive'))

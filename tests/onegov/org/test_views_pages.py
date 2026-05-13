@@ -80,8 +80,8 @@ def test_pages_cache(client: Client) -> None:
 
 
 def test_pages(client: Client) -> None:
-    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
-    assert len(client.get(root_url).pyquery('.edit-bar')) == 0
+    root_topic = client.get('/').pyquery('.top-bar-section a').attr('href')
+    assert len(client.get(root_topic).pyquery('.edit-bar')) == 0
 
     admin = client.spawn()
     admin.login_admin()
@@ -100,7 +100,7 @@ def test_pages(client: Client) -> None:
     client.login_admin()
     editor = client.spawn()
     editor.login_editor()
-    root_page = client.get(root_url)
+    root_page = client.get(root_topic)
     new_page = root_page.click('Thema')
     assert "Neues Thema" in new_page
 
@@ -229,7 +229,7 @@ def test_pages_person_link_extension(client: Client) -> None:
 
     # add person
     people_page = client.get('/people')
-    new_person_page = people_page.click('Person')
+    new_person_page = people_page.click('Person', index=1)
     assert "Neue Person" in new_person_page
 
     new_person_page.form['first_name'] = 'Franz'
@@ -469,9 +469,9 @@ def test_move_page_assigning_a_child_as_parent(client: Client) -> None:
 
 
 def test_links(client: Client) -> None:
-    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+    root_topic = client.get('/').pyquery('.top-bar-section a').attr('href')
     client.login_admin()
-    root_page = client.get(root_url)
+    root_page = client.get(root_topic)
 
     assert 'URL ändern' in edit_bar_links(root_page, 'text')
     new_link = root_page.click("Verknüpfung")
@@ -485,7 +485,7 @@ def test_links(client: Client) -> None:
     assert 'https://www.google.ch' in link
 
     new_link = root_page.click("Verknüpfung")
-    new_link.form['url'] = root_url
+    new_link.form['url'] = root_topic
     new_link.form['title'] = 'Link to Org'
     internal_link = new_link.form.submit().follow()
 
@@ -499,20 +499,34 @@ def test_links(client: Client) -> None:
     assert '1 Links werden nach dieser Aktion ersetzt.' in callout
     change_url_check.form['test'] = False
     root_page = change_url_check.form.submit().follow()
-    root_url = root_page.request.url
+    root_topic = root_page.request.url
     # check the link to org is updated getting 200 OK
     link_page = root_page.click('Link to Org', index=0)
 
     assert internal_link.request.url != link_page.request.url
 
+    # create link on root level
+    root_link = client.get('/').click('Verknüpfung')
+    assert "Neue Verknüpfung" in root_link
+
+    root_link.form['title'] = 'seantis'
+    root_link.form['url'] = 'https://www.seantis.ch'
+    link = root_link.form.submit().follow()
+    assert "Sie wurden nicht automatisch weitergeleitet" in link
+    assert 'https://www.seantis.ch' in link
+
     client.get('/auth/logout')
 
-    root_page = client.get(root_url)
+    root_page = client.get(root_topic)
     assert "Google" in root_page
     google = root_page.click("Google", index=0)
-
     assert google.status_code == 302
     assert google.location == 'https://www.google.ch'
+
+    assert 'seantis' in root_page
+    seantis = root_page.click('seantis', index=0)
+    assert seantis.status_code == 302
+    assert seantis.location == 'https://www.seantis.ch'
 
 
 def test_copy_paste_with_same_trait_only(client: Client) -> None:

@@ -9,7 +9,9 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.org.forms.settings import (
-    GeneralSettingsForm as OrgGeneralSettingsForm)
+    AppearanceSettingsForm as OrgAppearanceSettingsForm)
+from onegov.org.forms.settings import (
+    ModuleActivationSettingsForm as OrgModuleActivationSettingsForm)
 from onegov.town6 import _
 from onegov.user import UserCollection, User
 from onegov.town6.theme import user_options
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-class GeneralSettingsForm(OrgGeneralSettingsForm):
+class AppearanceSettingsForm(OrgAppearanceSettingsForm):
     """ Defines the settings form for onegov org. """
 
     page_image_position = RadioField(
@@ -295,12 +297,6 @@ class ChatSettingsForm(Form):
 
 class RISSettingsForm(Form):
 
-    ris_enabled = BooleanField(
-        label=_('Enable RIS'),
-        description=_('Enables the RIS integration for this organisation.'),
-        default=False
-    )
-
     # the url breadcrumbs shall point to for non-logged-in users
     ris_main_url = StringField(
         label=_('URL path for the RIS main page'),
@@ -317,4 +313,12 @@ class RISSettingsForm(Form):
             'category should be separated by a semicolon. '
             'Example: Cat 1 text; Cat 2 text; Cat 3 text'),
         render_kw={'rows': 12}
+    )
+
+
+class ModuleActivationSettingsForm(OrgModuleActivationSettingsForm):
+    ris_enabled = BooleanField(
+        label=_('Enable Ratsinformationssystem (RIS)'),
+        description=_('Enables the RIS integration for this organisation.'),
+        default=False
     )

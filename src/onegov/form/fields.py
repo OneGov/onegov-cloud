@@ -743,6 +743,13 @@ class TagsField(StringField):
     #        passed in by the form or the object?! This seems like a bug
     data: str | list[str]  # type:ignore[assignment]
 
+    def _value(self) -> str:
+        # Without this override, we had the underlying data corrupted
+        # containing strings like ["['[]']"]
+        if isinstance(self.data, list):
+            return ','.join(self.data)
+        return self.data or ''
+
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
             self.data = []

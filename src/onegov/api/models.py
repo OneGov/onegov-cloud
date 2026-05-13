@@ -23,7 +23,7 @@ from wtforms import HiddenField
 
 from typing import TYPE_CHECKING, Any, ClassVar, NoReturn, Self, overload
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Mapping
+    from collections.abc import Collection, Iterator, Mapping
     from onegov.core import Framework
     from onegov.core.collection import PKType
     from onegov.core.request import CoreRequest
@@ -194,9 +194,11 @@ class ApiEndpoint[M: DeclarativeBase]:
         self.batch_size = 100
 
     @cached_property
-    def filters(self) -> Mapping[str, str | None]:
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
         """ A mapping of the available filter params to their corresponding
-        description.
+        description or a collection of possible values. If possible values
+        are specified it is assumed that the filter can be specfied multiple
+        times.
 
         The description is optional and should only be used for non-trivial
         filters that don't just accept arbitrary strings.

@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import datetime
 import json
-import os
 import transaction
+import zipfile
+from io import BytesIO
 
+from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import PASParliamentaryGroupCollection
 from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
@@ -45,12 +48,6 @@ def add_rate_set(
     page.form['study_intercantonal_president_hour'] = 1
     page.form['commission_intercantonal_member_halfday'] = 1
     page.form['study_intercantonal_member_hour'] = 1
-    page.form['commission_official_president_halfday'] = 1
-    page.form['commission_official_president_fullday'] = 1
-    page.form['study_official_president_halfhour'] = 1
-    page.form['commission_official_vice_president_halfday'] = 1
-    page.form['commission_official_vice_president_fullday'] = 1
-    page.form['study_official_member_halfhour'] = 1
     page.form['shortest_all_president_halfhour'] = 1
     page.form['shortest_all_member_halfhour'] = 1
     page = page.form.submit().follow()
@@ -89,102 +86,69 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
 
     delete.append(page)
 
-    # parties
-    page = settings.click('Parteien')
-    page = page.click(href='new')
-    page.form['name'] = 'BB'
-    page = page.form.submit().follow()
-    assert 'BB' in page
+    # Create read-only entities programmatically (imported via API)
+    session = client.app.session()
 
-    page = page.click('Bearbeiten')
-    page.form['name'] = 'AA'
-    page = page.form.submit().follow()
-    assert 'AA' in page
+    parties = PartyCollection(session)
+    parties.add(name='AA')
 
-    delete.append(page)
+    parl_groups = PASParliamentaryGroupCollection(session)
+    parl_groups.add(name='BB')
 
-    # Parliamentarian Group
-    page = settings.click('Fraktionen')
-    page = page.click(href='new')
-    page.form['name'] = 'CC'
-    page = page.form.submit().follow()
-    assert 'CC' in page
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='First',
+        last_name='Last',
+        gender='male',
+        shipping_method='a',
+        shipping_address='Address',
+        shipping_address_zip_code='ZIP',
+        shipping_address_city='City',
+        email_primary='first.last@example.org',
+    )
 
-    page = page.click('Bearbeiten')
-    page.form['name'] = 'BB'
-    page = page.form.submit().follow()
-    assert 'BB' in page
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=parl.id,
+            role='member',
+            start=datetime.date(2020, 1, 1),
+        )
+    )
 
-    delete.append(page)
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='CC')
 
-    # Parliamentarian
-    page = settings.click('Parlamentarier:innen')
-    page = page.click(href='new')
-    page.form['gender'] = 'male'
-    page.form['first_name'] = 'First'
-    page.form['last_name'] = 'Last'
-    page.form['shipping_method'] = 'a'
-    page.form['shipping_address'] = 'Address'
-    page.form['shipping_address_zip_code'] = 'ZIP'
-    page.form['shipping_address_city'] = 'City'
-    page.form['email_primary'] = 'first.last@example.org'
-    page = page.form.submit().follow()
-    assert 'First Last' in page
-    assert ' Das Parlamentsmitglied wurde automatisch für den' in page
+    memberships = PASCommissionMembershipCollection(session)
+    memberships.add(
+        commission_id=commission.id,
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2020, 1, 1),
+    )
 
-    page = page.click('Bearbeiten')
-    page.form['gender'] = 'female'
-    page = page.form.submit().follow()
-    assert 'weiblich' in page
+    session.flush()
+    transaction.commit()
 
-    delete.append(page)
+    # Verify entities are visible
+    assert 'AA' in settings.click('Parteien')
+    assert 'BB' in settings.click('Fraktionen')
+    assert 'First Last' in settings.click('Parlamentarier:innen')
+    assert 'CC' in settings.click('Kommissionen')
 
-    # Role
-    page = page.click(href='new')
-    page.form['role'] = 'member'
-    page.form['start'] = '2020-01-01'
-    page = page.form.submit().follow()
-    assert 'Mitglied Parlament' in page
-
-    page = page.click('Mitglied Parlament').click('Bearbeiten')
-    page.form['role'] = 'president'
-    page = page.form.submit().follow()
-    assert 'Präsident:in Parlament' in page
-
-    # Commission
-    page = settings.click('Kommissionen')
-    page = page.click(href='new')
-    page.form['name'] = 'DD'
-    page = page.form.submit().follow()
-    assert 'DD' in page
-
-    page = page.click('Bearbeiten')
-    page.form['name'] = 'CC'
-    page = page.form.submit().follow()
-    assert 'CC' in page
-
-    delete.append(page)
-
-    # Commission Membership
-    page = page.click(href='new-membership')
-    page.form['role'] = 'member'
-    page.form['start'] = '2020-01-01'
-    page = page.form.submit().follow()
-    assert 'Mitglied' in page
-
-    page = page.click('Mitglied').click('Bearbeiten')
-    page.form['role'] = 'president'
-    page = page.form.submit().follow()
-    assert 'Präsident:in' in page
-
-    # Attendences
-    # ... commission
-    page = page.click(href='add-attendence')
+    # Attendences (still editable via UI)
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
     page.form['date'] = '2024-02-02'
     page.form['duration'] = '1'
     page.form['type'] = 'commission'
+    page.form['commission_id'].select(text='CC')
+    page.form['parliamentarian_id'].select(text='First Last')
     page = page.form.submit().follow()
-    assert 'Kommissionsitzung hinzugefügt' in page
+    assert 'Neue Anwesenheit hinzugefügt' in page
 
     # ... attendence
     page = client.get('/').follow().click('Anwesenheiten').click(
@@ -194,6 +158,7 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     page.form['duration'] = '2'
     page.form['type'] = 'study'
     page.form['commission_id'].select(text='CC')
+    page.form['parliamentarian_id'].select(text='First Last')
     page = page.form.submit().follow()
     assert 'Neue Anwesenheit hinzugefügt' in page
 
@@ -242,19 +207,15 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     assert '1 Resultat' in client.get('/search?q=aa')
     assert '1 Resultat' in client.get('/search?q=bb')
     assert '1 Resultat' in client.get('/search?q=cc')
-    assert '2 Resultate' in client.get('/search?q=first')
+    assert '1 Resultat' in client.get('/search?q=first')
     assert '1 Resultat' in client.get('/search?q=Q1')
 
-    # Delete
+    # Delete (only rate set, settlement run, attendence — still editable)
     for page in delete:
         page.click('Löschen')
     assert 'Noch keine Sätze erfasst' in settings.click('Sätze')
     assert 'Noch keine Abrechnungsläufe erfasst' in (
            settings.click('Abrechnungsläufe'))
-    assert 'Noch keine Parteien erfasst' in settings.click('Parteien')
-    assert 'Noch keine Fraktionen erfasst' in settings.click('Fraktionen')
-    assert 'Noch keine Parlamentarier:innen erfasst' in (
-           settings.click('Parlamentarier:innen'))
 
 
 def test_view_upload_json(
@@ -453,70 +414,61 @@ def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
     page.form['closed'] = False
     page = page.form.submit().follow()
 
-    # parties
-    page = settings.click('Parteien')
-    page = page.click(href='new')
-    page.form['name'] = 'BB'
-    page = page.form.submit().follow()
-    assert 'BB' in page
+    # Create read-only entities programmatically
+    session = client.app.session()
 
-    # Parliamentarian
-    page = settings.click('Parlamentarier:innen')
-    page = page.click(href='new')
-    page.form['personnel_number'] = '666999'
-    page.form['gender'] = 'male'
-    page.form['first_name'] = 'First'
-    page.form['last_name'] = 'Last'
-    page.form['shipping_method'] = 'a'
-    page.form['shipping_address'] = 'Address'
-    page.form['shipping_address_zip_code'] = 'ZIP'
-    page.form['shipping_address_city'] = 'City'
-    page.form['email_primary'] = 'first.last@example.org'
-    page = page.form.submit().follow()
-    assert 'First Last' in page
+    parties = PartyCollection(session)
+    parties.add(name='BB')
 
-    page = page.click('Bearbeiten')
-    page.form['gender'] = 'female'
-    page = page.form.submit().follow()
-    assert 'weiblich' in page
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='First',
+        last_name='Last',
+        gender='male',
+        shipping_method='a',
+        shipping_address='Address',
+        shipping_address_zip_code='ZIP',
+        shipping_address_city='City',
+        email_primary='first.last@example.org',
+    )
 
-    # Role
-    page = page.click(href='new')
-    page.form['role'] = 'member'
-    page.form['start'] = '2020-01-01'
-    page = page.form.submit().follow()
-    assert 'Mitglied Parlament' in page
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=parl.id,
+            role='member',
+            start=datetime.date(2020, 1, 1),
+        )
+    )
 
-    # Commission
-    page = settings.click('Kommissionen')
-    page = page.click(href='new')
-    page.form['name'] = 'DD'
-    page = page.form.submit().follow()
-    assert 'DD' in page
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='DD')
 
-    # Commission Membership
-    page = page.click(href='new-membership')
-    page.form['role'] = 'member'
-    page.form['start'] = '2020-01-01'
-    page = page.form.submit().follow()
-    assert 'Mitglied' in page
+    memberships = PASCommissionMembershipCollection(session)
+    memberships.add(
+        commission_id=commission.id,
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2020, 1, 1),
+    )
 
-    # make president
-    # page = page.click('Mitglied').click('Bearbeiten')
-    # page.form['role'] = 'president'
-    # page = page.form.submit().follow()
-    # assert 'Präsident:in' in page
+    session.flush()
+    transaction.commit()
 
     # Attendences
-    # ... commission
-    page = page.click(href='add-attendence')
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
     page.form['date'] = '2024-02-02'
     page.form['duration'] = '1'
     page.form['type'] = 'commission'
+    page.form['commission_id'].select(text='DD')
+    page.form['parliamentarian_id'].select(text='First Last')
     page = page.form.submit().follow()
-    assert 'Kommissionsitzung hinzugefügt' in page
+    assert 'Neue Anwesenheit hinzugefügt' in page
 
-    # ... attendence
     page = client.get('/').follow().click('Anwesenheiten').click(
         href='new', index=0
     )
@@ -524,6 +476,7 @@ def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
     page.form['duration'] = '2'
     page.form['type'] = 'study'
     page.form['commission_id'].select(text='DD')
+    page.form['parliamentarian_id'].select(text='First Last')
     page = page.form.submit().follow()
     assert 'Neue Anwesenheit hinzugefügt' in page
 
@@ -547,37 +500,37 @@ def test_attendance_blocked_outside_any_settlement_run(
     page.form['closed'] = False
     page = page.form.submit().follow()
 
-    # Create party
-    page = settings.click('Parteien')
-    page = page.click(href='new')
-    page.form['name'] = 'Test Party'
-    page = page.form.submit().follow()
+    # Create read-only entities programmatically
+    session = client.app.session()
 
-    # Create parliamentarian
-    page = settings.click('Parlamentarier:innen')
-    page = page.click(href='new')
-    page.form['personnel_number'] = '999'
-    page.form['gender'] = 'male'
-    page.form['first_name'] = 'Test'
-    page.form['last_name'] = 'User'
-    page.form['shipping_method'] = 'a'
-    page.form['shipping_address'] = 'Address'
-    page.form['shipping_address_zip_code'] = 'ZIP'
-    page.form['shipping_address_city'] = 'City'
-    page.form['email_primary'] = 'test@example.org'
-    page = page.form.submit().follow()
+    parties = PartyCollection(session)
+    parties.add(name='Test Party')
 
-    # Create commission
-    page = settings.click('Kommissionen')
-    page = page.click(href='new')
-    page.form['name'] = 'Test Commission'
-    page = page.form.submit().follow()
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='Test',
+        last_name='User',
+        gender='male',
+        shipping_method='a',
+        shipping_address='Address',
+        shipping_address_zip_code='ZIP',
+        shipping_address_city='City',
+        email_primary='test@example.org',
+    )
 
-    # Add commission membership
-    page = page.click(href='new-membership')
-    page.form['role'] = 'member'
-    page.form['start'] = '2020-01-01'
-    page = page.form.submit().follow()
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Test Commission')
+
+    memberships = PASCommissionMembershipCollection(session)
+    memberships.add(
+        commission_id=commission.id,
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2020, 1, 1),
+    )
+
+    session.flush()
+    transaction.commit()
 
     # TEST 1: Try to create attendance BEFORE settlement run period
     # Should fail - NOT within any settlement run
@@ -726,7 +679,8 @@ def test_fetch_commissions_parliamentarians_json(
     parl_president = parliamentarians.add(
         first_name='Alice',
         last_name='President',
-        email_primary='alice.president@example.org'
+        email_primary='alice.president@example.org',
+        zg_username='zgalice',
     )
 
     # Add president to Commission A (using the ID we saved earlier)
@@ -739,7 +693,7 @@ def test_fetch_commissions_parliamentarians_json(
 
     # Create and configure user
     users = UserCollection(session)
-    user = users.by_username('alice.president@example.org')
+    user = users.by_username('zgalice')
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
@@ -748,7 +702,7 @@ def test_fetch_commissions_parliamentarians_json(
     transaction.commit()
 
     # Login as commission president
-    client.login('alice.president@example.org', 'test')
+    client.login('zgalice', 'test')
 
     # Commission president should only see Commission A
     # (where they're president)
@@ -774,46 +728,84 @@ def test_fetch_commissions_parliamentarians_json(
     assert commission3_id not in data3
 
 
-def test_commission_edit_with_dates(client: Client[TestPasApp]) -> None:
-    """Test that commission editing works with start and end dates.
+def test_commissions_view_filtered_by_role(
+    client: Client[TestPasApp],
+) -> None:
+    session = client.app.session()
 
-    This is a regression test for the issue where editbar_links = []
-    prevented the form from being submitted.
-    """
+    commissions = PASCommissionCollection(session)
+    commission_a = commissions.add(name='Finanzkommission')
+    commission_b = commissions.add(name='Bildungskommission')
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='Pia',
+        last_name='Member',
+        email_primary='pia@example.org',
+        zg_username='zgpia',
+    )
+    pres = parliamentarians.add(
+        first_name='Alice',
+        last_name='President',
+        email_primary='alice@example.org',
+        zg_username='zgalice',
+    )
+
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=parl.id,
+            commission_id=commission_a.id,
+            role='member',
+        )
+    )
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=pres.id,
+            commission_id=commission_a.id,
+            role='president',
+        )
+    )
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=pres.id,
+            commission_id=commission_b.id,
+            role='member',
+        )
+    )
+
+    users = UserCollection(session)
+
+    user_parl = users.by_username('zgpia')
+    assert user_parl is not None
+    user_parl.role = 'parliamentarian'
+    user_parl.password = 'test'
+    user_parl.active = True
+
+    user_pres = users.by_username('zgalice')
+    assert user_pres is not None
+    user_pres.role = 'commission_president'
+    user_pres.password = 'test'
+    user_pres.active = True
+
+    transaction.commit()
+
+    # Admin sees all commissions
     client.login_admin()
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' in page
 
-    settings = client.get('/').follow().click('PAS Einstellungen')
+    # Parliamentarian sees only their commission (A)
+    client.login('zgpia', 'test')
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' not in page
 
-    page = settings.click('Kommissionen')
-    page = page.click(href='new')
-    page.form['name'] = 'Test Commission'
-    page.form['type'] = 'normal'
-    page = page.form.submit().follow()
-    assert 'Test Commission' in page
-
-    page = page.click('Bearbeiten')
-    assert page.form['name'].value == 'Test Commission'
-
-    page.form['start'] = '2024-01-01'
-    page.form['end'] = '2024-12-31'
-    page.form['name'] = 'Updated Commission'
-
-    # Verify that the "Speichern" (Save) button exists in the editbar
-    # This was the actual bug - this button disappeared
-    editbar = page.pyquery('ul.edit-bar')
-    assert editbar, "Edit bar should be present"
-    save_button = page.pyquery('button.save-link')
-    assert save_button, "Save button should be present in editbar"
-    assert 'Speichern' in save_button.text()
-
-    page = page.form.submit().follow()
-    assert 'Updated Commission' in page
-
-    # Verify dates were saved by re-editing
-    page = page.click('Bearbeiten')
-    assert page.form['name'].value == 'Updated Commission'
-    assert page.form['start'].value == '2024-01-01'
-    assert page.form['end'].value == '2024-12-31'
+    # Commission president sees both (member of both)
+    client.login('zgalice', 'test')
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' in page
 
 
 def test_add_new_user_without_activation_email(
@@ -859,37 +851,50 @@ def test_settlement_run_complete_translation(
     page.form['closed'] = False
     page = page.form.submit().follow()
 
-    page = settings.click('Parteien')
-    page = page.click(href='new')
-    page.form['name'] = 'TestParty'
-    page = page.form.submit().follow()
+    # Create read-only entities programmatically
+    session = client.app.session()
 
-    page = settings.click('Parlamentarier:innen')
-    page = page.click(href='new')
-    page.form['gender'] = 'male'
-    page.form['first_name'] = 'Test'
-    page.form['last_name'] = 'Person'
-    page.form['shipping_method'] = 'a'
-    page.form['shipping_address'] = 'Address'
-    page.form['shipping_address_zip_code'] = 'ZIP'
-    page.form['shipping_address_city'] = 'City'
-    page.form['email_primary'] = 'test.person@example.org'
-    page = page.form.submit().follow()
+    parties = PartyCollection(session)
+    parties.add(name='TestParty')
 
-    page = settings.click('Kommissionen')
-    page = page.click(href='new')
-    page.form['name'] = 'TestCommission'
-    page = page.form.submit().follow()
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='Test',
+        last_name='Person',
+        gender='male',
+        shipping_method='a',
+        shipping_address='Address',
+        shipping_address_zip_code='ZIP',
+        shipping_address_city='City',
+        email_primary='test.person@example.org',
+    )
 
-    page = page.click(href='new-membership')
-    page.form['role'] = 'member'
-    page.form['start'] = '2020-01-01'
-    page = page.form.submit().follow()
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='TestCommission')
 
-    page = page.click(href='add-attendence')
+    memberships = PASCommissionMembershipCollection(session)
+    memberships.add(
+        commission_id=commission.id,
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2020, 1, 1),
+    )
+
+    session.flush()
+    transaction.commit()
+
+    # Create attendance with abschluss via standalone form
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
     page.form['date'] = '2024-02-02'
     page.form['duration'] = '1'
     page.form['type'] = 'commission'
+    page.form['commission_id'].select(text='TestCommission')
+    page.form['parliamentarian_id'].select(text='Test Person')
     page.form['abschluss'] = True
     page = page.form.submit().follow()
 
@@ -900,7 +905,7 @@ def test_settlement_run_complete_translation(
     assert '✓ Complete' not in page
 
 
-def test_bulk_commission_add_abschluss_notifies_admins(
+def test_commission_president_bulk_add(
     client: Client[TestPasApp],
 ) -> None:
     session = client.app.session()
@@ -919,11 +924,13 @@ def test_bulk_commission_add_abschluss_notifies_admins(
         first_name='Bob',
         last_name='Member',
         email_primary='bob.member@example.org',
+        zg_username='zgbob',
     )
     alice = parliamentarians.add(
         first_name='Alice',
         last_name='President',
         email_primary='alice.president@example.org',
+        zg_username='zgalice',
     )
 
     commissions = PASCommissionCollection(session)
@@ -949,41 +956,28 @@ def test_bulk_commission_add_abschluss_notifies_admins(
     alice_id = str(alice.id)
 
     users = UserCollection(session)
-    president_user = users.by_username('alice.president@example.org')
+    president_user = users.by_username('zgalice')
     assert president_user is not None
     president_user.role = 'commission_president'
     president_user.password = 'test'
     president_user.active = True
     transaction.commit()
 
-    client.login('alice.president@example.org', 'test')
-    # we have setup the structure, now create attendence
+    client.login('zgalice', 'test')
+
+    page = client.get('/attendences')
+    assert 'Massenbuchung Kommissionssitzung' in page
 
     page = client.get('/attendences/new-commission-bulk')
+    assert page.status_code == 200
     page.form['date'] = '2024-06-01'
     page.form['type'] = 'commission'
     page.form['duration'] = '2'
     page.form['commission_id'] = commission_id
-    # First without abschluss
     page.form['abschluss'] = False
     page.form['parliamentarian_id'] = [bob_id, alice_id]
-    page.form.submit()
-    # This sholud not send E-Mails
-    assert len(os.listdir(client.app.maildir)) == 0
-
-
-    page = client.get('/attendences/new-commission-bulk')
-    page.form['date'] = '2024-06-01'
-    page.form['type'] = 'commission'
-    page.form['duration'] = '2'
-    page.form['commission_id'] = commission_id
-    page.form['abschluss'] = True
-    page.form['parliamentarian_id'] = [bob_id, alice_id]
-    page.form.submit()
-
-    assert len(os.listdir(client.app.maildir)) == 1
-    recipients = {client.get_email(i)['To'] for i in range(1)}
-    assert 'admin@example.org' in recipients
+    page = page.form.submit().maybe_follow()
+    assert page.status_code == 200
 
 
 def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
@@ -994,17 +988,20 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     assert 'Präsidialzulagen' in settings
 
     # Step 2: Create parliamentarians with president/VP roles
+    # and settlement runs
     session = client.app.session()
     parliamentarians = PASParliamentarianCollection(client.app)
     president = parliamentarians.add(
         first_name='Hans',
         last_name='Präsident',
         email_primary='hans.praesident@example.org',
+        zg_username='zghans',
     )
     vice = parliamentarians.add(
         first_name='Lisa',
         last_name='Vizepräsidentin',
         email_primary='lisa.vize@example.org',
+        zg_username='zglisa',
     )
     session.flush()
     president_id = str(president.id)
@@ -1017,48 +1014,265 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
         parliamentarian_id=vice.id,
         role='vice_president',
     ))
+
+    run1 = SettlementRun(
+        name='Q1 2026',
+        start=datetime.date(2026, 1, 1),
+        end=datetime.date(2026, 3, 31),
+        active=True,
+        closed=False,
+    )
+    run2 = SettlementRun(
+        name='Q2 2026',
+        start=datetime.date(2026, 4, 1),
+        end=datetime.date(2026, 6, 30),
+        active=True,
+        closed=False,
+    )
+    session.add(run1)
+    session.add(run2)
+    session.flush()
+    run1_id = str(run1.id)
+    run2_id = str(run2.id)
     transaction.commit()
 
-    # Step 3: Single dropdown with both roles
-    current_year = datetime.date.today().year
     pres_value = f'{president_id}:president'
     vice_value = f'{vice_id}:vice_president'
 
-    # Submit Q1 for president
+    # Submit allowance for president on run1
     page = client.get('/presidential-allowances/new')
-    assert 'Quartalszulage hinzufügen' in page
-    page.form['year'] = current_year
-    page.form['quarter'] = 1
+    assert 'Zulage hinzufügen' in page
+    page.form['settlement_run'] = run1_id
     page.form['recipient'] = pres_value
     page = page.form.submit().follow()
-    assert 'Quartalszulage hinzugefügt' in page
+    assert 'Zulage hinzugefügt' in page
     assert 'Hans Präsident' in page
-    assert 'Q1' in page
+    assert 'Q1 2026' in page
 
-    # Submit Q1 for vice president
+    # Submit allowance for vice president on run1
     page = client.get('/presidential-allowances/new')
-    page.form['year'] = current_year
-    page.form['quarter'] = 1
+    page.form['settlement_run'] = run1_id
     page.form['recipient'] = vice_value
     page = page.form.submit().follow()
-    assert 'Quartalszulage hinzugefügt' in page
+    assert 'Zulage hinzugefügt' in page
     assert 'Lisa Vizepräsidentin' in page
 
-    # Submit Q2-Q4 for both roles
-    for q in (2, 3, 4):
-        for val in (pres_value, vice_value):
-            page = client.get('/presidential-allowances/new')
-            page.form['year'] = current_year
-            page.form['quarter'] = q
-            page.form['recipient'] = val
-            page = page.form.submit().follow()
-            assert 'Quartalszulage hinzugefügt' in page
+    # Fill run1 to max (4): add 2 more on run1
+    for val in (pres_value, vice_value):
+        page = client.get('/presidential-allowances/new')
+        page.form['settlement_run'] = run1_id
+        page.form['recipient'] = val
+        page = page.form.submit().follow()
+        assert 'Zulage hinzugefügt' in page
 
-    # Step 4: Yearly limit reached — 5th entry should fail
+    # 5th allowance on run1 should fail (max 4 per run)
     page = client.get('/presidential-allowances/new')
-    page.form['year'] = current_year
-    page.form['quarter'] = 1
+    page.form['settlement_run'] = run1_id
+    page.form['recipient'] = pres_value
+    result = page.form.submit()
+    assert result.status_code == 200
+    assert 'Maximum' in result
+
+    # But adding on run2 still works
+    page = client.get('/presidential-allowances/new')
+    page.form['settlement_run'] = run2_id
+    page.form['recipient'] = pres_value
+    page = page.form.submit().follow()
+    assert 'Zulage hinzugefügt' in page
+
+    # Fill up yearly limit for president (20k = 4 × 5000)
+    # Already have 3 president allowances (2 on run1, 1 on run2)
+    # Need 1 more to hit limit
+    page = client.get('/presidential-allowances/new')
+    page.form['settlement_run'] = run2_id
+    page.form['recipient'] = pres_value
+    page = page.form.submit().follow()
+    assert 'Zulage hinzugefügt' in page
+
+    # 5th president allowance should fail (yearly limit)
+    page = client.get('/presidential-allowances/new')
+    page.form['settlement_run'] = run2_id
     page.form['recipient'] = pres_value
     result = page.form.submit()
     assert result.status_code == 200
     assert 'CHF 20000' in result
+
+
+def test_abschluss_email_uses_commission_name(
+    client: Client[TestPasApp],
+) -> None:
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    add_rate_set(settings, [])
+
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1 2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='Max',
+        last_name='Muster',
+        email_primary='max.muster@example.org',
+    )
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Finanzkommission')
+
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+
+    session.flush()
+    transaction.commit()
+
+    # Create attendance without abschluss first
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
+    page.form['date'] = '2024-06-15'
+    page.form['duration'] = '2'
+    page.form['type'] = 'commission'
+    page.form['commission_id'].select(text='Finanzkommission')
+    page.form['parliamentarian_id'].select(text='Max Muster')
+    page.form['abschluss'] = False
+    page = page.form.submit().follow()
+
+    # Now edit to set abschluss — this triggers the email
+    page = page.click('Bearbeiten')
+    page.form['abschluss'] = True
+    page.form.submit().follow()
+
+    email = client.get_email(0)
+    assert email['Subject'] == ('PAS: Abschluss gesetzt für Finanzkommission')
+    assert 'Finanzkommission' in email['HtmlBody']
+    assert 'Max Muster' in email['HtmlBody']
+
+
+def test_parliamentarian_pdf_zip_download(
+    client: Client[TestPasApp],
+) -> None:
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    add_rate_set(settings, [])
+
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1 2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    alice = parliamentarians.add(
+        first_name='Alice',
+        last_name='Aaberg',
+        email_primary='alice@example.org',
+    )
+    bob = parliamentarians.add(
+        first_name='Bob',
+        last_name='Baumann',
+        email_primary='bob@example.org',
+    )
+
+    parties = PartyCollection(session)
+    party = parties.add(name='TestPartei')
+
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=alice.id,
+            role='member',
+            party=party,
+            start=datetime.date(2024, 1, 1),
+        )
+    )
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=bob.id,
+            role='member',
+            party=party,
+            start=datetime.date(2024, 1, 1),
+        )
+    )
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='TestKommission')
+
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=alice.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=bob.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+
+    session.flush()
+
+    # Add attendances for both
+    from onegov.pas.models import Attendence
+
+    session.add(
+        Attendence(
+            parliamentarian=alice,
+            commission=commission,
+            date=datetime.date(2024, 3, 10),
+            duration=120,
+            type='commission',
+        )
+    )
+    session.add(
+        Attendence(
+            parliamentarian=bob,
+            commission=commission,
+            date=datetime.date(2024, 3, 10),
+            duration=120,
+            type='commission',
+        )
+    )
+    session.flush()
+    transaction.commit()
+
+    # Navigate to settlement run and find ZIP link
+    page = settings.click('Abrechnungsläufe')
+    page = page.click('Q1 2024')
+    assert 'Alle Parlamentarier:innen (ZIP)' in page
+
+    resp = page.click(href='all-parliamentarians-zip')
+    assert resp.status_code == 200
+    assert resp.content_type == 'application/zip'
+    assert resp.content_disposition is not None
+    assert '.zip' in resp.content_disposition
+
+    zf = zipfile.ZipFile(BytesIO(resp.body))
+    names = zf.namelist()
+    assert len(names) == 2
+    assert all(n.endswith('.pdf') for n in names)
+    assert any('Aaberg' in n for n in names)
+    assert any('Baumann' in n for n in names)
+
+    for name in names:
+        pdf_bytes = zf.read(name)
+        assert len(pdf_bytes) > 0
+        assert pdf_bytes[:4] == b'%PDF'

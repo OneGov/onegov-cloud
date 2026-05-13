@@ -270,5 +270,5 @@ def get_template_variables(request: TranslatorAppRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
-        'hide_search_header': not request.is_logged_in
+        'hide_search_header': not request.is_logged_in,
     }

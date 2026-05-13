@@ -21,6 +21,7 @@ from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
 from onegov.file import File
+from onegov.ticket import Ticket
 from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
@@ -2255,6 +2256,112 @@ def test_time_reports_finanzstelle_filtering(client: Client) -> None:
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
+def test_admin_in_group_sees_trp_tickets(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Admin who is group member (not accountant) should see TRP tickets
+    only of that group.
+
+    """
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Group',
+        last_name='Translator',
+        admission='certified',
+        email='grouptranslator@example.org',
+        drive_distance=0.0,
+    ).id
+
+    user_group_collection = UserGroupCollection(session)
+    user_group = user_group_collection.add(name='finanzstelle_admin_group')
+    user_group.meta = {
+        'finanzstelle': 'migrationsamt_und_passbuero',
+        'accountant_emails': ['editor@example.org'],
+    }
+    other_group = user_group_collection.add(name='finanzstelle_other_group')
+    other_group.meta = {
+        'finanzstelle': 'polizei',
+        'accountant_emails': ['accountant@example.org'],
+    }
+    admin_user = (
+        session.query(User).filter_by(username='admin@example.org').one()
+    )
+    admin_user.groups = [user_group]
+    transaction.commit()
+
+    client.login_member()
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
+    page.form['finanzstelle'] = 'migrationsamt_und_passbuero'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '09:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '10:00'
+    page.form['case_number'] = 'CASE-ADMIN-GROUP-001'
+    page = page.form.submit().follow()
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    page = client.get(f'/translator/{translator_id}')
+    page = page.click('Zeit erfassen')
+    page.form['assignment_type'] = 'on-site'
+    page.form['assignment_location'] = 'obergericht'
+    page.form['finanzstelle'] = 'polizei'
+    page.form['start_date'] = '2025-01-11'
+    page.form['start_time'] = '11:00'
+    page.form['end_date'] = '2025-01-11'
+    page.form['end_time'] = '12:00'
+    page.form['case_number'] = 'CASE-ADMIN-GROUP-002'
+    page.form['is_urgent'] = False
+    page.form['notes'] = 'Other group test'
+    page = page.form.submit().follow()
+    assert 'Zeiterfassung zur Überprüfung eingereicht' in page
+
+    group_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(case_number='CASE-ADMIN-GROUP-001')
+        .one()
+    )
+    other_report = (
+        session.query(TranslatorTimeReport)
+        .filter_by(case_number='CASE-ADMIN-GROUP-002')
+        .one()
+    )
+    group_ticket = (
+        session.query(Ticket)
+        .filter(Ticket.handler_code == 'TRP')
+        .filter(
+            Ticket.handler_data['handler_data']['time_report_id'].astext
+            == str(group_report.id)
+        )
+        .one()
+    )
+    other_ticket = (
+        session.query(Ticket)
+        .filter(Ticket.handler_code == 'TRP')
+        .filter(
+            Ticket.handler_data['handler_data']['time_report_id'].astext
+            == str(other_report.id)
+        )
+        .one()
+    )
+
+    client.login_admin()
+    page = client.get('/tickets/ALL/open')
+    assert group_ticket.number in page
+    assert 'TRANSLATOR, Group' in page
+    assert other_ticket.number not in page
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
 def test_time_report_workflow(
     broadcast: MagicMock,
     authenticate: MagicMock,
@@ -2337,24 +2444,16 @@ def test_time_report_workflow(
     )
     assert (
         'Eine Zeiterfassung wurde für Sie eingereicht und wird nun '
-        'geprüft.' in mail_to_translator['TextBody']
-    )
-    assert (
-        'Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden'
+        'durch unsere interne Kontrollstelle geprüft:'
         in mail_to_translator['TextBody']
     )
-
-    translator_link_match = re.search(
-        r'<a href="([^"]+)">Zeiterfassung anzeigen</a>',
-        mail_to_translator['HtmlBody'],
+    assert (
+        'Sobald die Kontrolle abgeschlossen ist, werden Sie wieder '
+        'informiert.' in mail_to_translator['TextBody']
     )
-    assert translator_link_match is not None
-    translator_status_link = translator_link_match.group(1)
-    assert '/status' in translator_status_link
-    assert accountant_email in mail_to_translator['TextBody']
 
     client.login_translator()
-    status_page = client.get(translator_status_link)
+    status_page = client.get(ticket_link + '/status')
     assert status_page.status_code == 200
     assert 'TRP-' in status_page
 
@@ -3351,3 +3450,183 @@ def test_time_report_schriftlich(
     assert report.end is None
     assert report.duration == 0
     assert report.total_compensation == Decimal('450.00')  # 5 * 90
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_expertise_professional_guilds_no_corruption(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+    """OGC-3135: expertise_professional_guilds_other gets corrupted
+    through repeated edit/mutation cycles — nested string repr of list
+    stored instead of actual list values."""
+
+    session = client.app.session()
+    languages = create_languages(session)
+    language_ids = [str(lang.id) for lang in languages]
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    settings.form.submit()
+
+    # Create translator with expertise fields set
+    page = client.get('/translators/new')
+    page.form['first_name'] = 'Test'
+    page.form['last_name'] = 'Guilds'
+    page.form['pers_id'] = 999
+    page.form['admission'] = 'uncertified'
+    page.form['gender'] = 'M'
+    page.form['withholding_tax'] = False
+    page.form['self_employed'] = False
+    page.form['date_of_birth'] = '1980-01-01'
+    page.form['nationalities'] = ['CH']
+    page.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    page.form['address'] = 'Teststrasse 1'
+    page.form['zip_code'] = '6000'
+    page.form['city'] = 'Luzern'
+    page.form['email'] = 'guilds@test.com'
+    page.form['tel_mobile'] = '+41790000000'
+    page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['agency_references'] = 'OK'
+    # Set expertise fields
+    page.form.get(
+        'expertise_professional_guilds', index=0
+    ).checked = True  # nutrition_agriculture
+    page.form.get(
+        'expertise_professional_guilds', index=9
+    ).checked = True  # law_insurance
+    page.form['expertise_professional_guilds_other'] = (
+        'Psychologie,Exorzismus'
+    )
+    with patch(
+        'onegov.gis.utils.MapboxRequests.directions',
+        return_value=FakeResponse({
+            'code': 'Ok', 'routes': [{'distance': 1000}]
+        })
+    ):
+        result = page.form.submit()
+        error_msg = result.pyquery('.error-message').text()
+        assert result.status_int == 302, error_msg
+        result.follow()
+
+    # Verify initial state
+    translator = session.query(Translator).filter_by(
+        email='guilds@test.com'
+    ).one()
+    assert set(translator.expertise_professional_guilds) == {
+        'nutrition_agriculture', 'law_insurance'
+    }
+    assert set(translator.expertise_professional_guilds_other) == {
+        'Psychologie', 'Exorzismus'
+    }
+
+    # Edit with validation failure then resubmit — this is the actual
+    # corruption path: process_formdata sets data=list, validation fails,
+    # form re-renders calling _value() on list-shaped data
+    for i in range(3):
+        page = client.get('/').follow().click('GUILDS, Test')
+        page = page.click('Bearbeiten')
+        original_mobile = page.form['tel_mobile'].value
+        page.form['tel_mobile'] = 'invalid'  # trigger validation error
+        with patch(
+            'onegov.gis.utils.MapboxRequests.directions',
+            return_value=FakeResponse({
+                'code': 'Ok', 'routes': [{'distance': 1000}]
+            })
+        ):
+            page = page.form.submit()  # 200 = validation failure
+            assert page.status_int == 200
+            # Fix the error and resubmit
+            page.form['tel_mobile'] = original_mobile
+            page.form.submit().follow()
+
+        session.expire_all()
+        translator = session.query(Translator).filter_by(
+            email='guilds@test.com'
+        ).one()
+        assert set(translator.expertise_professional_guilds) == {
+            'nutrition_agriculture', 'law_insurance'
+        }, f'expertise_professional_guilds corrupted after edit #{i+1}'
+        assert set(translator.expertise_professional_guilds_other) == {
+            'Psychologie', 'Exorzismus'
+        }, (
+            f'expertise_professional_guilds_other corrupted after '
+            f'edit #{i+1}: {translator.expertise_professional_guilds_other}'
+        )
+
+    # Now test mutation apply path — editor submits mutation
+    client.logout()
+    client.login_editor()
+    page = client.get('/').maybe_follow().click('GUILDS, Test')
+    page = page.click('Mutation melden')
+    page.form['submitter_message'] = 'Update guilds'
+    page.form['expertise_professional_guilds'].select_multiple([
+        'economy', 'law_insurance'
+    ])
+    page.form['expertise_professional_guilds_other'] = 'Religion'
+    page.form.submit().follow()
+
+    client.logout()
+    client.login_admin()
+
+    # Admin applies mutation
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    page = page.click('Vorgeschlagene Änderungen übernehmen')
+    page.form.submit().follow()
+
+    session.expire_all()
+    translator = session.query(Translator).filter_by(
+        email='guilds@test.com'
+    ).one()
+    assert set(translator.expertise_professional_guilds) == {
+        'economy', 'law_insurance'
+    }, (
+        f'expertise_professional_guilds corrupted after mutation: '
+        f'{translator.expertise_professional_guilds}'
+    )
+    assert translator.expertise_professional_guilds_other == ['Religion'], (
+        f'expertise_professional_guilds_other corrupted after mutation: '
+        f'{translator.expertise_professional_guilds_other}'
+    )
+
+    # Edit again after mutation to ensure no corruption
+    for i in range(3):
+        page = client.get('/').follow().click('GUILDS, Test')
+        page = page.click('Bearbeiten')
+        with patch(
+            'onegov.gis.utils.MapboxRequests.directions',
+            return_value=FakeResponse({
+                'code': 'Ok', 'routes': [{'distance': 1000}]
+            })
+        ):
+            page.form.submit().follow()
+
+        session.expire_all()
+        translator = session.query(Translator).filter_by(
+            email='guilds@test.com'
+        ).one()
+        assert set(translator.expertise_professional_guilds) == {
+            'economy', 'law_insurance'
+        }, (
+            f'expertise_professional_guilds corrupted after '
+            f'post-mutation edit #{i+1}: '
+            f'{translator.expertise_professional_guilds}'
+        )
+        assert translator.expertise_professional_guilds_other == [
+            'Religion'
+        ], (
+            f'expertise_professional_guilds_other corrupted after '
+            f'post-mutation edit #{i+1}: '
+            f'{translator.expertise_professional_guilds_other}'
+        )

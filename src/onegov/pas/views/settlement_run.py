@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from io import BytesIO
+from zipfile import ZipFile
 from webob import Response
 from onegov.core.utils import module_path
 from decimal import Decimal
@@ -50,6 +51,12 @@ from onegov.pas.views.abschlussliste import (
 )
 from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
         generate_fibu_export_rows)
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
+from onegov.pas.models.presidential_allowance import (
+    LOHNART_ALLOWANCE_TEXT,
+)
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -268,9 +275,8 @@ def view_settlement_run(
         session, self.start, self.end
     )
 
-    # Get parliamentarians active during settlement run period with settlements
     parliamentarians = get_parliamentarians_with_settlements(
-        session, self.start, self.end
+        session, self.start, self.end, settlement_run_id=self.id
     )
 
     # Get commission closure status for the control list
@@ -331,6 +337,18 @@ def view_settlement_run(
         'parliamentarians': {
             'title': _('Settlements by Parliamentarian'),
             'links': [
+                Link(
+                    _('All Parliamentarians (ZIP)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category=('all-parliamentarians-zip'),
+                        ),
+                        name='run-export',
+                    ),
+                ),
+            ]
+            + [
                 Link(
                     f'{p.last_name} {p.first_name}',
                     request.link(
@@ -657,6 +675,33 @@ def generate_settlement_pdf(
         assert len(totals) > 0
     else:
         raise ValueError(f'Unsupported entity type: {entity_type}')
+
+    allowances = (
+        PresidentialAllowanceCollection(
+            request.session,
+            settlement_run_id=settlement_run.id,
+        )
+        .query()
+        .all()
+    )
+    if allowances:
+        rate_set = get_current_rate_set(request.session, settlement_run)
+        cola_multiplier = Decimal(
+            str(1 + (rate_set.cost_of_living_adjustment / 100))
+        )
+        for a in allowances:
+            base = Decimal(str(a.amount))
+            with_cola = base * cola_multiplier
+            settlement_data.append(
+                (
+                    settlement_run.end,
+                    a.parliamentarian,
+                    LOHNART_ALLOWANCE_TEXT,
+                    Decimal('0'),
+                    base,
+                    with_cola,
+                )
+            )
 
     html = _generate_settlement_html(
         settlement_data=settlement_data,
@@ -1153,6 +1198,35 @@ def view_settlement_run_all_export(
             content_type='text/csv; charset=utf-8',
             content_disposition=f'attachment; filename="{filename}"'
         )
+    elif self.category == 'all-parliamentarians-zip':
+        session = request.session
+        parliamentarians = get_parliamentarians_with_settlements(
+            session,
+            self.settlement_run.start,
+            self.settlement_run.end,
+            settlement_run_id=self.settlement_run.id,
+        )
+        zip_buffer = BytesIO()
+        with ZipFile(zip_buffer, 'w') as zf:
+            for p in parliamentarians:
+                pdf_bytes = generate_parliamentarian_settlement_pdf(
+                    self.settlement_run, request, p
+                )
+                name = f'{p.last_name}_{p.first_name}'.replace(
+                    ',', ' '
+                ).replace('+', ' ')
+                fname = normalize_for_filename(f'Parlamentarier_{name}')
+                zf.writestr(f'{fname}.pdf', pdf_bytes)
+
+        zip_buffer.seek(0)
+        run_name = normalize_for_filename(self.settlement_run.name)
+        filename = f'Parlamentarier_{run_name}.zip'
+        return Response(
+            zip_buffer.read(),
+            content_type='application/zip',
+            content_disposition=(f'attachment; filename="{filename}"'),
+        )
+
     else:
         raise NotImplementedError(
             f'Export category {self.category} not implemented for all exports'

@@ -308,6 +308,50 @@ def test_view_occurrences_event_documents(client: Client) -> None:
         assert "zoo-programm-saison-2024.pdf" in page
 
 
+def test_event_time_display(client: Client) -> None:
+    client.login_admin()
+    start_date = date.today() + timedelta(days=1)
+
+    # Create timed event
+    form_page = client.get('/events').click("^Veranstaltung$")
+    form_page.form['email'] = 'test@example.org'
+    form_page.form['title'] = 'Timed Event'
+    form_page.form['description'] = 'Has specific times.'
+    form_page.form['location'] = 'Location'
+    form_page.form['organizer'] = 'Organizer'
+    form_page.form['organizer_email'] = 'a@b.ch'
+    form_page.form['start_date'] = start_date.isoformat()
+    form_page.form['end_date'] = start_date.isoformat()
+    form_page.form['start_time'] = '18:00'
+    form_page.form['end_time'] = '22:00'
+    form_page.form.submit().follow()
+
+    # Create all-day event
+    form_page = client.get('/events').click("^Veranstaltung$")
+    form_page.form['email'] = 'test@example.org'
+    form_page.form['title'] = 'Allday Event'
+    form_page.form['description'] = 'Runs all day.'
+    form_page.form['location'] = 'Location'
+    form_page.form['organizer'] = 'Organizer'
+    form_page.form['organizer_email'] = 'a@b.ch'
+    form_page.form['start_date'] = start_date.isoformat()
+    form_page.form['end_date'] = start_date.isoformat()
+    form_page.form['start_time'] = '00:00'
+    form_page.form['end_time'] = '23:59'
+    form_page.form.submit().follow()
+
+    events_page = client.get('/events')
+
+    # Timed event: "Uhr" must appear
+    timed = events_page.click('Timed Event')
+    assert '18:00 - 22:00 Uhr' in timed
+
+    # All-day event: "Uhr" must NOT appear
+    allday = events_page.click('Allday Event')
+    assert 'den ganzen Tag' in allday.text
+    assert 'den ganzen Tag Uhr' not in allday.text
+
+
 def test_view_occurrences_event_information(client: Client) -> None:
     client.login_admin()
     settings = client.get('/event-settings')

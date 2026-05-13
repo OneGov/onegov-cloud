@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 from sqlalchemy import func, or_, cast, String
+from sqlalchemy.orm import QueryableAttribute
 
 from onegov.core.templates import render_macro
 from onegov.event import OccurrenceCollection, Event
@@ -56,11 +57,18 @@ class InlineEventSearch:
             return query
 
         for word in self.term.split():
-            query = query.filter(or_(*(
-                func.lower(
-                    cast(getattr(Event, prop), String)
-                ).contains(word.lower())
-                for prop in Event.fts_properties.keys()
-            )))
+            query = query.filter(
+                or_(
+                    *(
+                        func.lower(
+                            cast(getattr(Event, prop), String)
+                        ).contains(word.lower())
+                        for prop in Event.fts_properties
+                        if isinstance(
+                            getattr(Event, prop, None), QueryableAttribute
+                        )
+                    )
+                )
+            )
 
         return query

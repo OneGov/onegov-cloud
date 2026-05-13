@@ -171,7 +171,7 @@ def test_resources_person_link_extension(client: Client) -> None:
 
     # add person
     people_page = client.get('/people')
-    new_person_page = people_page.click('Person')
+    new_person_page = people_page.click('Person', index=1)
     assert "Neue Person" in new_person_page
 
     new_person_page.form['first_name'] = 'Franz'
@@ -4275,20 +4275,20 @@ def test_allocation_rules_with_holidays(client: Client) -> None:
     page.form['on_holidays'] = 'no'
     page = page.form.submit().follow()
 
-    assert 'Verfügbarkeitszeitraum aktiv, 352 Verfügbarkeiten erstellt' in page
-    assert count_allocations() == 352
+    assert 'Verfügbarkeitszeitraum aktiv, 350 Verfügbarkeiten erstellt' in page
+    assert count_allocations() == 350
 
     # running the cronjob on an ordinary day will not change anything
     with freeze_time('2019-01-31 22:00:00'):
         run_cronjob()
 
-    assert count_allocations() == 352
+    assert count_allocations() == 350
 
     # only run at the end of the year does it work
     with freeze_time('2019-12-31 22:00:00'):
         run_cronjob()
 
-    assert count_allocations() == 705
+    assert count_allocations() == 701
 
 
 def test_allocation_rules_with_school_holidays(client: Client) -> None:
@@ -4594,7 +4594,8 @@ def test_my_reservations_view(client: Client) -> None:
     # let's enable it
     admin = client.spawn()
     admin.login_admin()
-    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings = admin.get('/').click(
+        'Module aktivieren/deaktivieren')
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 

@@ -27,10 +27,11 @@ def view_changes(
 ) -> RenderData:
 
     layout = ChangeCollectionLayout(self, request)
-    changes = self.query().all()
+    changes = self.batch
 
     parliamentarian_ids = {
-        pid for change in changes
+        pid
+        for change in changes
         if change.changes and (pid := change.changes.get('parliamentarian_id'))
     }
     parliamentarians = {}
@@ -41,7 +42,8 @@ def view_changes(
         parliamentarians = {str(p.id): p for p in query}
 
     commission_ids = {
-        cid for change in changes
+        cid
+        for change in changes
         if change.changes and (cid := change.changes.get('commission_id'))
     }
     commissions = {}

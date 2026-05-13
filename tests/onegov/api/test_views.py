@@ -59,8 +59,22 @@ def patch_collection_json(monkeypatch: pytest.MonkeyPatch) -> None:
         self.prompt = prompt
         self.data = data
 
+    def Data__init__(
+        self: Any,
+        name: str,
+        value: Any | None = None,
+        prompt: str | None = None,
+        values: list[str] | None = None,
+        **extra: Any,
+    ) -> None:
+        self.name = name
+        self.value = value
+        self.prompt = prompt
+        self.values = values
+
     monkeypatch.setattr(Collection, '__init__', Collection__init__)
     monkeypatch.setattr('collection_json.Query.__init__', Query__init__)
+    monkeypatch.setattr('collection_json.Data.__init__', Data__init__)
 
 
 def test_view_api(client: Client, app: App) -> None:

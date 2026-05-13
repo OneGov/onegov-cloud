@@ -4,7 +4,6 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.pas import _
 from sqlalchemy import ForeignKey
-from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
@@ -25,6 +24,8 @@ VICE_PRESIDENT_YEARLY_ALLOWANCE = 5_000
 PRESIDENT_QUARTERLY = PRESIDENT_YEARLY_ALLOWANCE // 4  # 5000
 VICE_PRESIDENT_QUARTERLY = VICE_PRESIDENT_YEARLY_ALLOWANCE // 4  # 1250
 
+MAX_ALLOWANCES_PER_RUN = 4
+
 ALLOWANCE_ROLES: dict[str, str] = {
     'president': _('President'),
     'vice_president': _('Vice president'),
@@ -33,25 +34,20 @@ ALLOWANCE_ROLES: dict[str, str] = {
 # FiBu account for presidential allowances
 # (amtliche Missionen Kantonsratspräsidiums)
 FIBU_KONTO_ALLOWANCE = '3000.30'
-LOHNART_ALLOWANCE_NR = '2400'
+LOHNART_ALLOWANCE_NR = '2411'
 LOHNART_ALLOWANCE_TEXT = 'Jahreszulage KR-Präsidium'
 
 
 class PresidentialAllowance(Base, TimestampMixin):
-    """Tracks quarterly presidential allowances (Jahreszulage)
-    for the president and vice president of the Kantonsrat."""
+    """Tracks presidential allowances (Jahreszulage)
+    for the president and vice president of the Kantonsrat.
+    Each allowance is tied to a settlement run (max 4 per run).
+    """
 
     __tablename__ = 'pas_presidential_allowances'
-    __table_args__ = (UniqueConstraint('year', 'quarter', 'role'),)
 
     #: Internal ID
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-
-    #: The year
-    year: Mapped[int]
-
-    #: The quarter (1-4)
-    quarter: Mapped[int]
 
     #: The role: 'president' or 'vice_president'
     role: Mapped[str]
@@ -67,14 +63,13 @@ class PresidentialAllowance(Base, TimestampMixin):
     #: The parliamentarian
     parliamentarian: Mapped[PASParliamentarian] = relationship()
 
-    #: Optional link to the settlement run this belongs to
-    settlement_run_id: Mapped[UUID | None] = mapped_column(
+    #: The settlement run this allowance belongs to
+    settlement_run_id: Mapped[UUID] = mapped_column(
         ForeignKey('pas_settlements.id'),
-        nullable=True,
     )
 
     #: The settlement run
-    settlement_run: Mapped[SettlementRun | None] = relationship()
+    settlement_run: Mapped[SettlementRun] = relationship()
 
     @property
     def role_label(self) -> str:
@@ -82,6 +77,7 @@ class PresidentialAllowance(Base, TimestampMixin):
 
     def __repr__(self) -> str:
         return (
-            f'<PresidentialAllowance {self.year}'
-            f' Q{self.quarter} {self.role} {self.amount}>'
+            f'<PresidentialAllowance'
+            f' run={self.settlement_run_id}'
+            f' {self.role} {self.amount}>'
         )

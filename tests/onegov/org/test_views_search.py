@@ -199,7 +199,7 @@ def test_basic_autocomplete(client_with_fts: Client) -> None:
 
     people = client.get('/people')
 
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
@@ -235,7 +235,7 @@ def test_search_type_filter(client_with_fts: Client) -> None:
     client.login_editor()
 
     people = client.get('/people')
-    new_person = people.click('Person')
+    new_person = people.click('Person', index=1)
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
