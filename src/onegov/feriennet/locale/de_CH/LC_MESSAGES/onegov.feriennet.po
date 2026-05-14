@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-23 15:50+0200\n"
+"POT-Creation-Date: 2026-05-14 13:14+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2462,8 +2462,8 @@ msgstr ""
 "Vielen Dank dass Sie uns Ihre Hilfe angeboten haben! Wir werden Ihre Anfrage "
 "bearbeiten und uns bei Ihnen melden."
 
-msgid "No activities needing volunteers found."
-msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
+msgid "No volunteers found."
+msgstr "Keine Hilfspersonen gefunden."
 
 msgid "${count} of ${total}"
 msgstr "${count} von ${total}"
@@ -2497,6 +2497,9 @@ msgstr "Möchten Sie die Hilfsperson wirklich entfernen?"
 
 msgid "Remove volunteer"
 msgstr "Hilfsperson entfernen"
+
+msgid "Need Status"
+msgstr "Bedarfsstatus"
 
 msgid "Editors"
 msgstr "Veranstalter"
@@ -3333,6 +3336,15 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} wurde gelöscht, inklusive aller damit verbundenen Daten."
+
+msgid "Enough volunteers"
+msgstr "Genügend Hilfspersonen"
+
+msgid "Not enough volunteers"
+msgstr "Zu wenig Hilfspersonen"
+
+#~ msgid "No activities needing volunteers found."
+#~ msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
 #~ msgid ""
 #~ "Attendees can get group codes via the button \"invite a companion\". "

@@ -27,6 +27,11 @@ SELECT
     lower(occasion_needs.number) AS min_required,        -- Integer
     upper(occasion_needs.number) - 1 AS max_required,    -- Integer
     coalesce(needs_fulfilled.fulfilled, 0) AS confirmed, -- Integer
+    CASE
+        WHEN lower(occasion_needs.number) > coalesce(needs_fulfilled.fulfilled, 0)
+        THEN 'unfulfilled'
+        ELSE 'fulfilled'
+    END AS need_state,                                   -- Text
     occasions.id AS occasion_id,                         -- UUID
     occasions.period_id AS period_id,                    -- UUID
     occasion_numbers.number AS occasion_number,          -- Integer

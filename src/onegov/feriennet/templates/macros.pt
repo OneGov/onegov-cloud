@@ -912,17 +912,6 @@
     </div>
 </metal:periods>
 
-<metal:volunteer_state define-macro="volunteer_state" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
-    <div class="filter-panel side-panel">
-        <h3 class="filter-title" i18n:translate tal:condition="not hide_title|True">Volunteer State</h3>
-        <select data-auto-redirect tal:define="view_name view_name|None; period model.period">
-            <option tal:repeat="s state_options" value="${request.link(model.for_status(period, s[0]), name=view_name)}" tal:attributes="selected state == s[0]">
-                ${s[1]}
-            </option>
-        </select>
-    </div>
-</metal:volunteer_state>
-
 <metal:users define-macro="users" i18n:domain="onegov.feriennet">
     <div class="filter-panel side-panel" tal:condition="request.is_admin and users">
         <h3 class="filter-title" i18n:translate>User</h3>

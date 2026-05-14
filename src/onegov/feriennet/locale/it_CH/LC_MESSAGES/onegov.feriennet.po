@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-23 15:50+0200\n"
+"POT-Creation-Date: 2026-05-14 13:14+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1111,9 +1111,9 @@ msgid ""
 "Attendees can get group codes via the link \"invite a companion\" in their "
 "booking. Bookings with a group code are preferred in the matching process."
 msgstr ""
-"I partecipanti possono ottenere codici gruppo tramite il link "
-"\"Invitare gli amici\" nella loro prenotazione. Le prenotazioni con un "
-"codice gruppo sono preferite nel processo di assegnazione."
+"I partecipanti possono ottenere codici gruppo tramite il link \"Invitare gli "
+"amici\" nella loro prenotazione. Le prenotazioni con un codice gruppo sono "
+"preferite nel processo di assegnazione."
 
 msgid "With billing"
 msgstr "Con fatturazione"
@@ -2461,8 +2461,8 @@ msgstr ""
 "Grazie mille per averci offerto il vostro aiuto! Esamineremo la sua "
 "richiesta e le faremo sapere."
 
-msgid "No activities needing volunteers found."
-msgstr "Nessuna attività trovata che abbia bisogno di aiutanti."
+msgid "No volunteers found."
+msgstr "Nessun aiutante trovato."
 
 msgid "${count} of ${total}"
 msgstr "${count} di ${total}"
@@ -2496,6 +2496,9 @@ msgstr "Vuole davvero rimuovere l'aiutante?"
 
 msgid "Remove volunteer"
 msgstr "Rimuovere l'aiutante"
+
+msgid "Need Status"
+msgstr "Stato della richiesta"
 
 msgid "Editors"
 msgstr "Organizzatore"
@@ -3331,6 +3334,15 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} è stato cancellato, inclusi tutti i dati associati."
+
+msgid "Enough volunteers"
+msgstr "Abbastanza volontari"
+
+msgid "Not enough volunteers"
+msgstr "Troppo pochi volontari"
+
+#~ msgid "No activities needing volunteers found."
+#~ msgstr "Nessuna attività trovata che abbia bisogno di aiutanti."
 
 #~ msgid ""
 #~ "Attendees can get group codes via the button \"invite a companion\". "

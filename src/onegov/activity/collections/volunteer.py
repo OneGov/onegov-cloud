@@ -105,8 +105,8 @@ class VolunteerCollection(GenericCollection[Volunteer]):
         if self.volunteer_state is not None:
             query = query.where(stmt.c.state == self.volunteer_state)
 
-        # if self.need_state is not None:
-        #     query = query.where(stmt.c.need_state == self.need_state)
+        if self.need_state is not None:
+            query = query.where(stmt.c.need_state == self.need_state)
 
         return self.session.execute(query)
 
@@ -119,17 +119,12 @@ class VolunteerCollection(GenericCollection[Volunteer]):
     def for_status(
         self,
         period: BookingPeriod | BookingPeriodMeta | None,
-        volunteer_state: VolunteerState | None
-    ) -> Self:
-        return self.__class__(self.session, period,
-                              volunteer_state=volunteer_state)
-
-    def for_need_status(
-        self,
-        period: BookingPeriod | BookingPeriodMeta | None,
         volunteer_state: VolunteerState | None,
         need_state: str | None
     ) -> Self:
         return self.__class__(
-            self.session, period,
-            volunteer_state=volunteer_state, need_state=need_state)
+            self.session,
+            period,
+            volunteer_state=volunteer_state,
+            need_state=need_state
+        )

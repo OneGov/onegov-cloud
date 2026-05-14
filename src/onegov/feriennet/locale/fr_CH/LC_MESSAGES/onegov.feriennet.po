@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-23 15:50+0200\n"
+"POT-Creation-Date: 2026-05-14 13:14+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2482,8 +2482,8 @@ msgstr ""
 "Merci de proposer de faire du bénévolat ! Nous examinerons votre demande et "
 "nous vous contacterons."
 
-msgid "No activities needing volunteers found."
-msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."
+msgid "No volunteers found."
+msgstr "Aucun·e bénévole trouvé·e."
 
 msgid "${count} of ${total}"
 msgstr "${count} de ${total}"
@@ -2517,6 +2517,9 @@ msgstr "Voulez-vous vraiment supprimer cette personne ?"
 
 msgid "Remove volunteer"
 msgstr "Supprimer la personne"
+
+msgid "Need Status"
+msgstr "Statut du besoin"
 
 msgid "Editors"
 msgstr "Prestataires"
@@ -3353,6 +3356,15 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} a été supprimé·e, y compris toutes les données associées."
+
+msgid "Enough volunteers"
+msgstr "Assez de bénévoles"
+
+msgid "Not enough volunteers"
+msgstr "Pas assez de bénévoles"
+
+#~ msgid "No activities needing volunteers found."
+#~ msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."
 
 #~ msgid ""
 #~ "Attendees can get group codes via the button \"invite a companion\". "
