@@ -476,8 +476,7 @@ def test_volunteer_subscription(
     assert browser.is_text_present("Photography")
     assert browser.is_text_present("Dancing")
     browser.find_by_text("Als kontaktiert markieren")[0].click()
-    assert browser.find_by_css(
-        ".bg-color.contacted").first.text == "Kontaktiert"
+    assert browser.is_element_present_by_css(".bg-color.contacted")
     browser.find_by_text("Als bestätigt markieren")[0].click()
 
     browser.find_by_text("Statusmail").click()

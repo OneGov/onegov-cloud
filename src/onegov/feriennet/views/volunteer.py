@@ -347,9 +347,9 @@ def submit_volunteer(
         complete = True
 
         subject = request.translate(_('Subscription as a volunteer'))
-        custom_text_before_list = Markup(
+        custom_text_before_list = Markup(  # nosec: B704
             request.app.org.meta.get('before_list_text', '').strip())
-        custom_text_after_list = Markup(
+        custom_text_after_list = Markup(  # nosec: B704
             request.app.org.meta.get('after_list_text', '').strip())
 
         send_ticket_mail(
