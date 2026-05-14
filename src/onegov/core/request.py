@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
 import morepath
 import ua_parser
 
@@ -770,10 +772,24 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     @cached_property
     def csrf_salt(self) -> str:
-        if not self.browser_session.has('csrf_salt'):
-            self.browser_session['csrf_salt'] = random_token()
+        # For authenticated users we keep the per-session salt. Their
+        # responses are `no-store` anyway, so the session write has no
+        # caching cost.
+        if self.is_logged_in or getattr(self, 'authenticated_email', None):
+            if not self.browser_session.has('csrf_salt'):
+                self.browser_session['csrf_salt'] = random_token()
+            return self.browser_session['csrf_salt']
 
-        return self.browser_session['csrf_salt']
+        # For anonymous users we derive a deterministic salt from the
+        # server secret. No session write -> no Set-Cookie -> the
+        # response stays cacheable by a shared proxy. CSRF protection
+        # is preserved because cross-origin attackers cannot read the
+        # rendered token from our response body (same-origin policy).
+        return hmac.new(
+            self.app.csrf_secret.encode('utf-8'),
+            b'anonymous-csrf-salt',
+            hashlib.sha256,
+        ).hexdigest()
 
     def new_csrf_token(self, salt: str | bytes | None = None) -> bytes:
         """ Returns a new CSRF token. A CSRF token can be verified

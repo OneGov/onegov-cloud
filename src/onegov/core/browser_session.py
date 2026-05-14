@@ -105,6 +105,13 @@ class BrowserSession:
         the process.
 
         """
+        # Skip the delete (and the resulting `mark_as_dirty`) when the
+        # key doesn't exist. Otherwise every page that consumes flash
+        # messages would dirty the session and trigger Set-Cookie on
+        # otherwise-cacheable anonymous responses.
+        if not self.has(name):
+            return default
+
         value = self.get(name, default=default)
 
         # we can run into a race condition here when two requests come in
