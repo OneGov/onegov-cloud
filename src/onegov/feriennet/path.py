@@ -30,6 +30,7 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.activity.models import BookingPeriodMeta
     from onegov.feriennet.request import FeriennetRequest
+    from onegov.activity.models.volunteer import VolunteerState
 
 
 @FeriennetApp.path(
@@ -415,7 +416,9 @@ def get_volunteer_cart_action(
     converters={'period_id': UUID})
 def get_volunteers(
     request: FeriennetRequest,
-    period_id: UUID
+    period_id: UUID,
+    volunteer_state: VolunteerState | None = None,
+    need_state: str | None = None
 ) -> VolunteerCollection | None:
 
     if not period_id:
@@ -429,7 +432,8 @@ def get_volunteers(
     if not period:
         return None
 
-    return VolunteerCollection(request.session, period)
+    return VolunteerCollection(
+        request.session, period, volunteer_state, need_state)
 
 
 @FeriennetApp.path(

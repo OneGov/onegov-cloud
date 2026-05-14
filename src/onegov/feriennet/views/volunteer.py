@@ -58,6 +58,14 @@ def view_volunteers(
     def activity_link(activity_name: str) -> str:
         return request.class_link(VacationActivity, {'name': activity_name})
 
+    state_options = [
+        (None, _('All')),
+        ('open', _('Open')),
+        ('contacted', _('Contacted')),
+        ('confirmed', _('Confirmed')),
+        ('cancelled', _('Denied')),
+    ]
+
     return {
         'layout': layout,
         'title': _('Volunteers'),
@@ -65,6 +73,8 @@ def view_volunteers(
         'grouped': grouped,
         'periods': request.app.periods,
         'period': self.period,
+        'state_options': state_options,
+        'state': self.volunteer_state,
         'model': self,
         'has_needs': has_needs,
         'state_change': state_change,
