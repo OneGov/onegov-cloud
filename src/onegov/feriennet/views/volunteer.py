@@ -273,7 +273,7 @@ def handle_ticket_cancelled(self: Volunteer, request: FeriennetRequest) -> str:
             'get_confirmed': get_confirmed,
             'get_age': get_age,
             'state_change': state_change,
-            'ticket-state': 'pending'
+            'ticket_state': 'pending'
         }
     )
 

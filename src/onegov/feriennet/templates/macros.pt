@@ -1227,7 +1227,7 @@
         </p>
         <ul tal:condition="ticket_state == 'pending'">
             <li class="state-transitions" tal:condition="subscription.state != 'open'">
-                <a ic-post-to="${state_change(request, subscription, 'ticket_open', layout)}"
+                <a class="mark-open" ic-post-to="${state_change(request, subscription, 'ticket_open', layout)}"
                 ic-target="#${subscription.need.id.hex}"
                 ic-select-from-response="#${subscription.need.id.hex}">
                     <i class="far fa-fw fa-circle" aria-hidden="true"></i>
@@ -1237,7 +1237,7 @@
                 </a>
             </li>
             <li class="state-transitions" tal:condition="subscription.state != 'contacted'">
-                <a ic-post-to="${state_change(request, subscription, 'ticket_contacted', layout)}"
+                <a class="mark-contacted" ic-post-to="${state_change(request, subscription, 'ticket_contacted', layout)}"
                 ic-target="#${subscription.need.id.hex}"
                 ic-select-from-response="#${subscription.need.id.hex}">
                     <i class="fa fa-fw fa-circle" aria-hidden="true"></i>
@@ -1247,7 +1247,7 @@
                 </a>
             </li>
             <li class="state-transitions" tal:condition="subscription.state != 'confirmed'">
-                <a ic-post-to="${state_change(request, subscription, 'ticket_confirmed', layout)}"
+                <a class="mark-confirmed" ic-post-to="${state_change(request, subscription, 'ticket_confirmed', layout)}"
                 ic-target="#${subscription.need.id.hex}"
                 ic-select-from-response="#${subscription.need.id.hex}">
                     <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i>
@@ -1257,7 +1257,7 @@
                 </a>
             </li>
             <li class="state-transitions" tal:condition="subscription.state != 'cancelled'">
-                <a ic-post-to="${state_change(request, subscription, 'ticket_cancelled', layout)}"
+                <a class="mark-cancelled" ic-post-to="${state_change(request, subscription, 'ticket_cancelled', layout)}"
                 ic-target="#${subscription.need.id.hex}"
                 ic-select-from-response="#${subscription.need.id.hex}">
                     <i class="fa fa-fw fa-times-circle" aria-hidden="true"></i>
