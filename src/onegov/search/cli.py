@@ -23,7 +23,11 @@ if TYPE_CHECKING:
 cli = command_group()
 
 
-def psql_index_status(app: SearchApp) -> None:
+def psql_index_status(
+    app: SearchApp,
+    title: str | None = None,
+    skip_ok: bool = False
+) -> None:
     """ Prints the percentage of indexed documents per model. """
 
     success = 1  # 1 = OK, 2 = WARNING, 3 = ERROR
@@ -34,8 +38,7 @@ def psql_index_status(app: SearchApp) -> None:
         func.count(SearchIndex.id)
     ).group_by(SearchIndex.owner_tablename).tuples())
 
-    click.echo(f'| Status | {"Tablename": <40} | Indexed | No. docs |')
-    click.echo(f'|--------|-{"---------":-<40}-|---------|----------|')
+    header_printed = False
 
     for model in sorted(
         app.indexable_base_models(),
@@ -64,14 +67,25 @@ def psql_index_status(app: SearchApp) -> None:
         elif percentage < 10.0:
             status = click.style('  ERR ', fg='red')
             success = max(success, 3)
+        elif skip_ok:
+            continue
         else:
             status = click.style('  OK  ', fg='green')
+        if not header_printed:
+            header_printed = True
+            if title:
+                click.secho(title, underline=True)
+            click.echo(f'| Status | {"Tablename": <40} | Indexed | No. docs |')
+            click.echo(f'|--------|-{"---------":-<40}-|---------|----------|')
+
         click.echo(
             f'| {status} | {tablename:<40} | {percentage: >6.2f}% | '
             f' {count:>7} |',
         )
 
-    if success == 1:
+    if skip_ok and not header_printed:
+        pass
+    elif success == 1:
         click.secho('Indexing status check OK', fg='green')
     elif success == 2:
         click.secho('Indexing status check WARNING', fg='yellow')
@@ -104,9 +118,16 @@ def reindex(
 
 
 @cli.command(context_settings={'default_selector': '*'})
+@click.option(
+    '--skip-ok',
+    is_flag=True,
+    default=False,
+    help='Skips output for schemas/tables that are OK'
+)
 @pass_group_context
 def index_status(
-    group_context: GroupContext
+    group_context: GroupContext,
+    skip_ok: bool
 ) -> Callable[[CoreRequest, Framework], None]:
     """ Prints the status of the search index. """
 
@@ -115,8 +136,6 @@ def index_status(
             return
 
         title = f'Index status of {app.application_id}'
-        click.secho(title, underline=True)
-
-        psql_index_status(app)  # type: ignore[arg-type]
+        psql_index_status(app, title, skip_ok)  # type: ignore[arg-type]
 
     return run_index_status

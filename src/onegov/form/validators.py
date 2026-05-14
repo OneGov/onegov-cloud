@@ -194,6 +194,7 @@ MIME_TYPES_AUDIO = {
     'audio/mpeg',
     'audio/wav',
     'audio/webm',  # weba
+    'application/octet-stream',  # fallback landsgemeinde
 }
 
 MIME_TYPES_VIDEO = {
