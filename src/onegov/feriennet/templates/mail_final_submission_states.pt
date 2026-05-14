@@ -3,8 +3,11 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Hello!</p>
-        <p i18n:translate>Your subscription states have been updated, this is the final list:</p>
+        <tal:b tal:replace="custom_text_before_list" />
+            <tal:b condition="not custom_text_before_list">
+            <p i18n:translate>Hello!</p>
+            <p i18n:translate>Your subscription states have been updated, this is the final list:</p>
+        </tal:b>
         <ul class="normal">
             <tal:needs repeat="subscription subscriptions">
                 <li class="${subscription.state}">
@@ -19,5 +22,6 @@
                 </li>
             </tal:needs>
         </ul>
+        <tal:b tal:replace="custom_text_after_list" />
     </tal:b>
 </div>

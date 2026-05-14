@@ -403,6 +403,11 @@ def send_final_submission_states(
     else:
         recipient = self.handler.email
         if recipient:
+
+            custom_text_before_list = Markup(  # nosec: B704
+            request.app.org.meta.get('before_status_list_text', '').strip())
+            custom_text_after_list = Markup(  # nosec: B704
+            request.app.org.meta.get('after_status_list_text', '').strip())
             assert request.current_username
             TicketChatMessage.create(
                 self,
@@ -426,6 +431,8 @@ def send_final_submission_states(
                 content={
                     'model': self,
                     'subscriptions': self.handler.volunteer_cart,
+                    'custom_text_before_list': custom_text_before_list,
+                    'custom_text_after_list': custom_text_after_list,
                 }
             )
             request.success(_(

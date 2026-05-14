@@ -181,6 +181,32 @@ class FeriennetSettingsForm(Form):
         fieldset=_('Volunteers'),
         render_kw={'rows': 10})
 
+    custom_status_text_info = PanelField(
+        label=_('Custom volunteer final status mail text'),
+        hide_label=False,
+        fieldset=_('Volunteers'),
+        text=_(
+            'You can overwrite the standard volunteer final status mail '
+            'text before and after the list of subscriptions. The standard '
+            'text is:\n\n'
+            '"Hello!\n'
+            'Your subscription states have been updated, this is the final '
+            'list:\n\n'
+            '[List of subscriptions]\n\n'
+        ),
+        kind='',
+    )
+
+    before_status_list_text = HtmlField(
+        label=_('Before list text'),
+        fieldset=_('Volunteers'),
+        render_kw={'rows': 10})
+
+    after_status_list_text = HtmlField(
+        label=_('After list text'),
+        fieldset=_('Volunteers'),
+        render_kw={'rows': 10})
+
     def ensure_beneificary_if_bank_account(self) -> bool | None:
         if self.bank_account.data and not self.bank_beneficiary.data:
             assert isinstance(self.bank_beneficiary.errors, list)
@@ -275,7 +301,9 @@ class FeriennetSettingsForm(Form):
             ('donation_description', ''),
             ('volunteers', 'disabled'),
             ('before_list_text', ''),
-            ('after_list_text', '')
+            ('after_list_text', ''),
+            ('before_status_list_text', ''),
+            ('after_status_list_text', '')
         )
 
         for attr, default in attributes:
@@ -284,7 +312,8 @@ class FeriennetSettingsForm(Form):
             if attr == 'donation_amounts':
                 value = format_donation_amounts(value)
             elif attr in ('donation_description',
-                          'before_list_text', 'after_list_text'):
+                          'before_list_text', 'after_list_text',
+                          'before_status_list_text', 'after_status_list_text'):
                 # NOTE: We need to treat this as Markup
                 # TODO: It would be cleaner if we had a proxy object
                 #       with all the attributes as dict_property, then
@@ -313,7 +342,9 @@ class FeriennetSettingsForm(Form):
             'donation_description',
             'volunteers',
             'before_list_text',
-            'after_list_text'
+            'after_list_text',
+            'before_status_list_text',
+            'after_status_list_text'
         )
 
         super().populate_obj(obj, exclude=attributes)
