@@ -997,3 +997,31 @@ def add_indexes_to_speed_up_activity_filters(context: UpgradeContext) -> None:
             ['occasion_id'],
             if_not_exists=True
         )
+
+
+@upgrade_task('Add cancelled state to volunteer_state enum')
+def add_cancelled_state_to_volunteer_state(context: UpgradeContext) -> None:
+    if not context.has_enum('volunteer_state'):
+        return
+
+    new_type = Enum(
+        'open',
+        'contacted',
+        'confirmed',
+        'cancelled',
+        name='volunteer_state'
+    )
+
+    op = context.operations
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state TYPE Text;
+        DROP TYPE volunteer_state;
+    """))
+
+    new_type.create(op.get_bind())
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state
+        TYPE volunteer_state USING state::text::volunteer_state;
+    """))
