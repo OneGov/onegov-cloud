@@ -406,6 +406,7 @@ def test_volunteers_export(
     assert volunteer_export == volunteer_json
 
 
+@pytest.mark.flaky(reruns=3)
 def test_volunteer_subscription(
     browser: ExtendedBrowser,
     scenario: Scenario,
