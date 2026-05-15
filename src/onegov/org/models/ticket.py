@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from datetime import date
 from functools import cached_property
 from markupsafe import Markup
+from onegov.activity import Occasion, Volunteer
 from onegov.chat import Message, MessageCollection
 from onegov.chat.collections import ChatCollection
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
@@ -34,7 +36,6 @@ from uuid import uuid4
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from datetime import datetime
     from onegov.chat.models import Chat
     from onegov.core.request import CoreRequest
     from onegov.event import Event
@@ -44,8 +45,7 @@ if TYPE_CHECKING:
     from onegov.ticket.collection import ExtendedTicketState
     from sqlalchemy.orm import Mapped, Query, Session
     from uuid import UUID
-
-    type DateRange = tuple[datetime, datetime]
+    type DateRange = tuple[date, date]
 
 
 def ticket_submitter(ticket: Ticket) -> str | None:
@@ -1770,6 +1770,171 @@ class ChatHandler(Handler):
         request: OrgRequest  # type: ignore[override]
     ) -> list[Link | LinkGroup]:
         return []
+
+
+class VolunteerTicket(OrgTicketMixin, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'VOL'}
+
+    if TYPE_CHECKING:
+        handler: VolunteerHandler
+
+
+@handlers.registered_handler('VOL')
+class VolunteerHandler(Handler):
+
+    id: UUID
+    handler_title = _('Volunteer')
+    code_title = _('Volunteer')
+
+    @cached_property
+    def volunteer_cart(self) -> list[Volunteer]:
+        query = self.session.query(Volunteer).filter(
+            Volunteer.token == self.id
+        ).order_by(Volunteer.need_id)
+
+        return query.all()
+
+    @property
+    def volunteer(self) -> Volunteer | None:
+        if self.volunteer_cart:
+            return self.volunteer_cart[0]
+        return None
+
+    @property
+    def deleted(self) -> bool:
+        return self.volunteer_cart == []
+
+    @property
+    def email(self) -> str:
+        if self.deleted:
+            return self.ticket.snapshot.get('email', '')
+        if self.volunteer is None:
+            return ''
+        return self.volunteer.email
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.deleted:
+            self.ticket.snapshot['email'] = email
+        else:
+            for item in self.volunteer_cart:
+                item.email = email
+        self.ticket.ticket_email = email
+
+    @cached_property
+    def ticket_deletable(self) -> bool:
+        volunteer = self.volunteer
+        need_id = volunteer.need_id if volunteer else None
+
+        occasion = self.session.query(Occasion).filter_by(
+            need_id=need_id).first()
+        if not occasion:
+            return True
+
+        return not occasion.period.active
+
+    @property
+    def title(self) -> str:
+        if self.volunteer:
+            return f'{self.volunteer.first_name} {self.volunteer.last_name}'
+        else:
+            return _('Volunteer')
+
+    @property
+    def subtitle(self) -> None:
+        return None
+
+    @property
+    def group(self) -> str:
+        return _('Volunteer')
+
+    def get_summary(
+        self,
+        request: OrgRequest  # type:ignore[override]
+    ) -> Markup:
+
+        layout = DefaultLayout(self.volunteer_cart, request)
+
+        def get_confirmed(
+                request: OrgRequest,
+                need_id: str,
+        ) -> int:
+            return request.session.query(Volunteer).filter(
+                Volunteer.need_id == need_id,
+                Volunteer.state == 'confirmed'
+            ).count()
+
+        def state_change(request: OrgRequest,
+                        volunteer: Volunteer,
+                        state: str,
+                        layout: DefaultLayout) -> str:
+            assert volunteer.id is not None
+            url = request.class_link(
+                Volunteer, name=state, variables={'id': volunteer.id.hex})
+            return layout.csrf_protected_url(url)
+
+        def get_age(
+            birth_date: date
+        ) -> int:
+            today = date.today()
+            age = today.year - birth_date.year
+            if (today.month, today.day) < (birth_date.month, birth_date.day):
+                age -= 1
+            return age
+
+        parts = []
+        parts.append(
+            render_macro(layout.macros['volunteer_submissions'], request, {
+                'self': self,
+                'volunteer': self.volunteer,
+                'get_age': get_age,
+                'state_change': state_change,
+                'subscriptions': self.volunteer_cart,
+                'get_confirmed': get_confirmed,
+                'layout': layout,
+                'ticket_state': self.ticket.state,
+            })
+        )
+
+        return Markup('').join(parts)
+
+    def get_links(  # type:ignore[override]
+        self,
+        request: OrgRequest  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
+
+        if self.deleted:
+            return []
+
+        links: list[Link | LinkGroup] = []
+
+        links.append(Link(
+                text=_('Status mail'),
+                url=request.link(self.ticket, 'send-status-mail'),
+                attrs={'class': ('envelope')},
+                traits=(
+                    Confirm(
+                        _('Do you really want to send the current status?'),
+                        _(
+                            'A mail will be sent to the volunteer '
+                            'containing the status of his '
+                            'subscriptions. Only send this if these are the '
+                            'final states ofthe subscriptions.'
+                        ),
+                        _('Send'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='GET',
+                        redirect_after=request.url
+                    )
+                )
+            ))
+
+        return links
 
 
 def apply_ticket_permissions[T: Query[Any]](
