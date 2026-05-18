@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-05-14 10:58+0200\n"
+"POT-Creation-Date: 2026-05-18 16:39+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -414,6 +414,12 @@ msgstr "Telefon"
 msgid "Address"
 msgstr "Adresse"
 
+msgid "Transport"
+msgstr "Transport"
+
+msgid "Note"
+msgstr "Bemerkung"
+
 msgid "Wishlist / Bookings"
 msgstr "Wunschliste / Buchungen"
 
@@ -698,9 +704,6 @@ msgstr "Die Swisspass ID darf nur Ziffern und Bindestriche enthalten."
 
 msgid "Attendee"
 msgstr "Teilnehmende"
-
-msgid "Note"
-msgstr "Bemerkung"
 
 msgid "Political Municipality"
 msgstr "Politische Gemeinde"
@@ -1376,6 +1379,21 @@ msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
+
+msgid "No pass"
+msgstr "Kein Abo"
+
+msgid "GA"
+msgstr "GA"
+
+msgid "Half Fare Travelcard"
+msgstr "Halbtax"
+
+msgid "Other pass (e.g. zones)"
+msgstr "Anders Abo (z.B. Zonen)"
+
+msgid "Own Vehicle"
+msgstr "Eigenes Fahrzeug"
 
 msgid "Register a new account"
 msgstr "Ein neues Konto eröffnen"

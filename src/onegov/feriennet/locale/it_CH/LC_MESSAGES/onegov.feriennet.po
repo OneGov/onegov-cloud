@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-05-14 10:58+0200\n"
+"POT-Creation-Date: 2026-05-18 16:39+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -414,6 +414,12 @@ msgstr "Telefono"
 msgid "Address"
 msgstr "Indirizzo"
 
+msgid "Transport"
+msgstr "Trasporto"
+
+msgid "Note"
+msgstr "Commento"
+
 msgid "Wishlist / Bookings"
 msgstr "Lista desideri / Prenotazioni"
 
@@ -698,9 +704,6 @@ msgstr "L'ID Swisspass deve contenere solo cifre e trattini."
 
 msgid "Attendee"
 msgstr "Partecipante"
-
-msgid "Note"
-msgstr "Commento"
 
 msgid "Political Municipality"
 msgstr "Comune politico"
@@ -1377,6 +1380,21 @@ msgstr "Un beneficiario è richiesto se viene indicato un conto bancario."
 
 msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
+
+msgid "No pass"
+msgstr "Nessun lasciapassare"
+
+msgid "GA"
+msgstr "AG"
+
+msgid "Half Fare Travelcard"
+msgstr "Metà-prezzo"
+
+msgid "Other pass (e.g. zones)"
+msgstr "Altro lasciapassare (es. zone)"
+
+msgid "Own Vehicle"
+msgstr "Veicolo proprio"
 
 msgid "Register a new account"
 msgstr "Aprire un nuovo conto"

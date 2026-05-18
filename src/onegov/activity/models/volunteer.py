@@ -81,3 +81,7 @@ class Volunteer(Base, ContentMixin, TimestampMixin):
 
     #: The phone number of the volunteer
     phone: Mapped[str]
+
+    transport: Mapped[str]
+
+    note: Mapped[str | None]

@@ -1025,3 +1025,15 @@ def add_cancelled_state_to_volunteer_state(context: UpgradeContext) -> None:
         ALTER TABLE volunteers ALTER COLUMN state
         TYPE volunteer_state USING state::text::volunteer_state;
     """))
+
+
+@upgrade_task('Add transport and note to volunteer')
+def add_transport_and_note_to_volunteer(context: UpgradeContext) -> None:
+    context.operations.add_column(
+        'volunteers',
+        Column('transport', Text, nullable=True)
+    )
+    context.operations.add_column(
+        'volunteers',
+        Column('note', Text, nullable=True)
+    )

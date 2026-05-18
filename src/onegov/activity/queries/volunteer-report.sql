@@ -43,6 +43,8 @@ SELECT
     volunteers.email AS email,                           -- Text
     volunteers.phone AS phone,                           -- Text
     volunteers.state AS state,                           -- Text
+    volunteers.transport as transport,                     -- Text
+    volunteers.note as note,                             -- Text
     volunteers.token AS token,               -- UUID
     tickets.id AS ticket_id,                             -- UUID
     array_agg(
@@ -87,6 +89,8 @@ GROUP BY
     volunteers.birth_date,
     volunteers.email,
     volunteers.phone,
+    volunteers.transport,
+    volunteers.note,
     needs_fulfilled.fulfilled,
     tickets.id
 ORDER BY
