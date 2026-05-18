@@ -48,12 +48,14 @@ def get_top_level_organisations(
 
 
 def get_sub_organisations(
-        data: list[dict[str, list[str]] | str]) -> list[str]:
+    data: list[dict[str, list[str]] | str]
+) -> list[str]:
     sub_organisations: set[str] = set()
     for item in data:
         if isinstance(item, dict):
             for sub_orgs in item.values():
-                sub_organisations.update(sub_orgs)
+                if sub_orgs:
+                    sub_organisations.update(sub_orgs)
     return list(sub_organisations)
 
 
