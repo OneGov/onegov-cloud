@@ -24,11 +24,11 @@ def test_get_sub_organisations() -> None:
         'Sub 1', 'Sub 2'
     ]
 
-    assert get_sub_organisations([{'Org 1': None}]) == []  # type: ignore[list-item]
+    assert get_sub_organisations([{'Org 1': None}]) == []
 
     # Mix of None and real sub orgs
     assert get_sub_organisations([
-        {'Org 1': None},  # type: ignore[list-item]
+        {'Org 1': None},
         {'Org 2': ['Sub 1']},
     ]) == ['Sub 1']
 
