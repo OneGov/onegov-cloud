@@ -3,7 +3,10 @@ from __future__ import annotations
 from markupsafe import Markup
 from onegov.org.models import Topic
 from onegov.org.request import OrgRequest
-from onegov.org.views.people import person_functions_by_organization
+from onegov.org.views.people import (
+    get_sub_organisations,
+    person_functions_by_organization,
+)
 from onegov.people import Person
 from uuid import UUID
 
@@ -12,6 +15,22 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from .conftest import Client, TestOrgApp
+
+
+def test_get_sub_organisations() -> None:
+    assert get_sub_organisations([]) == []
+    assert get_sub_organisations(['Org 1', 'Org 2']) == []
+    assert sorted(get_sub_organisations([{'Org 1': ['Sub 1', 'Sub 2']}])) == [
+        'Sub 1', 'Sub 2'
+    ]
+
+    assert get_sub_organisations([{'Org 1': None}]) == []  # type: ignore[list-item]
+
+    # Mix of None and real sub orgs
+    assert get_sub_organisations([
+        {'Org 1': None},  # type: ignore[list-item]
+        {'Org 2': ['Sub 1']},
+    ]) == ['Sub 1']
 
 
 def test_people_view(client: Client) -> None:
