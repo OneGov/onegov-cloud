@@ -217,7 +217,7 @@ def test_migrate_links(client: Client) -> None:
         assert '&lt;a&gt;' not in text
 
     def get_topic_text() -> Markup:
-        t = TopicCollection(request).by_title('Foo Topic')
+        t = TopicCollection(request).by_name('foo-topic')
         assert t is not None and t.text is not None
         verify_tags_in_text(t.text)
         return t.text
