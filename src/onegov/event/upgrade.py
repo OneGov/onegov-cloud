@@ -75,6 +75,8 @@ def migrate_filter_keywords_column(context: UpgradeContext) -> None:
             continue
 
         for keyword, values in keywords.items():
+            if values is None:
+                continue
             if isinstance(values, str):
                 values = [values]
             for value in values:
@@ -104,3 +106,35 @@ def migrate_filter_keywords_column(context: UpgradeContext) -> None:
         SET content = content - 'filter_keywords'
         WHERE "content" ? 'filter_keywords'
     """))
+
+
+@upgrade_task('Add indexes to speed up occurrence filters')
+def add_indexes_to_speed_up_occurrence_filters(
+    context: UpgradeContext
+) -> None:
+    if context.has_table('event_occurrences'):
+        context.operations.create_index(
+            'ix_event_occurrences_event_id',
+            'event_occurrences',
+            ['event_id'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_event_occurrences_start',
+            'event_occurrences',
+            ['start'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_event_occurrences_end',
+            'event_occurrences',
+            ['end'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_event_occurrences_tags',
+            'event_occurrences',
+            ['tags'],
+            postgresql_using='gist',
+            if_not_exists=True
+        )

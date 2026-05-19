@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-21 13:23+0200\n"
+"POT-Creation-Date: 2026-05-13 10:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3317,6 +3317,9 @@ msgstr "Associazione sportiva"
 msgid "all day"
 msgstr "tutto il giorno"
 
+msgid "o'clock"
+msgstr "ore"
+
 msgid "Homepage"
 msgstr "Pagina principale"
 
@@ -3708,6 +3711,12 @@ msgstr "Elimina collegamento esterno"
 
 msgid "Sort"
 msgstr "Ordinare"
+
+msgid "Topic"
+msgstr "Argomento"
+
+msgid "Link"
+msgstr "Collegamento"
 
 msgid "The submission was adopted"
 msgstr "L'iscrizione è stata adottata"
@@ -4207,8 +4216,22 @@ msgstr "Vuoi davvero rifiutare questo elemento?"
 msgid "Chats"
 msgstr "Chat"
 
-msgid "Link"
-msgstr "Collegamento"
+msgid "Volunteer"
+msgstr "Aiutante"
+
+msgid "Status mail"
+msgstr "E-mail di stato"
+
+msgid "Do you really want to send the current status?"
+msgstr "Vuoi davvero inviare lo stato attuale?"
+
+msgid ""
+"A mail will be sent to the volunteer containing the status of his "
+"subscriptions. Only send this if these are the final states ofthe "
+"subscriptions."
+msgstr ""
+"Una mail sarà inviata al volontario contenente lo stato delle sue "
+"iscrizioni. Inviare solo se questi sono gli stati finali delle iscrizioni."
 
 msgid "New Link"
 msgstr "Nuovo collegamento"
@@ -4228,9 +4251,6 @@ msgstr "Il collegamento è stato cancellato"
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
 msgstr "Desideri davvero eliminare il collegamento \"${title}\"?"
-
-msgid "Topic"
-msgstr "Argomento"
 
 msgid "New Topic"
 msgstr "Nuovo argomento"
@@ -4334,21 +4354,6 @@ msgstr "Fonte"
 msgid "Appendix"
 msgstr "Appendice"
 
-msgid "Subject"
-msgstr "Oggetto"
-
-msgid "Owner"
-msgstr "Proprietario"
-
-msgid "Reaction Time"
-msgstr "Tempo di reazione"
-
-msgid "Process Time"
-msgstr "Tempo di elaborazione"
-
-msgid "Event Source"
-msgstr "Origine evento"
-
 msgid "Total"
 msgstr "Totale"
 
@@ -4368,6 +4373,21 @@ msgstr "Pagamento"
 
 msgid "Total Amount"
 msgstr "Importo totale"
+
+msgid "Subject"
+msgstr "Oggetto"
+
+msgid "Owner"
+msgstr "Proprietario"
+
+msgid "Reaction Time"
+msgstr "Tempo di reazione"
+
+msgid "Process Time"
+msgstr "Tempo di elaborazione"
+
+msgid "Event Source"
+msgstr "Origine evento"
 
 msgid ""
 "The record behind this ticket was removed. The following information is a "
@@ -6398,7 +6418,7 @@ msgid "Your ${org} Registration"
 msgstr "La tua registrazione a ${org}"
 
 msgid ""
-"Thank you for registering. Please follow the instructions on the activiation "
+"Thank you for registering. Please follow the instructions on the activation "
 "e-mail sent to you. Please check your spam folder if you have not received "
 "the email."
 msgstr ""
@@ -7134,8 +7154,8 @@ msgstr "Questo fine settimana"
 msgid "This week"
 msgstr "Questa settimana"
 
-msgid "o'clock"
-msgstr "ore"
+msgid "Edit Event Filter Configuration"
+msgstr "Modifica configurazione filtro eventi"
 
 msgid "Event Export"
 msgstr "Esportazione degli eventi"
@@ -7972,7 +7992,7 @@ msgid "The username can be changed <a href=\"${url}\">here</a>."
 msgstr "L'indirizzo e-mail può essere modificato <a href=\"${url}\">qui</a>."
 
 #, python-format
-msgid "Succesfully changed ${old_username} to ${new_username}"
+msgid "Successfully changed ${old_username} to ${new_username}"
 msgstr "Modifica riuscita da ${old_username} a ${new_username}"
 
 msgid "New User"

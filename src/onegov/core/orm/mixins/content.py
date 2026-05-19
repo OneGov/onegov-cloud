@@ -410,7 +410,7 @@ class dict_markup_property[MarkupT: (Markup, Markup | None)](  # noqa: N801
             attribute,
             key,
             default,  # type:ignore[arg-type]
-            Markup  # type:ignore[arg-type]
+            Markup
         )
 
     def _default_expr(self, owner: type[Any]) -> ColumnElement[MarkupT]:

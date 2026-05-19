@@ -10,6 +10,7 @@ from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import CheckConstraint
+from sqlalchemy import Index
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy.orm import joinedload, object_session
@@ -88,6 +89,7 @@ class Invoice(Base, TimestampMixin):
     #       identities we need a CHECK constraint instead of NOT NULLABLE
     #       constaints on the columns.
     __table_args__ = (
+        Index('ix_invoices_type', type),
         CheckConstraint(
             '(period_id IS NOT NULL AND user_id IS NOT NULL) '
             "OR type != 'booking_period'",

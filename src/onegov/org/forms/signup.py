@@ -44,7 +44,7 @@ class SignupForm(Form):
     daily_newsletter = BooleanField(
         label=_('Daily newsletter for all categories (only for '
                 'news items)'),
-        default=False,
+        default=True,
     )
 
     def on_request(self) -> None:

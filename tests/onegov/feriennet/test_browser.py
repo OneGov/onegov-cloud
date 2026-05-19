@@ -3,7 +3,10 @@ from __future__ import annotations
 import time
 import json
 import pytest
+import os
 
+from datetime import datetime
+from pathlib import Path
 from datetime import timedelta
 from psycopg2.extras import NumericRange
 from pytest import mark
@@ -15,6 +18,7 @@ if TYPE_CHECKING:
     from tests.shared import ExtendedBrowser
     from tests.shared.postgresql import Postgresql
     from .conftest import Scenario
+    from .conftest import Client, TestApp
 
 
 def test_browse_matching(
@@ -400,3 +404,102 @@ def test_volunteers_export(
         'Adresse': 'Foostreet 1'
     }
     assert volunteer_export == volunteer_json
+
+
+@pytest.mark.flaky(reruns=3)
+def test_volunteer_subscription(
+    browser: ExtendedBrowser,
+    scenario: Scenario,
+    client: Client[TestApp]
+) -> None:
+
+    scenario.add_period(title="2026", confirmed=True, finalized=False)
+    scenario.add_activity(title="Photography", state='accepted')
+
+    now = datetime.now()
+    later = scenario.date_offset(10)  # ein date-Objekt
+
+    later = datetime.combine(later, now.time())
+    scenario.add_occasion(
+        cost=100, dates=[(later, later + timedelta(hours=1))])
+    scenario.add_need(
+        name="Aufichtsperson", number=NumericRange(1, 3), accept_signups=True)
+
+    scenario.add_activity(title="Dancing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_need(
+        name="Begleitung", number=NumericRange(3, 4), accept_signups=True)
+
+    scenario.commit()
+
+    browser.login_admin()
+    browser.visit('/feriennet-settings')
+    browser.find_by_css('#volunteers-2').click()
+    browser.find_by_text("Speichern").click()
+
+    browser.logout()
+
+    browser.visit('/activities/volunteer')
+    browser.find_by_text("Photography")
+    browser.find_by_text("Dancing")
+    browser.find_by_text("Zu meiner Liste")[0].click()
+    browser.find_by_text("Zu meiner Liste")[1].click()
+
+    browser.find_by_css(".volunteer-cart .button").click()
+    browser.find_by_css("#my-list .button.success").click()
+    browser.fill_form({
+        'first_name': "Foo",
+        'last_name': "Bar",
+        'birth_date': '1984-04-06',
+        'address': 'Foostreet 1',
+        'zip_code': '1234',
+        'place': 'Bartown',
+        'email': 'foo@bar.org',
+        'phone': '1234'
+    })
+    browser.find_by_value("Absenden").click()
+
+    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
+    with open(mail, 'r') as file:
+        mail_content = file.read()
+        assert (
+            "Sie haben sich als Hilfsperson"
+            in mail_content
+        )
+        assert ("Photography" in mail_content)
+        assert ("Dancing" in mail_content)
+
+    browser.login_admin()
+    browser.visit('/tickets/ALL/open')
+    browser.find_by_css('.ticket-number-plain a').click()
+    browser.find_by_text('Ticket annehmen').click()
+
+    assert browser.is_text_present("Photography")
+    assert browser.is_text_present("Dancing")
+    browser.find_by_text("Als kontaktiert markieren")[0].click()
+    assert browser.is_element_present_by_css(".bg-color.contacted")
+    browser.find_by_text("Als bestätigt markieren")[0].click()
+
+    browser.find_by_text("Statusmail").click()
+    browser.find_by_text("Senden").click()
+    assert browser.is_text_present(
+        "Nicht alle Anmeldungen befinden sich in einem finalen Zustand.")
+
+    browser.find_by_text("Als abgelehnt markieren")[1].click()
+
+    browser.find_by_text("Statusmail").click()
+    browser.find_by_text("Senden").click()
+    assert browser.is_text_present(
+        "1 E-Mails erfolgreich gesendet")
+
+    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[1]
+    with open(mail, 'r') as file:
+        mail_content = file.read()
+        assert (
+            "dies ist die finale Liste"
+            in mail_content
+        )
+        assert ("Photography" in mail_content)
+        assert ("Dancing" in mail_content)
+        assert ("Abgelehnt" in mail_content)
+        assert ("Best\\u00e4tigt" in mail_content)

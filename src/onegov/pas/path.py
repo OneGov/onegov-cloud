@@ -448,10 +448,10 @@ def get_settlement_run_export_all(
     path='/import-logs'
 )
 def get_import_logs(
-    request: TownRequest
+    request: TownRequest, user_id: str | None = None
 ) -> ImportLogCollection:
     """ Returns the collection of import logs. """
-    return ImportLogCollection(request.session)
+    return ImportLogCollection(request.session, user_id=user_id)
 
 
 @PasApp.path(

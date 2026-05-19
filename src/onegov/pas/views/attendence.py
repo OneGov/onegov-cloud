@@ -280,15 +280,13 @@ def add_attendence(
 )
 def add_bulk_attendence(
     self: AttendenceCollection,
-    request: TownRequest,
+    request: PasRequest,
     form: AttendenceAddCommissionBulkForm
 ) -> RenderData | Response:
     request.include('custom')
 
-    if not request.is_admin:
-        request.alert(
-            _('Only admins can add bulk attendance records.')
-        )
+    if not request.is_admin and not request.is_commission_president:
+        request.alert(_('Only admins can add bulk attendance records.'))
         return request.redirect(request.class_link(AttendenceCollection))
 
     title = _('New commission session (bulk)')

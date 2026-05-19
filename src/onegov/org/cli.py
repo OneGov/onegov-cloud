@@ -577,6 +577,7 @@ def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
 @click.option('--published-only', is_flag=True, default=False,
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
+@click.option('--include-imported', is_flag=True, default=False)
 def fetch(
     group_context: GroupContext,
     source: Sequence[str],
@@ -585,7 +586,8 @@ def fetch(
     create_tickets: bool,
     state_transfers: Sequence[str],
     published_only: bool,
-    delete_orphaned_tickets: bool
+    delete_orphaned_tickets: bool,
+    include_imported: bool
 ) -> Callable[[OrgRequest, OrgApp], None]:
     r""" Fetches events from other instances.
 
@@ -617,6 +619,12 @@ def fetch(
 
         Delete Tickets, TicketNotes and TicketMessasges if an
         event gets deleted automatically.
+
+    - ``--include-imported``
+
+        By default skip events that have a source attribute, which means they
+        have been imported. If the flag is set, imported events will be
+        included in the fetch transfer.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
@@ -671,12 +679,13 @@ def fetch(
                 assert remote_session.info['schema'] == remote_schema
 
                 query = remote_session.query(Event)
-                query = query.filter(
-                    or_(
-                        Event.meta['source'].astext.is_(None),
-                        Event.meta['source'].astext == ''
+                if not include_imported:
+                    query = query.filter(
+                        or_(
+                            Event.meta['source'].astext.is_(None),
+                            Event.meta['source'].astext == ''
+                        )
                     )
-                )
                 if tag:
                     query = query.filter(Event._tags.has_any(array(tag)))
                 if location:

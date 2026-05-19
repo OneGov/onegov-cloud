@@ -301,7 +301,12 @@ class SessionManager:
         # in the future, this might become something we can configure through
         # the setuptools entry_points -> modules could advertise what they need
         # and the core would install the extensions the modules require
-        self.required_extensions = {'btree_gist', 'hstore', 'unaccent'}
+        self.required_extensions = {
+            'btree_gist',
+            'hstore',
+            'intarray',
+            'unaccent'
+        }
         self.created_extensions: set[str] = set()
 
         # override the isolation level in any case, we cannot allow another
