@@ -77,7 +77,10 @@ class Invoice(Base, TimestampMixin):
     )
 
     #: the specific items linked with this invoice
-    items: Mapped[list[InvoiceItem]] = relationship(back_populates='invoice')
+    items: Mapped[list[InvoiceItem]] = relationship(
+        back_populates='invoice',
+        order_by=InvoiceItem.created.asc()
+    )
 
     #: the references pointing to this invoice
     references: Mapped[list[InvoiceReference]] = relationship(
