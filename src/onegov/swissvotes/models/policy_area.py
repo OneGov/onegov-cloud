@@ -66,7 +66,8 @@ class PolicyArea:
     def from_url_param(cls, s: str) -> PolicyArea | None:
         """ Validates and constructs a PolicyArea from a URL parameter.
 
-        Returns None for empty or invalid values so they can be dropped.
+        Returns None for empty or invalid values. Callers that need to reject
+        invalid input (e.g. URL converters) should raise ValueError on None.
         A valid value has at most 3 all-numeric components separated by dots
         where each component starts with the previous one
         (e.g. "1", "1.12", "1.12.121").

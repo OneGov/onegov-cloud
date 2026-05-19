@@ -13,6 +13,8 @@ def policy_area_decode(s: str) -> PolicyArea:
 
 
 def policy_area_encode(p: PolicyArea | None) -> str:
+    # None branch satisfies morepath's Converter[T]
+    # stub (encode: T | None → str)
     return p.value if p is not None else ''
 
 

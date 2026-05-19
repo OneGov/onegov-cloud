@@ -308,7 +308,8 @@ def test_view_update_external_resources(
 
 def test_view_votes_empty_policy_area(swissvotes_app: TestApp) -> None:
     """
-    Ensure that the votes view does not crash when the policy area is empty.
+    Empty or structurally invalid policy_area URL parameters are rejected
+    with 400 Bad Request rather than causing a 500 crash.
     """
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
