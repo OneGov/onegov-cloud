@@ -316,5 +316,8 @@ def test_view_votes_empty_policy_area(swissvotes_app: TestApp) -> None:
     page = client.get('/votes')
     assert page.status_code == 200
 
-    page = client.get('/votes?term=&policy_area=9&policy_area=')
-    assert page.status_code == 200
+    client.get('/votes?term=&policy_area=', status=400)
+    client.get('/votes?term=&policy_area=9&policy_area=', status=400)
+    client.get('/votes?term=&policy_area=&policy_area=3', status=400)
+    client.get('/votes?term=&policy_area=9&policy_area=&policy_area=3',
+               status=400)

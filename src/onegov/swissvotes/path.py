@@ -73,7 +73,7 @@ def get_votes(
     to_date: date | None = None,
     legal_form: list[int] | None = None,
     result: list[int] | None = None,
-    policy_area: list[PolicyArea | None] | None = None,
+    policy_area: list[PolicyArea] | None = None,
     term: str | None = None,
     full_text: bool | None = None,
     position_federal_council: list[int] | None = None,
@@ -82,9 +82,6 @@ def get_votes(
     sort_by: str | None = None,
     sort_order: str | None = None
 ) -> SwissVoteCollection:
-    filtered_policy_area = [
-        p for p in policy_area if p
-    ] if policy_area else None
     return SwissVoteCollection(
         app,
         page=page,
@@ -92,7 +89,7 @@ def get_votes(
         to_date=to_date,
         legal_form=legal_form,
         result=result,
-        policy_area=filtered_policy_area or None,
+        policy_area=policy_area,
         term=term,
         full_text=full_text,
         position_federal_council=position_federal_council,
