@@ -9,6 +9,11 @@ from wtforms.fields import StringField
 from wtforms.fields import RadioField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, Email
+from onegov.feriennet.utils import decode_name
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.feriennet.models import VolunteerCart
 
 
 class VolunteerForm(Form):
@@ -67,3 +72,16 @@ class VolunteerForm(Form):
         label=_('Note'),
         render_kw={'rows': 4},
     )
+
+    def process_obj(self, model: VolunteerCart) -> None:  # type:ignore[override]
+        current_user = self.request.current_user  # type: ignore
+
+        if current_user:
+            self.first_name.data, self.last_name.data = decode_name(
+                current_user.realname
+            )
+            self.email.data = current_user.username
+            self.phone.data = current_user.data.get('phone', '')
+            self.address.data = current_user.data.get('address', '')
+            self.zip_code.data = current_user.data.get('zip_code', '')
+            self.place.data = current_user.data.get('place', '')
