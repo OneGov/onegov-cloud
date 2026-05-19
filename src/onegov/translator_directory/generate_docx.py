@@ -187,8 +187,8 @@ def signature_for_mail_templates(
     uploaded. It should contain the string 'Unterschrift', as well as the
     first and last name of the user. """
 
-    current_user = request.get_current_user()
-    name_parts = (current_user.realname or '').strip().split(None, 1)
+    assert request.current_user is not None
+    name_parts = (request.current_user.realname or '').strip().split(None, 1)
     if len(name_parts) != 2 or not name_parts[0] or not name_parts[1]:
         return None
     first_name, last_name = name_parts

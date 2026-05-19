@@ -136,26 +136,6 @@ class OrgRequest(CoreRequest):
             self._current_user = self.session.merge(self._current_user)
         return self._current_user
 
-    def get_current_user(self) -> User:
-        """ Returns current_user, raising HTTPForbidden if it is None.
-
-        Use this instead of asserting current_user is not None. Raises for
-        both anonymous requests and cases where a logged-in identity has no
-        corresponding user record. In the latter case a Sentry warning with
-        the identity uid is captured to aid debugging.
-        """
-        user = self.current_user
-        if user is None:
-            if self.is_logged_in:
-                uid = getattr(self.identity, 'uid', 'unknown')
-                sentry_sdk.capture_message(
-                    f'current_user is None despite valid identity'
-                    f': {uid}',
-                    level='warning',
-                )
-            raise HTTPForbidden()
-        return user
-
     @cached_property
     def authenticated_email(self) -> str | None:
         """

@@ -7,6 +7,10 @@ from onegov.event import OccurrenceCollection
 from onegov.form.collection import FormCollection, SurveyCollection
 from onegov.newsletter import NewsletterCollection
 from onegov.org import _, OrgApp
+from onegov.org.api import (
+    DirectoryEntryApiEndpoint, EventApiEndpoint, FormApiEndpoint,
+    NewsApiEndpoint, PersonApiEndpoint, ResourceApiEndpoint,
+    TopicApiEndpoint)
 from onegov.org.models import (
     CitizenDashboard,
     Dashboard,
@@ -14,6 +18,7 @@ from onegov.org.models import (
     ImageFileCollection,
     Organisation,
 )
+from onegov.org.models.directory import ExtendedDirectory
 from onegov.org.models.page import News
 from onegov.pay import PaymentCollection
 from onegov.people import PersonCollection
@@ -26,7 +31,8 @@ from sqlalchemy import func
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Callable, Iterator
+    from onegov.org.api import ApiEndpoint
     from onegov.org.request import OrgRequest
 
 
@@ -36,6 +42,12 @@ def get_template_variables(request: OrgRequest) -> dict[str, Any]:
         'global_tools': tuple(get_global_tools(request)),
         'modules': get_modules(request)
     }
+
+
+@OrgApp.setting(section='api', name='endpoints')
+def get_api_endpoints_handler(
+) -> Callable[[OrgRequest], Iterator[ApiEndpoint[Any]]]:
+    return get_api_endpoints
 
 
 def get_modules(request: OrgRequest) -> LinkGroup:
@@ -282,7 +294,7 @@ def get_global_tools(
 
     # Tickets
     if request.is_manager or request.is_supporter:
-        user = request.get_current_user()
+        assert request.current_user is not None
         ticket_count = request.app.ticket_count
         screen_count = ticket_count.open or ticket_count.pending
 
@@ -295,7 +307,7 @@ def get_global_tools(
                     TicketCollection, {
                         'handler': 'ALL',
                         'state': 'unfinished',
-                        'owner': user.id.hex
+                        'owner': request.current_user.id.hex
                     },
                 ),
                 attrs={
@@ -408,4 +420,20 @@ def get_global_tools(
             attrs={
                 'class': ('citizen-tickets'),
             }
+        )
+
+
+def get_api_endpoints(request: OrgRequest) -> Iterator[ApiEndpoint[Any]]:
+    yield EventApiEndpoint(request)
+    yield FormApiEndpoint(request)
+    yield NewsApiEndpoint(request)
+    yield PersonApiEndpoint(request)
+    yield ResourceApiEndpoint(request)
+    yield TopicApiEndpoint(request)
+    directories = request.exclude_invisible(
+        request.session.query(ExtendedDirectory))
+    for directory in directories:
+        yield DirectoryEntryApiEndpoint(
+            request=request,
+            name=directory.name
         )

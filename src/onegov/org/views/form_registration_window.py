@@ -419,7 +419,8 @@ def view_cancel_submissions_for_registration_window(
                 no_messages=True, force_email=ticket.muted
             )
 
-            close_ticket(ticket, request.get_current_user(), request)
+            assert request.current_user is not None
+            close_ticket(ticket, request.current_user, request)
             # same behaviour as when closing ticket normally
             # to disable mail on ticket close, there is a ticket-setting
             send_email_if_enabled(

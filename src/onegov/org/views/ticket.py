@@ -1556,11 +1556,11 @@ def get_filters(
     request: OrgRequest
 ) -> Iterator[Link]:
 
-    current_user = request.get_current_user()
+    assert request.current_user is not None
     yield Link(
         text=_('My'),
         url=request.link(
-            self.for_state('unfinished').for_owner(current_user.id)
+            self.for_state('unfinished').for_owner(request.current_user.id)
         ),
         active=self.state == 'unfinished',
         attrs={'class': 'ticket-filter-my'}

@@ -1957,8 +1957,8 @@ def can_change_username(
     if user.role not in request.app.settings.user.change_username_roles:
         return False
 
-    current_user = request.get_current_user()
-    second_factor = (current_user.second_factor or {}).get('type')
+    assert request.current_user is not None
+    second_factor = (request.current_user.second_factor or {}).get('type')
     # NOTE: For now we only allow second factors that don't require multiple
     #       steps, so we can do it all in a single form
     if second_factor not in ('yubikey', 'totp'):
