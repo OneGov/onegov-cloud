@@ -39,6 +39,7 @@ class Search(Pagination[Any]):
         types: Iterable[str] | str | None = None,
         start: date | None = None,
         end: date | None = None,
+        plain: bool = False,
         page: int = 0,
     ) -> None:
         self.request = request
@@ -50,6 +51,7 @@ class Search(Pagination[Any]):
         )
         self.start = start
         self.end = end
+        self.plain = plain
         self.page = page  # page index
 
         self.number_of_results: int | None = None
@@ -153,6 +155,7 @@ class Search(Pagination[Any]):
             self.types,
             self.start,
             self.end,
+            self.plain,
             index
         )
 
@@ -282,7 +285,10 @@ class Search(Pagination[Any]):
         return language or 'simple'
 
     def generic_search(self) -> Query[SearchIndex]:
-        ts_query = func.websearch_to_tsquery(self.language, self.query)
+        if self.plain:
+            ts_query = func.plainto_tsquery(self.language, self.query)
+        else:
+            ts_query = func.websearch_to_tsquery(self.language, self.query)
 
         decay = 0.99
         scale = (90 * 24 * 3600)  # 90 days to reach target decay

@@ -46,7 +46,7 @@ class Meeting(
 
     @property
     def fts_suggestion(self) -> list[str]:
-        return [self.title_text, self.display_name]
+        return [self.display_name]
 
     @property
     def fts_last_change(self) -> datetime | None:
