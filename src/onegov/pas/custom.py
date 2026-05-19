@@ -294,7 +294,7 @@ def notify_admins_finalized(
         template='mail_abschluss_notification.pt',
         subject=_(
             'PAS: Abschluss set for ${name}',
-            mapping={'name': parliamentarian_name},
+            mapping={'name': commission_name or parliamentarian_name},
         ),
         receivers=admin_emails,
         content={

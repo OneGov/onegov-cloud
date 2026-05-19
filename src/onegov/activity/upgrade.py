@@ -834,3 +834,194 @@ def add_group_code_to_periods(context: UpgradeContext) -> None:
         context.add_column_with_defaults('periods', Column(
             'with_group_code', Boolean, nullable=True
         ), default=True)
+
+
+@upgrade_task('Add indexes to speed up activity filters')
+def add_indexes_to_speed_up_activity_filters(context: UpgradeContext) -> None:
+    if context.has_table('periods'):
+        context.operations.create_index(
+            'ix_periods_booking_cost',
+            'periods',
+            ['booking_cost'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_periods_all_inclusive',
+            'periods',
+            ['all_inclusive'],
+            if_not_exists=True
+        )
+    if context.has_table('activities'):
+        context.operations.create_index(
+            'ix_activities_tags',
+            'activities',
+            ['tags'],
+            postgresql_using='gist',
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_activities_username',
+            'activities',
+            ['username'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_activities_municipality',
+            'activities',
+            ['municipality'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_activities_state',
+            'activities',
+            ['state'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_activities_type',
+            'activities',
+            ['type'],
+            if_not_exists=True
+        )
+    if context.has_table('occasions'):
+        context.operations.create_index(
+            'ix_occasions_activity_id',
+            'occasions',
+            ['activity_id'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_period_id',
+            'occasions',
+            ['period_id'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_cancelled',
+            'occasions',
+            ['cancelled'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_duration',
+            'occasions',
+            ['duration'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_cost',
+            'occasions',
+            ['cost'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_booking_cost',
+            'occasions',
+            ['booking_cost'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_active_days',
+            'occasions',
+            ['active_days'],
+            postgresql_ops={'active_days': 'gist__intbig_ops'},
+            postgresql_using='gist',
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_weekdays',
+            'occasions',
+            ['weekdays'],
+            postgresql_using='gist',
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_age',
+            'occasions',
+            ['age'],
+            postgresql_using='gist',
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_age_lower',
+            'occasions',
+            [text('LOWER(age)')],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_age_upper',
+            'occasions',
+            [text('UPPER(age)')],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_seeking_volunteers',
+            'occasions',
+            ['seeking_volunteers'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasions_attendee_count',
+            'occasions',
+            ['attendee_count'],
+            if_not_exists=True
+        )
+    if context.has_table('occasion_dates'):
+        context.operations.create_index(
+            'ix_occasion_dates_start',
+            'occasion_dates',
+            ['start'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasion_dates_end',
+            'occasion_dates',
+            ['end'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasion_dates_start_week',
+            'occasion_dates',
+            [text('(EXTRACT(week FROM start))')],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasion_dates_end_week',
+            'occasion_dates',
+            [text('(EXTRACT(week FROM "end"))')],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_occasion_dates_occasion_id',
+            'occasion_dates',
+            ['occasion_id'],
+            if_not_exists=True
+        )
+
+
+@upgrade_task('Add cancelled state to volunteer_state enum')
+def add_cancelled_state_to_volunteer_state(context: UpgradeContext) -> None:
+    if not context.has_enum('volunteer_state'):
+        return
+
+    new_type = Enum(
+        'open',
+        'contacted',
+        'confirmed',
+        'cancelled',
+        name='volunteer_state'
+    )
+
+    op = context.operations
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state TYPE Text;
+        DROP TYPE volunteer_state;
+    """))
+
+    new_type.create(op.get_bind())
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state
+        TYPE volunteer_state USING state::text::volunteer_state;
+    """))

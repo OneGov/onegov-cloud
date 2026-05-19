@@ -3,6 +3,8 @@ from __future__ import annotations
 import datetime
 import json
 import transaction
+import zipfile
+from io import BytesIO
 
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
@@ -726,6 +728,86 @@ def test_fetch_commissions_parliamentarians_json(
     assert commission3_id not in data3
 
 
+def test_commissions_view_filtered_by_role(
+    client: Client[TestPasApp],
+) -> None:
+    session = client.app.session()
+
+    commissions = PASCommissionCollection(session)
+    commission_a = commissions.add(name='Finanzkommission')
+    commission_b = commissions.add(name='Bildungskommission')
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='Pia',
+        last_name='Member',
+        email_primary='pia@example.org',
+        zg_username='zgpia',
+    )
+    pres = parliamentarians.add(
+        first_name='Alice',
+        last_name='President',
+        email_primary='alice@example.org',
+        zg_username='zgalice',
+    )
+
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=parl.id,
+            commission_id=commission_a.id,
+            role='member',
+        )
+    )
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=pres.id,
+            commission_id=commission_a.id,
+            role='president',
+        )
+    )
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=pres.id,
+            commission_id=commission_b.id,
+            role='member',
+        )
+    )
+
+    users = UserCollection(session)
+
+    user_parl = users.by_username('zgpia')
+    assert user_parl is not None
+    user_parl.role = 'parliamentarian'
+    user_parl.password = 'test'
+    user_parl.active = True
+
+    user_pres = users.by_username('zgalice')
+    assert user_pres is not None
+    user_pres.role = 'commission_president'
+    user_pres.password = 'test'
+    user_pres.active = True
+
+    transaction.commit()
+
+    # Admin sees all commissions
+    client.login_admin()
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' in page
+
+    # Parliamentarian sees only their commission (A)
+    client.login('zgpia', 'test')
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' not in page
+
+    # Commission president sees both (member of both)
+    client.login('zgalice', 'test')
+    page = client.get('/commissions')
+    assert 'Finanzkommission' in page
+    assert 'Bildungskommission' in page
+
+
 def test_add_new_user_without_activation_email(
     client: Client[TestPasApp]
 ) -> None:
@@ -1014,3 +1096,183 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     result = page.form.submit()
     assert result.status_code == 200
     assert 'CHF 20000' in result
+
+
+def test_abschluss_email_uses_commission_name(
+    client: Client[TestPasApp],
+) -> None:
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    add_rate_set(settings, [])
+
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1 2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parl = parliamentarians.add(
+        first_name='Max',
+        last_name='Muster',
+        email_primary='max.muster@example.org',
+    )
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Finanzkommission')
+
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+
+    session.flush()
+    transaction.commit()
+
+    # Create attendance without abschluss first
+    page = (
+        client.get('/')
+        .follow()
+        .click('Anwesenheiten')
+        .click(href='new', index=0)
+    )
+    page.form['date'] = '2024-06-15'
+    page.form['duration'] = '2'
+    page.form['type'] = 'commission'
+    page.form['commission_id'].select(text='Finanzkommission')
+    page.form['parliamentarian_id'].select(text='Max Muster')
+    page.form['abschluss'] = False
+    page = page.form.submit().follow()
+
+    # Now edit to set abschluss — this triggers the email
+    page = page.click('Bearbeiten')
+    page.form['abschluss'] = True
+    page.form.submit().follow()
+
+    email = client.get_email(0)
+    assert email['Subject'] == ('PAS: Abschluss gesetzt für Finanzkommission')
+    assert 'Finanzkommission' in email['HtmlBody']
+    assert 'Max Muster' in email['HtmlBody']
+
+
+def test_parliamentarian_pdf_zip_download(
+    client: Client[TestPasApp],
+) -> None:
+    client.login_admin()
+    settings = client.get('/').follow().click('PAS Einstellungen')
+    add_rate_set(settings, [])
+
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1 2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    alice = parliamentarians.add(
+        first_name='Alice',
+        last_name='Aaberg',
+        email_primary='alice@example.org',
+    )
+    bob = parliamentarians.add(
+        first_name='Bob',
+        last_name='Baumann',
+        email_primary='bob@example.org',
+    )
+
+    parties = PartyCollection(session)
+    party = parties.add(name='TestPartei')
+
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=alice.id,
+            role='member',
+            party=party,
+            start=datetime.date(2024, 1, 1),
+        )
+    )
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=bob.id,
+            role='member',
+            party=party,
+            start=datetime.date(2024, 1, 1),
+        )
+    )
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='TestKommission')
+
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=alice.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+    PASCommissionMembershipCollection(session).add(
+        commission_id=commission.id,
+        parliamentarian_id=bob.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+    )
+
+    session.flush()
+
+    # Add attendances for both
+    from onegov.pas.models import Attendence
+
+    session.add(
+        Attendence(
+            parliamentarian=alice,
+            commission=commission,
+            date=datetime.date(2024, 3, 10),
+            duration=120,
+            type='commission',
+        )
+    )
+    session.add(
+        Attendence(
+            parliamentarian=bob,
+            commission=commission,
+            date=datetime.date(2024, 3, 10),
+            duration=120,
+            type='commission',
+        )
+    )
+    session.flush()
+    transaction.commit()
+
+    # Navigate to settlement run and find ZIP link
+    page = settings.click('Abrechnungsläufe')
+    page = page.click('Q1 2024')
+    assert 'Alle Parlamentarier:innen (ZIP)' in page
+
+    resp = page.click(href='all-parliamentarians-zip')
+    assert resp.status_code == 200
+    assert resp.content_type == 'application/zip'
+    assert resp.content_disposition is not None
+    assert '.zip' in resp.content_disposition
+
+    zf = zipfile.ZipFile(BytesIO(resp.body))
+    names = zf.namelist()
+    assert len(names) == 2
+    assert all(n.endswith('.pdf') for n in names)
+    assert any('Aaberg' in n for n in names)
+    assert any('Baumann' in n for n in names)
+
+    for name in names:
+        pdf_bytes = zf.read(name)
+        assert len(pdf_bytes) > 0
+        assert pdf_bytes[:4] == b'%PDF'

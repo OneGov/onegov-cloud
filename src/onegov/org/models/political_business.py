@@ -309,6 +309,21 @@ class PoliticalBusinessCollection(
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),
+            'editor': (),
+            'member': ('member', 'mtan', 'public'),
+        }.get(role, ('mtan', 'public'))
+
+        if available_accesses:
+            query = query.filter(or_(
+                *(
+                    PoliticalBusiness.meta['access'].astext == access
+                    for access in available_accesses
+                ),
+                PoliticalBusiness.meta['access'].is_(None)
+            ))
 
         if self.term:
             language = self.request.locale

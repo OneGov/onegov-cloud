@@ -224,6 +224,40 @@ def test_views(client_with_fts: Client[TestApp]) -> None:
         page = page.click('Archiv', index=0)
     assert 'Noch keine Landsgemeinden erfasst.' in page
 
+
+def test_view_add_draft_votum_no_state_cascade(
+    client: Client[TestApp]
+) -> None:
+    # Regression test for OGC-3061: adding a votum with the default state
+    # 'draft' must not cascade the draft state to the agenda item or assembly.
+    client.login_admin()
+
+    page = client.get('/').click('Archiv')
+    page = page.click('Landsgemeinde', index=1)
+    page.form['date'] = '2023-05-07'
+    page.form['state'] = 'scheduled'
+    page.form['overview'] = '<p>Overview</p>'
+    page = page.form.submit().follow()
+
+    page = page.click('Traktandum')
+    page.form['number'] = 1
+    page.form['state'] = 'scheduled'
+    page.form['title'] = 'Traktandum 1'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    assert page.form['state'].value == 'draft'
+    page.form['person_name'] = 'Test Person'
+    page = page.form.submit().follow()
+
+    states = client.get('/assembly/2023-05-07/states')
+    assert 'Entwurf' in states.pyquery('.votum').text()
+    assert 'geplant' in states.pyquery('.assembly').text()
+    assert 'Entwurf' not in states.pyquery('.assembly').text()
+    assert 'geplant' in states.pyquery('.agenda-item').text()
+    assert 'Entwurf' not in states.pyquery('.agenda-item').text()
+
+
 def test_view_pages_cache(client: Client[TestApp]) -> None:
     # make sure codes != 200 are not cached
     anonymous = client.spawn()
@@ -313,3 +347,62 @@ def test_view_suggestions(client: Client[TestApp]) -> None:
     assert client.get(
         '/suggestion/person/political-affiliation?term=s'
     ).json == ['SVP', 'jSVP']
+
+
+def test_views_assembly_ticker_sorted_vota(client: Client[TestApp]) -> None:
+    client.login_admin()
+
+    # add assembly
+    page = client.get('/').click('Archiv')
+    page = page.click('Landsgemeinde', index=1)
+    page.form['date'] = '2026-05-03'
+    page.form['state'] = 'ongoing'
+    page.form['overview'] = '<p>Overview</p>'
+    page = page.form.submit().follow()
+
+    # add agenda item 1 with two vota
+    page = page.click('Traktandum')
+    page.form['number'] = 1
+    page.form['state'] = 'completed'
+    page.form['title'] = 'Item 1'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    page.form['number'] = 1
+    page.form['state'] = 'completed'
+    page.form['person_name'] = 'Alice'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    page.form['number'] = 2
+    page.form['state'] = 'completed'
+    page.form['person_name'] = 'Bob'
+    page.form.submit()
+
+    # add agenda item 2 with two vota
+    page = client.get('/assembly/2026-05-03').click('Traktandum')
+    page.form['number'] = 2
+    page.form['state'] = 'completed'
+    page.form['title'] = 'Item 2'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    page.form['number'] = 2
+    page.form['state'] = 'completed'
+    page.form['person_name'] = 'Dave'
+    page = page.form.submit().follow()
+
+    page = page.click('Wortmeldung')
+    page.form['number'] = 1
+    page.form['state'] = 'completed'
+    page.form['person_name'] = 'Charlie'
+    page.form.submit()
+
+    # ticker renders vota in reverse number order
+    ticker = client.get('/assembly/2026-05-03/ticker')
+    text = ticker.text
+
+    # within item 1: Bob (votum 2) before Alice (votum 1)
+    assert text.index('Bob') < text.index('Alice')
+    # within item 2: Dave (votum 2) before Charlie (votum 1)
+    assert text.index('Dave') < text.index('Charlie')
