@@ -170,7 +170,7 @@
                         <div class="mc-field-group">
                             <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required="" value="" i18n:attributes="placeholder" placeholder="E-mail address">
                             <ul aria-hidden="true" class="hidden">
-                                <li><input type="radio" name="MMERGE5" id="mce-MMERGE50" value="Deutsch" ${'checked' if request.locale.startswith('de') else ''}><label for="mce-MMERGE50">Deutsch</label></li>
+                                <li><input type="radio" name="MMERGE5" id="mce-MMERGE50" value="Deutsch" ${'' if request.locale.startswith('fr') else 'checked'}><label for="mce-MMERGE50">Deutsch</label></li>
                                 <li><input type="radio" name="MMERGE5" id="mce-MMERGE51" value="Français" ${'checked' if request.locale.startswith('fr') else ''}><label for="mce-MMERGE51">Français</label></li>
                             </ul>
                         </div>
