@@ -12,7 +12,6 @@ from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (
     AttendenceCollection,
-    PASParliamentarianCollection,
     SettlementRunCollection,
 )
 from onegov.pas.custom import (
@@ -31,6 +30,10 @@ from onegov.pas.models import Change
 from onegov.pas.models import SettlementRun
 from onegov.pas.models.attendence import TYPES
 from onegov.pas.models.commission_membership import PASCommissionMembership
+from onegov.pas.utils import (
+    get_active_kantonsrat_parliamentarians,
+    is_active_kantonsrat_member,
+)
 
 
 from typing import TYPE_CHECKING
@@ -360,10 +363,7 @@ def edit_plenary_bulk_attendence(
         return request.redirect(request.class_link(AttendenceCollection))
 
     all_parliamentarians = [
-        str(parliamentarian.id)
-        for parliamentarian
-        in PASParliamentarianCollection(
-            request.app, active=[True]).query()
+        str(p.id) for p in get_active_kantonsrat_parliamentarians(request.app)
     ]
 
     if form.submitted(request):
@@ -504,6 +504,7 @@ def edit_commission_bulk_attendence(
             commission_parliamentarians = [
                 str(membership.parliamentarian_id)
                 for membership in memberships
+                if is_active_kantonsrat_member(membership.parliamentarian)
             ]
             unselected_parliamentarians = [
                 pid for pid in commission_parliamentarians
