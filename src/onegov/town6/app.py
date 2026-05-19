@@ -12,6 +12,7 @@ from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.town6.custom import get_api_endpoints
 from onegov.town6.custom import get_global_tools, get_modules
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
@@ -21,6 +22,7 @@ from webob import Response
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
+    from onegov.api.models import ApiEndpoint
     from onegov.core.types import RenderData
     from onegov.org.exceptions import MTANAccessLimitExceeded
     from onegov.org.models import Organisation
@@ -197,6 +199,12 @@ def get_public_ticket_messages() -> tuple[str, ...]:
 @TownApp.setting(section='org', name='disabled_extensions')
 def get_disabled_extensions() -> tuple[str, ...]:
     return ()
+
+
+@TownApp.setting(section='api', name='endpoints')
+def get_api_endpoints_handler(
+) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any]]]:
+    return get_api_endpoints
 
 
 @TownApp.setting(section='org', name='render_mtan_access_limit_exceeded')

@@ -511,13 +511,23 @@ ul.tags {
 }
 
 .FER-link::before {
-    @include icon('\f135');
+    @include icon-bold('\f135');
     display: inline-block;
     margin-right: 1ex;
 }
 
 .ticket-handler-FER td:first-child::before {
-    @include icon('\f135');
+    @include icon-bold('\f135');
+}
+
+.VOL-link::before {
+    @include icon-bold('\f007');
+    display: inline-block;
+    margin-right: 1ex;
+}
+
+.ticket-handler-VOL td:first-child::before {
+    @include icon-bold('\f007');
 }
 
 /*
@@ -3260,4 +3270,35 @@ $booking-left-margin: 1.6rem;
 
 .subscribe-panel {
     display: none;
+}
+
+
+.volunteer-cards {
+    dt {
+        margin-bottom: 0;
+    }
+
+    .bg-color {
+        padding: 0 .2rem;
+        margin-left: -0.2rem;
+        border-radius: .3rem;
+
+        &.open {
+            background: $black-pastel;
+        }
+
+        &.contacted {
+            background: $blue-pastel;
+        }
+
+        &.confirmed,
+        &.enough {
+            background: $green-pastel;
+        }
+
+        &.cancelled,
+        &.not-enough {
+            background: $orange-pastel;
+        }
+    }
 }
