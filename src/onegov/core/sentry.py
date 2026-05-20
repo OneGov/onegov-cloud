@@ -6,7 +6,7 @@ import weakref
 
 from onegov.core.framework import Framework
 from onegov.core.orm import DB_CONNECTION_ERRORS
-from morepath.core import excview_tween_factory  # type:ignore[import-untyped]
+from more.transaction.main import transaction_tween_factory
 from sentry_sdk import capture_event, get_client
 from sentry_sdk.integrations import Integration
 from sentry_sdk.integrations._wsgi_common import RequestExtractor
@@ -56,10 +56,14 @@ class OneGovCloudIntegration(Integration):
         #       consider the possibility of monkeypatching morepath
         #       or more specifically morepath.App.publish
         #
-        # NOTE: We need to be on top of the excview_tween so we
-        #       don't forward errors to sentry that have a view
-        #       registered. (mostly webob.exc.HTTPException)
-        @Framework.tween_factory(over=excview_tween_factory)
+        # NOTE: We need to be on top of the transaction_tween, which
+        #       sits on top of excview_tween, so we don't forward
+        #       errors to sentry that have a registered view (mostly
+        #       `webob.exc.HTTPException`) but we always include the
+        #       whole request in the trace, including any potential
+        #       retries due to serialization failures, which may lead
+        #       to a successful request eventually.
+        @Framework.tween_factory(over=transaction_tween_factory)
         def sentry_tween_factory(
             app: Framework,
             handler: Callable[[CoreRequest], Response]
