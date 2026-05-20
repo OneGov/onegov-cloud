@@ -4,6 +4,7 @@ import niquests_mock
 import textwrap
 import transaction
 
+from orjson import loads
 from onegov.form import FormCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.models.payment_providers import StripeConnect
@@ -21,18 +22,18 @@ def test_setup_stripe(client: Client) -> None:
     assert client.app.default_payment_provider is None
 
     with niquests_mock.MockRouter() as m:
-        m.post('https://oauth.example.org/register/foo', json={
+        m.post('https://oauth.example.org/register/foo').respond(json={
             'token': '0xdeadbeef'
         })
 
         client.get('/payment-provider').click("Stripe Connect")
 
         assert m.calls[0].response is not None
-        url = URL(m.calls[0].response.json()['url'])
+        url = URL(loads(m.calls[0].request.body)['url'])  # type: ignore[arg-type]
         url = url.query_param('oauth_redirect_secret', 'bar')
         url = url.query_param('code', 'api_key')
 
-        m.post('https://connect.stripe.com/oauth/token', json={
+        m.post('https://connect.stripe.com/oauth/token').respond(json={
             'scope': 'read_write',
             'stripe_publishable_key': 'stripe_publishable_key',
             'stripe_user_id': 'stripe_user_id',
@@ -54,7 +55,9 @@ def test_setup_stripe(client: Client) -> None:
 
     # test new format for business name
     with niquests_mock.MockRouter() as m:
-        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+        m.get(
+            'https://api.stripe.com/v1/accounts/stripe_user_id'
+        ).respond(json={
             'business_profile': {'name': 'Govikon City'},
             'email': 'info@example.org'
         })
@@ -64,7 +67,9 @@ def test_setup_stripe(client: Client) -> None:
 
     # test old format
     with niquests_mock.MockRouter() as m:
-        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+        m.get(
+            'https://api.stripe.com/v1/accounts/stripe_user_id'
+        ).respond(json={
             'business_name': 'Govikon City',
             'email': 'info@example.org'
         })
@@ -74,7 +79,9 @@ def test_setup_stripe(client: Client) -> None:
 
     # business_name given but empty
     with niquests_mock.MockRouter() as m:
-        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+        m.get(
+            'https://api.stripe.com/v1/accounts/stripe_user_id'
+        ).respond(json={
             'business_name': '',
             'email': 'info@example.org'
         })
@@ -86,7 +93,9 @@ def test_setup_stripe(client: Client) -> None:
 
     # business_name not given in response
     with (niquests_mock.MockRouter() as m):
-        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+        m.get(
+            'https://api.stripe.com/v1/accounts/stripe_user_id'
+        ).respond(json={
             'email': 'info@example.org'
         })
 
@@ -139,15 +148,17 @@ def test_stripe_form_payment(client: Client) -> None:
             'id': '123456'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
-        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/123456/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
 
     with niquests_mock.MockRouter() as m:
-        m.get('https://api.stripe.com/v1/charges/123456', json={
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json={
             'id': '123456',
             'captured': True,
             'refunded': False,
@@ -189,7 +200,7 @@ def test_stripe_charge_fee_to_customer(client: Client) -> None:
     client.login_admin()
 
     with niquests_mock.MockRouter() as m:
-        m.get('https://api.stripe.com/v1/accounts/foobar', json={
+        m.get('https://api.stripe.com/v1/accounts/foobar').respond(json={
             'business_name': 'Govikon',
             'email': 'info@example.org'
         })
@@ -217,15 +228,17 @@ def test_stripe_charge_fee_to_customer(client: Client) -> None:
             'id': '123456'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
-        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/123456/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
 
     with niquests_mock.MockRouter() as m:
-        m.get('https://api.stripe.com/v1/charges/123456', json={
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json={
             'id': '123456',
             'captured': True,
             'refunded': False,

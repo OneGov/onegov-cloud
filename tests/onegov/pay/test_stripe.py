@@ -128,9 +128,9 @@ def test_stripe_prepare_oauth_request() -> None:
     stripe.client_secret = 'client_secret'
 
     with niquests_mock.MockRouter() as m:
-        m.post('https://oauth.example.org/register/gateway_auth', json={
-            'token': '0xdeadbeef'
-        })
+        m.post(
+            'https://oauth.example.org/register/gateway_auth'
+        ).respond(json={'token': '0xdeadbeef'})
 
         url = stripe.prepare_oauth_request(
             redirect_uri='https://endpoint',

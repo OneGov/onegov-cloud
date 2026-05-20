@@ -29,7 +29,9 @@ class Posters:
         raise NotImplementedError()
 
     def parse_xml(self, response: niquests.Response) -> str:
-        tree = lxml.etree.fromstring(response.content or '')
+        if response.content is None:
+            raise TypeError()
+        tree = lxml.etree.fromstring(response.content)
         element = tree.find("./field[@name='primaryMedia']/value")
         if element is None or not element.text:
             raise ValueError('No primary media found')

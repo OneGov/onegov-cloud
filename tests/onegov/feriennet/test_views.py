@@ -1884,9 +1884,11 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
             'id': '123456'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
-        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/123456/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
@@ -1896,7 +1898,7 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
         page = client.get('/payments')
         assert ">Offen<" in page
 
-        m.get('https://api.stripe.com/v1/charges?limit=100', json={
+        m.get('https://api.stripe.com/v1/charges?limit=100').respond(json={
             "object": "list",
             "url": "/v1/charges",
             "has_more": False,
@@ -1915,7 +1917,9 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
             ]
         })
 
-        m.get('https://api.stripe.com/v1/payouts?limit=100&status=paid', json={
+        m.get(
+            'https://api.stripe.com/v1/payouts?limit=100&status=paid'
+        ).respond(json={
             "object": "list",
             "url": "/v1/payouts",
             "has_more": False,
@@ -1947,7 +1951,7 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
         charge = {
             'id': '123456'
         }
-        m.post('https://api.stripe.com/v1/refunds', json=charge)
+        m.post('https://api.stripe.com/v1/refunds').respond(json=charge)
         page.click("Zahlung rückerstatten")
         # client.post(get_post_url(page, 'payment-refund'))
 
@@ -1979,9 +1983,11 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
             'id': '654321'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/654321', json=charge)
-        m.post('https://api.stripe.com/v1/charges/654321/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/654321').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/654321/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'barfoo'
         page.form.submit().follow()
