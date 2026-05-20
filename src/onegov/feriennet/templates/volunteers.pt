@@ -5,10 +5,11 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x volunteers-list occasion-list">
             <div class="cell small-12 medium-8">
-                <div class="panel" i18n:translate tal:condition="not:has_needs">
-                    No activities needing volunteers found.
-                </div>
-
+                <tal:b tal:condition="not:has_needs" tal:define="view_name view_name|None">
+                    <div class="panel" i18n:translate>
+                        No volunteers found.
+                    </div>
+                </tal:b>
 
                 <tal:b repeat="activity_group grouped(records, 'activity_id')">
                     <div class="occasion">
@@ -227,9 +228,25 @@
             </div>
             <div class="cell small-12 medium-4 sidebar">
                 <div class="sidebar-wrapper">
-                    <tal:b metal:use-macro="layout.macros.periods" />
-                </div>
+                    <tal:b metal:use-macro="layout.macros.periods"/>
+                    <tal:b tal:define="view_name view_name|None; period model.period">
+                        <div class="filter-panel side-panel">
+                            <h3 class="filter-title" i18n:translate tal:condition="not hide_title|True">Volunteer State</h3>
+                            <select data-auto-redirect>
+                                <option tal:repeat="s state_options" value="${request.link(model.for_status(period, s[0], need_state), name=view_name)}" tal:attributes="selected volunteer_state == s[0]">
+                                    ${s[1]}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="filter-panel side-panel">
+                            <h3 class="filter-title" i18n:translate tal:condition="not hide_title|True">Need Status</h3>
+                            <select data-auto-redirect>
+                                <option tal:repeat="s need_status_options" value="${request.link(model.for_status(period, volunteer_state, s[0]), name=view_name)}" tal:attributes="selected need_state == s[0]">
+                                    ${s[1]}
+                                </option>
+                            </select>
+                        </div>
+                    </tal:b>
             </div>
-        </div>
     </tal:b>
 </div>

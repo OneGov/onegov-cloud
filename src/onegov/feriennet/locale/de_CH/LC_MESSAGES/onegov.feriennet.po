@@ -2511,6 +2511,16 @@ msgstr "Inaktiv"
 msgid "No activities needing volunteers found."
 msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
+msgid ""
+"Thank you for offering to volunteer! We will have a look at your request and "
+"get back to you."
+msgstr ""
+"Vielen Dank dass Sie uns Ihre Hilfe angeboten haben! Wir werden Ihre Anfrage "
+"bearbeiten und uns bei Ihnen melden."
+
+msgid "No volunteers found."
+msgstr "Keine Hilfspersonen gefunden."
+
 msgid "${count} of ${total}"
 msgstr "${count} von ${total}"
 
@@ -2537,6 +2547,9 @@ msgstr "Möchten Sie die Hilfsperson wirklich entfernen?"
 
 msgid "Remove volunteer"
 msgstr "Hilfsperson entfernen"
+
+msgid "Need Status"
+msgstr "Bedarfsstatus"
 
 msgid "Editors"
 msgstr "Veranstalter"
@@ -3425,6 +3438,15 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} wurde gelöscht, inklusive aller damit verbundenen Daten."
+
+msgid "Enough volunteers"
+msgstr "Genügend Hilfspersonen"
+
+msgid "Not enough volunteers"
+msgstr "Zu wenig Hilfspersonen"
+
+#~ msgid "No activities needing volunteers found."
+#~ msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
 msgid "Subscription as a volunteer"
 msgstr "Anmeldung als Hilfsperson"

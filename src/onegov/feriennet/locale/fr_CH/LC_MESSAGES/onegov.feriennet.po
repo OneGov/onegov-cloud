@@ -2532,6 +2532,16 @@ msgstr "Inactif"
 msgid "No activities needing volunteers found."
 msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."
 
+msgid ""
+"Thank you for offering to volunteer! We will have a look at your request and "
+"get back to you."
+msgstr ""
+"Merci de proposer de faire du bénévolat ! Nous examinerons votre demande et "
+"nous vous contacterons."
+
+msgid "No volunteers found."
+msgstr "Aucun·e bénévole trouvé·e."
+
 msgid "${count} of ${total}"
 msgstr "${count} de ${total}"
 
@@ -2558,6 +2568,9 @@ msgstr "Voulez-vous vraiment supprimer cette personne ?"
 
 msgid "Remove volunteer"
 msgstr "Supprimer la personne"
+
+msgid "Need Status"
+msgstr "Statut du besoin"
 
 msgid "Editors"
 msgstr "Prestataires"
@@ -3444,6 +3457,15 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} a été supprimé·e, y compris toutes les données associées."
+
+msgid "Enough volunteers"
+msgstr "Assez de bénévoles"
+
+msgid "Not enough volunteers"
+msgstr "Pas assez de bénévoles"
+
+#~ msgid "No activities needing volunteers found."
+#~ msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."
 
 msgid "Subscription as a volunteer"
 msgstr "Inscription en tant que bénévole"

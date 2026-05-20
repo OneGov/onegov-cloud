@@ -84,6 +84,20 @@ def view_volunteers(
         Ticket.handler_code == 'VOL',
     ).all()}
 
+    state_options = [
+        (None, _('All')),
+        ('open', _('Open')),
+        ('contacted', _('Contacted')),
+        ('confirmed', _('Confirmed')),
+        ('cancelled', _('Denied')),
+    ]
+
+    need_status_options = [
+        (None, _('All')),
+        ('fulfilled', _('Enough volunteers')),
+        ('unfulfilled', _('Not enough volunteers')),
+    ]
+
     return {
         'layout': layout,
         'title': _('Volunteers'),
@@ -92,6 +106,10 @@ def view_volunteers(
         'grouped': grouped,
         'periods': request.app.periods,
         'period': self.period,
+        'state_options': state_options,
+        'volunteer_state': self.volunteer_state,
+        'need_status_options': need_status_options,
+        'need_state': self.need_state,
         'model': self,
         'has_needs': has_needs,
         'state_change': state_change,
