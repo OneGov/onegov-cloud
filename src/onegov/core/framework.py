@@ -28,7 +28,7 @@ import random
 import sys
 import traceback
 
-from base64 import b64encode
+from base64 import b64encode, urlsafe_b64encode
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -1002,6 +1002,9 @@ class Framework(
         assert category in ('transactional', 'marketing')
         assert self.mail is not None
         sender = self.mail[category]['sender']
+        tenants = self.mail[category].get('tenants', {})
+        config = tenants.get(self.application_id, {})
+        sender = config.get('sender') or sender
         assert sender
 
         # Postmark requires E-Mails in the marketing stream to contain
@@ -1529,7 +1532,7 @@ class Framework(
         """ Take the sha-256 because we want a key that is 32 bytes long. """
         hash_object = hashlib.sha256()
         hash_object.update(self.identity_secret.encode('utf-8'))
-        return b64encode(hash_object.digest())
+        return urlsafe_b64encode(hash_object.digest())
 
     def encrypt(self, plaintext: str) -> bytes:
         """ Encrypts the given text using Fernet (symmetric encryption).
