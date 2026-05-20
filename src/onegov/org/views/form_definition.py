@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import morepath
-import requests
+import niquests
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
@@ -417,7 +417,7 @@ def formcoder(self: FormCollection, request: OrgRequest) -> Response:
     )
 
     try:
-        response = requests.post(
+        response = niquests.post(
             url=url,
             headers={
                 'Authorization': f'Bearer {token}',

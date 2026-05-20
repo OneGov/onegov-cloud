@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import lxml.etree
-import requests
+import niquests
 from onegov.swissvotes import log
 from onegov.swissvotes.models import SwissVote
 
@@ -28,8 +28,8 @@ class Posters:
     def get_object_id(self, url: str) -> str:
         raise NotImplementedError()
 
-    def parse_xml(self, response: requests.Response) -> str:
-        tree = lxml.etree.fromstring(response.content)
+    def parse_xml(self, response: niquests.Response) -> str:
+        tree = lxml.etree.fromstring(response.content or '')
         element = tree.find("./field[@name='primaryMedia']/value")
         if element is None or not element.text:
             raise ValueError('No primary media found')
@@ -59,7 +59,7 @@ class Posters:
                 continue
             meta_data_url = self.meta_data_url(url)
             try:
-                response = requests.get(
+                response = niquests.get(
                     meta_data_url,
                     headers=self.headers,
                     timeout=60

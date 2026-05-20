@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 import transaction
 
 from decimal import Decimal
@@ -84,14 +84,14 @@ class DatatransClient:
     ) -> None:
 
         self.merchant_id = merchant_id
-        self.session = requests.Session()
+        self.session = niquests.Session(timeout=(5, 10))
         if merchant_id is not None:
             self.session.auth = (merchant_id, password or '')
         self.base_url = (
             f'https://api.{"sandbox." if sandbox else ""}datatrans.com/v1'
         )
 
-    def raise_for_status(self, res: requests.Response) -> None:
+    def raise_for_status(self, res: niquests.Response) -> None:
         if res.status_code == 400:
             error = res.json()['error']
             raise DatatransApiError(
@@ -107,7 +107,7 @@ class DatatransClient:
             timeout=(5, 10)
         )
         self.raise_for_status(res)
-        return DatatransTransaction.model_validate_json(res.content)
+        return DatatransTransaction.model_validate_json(res.content or b'')
 
     def init(
         self,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests_mock
+import niquests_mock
 import textwrap
 import transaction
 
@@ -20,14 +20,15 @@ def test_setup_stripe(client: Client) -> None:
 
     assert client.app.default_payment_provider is None
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         m.post('https://oauth.example.org/register/foo', json={
             'token': '0xdeadbeef'
         })
 
         client.get('/payment-provider').click("Stripe Connect")
 
-        url = URL(m.request_history[0].json()['url'])
+        assert m.calls[0].response is not None
+        url = URL(m.calls[0].response.json()['url'])
         url = url.query_param('oauth_redirect_secret', 'bar')
         url = url.query_param('code', 'api_key')
 
@@ -52,7 +53,7 @@ def test_setup_stripe(client: Client) -> None:
     assert provider.access_token == 'access_token'
 
     # test new format for business name
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
             'business_profile': {'name': 'Govikon City'},
             'email': 'info@example.org'
@@ -62,7 +63,7 @@ def test_setup_stripe(client: Client) -> None:
         assert 'Govikon City / info@example.org' in page
 
     # test old format
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
             'business_name': 'Govikon City',
             'email': 'info@example.org'
@@ -72,7 +73,7 @@ def test_setup_stripe(client: Client) -> None:
         assert 'Govikon City / info@example.org' in page
 
     # business_name given but empty
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
             'business_name': '',
             'email': 'info@example.org'
@@ -84,7 +85,7 @@ def test_setup_stripe(client: Client) -> None:
         assert 'info@example.org' in page
 
     # business_name not given in response
-    with (requests_mock.Mocker() as m):
+    with (niquests_mock.MockRouter() as m):
         m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
             'email': 'info@example.org'
         })
@@ -133,7 +134,7 @@ def test_stripe_form_payment(client: Client) -> None:
     assert button.attr('data-stripe-allowrememberme') == 'false'
     assert button.attr('data-stripe-key') == '0xdeadbeef'
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
@@ -145,7 +146,7 @@ def test_stripe_form_payment(client: Client) -> None:
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         m.get('https://api.stripe.com/v1/charges/123456', json={
             'id': '123456',
             'captured': True,
@@ -187,7 +188,7 @@ def test_stripe_charge_fee_to_customer(client: Client) -> None:
 
     client.login_admin()
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         m.get('https://api.stripe.com/v1/accounts/foobar', json={
             'business_name': 'Govikon',
             'email': 'info@example.org'
@@ -211,7 +212,7 @@ def test_stripe_charge_fee_to_customer(client: Client) -> None:
     button = page.pyquery('.checkout-button')
     assert button.attr('data-stripe-amount') == '1061'
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
@@ -223,7 +224,7 @@ def test_stripe_charge_fee_to_customer(client: Client) -> None:
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         m.get('https://api.stripe.com/v1/charges/123456', json={
             'id': '123456',
             'captured': True,

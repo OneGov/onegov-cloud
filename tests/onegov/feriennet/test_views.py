@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import niquests_mock
 import onegov.feriennet
 import os
 import pytest
 import re
-import requests_mock
 import transaction
 
 from datetime import datetime, timedelta, date, time
@@ -1879,7 +1879,7 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     assert "Jetzt online bezahlen" in page
 
     # pay online
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
@@ -1892,7 +1892,7 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
         page.form.submit().follow()
 
     # sync the charges
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         page = client.get('/payments')
         assert ">Offen<" in page
 
@@ -1943,7 +1943,7 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     assert "3.20" in page
 
     # refund the charge
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
@@ -1974,7 +1974,7 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     client.get('/billing?state=all').click("Rechnung als unbezahlt markieren")
 
     # pay again (leading to a refunded and an open charge)
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '654321'
         }

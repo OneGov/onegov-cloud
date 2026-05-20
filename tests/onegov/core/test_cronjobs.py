@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 
 from datetime import datetime
 from freezegun import freeze_time
@@ -63,7 +63,7 @@ def test_run_cronjob(postgres_dsn: str, redis_url: str) -> None:
         server.start()
 
         with freeze_time(replace_timezone(datetime(2016, 1, 1, 8, 0), 'UTC')):
-            requests.get(server.url)
+            niquests.get(server.url, timeout=10)
 
             for i in range(0, 600):
                 if result == 0:

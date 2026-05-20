@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import pytest
-import requests_mock
+import niquests_mock
 import transaction
 
 from onegov.pay.models.payment_providers.stripe import (
@@ -127,7 +127,7 @@ def test_stripe_prepare_oauth_request() -> None:
     stripe.client_id = 'client_id'
     stripe.client_secret = 'client_secret'
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         m.post('https://oauth.example.org/register/gateway_auth', json={
             'token': '0xdeadbeef'
         })

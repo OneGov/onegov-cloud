@@ -5,14 +5,14 @@ from collections import OrderedDict
 
 from markupsafe import Markup
 import pytz
-import requests
+import niquests
 import logging
 from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from functools import lru_cache
 from itertools import groupby, chain
 
-from requests.adapters import HTTPAdapter
+from niquests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
 from onegov.chat.collections import ChatCollection
@@ -889,13 +889,13 @@ def update_newsletter_email_bounce_statistics(
     # https://postmarkapp.com/developer/api/suppressions-api for the
     # suppression api.
 
-    def create_retry_session() -> requests.Session:
+    def create_retry_session() -> niquests.Session:
         adapter = HTTPAdapter(max_retries=Retry(
             total=3,
             backoff_factor=3,
             status_forcelist=[429, 500, 502, 503, 504],
         ))
-        session = requests.Session()
+        session = niquests.Session(timeout=30)
         session.mount('https://', adapter)
 
         return session
@@ -928,7 +928,7 @@ def update_newsletter_email_bounce_statistics(
             )
             r.raise_for_status()
             return r.json() or {}
-        except requests.exceptions.HTTPError as http_err:
+        except niquests.exceptions.HTTPError as http_err:
             if r and r.status_code == 401:
                 raise RuntimeWarning(
                     f'Postmark API token is not set or invalid: {http_err}'
@@ -1298,7 +1298,7 @@ def wil_daily_event_import(request: OrgRequest) -> None:
 
     log.info(f'Start querying url {minaza_url} for Wil event import')
     try:
-        response = requests.get(
+        response = niquests.get(
             minaza_url, params=params, headers=headers, timeout=60)
     except Exception:
         log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
@@ -1313,7 +1313,8 @@ def wil_daily_event_import(request: OrgRequest) -> None:
 
     try:
         collection = EventCollection(request.session)
-        added, updated, purged = collection.from_minasa(response.content)
+        added, updated, purged = collection.from_minasa(
+            response.content or b'')
         log.info(f'Wil: Events successfully imported '
                  f'{len(added)} added, {len(updated)} updated, '
                  f'{len(purged)} deleted')

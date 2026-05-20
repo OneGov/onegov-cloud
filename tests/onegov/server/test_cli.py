@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import port_for
 import pytest
-import requests
+import niquests
 import time
 
 from onegov.server.cli import WsgiProcess, WsgiServer
@@ -39,9 +39,10 @@ def test_wsgi_process(use_spawn_process: None) -> None:
     while not process.ready:
         time.sleep(0.1)
 
-    response = requests.get(f'http://127.0.0.1:{port}')
+    response = niquests.get(f'http://127.0.0.1:{port}', timeout=10)
     assert response.status_code == 200
-    assert "Hello world!" in response.content.decode('utf-8')
+    assert response.text is not None
+    assert "Hello world!" in response.text
 
     process.terminate()
 
@@ -57,9 +58,10 @@ def test_wsgi_server(use_spawn_process: None) -> None:
 
     original_pid = server.process.pid
 
-    response = requests.get(f'http://127.0.0.1:{port}')
+    response = niquests.get(f'http://127.0.0.1:{port}', timeout=10)
     assert response.status_code == 200
-    assert "Hello world!" in response.content.decode('utf-8')
+    assert response.text is not None
+    assert "Hello world!" in response.text
 
     class MockEvent:
         src_path: str | None = None
@@ -76,8 +78,9 @@ def test_wsgi_server(use_spawn_process: None) -> None:
 
     assert server.process.pid != original_pid
 
-    response = requests.get(f'http://127.0.0.1:{port}')
+    response = niquests.get(f'http://127.0.0.1:{port}')
     assert response.status_code == 200
-    assert "Hello world!" in response.content.decode('utf-8')
+    assert response.text is not None
+    assert "Hello world!" in response.text
 
     server.stop()

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 import stripe
 import transaction
 
@@ -434,7 +434,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
             'error_url': error_url
         }
 
-        response = requests.post(register, json=payload, timeout=60)
+        response = niquests.post(register, json=payload, timeout=60)
         assert response.status_code == 200
 
         return self.oauth_url(

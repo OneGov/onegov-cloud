@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 import transaction
 
 from datetime import datetime, timedelta
@@ -144,7 +144,7 @@ class SaferpayClient:
 
         self.customer_id = customer_id
         self.terminal_id = terminal_id
-        self.session = requests.Session()
+        self.session = niquests.Session(timeout=(5, 10))
         if api_username:
             self.session.auth = (api_username, api_password or '')
         self.base_url = (
@@ -160,7 +160,7 @@ class SaferpayClient:
             'RetryIndicator': 0,
         }
 
-    def raise_for_status(self, res: requests.Response) -> None:
+    def raise_for_status(self, res: niquests.Response) -> None:
         if res.status_code in (400, 402):
             error = res.json()
             raise SaferpayApiError(
@@ -220,7 +220,7 @@ class SaferpayClient:
             timeout=(5, 10)
         )
         self.raise_for_status(res)
-        return SaferpayTransaction.model_validate_json(res.content)
+        return SaferpayTransaction.model_validate_json(res.content or b'')
 
     def init(
         self,
@@ -286,7 +286,7 @@ class SaferpayClient:
             timeout=(5, 10)
         )
         self.raise_for_status(res)
-        tx = SaferpayTransaction.model_validate_json(res.content)
+        tx = SaferpayTransaction.model_validate_json(res.content or b'')
         if init_tx is None:
             init_tx = session.query(
                 InitiatedSaferpayTransaction
@@ -450,7 +450,9 @@ class SaferpayClient:
                 timeout=(5, 10)
             )
             self.raise_for_status(res)
-            refund_tx = SaferpayTransaction.model_validate_json(res.content)
+            refund_tx = SaferpayTransaction.model_validate_json(
+                res.content or b''
+            )
             if refund_tx.status == 'AUTHORIZED':
                 try:
                     # try to capture but if we can't don't stress about it
