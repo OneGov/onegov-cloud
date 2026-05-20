@@ -12,6 +12,7 @@ from onegov.translator_directory.forms.user_group import (
 from onegov.org.models import Organisation, GeneralFile, GeneralFileCollection
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
+from onegov.user import User
 from purl import URL
 from sqlalchemy import and_
 
@@ -90,8 +91,13 @@ class TranslatorDirectoryApp(TownApp):
     @property
     def mailto_link(self) -> str:
         from onegov.translator_directory.models.translator import Translator
-        q = self.session().query(Translator).with_entities(
-            Translator.email)
+        q = (
+            self.session()
+            .query(Translator)
+            .with_entities(Translator.email)
+            .join(User, Translator.email == User.username)
+            .filter(User.active == True)
+        )
         emails = q.distinct().all()
         bcc_addresses = '; '.join(str(email) for (email,) in emails if email)
         mailto_link = f'mailto:?bcc={bcc_addresses}'
