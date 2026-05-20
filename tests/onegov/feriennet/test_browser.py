@@ -3,10 +3,8 @@ from __future__ import annotations
 import time
 import json
 import pytest
-import os
 
 from datetime import datetime
-from pathlib import Path
 from datetime import timedelta
 from psycopg2.extras import NumericRange
 from pytest import mark
@@ -406,7 +404,6 @@ def test_volunteers_export(
     assert volunteer_export == volunteer_json
 
 
-@pytest.mark.flaky(reruns=3)
 def test_volunteer_subscription(
     browser: ExtendedBrowser,
     scenario: Scenario,
@@ -459,15 +456,10 @@ def test_volunteer_subscription(
     })
     browser.find_by_value("Absenden").click()
 
-    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
-    with open(mail, 'r') as file:
-        mail_content = file.read()
-        assert (
-            "Sie haben sich als Hilfsperson"
-            in mail_content
-        )
-        assert ("Photography" in mail_content)
-        assert ("Dancing" in mail_content)
+    mail = client.get_email(0, flush_queue=True)
+    assert "Sie haben sich als Hilfsperson" in mail['HtmlBody']
+    assert "Photography" in mail['HtmlBody']
+    assert "Dancing" in mail['HtmlBody']
 
     browser.login_admin()
     browser.visit('/tickets/ALL/open')
@@ -492,14 +484,9 @@ def test_volunteer_subscription(
     assert browser.is_text_present(
         "1 E-Mails erfolgreich gesendet")
 
-    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[1]
-    with open(mail, 'r') as file:
-        mail_content = file.read()
-        assert (
-            "dies ist die finale Liste"
-            in mail_content
-        )
-        assert ("Photography" in mail_content)
-        assert ("Dancing" in mail_content)
-        assert ("Abgelehnt" in mail_content)
-        assert ("Best\\u00e4tigt" in mail_content)
+    mail = client.get_email(0, flush_queue=True)
+    assert "dies ist die finale Liste" in mail['HtmlBody']
+    assert "Photography" in mail['HtmlBody']
+    assert "Dancing" in mail['HtmlBody']
+    assert "Abgelehnt" in mail['HtmlBody']
+    assert "Bestätigt" in mail['HtmlBody']
