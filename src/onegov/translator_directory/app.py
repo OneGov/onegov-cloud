@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import cached_property
 from onegov.core import utils
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
@@ -88,7 +87,7 @@ class TranslatorDirectoryApp(TownApp):
         ).with_entities(GeneralFile.name)
         return [filename for filename, in query]
 
-    @cached_property
+    @property
     def mailto_link(self) -> str:
         from onegov.translator_directory.models.translator import Translator
         q = self.session().query(Translator).with_entities(

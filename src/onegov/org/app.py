@@ -24,13 +24,9 @@ from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
 from onegov.org import _, directives
-from onegov.org.api import (
-    EventApiEndpoint, NewsApiEndpoint, TopicApiEndpoint,
-    DirectoryEntryApiEndpoint)
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
-from onegov.org.models.directory import ExtendedDirectory
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
@@ -54,7 +50,6 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Sequence)
     from more.content_security import ContentSecurityPolicy
     from morepath.authentication import Identity, NoIdentity
-    from onegov.api import ApiEndpoint
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
@@ -701,30 +696,6 @@ def get_disabled_extensions() -> Collection[str]:
 @OrgApp.setting(section='org', name='citizen_login_enabled')
 def get_citizen_login_enabled() -> bool:
     return True
-
-
-@OrgApp.setting(section='api', name='endpoints')
-def get_api_endpoints_handler(
-) -> Callable[[OrgRequest], Iterator[ApiEndpoint[Any]]]:
-
-    def get_api_endpoints(
-            request: OrgRequest,
-            page: int = 0,
-            extra_parameters: dict[str, Any] | None = None
-    ) -> Iterator[ApiEndpoint[Any]]:
-        yield EventApiEndpoint(request, extra_parameters, page)
-        yield NewsApiEndpoint(request, extra_parameters, page)
-        yield TopicApiEndpoint(request, extra_parameters, page)
-        directories = request.exclude_invisible(
-            request.session.query(ExtendedDirectory))
-        for directory in directories:
-            yield DirectoryEntryApiEndpoint(
-                request=request,
-                page=page,
-                name=directory.name,
-                extra_parameters=extra_parameters)
-
-    return get_api_endpoints
 
 
 @OrgApp.setting(section='org', name='render_mtan_access_limit_exceeded')

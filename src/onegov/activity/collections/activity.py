@@ -20,11 +20,8 @@ from onegov.core.utils import normalize_for_url
 from onegov.core.utils import toggle
 from sedate import utcnow
 from sqlalchemy import and_, or_, not_
-from sqlalchemy import column
-from sqlalchemy import distinct
 from sqlalchemy import exists
 from sqlalchemy import func
-from sqlalchemy import select
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import array
 from uuid import UUID
@@ -509,15 +506,12 @@ class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):
 
         """
 
-        base = self.query_base().with_entities(
-            func.skeys(self.model_class._tags).label('keys'))
-
-        query = select(func.array_agg(column('keys')))  # type: ignore[var-annotated]
-        query = query.select_from(base.subquery())
-
-        tags = self.session.execute(query.distinct()).scalar()
-
-        return set(tags) if tags else set()
+        return {
+            tag
+            for tag, in self.query_base().with_entities(
+                func.skeys(self.model_class._tags)
+            ).distinct()
+        }
 
     @property
     def used_municipalities(self) -> set[str]:
@@ -525,10 +519,13 @@ class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):
         the current type
 
         """
-        q = self.query_base().with_entities(distinct(Activity.municipality))
-        q = q.filter(Activity.municipality != None)
 
-        return {municipality for municipality, in q}
+        return {
+            municipality
+            for municipality, in self.query_base().with_entities(
+                Activity.municipality
+            ).filter(Activity.municipality.is_not(None)).distinct()
+        }
 
     def get_unique_name(self, name: str) -> str:
         """ Given a desired name, finds a variant of that name that's not
@@ -596,8 +593,8 @@ class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):
 
         weeknumbers_weeks = {n[:2] for n in self.session.execute(text("""
             SELECT DISTINCT
-                EXTRACT(week FROM start::date),
-                EXTRACT(week FROM "end"::date)
+                EXTRACT(week FROM start),
+                EXTRACT(week FROM "end")
             FROM OCCASION_DATES
                 LEFT JOIN occasions
                 ON occasion_id = occasions.id

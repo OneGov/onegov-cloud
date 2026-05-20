@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-27 17:28+0200\n"
+"POT-Creation-Date: 2026-05-13 10:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3310,6 +3310,9 @@ msgstr "Sporverein"
 msgid "all day"
 msgstr "den ganzen Tag"
 
+msgid "o'clock"
+msgstr "Uhr"
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -3706,6 +3709,12 @@ msgstr "Verknüpfung löschen"
 
 msgid "Sort"
 msgstr "Sortieren"
+
+msgid "Topic"
+msgstr "Thema"
+
+msgid "Link"
+msgstr "Verknüpfung"
 
 msgid "The submission was adopted"
 msgstr "Der Eintrag wurde übernommen"
@@ -4207,8 +4216,23 @@ msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 msgid "Chats"
 msgstr "Chats"
 
-msgid "Link"
-msgstr "Verknüpfung"
+msgid "Volunteer"
+msgstr "Hilfsperson"
+
+msgid "Status mail"
+msgstr "Statusmail"
+
+msgid "Do you really want to send the current status?"
+msgstr "Möchten Sie den aktuellen Status wirklich senden?"
+
+msgid ""
+"A mail will be sent to the volunteer containing the status of his "
+"subscriptions. Only send this if these are the final states ofthe "
+"subscriptions."
+msgstr ""
+"Eine Email wird an die Hilfsperson gesendet, welche den Status seiner "
+"Anmeldungen enthält. Senden Sie dies nur, wenn dies die endgültigen Zustände "
+"der Anmeldungen sind."
 
 msgid "New Link"
 msgstr "Neue Verknüpfung"
@@ -4228,9 +4252,6 @@ msgstr "Die Verknüpfung wurde gelöscht"
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
 msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
-
-msgid "Topic"
-msgstr "Thema"
 
 msgid "New Topic"
 msgstr "Neues Thema"
@@ -7157,9 +7178,6 @@ msgstr "Dieses Wochenende"
 msgid "This week"
 msgstr "Diese Woche"
 
-msgid "o'clock"
-msgstr "Uhr"
-
 msgid "Edit Event Filter Configuration"
 msgstr "Filterkonfiguration für Veranstaltungen bearbeiten"
 
@@ -8022,6 +8040,15 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid ""
+#~ "A status mail will be sent to the volunteer containing the final status "
+#~ "of his subscriptions. Only send this if these are the final states ofthe "
+#~ "subscriptions."
+#~ msgstr ""
+#~ "Eine Statusmail wird an die Hilfsperson gesendet, welche den finalen "
+#~ "Status ihrer Anmeldungen enthält. Senden Sie dies nur, wenn dies die "
+#~ "finalen Zustände der Anmeldungen sind."
 
 #~ msgid "RIS Settings"
 #~ msgstr "Ratsinformationssystem"

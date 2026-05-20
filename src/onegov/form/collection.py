@@ -214,6 +214,8 @@ class FormDefinitionCollection:
         """ Returns the given form by name or None. """
         return self.query().filter(FormDefinition.name == name).first()
 
+    by_id = by_name
+
 
 class FormSubmissionCollection:
     """ Manages a collection of submissions. """

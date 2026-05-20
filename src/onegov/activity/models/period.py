@@ -392,7 +392,9 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
             'active',
             unique=True,
             postgresql_where=column('active') == True
-        )
+        ),
+        Index('ix_periods_booking_cost', booking_cost),
+        Index('ix_periods_all_inclusive', all_inclusive),
     )
 
     #: The occasions linked to this period

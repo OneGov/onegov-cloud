@@ -7,6 +7,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.pay.models.payable import PayableManyTimes
 from onegov.pay.constants import PRECISION, SCALE
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy import Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
@@ -138,3 +139,10 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
             'worldline_saferpay'
         )
         return value
+
+    __table_args__ = (
+        Index('ix_invoice_items_type', type),
+        Index('ix_invoice_items_invoice_id', invoice_id),
+        Index('ix_invoice_items_paid', paid),
+        Index('ix_invoice_items_amount', unit * quantity),
+    )
