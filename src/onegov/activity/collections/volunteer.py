@@ -38,7 +38,7 @@ if TYPE_CHECKING:
         zip_code: str
         place: str
         organisation: str | None
-        birth_date: date | None
+        birth_date: date
         age: int
         email: str
         phone: str

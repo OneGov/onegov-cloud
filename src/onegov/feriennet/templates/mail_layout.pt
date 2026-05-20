@@ -189,14 +189,6 @@
         Margin-bottom: 10px;
     }
 
-    ul.normal li {
-        list-style-position: outside;
-    }
-
-    ul.normal {
-        margin-left: 10px;
-    }
-
     hr {
         border: 1px solid #ddd;
         border-width: 1px 0 0 0;
@@ -282,24 +274,6 @@
 
     .content table {
         width: 100%;
-    }
-
-    .bg-color {
-        padding: 0 .2rem;
-        margin-left: -0.2rem;
-        border-radius: .3rem;
-    }
-
-    .confirmed .bg-color {
-        background: #d4ecd8;
-    }
-
-    .cancelled .bg-color {
-        background: #f8d5d8;
-    }
-
-    li.cancelled {
-        text-decoration: line-through;
     }
     </style>
 </head>
