@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-05-14 10:58+0200\n"
+"POT-Creation-Date: 2026-05-18 16:39+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -415,6 +415,12 @@ msgstr "Téléphone"
 msgid "Address"
 msgstr "Adresse"
 
+msgid "Transport"
+msgstr "Transport"
+
+msgid "Note"
+msgstr "Remarque"
+
 msgid "Wishlist / Bookings"
 msgstr "Liste des souhaits / Réservations"
 
@@ -701,9 +707,6 @@ msgstr ""
 
 msgid "Attendee"
 msgstr "Participant·e·s"
-
-msgid "Note"
-msgstr "Remarque"
 
 msgid "Political Municipality"
 msgstr "Commune politique"
@@ -1388,6 +1391,21 @@ msgstr "Un·e bénéficiaire doit être indiqué·e pour le compte bancaire."
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
+
+msgid "No pass"
+msgstr "Pas de carte"
+
+msgid "GA"
+msgstr "AG"
+
+msgid "Half Fare Travelcard"
+msgstr "Demi-tarif"
+
+msgid "Other pass (e.g. zones)"
+msgstr "Autre carte (ex. zones)"
+
+msgid "Own Vehicle"
+msgstr "Véhicule personnel"
 
 msgid "Register a new account"
 msgstr "Enregistrer un nouveau compte"
@@ -3352,8 +3370,7 @@ msgstr ""
 "bénévoles avant et après la liste des inscriptions. Le texte standard est:\n"
 "\n"
 "\"Bonjour\n"
-"Vos états d'inscription ont été mis à jour, voici la liste finale :"
-"\n"
+"Vos états d'inscription ont été mis à jour, voici la liste finale :\n"
 "[Liste des inscriptions]\n"
 
 msgid "The ESR identification number must be 3-6 characters long"

@@ -1147,6 +1147,18 @@
         <dd><a href="tel:${volunteer.phone}">${volunteer.phone}</a></dd>
         <dt tal:condition="volunteer.organisation" i18n:translate>Organisation</dt>
         <dd>${volunteer.organisation}</dd>
+        <dt tal:condition="volunteer.transport" i18n:translate>Transport</dt>
+        <dd>
+            <tal:b switch="volunteer.transport">
+                <tal:b case="'no_pass'" i18n:translate>No pass</tal:b>
+                <tal:b case="'ga'" i18n:translate>GA</tal:b>
+                <tal:b case="'half_fare'" i18n:translate>Half Fare Travelcard</tal:b>
+                <tal:b case="'other_pass'" i18n:translate>Other pass (e.g. zones)</tal:b>
+                <tal:b case="'own_vehicle'" i18n:translate>Own Vehicle</tal:b>
+            </tal:b>
+        </dd>
+        <dt tal:condition="volunteer.note" i18n:translate>Note</dt>
+        <dd>${volunteer.note}</dd>
     </dl>
 
     <h2>Subscriptions</h2>

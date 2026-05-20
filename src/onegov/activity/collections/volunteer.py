@@ -42,6 +42,8 @@ if TYPE_CHECKING:
         age: int
         email: str
         phone: str
+        transport: str
+        note: str
         state: VolunteerState
         dates: Sequence[datetime]
 
@@ -68,6 +70,8 @@ if TYPE_CHECKING:
         age: None
         email: None
         phone: None
+        transport: None
+        note: None
         state: None
         dates: Sequence[datetime]
 

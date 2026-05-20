@@ -198,6 +198,22 @@
                                                                 <a href="tel:${record.phone}">${record.phone}</a>
                                                             </dd>
                                                         </div>
+                                                        <div>
+                                                            <dt tal:condition="record.transport" i18n:translate>Transport</dt>
+                                                            <dd tal:condition="record.transport">
+                                                                <tal:b switch="record.transport">
+                                                                    <tal:b case="'no_pass'" i18n:translate>No pass</tal:b>
+                                                                    <tal:b case="'ga'" i18n:translate>GA</tal:b>
+                                                                    <tal:b case="'half_fare'" i18n:translate>Half Fare Travelcard</tal:b>
+                                                                    <tal:b case="'other_pass'" i18n:translate>Other pass (e.g. zones)</tal:b>
+                                                                    <tal:b case="'own_vehicle'" i18n:translate>Own Vehicle</tal:b>
+                                                                </tal:b>
+                                                            </dd>
+                                                        </div>
+                                                        <div>
+                                                            <dt tal:condition="record.note" i18n:translate>Note</dt>
+                                                            <dd tal:condition="record.note">${record.note}</dd>
+                                                        </div>
                                                     </dl>
                                                 </td>
                                             </tr>

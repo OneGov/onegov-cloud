@@ -367,6 +367,8 @@ def submit_volunteer(
                 'custom_text_after_list': custom_text_after_list,
             }
         )
+    else:
+        form.process(obj=self)
 
     return {
         'layout': layout,
