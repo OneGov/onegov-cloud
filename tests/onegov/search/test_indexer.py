@@ -15,7 +15,11 @@ from onegov.search.indexer import (
     TypeMappingRegistry
 )
 from onegov.search.search_index import SearchIndex
+from typing import TYPE_CHECKING
 from unittest.mock import patch, Mock, MagicMock
+
+if TYPE_CHECKING:
+    from onegov.search.indexer import DeleteTask, IndexTask
 
 
 from typing import Any, TYPE_CHECKING
@@ -436,7 +440,8 @@ def test_indexer_reraises_on_transaction_abort(
     caplog: pytest.LogCaptureFixture
 ) -> None:
     """index()/delete() must log and re-raise on transaction abort so
-    tpc_abort() suppresses queued emails and http_conflict_tween returns 409.
+    tpc_abort() suppresses queued emails. When abort_error is an SA
+    OperationalError, http_conflict_tween additionally returns 409.
     """
     from sqlalchemy.exc import OperationalError as SAOperationalError
 
@@ -446,7 +451,7 @@ def test_indexer_reraises_on_transaction_abort(
     }, 'title')
     indexer = Indexer(mappings)
 
-    index_task: dict = {
+    index_task: IndexTask = {
         'action': 'index',
         'schema': 'test',
         'tablename': 'my-pages',
@@ -464,7 +469,7 @@ def test_indexer_reraises_on_transaction_abort(
         'title': 'Test',
         'properties': {'title': 'Test'},
     }
-    delete_task: dict = {
+    delete_task: DeleteTask = {
         'action': 'delete',
         'schema': 'test',
         'tablename': 'my-pages',
@@ -521,10 +526,15 @@ def test_indexer_reraises_on_transaction_abort(
         session = make_session(execute_error, abort_savepoint=True)
         with caplog.at_level(logging.ERROR, logger='onegov.search.index'):
             caplog.clear()
-            with pytest.raises(SAOperationalError):
-                method(task, session)
+            with pytest.raises(SAOperationalError) as exc_info:
+                method(task, session)  # type: ignore[arg-type]
             assert caplog.records, (
                 f'{method.__name__} did not log the serialization failure'
+            )
+            # abort_error is not e → raise abort_error from e;
+            assert isinstance(
+                exc_info.value.__cause__,
+                psycopg2.errors.InFailedSqlTransaction,
             )
 
     # Scenario 2: execute() raises bare InFailedSqlTransaction — matches the
@@ -541,11 +551,15 @@ def test_indexer_reraises_on_transaction_abort(
         session = make_session(in_failed, abort_savepoint=False)
         with caplog.at_level(logging.ERROR, logger='onegov.search.index'):
             caplog.clear()
-            with pytest.raises(psycopg2.errors.InFailedSqlTransaction):
-                method(task, session)
+            with pytest.raises(
+                psycopg2.errors.InFailedSqlTransaction
+            ) as exc_info2:
+                method(task, session)  # type: ignore[arg-type]
             assert caplog.records, (
                 f'{method.__name__} did not log the InFailedSqlTransaction'
             )
+            # abort_error is e → bare raise
+            assert exc_info2.value.__cause__ is None
 
     # Non-abort errors must be swallowed → return False.
     for method, task in (
@@ -555,4 +569,4 @@ def test_indexer_reraises_on_transaction_abort(
         session = make_session(
             RuntimeError('unexpected'), abort_savepoint=False
         )
-        assert method(task, session) is False
+        assert method(task, session) is False  # type: ignore[arg-type]

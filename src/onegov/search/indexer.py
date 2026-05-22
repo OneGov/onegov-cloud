@@ -12,6 +12,7 @@ from onegov.search.utils import language_from_locale
 from operator import itemgetter
 from psycopg2.extensions import TransactionRollbackError
 from sqlalchemy import and_, bindparam, delete, func, text, String
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.dialects.postgresql import insert, ARRAY
@@ -65,11 +66,11 @@ def _transaction_abort_error(exc: BaseException) -> BaseException | None:
     # InFailedSqlTransaction 25P02). Prefer returning the SA OperationalError
     # so http_conflict_tween can turn it into a 409; fall back to the raw
     # psycopg2 error otherwise.
-    from sqlalchemy.exc import OperationalError
     seen: set[int] = set()
     queue: list[BaseException | None] = [exc]
     sa_error: BaseException | None = None
     raw_error: BaseException | None = None
+
     while queue:
         current = queue.pop()
         if current is None or id(current) in seen:
@@ -91,6 +92,7 @@ def _transaction_abort_error(exc: BaseException) -> BaseException | None:
             raw_error = orig
         queue.append(current.__cause__)
         queue.append(current.__context__)
+
     return sa_error or raw_error
 
 
@@ -338,6 +340,9 @@ class Indexer:
             )
             abort_error = _transaction_abort_error(e)
             if abort_error is not None:
+                if abort_error is e:
+                    raise
+                # abort outer tx; SA OperationalError → 409
                 raise abort_error from e
             return False
 
@@ -417,6 +422,9 @@ class Indexer:
             )
             abort_error = _transaction_abort_error(e)
             if abort_error is not None:
+                if abort_error is e:
+                    raise
+                # abort outer tx; SA OperationalError → 409
                 raise abort_error from e
             return False
 
