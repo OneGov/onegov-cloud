@@ -202,8 +202,7 @@ class ChangeUsernameForm(Form):
     def populate_obj(self, obj: User) -> None:  # type: ignore[override]
         assert self.new_username.data is not None
         request = self.request
-        obj.logout_all_sessions(request.app)
-        obj.username = self.new_username.data
+        obj.change_username(self.new_username.data, request.app)
         # Run application-specific callback
         request.app.settings.user.change_username_callback(obj, request)
 

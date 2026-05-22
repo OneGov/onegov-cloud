@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sentry_sdk
 
 from functools import cached_property
 from onegov.core.custom import msgpack
@@ -13,8 +12,8 @@ from onegov.page import Page, PageCollection
 from onegov.user import User
 from sedate import utcnow
 from sqlalchemy import inspect
+from uuid import UUID
 from sqlalchemy.orm import noload
-from webob.exc import HTTPForbidden
 
 
 from typing import Any, NamedTuple, TYPE_CHECKING
@@ -106,6 +105,9 @@ class OrgRequest(CoreRequest):
 
     @property
     def current_username(self) -> str | None:
+        user = self.current_user
+        if user is not None:
+            return user.username
         return self.identity.userid if self.identity else None
 
     # NOTE: Internal cache, don't use directly!
@@ -117,11 +119,27 @@ class OrgRequest(CoreRequest):
             return None
 
         if not hasattr(self, '_current_user'):
-            self._current_user = (
-                self.session.query(User)
-                .filter_by(username=self.identity.userid)
-                .first()
-            )
+            uid = getattr(self.identity, 'uid', None)
+            if uid:
+                self._current_user = (
+                    self.session.query(User)
+                    .filter(User.id == UUID(uid))
+                    .first()
+                )
+                if (
+                    self._current_user is not None
+                    and self.identity.userid != self._current_user.username
+                ):
+                    # stale username in session — fix it for subsequent
+                    # requests
+                    self.browser_session['userid'] = (
+                        self._current_user.username)
+            else:
+                self._current_user = (
+                    self.session.query(User)
+                    .filter_by(username=self.identity.userid)
+                    .first()
+                )
             return self._current_user
 
         if self._current_user is None:

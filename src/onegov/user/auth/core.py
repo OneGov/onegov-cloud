@@ -3,6 +3,7 @@ from __future__ import annotations
 import morepath
 
 from itsdangerous import URLSafeSerializer, BadData
+from uuid import UUID
 from itsdangerous.encoding import base64_encode, base64_decode
 from secrets import token_bytes
 from onegov.core.utils import relative_url
@@ -272,11 +273,6 @@ class Auth:
         """ Returns the morepath identity of the given user. """
 
         return self.identity_class(
-            # FIXME: We should consider switching to user.id.hex
-            #        for userid and provide username in a separate field
-            #        instead, but this was the less intrusive step
-            #        in the meantime. We use identity.userid in quite
-            #        a few places after all.
             userid=user.username,
             uid=user.id.hex,
             groupids=frozenset(group.id.hex for group in user.groups),
@@ -286,6 +282,11 @@ class Auth:
 
     def by_identity(self, identity: Identity | NoIdentity) -> User | None:
         """ Returns the user record of the given identity. """
+        uid = getattr(identity, 'uid', None)
+        if uid:
+            user = self.users.by_id(UUID(uid))
+            if user is not None:
+                return user
         if identity.userid is None:
             return None
         return self.users.by_username(identity.userid)
