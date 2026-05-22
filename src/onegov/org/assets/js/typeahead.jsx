@@ -25,6 +25,7 @@ var getSearchUrl = function(target, query, lucky) {
     var url = new URL(target);
     url.searchParams.delete('page');
     url.searchParams.set('q', query);
+    url.searchParams.set('plain', '1');
     if (lucky) {
         url.searchParams.set('lucky', '1');
     }

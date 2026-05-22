@@ -41,6 +41,9 @@
         searchBoxElement.style.paddingTop = '0.5em!important';
         searchBoxElement.style.paddingBottom = '0.5em!important';
 
+        // MapboxSearchBox (not AddressAutofill) because hometown/address-level2
+        // fields need place/locality search types that AddressAutofill can't do.
+        // Trade-off: we must manually sync SearchBox ↔ hidden original input.
         // Hide the original input element because the searchBoxElement is the one capbable of search
         // We use the stategy where we basically overlayed on that
         inputElement.style.display = 'none';
@@ -70,10 +73,7 @@
 
         // Handle manual edits in the search box
         searchBoxElement.addEventListener('input', () => {
-            // Sync the manually entered value back to the original input
-            if (searchBoxElement.value) {
-                inputElement.value = searchBoxElement.value;
-            }
+            inputElement.value = searchBoxElement.value || '';
         });
 
 
