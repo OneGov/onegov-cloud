@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import psycopg2.errors
 import pytest
 import transaction
 
@@ -14,7 +15,7 @@ from onegov.search.indexer import (
     TypeMappingRegistry
 )
 from onegov.search.search_index import SearchIndex
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 
 
 from typing import Any, TYPE_CHECKING
@@ -429,3 +430,129 @@ def test_tags(
     assert indexer.process([task], session)
 
     # TODO search indexed entry using search index via tags
+
+
+def test_indexer_reraises_on_transaction_abort(
+    caplog: pytest.LogCaptureFixture
+) -> None:
+    """index()/delete() must log and re-raise on transaction abort so
+    tpc_abort() suppresses queued emails and http_conflict_tween returns 409.
+    """
+    from sqlalchemy.exc import OperationalError as SAOperationalError
+
+    mappings = TypeMappingRegistry()
+    mappings.register_type('Page', {
+        'title': {'type': 'localized', 'weight': 'A'},
+    }, 'title')
+    indexer = Indexer(mappings)
+
+    index_task: dict = {
+        'action': 'index',
+        'schema': 'test',
+        'tablename': 'my-pages',
+        'id': 1,
+        'id_key': 'id',
+        'owner_type': 'Page',
+        'access': 'public',
+        'public': True,
+        'last_change': None,
+        'publication_start': None,
+        'publication_end': None,
+        'suggestion': [],
+        'tags': [],
+        'language': 'en',
+        'title': 'Test',
+        'properties': {'title': 'Test'},
+    }
+    delete_task: dict = {
+        'action': 'delete',
+        'schema': 'test',
+        'tablename': 'my-pages',
+        'owner_type': 'Page',
+        'id': 1,
+    }
+
+    def make_session(
+        execute_error: BaseException,
+        abort_savepoint: bool
+    ) -> Mock:
+        # abort_savepoint=True: __exit__ raises InFailedSqlTransaction,
+        # mirroring the failed ROLLBACK TO SAVEPOINT after a serialization
+        # failure aborts the outer PG transaction.
+        session = Mock()
+
+        ctx = MagicMock()
+        ctx.__enter__ = Mock(return_value=ctx)
+
+        if abort_savepoint:
+            def exit_raises_in_failed(
+                exc_type: object,
+                exc_val: object,
+                exc_tb: object
+            ) -> bool:
+                if exc_val is not None:
+                    raise psycopg2.errors.InFailedSqlTransaction(
+                        'current transaction is aborted, commands ignored '
+                        'until end of transaction block'
+                    )
+                return False
+            ctx.__exit__ = Mock(side_effect=exit_raises_in_failed)
+        else:
+            ctx.__exit__ = Mock(return_value=False)
+
+        session.begin_nested.return_value = ctx
+        session.execute.side_effect = execute_error
+        return session
+
+    # Scenario 1: execute() raises OperationalError(SerializationFailure),
+    # __exit__ raises InFailedSqlTransaction — matches the 'attendees' entry
+    # in the production logs. Must re-raise SAOperationalError for 409.
+    for method, task in (
+        (indexer.index, [index_task]),
+        (indexer.delete, [delete_task]),
+    ):
+        execute_error = SAOperationalError(
+            statement='INSERT INTO search_index ...',
+            params={},
+            orig=psycopg2.errors.SerializationFailure(
+                'could not serialize access due to read/write dependencies'
+            ),
+        )
+        session = make_session(execute_error, abort_savepoint=True)
+        with caplog.at_level(logging.ERROR, logger='onegov.search.index'):
+            caplog.clear()
+            with pytest.raises(SAOperationalError):
+                method(task, session)
+            assert caplog.records, (
+                f'{method.__name__} did not log the serialization failure'
+            )
+
+    # Scenario 2: execute() raises bare InFailedSqlTransaction — matches the
+    # 'users' entry in the production logs (second call on already-dead tx).
+    # Must still re-raise even without a SerializationFailure in the chain.
+    for method, task in (
+        (indexer.index, [index_task]),
+        (indexer.delete, [delete_task]),
+    ):
+        in_failed = psycopg2.errors.InFailedSqlTransaction(
+            'current transaction is aborted, commands ignored '
+            'until end of transaction block'
+        )
+        session = make_session(in_failed, abort_savepoint=False)
+        with caplog.at_level(logging.ERROR, logger='onegov.search.index'):
+            caplog.clear()
+            with pytest.raises(psycopg2.errors.InFailedSqlTransaction):
+                method(task, session)
+            assert caplog.records, (
+                f'{method.__name__} did not log the InFailedSqlTransaction'
+            )
+
+    # Non-abort errors must be swallowed → return False.
+    for method, task in (
+        (indexer.index, [index_task]),
+        (indexer.delete, [delete_task]),
+    ):
+        session = make_session(
+            RuntimeError('unexpected'), abort_savepoint=False
+        )
+        assert method(task, session) is False

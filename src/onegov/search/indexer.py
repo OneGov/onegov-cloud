@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import psycopg2.errors
 import re
 
 from itertools import groupby
@@ -9,6 +10,7 @@ from onegov.search.datamanager import IndexerDataManager
 from onegov.search.search_index import SearchIndex
 from onegov.search.utils import language_from_locale
 from operator import itemgetter
+from psycopg2.extensions import TransactionRollbackError
 from sqlalchemy import and_, bindparam, delete, func, text, String
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.exc import ObjectDeletedError
@@ -55,6 +57,41 @@ if TYPE_CHECKING:
         | InstrumentedAttribute[int | None]
         | InstrumentedAttribute[str | None]
     )
+
+
+def _transaction_abort_error(exc: BaseException) -> BaseException | None:
+    # Walk __cause__/__context__ chains for evidence the outer PG transaction
+    # was aborted (serialization failure 40xxx, deadlock,
+    # InFailedSqlTransaction 25P02). Prefer returning the SA OperationalError
+    # so http_conflict_tween can turn it into a 409; fall back to the raw
+    # psycopg2 error otherwise.
+    from sqlalchemy.exc import OperationalError
+    seen: set[int] = set()
+    queue: list[BaseException | None] = [exc]
+    sa_error: BaseException | None = None
+    raw_error: BaseException | None = None
+    while queue:
+        current = queue.pop()
+        if current is None or id(current) in seen:
+            continue
+        seen.add(id(current))
+        orig = getattr(current, 'orig', None)
+        if sa_error is None and isinstance(current, OperationalError):
+            if isinstance(orig, TransactionRollbackError):
+                sa_error = current
+        if raw_error is None and isinstance(current, (
+            TransactionRollbackError,
+            psycopg2.errors.InFailedSqlTransaction,
+        )):
+            raw_error = current
+        if raw_error is None and isinstance(orig, (
+            TransactionRollbackError,
+            psycopg2.errors.InFailedSqlTransaction,
+        )):
+            raw_error = orig
+        queue.append(current.__cause__)
+        queue.append(current.__context__)
+    return sa_error or raw_error
 
 
 class Indexer:
@@ -291,13 +328,17 @@ class Indexer:
                 # will not be able to infer the matching constraint
                 index_where=owner_id_column.is_not(None)
             )
+
             with session.begin_nested():
                 session.execute(stmt, list(params_dict.values()))
-        except Exception:
+        except Exception as e:
             index_log.exception(
                 f'Error creating index schema {schema} of '
                 f'table {tablename}, tasks: {[t["id"] for t in tasks]}',
             )
+            abort_error = _transaction_abort_error(e)
+            if abort_error is not None:
+                raise abort_error from e
             return False
 
         return True
@@ -370,10 +411,13 @@ class Indexer:
             )
             with session.begin_nested():
                 session.execute(stmt)
-        except Exception:
+        except Exception as e:
             index_log.exception(
                 f'Error deleting index schema {schema} tasks {tasks}:'
             )
+            abort_error = _transaction_abort_error(e)
+            if abort_error is not None:
+                raise abort_error from e
             return False
 
         return True
