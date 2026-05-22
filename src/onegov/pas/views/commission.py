@@ -1,20 +1,25 @@
 from __future__ import annotations
+from datetime import date
 from itertools import groupby
 
+from onegov.core.elements import Link
 from onegov.core.security import Private, Public
 from onegov.pas import PasApp
 from onegov.pas.collections import PASCommissionCollection
+from onegov.pas.i18n import _
 from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
-from onegov.town6.views.commission import view_commissions
+from onegov.pas.utils import is_active_kantonsrat_member
 from onegov.user import User
+from sqlalchemy import or_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
+    from onegov.pas.request import PasRequest
     from onegov.town6.request import TownRequest
     from webob import Response
 
@@ -25,11 +30,37 @@ if TYPE_CHECKING:
     permission=Private
 )
 def pas_view_commissions(
-    self: PASCommissionCollection,
-    request: TownRequest
+    self: PASCommissionCollection, request: PasRequest
 ) -> RenderData | Response:
-    return view_commissions(
-        self, request, PASCommissionCollectionLayout(self, request))
+    layout = PASCommissionCollectionLayout(self, request)
+
+    filters = {}
+    filters['active'] = [
+        Link(
+            text=request.translate(title),
+            active=self.active == value,
+            url=request.link(self.for_filter(active=value)),
+        )
+        for title, value in ((_('Active'), True), (_('Inactive'), False))
+    ]
+
+    commissions = self.query().all()
+
+    if not request.is_admin:
+        p = request.current_parliamentarian
+        if p:
+            my_ids = {m.commission_id for m in p.commission_memberships}
+            commissions = [c for c in commissions if c.id in my_ids]
+        else:
+            commissions = []
+
+    return {
+        'add_link': request.link(self, name='new'),
+        'filters': filters,
+        'layout': layout,
+        'commissions': commissions,
+        'title': layout.title,
+    }
 
 
 @PasApp.html(
@@ -79,10 +110,6 @@ def commissions_parliamentarians_json(
     self: PASCommissionCollection, request: TownRequest
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
-    # TODO: Should we consider all that have been active in
-    # current settlement run to be more precise?
-    # It might happen that some have been active just recently
-    # but not anymore, these will not be selectable currently.
     if not request.is_admin:
         if (not hasattr(request.identity, 'role')
             or request.identity.role not in (
@@ -90,7 +117,17 @@ def commissions_parliamentarians_json(
             return {}
 
     session = request.session
-    memberships = session.query(PASCommissionMembership).all()
+    today = date.today()
+    memberships = (
+        session.query(PASCommissionMembership)
+        .filter(
+            or_(
+                PASCommissionMembership.end.is_(None),
+                PASCommissionMembership.end >= today,
+            )
+        )
+        .all()
+    )
 
     # If user is parliamentarian, filter to only their commissions
     if (hasattr(request.identity, 'role')
@@ -154,6 +191,7 @@ def commissions_parliamentarians_json(
                 'title': m.parliamentarian.title
             }
             for m in group
+            if is_active_kantonsrat_member(m.parliamentarian)
         ]
         for commission_id, group in groupby(sorted_memberships, key=key_func)
     }

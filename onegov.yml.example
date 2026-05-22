@@ -103,14 +103,21 @@ configuration: &global-config
   # marketing e-mail. Though they can both have different configurations
   # Each mail config can write to one of the mail_queues defined in
   # global scope. This could all be the same queue. Use *aliases
-  # to refer to the mail queue &anchors declared above.
+  # to refer to the mail queue &anchors declared above. In addition
+  # individual tenants can override the default sender.
   mail:
     transactional:
       sender: service@onegovcloud.ch
       <<: *local_smtp
+      # tenants:
+      #   "onegov_town6/govikon":
+      #     sender: info@govikon.ch
     marketing:
       sender: newsletters@onegovcloud.ch
       <<: *local_smtp
+      # tenants:
+      #   "onegov_town6/govikon":
+      #     sender: marketing@govikon.ch
 
   # SMS delivery works a little differently from mail delivery, from the onset
   # we assume that each schema has its own queue with its own ASPSM account and

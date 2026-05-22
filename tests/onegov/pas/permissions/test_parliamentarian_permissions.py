@@ -217,18 +217,17 @@ def test_commission_president_private_access_permission_rule(
     ) is True
 
 
-def test_parliamentarian_no_private_access_to_commission(
+def test_parliamentarian_private_access_to_own_commission(
     client: Client[TestPasApp]
 ) -> None:
-    """Regular parliamentarians should not have private access to
-    commissions"""
+    """Parliamentarians can access commissions they are members of,
+    but not other commissions."""
     session = client.app.session()
 
-    # Create commission
     commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Finance Commission')
+    own_commission = commissions.add(name='Finance Commission')
+    other_commission = commissions.add(name='Other Commission')
 
-    # Create parliamentarian as regular member (not president)
     parliamentarians = PASParliamentarianCollection(client.app)
     parliamentarian = parliamentarians.add(
         first_name='Mary',
@@ -237,15 +236,16 @@ def test_parliamentarian_no_private_access_to_commission(
         zg_username='zgmary',
     )
 
-    # Make them regular commission member
     membership = PASCommissionMembership(
         parliamentarian_id=parliamentarian.id,
-        commission_id=commission.id,
+        commission_id=own_commission.id,
         role='member'
     )
     session.add(membership)
 
-    # Update user role to parliamentarian
+    own_id = own_commission.id
+    other_id = other_commission.id
+
     users = UserCollection(session)
     user = users.by_username('zgmary')
     assert user is not None
@@ -253,7 +253,14 @@ def test_parliamentarian_no_private_access_to_commission(
 
     transaction.commit()
 
-    # Test permission rule with parliamentarian identity
+    session = client.app.session()
+    own_comm = session.get(PASCommission, own_id)
+    assert own_comm is not None
+    own_commission = own_comm
+    other_comm = session.get(PASCommission, other_id)
+    assert other_comm is not None
+    other_commission = other_comm
+
     identity = Identity(
         uid='foo',
         userid='zgmary',
@@ -262,10 +269,19 @@ def test_parliamentarian_no_private_access_to_commission(
         application_id=client.app.application_id
     )
 
-    # Should not have private access to commission
-    assert has_private_access_to_commission(
-        client.app, identity, commission, Private
-    ) is False
+    assert (
+        has_private_access_to_commission(
+            client.app, identity, own_commission, Private
+        )
+        is True
+    )
+
+    assert (
+        has_private_access_to_commission(
+            client.app, identity, other_commission, Private
+        )
+        is False
+    )
 
 
 def test_commission_president_no_access_to_different_commission(

@@ -835,7 +835,9 @@ def test_extensions_schema(postgres_dsn: str) -> None:
         assert obj.data['index'] == str(ix)
         assert obj.data['schema'] == schema
 
-    assert mgr.created_extensions == {'btree_gist', 'hstore', 'unaccent'}
+    assert mgr.created_extensions == {
+        'btree_gist', 'hstore', 'intarray', 'unaccent'
+    }
 
 
 def test_serialization_failure(postgres_dsn: str) -> None:

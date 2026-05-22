@@ -8,6 +8,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.pay.types import PaymentState
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy import Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
@@ -79,6 +80,11 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
         'polymorphic_on': source,
         'polymorphic_identity': 'generic'
     }
+
+    __table_args__ = (
+        Index('ix_payments_source', source),
+        Index('ix_payments_state', state),
+    )
 
     if TYPE_CHECKING:
         linked_invoice_items: Mapped[list[InvoiceItem]]

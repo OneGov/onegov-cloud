@@ -146,6 +146,18 @@ def test_newsletter_signup(client: Client) -> None:
     client.logout()
 
     page = client.get('/newsletters')
+    assert 'daily_newsletter' not in page.form.fields
+
+    # activate automatic newsletter
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['enable_automatic_newsletters'] = True
+    page.form['newsletter_times'] = '10'
+    page.form.submit()
+    client.logout()
+
+    page = client.get('/newsletters')
+    assert 'daily_newsletter' in page.form.fields
     page.form['address'] = 'asdf'
     page = page.form.submit()
 

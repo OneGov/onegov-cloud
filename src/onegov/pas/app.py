@@ -58,6 +58,13 @@ class PasApp(TownApp):
         self.kub_base_url = kub_base_url
         self.kub_cert_dir = kub_cert_dir
 
+    def on_login(
+        self,
+        request: PasRequest,  # type:ignore[override]
+        user: User,
+    ) -> None:
+        request.warn_no_parliamentarian()
+
     def redirect_after_login(
         self,
         identity: Identity | NoIdentity,

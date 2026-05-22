@@ -517,11 +517,10 @@ class ApiEndpointCollection:
 
     @cached_property
     def endpoints(self) -> dict[str, ApiEndpoint[Any]]:
+        settings = self.app.config.setting_registry
         return {
             endpoint.endpoint: endpoint
-            for endpoint in self.app.config.setting_registry.api.endpoints(
-                request=self.request
-            )
+            for endpoint in settings.api.endpoints(self.request)
         }
 
     def get_endpoint(
@@ -530,15 +529,15 @@ class ApiEndpointCollection:
             page: int = 0,
             extra_parameters: dict[str, list[str]] | None = None
     ) -> ApiEndpoint[Any] | None:
-        endpoints = self.app.config.setting_registry.api.endpoints(
-            request=self.request,
-            extra_parameters=extra_parameters,
-            page=page
-        )
-        return next((
-            endpoint for endpoint in endpoints
-            if endpoint.endpoint == name
-        ), None)
+        endpoint = self.endpoints.get(name)
+        if endpoint is None:
+            return None
+
+        if extra_parameters:
+            endpoint = endpoint.for_filter(**extra_parameters)
+        if page:
+            endpoint = endpoint.for_page(page)
+        return endpoint
 
 
 class AuthEndpoint:
