@@ -875,6 +875,12 @@ class SessionManager:
                     )
                     for base in self.bases:
                         base.metadata.schema = schema
+                        # FIXME: this is a workaround to resolve n+1 queries
+                        #        being detected by sentry. Started a
+                        #        discussion on the sqlalchemy,
+                        #        https://github.com/sqlalchemy/sqlalchemy/discussions/13295.
+                        #        Derived issue from discussion:
+                        #        https://github.com/sqlalchemy/sqlalchemy/issues/13311
                         missing = [
                             t for t in base.metadata.sorted_tables
                             if t.name not in existing_tables
