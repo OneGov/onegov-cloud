@@ -6816,6 +6816,14 @@ msgstr "Ihre Veranstaltung wurde abgelehnt"
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
 
+msgid ""
+"Your request could not be completed because of a simultaneous conflicting "
+"request. Please try again."
+msgstr ""
+"Ihre Anfrage konnte nicht abgeschlossen werden, da gleichzeitig eine "
+"konfliktverursachende Anfrage verarbeitet wurde. Bitte versuchen Sie es "
+"erneut."
+
 msgid "Not Found"
 msgstr "Seite nicht gefunden"
 

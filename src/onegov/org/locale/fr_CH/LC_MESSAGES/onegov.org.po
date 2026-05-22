@@ -6828,6 +6828,13 @@ msgstr "Votre événement a été rejeté"
 msgid "Access Denied"
 msgstr "Accès refusé"
 
+msgid ""
+"Your request could not be completed because of a simultaneous conflicting "
+"request. Please try again."
+msgstr ""
+"Votre demande n'a pas pu être traitée en raison d'une demande conflictuelle "
+"simultanée. Veuillez réessayer."
+
 msgid "Not Found"
 msgstr "Pas trouvé"
 

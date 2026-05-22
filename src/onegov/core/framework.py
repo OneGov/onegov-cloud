@@ -67,7 +67,8 @@ from psycopg2.extensions import TransactionRollbackError
 from purl import URL
 from sqlalchemy.exc import OperationalError
 from urllib.parse import urlencode
-from webob.exc import HTTPConflict, HTTPServiceUnavailable
+from translationstring import TranslationString
+from webob.exc import HTTPConflict, HTTPSeeOther, HTTPServiceUnavailable
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
@@ -1771,6 +1772,24 @@ def http_conflict_tween_factory(
                 raise
 
             log.warning('A transaction failed because there was a conflict')
+
+            # Redis-backed browser_session is not rolled back with the postgres
+            # transaction, so stale flash messages must be cleared manually.
+            request.browser_session.pop('messages', None)
+
+            # POST form: redirect back so user sees the alert and can retry.
+            if (request.method == 'POST'
+                    and not request.is_xhr
+                    and request.content_type in (
+                        'application/x-www-form-urlencoded',
+                        'multipart/form-data',
+                    )):
+                request.alert(request.translate(TranslationString(
+                    'Your request could not be completed because of a '
+                    'simultaneous conflicting request. Please try again.',
+                    domain='onegov.org'
+                )))
+                return HTTPSeeOther(location=request.path)
 
             return HTTPConflict()
 
