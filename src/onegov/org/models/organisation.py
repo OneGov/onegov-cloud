@@ -161,7 +161,6 @@ class Organisation(Base, TimestampMixin):
     instagram_url: dict_property[str | None] = meta_property()
     linkedin_url: dict_property[str | None] = meta_property()
     tiktok_url: dict_property[str | None] = meta_property()
-    og_logo_default: dict_property[str | None] = meta_property()
 
     # custom links
     impressum_url: dict_property[str | None] = meta_property()
@@ -290,8 +289,9 @@ class Organisation(Base, TimestampMixin):
 
     assembly_title: dict_property[str | None] = meta_property()
 
-    # application description for organisation profil
-    description: dict_property[str | None] = meta_property()
+    # organisation profil
+    og_description: dict_property[str | None] = meta_property()
+    og_logo_default: dict_property[str | None] = meta_property()
 
     # Kaba settings
     @property
