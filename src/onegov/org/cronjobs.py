@@ -1,20 +1,17 @@
 from __future__ import annotations
 
-from inspect import isabstract
-from collections import OrderedDict
-
-from markupsafe import Markup
-import pytz
 import niquests
+import pytz
 import logging
+
 from babel.dates import get_month_names
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from functools import lru_cache
+from inspect import isabstract
 from itertools import groupby, chain
-
+from markupsafe import Markup
 from niquests.adapters import HTTPAdapter
-from urllib3.util import Retry
-
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models
@@ -64,16 +61,16 @@ from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import undefer
+from urllib3.util import Retry
 from uuid import UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
     from sqlalchemy.orm import Query
-
-    from onegov.org.request import OrgRequest
 
 
 log = logging.getLogger('onegov.org.cronjobs')
@@ -1304,7 +1301,7 @@ def wil_daily_event_import(request: OrgRequest) -> None:
         log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
         return
 
-    if response.status_code != 200:
+    if response.status_code != 200 or not response.content:
         log.error(
             f'Failed to retrieve events for Wil from {minaza_url}, '
             f'with params: {params}, '
@@ -1314,7 +1311,7 @@ def wil_daily_event_import(request: OrgRequest) -> None:
     try:
         collection = EventCollection(request.session)
         added, updated, purged = collection.from_minasa(
-            response.content or b'')
+            response.content)
         log.info(f'Wil: Events successfully imported '
                  f'{len(added)} added, {len(updated)} updated, '
                  f'{len(purged)} deleted')

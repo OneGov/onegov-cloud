@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import niquests
 import port_for
 import pytest
-import niquests
 import time
 
 from onegov.server.cli import WsgiProcess, WsgiServer

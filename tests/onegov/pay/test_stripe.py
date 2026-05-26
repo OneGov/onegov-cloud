@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import logging
-import pytest
 import niquests_mock
+import pytest
 import transaction
 
 from onegov.pay.models.payment_providers.stripe import (
