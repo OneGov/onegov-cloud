@@ -90,6 +90,12 @@ class OrganisationProfileSettingsForm(Form):
         label=_('Name'),
         validators=[InputRequired()])
 
+    description = TextAreaField(
+        label=_('Application Description'),
+        description=_('Application Description'),
+        render_kw={'rows': 4},
+    )
+
     reply_to = EmailField(
         _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
         description=_('Replies to automated e-mails go to this address.'))

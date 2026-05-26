@@ -290,6 +290,9 @@ class Organisation(Base, TimestampMixin):
 
     assembly_title: dict_property[str | None] = meta_property()
 
+    # application description for organisation profil
+    description: dict_property[str | None] = meta_property()
+
     # Kaba settings
     @property
     def kaba_configurations(self) -> list[RawKabaConfiguration]:
