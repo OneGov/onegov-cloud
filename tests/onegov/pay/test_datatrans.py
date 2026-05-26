@@ -48,9 +48,8 @@ def test_datatrans_settle_good_tx() -> None:
 
         transaction.commit()
         mock_session.post.assert_called_once_with(
-            f'{client.base_url}/transactions/bar/settle',
-            json={'amount': 100, 'currency': 'CHF', 'refno': 'baz'},
-            timeout=(5, 10)
+            '/transactions/bar/settle',
+            json={'amount': 100, 'currency': 'CHF', 'refno': 'baz'}
         )
 
 
