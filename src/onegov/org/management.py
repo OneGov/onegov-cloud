@@ -5,6 +5,7 @@ import time
 from collections import defaultdict
 
 import transaction
+from markupsafe import Markup
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
 
@@ -88,16 +89,19 @@ class LinkMigration(ModelsWithLinksMixin):
             value = getattr(item, field, None)
             if not value:
                 continue
-            new_val = pattern.sub(repl, value)
-            if value != new_val:
-                count += 1
+            new_val, n = pattern.subn(repl, value)
+            if n:
+                count += n
                 id_count = count_by_id.setdefault(
                     group_by,
                     defaultdict(int)
                 )
 
-                id_count[field] += 1
+                id_count[field] += n
                 if not test:
+                    new_val = (
+                        Markup(new_val)  # nosec: B704
+                        if isinstance(value, Markup) else new_val)
                     setattr(
                         item,
                         field,

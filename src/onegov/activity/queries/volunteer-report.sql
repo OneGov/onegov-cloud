@@ -43,8 +43,6 @@ SELECT
     volunteers.email AS email,                           -- Text
     volunteers.phone AS phone,                           -- Text
     volunteers.state AS state,                           -- Text
-    volunteers.token AS token,               -- UUID
-    tickets.id AS ticket_id,                             -- UUID
     array_agg(
         ARRAY[
             occasion_dates.start
@@ -64,7 +62,6 @@ FROM
     JOIN activities ON occasions.activity_id = activities.id
     JOIN occasion_dates ON occasions.id = occasion_dates.occasion_id
     JOIN occasion_numbers ON occasions.id = occasion_numbers.occasion_id
-    LEFT JOIN tickets ON tickets.handler_id::uuid = volunteers.token
 GROUP BY
     activities.id,
     activities.title,
@@ -87,8 +84,7 @@ GROUP BY
     volunteers.birth_date,
     volunteers.email,
     volunteers.phone,
-    needs_fulfilled.fulfilled,
-    tickets.id
+    needs_fulfilled.fulfilled
 ORDER BY
     activity_title,
     activity_id,
