@@ -25,7 +25,7 @@ class RedisCacheRegion(CacheRegion):
     on a given namespace as well as a couple of additional convenience
     methods specific to Redis.
 
-    It will use dill to serialize/deserialize values.
+    It will use msgpack to serialize/deserialize values.
     """
     def __init__(
         self,
