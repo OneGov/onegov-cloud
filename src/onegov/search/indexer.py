@@ -291,7 +291,7 @@ class Indexer:
             # will not be able to infer the matching constraint
             index_where=owner_id_column.is_not(None)
         )
-       session.execute(stmt, list(params_dict.values()))
+        session.execute(stmt, list(params_dict.values()))
 
         return True
 
