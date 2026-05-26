@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 import secrets
 import string
 from sedate import to_timezone
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class KabaApiError(Exception):
-    def __init__(self, message: str, response: requests.Response) -> None:
+    def __init__(self, message: str, response: niquests.Response) -> None:
         super().__init__(message)
         self.message = message
         self.response = response
@@ -32,7 +32,7 @@ class KabaClient:
     ) -> None:
 
         self.site_id = site_id
-        self.session = requests.Session()
+        self.session = niquests.Session(timeout=(5, 10))
         self.session.auth = (api_key, api_secret)
         self.base_url = 'https://api.exivo.io/v1'
 
@@ -66,7 +66,7 @@ class KabaClient:
             if (client := cls.from_config(raw_config.decrypt(app)))
         }
 
-    def raise_for_status(self, res: requests.Response) -> None:
+    def raise_for_status(self, res: niquests.Response) -> None:
         if res.ok:
             return
 

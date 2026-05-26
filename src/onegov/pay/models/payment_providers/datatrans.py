@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 import transaction
 
 from decimal import Decimal
@@ -84,14 +84,17 @@ class DatatransClient:
     ) -> None:
 
         self.merchant_id = merchant_id
-        self.session = requests.Session()
-        if merchant_id is not None:
-            self.session.auth = (merchant_id, password or '')
         self.base_url = (
             f'https://api.{"sandbox." if sandbox else ""}datatrans.com/v1'
         )
+        self.session = niquests.Session(
+            base_url=self.base_url,
+            timeout=(5, 10)
+        )
+        if merchant_id is not None:
+            self.session.auth = (merchant_id, password or '')
 
-    def raise_for_status(self, res: requests.Response) -> None:
+    def raise_for_status(self, res: niquests.Response) -> None:
         if res.status_code == 400:
             error = res.json()['error']
             raise DatatransApiError(
@@ -102,12 +105,9 @@ class DatatransClient:
         res.raise_for_status()
 
     def status(self, transaction_id: str) -> DatatransTransaction:
-        res = self.session.get(
-            f'{self.base_url}/transactions/{transaction_id}',
-            timeout=(5, 10)
-        )
+        res = self.session.get(f'/transactions/{transaction_id}')
         self.raise_for_status(res)
-        return DatatransTransaction.model_validate_json(res.content)
+        return DatatransTransaction.model_validate_json(res.content or b'')
 
     def init(
         self,
@@ -130,11 +130,7 @@ class DatatransClient:
                 **extra
             }
 
-        res = self.session.post(
-            f'{self.base_url}/transactions',
-            json=payload,
-            timeout=(5, 10)
-        )
+        res = self.session.post('/transactions', json=payload)
         self.raise_for_status(res)
         return res.json()['transactionId']
 
@@ -144,13 +140,12 @@ class DatatransClient:
             raise DatatransPaymentError('invalid merchant_id')
 
         res = self.session.post(
-            f'{self.base_url}/transactions/{tx.transaction_id}/settle',
+            f'/transactions/{tx.transaction_id}/settle',
             json={
                 'amount': tx.amount,
                 'currency': tx.currency,
                 'refno': tx.refno,
-            },
-            timeout=(5, 10)
+            }
         )
         self.raise_for_status(res)
 
@@ -163,22 +158,20 @@ class DatatransClient:
         if tx.status in ('settled', 'authorized'):
             # transaction can be cancelled
             res = self.session.post(
-                f'{self.base_url}/transactions/{tx.transaction_id}/cancel',
-                json={},
-                timeout=(5, 10)
+                f'/transactions/{tx.transaction_id}/cancel',
+                json={}
             )
             self.raise_for_status(res)
             return None
         elif tx.status == 'transmitted':
             # actual refund required
             res = self.session.post(
-                f'{self.base_url}/transactions/{tx.transaction_id}/credit',
+                f'/transactions/{tx.transaction_id}/credit',
                 json={
                     'currency': tx.currency,
                     'amount': tx.amount,
                     'refno': str(uuid4()),
-                },
-                timeout=(5, 10)
+                }
             )
             self.raise_for_status(res)
             return res.json()['transactionId']

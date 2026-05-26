@@ -144,12 +144,12 @@ def test_import_guidle(
 ) -> None:
 
     runner = CliRunner()
-    with open(xml) as f:
-        text = f.read()
-    response = MagicMock(text=text)
+    with open(xml, mode='rb') as f:
+        content = f.read()
+    response = MagicMock(content=content)
 
     # First import
-    with patch('onegov.event.cli.get', return_value=response):
+    with patch('onegov.event.cli.niquests.get', return_value=response):
         result = runner.invoke(cli, [
             '--config', cfg_path,
             '--select', '/foo/bar',
@@ -160,7 +160,7 @@ def test_import_guidle(
     assert "4 added, 0 updated, 0 deleted" in result.output
 
     # Reimport, not changed due to last_update
-    with patch('onegov.event.cli.get', return_value=response):
+    with patch('onegov.event.cli.niquests.get', return_value=response):
         result = runner.invoke(cli, [
             '--config', cfg_path,
             '--select', '/foo/bar',
@@ -171,8 +171,8 @@ def test_import_guidle(
     assert "0 added, 0 updated, 0 deleted" in result.output
 
     # Reimport, not changed due to not changed
-    response.text.replace('2017-10-21', '2017-10-22')
-    with patch('onegov.event.cli.get', return_value=response):
+    response.content.replace(b'2017-10-21', b'2017-10-22')
+    with patch('onegov.event.cli.niquests.get', return_value=response):
         result = runner.invoke(cli, [
             '--config', cfg_path,
             '--select', '/foo/bar',
@@ -196,7 +196,7 @@ def test_import_guidle(
         f.write("Konzert Pop / Rock / Jazz,Konzert\nSport,Sport")
 
     # Re-import with tagmap
-    with patch('onegov.event.cli.get', return_value=response):
+    with patch('onegov.event.cli.niquests.get', return_value=response):
         result = runner.invoke(cli, [
             '--config', cfg_path,
             '--select', '/foo/bar',
@@ -216,12 +216,12 @@ def test_import_guidle(
 def test_import_guidle_no_end_date(cfg_path: str, xml: str) -> None:
     runner = CliRunner()
 
-    with open(xml) as f:
-        text = f.read()
-    response = MagicMock(text=text)
+    with open(xml, mode='rb') as f:
+        content = f.read()
+    response = MagicMock(content=content)
 
     # First import
-    with patch('onegov.event.cli.get', return_value=response):
+    with patch('onegov.event.cli.niquests.get', return_value=response):
         result = runner.invoke(cli, [
             '--config', cfg_path,
             '--select', '/foo/bar',

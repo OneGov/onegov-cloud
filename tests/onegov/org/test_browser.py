@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import niquests
 import os
 import pytest
-import requests
 import time
 import transaction
 
@@ -387,13 +387,13 @@ def test_publication_workflow(
     # make sure the file can be downloaded
     file_url = browser.find_by_css('.file-preview')['href']
     assert file_url is not None
-    r = requests.get(file_url)
+    r = niquests.get(file_url, timeout=10)
     assert r.status_code == 200
     assert 'public' in r.headers['cache-control']
 
     # make sure unpublishing works
     browser.find_by_css('.publication .file-status-tag a').click()
-    r = requests.get(file_url)
+    r = niquests.get(file_url, timeout=10)
     assert r.status_code == 403
 
     assert browser.is_text_present("Privat", wait_time=1)
@@ -422,10 +422,10 @@ def test_publication_workflow(
     job.app = org_app
     job_url = f'{browser.url.replace("/files", "")}/cronjobs/{job.id}'
 
-    requests.get(job_url)
+    niquests.get(job_url, timeout=10)
     sleep(0.1)
 
-    r = requests.get(file_url)
+    r = niquests.get(file_url, timeout=10)
     assert r.status_code == 200
     assert 'public' in r.headers['cache-control']
 

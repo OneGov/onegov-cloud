@@ -102,32 +102,36 @@ def analyze_sql_queries(
 
         if report == 'all':
             click.echo('< took {}'.format(runtime))
-    yield
 
-    event.remove(Engine, 'before_cursor_execute', before_exec)
-    event.remove(Engine, 'after_cursor_execute', after_exec)
+    try:
+        yield
+    finally:
+        event.remove(Engine, 'before_cursor_execute', before_exec)
+        event.remove(Engine, 'after_cursor_execute', after_exec)
 
-    total_queries = sum(queries.values())
-    redundant_queries = sum(1 for v in queries.values() if v > 1)
+        total_queries = sum(queries.values())
+        redundant_queries = sum(1 for v in queries.values() if v > 1)
 
-    if total_queries > 10:
-        total_queries_str = click.style(str(total_queries), 'red')
-    elif total_queries > 5:
-        total_queries_str = click.style(str(total_queries), 'yellow')
-    else:
-        total_queries_str = click.style(str(total_queries), 'green')
+        if total_queries > 10:
+            total_queries_str = click.style(str(total_queries), 'red')
+        elif total_queries > 5:
+            total_queries_str = click.style(str(total_queries), 'yellow')
+        else:
+            total_queries_str = click.style(str(total_queries), 'green')
 
-    if redundant_queries:
-        redundant_queries_str = click.style(str(redundant_queries), 'red')
-    else:
-        redundant_queries_str = '0'
+        if redundant_queries:
+            redundant_queries_str = click.style(str(redundant_queries), 'red')
+        else:
+            redundant_queries_str = '0'
 
-    if total_queries:
-        click.echo('executed {} queries, {} of which were redundant'.format(
-            total_queries_str, redundant_queries_str))
+        if total_queries:
+            click.echo(
+                f'executed {total_queries_str} queries, '
+                f'{redundant_queries_str} of which were redundant'
+            )
 
-    if redundant_queries and report == 'redundant':
-        click.echo('The following queries were redundant:')
-        for query, count in queries.items():
-            if count > 1:
-                print_query(query)
+        if redundant_queries and report == 'redundant':
+            click.echo('The following queries were redundant:')
+            for query, count in queries.items():
+                if count > 1:
+                    print_query(query)

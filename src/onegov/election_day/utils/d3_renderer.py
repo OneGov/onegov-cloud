@@ -4,6 +4,7 @@ from base64 import b64decode
 from io import BytesIO
 from io import StringIO
 from json import dumps, loads
+from niquests import post
 from onegov.core.custom import json
 from onegov.core.utils import module_path
 from onegov.election_day import _
@@ -21,7 +22,6 @@ from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_vertical_data
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
-from requests import post
 from rjsmin import jsmin  # type:ignore[import-untyped]
 
 
@@ -156,6 +156,7 @@ class D3Renderer:
         )
 
         response.raise_for_status()
+        assert response.text is not None
 
         if fmt == 'svg':
             return StringIO(response.text)
