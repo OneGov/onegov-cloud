@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 
 from itertools import groupby
+
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.datamanager import IndexerDataManager
@@ -293,12 +294,12 @@ class Indexer:
             )
             with session.begin_nested():
                 session.execute(stmt, list(params_dict.values()))
-        except Exception:
+        except Exception as ex:
             index_log.exception(
                 f'Error creating index schema {schema} of '
                 f'table {tablename}, tasks: {[t["id"] for t in tasks]}',
             )
-            return False
+            raise
 
         return True
 
@@ -370,11 +371,11 @@ class Indexer:
             )
             with session.begin_nested():
                 session.execute(stmt)
-        except Exception:
+        except Exception as ex:
             index_log.exception(
                 f'Error deleting index schema {schema} tasks {tasks}:'
             )
-            return False
+            raise
 
         return True
 
