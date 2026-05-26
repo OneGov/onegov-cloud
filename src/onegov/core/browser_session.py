@@ -72,9 +72,9 @@ class BrowserSession:
     This class also acts as a data manager for ``transaction``, so changes
     are not committed to Redis, until the transaction is commited.
 
-    The ``on_dirty`` callback gets invoked just before the changes are
-    committed to Redis, so additional changes can be performed in this
-    callback.
+    The ``on_dirty`` callback gets invoked when the firs change to the
+    session happens, even if it ends up getting rolled back, so use with
+    care!
 
     """
 
@@ -166,6 +166,12 @@ class BrowserSession:
             #       intend to write anything.
             transaction.get().join(self)
             self._is_dirty = True
+            # FIXME: We would like to defer calling this until the transaction
+            #        has been committed, but since we use this to add headers
+            #        to the response via `request.after`, we cannot do that
+            #        since those callbacks are invoked on the inner-most layer
+            #        so the transaction commit happens after the callbacks run
+            self._on_dirty(self, self._token)
 
     @overload
     def get(self, name: str) -> Any | None: ...
@@ -245,8 +251,6 @@ class BrowserSession:
     def tpc_finish(self, transaction: ITransaction) -> None:
         if not self._is_dirty:
             return
-
-        self._on_dirty(self, self._token)
 
         if self._pending_flush:
             self._cache.flush()

@@ -187,7 +187,7 @@ def test_browser_session_data_manager_callback(redis_url: str) -> None:
 
 
     on_dirty_called = False
-    # aborting changes, avoids the callback being invoked
+    # aborting changes, does not avoid the callback being invoked
     def on_dirty(session: BrowserSession, token: str) -> None:
         nonlocal on_dirty_called
         on_dirty_called = True
@@ -201,6 +201,6 @@ def test_browser_session_data_manager_callback(redis_url: str) -> None:
     transaction.begin()
     session['bar'] = 'baz'
     transaction.abort()
-    assert not on_dirty_called
+    assert on_dirty_called
     assert session._cache.get('foo') == 'bar'
     assert session._cache.get('extra') == 'foo'
