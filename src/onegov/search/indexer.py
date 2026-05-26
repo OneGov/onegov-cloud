@@ -360,8 +360,7 @@ class Indexer:
                 owner_id_column.in_(owner_ids)
             ))
         )
-        with session.begin_nested():
-            session.execute(stmt)
+        session.execute(stmt)
 
         return True
 
