@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+import niquests
+
+from babel.numbers import format_decimal
+from datetime import date
+from decimal import Decimal, ROUND_HALF_UP
+from lxml import html
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.commission_membership import PASCommissionMembership
@@ -10,16 +16,9 @@ from onegov.pas.models.presidential_allowance import (
     PresidentialAllowance,
 )
 from onegov.pas.collections import PASParliamentarianCollection
-from decimal import Decimal, ROUND_HALF_UP
-from babel.numbers import format_decimal
-from datetime import date
-from lxml import html
+from sqlalchemy.orm import selectinload
 from uuid import UUID
 
-import requests
-
-
-from sqlalchemy.orm import selectinload
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -89,8 +88,9 @@ def fetch_clex_kantonsrat_members(
     if reference_date is None:
         reference_date = date.today()
 
-    resp = requests.get(CLEX_URL, timeout=30)
+    resp = niquests.get(CLEX_URL, timeout=30)
     resp.raise_for_status()
+    assert resp.content is not None
 
     tree = html.fromstring(resp.content)
     rows = tree.xpath('//table//tr')
