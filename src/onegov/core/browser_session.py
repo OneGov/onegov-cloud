@@ -72,7 +72,7 @@ class BrowserSession:
     This class also acts as a data manager for ``transaction``, so changes
     are not committed to Redis, until the transaction is commited.
 
-    The ``on_dirty`` callback gets invoked when the firs change to the
+    The ``on_dirty`` callback gets invoked when the first change to the
     session happens, even if it ends up getting rolled back, so use with
     care!
 
