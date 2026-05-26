@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import requests_mock
+import niquests_mock
 import textwrap
 import transaction
 
+from orjson import loads
 from onegov.form import FormCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.models.payment_providers import StripeConnect
@@ -20,18 +21,19 @@ def test_setup_stripe(client: Client) -> None:
 
     assert client.app.default_payment_provider is None
 
-    with requests_mock.Mocker() as m:
-        m.post('https://oauth.example.org/register/foo', json={
+    with niquests_mock.MockRouter() as m:
+        m.post('https://oauth.example.org/register/foo').respond(json={
             'token': '0xdeadbeef'
         })
 
         client.get('/payment-provider').click("Stripe Connect")
 
-        url = URL(m.request_history[0].json()['url'])
+        assert m.calls[0].response is not None
+        url = URL(loads(m.calls[0].request.body)['url'])  # type: ignore[arg-type]
         url = url.query_param('oauth_redirect_secret', 'bar')
         url = url.query_param('code', 'api_key')
 
-        m.post('https://connect.stripe.com/oauth/token', json={
+        m.post('https://connect.stripe.com/oauth/token').respond(json={
             'scope': 'read_write',
             'stripe_publishable_key': 'stripe_publishable_key',
             'stripe_user_id': 'stripe_user_id',
@@ -52,8 +54,10 @@ def test_setup_stripe(client: Client) -> None:
     assert provider.access_token == 'access_token'
 
     # test new format for business name
-    with requests_mock.Mocker() as m:
-        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+    with niquests_mock.MockRouter() as m:
+        m.get(
+            'https://api.stripe.com/v1/accounts/stripe_user_id'
+        ).respond(json={
             'business_profile': {'name': 'Govikon City'},
             'email': 'info@example.org'
         })
@@ -62,8 +66,10 @@ def test_setup_stripe(client: Client) -> None:
         assert 'Govikon City / info@example.org' in page
 
     # test old format
-    with requests_mock.Mocker() as m:
-        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+    with niquests_mock.MockRouter() as m:
+        m.get(
+            'https://api.stripe.com/v1/accounts/stripe_user_id'
+        ).respond(json={
             'business_name': 'Govikon City',
             'email': 'info@example.org'
         })
@@ -72,8 +78,10 @@ def test_setup_stripe(client: Client) -> None:
         assert 'Govikon City / info@example.org' in page
 
     # business_name given but empty
-    with requests_mock.Mocker() as m:
-        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+    with niquests_mock.MockRouter() as m:
+        m.get(
+            'https://api.stripe.com/v1/accounts/stripe_user_id'
+        ).respond(json={
             'business_name': '',
             'email': 'info@example.org'
         })
@@ -84,8 +92,10 @@ def test_setup_stripe(client: Client) -> None:
         assert 'info@example.org' in page
 
     # business_name not given in response
-    with (requests_mock.Mocker() as m):
-        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+    with (niquests_mock.MockRouter() as m):
+        m.get(
+            'https://api.stripe.com/v1/accounts/stripe_user_id'
+        ).respond(json={
             'email': 'info@example.org'
         })
 
@@ -133,20 +143,22 @@ def test_stripe_form_payment(client: Client) -> None:
     assert button.attr('data-stripe-allowrememberme') == 'false'
     assert button.attr('data-stripe-key') == '0xdeadbeef'
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
-        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/123456/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
 
-    with requests_mock.Mocker() as m:
-        m.get('https://api.stripe.com/v1/charges/123456', json={
+    with niquests_mock.MockRouter() as m:
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json={
             'id': '123456',
             'captured': True,
             'refunded': False,
@@ -187,8 +199,8 @@ def test_stripe_charge_fee_to_customer(client: Client) -> None:
 
     client.login_admin()
 
-    with requests_mock.Mocker() as m:
-        m.get('https://api.stripe.com/v1/accounts/foobar', json={
+    with niquests_mock.MockRouter() as m:
+        m.get('https://api.stripe.com/v1/accounts/foobar').respond(json={
             'business_name': 'Govikon',
             'email': 'info@example.org'
         })
@@ -211,20 +223,22 @@ def test_stripe_charge_fee_to_customer(client: Client) -> None:
     button = page.pyquery('.checkout-button')
     assert button.attr('data-stripe-amount') == '1061'
 
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
-        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/123456/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
 
-    with requests_mock.Mocker() as m:
-        m.get('https://api.stripe.com/v1/charges/123456', json={
+    with niquests_mock.MockRouter() as m:
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json={
             'id': '123456',
             'captured': True,
             'refunded': False,

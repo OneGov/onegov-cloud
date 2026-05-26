@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import lxml.etree
-import requests
+import niquests
 from datetime import datetime
 
 from onegov.event import OccurrenceCollection
@@ -536,7 +536,12 @@ class JobsWidget:
                 #        either need to add a JSON serializer for RSSFeed
                 #        or change them to plain dictionaries.
                 def get_content() -> bytes | None:
-                    response = requests.get(rss_feed_url, timeout=4)
+                    try:
+                        response = niquests.get(rss_feed_url, timeout=4)
+                    except Exception:
+                        # timeout or some connection error
+                        return None
+
                     if response.status_code == 200:
                         return response.content
                     return None

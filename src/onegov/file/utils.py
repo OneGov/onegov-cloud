@@ -184,8 +184,10 @@ def name_without_extension(name: str) -> str:
 def current_dir(dir: StrOrBytesPath) -> Iterator[None]:
     previous = os.getcwd()
     os.chdir(dir)
-    yield
-    os.chdir(previous)
+    try:
+        yield
+    finally:
+        os.chdir(previous)
 
 
 # we don't support *all* the image types PIL supports
