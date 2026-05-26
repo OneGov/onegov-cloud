@@ -31,8 +31,10 @@ if TYPE_CHECKING:
 def stripe_api_key(key: str | None) -> Iterator[None]:
     old_key = stripe.api_key
     stripe.api_key = key
-    yield
-    stripe.api_key = old_key
+    try:
+        yield
+    finally:
+        stripe.api_key = old_key
 
 
 # instantiate once to get keep-alive support
