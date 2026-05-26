@@ -465,6 +465,14 @@ class AdjacencyListCollection[L: AdjacencyList]:
             return item
         return None
 
+    def by_title(self, title: str) -> L | None:
+        query = self.query(ordered=False)
+        return query.filter(self.__listclass__.title == title).first()
+
+    def by_name(self, name: str) -> L | None:
+        query = self.query(ordered=False)
+        return query.filter(self.__listclass__.name == name).first()
+
     def get_unique_child_name(self, name: str, parent: L | None) -> str:
         """ Takes the given name or title, normalizes it and makes sure
         that it's unique among the siblings of the item.

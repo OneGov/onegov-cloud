@@ -5,11 +5,11 @@ import time
 from collections import defaultdict
 
 import transaction
-from aiohttp import ClientTimeout
+from markupsafe import Markup
 from sqlalchemy.orm import object_session
 from urlextract import URLExtract
 
-from onegov.async_http.fetch import async_aiohttp_get_all
+from onegov.async_http.fetch import async_niquests_get_all
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 from onegov.people import AgencyCollection
@@ -89,16 +89,19 @@ class LinkMigration(ModelsWithLinksMixin):
             value = getattr(item, field, None)
             if not value:
                 continue
-            new_val = pattern.sub(repl, value)
-            if value != new_val:
-                count += 1
+            new_val, n = pattern.subn(repl, value)
+            if n:
+                count += n
                 id_count = count_by_id.setdefault(
                     group_by,
                     defaultdict(int)
                 )
 
-                id_count[field] += 1
+                id_count[field] += n
                 if not test:
+                    new_val = (
+                        Markup(new_val)  # nosec: B704
+                        if isinstance(value, Markup) else new_val)
                     setattr(
                         item,
                         field,
@@ -198,6 +201,8 @@ class PageNameChange(ModelsWithLinksMixin):
 
 
 class LinkCheck:
+    __slots__ = ('name', 'link', 'url', 'status', 'message')
+
     def __init__(self, name: str, link: str, url: str) -> None:
         self.name = name
         self.link = link
@@ -227,7 +232,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         self,
         request: OrgRequest,
         link_type: Literal['internal', 'external', ''] | None = None,
-        total_timout: float = 30
+        timeout: float = 30
     ) -> None:
         """
         :param request: morepath request object
@@ -241,10 +246,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         self.link_type = link_type or None
         self.domain = self.request.domain
         self.extractor = URLExtract()
-
-        self.timeout = ClientTimeout(
-            total=total_timout
-        )
+        self.timeout = timeout
 
     @property
     def internal_only(self) -> bool:
@@ -327,9 +329,9 @@ class LinkHealthCheck(ModelsWithLinksMixin):
 
         urls: Sequence[LinkCheck]
         if self.link_type == 'external':
-            urls = async_aiohttp_get_all(
+            urls = async_niquests_get_all(
                 urls=tuple(self.url_list_generator()),
-                response_attr='status',
+                response_attr='status_code',
                 callback=on_success,
                 handle_exceptions=handle_errors,
                 timeout=self.timeout

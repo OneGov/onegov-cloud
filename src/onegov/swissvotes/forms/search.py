@@ -180,7 +180,9 @@ class SearchForm(Form):
         self.to_date.data = model.to_date
         self.legal_form.data = model.legal_form
         self.result.data = model.result
-        self.policy_area.data = model.policy_area
+        self.policy_area.data = (
+            [p.value for p in model.policy_area] if model.policy_area else None
+        )
         self.term.data = model.term
         self.full_text.data = 0 if model.full_text is False else 1
         self.position_federal_council.data = model.position_federal_council

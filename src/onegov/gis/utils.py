@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 from purl import URL
 
 
@@ -10,9 +10,9 @@ if TYPE_CHECKING:
     from onegov.gis.models.coordinates import AnyCoordinates, RealCoordinates
 
 
-Endpoint = Literal['directions', 'geocoding']
-GeocodeProfile = Literal['places']
-DirectionsProfile = Literal[
+type Endpoint = Literal['directions', 'geocoding']
+type GeocodeProfile = Literal['places']
+type DirectionsProfile = Literal[
     'driving-traffic',
     'driving',
     'walking',
@@ -91,7 +91,7 @@ class MapboxRequests:
         ctry: str | None = None,
         locale: str | None = None,
         as_url: Literal[False] = False
-    ) -> requests.Response: ...
+    ) -> niquests.Response: ...
 
     @overload
     def geocode(
@@ -119,7 +119,7 @@ class MapboxRequests:
         locale: str | None = None,
         *,
         as_url: bool
-    ) -> requests.Response | URL: ...
+    ) -> niquests.Response | URL: ...
 
     def geocode(
         self,
@@ -131,7 +131,7 @@ class MapboxRequests:
         ctry: str | None = None,
         locale: str | None = None,
         as_url: bool = False
-    ) -> requests.Response | URL:
+    ) -> niquests.Response | URL:
 
         if not ctry:
             ctry = 'Schweiz'
@@ -152,14 +152,14 @@ class MapboxRequests:
             url = url.query_param('language', locale)
         if as_url:
             return url
-        return requests.get(url.as_string(), timeout=60)
+        return niquests.get(url.as_string(), timeout=60)
 
     @overload
     def directions(
         self,
         coordinates: Iterable[tuple[str | float, str | float]],
         as_url: Literal[False] = False
-    ) -> requests.Response: ...
+    ) -> niquests.Response: ...
 
     @overload
     def directions(
@@ -173,13 +173,13 @@ class MapboxRequests:
         self,
         coordinates: Iterable[tuple[str | float, str | float]],
         as_url: bool
-    ) -> requests.Response | URL: ...
+    ) -> niquests.Response | URL: ...
 
     def directions(
         self,
         coordinates: Iterable[tuple[str | float, str | float]],
         as_url: bool = False
-    ) -> requests.Response | URL:
+    ) -> niquests.Response | URL:
         """
         coordinates: iterable of tuples of (lat, lon)
         """
@@ -188,7 +188,7 @@ class MapboxRequests:
         )
         if as_url:
             return url
-        return requests.get(url.as_string(), timeout=60)
+        return niquests.get(url.as_string(), timeout=60)
 
 
 def outside_bbox(

@@ -304,3 +304,21 @@ def test_view_update_external_resources(
 
     assert '15 hinzugefügt, 17 geändert, 19 gelöscht' in manage
     assert 'Quellen konnten nicht aktualisiert werden: 4, 8, 9' in manage
+
+
+def test_view_votes_empty_policy_area(swissvotes_app: TestApp) -> None:
+    """
+    Empty or structurally invalid policy_area URL parameters are rejected
+    with 400 Bad Request rather than causing a 500 crash.
+    """
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/votes')
+    assert page.status_code == 200
+
+    client.get('/votes?term=&policy_area=', status=400)
+    client.get('/votes?term=&policy_area=9&policy_area=', status=400)
+    client.get('/votes?term=&policy_area=&policy_area=3', status=400)
+    client.get('/votes?term=&policy_area=9&policy_area=&policy_area=3',
+               status=400)

@@ -602,8 +602,10 @@ class UpgradeContext:
         # that doesn't require knowledge of onegov.search
         if hasattr(self.app, 'fts_orm_events'):
             self.app.fts_orm_events.stopped = True
-            yield
-            self.app.fts_orm_events.stopped = False
+            try:
+                yield
+            finally:
+                self.app.fts_orm_events.stopped = False
         else:
             yield
 

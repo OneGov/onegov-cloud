@@ -112,6 +112,7 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
             parliamentarian_id=parl.id,
             role='member',
             start=datetime.date(2020, 1, 1),
+            meta={'org_type': 'Kantonsrat'},
         )
     )
 
@@ -437,6 +438,7 @@ def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
             parliamentarian_id=parl.id,
             role='member',
             start=datetime.date(2020, 1, 1),
+            meta={'org_type': 'Kantonsrat'},
         )
     )
 
@@ -520,6 +522,15 @@ def test_attendance_blocked_outside_any_settlement_run(
 
     commissions = PASCommissionCollection(session)
     commission = commissions.add(name='Test Commission')
+
+    session.add(
+        PASParliamentarianRole(
+            parliamentarian_id=parl.id,
+            role='member',
+            start=datetime.date(2020, 1, 1),
+            meta={'org_type': 'Kantonsrat'},
+        )
+    )
 
     memberships = PASCommissionMembershipCollection(session)
     memberships.add(
@@ -613,6 +624,13 @@ def test_fetch_commissions_parliamentarians_json(
         last_name='Johnson',
     )
 
+    for p in (parl1, parl2, parl3):
+        session.add(PASParliamentarianRole(
+            parliamentarian_id=p.id,
+            role='member',
+            meta={'org_type': 'Kantonsrat'},
+        ))
+
     memberships = PASCommissionMembershipCollection(session)
 
     # Commission A has John and Jane
@@ -682,6 +700,11 @@ def test_fetch_commissions_parliamentarians_json(
         email_primary='alice.president@example.org',
         zg_username='zgalice',
     )
+    session.add(PASParliamentarianRole(
+        parliamentarian_id=parl_president.id,
+        role='member',
+        meta={'org_type': 'Kantonsrat'},
+    ))
 
     # Add president to Commission A (using the ID we saved earlier)
     president_membership = PASCommissionMembership(
@@ -872,6 +895,13 @@ def test_settlement_run_complete_translation(
     commissions = PASCommissionCollection(session)
     commission = commissions.add(name='TestCommission')
 
+    session.add(PASParliamentarianRole(
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2020, 1, 1),
+        meta={'org_type': 'Kantonsrat'},
+    ))
+
     memberships = PASCommissionMembershipCollection(session)
     memberships.add(
         commission_id=commission.id,
@@ -932,6 +962,13 @@ def test_commission_president_bulk_add(
         email_primary='alice.president@example.org',
         zg_username='zgalice',
     )
+
+    for p in (bob, alice):
+        session.add(PASParliamentarianRole(
+            parliamentarian_id=p.id,
+            role='member',
+            meta={'org_type': 'Kantonsrat'},
+        ))
 
     commissions = PASCommissionCollection(session)
     commission = commissions.add(name='Finanzkommission')
@@ -1122,6 +1159,13 @@ def test_abschluss_email_uses_commission_name(
         last_name='Muster',
         email_primary='max.muster@example.org',
     )
+
+    session.add(PASParliamentarianRole(
+        parliamentarian_id=parl.id,
+        role='member',
+        start=datetime.date(2024, 1, 1),
+        meta={'org_type': 'Kantonsrat'},
+    ))
 
     commissions = PASCommissionCollection(session)
     commission = commissions.add(name='Finanzkommission')

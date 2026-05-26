@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import pytest
-from aiohttp import InvalidURL
+from niquests.exceptions import MissingSchema
 
-from onegov.async_http.fetch import async_aiohttp_get_all
+from onegov.async_http.fetch import async_niquests_get_all
 from onegov.core.utils import Bunch
 
 
@@ -24,8 +24,8 @@ invalid_urls: list[UrlType] = [
 
 def test_fetch_all_invalid() -> None:
 
-    with pytest.raises(InvalidURL):
-        async_aiohttp_get_all(invalid_urls)
+    with pytest.raises(MissingSchema):
+        async_niquests_get_all(invalid_urls)
 
 
 def test_fetch_all_invalid_with_custom_handler() -> None:
@@ -34,14 +34,14 @@ def test_fetch_all_invalid_with_custom_handler() -> None:
         return url
 
     def handle_invalid(url: UrlType, exception: Exception) -> str:
-        if isinstance(exception, InvalidURL):
+        if isinstance(exception, MissingSchema):
             if isinstance(url, Bunch):
                 return url.name
             return str(exception)
         else:
             raise exception
 
-    results = async_aiohttp_get_all(
+    results = async_niquests_get_all(
         invalid_urls,
         callback=callback,
         handle_exceptions=handle_invalid
@@ -53,5 +53,5 @@ def test_fetch_all_invalid_with_custom_handler() -> None:
 
 def test_fetch_all_valid() -> None:
     # get status 200 without waiting for the content
-    results = async_aiohttp_get_all(valid_urls, response_attr='status')
+    results = async_niquests_get_all(valid_urls, response_attr='status_code')
     assert results == list(zip(valid_urls, [200, 200]))

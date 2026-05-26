@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+import niquests
+
+from babel.numbers import format_decimal
+from datetime import date
+from decimal import Decimal, ROUND_HALF_UP
+from lxml import html
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.commission_membership import PASCommissionMembership
@@ -9,14 +15,18 @@ from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.pas.models.presidential_allowance import (
     PresidentialAllowance,
 )
-from decimal import Decimal, ROUND_HALF_UP
-from babel.numbers import format_decimal
-from datetime import date
+from onegov.pas.collections import PASParliamentarianCollection
+from sqlalchemy.orm import selectinload
 from uuid import UUID
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core import Framework
+    from onegov.parliament.models.parliamentarian import Parliamentarian
+    from onegov.parliament.models.parliamentarian_role import (
+        ParliamentarianRole,
+    )
     from onegov.pas.models import SettlementRun
     from onegov.pas.models.attendence import Attendence
     from onegov.user import User
@@ -24,26 +34,19 @@ if TYPE_CHECKING:
 
 
 def _is_kantonsrat_role(
-    role: PASParliamentarianRole,
+    role: PASParliamentarianRole | ParliamentarianRole,
 ) -> bool:
     """A Kantonsrat role has meta.org_type == 'Kantonsrat' (set
-    by the KUB importer). Falls back to the legacy heuristic
-    (all of party_id, parliamentary_group_id, and
-    additional_information being NULL) for rows imported before
-    org_type was persisted.
+    by the KUB importer).
     """
     org_type = role.meta.get('org_type')
     if org_type is not None:
         return org_type == 'Kantonsrat'
-    return (
-        role.party_id is None
-        and role.parliamentary_group_id is None
-        and role.additional_information is None
-    )
+    return False
 
 
 def is_active_kantonsrat_member(
-    parliamentarian: PASParliamentarian,
+    parliamentarian: PASParliamentarian | Parliamentarian,
     reference_date: date | None = None,
 ) -> bool:
     if reference_date is None:
@@ -52,6 +55,68 @@ def is_active_kantonsrat_member(
         _is_kantonsrat_role(r) and (r.end is None or r.end >= reference_date)
         for r in parliamentarian.roles
     )
+
+
+def get_active_kantonsrat_parliamentarians(
+    app: Framework,
+    reference_date: date | None = None,
+) -> list[PASParliamentarian]:
+    parliamentarians = (
+        PASParliamentarianCollection(app)
+        .query()
+        .options(selectinload(PASParliamentarian.roles))
+        .all()
+    )
+    return [
+        p
+        for p in parliamentarians
+        if is_active_kantonsrat_member(p, reference_date)
+    ]
+
+
+CLEX_URL = 'https://zg-compwork.clex.ch/frontend/people'
+
+
+def fetch_clex_kantonsrat_members(
+    reference_date: date | None = None,
+) -> set[tuple[str, str]]:
+    """Fetch active Kantonsrat members from the CLEX frontend.
+
+    Returns set of (last_name, first_name) tuples for members
+    without an exit date or with an exit date >= reference_date.
+    """
+    if reference_date is None:
+        reference_date = date.today()
+
+    resp = niquests.get(CLEX_URL, timeout=30)
+    resp.raise_for_status()
+    assert resp.content is not None
+
+    tree = html.fromstring(resp.content)
+    rows = tree.xpath('//table//tr')
+
+    members: set[tuple[str, str]] = set()
+    for row in rows:
+        cells = row.xpath('td')
+        if len(cells) < 6:
+            continue
+        last_name = (cells[1].text_content() or '').strip()
+        first_name = (cells[2].text_content() or '').strip()
+        exit_text = (cells[6].text_content() or '').strip()
+        if not last_name:
+            continue
+
+        if exit_text and exit_text != '—':
+            try:
+                parts = exit_text.split('.')
+                exit_date = date(int(parts[2]), int(parts[1]), int(parts[0]))
+                if exit_date < reference_date:
+                    continue
+            except (ValueError, IndexError):
+                pass
+
+        members.add((last_name, first_name))
+    return members
 
 
 def format_swiss_number(value: Decimal | int) -> str:

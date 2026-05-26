@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from decimal import Decimal
 from functools import cached_property
 from markupsafe import Markup
@@ -60,11 +62,34 @@ class PolicyArea:
         else:
             raise NotImplementedError()
 
+    @classmethod
+    def from_url_param(cls, s: str) -> PolicyArea | None:
+        """ Validates and constructs a PolicyArea from a URL parameter.
+
+        Returns None for empty or invalid values. Callers that need to reject
+        invalid input (e.g. URL converters) should raise ValueError on None.
+        A valid value has at most 3 all-numeric components separated by dots
+        where each component starts with the previous one
+        (e.g. "1", "1.12", "1.12.121").
+        """
+        if not s or not re.fullmatch(r'\d+(\.\d+)*', s):
+            return None
+        components = s.split('.')
+        if len(components) > 3:
+            return None
+        for i in range(1, len(components)):
+            if not components[i].startswith(components[i - 1]):
+                return None
+        return cls(s)
+
     def __repr__(self) -> str:
         return self.value
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.value == other.value
+
+    def __hash__(self) -> int:
+        return hash(self.value)
 
     @cached_property
     def level(self) -> int:
