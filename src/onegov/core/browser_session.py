@@ -235,7 +235,6 @@ class BrowserSession:
         self._pending_overrides = {}
         self._pending_flush = False
         self._pending_deletes = set()
-        self._pending_transaction = False
         self._is_dirty = False
 
     def tpc_begin(self, transaction: ITransaction) -> None:
