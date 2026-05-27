@@ -38,7 +38,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="medium-5 cell" tal:define="has_filters filters|nothing; has_bulk_edits python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups)" tal:condition="python:has_filters or has_bulk_edits">
+            <div class="medium-5 cell" tal:define="has_filters filters|nothing; has_bulk_edits python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups); has_allowances python:bool(allowances)" tal:condition="python:has_filters or has_bulk_edits or has_allowances">
                 <div class="sidebar-wrapper">
                     <div class="side-panel" tal:condition="python: filters.get('settlement_run')">
                         <h3 i18n:translate>Settlement run</h3>
@@ -51,6 +51,22 @@
                     <div class="side-panel" tal:condition="python: filters.get('plenary_session')">
                         <h3 i18n:translate>Plenary session</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['plenary_session']" />
+                    </div>
+                    <div class="side-panel" tal:condition="python: allowances">
+                        <h3 i18n:translate>Presidential allowances</h3>
+                        <ul class="more-list">
+                            <li tal:repeat="a allowances">
+                                <span class="list-title">
+                                    ${a.parliamentarian.first_name} ${a.parliamentarian.last_name}
+                                    — <strong>CHF ${a.amount}</strong>
+                                </span>
+                                <p class="list-lead preview">
+                                    ${request.translate(a.role_label)}<br>
+                                    <tal:b tal:condition="a.settlement_run">${a.settlement_run.name}<br></tal:b>
+                                    <small class="muted">${layout.format_date(a.created, 'date')}</small>
+                                </p>
+                            </li>
+                        </ul>
                     </div>
                     <div class="side-panel" tal:condition="python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups)">
                         <h3 i18n:translate>Bulk edits</h3>
