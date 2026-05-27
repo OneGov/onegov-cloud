@@ -10,7 +10,7 @@ from re import findall
 from tests.shared.utils import use_locale
 from transaction import commit
 from translationstring import TranslationString
-from webtest import TestApp as Client
+from .conftest import Client
 from webtest.forms import Upload
 
 
@@ -28,7 +28,7 @@ def test_view_vote(swissvotes_app: TestApp, sample_vote: SwissVote) -> None:
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details")
     assert "100.1" in page
     assert "Vote DE" in page
@@ -96,7 +96,7 @@ def test_view_vote(swissvotes_app: TestApp, sample_vote: SwissVote) -> None:
     swissvotes_app.session().query(SwissVote).one()._legal_form = 3
     commit()
 
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details")
     assert "Volksinitiative" in page
     assert "Initiator" in page
@@ -204,7 +204,7 @@ def test_view_vote(swissvotes_app: TestApp, sample_vote: SwissVote) -> None:
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Details").click("Abstimmung löschen")
     manage.form.submit().follow()
 
@@ -224,7 +224,7 @@ def test_view_vote_tie_breaker(
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details")
 
     assert (
@@ -266,7 +266,7 @@ def test_vote_upload(
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Details").click("Anhänge verwalten")
     for name in names:
         manage.form[name] = Upload(
@@ -297,7 +297,7 @@ def test_vote_upload(
 
     # Fallback
     client.get('/locale/en_US').follow()
-    manage = client.get('/').maybe_follow().click("Votes")
+    manage = client.get('/votes')
     manage = manage.click("Details")
     for name in names:
         name = name.replace('_', '-')
@@ -518,7 +518,7 @@ def test_view_vote_static_attachment_links(
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details")
 
     # No attachments yet
@@ -556,7 +556,7 @@ def test_view_vote_campaign_material(
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    page = client.get('/').maybe_follow().click('Abstimmungen')
+    page = client.get('/votes')
     page = page.click('Details')
 
     # Other
@@ -578,13 +578,13 @@ def test_view_vote_campaign_material(
     assert manage.click('article.pdf').content_type == 'application/pdf'
 
     # ... view
-    details = client.get('/').maybe_follow().click('Abstimmungen')
+    details = client.get('/votes')
     details = details.click('Details').click('Liste der Dokumente anzeigen')
     assert details.click('Article').content_type == 'application/pdf'
 
     # ... view (anon)
-    details = Client(swissvotes_app).get('/').maybe_follow()
-    details = details.click('Abstimmungen').click('Details')
+    anon = Client(swissvotes_app)
+    details = anon.get('/votes').click('Details')
     details = details.click('Liste der Dokumente anzeigen')
     assert 'Urheberrechtsschutz' in details
     with pytest.raises(IndexError):
@@ -655,7 +655,7 @@ def test_view_vote_search(
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    page = client.get('/').maybe_follow().click('Abstimmungen')
+    page = client.get('/votes')
     page.form['term'] = 'keyword'
     page = page.form.submit()
     page = page.click('Suchresultate in den Dokumenten zu dieser Vorlage')

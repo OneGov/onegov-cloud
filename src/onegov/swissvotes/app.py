@@ -135,6 +135,7 @@ def swissvotes_content_security_policy() -> ContentSecurityPolicy:
     policy.connect_src.add('https://mstdn.social')
     policy.img_src.add('https://www.emuseum.ch')
     policy.script_src.add('https://stats.seantis.ch')
+    policy.script_src.add(' https://unibe.us16.list-manage.com')
     return policy
 
 
@@ -171,6 +172,12 @@ def get_frameworks_asset() -> Iterator[str]:
     yield 'd3.js'
     yield 'd3.chart.bar.js'
     yield 'foundation.js'
+    yield 'foundation.reveal.js'
+    yield 'foundation.alert.js'
+    yield 'foundation.dropdown.js'
+    yield 'foundation.orbit.js'
+    yield 'foundation.topbar.js'
+    yield 'foundation.tooltip.js'
     yield 'intercooler.js'
     yield 'underscore.js'
     yield 'sortable.js'
@@ -192,6 +199,8 @@ def get_common_asset() -> Iterator[str]:
     yield 'common.js'
     yield 'policy-selector.jsx'
     yield 'image-gallery.js'
+    yield 'mailchimp-validate.js'
+    yield 'mailchimp.js'
 
 
 @SwissvotesApp.webasset('mastodon')
