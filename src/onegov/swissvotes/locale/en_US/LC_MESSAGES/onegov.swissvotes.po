@@ -2153,8 +2153,8 @@ msgstr "Page not found"
 msgid "The page you are looking for could not be found."
 msgstr "The page you are looking for could not be found."
 
-msgid "The database on Swiss referendums"
-msgstr "The database on Swiss referendums"
+msgid "The database on Swiss popular votes"
+msgstr "The database on Swiss popular votes"
 
 msgid "Page added."
 msgstr "Page added."

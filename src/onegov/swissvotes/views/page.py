@@ -179,7 +179,7 @@ def view_page(
 
     if self.id == 'home':
         layout.title = 'Swissvotes'
-        layout.sub_title = _('The database on Swiss referendums')
+        layout.sub_title = _('The database on Swiss popular votes')
 
     return {
         'layout': layout,

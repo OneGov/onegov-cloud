@@ -2117,8 +2117,8 @@ msgstr "Page introuvable"
 msgid "The page you are looking for could not be found."
 msgstr "La page que vous cherchez n’a pas pu être trouvée."
 
-msgid "The database on Swiss referendums"
-msgstr "La base de données sur les référendums suisses"
+msgid "The database on Swiss popular votes"
+msgstr "La base de données des votations en Suisse"
 
 msgid "Page added."
 msgstr "Page ajoutée."
