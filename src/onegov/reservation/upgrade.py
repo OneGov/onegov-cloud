@@ -255,146 +255,146 @@ def add_reserved_slots_indeces(context: UpgradeContext) -> None:
 @upgrade_task('Add additional indexes to libres tables')
 def add_additional_indexes_to_libres_tables(context: UpgradeContext) -> None:
     context.operations.create_index(
-      'ix_reserved_slots_end',
-      'reserved_slots',
-      columns=['end'],
-      if_not_exists=True
+        'ix_reserved_slots_end',
+        'reserved_slots',
+        columns=['end'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reserved_slots_allocation_id',
-      'reserved_slots',
-      columns=['allocation_id'],
-      if_not_exists=True
+        'ix_reserved_slots_allocation_id',
+        'reserved_slots',
+        columns=['allocation_id'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_token',
-      'reservations',
-      columns=['token'],
-      if_not_exists=True
+        'ix_reservations_token',
+        'reservations',
+        columns=['token'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_target',
-      'reservations',
-      columns=['target'],
-      if_not_exists=True
+        'ix_reservations_target',
+        'reservations',
+        columns=['target'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_target_type',
-      'reservations',
-      columns=['target_type'],
-      if_not_exists=True
+        'ix_reservations_target_type',
+        'reservations',
+        columns=['target_type'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_type',
-      'reservations',
-      columns=['type'],
-      if_not_exists=True
+        'ix_reservations_type',
+        'reservations',
+        columns=['type'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_resource',
-      'reservations',
-      columns=['resource'],
-      if_not_exists=True
+        'ix_reservations_resource',
+        'reservations',
+        columns=['resource'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_start',
-      'reservations',
-      columns=['start'],
-      if_not_exists=True
+        'ix_reservations_start',
+        'reservations',
+        columns=['start'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_end',
-      'reservations',
-      columns=['end'],
-      if_not_exists=True
+        'ix_reservations_end',
+        'reservations',
+        columns=['end'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_status',
-      'reservations',
-      columns=['status'],
-      if_not_exists=True
+        'ix_reservations_status',
+        'reservations',
+        columns=['status'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_email',
-      'reservations',
-      columns=['email'],
-      if_not_exists=True
+        'ix_reservations_email',
+        'reservations',
+        columns=['email'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservations_session_id',
-      'reservations',
-      columns=['session_id'],
-      if_not_exists=True
+        'ix_reservations_session_id',
+        'reservations',
+        columns=['session_id'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservation_blockers_token',
-      'reservation_blockers',
-      columns=['token'],
-      if_not_exists=True
+        'ix_reservation_blockers_token',
+        'reservation_blockers',
+        columns=['token'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservation_blockers_target',
-      'reservation_blockers',
-      columns=['target'],
-      if_not_exists=True
+        'ix_reservation_blockers_target',
+        'reservation_blockers',
+        columns=['target'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservation_blockers_target_type',
-      'reservation_blockers',
-      columns=['target_type'],
-      if_not_exists=True
+        'ix_reservation_blockers_target_type',
+        'reservation_blockers',
+        columns=['target_type'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservation_blockers_resource',
-      'reservation_blockers',
-      columns=['resource'],
-      if_not_exists=True
+        'ix_reservation_blockers_resource',
+        'reservation_blockers',
+        columns=['resource'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservation_blockers_start',
-      'reservation_blockers',
-      columns=['start'],
-      if_not_exists=True
+        'ix_reservation_blockers_start',
+        'reservation_blockers',
+        columns=['start'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_reservation_blockers_end',
-      'reservation_blockers',
-      columns=['end'],
-      if_not_exists=True
+        'ix_reservation_blockers_end',
+        'reservation_blockers',
+        columns=['end'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_allocations_resource',
-      'allocations',
-      columns=['resource'],
-      if_not_exists=True
+        'ix_allocations_resource',
+        'allocations',
+        columns=['resource'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_allocations_type',
-      'allocations',
-      columns=['type'],
-      if_not_exists=True
+        'ix_allocations_type',
+        'allocations',
+        columns=['type'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_allocations_mirror_of',
-      'allocations',
-      columns=['mirror_of'],
-      if_not_exists=True
+        'ix_allocations_mirror_of',
+        'allocations',
+        columns=['mirror_of'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_allocations_group',
-      'allocations',
-      columns=['group'],
-      if_not_exists=True
+        'ix_allocations_group',
+        'allocations',
+        columns=['group'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_allocations_start',
-      'allocations',
-      columns=['_start'],
-      if_not_exists=True
+        'ix_allocations_start',
+        'allocations',
+        columns=['_start'],
+        if_not_exists=True
     )
     context.operations.create_index(
-      'ix_allocations_end',
-      'allocations',
-      columns=['_end'],
-      if_not_exists=True
+        'ix_allocations_end',
+        'allocations',
+        columns=['_end'],
+        if_not_exists=True
     )
