@@ -7,6 +7,7 @@ from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_complex_vote
 from tests.onegov.election_day.common import upload_vote
 from webtest import TestApp as Client
+from webtest import Upload
 
 
 from typing import TYPE_CHECKING
@@ -285,3 +286,31 @@ def test_views_vote_municipal_and_municipality(
     assert 'Hochwasserschutzprojekt Dorfbach ' in balgach_page
     assert '75.15' in balgach_page
     assert balgach_page.click('Dorfbach').maybe_follow().status_code == 200
+
+
+def test_view_vote_shows_long_title(election_day_app_zg: TestApp) -> None:
+    client = Client(election_day_app_zg)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['title_de'] = 'The Long Title of the Vote'
+    new.form['short_title_de'] = 'Short Title'
+    new.form['date'] = '2022-01-01'
+    new.form['domain'] = 'federation'
+    new.form['type'] = 'simple'
+    new.form.submit().follow()
+
+    csv = (
+        'entity_id,yeas,nays,eligible_voters,empty,invalid,status,type,counted\n'
+        '1701,3049,5111,13828,54,3,final,proposal,true\n'
+    )
+    upload = client.get('/vote/short-title/upload')
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain')
+    upload.form.submit()
+
+    archive = client.get('/archive/2022-01-01')
+    assert 'The Long Title of the Vote' in archive
+    assert 'Short Title' not in archive
