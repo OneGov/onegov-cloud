@@ -177,10 +177,12 @@ def handle_new_directory(
         try:
             directory = self.add_by_form(form, properties=('configuration', ))
         except DuplicateEntryError as e:
+            transaction.abort()
+            # NOTE: The alert needs to be emitted after, so it doesn't get
+            #       rolled back as well.
             request.alert(_('The entry ${name} exists twice', mapping={
                 'name': e.name
             }))
-            transaction.abort()
             return request.redirect(request.link(self))
 
         request.success(_('Added a new directory'))
@@ -674,10 +676,12 @@ def handle_new_directory_entry(
                 type='extended'
             )
         except DuplicateEntryError as e:
+            transaction.abort()
+            # NOTE: The alert needs to be emitted after, so it doesn't get
+            #       rolled back as well.
             request.alert(_('The entry ${name} exists twice', mapping={
                 'name': e.name
             }))
-            transaction.abort()
             return request.redirect(request.link(self))
 
         if self.directory.enable_update_notifications and entry.access in (
@@ -1061,29 +1065,30 @@ def view_import(
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
+        message: str | None = None
         try:
             imported = form.run_import(target=self.directory)
         except MissingColumnError as e:
             field = self.directory.field_by_id(e.column)
             assert field is not None
-            request.alert(_('The column ${name} is missing', mapping={
+            message = _('The column ${name} is missing', mapping={
                 'name': field.human_id
-            }))
+            })
         except MissingFileError as e:
-            request.alert(_('The file ${name} is missing', mapping={
+            message = _('The file ${name} is missing', mapping={
                 'name': e.name
-            }))
+            })
         except DuplicateEntryError as e:
-            request.alert(_('The entry ${name} exists twice', mapping={
+            message = _('The entry ${name} exists twice', mapping={
                 'name': e.name
-            }))
+            })
         except ValidationError as e:
             error = e
         except NotImplementedError:
-            request.alert(_(
+            message = _(
                 'The given file is invalid, does it include a metadata.json '
                 'with a data.xlsx, data.csv, or data.json?'
-            ))
+            )
         else:
             notify = request.success if imported else request.warning
             notify(_('Imported ${count} entries', mapping={
@@ -1094,6 +1099,10 @@ def view_import(
 
         # no success if we land here
         transaction.abort()
+        # NOTE: The alert needs to be emitted after, so it doesn't get
+        #       rolled back as well.
+        if message is not None:
+            request.alert(message)
 
     return {
         'layout': layout,

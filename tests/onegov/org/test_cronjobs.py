@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 import logging
+import niquests
 import os
 import pytest
-import requests
 import transaction
 
 from datetime import datetime, timedelta, timezone
@@ -1720,7 +1720,7 @@ def test_update_newsletter_email_bounce_statistics(
     transaction.commit()
     close_all_sessions()
 
-    with patch('requests.Session.get') as mock_get:
+    with patch('niquests.Session.get') as mock_get:
         mock_get.side_effect = [
             Bunch(  # answer to bounce request
                 status_code=200,
@@ -1797,7 +1797,7 @@ def test_update_newsletter_email_bounce_statistics(
             'michu@user.ch').is_inactive is True
 
     # reactivate recipients
-    with patch('requests.Session.get') as mock_get:
+    with patch('niquests.Session.get') as mock_get:
         mock_get.side_effect = [
             Bunch(  # answer to bounce request
                 status_code=200,
@@ -1856,12 +1856,12 @@ def test_update_newsletter_email_bounce_statistics(
             'michu@user.ch').is_inactive is True
 
     # test raising runtime warning exception for status code 401
-    with patch('requests.Session.get') as mock_get:
+    with patch('niquests.Session.get') as mock_get:
         mock_get.return_value = Bunch(
             status_code=401,
             json=lambda: {},
             raise_for_status=Mock(
-                side_effect=requests.exceptions.HTTPError('401 Unauthorized')),
+                side_effect=niquests.exceptions.HTTPError('401 Unauthorized')),
         )
 
         # execute cronjob
@@ -1870,16 +1870,16 @@ def test_update_newsletter_email_bounce_statistics(
 
     # for other 30x and 40x status codes, the cronjob shall raise an exception
     for status_code in [301, 302, 303, 400, 402, 403, 404, 405]:
-        with patch('requests.Session.get') as mock_get:
+        with patch('niquests.Session.get') as mock_get:
             mock_get.return_value = Bunch(
                 status_code=status_code,
                 json=lambda: {},
                 raise_for_status=Mock(
-                    side_effect=requests.exceptions.HTTPError()),
+                    side_effect=niquests.exceptions.HTTPError()),
             )
 
             # execute cronjob
-            with pytest.raises(requests.exceptions.HTTPError):
+            with pytest.raises(niquests.exceptions.HTTPError):
                 client.get(get_cronjob_url(job))
 
     recipients = RecipientCollection(client.app.session())
@@ -2253,15 +2253,15 @@ def test_wil_daily_event_import(
     wil_app.azizi_api_token = 'mytoken'
 
     # connection error
-    with patch('requests.get',
-               side_effect=requests.exceptions.ConnectionError):
+    with patch('niquests.get',
+               side_effect=niquests.exceptions.ConnectionError):
         client.get(get_cronjob_url(wil_job))
 
         assert ('Failed to retrieve events for Wil from' in
                 capturelog.records()[-1].message)
 
     # server error
-    with patch('requests.get') as mock_get:
+    with patch('niquests.get') as mock_get:
         mock_response = Mock()
         mock_response.status_code = 500
         mock_response.text = 'Internal Server Error'

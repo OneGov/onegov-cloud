@@ -7,6 +7,8 @@ from onegov.file import FileCollection
 from onegov.swissvotes.app import SwissvotesApp
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
+from onegov.swissvotes.converters import policy_area_converter
+from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import Principal
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
@@ -54,7 +56,7 @@ def get_locale(app: SwissvotesApp, locale: str) -> SiteLocale | None:
         'to_date': extended_date_converter,
         'legal_form': [int],
         'result': [int],
-        'policy_area': [str],
+        'policy_area': [policy_area_converter],
         'term': str,
         'full_text': bool,
         'position_federal_council': [int],
@@ -71,7 +73,7 @@ def get_votes(
     to_date: date | None = None,
     legal_form: list[int] | None = None,
     result: list[int] | None = None,
-    policy_area: list[str] | None = None,
+    policy_area: list[PolicyArea] | None = None,
     term: str | None = None,
     full_text: bool | None = None,
     position_federal_council: list[int] | None = None,

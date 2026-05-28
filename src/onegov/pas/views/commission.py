@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import date
 from itertools import groupby
 
 from onegov.core.elements import Link
@@ -10,7 +11,9 @@ from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
+from onegov.pas.utils import is_active_kantonsrat_member
 from onegov.user import User
+from sqlalchemy import or_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -107,10 +110,6 @@ def commissions_parliamentarians_json(
     self: PASCommissionCollection, request: TownRequest
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
-    # TODO: Should we consider all that have been active in
-    # current settlement run to be more precise?
-    # It might happen that some have been active just recently
-    # but not anymore, these will not be selectable currently.
     if not request.is_admin:
         if (not hasattr(request.identity, 'role')
             or request.identity.role not in (
@@ -118,7 +117,17 @@ def commissions_parliamentarians_json(
             return {}
 
     session = request.session
-    memberships = session.query(PASCommissionMembership).all()
+    today = date.today()
+    memberships = (
+        session.query(PASCommissionMembership)
+        .filter(
+            or_(
+                PASCommissionMembership.end.is_(None),
+                PASCommissionMembership.end >= today,
+            )
+        )
+        .all()
+    )
 
     # If user is parliamentarian, filter to only their commissions
     if (hasattr(request.identity, 'role')
@@ -182,6 +191,7 @@ def commissions_parliamentarians_json(
                 'title': m.parliamentarian.title
             }
             for m in group
+            if is_active_kantonsrat_member(m.parliamentarian)
         ]
         for commission_id, group in groupby(sorted_memberships, key=key_func)
     }

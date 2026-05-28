@@ -16,7 +16,7 @@ from unittest import mock
 def no_requests(monkeypatch: pytest.MonkeyPatch) -> None:
     # prevents tests from making live requests
     mock_session = mock.Mock()
-    monkeypatch.delattr('requests.sessions.Session.request')
+    monkeypatch.delattr('niquests.sessions.Session.request')
 
 
 def test_datatrans_fee_policy() -> None:
@@ -48,9 +48,8 @@ def test_datatrans_settle_good_tx() -> None:
 
         transaction.commit()
         mock_session.post.assert_called_once_with(
-            f'{client.base_url}/transactions/bar/settle',
-            json={'amount': 100, 'currency': 'CHF', 'refno': 'baz'},
-            timeout=(5, 10)
+            '/transactions/bar/settle',
+            json={'amount': 100, 'currency': 'CHF', 'refno': 'baz'}
         )
 
 

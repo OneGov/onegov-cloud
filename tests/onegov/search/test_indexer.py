@@ -429,3 +429,56 @@ def test_tags(
     assert indexer.process([task], session)
 
     # TODO search indexed entry using search index via tags
+
+
+def test_index_delete_failure_aborts_transaction(
+    session_manager: SessionManager,
+    session: Session
+) -> None:
+    # Adding a person: index() raises a failure that propagates through
+    # process() into tpc_vote, causing the transaction manager to call
+    # tpc_abort on all data managers.
+
+    from onegov.core.orm import Base
+    mappings = TypeMappingRegistry()
+    mappings.register_orm_base(Base)
+    indexer = Indexer(mappings)
+    translator = ORMEventTranslator(indexer)
+
+    session_manager.on_insert.connect(translator.on_insert)
+    session_manager.on_delete.connect(translator.on_delete)
+    session_manager.on_transaction_join.connect(translator.on_transaction_join)
+
+    people = PersonCollection(session)
+    person = people.add(first_name='John', last_name='Doe')
+
+    with patch.object(
+        indexer,
+        'index',
+        side_effect=RuntimeError('search index error')
+    ):
+        with pytest.raises(RuntimeError, match='search index error'):
+            transaction.commit()
+
+    transaction.begin()
+    assert people.query().count() == 0
+
+    # Existing person: delete() raises — the deletion
+    # is rolled back and the person remains in the database.
+    person = people.add(first_name='John', last_name='Doe')
+    transaction.commit()
+    transaction.begin()
+    assert people.query().count() == 1
+
+    session.delete(person)
+
+    with patch.object(
+        indexer,
+        'delete',
+        side_effect=RuntimeError('search index error')
+    ):
+        with pytest.raises(RuntimeError, match='search index error'):
+            transaction.commit()
+
+    transaction.begin()
+    assert people.query().count() == 1

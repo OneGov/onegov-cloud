@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import click
 
+from onegov.activity import Activity
 from onegov.core.cli import command_group
 from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
@@ -172,3 +173,32 @@ def compute_occasion_durations(
             o.duration = o.compute_duration(o.dates)
 
     return compute_occasion_durations
+
+
+@cli.command(name='delete-activity', context_settings={'singular': True})
+@click.argument('name')
+def delete_activity(
+    name: str
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
+    """ Deletes activities with name (not Title).
+
+    Example::
+
+        onegov-feriennet --select /foo/bar activity "mandala-malen"
+
+    """
+
+    def delete_activity(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+
+        activity = request.session.query(
+            Activity).filter_by(name=name).first()
+
+        if not activity:
+            raise click.ClickException(f'Could not find activity «{name}»')
+
+        request.session.delete(activity)
+
+    return delete_activity

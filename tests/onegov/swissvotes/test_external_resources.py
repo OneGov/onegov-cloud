@@ -87,7 +87,7 @@ def test_posters_fetch(swissvotes_app: TestApp) -> None:
     )
 
     with patch(
-        'onegov.swissvotes.external_resources.posters.requests.get',
+        'onegov.swissvotes.external_resources.posters.niquests.get',
         return_value=MagicMock(content=xml.format('http://source/xxx'))
     ):
         assert mfg_posters.fetch(session) == (6, 0, 0, set())
@@ -136,7 +136,7 @@ def test_posters_fetch(swissvotes_app: TestApp) -> None:
     vote_3.posters_sa_nay = ''  # -1
 
     with patch(
-        'onegov.swissvotes.external_resources.posters.requests.get',
+        'onegov.swissvotes.external_resources.posters.niquests.get',
         return_value=MagicMock(content=xml.format('http://source/yyy'))
     ):
         assert mfg_posters.fetch(session) == (2, 4, 2, set())
@@ -181,7 +181,7 @@ def test_posters_fetch(swissvotes_app: TestApp) -> None:
         assert vote_3.posters_sa_nay_imgs == {}
 
     with patch(
-        'onegov.swissvotes.external_resources.posters.requests.get',
+        'onegov.swissvotes.external_resources.posters.niquests.get',
         side_effect=Exception()
     ):
         assert mfg_posters.fetch(session) == (
