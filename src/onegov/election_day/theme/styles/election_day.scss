@@ -149,6 +149,14 @@ html {
     h3 {
         font-size: $h4-font-size;
     }
+
+    .municipal-view-link {
+        font-size: .875rem;
+        margin-bottom: 2rem;
+        padding-left: 1em;
+        padding-top: 7px;
+        padding-bottom: 7px;
+    }
 }
 
 @media #{$small-only} {

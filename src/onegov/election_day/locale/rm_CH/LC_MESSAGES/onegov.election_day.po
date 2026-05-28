@@ -927,8 +927,8 @@ msgstr "Elecziuns chantunalas"
 msgid "Municipal Elections and Votes"
 msgstr "Elecziuns e votaziuns communalas"
 
-msgid "All municipal election and vote results"
-msgstr "Tut ils resultats da las elecziuns e votaziuns communalas"
+msgid "Local election and referendum results"
+msgstr "Als resultats da las elecziuns e votaziuns communalas"
 
 msgid "Federal Votes"
 msgstr "Votaziuns federalas"

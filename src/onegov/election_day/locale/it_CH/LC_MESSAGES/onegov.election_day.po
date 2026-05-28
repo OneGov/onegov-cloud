@@ -915,8 +915,8 @@ msgstr "Elezioni regionali"
 msgid "Cantonal Elections"
 msgstr "Elezioni cantonali"
 
-msgid "All municipal election and vote results"
-msgstr "Tutti i risultati delle elezioni e votazioni comunali"
+msgid "Local election and referendum results"
+msgstr "Ai risultati delle elezioni e votazioni comunali"
 
 msgid "Federal Votes"
 msgstr "Votazioni federali"

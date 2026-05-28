@@ -81,11 +81,11 @@
                                     <tal:block i18n:translate="">on</tal:block> ${layout.format_date(date, 'date_long')}
                                 </span>
                             </h3>
-                            <p tal:condition="show_communal_nav">
+                            <div tal:condition="show_communal_nav" class="municipal-view-link">
                                 <a href="${request.link(layout.municipal_archive.for_date(date))}" i18n:translate="">
-                                    All municipal election and vote results
+                                    Local election and referendum results
                                 </a>
-                            </p>
+                            </div>
                         </tal:block>
 
                         <h3 tal:condition="type == 'vote' and domain == 'federation'">

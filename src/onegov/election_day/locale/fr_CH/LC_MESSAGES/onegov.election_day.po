@@ -920,8 +920,8 @@ msgstr "Elections régionales"
 msgid "Cantonal Elections"
 msgstr "Elections cantonaux"
 
-msgid "All municipal election and vote results"
-msgstr "Tous les résultats des élections et votations communales"
+msgid "Local election and referendum results"
+msgstr "Aux résultats des élections et votations communales"
 
 msgid "Federal Votes"
 msgstr "Votations fédérales"
