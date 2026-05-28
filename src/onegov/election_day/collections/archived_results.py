@@ -506,6 +506,9 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
             return None
         return self.municipality_mapping[municipality]
 
+    def get_municipalities(self) -> list[str]:
+        return sorted(self.municipality_mapping.values())
+
     def sanitize_municipality(self, municipality: str) -> str:
         """
         Removes ` (SG)`, removes spaces and `.` from municipality.
@@ -671,6 +674,7 @@ class SearchableArchivedResultCollection(
     @property
     def term_filter(self) -> tuple[
         ColumnElement[str | None],
+        ColumnElement[str | None],
         ColumnElement[str | None]
     ]:
         term = SearchableArchivedResultCollection.term_to_tsquery_string(
@@ -682,6 +686,9 @@ class SearchableArchivedResultCollection(
             ),
             SearchableArchivedResultCollection.filter_text_by_locale(
                 ArchivedResult.title, term, self.locale
+            ),
+            SearchableArchivedResultCollection.filter_text_by_locale(
+                ArchivedResult.meta['domain_segment'].astext, term, self.locale
             )
         )
 
