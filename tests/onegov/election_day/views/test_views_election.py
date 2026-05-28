@@ -1056,7 +1056,7 @@ def test_views_election_municipal_and_municipality(
         assert municipality in municipal_page
 
     # verify municipality detail page
-    goldach_page = municipal_page.click('Goldach')
+    goldach_page = municipal_page.click('Goldach', index=0)
     assert 'Urnengang vom 18. Mai 2025' in goldach_page
     assert 'Kommunale Wahlen und Abstimmungen' in goldach_page
     assert 'Goldach' in goldach_page

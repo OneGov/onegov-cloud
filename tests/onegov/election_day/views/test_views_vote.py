@@ -275,7 +275,7 @@ def test_views_vote_municipal_and_municipality(
         assert municipality in municipal_page
 
     # verify municipality detail page
-    balgach_page = municipal_page.click('Balgach')
+    balgach_page = municipal_page.click('Balgach', index=0)
     assert 'Urnengang vom 18. Mai 2025' in balgach_page
     assert 'Kommunale Wahlen und Abstimmungen' in balgach_page
     assert 'Balgach' in balgach_page
