@@ -1,8 +1,12 @@
 # Changes
 
+## 2026.30
+
+No changes since last release
+
 ## 2026.29
 
-`2026-05-28` | [45e660da37...48829840f9](https://github.com/OneGov/onegov-cloud/compare/45e660da37^...48829840f9)
+`2026-05-28` | [45e660da37...7e3e5ef99d](https://github.com/OneGov/onegov-cloud/compare/45e660da37^...7e3e5ef99d)
 
 ### Core
 
@@ -1607,48 +1611,4 @@ Right split trailing slashes from configured domains prior comparison
 ##### Ensure finalized attendance for commission.
 
 `Bugfix` | [OGC-2845](https://linear.app/onegovcloud/issue/OGC-2845) | [58d94c5689](https://github.com/onegov/onegov-cloud/commit/58d94c568988d3748aa184372b1ee755ac0c858a)
-
-## 2026.3
-
-`2026-01-29` | [e17f907a3b...742db7bad0](https://github.com/OneGov/onegov-cloud/compare/e17f907a3b^...742db7bad0)
-
-### Feriennet
-
-##### Banner
-
-`Feature` | [PRO-1474](https://linear.app/projuventute/issue/PRO-1474) | [09587de5de](https://github.com/onegov/onegov-cloud/commit/09587de5dec6f8da0f64717cc926937b4a535983)
-
-### Org
-
-##### Adds a resource switcher to the occupancy view
-
-`Feature` | [OGC-2873](https://linear.app/onegovcloud/issue/OGC-2873) | [3943814f00](https://github.com/onegov/onegov-cloud/commit/3943814f00d40378b65be76af3100f4f9ec34114)
-
-##### Adds an utilization stats button to the occupancy view
-
-`Feature` | [OGC-2062](https://linear.app/onegovcloud/issue/OGC-2062) | [0baff1be97](https://github.com/onegov/onegov-cloud/commit/0baff1be97f0105c4f9fb3fdb37c292a93e91350)
-
-##### Adds missing access hints in boardlets
-
-`Bugfix` | [cd3d24431a](https://github.com/onegov/onegov-cloud/commit/cd3d24431a59ab8edde4049e50eb5b8ba5decb51)
-
-##### Resolve fixme for TagField
-
-`Bugfix` | [92b85f250f](https://github.com/onegov/onegov-cloud/commit/92b85f250f0f9cd3d0101ed082ff9d057c3a43bf)
-
-##### Fixes reservation blockers for non-partly available allocations
-
-`Bugfix` | [OGC-2937](https://linear.app/onegovcloud/issue/OGC-2937) | [92064770d5](https://github.com/onegov/onegov-cloud/commit/92064770d54e48997a5d471a859def6ab336f022)
-
-### Search
-
-##### Adds it_ch to used locales for Org and Town6
-
-`Feature` | [OGC-2931](https://linear.app/onegovcloud/issue/OGC-2931) | [138cf9df78](https://github.com/onegov/onegov-cloud/commit/138cf9df78942706cddb5c1f7a55cb373d3cb59e)
-
-### Town6
-
-##### Allow to copy newsletter.
-
-`Feature` | [OGC-1663](https://linear.app/onegovcloud/issue/OGC-1663) | [9af1fd1d74](https://github.com/onegov/onegov-cloud/commit/9af1fd1d74a7297f6314e7c093b0363220e399fc)
 
