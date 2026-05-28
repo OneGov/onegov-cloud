@@ -45,11 +45,11 @@
                 </h3>
 
                 <div tal:repeat="domain archive_items[date]" class="domain-${domain}">
-                    <h4 tal:condition="municipal_view">
+                    <h3 tal:condition="municipal_view">
                         <a href="${request.link(layout.municipality_archive.for_municipality(domain))}">
                             <span>${domain}</span>
                         </a>
-                    </h4>
+                    </h3>
 
                     <div tal:repeat="type archive_items[date][domain]" class="type-${type}">
 
