@@ -61,7 +61,7 @@ class AgendaItemCollection(GenericCollection[AgendaItem]):
         query = self.session.query(AgendaItem)
         query = query.outerjoin(AgendaItem.vota)
         query = query.filter(AgendaItem.assembly_id == assembly.id)
-        query = query.order_by(AgendaItem.number.desc())
+        query = query.order_by(AgendaItem.number.desc(), Votum.number)
         query = query.options(
             contains_eager(AgendaItem.vota)
                 .undefer(Votum.content)

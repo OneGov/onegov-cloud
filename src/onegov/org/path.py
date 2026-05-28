@@ -820,6 +820,7 @@ def get_event(app: OrgApp, name: str) -> Event | None:
     path='/search',
     converters={
         'type': [str],
+        'plain': bool,
         'page': int
     }
 )
@@ -827,9 +828,10 @@ def get_search(
     request: OrgRequest,
     q: str = '',
     type: list[str] | None = None,
+    plain: bool = False,
     page: int = 0
 ) -> Search:
-    return Search(request, q, types=type, page=page)
+    return Search(request, q, types=type, plain=plain, page=page)
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')

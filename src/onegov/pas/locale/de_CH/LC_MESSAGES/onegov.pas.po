@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-04-23 14:40+0200\n"
+"POT-Creation-Date: 2026-05-28 01:42+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -188,6 +188,9 @@ msgstr "Grundeigenschaften"
 
 msgid "Contract number"
 msgstr "Vertragsnummer"
+
+msgid "ZG Username"
+msgstr "ZG Benutzername"
 
 msgid "Gender"
 msgstr "Geschlecht"
@@ -405,21 +408,6 @@ msgstr "Abbrechen"
 msgid "Commissions"
 msgstr "Kommissionen"
 
-msgid "Do you really want to delete this commission?"
-msgstr "Möchten Sie die Kommission wirklich löschen?"
-
-msgid "Delete commission"
-msgstr "Kommission löschen"
-
-msgid "Remove"
-msgstr "Entfernen"
-
-msgid "Do you really want to remove this parliamentarian?"
-msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
-
-msgid "Remove parliamentarian"
-msgstr "Parlamentarier:in entfernen"
-
 #, python-format
 msgid "${hours} hours ${minutes} minutes"
 msgstr "${hours} Stunden ${minutes} Minuten"
@@ -468,44 +456,11 @@ msgstr "Legislatur löschen"
 msgid "Parliamentarians"
 msgstr "Parlamentarier:innen"
 
-msgid "Role (as a party or group member)"
-msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
-
-msgid "Do you really want to delete this parliamentarian?"
-msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
-
-msgid "Delete parliamentarian"
-msgstr "Parlamentarier:in löschen"
-
-msgid "Do you really want to remove this role?"
-msgstr "Rolle wirklich entfernen?"
-
-msgid "Remove role"
-msgstr "Rolle entfernen"
-
 msgid "Parliamentary groups"
 msgstr "Fraktionen"
 
-msgid "Parliamentary group"
-msgstr "Fraktion"
-
-msgid "Do you really want to delete this parliamentary group?"
-msgstr "Möchten Sie diese Fraktion wirklich löschen?"
-
-msgid "Delete parliamentary group"
-msgstr "Fraktion löschen"
-
 msgid "Parties"
 msgstr "Parteien"
-
-msgid "Party"
-msgstr "Partei"
-
-msgid "Do you really want to delete this party?"
-msgstr "Möchten Sie diese Partei wirklich löschen?"
-
-msgid "Delete party"
-msgstr "Partei löschen"
 
 msgid "Presidential allowances"
 msgstr "Präsidialzulagen"
@@ -571,6 +526,13 @@ msgstr "Auf App hochgeladen"
 
 msgid "Vice president"
 msgstr "Vize-Präsident:in"
+
+msgid ""
+"Your user account is not linked to a parliamentarian record. Please contact "
+"an administrator."
+msgstr ""
+"Ihr Benutzerkonto ist nicht mit einem Parlamentarier-Eintrag verknüpft. "
+"Bitte kontaktieren Sie einen Administrator."
 
 msgid "Duration"
 msgstr "Dauer"
@@ -736,11 +698,11 @@ msgid "Hello!"
 msgstr "Hallo!"
 
 msgid ""
-"${user_name} has closed commission ${commission_name} for settlement run "
-"${settlement_run_name}."
+"${user_name} has completed the recording for commission ${commission_name} "
+"in settlement run ${settlement_run_name}."
 msgstr ""
-"${user_name} hat den Abschluss der Kommission ${commission_name} für den "
-"Abrechnungslauf ${settlement_run_name} gesetzt."
+"${user_name} hat für die Kommission «${commission_name}» im Abrechnungslauf "
+"«${settlement_run_name}» die Erfassung abgeschlossen."
 
 msgid "Parliamentarian:"
 msgstr "Parlamentarier:in:"
@@ -754,21 +716,17 @@ msgstr "Datum:"
 msgid "Set by:"
 msgstr "Gesetzt von:"
 
-msgid ""
-"${parliamentarian_name} can no longer add new commission attendances for the "
-"period ${start} – ${end}."
-msgstr ""
-"${parliamentarian_name} kann für den Zeitraum ${start} – ${end} keine neuen "
-"Kommissions-Anwesenheiten mehr hinzufügen."
-
-msgid "ZG Username"
-msgstr "ZG Benutzername"
-
 msgid "Roles"
 msgstr "Rollen"
 
 msgid "Parliament"
 msgstr "Parlament"
+
+msgid "Party"
+msgstr "Partei"
+
+msgid "Parliamentary group"
+msgstr "Fraktion"
 
 msgid "Role"
 msgstr "Rolle"
@@ -876,6 +834,11 @@ msgstr "Noch keine Abrechnungsläufe erfasst"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
+msgid "Cannot book attendance - abschluss already set for this settlement run"
+msgstr ""
+"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für diesen "
+"Abrechnungslauf"
+
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
 
@@ -887,6 +850,12 @@ msgstr "Nur Administratoren können Massenanwesenheiten erfassen."
 
 msgid "New commission session (bulk)"
 msgstr "Neue Massenbuchung Kommissionssitzung"
+
+#, python-format
+msgid "Cannot book attendance - abschluss already set for: ${names}"
+msgstr ""
+"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
+"${names}"
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
@@ -946,23 +915,8 @@ msgstr ""
 msgid "Deleted ${count} attendeces"
 msgstr "${count} Anwesenheiten gelöscht"
 
-msgid "Added a new parliamentarian"
-msgstr "Parlamentarier:in hinzugefügt"
-
-msgid "New parliamentarian"
-msgstr "Neue:r Parlamentarier:in"
-
-msgid "New commission meeting"
-msgstr "Neue Kommissionsitzung"
-
-#, python-format
-msgid "Cannot book attendance - abschluss already set for: ${names}"
-msgstr ""
-"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
-"${names}"
-
-msgid "Added commission meeting"
-msgstr "Kommissionsitzung hinzugefügt"
+msgid "Inactive"
+msgstr "Inaktiv"
 
 msgid "Overview"
 msgstr "Übersicht"
@@ -987,23 +941,11 @@ msgstr ""
 msgid "Import failed: ${error}"
 msgstr "Import fehlgeschlagen: ${error}"
 
-msgid "Inactive"
-msgstr "Inaktiv"
-
 msgid "Added a new legislative period"
 msgstr "Legislatur hinzugefügt"
 
 msgid "New legislative period"
 msgstr "Neue Legislatur"
-
-msgid "The parliamentarian has been deleted."
-msgstr "Der/Die Parlamentarier:in wurde gelöscht."
-
-msgid "Added a new party"
-msgstr "Partei hinzugefügt"
-
-msgid "New party"
-msgstr "Neue Partei"
 
 msgid "Allowance added"
 msgstr "Zulage hinzugefügt"
@@ -1047,6 +989,9 @@ msgstr "Abrechnungen nach Kommission"
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
 
+msgid "All Parliamentarians (ZIP)"
+msgstr "Alle Parlamentarier:innen (ZIP)"
+
 msgid "Abschlussliste"
 msgstr "Abschlussliste"
 
@@ -1086,6 +1031,69 @@ msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
 
+#~ msgid "Do you really want to delete this commission?"
+#~ msgstr "Möchten Sie die Kommission wirklich löschen?"
+
+#~ msgid "Delete commission"
+#~ msgstr "Kommission löschen"
+
+#~ msgid "Remove"
+#~ msgstr "Entfernen"
+
+#~ msgid "Do you really want to remove this parliamentarian?"
+#~ msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
+
+#~ msgid "Remove parliamentarian"
+#~ msgstr "Parlamentarier:in entfernen"
+
+#~ msgid "Role (as a party or group member)"
+#~ msgstr "Rolle (als Partei- oder Fraktionsmitglied)"
+
+#~ msgid "Do you really want to delete this parliamentarian?"
+#~ msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
+
+#~ msgid "Delete parliamentarian"
+#~ msgstr "Parlamentarier:in löschen"
+
+#~ msgid "Do you really want to remove this role?"
+#~ msgstr "Rolle wirklich entfernen?"
+
+#~ msgid "Remove role"
+#~ msgstr "Rolle entfernen"
+
+#~ msgid "Do you really want to delete this parliamentary group?"
+#~ msgstr "Möchten Sie diese Fraktion wirklich löschen?"
+
+#~ msgid "Delete parliamentary group"
+#~ msgstr "Fraktion löschen"
+
+#~ msgid "Do you really want to delete this party?"
+#~ msgstr "Möchten Sie diese Partei wirklich löschen?"
+
+#~ msgid "Delete party"
+#~ msgstr "Partei löschen"
+
+#~ msgid "Added a new parliamentarian"
+#~ msgstr "Parlamentarier:in hinzugefügt"
+
+#~ msgid "New parliamentarian"
+#~ msgstr "Neue:r Parlamentarier:in"
+
+#~ msgid "New commission meeting"
+#~ msgstr "Neue Kommissionsitzung"
+
+#~ msgid "Added commission meeting"
+#~ msgstr "Kommissionsitzung hinzugefügt"
+
+#~ msgid "The parliamentarian has been deleted."
+#~ msgstr "Der/Die Parlamentarier:in wurde gelöscht."
+
+#~ msgid "Added a new party"
+#~ msgstr "Partei hinzugefügt"
+
+#~ msgid "New party"
+#~ msgstr "Neue Partei"
+
 #~ msgid "Quarter"
 #~ msgstr "Quartal"
 
@@ -1112,12 +1120,6 @@ msgstr ""
 #~ "Pauschale Jahreszulage gemäss § 8 Nebenamtsgesetz für die Vertretung des "
 #~ "Kantons an Anlässen. Auszahlung in vierteljährlichen Raten über "
 #~ "Abrechnungsläufe."
-
-#~ msgid ""
-#~ "Cannot book attendance - abschluss already set for this settlement run"
-#~ msgstr ""
-#~ "Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für "
-#~ "diesen Abrechnungslauf"
 
 #, python-format
 #~ msgid "Cannot edit attendance - abschluss already set for: ${names}"

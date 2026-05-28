@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 from attr import attrs, attrib
 from base64 import urlsafe_b64encode
 from jwt import PyJWKClient, decode_complete, get_algorithm_by_name
@@ -18,6 +18,13 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user.auth.provider import (
         HasApplicationIdAndNamespace, OIDCProvider)
+
+
+# HACK: Make OAuth2Session rely on niquests instead of requests
+OAuth2Session.__bases__ = (niquests.Session,)
+OAuth2Session.post = (  # type: ignore[method-assign]
+    lambda self, *args, **kwargs: self.request('POST', *args, **kwargs)
+)
 
 
 @attrs(auto_attribs=True)
@@ -111,7 +118,7 @@ class OIDCClient:
             metadata_url = (self.issuer.rstrip('/')
                             + '/.well-known/oauth-authorization-server')
             try:
-                response = requests.get(metadata_url, timeout=(5, 10))
+                response = niquests.get(metadata_url, timeout=(5, 10))
                 response.raise_for_status()
                 claims = response.json()
                 assert isinstance(claims, dict)

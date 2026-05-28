@@ -12,6 +12,10 @@ from onegov.pas import _
 from onegov.pas.custom import get_current_settlement_run
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
+from onegov.pas.utils import (
+    get_active_kantonsrat_parliamentarians,
+    is_active_kantonsrat_member,
+)
 from onegov.pas.custom import AttendenceCollection
 from onegov.pas.models import PASCommissionMembership, SettlementRun
 from onegov.pas.models.attendence import TYPES
@@ -241,6 +245,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 ]
             else:
                 self.parliamentarian_id.choices = []
+                self.request.warn_no_parliamentarian()  # type:ignore[attr-defined]
         elif (
             hasattr(self.request.identity, 'role')
             and self.request.identity.role == 'commission_president'
@@ -281,12 +286,13 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 self.parliamentarian_id.choices = list(dict.fromkeys(choices))
             else:
                 self.parliamentarian_id.choices = []
+                self.request.warn_no_parliamentarian()  # type:ignore[attr-defined]
         else:
             self.parliamentarian_id.choices = [
-                (str(parliamentarian.id), parliamentarian.title)
-                for parliamentarian in PASParliamentarianCollection(
+                (str(p.id), p.title)
+                for p in get_active_kantonsrat_parliamentarians(
                     self.request.app
-                ).query()
+                )
             ]
 
         # Filter commission choices based on user role
@@ -375,11 +381,11 @@ class AttendenceAddForm(AttendenceForm):
             else:
                 self.parliamentarian_id.choices = []
         else:
-            # Admins, editors can select any active parliamentarian
             self.parliamentarian_id.choices = [
-                (str(parliamentarian.id), parliamentarian.title)
-                for parliamentarian in PASParliamentarianCollection(
-                    self.request.app, active=[True]).query()
+                (str(p.id), p.title)
+                for p in get_active_kantonsrat_parliamentarians(
+                    self.request.app
+                )
             ]
 
 
@@ -409,10 +415,8 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
         self.parliamentarian_id.choices = [
-            (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in PASParliamentarianCollection(
-                self.request.app, active=[True]).query()
+            (str(p.id), p.title)
+            for p in get_active_kantonsrat_parliamentarians(self.request.app)
         ]
         self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices
@@ -474,15 +478,13 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
             for commission
             in PASCommissionCollection(self.request.session).query()
         ]
-        # Set choices for all possible parliamentarians so WTForms can validate
         self.parliamentarian_id.choices = [
-            (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in PASParliamentarianCollection(
-                self.request.app, active=[True]).query()
+            (str(p.id), p.title)
+            for p in get_active_kantonsrat_parliamentarians(self.request.app)
         ]
-        # JavaScript will handle selection based on commission
         self.parliamentarian_id.data = []
+
+        self.request.warn_no_parliamentarian()  # type: ignore[attr-defined]
 
 
 class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
@@ -533,12 +535,9 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
             for commission
             in PASCommissionCollection(self.request.session).query()
         ]
-        # Set choices for all possible parliamentarians so WTForms can validate
         self.parliamentarian_id.choices = [
-            (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in PASParliamentarianCollection(
-                self.request.app, active=[True]).query()
+            (str(p.id), p.title)
+            for p in get_active_kantonsrat_parliamentarians(self.request.app)
         ]
 
 
@@ -561,6 +560,7 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
         self.parliamentarian_id.choices = [
             (str(m.parliamentarian.id), m.parliamentarian.title)
             for m in memberships
+            if is_active_kantonsrat_member(m.parliamentarian)
         ]
 
         self.duration.data = obj.duration / 60
@@ -618,10 +618,8 @@ class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
         ]
 
         self.parliamentarian_id.choices = [
-            (str(parliamentarian.id), parliamentarian.title)
-            for parliamentarian
-            in PASParliamentarianCollection(
-                self.request.app, active=[True]).query()
+            (str(p.id), p.title)
+            for p in get_active_kantonsrat_parliamentarians(self.request.app)
         ]
 
         self.parliamentarian_id.data = [

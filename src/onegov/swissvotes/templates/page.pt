@@ -1,7 +1,9 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.swissvotes">
     <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="main-title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="sub-title">${layout.sub_title|None}</tal:block>
     <tal:block metal:fill-slot="content">
-        <h2>${layout.title}</h2>
+
         <div class="page-content">
             <div class="row" tal:condition="slides">
                 <div class="columns small-12 show-for-small-only">
@@ -43,7 +45,7 @@
 
                     <div id="patrons" tal:condition="layout.model.id == 'disclaimer'">
                         <h5 i18n:translate>Patrons</h5>
-                        <div class="patron"><a href="https://sagw.ch/"><img src="${layout.static_path}/images/logo_sagw.svg" alt="Schweizerische Akademie für Geistes- und Sozialwissenschaften"></a></div>
+                        <div class="patron"><a href="https://sagw.ch/"><img src="${layout.static_path}/images/SAGW_supported_by/SAGW_Logo_addition_supported_pos.svg" alt="Schweizerische Akademie für Geistes- und Sozialwissenschaften"></a></div>
                         <div class="patron"><a href="https://www.pom.be.ch/pom/de/index/lotteriefonds/lotteriefonds/Lotteriefonds.html"><img src="${layout.static_path}/images/logo_lotteriefonds_be.png" alt="Lotteriefonds des Kantons Bern"></a></div>
                         <div class="patron"><a href="https://www.ernst-goehner-stiftung.ch"><img src="${layout.static_path}/images/logo_ernst_goehner.jpg" alt="Ernst Göhner Stiftung"></a></div>
                         <div class="patron"><a href="https://seantis.ch"><img src="${layout.static_path}/images/logo_seantis.svg" alt="seantis gmbh"></a></div>

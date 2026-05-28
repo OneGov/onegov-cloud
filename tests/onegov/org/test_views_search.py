@@ -27,7 +27,7 @@ def test_basic_search(client_with_fts: Client) -> None:
     add_news = client.get('/news').click('Nachricht')
     add_news.form['title'] = "Now supporting fulltext search"
     add_news.form['lead'] = "It is pretty awesome"
-    add_news.form['text'] = "Much <em>wow</em>"
+    add_news.form['text'] = "Much <em>wow</em> from 9 - 5"
     news = add_news.form.submit().follow()
 
     root_page = client.get('/')
@@ -43,6 +43,11 @@ def test_basic_search(client_with_fts: Client) -> None:
     assert "fulltext" in search_page
     assert "Now supporting fulltext search" in search_page
     assert "It is pretty awesome" in search_page
+
+    # Hyphens have a special meaning, so using them without plain
+    # will yield different results
+    assert 'fulltext' not in client.get('/search?q=9+-+5')
+    assert 'fulltext' in client.get('/search?q=9+-+5&plain=1')
 
     # make sure anonymous doesn't see hidden things in the search results
     assert "fulltext" in anom.get('/search?q=fulltext')

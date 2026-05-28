@@ -232,17 +232,17 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             return None
 
         result = [
-            as_file(self.declaration_of_authorization, 'Mutationsmeldung'),
-            as_file(self.letter_of_motivation, 'Mutationsmeldung'),
-            as_file(self.resume, 'Mutationsmeldung'),
-            as_file(self.uploaded_certificates, 'Mutationsmeldung'),
-            as_file(self.social_security_card, 'Mutationsmeldung'),
-            as_file(self.passport, 'Mutationsmeldung'),
-            as_file(self.passport_photo, 'Mutationsmeldung'),
-            as_file(self.debt_collection_register_extract, 'Mutationsmeldung'),
-            as_file(self.criminal_register_extract, 'Mutationsmeldung'),
-            as_file(self.certificate_of_capability, 'Mutationsmeldung'),
-            as_file(self.confirmation_compensation_office, 'Mutationsmeldung'),
+            as_file(self.declaration_of_authorization, 'Antrag'),
+            as_file(self.letter_of_motivation, 'Antrag'),
+            as_file(self.resume, 'Antrag'),
+            as_file(self.uploaded_certificates, 'Diplome und Zertifikate'),
+            as_file(self.social_security_card, 'Antrag'),
+            as_file(self.passport, 'Antrag'),
+            as_file(self.passport_photo, 'Antrag'),
+            as_file(self.debt_collection_register_extract, 'Abklärungen'),
+            as_file(self.criminal_register_extract, 'Abklärungen'),
+            as_file(self.certificate_of_capability, 'Abklärungen'),
+            as_file(self.confirmation_compensation_office, 'Abklärungen'),
         ]
         return [r for r in result if r is not None]
 

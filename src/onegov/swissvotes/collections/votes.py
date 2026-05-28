@@ -60,7 +60,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         to_date: date | None = None,
         legal_form: list[int] | None = None,
         result: list[int] | None = None,
-        policy_area: list[str] | None = None,
+        policy_area: list[PolicyArea] | None = None,
         term: str | None = None,
         full_text: bool | None = None,
         position_federal_council: list[int] | None = None,
@@ -378,8 +378,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
             ))
         if self.policy_area:
             levels: list[list[Decimal]] = [[], [], []]
-            for area_code in self.policy_area:
-                area = PolicyArea(area_code)
+            for area in self.policy_area:
                 if area.level == 1:
                     levels[0].append(area.descriptor_decimal)
                 if area.level == 2:

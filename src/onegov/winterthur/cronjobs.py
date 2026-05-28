@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import niquests
 import os
-import requests
 
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
@@ -31,7 +31,7 @@ def import_dws_vk(request: WinterthurRequest) -> None:
     ical_url = ('https://www.google.com/calendar/ical/dwskalender%40gmail.com'
                 '/public/basic.ics')
     try:
-        response = requests.get(ical_url, timeout=30)
+        response = niquests.get(ical_url, timeout=30)
     except Exception:
         log.exception(f'Failed to retrieve DWS events from {ical_url}')
         return

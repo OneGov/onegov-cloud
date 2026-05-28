@@ -8,7 +8,8 @@ import transaction
 from lxml.html import document_fromstring
 from onegov.user import UserCollection
 from sqlalchemy.orm.session import close_all_sessions
-from tests.shared import Client, utils
+from tests.shared import utils
+from .conftest import Client
 
 
 from typing import TYPE_CHECKING

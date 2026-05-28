@@ -440,6 +440,10 @@ class Organisation(Base, TimestampMixin):
         return flatten_event_filter_fields_from_definition(
             self.event_filter_definition)
 
+    @property
+    def event_filter_names(self) -> dict[str, str]:
+        return {f.id: f.label for f in self.event_filter_fields}
+
 
 @lru_cache(maxsize=64)
 def flatten_event_filter_fields_from_definition(
