@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 11:08-0400\n"
+"POT-Creation-Date: 2026-05-28 16:58+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -674,14 +674,14 @@ msgstr "Datoteca"
 msgid "File format"
 msgstr "Format da la datoteca"
 
+msgid "Delivery"
+msgstr "Furniziun"
+
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Resultats da las partidas"
-
-msgid "Delivery"
-msgstr "Furniziun"
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
@@ -912,6 +912,9 @@ msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 msgid "Elections and votes on ${date}"
 msgstr "Votaziun dals ${date}"
 
+msgid "Municipal Elections and Votes"
+msgstr "Elecziuns e votaziuns communalas"
+
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
 
@@ -923,9 +926,6 @@ msgstr "Elecziuns regionalas"
 
 msgid "Cantonal Elections"
 msgstr "Elecziuns chantunalas"
-
-msgid "Municipal Elections and Votes"
-msgstr "Elecziuns e votaziuns communalas"
 
 msgid "Local election and referendum results"
 msgstr "Als resultats da las elecziuns e votaziuns communalas"
@@ -950,6 +950,9 @@ msgstr "Anc nagins resultats avant maun"
 
 msgid "Result"
 msgstr "Resultat"
+
+msgid "All municipal elections and votes"
+msgstr "Tut las elecziuns e votaziuns communalas"
 
 msgid "Archive Search"
 msgstr "Tschertga en l'archiv"

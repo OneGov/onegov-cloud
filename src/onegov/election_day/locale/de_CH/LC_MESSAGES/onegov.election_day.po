@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 11:35-0400\n"
+"POT-Creation-Date: 2026-05-28 16:58+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -664,14 +664,14 @@ msgstr "Datei"
 msgid "File format"
 msgstr "Dateiformat"
 
+msgid "Delivery"
+msgstr "Lieferung"
+
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Parteiresultate"
-
-msgid "Delivery"
-msgstr "Lieferung"
 
 msgid "Proposal / Results"
 msgstr "Vorlage / Resultate"
@@ -940,6 +940,9 @@ msgstr "Noch keine Resultate"
 
 msgid "Result"
 msgstr "Resultat"
+
+msgid "All municipal elections and votes"
+msgstr "Alle kommunalen Wahlen und Abstimmungen"
 
 msgid "Archive Search"
 msgstr "Archivsuche"

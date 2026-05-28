@@ -5,6 +5,9 @@ from morepath import redirect
 from fs.errors import ResourceNotFound
 from morepath.request import Response
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.collections import (
+    AllMunicipalArchivedResultCollection
+)
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import MunicipalArchivedResultCollection
 from onegov.election_day.collections import (
@@ -88,6 +91,26 @@ def view_archive_municipal(
         'date': self.date,
         'archive_items': self.group_items(results, request),
         'municipal_view': True,
+    }
+
+
+@ElectionDayApp.html(
+    model=AllMunicipalArchivedResultCollection,
+    template='archive.pt',
+    permission=MaybePublic
+)
+def view_archive_all_municipal(
+    self: AllMunicipalArchivedResultCollection,
+    request: ElectionDayRequest
+) -> RenderData:
+    layout = DefaultLayout(self, request)
+    results, _ = self.by_all()
+
+    return {
+        'layout': layout,
+        'date': None,
+        'archive_items': self.group_items(results, request),
+        'all_municipal_view': True,
     }
 
 

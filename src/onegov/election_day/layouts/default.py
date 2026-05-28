@@ -8,6 +8,7 @@ from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
 from onegov.election_day.collections import (
+    AllMunicipalArchivedResultCollection,
     ArchivedResultCollection,
     MunicipalArchivedResultCollection,
     MunicipalityArchivedResultCollection
@@ -161,6 +162,10 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def archive(self) -> ArchivedResultCollection:
         return ArchivedResultCollection(self.request.session)
+
+    @cached_property
+    def all_municipal_archive(self) -> AllMunicipalArchivedResultCollection:
+        return AllMunicipalArchivedResultCollection(self.request.session)
 
     @cached_property
     def municipal_archive(self) -> MunicipalArchivedResultCollection:

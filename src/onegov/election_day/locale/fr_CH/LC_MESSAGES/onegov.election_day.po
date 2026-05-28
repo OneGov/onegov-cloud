@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 11:35-0400\n"
+"POT-Creation-Date: 2026-05-28 16:58+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -119,7 +119,9 @@ msgstr ""
 
 #, python-format
 msgid "Domain not supported: ${doi_type} (supported: CH, CT, BZ, MU, AN)"
-msgstr "Domaine non pris en charge : ${doi_type} (pris en charge : CH, CT, BZ, MU, AN)"
+msgstr ""
+"Domaine non pris en charge : ${doi_type} (pris en charge : CH, CT, BZ, MU, "
+"AN)"
 
 msgid "Changing types is not supported"
 msgstr "Le changement de types n'est pas pris en charge"
@@ -667,14 +669,14 @@ msgstr "Fichier"
 msgid "File format"
 msgstr "Format de fichier"
 
+msgid "Delivery"
+msgstr "Livraison"
+
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Résultats des partis"
-
-msgid "Delivery"
-msgstr "Livraison"
 
 msgid "Proposal / Results"
 msgstr "Objet de la votation / Résultats"
@@ -943,6 +945,9 @@ msgstr "Pas de résultats à l'heure actuelle"
 
 msgid "Result"
 msgstr "Résultat"
+
+msgid "All municipal elections and votes"
+msgstr "Toutes les élections et votations communales"
 
 msgid "Archive Search"
 msgstr "Recherche dans les archives"

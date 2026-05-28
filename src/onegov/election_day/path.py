@@ -14,6 +14,7 @@ from onegov.election_day.collections import ElectionCompoundCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import ListCollection
 from onegov.election_day.collections import (
+    AllMunicipalArchivedResultCollection,
     MunicipalArchivedResultCollection,
     MunicipalityArchivedResultCollection
 )
@@ -335,6 +336,16 @@ def get_archive_by_year(
     date: str
 ) -> ArchivedResultCollection:
     return ArchivedResultCollection(app.session(), date)
+
+
+@ElectionDayApp.path(
+    model=AllMunicipalArchivedResultCollection,
+    path='/archive/municipal'
+)
+def get_all_municipal_archive(
+    app: ElectionDayApp,
+) -> AllMunicipalArchivedResultCollection:
+    return AllMunicipalArchivedResultCollection(app.session())
 
 
 @ElectionDayApp.path(

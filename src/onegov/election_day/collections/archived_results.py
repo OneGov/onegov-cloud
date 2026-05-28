@@ -477,6 +477,58 @@ class MunicipalArchivedResultCollection(ArchivedResultCollection):
         )
 
 
+class AllMunicipalArchivedResultCollection(MunicipalArchivedResultCollection):
+    """All municipal archived results across all dates."""
+
+    def by_all(self) -> tuple[list[ArchivedResult], datetime | None]:
+        query = self.query()
+        query = query.filter(ArchivedResult.domain == 'municipality')
+        query = query.order_by(
+            ArchivedResult.name,
+            ArchivedResult.shortcode,
+            ArchivedResult.title,
+            ArchivedResult.date,
+        )
+        result = query.all()
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        last_modified = max(last_modifieds) if last_modifieds else None
+        return result, last_modified
+
+    def group_items(  # type: ignore[override]
+        self,
+        items: Collection[ArchivedResult],
+        request: ElectionDayRequest
+    ) -> dict[str, dict[str, list[ArchivedResult]]] | None:
+
+        if not items:
+            return None
+
+        def by_type(
+            group: Iterable[ArchivedResult],
+        ) -> dict[str, list[ArchivedResult]]:
+            return groupbydict(
+                group,
+                lambda k: (
+                    'vote'
+                    if k.type in ('vote', 'complex_vote')
+                    else 'election'
+                ),
+                lambda k: (
+                    'vote'
+                    if k.type in ('vote', 'complex_vote')
+                    else 'election',
+                    k.date and -k.date.toordinal(),
+                ),
+            )
+
+        return groupbydict(
+            items,
+            lambda i: (i.meta or {}).get('domain_segment') or '',
+            lambda i: (i.meta or {}).get('domain_segment') or '',
+            by_type,
+        )
+
+
 class MunicipalityArchivedResultCollection(ArchivedResultCollection):
 
     def __init__(self, session: Session, municipality: str = ''):
