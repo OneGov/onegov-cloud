@@ -295,7 +295,12 @@
                             <span tal:condition="python: str(year) == date">${year}</span>
                             <a tal:condition="python: str(year) != date" href="${request.link(layout.archive.for_date(year))}">${year}</a>
                         </li>
-                    </ul><br>
+                    </ul>
+                    <div class="archive-breadcrumbs-municipality">
+                        <div tal:repeat="municipality layout.municipality_archive.get_municipalities()">
+                            <a href="${request.link(layout.municipality_archive.for_municipality(municipality))}">${municipality}</a>
+                        </div>
+                    </div>
                     <p><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
                     <tal:block tal:condition="layout.last_archive_modification">
                         <a i18n:translate href="${layout.archive_download}">

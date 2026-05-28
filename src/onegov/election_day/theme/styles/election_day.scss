@@ -179,12 +179,20 @@ html {
 }
 
 .archive-breadcrumbs {
+    ul, .archive-breadcrumbs-municipality, p {
+        margin-bottom: 1rem;
+    }
+
     li {
         display: inline-block;
 
         + li::before {
             content: '/ ';
         }
+    }
+
+    .archive-breadcrumbs-municipality {
+        column-count: 6;
     }
 }
 
