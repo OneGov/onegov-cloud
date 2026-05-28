@@ -259,12 +259,12 @@ def test_views_vote_municipal_and_municipality(
     assert 'Kantonale Abstimmungen' in page
     assert 'Finanzausgleichsgesetz' in page
     assert 'Kommunale Wahlen und Abstimmungen' in page
-    assert 'Alle kommunalen Wahl- und Abstimmungsergebnisse' in page
+    assert 'Zu den kommunalen Wahl- und Abstimmungsergebnissen' in page
     assert '/archive/2025-05-18/municipal' in page
 
     # verify municipal results
     municipal_page = page.click(
-        'Alle kommunalen Wahl- und Abstimmungsergebnisse')
+        'Zu den kommunalen Wahl- und Abstimmungsergebnissen')
     assert 'Urnengang vom 18. Mai 2025' in page
     assert 'Kommunale Wahlen und Abstimmungen' in page
     for municipality in (
@@ -280,10 +280,12 @@ def test_views_vote_municipal_and_municipality(
     assert 'Kommunale Wahlen und Abstimmungen' in balgach_page
     assert 'Balgach' in balgach_page
     assert 'Abstimmung' in balgach_page
-    assert 'Hochwasserschutzprojekte Wolfsbach' in balgach_page
+    t1 = 'betreffend die Hochwasserschutzprojekte «Wolfsbach und'
+    assert t1 in balgach_page
     assert 'angenommen' in balgach_page
     assert '74.15' in balgach_page
-    assert 'Hochwasserschutzprojekt Dorfbach ' in balgach_page
+    t2 = 'Urnenabstimmung betreffend das Hochwasserschutzprojekt «Dorfbach»'
+    assert t2 in balgach_page
     assert '75.15' in balgach_page
     assert balgach_page.click('Dorfbach').maybe_follow().status_code == 200
 

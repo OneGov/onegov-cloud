@@ -1044,12 +1044,12 @@ def test_views_election_municipal_and_municipality(
     page = client.get('/')
     assert 'Urnengang vom 18. Mai 2025' in page
     assert 'Kommunale Wahlen und Abstimmungen' in page
-    assert 'Alle kommunalen Wahl- und Abstimmungsergebnisse' in page
+    assert 'Zu den kommunalen Wahl- und Abstimmungsergebnissen' in page
     assert '/archive/2025-05-18/municipal' in page
 
     # verify municipal archive lists municipalities
     municipal_page = page.click(
-        'Alle kommunalen Wahl- und Abstimmungsergebnisse')
+        'Zu den kommunalen Wahl- und Abstimmungsergebnissen')
     assert 'Urnengang vom 18. Mai 2025' in page
     assert 'Kommunale Wahlen und Abstimmungen' in municipal_page
     for municipality in ('Gaiserwald', 'Goldach', 'St. Margrethen'):
@@ -1061,6 +1061,7 @@ def test_views_election_municipal_and_municipality(
     assert 'Kommunale Wahlen und Abstimmungen' in goldach_page
     assert 'Goldach' in goldach_page
     assert 'Wahl' in goldach_page
-    assert 'Wahl Schulpräsidium' in goldach_page
-    assert (goldach_page.click('Schulpräsidium').
+    title = 'Ersatzwahl der Schulpräsidentin/des Schulpräsidenten'
+    assert title in goldach_page
+    assert (goldach_page.click('Ersatzwahl der Schulpräsidentin').
             maybe_follow().status_code == 200)
