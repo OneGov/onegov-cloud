@@ -220,7 +220,7 @@ def import_information_delivery(
         assert group_info.election_group
         group = group_info.election_group
         assert group.domain_of_influence
-        supported, domain, _domain_segment = convert_ech_domain(
+        supported, domain, domain_segment = convert_ech_domain(
             group.domain_of_influence, principal, entities
         )
         if not supported:
@@ -277,6 +277,7 @@ def import_information_delivery(
             # update election
             elections[identification] = election
             election.domain = domain
+            election.domain_segment = domain_segment
             assert info.election_description
             title_translations = {}
             short_title_translations = {}
