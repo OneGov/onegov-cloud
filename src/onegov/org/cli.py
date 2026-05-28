@@ -17,6 +17,7 @@ import transaction
 import yaml
 
 from collections import defaultdict
+from itertools import chain
 from datetime import date, datetime, timedelta
 from io import BytesIO
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
@@ -794,10 +795,37 @@ def fetch(
                                 owner=local_admin.username,
                             )
 
-                if hasattr(app, 'fts_orm_events'):
-                    for event_ in (*added, *updated):
-                        if not event_.fts_skip:
-                            app.fts_orm_events.index(local_schema, event_)
+                if app.fts_search_enabled:
+                    if added or updated:
+                        app.fts_indexer.process(
+                            (
+                                task
+                                for event_ in chain(added, updated)
+                                if (
+                                    task := app.fts_orm_events.index_task(
+                                        local_schema,
+                                        event_,  # type:ignore
+                                    )
+                                )
+                                is not None
+                            ),
+                            local_session,
+                        )
+                    if purged:
+                        app.fts_indexer.process(
+                            (
+                                {
+                                    'action': 'delete',
+                                    'schema': local_schema,
+                                    'tablename': 'events',
+                                    'owner_type': 'Event',
+                                    'id': eid,
+                                }
+                                for eid in purged
+                            ),
+                            local_session,
+                        )
+                    local_session.flush()
 
                 helper_request: OrgRequest = Bunch(  # type:ignore
                     current_username=local_admin and local_admin.username,
