@@ -762,33 +762,42 @@ def fetch(
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
 
-                added, updated, purged = local_events.from_import(
-                    remote_events(),
-                    to_purge=[f'fetch-{key}'],
-                    publish_immediately=False,
-                    valid_state_transfers=valid_state_transfers,
-                    published_only=published_only
-                )
+                with app.session_manager.disable_change_signals():
+                    added, updated, purged = local_events.from_import(
+                        remote_events(),
+                        to_purge=[f'fetch-{key}'],
+                        publish_immediately=False,
+                        valid_state_transfers=valid_state_transfers,
+                        published_only=published_only,
+                    )
 
-                for event_ in added:
-                    event_.submit()
-                    if not create_tickets:
-                        event_.publish()
-                        continue
+                    for event_ in added:
+                        event_.submit()
+                        if not create_tickets:
+                            event_.publish()
+                            continue
 
-                    assert local_admin is not None
-                    with local_session.no_autoflush:
-                        tickets = TicketCollection(local_session)
-                        new_ticket = tickets.open_ticket(
-                            handler_code='EVN', handler_id=event_.id.hex,
-                            source=event_.meta['source'],
-                            user=local_admin.username
-                        )
-                        new_ticket.muted = True
-                        TicketNote.create(new_ticket, request, (
-                            f'Importiert von Instanz {key}'
+                        assert local_admin is not None
+                        with local_session.no_autoflush:
+                            tickets = TicketCollection(local_session)
+                            new_ticket = tickets.open_ticket(
+                                handler_code='EVN',
+                                handler_id=event_.id.hex,
+                                source=event_.meta['source'],
+                                user=local_admin.username,
+                            )
+                            new_ticket.muted = True
+                            TicketNote.create(
+                                new_ticket,
+                                request,
+                                (f'Importiert von Instanz {key}'),
+                                owner=local_admin.username,
+                            )
 
-                        ), owner=local_admin.username)
+                if hasattr(app, 'fts_orm_events'):
+                    for event_ in (*added, *updated):
+                        if not event_.fts_skip:
+                            app.fts_orm_events.index(local_schema, event_)
 
                 helper_request: OrgRequest = Bunch(  # type:ignore
                     current_username=local_admin and local_admin.username,
