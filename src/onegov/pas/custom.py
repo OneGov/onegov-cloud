@@ -296,7 +296,7 @@ def notify_admins_finalized(
             'title': request.translate(_('Abschluss Notification')),
             'parliamentarian_name': parliamentarian_name,
             'commission_name': commission_name,
-            'attendance_date': attendence.date,
+            'attendance_created': attendence.created,
             'user_name': user_name,
             'settlement_run_name': settlement_run_name,
         },
