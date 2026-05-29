@@ -173,6 +173,32 @@ def test_directory_form(session: Session) -> None:
     assert form['last_name'].data == 'Sanchez'
 
 
+def test_directory_form_field_named_text(session: Session) -> None:
+    # A user-defined field named 'text' must not clash with
+    # DirectoryEntry.text (a read-only @property used for FTS).
+    faq = DirectoryCollection(session).add(
+        title='FAQ',
+        structure="""
+            Title *= ___
+            Text *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Title]",
+            order=['Title'],
+        )
+    )
+
+    form = faq.form_class()
+    form['title'].data = 'What is onegov?'
+    form['text'].data = 'A government platform.'
+
+    entry = DirectoryEntry(content={})
+    form.populate_obj(entry)
+
+    assert entry.title == 'What is onegov?'
+    assert entry.values['text'] == 'A government platform.'
+
+
 def test_directory_entry_collection(session: Session) -> None:
     directory = DirectoryCollection(session).add(
         title='Albums',
