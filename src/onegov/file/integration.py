@@ -39,7 +39,7 @@ from tempfile import SpooledTemporaryFile
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
-    from depot.io.interfaces import FileStorage, StoredFile
+    from depot.io.interfaces import FileStorage
     from functools import cached_property
     from onegov.core.orm import SessionManager
     from onegov.core.request import CoreRequest

@@ -23,7 +23,6 @@ if TYPE_CHECKING:
     from typing import Any
     from onegov.core.security.roles import Intent
     from morepath import Identity
-    from onegov.pas.models.parliamentarian import PASParliamentarian
 
 
 """
