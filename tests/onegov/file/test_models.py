@@ -23,7 +23,6 @@ from unittest.mock import Mock
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pathlib import Path
     from sqlalchemy.orm import Session
 
 

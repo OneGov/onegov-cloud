@@ -27,8 +27,6 @@ from wtforms.validators import NumberRange
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from webob import Response
-
     from onegov.core.types import JSON_ro, RenderData
     from onegov.winterthur.request import WinterthurRequest
 

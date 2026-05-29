@@ -14,7 +14,6 @@ from onegov.people import Person
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.landsgemeinde.models import Assembly
     from sqlalchemy.orm import Session
 
 

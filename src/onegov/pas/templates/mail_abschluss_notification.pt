@@ -23,7 +23,7 @@
             </tr>
             <tr>
                 <td><strong i18n:translate>Date:</strong></td>
-                <td>${layout.format_date(attendance_date, 'datetime')}</td>
+                <td>${layout.format_date(attendance_created, 'datetime')}</td>
             </tr>
             <tr>
                 <td><strong i18n:translate>Set by:</strong></td>
