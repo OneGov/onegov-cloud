@@ -51,7 +51,6 @@ if TYPE_CHECKING:
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Reservation
 
 
 def assert_anonymous_access_only_temporary(
