@@ -4,7 +4,7 @@ from __future__ import annotations
 from functools import cached_property
 from onegov.core.custom import msgpack
 from onegov.core.orm import orm_cached
-from onegov.core.request import CoreRequest
+from onegov.core.request import CoreRequest, is_logged_in
 from onegov.core.security import Private
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import News, TANAccessCollection, Topic
@@ -115,7 +115,7 @@ class OrgRequest(CoreRequest):
 
     @property
     def current_user(self) -> User | None:
-        if not self.identity:
+        if not is_logged_in(self.identity):
             return None
 
         if not hasattr(self, '_current_user'):

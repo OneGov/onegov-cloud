@@ -3,7 +3,6 @@ from __future__ import annotations
 import morepath
 
 from itsdangerous import URLSafeSerializer, BadData
-from uuid import UUID
 from itsdangerous.encoding import base64_encode, base64_decode
 from secrets import token_bytes
 from onegov.core.utils import relative_url
@@ -282,14 +281,11 @@ class Auth:
 
     def by_identity(self, identity: Identity | NoIdentity) -> User | None:
         """ Returns the user record of the given identity. """
-        uid = getattr(identity, 'uid', None)
-        if uid:
-            user = self.users.by_id(UUID(uid))
-            if user is not None:
-                return user
+
         if identity.userid is None:
             return None
-        return self.users.by_username(identity.userid)
+
+        return self.users.by_id(identity.uid)
 
     def login_to(
         self,
