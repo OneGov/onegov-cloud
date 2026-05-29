@@ -4661,3 +4661,27 @@ def test_my_reservations_view(client: Client) -> None:
     # but not the other views
     client2.get('/resources/my-reservations-json', status=403)
     client2.get('/resources/my-reservations-pdf', status=403)
+
+
+def test_reserve_form_expired_session_returns_403(client: Client) -> None:
+    # Regression: cleanup was only called inside `if request.POST:`, so an
+    # expired session could still render the form (or crash on info.price
+    # for a detached object on re-render). Cleanup must run first.
+    with freeze_time("2015-08-28 10:00:00"):
+        resources = ResourceCollection(client.app.libres_context)
+        resource = resources.by_name('tageskarte')
+        assert resource is not None
+        scheduler = resource.get_scheduler(client.app.libres_context)
+
+        allocations = scheduler.allocate(
+            dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+            whole_day=True,
+        )
+
+        reserve = client.bound_reserve(allocations[0])
+        transaction.commit()
+
+        assert reserve(whole_day=True).json == {'success': True}
+
+    with freeze_time("2015-08-28 10:15:01"):  # past 15-min expiry threshold
+        client.get('/resource/tageskarte/form', status=403)
