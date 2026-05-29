@@ -334,8 +334,9 @@ def handle_reservation_form(
     reservations on a resource.
 
     """
-    # remove all expired session before loading
-    self.remove_expired_reservation_sessions()  # type: ignore[attr-defined]
+    # remove all expired session before loading on POST
+    if request.POST:
+        self.remove_expired_reservation_sessions()  # type: ignore[attr-defined]
 
     reservations_query = self.bound_reservations(request, with_data=True)  # type: ignore[attr-defined]
     reservations: tuple[Reservation, ...] = tuple(reservations_query)

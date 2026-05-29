@@ -4664,17 +4664,17 @@ def test_my_reservations_view(client: Client) -> None:
 
 
 def test_reserve_form_expired_session_returns_403(client: Client) -> None:
-    # Regression: cleanup was only called inside `if request.POST:`, so an
-    # expired session could still render the form (or crash on info.price
-    # for a detached object on re-render). Cleanup must run first.
-    with freeze_time("2015-08-28 10:00:00"):
+    # Regression: cleanup was placed after bound_reservations inside
+    # `if request.POST:`, so submitting the form after session expiry could
+    # crash when the template accessed info.price on a detached object.
+    with freeze_time("2026-05-29 10:00:00"):
         resources = ResourceCollection(client.app.libres_context)
         resource = resources.by_name('tageskarte')
         assert resource is not None
         scheduler = resource.get_scheduler(client.app.libres_context)
 
         allocations = scheduler.allocate(
-            dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+            dates=(datetime(2026, 5, 29), datetime(2026, 5, 29)),
             whole_day=True,
         )
 
@@ -4683,5 +4683,8 @@ def test_reserve_form_expired_session_returns_403(client: Client) -> None:
 
         assert reserve(whole_day=True).json == {'success': True}
 
-    with freeze_time("2015-08-28 10:15:01"):  # past 15-min expiry threshold
-        client.get('/resource/tageskarte/form', status=403)
+        formular = client.get('/resource/tageskarte/form')
+        formular.form['email'] = 'info@example.org'
+
+    with freeze_time("2026-05-29 10:15:01"):  # past 15-min expiry threshold
+        formular.form.submit(expect_errors=True, status=403)
