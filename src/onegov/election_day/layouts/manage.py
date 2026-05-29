@@ -58,11 +58,32 @@ class ManageLayout(DefaultLayout):
         principal = self.principal
 
         result: NestedMenu = []
-        result.append((
+
+        submenu: NestedMenu = []
+        submenu.append((
             _('Votes'),
             self.request.link(VoteCollection(session)),
             isinstance(self.model, VoteCollection),
             []
+        ))
+        submenu.append(
+            (
+                _('ech0252 upload'),
+                self.request.link(
+                    self.principal, name='upload-ech'
+                ),
+                'upload-ech' in self.request.url,
+                [],
+            )
+        )
+        result.append((
+            _('Votes'),
+            '',
+            isinstance(
+                self.model,
+                VoteCollection,
+            ),
+            submenu,
         ))
 
         if principal.domain == 'municipality':
@@ -73,18 +94,23 @@ class ManageLayout(DefaultLayout):
                 []
             ))
         else:
-            submenu: NestedMenu = []
+            submenu = []
             submenu.append((
                 _('Elections'),
                 self.request.link(ElectionCollection(session)),
                 isinstance(self.model, ElectionCollection),
                 []
             ))
-
             submenu.append((
                 _('Compounds of elections'),
                 self.request.link(ElectionCompoundCollection(session)),
                 isinstance(self.model, ElectionCompoundCollection),
+                []
+            ))
+            submenu.append((
+                _('ech0252 upload'),
+                self.request.link(self.principal, name='upload-ech'),
+                'upload-ech' in self.request.url,
                 []
             ))
             result.append((
