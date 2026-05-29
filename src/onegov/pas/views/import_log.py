@@ -18,7 +18,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pas.request import PasRequest
     from onegov.core.types import RenderData
-    from webob import Response
 
 
 @PasApp.html(
