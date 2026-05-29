@@ -174,13 +174,18 @@ def test_directory_form(session: Session) -> None:
 
 
 def test_directory_form_field_named_text(session: Session) -> None:
-    # A user-defined field named 'text' must not clash with
-    # DirectoryEntry.text (a read-only @property used for FTS).
+    # Users can name directory fields after any property on DirectoryEntry
+    # (e.g. text, values, external_link) without causing an AttributeError
+    # during populate_obj.
     faq = DirectoryCollection(session).add(
         title='FAQ',
         structure="""
             Title *= ___
             Text *= ___
+            External Link = ___
+            External Link Title = ___
+            Directory Name = ___
+            Values = ___
         """,
         configuration=DirectoryConfiguration(
             title="[Title]",
@@ -191,12 +196,20 @@ def test_directory_form_field_named_text(session: Session) -> None:
     form = faq.form_class()
     form['title'].data = 'What is onegov?'
     form['text'].data = 'A government platform.'
+    form['external_link'].data = 'https://example.com'
+    form['external_link_title'].data = 'Example'
+    form['directory_name'].data = 'faq'
+    form['values'].data = 'some value'
 
     entry = DirectoryEntry(content={})
     form.populate_obj(entry)
 
     assert entry.title == 'What is onegov?'
     assert entry.values['text'] == 'A government platform.'
+    assert entry.values['external_link'] == 'https://example.com'
+    assert entry.values['external_link_title'] == 'Example'
+    assert entry.values['directory_name'] == 'faq'
+    assert entry.values['values'] == 'some value'
 
 
 def test_directory_entry_collection(session: Session) -> None:
