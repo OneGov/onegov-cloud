@@ -7,9 +7,9 @@ import html
 import isodate
 import json
 import locale
+import niquests
 import pytz
 import re
-import requests
 import shutil
 import sys
 import textwrap
@@ -1833,8 +1833,8 @@ def import_meetings(
                                         f' {row["cells"][0]}'
                                     )
                                     continue
-                                resp = requests.get(link, timeout=(5, 10))
-                                if resp.status_code == 200:
+                                resp = niquests.get(link, timeout=(5, 10))
+                                if resp.status_code == 200 and resp.content:
                                     if existing_file := file_coll.by_content(
                                         BytesIO(resp.content)
                                     ).first():

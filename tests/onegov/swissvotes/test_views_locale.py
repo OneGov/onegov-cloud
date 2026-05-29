@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from webtest import TestApp as Client
+from .conftest import Client
 
 
 from typing import TYPE_CHECKING

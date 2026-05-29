@@ -452,15 +452,16 @@ class DepotApp(App):
         )
         self.bind_depot()
 
-        yield
-
-        self.custom_depot_id = None
-        self.clear_depot_cache()
-        self._configure_depot(
-            original_depot_backend,
-            original_depot_storage_path
-        )
-        self.bind_depot()
+        try:
+            yield
+        finally:
+            self.custom_depot_id = None
+            self.clear_depot_cache()
+            self._configure_depot(
+                original_depot_backend,
+                original_depot_storage_path
+            )
+            self.bind_depot()
 
 
 @DepotApp.tween_factory(over=transaction_tween_factory)

@@ -199,51 +199,53 @@ def test_user_cleanup_sessions() -> None:
     user = User()
     assert not user.sessions
 
-    with patch('onegov.user.models.user.remembered') as remembered:
-        with patch('onegov.user.models.user.forget'):
-            # ... implicit
-            remembered.return_value = True
-            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
-            assert user.sessions is not None
-            assert 'xxx' in user.sessions
+    with (
+        patch('onegov.user.models.user.remembered') as remembered,
+        patch('onegov.user.models.user.forget')
+    ):
+        # ... implicit
+        remembered.return_value = True
+        user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+        assert user.sessions is not None
+        assert 'xxx' in user.sessions
 
-            remembered.return_value = False
-            user.cleanup_sessions(DummyRequest('zzz').app)  # type: ignore[arg-type]
-            assert 'xxx' not in user.sessions
+        remembered.return_value = False
+        user.cleanup_sessions(DummyRequest('zzz').app)  # type: ignore[arg-type]
+        assert 'xxx' not in user.sessions
 
-            # ... while adding
-            remembered.return_value = True
-            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
-            assert 'xxx' in user.sessions
+        # ... while adding
+        remembered.return_value = True
+        user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+        assert 'xxx' in user.sessions
 
-            remembered.return_value = False
-            user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
-            assert 'xxx' not in user.sessions
-            assert 'yyy' not in user.sessions
+        remembered.return_value = False
+        user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
+        assert 'xxx' not in user.sessions
+        assert 'yyy' in user.sessions
 
-            # ... while removing
-            remembered.return_value = True
-            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
-            user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
-            assert 'xxx' in user.sessions
-            assert 'yyy' in user.sessions
+        # ... while removing
+        remembered.return_value = True
+        user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+        user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
+        assert 'xxx' in user.sessions
+        assert 'yyy' in user.sessions
 
-            remembered.return_value = False
-            user.remove_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
-            assert 'xxx' not in user.sessions
-            assert 'yyy' not in user.sessions
+        remembered.return_value = False
+        user.remove_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+        assert 'xxx' not in user.sessions
+        assert 'yyy' not in user.sessions
 
-            # ... while logging out
-            remembered.return_value = True
-            user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
-            user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
-            assert 'xxx' in user.sessions
-            assert 'yyy' in user.sessions
+        # ... while logging out
+        remembered.return_value = True
+        user.save_current_session(DummyRequest('xxx'))  # type: ignore[arg-type]
+        user.save_current_session(DummyRequest('yyy'))  # type: ignore[arg-type]
+        assert 'xxx' in user.sessions
+        assert 'yyy' in user.sessions
 
-            remembered.return_value = False
-            user.logout_all_sessions(DummyRequest('zzz').app)  # type: ignore[arg-type]
-            assert 'xxx' not in user.sessions
-            assert 'yyy' not in user.sessions
+        remembered.return_value = False
+        user.logout_all_sessions(DummyRequest('zzz').app)  # type: ignore[arg-type]
+        assert 'xxx' not in user.sessions
+        assert 'yyy' not in user.sessions
 
 
 def test_role_mapping(session: Session) -> None:

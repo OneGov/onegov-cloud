@@ -15,7 +15,10 @@ from onegov.pas.excel_header_constants import (
     commission_expected_headers_variant_2,
 )
 from onegov.pas.data_import import import_commissions_excel
-from onegov.pas.utils import is_active_kantonsrat_member
+from onegov.pas.utils import (
+    fetch_clex_kantonsrat_members,
+    is_active_kantonsrat_member,
+)
 from onegov.pas.log import ClickOutputHandler, CompositeOutputHandler
 from onegov.pas.importer.output_handlers import DatabaseOutputHandler
 from onegov.pas.importer.orchestrator import (
@@ -27,6 +30,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.pas.app import PasApp
+    from onegov.pas.models.parliamentarian import PASParliamentarian
     from onegov.pas.request import PasRequest
 
     type Processor = Callable[[PasRequest, PasApp], None]
@@ -325,14 +329,25 @@ def sync_user_accounts_cli(dry_run: bool) -> Processor:
 
 
 @cli.command('list-kantonsrat', context_settings={'singular': True})
-def list_kantonsrat_cli() -> Processor:
+@click.option(
+    '--compare-clex',
+    is_flag=True,
+    default=False,
+    help='Compare internal list against CLEX frontend',
+)
+def list_kantonsrat_cli(compare_clex: bool) -> Processor:
     """List parliamentarians by Kantonsrat membership status.
 
-    Shows who has an active Kantonsrat role (no party, no group,
-    no additional_information, end is NULL or >= today).
+    Shows who has an active Kantonsrat role (meta.org_type ==
+    'Kantonsrat', end is NULL or >= today).
+
+    With --compare-clex, fetches the public member table from
+    zg-compwork.clex.ch and shows differences.
 
     Example:
         onegov-pas --select '/onegov_pas/zug' list-kantonsrat
+        onegov-pas --select '/onegov_pas/zug' list-kantonsrat \
+            --compare-clex
     """
 
     def do_list(request: PasRequest, app: PasApp) -> None:
@@ -379,7 +394,59 @@ def list_kantonsrat_cli() -> Processor:
             f'Not in: {len(not_in_kantonsrat)}'
         )
 
+        if compare_clex:
+            _compare_with_clex(in_kantonsrat, today)
+
     return do_list
+
+
+def _compare_with_clex(
+    internal: list[PASParliamentarian],
+    reference_date: date,
+) -> None:
+    from onegov.pas.utils import CLEX_URL
+
+    click.secho(
+        f'\n=== CLEX comparison ({CLEX_URL}) ===',
+        fg='cyan',
+    )
+    try:
+        clex_members = fetch_clex_kantonsrat_members(reference_date)
+    except Exception as e:
+        click.secho(f'Failed to fetch CLEX data: {e}', fg='red')
+        return
+
+    internal_set = {(p.last_name, p.first_name) for p in internal}
+
+    only_internal = sorted(internal_set - clex_members)
+    only_clex = sorted(clex_members - internal_set)
+
+    if not only_internal and not only_clex:
+        click.secho('Lists match perfectly.', fg='green')
+        return
+
+    if only_internal:
+        click.secho(
+            f'\nOnly in internal DB ({len(only_internal)}):',
+            fg='yellow',
+        )
+        for last, first in only_internal:
+            click.echo(f'  {last}, {first}')
+
+    if only_clex:
+        click.secho(
+            f'\nOnly on CLEX ({len(only_clex)}):',
+            fg='yellow',
+        )
+        for last, first in only_clex:
+            click.echo(f'  {last}, {first}')
+
+    click.echo(
+        f'\nInternal: {len(internal_set)} | '
+        f'CLEX: {len(clex_members)} | '
+        f'Only internal: {len(only_internal)} | '
+        f'Only CLEX: {len(only_clex)}'
+    )
 
 
 @cli.command('update-custom-data')

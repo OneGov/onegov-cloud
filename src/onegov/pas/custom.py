@@ -283,12 +283,6 @@ def notify_admins_finalized(
         .first()
     )
     settlement_run_name = settlement_run.name if settlement_run else ''
-    settlement_run_start = (
-        settlement_run.start if settlement_run else None
-    )
-    settlement_run_end = (
-        settlement_run.end if settlement_run else None
-    )
     send_transactional_html_mail(
         request=request,
         template='mail_abschluss_notification.pt',
@@ -305,7 +299,5 @@ def notify_admins_finalized(
             'attendance_date': attendence.date,
             'user_name': user_name,
             'settlement_run_name': settlement_run_name,
-            'settlement_run_start': settlement_run_start,
-            'settlement_run_end': settlement_run_end,
         },
     )

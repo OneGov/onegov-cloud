@@ -196,6 +196,7 @@ def test_sendmail(
     assert result.exit_code == 0
     assert len(os.listdir(maildir)) == 0
 
+    app.set_application_id('test/foo')
     app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
@@ -250,6 +251,7 @@ def test_sendmail_invalid_queue(
     maildir = os.path.join(temporary_directory, 'mails')
     app = maildir_app
 
+    app.set_application_id('test/foo')
     app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
@@ -292,6 +294,7 @@ def test_sendmail_smtp(
     assert len(os.listdir(maildir)) == 0
     assert len(smtp.outbox) == 0
 
+    app.set_application_id('test/foo')
     app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
@@ -356,6 +359,7 @@ def test_sendmail_limit(
     assert result.exit_code == 0
     assert len(os.listdir(maildir)) == 0
 
+    app.set_application_id('test/foo')
     app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
@@ -448,6 +452,7 @@ def test_sendmail_exception(
     )
     maildir = os.path.join(temporary_directory, 'mails')
     app = maildir_app
+    app.set_application_id('test/foo')
     app.send_email(
         reply_to='Gövikon <info@example.org>',
         receivers=['recipient@example.org'],

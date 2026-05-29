@@ -330,14 +330,17 @@ class User(Base, TimestampMixin, ORMSearchable):
     def save_current_session(self, request: CoreRequest) -> None:
         """ Stores the current browser session. """
 
+        # NOTE: We cleanup before we add the current session
+        #       since the current session may not yet have been
+        #       persisted, so `remembered` may yield `False`.
+        self.cleanup_sessions(request.app)
+
         self.sessions = self.sessions or {}
         self.sessions[request.browser_session._token] = {
             'address': request.client_addr,
             'timestamp': utcnow().replace(tzinfo=None).isoformat(),
             'agent': request.user_agent
         }
-
-        self.cleanup_sessions(request.app)
 
     def remove_current_session(self, request: CoreRequest) -> None:
         """ Removes the current browser session. """

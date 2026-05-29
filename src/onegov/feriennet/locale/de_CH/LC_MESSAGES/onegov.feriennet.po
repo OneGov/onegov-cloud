@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-05-14 10:58+0200\n"
+"POT-Creation-Date: 2026-04-23 15:50+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2250,27 +2250,6 @@ msgstr "Meine Liste"
 msgid "All activities"
 msgstr "Alle Angebote"
 
-msgid "Volunteer"
-msgstr "Hilfsperson"
-
-msgid "Confirmed volunteers"
-msgstr "Bestätigte Hilfspersonen"
-
-msgid "Required volunteers"
-msgstr "Benötigte Hilfspersonen"
-
-msgid "Mark as open"
-msgstr "Als offen markieren"
-
-msgid "Mark as contacted"
-msgstr "Als kontaktiert markieren"
-
-msgid "Mark as confirmed"
-msgstr "Als bestätigt markieren"
-
-msgid "Mark as denied"
-msgstr "Als abgelehnt markieren"
-
 msgid "Hello!"
 msgstr "Guten Tag"
 
@@ -2301,22 +2280,8 @@ msgstr "Stornierungsbedingungen:"
 msgid "We have received your deregistration for ${name}."
 msgstr "Wir haben Ihre Abmeldung für ${name} erhalten."
 
-msgid "Your subscription states have been updated, this is the final list:"
-msgstr ""
-"Der Status ihrer Anmeldungen wurde aktualisiert, dies ist die finale Liste:"
-
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET wird unterstützt von:"
-
-msgid "You have signed up to volunteer for the following activities:"
-msgstr "Sie haben sich als Hilfsperson für folgende Angebote angemeldet:"
-
-msgid ""
-"Thank you for offering to volunteer! We will have a look at your request and "
-"get back to you."
-msgstr ""
-"Vielen Dank dass Sie uns Ihre Hilfe angeboten haben! Wir werden Ihre Anfrage "
-"bearbeiten und uns bei Ihnen melden."
 
 msgid "The average happiness is ${happiness}."
 msgstr "Die durchschnittliche Zufriedenheit liegt bei ${happiness}."
@@ -2490,6 +2455,13 @@ msgstr "Aktiv"
 msgid "Inactive"
 msgstr "Inaktiv"
 
+msgid ""
+"Thank you for offering to volunteer! We will have a look at your request and "
+"get back to you."
+msgstr ""
+"Vielen Dank dass Sie uns Ihre Hilfe angeboten haben! Wir werden Ihre Anfrage "
+"bearbeiten und uns bei Ihnen melden."
+
 msgid "No activities needing volunteers found."
 msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
@@ -2502,9 +2474,6 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "View ticket"
-msgstr "Ticket anzeigen"
-
 msgid "Contact by e-mail"
 msgstr "Via E-Mail kontaktieren"
 
@@ -2513,6 +2482,15 @@ msgstr "Via Telefon kontaktieren"
 
 msgid "Hide Details"
 msgstr "Details verstecken"
+
+msgid "Mark as open"
+msgstr "Als offen markieren"
+
+msgid "Mark as contacted"
+msgstr "Als kontaktiert markieren"
+
+msgid "Mark as confirmed"
+msgstr "Als bestätigt markieren"
 
 msgid "Do you really want to remove this volunteer?"
 msgstr "Möchten Sie die Hilfsperson wirklich entfernen?"
@@ -3273,6 +3251,9 @@ msgstr "Ein Betrag pro Zeile"
 msgid "Volunteer registration"
 msgstr "Registration Hilfsperson"
 
+msgid "Experimental"
+msgstr "Experimentell"
+
 msgid "Disabled"
 msgstr "Deaktiviert"
 
@@ -3281,61 +3262,6 @@ msgstr "Nur für Administratoren"
 
 msgid "Enabled"
 msgstr "Aktiviert"
-
-msgid "Custom volunteer subscription mail text"
-msgstr "Benutzerdefinierter E-Mail Text für die Registrierung als Hilfsperson"
-
-msgid ""
-"You can overwrite the standard volunteer subscription mail text before and "
-"after the list of subscriptions. The standard text is:\n"
-"\n"
-"\"Hello!\n"
-"You have signed up to volunteer for the following activities:\n"
-"\n"
-"[List of subscriptions]\n"
-"\n"
-"Thank you for offering to volunteer! We will have a look at your request and "
-"get back to you.\""
-msgstr ""
-"Sie können den Standard E-Mail Text für die Registrierung als Hilfsperson "
-"vor und nach der Liste der Anmeldungen überschreiben. Der Standard Text "
-"ist:\n"
-"\n"
-"\"Guten Tag\n"
-"Sie haben sich als Hilfsperson für folgende Angebote angemeldet:\n"
-"\n"
-"[Liste der Anmeldungen]\n"
-"\n"
-"Vielen Dank dass Sie uns Ihre Hilfe angeboten haben! Wir werden Ihre Anfrage "
-"bearbeiten und uns bei Ihnen melden.\""
-
-msgid "Before list text"
-msgstr "Text vor der Liste  "
-
-msgid "After list text"
-msgstr "Text nach der Liste  "
-
-msgid "Custom volunteer final status mail text"
-msgstr "Benutzerdefinierter E-Mail Text für den finalen Status der Anmeldungen"
-
-msgid ""
-"You can overwrite the standard volunteer final status mail text before and "
-"after the list of subscriptions. The standard text is:\n"
-"\n"
-"\"Hello!\n"
-"Your subscription states have been updated, this is the final list:\n"
-"\n"
-"[List of subscriptions]\n"
-"\n"
-msgstr ""
-"Sie können den Standard E-Mail Text für die Registrierung als Hilfsperson "
-"vor und nach der Liste der Anmeldungen überschreiben. Der Standard Text "
-"ist:\n"
-"\n"
-"\"Guten Tag\n"
-"Der Status ihrer Anmeldungen wurde aktualisiert, dies ist die finale Liste:\n"
-"\n"
-"[Liste der Anmeldungen]\n"
 
 msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Die ESR Identifikationsnummer muss 3-6 Zeichen lang sein"
@@ -3407,46 +3333,6 @@ msgstr ""
 #, python-format
 msgid "${name} has been deleted, including all associated data."
 msgstr "${name} wurde gelöscht, inklusive aller damit verbundenen Daten."
-
-msgid "Subscription as a volunteer"
-msgstr "Anmeldung als Hilfsperson"
-
-msgid ""
-"Not all subscriptions are in a final state. Please make sure all "
-"subscriptions are either confirmed or rejected."
-msgstr ""
-"Nicht alle Anmeldungen befinden sich in einem finalen Zustand. Bitte stellen "
-"Sie sicher, dass alle Anmeldungen entweder bestätigt oder abgelehnt wurden."
-
-msgid ""
-"The subscriptions have been processed and the status mail has been sent to "
-"the volunteer."
-msgstr ""
-"Die Anmeldungen wurden bearbeitet und die Status-Email wurde an die "
-"Hilfsperson gesendet."
-
-msgid "Your subscriptions as a volunteer have been processed."
-msgstr "Ihre Anmeldungen als Hilfsperson wurden bearbeitet."
-
-#, python-format
-msgid "Successfully sent ${count} emails"
-msgstr "${count} E-Mails erfolgreich gesendet"
-
-msgid "The submitter email is not available"
-msgstr "Die E-Mail-Adresse des Absenders ist nicht verfügbar"
-
-#~ msgid ""
-#~ "You have You have signed up to volunteer for the following activities:"
-#~ msgstr "Sie haben sich als Hilfsperson für folgende Angebote angemeldet:"
-
-#~ msgid "You have subscribed to the following needs:"
-#~ msgstr "Sie haben sich für folgende Bedarfe angemeldet:"
-
-#~ msgid "Final submission states"
-#~ msgstr "Endgültige Anmeldungszustände"
-
-#~ msgid "Experimental"
-#~ msgstr "Experimentell"
 
 #~ msgid ""
 #~ "Attendees can get group codes via the button \"invite a companion\". "

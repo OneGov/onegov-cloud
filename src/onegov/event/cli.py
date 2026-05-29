@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import click
 import hashlib
+import niquests
 import pycurl
 
 from csv import reader as csvreader
@@ -28,7 +29,6 @@ from onegov.file import DepotApp
 from onegov.file.utils import as_fileintent
 from onegov.gis import Coordinates
 from pytz import UTC
-from requests import get
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
@@ -130,11 +130,12 @@ def get_event_dates(url: str, timezone: str) -> tuple[datetime, datetime]:
 
     """
 
-    response = get(
+    response = niquests.get(
         urlparse(url)._replace(query='type=ical').geturl(),
         timeout=60
     )
     response.raise_for_status()
+    assert response.text is not None
 
     for event in vCalendar.from_ical(response.text).walk('vevent'):
         start = event.get('dtstart').dt
@@ -191,7 +192,7 @@ def import_json(
     def _import_json(request: CoreRequest, app: Framework) -> None:
         unknown_tags = set()
 
-        response = get(url, timeout=60)
+        response = niquests.get(url, timeout=60)
         response.raise_for_status()
         data = response.json()
 
@@ -433,8 +434,9 @@ def import_guidle(
 
     def _import_guidle(request: CoreRequest, app: Framework) -> None:
         try:
-            response = get(url, timeout=300)
+            response = niquests.get(url, timeout=300)
             response.raise_for_status()
+            assert response.content is not None
 
             unknown_tags: set[str] = set()
             prefix = 'guidle-{}'.format(
@@ -462,7 +464,7 @@ def import_guidle(
                 Event.meta['source_updated'].astext,
             ))
 
-            root = etree.fromstring(response.text.encode('utf-8'))
+            root = etree.fromstring(response.content)
 
             def items(
                 unknown_tags: set[str]

@@ -162,6 +162,7 @@ select = [
     "SIM",
     "SLOT",
     "T",
+    "TID251",
     "TRY",
     "UP",
     "W"
@@ -316,6 +317,11 @@ extend-markup-names = ["chameleon.utils.Markup"]
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["attr.attrib"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"aiohttp".msg = "We have switched to niquests, please use that instead"
+"httpx".msg = "We have switched to niquests, please use that instead"
+"requests".msg = "We have switched to niquests, please use that instead"
 
 [tool.ruff.format]
 quote-style = "single"
