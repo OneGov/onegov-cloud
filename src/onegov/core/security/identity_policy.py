@@ -16,7 +16,7 @@ class IdentityPolicy:
 
     """
 
-    required_keys = {'userid', 'groupids', 'role', 'application_id'}
+    required_keys = {'userid', 'uid', 'groupids', 'role', 'application_id'}
 
     def identify(self, request: CoreRequest) -> Identity | None:
         try:
@@ -27,9 +27,6 @@ class IdentityPolicy:
             # FIXME: According to docs this should return NO_IDENTITY
             return None
         else:
-            uid = request.browser_session.get('uid')
-            if uid is not None:
-                identifiers['uid'] = uid
             return Identity(**identifiers)
 
     def remember(
@@ -40,8 +37,6 @@ class IdentityPolicy:
     ) -> None:
         for key in self.required_keys:
             request.browser_session[key] = getattr(identity, key)
-        if (uid := getattr(identity, 'uid', None)) is not None:
-            request.browser_session['uid'] = uid
 
     def forget(self, response: Response, request: CoreRequest) -> None:
         request.browser_session.flush()
