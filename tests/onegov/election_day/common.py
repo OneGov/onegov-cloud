@@ -325,41 +325,16 @@ def logout(client: Client[TestResponse, TestApp], to: str = '') -> None:
 def import_ech_from_file(
     client: Client[TestResponse, TestApp],
     path: str,
-    create: bool = True,
 ) -> TestResponse:
-    """Upload an eCH-0252 XML delivery file via the vote upload UI.
-
-    Creates a placeholder vote on the first call so the upload endpoint is
-    reachable. Pass create=False for subsequent files on the same polling day.
     """
-    from xml.etree.ElementTree import parse as parse_xml
-
-    if create:
-        tree = parse_xml(path)
-        root = tree.getroot()
-        polling_day_text = None
-        for ns in (
-            'http://www.ech.ch/xmlns/eCH-0252/2',
-            'http://www.ech.ch/xmlns/eCH-0252/1',
-        ):
-            elem = root.find(f'.//{{{ns}}}pollingDay')
-            if elem is not None and elem.text:
-                polling_day_text = elem.text
-                break
-        assert polling_day_text, 'pollingDay not found in XML'
-
-        new = client.get('/manage/votes/new-vote')
-        new.form['title_de'] = 'ech-xml-placeholder'
-        new.form['date'] = polling_day_text
-        new.form['domain'] = 'federation'
-        new.form['type'] = 'simple'
-        new.form.submit()
+    Upload an eCH-0252 XML delivery file via the principal upload
+    endpoint.
+    """
 
     with open(path, 'rb') as f:
         xml_content = f.read()
 
-    upload = client.get('/vote/ech-xml-placeholder/upload')
-    upload.form['file_format'] = 'xml'
+    upload = client.get('/upload-ech')
     upload.form['xml'] = Upload('data.xml', xml_content, 'text/xml')
     response = upload.form.submit()
     assert 'Ihre Resultate wurden erfolgreich hochgeladen' in response

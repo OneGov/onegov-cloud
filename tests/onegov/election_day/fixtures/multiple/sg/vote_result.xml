@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<delivery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ech.ch/xmlns/eCH-0252/2">
+	<deliveryHeader>
+		<senderId xmlns="http://www.ech.ch/xmlns/eCH-0058/5">ABX-VOTING</senderId>
+		<messageId xmlns="http://www.ech.ch/xmlns/eCH-0058/5">abc123</messageId>
+		<messageType xmlns="http://www.ech.ch/xmlns/eCH-0058/5">1198</messageType>
+		<sendingApplication xmlns="http://www.ech.ch/xmlns/eCH-0058/5">
+			<manufacturer>Test</manufacturer>
+			<product>Test</product>
+			<productVersion>1.0</productVersion>
+		</sendingApplication>
+		<messageDate xmlns="http://www.ech.ch/xmlns/eCH-0058/5">2026-05-18T10:00:00Z</messageDate>
+		<action xmlns="http://www.ech.ch/xmlns/eCH-0058/5">1</action>
+		<testDeliveryFlag xmlns="http://www.ech.ch/xmlns/eCH-0058/5">true</testDeliveryFlag>
+	</deliveryHeader>
+	<voteBaseDelivery>
+		<cantonId>17</cantonId>
+		<pollingDay>2026-05-18</pollingDay>
+		<voteInfo>
+			<vote>
+				<voteIdentification>vote-id-1</voteIdentification>
+				<domainOfInfluence>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">MU</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3251</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Altstätten</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Altstätten</domainOfInfluenceShortname>
+				</domainOfInfluence>
+				<superiorAuthority>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">MU</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3251</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Altstätten</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Altstätten</domainOfInfluenceShortname>
+				</superiorAuthority>
+				<pollingDay>2026-05-18</pollingDay>
+				<voteTitleInformation>
+					<language>de</language>
+					<voteTitle>Testabstimmung Gemeinde</voteTitle>
+					<voteTitleShort>Testabstimmung Gemeinde</voteTitleShort>
+				</voteTitleInformation>
+				<decisiveMajority>1</decisiveMajority>
+				<voteSubType>1</voteSubType>
+				<sequence>1</sequence>
+			</vote>
+			<countingCircleInfo>
+				<countingCircle>
+					<countingCircleId>3251</countingCircleId>
+					<countingCircleName>Altstätten</countingCircleName>
+					<domainOfInfluenceType>MU</domainOfInfluenceType>
+				</countingCircle>
+				<resultData>
+					<countOfVotersInformation>
+						<countOfVotersTotal>1000</countOfVotersTotal>
+						<subtotalInfo>
+							<countOfVoters>1000</countOfVoters>
+							<voterType>1</voterType>
+							<sex>1</sex>
+						</subtotalInfo>
+					</countOfVotersInformation>
+					<votingCardInformation>
+						<countOfVotingCardsReceivedInBallotBox>10</countOfVotingCardsReceivedInBallotBox>
+						<countOfVotingCardsReceivedPrematurelyInBallotBox>0</countOfVotingCardsReceivedPrematurelyInBallotBox>
+						<countOfVotingCardsReceivedByMail>290</countOfVotingCardsReceivedByMail>
+						<countOfInvalidVotingCardsReceivedByMail>5</countOfInvalidVotingCardsReceivedByMail>
+						<countOfVotingCardsReceivedByEvoting>0</countOfVotingCardsReceivedByEvoting>
+					</votingCardInformation>
+					<isFullyCounted>true</isFullyCounted>
+					<releasedTimestamp>2026-05-18T10:00:00Z</releasedTimestamp>
+					<lockoutTimestamp>2026-05-18T10:05:00Z</lockoutTimestamp>
+					<voterTurnout>30.00</voterTurnout>
+					<receivedVotes>300</receivedVotes>
+					<receivedInvalidVotes>0</receivedInvalidVotes>
+					<receivedBlankVotes>5</receivedBlankVotes>
+					<receivedValidVotes>295</receivedValidVotes>
+					<countOfYesVotes>200</countOfYesVotes>
+					<countOfNoVotes>95</countOfNoVotes>
+					<countOfVotesWithoutAnswer>0</countOfVotesWithoutAnswer>
+				</resultData>
+			</countingCircleInfo>
+		</voteInfo>
+		<numberOfEntries>1</numberOfEntries>
+	</voteBaseDelivery>
+</delivery>

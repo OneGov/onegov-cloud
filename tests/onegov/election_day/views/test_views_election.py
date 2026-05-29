@@ -1038,7 +1038,6 @@ def test_views_election_municipal_and_municipality(
             'tests.onegov.election_day',
             f'{fixtures}/majority-election-result-delivery_20250518.xml'
         ),
-        create=False,
     )
 
     page = client.get('/')
