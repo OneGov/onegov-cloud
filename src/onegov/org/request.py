@@ -119,27 +119,17 @@ class OrgRequest(CoreRequest):
             return None
 
         if not hasattr(self, '_current_user'):
-            uid = getattr(self.identity, 'uid', None)
-            if uid:
-                self._current_user = (
-                    self.session.query(User)
-                    .filter(User.id == UUID(uid))
-                    .first()
-                )
-                if (
-                    self._current_user is not None
-                    and self.identity.userid != self._current_user.username
-                ):
-                    # stale username in session — fix it for subsequent
-                    # requests
-                    self.browser_session['userid'] = (
-                        self._current_user.username)
-            else:
-                self._current_user = (
-                    self.session.query(User)
-                    .filter_by(username=self.identity.userid)
-                    .first()
-                )
+            self._current_user = (
+                self.session.query(User)
+                .filter(User.id == UUID(self.identity.uid))
+                .first()
+            )
+            if (
+                self._current_user is not None
+                and self.identity.userid != self._current_user.username
+            ):
+                # stale username in session — fix it for subsequent requests
+                self.browser_session['userid'] = self._current_user.username
             return self._current_user
 
         if self._current_user is None:
