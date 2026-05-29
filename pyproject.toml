@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 log_level = "INFO"
+redis_timeout = 30
 testpaths = ["tests"]
 python_classes = []
 python_files = ["test_*.py"]
