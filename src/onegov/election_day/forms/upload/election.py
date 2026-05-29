@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
-from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES_XML
 from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
@@ -25,23 +24,11 @@ class UploadElectionBaseForm(Form):
         _('File format'),
         choices=[
             ('internal', 'OneGov Cloud'),
-            ('xml', 'eCH-0252'),
         ],
         validators=[
             InputRequired()
         ],
         default='internal'
-    )
-
-    xml = UploadField(
-        label=_('Delivery'),
-        validators=[
-            DataRequired(),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        allowed_mimetypes=ALLOWED_MIME_TYPES_XML,
-        depends_on=('file_format', 'xml'),
-        render_kw={'force_simple': True}
     )
 
     results = UploadField(
@@ -52,7 +39,7 @@ class UploadElectionBaseForm(Form):
         ],
         allowed_mimetypes=ALLOWED_MIME_TYPES,
         render_kw={'force_simple': True},
-        depends_on=('file_format', '!wabsti_c', 'file_format', '!xml'),
+        depends_on=('file_format', '!wabsti_c'),
     )
 
     def adjust(
@@ -66,7 +53,6 @@ class UploadElectionBaseForm(Form):
         if election.data_sources:
             self.file_format.choices = [
                 ('internal', 'OneGov Cloud'),
-                ('xml', 'eCH-0252'),
                 ('wabsti_c', 'WabstiCExport')
             ]
 
