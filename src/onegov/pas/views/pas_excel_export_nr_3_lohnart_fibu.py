@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from sedate import utcnow
-from collections.abc import Iterator
 
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
@@ -23,10 +22,10 @@ from onegov.pas.utils import is_commission_president, round_to_five_rappen
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from onegov.town6.request import TownRequest
     from onegov.pas.models import (SettlementRun)
     from datetime import date
-    from collections.abc import Iterator
 
 
 # Document: 'KR-Entschaedigung - 1.Quartal 2024 (1).csv'

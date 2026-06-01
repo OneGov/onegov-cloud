@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from enum import Enum
 from decimal import Decimal
-from collections.abc import Callable
 from itertools import chain
 from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
 from onegov.core.orm import Base, observes
