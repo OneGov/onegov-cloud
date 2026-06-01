@@ -795,7 +795,7 @@ def fetch(
                                 owner=local_admin.username,
                             )
 
-                if app.fts_search_enabled:
+                if getattr(app, 'fts_search_enabled', False):
                     if added or updated:
                         app.fts_indexer.process(
                             (
