@@ -174,17 +174,7 @@ def handle_new_directory(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        try:
-            directory = self.add_by_form(form, properties=('configuration', ))
-        except DuplicateEntryError as e:
-            transaction.abort()
-            # NOTE: The alert needs to be emitted after, so it doesn't get
-            #       rolled back as well.
-            request.alert(_('The entry ${name} exists twice', mapping={
-                'name': e.name
-            }))
-            return request.redirect(request.link(self))
-
+        directory = self.add_by_form(form, properties=('configuration', ))
         request.success(_('Added a new directory'))
         return request.redirect(
             request.link(ExtendedDirectoryEntryCollection(directory)))
@@ -670,20 +660,10 @@ def handle_new_directory_entry(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        try:
-            entry = self.directory.add_by_form(
-                form,
-                type='extended'
-            )
-        except DuplicateEntryError as e:
-            transaction.abort()
-            # NOTE: The alert needs to be emitted after, so it doesn't get
-            #       rolled back as well.
-            request.alert(_('The entry ${name} exists twice', mapping={
-                'name': e.name
-            }))
-            return request.redirect(request.link(self))
-
+        entry = self.directory.add_by_form(
+            form,
+            type='extended'
+        )
         if self.directory.enable_update_notifications and entry.access in (
             'public',
             'mtan'

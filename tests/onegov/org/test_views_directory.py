@@ -309,7 +309,7 @@ def test_directory_change_requests(client: Client) -> None:
 
     # create a directory that accepts change requests
     page = client.get('/directories').click('^Verzeichnis$')
-    page.form['title'] = "Playgrounds"
+    page.form['title'] = 'Playgrounds'
     page.form['structure'] = """
         Name *= ___
         Pic *= *.jpg|*.png|*.gif

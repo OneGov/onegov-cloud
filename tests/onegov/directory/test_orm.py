@@ -695,16 +695,24 @@ def test_add_duplicate_entry(session: Session) -> None:
         title="Foos",
         structure="Name *= ___",
         configuration=DirectoryConfiguration(
-            title='Name',
+            title='Foobar',
             order=['Name'],
         )
     )
 
     foos.add(values=dict(name='foobar'))
     session.flush()
+    foos.add(values=dict(name='foobar'))
+    session.flush()
+    foos.add(values=dict(name='foobar'))
+    session.flush()
 
-    with pytest.raises(DuplicateEntryError):
-        foos.add(values=dict(name='foobar'))
+    # test collection entry names
+    assert [d.name for d in foos.entries] == [
+        'foobar',
+        'foobar-2',
+        'foobar-3',
+    ]
 
 
 def test_custom_order(session: Session) -> None:

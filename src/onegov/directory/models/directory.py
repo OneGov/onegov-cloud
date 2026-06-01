@@ -10,8 +10,8 @@ from onegov.core.crypto import random_token
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.utils import normalize_for_url
-from onegov.directory.errors import ValidationError, DuplicateEntryError
+from onegov.core.utils import increment_name, normalize_for_url
+from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import (
     DirectoryConfiguration, DirectoryConfigurationStorage)
@@ -435,10 +435,22 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
             if session:
                 with session.no_autoflush:
-                    if self.entry_with_name_exists(name):
-                        entry.directory = None  # type: ignore[assignment]
-                        session.expunge(entry)
-                        raise DuplicateEntryError(name)
+                    existing = {
+                        n for n, in session.query(
+                            self.entry_cls.name
+                        ).filter(
+                            self.entry_cls.directory_id == self.id
+                        )
+                        if n != entry.name
+                    }
+                    for _ in range(100):
+                        if name not in existing:
+                            break
+                        name = increment_name(name)
+                    else:
+                        raise RuntimeError(
+                            'increment_name failed to find a candidate'
+                        )
 
             entry.name = name
 
