@@ -1452,7 +1452,7 @@ msgid "Show the lead if accessing the parent page"
 msgstr "Mostra l'estratto se accedi alla pagina principale"
 
 msgid "(Redesign only)"
-msgstr ""
+msgstr "(Solo riprogettazione)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "

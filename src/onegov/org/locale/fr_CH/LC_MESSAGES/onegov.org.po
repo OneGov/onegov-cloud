@@ -1449,7 +1449,7 @@ msgid "Show the lead if accessing the parent page"
 msgstr "Afficher l'introduction sur la page parent"
 
 msgid "(Redesign only)"
-msgstr ""
+msgstr "(Redesign uniquement)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
