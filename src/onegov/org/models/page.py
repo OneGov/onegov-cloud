@@ -55,6 +55,10 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     fts_type_title = _('Topics')
     fts_public = True
+    fts_properties = {
+        **SearchableContent.fts_properties,
+        'keywords': {'type': 'localized', 'weight': 'A'},
+    }
 
     # NOTE: Topics should not decrease in relevance over time
     @property
@@ -73,6 +77,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     # Show the lead on topics page
     lead_when_child: dict_property[bool] = content_property(default=True)
+
+    keywords: dict_property[list[str]] = meta_property(default=list)
 
     @property
     def deletable(self) -> bool:
@@ -247,6 +253,8 @@ class News(Page, TraitInfo, SearchableContent, AccessExtension,
             if not self.parent and action == 'edit':
                 return self.get_root_page_form_class(request)
             form_class = self.with_content_extensions(PageForm, request)
+            # prevent showing keywords field for news
+            form_class.keywords = None  # type: ignore[assignment]
 
             if hasattr(form_class, 'is_visible_on_homepage'):
                 # clarify the intent of this particular flag on the news, as

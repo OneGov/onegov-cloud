@@ -2420,6 +2420,9 @@
 <meta property="og:description" tal:attributes="content og_description" tal:define="og_description layout.og_description" tal:condition="og_description">
 <meta property="og:locale" tal:attributes="content layout.og_locale">
 <meta tal:repeat="locale layout.og_locale_alternate" property="og:locale:alternate" tal:attributes="content locale">
+<tal:b tal:define="meta_keywords python: getattr(layout.model, 'keywords', None)" tal:condition="meta_keywords">
+<meta name="keywords" tal:attributes="content python:', '.join(meta_keywords)" />
+</tal:b>
 </metal:open_graph_tags>
 
 <metal:modal define-macro="modal">
