@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from enum import Enum
 from decimal import Decimal
-from collections.abc import Callable
 from itertools import chain
 from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
 from onegov.core.orm import Base, observes
@@ -464,6 +463,14 @@ class AdjacencyListCollection[L: AdjacencyList]:
         if ensure_type is None or item is None or item.type == ensure_type:
             return item
         return None
+
+    def by_title(self, title: str) -> L | None:
+        query = self.query(ordered=False)
+        return query.filter(self.__listclass__.title == title).first()
+
+    def by_name(self, name: str) -> L | None:
+        query = self.query(ordered=False)
+        return query.filter(self.__listclass__.name == name).first()
 
     def get_unique_child_name(self, name: str, parent: L | None) -> str:
         """ Takes the given name or title, normalizes it and makes sure

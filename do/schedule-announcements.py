@@ -8,7 +8,11 @@ import subprocess
 import time
 import yaml
 
-from collections.abc import Sequence
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 schedule_config_file = 'maintenance-schedule.yml'
 
@@ -53,7 +57,7 @@ def parse_schedule_config(cfg: str) -> list[tuple[str, list[str]]]:
     return out
 
 
-def schedule_announcement(date_string, node, dry_run):
+def schedule_announcement(date_string: str, node: str, dry_run: bool) -> None:
     """
     Execute the `schedule-maintenance` command, optionally in
     `dry-run` mode.
@@ -76,7 +80,7 @@ def schedule_announcement(date_string, node, dry_run):
     click.secho(f'Command: {quoted}\n', fg='yellow')
 
     try:
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True)  # nosec: B603
     except subprocess.CalledProcessError as e:
         click.secho(f'Error scheduling announcement for {node} '
                     f'on {date_string}: {e}\n', fg='red')
@@ -97,17 +101,17 @@ def schedule_rollout_announcements(
     and manually confirm with y/n for each server.
 
     :param dry_run: run the command without actually scheduling the
-    announcements and sending out emails\n
-    :param select: only schedule announcements for the specified nodes\n
+    announcements and sending out emails
+    :param select: only schedule announcements for the specified nodes
     :param unselect: schedule announcements for all nodes except the
     specified ones
 
-    Examples:\n
-      python3 do/schedule-announcements.py --help\n
-      python3 do/schedule-announcements.py --dry-run\n
-      python3 do/schedule-announcements.py\n
-      python3 do/schedule-announcements.py --select A --select B\n
-      python3 do/schedule-announcements.py --unselect C --unselect D\n
+    Examples:
+      python3 do/schedule-announcements.py --help
+      python3 do/schedule-announcements.py --dry-run
+      python3 do/schedule-announcements.py
+      python3 do/schedule-announcements.py --select A --select B
+      python3 do/schedule-announcements.py --unselect C --unselect D
     """
 
     try:

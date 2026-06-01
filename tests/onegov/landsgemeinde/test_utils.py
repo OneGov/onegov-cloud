@@ -13,7 +13,6 @@ from onegov.landsgemeinde.utils import update_ticker
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.landsgemeinde.models import Assembly
     from .conftest import TestApp
 
 

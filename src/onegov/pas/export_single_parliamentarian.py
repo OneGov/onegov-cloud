@@ -24,12 +24,10 @@ from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
     FontConfiguration,
 )
-from datetime import date  # noqa: TC003
-
 
 from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
-    from datetime import date
+    from datetime import date  # noqa: TC003
     from onegov.pas.models import PASParliamentarian, RateSet
     from onegov.pas.models.settlement_run import SettlementRun
 

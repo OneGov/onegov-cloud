@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 log_level = "INFO"
+redis_timeout = 60
 testpaths = ["tests"]
 python_classes = []
 python_files = ["test_*.py"]
@@ -162,6 +163,7 @@ select = [
     "SIM",
     "SLOT",
     "T",
+    "TID251",
     "TRY",
     "UP",
     "W"
@@ -316,6 +318,11 @@ extend-markup-names = ["chameleon.utils.Markup"]
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["attr.attrib"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"aiohttp".msg = "We have switched to niquests, please use that instead"
+"httpx".msg = "We have switched to niquests, please use that instead"
+"requests".msg = "We have switched to niquests, please use that instead"
 
 [tool.ruff.format]
 quote-style = "single"

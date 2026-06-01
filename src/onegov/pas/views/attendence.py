@@ -4,7 +4,7 @@ from collections import defaultdict
 import uuid
 from datetime import datetime
 
-from sqlalchemy import distinct
+from sqlalchemy import distinct, false
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
@@ -12,9 +12,12 @@ from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (
     AttendenceCollection,
+    PASParliamentarianCollection,
+    PresidentialAllowanceCollection,
     SettlementRunCollection,
 )
 from onegov.pas.custom import (
+    has_user_set_abschluss_for_settlement_run,
     validate_attendance_date,
     notify_admins_finalized,
 )
@@ -27,6 +30,7 @@ from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
+from onegov.pas.models import PresidentialAllowance
 from onegov.pas.models import SettlementRun
 from onegov.pas.models.attendence import TYPES
 from onegov.pas.models.commission_membership import PASCommissionMembership
@@ -202,6 +206,22 @@ def view_attendences(
                 )
             )
 
+    allowance_q = PresidentialAllowanceCollection(
+        request.session,
+        settlement_run_id=uuid.UUID(self.settlement_run_id)
+        if self.settlement_run_id else None,
+    ).query()
+    if request.is_parliamentarian:
+        parl = request.current_parliamentarian
+        if parl:
+            allowance_q = allowance_q.filter(
+                PresidentialAllowance.parliamentarian_id
+                == parl.id
+            )
+        else:
+            allowance_q = allowance_q.filter(false())
+    allowances = allowance_q.all()
+
     edit_links: dict[uuid.UUID, str] = {}
     for a in attendences_sorted:
         if a.bulk_edit_id:
@@ -222,6 +242,7 @@ def view_attendences(
         'title': layout.title,
         'bulk_edit_groups': bulk_edit_groups,
         'can_edit_attendences': request.is_admin,
+        'allowances': allowances,
         'filters': {
             'settlement_run': run_filters,
             'type': type_filters,
@@ -249,6 +270,29 @@ def add_attendence(
                 request.session, form.date.data
             ):
                 request.alert(error)
+                return {
+                    'layout': AttendenceCollectionLayout(self, request),
+                    'title': _('New attendence'),
+                    'form': form,
+                    'form_width': 'large',
+                }
+
+        if not request.is_admin:
+            if (
+                form.parliamentarian_id.data
+                and form.date.data
+                and has_user_set_abschluss_for_settlement_run(
+                    request.session,
+                    form.parliamentarian_id.data,
+                    form.date.data,
+                )
+            ):
+                request.alert(
+                    _(
+                        'Cannot book attendance - abschluss '
+                        'already set for this settlement run'
+                    )
+                )
                 return {
                     'layout': AttendenceCollectionLayout(self, request),
                     'title': _('New attendence'),
@@ -309,6 +353,34 @@ def add_bulk_attendence(
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
+            if not request.is_admin and form.date.data:
+                blocked_parls: list[str] = []
+                for parl_id in raw_parl_ids:
+                    pid = str(parl_id)
+                    if has_user_set_abschluss_for_settlement_run(
+                        request.session, pid, form.date.data
+                    ):
+                        parl = PASParliamentarianCollection(request.app).by_id(
+                            pid
+                        )
+                        if parl:
+                            blocked_parls.append(parl.title)
+                if blocked_parls:
+                    request.alert(
+                        _(
+                            'Cannot book attendance - '
+                            'abschluss already set '
+                            'for: ${names}',
+                            mapping={'names': ', '.join(blocked_parls)},
+                        )
+                    )
+                    return {
+                        'layout': AttendenceCollectionLayout(self, request),
+                        'title': title,
+                        'form': form,
+                        'form_width': 'large',
+                    }
+
             data.pop('parliamentarian_id', None)
             bulk_edit_id = uuid.uuid4()
             notify_attendence = None

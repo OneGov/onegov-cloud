@@ -15,7 +15,6 @@ from wtforms.validators import InputRequired
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from io import BytesIO
     from sqlalchemy.orm import Session
     from ..conftest import TestApp
 

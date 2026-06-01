@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 
-import requests
+import niquests
 import yaml
 
 import morepath
@@ -413,12 +413,12 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
             return yaml.safe_load(f).get('event_form_lead', None)
 
     def load_formcode_specification(self) -> str:
-        response = requests.get(
+        response = niquests.get(
             'https://raw.githubusercontent.com/seantis/docs-admin-digital'
             '/refs/heads/main/content/module/formulare/index.md',
             timeout=(5, 10)
         )
-        if not response.ok:
+        if not response.ok or not response.text:
             # Fallback to our docstring
             import onegov.form.parser.core as parser
             return parser.__doc__
@@ -426,12 +426,12 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
         specification = response.text
 
         # try to extend specification with examples
-        response = requests.get(
+        response = niquests.get(
             'https://raw.githubusercontent.com/seantis/docs-admin-digital'
             '/refs/heads/main/content/module/formulare/beispiele.md',
             timeout=(5, 10)
         )
-        if not response.ok:
+        if not response.ok or not response.text:
             return specification
         return f'{specification}\n\n{response.text}'
 

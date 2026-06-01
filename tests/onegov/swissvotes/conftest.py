@@ -16,20 +16,33 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.user import User
+from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
 from tests.shared.utils import create_image
 from transaction import commit
 from xlsxwriter.workbook import Workbook
 
 
-from typing import TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
+    _AppT = TypeVar(
+        '_AppT',
+        bound=SwissvotesApp,
+        default='TestApp',
+        covariant=True
+    )
+else:
+    _AppT = TypeVar('_AppT', bound=SwissvotesApp)
 
 class TestApp(SwissvotesApp):
     __test__ = False
     maildir: str
+
+
+class Client(BaseClient[_AppT]):
+    skip_n_forms = 0
+    use_intercooler = True
 
 
 def create_swissvotes_app(

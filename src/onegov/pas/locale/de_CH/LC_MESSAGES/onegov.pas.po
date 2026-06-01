@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-05-08 20:17+0200\n"
+"POT-Creation-Date: 2026-05-28 01:42+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -698,11 +698,11 @@ msgid "Hello!"
 msgstr "Hallo!"
 
 msgid ""
-"${user_name} has closed commission ${commission_name} for settlement run "
-"${settlement_run_name}."
+"${user_name} has completed the recording for commission ${commission_name} "
+"in settlement run ${settlement_run_name}."
 msgstr ""
-"${user_name} hat den Abschluss der Kommission ${commission_name} für den "
-"Abrechnungslauf ${settlement_run_name} gesetzt."
+"${user_name} hat für die Kommission «${commission_name}» im Abrechnungslauf "
+"«${settlement_run_name}» die Erfassung abgeschlossen."
 
 msgid "Parliamentarian:"
 msgstr "Parlamentarier:in:"
@@ -715,13 +715,6 @@ msgstr "Datum:"
 
 msgid "Set by:"
 msgstr "Gesetzt von:"
-
-msgid ""
-"${parliamentarian_name} can no longer add new commission attendances for the "
-"period ${start} – ${end}."
-msgstr ""
-"${parliamentarian_name} kann für den Zeitraum ${start} – ${end} keine neuen "
-"Kommissions-Anwesenheiten mehr hinzufügen."
 
 msgid "Roles"
 msgstr "Rollen"
@@ -841,6 +834,11 @@ msgstr "Noch keine Abrechnungsläufe erfasst"
 msgid "New attendence"
 msgstr "Neue Anwesenheit"
 
+msgid "Cannot book attendance - abschluss already set for this settlement run"
+msgstr ""
+"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für diesen "
+"Abrechnungslauf"
+
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
 
@@ -852,6 +850,12 @@ msgstr "Nur Administratoren können Massenanwesenheiten erfassen."
 
 msgid "New commission session (bulk)"
 msgstr "Neue Massenbuchung Kommissionssitzung"
+
+#, python-format
+msgid "Cannot book attendance - abschluss already set for: ${names}"
+msgstr ""
+"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
+"${names}"
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
@@ -1078,12 +1082,6 @@ msgstr ""
 #~ msgid "New commission meeting"
 #~ msgstr "Neue Kommissionsitzung"
 
-#, python-format
-#~ msgid "Cannot book attendance - abschluss already set for: ${names}"
-#~ msgstr ""
-#~ "Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
-#~ "${names}"
-
 #~ msgid "Added commission meeting"
 #~ msgstr "Kommissionsitzung hinzugefügt"
 
@@ -1122,12 +1120,6 @@ msgstr ""
 #~ "Pauschale Jahreszulage gemäss § 8 Nebenamtsgesetz für die Vertretung des "
 #~ "Kantons an Anlässen. Auszahlung in vierteljährlichen Raten über "
 #~ "Abrechnungsläufe."
-
-#~ msgid ""
-#~ "Cannot book attendance - abschluss already set for this settlement run"
-#~ msgstr ""
-#~ "Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für "
-#~ "diesen Abrechnungslauf"
 
 #, python-format
 #~ msgid "Cannot edit attendance - abschluss already set for: ${names}"
