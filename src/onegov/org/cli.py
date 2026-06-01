@@ -804,7 +804,7 @@ def fetch(
                                 if (
                                     task := app.fts_orm_events.index_task(
                                         local_schema,
-                                        event_,  # type:ignore
+                                        event_,
                                     )
                                 )
                                 is not None
