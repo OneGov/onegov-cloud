@@ -105,8 +105,9 @@ class OrgRequest(CoreRequest):
 
     @property
     def current_username(self) -> str | None:
-        if self._current_user:
-            return self._current_user.username
+        cached = getattr(self, '_current_user', None)
+        if cached is not None:
+            return cached.username
 
         return self.identity.userid if self.identity else None
 
