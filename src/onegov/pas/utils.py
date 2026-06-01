@@ -28,7 +28,7 @@ if TYPE_CHECKING:
         ParliamentarianRole,
     )
     from onegov.pas.models import SettlementRun
-    from onegov.pas.models.attendence import Attendence
+
     from onegov.user import User
     from sqlalchemy.orm import Session
 

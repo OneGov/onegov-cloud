@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from onegov.event.models.event import EventState
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Self, IO
+    from typing import Self
     from uuid import UUID
 
 log = logging.getLogger('onegov.org.events')
