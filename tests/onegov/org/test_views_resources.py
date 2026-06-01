@@ -4663,11 +4663,20 @@ def test_my_reservations_view(client: Client) -> None:
     client2.get('/resources/my-reservations-pdf', status=403)
 
 
-def test_reserve_form_expired_session_returns_403(client: Client) -> None:
-    # Regression: cleanup was placed after bound_reservations inside
-    # `if request.POST:`, so submitting the form after session expiry could
-    # crash when the template accessed info.price on a detached object.
-    with freeze_time("2026-05-29 10:00:00"):
+@pytest.mark.parametrize('frozen_at,expected_status', [
+    ('2026-05-29 11:59:59', 200),   # just before 2-hour expiry: proceeds
+    ('2026-05-29 12:00:01', 403),   # just after 2-hour expiry → session
+    # cleaned up
+])
+def test_reserve_form_session_expiry(
+    client: Client,
+    frozen_at: str,
+    expected_status: int,
+) -> None:
+    # Regression: expired-session cleanup must run before bound_reservations.
+    # Old placement (after bound_reservations) detached the reservation; the
+    # template then crashed accessing info.price on the detached object.
+    with freeze_time('2026-05-29 10:00:00'):
         resources = ResourceCollection(client.app.libres_context)
         resource = resources.by_name('tageskarte')
         assert resource is not None
@@ -4686,5 +4695,5 @@ def test_reserve_form_expired_session_returns_403(client: Client) -> None:
         formular = client.get('/resource/tageskarte/form')
         formular.form['email'] = 'info@example.org'
 
-    with freeze_time("2026-05-29 10:15:01"):  # past 15-min expiry threshold
-        formular.form.submit(expect_errors=True, status=403)
+    with freeze_time(frozen_at):
+        formular.form.submit(status=expected_status)
