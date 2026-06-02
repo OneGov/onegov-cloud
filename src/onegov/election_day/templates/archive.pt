@@ -2,6 +2,7 @@
      i18n:domain="onegov.election_day"
      tal:define="communal_instance layout.principal.domain == 'municipality';
                  show_communal_nav show_communal_nav | python:False;
+                 show_archive_links show_archive_links | python:False;
                  municipal_view municipal_view | python:False;
                  municipality_view municipality_view | python:False;
                  all_municipal_view all_municipal_view | python:False;">
@@ -368,7 +369,7 @@
             </tal:block>
         </div>
 
-        <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years">
+        <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years and show_archive_links">
             <div class="columns small-12 small-centered">
                 <h2 id="archive" i18n:translate="">Archive</h2>
                 <div class="archive-breadcrumbs">

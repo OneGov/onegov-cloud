@@ -71,6 +71,7 @@ def view_archive(
         'date': self.date,
         'archive_items': self.group_items(results, request),
         'show_communal_nav': True,
+        'show_archive_links': True,
     }
 
 
@@ -190,6 +191,7 @@ def view_principal(
         'archive_items': archive.group_items(current, request),
         'date': None,
         'show_communal_nav': True,
+        'show_archive_links': True,
     }
 
 
