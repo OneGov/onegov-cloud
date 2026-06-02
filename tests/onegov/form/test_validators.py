@@ -45,7 +45,6 @@ def test_unique_column_value_validator(postgres_dsn: str) -> None:
             self.request = Request(session)
 
     mgr = SessionManager(postgres_dsn, Base)
-    mgr.bases.append(Base)
     mgr.set_current_schema('foobar')
     session = mgr.session()
     session.add(Dummy(name='Alice'))
