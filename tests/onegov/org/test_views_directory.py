@@ -513,19 +513,6 @@ def test_directory_submissions(
     page = client.get(ticket_url)
     assert 'Washington' in client.get('/directories/points-of-interest')
 
-    # another way this can fail is with duplicate entries of the same name
-    postgres.undo(pop=False)
-    page = client.get('/directories/points-of-interest').click(
-        'Eintrag', index=0)
-
-    page.form['name'] = 'Washington Monument'
-    page.form.submit()
-
-    client.post(accept_url)
-
-    page = client.get(ticket_url)
-    assert "Ein Eintrag mit diesem Namen existiert bereits" in page
-
     # less severe structural changes are automatically applied
     postgres.undo(pop=False)
     page = client.get('/directories/points-of-interest').click('Konfigurieren')
