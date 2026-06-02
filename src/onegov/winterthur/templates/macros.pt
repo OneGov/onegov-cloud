@@ -6,10 +6,19 @@
       i18n:domain="onegov.winterthur">
 <body>
 
+<metal:before_occurrence_lead define-macro="before_occurrence_lead" i18n:domain="onegov.winterthur">
+    <div class="framed-only">
+        <p>
+            <a class="small" href="${request.link(layout.collection)}" i18n:translate>Back</a>
+        </p>
+    </div>
+</metal:before_occurrence_lead>
+
+
 <metal:before_directory_entry_lead define-macro="before_directory_entry_lead" i18n:domain="onegov.winterthur">
     <div class="framed-only">
         <p>
-            <a class="small" href="${request.link(entry.directory)}" i18n:translate>Back to the overview</a>
+            <a class="small" href="${request.link(entry.directory)}" i18n:translate>Back</a>
         </p>
     </div>
 </metal:before_directory_entry_lead>

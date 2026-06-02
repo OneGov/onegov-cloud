@@ -7,6 +7,7 @@ from datetime import timedelta
 from freezegun import freeze_time
 from functools import partial
 from io import BytesIO
+from onegov.event import EventCollection
 from onegov.pdf import Pdf
 from onegov.winterthur.collections import AddressCollection
 from sedate import utcnow
@@ -173,3 +174,54 @@ def test_view_shift_schedule(client: Client[TestApp]) -> None:
             'shift-schedule-1609459200.0.png',
             'shift-schedule-1640995200.0.png'
         ]
+
+
+def test_directory_entry_iframe_back_button(client: 'Client[TestApp]') -> None:
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Clubs'
+    page.form['structure'] = 'Name *= ___'
+    page.form['content_fields'] = 'Name'
+    page.form['title_format'] = '[Name]'
+    clubs = page.form.submit().follow()
+
+    page = clubs.click('Eintrag', index=0)
+    page.form['name'] = 'Pilatus'
+    clubs = page.form.submit().follow()
+
+    entry = clubs.click('Pilatus')
+    assert 'Zurück' in entry  # although no visible as not framed
+
+    back_url = entry.pyquery('.framed-only a').attr('href')
+    back = client.get(back_url).follow()
+    assert 'Pilatus' in back
+    assert back.request.path == '/directories/clubs'
+
+
+def test_occurrence_iframe_back_button(client: 'Client[TestApp]') -> None:
+    transaction.begin()
+
+    session = client.app.session()
+    events = EventCollection(session)
+    event = events.add(
+        title='Test Event',
+        start=utcnow(),
+        end=utcnow() + timedelta(hours=1),
+        timezone='Europe/Zurich',
+        tags=[],
+        content={'description': 'Test description'},
+        meta={'submitter_email': 'test@example.org'}
+    )
+    event.submit()
+    event.publish()
+
+    transaction.commit()
+
+    occurrence = client.get('/events').click('Test Event')
+    assert 'Zurück' in occurrence  # although no visible as not framed
+
+    back_url = occurrence.pyquery('.framed-only a').attr('href')
+    back = client.get(back_url)
+    assert 'Test Event' in back
+    assert back.request.path == '/events'

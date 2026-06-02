@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-04-27 17:28+0200\n"
+"POT-Creation-Date: 2026-06-01 12:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -34,6 +34,15 @@ msgstr "Ultime notizie"
 
 msgid "Topics"
 msgstr "Argomenti"
+
+msgid "Forms"
+msgstr "Moduli"
+
+msgid "Resources"
+msgstr "Prenotazioni"
+
+msgid "People"
+msgstr "Persone"
 
 msgid "Important information regarding online payments"
 msgstr "Informazioni importanti sui pagamenti online"
@@ -233,12 +242,6 @@ msgstr "Abbonamento alla newsletter"
 
 msgid "Directories"
 msgstr "Cartelle"
-
-msgid "People"
-msgstr "Persone"
-
-msgid "Forms"
-msgstr "Moduli"
 
 msgid "Surveys"
 msgstr "Sondaggi"
@@ -1438,9 +1441,6 @@ msgstr "Descrive il contenuto di questa pagina"
 msgid "Show the lead if accessing the parent page"
 msgstr "Mostra l'estratto se accedi alla pagina principale"
 
-msgid "(Redesign only)"
-msgstr "(Solo riprogettazione)"
-
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
 "iFrames, please contact info@seantis.ch."
@@ -2006,9 +2006,6 @@ msgstr ""
 
 msgid "Send on"
 msgstr "Invia il"
-
-msgid "Resources"
-msgstr "Prenotazioni"
 
 msgid "Please add at least one notification."
 msgstr "Aggiungere almeno una notifica."
@@ -3317,6 +3314,9 @@ msgstr "Associazione sportiva"
 msgid "all day"
 msgstr "tutto il giorno"
 
+msgid "o'clock"
+msgstr "ore"
+
 msgid "Homepage"
 msgstr "Pagina principale"
 
@@ -3708,6 +3708,12 @@ msgstr "Elimina collegamento esterno"
 
 msgid "Sort"
 msgstr "Ordinare"
+
+msgid "Topic"
+msgstr "Argomento"
+
+msgid "Link"
+msgstr "Collegamento"
 
 msgid "The submission was adopted"
 msgstr "L'iscrizione è stata adottata"
@@ -4207,9 +4213,6 @@ msgstr "Vuoi davvero rifiutare questo elemento?"
 msgid "Chats"
 msgstr "Chat"
 
-msgid "Link"
-msgstr "Collegamento"
-
 msgid "New Link"
 msgstr "Nuovo collegamento"
 
@@ -4228,9 +4231,6 @@ msgstr "Il collegamento è stato cancellato"
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
 msgstr "Desideri davvero eliminare il collegamento \"${title}\"?"
-
-msgid "Topic"
-msgstr "Argomento"
 
 msgid "New Topic"
 msgstr "Nuovo argomento"
@@ -4346,8 +4346,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -5151,8 +5151,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -6311,8 +6311,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -6494,6 +6494,9 @@ msgstr "È stato aggiunto un collegamento agli appunti"
 msgid "Administrative"
 msgstr "Administrativo"
 
+#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
+#. well.
+#.
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "L'elemento ${name} è duplicato"
@@ -7133,9 +7136,6 @@ msgstr "Questo fine settimana"
 
 msgid "This week"
 msgstr "Questa settimana"
-
-msgid "o'clock"
-msgstr "ore"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifica configurazione filtro eventi"
@@ -7992,6 +7992,9 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "(Redesign only)"
+#~ msgstr "(Solo riprogettazione)"
 
 #~ msgid "RIS Settings"
 #~ msgstr "Impostazioni RIS"

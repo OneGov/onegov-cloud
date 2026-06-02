@@ -22,6 +22,10 @@
     <!--! To be override by other applications -->
 </metal:b>
 
+<metal:b define-macro="before_occurrence_lead">
+    <!--! To be override by other applications -->
+</metal:b>
+
 <metal:b define-macro="extra_usermanagement_fields">
     <!--! To be override by other applications -->
 </metal:b>
@@ -617,7 +621,7 @@
         <metal:newlist use-macro="layout.macros['news-item-full']" tal:define="heading 'h4'" />
     </div>
     <div class="newslist grid-x align-center">
-        <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All articles</span></a>
+        <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All posts</span></a>
     </div>
 </metal:newslist>
 
