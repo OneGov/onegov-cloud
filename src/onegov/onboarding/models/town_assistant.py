@@ -209,7 +209,7 @@ class TownAssistant(Assistant):
                     },
                 )
 
-                self.app.perform_reindex_in_transaction()
+                self.app.perform_reindex(dispose_session=False)
                 self.app.send_transactional_email(
                     subject=title,
                     receivers=(user,),

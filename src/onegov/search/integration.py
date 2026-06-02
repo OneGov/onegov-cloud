@@ -218,8 +218,8 @@ class SearchApp(morepath.App):
             for model in self.searchable_models()
         }
 
-    def perform_reindex(self) -> None:
-        """ Re-indexes all content.
+    def perform_reindex(self, dispose_session: bool = True) -> None:
+        """Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
 
@@ -268,38 +268,7 @@ class SearchApp(morepath.App):
         with ThreadPoolExecutor() as executor:
             executor.map(reindex_model, self.indexable_base_models())
 
-        session.invalidate()
-        if session.bind and hasattr(session.bind, 'dispose'):
-            session.bind.dispose()
-
-    def perform_reindex_in_transaction(self) -> None:
-        """Re-indexes all content of the current schema using the active
-        session's transaction.
-
-        Unlike :meth:`perform_reindex`, this does not commit, invalidate or
-        dispose of the session, making it safe to call within an active
-        request transaction (e.g. when bootstrapping a freshly created
-        schema during onboarding).
-
-        """
-        if not self.fts_search_enabled:
-            return
-
-        schema = self.schema
-        session = self.session()
-        for model in self.indexable_base_models():
-            query = session.query(model).options(undefer('*'))
-            query = apply_searchable_polymorphic_filter(
-                query, model, order_by_polymorphic_identity=True
-            )
-            self.fts_indexer.process(
-                (
-                    task
-                    for obj in query
-                    if (
-                        task := self.fts_orm_events.index_task(schema, obj)  # type: ignore[arg-type]
-                    )
-                    is not None
-                ),
-                session,
-            )
+        if dispose_session:
+            session.invalidate()
+            if session.bind and hasattr(session.bind, 'dispose'):
+                session.bind.dispose()
