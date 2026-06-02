@@ -20,7 +20,7 @@
 
             <div metal:use-macro="layout.macros['tab_menu']"/>
 
-            <h3 i18n:translate="">${layout.title()}</h3>
+            <h3 tal:condition="vote.domain != 'municipality'" i18n:translate="">${layout.title()}</h3>
             <h4 tal:condition="layout.subtitle()" i18n:translate="">${layout.subtitle()}</h4>
 
             <tal:block metal:use-macro="layout.macros['ballot-statistics-table']"/>

@@ -166,7 +166,7 @@ def import_information_delivery(
                   mapping={'year': polling_day.year}),
             ))
         return polling_day, [], [], set(), errors
-    entities = principal.entities[polling_day.year]  # tschupre
+    entities = principal.entities[polling_day.year]
 
     # query existing compounds
     existing_compounds = session.query(ElectionCompound).filter(

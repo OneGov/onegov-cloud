@@ -303,6 +303,14 @@ table {
         }
     }
 
+    &.ballot-entities-table,
+    &.ballot-statistics-table {
+        th:first-child,
+        td:first-child {
+            width: 1%;
+        }
+    }
+
     &.collapsible {
         .less,
         .more {
@@ -579,7 +587,7 @@ table {
 }
 
 figure {
-    margin: 4rem 0 2rem;
+    margin: 2rem 0 2rem;
 }
 
 figcaption {
