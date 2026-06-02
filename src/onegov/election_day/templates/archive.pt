@@ -387,7 +387,7 @@
                         </div>
                     </div>
                     <p><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
-                    <tal:block tal:condition="layout.last_archive_modification">
+                    <tal:block tal:condition="python:layout.is_root and layout.last_archive_modification">
                         <a i18n:translate href="${layout.archive_download}">
                             Download the entire archive (Status: <tal:block tal:content="layout.format_date(layout.last_archive_modification, 'datetime')" i18n:name='date'/>)</a>
                     </tal:block>

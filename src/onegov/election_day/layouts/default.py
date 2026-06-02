@@ -15,6 +15,7 @@ from onegov.election_day.collections import (
 )
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.collections import VoteCollection
+from onegov.election_day.models import Principal
 from onegov.user import Auth
 from sedate import utcnow
 
@@ -61,6 +62,10 @@ class DefaultLayout(ChameleonLayout):
 
     def title(self) -> str:
         return ''
+
+    @property
+    def is_root(self) -> bool:
+        return isinstance(self.model, Principal)
 
     @cached_property
     def principal(self) -> Canton | Municipality:
