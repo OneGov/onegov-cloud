@@ -565,7 +565,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
                 exclude = {k for k, v in inspect.getmembers(
                     obj.__class__,
-                    lambda v: isinstance(v, InstrumentedAttribute)
+                    lambda v: isinstance(v, (InstrumentedAttribute, property))
                 )}
 
                 include = ('publication_start', 'publication_end')
