@@ -70,7 +70,6 @@ class PageForm(PageBaseForm):
 
     lead_when_child = BooleanField(
         label=_('Show the lead if accessing the parent page'),
-        description=_('(Redesign only)')
     )
 
     def on_request(self) -> None:

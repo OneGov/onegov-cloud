@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-06-01 12:31+0200\n"
+"POT-Creation-Date: 2026-06-01 12:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1450,9 +1450,6 @@ msgstr ""
 
 msgid "Show the lead if accessing the parent page"
 msgstr "Mostra l'estratto se accedi alla pagina principale"
-
-msgid "(Redesign only)"
-msgstr "(Solo riprogettazione)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
@@ -8005,6 +8002,9 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "(Redesign only)"
+#~ msgstr "(Solo riprogettazione)"
 
 #~ msgid "RIS Settings"
 #~ msgstr "Impostazioni RIS"

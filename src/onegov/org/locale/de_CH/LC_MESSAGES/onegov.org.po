@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-01 12:31+0200\n"
+"POT-Creation-Date: 2026-06-01 12:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1447,9 +1447,6 @@ msgstr ""
 
 msgid "Show the lead if accessing the parent page"
 msgstr "Zeige Einleitung auf übergeordneter Seite"
-
-msgid "(Redesign only)"
-msgstr "(verfügbar im Redesign)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
@@ -8035,6 +8032,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "(Redesign only)"
+#~ msgstr "(verfügbar im Redesign)"
 
 #~ msgid "RIS Settings"
 #~ msgstr "Ratsinformationssystem"
