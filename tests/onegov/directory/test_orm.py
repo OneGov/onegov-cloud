@@ -10,7 +10,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
-from onegov.directory.errors import DuplicateEntryError, ValidationError
+from onegov.directory.errors import ValidationError
 from onegov.file import File
 from wtforms.validators import ValidationError as WtfValidationError
 
@@ -710,8 +710,8 @@ def test_add_duplicate_entry(session: Session) -> None:
     # test collection entry names
     assert [d.name for d in foos.entries] == [
         'foobar',
+        'foobar-1',
         'foobar-2',
-        'foobar-3',
     ]
 
 

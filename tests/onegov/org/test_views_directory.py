@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import re
-import pytest
 import transaction
 
 from datetime import timedelta, datetime
@@ -12,7 +11,6 @@ from onegov.file import FileCollection
 from onegov.directory import (
     Directory, DirectoryEntry, DirectoryCollection,
     DirectoryConfiguration, DirectoryZipArchive)
-from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
@@ -820,17 +818,13 @@ def test_add_directory_entries_with_duplicate_names(client: Client) -> None:
 
     page = client.get('/directories/playgrounds').click("^Eintrag$")
     page.form['name'] = duplicate_name
-    page.form.submit()
+    page = page.form.submit()
+    assert page.location == f'http://localhost/directories/playgrounds/{duplicate_name}'
 
-    client.get('/directories/playgrounds').click("^Eintrag$")
+    page = client.get('/directories/playgrounds').click("^Eintrag$")
     page.form['name'] = duplicate_name
-    try:
-        page = page.form.submit().follow()
-        assert f'Der Eintrag {duplicate_name} existiert zweimal' in page
-    except DuplicateEntryError:
-        pytest.fail(
-            "DuplicateEntryError not handled upon inserting duplicate "
-            "entries in /directories")
+    page = page.form.submit()
+    assert page.location == f'http://localhost/directories/playgrounds/{duplicate_name}-1'
 
 
 def test_directory_numbering(client: Client) -> None:

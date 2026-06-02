@@ -176,12 +176,12 @@ def normalize_for_filename(
 
 
 def increment_name(name: str) -> str:
-    """ Takes the given name and adds a numbered suffix beginning at 2.
+    """ Takes the given name and adds a numbered suffix beginning at 1.
 
     For example::
 
-        foo => foo-2
-        foo-2 => foo-3
+        foo => foo-1
+        foo-2 => foo-2
 
     """
 
@@ -191,7 +191,7 @@ def increment_name(name: str) -> str:
         next_number = int(number_str) + 1
         return f'{name[:-len(number_str)]}{next_number}'
     else:
-        return f'{name}-2'
+        return f'{name}-1'
 
 
 def remove_repeated_spaces(text: str) -> str:

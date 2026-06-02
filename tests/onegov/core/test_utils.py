@@ -269,10 +269,10 @@ def test_load_tlds() -> None:
 
 
 def test_increment_name() -> None:
-    assert utils.increment_name('test') == 'test-2'
-    assert utils.increment_name('test-2') == 'test-3'
+    assert utils.increment_name('test') == 'test-1'
+    assert utils.increment_name('test-1') == 'test-2'
     assert utils.increment_name('test-9') == 'test-10'
-    assert utils.increment_name('test2') == 'test2-2'
+    assert utils.increment_name('test2') == 'test2-1'
     assert utils.increment_name('test-1-1') == 'test-1-2'
     assert utils.increment_name('test-1-2') == 'test-1-3'
     assert utils.increment_name('test-1-20') == 'test-1-21'
