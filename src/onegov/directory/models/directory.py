@@ -565,10 +565,14 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
                 exclude = {k for k, v in inspect.getmembers(
                     obj.__class__,
-                    lambda v: isinstance(v, InstrumentedAttribute)
+                    lambda v: isinstance(v, (InstrumentedAttribute, property))
                 )}
 
-                include = ('publication_start', 'publication_end')
+                include = (
+                    'publication_start',
+                    'publication_end',
+                    'coordinates',
+                )
                 exclude = {k for k in exclude if k not in include}
 
                 super().populate_obj(obj, exclude=exclude)

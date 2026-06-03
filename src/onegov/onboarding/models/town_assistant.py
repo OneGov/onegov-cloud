@@ -197,20 +197,24 @@ class TownAssistant(Assistant):
                 users.add(user, password, 'admin')
 
                 title = request.translate(_('Welcome to OneGov Cloud'))
-                welcome_mail = render_template('mail_welcome.pt', request, {
-                    'url': 'https://{}'.format(self.get_domain(name)),
-                    'mail': user,
-                    'layout': MailLayout(self, request),
-                    'title': title,
-                    'org': name
-                })
+                welcome_mail = render_template(
+                    'mail_welcome.pt',
+                    request,
+                    {
+                        'url': 'https://{}'.format(self.get_domain(name)),
+                        'mail': user,
+                        'layout': MailLayout(self, request),
+                        'title': title,
+                        'org': name,
+                    },
+                )
 
-                self.app.perform_reindex()
+                self.app.perform_reindex(dispose_session=False)
                 self.app.send_transactional_email(
                     subject=title,
-                    receivers=(user, ),
+                    receivers=(user,),
                     content=welcome_mail,
-                    reply_to='onegov@seantis.ch'
+                    reply_to='onegov@seantis.ch',
                 )
                 session.flush()
 
