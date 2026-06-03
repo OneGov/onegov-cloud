@@ -11,7 +11,8 @@ timeout = 300
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     '''ignore:pkg_resources is deprecated as an API''',
-    '''ignore:Deprecated call to `pkg_resources\.declare_namespace\('.*'\):DeprecationWarning:fs2.*''',
+    '''ignore:Deprecated call to `pkg_resources\.declare_namespace\('.*'\):DeprecationWarning:(fs|pkg_resources).*''',
+    '''ignore:Call to deprecated setex:DeprecationWarning:dogpile.*''',
     # potential issue for future upgrades
     # unfortunately it's not possible to filter escape sequence warnings in
     # specific modules, but we should be covered by Ruff for our own code
