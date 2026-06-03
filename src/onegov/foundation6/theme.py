@@ -3,7 +3,7 @@ from __future__ import annotations
 import os.path
 import textwrap
 
-import sass
+import subprocess
 
 from collections import OrderedDict
 from itertools import chain
@@ -285,11 +285,23 @@ class BaseTheme(CoreTheme):
         paths.append(self.foundation_path)
         if self.include_motion_ui:
             paths.append(self.vendor_path)
-        return sass.compile(
-            string=theme.getvalue(),
-            include_paths=paths,
-            output_style='compressed' if self.compress else 'nested'
+
+        style = 'compressed' if self.compress else 'expanded'
+        result = subprocess.run(  # nosec B603 B607
+            [
+                'sass',
+                '--stdin',
+                '--no-source-map',
+                f'--style={style}',
+                '--quiet-deps',
+                *(f'--load-path={p}' for p in paths),
+            ],
+            input=theme.getvalue(),
+            capture_output=True,
+            text=True,
+            check=True,
         )
+        return result.stdout
 
 
 class Theme(BaseTheme):
