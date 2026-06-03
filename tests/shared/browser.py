@@ -259,7 +259,7 @@ class ExtendedBrowser:
         self,
         browser: Browser,
         baseurl: str | None = None,
-        wait_time: float = 8.0,
+        wait_time: float = 5.0,
     ) -> None:
         self.baseurl = baseurl
 
