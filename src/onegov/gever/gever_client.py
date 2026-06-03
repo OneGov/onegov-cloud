@@ -71,7 +71,7 @@ class GeverClientCAS:
         )
         # Get CSRF token that was returned by server in a cookie
         # FIXME: See https://github.com/jawah/niquests/issues/401
-        csrf_token: str = self.portal_session.cookies['csrftoken']  # type: ignore[index]
+        csrf_token: str = self.portal_session.cookies['csrftoken']
 
         # Send the CSRF token as a request header in subsequent requests
         self.portal_session.headers.update({'X-CSRFToken': csrf_token})
