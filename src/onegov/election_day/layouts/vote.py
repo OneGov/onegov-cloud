@@ -68,8 +68,6 @@ class VoteLayout(DetailLayout):
         tab = (self.tab if tab is None else tab) or ''
 
         if tab == 'entities':
-            if self.model.domain == 'municipality':
-                return _('Result')
             return self.principal.label('entities')
         if tab == 'districts':
             return self.app.principal.label('districts')

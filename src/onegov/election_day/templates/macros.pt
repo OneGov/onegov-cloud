@@ -877,12 +877,12 @@
     <div class="ballot-result-bar" tal:condition="layout.has_results and ballot">
         <ul class="percentages flex-container justify-between align-center">
             <li>
-                <span i18n:translate="">${layout.label('Yeas')}</span><br/>
-                <span class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</span>
+                <span i18n:translate="">${layout.label('Yeas')}</span><span>: ${layout.format_number(ballot.yeas)}</span><br/>
+                <span class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</span><br/>
             </li>
             <li>
-                <span i18n:translate="">${layout.label('Nays')}</span><br/>
-                <span class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</span>
+                <span i18n:translate="">${layout.label('Nays')}</span><span>: ${layout.format_number(ballot.nays)}</span><br/>
+                <span class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</span><br/>
             </li>
         </ul>
         <div class="percentage">
@@ -1408,7 +1408,7 @@
                 <span i18n:translate="">Received Ballots</span>
                 <strong>${layout.format_number(election.received_ballots)}</strong>
             </li>
-            <li>
+            <li tal:condition="election.domain!='municipality'">
                 <span i18n:translate="">Counted</span>
                 <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></strong>
             </li>
@@ -1453,9 +1453,17 @@
             <span i18n:translate="">Cast Ballots</span>
             <strong>${layout.format_number(ballot.cast_ballots)}</strong>
         </li>
-        <li>
+        <li tal:condition="vote.domain!='municipality'">
             <span i18n:translate="">Counted</span>
             <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress ballot.progress" /></strong>
+        </li>
+        <li tal:condition="vote.domain=='municipality'">
+            <span i18n:translate="">Empty votes</span>
+            <strong>${layout.format_number(ballot.empty)}</strong>
+        </li>
+        <li tal:condition="vote.domain=='municipality'">
+            <span i18n:translate="">Invalid votes</span>
+            <strong>${layout.format_number(ballot.invalid)}</strong>
         </li>
     </ul>
 </metal:vote_factoids>
