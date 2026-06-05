@@ -1435,6 +1435,16 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
+msgid "Keywords"
+msgstr "Schlagworte"
+
+msgid ""
+"Additional search terms and synonyms for this page. Helps visitors find this "
+"page even if they use different words."
+msgstr ""
+"Zusätzliche Suchbegriffe und Synonyme für diese Seite. Hilft Besuchern, "
+"diese Seite zu finden, auch wenn sie andere Wörter verwenden."
+
 msgid "Show the lead if accessing the parent page"
 msgstr "Zeige Einleitung auf übergeordneter Seite"
 
