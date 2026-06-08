@@ -70,6 +70,29 @@ def test_basic_search(client_with_fts: Client) -> None:
     assert "0 Resultate" in anom.get('/search?q=fulltext')
 
 
+def test_search_topic_keywords(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_admin()
+
+    # Create a topic whose title does not contain the search term, but whose
+    # keywords do — the keyword should make the topic findable.
+    new_page = client.get('/topics/themen').click('Thema')
+    new_page.form['title'] = "Einwohnerdienste"
+    new_page.form['keywords'] = "Einwohnerkontrolle, Einwohneramt"
+    new_page.form.submit()
+
+    assert "Einwohnerdienste" in client.get('/search?q=Einwohnerkontrolle')
+    assert "0 Resultate" not in client.get('/search?q=Einwohnerkontrolle')
+    assert "Einwohnerdienste" in client.get('/search?q=Einwohneramt')
+    assert "0 Resultate" not in client.get('/search?q=Einwohneramt')
+
+    # Searching by the actual title still works
+    assert "Einwohnerdienste" in client.get('/search?q=Einwohnerdienste')
+
+    # An unrelated term returns no results
+    assert "0 Resultate" in client.get('/search?q=Feuerwehr')
+
+
 def test_view_search_is_limiting(client_with_fts: Client) -> None:
     # ensures that the search doesn't just return all results
     # a regression that occurred for anonymous uses only

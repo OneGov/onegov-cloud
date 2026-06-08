@@ -13,10 +13,6 @@
         </p>
 
         <table>
-            <tr>
-                <td><strong i18n:translate>Parliamentarian:</strong></td>
-                <td>${parliamentarian_name}</td>
-            </tr>
             <tr tal:condition="commission_name">
                 <td><strong i18n:translate>Commission:</strong></td>
                 <td>${commission_name}</td>

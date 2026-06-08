@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function onWebsocketNotification(message, _websocket) {
         if (document.body.id.search(message.assembly) !== -1) {
             if (message.event === 'refresh') {
-                window.location.reload();
+                window.location.href = window.location.href;
             }
             if (message.event === 'update') {
                 const agendaItem = document.querySelector('#' + message.node);
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .then((response) => {
                 const modified = response.headers.get("Last-Modified");
                 if (lastModified && modified !== lastModified) {
-                    window.location.reload();
+                    window.location.href = window.location.href;
                 }
                 lastModified = modified;
             })

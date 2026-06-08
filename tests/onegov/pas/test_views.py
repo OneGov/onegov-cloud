@@ -1306,7 +1306,6 @@ def test_abschluss_email_uses_commission_name(
     email = client.get_email(0)
     assert email['Subject'] == ('PAS: Abschluss gesetzt für Finanzkommission')
     assert 'Finanzkommission' in email['HtmlBody']
-    assert 'Max Muster' in email['HtmlBody']
 
 
 def test_parliamentarian_pdf_zip_download(

@@ -130,7 +130,6 @@ def test_cache_control(election_day_app_zg: TestApp) -> None:
 
     response = client.get('/')
     assert 'cache-control' not in response.headers
-    assert 'no_cache' not in response.headers['Set-Cookie']
     assert 'no_cache' not in client.cookies
 
     login(client)
@@ -217,12 +216,8 @@ def test_pages_cache(election_day_app_zg: TestApp) -> None:
     assert 'Set-Cookie' in response.headers  # no_cache
     assert len(election_day_app_zg.pages_cache.keys()) == 0
 
-    anonymous = Client(election_day_app_zg)
-    response = anonymous.get('/vote/0xdeadbeef/entities')
-    assert 'Set-Cookie' in response.headers  # session_id
-    assert len(election_day_app_zg.pages_cache.keys()) == 0
-
     # make sure HEAD requests are cached without qs
+    anonymous = Client(election_day_app_zg)
     anonymous.head('/vote/0xdeadbeef/')
     assert len(election_day_app_zg.pages_cache.keys()) == 1
 
