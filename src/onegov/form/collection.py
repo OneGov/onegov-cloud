@@ -475,9 +475,13 @@ class FormSubmissionCollection:
             )
 
             submission.files.append(f)
+            self.session.flush()
 
-            # replace the data in the submission with a reference
+            # replace the data in the submission with a reference and
+            # update the size to reflect the actual stored size after
+            # any resizing/compression applied by the depot
             submission.data[field_id]['data'] = '@{}'.format(f.id)
+            submission.data[field_id]['size'] = f.reference.file.content_length
 
             # we need to mark these changes as only top-level json changes
             # are automatically propagated
@@ -516,9 +520,12 @@ class FormSubmissionCollection:
                     )
 
                     submission.files.append(f)
+                    self.session.flush()
 
-                    # replace the data in the submission with a reference
+                    # replace the data in the submission with a reference and
+                    # update the size to reflect the actual stored size
                     data['data'] = '@{}'.format(f.id)
+                    data['size'] = f.reference.file.content_length
 
                 datalist.append(data)
                 new_idx += 1
