@@ -14,8 +14,8 @@ from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
     PublicationExtension, DeletableContentExtension,
-    InlinePhotoAlbumExtension, SidebarContactLinkExtension,
-    PushNotificationExtension
+    InlinePhotoAlbumExtension, InternalNotesExtension,
+    SidebarContactLinkExtension, PushNotificationExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -49,7 +49,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
             GeneralFileLinkExtension, SidebarLinksExtension,
-            SidebarContactLinkExtension, InlinePhotoAlbumExtension):
+            SidebarContactLinkExtension, InlinePhotoAlbumExtension,
+            InternalNotesExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 

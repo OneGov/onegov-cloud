@@ -16,6 +16,11 @@
         <metal:hint use-macro="layout.macros['publication_hint_long']" tal:define="item page" />
         <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item page"/>
 
+        <div class="panel callout" tal:condition="request.is_manager and page.internal_notes">
+            <strong i18n:translate>Internal Comments</strong>
+            <p>${page.internal_notes}</p>
+        </div>
+
         <tal:b condition="page.trait == 'page'">
 
 

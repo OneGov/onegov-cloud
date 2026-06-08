@@ -1992,6 +1992,9 @@ msgstr ""
 "Reservierung hinzufügt, wird eine eine Benachrichtigung an den oben "
 "genannten Empfänger gesendet."
 
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
+
 msgid "Internal Notes"
 msgstr "Interne Notizen"
 
