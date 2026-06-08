@@ -563,11 +563,16 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
 
     def sanitize_municipality(self, municipality: str) -> str:
         """
-        Removes ` (SG)`, removes spaces and `.` from municipality.
+        Removes ` (SG)`, removes spaces, `.` and umlauts from municipality.
         """
         if '(' in municipality:
             municipality = municipality.split(' (')[0]
-        return municipality.replace(' ', '').replace('.', '').lower()
+        municipality = municipality.lower()
+        for umlaut, replacement in (
+            ('ä', 'ae'), ('ö', 'oe'), ('ü', 'ue')
+        ):
+            municipality = municipality.replace(umlaut, replacement)
+        return municipality.replace(' ', '').replace('.', '')
 
     def for_municipality(self, municipality: str) -> Self:
         municipality = self.sanitize_municipality(municipality)
