@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import inspect
 
 from email_validator import validate_email
 from enum import Enum
@@ -26,7 +25,6 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy_utils import aggregated
 from translationstring import TranslationString
 from uuid import uuid4, UUID
@@ -563,17 +561,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 directory_update: bool = True
             ) -> None:
 
-                exclude = {k for k, v in inspect.getmembers(
-                    obj.__class__,
-                    lambda v: isinstance(v, (InstrumentedAttribute, property))
-                )}
-
-                include = (
-                    'publication_start',
-                    'publication_end',
-                    'coordinates',
-                )
-                exclude = {k for k in exclude if k not in include}
+                # skip directory structure fields, directory.update()
+                # handles those
+                exclude = {f.id for f in directory.fields}
 
                 super().populate_obj(obj, exclude=exclude)
 
