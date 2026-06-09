@@ -296,6 +296,9 @@ class ValidFormDefinition:
         "The field '{label}' has no type defined. "
         "For example use '___' for a text field."
     )
+    mixed_type = _(
+        "The field '{label}' cannot mix radio buttons and checkboxes."
+    )
     email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
     syntax = _('The syntax on line {line} is not valid.')
     indent = _('The indentation on line {line} is not valid. '
@@ -377,7 +380,8 @@ class ValidFormDefinition:
             ) from exception
         except MixedTypeError as exception:
             raise ValidationError(
-                exception.field_name
+                field.gettext(self.mixed_type).format(
+                    label=exception.field_name)
             ) from exception
         except NestedFieldsetError as exception:
             raise ValidationError(

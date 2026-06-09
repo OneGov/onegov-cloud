@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-09 11:43+0200\n"
+"POT-Creation-Date: 2026-06-09 12:54+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -166,6 +166,10 @@ msgstr ""
 msgid ""
 "The field '{label}' has no type defined. For example use '___' for a text "
 "field."
+msgstr ""
+
+#, python-format
+msgid "The field '{label}' cannot mix radio buttons and checkboxes."
 msgstr ""
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
