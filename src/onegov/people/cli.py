@@ -9,11 +9,9 @@ from collections import OrderedDict
 
 from onegov.core.cli import command_group
 from onegov.core.cli import abort
-from onegov.core.orm import mark_changed
 from onegov.people.models import Person
 from openpyxl import load_workbook
 from openpyxl import Workbook
-from sqlalchemy import text
 
 
 from typing import IO
@@ -104,26 +102,23 @@ def strip_whitespace_from_names(
 
     def _strip(request: CoreRequest, app: Framework) -> None:
         session = app.session()
-
-        # Raw SQL skips ORM/FTS events; mark_changed tells zope.sqlalchemy
-        # to commit.
-        result = session.execute(text("""
-            UPDATE people
-               SET first_name = TRIM(first_name),
-                   last_name = TRIM(last_name),
-                   function = TRIM(function)
-             WHERE first_name != TRIM(first_name)
-                OR last_name != TRIM(last_name)
-                OR (function IS NOT NULL AND function != TRIM(function))
-        """))
-        count = result.rowcount  # type: ignore[attr-defined]
-        mark_changed(session)
+        count = 0
+        for person in session.query(Person):
+            first_name = person.first_name.strip()
+            last_name = person.last_name.strip()
+            function = (
+                person.function.strip() if person.function else person.function
+            )
+            if (first_name, last_name, function) != (
+                    person.first_name, person.last_name, person.function):
+                person.first_name = first_name
+                person.last_name = last_name
+                person.function = function
+                count += 1
 
         if dry_run:
             transaction.abort()
             click.secho('Aborting transaction', fg='yellow')
-        else:
-            transaction.commit()
 
         click.secho(
             f'{app.schema}: Stripped whitespace from {count} person(s)',

@@ -5,7 +5,6 @@ import transaction
 
 from openpyxl import load_workbook
 from onegov.core.cli import command_group
-from onegov.core.orm import mark_changed
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import log
@@ -17,7 +16,7 @@ from onegov.user import User
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
 from onegov.user.sync import ZugUserSource
-from sqlalchemy import or_, and_, text
+from sqlalchemy import or_, and_
 
 
 from typing import Any, TYPE_CHECKING
@@ -1039,24 +1038,21 @@ def strip_whitespace_from_names(
         app: TranslatorDirectoryApp
     ) -> None:
         session = app.session()
-
-        # Raw SQL skips ORM/FTS events; mark_changed tells zope.sqlalchemy
-        # to commit.
-        result = session.execute(text("""
-            UPDATE translators
-               SET first_name = TRIM(first_name),
-                   last_name   = TRIM(last_name)
-             WHERE first_name  != TRIM(first_name)
-                OR last_name   != TRIM(last_name)
-        """))
-        count = result.rowcount  # type: ignore[attr-defined]
-        mark_changed(session)
+        count = 0
+        for translator in session.query(Translator):
+            first_name = translator.first_name.strip()
+            last_name = translator.last_name.strip()
+            if (first_name, last_name) != (
+                translator.first_name,
+                translator.last_name,
+            ):
+                translator.first_name = first_name
+                translator.last_name = last_name
+                count += 1
 
         if dry_run:
             transaction.abort()
             click.secho('Aborting transaction', fg='yellow')
-        else:
-            transaction.commit()
 
         click.secho(
             f'{app.schema}: Stripped whitespace from {count} translator(s)',

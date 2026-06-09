@@ -7,10 +7,9 @@ import transaction
 from datetime import date, datetime, UTC
 from sedate import replace_timezone
 from sqlalchemy import or_, and_
-from sqlalchemy import cast, Date, text
+from sqlalchemy import cast, Date
 
 from onegov.core.cli import command_group
-from onegov.core.orm import mark_changed
 from onegov.fsi import log
 from onegov.fsi.ims_import import (
     parse_ims_data, import_ims_data, import_teacher_data, with_open,
@@ -448,24 +447,29 @@ def strip_whitespace_from_names(
 
     def _strip(request: FsiRequest, app: FsiApp) -> None:
         session = app.session()
-
-        # Raw SQL skips ORM/FTS events; mark_changed tells zope.sqlalchemy
-        # to commit.
-        result = session.execute(text("""
-            UPDATE fsi_attendees
-               SET first_name = TRIM(first_name),
-                   last_name   = TRIM(last_name)
-             WHERE (first_name IS NOT NULL AND first_name != TRIM(first_name))
-                OR (last_name  IS NOT NULL AND last_name  != TRIM(last_name))
-        """))
-        count = result.rowcount  # type: ignore[attr-defined]
-        mark_changed(session)
+        count = 0
+        for attendee in session.query(CourseAttendee):
+            first_name = (
+                attendee.first_name.strip()
+                if attendee.first_name
+                else attendee.first_name
+            )
+            last_name = (
+                attendee.last_name.strip()
+                if attendee.last_name
+                else attendee.last_name
+            )
+            if (first_name, last_name) != (
+                attendee.first_name,
+                attendee.last_name,
+            ):
+                attendee.first_name = first_name
+                attendee.last_name = last_name
+                count += 1
 
         if dry_run:
             transaction.abort()
             click.secho('Aborting transaction', fg='yellow')
-        else:
-            transaction.commit()
 
         click.secho(
             f'{app.schema}: Stripped whitespace from {count} attendee(s)',

@@ -6,8 +6,8 @@ import transaction
 from onegov.activity import Activity
 from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
+from onegov.activity.models import Volunteer
 from onegov.core.cli import command_group
-from onegov.core.orm import mark_changed
 from sqlalchemy import text
 
 
@@ -226,24 +226,21 @@ def strip_whitespace_from_names(
         app: FeriennetApp
     ) -> None:
         session = app.session()
-
-        # Raw SQL skips ORM/FTS events; mark_changed tells zope.sqlalchemy
-        # to commit.
-        result = session.execute(text("""
-            UPDATE volunteers
-               SET first_name = TRIM(first_name),
-                   last_name   = TRIM(last_name)
-             WHERE first_name  != TRIM(first_name)
-                OR last_name   != TRIM(last_name)
-        """))
-        count = result.rowcount  # type: ignore[attr-defined]
-        mark_changed(session)
+        count = 0
+        for volunteer in session.query(Volunteer):
+            first_name = volunteer.first_name.strip()
+            last_name = volunteer.last_name.strip()
+            if (first_name, last_name) != (
+                volunteer.first_name,
+                volunteer.last_name,
+            ):
+                volunteer.first_name = first_name
+                volunteer.last_name = last_name
+                count += 1
 
         if dry_run:
             transaction.abort()
             click.secho('Aborting transaction', fg='yellow')
-        else:
-            transaction.commit()
 
         click.secho(
             f'{app.schema}: Stripped whitespace from {count} volunteer(s)',
