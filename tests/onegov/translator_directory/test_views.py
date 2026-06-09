@@ -1445,6 +1445,141 @@ def test_view_translator_mutation(
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
+def test_mutation_email_change_syncs_user_account(
+    broadcast: MagicMock,
+    authenticate: MagicMock,
+    connect: MagicMock,
+    client: Client,
+) -> None:
+    """Applying an email mutation must update the User account's
+    username so that notifications reach the new address."""
+
+    session = client.app.session()
+    languages = create_languages(session)
+    language_ids = [str(lang.id) for lang in languages]
+    transaction.commit()
+
+    client.login_admin()
+
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value(
+        {'lat': 46, 'lon': 7, 'zoom': 12}
+    )
+    settings.form.submit()
+
+    page = client.get('/translators/new')
+    page.form['first_name'] = 'Max'
+    page.form['last_name'] = 'Muster'
+    page.form['admission'] = 'uncertified'
+    page.form['gender'] = 'M'
+    page.form['withholding_tax'] = False
+    page.form['self_employed'] = False
+    page.form['date_of_birth'] = '1985-03-15'
+    page.form['nationalities'] = ['CH']
+    page.form['coordinates'] = encode_map_value(
+        {'lat': 46, 'lon': 7, 'zoom': 12}
+    )
+    page.form['address'] = 'Teststrasse 1'
+    page.form['zip_code'] = '6300'
+    page.form['city'] = 'Zug'
+    page.form['email'] = 'old@example.com'
+    page.form['tel_mobile'] = '+41791234567'
+    page.form['tel_private'] = '+41791234568'
+    page.form['tel_office'] = '+41791234569'
+    page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['monitoring_languages_ids'] = language_ids[3:4]
+    with patch(
+        'onegov.gis.utils.MapboxRequests.directions',
+        return_value=FakeResponse(
+            {'code': 'Ok', 'routes': [{'distance': 1000}]}
+        ),
+    ):
+        assert 'hinzugefügt' in page.form.submit().follow()
+
+    # Verify user account was created with old email
+    user = session.query(User).filter_by(username='old@example.com').first()
+    assert user is not None
+    assert user.role == 'translator'
+    assert user.active is True
+
+    # Set password so translator can log in
+    client.logout()
+    reset_url = re.search(  # type: ignore[union-attr]
+        r'(http://localhost/auth/reset-password[^)]+)',
+        client.get_email(0, flush_queue=True)['TextBody'],
+    ).group()
+    page = client.get(reset_url)
+    page.form['email'] = 'old@example.com'
+    page.form['password'] = 'hunter2hunter2'
+    page.form.submit()
+
+    # Translator submits mutation with new email
+    client.login('old@example.com', 'hunter2hunter2', None)
+    page = client.get('/').maybe_follow()
+    page = page.click('Mutation melden')
+    page.form['submitter_message'] = 'Neue E-Mail-Adresse'
+    page.form['email'] = 'new@example.com'
+    with patch(
+        'onegov.gis.utils.MapboxRequests.directions',
+        return_value=FakeResponse(
+            {'code': 'Ok', 'routes': [{'distance': 1000}]}
+        ),
+    ):
+        page = page.form.submit().follow()
+        assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    client.flush_email_queue()
+    client.logout()
+
+    # Admin applies the email mutation
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'E-Mail: new@example.com' in page
+
+    page = page.click('Vorgeschlagene Änderungen übernehmen')
+    page = page.form.submit().follow()
+    assert 'Vorgeschlagene Änderungen übernommen' in page
+
+    # Verify: translator record has new email
+    translator = session.query(Translator).filter_by(first_name='Max').first()
+    assert translator is not None
+    assert translator.email == 'new@example.com'
+
+    # Verify: user account username updated to new email
+    old_user = (
+        session.query(User).filter_by(username='old@example.com').first()
+    )
+    assert (
+        old_user is None
+    ), 'Old user account should no longer exist with old username'
+
+    new_user = (
+        session.query(User).filter_by(username='new@example.com').first()
+    )
+    assert new_user is not None, 'User account must be updated to new email'
+    assert new_user.role == 'translator'
+    assert new_user.active is True
+
+    # Verify: translator can log in with new email
+    client.logout()
+    client.login('new@example.com', 'hunter2hunter2', None)
+    page = client.get('/').maybe_follow()
+    assert 'MUSTER, Max' in page
+
+    # Verify: old email no longer works for login
+    client.logout()
+    login_page = client.get('/auth/login')
+    login_page.form['username'] = 'old@example.com'
+    login_page.form['password'] = 'hunter2hunter2'
+    login_page = login_page.form.submit()
+    assert 'Falsche E-Mail Adresse' in login_page
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
 def test_translator_mutation_with_document_upload(
     broadcast: MagicMock,
     authenticate: MagicMock,
