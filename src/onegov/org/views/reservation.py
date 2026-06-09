@@ -53,6 +53,20 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
 
 
+def reservation_subject(
+    resource_title: str,
+    reservations: Sequence[Reservation],
+    activity: str,
+) -> str:
+    dates = sorted(
+        {r.display_start().strftime('%d.%m.%Y') for r in reservations}
+    )
+    date_str = ', '.join(dates[:3])
+    if len(dates) > 3:
+        date_str += ', ...'
+    return f'{resource_title} - {date_str} - {activity}'
+
+
 def assert_anonymous_access_only_temporary(
     resource: Resource,
     reservation: Reservation,
@@ -820,7 +834,9 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     send_ticket_mail(
         request=request,
         template='mail_ticket_opened.pt',
-        subject=_('Your request has been registered'),
+        subject=reservation_subject(
+            self.title, reservations, request.translate(_('Request'))
+        ),
         receivers=(reservations[0].email,),
         ticket=ticket,
         content={
@@ -835,7 +851,9 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened_info.pt',
-            subject=_('New ticket'),
+            subject=reservation_subject(
+                self.title, reservations, request.translate(_('New ticket'))
+            ),
             ticket=ticket,
             receivers=(email, ),
             content={
@@ -1075,7 +1093,9 @@ def accept_reservation(
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
-            subject=_('Your reservations were accepted'),
+            subject=reservation_subject(
+                resource.title, reservations, request.translate(_('Accepted'))
+            ),
             receivers=(self.email,),
             ticket=ticket,
             content={
@@ -1340,7 +1360,9 @@ def reject_reservation(
     send_ticket_mail(
         request=request,
         template='mail_reservation_rejected.pt',
-        subject=_('The following reservations were rejected'),
+        subject=reservation_subject(
+            resource.title, targeted, request.translate(_('Rejected'))
+        ),
         receivers=(self.email, ),
         ticket=ticket,
         content={
@@ -1601,7 +1623,11 @@ def send_reservation_summary(
         send_ticket_mail(
             request=request,
             template='mail_reservation_summary.pt',
-            subject=_('Reservation summary'),
+            subject=reservation_subject(
+                self.handler.resource.title,
+                self.handler.reservations,
+                request.translate(_('Summary')),
+            ),
             receivers=(recipient, ),
             ticket=self,
             force=True,
