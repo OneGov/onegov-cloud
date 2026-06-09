@@ -242,7 +242,7 @@ def test_pending_submission_successful_file_upload(client: Client) -> None:
 def test_add_custom_form(client: Client) -> None:
     client.login_editor()
 
-    # this error is not strictly line based, so there's a general error
+    # field with no type gets a specific error message
     form_page = client.get('/forms/new')
     form_page.form['title'] = "My Form"
     form_page.form['lead'] = "This is a form"
@@ -250,7 +250,7 @@ def test_add_custom_form(client: Client) -> None:
     form_page.form['definition'] = "abc ="
     form_page = form_page.form.submit()
 
-    assert "Das Formular ist nicht gültig." in form_page
+    assert "Das Feld 'abc' hat keinen Typ definiert." in form_page
 
     # this error is line based
     form_page = client.get('/forms/new')
