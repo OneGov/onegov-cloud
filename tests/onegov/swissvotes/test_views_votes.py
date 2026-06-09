@@ -11,7 +11,7 @@ from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
-from tests.shared import Client
+from .conftest import Client
 from transaction import commit
 from unittest.mock import patch
 from webtest.forms import Upload
@@ -45,7 +45,7 @@ def test_view_votes_pagination(swissvotes_app: TestApp) -> None:
     client.get('/locale/de_CH').follow()
 
     # 102
-    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = client.get('/votes')
     page = page.click("Details", index=0)
     assert "<td>102</td>" in page
     assert "Vorherige Abstimmung" in page
@@ -98,7 +98,7 @@ def test_view_update_votes(swissvotes_app: TestApp, file: str) -> None:
         content = f.read()
 
     # Upload
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
@@ -124,7 +124,7 @@ def test_view_update_votes(swissvotes_app: TestApp, file: str) -> None:
     assert vote.recommendations_parties['Nay'][0].name == 'sps'
 
     # Upload (unchanged)
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
@@ -135,12 +135,12 @@ def test_view_update_votes(swissvotes_app: TestApp, file: str) -> None:
     assert "Datensatz aktualisiert (0 hinzugefügt, 0 geändert)" in manage
 
     # Download
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     csv = manage.click("Datensatz herunterladen", index=0).body
     # xlsx = manage.click("Datensatz herunterladen", index=1).body
 
     # Upload (roundtrip)
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Abstimmungsdatensatz aktualisieren")
 
     # Changed from xlsx to content to upload since
@@ -157,7 +157,7 @@ def test_view_update_votes(swissvotes_app: TestApp, file: str) -> None:
     assert csv == client.get('/votes/csv').body
 
     # Delete all votes
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Alle Abstimmungen löschen")
     manage = manage.form.submit().follow()
 
@@ -208,7 +208,7 @@ def test_view_update_votes_unknown_descriptors(
     workbook.close()
     file.seek(0)
 
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Abstimmungsdatensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
@@ -246,7 +246,7 @@ def test_view_update_metadata(
         content = f.read()
 
     # Upload
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Daten Kampagnenmaterial aktualisieren")
     manage.form['metadata'] = Upload(
         'metadata.xlsx',
@@ -262,7 +262,7 @@ def test_view_update_metadata(
     assert len(vote.campaign_material_metadata) == 33
 
     # Upload (unchanged)
-    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = client.get('/votes')
     manage = manage.click("Daten Kampagnenmaterial aktualisieren")
     manage.form['metadata'] = Upload(
         'metadata.xlsx',
@@ -297,10 +297,28 @@ def test_view_update_external_resources(
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    manage = client.get('/').maybe_follow().click('Abstimmungen')
+    manage = client.get('/votes')
     manage = manage.click('Bildquellen aktualisieren')
     manage.form['resources'] = ['mfg', 'sa', 'bs']
     manage = manage.form.submit().follow()
 
     assert '15 hinzugefügt, 17 geändert, 19 gelöscht' in manage
     assert 'Quellen konnten nicht aktualisiert werden: 4, 8, 9' in manage
+
+
+def test_view_votes_empty_policy_area(swissvotes_app: TestApp) -> None:
+    """
+    Empty or structurally invalid policy_area URL parameters are rejected
+    with 400 Bad Request rather than causing a 500 crash.
+    """
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/votes')
+    assert page.status_code == 200
+
+    client.get('/votes?term=&policy_area=', status=400)
+    client.get('/votes?term=&policy_area=9&policy_area=', status=400)
+    client.get('/votes?term=&policy_area=&policy_area=3', status=400)
+    client.get('/votes?term=&policy_area=9&policy_area=&policy_area=3',
+               status=400)

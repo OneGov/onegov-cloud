@@ -29,7 +29,7 @@ from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
 from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
-from wtforms import DateField, DateTimeLocalField, RadioField, TimeField, Field
+from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -194,6 +194,7 @@ MIME_TYPES_AUDIO = {
     'audio/mpeg',
     'audio/wav',
     'audio/webm',  # weba
+    'application/octet-stream',  # fallback landsgemeinde
 }
 
 MIME_TYPES_VIDEO = {

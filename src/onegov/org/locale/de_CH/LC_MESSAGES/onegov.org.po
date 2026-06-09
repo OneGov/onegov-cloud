@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-27 17:28+0200\n"
+"POT-Creation-Date: 2026-06-01 12:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -35,6 +35,15 @@ msgstr "Aktuelles"
 
 msgid "Topics"
 msgstr "Themen"
+
+msgid "Forms"
+msgstr "Formulare"
+
+msgid "Resources"
+msgstr "Reservationen"
+
+msgid "People"
+msgstr "Personen"
 
 msgid "Important information regarding online payments"
 msgstr "Wichtige Information bezüglich Online-Zahlungen"
@@ -232,12 +241,6 @@ msgstr "Newsletter"
 
 msgid "Directories"
 msgstr "Verzeichnisse"
-
-msgid "People"
-msgstr "Personen"
-
-msgid "Forms"
-msgstr "Formulare"
 
 msgid "Surveys"
 msgstr "Umfragen"
@@ -1432,11 +1435,18 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
+msgid "Keywords"
+msgstr "Schlagworte"
+
+msgid ""
+"Additional search terms and synonyms for this page. Helps visitors find this "
+"page even if they use different words."
+msgstr ""
+"Zusätzliche Suchbegriffe und Synonyme für diese Seite. Hilft Besuchern, "
+"diese Seite zu finden, auch wenn sie andere Wörter verwenden."
+
 msgid "Show the lead if accessing the parent page"
 msgstr "Zeige Einleitung auf übergeordneter Seite"
-
-msgid "(Redesign only)"
-msgstr "(verfügbar im Redesign)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
@@ -2005,9 +2015,6 @@ msgstr ""
 
 msgid "Send on"
 msgstr "Senden am"
-
-msgid "Resources"
-msgstr "Reservationen"
 
 msgid "Please add at least one notification."
 msgstr "Bitte wählen sie mindestens eine Benachrichtigung."
@@ -3310,6 +3317,9 @@ msgstr "Sporverein"
 msgid "all day"
 msgstr "den ganzen Tag"
 
+msgid "o'clock"
+msgstr "Uhr"
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -3706,6 +3716,12 @@ msgstr "Verknüpfung löschen"
 
 msgid "Sort"
 msgstr "Sortieren"
+
+msgid "Topic"
+msgstr "Thema"
+
+msgid "Link"
+msgstr "Verknüpfung"
 
 msgid "The submission was adopted"
 msgstr "Der Eintrag wurde übernommen"
@@ -4207,9 +4223,6 @@ msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 msgid "Chats"
 msgstr "Chats"
 
-msgid "Link"
-msgstr "Verknüpfung"
-
 msgid "New Link"
 msgstr "Neue Verknüpfung"
 
@@ -4228,9 +4241,6 @@ msgstr "Die Verknüpfung wurde gelöscht"
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
 msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
-
-msgid "Topic"
-msgstr "Thema"
 
 msgid "New Topic"
 msgstr "Neues Thema"
@@ -4348,8 +4358,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -5164,8 +5174,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -6322,8 +6332,8 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -6513,6 +6523,9 @@ msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 msgid "Administrative"
 msgstr "Administrativ"
 
+#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
+#. well.
+#.
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "Der Eintrag ${name} existiert zweimal"
@@ -7156,9 +7169,6 @@ msgstr "Dieses Wochenende"
 
 msgid "This week"
 msgstr "Diese Woche"
-
-msgid "o'clock"
-msgstr "Uhr"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Filterkonfiguration für Veranstaltungen bearbeiten"
@@ -8022,6 +8032,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "(Redesign only)"
+#~ msgstr "(verfügbar im Redesign)"
 
 #~ msgid "RIS Settings"
 #~ msgstr "Ratsinformationssystem"

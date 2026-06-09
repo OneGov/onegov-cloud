@@ -72,6 +72,9 @@ var setup_sortable_list = function(list_element) {
     var start = null;
 
     var sortable = Sortable.create(list_element, {
+        scroll: true,
+        scrollSensitivity: 40,
+        scrollSpeed: 50,
         onStart: function(event) {
             if ($(event.element).parent().hasClass('children')) {
                 return;

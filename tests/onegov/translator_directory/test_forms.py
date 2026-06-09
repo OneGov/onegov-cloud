@@ -383,7 +383,7 @@ def test_translator_mutation_form(translator_app: TestApp) -> None:
         'comments': 'Some other comment',
     }
 
-    # Test document uploads
+    # Test document uploads with correct category assignment
     form = TranslatorMutationForm(
         DummyPostData(
             {
@@ -396,8 +396,12 @@ def test_translator_mutation_form(translator_app: TestApp) -> None:
     assert form.validate()
     files = form.get_files()
     assert len(files) == 2
-    assert files[0].note == 'Mutationsmeldung'
-    assert files[1].note == 'Mutationsmeldung'
+    by_name = {f.name: f.note for f in files}
+    assert by_name['_Certificates.pdf'] == ('Diplome und Zertifikate')
+    assert (
+        by_name['_Identity card, passport or foreigner identity card.pdf']
+        == 'Antrag'
+    )
 
     # Test document upload with empty data
     form = TranslatorMutationForm(DummyPostData({}))
@@ -414,6 +418,43 @@ def test_translator_mutation_form(translator_app: TestApp) -> None:
     assert form.proposed_changes == {}
     files = form.get_files()
     assert len(files) == 1
+    assert files[0].note == 'Antrag'
+
+    # Test all document fields map to correct categories
+    form = TranslatorMutationForm(
+        DummyPostData(
+            {
+                'declaration_of_authorization': create_file('1.pdf'),
+                'letter_of_motivation': create_file('2.pdf'),
+                'resume': create_file('3.pdf'),
+                'uploaded_certificates': create_file('4.pdf'),
+                'social_security_card': create_file('5.pdf'),
+                'passport': create_file('6.pdf'),
+                'passport_photo': create_file('7.pdf'),
+                'debt_collection_register_extract': create_file('8.pdf'),
+                'criminal_register_extract': create_file('9.pdf'),
+                'certificate_of_capability': create_file('A.pdf'),
+                'confirmation_compensation_office': create_file('B.pdf'),
+            }
+        )
+    )
+    form.request = request
+    files = form.get_files()
+    assert len(files) == 11
+    categories = {(f.note, f.reference.filename) for f in files}
+    assert categories == {
+        ('Antrag', '1.pdf'),
+        ('Antrag', '2.pdf'),
+        ('Antrag', '3.pdf'),
+        ('Diplome und Zertifikate', '4.pdf'),
+        ('Antrag', '5.pdf'),
+        ('Antrag', '6.pdf'),
+        ('Antrag', '7.pdf'),
+        ('Abklärungen', '8.pdf'),
+        ('Abklärungen', '9.pdf'),
+        ('Abklärungen', 'A.pdf'),
+        ('Abklärungen', 'B.pdf'),
+    }
 
 
 def test_accreditation_form(translator_app: TestApp) -> None:

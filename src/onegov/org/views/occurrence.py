@@ -202,9 +202,12 @@ def view_occurrence(
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
 
+    filter_names = {f.id: f.label for f in request.app.org.event_filter_fields}
+
     return {
         'description': description,
         'framed': framed,
+        'filter_names': filter_names,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
         'organizer_phone': self.event.organizer_phone,
@@ -212,7 +215,6 @@ def view_occurrence(
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
-        'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
         'show_tags': show_tags(request),

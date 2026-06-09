@@ -96,7 +96,7 @@ def test_auth_login_yubikey(session: Session) -> None:
 
     app = DummyApp(session)
     app.yubikey_client_id = 'abc'  # type: ignore[attr-defined]
-    app.yubikey_secret_key = 'dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='  # type: ignore[attr-defined]
+    app.yubikey_secret_key = 'dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='  # type: ignore[attr-defined]  # gitleaks:allow
 
     auth = Auth(app)  # type: ignore[arg-type]
 

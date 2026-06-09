@@ -218,8 +218,8 @@ class SearchApp(morepath.App):
             for model in self.searchable_models()
         }
 
-    def perform_reindex(self) -> None:
-        """ Re-indexes all content.
+    def perform_reindex(self, dispose_session: bool = True) -> None:
+        """Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
 
@@ -268,6 +268,7 @@ class SearchApp(morepath.App):
         with ThreadPoolExecutor() as executor:
             executor.map(reindex_model, self.indexable_base_models())
 
-        session.invalidate()
-        if session.bind and hasattr(session.bind, 'dispose'):
-            session.bind.dispose()
+        if dispose_session:
+            session.invalidate()
+            if session.bind and hasattr(session.bind, 'dispose'):
+                session.bind.dispose()

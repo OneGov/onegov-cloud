@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 
 from itertools import groupby
+
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import index_log, log, Searchable, utils
 from onegov.search.datamanager import IndexerDataManager
@@ -105,200 +106,192 @@ class Indexer:
         tablename: str | None = None
         schema: str | None = None
         owner_id_column: PKColumn | None = None
-        try:
-            for task in tasks:
-                if schema is not None:
-                    if schema != task['schema']:
-                        index_log.error(
-                            'Received mixed schemas in search delete tasks.'
-                        )
-                        return False
+        for task in tasks:
+            if schema is not None:
+                if schema != task['schema']:
+                    index_log.error(
+                        'Received mixed schemas in search delete tasks.'
+                    )
+                    return False
+            else:
+                schema = task['schema']
+
+            if tablename is not None:
+                if tablename != task['tablename']:
+                    index_log.error(
+                        'Received mixed tables in search delete tasks.'
+                    )
+                    return False
+            else:
+                tablename = task['tablename']
+
+            _owner_type = task['owner_type']  # class name
+            _mapping = self.mappings[_owner_type]
+            _owner_id = task['id']
+            _owner_id_column: PKColumn
+            if isinstance(_owner_id, UUID):
+                _owner_id_column = SearchIndex.owner_id_uuid
+            elif isinstance(_owner_id, int):
+                _owner_id_column = SearchIndex.owner_id_int
+            elif isinstance(_owner_id, str):
+                _owner_id_column = SearchIndex.owner_id_str
+
+            if owner_id_column is not None:
+                if owner_id_column is not _owner_id_column:
+                    index_log.error(
+                        'Received mixed id types in search delete tasks.'
+                    )
+                    return False
+            else:
+                owner_id_column = _owner_id_column
+
+            detected_language = task['language']
+            if language_from_locale(detected_language) == 'simple':
+                detected_language = 'simple'
+
+            if detected_language not in self.languages:
+                if len(self.languages) == 1:
+                    language = next(iter(self.languages))
                 else:
-                    schema = task['schema']
-
-                if tablename is not None:
-                    if tablename != task['tablename']:
-                        index_log.error(
-                            'Received mixed tables in search delete tasks.'
-                        )
-                        return False
-                else:
-                    tablename = task['tablename']
-
-                _owner_type = task['owner_type']  # class name
-                _mapping = self.mappings[_owner_type]
-                _owner_id = task['id']
-                _owner_id_column: PKColumn
-                if isinstance(_owner_id, UUID):
-                    _owner_id_column = SearchIndex.owner_id_uuid
-                elif isinstance(_owner_id, int):
-                    _owner_id_column = SearchIndex.owner_id_int
-                elif isinstance(_owner_id, str):
-                    _owner_id_column = SearchIndex.owner_id_str
-
-                if owner_id_column is not None:
-                    if owner_id_column is not _owner_id_column:
-                        index_log.error(
-                            'Received mixed id types in search delete tasks.'
-                        )
-                        return False
-                else:
-                    owner_id_column = _owner_id_column
-
-                detected_language = task['language']
-                if language_from_locale(detected_language) == 'simple':
-                    detected_language = 'simple'
-
-                if detected_language not in self.languages:
-                    if len(self.languages) == 1:
-                        language = next(iter(self.languages))
+                    # prioritize german and then french locales
+                    for locale in ('de_CH', 'de', 'fr_CH', 'fr'):
+                        if locale in self.languages:
+                            language = locale
+                            break
                     else:
-                        # prioritize german and then french locales
-                        for locale in ('de_CH', 'de', 'fr_CH', 'fr'):
-                            if locale in self.languages:
-                                language = locale
-                                break
-                        else:
-                            # if there is nothing to prioritize, just pick one
-                            language = next(iter(self.languages), 'simple')
-                else:
-                    language = detected_language
-                _properties = task['properties']
-                _tags = task['tags']
+                        # if there is nothing to prioritize, just pick one
+                        language = next(iter(self.languages), 'simple')
+            else:
+                language = detected_language
+            _properties = task['properties']
+            _tags = task['tags']
 
-                # NOTE: We use a dictionary to avoid duplicate updates for
-                #       the same model, only the latest update will count
-                params_dict[_owner_id] = {
-                    '_owner_id': _owner_id,
-                    '_owner_type': _owner_type,
-                    '_owner_tablename': tablename,
-                    '_public': task['public'],
-                    '_access': task.get('access', 'public'),
-                    '_last_change': task['last_change'],
-                    '_tags': _tags,
-                    '_suggestion': task['suggestion'],
-                    '_publication_start':
-                        task.get('publication_start', None),
-                    '_publication_end':
-                        task.get('publication_end', None),
-                    '_title_string': task['title'],
-                    **{
-                        f'_lang__{lang}': lang
-                        for lang in self.languages
-                    },
-                    **{
-                        f'_{k}': v
-                        for k, v in _properties.items()
-                    }
+            # NOTE: We use a dictionary to avoid duplicate updates for
+            #       the same model, only the latest update will count
+            params_dict[_owner_id] = {
+                '_owner_id': _owner_id,
+                '_owner_type': _owner_type,
+                '_owner_tablename': tablename,
+                '_public': task['public'],
+                '_access': task.get('access', 'public'),
+                '_last_change': task['last_change'],
+                '_tags': _tags,
+                '_suggestion': task['suggestion'],
+                '_publication_start':
+                    task.get('publication_start', None),
+                '_publication_end':
+                    task.get('publication_end', None),
+                '_title_string': task['title'],
+                **{
+                    f'_lang__{lang}': lang
+                    for lang in self.languages
+                },
+                **{
+                    f'_{k}': v
+                    for k, v in _properties.items()
                 }
-                for field in _properties.keys():
-                    _config = _mapping.mapping.get(field, {})
-                    _weight = _config.get('weight')
-                    if _weight not in ('A', 'B', 'C', 'D'):
-                        index_log.warn(
-                            f'Invalid weight for property "{field}" on type '
-                            f'"{_owner_type}", falling back to weight "C".'
-                        )
-                        _weight = 'C'
-                    for lang in self.languages:
-                        params_dict[_owner_id][
-                            f'_weight__{field}__{lang}'
-                        ] = chr(ord(_weight) + 1) if (
-                            'localized' in _config.get('type', '')
-                            and lang != language
-                            # TODO: Do we want to emit a warning if we can't
-                            #       de-prioritize non-matching languages?
-                            and _weight != 'D'
-                        ) else _weight
+            }
+            for field in _properties.keys():
+                _config = _mapping.mapping.get(field, {})
+                _weight = _config.get('weight')
+                if _weight not in ('A', 'B', 'C', 'D'):
+                    index_log.warn(
+                        f'Invalid weight for property "{field}" on type '
+                        f'"{_owner_type}", falling back to weight "C".'
+                    )
+                    _weight = 'C'
+                for lang in self.languages:
+                    params_dict[_owner_id][
+                        f'_weight__{field}__{lang}'
+                    ] = chr(ord(_weight) + 1) if (
+                        'localized' in _config.get('type', '')
+                        and lang != language
+                        # TODO: Do we want to emit a warning if we can't
+                        #       de-prioritize non-matching languages?
+                        and _weight != 'D'
+                    ) else _weight
 
-            assert schema is not None
-            assert owner_id_column is not None
+        assert schema is not None
+        assert owner_id_column is not None
 
-            title_vector: ColumnElement[str] | None = None
-            for language in self.languages:
-                title_vector_part = func.setweight(
-                    func.to_tsvector(
-                        bindparam(f'_lang__{language}', type_=String),
-                        bindparam('_title_string', type_=String)
-                    ),
-                    'A'
-                )
-                if title_vector is None:
-                    title_vector = title_vector_part
-                else:
-                    title_vector = title_vector.op('||')(title_vector_part)
-
-            data_vector: ColumnElement[str] = func.setweight(
-                func.array_to_tsvector(
-                    bindparam('_tags', type_=ARRAY(String))
+        title_vector: ColumnElement[str] | None = None
+        for language in self.languages:
+            title_vector_part = func.setweight(
+                func.to_tsvector(
+                    bindparam(f'_lang__{language}', type_=String),
+                    bindparam('_title_string', type_=String)
                 ),
                 'A'
             )
-            for field in tasks[0]['properties'].keys():
-                for language in self.languages:
-                    data_vector = data_vector.op('||')(
-                        func.setweight(
-                            func.to_tsvector(
-                                bindparam(f'_lang__{language}', type_=String),
-                                bindparam(f'_{field}', type_=String)
-                            ),
-                            bindparam(f'_weight__{field}__{language}')
-                        )
-                    )
+            if title_vector is None:
+                title_vector = title_vector_part
+            else:
+                title_vector = title_vector.op('||')(title_vector_part)
 
-            stmt = insert(SearchIndex.__table__).values(  # type: ignore[arg-type]
-                {
-                    owner_id_column: bindparam('_owner_id'),
-                    SearchIndex.owner_type: bindparam('_owner_type'),
-                    SearchIndex.owner_tablename:
-                        bindparam('_owner_tablename'),
-                    SearchIndex.publication_start:
-                        bindparam('_publication_start'),
-                    SearchIndex.publication_end:
-                        bindparam('_publication_end'),
-                    SearchIndex.public: bindparam('_public'),
-                    SearchIndex.access: bindparam('_access'),
-                    SearchIndex.last_change: bindparam('_last_change'),
-                    SearchIndex._tags:
-                        bindparam('_tags', type_=ARRAY(String)),
-                    SearchIndex.suggestion: bindparam('_suggestion'),
-                    SearchIndex.title_vector: title_vector,
-                    SearchIndex.data_vector: data_vector,
-                }
-            )
-            # we may have already indexed this model
-            # so perform an update instead
-            stmt = stmt.on_conflict_do_update(
-                index_elements=[
-                    SearchIndex.owner_tablename,
-                    owner_id_column
-                ],
-                set_={
-                    # the owner_type can change, although uncommon
-                    'owner_type': stmt.excluded.owner_type,
-                    'publication_start': stmt.excluded.publication_start,
-                    'publication_end': stmt.excluded.publication_end,
-                    'public': stmt.excluded.public,
-                    'access': stmt.excluded.access,
-                    'last_change': stmt.excluded.last_change,
-                    'tags': stmt.excluded.tags,
-                    'suggestion': stmt.excluded.suggestion,
-                    'title_vector': stmt.excluded.title_vector,
-                    'data_vector': stmt.excluded.data_vector,
-                },
-                # since our unique constraints are partial indeces
-                # we need this index_where clause, otherwise postgres
-                # will not be able to infer the matching constraint
-                index_where=owner_id_column.is_not(None)
-            )
-            with session.begin_nested():
-                session.execute(stmt, list(params_dict.values()))
-        except Exception:
-            index_log.exception(
-                f'Error creating index schema {schema} of '
-                f'table {tablename}, tasks: {[t["id"] for t in tasks]}',
-            )
-            return False
+        data_vector: ColumnElement[str] = func.setweight(
+            func.array_to_tsvector(
+                bindparam('_tags', type_=ARRAY(String))
+            ),
+            'A'
+        )
+        for field in tasks[0]['properties'].keys():
+            for language in self.languages:
+                data_vector = data_vector.op('||')(
+                    func.setweight(
+                        func.to_tsvector(
+                            bindparam(f'_lang__{language}', type_=String),
+                            bindparam(f'_{field}', type_=String)
+                        ),
+                        bindparam(f'_weight__{field}__{language}')
+                    )
+                )
+
+        stmt = insert(SearchIndex.__table__).values(  # type: ignore[arg-type]
+            {
+                owner_id_column: bindparam('_owner_id'),
+                SearchIndex.owner_type: bindparam('_owner_type'),
+                SearchIndex.owner_tablename:
+                    bindparam('_owner_tablename'),
+                SearchIndex.publication_start:
+                    bindparam('_publication_start'),
+                SearchIndex.publication_end:
+                    bindparam('_publication_end'),
+                SearchIndex.public: bindparam('_public'),
+                SearchIndex.access: bindparam('_access'),
+                SearchIndex.last_change: bindparam('_last_change'),
+                SearchIndex._tags:
+                    bindparam('_tags', type_=ARRAY(String)),
+                SearchIndex.suggestion: bindparam('_suggestion'),
+                SearchIndex.title_vector: title_vector,
+                SearchIndex.data_vector: data_vector,
+            }
+        )
+        # we may have already indexed this model
+        # so perform an update instead
+        stmt = stmt.on_conflict_do_update(
+            index_elements=[
+                SearchIndex.owner_tablename,
+                owner_id_column
+            ],
+            set_={
+                # the owner_type can change, although uncommon
+                'owner_type': stmt.excluded.owner_type,
+                'publication_start': stmt.excluded.publication_start,
+                'publication_end': stmt.excluded.publication_end,
+                'public': stmt.excluded.public,
+                'access': stmt.excluded.access,
+                'last_change': stmt.excluded.last_change,
+                'tags': stmt.excluded.tags,
+                'suggestion': stmt.excluded.suggestion,
+                'title_vector': stmt.excluded.title_vector,
+                'data_vector': stmt.excluded.data_vector,
+            },
+            # since our unique constraints are partial indeces
+            # we need this index_where clause, otherwise postgres
+            # will not be able to infer the matching constraint
+            index_where=owner_id_column.is_not(None)
+        )
+        session.execute(stmt, list(params_dict.values()))
 
         return True
 
@@ -357,24 +350,17 @@ class Indexer:
             # nothing to delete
             return True
 
-        try:
-            assert schema is not None
-            assert tablename is not None
-            assert owner_id_column is not None
-            stmt = (
-                delete(SearchIndex.__table__)  # type: ignore[arg-type]
-                .where(and_(
-                    SearchIndex.owner_tablename == tablename,
-                    owner_id_column.in_(owner_ids)
-                ))
-            )
-            with session.begin_nested():
-                session.execute(stmt)
-        except Exception:
-            index_log.exception(
-                f'Error deleting index schema {schema} tasks {tasks}:'
-            )
-            return False
+        assert schema is not None
+        assert tablename is not None
+        assert owner_id_column is not None
+        stmt = (
+            delete(SearchIndex.__table__)  # type: ignore[arg-type]
+            .where(and_(
+                SearchIndex.owner_tablename == tablename,
+                owner_id_column.in_(owner_ids)
+            ))
+        )
+        session.execute(stmt)
 
         return True
 

@@ -39,7 +39,7 @@ from tempfile import SpooledTemporaryFile
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
-    from depot.io.interfaces import FileStorage, StoredFile
+    from depot.io.interfaces import FileStorage
     from functools import cached_property
     from onegov.core.orm import SessionManager
     from onegov.core.request import CoreRequest
@@ -452,15 +452,16 @@ class DepotApp(App):
         )
         self.bind_depot()
 
-        yield
-
-        self.custom_depot_id = None
-        self.clear_depot_cache()
-        self._configure_depot(
-            original_depot_backend,
-            original_depot_storage_path
-        )
-        self.bind_depot()
+        try:
+            yield
+        finally:
+            self.custom_depot_id = None
+            self.clear_depot_cache()
+            self._configure_depot(
+                original_depot_backend,
+                original_depot_storage_path
+            )
+            self.bind_depot()
 
 
 @DepotApp.tween_factory(over=transaction_tween_factory)

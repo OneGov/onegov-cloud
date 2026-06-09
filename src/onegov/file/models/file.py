@@ -417,9 +417,11 @@ def metadata_lock(
                     yield False
                     break
             else:
-                yield True
-                fcntl.flock(fd, fcntl.LOCK_UN)
-                break
+                try:
+                    yield True
+                    break
+                finally:
+                    fcntl.flock(fd, fcntl.LOCK_UN)
 
 
 @event.listens_for(Session, 'after_commit')

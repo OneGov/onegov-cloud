@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import niquests
 from base64 import b64encode
 
 
@@ -16,8 +16,8 @@ class GeverClientCAS:
 
     def __init__(self, username: str, password: str, service_url: str):
 
-        self.portal_session = requests.Session()
-        self.service_session = requests.Session()
+        self.portal_session = niquests.Session()
+        self.service_session = niquests.Session()
         self.portal_session.headers.update({'Accept': 'application/json'})
         self.service_session.headers.update({'Accept': 'application/json'})
 
@@ -37,7 +37,7 @@ class GeverClientCAS:
         # FIXME: This should probably add annotations for the keyword
         #        arguments we're using
         **kwargs: Any
-    ) -> requests.Response:
+    ) -> niquests.Response:
 
         # First request will always need to obtain a token first
         if 'Authorization' not in self.service_session.headers:
@@ -54,7 +54,7 @@ class GeverClientCAS:
 
         return response
 
-    def token_has_expired(self, response: requests.Response) -> bool:
+    def token_has_expired(self, response: niquests.Response) -> bool:
         status = response.status_code
 
         if status == 401:
@@ -70,6 +70,7 @@ class GeverClientCAS:
             json={'username': self.username, 'password': self.password}
         )
         # Get CSRF token that was returned by server in a cookie
+        # FIXME: See https://github.com/jawah/niquests/issues/401
         csrf_token = self.portal_session.cookies['csrftoken']
 
         # Send the CSRF token as a request header in subsequent requests
@@ -99,7 +100,7 @@ class GeverClientCAS:
         file: bytes,
         filename: str | bytes,
         endpoint: str
-    ) -> requests.Response:
+    ) -> niquests.Response:
 
         def _base64_str(s: str | bytes) -> str:
             if not isinstance(s, bytes):
@@ -142,7 +143,8 @@ class GeverClientCAS:
             return resp  # fail early
 
         # The server will return a temporary upload URL 'location' in header
-        location = resp.headers['Location']
+        # FIXME: See https://github.com/jawah/niquests/issues/401#issuecomment-4498876553
+        location: str = resp.headers['Location']
         headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/offset+octet-stream',

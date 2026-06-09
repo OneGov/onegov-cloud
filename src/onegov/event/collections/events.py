@@ -8,7 +8,7 @@ from datetime import timedelta
 
 import click
 import logging
-import requests
+import niquests
 
 from dateutil.parser import parse
 from html import unescape
@@ -35,11 +35,11 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 from uuid import uuid4
 
+
 from typing import Any
 from typing import IO
 from typing import NamedTuple
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Mapping
@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from onegov.event.models.event import EventState
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Self, IO
+    from typing import Self
     from uuid import UUID
 
 log = logging.getLogger('onegov.org.events')
@@ -535,11 +535,13 @@ class EventCollection(Pagination[Event]):
                 return None, None
 
             try:
-                response = requests.get(url, timeout=10)
+                response = niquests.get(url, timeout=10)
                 response.raise_for_status()
+                if not response.content:
+                    return None, None
                 image_steam = BytesIO(response.content)
                 return image_steam, url.split('/')[-1]
-            except requests.RequestException:
+            except niquests.RequestException:
                 log.exception(
                     f'Failed to retrieve event image from {url}')
                 return None, None

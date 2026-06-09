@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import niquests_mock
 import onegov.feriennet
 import os
 import pytest
 import re
-import requests_mock
 import transaction
 
 from datetime import datetime, timedelta, date, time
@@ -1879,24 +1879,26 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     assert "Jetzt online bezahlen" in page
 
     # pay online
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
-        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/123456/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
 
     # sync the charges
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         page = client.get('/payments')
         assert ">Offen<" in page
 
-        m.get('https://api.stripe.com/v1/charges?limit=100', json={
+        m.get('https://api.stripe.com/v1/charges?limit=100').respond(json={
             "object": "list",
             "url": "/v1/charges",
             "has_more": False,
@@ -1915,7 +1917,9 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
             ]
         })
 
-        m.get('https://api.stripe.com/v1/payouts?limit=100&status=paid', json={
+        m.get(
+            'https://api.stripe.com/v1/payouts?limit=100&status=paid'
+        ).respond(json={
             "object": "list",
             "url": "/v1/payouts",
             "has_more": False,
@@ -1943,11 +1947,11 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     assert "3.20" in page
 
     # refund the charge
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
-        m.post('https://api.stripe.com/v1/refunds', json=charge)
+        m.post('https://api.stripe.com/v1/refunds').respond(json=charge)
         page.click("Zahlung rückerstatten")
         # client.post(get_post_url(page, 'payment-refund'))
 
@@ -1974,14 +1978,16 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     client.get('/billing?state=all').click("Rechnung als unbezahlt markieren")
 
     # pay again (leading to a refunded and an open charge)
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '654321'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/654321', json=charge)
-        m.post('https://api.stripe.com/v1/charges/654321/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/654321').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/654321/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'barfoo'
         page.form.submit().follow()

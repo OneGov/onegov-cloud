@@ -22,6 +22,10 @@
     <!--! To be override by other applications -->
 </metal:b>
 
+<metal:b define-macro="before_occurrence_lead">
+    <!--! To be override by other applications -->
+</metal:b>
+
 <metal:b define-macro="extra_usermanagement_fields">
     <!--! To be override by other applications -->
 </metal:b>
@@ -617,7 +621,7 @@
         <metal:newlist use-macro="layout.macros['news-item-full']" tal:define="heading 'h4'" />
     </div>
     <div class="newslist grid-x align-center">
-        <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All articles</span></a>
+        <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All posts</span></a>
     </div>
 </metal:newslist>
 
@@ -1477,7 +1481,7 @@
             <dd>
                 <ul tal:repeat="filter event.filter_keywords_ordered().items()" class="no-margin-bottom">
                     <li tal:condition="filter[1]">
-                        <span>${filter[0].title()}:</span>
+                        <span>${layout.org.event_filter_names[filter[0]]}:</span>
                         <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
                         <span tal:condition="not isinstance(filter[1], list) and filter[1]" i18n:translate>${filter[1]}</span>
                     </li>
@@ -1613,7 +1617,7 @@
                                         </div>
                                         <div tal:condition="occurrence.filter_keywords and show_filters">
                                             <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
-                                                <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
+                                                <span tal:condition="filter[1]" class="blank-label-description">${layout.org.event_filter_names[filter[0]]}:</span>
                                                 <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
                                                 <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
                                             </div>

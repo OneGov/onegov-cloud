@@ -247,7 +247,7 @@ def import_lu_data_files(
                 """)
             )
             session.flush()
-            if app.fts_search_enabled:
+            if getattr(app, 'fts_search_enabled', False):
                 # remove the relevant entries from the search index
                 session.execute(text("""
                     DELETE

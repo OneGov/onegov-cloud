@@ -14,9 +14,8 @@ install: ensure_uv
 	# ensure required folder structure
 	mkdir -p ./profiles
 
-	# gather eggs
+	# clean up old eggs folder if it still exists
 	rm -rf ./eggs
-	scrambler --target eggs
 
 update: ensure_uv
 	# update all dependencies

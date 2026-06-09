@@ -13,7 +13,6 @@ from onegov.landsgemeinde.utils import update_ticker
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.landsgemeinde.models import Assembly
     from .conftest import TestApp
 
 
@@ -180,6 +179,58 @@ def test_ensure_states() -> None:
         '4.2': 'completed'
     }
 
+    # assembly draft
+    assembly = create()
+    assembly.state = 'draft'
+    assert ensure_states(assembly) == {
+        assembly.agenda_items[0],  # was completed
+        assembly.agenda_items[0].vota[0],  # was completed
+        assembly.agenda_items[0].vota[1],  # was completed
+        assembly.agenda_items[0].vota[2],  # was completed
+        assembly.agenda_items[1],  # was ongoing, start cleared
+        assembly.agenda_items[1].vota[0],  # was completed
+        assembly.agenda_items[1].vota[1],  # was ongoing
+        assembly.agenda_items[1].vota[2],  # was scheduled
+        assembly.agenda_items[2],  # was scheduled
+        assembly.agenda_items[3],  # was scheduled
+        assembly.agenda_items[3].vota[0],  # was scheduled
+        assembly.agenda_items[3].vota[1],  # was scheduled
+    }
+    assert get(assembly) == {
+        '': 'draft',
+        '1': 'draft',
+        '1.1': 'draft',
+        '1.2': 'draft',
+        '1.3': 'draft',
+        '2': 'draft',
+        '2.1': 'draft',
+        '2.2': 'draft',
+        '2.3': 'draft',
+        '3': 'draft',
+        '4': 'draft',
+        '4.1': 'draft',
+        '4.2': 'draft'
+    }
+
+    # assembly ongoing (no-op)
+    assembly = create()
+    assert ensure_states(assembly) == set()
+    assert get(assembly) == {
+        '': 'ongoing',
+        '1': 'completed',
+        '1.1': 'completed',
+        '1.2': 'completed',
+        '1.3': 'completed',
+        '2': 'ongoing 12:00:00',
+        '2.1': 'completed',
+        '2.2': 'ongoing',
+        '2.3': 'scheduled',
+        '3': 'scheduled',
+        '4': 'scheduled',
+        '4.1': 'scheduled',
+        '4.2': 'scheduled'
+    }
+
     # 1 draft
     assembly = create()
     assembly.agenda_items[0].state = 'draft'
@@ -198,6 +249,32 @@ def test_ensure_states() -> None:
         '2.1': 'completed',
         '2.2': 'ongoing',
         '2.3': 'scheduled',
+        '3': 'scheduled',
+        '4': 'scheduled',
+        '4.1': 'scheduled',
+        '4.2': 'scheduled'
+    }
+
+    # 2 draft (non-first item: own vota only, no cascade to siblings or
+    # assembly)
+    assembly = create()
+    assembly.agenda_items[1].state = 'draft'
+    assert ensure_states(assembly.agenda_items[1]) == {
+        assembly.agenda_items[1],  # start cleared
+        assembly.agenda_items[1].vota[0],  # was completed
+        assembly.agenda_items[1].vota[1],  # was ongoing
+        assembly.agenda_items[1].vota[2],  # was scheduled
+    }
+    assert get(assembly) == {
+        '': 'ongoing',
+        '1': 'completed',
+        '1.1': 'completed',
+        '1.2': 'completed',
+        '1.3': 'completed',
+        '2': 'draft',
+        '2.1': 'draft',
+        '2.2': 'draft',
+        '2.3': 'draft',
         '3': 'scheduled',
         '4': 'scheduled',
         '4.1': 'scheduled',
@@ -303,6 +380,62 @@ def test_ensure_states() -> None:
         '4.2': 'scheduled'
     }
 
+    # 1.1 scheduled (all vota of item become scheduled → item itself becomes
+    # scheduled via set_by_children; Assembly is never set to scheduled)
+    assembly = create()
+    assembly.agenda_items[0].vota[0].state = 'scheduled'
+    assert ensure_states(assembly.agenda_items[0].vota[0]) == {
+        assembly.agenda_items[0],  # was completed → scheduled (all vota
+        # scheduled)
+        assembly.agenda_items[0].vota[1],  # 1.2: was completed → scheduled
+        assembly.agenda_items[0].vota[2],  # 1.3: was completed → scheduled
+        assembly.agenda_items[1],  # was ongoing → scheduled, start cleared
+        assembly.agenda_items[1].vota[0],  # 2.1: was completed → scheduled
+        assembly.agenda_items[1].vota[1],  # 2.2: was ongoing → scheduled
+    }
+    assert get(assembly) == {
+        '': 'ongoing',
+        '1': 'scheduled',
+        '1.1': 'scheduled',
+        '1.2': 'scheduled',
+        '1.3': 'scheduled',
+        '2': 'scheduled',
+        '2.1': 'scheduled',
+        '2.2': 'scheduled',
+        '2.3': 'scheduled',
+        '3': 'scheduled',
+        '4': 'scheduled',
+        '4.1': 'scheduled',
+        '4.2': 'scheduled'
+    }
+
+    # 1.2 scheduled (not all vota scheduled → item stays ongoing,
+    # not scheduled)
+    assembly = create()
+    assembly.agenda_items[0].vota[1].state = 'scheduled'
+    assert ensure_states(assembly.agenda_items[0].vota[1]) == {
+        assembly.agenda_items[0],  # was completed → ongoing, start set
+        assembly.agenda_items[0].vota[2],  # 1.3: was completed → scheduled
+        assembly.agenda_items[1],  # was ongoing → scheduled, start cleared
+        assembly.agenda_items[1].vota[0],  # 2.1: was completed → scheduled
+        assembly.agenda_items[1].vota[1],  # 2.2: was ongoing → scheduled
+    }
+    assert get(assembly) == {
+        '': 'ongoing',
+        '1': 'ongoing 12:00:00',
+        '1.1': 'completed',
+        '1.2': 'scheduled',
+        '1.3': 'scheduled',
+        '2': 'scheduled',
+        '2.1': 'scheduled',
+        '2.2': 'scheduled',
+        '2.3': 'scheduled',
+        '3': 'scheduled',
+        '4': 'scheduled',
+        '4.1': 'scheduled',
+        '4.2': 'scheduled'
+    }
+
     # 2 completed
     assembly = create()
     assembly.agenda_items[1].state = 'completed'
@@ -363,6 +496,26 @@ def test_ensure_states() -> None:
         '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
+        '2.3': 'scheduled',
+        '3': 'scheduled',
+        '4': 'scheduled',
+        '4.1': 'scheduled',
+        '4.2': 'scheduled'
+    }
+
+    # 2.2 draft (existing votum → draft: no cascade at all, no-op)
+    assembly = create()
+    assembly.agenda_items[1].vota[1].state = 'draft'
+    assert ensure_states(assembly.agenda_items[1].vota[1]) == set()
+    assert get(assembly) == {
+        '': 'ongoing',
+        '1': 'completed',
+        '1.1': 'completed',
+        '1.2': 'completed',
+        '1.3': 'completed',
+        '2': 'ongoing 12:00:00',
+        '2.1': 'completed',
+        '2.2': 'draft',
         '2.3': 'scheduled',
         '3': 'scheduled',
         '4': 'scheduled',
@@ -689,6 +842,62 @@ def test_ensure_states() -> None:
         '4.1': 'completed',
         '4.2': 'completed',
         '4.3': 'completed'
+    }
+
+    # add draft votum to fully-scheduled assembly (regression: OGC-3061)
+    # A new votum with default state 'draft' must not cascade upward to the
+    # agenda item or assembly.
+    scheduled = Assembly(state='scheduled', date=date(2023, 5, 7))
+    scheduled.agenda_items.append(AgendaItem(state='scheduled', number=1))
+    scheduled.agenda_items.append(AgendaItem(state='scheduled', number=2))
+    scheduled.agenda_items[1].vota.append(Votum(state='draft', number=1))
+    assert ensure_states(scheduled.agenda_items[1].vota[0]) == set()
+    assert get(scheduled) == {
+        '': 'scheduled',
+        '1': 'scheduled',
+        '2': 'scheduled',
+        '2.1': 'draft',
+    }
+
+    # add 4.3 draft (new draft votum doesn't affect sibling or parent states)
+    assembly = create()
+    assembly.agenda_items[3].vota.append(Votum(state='draft', number=3))
+    assert ensure_states(assembly.agenda_items[3].vota[2]) == set()
+    assert get(assembly) == {
+        '': 'ongoing',
+        '1': 'completed',
+        '1.1': 'completed',
+        '1.2': 'completed',
+        '1.3': 'completed',
+        '2': 'ongoing 12:00:00',
+        '2.1': 'completed',
+        '2.2': 'ongoing',
+        '2.3': 'scheduled',
+        '3': 'scheduled',
+        '4': 'scheduled',
+        '4.1': 'scheduled',
+        '4.2': 'scheduled',
+        '4.3': 'draft',
+    }
+
+    # set_by_children promotes assembly from scheduled → ongoing
+    # (create() always starts ongoing, so this needs a custom assembly)
+    custom = Assembly(state='scheduled', date=date(2023, 5, 7))
+    custom.agenda_items.append(AgendaItem(state='scheduled', number=1))
+    custom.agenda_items.append(AgendaItem(state='scheduled', number=2))
+    custom.agenda_items[0].vota.append(Votum(state='scheduled', number=1))
+    custom.agenda_items[0].vota.append(Votum(state='scheduled', number=2))
+    custom.agenda_items[0].vota[0].state = 'completed'
+    assert ensure_states(custom.agenda_items[0].vota[0]) == {
+        custom.agenda_items[0],  # scheduled → ongoing (has completed votum)
+        custom,  # scheduled → ongoing (has ongoing item)
+    }
+    assert get(custom) == {
+        '': 'ongoing',
+        '1': 'ongoing 12:00:00',
+        '1.1': 'completed',
+        '1.2': 'scheduled',
+        '2': 'scheduled',
     }
 
     # delete 4

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import queue
-import requests
+import niquests
 import threading
 import uuid
 from dataclasses import dataclass
@@ -46,7 +46,7 @@ class UpdateResult:
 def _fetch_custom_data_worker(
     parliamentarian_queue: queue.Queue[Any],
     result_queue: queue.Queue[UpdateResult],
-    session: requests.Session,
+    session: niquests.Session,
     base_url: str
 ) -> None:
     """Worker thread that fetches API data for parliamentarians."""
@@ -75,7 +75,7 @@ def _fetch_custom_data_worker(
                 addresses=addresses,
                 sex=sex
             ))
-        except requests.exceptions.HTTPError as e:
+        except niquests.exceptions.HTTPError as e:
             if e.response is not None and e.response.status_code == 404:
                 log.warning(
                     f'Person not found in API: {parliamentarian.title} '
@@ -144,7 +144,7 @@ class KubImporter:
         self.base_url = base_url.rstrip('/')  # Normalize
         self.output = output
 
-        self.session = requests.Session()
+        self.session = niquests.Session(timeout=60)
         self.session.headers.update({
             'Authorization': f'Token {token}',
             'Accept': 'application/json'
@@ -178,7 +178,7 @@ class KubImporter:
                 )
             if self.output:
                 self.output.success('API is accessible')
-        except requests.exceptions.RequestException as e:
+        except niquests.exceptions.RequestException as e:
             raise APIAccessibilityError(f'API check failed: {e}') from e
 
     def _update_address_fields(
@@ -322,7 +322,7 @@ class KubImporter:
                 else:
                     url = None
 
-            except requests.exceptions.RequestException as e:
+            except niquests.exceptions.RequestException as e:
                 log.warning(f'Failed to fetch from {endpoint}: {e}')
                 if self.output:
                     self.output.error(f'Failed to fetch from {endpoint}: {e}')
