@@ -267,9 +267,6 @@ def notify_admins_finalized(
     if not admin_emails:
         return
 
-    parliamentarian_name = (
-        attendence.parliamentarian.title if attendence.parliamentarian else ''
-    )
     commission_name = (
         attendence.commission.title if attendence.commission else ''
     )
@@ -288,13 +285,12 @@ def notify_admins_finalized(
         template='mail_abschluss_notification.pt',
         subject=_(
             'PAS: Abschluss set for ${name}',
-            mapping={'name': commission_name or parliamentarian_name},
+            mapping={'name': commission_name},
         ),
         receivers=admin_emails,
         content={
             'model': attendence,
             'title': request.translate(_('Abschluss Notification')),
-            'parliamentarian_name': parliamentarian_name,
             'commission_name': commission_name,
             'attendance_created': attendence.created,
             'user_name': user_name,

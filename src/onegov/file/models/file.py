@@ -414,7 +414,7 @@ def metadata_lock(
                 fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except OSError:
                 if monotonic() - start_time >= timeout:
-                    yield False  # noqa: RUF075
+                    yield False
                     break
             else:
                 try:

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import transaction
 
-from contextlib import suppress
 from dogpile.cache.api import NO_VALUE
 from hashlib import blake2b
 
@@ -147,16 +146,15 @@ class BrowserSession:
         the process.
 
         """
-        value = self.get(name, default=default)
+        value = self._get(name)
+        if value is NO_VALUE:
+            return default
 
-        # we can run into a race condition here when two requests come in
-        # simultaneously - one request will get the value and delete it, the
-        # other will get the value and fail with an error when trying to
-        # delete it
-        #
-        # we can be pragmatic - if it's gone, it doesn't need to be deleted
-        with suppress(AttributeError):
-            delattr(self, name)
+        # NOTE: dogpile.cache deletes are idempotent and so are deletes
+        #       on our data manager layer, so we don't have to worry
+        #       about races, if the key no longer exists, this just does
+        #       not do anything, rather than throw an exception.
+        self.delete(name)
 
         return value
 
@@ -215,9 +213,8 @@ class BrowserSession:
 
         self.delete(name)
 
-    __setitem__ = __setattr__
-    __delitem__ = __delattr__
-    __delattr__ = __delattr__
+    __setitem__ = set
+    __delitem__ = delete
     __contains__ = has
 
     # DataManager interface

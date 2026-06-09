@@ -1,22 +1,27 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-04-16 09:07+0200\n"
+"POT-Creation-Date: 2026-06-01 13:53+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 
-#, fuzzy
-msgid "Events"
-msgstr "Evento"
+msgid "Meetings"
+msgstr "Riunioni"
 
-msgid "Latest news"
-msgstr "Ultime notizie"
+msgid "Political Businesses"
+msgstr "Attività politico"
 
-msgid "Topics"
-msgstr "Argomenti"
+msgid "Parliamentarians"
+msgstr "Parlamentari"
+
+msgid "Commissions"
+msgstr "Commissioni"
+
+msgid "Parliamentary groups"
+msgstr "Gruppi parlamentari"
 
 msgid "Chats"
 msgstr "Chat"
@@ -202,6 +207,10 @@ msgstr "Abilita il sistema di informazione del consiglio (RIS)"
 msgid "Enables the RIS integration for this organisation."
 msgstr "Attiva l'integrazione RIS per questa organizzazione."
 
+#, fuzzy
+msgid "Events"
+msgstr "Evento"
+
 msgid "All events"
 msgstr "Tutti gli eventi"
 
@@ -324,9 +333,6 @@ msgstr "File"
 msgid "Chat Archive"
 msgstr "Archivio chat"
 
-msgid "Meetings"
-msgstr "Riunioni"
-
 msgid "Meeting"
 msgstr "Riunione"
 
@@ -341,9 +347,6 @@ msgstr "L'operazione non può essere annullata."
 
 msgid "Delete meeting"
 msgstr "Elimina riunione"
-
-msgid "Parliamentarians"
-msgstr "Parlamentari"
 
 msgid "Parliamentarian"
 msgstr "Parlamentare"
@@ -366,9 +369,6 @@ msgstr "Vuoi davvero rimuovere questo ruolo?"
 msgid "Remove role"
 msgstr "Rimuovi ruolo"
 
-msgid "Parliamentary groups"
-msgstr "Gruppi parlamentari"
-
 msgid "Parliamentary group"
 msgstr "Gruppo parlamentare"
 
@@ -384,9 +384,6 @@ msgstr "Partiti politici"
 msgid "Political Party"
 msgstr "Partito"
 
-msgid "Commissions"
-msgstr "Commissioni"
-
 msgid "Commission"
 msgstr "Commissione"
 
@@ -395,9 +392,6 @@ msgstr "Vuoi davvero cancellare questa commissione?"
 
 msgid "Delete commission"
 msgstr "Elimina commissione"
-
-msgid "Political Businesses"
-msgstr "Attività politico"
 
 msgid "Political Business"
 msgstr "Attività politico"
@@ -498,14 +492,14 @@ msgstr "Nessuna chat attiva."
 msgid "Contact"
 msgstr "Contatti"
 
+msgid "Filters"
+msgstr "Filtri"
+
 msgid "Function"
 msgstr "Funzione"
 
 msgid "No active commissions."
 msgstr "Nessuna commissione attiva."
-
-msgid "Filters"
-msgstr "Filtri"
 
 msgid "No directories defined yet."
 msgstr "Nessuna cartella ancora definita."
@@ -821,8 +815,8 @@ msgstr "Trascina e rilascia il file da caricare"
 msgid "read more"
 msgstr "leggere di più"
 
-msgid "All articles"
-msgstr "Tutti gli articoli"
+msgid "All posts"
+msgstr "Tutti i post"
 
 msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
@@ -1485,8 +1479,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -1660,6 +1654,9 @@ msgstr ""
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Per utilizzare il tuo account hai bisogno di Yubikey con il seriale ${number}"
+
+msgid "Latest news"
+msgstr "Ultime notizie"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -2872,6 +2869,9 @@ msgstr "Panoramica delle notifiche push"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Topics"
+#~ msgstr "Argomenti"
 
 #~ msgid "Activate/deactivate modules"
 #~ msgstr "Attiva/disattiva moduli"

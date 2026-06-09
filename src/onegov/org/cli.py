@@ -17,6 +17,7 @@ import transaction
 import yaml
 
 from collections import defaultdict
+from itertools import chain
 from datetime import date, datetime, timedelta
 from io import BytesIO
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
@@ -762,33 +763,69 @@ def fetch(
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
 
-                added, updated, purged = local_events.from_import(
-                    remote_events(),
-                    to_purge=[f'fetch-{key}'],
-                    publish_immediately=False,
-                    valid_state_transfers=valid_state_transfers,
-                    published_only=published_only
-                )
+                with app.session_manager.disable_change_signals():
+                    added, updated, purged = local_events.from_import(
+                        remote_events(),
+                        to_purge=[f'fetch-{key}'],
+                        publish_immediately=False,
+                        valid_state_transfers=valid_state_transfers,
+                        published_only=published_only,
+                    )
 
-                for event_ in added:
-                    event_.submit()
-                    if not create_tickets:
-                        event_.publish()
-                        continue
+                    for event_ in added:
+                        event_.submit()
+                        if not create_tickets:
+                            event_.publish()
+                            continue
 
-                    assert local_admin is not None
-                    with local_session.no_autoflush:
-                        tickets = TicketCollection(local_session)
-                        new_ticket = tickets.open_ticket(
-                            handler_code='EVN', handler_id=event_.id.hex,
-                            source=event_.meta['source'],
-                            user=local_admin.username
+                        assert local_admin is not None
+                        with local_session.no_autoflush:
+                            tickets = TicketCollection(local_session)
+                            new_ticket = tickets.open_ticket(
+                                handler_code='EVN',
+                                handler_id=event_.id.hex,
+                                source=event_.meta['source'],
+                                user=local_admin.username,
+                            )
+                            new_ticket.muted = True
+                            TicketNote.create(
+                                new_ticket,
+                                request,
+                                (f'Importiert von Instanz {key}'),
+                                owner=local_admin.username,
+                            )
+
+                if getattr(app, 'fts_search_enabled', False):
+                    if added or updated:
+                        app.fts_indexer.process(
+                            (
+                                task
+                                for event_ in chain(added, updated)
+                                if (
+                                    task := app.fts_orm_events.index_task(
+                                        local_schema,
+                                        event_,
+                                    )
+                                )
+                                is not None
+                            ),
+                            local_session,
                         )
-                        new_ticket.muted = True
-                        TicketNote.create(new_ticket, request, (
-                            f'Importiert von Instanz {key}'
-
-                        ), owner=local_admin.username)
+                    if purged:
+                        app.fts_indexer.process(
+                            (
+                                {
+                                    'action': 'delete',
+                                    'schema': local_schema,
+                                    'tablename': 'events',
+                                    'owner_type': 'Event',
+                                    'id': eid,
+                                }
+                                for eid in purged
+                            ),
+                            local_session,
+                        )
+                    local_session.flush()
 
                 helper_request: OrgRequest = Bunch(  # type:ignore
                     current_username=local_admin and local_admin.username,

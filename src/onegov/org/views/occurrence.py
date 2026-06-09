@@ -215,7 +215,6 @@ def view_occurrence(
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
-        'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
         'show_tags': show_tags(request),
