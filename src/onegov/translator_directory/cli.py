@@ -5,6 +5,7 @@ import transaction
 
 from openpyxl import load_workbook
 from onegov.core.cli import command_group
+from onegov.core.orm import mark_changed
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import log
@@ -16,7 +17,7 @@ from onegov.user import User
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
 from onegov.user.sync import ZugUserSource
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, text
 
 
 from typing import Any, TYPE_CHECKING
@@ -1016,3 +1017,50 @@ def change_finanzstelle_cli(
             click.secho('Changes committed', fg='green')
 
     return do_change
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    """Strips leading/trailing whitespace from first_name and last_name
+    of all translators.
+
+    Example:
+
+        `onegov-translator --select /translator_directory/*
+        strip-whitespace-from-names`
+
+    """
+
+    def _strip(
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
+    ) -> None:
+        session = app.session()
+
+        # Raw SQL skips ORM/FTS events; mark_changed tells zope.sqlalchemy
+        # to commit.
+        result = session.execute(text("""
+            UPDATE translators
+               SET first_name = TRIM(first_name),
+                   last_name   = TRIM(last_name)
+             WHERE first_name  != TRIM(first_name)
+                OR last_name   != TRIM(last_name)
+        """))
+        count = result.rowcount  # type: ignore[attr-defined]
+        mark_changed(session)
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+        else:
+            transaction.commit()
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} translator(s)',
+            fg='green'
+        )
+
+    return _strip

@@ -6,6 +6,7 @@ from onegov.core.orm.mixins.content import data_property
 from onegov.core.orm.mixins.content import dict_markup_property
 from onegov.core.orm.mixins.content import dict_property
 from onegov.core.orm.mixins.content import meta_property
+from onegov.core.orm.mixins.names import StripWhitespaceMixin
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.orm.mixins.timestamp import TimestampMixin
 
@@ -17,6 +18,7 @@ __all__ = [
     'dict_property',
     'dict_markup_property',
     'meta_property',
+    'StripWhitespaceMixin',
     'TimestampMixin',
     'UTCPublicationMixin',
 ]

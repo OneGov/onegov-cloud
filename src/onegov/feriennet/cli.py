@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import click
+import transaction
 
 from onegov.activity import Activity
-from onegov.core.cli import command_group
 from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
+from onegov.core.cli import command_group
+from onegov.core.orm import mark_changed
 from sqlalchemy import text
 
 
@@ -202,3 +204,50 @@ def delete_activity(
         request.session.delete(activity)
 
     return delete_activity
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
+    """ Strips leading/trailing whitespace from first_name and last_name
+    of all volunteers.
+
+    Example:
+
+        `onegov-feriennet --select /onegov_feriennet/*
+        strip-whitespace-from-names`
+
+    """
+
+    def _strip(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+        session = app.session()
+
+        # Raw SQL skips ORM/FTS events; mark_changed tells zope.sqlalchemy
+        # to commit.
+        result = session.execute(text("""
+            UPDATE volunteers
+               SET first_name = TRIM(first_name),
+                   last_name   = TRIM(last_name)
+             WHERE first_name  != TRIM(first_name)
+                OR last_name   != TRIM(last_name)
+        """))
+        count = result.rowcount  # type: ignore[attr-defined]
+        mark_changed(session)
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+        else:
+            transaction.commit()
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} volunteer(s)',
+            fg='green'
+        )
+
+    return _strip

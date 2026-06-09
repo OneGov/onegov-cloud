@@ -7,9 +7,10 @@ import transaction
 from datetime import date, datetime, UTC
 from sedate import replace_timezone
 from sqlalchemy import or_, and_
-from sqlalchemy import cast, Date
+from sqlalchemy import cast, Date, text
 
 from onegov.core.cli import command_group
+from onegov.core.orm import mark_changed
 from onegov.fsi import log
 from onegov.fsi.ims_import import (
     parse_ims_data, import_ims_data, import_teacher_data, with_open,
@@ -429,3 +430,46 @@ def fetch_users(
 
     if dry_run:
         transaction.abort()
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[FsiRequest, FsiApp], None]:
+    """ Strips leading/trailing whitespace from first_name and last_name
+    of all course attendees.
+
+    Example:
+
+        `onegov-fsi --select /fsi/* strip-whitespace-from-names`
+
+    """
+
+    def _strip(request: FsiRequest, app: FsiApp) -> None:
+        session = app.session()
+
+        # Raw SQL skips ORM/FTS events; mark_changed tells zope.sqlalchemy
+        # to commit.
+        result = session.execute(text("""
+            UPDATE fsi_attendees
+               SET first_name = TRIM(first_name),
+                   last_name   = TRIM(last_name)
+             WHERE (first_name IS NOT NULL AND first_name != TRIM(first_name))
+                OR (last_name  IS NOT NULL AND last_name  != TRIM(last_name))
+        """))
+        count = result.rowcount  # type: ignore[attr-defined]
+        mark_changed(session)
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+        else:
+            transaction.commit()
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} attendee(s)',
+            fg='green'
+        )
+
+    return _strip

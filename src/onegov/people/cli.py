@@ -9,9 +9,11 @@ from collections import OrderedDict
 
 from onegov.core.cli import command_group
 from onegov.core.cli import abort
+from onegov.core.orm import mark_changed
 from onegov.people.models import Person
 from openpyxl import load_workbook
 from openpyxl import Workbook
+from sqlalchemy import text
 
 
 from typing import IO
@@ -83,6 +85,52 @@ EXPORT_FIELDS = OrderedDict((
     ('Link zum Bild', 'picture_url'),
     ('Notizen', 'notes'),
 ))
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[CoreRequest, Framework], None]:
+    """ Strips leading/trailing whitespace from first_name, last_name,
+    and function of all people.
+
+    Example:
+
+        `onegov-people --select /onegov_org/* strip-whitespace-from-names`
+        `onegov-people --select /onegov_town6/* strip-whitespace-from-names`
+
+    """
+
+    def _strip(request: CoreRequest, app: Framework) -> None:
+        session = app.session()
+
+        # Raw SQL skips ORM/FTS events; mark_changed tells zope.sqlalchemy
+        # to commit.
+        result = session.execute(text("""
+            UPDATE people
+               SET first_name = TRIM(first_name),
+                   last_name = TRIM(last_name),
+                   function = TRIM(function)
+             WHERE first_name != TRIM(first_name)
+                OR last_name != TRIM(last_name)
+                OR (function IS NOT NULL AND function != TRIM(function))
+        """))
+        count = result.rowcount  # type: ignore[attr-defined]
+        mark_changed(session)
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+        else:
+            transaction.commit()
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} person(s)',
+            fg='green'
+        )
+
+    return _strip
 
 
 @cli.command('export')
