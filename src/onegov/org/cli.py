@@ -916,9 +916,15 @@ def fix_directory_files(
 def fix_submission_file_sizes(
     group_context: GroupContext
 ) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Updates the file size stored in form submission data to reflect the
+    """
+    Updates the file size stored in form submission data to reflect the
     actual stored size (after resizing/compression) rather than the original
-    upload size. """
+    upload size.
+
+        `onegov-org --select /onegov_org/* fix-submission-file-sizes`
+        `onegov-org --select /onegov_town6/* fix-submission-file-sizes`
+
+    """
 
     def file_dicts(data: dict[str, object]) -> list[dict[str, object]]:
         """ Yields all single-file and multi-file dicts from submission
@@ -944,7 +950,10 @@ def fix_submission_file_sizes(
                 ).first()
                 if file is None:
                     continue
-                actual_size = file.reference.file.content_length
+                try:
+                    actual_size = file.reference.file.content_length
+                except OSError:
+                    continue
                 if file_dict.get('size') == actual_size:
                     continue
                 file_dict['size'] = actual_size
