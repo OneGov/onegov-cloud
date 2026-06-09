@@ -348,6 +348,12 @@ def handle_reservation_form(
     reservations on a resource.
 
     """
+    # remove all expired session before loading on POST
+    if request.POST:
+        self.remove_expired_reservation_sessions(  # type: ignore[attr-defined]
+            expiration_date=sedate.utcnow() - timedelta(hours=2)
+        )
+
     reservations_query = self.bound_reservations(request, with_data=True)  # type: ignore[attr-defined]
     reservations: tuple[Reservation, ...] = tuple(reservations_query)
 
@@ -394,10 +400,6 @@ def handle_reservation_form(
                 data['ticket_tag'] = form.ticket_tag.data
                 if filtered_meta:
                     data['ticket_tag_meta'] = filtered_meta
-
-        # while we re at it, remove all expired sessions
-        # FIXME: Should this be part of the base class?
-        self.remove_expired_reservation_sessions()  # type: ignore[attr-defined]
 
         # add the submission if it doesn't yet exist
         if self.definition and not submission:
