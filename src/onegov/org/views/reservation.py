@@ -55,7 +55,7 @@ if TYPE_CHECKING:
 
 def reservation_subject(
     resource_title: str,
-    reservations: Sequence[Reservation],
+    reservations: Sequence[Any],
     activity: str,
 ) -> str:
     dates = sorted(
@@ -1608,6 +1608,8 @@ def send_reservation_summary(
     if self.handler.deleted or not self.handler.reservations:
         raise exc.HTTPNotFound()
 
+    resource = self.handler.resource
+    assert resource is not None
     recipient = self.handler.email
     if recipient:
         assert request.current_username
@@ -1624,7 +1626,7 @@ def send_reservation_summary(
             request=request,
             template='mail_reservation_summary.pt',
             subject=reservation_subject(
-                self.handler.resource.title,
+                resource.title,
                 self.handler.reservations,
                 request.translate(_('Summary')),
             ),
@@ -1633,7 +1635,7 @@ def send_reservation_summary(
             force=True,
             content={
                 'model': self,
-                'resource': self.handler.resource,
+                'resource': resource,
                 'reservations': self.handler.reservations,
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
