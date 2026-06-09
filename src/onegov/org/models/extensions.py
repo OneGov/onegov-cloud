@@ -1123,6 +1123,7 @@ class SidebarContactLinkExtension(ContentExtension):
                     self.contact_errors = {}
 
             def on_request(self) -> None:
+                super().on_request()
                 if not self.sidepanel_contact.data:
                     self.sidepanel_contact.data = self.contact_links_to_json(
                         None)
