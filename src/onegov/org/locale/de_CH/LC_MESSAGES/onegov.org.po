@@ -6523,7 +6523,7 @@ msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 msgid "Administrative"
 msgstr "Administrativ"
 
-sgid "Added a new directory"
+msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 
 msgid "New Directory"
