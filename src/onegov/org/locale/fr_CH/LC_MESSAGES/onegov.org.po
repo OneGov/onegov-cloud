@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-04-27 17:28+0200\n"
+"POT-Creation-Date: 2026-06-09 08:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -34,6 +34,15 @@ msgstr "Dernières nouvelles"
 
 msgid "Topics"
 msgstr "Sujets"
+
+msgid "Forms"
+msgstr "Formulaires"
+
+msgid "Resources"
+msgstr "Reservations"
+
+msgid "People"
+msgstr "Personnes"
 
 msgid "Important information regarding online payments"
 msgstr "Informations importantes concernant les paiements en ligne"
@@ -231,12 +240,6 @@ msgstr "Newsletter"
 
 msgid "Directories"
 msgstr "Répertoires"
-
-msgid "People"
-msgstr "Personnes"
-
-msgid "Forms"
-msgstr "Formulaires"
 
 msgid "Surveys"
 msgstr "Enquêtes"
@@ -2007,9 +2010,6 @@ msgstr ""
 msgid "Send on"
 msgstr "Envoyer sur"
 
-msgid "Resources"
-msgstr "Reservations"
-
 msgid "Please add at least one notification."
 msgstr "Veuillez ajouter au moins une notification."
 
@@ -3325,6 +3325,9 @@ msgstr "Association sportive"
 msgid "all day"
 msgstr "toute la journée"
 
+msgid "o'clock"
+msgstr "h"
+
 msgid "Homepage"
 msgstr "Page d'accueil"
 
@@ -3714,6 +3717,12 @@ msgstr "Supprimer lien externe"
 
 msgid "Sort"
 msgstr "Trier"
+
+msgid "Topic"
+msgstr "Rubrique"
+
+msgid "Link"
+msgstr "Lien"
 
 msgid "The submission was adopted"
 msgstr "La proposition a été adoptée"
@@ -4214,9 +4223,6 @@ msgstr "Souhaitez-vous vraiment rejeter cette entrée ?"
 msgid "Chats"
 msgstr "Chats"
 
-msgid "Link"
-msgstr "Lien"
-
 msgid "New Link"
 msgstr "Nouveau lien"
 
@@ -4235,9 +4241,6 @@ msgstr "Le lien a été supprimé"
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
 msgstr "Voulez-vous vraiment supprimer le lien « ${title} » ?"
-
-msgid "Topic"
-msgstr "Rubrique"
 
 msgid "New Topic"
 msgstr "Nouveau sujet"
@@ -4355,8 +4358,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Paiement"
 
@@ -5171,8 +5174,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6336,8 +6339,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -6527,10 +6530,6 @@ msgstr "Un lien a été ajouté au presse-papiers"
 
 msgid "Administrative"
 msgstr "Administratif"
-
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "L'entrée ${name} existe deux fois"
 
 msgid "Added a new directory"
 msgstr "Ajout d'un nouveau dossier"
@@ -7168,9 +7167,6 @@ msgstr "Ce week-end"
 
 msgid "This week"
 msgstr "Cette semaine"
-
-msgid "o'clock"
-msgstr "h"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifier la configuration du filtre d'événements"
@@ -8033,6 +8029,10 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#, python-format
+#~ msgid "The entry ${name} exists twice"
+#~ msgstr "L'entrée ${name} existe deux fois"
 
 #~ msgid "RIS Settings"
 #~ msgstr "Paramètres RIS"
