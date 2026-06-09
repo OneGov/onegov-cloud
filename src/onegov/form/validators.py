@@ -292,10 +292,6 @@ class ValidFormDefinition:
     """ Makes sure the given text is a valid onegov.form definition. """
 
     message = _('The form could not be parsed.')
-    field_without_type = _(
-        "The field '{label}' has no type defined. "
-        "For example use '___' for a text field."
-    )
     email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
     syntax = _('The syntax on line {line} is not valid.')
     indent = _('The indentation on line {line} is not valid. '
@@ -370,12 +366,7 @@ class ValidFormDefinition:
             raise ValidationError(
                 field.gettext(self.duplicate).format(label=exception.label)
             ) from exception
-        except FieldCompileError as exception:
-            raise ValidationError(
-                field.gettext(self.field_without_type).format(
-                    label=exception.field_name)
-            ) from exception
-        except MixedTypeError as exception:
+        except (FieldCompileError, MixedTypeError) as exception:
             raise ValidationError(
                 exception.field_name
             ) from exception

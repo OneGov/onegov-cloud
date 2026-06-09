@@ -468,11 +468,7 @@ class DirectoryBaseForm(Form):
     ) -> ParsedField | None:
         """ Returns the first hidden field, or None. """
 
-        try:
-            fields = flatten_fieldsets(parse_formcode(self.structure.data))
-        except FormError:
-            return None
-        for field in fields:
+        for field in flatten_fieldsets(parse_formcode(self.structure.data)):
             if not self.is_public(field.id, configuration):
                 return field
         return None

@@ -1253,9 +1253,6 @@ def parse_field_block(
     key, field = next(i for i in field_block.items())
     field_help = field_block.get('field_help')
 
-    if field is None:
-        raise errors.FieldCompileError(field_name=key.rstrip('= '))
-
     identifier_src = key.rstrip('= ') + '='
     identifier = ELEMENTS.identifier.parse_string(identifier_src)
 
