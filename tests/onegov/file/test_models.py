@@ -265,18 +265,18 @@ def test_pdf_preview_creation_with_erroneous_pdf(
 
 
 def test_max_image_size(session: Session) -> None:
-    session.add(File(name='unchanged.png', reference=create_image(2048, 2048)))
-    session.add(File(name='limited.png', reference=create_image(2049, 2048)))
+    session.add(File(name='unchanged.png', reference=create_image(4096, 4096)))
+    session.add(File(name='limited.png', reference=create_image(4097, 4096)))
 
     transaction.commit()
 
     limited, unchanged = session.query(File).order_by(File.name).all()
 
-    assert Image.open(limited.reference.file).size == (2048, 2047)
-    assert Image.open(unchanged.reference.file).size == (2048, 2048)
+    assert Image.open(limited.reference.file).size == (4096, 4095)
+    assert Image.open(unchanged.reference.file).size == (4096, 4096)
 
-    assert unchanged.reference.size == ['2048px', '2048px']
-    assert limited.reference.size == ['2048px', '2047px']
+    assert unchanged.reference.size == ['4096px', '4096px']
+    assert limited.reference.size == ['4096px', '4095px']
 
     assert unchanged.reference.thumbnail_small['size'] == ['512px', '512px']
     assert limited.reference.thumbnail_small['size'][0] in ['512px', '511px']
@@ -335,7 +335,7 @@ def test_determine_unknown_svg_size(
 
     # use the default max size as the size if we can't determine one
     logo = session.query(File).order_by(File.name).one()
-    assert logo.reference.size == ['2048px', '2048px']
+    assert logo.reference.size == ['4096px', '4096px']
 
 
 def test_associated_files(session: Session) -> None:

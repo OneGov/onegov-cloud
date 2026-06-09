@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         exif: NotRequired[Image.Exif]
 
 
-IMAGE_MAX_SIZE = 2048
+IMAGE_MAX_SIZE = 4096
 IMAGE_QUALITY = 85
 CHECKSUM_FUNCTION = 'md5'
 
