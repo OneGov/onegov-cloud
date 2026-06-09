@@ -443,16 +443,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
                         )
                         if n != entry.name
                     }
-                    for _ in range(100):
-                        if name not in existing:
-                            break
+                    while name in existing:
                         name = increment_name(name)
-                    else:
-                        raise RuntimeError(
-                            'increment_name failed to find a candidate'
-                        )
-
-            entry.name = name
+                    entry.name = name
+            else:
+                entry.name = name
 
         # validate the values
         form = self.form_obj

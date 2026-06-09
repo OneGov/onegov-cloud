@@ -17,7 +17,6 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryZipArchive
 from onegov.directory.archive import DirectoryFileNotFound
 from onegov.directory.collections.directory import EntryRecipientCollection
-from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
@@ -1056,10 +1055,6 @@ def view_import(
             })
         except MissingFileError as e:
             message = _('The file ${name} is missing', mapping={
-                'name': e.name
-            })
-        except DuplicateEntryError as e:
-            message = _('The entry ${name} exists twice', mapping={
                 'name': e.name
             })
         except ValidationError as e:
