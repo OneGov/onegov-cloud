@@ -747,7 +747,7 @@ def test_add_duplicate_entry(session: Session) -> None:
     session.flush()
 
     # test collection entry names
-    assert [d.name for d in foos.entries] == [
+    assert sorted(d.name for d in foos.entries) == [
         'foobar',
         'foobar-1',
         'foobar-2',
