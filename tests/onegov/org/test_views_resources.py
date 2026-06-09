@@ -4157,15 +4157,15 @@ def test_allocation_rules_copy_paste(client: Client) -> None:
 
     # Copy the rule
     edit_page = client.get('/resource/room-1').click('Verfügbarkeitszeiträume')
-    copy_links = edit_page.html.find_all('a', string='Kopieren')  # type: ignore[call-overload]
-    client.post(copy_links[0].attrs['ic-post-to'])
+    copy_links = edit_page.html.find_all('a', string='Kopieren')
+    client.post(str(copy_links[0].attrs['ic-post-to']))
     edit_page = client.get(edit_page.request.path)
     assert 'in die Zwischenablage kopiert' in edit_page
 
     # Paste the rule in the other room
     edit_page = client.get('/resource/room-2').click('Verfügbarkeitszeiträume')
-    paste_links = edit_page.html.find_all('a', string='Einfügen')  # type: ignore[call-overload]
-    client.post(paste_links[0].attrs['ic-post-to'])
+    paste_links = edit_page.html.find_all('a', string='Einfügen')
+    client.post(str(paste_links[0].attrs['ic-post-to']))
     edit_page = client.get(edit_page.request.path)
     assert 'wurde eingefügt' in edit_page
     assert count_allocations(1) == 2
