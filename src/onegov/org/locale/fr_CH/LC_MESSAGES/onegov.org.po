@@ -1994,6 +1994,9 @@ msgstr ""
 "Chaque fois qu'un client ajoute un message au ticket pour une réservation, "
 "une notification est envoyée au destinataire ci-dessus."
 
+msgid "Internal Comments"
+msgstr "Commentaires internes"
+
 msgid "Internal Notes"
 msgstr "Notes internes"
 

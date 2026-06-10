@@ -528,6 +528,9 @@ msgstr "Ricevi notifiche su nuovi elementi"
 msgid "Propose a new entry"
 msgstr "Proporre un nuovo elemento"
 
+msgid "Internal Comments"
+msgstr "Commenti interni"
+
 msgid "Internal Notes"
 msgstr "Note interne"
 
