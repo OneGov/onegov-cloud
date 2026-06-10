@@ -71,7 +71,6 @@ var setup_sortable_list = function(list_element) {
     var list = $(list_element);
     var start = null;
     var header_height = $('.nav-bar-sticky').outerHeight() || 0;
-    console.log('header height', header_height);
 
     var sortable = Sortable.create(list_element, {
         scroll: true,
