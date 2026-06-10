@@ -71,6 +71,7 @@ $.Redactor.opts.langs['fr'] = {
     align_justify: 'Justifier',
     horizontalrule: 'Ligne horizontale',
 	superscript: 'Exposant',
+    subscript: 'Indice',
     fullscreen: 'Plein écran',
     deleted: 'Supprimer',
     anchor: 'Ancre',

@@ -68,6 +68,7 @@ $.Redactor.opts.langs['it'] = {
 	align_justify: 'Giustifica il testo',
 	horizontalrule: 'Inserisci regola orizzontale',
 	superscript: 'Apice',
+	subscript: 'Pedice',
 	deleted: 'Eliminato',
 	anchor: 'Ancora',
 	link_new_tab: 'Apri il link in una nuova scheda',

@@ -71,6 +71,7 @@ $.Redactor.opts.langs['de'] = {
 	align_justify: 'Blocksatz',
 	horizontalrule: 'Horizontale Linie',
 	superscript: 'Hochgestellt',
+	subscript: 'Tiefgestellt',
 	fullscreen: 'Vollbild',
 	deleted: 'Durchgestrichen',
 	anchor: 'Anker',

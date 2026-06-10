@@ -3,6 +3,11 @@
     height: auto;
 }
 
-.re-superscript {
+.re-superscript,
+.re-subscript {
     font-family: $body-font-family !important;
+}
+
+sub {
+    vertical-align: sub !important;
 }

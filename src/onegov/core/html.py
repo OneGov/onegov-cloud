@@ -32,6 +32,7 @@ SANE_HTML_TAGS = [
     'pre',
     'strong',
     'sup',
+    'sub',
     'span',
     'ul',
     'h1',
