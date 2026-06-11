@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-05-26 13:48+0200\n"
+"POT-Creation-Date: 2026-06-11 10:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1435,11 +1435,18 @@ msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
 msgid "Describes what this page is about"
 msgstr "Décrit de quoi parle cette page"
 
+msgid "Keywords"
+msgstr "Mots-clés"
+
+msgid ""
+"Additional search terms and synonyms for this page. Helps visitors find this "
+"page even if they use different words."
+msgstr ""
+"Termes de recherche supplémentaires et synonymes pour cette page. Aide les "
+"visiteurs à trouver cette page même s'ils utilisent des mots différents."
+
 msgid "Show the lead if accessing the parent page"
 msgstr "Afficher l'introduction sur la page parent"
-
-msgid "(Redesign only)"
-msgstr "(Redesign uniquement)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
@@ -2028,6 +2035,13 @@ msgstr "Français"
 msgid "Italian"
 msgstr "Italien"
 
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
+"riches. La taille optimale est de 1200:630 px."
+
 msgid "Logo"
 msgstr "Logo"
 
@@ -2051,13 +2065,6 @@ msgstr "Icône 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icône SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
-"riches. La taille optimale est de 1200:630 px."
 
 msgid "Primary Color"
 msgstr "Couleur primaire"
@@ -5729,9 +5736,6 @@ msgstr ""
 "qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
 "située en haut."
 
-msgid "Back"
-msgstr "Retour"
-
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
 
@@ -6534,6 +6538,9 @@ msgstr "Un lien a été ajouté au presse-papiers"
 msgid "Administrative"
 msgstr "Administratif"
 
+#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
+#. well.
+#.
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "L'entrée ${name} existe deux fois"
@@ -8036,6 +8043,12 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Back"
+#~ msgstr "Retour"
+
+#~ msgid "(Redesign only)"
+#~ msgstr "(Redesign uniquement)"
 
 #~ msgid "RIS Settings"
 #~ msgstr "Paramètres RIS"

@@ -1,47 +1,36 @@
-$primary-color: #5a5a5a;
+$primary-color: #a4112e;
 $footer-height: 38px;
 
 /*
     Base colors
 */
-$black: #0f0f0f;
-$black-dark: #000;
-$black-light: #363738;
-$black-pastel: #dadada;
-$blue: #2575ed;
-$blue-dark: #1a52a5;
-$blue-light: #92baf6;
-$blue-pastel: #d3e3fb;
-$gray: #e0e3e5;
-$gray-dark: #b3b6b7;
-$gray-light: #f0f1f2;
+$black: #4b3d3f;
+$blue-dark: #474977;
+$blue-light: #5387e8;
+$gray: #f5f5f5;
+$gray-dark: #cacaca;
+$gray-light: #f5f5f5;
 $gray-pastel: #f0f0f0;
-$green: #2c9f42;
-$green-dark: #237f35;
-$green-light: #96cfa1;
+$green-dark: #3a5858;
+$green-light: #3eb762;
 $green-pastel: #d4ecd8;
-$orange: #ffb100;
-$orange-dark: #d59200;
-$red: #de2c3b;
+$orange: #f48a48;
 $red-dark: #b2232f;
-$red-light: #ef969d;
-$red-pastel: #f8d5d8;
 $white: #fff;
 $yellow: #ffc800;
 $yellow-dark: #cca000;
 $yellow-light: #ffe480;
 $yellow-pastel: #fff4cc;
 $gainsboro: #d4d4d4;
-$black: #333;
 
 /*
     Main colors
 */
-$secondary-color: $gray;
+$secondary-color: $black;
 $alert-color: $red-dark;
 $info-color: $blue-dark;
 $success-color: $green-dark;
-$warning-color: $orange-dark;
+$warning-color: $orange;
 
 /*
     Anchors
@@ -69,12 +58,12 @@ $label-radius: 1px;
 */
 $global-radius: 1px;
 
-$body-font-color: #333;
+$body-font-color: #4b3d3f;
 $bottom-links-color: #777;
 $bottom-links-size: .8rem;
 $crumb-bg: #fff;
 $crumb-border-size: 0;
-$f-dropdown-list-hover-bg: $gray;
+$f-dropdown-list-hover-bg: $gray-dark;
 $header-line-height: 1.25;
 $include-print-styles: false;
 $row-width: rem-calc(1050);
@@ -93,7 +82,7 @@ $thumb-box-shadow-hover: 0 0 0 2px rgba($black, .3);
 $top-bar-border-size: .3rem;
 $topbar-bg-color: $gray-pastel;
 $topbar-dropdown-bg: $gray-pastel;
-$topbar-link-bg-hover: $gray;
+$topbar-link-bg-hover: $gray-light;
 $topbar-link-color: #312f2e;
 $topbar-link-color-active: #312f2e;
 $topbar-link-color-active-hover: #312f2e;
@@ -124,8 +113,15 @@ $button-font-color: $primary-fg-color;
     $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -45%, $saturation: 10%);
 }
 
-
 /*
     Fonts
 */
-$font-family-sans-serif: "Apercu", Helvetica, Roboto, Arial, sans-serif !default;
+$font-family-sans-serif: "HK Grotesk", Helvetica, Roboto, Arial, sans-serif !default;
+
+/*
+    Full width rows
+*/
+.row.row-wide {
+    margin: 0;
+    max-width: 100%;
+}

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-05-26 13:48+0200\n"
+"POT-Creation-Date: 2026-06-11 10:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1435,11 +1435,18 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
+msgid "Keywords"
+msgstr "Schlagworte"
+
+msgid ""
+"Additional search terms and synonyms for this page. Helps visitors find this "
+"page even if they use different words."
+msgstr ""
+"Zusätzliche Suchbegriffe und Synonyme für diese Seite. Hilft Besuchern, "
+"diese Seite zu finden, auch wenn sie andere Wörter verwenden."
+
 msgid "Show the lead if accessing the parent page"
 msgstr "Zeige Einleitung auf übergeordneter Seite"
-
-msgid "(Redesign only)"
-msgstr "(verfügbar im Redesign)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
@@ -2027,6 +2034,13 @@ msgstr "Französisch"
 msgid "Italian"
 msgstr "Italienisch"
 
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
+"Grösse beträgt 1200:630px."
+
 msgid "Logo"
 msgstr "Logo"
 
@@ -2050,13 +2064,6 @@ msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icon SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
-"Grösse beträgt 1200:630px."
 
 msgid "Primary Color"
 msgstr "Primärfarbe"
@@ -5720,9 +5727,6 @@ msgstr ""
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
 
-msgid "Back"
-msgstr "Zurück"
-
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
@@ -6519,6 +6523,9 @@ msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 msgid "Administrative"
 msgstr "Administrativ"
 
+#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
+#. well.
+#.
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "Der Eintrag ${name} existiert zweimal"
@@ -8025,6 +8032,12 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Back"
+#~ msgstr "Zurück"
+
+#~ msgid "(Redesign only)"
+#~ msgstr "(verfügbar im Redesign)"
 
 #~ msgid "RIS Settings"
 #~ msgstr "Ratsinformationssystem"

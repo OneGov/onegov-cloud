@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 log_level = "INFO"
+redis_timeout = 60
 testpaths = ["tests"]
 python_classes = []
 python_files = ["test_*.py"]
@@ -11,19 +12,20 @@ timeout = 300
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     '''ignore:pkg_resources is deprecated as an API''',
-    '''ignore:Deprecated call to `pkg_resources\.declare_namespace\('.*'\):DeprecationWarning''',
+    '''ignore:Deprecated call to `pkg_resources\.declare_namespace\('.*'\):DeprecationWarning:(fs|pkg_resources).*''',
+    '''ignore:Call to deprecated setex:DeprecationWarning:dogpile.*''',
     # potential issue for future upgrades
     # unfortunately it's not possible to filter escape sequence warnings in
     # specific modules, but we should be covered by Ruff for our own code
     '''ignore:"[^"]+" is an invalid escape sequence:::''',
+    # FIXME: OGC-2659
     '''ignore:'crypt':DeprecationWarning:passlib.*:''',
     # Until pysaml2 is compatible with newer versions of xmlschema
     # we are stuck with this DeprecationWarning
     # See: https://github.com/IdentityPython/pysaml2/issues/947
     '''ignore:pathlib\.PurePath\.as_uri\(\) is deprecated:DeprecationWarning:xmlschema.*:''',
-    # See: https://github.com/amol-/depot/issues/90
-    '''ignore:datetime\.datetime\.utcnow\(\) is deprecated:DeprecationWarning:depot.*:''',
     # fixed upstream
+    '''ignore:datetime\.datetime\.utcnow\(\) is deprecated:DeprecationWarning:depot.*:''',
     '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:ldap3.*:''',
 ]
 
@@ -57,15 +59,13 @@ strict = true
 implicit_reexport = true
 warn_unreachable = true
 warn_return_any = false
-untyped_calls_exclude = "icalendar,pycurl,selenium.webdriver.chrome.webdriver"
+untyped_calls_exclude = "icalendar"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available
 module = [
-    # FIXME: Do we really need this? We have this implemented ourselves
-    #        in OCQMS, so we could just copy that code over... plus the
-    #        standard lib technically supports some ISO-8601 formats as well
+    # FIXME: Remove after https://github.com/gweis/isodate/issues/100
     "isodate.*",
     # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",

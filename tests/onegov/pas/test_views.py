@@ -1017,6 +1017,109 @@ def test_commission_president_bulk_add(
     assert page.status_code == 200
 
 
+def test_abschluss_blocks_second_bulk_add(
+    client: Client[TestPasApp],
+) -> None:
+    from onegov.pas.models import Attendence
+
+    session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='Q1 2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            active=True,
+            closed=False,
+        )
+    )
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    bob = parliamentarians.add(
+        first_name='Bob',
+        last_name='Member',
+        email_primary='bob.member@example.org',
+        zg_username='zgbob',
+    )
+    alice = parliamentarians.add(
+        first_name='Alice',
+        last_name='President',
+        email_primary='alice.president@example.org',
+        zg_username='zgalice',
+    )
+
+    for p in (bob, alice):
+        session.add(
+            PASParliamentarianRole(
+                parliamentarian_id=p.id,
+                role='member',
+                meta={'org_type': 'Kantonsrat'},
+            )
+        )
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Finanzkommission')
+
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=bob.id,
+            commission_id=commission.id,
+            role='member',
+        )
+    )
+    session.add(
+        PASCommissionMembership(
+            parliamentarian_id=alice.id,
+            commission_id=commission.id,
+            role='president',
+        )
+    )
+
+    commission_id = str(commission.id)
+    bob_id = str(bob.id)
+    alice_id = str(alice.id)
+
+    users = UserCollection(session)
+    president_user = users.by_username('zgalice')
+    assert president_user is not None
+    president_user.role = 'commission_president'
+    president_user.password = 'test'
+    president_user.active = True
+    transaction.commit()
+
+    client.login('zgalice', 'test')
+
+    page = client.get('/attendences/new-commission-bulk')
+    assert page.status_code == 200
+    page.form['date'] = '2024-06-01'
+    page.form['type'] = 'commission'
+    page.form['duration'] = '2'
+    page.form['commission_id'] = commission_id
+    page.form['abschluss'] = True
+    page.form['parliamentarian_id'] = [bob_id, alice_id]
+    page = page.form.submit().maybe_follow()
+    assert page.status_code == 200
+
+    session = client.app.session()
+    count_after_first = session.query(Attendence).count()
+    assert count_after_first == 2
+
+    page = client.get('/attendences/new-commission-bulk')
+    assert page.status_code == 200
+    page.form['date'] = '2024-07-15'
+    page.form['type'] = 'commission'
+    page.form['duration'] = '3'
+    page.form['commission_id'] = commission_id
+    page.form['abschluss'] = False
+    page.form['parliamentarian_id'] = [bob_id, alice_id]
+    page = page.form.submit()
+
+    assert 'abschluss' in page.text.lower()
+
+    session = client.app.session()
+    count_after_second = session.query(Attendence).count()
+    assert count_after_second == 2
+
+
 def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     client.login_admin()
 
@@ -1203,7 +1306,6 @@ def test_abschluss_email_uses_commission_name(
     email = client.get_email(0)
     assert email['Subject'] == ('PAS: Abschluss gesetzt für Finanzkommission')
     assert 'Finanzkommission' in email['HtmlBody']
-    assert 'Max Muster' in email['HtmlBody']
 
 
 def test_parliamentarian_pdf_zip_download(

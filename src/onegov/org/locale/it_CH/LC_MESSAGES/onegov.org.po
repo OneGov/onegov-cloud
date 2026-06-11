@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-05-26 13:48+0200\n"
+"POT-Creation-Date: 2026-06-11 10:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1438,11 +1438,18 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Descrive il contenuto di questa pagina"
 
+msgid "Keywords"
+msgstr "Parole chiave"
+
+msgid ""
+"Additional search terms and synonyms for this page. Helps visitors find this "
+"page even if they use different words."
+msgstr ""
+"Termini di ricerca aggiuntivi e sinonimi per questa pagina. Aiuta i "
+"visitatori a trovare questa pagina anche se usano parole diverse."
+
 msgid "Show the lead if accessing the parent page"
 msgstr "Mostra l'estratto se accedi alla pagina principale"
-
-msgid "(Redesign only)"
-msgstr "(Solo riprogettazione)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
@@ -2028,6 +2035,13 @@ msgstr "Francese"
 msgid "Italian"
 msgstr "Italiano"
 
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Immagine di anteprima dei social media predefinita per le anteprime dei "
+"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
+
 msgid "Logo"
 msgstr "Logo"
 
@@ -2051,13 +2065,6 @@ msgstr "Icona 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icona SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Immagine di anteprima dei social media predefinita per le anteprime dei "
-"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
 
 msgid "Primary Color"
 msgstr "Colore primario"
@@ -5703,9 +5710,6 @@ msgstr ""
 "controllare l'URL per eventuali errori o utilizza la casella di ricerca in "
 "alto."
 
-msgid "Back"
-msgstr "Indietro"
-
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
 
@@ -6500,6 +6504,9 @@ msgstr "È stato aggiunto un collegamento agli appunti"
 msgid "Administrative"
 msgstr "Administrativo"
 
+#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
+#. well.
+#.
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "L'elemento ${name} è duplicato"
@@ -7995,6 +8002,12 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Back"
+#~ msgstr "Indietro"
+
+#~ msgid "(Redesign only)"
+#~ msgstr "(Solo riprogettazione)"
 
 #~ msgid "RIS Settings"
 #~ msgstr "Impostazioni RIS"

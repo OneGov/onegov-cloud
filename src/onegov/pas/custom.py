@@ -267,9 +267,6 @@ def notify_admins_finalized(
     if not admin_emails:
         return
 
-    parliamentarian_name = (
-        attendence.parliamentarian.title if attendence.parliamentarian else ''
-    )
     commission_name = (
         attendence.commission.title if attendence.commission else ''
     )
@@ -283,29 +280,20 @@ def notify_admins_finalized(
         .first()
     )
     settlement_run_name = settlement_run.name if settlement_run else ''
-    settlement_run_start = (
-        settlement_run.start if settlement_run else None
-    )
-    settlement_run_end = (
-        settlement_run.end if settlement_run else None
-    )
     send_transactional_html_mail(
         request=request,
         template='mail_abschluss_notification.pt',
         subject=_(
             'PAS: Abschluss set for ${name}',
-            mapping={'name': commission_name or parliamentarian_name},
+            mapping={'name': commission_name},
         ),
         receivers=admin_emails,
         content={
             'model': attendence,
             'title': request.translate(_('Abschluss Notification')),
-            'parliamentarian_name': parliamentarian_name,
             'commission_name': commission_name,
-            'attendance_date': attendence.date,
+            'attendance_created': attendence.created,
             'user_name': user_name,
             'settlement_run_name': settlement_run_name,
-            'settlement_run_start': settlement_run_start,
-            'settlement_run_end': settlement_run_end,
         },
     )
