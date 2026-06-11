@@ -19,10 +19,10 @@ def msgpack_deserialize(value: bytes | NoValue) -> Any:
 
     try:
         return msgpack.unpackb(value)
-    except Exception:
+    except Exception as ex:
         # treat stale/incompatible cached data as a cache miss so the
         # value is recomputed (e.g. after a schema change adds new keys)
-        raise CantDeserializeException()
+        raise CantDeserializeException() from ex
 
 
 class RedisCacheRegion(CacheRegion):
