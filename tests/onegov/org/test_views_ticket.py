@@ -826,7 +826,7 @@ def test_disable_tickets(client: Client) -> None:
     manage = client.get('/usergroups/new')
     manage.form['name'] = 'Group'
     manage.form['users'].select_multiple(texts=['admin@example.org'])
-    manage.form['ticket_permissions'].select_multiple(texts=['FRM'])
+    manage.form['ticket_permissions'].select_multiple(value=['FRM'])
     manage = manage.form.submit()
 
     client.logout()
