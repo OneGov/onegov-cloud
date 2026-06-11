@@ -9,6 +9,7 @@ from onegov.file import FileCollection
 from onegov.org.models import Topic
 from onegov.page import Page, PageCollection
 from sedate import utcnow
+from webtest.forms import Textarea
 from tests.onegov.org.common import edit_bar_links
 from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
 from tests.shared.utils import (get_meta, create_image,
@@ -710,3 +711,42 @@ def test_add_iframe(client: Client) -> None:
     page.form['url'] = "https://www.organisation.org/success-stories/"
     page = page.form.submit()
     assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page
+
+
+def test_pages_internal_notes_extension(client: Client) -> None:
+    client.login_admin()
+
+    root_topic = client.get('/').pyquery('.top-bar-section a').attr('href')
+    root_page = client.get(root_topic)
+
+    new_page = root_page.click('Thema')
+    new_page.form['title'] = 'Topic With Notes'
+    new_page.form['lead'] = 'Some lead'
+    new_page.form['text'] = '<p>Some text</p>'
+    page = new_page.form.submit().follow()
+
+    edit_page = page.click('Bearbeiten')
+    assert 'name="internal_notes"' in edit_page.text
+
+    # WebTest doesn't parse internal_notes from rendered HTML;
+    # inject manually so it's included in POST
+
+    field = Textarea(edit_page.form, 'textarea', 'internal_notes', 0, '')
+    edit_page.form.fields['internal_notes'] = [field]
+    edit_page.form.field_order.append(('internal_notes', field))
+    edit_page.form['internal_notes'] = 'Secret background info'
+    page = edit_page.form.submit().follow()
+
+    page = client.get(page.request.url)
+    assert 'Secret background info' in page
+
+    anon = client.spawn()
+    anon_page = anon.get(page.request.url)
+    assert 'Secret background info' not in anon_page
+    assert 'Internes Kommentarfeld' not in anon_page
+
+    editor = client.spawn()
+    editor.login_editor()
+    editor_page = editor.get(page.request.url)
+    assert 'Secret background info' in editor_page
+    assert 'Internes Kommentarfeld' in editor_page

@@ -1994,6 +1994,9 @@ msgstr ""
 "Chaque fois qu'un client ajoute un message au ticket pour une réservation, "
 "une notification est envoyée au destinataire ci-dessus."
 
+msgid "Internal Comments"
+msgstr "Commentaires internes"
+
 msgid "Internal Notes"
 msgstr "Notes internes"
 
@@ -6535,13 +6538,6 @@ msgstr "Un lien a été ajouté au presse-papiers"
 msgid "Administrative"
 msgstr "Administratif"
 
-#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
-#. well.
-#.
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "L'entrée ${name} existe deux fois"
-
 msgid "Added a new directory"
 msgstr "Ajout d'un nouveau dossier"
 
@@ -8049,6 +8045,10 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
 #~ msgid "The following reservations were rejected"
 #~ msgstr "Les réservations suivantes ont été rejetées"
+
+#, python-format
+#~ msgid "The entry ${name} exists twice"
+#~ msgstr "L'entrée ${name} existe deux fois"
 
 #~ msgid "(Redesign only)"
 #~ msgstr "(Redesign uniquement)"

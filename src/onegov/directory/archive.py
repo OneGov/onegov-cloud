@@ -261,13 +261,15 @@ class DirectoryArchiveReader:
                 if name in existing:
                     continue
 
-                existing.add(name)
             try:
                 entry = directory.add(values)
             except KeyError as exception:
                 raise MissingColumnError(
                     column=exception.args[0]
                 ) from exception
+
+            if skip_existing:
+                existing.add(entry.name)
 
             names = (
                 ('latitude', 'longitude'),

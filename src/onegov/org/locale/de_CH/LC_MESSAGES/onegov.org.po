@@ -1992,6 +1992,9 @@ msgstr ""
 "Reservierung hinzufügt, wird eine eine Benachrichtigung an den oben "
 "genannten Empfänger gesendet."
 
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
+
 msgid "Internal Notes"
 msgstr "Interne Notizen"
 
@@ -6520,13 +6523,6 @@ msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 msgid "Administrative"
 msgstr "Administrativ"
 
-#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
-#. well.
-#.
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "Der Eintrag ${name} existiert zweimal"
-
 msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 
@@ -8038,6 +8034,10 @@ msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
 #~ msgid "The following reservations were rejected"
 #~ msgstr "Die folgenden Reservationen wurden abgelehnt"
+
+#, python-format
+#~ msgid "The entry ${name} exists twice"
+#~ msgstr "Der Eintrag ${name} existiert zweimal"
 
 #~ msgid "(Redesign only)"
 #~ msgstr "(verfügbar im Redesign)"

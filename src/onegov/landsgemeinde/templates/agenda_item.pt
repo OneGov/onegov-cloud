@@ -23,6 +23,8 @@
                     <tal:block tal:content="agenda_item.resolution">
                     <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
                 </div>
+                <br>
+                <h2 tal:condition="agenda_item.vota" i18n:translate="">Motions / Vota</h2>
                 <div class="agenda-item-vota">
                     <tal:block tal:repeat="votum agenda_item.vota" metal:use-macro="layout.macros['votum']" />
                 </div>

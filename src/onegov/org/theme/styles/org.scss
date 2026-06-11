@@ -688,6 +688,25 @@ $footer-border-width: 0;
     }
 }
 
+.internal-notes {
+    background: $gray-pastel;
+    border-left: 3px solid $blue-dark;
+    border-radius: 2px;
+    font-size: .875rem;
+    margin-bottom: 1.5rem;
+    padding: .75rem 1rem;
+
+    strong {
+        color: $blue-dark;
+        display: block;
+        margin-bottom: .25rem;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+}
+
 /*
     top navigation
 */

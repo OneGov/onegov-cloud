@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-25 09:27+0100\n"
+"POT-Creation-Date: 2026-06-09 12:54+0200\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -168,6 +168,18 @@ msgstr ""
 msgid "The form could not be parsed."
 msgstr "Il modulo non può essere analizzato."
 
+#, python-format
+msgid ""
+"The field '{label}' has no type defined. For example use '___' for a text "
+"field."
+msgstr ""
+"Il campo '{label}' non ha un tipo definito. Ad esempio, usa '___' per un "
+"campo di testo."
+
+#, python-format
+msgid "The field '{label}' cannot mix radio buttons and checkboxes."
+msgstr "Il campo '{label}' non può combinare pulsanti radio e caselle di controllo."
+
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
 msgstr "Definisci almeno un campo e-mail obbligatorio ('E-Mail * = @@@')"
 
@@ -238,8 +250,7 @@ msgstr ""
 "aggiungere campi."
 
 #, python-format
-msgid ""
-"Nested fieldsets (`#`) are not supported, please remove line {line}."
+msgid "Nested fieldsets (`#`) are not supported, please remove line {line}."
 msgstr ""
 "I fieldset annidati (`#`) non sono supportati, si prega di rimuovere la riga "
 "{line}."
