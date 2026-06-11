@@ -5,7 +5,6 @@ import morepath
 from itsdangerous import URLSafeSerializer, BadData
 from itsdangerous.encoding import base64_encode, base64_decode
 from secrets import token_bytes
-from uuid import UUID
 from onegov.core.utils import relative_url
 from onegov.user import log
 from onegov.user.auth.second_factor import SECOND_FACTORS
@@ -287,7 +286,7 @@ class Auth:
         if uid is None:
             return None
 
-        return self.users.by_id(UUID(uid))
+        return self.users.by_id(uid)
 
     def login_to(
         self,
