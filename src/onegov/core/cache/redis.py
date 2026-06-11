@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dogpile.cache import CacheRegion
+from dogpile.cache.api import CantDeserializeException
 from dogpile.cache.api import NO_VALUE
 from functools import lru_cache
 from onegov.core.custom import msgpack
@@ -16,7 +17,12 @@ def msgpack_deserialize(value: bytes | NoValue) -> Any:
     if value is NO_VALUE:
         return value
 
-    return msgpack.unpackb(value)
+    try:
+        return msgpack.unpackb(value)
+    except Exception:
+        # treat stale/incompatible cached data as a cache miss so the
+        # value is recomputed (e.g. after a schema change adds new keys)
+        raise CantDeserializeException()
 
 
 class RedisCacheRegion(CacheRegion):
@@ -25,7 +31,7 @@ class RedisCacheRegion(CacheRegion):
     on a given namespace as well as a couple of additional convenience
     methods specific to Redis.
 
-    It will use dill to serialize/deserialize values.
+    It will use msgpack to serialize/deserialize values.
     """
     def __init__(
         self,
