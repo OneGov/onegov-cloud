@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pdfrw import PdfReader  # type:ignore[import-untyped]
+from pdfrw import PdfReader  # type:ignore[attr-defined]
 from pdfrw.buildxobj import pagexobj  # type:ignore[import-untyped]
 from pdfrw.toreportlab import makerl  # type:ignore[import-untyped]
 from reportlab.platypus import Flowable
