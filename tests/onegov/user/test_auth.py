@@ -66,6 +66,22 @@ def test_auth_login(session: Session) -> None:
     assert identity.application_id == 'my-app'
 
 
+def test_by_identity(session: Session) -> None:
+    user = UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
+    session.flush()
+    auth = Auth(DummyApp(session))  # type: ignore[arg-type]
+
+    identity = auth.as_identity(user)
+    # uid is stored as a hex string in the identity; by_identity must coerce it
+    assert isinstance(identity.uid, str)
+    assert auth.by_identity(identity) == user
+
+    # NoIdentity / missing uid returns None without hitting the database
+    from onegov.core.utils import Bunch
+    assert auth.by_identity(Bunch(uid=None, userid=None)) is None  # type: ignore[arg-type]
+    assert auth.by_identity(Bunch(userid=None)) is None  # type: ignore[arg-type]
+
+
 def test_auth_login_inactive(session: Session) -> None:
     user = UserCollection(session).add(
         'AzureDiamond', 'hunter2', 'irc-user', active=False)
