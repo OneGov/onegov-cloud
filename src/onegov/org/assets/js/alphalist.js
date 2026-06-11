@@ -1,12 +1,15 @@
 (function($) {
     $.Redactor.prototype.alphalist = function() {
         return {
+
             init: function() {
                 var self = this;
+
                 var button = this.button.addAfter('orderedlist', 'alphalist', this.lang.get('alphalist'));
                 if (!button || !button.length) {
                     button = this.button.add('alphalist', this.lang.get('alphalist'));
                 }
+
                 self.$alphalistButton = button;
 
                 button.on('click', function(e) {
@@ -19,31 +22,47 @@
                 });
             },
 
-            // isAlphaList: function() {
-            //     var current = this.selection.getBlock();
-            //     if (!current) return false;
-            //     var parent = current.parentNode;
-            //     return $(parent).is('ol.alpha-list');
-            // },
+            isAlphaList: function() {
+                var current = this.selection.getBlock();
+                if (!current) return false;
+                var parent = current.parentNode;
+                return $(parent).is('ol.alpha-list');
+            },
 
-            // updateButtonState: function() {
-            //     if (this.alphalist.isAlphaList.call(this)) {
-            //         this.$alphalistButton.addClass('redactor-act');
-            //     } else {
-            //         this.$alphalistButton.removeClass('redactor-act');
-            //     }
+            updateButtonState: function() {
+                if (this.alphalist.isAlphaList.call(this)) {
+                    this.$alphalistButton.addClass('redactor-act');
+                } else {
+                    this.$alphalistButton.removeClass('redactor-act');
+                }
 
-            //     var $olButton = this.button.get('orderedlist');
-            //     if ($olButton) {
-            //         if (this.alphalist.isAlphaList.call(this)) {
-            //             $olButton.removeClass('redactor-act');
-            //         }
-            //     }
-            // },
+                var $olButton = this.button.get('orderedlist');
+                if ($olButton) {
+                    if (this.alphalist.isAlphaList.call(this)) {
+                        $olButton.removeClass('redactor-act');
+                    }
+                }
+            },
+
+            focusEnd: function($element) {
+                var $target = $element.is('ol, ul') ? $element.find('li').last() : $element;
+                if (!$target.length) return;
+                var range = document.createRange();
+                var sel = window.getSelection();
+                range.selectNodeContents($target[0]);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                this.alphalist.updateButtonState.call(this);
+            },
 
             toggle: function() {
                 var current = this.selection.getBlock();
                 if (!current) return;
+
+                var $editor = $(this.$editor);
+                var selection = this.selection.get();
+                var selectedBlocks = [];
                 var parent = current.parentNode;
 
                 if ($(parent).hasClass('alpha-list')) {
@@ -54,8 +73,10 @@
                         blocks.push($('<p>').html($(this).html()));
                     });
                     $ol.replaceWith(blocks);
+                    
                     this.$alphalistButton.removeClass('redactor-act');
-                    this.focus.set();
+
+                    this.alphalist.focusEnd.call(this, $(blocks[blocks.length - 1]));
                     return;
                 }
 
@@ -64,14 +85,11 @@
                         var $newOl = $('<ol>').addClass('alpha-list').html($(parent).html());
                         $(parent).replaceWith($newOl);
                     }
+
+                    this.alphalist.focusEnd.call(this, $newOl);
                     this.alphalist.updateButtonState.call(this);
-                    this.focus.set();
                     return;
                 }
-
-                var $editor = $(this.$editor);
-                var selection = this.selection.get();
-                var selectedBlocks = [];
 
                 if (selection && !selection.isCollapsed) {
                     var range = selection.getRangeAt(0);
@@ -96,6 +114,7 @@
                 for (var i = 1; i < selectedBlocks.length; i++) {
                     $(selectedBlocks[i]).remove();
                 }
+                this.alphalist.focusEnd.call(this, $ol);
 
                 this.$alphalistButton.addClass('redactor-act');
                 this.alphalist.updateButtonState.call(this);
