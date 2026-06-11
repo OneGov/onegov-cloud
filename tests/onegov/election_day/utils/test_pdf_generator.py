@@ -5,7 +5,7 @@ from datetime import timedelta
 from onegov.election_day.models import BallotResult
 from onegov.election_day.models import Vote
 from onegov.election_day.utils.pdf_generator import PdfGenerator
-from pdfrw import PdfReader  # type: ignore[import-untyped]
+from pdfrw import PdfReader  # type: ignore
 from tests.onegov.election_day.common import DummyRequest
 from tests.onegov.election_day.utils.common import add_election_compound
 from tests.onegov.election_day.utils.common import add_majorz_election
