@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import re
-import pytest
 import transaction
 
 from datetime import timedelta, datetime
@@ -12,7 +11,6 @@ from onegov.file import FileCollection
 from onegov.directory import (
     Directory, DirectoryEntry, DirectoryCollection,
     DirectoryConfiguration, DirectoryZipArchive)
-from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
@@ -309,7 +307,7 @@ def test_directory_change_requests(client: Client) -> None:
 
     # create a directory that accepts change requests
     page = client.get('/directories').click('^Verzeichnis$')
-    page.form['title'] = "Playgrounds"
+    page.form['title'] = 'Playgrounds'
     page.form['structure'] = """
         Name *= ___
         Pic *= *.jpg|*.png|*.gif
@@ -514,19 +512,6 @@ def test_directory_submissions(
 
     page = client.get(ticket_url)
     assert 'Washington' in client.get('/directories/points-of-interest')
-
-    # another way this can fail is with duplicate entries of the same name
-    postgres.undo(pop=False)
-    page = client.get('/directories/points-of-interest').click(
-        'Eintrag', index=0)
-
-    page.form['name'] = 'Washington Monument'
-    page.form.submit()
-
-    client.post(accept_url)
-
-    page = client.get(ticket_url)
-    assert "Ein Eintrag mit diesem Namen existiert bereits" in page
 
     # less severe structural changes are automatically applied
     postgres.undo(pop=False)
@@ -820,17 +805,15 @@ def test_add_directory_entries_with_duplicate_names(client: Client) -> None:
 
     page = client.get('/directories/playgrounds').click("^Eintrag$")
     page.form['name'] = duplicate_name
-    page.form.submit()
+    page = page.form.submit()
+    assert (URL(page.location).path() ==
+            f'/directories/playgrounds/{duplicate_name}')
 
-    client.get('/directories/playgrounds').click("^Eintrag$")
+    page = client.get('/directories/playgrounds').click("^Eintrag$")
     page.form['name'] = duplicate_name
-    try:
-        page = page.form.submit().follow()
-        assert f'Der Eintrag {duplicate_name} existiert zweimal' in page
-    except DuplicateEntryError:
-        pytest.fail(
-            "DuplicateEntryError not handled upon inserting duplicate "
-            "entries in /directories")
+    page = page.form.submit()
+    assert (URL(page.location).path() ==
+            f'/directories/playgrounds/{duplicate_name}-1')
 
 
 def test_directory_numbering(client: Client) -> None:

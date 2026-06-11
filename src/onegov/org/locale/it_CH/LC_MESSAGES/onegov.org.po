@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-06-01 12:55+0200\n"
+"POT-Creation-Date: 2026-06-09 08:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -6507,13 +6507,6 @@ msgstr "È stato aggiunto un collegamento agli appunti"
 msgid "Administrative"
 msgstr "Administrativo"
 
-#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
-#. well.
-#.
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "L'elemento ${name} è duplicato"
-
 msgid "Added a new directory"
 msgstr "Aggiunta una nuova cartella"
 
@@ -8005,6 +7998,10 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#, python-format
+#~ msgid "The entry ${name} exists twice"
+#~ msgstr "L'elemento ${name} è duplicato"
 
 #~ msgid "(Redesign only)"
 #~ msgstr "(Solo riprogettazione)"
