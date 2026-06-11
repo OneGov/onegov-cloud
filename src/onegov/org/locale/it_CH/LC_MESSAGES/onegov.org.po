@@ -1438,6 +1438,16 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Descrive il contenuto di questa pagina"
 
+msgid "Keywords"
+msgstr "Parole chiave"
+
+msgid ""
+"Additional search terms and synonyms for this page. Helps visitors find this "
+"page even if they use different words."
+msgstr ""
+"Termini di ricerca aggiuntivi e sinonimi per questa pagina. Aiuta i "
+"visitatori a trovare questa pagina anche se usano parole diverse."
+
 msgid "Show the lead if accessing the parent page"
 msgstr "Mostra l'estratto se accedi alla pagina principale"
 
@@ -1983,6 +1993,9 @@ msgid ""
 msgstr ""
 "Ogni volta che un cliente aggiunge un messaggio al ticket di una "
 "prenotazione, viene inviata una notifica al destinatario sopra indicato."
+
+msgid "Internal Comments"
+msgstr "Commenti interni"
 
 msgid "Internal Notes"
 msgstr "Note interne"

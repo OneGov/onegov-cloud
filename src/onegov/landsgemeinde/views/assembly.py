@@ -136,6 +136,12 @@ def view_assembly_ticker(
         .preloaded_by_assembly(self).all()
     )
 
+    # FIXME: For some reason we need there to be a session cookie
+    #        in order for the ticker to work correctly, which does
+    #        not really make much sense, since we don't need the
+    #        browser session for the ticker...
+    request.browser_session.mark_as_dirty()
+
     return {
         'layout': layout,
         'assembly': self,

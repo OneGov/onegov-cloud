@@ -1123,6 +1123,7 @@ class SidebarContactLinkExtension(ContentExtension):
                     self.contact_errors = {}
 
             def on_request(self) -> None:
+                super().on_request()
                 if not self.sidepanel_contact.data:
                     self.sidepanel_contact.data = self.contact_links_to_json(
                         None)
@@ -1217,6 +1218,30 @@ class DeletableContentExtension(ContentExtension):
             )
 
         return DeletableContentForm
+
+
+class InternalNotesExtension(ContentExtension):
+
+    internal_notes: dict_property[str | None] = content_property()
+
+    def extend_form[T: Form](
+        self, form_class: type[T], request: OrgRequest
+    ) -> type[T]:
+
+        class InternalNotesForm(form_class):  # type:ignore
+            internal_notes = TextAreaField(
+                label=_('Internal Comments'),
+                fieldset=_('Administrative'),
+                render_kw={'rows': 7},
+            )
+
+            def on_request(self) -> None:
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
+                if not self.request.is_manager:
+                    self.delete_field('internal_notes')
+
+        return InternalNotesForm
 
 
 class InlinePhotoAlbumExtension(ContentExtension):

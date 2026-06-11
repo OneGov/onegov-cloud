@@ -203,7 +203,6 @@ h1.main-title small {
 
 .ticker-item {
     h2 {
-        border-top: 3px solid $smoke;
         padding-top: 2rem;
     }
 
@@ -213,6 +212,10 @@ h1.main-title small {
 
     .ticker-info {
         position: relative;
+
+        h2 {
+            border-top: 3px solid $smoke;
+        }
 
         .agenda-item-timestamp {
             background-color: $smoke;

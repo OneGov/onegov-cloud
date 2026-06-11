@@ -937,6 +937,9 @@ def import_contract_numbers_cli(
             'kantonsgericht',
             'verkehrsabteilung_staatsanwaltschaft',
             'jugendanwaltschaft',
+            'ombudsstelle',
+            'friedensrichteramt',
+            'schlichtungsstelle_mietsachen',
         ]
     ),
     help='New finanzstelle key',

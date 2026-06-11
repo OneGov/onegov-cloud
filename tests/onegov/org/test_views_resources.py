@@ -4157,15 +4157,15 @@ def test_allocation_rules_copy_paste(client: Client) -> None:
 
     # Copy the rule
     edit_page = client.get('/resource/room-1').click('Verfügbarkeitszeiträume')
-    copy_links = edit_page.html.find_all('a', string='Kopieren')  # type: ignore[call-overload]
-    client.post(copy_links[0].attrs['ic-post-to'])
+    copy_links = edit_page.html.find_all('a', string='Kopieren')
+    client.post(str(copy_links[0].attrs['ic-post-to']))
     edit_page = client.get(edit_page.request.path)
     assert 'in die Zwischenablage kopiert' in edit_page
 
     # Paste the rule in the other room
     edit_page = client.get('/resource/room-2').click('Verfügbarkeitszeiträume')
-    paste_links = edit_page.html.find_all('a', string='Einfügen')  # type: ignore[call-overload]
-    client.post(paste_links[0].attrs['ic-post-to'])
+    paste_links = edit_page.html.find_all('a', string='Einfügen')
+    client.post(str(paste_links[0].attrs['ic-post-to']))
     edit_page = client.get(edit_page.request.path)
     assert 'wurde eingefügt' in edit_page
     assert count_allocations(1) == 2
@@ -4661,3 +4661,39 @@ def test_my_reservations_view(client: Client) -> None:
     # but not the other views
     client2.get('/resources/my-reservations-json', status=403)
     client2.get('/resources/my-reservations-pdf', status=403)
+
+
+@pytest.mark.parametrize('frozen_at,expected_status', [
+    ('2026-05-29 11:59:59', 200),   # just before 2-hour expiry: proceeds
+    ('2026-05-29 12:00:01', 403),   # just after 2-hour expiry → session
+    # cleaned up
+])
+def test_reserve_form_session_expiry(
+    client: Client,
+    frozen_at: str,
+    expected_status: int,
+) -> None:
+    # Regression: expired-session cleanup must run before bound_reservations.
+    # Old placement (after bound_reservations) detached the reservation; the
+    # template then crashed accessing info.price on the detached object.
+    with freeze_time('2026-05-29 10:00:00'):
+        resources = ResourceCollection(client.app.libres_context)
+        resource = resources.by_name('tageskarte')
+        assert resource is not None
+        scheduler = resource.get_scheduler(client.app.libres_context)
+
+        allocations = scheduler.allocate(
+            dates=(datetime(2026, 5, 29), datetime(2026, 5, 29)),
+            whole_day=True,
+        )
+
+        reserve = client.bound_reserve(allocations[0])
+        transaction.commit()
+
+        assert reserve(whole_day=True).json == {'success': True}
+
+        formular = client.get('/resource/tageskarte/form')
+        formular.form['email'] = 'info@example.org'
+
+    with freeze_time(frozen_at):
+        formular.form.submit(status=expected_status)

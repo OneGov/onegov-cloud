@@ -237,6 +237,18 @@ ASSIGNMENT_LOCATIONS: dict[str, LocationMapping] = {
         'Spitäler Schaffhausen Einvernahme Polizei',
         'Geissbergstrasse 81, 8208 Schaffhausen'
     ),
+    'ombudsstelle': (
+        'Ombudsstelle',
+        'Sporrengasse 1, 8200 Schaffhausen'
+    ),
+    'friedensrichteramt': (
+        'Friedensrichteramt',
+        'Vordergasse 54, 8200 Schaffhausen'
+    ),
+    'schlichtungsstelle_mietsachen': (
+        'Schlichtungsstelle für Mietsachen',
+        'Herrenacker 26, 8200 Schaffhausen'
+    ),
 }
 
 
@@ -296,5 +308,26 @@ FINANZSTELLE: dict[str, Finanzstelle] = {
         zip_code='8200',
         city='Schaffhausen',
         kostenstelle='2466',
+    ),
+    'ombudsstelle': Finanzstelle(
+        name='Ombudsstelle',
+        street='Sporrengasse 1',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='1000',
+    ),
+    'friedensrichteramt': Finanzstelle(
+        name='Friedensrichteramt',
+        street='Vordergasse 54',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='3032',
+    ),
+    'schlichtungsstelle_mietsachen': Finanzstelle(
+        name='Schlichtungsstelle für Mietsachen',
+        street='Herrenacker 26',
+        zip_code='8200',
+        city='Schaffhausen',
+        kostenstelle='3035',
     ),
 }
