@@ -12,7 +12,7 @@ from onegov.pdf import page_fn_header_logo_and_footer
 from onegov.pdf import Pdf
 from onegov.pdf.utils import extract_pdf_info
 from pdfdocument.document import MarkupParagraph
-from pdfrw import PdfReader  # type: ignore[attr-defined]
+from pdfrw import PdfReader  # type: ignore[import-untyped]
 from pytest import mark
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
