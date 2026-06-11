@@ -10,7 +10,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
-from onegov.directory.errors import DuplicateEntryError, ValidationError
+from onegov.directory.errors import ValidationError
 from onegov.file import File
 from wtforms.validators import ValidationError as WtfValidationError
 
@@ -734,16 +734,24 @@ def test_add_duplicate_entry(session: Session) -> None:
         title="Foos",
         structure="Name *= ___",
         configuration=DirectoryConfiguration(
-            title='Name',
+            title='Foobar',
             order=['Name'],
         )
     )
 
     foos.add(values=dict(name='foobar'))
     session.flush()
+    foos.add(values=dict(name='foobar'))
+    session.flush()
+    foos.add(values=dict(name='foobar'))
+    session.flush()
 
-    with pytest.raises(DuplicateEntryError):
-        foos.add(values=dict(name='foobar'))
+    # test collection entry names
+    assert sorted(d.name for d in foos.entries) == [
+        'foobar',
+        'foobar-1',
+        'foobar-2',
+    ]
 
 
 def test_custom_order(session: Session) -> None:
