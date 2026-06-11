@@ -429,3 +429,51 @@ def fetch_users(
 
     if dry_run:
         transaction.abort()
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[FsiRequest, FsiApp], None]:
+    """ Strips leading/trailing whitespace from first_name and last_name
+    of all course attendees.
+
+    Example:
+
+        `onegov-fsi --select /fsi/* strip-whitespace-from-names`
+
+    """
+
+    def _strip(request: FsiRequest, app: FsiApp) -> None:
+        session = app.session()
+        count = 0
+        for attendee in session.query(CourseAttendee):
+            first_name = (
+                attendee.first_name.strip()
+                if attendee.first_name
+                else attendee.first_name
+            )
+            last_name = (
+                attendee.last_name.strip()
+                if attendee.last_name
+                else attendee.last_name
+            )
+            if (first_name, last_name) != (
+                attendee.first_name,
+                attendee.last_name,
+            ):
+                attendee.first_name = first_name
+                attendee.last_name = last_name
+                count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} attendee(s)',
+            fg='green'
+        )
+
+    return _strip
