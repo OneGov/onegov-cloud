@@ -806,12 +806,14 @@ def test_add_directory_entries_with_duplicate_names(client: Client) -> None:
     page = client.get('/directories/playgrounds').click("^Eintrag$")
     page.form['name'] = duplicate_name
     page = page.form.submit()
-    assert page.location == f'http://localhost/directories/playgrounds/{duplicate_name}'
+    assert (URL(page.location).path() ==
+            f'/directories/playgrounds/{duplicate_name}')
 
     page = client.get('/directories/playgrounds').click("^Eintrag$")
     page.form['name'] = duplicate_name
     page = page.form.submit()
-    assert page.location == f'http://localhost/directories/playgrounds/{duplicate_name}-1'
+    assert (URL(page.location).path() ==
+            f'/directories/playgrounds/{duplicate_name}-1')
 
 
 def test_directory_numbering(client: Client) -> None:
