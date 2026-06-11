@@ -86,5 +86,6 @@ $.Redactor.opts.langs['de'] = {
 	redo: 'Wiederherstellen',
 	undo: 'Rückgängig',
 	alphalist: 'a. Aufzählung',
+	blockquote: 'Zitat'
 };
 })( jQuery );

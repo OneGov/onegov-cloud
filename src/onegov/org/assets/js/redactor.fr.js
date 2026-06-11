@@ -86,5 +86,6 @@ $.Redactor.opts.langs['fr'] = {
     redo: 'Refaire',
     undo: 'Défaire',
 	alphalist: 'a. Liste alphabétique',
+	blockquote: 'Citation'
 };
 })( jQuery );

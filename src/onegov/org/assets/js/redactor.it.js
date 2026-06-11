@@ -80,6 +80,7 @@ $.Redactor.opts.langs['it'] = {
 	upload_label: 'Trascina il file qui o',
 	undo: 'Annulla azione',
 	redo: 'Rifai',
-	alphalist: 'a. Elenco di lettere'
+	alphalist: 'a. Elenco di lettere',
+	blockquote: 'Citazione'
 };
 })( jQuery );

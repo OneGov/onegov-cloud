@@ -40,7 +40,7 @@ $(function() {
             buttons: [
                 'formatting', 'bold', 'italic', 'deleted',
                 'unorderedlist', 'orderedlist', 'alphalist', 'image', 'file',
-                 'link', 'horizontalrule', 'html', 'superscript', 'subscript'
+                 'link', 'horizontalrule', 'superscript', 'subscript', 'html'
             ],
             formatting: ['p', 'blockquote', 'pre'],
             fileUpload: form.data('file-upload-url'),
@@ -73,6 +73,10 @@ $(function() {
                     tag: 'p',
                     class: 'edit-note',
                     title: translation.editnote
+                },
+                {
+                    tag: 'blockquote',
+                    title: translation.blockquote
                 }
             ],
             /* defined in input_with_button.js */
