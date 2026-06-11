@@ -84,6 +84,7 @@ $.Redactor.opts.langs['fr'] = {
     center: 'Centrer',
     upload_label: 'Déposez le fichier ici ou ',
     redo: 'Refaire',
-    undo: 'Défaire'
+    undo: 'Défaire',
+	alphalist: 'a. Liste alphabétique',
 };
 })( jQuery );

@@ -84,6 +84,7 @@ $.Redactor.opts.langs['de'] = {
 	center: 'Center',
 	upload_label: 'Datei hier ablegen oder ',
 	redo: 'Wiederherstellen',
-	undo: 'Rückgängig'
+	undo: 'Rückgängig',
+	alphalist: 'a. Aufzählung',
 };
 })( jQuery );

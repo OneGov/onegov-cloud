@@ -39,8 +39,8 @@ $(function() {
         textarea.redactor({
             buttons: [
                 'formatting', 'bold', 'italic', 'deleted',
-                'unorderedlist', 'orderedlist', 'image', 'file', 'link',
-                'horizontalrule', 'html', 'superscript', 'subscript'
+                'unorderedlist', 'orderedlist', 'alphalist', 'image', 'file',
+                 'link', 'horizontalrule', 'html', 'superscript', 'subscript'
             ],
             formatting: ['p', 'blockquote', 'pre'],
             fileUpload: form.data('file-upload-url'),
@@ -48,7 +48,7 @@ $(function() {
             imageUpload: form.data('image-upload-url'),
             imageManagerJson: form.data('image-list-url'),
             definedLinks: form.data('sitecollection-url'),
-            plugins: ['bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks', 'table', 'superscript', 'subscript'],
+            plugins: ['alphalist', 'bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks', 'table', 'superscript', 'subscript'],
             lang: language,
             convertVideoLinks: false,
             imageResizable: false,
