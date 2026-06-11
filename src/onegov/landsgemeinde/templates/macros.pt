@@ -138,7 +138,7 @@
 </metal:states-list>
 
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
-    <div tal:condition="request.is_logged_in or votum.state != 'scheduled'" id="votum-${votum.number}" class="votum ${votum.state}" tal:define="thumbnail votum.person_picture|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
+    <div tal:condition="request.is_logged_in or votum.state not in ('scheduled', 'draft')" id="votum-${votum.number}" class="votum ${votum.state}" tal:define="thumbnail votum.person_picture|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
         <div metal:use-macro="layout.macros['dropdown-editbar']" tal:define="editbar_links layout.editbar_links_for_votum(votum)"></div>
         <tal:block tal:condition="request.is_logged_in" metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
         <div class="votum-header">
@@ -193,7 +193,8 @@
         <div class="agenda-item-tags">
             <span tal:repeat="tag agenda_item.resolution_tags" class="blank-label">${tag}</span>
         </div>
-
+            <br>
+            <h3 tal:condition="agenda_item.vota" i18n:translate="">Motions / Vota</h3>
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
                 <div class="ticker-item ticker-votum ${votum.state}" tal:condition="votum.person_name or votum.person_details or votum.text or votum.motion or votum.statement_of_reasons">

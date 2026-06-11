@@ -530,6 +530,9 @@ msgstr "Benachrichtigungen bei neuen Einträgen erhalten"
 msgid "Propose a new entry"
 msgstr "Neuen Eintrag vorschlagen"
 
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
+
 msgid "Internal Notes"
 msgstr "Interne Notizen"
 
