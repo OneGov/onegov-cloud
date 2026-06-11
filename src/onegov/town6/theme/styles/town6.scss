@@ -1870,3 +1870,7 @@ a.category-anchor {
         }
     }
 }
+
+ol li a:not(.button) {
+  display: inline !important;
+}
