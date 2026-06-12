@@ -9,6 +9,8 @@ from onegov.election_day.collections.archived_results import \
 from onegov.election_day.collections.archived_results import \
     MunicipalityArchivedResultCollection
 from onegov.election_day.collections.archived_results import \
+    MunicipalityYearArchivedResultCollection
+from onegov.election_day.collections.archived_results import \
     SearchableArchivedResultCollection
 from onegov.election_day.collections.ballots import BallotCollection
 from onegov.election_day.collections.candidates import CandidateCollection
@@ -43,6 +45,7 @@ __all__ = [
     'AllMunicipalArchivedResultCollection',
     'MunicipalArchivedResultCollection',
     'MunicipalityArchivedResultCollection',
+    'MunicipalityYearArchivedResultCollection',
     'NotificationCollection',
     'ScreenCollection',
     'SearchableArchivedResultCollection',

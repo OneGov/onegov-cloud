@@ -16,7 +16,8 @@ from onegov.election_day.collections import ListCollection
 from onegov.election_day.collections import (
     AllMunicipalArchivedResultCollection,
     MunicipalArchivedResultCollection,
-    MunicipalityArchivedResultCollection
+    MunicipalityArchivedResultCollection,
+    MunicipalityYearArchivedResultCollection
 )
 from onegov.election_day.models import MunicipalityRedirect
 from onegov.election_day.collections import ScreenCollection
@@ -368,6 +369,21 @@ def get_archive_by_municipality(
     municipality: str
 ) -> MunicipalityArchivedResultCollection:
     return MunicipalityArchivedResultCollection(app.session(), municipality)
+
+
+@ElectionDayApp.path(
+    model=MunicipalityYearArchivedResultCollection,
+    path='/municipality/{municipality}/{year}',
+    converters={'year': int}
+)
+def get_archive_by_municipality_and_year(
+    app: ElectionDayApp,
+    municipality: str,
+    year: int
+) -> MunicipalityYearArchivedResultCollection:
+    return MunicipalityYearArchivedResultCollection(
+        app.session(), municipality, year
+    )
 
 
 @ElectionDayApp.path(

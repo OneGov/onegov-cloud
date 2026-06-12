@@ -13,6 +13,9 @@ from onegov.election_day.collections import MunicipalArchivedResultCollection
 from onegov.election_day.collections import (
     MunicipalityArchivedResultCollection
 )
+from onegov.election_day.collections import (
+    MunicipalityYearArchivedResultCollection
+)
 from onegov.election_day.models import MunicipalityRedirect
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.forms import ArchiveSearchFormElection
@@ -115,6 +118,25 @@ def view_archive_all_municipal(
     }
 
 
+def _municipality_view_data(
+    self: MunicipalityArchivedResultCollection,
+    request: ElectionDayRequest,
+    year: int | None = None
+) -> RenderData:
+    layout = DefaultLayout(self, request)
+    results, _ = self.by_municipality()
+
+    return {
+        'layout': layout,
+        'date': str(year) if year else None,
+        'archive_items': self.group_items(results, request),
+        'municipality_collection': self,
+        'municipality_name': self.get_municipality_name(),
+        'municipality_view': True,
+        'show_archive_links': True,
+    }
+
+
 @ElectionDayApp.html(
     model=MunicipalityArchivedResultCollection,
     template='archive.pt',
@@ -124,16 +146,19 @@ def view_archive_municipality(
     self: MunicipalityArchivedResultCollection,
     request: ElectionDayRequest
 ) -> RenderData:
-    layout = DefaultLayout(self, request)
-    results, _ = self.by_municipality()
+    return _municipality_view_data(self, request)
 
-    return {
-        'layout': layout,
-        'date': None,
-        'archive_items': self.group_items(results, request),
-        'municipality_name': self.get_municipality_name(),
-        'municipality_view': True,
-    }
+
+@ElectionDayApp.html(
+    model=MunicipalityYearArchivedResultCollection,
+    template='archive.pt',
+    permission=MaybePublic
+)
+def view_archive_municipality_year(
+    self: MunicipalityYearArchivedResultCollection,
+    request: ElectionDayRequest
+) -> RenderData:
+    return _municipality_view_data(self, request, year=self.year)
 
 
 @ElectionDayApp.json(

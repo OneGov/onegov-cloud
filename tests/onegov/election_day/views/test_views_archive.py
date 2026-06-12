@@ -3,7 +3,9 @@ from __future__ import annotations
 import transaction
 import pytest
 
+from datetime import date
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from tests.onegov.election_day.common import login, upload_complex_vote
 from webtest import TestApp as Client
@@ -219,3 +221,86 @@ def test_download_archive(election_day_app_zg: TestApp) -> None:
     archive = client.get('/').click('Gesamtes Archiv herunterladen')
     assert archive.headers['Content-Type'] == 'application/zip'
     assert len(archive.body)
+
+
+def _add_municipal_results(app: TestApp) -> None:
+    """Add two municipalities (Au, Wil) with results across two years."""
+    session = app.session()
+    for domain_segment, title, result_date, result_type in (
+        ('Au', 'Au Abstimmung 2025', date(2025, 5, 18), 'vote'),
+        ('Au', 'Au Wahl 2024', date(2024, 3, 3), 'election'),
+        ('Wil', 'Wil Abstimmung 2025', date(2025, 5, 18), 'vote'),
+    ):
+        session.add(ArchivedResult(
+            date=result_date,
+            type=result_type,
+            domain='municipality',
+            name=domain_segment,
+            url=f'https://example.com/{result_type}/{domain_segment}',
+            title_translations={'de_CH': title},
+            meta={'domain_segment': domain_segment},
+            schema='other-instance',
+        ))
+    transaction.commit()
+
+
+def test_view_archive_all_municipal(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/archive/municipal')
+    assert 'Alle Gemeinden' in page
+    assert 'Au' in page
+    assert 'Wil' in page
+    assert '/municipality/au' in page
+    assert '/municipality/wil' in page
+    # Only links — no result tables
+    assert 'Au Abstimmung 2025' not in page
+
+
+def test_view_archive_municipal_by_date(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/archive/2025-05-18/municipal')
+    assert 'Au' in page
+    assert 'Wil' in page
+    assert '/municipality/au' in page
+    assert '/municipality/wil' in page
+    # 2024 item not shown on 2025-05-18 page
+    assert 'Au Wahl 2024' not in page
+
+
+def test_view_archive_municipality(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/municipality/au')
+    assert 'Au Abstimmung 2025' in page
+    assert 'Au Wahl 2024' in page
+    # Wil's item not shown
+    assert 'Wil Abstimmung 2025' not in page
+    # Year archive footer: both years present
+    assert '/municipality/au/2025' in page
+    assert '/municipality/au/2024' in page
+    # "All" shown as plain text (no year filter active)
+    assert 'href="/municipality/au"' not in page
+
+
+def test_view_archive_municipality_year(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/municipality/au/2025')
+    assert 'Au Abstimmung 2025' in page
+    # 2024 item filtered out
+    assert 'Au Wahl 2024' not in page
+    # "All" shown as a link back to /municipality/au
+    assert '/municipality/au"' in page
+    # 2024 year link present; 2025 shown as plain text (current)
+    assert '/municipality/au/2024' in page
+    assert '/municipality/au/2025"' not in page

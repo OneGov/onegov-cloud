@@ -5,7 +5,8 @@
                  show_archive_links show_archive_links | python:False;
                  municipal_view municipal_view | python:False;
                  municipality_view municipality_view | python:False;
-                 all_municipal_view all_municipal_view | python:False;">
+                 all_municipal_view all_municipal_view | python:False;
+                 municipality_collection municipality_collection | python:None;">
     <tal:block metal:fill-slot="title">
         <tal:block condition="date">
             <tal:block i18n:translate="">Archive</tal:block> ${date} -
@@ -299,20 +300,29 @@
             </tal:block>
         </div>
 
-        <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years and show_archive_links">
+        <div class="row archive" tal:define="years python: municipality_collection.get_years() if municipality_view and municipality_collection else layout.archive.get_years()" tal:condition="years and show_archive_links">
             <div class="columns small-12 small-centered">
                 <h2 id="archive" i18n:translate="">Archive</h2>
                 <div class="archive-breadcrumbs">
                     <ul>
+                        <li tal:condition="municipality_view">
+                            <span tal:condition="not: date" i18n:translate="">All</span>
+                            <a tal:condition="date" href="${request.link(municipality_collection.without_year())}" i18n:translate="">All</a>
+                        </li>
                         <li tal:repeat="year years">
-                            <span tal:condition="python: str(year) == date">${year}</span>
-                            <a tal:condition="python: str(year) != date" href="${request.link(layout.archive.for_date(year))}">${year}</a>
+                            <tal:block tal:define="current python: str(year) == date;
+                                                   year_link python: request.link(municipality_collection.for_year(year)) if municipality_view else request.link(layout.archive.for_date(year))">
+                                <span tal:condition="current">${year}</span>
+                                <a tal:condition="not: current" href="${year_link}">${year}</a>
+                            </tal:block>
                         </li>
                     </ul>
-                    <p tal:condition="layout.municipality_archive.get_municipalities()">
-                        <a href="${request.link(layout.all_municipal_archive)}" i18n:translate="">All municipal elections and votes</a>
-                    </p>
-                    <p><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
+                    <tal:block tal:condition="not: municipality_view">
+                        <p tal:condition="layout.municipality_archive.get_municipalities()">
+                            <a href="${request.link(layout.all_municipal_archive)}" i18n:translate="">All municipal elections and votes</a>
+                        </p>
+                        <p><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
+                    </tal:block>
                     <tal:block tal:condition="python:layout.is_root and layout.last_archive_modification">
                         <a i18n:translate href="${layout.archive_download}">
                             Download the entire archive (Status: <tal:block tal:content="layout.format_date(layout.last_archive_modification, 'datetime')" i18n:name='date'/>)</a>

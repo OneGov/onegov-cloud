@@ -590,14 +590,29 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         municipality = self.sanitize_municipality(municipality)
         return self.__class__(self.session, municipality)
 
-    def by_municipality(
+    def for_year(self, year: int) -> MunicipalityYearArchivedResultCollection:
+        return MunicipalityYearArchivedResultCollection(
+            self.session, self.municipality, year
+        )
+
+    def get_years(self) -> list[int]:
+        year_col = cast(extract('year', ArchivedResult.date), Integer)
+        query = self.session.query(distinct(year_col))
+        query = query.filter(ArchivedResult.domain == 'municipality')
+        if (self.municipality and
+                self.municipality in self.municipality_mapping):
+            query = query.filter(
+                ArchivedResult.meta['domain_segment'].astext
+                == self.municipality_mapping[self.municipality]
+            )
+        query = query.order_by(desc(year_col))
+        return [y for y, in query]
+
+    def _municipality_query(
         self,
         municipality: str | None = None
-    ) -> tuple[list[ArchivedResult], datetime | None]:
-        """ Returns the results for a given municipality. """
-
+    ) -> Query[ArchivedResult]:
         municipality = municipality or self.municipality
-
         query = self.query()
         query = query.filter(ArchivedResult.domain == 'municipality')
         query = query.filter(
@@ -607,19 +622,51 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
             ArchivedResult.meta['domain_segment'].astext
              == self.municipality_mapping[municipality]
         )
-        query = query.order_by(
+        return query.order_by(
             ArchivedResult.date,
             ArchivedResult.domain,
             ArchivedResult.name,
             ArchivedResult.shortcode,
             ArchivedResult.title
         )
-        result = query.all()
 
+    def by_municipality(
+        self,
+        municipality: str | None = None
+    ) -> tuple[list[ArchivedResult], datetime | None]:
+        """ Returns the results for a given municipality. """
+
+        result = self._municipality_query(municipality).all()
         last_modifieds = [r.last_modified for r in result if r.last_modified]
-        last_modified = max(last_modifieds) if last_modifieds else None
+        return result, max(last_modifieds) if last_modifieds else None
 
-        return result, last_modified
+
+class MunicipalityYearArchivedResultCollection(
+    MunicipalityArchivedResultCollection
+):
+    """Municipality results filtered to a single year."""
+
+    def __init__(self, session: Session, municipality: str = '',
+                 year: int | None = None):
+        super().__init__(session, municipality)
+        self.year = year
+
+    def without_year(self) -> MunicipalityArchivedResultCollection:
+        return MunicipalityArchivedResultCollection(
+            self.session, self.municipality
+        )
+
+    def by_municipality(
+        self,
+        municipality: str | None = None
+    ) -> tuple[list[ArchivedResult], datetime | None]:
+        query = self._municipality_query(municipality)
+        if self.year:
+            year_col = cast(extract('year', ArchivedResult.date), Integer)
+            query = query.filter(year_col == self.year)
+        result = query.all()
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        return result, max(last_modifieds) if last_modifieds else None
 
 
 class SearchableArchivedResultCollection(
