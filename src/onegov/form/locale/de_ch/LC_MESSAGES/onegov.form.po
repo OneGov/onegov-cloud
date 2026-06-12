@@ -159,6 +159,10 @@ msgstr "Ungültige Eingabe."
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr "Die Datei ist zu gross, bitte senden Sie eine Datei kleiner als {}."
 
+#, python-format
+msgid "The image is too large, please provide an image smaller than {}."
+msgstr "Das Bild ist zu gross, bitte senden Sie ein Bild kleiner als {}."
+
 msgid ""
 "The password you wanted to use was found on list of commonly used passwords, "
 "please use a more secure password."

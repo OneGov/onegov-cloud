@@ -134,6 +134,24 @@ class FileSizeLimit:
             raise ValidationError(message)
 
 
+class ImageFileSizeLimit(FileSizeLimit):
+    """ Like :class:`FileSizeLimit` but with a default suited for image uploads
+    and image-specific error messaging.
+
+    Expects an :class:`onegov.form.fields.UploadField` instance.
+
+    """
+
+    DEFAULT_MAX_BYTES = 20_000_000  # 20 MB
+
+    message = _(
+        'The image is too large, please provide an image smaller than {}.'
+    )
+
+    def __init__(self, max_bytes: int = DEFAULT_MAX_BYTES):
+        super().__init__(max_bytes)
+
+
 MIME_TYPES_PDF = {
     'application/pdf',
 }

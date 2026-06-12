@@ -5,7 +5,7 @@ import pytest
 from datetime import timedelta
 from io import BytesIO
 from onegov.file import File
-from onegov.file.attachments import IMAGE_MAX_SIZE, IMAGE_QUALITY
+from onegov.file.attachments import IMAGE_QUALITY
 from onegov.form import CompleteFormSubmission
 from onegov.form import FormCollection
 from onegov.form import parse_form
@@ -500,23 +500,20 @@ def test_add_externally_defined_submission(session: Session) -> None:
 
 def test_upload_image_size_stored_as_actual_size(session: Session) -> None:
     """ The size stored in the submission data must reflect the actual stored
-    file size (after resizing/compression), not the original upload size. """
+    file size, not the original upload size. """
     collection = FormCollection(session)
 
     definition = collection.definitions.add(
         'Photo', definition="Photo = *.jpg|*.png"
     )
 
-    # create an image larger than IMAGE_MAX_SIZE so it will be resized
-    original_size = IMAGE_MAX_SIZE + 1000
-    img = Image.new('RGB', (original_size, original_size), color=(255, 0, 0))
+    img = Image.new('RGB', (200, 200), color=(255, 0, 0))
     buf = BytesIO()
     img.save(buf, format='JPEG', quality=IMAGE_QUALITY)
-    original_bytes = buf.getvalue()
     buf.seek(0)
 
     data: Any = FileMultiDict()
-    data.add_file('photo', buf, filename='big.jpg')
+    data.add_file('photo', buf, filename='photo.jpg')
 
     submission = collection.submissions.add(
         'photo', definition.form_class(data), state='pending'
@@ -528,8 +525,5 @@ def test_upload_image_size_stored_as_actual_size(session: Session) -> None:
     stored_file = submission.files[0]
     actual_size = stored_file.reference.file.content_length
 
-    # the stored file must be smaller than the original (was resized)
-    assert actual_size < len(original_bytes)
-
-    # the size in the submission data must match the actual stored size
+    # the size in the submission data must match the actual stored file size
     assert submission.data['photo']['size'] == actual_size

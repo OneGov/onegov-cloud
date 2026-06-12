@@ -22,6 +22,7 @@ from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import (
     FileSizeLimit,
+    ImageFileSizeLimit,
     ValidPhoneNumber,
     ValidFilterFormDefinition,
     MIME_TYPES_EXCEL,
@@ -128,7 +129,7 @@ class EventForm(Form):
         file_class=EventFile,
         validators=[
             Optional(),
-            FileSizeLimit(5 * 1024 * 1024)
+            ImageFileSizeLimit()
         ],
         allowed_mimetypes=(
             'image/gif',

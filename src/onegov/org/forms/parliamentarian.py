@@ -7,6 +7,7 @@ from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import (
+    ImageFileSizeLimit,
     MIME_TYPES_IMAGE,
     ValidPhoneNumber
 )
@@ -52,7 +53,7 @@ class ParliamentarianForm(NamedFileForm):
     picture = UploadField(
         label=_('Picture'),
         fieldset=_('Basic properties'),
-        validators=[],
+        validators=[ImageFileSizeLimit()],
         allowed_mimetypes=MIME_TYPES_IMAGE,
     )
 

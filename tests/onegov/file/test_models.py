@@ -11,7 +11,6 @@ from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.utils import module_path
 from onegov.file import File, FileSet, AssociatedFiles, NamedFile
-from onegov.file.attachments import IMAGE_MAX_SIZE
 from onegov.file.filters import WithPDFThumbnailFilter
 from onegov.file.models.fileset import file_to_set_associations
 from tests.shared.utils import create_image
@@ -267,39 +266,19 @@ def test_pdf_preview_creation_with_erroneous_pdf(
 
 def test_max_image_size(session: Session) -> None:
     session.add(
-        File(
-            name='unchanged.png',
-            reference=create_image(IMAGE_MAX_SIZE, IMAGE_MAX_SIZE),
-        )
-    )
+        File(name='unchanged.png', reference=create_image(2048, 2048)))
     session.add(
-        File(
-            name='limited.png',
-            reference=create_image(IMAGE_MAX_SIZE + 1, IMAGE_MAX_SIZE),
-        )
-    )
+        File(name='limited.png', reference=create_image(2049, 2048)))
 
     transaction.commit()
 
     limited, unchanged = session.query(File).order_by(File.name).all()
 
-    assert Image.open(limited.reference.file).size == (
-        IMAGE_MAX_SIZE,
-        IMAGE_MAX_SIZE - 1,
-    )
-    assert Image.open(unchanged.reference.file).size == (
-        IMAGE_MAX_SIZE,
-        IMAGE_MAX_SIZE,
-    )
+    assert Image.open(limited.reference.file).size == (2048, 2047)
+    assert Image.open(unchanged.reference.file).size == (2048, 2048)
 
-    assert unchanged.reference.size == [
-        f'{IMAGE_MAX_SIZE}px',
-        f'{IMAGE_MAX_SIZE}px',
-    ]
-    assert limited.reference.size == [
-        f'{IMAGE_MAX_SIZE}px',
-        f'{IMAGE_MAX_SIZE - 1}px',
-    ]
+    assert unchanged.reference.size == ['2048px', '2048px']
+    assert limited.reference.size == ['2048px', '2047px']
 
     assert unchanged.reference.thumbnail_small['size'] == ['512px', '512px']
     assert limited.reference.thumbnail_small['size'][0] in ['512px', '511px']
@@ -358,10 +337,7 @@ def test_determine_unknown_svg_size(
 
     # use the default max size as the size if we can't determine one
     logo = session.query(File).order_by(File.name).one()
-    assert logo.reference.size == [
-        f'{IMAGE_MAX_SIZE}px',
-        f'{IMAGE_MAX_SIZE}px',
-    ]
+    assert logo.reference.size == ['2048px', '2048px']
 
 
 def test_associated_files(session: Session) -> None:

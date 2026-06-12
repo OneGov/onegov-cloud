@@ -1,18 +1,26 @@
 from __future__ import annotations
 
+from io import BytesIO
 from onegov.core.orm import SessionManager
+from onegov.file.attachments import IMAGE_QUALITY
+from onegov.form import Form
+from onegov.form import parse_form
+from onegov.form.fields import UploadField
 from onegov.form.validators import ExpectedExtensions
+from onegov.form.validators import ImageFileSizeLimit
 from onegov.form.validators import InputRequiredIf
 from onegov.form.validators import ValidSwissSocialSecurityNumber
 from onegov.form.validators import UniqueColumnValue
 from onegov.form.validators import ValidPhoneNumber
+from PIL import Image
 from pytest import raises
 from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
+from werkzeug.datastructures import FileMultiDict
 from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from onegov.core.orm import Base  # noqa: F401
     from onegov.core.request import CoreRequest
@@ -205,3 +213,96 @@ def test_swiss_ssn_validator() -> None:
 def test_mp3_extension_nonempty_whitelist() -> None:
     validator = ExpectedExtensions(['.mp3'])
     assert validator.whitelist
+
+
+def test_image_file_size_limit() -> None:
+    class Field:
+        def __init__(self, size: int | None) -> None:
+            self.data = {'size': size} if size is not None else None
+
+        def gettext(self, text: str) -> str:
+            return text
+
+    validator = ImageFileSizeLimit()
+    assert validator.max_bytes == ImageFileSizeLimit.DEFAULT_MAX_BYTES
+
+    # no data — pass
+    validator(None, Field(None))  # type: ignore[arg-type]
+
+    # within limit — pass
+    validator(None, Field(ImageFileSizeLimit.DEFAULT_MAX_BYTES))  # type: ignore[arg-type]
+
+    # exceeds limit — fail
+    with raises(ValidationError):
+        validator(None, Field(ImageFileSizeLimit.DEFAULT_MAX_BYTES + 1))  # type: ignore[arg-type]
+
+    # custom limit
+    with raises(ValidationError):
+        ImageFileSizeLimit(max_bytes=1024)(None, Field(1025))  # type: ignore[arg-type]
+
+    with raises(ValidationError, match='The image is too large,'):
+        validator(None, Field(ImageFileSizeLimit.DEFAULT_MAX_BYTES + 1))  # type: ignore[arg-type]
+
+
+def test_image_file_size_limit_on_upload_field() -> None:
+    limit = 2_000  # 2 KB
+
+    class PhotoForm(Form):
+        photo = UploadField(validators=[ImageFileSizeLimit(max_bytes=limit)])
+
+    def make_form(img: Image.Image, fmt: str) -> PhotoForm:
+        buf = BytesIO()
+        img.save(buf, format=fmt)
+        buf.seek(0)
+        data: Any = FileMultiDict()
+        data.add_file('photo', buf, filename=f'test.{fmt.lower()}')
+        return PhotoForm(data)
+
+    # small solid-color JPEG — well under 2 KB
+    small = make_form(Image.new('RGB', (10, 10), color=(0, 128, 0)), 'JPEG')
+    assert small.validate(), small.photo.errors
+
+    # large PNG (1000×1000) — will exceed 2 KB
+    large = make_form(Image.new('RGB', (1000, 1000), color=(255, 0, 0)), 'PNG')
+    assert not large.validate()
+    assert large.photo.errors
+    assert 'The image is too large,' in large.photo.errors[0]
+
+
+def test_image_file_size_limit_rejects_on_form_submission() -> None:
+    limit = 1_000  # 1 KB — small enough that a 1000×1000 PNG always exceeds it
+
+    BaseForm = parse_form("Photo = *.jpg|*.png")
+
+    class PhotoForm(BaseForm):  # type: ignore[valid-type,misc]
+        def on_request(self) -> None:
+            self.photo.validators = [
+                *self.photo.validators,
+                ImageFileSizeLimit(max_bytes=limit),
+            ]
+
+    small = Image.new('RGB', (10, 10), color=(0, 128, 0))
+    buf_small = BytesIO()
+    small.save(buf_small, format='JPEG', quality=IMAGE_QUALITY)
+    buf_small.seek(0)
+    assert len(buf_small.getvalue()) < limit
+
+    data_small: Any = FileMultiDict()
+    data_small.add_file('photo', buf_small, filename='small.jpg')
+    form_small = PhotoForm(data_small)
+    form_small.on_request()
+    assert form_small.validate()
+    assert not form_small.photo.errors
+
+    large = Image.new('RGB', (1000, 1000), color=(255, 0, 0))
+    buf_large = BytesIO()
+    large.save(buf_large, format='PNG')
+    buf_large.seek(0)
+    assert len(buf_large.getvalue()) > limit
+
+    data_large: Any = FileMultiDict()
+    data_large.add_file('photo', buf_large, filename='large.png')
+    form_large = PhotoForm(data_large)
+    form_large.on_request()
+    assert not form_large.validate()
+    assert 'The image is too large,' in form_large.photo.errors[0]

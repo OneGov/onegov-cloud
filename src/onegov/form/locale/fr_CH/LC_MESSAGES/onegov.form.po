@@ -159,6 +159,11 @@ msgid "The file is too large, please provide a file smaller than {}."
 msgstr ""
 "Le fichier est trop volumineux, veuillez fournir un fichier de moins de {}."
 
+#, python-format
+msgid "The image is too large, please provide an image smaller than {}."
+msgstr ""
+"L'image est trop volumineuse, veuillez fournir une image de moins de {}."
+
 msgid ""
 "The password you wanted to use was found on list of commonly used passwords, "
 "please use a more secure password."

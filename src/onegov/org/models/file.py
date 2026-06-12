@@ -11,6 +11,7 @@ from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.file import SearchableFile
+from onegov.file.attachments import IMAGE_MAX_SIZE, resize_image
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
@@ -24,10 +25,10 @@ from sqlalchemy import asc, desc, select, nullslast
 from typing import overload, Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
+    from typing import IO, Self
     from sqlalchemy.engine import Result
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
-    from typing import Self
 
     class IdRow(NamedTuple):
         id: str
@@ -420,6 +421,24 @@ class BaseImageFileCollection[FileT: File](
 ):
 
     supported_content_types = IMAGE_MIME_TYPES_AND_SVG
+
+    def add(
+        self,
+        filename: str,
+        content: bytes | IO[bytes],
+        note: str | None = None,
+        published: bool = True,
+        publish_date: datetime | None = None,
+        publish_end_date: datetime | None = None
+    ) -> FileT:
+        return super().add(
+            filename,
+            resize_image(content, IMAGE_MAX_SIZE),  # type: ignore[arg-type]
+            note=note,
+            published=published,
+            publish_date=publish_date,
+            publish_end_date=publish_end_date,
+        )
 
 
 class ImageFileCollection(BaseImageFileCollection[ImageFile]):
