@@ -293,9 +293,12 @@ class ArchivedResultCollection:
         result.name = request.app.principal.name
         result.date = item.date
         result.shortcode = item.shortcode
+        short_titles = {
+            k: v for k, v in (item.short_title_translations or {}).items() if v
+        }
         result.title_translations = dict(
-            item.title_translations
-            or item.short_title_translations
+            short_titles
+            or item.title_translations
             or {}
         )
         result.last_modified = item.last_modified
