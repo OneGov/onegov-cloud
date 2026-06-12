@@ -68,7 +68,7 @@ class ManageLayout(DefaultLayout):
         ))
         submenu.append(
             (
-                _('ech0252 upload'),
+                _('eCH-0252 Upload'),
                 self.request.link(
                     self.principal, name='upload-ech'
                 ),
@@ -108,7 +108,7 @@ class ManageLayout(DefaultLayout):
                 []
             ))
             submenu.append((
-                _('ech0252 upload'),
+                _('eCH-0252 Upload'),
                 self.request.link(self.principal, name='upload-ech'),
                 'upload-ech' in self.request.url,
                 []

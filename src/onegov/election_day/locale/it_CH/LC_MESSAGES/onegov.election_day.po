@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-28 16:58+0200\n"
+"POT-Creation-Date: 2026-06-12 13:23+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -659,11 +659,11 @@ msgstr "Disattivare"
 msgid "File"
 msgstr "File"
 
-msgid "File format"
-msgstr "Formato del file"
-
 msgid "Delivery"
 msgstr "Transmissione"
+
+msgid "File format"
+msgstr "Formato del file"
 
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
@@ -751,6 +751,9 @@ msgstr "Controprogetto accettata"
 
 msgid "Manage"
 msgstr "Amministrare"
+
+msgid "eCH-0252 Upload"
+msgstr "eCH-0252 Upload"
 
 msgid "Upload tokens"
 msgstr "Carica token"
@@ -1104,10 +1107,10 @@ msgid "Cast Ballots"
 msgstr "Schede rientrate"
 
 msgid "Empty votes"
-msgstr "Voti in bianco"
+msgstr "Schede bianche"
 
 msgid "Invalid votes"
-msgstr "Voti nulli"
+msgstr "Schede nulle"
 
 #.
 #. Default: Turnout
@@ -1530,14 +1533,14 @@ msgstr "Nuova votazione"
 msgid "Your results were uploaded successfully."
 msgstr "I Suoi risultati sono stati caricati correttamente."
 
-msgid "Click here to trigger the notifications."
-msgstr "Clicca qui per attivare le notifiche."
-
 msgid "Click here to see the updated results page."
 msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
 
 msgid "Please use the following format:"
 msgstr "Utilizzi per favore il formato seguente:"
+
+msgid "Click here to trigger the notifications."
+msgstr "Clicca qui per attivare le notifiche."
 
 msgid "No map available for this year."
 msgstr "Nessuna mappa disponibile per quest'anno."
@@ -1951,3 +1954,6 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "ech0252 upload"
+#~ msgstr "eCH-0252 Upload"

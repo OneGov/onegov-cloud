@@ -44,7 +44,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', True, [
             ('Votes', 'VoteCollection/archive', True, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', False, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -54,7 +54,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
@@ -85,7 +85,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', True, [
             ('Votes', 'VoteCollection/archive', True, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', False, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -95,7 +95,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
@@ -132,7 +132,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', False, [
             ('Votes', 'VoteCollection/archive', False, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', True, [
             ('Elections', 'ElectionCollection/archive', True, []),
@@ -142,7 +142,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
@@ -171,7 +171,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', False, [
             ('Votes', 'VoteCollection/archive', False, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', True, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -181,7 +181,7 @@ def test_manage_layouts(session: Session) -> None:
                 True,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, [])
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, [])
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
@@ -210,7 +210,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', False, [
             ('Votes', 'VoteCollection/archive', False, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', False, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -220,7 +220,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', True, []),
@@ -250,7 +250,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', False, [
             ('Votes', 'VoteCollection/archive', False, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', False, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -260,7 +260,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
@@ -291,7 +291,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', False, [
             ('Votes', 'VoteCollection/archive', False, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', False, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -301,7 +301,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
@@ -333,7 +333,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', False, [
             ('Votes', 'VoteCollection/archive', False, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', False, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -343,7 +343,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
@@ -379,7 +379,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', False, [
             ('Votes', 'VoteCollection/archive', False, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', False, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -389,7 +389,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
@@ -419,7 +419,7 @@ def test_manage_layouts(session: Session) -> None:
     assert layout.menu == [
         ('Votes', '', False, [
             ('Votes', 'VoteCollection/archive', False, []),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Elections', '', False, [
             ('Elections', 'ElectionCollection/archive', False, []),
@@ -429,7 +429,7 @@ def test_manage_layouts(session: Session) -> None:
                 False,
                 []
             ),
-            ('ech0252 upload', 'DummyPrincipal/upload-ech', False, []),
+            ('eCH-0252 Upload', 'DummyPrincipal/upload-ech', False, []),
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
