@@ -68,6 +68,16 @@ def test_link_health_check(org_app: TestOrgApp) -> None:
         parent=None,
         portrait=Markup('<a href="http://www.google.com"></a>')
     )
+    agencies.add(
+        title='Empty portrait',
+        parent=None,
+        portrait=Markup('')
+    )
+    agencies.add(
+        title='No portrait',
+        parent=None,
+        portrait=None
+    )
 
     # check external
     check = LinkHealthCheck(request, 'external')
