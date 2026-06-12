@@ -7518,6 +7518,13 @@ msgstr "Reservation Anpassen"
 msgid "Cannot move reservation into the past"
 msgstr "Eine Reservation kann nicht in die Vergangenheit verschoben werden"
 
+msgid ""
+"The reserved slot could not be found and the reservation can no longer be "
+"adjusted."
+msgstr ""
+"Der reservierte Zeitslot konnte nicht gefunden werden und die Reservation "
+"kann nicht mehr angepasst werden."
+
 msgid "The reservation was adjusted"
 msgstr "Die Reservation wurde angepasst"
 

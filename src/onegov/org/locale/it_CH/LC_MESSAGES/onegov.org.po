@@ -7492,6 +7492,13 @@ msgstr "Regolare la prenotazione"
 msgid "Cannot move reservation into the past"
 msgstr "Impossibile spostare la prenotazione nel passato"
 
+msgid ""
+"The reserved slot could not be found and the reservation can no longer be "
+"adjusted."
+msgstr ""
+"Il periodo prenotato non è stato trovato e la prenotazione non può più "
+"essere modificata."
+
 msgid "The reservation was adjusted"
 msgstr "La prenotazione è stata regolata"
 

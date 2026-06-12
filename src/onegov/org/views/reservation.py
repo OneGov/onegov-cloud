@@ -7,6 +7,8 @@ import sedate
 import transaction
 
 from datetime import date, time, timedelta
+from libres.modules.errors import InvalidReservationError
+from libres.modules.errors import InvalidReservationToken
 from libres.modules.errors import LibresError
 from onegov.core.custom import json, msgpack
 from onegov.core.html import html_to_text
@@ -2022,6 +2024,13 @@ def adjust_reservation(
         else:
             # restore the payment link
             reservation.payment = payment
+    except (InvalidReservationToken, InvalidReservationError):
+        request.session.flush()
+        savepoint.rollback()
+        return show_error(_(
+            'The reserved slot could not be found and the reservation '
+            'can no longer be adjusted.'
+        ))
     except LibresError as e:
         # rollback previous changes
         request.session.flush()

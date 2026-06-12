@@ -1738,6 +1738,113 @@ def test_reserve_allocation_adjustment_invoice_change(client: Client) -> None:
 
 
 @freeze_time("2015-08-28", tick=True)
+def test_reject_one_reservation_does_not_break_sibling_adjust(
+    client: Client
+) -> None:
+    # Regression test for Sentry issue: two reservations on the same
+    # partly_available allocation share the same token. Rejecting one used to
+    # delete the sibling's ReservedSlot (because reserved_slots_by_reservation
+    # filtered only by allocation_id, not by time range). The sibling's
+    # subsequent adjust then raised NoResultFound -> unhandled 500.
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    # One partly_available allocation covering the whole day.
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 8), datetime(2015, 8, 28, 16)),
+        whole_day=False,
+        partly_available=True
+    )
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # Two bookings on the same allocation, same session -> same token.
+    assert reserve('08:00', '12:00').json == {'success': True}
+    assert reserve('13:00', '16:00').json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'user@example.org'
+    ticket = formular.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    client.login_admin()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    # Reject the first reservation (08:00-12:00).
+    ticket = ticket.click('Absagen', index=0).follow()
+
+    # The second reservation (13:00-16:00) must still be adjustable.
+    # Before the fix this raised NoResultFound -> 500 because rejecting
+    # the first reservation also deleted the second's ReservedSlot.
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '13:00'
+    adjust.form['end_time'] = '15:00'
+    ticket = adjust.form.submit().follow()
+    assert '13:00' in ticket
+    assert '15:00' in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reserve_allocation_adjustment_data_inconsistency(
+    client: Client
+) -> None:
+    # Regression test: if the ReservedSlot is missing for an approved
+    # reservation, change_reservation used to raise NoResultFound (a raw
+    # SQLAlchemy error), which bypassed the view's LibresError handler and
+    # produced an unhandled 500. The fix wraps it in InvalidReservationError
+    # so the view shows a proper error message instead.
+    from libres.db.models import ReservedSlot
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource_id = resource.id  # capture before any commit expires the object
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'user@example.org'
+    ticket = formular.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    client.login_admin()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    # Simulate data inconsistency: delete the reserved slot so that
+    # allocations_by_reservation() finds nothing for the approved reservation.
+    session = client.app.session()
+    reservation = session.query(Reservation).filter_by(
+        resource=resource_id
+    ).one()
+    session.query(ReservedSlot).filter_by(
+        reservation_token=reservation.token
+    ).delete()
+    transaction.commit()
+
+    # Submitting the adjustment form must show a user-visible error, not a 500.
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '10:00'
+    adjust.form['end_time'] = '11:00'
+    adjust = adjust.form.submit()
+    assert adjust.status_int == 200
+    assert 'Der reservierte Zeitslot konnte nicht gefunden werden' in adjust
+
+
+@freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation_add_reservation_invoice_change(
     client: Client
 ) -> None:
