@@ -179,7 +179,7 @@ html {
 }
 
 .archive-breadcrumbs {
-    ul, .archive-breadcrumbs-municipality, p {
+    ul, .municipalities-list, p {
         margin-bottom: 1rem;
     }
 
@@ -191,8 +191,8 @@ html {
         }
     }
 
-    .archive-breadcrumbs-municipality {
-        column-count: 5;
+    .municipalities-list {
+        column-count: 1;
     }
 }
 

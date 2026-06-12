@@ -105,12 +105,12 @@ def view_archive_all_municipal(
     request: ElectionDayRequest
 ) -> RenderData:
     layout = DefaultLayout(self, request)
-    results, _ = self.by_all()
 
     return {
         'layout': layout,
         'date': None,
-        'archive_items': self.group_items(results, request),
+        'archive_items': None,
+        'municipalities': layout.municipality_archive.get_municipalities(),
         'all_municipal_view': True,
     }
 

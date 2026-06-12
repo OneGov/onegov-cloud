@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-12 13:23+0200\n"
+"POT-Creation-Date: 2026-06-12 15:13+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -943,6 +943,9 @@ msgstr "Noch keine Resultate"
 
 msgid "Result"
 msgstr "Resultat"
+
+msgid "All municipalities"
+msgstr "Alle Gemeinden"
 
 msgid "All municipal elections and votes"
 msgstr "Alle kommunalen Wahlen und Abstimmungen"

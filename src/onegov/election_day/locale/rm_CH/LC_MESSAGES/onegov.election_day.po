@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-12 13:23+0200\n"
+"POT-Creation-Date: 2026-06-12 15:13+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -953,6 +953,9 @@ msgstr "Anc nagins resultats avant maun"
 
 msgid "Result"
 msgstr "Resultat"
+
+msgid "All municipalities"
+msgstr "Tut las vischnancas"
 
 msgid "All municipal elections and votes"
 msgstr "Tut las elecziuns e votaziuns communalas"
