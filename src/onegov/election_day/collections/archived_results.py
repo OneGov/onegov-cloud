@@ -293,14 +293,23 @@ class ArchivedResultCollection:
         result.name = request.app.principal.name
         result.date = item.date
         result.shortcode = item.shortcode
-        short_titles = {
-            k: v for k, v in (item.short_title_translations or {}).items() if v
-        }
-        result.title_translations = dict(
-            short_titles
-            or item.title_translations
-            or {}
-        )
+
+        # prioritize short title for elections, long title for votes
+        if isinstance(item, Election):
+            short_titles = {
+                k: v
+                for k, v in (item.short_title_translations or {}).items()
+                if v
+            }
+            result.title_translations = dict(
+                short_titles or item.title_translations or {}
+            )
+        else:
+            result.title_translations = dict(
+                item.title_translations
+                or item.short_title_translations
+                or {}
+            )
         result.last_modified = item.last_modified
         result.last_result_change = item.last_result_change
         result.external_id = item.id

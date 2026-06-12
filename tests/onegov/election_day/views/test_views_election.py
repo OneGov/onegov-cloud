@@ -1060,7 +1060,7 @@ def test_views_election_municipal_and_municipality(
     assert 'Kommunale Wahlen und Abstimmungen' in goldach_page
     assert 'Goldach' in goldach_page
     assert 'Wahl' in goldach_page
-    title = 'Ersatzwahl der Schulpräsidentin/des Schulpräsidenten'
+    title = 'Wahl Schulpräsidium'  # short title
     assert title in goldach_page
-    assert (goldach_page.click('Ersatzwahl der Schulpräsidentin').
+    assert (goldach_page.click(title).
             maybe_follow().status_code == 200)
