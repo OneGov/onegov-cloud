@@ -11,8 +11,10 @@ from datetime import date
 from datetime import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
+from io import BytesIO
 from mimetypes import types_map
-
+from onegov.core.utils import binary_to_dictionary, dictionary_to_binary
+from onegov.file.attachments import resize_image
 from onegov.file.utils import get_supported_image_mime_types
 from onegov.form import _
 from onegov.form.errors import (
@@ -134,9 +136,14 @@ class FileSizeLimit:
             raise ValidationError(message)
 
 
-class ImageFileSizeLimit(FileSizeLimit):
-    """ Like :class:`FileSizeLimit` but with a default suited for image uploads
-    and image-specific error messaging.
+class ImageSizeLimit(FileSizeLimit):
+    """ Like :class:`FileSizeLimit` but with a default suited for image
+    uploads, image-specific error messaging, and optional automatic resampling.
+
+    When *max_dimensions* is given, images whose longest side exceeds that
+    value are resampled (LANCZOS) before the byte-size check runs, so
+    over-sized images silently shrink rather than trigger a validation error —
+    unless the resampled image still exceeds *max_bytes*.
 
     Expects an :class:`onegov.form.fields.UploadField` instance.
 
@@ -148,8 +155,35 @@ class ImageFileSizeLimit(FileSizeLimit):
         'The image is too large, please provide an image smaller than {}.'
     )
 
-    def __init__(self, max_bytes: int = DEFAULT_MAX_BYTES):
+    def __init__(
+        self,
+        max_bytes: int = DEFAULT_MAX_BYTES,
+        max_dimensions: int | None = None,
+    ):
         super().__init__(max_bytes)
+        self.max_dimensions = max_dimensions
+
+    def __call__(self, form: Form, field: Field) -> None:
+        if (field.data
+                and self.max_dimensions is not None
+                and isinstance(field.data, dict)
+                and field.data.get('mimetype', '').startswith('image/')
+                and 'data' in field.data):
+            self._maybe_resize(field)
+        super().__call__(form, field)
+
+    def _maybe_resize(self, field: Field) -> None:
+        assert self.max_dimensions is not None
+        try:
+            binary = dictionary_to_binary(field.data)
+        except Exception:
+            return
+        buf = BytesIO(binary)
+        resized = resize_image(buf, self.max_dimensions)
+        if resized is buf:
+            return
+        filename = field.data.get('filename')
+        field.data = binary_to_dictionary(resized.read(), filename)
 
 
 MIME_TYPES_PDF = {
