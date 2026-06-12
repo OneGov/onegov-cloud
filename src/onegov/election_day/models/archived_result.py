@@ -128,6 +128,10 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
         return ''
 
+    @property
+    def domain_segment(self) -> str | None:
+        return (self.meta or {}).get('domain_segment') or None
+
     #: Shortcode for cantons that use it
     shortcode: Mapped[str | None]
 

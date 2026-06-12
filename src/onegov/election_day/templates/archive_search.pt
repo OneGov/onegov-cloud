@@ -52,16 +52,15 @@
                                     <th i18n:translate>Result</th>
                                     <th i18n:translate>Date</th>
                                     <th i18n:translate>Domain</th>
-                                    <th i18n:translate class="right-aligned" tal:condition="not: communal_instance">Counted</th>
+                                    <th i18n:translate class="right-aligned no-wrap" tal:condition="not: communal_instance">Counted</th>
                                     <th i18n:translate class="right-aligned">Updated</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tal:b tal:repeat="vote results">
                                     <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
-                                        <th class="top-aligned" tal:define="prefix vote.title_prefix(request)">
+                                        <th class="top-aligned">
                                             <a href="${vote.adjusted_url(request)}">
-                                                <span tal:condition="prefix">${prefix}: </span>
                                                 <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
                                             </a>
                                         </th>
@@ -73,7 +72,10 @@
                                         <td class="top-aligned" tal:condition="vote.domain == 'district'" i18n:translate>Regional</td>
                                         <td class="top-aligned" tal:condition="vote.domain == 'region'" i18n:translate>Regional</td>
                                         <td class="top-aligned" tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
-                                        <td class="top-aligned" tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
+                                        <td class="top-aligned no-wrap" tal:condition="vote.domain == 'municipality'">
+                                            <tal:b tal:condition="vote.domain_segment">${vote.domain_segment}</tal:b>
+                                            <span tal:condition="not: vote.domain_segment" i18n:translate>Communal</span>
+                                        </td>
                                         <td class="top-aligned" tal:condition="vote.domain == 'none'" i18n:translate>Regional</td>
                                         <td class="right-aligned top-aligned" tal:condition="not: communal_instance">
                                             <tal:b tal:condition="vote.has_results">
@@ -99,15 +101,14 @@
                                     <th i18n:translate="">Election</th>
                                     <th i18n:translate="">Date</th>
                                     <th i18n:translate="">Domain</th>
-                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Counted</th>
+                                    <th i18n:translate="" class="right-aligned no-wrap" tal:condition="not: communal_instance">Counted</th>
                                     <th i18n:translate="" class="right-aligned">Updated</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr tal:repeat="election results">
-                                    <th class="top-aligned" tal:define="prefix election.title_prefix(request)">
+                                    <th class="top-aligned">
                                         <a href="${election.adjusted_url(request)}">
-                                            <span tal:condition="prefix">${prefix}: </span>
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
                                         </a>
                                     </th>
@@ -116,7 +117,10 @@
                                     <td class="top-aligned" tal:condition="election.domain == 'district'" i18n:translate>Regional</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'region'" i18n:translate>Regional</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'canton'" i18n:translate>Cantonal</td>
-                                    <td class="top-aligned" tal:condition="election.domain == 'municipality'" i18n:translate>Communal</td>
+                                    <td class="top-aligned no-wrap" tal:condition="election.domain == 'municipality'">
+                                        <tal:b tal:condition="election.domain_segment">${election.domain_segment}</tal:b>
+                                        <span tal:condition="not: election.domain_segment" i18n:translate>Communal</span>
+                                    </td>
                                     <td class="top-aligned" tal:condition="election.domain == 'none'" i18n:translate>Regional</td>
                                     <td class="right-aligned top-aligned" tal:condition="not: communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
