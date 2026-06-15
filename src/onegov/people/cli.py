@@ -85,6 +85,49 @@ EXPORT_FIELDS = OrderedDict((
 ))
 
 
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[CoreRequest, Framework], None]:
+    """ Strips leading/trailing whitespace from first_name, last_name,
+    and function of all people.
+
+    Example:
+
+        `onegov-people --select /onegov_org/* strip-whitespace-from-names`
+        `onegov-people --select /onegov_town6/* strip-whitespace-from-names`
+
+    """
+
+    def _strip(request: CoreRequest, app: Framework) -> None:
+        session = app.session()
+        count = 0
+        for person in session.query(Person):
+            first_name = person.first_name.strip()
+            last_name = person.last_name.strip()
+            function = (
+                person.function.strip() if person.function else person.function
+            )
+            if (first_name, last_name, function) != (
+                    person.first_name, person.last_name, person.function):
+                person.first_name = first_name
+                person.last_name = last_name
+                person.function = function
+                count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} person(s)',
+            fg='green'
+        )
+
+    return _strip
+
+
 @cli.command('export')
 @click.argument('filename', type=click.Path(exists=False))
 def export_xlsx(filename: str) -> Callable[[CoreRequest, Framework], None]:

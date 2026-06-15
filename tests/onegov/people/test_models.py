@@ -523,3 +523,28 @@ def test_membership_siblings(session: Session) -> None:
     assert [m.title for m in membership_x.siblings_by_agency] == ['X', 'Y']
     assert [m.title for m in membership_y.siblings_by_agency] == ['X', 'Y']
     assert [m.title for m in membership_z.siblings_by_agency] == ['Z']
+
+
+def test_person_strip_leading_and_trailing_whitespace(
+    session: Session
+) -> None:
+    session.add(Person(
+        first_name=' Hans Ulrich',
+        last_name='Maulwurf ',
+        function=' Director ',
+    ))
+    session.flush()
+    person = session.query(Person).one()
+
+    assert person.first_name == 'Hans Ulrich'
+    assert person.last_name == 'Maulwurf'
+    assert person.function == 'Director'
+
+    person.first_name = '  Anna  '
+    person.last_name = '  Schmidt  '
+    person.function = '  Manager  '
+    session.flush()
+
+    assert person.first_name == 'Anna'
+    assert person.last_name == 'Schmidt'
+    assert person.function == 'Manager'

@@ -11,7 +11,7 @@ from onegov.core.orm.mixins import (
 from onegov.core.utils import linkify
 from onegov.directory import (
     Directory, DirectoryEntry, DirectoryEntryCollection)
-from onegov.directory.errors import DuplicateEntryError, ValidationError
+from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
@@ -207,9 +207,6 @@ class DirectorySubmissionAction:
             else:
                 entry = self.create_new_entry(request, data)
 
-        except DuplicateEntryError:
-            request.alert(_('An entry with this name already exists'))
-            return
         except ValidationError:
             request.alert(_('The entry is not valid, please adjust it'))
             return

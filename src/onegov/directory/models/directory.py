@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import inspect
 
 from email_validator import validate_email
 from enum import Enum
@@ -10,8 +9,8 @@ from onegov.core.crypto import random_token
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.utils import normalize_for_url
-from onegov.directory.errors import ValidationError, DuplicateEntryError
+from onegov.core.utils import increment_name, normalize_for_url
+from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import (
     DirectoryConfiguration, DirectoryConfigurationStorage)
@@ -26,7 +25,6 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy_utils import aggregated
 from translationstring import TranslationString
 from uuid import uuid4, UUID
@@ -435,12 +433,19 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
             if session:
                 with session.no_autoflush:
-                    if self.entry_with_name_exists(name):
-                        entry.directory = None  # type: ignore[assignment]
-                        session.expunge(entry)
-                        raise DuplicateEntryError(name)
-
-            entry.name = name
+                    existing = {
+                        n for n, in session.query(
+                            self.entry_cls.name
+                        ).filter(
+                            self.entry_cls.directory_id == self.id
+                        )
+                        if n != entry.name
+                    }
+                    while name in existing:
+                        name = increment_name(name)
+                    entry.name = name
+            else:
+                entry.name = name
 
         # validate the values
         form = self.form_obj
@@ -563,17 +568,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 directory_update: bool = True
             ) -> None:
 
-                exclude = {k for k, v in inspect.getmembers(
-                    obj.__class__,
-                    lambda v: isinstance(v, (InstrumentedAttribute, property))
-                )}
-
-                include = (
-                    'publication_start',
-                    'publication_end',
-                    'coordinates',
-                )
-                exclude = {k for k in exclude if k not in include}
+                # skip directory structure fields, directory.update()
+                # handles those
+                exclude = {f.id for f in directory.fields}
 
                 super().populate_obj(obj, exclude=exclude)
 

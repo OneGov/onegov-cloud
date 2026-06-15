@@ -23,6 +23,7 @@ from sedate import utcnow
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from datetime import datetime
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.models import Canton
@@ -222,6 +223,53 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def archive_download(self) -> str:
         return self.request.link(self.principal, name='archive-download')
+
+    @property
+    def og_title(self) -> str | None:
+        principal = self.principal
+        if not hasattr(principal, 'name'):
+            return None
+        return principal.name
+
+    @property
+    def og_site_name(self) -> str | None:
+        return self.og_title
+
+    @property
+    def og_type(self) -> str:
+        return 'website'
+
+    @property
+    def og_description(self) -> str | None:
+        principal = self.principal
+        if not hasattr(principal, 'og_description'):
+            return None
+        return principal.og_description
+
+    @property
+    def og_url(self) -> str:
+        return self.request.url
+
+    @cached_property
+    def og_image_url(self) -> str | None:
+        if not hasattr(self.principal, 'logo'):
+            return None
+        logo = self.app.logo
+        if logo is None:
+            return None
+        return self.request.link(logo)
+
+    @cached_property
+    def og_locale(self) -> str | None:
+        return self.request.locale
+
+    @property
+    def og_locale_alternate(self) -> Iterator[str]:
+        return (
+            locale
+            for locale in self.request.app.settings.i18n.locales
+            if locale != self.og_locale
+        )
 
     @property
     def last_archive_modification(self) -> datetime | None:

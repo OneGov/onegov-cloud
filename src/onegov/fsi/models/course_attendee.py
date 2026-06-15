@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import pytz
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import StripWhitespaceMixin
 from onegov.fsi.i18n import _
 from onegov.search import ORMSearchable
 from sedate import utcnow
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
 external_attendee_org = 'Externe Kursteilnehmer'
 
 
-class CourseAttendee(Base, ORMSearchable):
+class CourseAttendee(Base, StripWhitespaceMixin, ORMSearchable):
     """
     Comprises the user base mirrored by one-to-one relationship with
     onegov.user.User which is linked to the LDAP System including

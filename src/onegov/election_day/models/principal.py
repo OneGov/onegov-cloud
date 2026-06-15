@@ -71,6 +71,11 @@ class Principal:
 
     Defaults to false if nothing specified
 
+    og_description: Optional Open Graph description shown in social media link
+    previews. If omitted, no og:description meta tag is rendered. Example::
+
+        og_description: "Wahlen und Abstimmungen des Kantons Zug"
+
     """
 
     def __init__(
@@ -106,7 +111,8 @@ class Principal:
         official_host: str | None = None,
         segmented_notifications: bool = False,
         private: bool = False,
-        **kwargs: Never
+        og_description: str | None = None,  # Open Graph
+        **kwargs: Never,
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
         self.id = id_
@@ -148,6 +154,7 @@ class Principal:
         self.official_host = official_host
         self.segmented_notifications = segmented_notifications
         self.private = private
+        self.og_description = og_description
 
     @classmethod
     def from_yaml(cls, yaml_source: _ReadStream) -> Canton | Municipality:
@@ -255,6 +262,7 @@ class Canton(Principal, msgpack.Serializable, tag=50, keys=(
     'official_host',
     'segmented_notifications',
     'private',
+    'og_description',
 )):
     """ A cantonal instance. """
 
@@ -409,6 +417,7 @@ class Canton(Principal, msgpack.Serializable, tag=50, keys=(
         official_host: str | None = None,
         segmented_notifications: bool = False,
         private: bool = False,
+        og_description: str | None = None,
         **kwargs: Never,
     ) -> Self:
 
@@ -450,6 +459,7 @@ class Canton(Principal, msgpack.Serializable, tag=50, keys=(
             official_host=official_host,
             segmented_notifications=segmented_notifications,
             private=private,
+            og_description=og_description,
         )
 
         return self
@@ -531,6 +541,7 @@ class Municipality(Principal, msgpack.Serializable, tag=51, keys=(
     'custom_css',
     'official_host',
     'private',
+    'og_description',
 )):
     """ A communal instance. """
 
@@ -640,6 +651,7 @@ class Municipality(Principal, msgpack.Serializable, tag=51, keys=(
         custom_css: str | None = None,
         official_host: str | None = None,
         private: bool = False,
+        og_description: str | None = None,
         **kwargs: Never,
     ) -> Self:
 
@@ -683,6 +695,7 @@ class Municipality(Principal, msgpack.Serializable, tag=51, keys=(
             custom_css=custom_css,
             official_host=official_host,
             private=private,
+            og_description=og_description,
         )
 
         return self
