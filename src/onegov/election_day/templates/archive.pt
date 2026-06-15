@@ -289,7 +289,7 @@
             </tal:block>
 
             <tal:block tal:condition="all_municipal_view">
-                <h2 i18n:translate="">All municipalities</h2>
+                <h2 i18n:translate="">Communal elections and votes by municipality</h2>
                 <div class="archive-breadcrumbs">
                     <div class="municipalities-list">
                         <div tal:repeat="municipality municipalities">

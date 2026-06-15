@@ -954,8 +954,8 @@ msgstr "Anc nagins resultats avant maun"
 msgid "Result"
 msgstr "Resultat"
 
-msgid "All municipalities"
-msgstr "Tut las vischnancas"
+msgid "Communal elections and votes by municipality"
+msgstr "Elecziuns e votaziuns communalas per vischnanca"
 
 msgid "All municipal elections and votes"
 msgstr "Tut las elecziuns e votaziuns communalas"

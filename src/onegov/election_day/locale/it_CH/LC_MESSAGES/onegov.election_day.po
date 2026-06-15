@@ -942,8 +942,8 @@ msgstr "Ancora nessun risultato"
 msgid "Result"
 msgstr "Risultato"
 
-msgid "All municipalities"
-msgstr "Tutti i comuni"
+msgid "Communal elections and votes by municipality"
+msgstr "Elezioni e votazioni comunali per comune"
 
 msgid "All municipal elections and votes"
 msgstr "Tutte le elezioni e votazioni comunali"

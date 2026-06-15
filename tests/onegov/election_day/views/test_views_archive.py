@@ -250,7 +250,7 @@ def test_view_archive_all_municipal(election_day_app_sg: TestApp) -> None:
     client.get('/locale/de_CH').follow()
 
     page = client.get('/archive/municipal')
-    assert 'Alle Gemeinden' in page
+    assert 'Kommunale Wahlen und Abstimmungen nach Gemeinde' in page
     assert 'Au' in page
     assert 'Wil' in page
     assert '/municipality/au' in page
