@@ -141,6 +141,7 @@ def _municipality_view_data(
     return {
         'layout': layout,
         'date': str(year) if year else None,
+        'active_year': year,
         'archive_items': self.group_items(results, request),
         'municipality_collection': self,
         'municipality_name': self.get_municipality_name(),

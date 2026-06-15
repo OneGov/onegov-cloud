@@ -303,4 +303,15 @@ def test_view_archive_municipality_year(election_day_app_sg: TestApp) -> None:
     assert '/municipality/au"' in page
     # 2024 year link present; 2025 shown as plain text (current)
     assert '/municipality/au/2024' in page
-    assert '/municipality/au/2025"' not in page
+    assert 'href="/municipality/au/2025"' not in page
+
+
+def test_view_municipality_redirect(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    response = client.get('/gemeinde/au')
+    assert response.status_int == 302
+    assert response.location is not None
+    assert response.location.endswith('/municipality/au')

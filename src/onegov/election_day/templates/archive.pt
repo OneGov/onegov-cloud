@@ -6,7 +6,8 @@
                  municipal_view municipal_view | python:False;
                  municipality_view municipality_view | python:False;
                  all_municipal_view all_municipal_view | python:False;
-                 municipality_collection municipality_collection | python:None;">
+                 municipality_collection municipality_collection | python:None;
+                 active_year active_year | python:None;">
     <tal:block metal:fill-slot="title">
         <tal:block condition="date">
             <tal:block i18n:translate="">Archive</tal:block> ${date} -
@@ -310,7 +311,7 @@
                             <a tal:condition="date" href="${request.link(municipality_collection.without_year())}" i18n:translate="">All</a>
                         </li>
                         <li tal:repeat="year years">
-                            <tal:block tal:define="current python: str(year) == date;
+                            <tal:block tal:define="current python: year == active_year if municipality_view else str(year) == date;
                                                    year_link python: request.link(municipality_collection.for_year(year)) if municipality_view else request.link(layout.archive.for_date(year))">
                                 <span tal:condition="current">${year}</span>
                                 <a tal:condition="not: current" href="${year_link}">${year}</a>
