@@ -108,12 +108,24 @@ def view_archive_all_municipal(
     request: ElectionDayRequest
 ) -> RenderData:
     layout = DefaultLayout(self, request)
+    mun_archive = layout.municipality_archive
+    latest_years = mun_archive.get_latest_year_by_municipality()
+    municipalities = mun_archive.get_municipalities()
+    municipality_links = {
+        m: request.link(
+            mun_archive.for_municipality(m).for_year(latest_years[m])
+            if m in latest_years
+            else mun_archive.for_municipality(m)
+        )
+        for m in municipalities
+    }
 
     return {
         'layout': layout,
         'date': None,
         'archive_items': None,
-        'municipalities': layout.municipality_archive.get_municipalities(),
+        'municipalities': municipalities,
+        'municipality_links': municipality_links,
         'all_municipal_view': True,
     }
 

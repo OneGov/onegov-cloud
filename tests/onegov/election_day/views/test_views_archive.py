@@ -283,7 +283,7 @@ def test_view_archive_municipality(election_day_app_sg: TestApp) -> None:
     assert 'Au Wahl 2024' in page
     # Wil's item not shown
     assert 'Wil Abstimmung 2025' not in page
-    # Year archive footer: both years present
+    # Year archive footer: both years present as links
     assert '/municipality/au/2025' in page
     assert '/municipality/au/2024' in page
     # "All" shown as plain text (no year filter active)

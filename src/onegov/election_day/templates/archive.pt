@@ -293,7 +293,7 @@
                 <div class="archive-breadcrumbs">
                     <div class="municipalities-list">
                         <div tal:repeat="municipality municipalities">
-                            <a href="${request.link(layout.municipality_archive.for_municipality(municipality))}">${municipality}</a>
+                            <a href="${municipality_links[municipality]}">${municipality}</a>
                         </div>
                     </div>
                 </div>
