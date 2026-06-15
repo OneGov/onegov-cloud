@@ -4,6 +4,7 @@ from __future__ import annotations
 import sedate
 
 from datetime import datetime
+from io import BytesIO
 from dateutil.relativedelta import relativedelta
 from functools import cached_property
 from itertools import chain, groupby
@@ -431,9 +432,12 @@ class BaseImageFileCollection[FileT: File](
         publish_date: datetime | None = None,
         publish_end_date: datetime | None = None
     ) -> FileT:
+        buf: IO[bytes] = (
+            BytesIO(content) if isinstance(content, bytes) else content
+        )
         return super().add(
             filename,
-            resize_image(content, IMAGE_MAX_SIZE),  # type: ignore[arg-type]
+            resize_image(buf, IMAGE_MAX_SIZE),
             note=note,
             published=published,
             publish_date=publish_date,

@@ -46,6 +46,9 @@ def strip_exif_and_store_image_size(
     content: IO[bytes],
     content_type: str | None
 ) -> IO[bytes] | None:
+    # Resizing is NOT done here — it is the caller's responsibility
+    # (BaseImageFileCollection.add or ImageSizeLimit validator).  Plain File
+    # objects created outside those paths are stored at their original size.
 
     if content_type == 'image/svg+xml':
         file.size = get_svg_size_or_default(content)
