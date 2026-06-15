@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import transaction
 import yaml
 
 from datetime import timedelta
@@ -711,6 +712,32 @@ def test_add_iframe(client: Client) -> None:
     page.form['url'] = "https://www.organisation.org/success-stories/"
     page = page.form.submit()
     assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page
+
+
+def test_open_graph_description_fallback(client: 'Client') -> None:
+    client.login_admin()
+
+    # Create a topic without a lead
+    root_page = client.get('/topics/organisation')
+    new_page = root_page.click('Thema')
+    new_page.form['title'] = 'No Lead Page'
+    page = new_page.form.submit().follow()
+
+    assert get_meta(page, 'og:description') is None
+
+    # Set the instance-wide og_description on the organisation
+    client.app.org.og_description = 'Govikon — Ihre Gemeinde'
+    transaction.commit()
+
+    page = client.get(page.request.url)
+    assert get_meta(page, 'og:description') == 'Govikon — Ihre Gemeinde'
+
+    # A page with its own lead takes priority over the fallback
+    edit = page.click('Bearbeiten')
+    edit.form['lead'] = 'Page-specific lead'
+    page = edit.form.submit().follow()
+
+    assert get_meta(page, 'og:description') == 'Page-specific lead'
 
 
 def test_pages_internal_notes_extension(client: Client) -> None:

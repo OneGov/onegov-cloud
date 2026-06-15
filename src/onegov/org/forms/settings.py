@@ -90,6 +90,12 @@ class OrganisationProfileSettingsForm(Form):
         label=_('Name'),
         validators=[InputRequired()])
 
+    og_description = TextAreaField(
+        label=_('Application Description'),
+        description=_('Application Description'),
+        render_kw={'rows': 4},
+    )
+
     reply_to = EmailField(
         _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
         description=_('Replies to automated e-mails go to this address.'))
@@ -102,6 +108,14 @@ class OrganisationProfileSettingsForm(Form):
             ('it_CH', _('Italian'))
         ),
         validators=[InputRequired()]
+    )
+
+    og_logo_default = StringField(
+        label=_('Image'),
+        description=_('Default social media preview image for rich link '
+                      'previews. Optimal size is 1200:630 px.'),
+        fieldset='OpenGraph',
+        render_kw={'class_': 'image-url'}
     )
 
 
@@ -142,14 +156,6 @@ class AppearanceSettingsForm(Form):
         label=_('Icon SVG 20x20 (Safari)'),
         description=_('URL pointing to the icon'),
         render_kw={'class_': 'image-url'},
-    )
-
-    og_logo_default = StringField(
-        label=_('Image'),
-        description=_('Default social media preview image for rich link '
-                      'previews. Optimal size is 1200:630 px.'),
-        fieldset='OpenGraph',
-        render_kw={'class_': 'image-url'}
     )
 
     primary_color = ColorField(
