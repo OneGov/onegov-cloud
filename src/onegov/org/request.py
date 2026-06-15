@@ -12,7 +12,6 @@ from onegov.page import Page, PageCollection
 from onegov.user import User
 from sedate import utcnow
 from sqlalchemy import inspect
-from uuid import UUID
 from sqlalchemy.orm import noload
 
 
@@ -122,7 +121,7 @@ class OrgRequest(CoreRequest):
         if not hasattr(self, '_current_user'):
             self._current_user = (
                 self.session.query(User)
-                .filter(User.id == UUID(self.identity.uid))
+                .filter(User.id == self.identity.uid)
                 .first()
             )
             if (
