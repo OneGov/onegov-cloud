@@ -805,13 +805,15 @@ def migrate_analytics_code(context: UpgradeContext) -> None:
         click.echo(code)
 
 
-def fix_missing_reserved_slots(session: Any) -> tuple[int, list[Any]]:
+def fix_missing_reserved_slots(
+    session: Any,
+) -> tuple[list[Any], list[tuple[Any, bool]]]:
     """ Fixes approved reservations that have no reserved slots.
 
-    Returns ``(recreated, deleted_starts)`` where ``deleted_starts`` is a list
-    of the ``start`` datetimes of deleted reservations. Slots are recreated
-    when the time range is still free; otherwise the orphaned reservation is
-    deleted and a note is added to its ticket.
+    Returns ``(recreated_starts, deleted_starts)``. ``recreated_starts`` is a
+    list of ``start`` datetimes of reservations whose slots were recreated.
+    ``deleted_starts`` entries are ``(start, noted)`` tuples where ``noted``
+    indicates whether a ticket note was added.
     """
     import sedate
     from libres.db.models import Allocation, Reservation, ReservedSlot
@@ -841,7 +843,7 @@ def fix_missing_reserved_slots(session: Any) -> tuple[int, list[Any]]:
         .all()
     )
 
-    recreated = 0
+    recreated_starts: list[Any] = []
     deleted_starts: list[tuple[Any, bool]] = []
 
     for reservation in broken:
@@ -920,9 +922,9 @@ def fix_missing_reserved_slots(session: Any) -> tuple[int, list[Any]]:
                 slot.reservation_token = reservation.token
                 slot.source_type = 'reservation'
                 allocation.reserved_slots.append(slot)
-            recreated += 1
+            recreated_starts.append(reservation.start)
 
-    return recreated, deleted_starts
+    return recreated_starts, deleted_starts
 
 
 @upgrade_task('Recreate missing reserved slots for approved reservations')
@@ -939,13 +941,17 @@ def recreate_missing_reserved_slots(context: UpgradeContext) -> None:
             not context.has_table('reserved_slots')):
         return
 
-    recreated, deleted_starts = fix_missing_reserved_slots(context.session)
+    recreated_starts, deleted_starts = fix_missing_reserved_slots(
+        context.session
+    )
 
-    if recreated:
+    for start in recreated_starts:
+        date_str = (
+            start.strftime('%d.%m.%Y %H:%M') if start is not None else '?'
+        )
         click.secho(
-            f'{context.schema}: recreated slots for {recreated} '
-            f'reservation(s)',
-            fg='green'
+            f'{context.schema}: recreated slots for reservation {date_str}',
+            fg='green',
         )
     for start, noted in deleted_starts:
         date_str = (

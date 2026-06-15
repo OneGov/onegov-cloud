@@ -4822,10 +4822,10 @@ def test_migration_recreates_missing_reserved_slot(
 
     # Migration recreates the missing morning slots only.
     session = client.app.session()
-    recreated, deleted_starts = fix_missing_reserved_slots(session)
+    recreated_starts, deleted_starts = fix_missing_reserved_slots(session)
     transaction.commit()
 
-    assert recreated == 1
+    assert len(recreated_starts) == 1
     assert deleted_starts == []
 
     # Afternoon slots must be untouched.
@@ -4902,10 +4902,10 @@ def test_migration_removes_reservation_when_slot_is_taken(
 
     # Migration must detect the conflict, delete the reservation, and note it.
     session = client.app.session()
-    recreated, deleted_starts = fix_missing_reserved_slots(session)
+    recreated_starts, deleted_starts = fix_missing_reserved_slots(session)
     transaction.commit()
 
-    assert recreated == 0
+    assert recreated_starts == []
     assert len(deleted_starts) == 1
     _start, noted = deleted_starts[0]
     assert noted is True  # reservation is in the future → ticket note added
