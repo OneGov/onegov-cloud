@@ -7529,13 +7529,6 @@ msgstr "Ajuster la réservation"
 msgid "Cannot move reservation into the past"
 msgstr "Impossible de déplacer la réservation dans le passé"
 
-msgid ""
-"The reserved slot could not be found and the reservation can no longer be "
-"adjusted."
-msgstr ""
-"Le créneau réservé est introuvable et la réservation ne peut plus être "
-"modifiée."
-
 msgid "The reservation was adjusted"
 msgstr "La réservation a été ajustée"
 
