@@ -383,3 +383,42 @@ def test_view_rest_xml(election_day_app_zg: TestApp) -> None:
         assert isinstance(import_.call_args[0][0], Canton)
         assert isinstance(import_.call_args[0][1], BytesIO)
         assert isinstance(import_.call_args[0][2], Session)
+
+
+def test_infailedsqltransaction_after_corrupt_pool_connection(
+    election_day_app_zg: TestApp
+) -> None:
+    """OGC-3223: a connection returned to the pool while its PostgreSQL
+    transaction is aborted causes the next request to fail.
+
+    Without the fix, activate_schema's SET search_path raises
+    InFailedSqlTransaction on the first SQL of any request that uses the DB.
+    With the fix the checkout event issues ROLLBACK so the connection is clean.
+    """
+    from sqlalchemy.pool.base import ResetStyle
+
+    app = election_day_app_zg
+    pool = app.session_manager.engine.pool
+
+    # Flush all connections so the dirty one below is the only candidate.
+    app.session_manager.session_factory.remove()
+    pool.dispose()
+
+    # Abort a transaction on a raw connection and return it to the pool
+    # without ROLLBACK (bypassing SQLAlchemy's normal reset-on-return).
+    raw = app.session_manager.engine.raw_connection()
+    try:
+        raw.driver_connection.cursor().execute('SELECT 1/0')
+    except Exception:
+        pass
+    original = pool._reset_on_return
+    pool._reset_on_return = ResetStyle.reset_none
+    try:
+        raw.close()
+    finally:
+        pool._reset_on_return = original
+
+    # GET / accesses the DB (ArchivedResultCollection) — any request that
+    # hits the DB will fail with InFailedSqlTransaction without the fix.
+    result = Client(app).get('/', expect_errors=True)
+    assert result.status_int == 200
