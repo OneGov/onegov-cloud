@@ -76,6 +76,7 @@ from onegov.people import PersonCollection, Person
 from onegov.qrcode import QrCode
 from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
+from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket
 from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
@@ -3398,6 +3399,9 @@ class UserGroupLayout(DefaultLayout):
     @cached_property
     def collection(self) -> UserGroupCollection[UserGroup]:
         return UserGroupCollection(self.request.session)
+
+    def handler_label(self, code: str) -> str:
+        return ticket_handlers.code_label(self.request, code)
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

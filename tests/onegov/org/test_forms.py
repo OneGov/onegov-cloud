@@ -810,6 +810,7 @@ def test_user_group_form(
         app=Bunch(session=lambda: session),
         current_user=None,
         link=lambda *args, **kwargs: '#dummy',
+        translate=lambda text: str(text),
     )
     form = ManageUserGroupForm()
     form.model = None
