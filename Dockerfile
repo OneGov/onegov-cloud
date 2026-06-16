@@ -86,9 +86,9 @@ RUN GOBIN=/tmp go install github.com/seantis/hivemind@v1.0.4 \
 ARG DART_SASS_VERSION=1.100.0
 RUN curl -sL "https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz" \
     | tar xz -C /tmp \
-    && mv /tmp/dart-sass/sass /usr/local/bin/sass \
-    && mv /tmp/dart-sass/src /usr/local/bin/src \
-    && rm -rf /tmp/dart-sass
+    && mv /tmp/dart-sass /app/dart-sass \
+    && mkdir -p /app/bin \
+    && ln -s /app/dart-sass/sass /app/bin/sass
 
 # build onegov-cloud
 COPY MANIFEST.in /app/src/MANIFEST.in

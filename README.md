@@ -134,12 +134,6 @@ To install the requirements for Ubuntu do:
 
     sudo apt install postgresql postgresql-contrib redis-server nodejs python3 docker-compose
 
-Install [Dart Sass](https://github.com/sass/dart-sass/releases):
-
-    curl -sL https://github.com/sass/dart-sass/releases/download/1.100.0/dart-sass-1.100.0-linux-x64.tar.gz | tar xz -C /tmp
-    sudo cp /tmp/dart-sass/sass /tmp/dart-sass/src /usr/local/bin/
-    rm -rf /tmp/dart-sass
-
 ### Libraries
 
 You'll additionally have to install a number of libraries, to build the
@@ -147,7 +141,7 @@ dependencies:
 
 #### MacOS
 ```shell
-brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv libxmlsec1 weasyprint sass/sass/sass
+brew install curl libffi libjpeg libpq libxml2 libxslt zlib libev poppler pv libxmlsec1 weasyprint
 ```
 
 #### Ubuntu
