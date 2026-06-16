@@ -43,7 +43,9 @@
                         <tal:b condition="not:grouped">
                             <p i18n:translate="">No files uploaded yet</p>
                         </tal:b>
-                        <table tal:condition="grouped" class="files translator-documents">
+                        <table tal:condition="grouped"
+                               class="files translator-documents"
+                               data-move-url="${move_url}">
                             <tbody>
                                 <tal:b tal:repeat="(category, files) grouped">
                                     <tr>
@@ -51,9 +53,41 @@
                                         <th></th>
                                         <th i18n:translate>Extension</th>
                                         <th i18n:translate>Upload Date</th>
+                                        <th i18n:translate>Move</th>
                                     </tr>
-                                    <tal:b tal:repeat="file files">
-                                        <tal:b metal:use-macro="layout.macros.file_info" />
+                                    <tal:b tal:repeat="file files"
+                                           tal:define="file_upload file.upload_date|file.created">
+                                        <tr class="file-info ${'signed' if file.signed else ''}">
+                                            <td>${file.name}</td>
+                                            <td>
+                                                <a id="button-${file.id}"
+                                                   data-toggle="#details-${file.id}"
+                                                   class="untoggled">
+                                                    <i class="fa fa-chevron-down"
+                                                       aria-hidden="true"></i>
+                                                </a>
+                                            </td>
+                                            <td>${extension(file)}</td>
+                                            <td>${format_date(file_upload)}</td>
+                                            <td>
+                                                <select class="move-category-select"
+                                                        data-file-id="${file.id}">
+                                                    <option tal:repeat="cat categories"
+                                                            tal:attributes="value cat;
+                                                                           selected cat == file.note"
+                                                            >${cat}</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr id="details-${file.id}"
+                                            style="display: none;">
+                                            <td colspan="5">
+                                                <div ic-trigger-from="#button-${file.id}"
+                                                     ic-trigger-on="click once, change"
+                                                     ic-get-from="${actions_url(file.id)}">
+                                                </div>
+                                            </td>
+                                        </tr>
                                     </tal:b>
                                 </tal:b>
                             </tbody>
