@@ -27,6 +27,14 @@
 
     Have a look at the source code: https://onegov.readthedocs.org
     -->
+    <meta property="og:title" tal:attributes="content layout.og_title" tal:condition="layout.og_title" />
+    <meta property="og:type" tal:attributes="content layout.og_type" />
+    <meta property="og:url" tal:attributes="content layout.og_url" />
+    <meta property="og:image" tal:attributes="content layout.og_image_url" tal:condition="layout.og_image_url" />
+    <meta property="og:site_name" tal:attributes="content layout.og_site_name" tal:condition="layout.og_site_name" />
+    <meta property="og:description" tal:attributes="content layout.og_description" tal:condition="layout.og_description" />
+    <meta property="og:locale" tal:attributes="content layout.og_locale" />
+    <meta tal:repeat="locale layout.og_locale_alternate" property="og:locale:alternate" tal:attributes="content locale" />
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
     <style tal:condition="request.app.principal.custom_css">${request.app.principal.custom_css}</style>

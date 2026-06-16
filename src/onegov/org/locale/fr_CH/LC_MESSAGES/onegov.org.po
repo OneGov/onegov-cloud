@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-09 08:55+0200\n"
+"POT-Creation-Date: 2026-06-11 10:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2023,6 +2023,9 @@ msgstr "Envoyer sur"
 msgid "Please add at least one notification."
 msgstr "Veuillez ajouter au moins une notification."
 
+msgid "Application Description"
+msgstr "Description de l'application"
+
 msgid "Languages"
 msgstr "Langues"
 
@@ -2034,6 +2037,13 @@ msgstr "Français"
 
 msgid "Italian"
 msgstr "Italien"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
+"riches. La taille optimale est de 1200:630 px."
 
 msgid "Logo"
 msgstr "Logo"
@@ -2058,13 +2068,6 @@ msgstr "Icône 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icône SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
-"riches. La taille optimale est de 1200:630 px."
 
 msgid "Primary Color"
 msgstr "Couleur primaire"
@@ -5736,9 +5739,6 @@ msgstr ""
 "qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
 "située en haut."
 
-msgid "Back"
-msgstr "Retour"
-
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
 
@@ -8039,6 +8039,9 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Back"
+#~ msgstr "Retour"
 
 #, python-format
 #~ msgid "The entry ${name} exists twice"
