@@ -1979,10 +1979,27 @@ msgstr "Prenotazioni giornaliere"
 
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
-"be sent to the recipient above at 06:00."
+"be sent to the recipient above."
 msgstr ""
-"Alle ore 6:00 di ogni giorno selezionato qui sotto, al suddetto destinatario "
-"verrà inviata una notifica con le prenotazioni del giorno."
+"Per ogni giorno selezionato qui sotto, al suddetto destinatario verrà "
+"inviata una notifica con le prenotazioni del giorno."
+
+msgid "Delivery Times"
+msgstr "Orari di invio"
+
+msgid "e.g. 07:00 or 07:00, 14:30"
+msgstr "es. 07:00 o 07:00, 14:30"
+
+msgid "Please enter at least one delivery time."
+msgstr "Inserire almeno un orario di invio."
+
+msgid ""
+"Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
+msgstr ""
+"Orario non valido \"${time}\". Usare il formato HH:MM (es. 06:00)."
+
+msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
+msgstr "I minuti devono essere un multiplo di 5 (es. 06:00, 06:30)."
 
 msgid "Customer Messages"
 msgstr "Messaggi dei clienti"

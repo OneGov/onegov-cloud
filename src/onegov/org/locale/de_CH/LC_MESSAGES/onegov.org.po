@@ -1975,11 +1975,27 @@ msgstr "Tägliche Reservationen"
 
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
-"be sent to the recipient above at 06:00."
+"be sent to the recipient above."
 msgstr ""
 "An jedem unten ausgewählten Tag wird eine Benachrichtigung mit den "
-"Reservierungen des Tages um 06:00 Uhr an den oben genannten Empfänger "
-"gesendet."
+"Reservierungen des Tages an den oben genannten Empfänger gesendet."
+
+msgid "Delivery Times"
+msgstr "Zustellungszeiten"
+
+msgid "e.g. 07:00 or 07:00, 14:30"
+msgstr "z.B. 07:00 oder 07:00, 14:30"
+
+msgid "Please enter at least one delivery time."
+msgstr "Bitte mindestens eine Zustellungszeit eingeben."
+
+msgid ""
+"Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
+msgstr ""
+"Ungültige Zeit \"${time}\". Bitte im Format HH:MM eingeben (z.B. 06:00)."
+
+msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
+msgstr "Minuten müssen ein Vielfaches von 5 sein (z.B. 06:00, 06:30)."
 
 msgid "Customer Messages"
 msgstr "Kunden Nachrichten"
