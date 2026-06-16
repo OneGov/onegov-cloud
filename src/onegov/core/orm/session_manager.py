@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import psycopg2.extensions
 import re
 import sys
 import threading
@@ -408,6 +409,29 @@ class SessionManager:
         the session provided by the external engine.
 
         """
+
+        @event.listens_for(engine, 'checkout')
+        def rollback_aborted_connection(
+            dbapi_connection: Any,
+            connection_record: Any,
+            connection_proxy: Any,
+        ) -> None:
+            """ Roll back connections that were returned to the pool while a
+            PostgreSQL transaction was still in an aborted state.
+
+            Without this, the next request that checks out such a connection
+            will fail with InFailedSqlTransaction when activate_schema tries
+            to run SET search_path (OGC-3223).
+            """
+            if (
+                dbapi_connection.get_transaction_status()
+                == psycopg2.extensions.TRANSACTION_STATUS_INERROR
+            ):
+                log.warning(
+                    'Pool checked out a connection with an aborted PostgreSQL '
+                    'transaction — issuing ROLLBACK before use'
+                )
+                dbapi_connection.rollback()
 
         @event.listens_for(engine, 'before_cursor_execute')
         def activate_schema(
