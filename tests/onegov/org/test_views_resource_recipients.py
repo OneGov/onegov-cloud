@@ -123,6 +123,14 @@ def test_resource_recipient_delivery_times(client: Client) -> None:
     assert result.status_int == 200
     assert 'Bitte mindestens eine Zustellungszeit eingeben' in result
 
+    # delivery times are not validated when daily_reservations is unchecked
+    edit_page = client.get('/resource-recipients').click('Bearbeiten', index=0)
+    edit_page.form['daily_reservations'] = False
+    edit_page.form['daily_reservations_times'] = 'badtime'
+    edit_page.form['new_reservations'] = True
+    edit_page = edit_page.form.submit().follow()
+    assert 'User A' in edit_page
+
 
 def test_resource_recipient_legacy_delivery_time(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)

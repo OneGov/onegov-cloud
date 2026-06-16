@@ -116,8 +116,6 @@ class ResourceRecipientForm(Form):
             return None
 
         times = self.daily_reservations_times.data
-        if isinstance(times, str):
-            times = [t.strip() for t in times.split(',') if t.strip()]
         if not times:
             self.daily_reservations_times.errors.append(  # type: ignore[attr-defined]
                 _('Please enter at least one delivery time.')
