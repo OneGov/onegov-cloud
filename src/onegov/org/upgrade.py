@@ -803,3 +803,163 @@ def migrate_analytics_code(context: UpgradeContext) -> None:
     else:
         click.secho('Dropped unrecognized analytics code:', fg='yellow')
         click.echo(code)
+
+
+def fix_missing_reserved_slots(
+    session: Any,
+) -> tuple[list[Any], list[tuple[Any, bool]]]:
+    """ Fixes approved reservations that have no reserved slots.
+
+    Returns ``(recreated_starts, deleted_starts)``. ``recreated_starts`` is a
+    list of ``start`` datetimes of reservations whose slots were recreated.
+    ``deleted_starts`` entries are ``(start, noted)`` tuples where ``noted``
+    indicates whether a ticket note was added.
+    """
+    import sedate
+    from libres.db.models import Allocation, Reservation, ReservedSlot
+    from onegov.org.models.message import TicketNote
+    from onegov.ticket import Ticket
+
+    missing_subq = (
+        session.query(ReservedSlot)
+        .filter(
+            ReservedSlot.reservation_token == Reservation.token,
+            ReservedSlot.source_type == 'reservation',
+            ReservedSlot.start >= Reservation.start,
+            ReservedSlot.end <= Reservation.end,
+        )
+        .correlate(Reservation)
+        .exists()
+    )
+
+    broken = (
+        session.query(Reservation)
+        .filter(
+            Reservation.status == 'approved',
+            Reservation.start.isnot(None),
+            Reservation.end.isnot(None),
+            ~missing_subq,
+        )
+        .all()
+    )
+
+    recreated_starts: list[Any] = []
+    deleted_starts: list[tuple[Any, bool]] = []
+
+    for reservation in broken:
+        allocation = (
+            session.query(Allocation)
+            .filter(
+                Allocation.group == reservation.target,
+                Allocation.resource == Allocation.mirror_of,
+            )
+            .first()
+        )
+
+        if allocation is None:
+            continue
+
+        expected_slots = list(
+            allocation.all_slots(reservation.start, reservation.end)
+        )
+        if not expected_slots:
+            continue
+
+        conflict = any(
+            session.query(ReservedSlot)
+            .filter(
+                ReservedSlot.allocation_id == allocation.id,
+                ReservedSlot.start == slot_start,
+                ReservedSlot.source_type == 'reservation',
+                ReservedSlot.reservation_token != reservation.token,
+            )
+            .first() is not None
+            for slot_start, _ in expected_slots
+        )
+
+        if conflict:
+            ticket = (
+                session.query(Ticket)
+                .filter(
+                    Ticket.handler_code == 'RSV',
+                    Ticket.handler_id == reservation.token.hex,
+                )
+                .first()
+            )
+            is_future = (
+                reservation.end is not None
+                and reservation.end > sedate.utcnow()
+            )
+            if ticket is not None and is_future:
+                ticket.force_update()
+                TicketNote.bound_messages(session).add(
+                    channel_id=ticket.number,
+                    owner=ticket.ticket_email,
+                    text=(
+                        'Diese Reservation wurde aufgrund eines technischen '
+                        'Fehlers irrtümlich storniert und wurde entfernt.'
+                    ),
+                    meta={
+                        'id': ticket.id.hex,
+                        'handler_code': ticket.handler_code,
+                        'group': ticket.group,
+                        'origin': 'internal',
+                    }
+                )
+            # The many-to-many payment link uses passive_deletes, so unlink
+            # it explicitly before deleting to avoid a FK violation.
+            if hasattr(reservation, 'payment'):
+                reservation.payment = None
+            noted = ticket is not None and is_future
+            deleted_starts.append((reservation.start, noted))
+            session.delete(reservation)
+        else:
+            for slot_start, slot_end in expected_slots:
+                slot = ReservedSlot()
+                slot.start = slot_start
+                slot.end = slot_end
+                slot.resource = allocation.resource
+                slot.reservation_token = reservation.token
+                slot.source_type = 'reservation'
+                allocation.reserved_slots.append(slot)
+            recreated_starts.append(reservation.start)
+
+    return recreated_starts, deleted_starts
+
+
+@upgrade_task('Recreate missing reserved slots for approved reservations')
+def recreate_missing_reserved_slots(context: UpgradeContext) -> None:
+    """ Fixes approved reservations whose ReservedSlot rows were erroneously
+    deleted by a libres bug that occurred when rejecting one reservation on a
+    partly-available allocation also removed the sibling reservation's slots.
+
+    For each affected reservation the slots are recreated if the time range is
+    still free. If another reservation already owns those slots the orphaned
+    reservation is deleted and a note is added to its ticket.
+    """
+    if (not context.has_table('reservations') or
+            not context.has_table('reserved_slots')):
+        return
+
+    recreated_starts, deleted_starts = fix_missing_reserved_slots(
+        context.session
+    )
+
+    for start in recreated_starts:
+        date_str = (
+            start.strftime('%d.%m.%Y %H:%M') if start is not None else '?'
+        )
+        click.secho(
+            f'{context.schema}: recreated slots for reservation {date_str}',
+            fg='green',
+        )
+    for start, noted in deleted_starts:
+        date_str = (
+            start.strftime('%d.%m.%Y %H:%M') if start is not None else '?'
+        )
+        suffix = 'with ticket note' if noted else 'past reservation, no note'
+        click.secho(
+            f'{context.schema}: deleted orphaned reservation {date_str} '
+            f'({suffix})',
+            fg='yellow',
+        )

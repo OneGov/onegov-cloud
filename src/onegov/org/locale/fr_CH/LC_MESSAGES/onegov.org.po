@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-01 12:55+0200\n"
+"POT-Creation-Date: 2026-06-11 10:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1994,6 +1994,9 @@ msgstr ""
 "Chaque fois qu'un client ajoute un message au ticket pour une réservation, "
 "une notification est envoyée au destinataire ci-dessus."
 
+msgid "Internal Comments"
+msgstr "Commentaires internes"
+
 msgid "Internal Notes"
 msgstr "Notes internes"
 
@@ -2020,6 +2023,9 @@ msgstr "Envoyer sur"
 msgid "Please add at least one notification."
 msgstr "Veuillez ajouter au moins une notification."
 
+msgid "Application Description"
+msgstr "Description de l'application"
+
 msgid "Languages"
 msgstr "Langues"
 
@@ -2031,6 +2037,13 @@ msgstr "Français"
 
 msgid "Italian"
 msgstr "Italien"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
+"riches. La taille optimale est de 1200:630 px."
 
 msgid "Logo"
 msgstr "Logo"
@@ -2055,13 +2068,6 @@ msgstr "Icône 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icône SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Image par défaut de l'aperçu des médias sociaux pour les aperçus de liens "
-"riches. La taille optimale est de 1200:630 px."
 
 msgid "Primary Color"
 msgstr "Couleur primaire"
@@ -5733,9 +5739,6 @@ msgstr ""
 "qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
 "située en haut."
 
-msgid "Back"
-msgstr "Retour"
-
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
 
@@ -6537,13 +6540,6 @@ msgstr "Un lien a été ajouté au presse-papiers"
 
 msgid "Administrative"
 msgstr "Administratif"
-
-#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
-#. well.
-#.
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "L'entrée ${name} existe deux fois"
 
 msgid "Added a new directory"
 msgstr "Ajout d'un nouveau dossier"
@@ -8043,6 +8039,13 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Back"
+#~ msgstr "Retour"
+
+#, python-format
+#~ msgid "The entry ${name} exists twice"
+#~ msgstr "L'entrée ${name} existe deux fois"
 
 #~ msgid "(Redesign only)"
 #~ msgstr "(Redesign uniquement)"

@@ -90,6 +90,12 @@ class OrganisationProfileSettingsForm(Form):
         label=_('Name'),
         validators=[InputRequired()])
 
+    og_description = TextAreaField(
+        label=_('Application Description'),
+        description=_('Application Description'),
+        render_kw={'rows': 4},
+    )
+
     reply_to = EmailField(
         _('E-Mail Reply Address (Reply-To)'), [InputRequired()],
         description=_('Replies to automated e-mails go to this address.'))
@@ -102,6 +108,14 @@ class OrganisationProfileSettingsForm(Form):
             ('it_CH', _('Italian'))
         ),
         validators=[InputRequired()]
+    )
+
+    og_logo_default = StringField(
+        label=_('Image'),
+        description=_('Default social media preview image for rich link '
+                      'previews. Optimal size is 1200:630 px.'),
+        fieldset='OpenGraph',
+        render_kw={'class_': 'image-url'}
     )
 
 
@@ -142,14 +156,6 @@ class AppearanceSettingsForm(Form):
         label=_('Icon SVG 20x20 (Safari)'),
         description=_('URL pointing to the icon'),
         render_kw={'class_': 'image-url'},
-    )
-
-    og_logo_default = StringField(
-        label=_('Image'),
-        description=_('Default social media preview image for rich link '
-                      'previews. Optimal size is 1200:630 px.'),
-        fieldset='OpenGraph',
-        render_kw={'class_': 'image-url'}
     )
 
     primary_color = ColorField(
@@ -1393,20 +1399,7 @@ class OrgTicketSettingsForm(Form):
         return None
 
     def code_title(self, code: str) -> str:
-        """ Renders a better translation for handler_codes.
-        Note that the registry of handler_codes is global and not all handlers
-        might are used in this app. The translations give a hint whether the
-        handler is used/defined in the app using this form.
-        A better translation is only then possible.
-        """
-        trs = getattr(handlers.registry[code], 'code_title', None)
-        if not trs:
-            return code
-        translated = self.request.translate(trs)
-        if str(trs) == translated:
-            # Code not used by app
-            return code
-        return f'{code} - {translated}'
+        return handlers.code_label(self.request, code)
 
     def on_request(self) -> None:
 
@@ -1423,7 +1416,9 @@ class OrgTicketSettingsForm(Form):
         permissions: list[_Choice] = sorted((
             (
                 p.id.hex,
-                ': '.join(x for x in (p.handler_code, p.group) if x)
+                ': '.join(x for x in (
+                    self.code_title(p.handler_code), p.group
+                ) if x)
             )
             for p in self.request.session.query(
                 TicketPermission.id,
