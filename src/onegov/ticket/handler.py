@@ -349,6 +349,24 @@ class HandlerRegistry:
         """
         return self.registry[handler_code]
 
+    def code_label(self, request: CoreRequest, handler_code: str) -> str:
+        """ Renders a descriptive label for a handler code, e.g.
+        'FRM - Forms'.
+
+        The registry is global, so not all handlers might be used in the
+        current app. If the code's title has no translation in the app,
+        the handler is considered unused and the raw code is returned.
+
+        """
+        title = getattr(self.registry.get(handler_code), 'code_title', None)
+        if not title:
+            return handler_code
+        translated = request.translate(title)
+        if str(title) == translated:
+            # Code not used by app
+            return handler_code
+        return f'{handler_code} - {translated}'
+
     def register(
         self,
         handler_code: str,

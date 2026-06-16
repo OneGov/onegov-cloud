@@ -346,12 +346,13 @@ class ManageUserGroupForm(Form):
             (str(u.id), u.title)
             for u in UserCollection(self.request.session).query()
         ]
-        ticket_choices: list[_Choice] = [
-            (key, key)
+        labels = {
+            key: handlers.code_label(self.request, key)
             for key in handlers.registry.keys()
-        ]
+        }
+        ticket_choices: list[_Choice] = list(labels.items())
         ticket_choices.extend(
-            (f'DIR-{group}', f'DIR: {group}')
+            (f'DIR-{group}', f'{labels["DIR"]}: {group}')
             for group, in self.request.session.query(
                 Directory.title.label('group')
             # some groups may get deleted, but as long as there are tickets
@@ -366,7 +367,7 @@ class ManageUserGroupForm(Form):
             ).order_by('group').distinct()
         )
         ticket_choices.extend(
-            (f'FRM-{group}', f'FRM: {group}')
+            (f'FRM-{group}', f'{labels["FRM"]}: {group}')
             for group, in self.request.session.query(
                 FormDefinition.title.label('group')
             # some groups may get deleted, but as long as there are tickets
@@ -379,7 +380,7 @@ class ManageUserGroupForm(Form):
             ).order_by('group').distinct()
         )
         ticket_choices.extend(
-            (f'RSV-{group}', f'RSV: {group}')
+            (f'RSV-{group}', f'{labels["RSV"]}: {group}')
             for group, in self.request.session.query(
                 Resource.title.label('group')
             # some groups may get deleted, but as long as there are tickets
