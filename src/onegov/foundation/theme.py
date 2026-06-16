@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import os.path
-import subprocess
 
 from collections import OrderedDict
 from itertools import chain
 from io import StringIO
 from onegov.core.theme import Theme as CoreTheme
+from onegov.core.theme import compile_sass
 
 
 from typing import Any, TYPE_CHECKING
@@ -184,22 +184,7 @@ class BaseTheme(CoreTheme):
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
 
-        style = 'compressed' if self.compress else 'expanded'
-        result = subprocess.run(  # nosec B603 B607
-            [
-                'sass',
-                '--stdin',
-                '--no-source-map',
-                f'--style={style}',
-                '--quiet-deps',
-                *(f'--load-path={p}' for p in paths),
-            ],
-            input=theme.getvalue(),
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        return result.stdout
+        return compile_sass(theme.getvalue(), paths, self.compress)
 
 
 class Theme(BaseTheme):
