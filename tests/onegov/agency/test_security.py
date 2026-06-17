@@ -10,7 +10,7 @@ from onegov.agency.models import ExtendedPerson
 from onegov.agency.models.ticket import AgencyMutationTicket
 from onegov.agency.models.ticket import PersonMutationTicket
 from onegov.agency.security import get_current_role
-from onegov.core.security import Identity
+from onegov.core import Identity
 from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.security import Public

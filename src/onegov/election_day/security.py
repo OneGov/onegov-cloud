@@ -9,7 +9,7 @@ from onegov.election_day import ElectionDayApp
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.security import Identity
+    from onegov.core import Identity
 
 
 class MaybePublic(Intent):

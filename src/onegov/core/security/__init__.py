@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from onegov.core.security.identity import OneGovIdentity as Identity
 from onegov.core.security.identity_policy import forget
 from onegov.core.security.identity_policy import remembered
 from onegov.core.security.permissions import Personal
@@ -11,7 +10,6 @@ from onegov.core.security.permissions import Secret
 
 __all__ = [
     'forget',
-    'Identity',
     'Personal',
     'Private',
     'Public',

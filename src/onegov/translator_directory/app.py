@@ -20,7 +20,8 @@ from sqlalchemy import and_
 from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
-    from morepath.authentication import Identity, NoIdentity
+    from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from onegov.gis.models.coordinates import AnyCoordinates
 
 

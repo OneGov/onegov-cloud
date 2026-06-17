@@ -49,8 +49,8 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Sequence)
     from more.content_security import ContentSecurityPolicy
     from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from onegov.core.mail import Attachment
-    from onegov.core.security import Identity
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
     from onegov.ticket import Ticket

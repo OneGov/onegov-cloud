@@ -59,7 +59,7 @@ from onegov.core.orm import (
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.request import CoreRequest
-from onegov.core.security.identity import OneGovIdentity as Identity
+from onegov.core.identity import OneGovIdentity as Identity
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class

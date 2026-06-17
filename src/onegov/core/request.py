@@ -34,10 +34,9 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from morepath import reify
     from morepath.authentication import NoIdentity
-    from onegov.core import Framework
+    from onegov.core import Framework, Identity
     from onegov.core.browser_session import BrowserSession
     from onegov.core.i18n.translation_string import TranslationMarkup
-    from onegov.core.security import Identity
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
     from sqlalchemy.orm import Mapped, Session

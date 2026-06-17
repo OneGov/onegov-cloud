@@ -19,7 +19,7 @@ from typing import Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from morepath.authentication import NoIdentity
-    from onegov.core.security import Identity
+    from onegov.core import Identity
     from onegov.core.types import RenderData
     from onegov.user import User
     from onegov.user.integration import EnsureUserCallback

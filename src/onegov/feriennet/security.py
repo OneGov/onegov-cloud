@@ -19,7 +19,7 @@ from onegov.ticket import Ticket
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from morepath.authentication import NoIdentity
-    from onegov.core.security import Identity
+    from onegov.core import Identity
     from onegov.core.security.roles import Intent
 
 

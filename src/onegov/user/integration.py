@@ -18,9 +18,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Mapping
     from functools import cached_property
     from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.request import CoreRequest
-    from onegov.core.security import Identity
     from onegov.user import User
     from onegov.user.auth.provider import (
         IntegratedAuthenticationProvider, OauthProvider,

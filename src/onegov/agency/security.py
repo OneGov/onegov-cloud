@@ -23,7 +23,7 @@ from sqlalchemy.orm import object_session
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from morepath.authentication import NoIdentity
-    from onegov.core.security import Identity
+    from onegov.core import Identity
     from onegov.core.security.roles import Intent
     from sqlalchemy.orm import Session
 
