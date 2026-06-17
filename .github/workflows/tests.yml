@@ -176,6 +176,8 @@ jobs:
         # NOTE: Suppress uv warning
         UV_LINK_MODE: copy
 
+    # TODO: Remove this step once the Dockerfile dart-sass change is merged
+    #       to master.
     - name: Install Dart Sass
       run: |
         if ! command -v sass &>/dev/null; then
