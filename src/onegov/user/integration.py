@@ -17,8 +17,10 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Mapping
     from functools import cached_property
+    from morepath.authentication import NoIdentity
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.request import CoreRequest
+    from onegov.core.security import Identity
     from onegov.user import User
     from onegov.user.auth.provider import (
         IntegratedAuthenticationProvider, OauthProvider,
@@ -105,7 +107,7 @@ class UserApp(WebassetsApp):
 
     def redirect_after_login(
         self,
-        identity: morepath.Identity,
+        identity: Identity | NoIdentity,
         request: CoreRequest,
         default: str
     ) -> str | None:

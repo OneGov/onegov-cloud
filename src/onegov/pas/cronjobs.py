@@ -12,9 +12,8 @@ from onegov.pas.importer.output_handlers import DatabaseOutputHandler
 from onegov.pas.models import ImportLog
 from sqlalchemy.orm.attributes import flag_modified
 
-from typing import Any, TYPE_CHECKING, cast
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.pas.app import PasApp as PasAppType
     from onegov.pas.request import PasRequest
 
 log = logging.getLogger('onegov.pas.cronjobs')
@@ -66,7 +65,7 @@ def trigger_kub_data_import(
         kub_token, kub_base_url, output_handler, cert=cert
     ) as importer:
         combined_results, import_log_id = importer.run_full_sync(
-            request, cast('PasAppType', app), import_type
+            request, app, import_type
         )
 
     # Sync user accounts right after import

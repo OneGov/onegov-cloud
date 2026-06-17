@@ -17,7 +17,7 @@ from purl import URL
 from sqlalchemy import and_
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from morepath.authentication import Identity, NoIdentity
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 class TranslatorDirectoryApp(TownApp):
 
     send_ticket_statistics = False
-    request_class = TranslatorAppRequest
+    request_class: type[TranslatorAppRequest[Self]] = TranslatorAppRequest
 
     def fts_may_use_private_search(
         self,

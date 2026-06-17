@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from morepath import Identity
 from morepath.authentication import NO_IDENTITY
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
@@ -11,6 +10,7 @@ from onegov.agency.models import ExtendedPerson
 from onegov.agency.models.ticket import AgencyMutationTicket
 from onegov.agency.models.ticket import PersonMutationTicket
 from onegov.agency.security import get_current_role
+from onegov.core.security import Identity
 from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.security import Public

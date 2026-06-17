@@ -15,12 +15,12 @@ from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
 from purl import URL
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
-    from onegov.core.types import RenderData
     from morepath.authentication import NoIdentity
-    from morepath.authentication import Identity
+    from onegov.core.security import Identity
+    from onegov.core.types import RenderData
     from onegov.user import User
     from onegov.user.integration import EnsureUserCallback
 
@@ -28,7 +28,7 @@ log = logging.getLogger('onegov.pas')
 
 
 class PasApp(TownApp):
-    request_class = PasRequest
+    request_class: type[PasRequest[Self]] = PasRequest
 
     def configure_organisation(
         self,
@@ -79,7 +79,7 @@ class PasApp(TownApp):
 
 @PasApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> Callable[[TownApp, str], Organisation]:
+) -> Callable[[PasApp, str], Organisation]:
     return create_new_organisation
 
 

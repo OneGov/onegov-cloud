@@ -5,12 +5,16 @@ from onegov.pas.utils import is_parliamentarian
 from functools import cached_property
 from onegov.town6.request import TownRequest
 
-from typing import TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.pas.app import PasApp
     from onegov.pas.models import PASParliamentarian
 
 
-class PasRequest(TownRequest):
+AppT = TypeVar('AppT', bound='PasApp', default='PasApp', covariant=True)
+
+
+class PasRequest(TownRequest[AppT]):
 
     @cached_property
     def is_parliamentarian(self) -> bool:

@@ -389,9 +389,9 @@ class ResourceBaseForm(Form):
                 self.delete_field('kaba_components')
                 return
         else:
-            if not self.request.view_name.endswith('new-room'):
+            if not (self.request.view_name or '').endswith('new-room'):
                 self.delete_field('parent_id')
-            if self.request.view_name.endswith('new-daypass'):
+            if (self.request.view_name or '').endswith('new-daypass'):
                 self.delete_field('default_view')
                 self.delete_field('kaba_components')
                 return

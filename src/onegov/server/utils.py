@@ -35,13 +35,13 @@ def patch_morepath() -> None:
     if hasattr(morepath.autosetup, '_onegov_patch'):
         return
 
-    _get_module_name = morepath.autosetup.get_module_name  # type: ignore[attr-defined]
+    _get_module_name = morepath.autosetup.get_module_name
 
-    def get_module_name(distribution: object) -> str:
+    def get_module_name(distribution: importlib.metadata.Distribution) -> str:
         name = _get_module_name(distribution)
         if name.startswith('more_'):
             return 'more.' + name[5:]
         return name
 
-    morepath.autosetup.get_module_name = get_module_name  # type: ignore[attr-defined]
+    morepath.autosetup.get_module_name = get_module_name
     morepath.autosetup._onegov_patch = True  # type: ignore[attr-defined]

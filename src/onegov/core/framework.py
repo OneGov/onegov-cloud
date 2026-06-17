@@ -59,6 +59,7 @@ from onegov.core.orm import (
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.request import CoreRequest
+from onegov.core.security.identity import OneGovIdentity as Identity
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
@@ -70,7 +71,7 @@ from urllib.parse import urlencode
 from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -78,7 +79,6 @@ if TYPE_CHECKING:
     from email.headerregistry import Address
     from fs.base import FS, SubFS
     from gettext import GNUTranslations
-    from morepath.request import Request
     from morepath.settings import SettingRegistry
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
@@ -96,7 +96,7 @@ if TYPE_CHECKING:
 # This should be in more.webassets:
 # https://github.com/morepath/more.webassets/blob/master/more/webassets/core.py#L55
 if not WebassetsApp.dectate._directives[0][0].kw:
-    from morepath.core import excview_tween_factory  # type:ignore
+    from morepath.core import excview_tween_factory
     WebassetsApp.dectate._directives[0][0].kw['over'] = excview_tween_factory
 
 
@@ -109,7 +109,7 @@ class Framework(
 ):
     """ Baseclass for Morepath OneGov applications. """
 
-    request_class: type[Request] = CoreRequest
+    request_class: type[CoreRequest[Self]] = CoreRequest
 
     #: holds the database connection string, *if* there is a database connected
     dsn: str | None = None
@@ -129,7 +129,7 @@ class Framework(
     replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
     layout = directive(directives.Layout)
-    json = directive(directives.ExtendedJsonAction)  # type: ignore[assignment]
+    json = directive(directives.ExtendedJsonAction)
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
     same_site_cookie_policy: str | None = 'Lax'
@@ -798,7 +798,7 @@ class Framework(
             'SERVER_NAME': '',
             'SERVER_PORT': '',
             'SERVER_PROTOCOL': 'https'
-        }, app=self)
+        }, app=self)  # type: ignore[arg-type]
 
         obj = resolve_model(request)
 
@@ -834,12 +834,13 @@ class Framework(
         )
 
         try:
-            action, _handler = next(query(self.__class__))
+            action, _handler = next(iter(query(self.__class__)))
         except (StopIteration, RuntimeError) as exception:
             raise KeyError(
                 '{!r} has no view named {}'.format(model, view_name)
             ) from exception
 
+        assert hasattr(action, 'permission')
         return action.permission
 
     @cached_property
@@ -1348,12 +1349,12 @@ class Framework(
         uid: str,
         groupids: frozenset[str],
         role: str
-    ) -> morepath.authentication.Identity:
+    ) -> Identity:
         """ Returns a new morepath identity for the given userid, group and
         role, bound to this application.
 
         """
-        return morepath.authentication.Identity(
+        return Identity(
             userid, uid=uid, groupids=groupids, role=role,
             application_id=self.application_id_hash
         )
