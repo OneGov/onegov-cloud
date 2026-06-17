@@ -100,8 +100,8 @@ def view_move_file(
     request: TranslatorAppRequest
 ) -> Response:
     request.assert_valid_csrf_token()
-    file_id = request.params.get('file_id')
-    new_category = request.params.get('category')
+    file_id = request.POST.get('file_id')
+    new_category = request.POST.get('new_category')
     if file_id and new_category:
         file = request.session.query(File).filter_by(
             id=file_id

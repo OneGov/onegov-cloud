@@ -44,8 +44,7 @@
                             <p i18n:translate="">No files uploaded yet</p>
                         </tal:b>
                         <table tal:condition="grouped"
-                               class="files translator-documents"
-                               data-move-url="${move_url}">
+                               class="files translator-documents">
                             <tbody>
                                 <tal:b tal:repeat="(category, files) grouped">
                                     <tr>
@@ -55,36 +54,42 @@
                                         <th i18n:translate>Upload Date</th>
                                         <th i18n:translate>Move</th>
                                     </tr>
-                                    <tal:b tal:repeat="file files"
-                                           tal:define="file_upload file.upload_date|file.created">
-                                        <tr class="file-info ${'signed' if file.signed else ''}">
+                                    <tal:b tal:repeat="file files">
+                                        <tr class="file-info ${'signed' if file.signed else ''}"
+                                            tal:define="file_upload file.upload_date|file.created">
                                             <td>${file.name}</td>
                                             <td>
                                                 <a id="button-${file.id}"
-                                                   data-toggle="#details-${file.id}"
-                                                   class="untoggled">
-                                                    <i class="fa fa-chevron-down"
+                                                   data-ogc-toggle="#details-${file.id}">
+                                                    <i class="fa fa-chevron-down rotate"
                                                        aria-hidden="true"></i>
                                                 </a>
                                             </td>
                                             <td>${extension(file)}</td>
                                             <td>${format_date(file_upload)}</td>
                                             <td>
-                                                <select class="move-category-select"
-                                                        data-file-id="${file.id}">
-                                                    <option tal:repeat="cat categories"
-                                                            tal:attributes="value cat;
-                                                                           selected cat == file.note"
-                                                            >${cat}</option>
-                                                </select>
+                                                <form class="move-category-form"
+                                                      method="POST"
+                                                      action="${move_url}">
+                                                    <input type="hidden"
+                                                           name="file_id"
+                                                           value="${file.id}" />
+                                                    <select name="new_category"
+                                                            class="move-category-select">
+                                                        <option tal:repeat="cat categories"
+                                                                tal:attributes="value cat;
+                                                                               selected cat == file.note"
+                                                                >${cat}</option>
+                                                    </select>
+                                                </form>
                                             </td>
                                         </tr>
-                                        <tr id="details-${file.id}"
-                                            style="display: none;">
+                                        <tr id="details-${file.id}" class="hidden">
                                             <td colspan="5">
                                                 <div ic-trigger-from="#button-${file.id}"
                                                      ic-trigger-on="click once, change"
-                                                     ic-get-from="${actions_url(file.id)}">
+                                                     ic-get-from="${actions_url(file.id)}"
+                                                     class="file-preview-wrapper">
                                                 </div>
                                             </td>
                                         </tr>

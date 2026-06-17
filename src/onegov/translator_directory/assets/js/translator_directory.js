@@ -94,30 +94,11 @@ function setupTimeReportForm() {
 function setupDocumentMove() {
     var table = document.querySelector('.translator-documents');
     if (!table) { return; }
-    var moveUrl = table.dataset.moveUrl;
-    if (!moveUrl) { return; }
 
     table.querySelectorAll('.move-category-select').forEach(function(sel) {
         sel.addEventListener('change', function() {
-            var form = document.createElement('form');
-            form.method = 'POST';
-            form.action = moveUrl;
-            form.style.display = 'none';
-
-            var fileInput = document.createElement('input');
-            fileInput.type = 'hidden';
-            fileInput.name = 'file_id';
-            fileInput.value = sel.dataset.fileId;
-            form.appendChild(fileInput);
-
-            var catInput = document.createElement('input');
-            catInput.type = 'hidden';
-            catInput.name = 'category';
-            catInput.value = sel.value;
-            form.appendChild(catInput);
-
-            document.body.appendChild(form);
-            form.submit();
+            var form = sel.closest('.move-category-form');
+            if (form) { form.submit(); }
         });
     });
 }
