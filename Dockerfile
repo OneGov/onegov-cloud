@@ -82,14 +82,6 @@ RUN GOBIN=/tmp go install github.com/seantis/hivemind@v1.0.4 \
     && cp /tmp/hivemind /usr/local/bin/hivemind \
     && rm -rf /tmp/hivemind
 
-# install dart-sass (SCSS compiler)
-ARG DART_SASS_VERSION=1.100.0
-RUN curl -sL "https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz" \
-    | tar xz -C /tmp \
-    && mv /tmp/dart-sass /app/dart-sass \
-    && mkdir -p /app/bin \
-    && ln -s /app/dart-sass/sass /app/bin/sass
-
 # build onegov-cloud
 COPY MANIFEST.in /app/src/MANIFEST.in
 COPY pyproject.toml /app/src/pyproject.toml
@@ -110,6 +102,13 @@ RUN git rev-parse --short HEAD > .commit \
     && rm -rf /app/.git \
     && rm -rf /var/cache/wheels \
     && rm -rf /var/cache/pip
+
+# install dart-sass (SCSS compiler)
+ARG DART_SASS_VERSION=1.100.0
+RUN curl -sL "https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz" \
+    | tar xz -C /tmp \
+    && mv /tmp/dart-sass /app/dart-sass \
+    && ln -s /app/dart-sass/sass /app/bin/sass
 
 # configure timezone
 RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
