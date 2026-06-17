@@ -799,8 +799,6 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         assert salt or self.csrf_salt
         salt = salt or self.csrf_salt
 
-        # use app.identity_secret here, because that's being used for
-        # more.itsdangerous, which uses the same algorithm
         signer = TimestampSigner(self.identity_secret, salt=salt)
 
         return signer.sign(random_token())
