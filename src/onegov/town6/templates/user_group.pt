@@ -18,7 +18,7 @@
                 <dd>
                     <ul>
                         <li tal:repeat="permission layout.model.ticket_permissions">
-                            ${permission.handler_code}<tal:block tal:condition="permission.group">: ${permission.group}</tal:block>
+                            ${layout.handler_label(permission.handler_code)}<tal:block tal:condition="permission.group">: ${permission.group}</tal:block>
                         </li>
                     </ul>
                 </dd>
