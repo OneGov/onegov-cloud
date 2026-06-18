@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-11 10:23+0200\n"
+"POT-Creation-Date: 2026-06-11 11:12+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4371,8 +4371,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Paiement"
 
@@ -5187,8 +5187,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6349,8 +6349,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -7411,6 +7411,9 @@ msgstr "Nouvelles dates pour ${title}"
 msgid "Confirm your reservation"
 msgstr "Confirmer votre réservation"
 
+msgid "Request"
+msgstr "Demande"
+
 #. by default we will redirect to the created ticket
 msgid "Thank you for your reservation!"
 msgstr "Merci pour votre réservation !"
@@ -7432,8 +7435,8 @@ msgstr ""
 "site ${site_id}. Veuillez vous assurer que vos informations d'identification "
 "sont toujours valides."
 
-msgid "Your reservations were accepted"
-msgstr "Vos réservations ont été acceptées"
+msgid "Accepted"
+msgstr "Accepté"
 
 #, python-format
 msgid "Reservation(s) confirmed ${org} ${resource}"
@@ -7468,9 +7471,6 @@ msgid ""
 msgstr ""
 "Le paiement associé à cette réservation doit être remboursé avant qu'elle "
 "puisse être rejetée"
-
-msgid "The following reservations were rejected"
-msgstr "Les réservations suivantes ont été rejetées"
 
 #, python-format
 msgid "${org} Rejected Reservation"
@@ -8042,6 +8042,12 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
 #~ msgid "Back"
 #~ msgstr "Retour"
+
+#~ msgid "Your reservations were accepted"
+#~ msgstr "Vos réservations ont été acceptées"
+
+#~ msgid "The following reservations were rejected"
+#~ msgstr "Les réservations suivantes ont été rejetées"
 
 #, python-format
 #~ msgid "The entry ${name} exists twice"
