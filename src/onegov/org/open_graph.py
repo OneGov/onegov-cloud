@@ -68,7 +68,10 @@ class OpenGraphMixin:
 
     @property
     def og_description(self) -> str | None:
-        return getattr(self.og_model, self.og_description_attr, None)
+        return (
+            getattr(self.og_model, self.og_description_attr, None)
+            or self.org.og_description
+        )
 
     @property
     def og_image_alt(self) -> str | None:

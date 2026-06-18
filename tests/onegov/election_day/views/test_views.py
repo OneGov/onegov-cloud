@@ -17,6 +17,7 @@ from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
+from tests.shared.utils import get_meta
 from transaction import begin
 from transaction import commit
 from unittest.mock import patch
@@ -33,6 +34,28 @@ if TYPE_CHECKING:
 
 def test_view_permissions() -> None:
     utils.assert_explicit_permissions(election_day, ElectionDayApp)
+
+
+def test_open_graph_tags(election_day_app_zg: TestApp) -> None:
+    client = Client(election_day_app_zg)
+    page = client.get('/')
+
+    assert get_meta(page, 'og:type') == 'website'
+    assert get_meta(page, 'og:title') == 'Kanton Govikon'
+    assert get_meta(page, 'og:site_name') == 'Kanton Govikon'
+    assert get_meta(page, 'og:url') == 'http://localhost/'
+    assert get_meta(page, 'og:locale') == 'de_CH'
+    assert get_meta(page, 'og:description') is None
+    assert get_meta(page, 'og:image') is None
+
+    principal = election_day_app_zg.principal
+    principal.og_description = 'Wahlen und Abstimmungen des Kantons Govikon'
+    election_day_app_zg.cache.set('principal', principal)
+
+    page = client.get('/')
+    assert get_meta(page, 'og:description') == (
+        'Wahlen und Abstimmungen des Kantons Govikon'
+    )
 
 
 def test_view_private(election_day_app_zg: TestApp) -> None:

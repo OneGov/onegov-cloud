@@ -2022,6 +2022,9 @@ msgstr "Senden am"
 msgid "Please add at least one notification."
 msgstr "Bitte wählen sie mindestens eine Benachrichtigung."
 
+msgid "Application Description"
+msgstr "Beschreibung der Applikation"
+
 msgid "Languages"
 msgstr "Sprachen"
 
@@ -2033,6 +2036,13 @@ msgstr "Französisch"
 
 msgid "Italian"
 msgstr "Italienisch"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
+"Grösse beträgt 1200:630px."
 
 msgid "Logo"
 msgstr "Logo"
@@ -2057,13 +2067,6 @@ msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icon SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
-"Grösse beträgt 1200:630px."
 
 msgid "Primary Color"
 msgstr "Primärfarbe"

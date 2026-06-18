@@ -309,9 +309,9 @@ def import_election_internal_majorz(
     session = object_session(election)
     assert session is not None
     # FIXME: Switch to regular `session.execute` with insert statements
-    session.bulk_insert_mappings(Candidate, candidates.values())  # type: ignore[arg-type]
-    session.bulk_insert_mappings(ElectionResult, results.values())  # type: ignore[arg-type]
-    session.bulk_insert_mappings(CandidateResult, candidate_results)  # type: ignore[arg-type]
+    session.bulk_insert_mappings(Candidate, candidates.values())
+    session.bulk_insert_mappings(ElectionResult, results.values())
+    session.bulk_insert_mappings(CandidateResult, candidate_results)
     session.flush()
     session.expire_all()
 

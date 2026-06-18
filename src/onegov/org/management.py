@@ -285,6 +285,8 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                         self.filter_urls(urls)
                     )
         for agency in AgencyCollection(self.request.session).query():
+            if not agency.portrait:
+                continue
             urls = self.extractor.find_urls(agency.portrait, only_unique=True)
             if urls:
                 yield (

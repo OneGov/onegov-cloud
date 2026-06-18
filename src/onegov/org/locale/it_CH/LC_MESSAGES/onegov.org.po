@@ -2023,6 +2023,9 @@ msgstr "Invia il"
 msgid "Please add at least one notification."
 msgstr "Aggiungere almeno una notifica."
 
+msgid "Application Description"
+msgstr "Descrizione dell'applicazione"
+
 msgid "Languages"
 msgstr "Lingue"
 
@@ -2034,6 +2037,13 @@ msgstr "Francese"
 
 msgid "Italian"
 msgstr "Italiano"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Immagine di anteprima dei social media predefinita per le anteprime dei "
+"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
 
 msgid "Logo"
 msgstr "Logo"
@@ -2058,13 +2068,6 @@ msgstr "Icona 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icona SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Immagine di anteprima dei social media predefinita per le anteprime dei "
-"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
 
 msgid "Primary Color"
 msgstr "Colore primario"
