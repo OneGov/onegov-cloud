@@ -236,6 +236,47 @@ def test_tickets_search(client_with_fts: Client) -> None:
     assert len(tickets_page.pyquery('tr.ticket')) == 1
 
 
+def test_tickets_search_partial_number(client_with_fts: Client) -> None:
+    client = client_with_fts
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form[
+        'definition'
+    ] = """
+        E-Mail *= @@@
+        Name *= ___
+    """
+    form_page.form.submit()
+
+    client.logout()
+
+    form_page = client.get('/form/newsletter')
+    form_page.form['e_mail'] = 'paul@example.org'
+    form_page.form['name'] = 'Paul Atishon'
+    form_page.form.submit().follow().form.submit().follow()
+
+    client.login_editor()
+
+    tickets_page = client.get('/tickets/ALL/open')
+    ticket_number = tickets_page.pyquery('.ticket-number-plain').text()
+    assert ticket_number.startswith('FRM-')
+
+    # the full number still finds the ticket
+    page = client.get(f'/tickets/ALL/open?q={ticket_number}')
+    assert len(page.pyquery('tr.ticket')) == 1
+
+    # a partial number (without the handler prefix) finds it too
+    partial = ticket_number.split('-', 1)[1]
+    page = client.get(f'/tickets/ALL/open?q={partial}')
+    assert len(page.pyquery('tr.ticket')) == 1
+
+    # an unrelated number does not match
+    page = client.get('/tickets/ALL/open?q=9999-9999')
+    assert len(page.pyquery('tr.ticket')) == 0
+
+
 def test_ticket_states_idempotent(client: Client) -> None:
     client.login_editor()
 
