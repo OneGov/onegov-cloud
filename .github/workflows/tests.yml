@@ -186,6 +186,7 @@ jobs:
             | tar xz -C /tmp
           mv /tmp/dart-sass /app/dart-sass
           ln -s /app/dart-sass/sass /app/bin/sass
+          ln -s /app/bin/sass /usr/local/bin/sass
         fi
 
     - name: Prepare test environment
