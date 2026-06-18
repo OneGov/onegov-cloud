@@ -90,7 +90,17 @@ def view_archive_municipal(
     request: ElectionDayRequest
 ) -> RenderData:
     layout = DefaultLayout(self, request)
+    mun_archive = layout.municipality_archive
     results, _ = self.by_date()
+    latest_years = mun_archive.get_latest_year_by_municipality()
+    slugs = {r.domain_segment for r in results if r.domain_segment}
+
+    municipality_links = {
+        slug: _municipality_archive_url(
+            mun_archive, slug, latest_years, request
+        )
+        for slug in slugs
+    }
 
     return {
         'layout': layout,
@@ -100,6 +110,7 @@ def view_archive_municipal(
         'municipality_display_names': (
             request.app.principal.municipality_display_name_by_slug
         ),
+        'municipality_links': municipality_links,
     }
 
 
@@ -117,10 +128,8 @@ def view_archive_all_municipal(
     latest_years = mun_archive.get_latest_year_by_municipality()
 
     municipality_links = {
-        name: request.link(
-            mun_archive.for_municipality(slug).for_year(latest_years[slug])
-            if slug in latest_years
-            else mun_archive.for_municipality(slug)
+        name: _municipality_archive_url(
+            mun_archive, slug, latest_years, request
         )
         for slug, name in sorted(
             request.app.principal.municipality_display_name_by_slug.items(),
@@ -135,6 +144,19 @@ def view_archive_all_municipal(
         'municipality_links': municipality_links,
         'all_municipal_view': True,
     }
+
+
+def _municipality_archive_url(
+    mun_archive: MunicipalityArchivedResultCollection,
+    slug: str,
+    latest_years: dict[str, int],
+    request: ElectionDayRequest,
+) -> str:
+    if slug in latest_years:
+        return request.link(
+            mun_archive.for_municipality(slug).for_year(latest_years[slug])
+        )
+    return request.link(mun_archive.for_municipality(slug))
 
 
 def _municipality_display_name(

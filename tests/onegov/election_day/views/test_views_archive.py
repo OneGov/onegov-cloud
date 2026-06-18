@@ -267,9 +267,10 @@ def test_view_archive_municipal_by_date(election_day_app_sg: TestApp) -> None:
     page = client.get('/archive/2025-05-18/municipal')
     assert 'Au' in page
     assert 'Wil' in page
-    assert '/municipality/au' in page
-    assert '/municipality/wil' in page
-    # 2024 item not shown on 2025-05-18 page
+    assert '/municipality/au/2025' in page
+    assert '/municipality/wil/2025' in page
+    assert '/municipality/au"' not in page
+    assert '/municipality/wil"' not in page
     assert 'Au Wahl 2024' not in page
 
 

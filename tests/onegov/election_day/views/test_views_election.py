@@ -1054,13 +1054,21 @@ def test_views_election_municipal_and_municipality(
     for municipality in ('Gaiserwald', 'Goldach', 'St. Margrethen'):
         assert municipality in municipal_page
 
-    # verify municipality detail page
+    # verify municipality detail page (archive overview for Goldach)
     goldach_page = municipal_page.click('Goldach', index=0)
     assert 'Urnengang vom 18. Mai 2025' in goldach_page
     assert 'Kommunale Wahlen und Abstimmungen' in goldach_page
     assert 'Goldach' in goldach_page
-    assert 'Wahl' in goldach_page
-    title = 'Wahl Schulpräsidium'  # short title
-    assert title in goldach_page
-    assert (goldach_page.click(title).
-            maybe_follow().status_code == 200)
+
+    short_title = 'Wahl Schulpräsidium'
+    long_title = 'Ersatzwahl der Schulpräsidentin/des Schulpräsidenten'
+
+    # archive overview must show the short title, not the long title
+    assert short_title in goldach_page
+    assert long_title not in goldach_page
+
+    # election detail page must show the long title in the heading
+    election_page = goldach_page.click(short_title).maybe_follow()
+    assert election_page.status_code == 200
+    assert long_title in election_page
+    assert short_title in election_page  # breadcrumb still uses short title
