@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from operator import itemgetter
+
 from morepath import redirect
 
 from fs.errors import ResourceNotFound
@@ -95,6 +97,9 @@ def view_archive_municipal(
         'date': self.date,
         'archive_items': self.group_items(results, request),
         'municipal_view': True,
+        'municipality_display_names': (
+            request.app.principal.municipality_display_name_by_slug
+        ),
     }
 
 
@@ -110,24 +115,35 @@ def view_archive_all_municipal(
     layout = DefaultLayout(self, request)
     mun_archive = layout.municipality_archive
     latest_years = mun_archive.get_latest_year_by_municipality()
-    municipalities = mun_archive.get_municipalities()
+
     municipality_links = {
-        m: request.link(
-            mun_archive.for_municipality(m).for_year(latest_years[m])
-            if m in latest_years
-            else mun_archive.for_municipality(m)
+        name: request.link(
+            mun_archive.for_municipality(slug).for_year(latest_years[slug])
+            if slug in latest_years
+            else mun_archive.for_municipality(slug)
         )
-        for m in municipalities
+        for slug, name in sorted(
+            request.app.principal.municipality_display_name_by_slug.items(),
+            key=itemgetter(1),
+        )
     }
 
     return {
         'layout': layout,
         'date': None,
         'archive_items': None,
-        'municipalities': municipalities,
         'municipality_links': municipality_links,
         'all_municipal_view': True,
     }
+
+
+def _municipality_display_name(
+    sanitized: str,
+    request: ElectionDayRequest,
+) -> str:
+    return request.app.principal.municipality_display_name_by_slug.get(
+        sanitized, sanitized
+    )
 
 
 def _municipality_view_data(
@@ -144,7 +160,9 @@ def _municipality_view_data(
         'active_year': year,
         'archive_items': self.group_items(results, request),
         'municipality_collection': self,
-        'municipality_name': self.get_municipality_name(),
+        'municipality_name': _municipality_display_name(
+            self.municipality, request
+        ),
         'municipality_view': True,
         'show_archive_links': True,
     }

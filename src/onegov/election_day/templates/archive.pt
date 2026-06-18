@@ -7,7 +7,8 @@
                  municipality_view municipality_view | python:False;
                  all_municipal_view all_municipal_view | python:False;
                  municipality_collection municipality_collection | python:None;
-                 active_year active_year | python:None;">
+                 active_year active_year | python:None;
+                 municipality_display_names municipality_display_names | python:{};">
     <tal:block metal:fill-slot="title">
         <tal:block condition="date">
             <tal:block i18n:translate="">Archive</tal:block> ${date} -
@@ -51,7 +52,7 @@
                 <div tal:repeat="domain archive_items[date]" class="domain-${domain}">
                     <h3 tal:condition="municipal_view">
                         <a href="${request.link(layout.municipality_archive.for_municipality(domain))}">
-                            <span>${domain}</span>
+                            <span>${municipality_display_names.get(domain, domain)}</span>
                         </a>
                     </h3>
 
@@ -293,7 +294,7 @@
                 <h2 i18n:translate="">Communal elections and votes by municipality</h2>
                 <div class="archive-breadcrumbs">
                     <div class="municipalities-list">
-                        <div tal:repeat="municipality municipalities">
+                        <div tal:repeat="municipality municipality_links">
                             <a href="${municipality_links[municipality]}">${municipality}</a>
                         </div>
                     </div>
@@ -319,9 +320,7 @@
                         </li>
                     </ul>
                     <tal:block tal:condition="not: municipality_view">
-                        <p tal:condition="layout.municipality_archive.get_municipalities()">
-                            <a href="${request.link(layout.all_municipal_archive)}" i18n:translate="">All municipal elections and votes</a>
-                        </p>
+                        <p><a href="${request.link(layout.all_municipal_archive)}" i18n:translate="">All municipal elections and votes</a></p>
                         <p><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
                     </tal:block>
                     <tal:block tal:condition="python:layout.is_root and layout.last_archive_modification">

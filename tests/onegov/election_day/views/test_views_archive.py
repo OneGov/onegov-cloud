@@ -227,9 +227,9 @@ def _add_municipal_results(app: TestApp) -> None:
     """Add two municipalities (Au, Wil) with results across two years."""
     session = app.session()
     for domain_segment, title, result_date, result_type in (
-        ('Au', 'Au Abstimmung 2025', date(2025, 5, 18), 'vote'),
-        ('Au', 'Au Wahl 2024', date(2024, 3, 3), 'election'),
-        ('Wil', 'Wil Abstimmung 2025', date(2025, 5, 18), 'vote'),
+        ('au', 'Au Abstimmung 2025', date(2025, 5, 18), 'vote'),
+        ('au', 'Au Wahl 2024', date(2024, 3, 3), 'election'),
+        ('wil', 'Wil Abstimmung 2025', date(2025, 5, 18), 'vote'),
     ):
         session.add(ArchivedResult(
             date=result_date,
@@ -281,7 +281,7 @@ def test_view_archive_municipality(election_day_app_sg: TestApp) -> None:
     page = client.get('/municipality/au')
     assert 'Au Abstimmung 2025' in page
     assert 'Au Wahl 2024' in page
-    # Wil's item not shown
+    # Wil's item isn't shown
     assert 'Wil Abstimmung 2025' not in page
     # Year archive footer: both years present as links
     assert '/municipality/au/2025' in page

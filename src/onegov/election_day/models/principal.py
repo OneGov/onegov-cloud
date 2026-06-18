@@ -187,6 +187,24 @@ class Principal:
 
         return True
 
+    @cached_property
+    def municipality_display_name_by_slug(self) -> dict[str, str]:
+        """
+        Maps sanitized slug → display name, built once from static
+        entities.
+        """
+        from onegov.election_day.collections import (
+            MunicipalityArchivedResultCollection
+        )
+        sanitize = MunicipalityArchivedResultCollection.sanitize_municipality
+        result: dict[str, str] = {}
+        for entities in self.entities.values():
+            for entity in entities.values():
+                name = entity.get('name', '')
+                if name:
+                    result.setdefault(sanitize(name), name)
+        return result
+
     def get_entities(self, year: int) -> set[str]:
         entities = {
             entity.get('name', None)

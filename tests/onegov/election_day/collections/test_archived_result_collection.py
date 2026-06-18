@@ -463,3 +463,22 @@ def test_archived_result_collection_updates(session: Session) -> None:
     request.app.principal.official_host = 'https://wab.govikon.ch'
     result = archive.update(votes[2001], request)
     assert result.url == 'https://wab.govikon.ch/vote/2001'
+
+
+def test_sanitize_municipality() -> None:
+    from onegov.election_day.collections import (
+        MunicipalityArchivedResultCollection,
+    )
+    sanitize = MunicipalityArchivedResultCollection.sanitize_municipality
+
+    assert sanitize('St. Gallen') == 'stgallen'
+    assert sanitize('Au (SG)') == 'au'
+    assert sanitize('Zürich') == 'zuerich'
+    assert sanitize('Schüpfheim') == 'schuepfheim'
+    assert sanitize('Mörschwil') == 'moerschwil'
+    assert sanitize('stgallen') == 'stgallen'  # idempotent on slugs
+
+    # slugs invert umlaut order: 'zuerich' < 'zug' but 'Zug' < 'Zürich'
+    names = ['Zürich', 'Zug']
+    assert sorted(names) == ['Zug', 'Zürich']
+    assert sorted(sanitize(n) for n in names) == ['zuerich', 'zug']

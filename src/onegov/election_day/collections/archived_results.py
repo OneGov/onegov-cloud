@@ -323,8 +323,12 @@ class ArchivedResultCollection:
                 and item.results else None
             )
             if segment:
-                # get rid of e.g. ` (SG)` at the end of the segment
-                result.meta['domain_segment'] = segment.split(' (')[0]
+                segment = (
+                    MunicipalityArchivedResultCollection.sanitize_municipality(
+                        segment
+                    )
+                )
+                result.meta['domain_segment'] = segment
 
         if isinstance(item, Election):
             result.type = 'election'
@@ -545,35 +549,10 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
 
     def __init__(self, session: Session, municipality: str = ''):
         super().__init__(session)
-        self.municipality = self.sanitize_municipality(municipality)
+        self.municipality = municipality
 
-        # sanitized municipality: municipality name
-        self.municipality_mapping = {
-            self.sanitize_municipality(row[0]): row[0] for row in
-            self.session.query(
-                ArchivedResult.meta['domain_segment'].astext
-            )
-            .filter(ArchivedResult.domain == 'municipality')
-            .distinct()
-            if row[0]
-        }
-
-    def is_valid_municipality(self) -> bool:
-        return self.municipality in self.municipality_mapping
-
-    def get_municipality_name(
-        self,
-        municipality: str | None = None
-    ) -> str | None:
-        municipality = municipality or self.municipality
-        if municipality not in self.municipality_mapping:
-            return None
-        return self.municipality_mapping[municipality]
-
-    def get_municipalities(self) -> list[str]:
-        return sorted(self.municipality_mapping.values())
-
-    def sanitize_municipality(self, municipality: str) -> str:
+    @staticmethod
+    def sanitize_municipality(municipality: str) -> str:
         """
         Removes ` (SG)`, removes spaces, `.` and umlauts from municipality.
         """
@@ -613,11 +592,10 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         year_col = cast(extract('year', ArchivedResult.date), Integer)
         query = self.session.query(distinct(year_col))
         query = query.filter(ArchivedResult.domain == 'municipality')
-        if (self.municipality and
-                self.municipality in self.municipality_mapping):
+        if self.municipality:
             query = query.filter(
                 ArchivedResult.meta['domain_segment'].astext
-                == self.municipality_mapping[self.municipality]
+                == self.municipality
             )
         query = query.order_by(desc(year_col))
         return [y for y, in query]
@@ -633,8 +611,7 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
             ArchivedResult.type.in_(['election', 'vote', 'complex_vote'])
         )
         query = query.filter(
-            ArchivedResult.meta['domain_segment'].astext
-             == self.municipality_mapping[municipality]
+            ArchivedResult.meta['domain_segment'].astext == municipality
         )
         return query.order_by(
             ArchivedResult.date,
