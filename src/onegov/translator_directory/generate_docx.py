@@ -188,8 +188,10 @@ def signature_for_mail_templates(
     first and last name of the user. """
 
     assert request.current_user is not None
-    assert request.current_user.realname is not None
-    first_name, last_name = request.current_user.realname.split(' ')
+    name_parts = (request.current_user.realname or '').strip().split(None, 1)
+    if len(name_parts) != 2 or not name_parts[0] or not name_parts[1]:
+        return None
+    first_name, last_name = name_parts
     query = GeneralFileCollection(request.session).query().filter(
         and_(
             GeneralFile.name.like('Unterschrift%'),

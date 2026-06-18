@@ -13,12 +13,12 @@ def test_view_user_groups(client: Client) -> None:
     manage = client.get('/usergroups').click('Benutzergruppe', href='new')
     manage.form['name'] = 'Gruppe A'
     manage.form['users'].select_multiple(texts=['editor@example.org'])
-    manage.form['ticket_permissions'].select_multiple(texts=['DIR', 'EVN'])
+    manage.form['ticket_permissions'].select_multiple(value=['DIR', 'EVN'])
     page = manage.form.submit().maybe_follow()
     assert 'Gruppe A' in page
     assert 'editor@example.org' in page
-    assert 'DIR' in page
-    assert 'EVN' in page
+    assert 'DIR - Verzeichniseintrag Eingaben' in page
+    assert 'EVN - Veranstaltungen' in page
 
     page = client.get('/usermanagement').click('Ansicht', index=1)
     assert 'editor@example.org' in page
@@ -28,7 +28,7 @@ def test_view_user_groups(client: Client) -> None:
     manage = client.get('/usergroups').click('Ansicht').click('Bearbeiten')
     manage.form['name'] = 'Gruppe B'
     manage.form['users'].select_multiple(texts=['admin@example.org'])
-    manage.form['ticket_permissions'].select_multiple(texts=['DIR', 'FRM'])
+    manage.form['ticket_permissions'].select_multiple(value=['DIR', 'FRM'])
     page = manage.form.submit().maybe_follow()
     assert 'Gruppe B' in page
     assert 'admin@example.org' in page

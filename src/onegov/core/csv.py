@@ -15,12 +15,12 @@ from csv import Error as CsvError
 from csv import reader as csv_reader
 from csv import writer as csv_writer
 from datetime import datetime
-from editdistance import eval as distance
 from functools import lru_cache
 from io import BytesIO, StringIO
 from itertools import permutations
 from onegov.core import errors
 from ordered_set import OrderedSet
+from rapidfuzz.distance import Levenshtein
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
 from onegov.core.utils import normalize_for_url
@@ -818,13 +818,19 @@ def match_headers(
     if len(headers) > 1:
         sane_distance = min((
             sane_distance,
-            min(distance(a, b) for a, b in permutations(headers, 2))
+            min(
+                Levenshtein.distance(a, b)
+                for a, b in permutations(headers, 2)
+            )
         ))
 
     if len(expected) > 1:
         sane_distance = min((
             sane_distance,
-            min(distance(a, b) for a, b in permutations(expected, 2))
+            min(
+                Levenshtein.distance(a, b)
+                for a, b in permutations(expected, 2)
+            )
         ))
 
     sane_distance = min((
@@ -838,7 +844,7 @@ def match_headers(
 
     for column in expected:
         normalized = normalize_header(column)
-        distances = {h: distance(normalized, h) for h in headers}
+        distances = {h: Levenshtein.distance(normalized, h) for h in headers}
 
         closest = min(distances.values())
 

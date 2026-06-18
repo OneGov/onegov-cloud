@@ -648,22 +648,22 @@ def import_election_wabstic_proporz(
     assert session is not None
     # FIXME: Switch to regular `session.execute` with insert statements
     session.bulk_insert_mappings(
-        ListConnection,  # type: ignore[arg-type]
+        ListConnection,
         (
             added_connections[key]
             for key in sorted(added_connections, key=lambda x: x[1] or '')
         )
     )
     session.bulk_insert_mappings(
-        List,  # type: ignore[arg-type]
+        List,
         (
             added_lists[key]
             for key in filter(lambda x: x != '999', added_lists)
         )
     )
-    session.bulk_insert_mappings(Candidate, added_candidates.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(Candidate, added_candidates.values())
     session.bulk_insert_mappings(
-        ElectionResult,  # type: ignore[arg-type]
+        ElectionResult,
         (
             {
                 'id': result_uids[entity_id],
@@ -686,7 +686,7 @@ def import_election_wabstic_proporz(
         )
     )
     session.bulk_insert_mappings(
-        CandidateResult,  # type: ignore[arg-type]
+        CandidateResult,
         (
             {
                 'id': uuid4(),
@@ -699,7 +699,7 @@ def import_election_wabstic_proporz(
         )
     )
     session.bulk_insert_mappings(
-        ListResult,  # type: ignore[arg-type]
+        ListResult,
         (
             {
                 'id': uuid4(),
@@ -743,7 +743,7 @@ def import_election_wabstic_proporz(
                 'counted': False
             }
         )
-    session.bulk_insert_mappings(ElectionResult, result_inserts)  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ElectionResult, result_inserts)
     session.flush()
     session.expire_all()
 
