@@ -324,7 +324,7 @@ def ensure_user(
         if users.by_username(username) is not None:
             log.error(f'Cannot rename user {user.username} to {username}')
         else:
-            user.username = username
+            user.change_username(username, app)
             app.settings.user.change_username_callback(user, request)
 
     # update the role even if the user exists already

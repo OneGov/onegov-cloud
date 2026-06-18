@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+
 from functools import cached_property
 from onegov.core.custom import msgpack
 from onegov.core.orm import orm_cached
-from onegov.core.request import CoreRequest
+from onegov.core.request import CoreRequest, is_logged_in
 from onegov.core.security import Private
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import News, TANAccessCollection, Topic
@@ -103,6 +104,10 @@ class OrgRequest(CoreRequest):
 
     @property
     def current_username(self) -> str | None:
+        cached = getattr(self, '_current_user', None)
+        if cached is not None:
+            return cached.username
+
         return self.identity.userid if self.identity else None
 
     # NOTE: Internal cache, don't use directly!
@@ -110,15 +115,21 @@ class OrgRequest(CoreRequest):
 
     @property
     def current_user(self) -> User | None:
-        if not self.identity:
+        if not is_logged_in(self.identity):
             return None
 
         if not hasattr(self, '_current_user'):
             self._current_user = (
                 self.session.query(User)
-                .filter_by(username=self.identity.userid)
+                .filter(User.id == self.identity.uid)
                 .first()
             )
+            if (
+                self._current_user is not None
+                and self.identity.userid != self._current_user.username
+            ):
+                # stale username in session — fix it for subsequent requests
+                self.browser_session['userid'] = self._current_user.username
             return self._current_user
 
         if self._current_user is None:
