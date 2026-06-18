@@ -102,7 +102,11 @@ def view_move_file(
     request.assert_valid_csrf_token()
     file_id = request.POST.get('file_id')
     new_category = request.POST.get('new_category')
-    if file_id and new_category:
+    if (
+        isinstance(file_id, str)
+        and isinstance(new_category, str)
+        and new_category
+    ):
         file = request.session.query(File).filter_by(
             id=file_id
         ).first()
