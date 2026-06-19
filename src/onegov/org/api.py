@@ -693,6 +693,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
 
             data['coordinates'] = get_geo_location(item)
             data['contact'] = item.contact
+            data['content_hash'] = item.content_hash
 
         return data
 

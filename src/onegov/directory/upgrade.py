@@ -8,7 +8,8 @@ from __future__ import annotations
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.directory import Directory
-from sqlalchemy import Column, Integer
+from onegov.directory.models import DirectoryEntry
+from sqlalchemy import Column, Integer, Text
 
 
 @upgrade_task('Add entries count')
@@ -84,3 +85,27 @@ def add_meta_data_and_content_columns_to_entry_recipients(
     if not context.has_column('entry_recipients', 'content'):
         context.operations.add_column('entry_recipients',
                                       Column('content', JSON))
+
+
+@upgrade_task('Add content hash to directory entries')
+def add_content_hash_to_directory_entries(context: UpgradeContext) -> None:
+    if context.has_column('directory_entries', 'content_hash'):
+        return
+
+    context.operations.add_column(
+        'directory_entries',
+        Column('content_hash', Text, nullable=True)
+    )
+
+
+@upgrade_task('Calc content hash for directory entries 1')
+def calc_content_hash_for_directory_entries(context: UpgradeContext) -> None:
+    if not context.has_column('directory_entries', 'content_hash'):
+        return
+
+    for entry in context.session.query(DirectoryEntry).filter(
+        DirectoryEntry.content_hash.is_(None)
+    ):
+        entry.update_content_hash()
+
+    context.session.flush()

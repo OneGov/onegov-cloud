@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import logging
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -14,6 +18,9 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from translationstring import TranslationString
 from uuid import uuid4, UUID
+
+
+log = logging.getLogger('onegov.directory')
 
 
 from typing import Any, TYPE_CHECKING
@@ -75,6 +82,9 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: Describes the entry briefly
     lead: Mapped[str | None]
 
+    #: SHA-256 hash of the entry values and associated file checksums
+    content_hash: Mapped[str | None] = mapped_column(default=None)
+
     #: All keywords defined for this entry (indexed)
     _keywords: Mapped[dict[str, str] | None] = mapped_column(
         MutableDict.as_mutable(HSTORE),
@@ -130,3 +140,20 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         self.content = self.content or {}
         self.content['values'] = values
         self.content.changed()  # type:ignore[attr-defined]
+
+    def update_content_hash(self) -> None:
+        values_part = json.dumps(self.values, sort_keys=True, default=str)
+        files_part = '|'.join(sorted(
+            f.checksum or f.id for f in self.files
+        ))
+        new_hash = hashlib.sha256(
+            f'{values_part}:{files_part}'.encode()
+        ).hexdigest()
+
+        if self.content_hash != new_hash:
+            if self.content_hash is not None:
+                log.info(
+                    'Content hash changed for directory entry %s: %s -> %s',
+                    self.id, self.content_hash, new_hash
+                )
+            self.content_hash = new_hash
