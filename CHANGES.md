@@ -1,8 +1,124 @@
 # Changes
 
+## 2026.33
+
+`2026-06-19` | [720d0843df...e3076b731f](https://github.com/OneGov/onegov-cloud/compare/720d0843df^...e3076b731f)
+
+**Upgrade hints**
+- `onegov-org --select /onegov_town6/* fix-submission-file-sizes`
+### Core
+
+##### Replaces `editdistance` with `rapidfuzz`
+
+`editdistance` is no longer maintained and has some known bugs that
+never got fixed.
+
+`Bugfix` | [40cf4a56c6](https://github.com/onegov/onegov-cloud/commit/40cf4a56c6a749a5cf085cf70bc3aac45a738179)
+
+##### Cleans up stale dependencies
+
+`Bugfix` | [e740698bef](https://github.com/onegov/onegov-cloud/commit/e740698bef01c11a9ff5b74a8e4956345ae60686)
+
+##### Avoids unnecessary copy when converting XLS(X) files to CSV
+
+`Performance` | [ccbb81079b](https://github.com/onegov/onegov-cloud/commit/ccbb81079b3eb3311abcccd57ccc602ad83772cd)
+
+### Form
+
+##### Update image size information in submission after potential resizing
+
+`Feature` | [OGC-3199](https://linear.app/onegovcloud/issue/OGC-3199) | [61752c305e](https://github.com/onegov/onegov-cloud/commit/61752c305e79c6aefb0a24bb46ac294ec94c0fbe)
+
+### Foundation
+
+##### Replaces `libsass` with dart sass binary.
+
+`Feature` | [OGC-3071](https://linear.app/onegovcloud/issue/OGC-3071) | [d125e1c894](https://github.com/onegov/onegov-cloud/commit/d125e1c89482bb9ef61f91fc7a2959ee41429dd4)
+
+### Org
+
+##### Use display name for Ticket handler codes.
+
+`Feature` | [OGC-3216](https://linear.app/onegovcloud/issue/OGC-3216) | [720d0843df](https://github.com/onegov/onegov-cloud/commit/720d0843df3211cbe5494c72f3207acad2fbcadc)
+
+##### Replace assert current_user is not None with a Sentry warning and HTTPForbidden
+
+Adds OrgRequest.get_current_user() which captures a Sentry warning and raises HTTPForbidden when current_user is None despite a valid session. Replaces all bare asserts across feriennet, org, town6 and translator_directory.
+
+`Feature` | [HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7467148569/](#HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7467148569/) | [a893216970](https://github.com/onegov/onegov-cloud/commit/a893216970b2006c218299cd68d7a774fee64d3e)
+
+##### Descriptive subjects with resource, date and activity.
+
+Subjects now show resource name, reservation date(s), and activity type
+(e.g. "Turnhalle - 15.06.2026 - Anfrage") instead of generic text.
+Threading via Message-ID/In-Reply-To/References already groups emails
+in mail clients.
+
+`Feature` | [OGC-2158](https://linear.app/onegovcloud/issue/OGC-2158) | [ed0d8a4526](https://github.com/onegov/onegov-cloud/commit/ed0d8a452669b679db0e6b0d18f6ed550498be22)
+
+##### Makes resource notification delivery time configurable
+
+`Feature` | [OGC-3205](https://linear.app/onegovcloud/issue/OGC-3205) | [e3076b731f](https://github.com/onegov/onegov-cloud/commit/e3076b731ffec8c1414fa7165a09b10421c8c27a)
+
+### People
+
+##### Fix potential crash in `PersonCollection.people_by_organization`
+
+`Bugfix` | [ONEGOV-CLOUD-5FT](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5FT) | [5e1c1dfd83](https://github.com/onegov/onegov-cloud/commit/5e1c1dfd832e74e5e030a25ffced803cd1d7243b)
+
+### Reservation
+
+##### Fixes raises 500 when sibling slot was deleted
+
+Catch InvalidReservationToken and InvalidReservationError from libres in the adjust_reservation view and show a user-visible error instead of an unhandled 500.
+
+Triggered by a bug in libres where rejecting one reservation on a partly_available allocation deleted the sibling reservation's slot. The view-level catch acts as a fallback for any pre-existing inconsistent data.
+
+`Bugfix` | [HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7543641349](#HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7543641349) | [65f4149f21](https://github.com/onegov/onegov-cloud/commit/65f4149f21c12be52a93d73b1233ddf28741fa96)
+
+## 3
+
+`2026-06-18` | [3d714d485a...31dffd169f](https://github.com/OneGov/onegov-cloud/compare/3d714d485a^...31dffd169f)
+
+## 2
+
+`2026-06-15` | [092d68c15c...092d68c15c](https://github.com/OneGov/onegov-cloud/compare/092d68c15c^...092d68c15c)
+
+## 1
+
+`2026-06-15` | [0e89ad461d...0f64092db1](https://github.com/OneGov/onegov-cloud/compare/0e89ad461d^...0f64092db1)
+
+**Upgrade hints**
+- New version of xsdata-ech required, run `make update`
+### Election-Day
+
+##### Improves error messages in API
+
+Return proper errors in JSON for 401 and 500 errors.
+
+`Feature` | [0e89ad461d](https://github.com/onegov/onegov-cloud/commit/0e89ad461dc51dabebaa97b3e0c9bf9d7bb94c3b)
+
+##### Adds support for eCH-0252 V2.0.0
+
+Replaces existing pre release support.
+
+`Feature` | [fbe95b9391](https://github.com/onegov/onegov-cloud/commit/fbe95b9391d20a027acc296d089f00e17aebdde5)
+
+##### Improves error message for unsupported DOI
+
+`Feature` | [a0d220d432](https://github.com/onegov/onegov-cloud/commit/a0d220d4329c5d53f2b302283fe6d6f4b207ac1e)
+
+##### No longer delete elections on the same date.
+
+Deleting all elections on the same date that are not in the current
+eCH 0252 delivery is to aggressive. Remove only elections in the
+same ElectionCompound.
+
+`Feature` | [5c58a21e9f](https://github.com/onegov/onegov-cloud/commit/5c58a21e9f60f1a3e5d129e7529397125a751922)
+
 ## 2026.32
 
-`2026-06-15` | [8f95a83b07...250e96c455](https://github.com/OneGov/onegov-cloud/compare/8f95a83b07^...250e96c455)
+`2026-06-15` | [8f95a83b07...c3dae2d191](https://github.com/OneGov/onegov-cloud/compare/8f95a83b07^...c3dae2d191)
 
 **Upgrade hints**
 - onegov-translator --select /translator_directory/* strip-whitespace-from-names
@@ -1508,157 +1624,4 @@ received votes cannot be derived from the other numbers.
 ##### Adds AI support to generate form code
 
 `Feature` | [OGC-2974](https://linear.app/onegovcloud/issue/OGC-2974) | [71ba68e5e0](https://github.com/onegov/onegov-cloud/commit/71ba68e5e040e654526c745a21da650c739b852a)
-
-## fedpol2
-
-`2026-03-05` | [cace0810c8...2d54353105](https://github.com/OneGov/onegov-cloud/compare/cace0810c8^...2d54353105)
-
-## fedpol
-
-`2026-03-04` | [17ecf7e9f6...6b6a653c12](https://github.com/OneGov/onegov-cloud/compare/17ecf7e9f6^...6b6a653c12)
-
-### Fedpol
-
-##### Adds demo application
-
-`Feature` | [OGC-2979](https://linear.app/onegovcloud/issue/OGC-2979) | [17ecf7e9f6](https://github.com/onegov/onegov-cloud/commit/17ecf7e9f609caf8fbbb2f81e44db7db8c3779b4)
-
-### Feriennet
-
-##### Text change and infopanel
-
-Changed "attendees" to "carpool contacts" and added an infopanel for clarification .
-
-`Feature` | [PRO-1494](https://linear.app/projuventute/issue/PRO-1494) | [3355fe7af8](https://github.com/onegov/onegov-cloud/commit/3355fe7af82fd96d6bd3db6abad27300941ba14a)
-
-### Org
-
-##### Fixes potential float underflow error in search query
-
-`Bugfix` | [1cf45d9254](https://github.com/onegov/onegov-cloud/commit/1cf45d9254177f8d90898943c977e83c9bad906c)
-
-### Pas
-
-##### Makes the label more clear that it's decimal hours input.
-
-`Feature` | [2b7c50efd3](https://github.com/onegov/onegov-cloud/commit/2b7c50efd36752842aace6e267c162577678a7a8)
-
-##### Send email if a commission finalized.
-
-`Feature` | [OGC-2941](https://linear.app/onegovcloud/issue/OGC-2941) | [8bd5c50179](https://github.com/onegov/onegov-cloud/commit/8bd5c50179a3a36d954fb93e449cc839fc29443d)
-
-##### Reduce log level to prevent sentry spam.
-
-`Bugfix` | [b0a97bfa13](https://github.com/onegov/onegov-cloud/commit/b0a97bfa13d4b7ae94400731ce96eeec6f9e84d4)
-
-### Payment
-
-##### Fix sqlalchemy 2.0 loader path strictness for payment batch-set
-
-Fixes sentry: https://seantis-gmbh.sentry.io/issues/7294132496
-
-`Bugfix` | [NONE](#NONE) | [3cb3d433fa](https://github.com/onegov/onegov-cloud/commit/3cb3d433faf5f5651bbbe8e7421c0dba56eed00d)
-
-### Ris
-
-##### Fix wrong translation for political party
-
-`Bugfix` | [OGC-2994](https://linear.app/onegovcloud/issue/OGC-2994) | [dce46c6fb0](https://github.com/onegov/onegov-cloud/commit/dce46c6fb064c0774b6ba02a0ab363b46a5837aa)
-
-### Tests
-
-##### Fix leap year issue in test
-
-Replace freeze_time with date.today as both Python and SQL expression agree on ages
-
-`Bugfix` | [NONE](#NONE) | [5e9f8c21d2](https://github.com/onegov/onegov-cloud/commit/5e9f8c21d2804c0ca99e68f2e2ea691982646ed4)
-
-## 2026.11
-
-`2026-02-27` | [f5feeeea66...c8c42347ea](https://github.com/OneGov/onegov-cloud/compare/f5feeeea66^...c8c42347ea)
-
-### Feriennet
-
-##### Show error if file cannot be displayed in photo album
-
-`Feature` | [OGC-2976](https://linear.app/onegovcloud/issue/OGC-2976) | [6730b8d860](https://github.com/onegov/onegov-cloud/commit/6730b8d860436c2d1ebfeea74f43ea2c0b95ae8e)
-
-##### Fix period info
-
-Show wishlist info not only when wishlist phase is active
-
-`Bugfix` | [PRO-1487](https://linear.app/projuventute/issue/PRO-1487) | [33fe463c48](https://github.com/onegov/onegov-cloud/commit/33fe463c48b1ccfef78a3d9520414e6365ad02ac)
-
-##### Prevent photoalbum and photoalbum overview from crashing due to missing size attribute (e.g. video)
-
-This is just an intermediate step. We may need to handle different file types in albums differently
-
-`Bugfix` | [OGC-2976](https://linear.app/onegovcloud/issue/OGC-2976) | [31a6fed7c2](https://github.com/onegov/onegov-cloud/commit/31a6fed7c27933281242b1bc0490da68a6bf695d)
-
-### Org
-
-##### Adds a change username function for admins
-
-Changing usernames is only allowed for users that are not sourced from
-an external login provider and if the current admin user has either a
-Yubikey or TOTP second factor configured (mTAN is not yet supported).
-
-This also adds a CLI command to change usernames, which can be utilized
-in all applications, not just Org.
-
-`Feature` | [OGC-2532](https://linear.app/onegovcloud/issue/OGC-2532) | [4b4467c068](https://github.com/onegov/onegov-cloud/commit/4b4467c068fe9add20957ecde58e2443a941ba87)
-
-##### Makes `OrgRequest.current_user` more robust
-
-With SQLAlchemy 2.0 it is possible for the `User` object to become
-detached, which can result in errors if we try to access a deferred
-attribute later on.
-
-`Bugfix` | [47bf5c3bd0](https://github.com/onegov/onegov-cloud/commit/47bf5c3bd0cf87baa1bcf1f9b57c8e7f86616421)
-
-##### Fixes inverted condition in allocation display
-
-`Bugfix` | [OGC-2984](https://linear.app/onegovcloud/issue/OGC-2984) | [17e9addabd](https://github.com/onegov/onegov-cloud/commit/17e9addabde93d74f60661976585c15f3e067cd7)
-
-### Pas
-
-##### Fixes an issue with comma in filename on windows.
-
-`Bugfix` | [NONE](#NONE) | [64908b60ac](https://github.com/onegov/onegov-cloud/commit/64908b60ac0b0ef184d62d8181a096c378aef130)
-
-##### Make sure address fits in letter.
-
-`Bugfix` | [NONE](#NONE) | [0d478902be](https://github.com/onegov/onegov-cloud/commit/0d478902beda550c5cd7f8c9e4d11acfbcd31b57)
-
-##### Display the true value for plenary session.
-
-`Bugfix` | [NONE](#NONE) | [7fac7accd6](https://github.com/onegov/onegov-cloud/commit/7fac7accd61a164d84ad6ae71f6129d9b327eec2)
-
-##### Round to two decimal places.
-
-`Bugfix` | [74859ffcc8](https://github.com/onegov/onegov-cloud/commit/74859ffcc85a968c0d6df2fcca99222bbf82863d)
-
-### Town6
-
-##### Remove searchbar in empty slider
-
-Don't display the searchbar if there are no images in the slider
-
-`Other` | [f5feeeea66](https://github.com/onegov/onegov-cloud/commit/f5feeeea66ccc9ff407fc3008f434afbde8eabb5)
-
-### Wab
-
-##### Handle invalid polling day date
-
-`Feature` | [OGC-2785](https://linear.app/onegovcloud/issue/OGC-2785) | [3d0b3fe3d4](https://github.com/onegov/onegov-cloud/commit/3d0b3fe3d4c4a1e5db126e8122a64214260c8393)
-
-##### Prevent cli update archived results for development and staging
-
-As `official_host` is not set for development and staging, cli `upload-archived-results` may cause duplicates when uploading new results due to different urls.
-
-`Feature` | [OGC-2978](https://linear.app/onegovcloud/issue/OGC-2978) | [34820b252c](https://github.com/onegov/onegov-cloud/commit/34820b252c306342d9defa6f2f38bbf4d3fcdb48)
-
-## ui
-
-`2026-02-23` | [dd502dc069...997bc59a4a](https://github.com/OneGov/onegov-cloud/compare/dd502dc069^...997bc59a4a)
 
