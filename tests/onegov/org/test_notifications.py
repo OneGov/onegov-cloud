@@ -82,9 +82,10 @@ def test_new_reservation_notification(client: Client[TestOrgApp]) -> None:
     for mail in mails:
         assert mail is not None
         if mail['To'] == 'jessie@example.org':  # email to customer
-            assert ("Ihre Anfrage wurde erfasst" in mail['Subject']
-                    or "Ihre Reservationen wurden bestätigt" in
-                    mail['Subject'])
+            assert (
+                'Gymnasium - 29.01.2024 - Anfrage' in mail['Subject']
+                or 'Gymnasium - 29.01.2024 - Angenommen' in mail['Subject']
+            )
             assert "Gymnasium" in mail['TextBody']
             assert 'Montag, 29. Januar 2024' in mail['TextBody']
             assert "Anzahl:" in mail['TextBody']

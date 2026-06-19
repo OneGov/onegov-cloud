@@ -8,7 +8,9 @@ from datetime import datetime, date
 from freezegun import freeze_time
 from onegov.core.utils import module_path
 from onegov.core.utils import Bunch
+from onegov.file.attachments import IMAGE_MAX_SIZE
 from onegov.org.models import Clipboard, ImageFileCollection, PushNotification
+from PIL import Image
 from onegov.org.models import News, NewsCollection
 from onegov.org.models import Organisation
 from onegov.org.models import SiteCollection
@@ -465,3 +467,27 @@ def test_duplicate_prevention_push_notifications(session: Session) -> None:
         PushNotification.record_sent_notification(
             session, news_id, "topic1", {"status": "sent"}
         )
+
+
+def test_image_file_collection_resizes_large_images(session: Session) -> None:
+    """ImageFileCollection must resize images that exceed IMAGE_MAX_SIZE."""
+    collection = ImageFileCollection(session)
+
+    large = IMAGE_MAX_SIZE + 500
+    image = collection.add('big.png', create_image(large, large))
+    session.flush()
+
+    stored_size = Image.open(image.reference.file).size
+    assert stored_size[0] <= IMAGE_MAX_SIZE
+    assert stored_size[1] <= IMAGE_MAX_SIZE
+
+    # an image already within the limit must not be altered
+    small = collection.add(
+        'small.png', create_image(IMAGE_MAX_SIZE, IMAGE_MAX_SIZE)
+    )
+    session.flush()
+
+    assert Image.open(small.reference.file).size == (
+        IMAGE_MAX_SIZE,
+        IMAGE_MAX_SIZE,
+    )

@@ -15,12 +15,12 @@ from csv import Error as CsvError
 from csv import reader as csv_reader
 from csv import writer as csv_writer
 from datetime import datetime
-from editdistance import eval as distance
 from functools import lru_cache
-from io import BytesIO, StringIO
+from io import BytesIO, StringIO, TextIOWrapper
 from itertools import permutations
 from onegov.core import errors
 from ordered_set import OrderedSet
+from rapidfuzz.distance import Levenshtein
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
 from onegov.core.utils import normalize_for_url
@@ -310,8 +310,13 @@ def convert_xlsx_to_csv(
     if TYPE_CHECKING:
         assert isinstance(sheet, Worksheet)
 
-    text_output = StringIO()
-    writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
+    output = TextIOWrapper(
+        BytesIO(),
+        encoding='utf-8',
+        newline='',
+        write_through=True
+    )
+    writecsv = csv_writer(output, quoting=QUOTE_ALL)
 
     for row in range(1, sheet.max_row + 1):
         values = []
@@ -340,15 +345,7 @@ def convert_xlsx_to_csv(
         if any(values):
             writecsv.writerow(values)
 
-    text_output.seek(0)
-    # FIXME: We can use StringIOWrapper around a BytesIO, then we don't
-    #        need to convert at the end!
-    output = BytesIO()
-
-    for line in text_output.readlines():
-        output.write(line.encode('utf-8'))
-
-    return output
+    return output.detach()
 
 
 def convert_xls_to_csv(
@@ -377,8 +374,13 @@ def convert_xls_to_csv(
     else:
         sheet = excel.sheet_by_index(0)
 
-    text_output = StringIO()
-    writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
+    output = TextIOWrapper(
+        BytesIO(),
+        encoding='utf-8',
+        newline='',
+        write_through=True
+    )
+    writecsv = csv_writer(output, quoting=QUOTE_ALL)
 
     for rownum in range(sheet.nrows):
         values = []
@@ -406,15 +408,7 @@ def convert_xls_to_csv(
 
         writecsv.writerow(values)
 
-    text_output.seek(0)
-    # FIXME: We can use StringIOWrapper around a BytesIO, then we don't
-    #        need to convert at the end!
-    output = BytesIO()
-
-    for line in text_output.readlines():
-        output.write(line.encode('utf-8'))
-
-    return output
+    return output.detach()
 
 
 def convert_excel_to_csv(
@@ -818,13 +812,19 @@ def match_headers(
     if len(headers) > 1:
         sane_distance = min((
             sane_distance,
-            min(distance(a, b) for a, b in permutations(headers, 2))
+            min(
+                Levenshtein.distance(a, b)
+                for a, b in permutations(headers, 2)
+            )
         ))
 
     if len(expected) > 1:
         sane_distance = min((
             sane_distance,
-            min(distance(a, b) for a, b in permutations(expected, 2))
+            min(
+                Levenshtein.distance(a, b)
+                for a, b in permutations(expected, 2)
+            )
         ))
 
     sane_distance = min((
@@ -838,7 +838,7 @@ def match_headers(
 
     for column in expected:
         normalized = normalize_header(column)
-        distances = {h: distance(normalized, h) for h in headers}
+        distances = {h: Levenshtein.distance(normalized, h) for h in headers}
 
         closest = min(distances.values())
 

@@ -176,6 +176,25 @@ def test_user_logout_all_sessions() -> None:
             assert call(None, 'yyy') in forget.mock_calls
 
 
+def test_user_change_username() -> None:
+    user = User(username='old@example.org')
+
+    with (
+        patch('onegov.user.models.user.remembered') as remembered,
+        patch('onegov.user.models.user.forget') as forget
+    ):
+        remembered.return_value = True
+
+        user.save_current_session(DummyRequest('sess1'))  # type: ignore[arg-type]
+        assert user.sessions is not None
+        assert 'sess1' in user.sessions
+
+        user.change_username('new@example.org', DummyRequest('zzz').app)  # type: ignore[arg-type]
+
+        assert call(None, 'sess1') in forget.mock_calls
+        assert user.username == 'new@example.org'
+
+
 def test_user_cleanup_sessions() -> None:
     user = User()
     assert not user.sessions
