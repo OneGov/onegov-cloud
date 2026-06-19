@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-11 11:12+0200\n"
+"POT-Creation-Date: 2026-06-19 09:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1979,10 +1979,10 @@ msgstr "Réservations quotidiennes"
 
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
-"be sent to the recipient above at 06:00."
+"be sent to the recipient above."
 msgstr ""
 "Pour chaque jour sélectionné ci-dessous, une notification avec les "
-"réservations du jour sera envoyée au destinataire ci-dessus à 6h00.."
+"réservations du jour sera envoyée au destinataire ci-dessus."
 
 msgid "Customer Messages"
 msgstr "Messages des clients"
@@ -1993,9 +1993,6 @@ msgid ""
 msgstr ""
 "Chaque fois qu'un client ajoute un message au ticket pour une réservation, "
 "une notification est envoyée au destinataire ci-dessus."
-
-msgid "Internal Comments"
-msgstr "Commentaires internes"
 
 msgid "Internal Notes"
 msgstr "Notes internes"
@@ -2019,6 +2016,25 @@ msgstr ""
 
 msgid "Send on"
 msgstr "Envoyer sur"
+
+msgid "Delivery Times"
+msgstr "Heures d'envoi"
+
+msgid "e.g. 07:05"
+msgstr "p.ex. 07:05"
+
+#. type: ignore[attr-defined]
+msgid "Please enter at least one delivery time."
+msgstr "Veuillez saisir au moins une heure d'envoi."
+
+#. type: ignore[attr-defined]
+#, python-format
+msgid "Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
+msgstr "Heure invalide \"${time}\". Utiliser le format HH:MM (p.ex. 06:00)."
+
+#. type: ignore[attr-defined]
+msgid "Minutes must be a multiple of 5 (e.g. 06:10, 16:35)."
+msgstr "Les minutes doivent être un multiple de 5 (p.ex. 06:10, 16:35)."
 
 msgid "Please add at least one notification."
 msgstr "Veuillez ajouter au moins une notification."
@@ -3743,9 +3759,6 @@ msgstr "La proposition a été adoptée"
 msgid "The entry is not valid, please adjust it"
 msgstr "L'entrée n'est pas valide, veuillez la rectifier"
 
-msgid "An entry with this name already exists"
-msgstr "Une entrée du même nom existe déjà"
-
 msgid "Your directory submission has been adopted"
 msgstr "Votre proposition de répertoire a été adoptée"
 
@@ -3914,6 +3927,12 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Supprimer le contenu"
+
+msgid "Internal Comments"
+msgstr "Commentaires internes"
+
+msgid "Administrative"
+msgstr "Administratif"
 
 msgid "Photo album"
 msgstr "Album photo"
@@ -6538,9 +6557,6 @@ msgstr "Confirmer la connexion du client"
 msgid "A link was added to the clipboard"
 msgstr "Un lien a été ajouté au presse-papiers"
 
-msgid "Administrative"
-msgstr "Administratif"
-
 msgid "Added a new directory"
 msgstr "Ajout d'un nouveau dossier"
 
@@ -8039,6 +8055,15 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "e.g. 07:00 or 07:00, 14:30"
+#~ msgstr "p.ex. 07:00 ou 07:00, 14:30"
+
+#~ msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
+#~ msgstr "Les minutes doivent être un multiple de 5 (p.ex. 06:00, 06:30)."
+
+#~ msgid "An entry with this name already exists"
+#~ msgstr "Une entrée du même nom existe déjà"
 
 #~ msgid "Back"
 #~ msgstr "Retour"
