@@ -191,19 +191,20 @@ class Principal:
     def municipality_display_name_by_slug(self) -> dict[str, str]:
         """
         Maps sanitized slug → display name, built once from static
-        entities.
+        entities based on the latest year.
         """
         from onegov.election_day.collections import (
             MunicipalityArchivedResultCollection
         )
         sanitize = MunicipalityArchivedResultCollection.sanitize_municipality
-        result: dict[str, str] = {}
-        for entities in self.entities.values():
-            for entity in entities.values():
-                name = entity.get('name', '')
-                if name:
-                    result.setdefault(sanitize(name), name)
-        return result
+        year = date.today().year
+        if year not in self.entities and self.entities:
+            year = max(self.entities)
+        return {
+            sanitize(name): name
+            for entity in self.entities.get(year, {}).values()
+            if (name := entity.get('name'))
+        }
 
     def get_entities(self, year: int) -> set[str]:
         entities = {
