@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-06-11 10:23+0200\n"
+"POT-Creation-Date: 2026-06-19 09:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1984,23 +1984,6 @@ msgstr ""
 "Per ogni giorno selezionato qui sotto, al suddetto destinatario verrà "
 "inviata una notifica con le prenotazioni del giorno."
 
-msgid "Delivery Times"
-msgstr "Orari di invio"
-
-msgid "e.g. 07:00 or 07:00, 14:30"
-msgstr "es. 07:00 o 07:00, 14:30"
-
-msgid "Please enter at least one delivery time."
-msgstr "Inserire almeno un orario di invio."
-
-msgid ""
-"Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
-msgstr ""
-"Orario non valido \"${time}\". Usare il formato HH:MM (es. 06:00)."
-
-msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
-msgstr "I minuti devono essere un multiplo di 5 (es. 06:00, 06:30)."
-
 msgid "Customer Messages"
 msgstr "Messaggi dei clienti"
 
@@ -2010,9 +1993,6 @@ msgid ""
 msgstr ""
 "Ogni volta che un cliente aggiunge un messaggio al ticket di una "
 "prenotazione, viene inviata una notifica al destinatario sopra indicato."
-
-msgid "Internal Comments"
-msgstr "Commenti interni"
 
 msgid "Internal Notes"
 msgstr "Note interne"
@@ -2036,6 +2016,25 @@ msgstr ""
 
 msgid "Send on"
 msgstr "Invia il"
+
+msgid "Delivery Times"
+msgstr "Orari di invio"
+
+msgid "e.g. 07:05"
+msgstr "es. 07:05"
+
+#. type: ignore[attr-defined]
+msgid "Please enter at least one delivery time."
+msgstr "Inserire almeno un orario di invio."
+
+#. type: ignore[attr-defined]
+#, python-format
+msgid "Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
+msgstr "Orario non valido \"${time}\". Usare il formato HH:MM (es. 06:00)."
+
+#. type: ignore[attr-defined]
+msgid "Minutes must be a multiple of 5 (e.g. 06:10, 16:35)."
+msgstr "I minuti devono essere un multiplo di 5 (es. 06:10, 16:35)."
 
 msgid "Please add at least one notification."
 msgstr "Aggiungere almeno una notifica."
@@ -3754,9 +3753,6 @@ msgstr "L'iscrizione è stata adottata"
 msgid "The entry is not valid, please adjust it"
 msgstr "L'elemento non è valido, modificalo"
 
-msgid "An entry with this name already exists"
-msgstr "Esiste già un elemento con questo nome"
-
 msgid "Your directory submission has been adopted"
 msgstr "L'invio della cartella è stato adottato"
 
@@ -3926,6 +3922,12 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
+
+msgid "Internal Comments"
+msgstr "Commenti interni"
+
+msgid "Administrative"
+msgstr "Administrativo"
 
 msgid "Photo album"
 msgstr "Album fotografico"
@@ -6521,9 +6523,6 @@ msgstr "Confermare l'accesso del cliente"
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
 
-msgid "Administrative"
-msgstr "Administrativo"
-
 msgid "Added a new directory"
 msgstr "Aggiunta una nuova cartella"
 
@@ -8015,6 +8014,15 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "e.g. 07:00 or 07:00, 14:30"
+#~ msgstr "es. 07:00 o 07:00, 14:30"
+
+#~ msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
+#~ msgstr "I minuti devono essere un multiplo di 5 (es. 06:00, 06:30)."
+
+#~ msgid "An entry with this name already exists"
+#~ msgstr "Esiste già un elemento con questo nome"
 
 #~ msgid "Back"
 #~ msgstr "Indietro"

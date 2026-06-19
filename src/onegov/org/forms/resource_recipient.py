@@ -100,7 +100,7 @@ class ResourceRecipientForm(Form):
     daily_reservations_times = TagsField(
         label=_('Delivery Times'),
         fieldset='Tage und Ressourcen',
-        description=_('e.g. 07:00 or 07:00, 14:30'),
+        description=_('e.g. 07:05'),
         depends_on=('daily_reservations', 'y'),
     )
 
@@ -132,7 +132,7 @@ class ResourceRecipientForm(Form):
                 return False
             if int(m.group(2)) % 5 != 0:
                 self.daily_reservations_times.errors.append(  # type: ignore[attr-defined]
-                    _('Minutes must be a multiple of 5 (e.g. 06:00, 06:30).')
+                    _('Minutes must be a multiple of 5 (e.g. 06:10, 16:35).')
                 )
                 return False
 

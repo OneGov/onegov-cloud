@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-11 10:23+0200\n"
+"POT-Creation-Date: 2026-06-19 09:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1980,23 +1980,6 @@ msgstr ""
 "An jedem unten ausgewählten Tag wird eine Benachrichtigung mit den "
 "Reservierungen des Tages an den oben genannten Empfänger gesendet."
 
-msgid "Delivery Times"
-msgstr "Zustellungszeiten"
-
-msgid "e.g. 07:00 or 07:00, 14:30"
-msgstr "z.B. 07:00 oder 07:00, 14:30"
-
-msgid "Please enter at least one delivery time."
-msgstr "Bitte mindestens eine Zustellungszeit eingeben."
-
-msgid ""
-"Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
-msgstr ""
-"Ungültige Zeit \"${time}\". Bitte im Format HH:MM eingeben (z.B. 06:00)."
-
-msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
-msgstr "Minuten müssen ein Vielfaches von 5 sein (z.B. 06:00, 06:30)."
-
 msgid "Customer Messages"
 msgstr "Kunden Nachrichten"
 
@@ -2007,9 +1990,6 @@ msgstr ""
 "Jedes Mal, wenn ein Kunde eine neue Nachricht zu einem Ticket für eine "
 "Reservierung hinzufügt, wird eine eine Benachrichtigung an den oben "
 "genannten Empfänger gesendet."
-
-msgid "Internal Comments"
-msgstr "Internes Kommentarfeld"
 
 msgid "Internal Notes"
 msgstr "Interne Notizen"
@@ -2034,6 +2014,26 @@ msgstr ""
 
 msgid "Send on"
 msgstr "Senden am"
+
+msgid "Delivery Times"
+msgstr "Zustellungszeiten"
+
+msgid "e.g. 07:05"
+msgstr "z.B. 07:05"
+
+#. type: ignore[attr-defined]
+msgid "Please enter at least one delivery time."
+msgstr "Bitte mindestens eine Zustellungszeit eingeben."
+
+#. type: ignore[attr-defined]
+#, python-format
+msgid "Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
+msgstr ""
+"Ungültige Zeit \"${time}\". Bitte im Format HH:MM eingeben (z.B. 06:00)."
+
+#. type: ignore[attr-defined]
+msgid "Minutes must be a multiple of 5 (e.g. 06:10, 16:35)."
+msgstr "Minuten müssen ein Vielfaches von 5 sein (z.B. 06:10, 16:35)."
 
 msgid "Please add at least one notification."
 msgstr "Bitte wählen sie mindestens eine Benachrichtigung."
@@ -3751,9 +3751,6 @@ msgstr "Der Eintrag wurde übernommen"
 msgid "The entry is not valid, please adjust it"
 msgstr "Der Eintrag ist nicht gültig, bitte korrigieren"
 
-msgid "An entry with this name already exists"
-msgstr "Ein Eintrag mit diesem Namen existiert bereits"
-
 msgid "Your directory submission has been adopted"
 msgstr "Ihr Verzeichniseintrag wurde übernommen"
 
@@ -3922,6 +3919,12 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Inhalt löschen"
+
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
+
+msgid "Administrative"
+msgstr "Administrativ"
 
 msgid "Photo album"
 msgstr "Fotoalbum"
@@ -6539,9 +6542,6 @@ msgstr "Kunden-Login bestätigen"
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
-msgid "Administrative"
-msgstr "Administrativ"
-
 msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 
@@ -8044,6 +8044,15 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "e.g. 07:00 or 07:00, 14:30"
+#~ msgstr "z.B. 07:00 oder 07:00, 14:30"
+
+#~ msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
+#~ msgstr "Minuten müssen ein Vielfaches von 5 sein (z.B. 06:00, 06:30)."
+
+#~ msgid "An entry with this name already exists"
+#~ msgstr "Ein Eintrag mit diesem Namen existiert bereits"
 
 #~ msgid "Back"
 #~ msgstr "Zurück"
