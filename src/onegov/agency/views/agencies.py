@@ -165,7 +165,7 @@ def view_agencies_sort(
 
     layout = AgencyCollectionLayout(self, request)
     layout.edit_mode = True
-    layout.editmode_links = None
+    layout.editmode_links = None  # type: ignore[assignment]
 
     return {
         'title': _('Sort'),
@@ -216,7 +216,7 @@ def view_agency_sort(
 
     layout = AgencyLayout(self, request)
     layout.edit_mode = True
-    layout.editmode_links = None
+    layout.editmode_links = None  # type: ignore[assignment]
 
     return {
         'title': _('Sort'),
