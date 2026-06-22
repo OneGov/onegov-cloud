@@ -271,12 +271,7 @@ class AgencyLayout(
                 Link(
                     text=_('Move'),
                     url=self.request.link(self.model.proxy(), 'move'),
-                    attrs={'class': 'move'}
-                ),
-                Link(
-                    text=_('Sort'),
-                    url=self.request.link(self.model.proxy(), 'sort'),
-                    attrs={'class': 'sort'}
+                    attrs={'class': 'move'},
                 ),
                 Link(
                     text=_('Change URL'),
@@ -302,24 +297,27 @@ class AgencyLayout(
                         Link(
                             text=_('Agency'),
                             url=self.request.link(
-                                self.model.proxy(),
-                                name='new'
+                                self.model.proxy(), name='new'
                             ),
-                            attrs={'class': 'new-agency'}
+                            attrs={'class': 'new-agency'},
                         ),
                         Link(
                             text=_('Membership'),
                             url=self.request.link(
-                                self.model.proxy(),
-                                name='new-membership'
+                                self.model.proxy(), name='new-membership'
                             ),
-                            attrs={'class': 'new-person'}
+                            attrs={'class': 'new-person'},
                         ),
-                    ]
+                    ],
                 ),
                 LinkGroup(
                     title=_('Sort'),
                     links=[
+                        Link(
+                            text=_('Sort'),
+                            url=self.request.link(self.model.proxy(), 'sort'),
+                            attrs={'class': 'sort'},
+                        ),
                         Link(
                             text=_('Suborganizations'),
                             url=self.csrf_protected_url(
