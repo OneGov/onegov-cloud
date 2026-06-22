@@ -215,7 +215,7 @@ def view_agency_sort(
 
     layout = AgencyLayout(self, request)
     layout.edit_mode = True
-    layout.editmode_links = layout.editmode_links[1:]
+    layout.editmode_links = None
 
     return {
         'title': _('Sort'),
@@ -237,7 +237,8 @@ def view_agency_sort(
                     for membership in self.memberships
                 )
             ),
-        )
+        ),
+        'agency': self,
     }
 
 
