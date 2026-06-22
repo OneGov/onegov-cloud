@@ -155,6 +155,7 @@ class TranslatorMutation:
         'address': _('Street and house number'),
         'zip_code': _('Zip Code'),
         'city': _('City'),
+        'hometown': _('Hometown'),
         'drive_distance': _('Drive distance (km)'),
         'social_sec_number': _('Swiss social security number'),
         'bank_name': _('Bank name'),
