@@ -445,6 +445,12 @@ class SessionManager:
 
             """
 
+            # Skip on INERROR: SET search_path would block ROLLBACK
+            # TO SAVEPOINT.
+            if (cursor.connection.get_transaction_status()
+                    == psycopg2.extensions.TRANSACTION_STATUS_INERROR):
+                return
+
             # execution options have priority!
             if 'schema' in connection._execution_options:
                 schema = connection._execution_options['schema']
@@ -465,6 +471,11 @@ class SessionManager:
             **kwargs: Any
         ) -> None:
             """ Kills idle sessions after a while, freeing up memory. """
+
+            # Skip on INERROR: SET would block ROLLBACK TO SAVEPOINT.
+            if (cursor.connection.get_transaction_status()
+                    == psycopg2.extensions.TRANSACTION_STATUS_INERROR):
+                return
 
             cursor.execute(
                 'SET SESSION idle_in_transaction_session_timeout = %s',

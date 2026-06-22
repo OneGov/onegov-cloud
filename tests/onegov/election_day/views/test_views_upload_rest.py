@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 import transaction
 
 from io import BytesIO
@@ -385,12 +386,67 @@ def test_view_rest_xml(election_day_app_zg: TestApp) -> None:
         assert isinstance(import_.call_args[0][2], Session)
 
 
+def test_savepoint_rollback_blocked_by_activate_schema(
+    election_day_app_zg: TestApp,
+) -> None:
+    """OGC-3223: ROLLBACK TO SAVEPOINT was skipped because activate_schema and
+    limit_session_lifetime both fire on every cursor execution via
+    before_cursor_execute. On an INERROR connection their inner
+    cursor.execute() calls raise InFailedSqlTransaction before the ROLLBACK TO
+    SAVEPOINT reaches PostgreSQL. Both handlers now return early on INERROR
+    so recovery works.
+    """
+    import psycopg2.extensions
+    from sqlalchemy import text
+
+    app = election_day_app_zg
+    schema = app.session_manager.session().info['schema']
+    engine = app.session_manager.engine
+
+    with engine.connect().execution_options(schema=schema) as conn:
+        conn.execute(text('SELECT 1'))
+        raw = conn.connection.driver_connection
+
+        nested = conn.begin_nested()
+
+        with pytest.raises(Exception):
+            conn.execute(text('SELECT 1/0'))
+
+        assert (
+            raw.get_transaction_status()
+            == psycopg2.extensions.TRANSACTION_STATUS_INERROR
+        )
+
+        nested.rollback()
+
+        # INTRANS: ROLLBACK TO SAVEPOINT reached PostgreSQL and recovered.
+        assert (
+            raw.get_transaction_status()
+            == psycopg2.extensions.TRANSACTION_STATUS_INTRANS
+        )
+
+        result = conn.execute(text('SELECT 1'))
+        assert result.scalar() == 1
+
+
+@pytest.mark.parametrize('trigger_sql', [
+    pytest.param('SELECT 1/0', id='division_by_zero'),
+    pytest.param(
+        "SET statement_timeout='1ms'; SELECT pg_sleep(1)",
+        id='statement_timeout',
+    ),
+])
 def test_infailedsqltransaction_after_corrupt_pool_connection(
-    election_day_app_zg: TestApp
+    election_day_app_zg: TestApp,
+    trigger_sql: str,
 ) -> None:
     """OGC-3223: a connection returned to the pool with an aborted PostgreSQL
     transaction causes InFailedSqlTransaction on the next request's SET
     search_path. The pool checkout event must roll it back before use.
+
+    Two triggers: division_by_zero (any PostgreSQL error leaves INERROR) and
+    statement_timeout (QueryCanceled swallowed by sentry_tween as
+    DB_CONNECTION_ERRORS, leaving the connection in INERROR without ROLLBACK).
     """
     from sqlalchemy.pool.base import ResetStyle
 
@@ -400,13 +456,15 @@ def test_infailedsqltransaction_after_corrupt_pool_connection(
     app.session_manager.session_factory.remove()
     pool.dispose()
 
-    # Put a connection with an aborted transaction into
-    # the pool without ROLLBACK.
+    # Return a connection with an aborted transaction to the pool
+    # without ROLLBACK.
     raw = app.session_manager.engine.raw_connection()
-    try:
-        raw.driver_connection.cursor().execute('SELECT 1/0')
-    except Exception:
-        pass
+    cursor = raw.driver_connection.cursor()
+    for statement in trigger_sql.split(';'):
+        try:
+            cursor.execute(statement.strip())
+        except Exception:
+            break
     original = pool._reset_on_return
     pool._reset_on_return = ResetStyle.reset_none
     try:
