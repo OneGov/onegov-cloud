@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import os.path
-import sass
 
 from collections import OrderedDict
 from itertools import chain
 from io import StringIO
 from onegov.core.theme import Theme as CoreTheme
+from onegov.core.theme import compile_sass
 
 
 from typing import Any, TYPE_CHECKING
@@ -184,11 +184,7 @@ class BaseTheme(CoreTheme):
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
 
-        return sass.compile(
-            string=theme.getvalue(),
-            include_paths=paths,
-            output_style='compressed' if self.compress else 'nested'
-        )
+        return compile_sass(theme.getvalue(), paths, self.compress)
 
 
 class Theme(BaseTheme):

@@ -501,10 +501,7 @@ class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):
 
     @property
     def used_tags(self) -> set[str]:
-        """ Returns a list of all the tags used on *all* activites of
-        the current type.
-
-        """
+        """ All tags used on *all* activites of the current type. """
 
         return {
             tag
@@ -515,10 +512,7 @@ class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):
 
     @property
     def used_municipalities(self) -> set[str]:
-        """ Returns a list of all the municipalities on *all* activites of
-        the current type
-
-        """
+        """ All municipalities used on *all* activites of the current type. """
 
         return {
             municipality

@@ -160,7 +160,7 @@ class Services:
 
     @property
     def total(self) -> Decimal | Literal[0]:
-        """ Returns the total percentage of used services. """
+        """ The total percentage of used services. """
         return sum(
             self.available[s].percentage * len(self.selected[s])
             for s in self.selected

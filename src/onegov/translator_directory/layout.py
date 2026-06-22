@@ -364,7 +364,7 @@ class TranslatorCollectionLayout(DefaultLayout):
 
     @cached_property
     def export_link(self) -> str | None:
-        """ Returns the export link with current filters included, or None """
+        """ The export link with current filters included, or None. """
         if not self.request.is_admin:
             return None
 
@@ -466,6 +466,11 @@ class TranslatorDocumentsLayout(DefaultLayout):
         url = URL(self.request.link(self.model, name='upload'))
         url = url.query_param('category', self.model.category)
         return self.csrf_protected_url(url.as_string())
+
+    @cached_property
+    def move_url(self) -> str:
+        url = self.request.link(self.model, name='move')
+        return self.csrf_protected_url(url)
 
     def link_for(self, category: str) -> str:
         return self.request.class_link(

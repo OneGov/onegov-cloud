@@ -62,7 +62,7 @@ class ElectionCompoundLayout(DetailLayout):
 
     @cached_property
     def all_tabs(self) -> tuple[str, ...]:
-        """ Return the tabs in order of their appearance. """
+        """ The tabs in order of their appearance. """
         result = [
             'seat-allocation',
             'list-groups',
@@ -201,8 +201,7 @@ class ElectionCompoundLayout(DetailLayout):
 
     @cached_property
     def pdf_path(self) -> str | None:
-        """ Returns the path to the PDF file or None, if it is not available.
-        """
+        """ The path to the PDF file, or None if it is not available. """
 
         assert self.request.locale
         path = 'pdf/{}'.format(
@@ -221,7 +220,7 @@ class ElectionCompoundLayout(DetailLayout):
 
     @cached_property
     def svg_path(self) -> str | None:
-        """ Returns the path to the SVG or None, if it is not available. """
+        """ The path to the SVG, or None if it is not available. """
 
         assert self.request.locale
 
@@ -242,13 +241,13 @@ class ElectionCompoundLayout(DetailLayout):
 
     @cached_property
     def svg_link(self) -> str:
-        """ Returns a link to the SVG download view. """
+        """ A link to the SVG download view. """
 
         return self.request.link(self.model, name='{}-svg'.format(self.tab))
 
     @cached_property
     def svg_name(self) -> str:
-        """ Returns a nice to read SVG filename. """
+        """ A human-readable SVG filename. """
 
         return '{}.svg'.format(
             normalize_for_url(

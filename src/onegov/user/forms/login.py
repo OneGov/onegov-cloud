@@ -43,7 +43,7 @@ class LoginForm(Form):
 
     @property
     def login_data(self) -> LoginData:
-        """ Returns the data required to be passed to the
+        """ The data required to be passed to the
         :class:`onegov.user.auth.Auth` methods.
 
         """

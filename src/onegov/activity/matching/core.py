@@ -102,7 +102,7 @@ class AttendeeAgent[BookingT: Booking | MatchableBooking](HashableID):
 
     @property
     def is_valid(self) -> bool:
-        """ Returns True if the results of this agent are valid.
+        """ True if the results of this agent are valid.
 
         The algorithm should never get to this stage, so this is an extra
         security measure to make sure there's no bug.

@@ -21,13 +21,13 @@ class Dashboard:
 
     @property
     def boardlet_configs(self) -> dict[str, BoardletConfig]:
-        """ Returns the appropriate set of `BoardletConfig` for our kind. """
+        """ The appropriate set of `BoardletConfig` for our kind. """
 
         return self.request.app.config.boardlets_registry[self.kind]
 
     @property
     def is_available(self) -> bool:
-        """ Returns true if there are `Boardlet`s to display. """
+        """ True if there are `Boardlet`s to display. """
 
         return self.boardlet_configs and True or False
 
@@ -82,32 +82,28 @@ class Boardlet:
 
     @property
     def title(self) -> str:
-        """ Returns the title of the boardlet, which is meant to be something
-        meaningful, like the most important metric used in the boardlet.
-
-        """
+        """The title of the boardlet — typically the most important metric."""
         raise NotImplementedError()
 
     @property
     def url(self) -> str | None:
-        """ Returns an url the title of the boardlet should link to.
-        """
+        """ A URL the title of the boardlet should link to. """
         return None
 
     @property
     def facts(self) -> Iterator[BoardletFact]:
-        """ Yields facts. (:class:`BoardletFact` instances)"""
+        """ Facts as :class:`BoardletFact` instances. """
 
         raise NotImplementedError()
 
     @property
     def is_available(self) -> bool:
-        """ Returns true if the boardlet is active/has data. """
+        """ True if the boardlet is active/has data. """
         return True
 
     @property
     def state(self) -> Literal['success', 'warning', 'failure']:
-        """ Yields one of three states:
+        """ One of three states:
 
         * 'success'
         * 'warning'

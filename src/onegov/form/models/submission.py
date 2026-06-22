@@ -136,7 +136,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
     @property
     def form_obj(self) -> Form:
-        """ Returns a form instance containing the submission data. """
+        """ A form instance containing the submission data. """
         return self.form_class(data=self.data)
 
     def get_email_field_name(self, form: Form | None = None) -> str | None:
@@ -360,7 +360,7 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
 
     @property
     def form_obj(self) -> Form:
-        """ Returns a form instance containing the submission data. """
+        """ A form instance containing the submission data. """
         return self.form_class(data=self.data)
 
     @observes('definition')

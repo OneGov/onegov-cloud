@@ -89,7 +89,7 @@ class VoteLayout(DefaultLayout):
 
     @cached_property
     def attachments(self) -> RenderData:
-        """ Returns a dictionary with static URLS and locale for attachments.
+        """ A dictionary with static URLs and locale for attachments.
 
         Note that only file / locale combinations with a file_name
         definition have a static URL!

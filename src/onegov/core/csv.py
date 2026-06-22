@@ -16,7 +16,7 @@ from csv import reader as csv_reader
 from csv import writer as csv_writer
 from datetime import datetime
 from functools import lru_cache
-from io import BytesIO, StringIO
+from io import BytesIO, StringIO, TextIOWrapper
 from itertools import permutations
 from onegov.core import errors
 from ordered_set import OrderedSet
@@ -310,8 +310,13 @@ def convert_xlsx_to_csv(
     if TYPE_CHECKING:
         assert isinstance(sheet, Worksheet)
 
-    text_output = StringIO()
-    writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
+    output = TextIOWrapper(
+        BytesIO(),
+        encoding='utf-8',
+        newline='',
+        write_through=True
+    )
+    writecsv = csv_writer(output, quoting=QUOTE_ALL)
 
     for row in range(1, sheet.max_row + 1):
         values = []
@@ -340,15 +345,7 @@ def convert_xlsx_to_csv(
         if any(values):
             writecsv.writerow(values)
 
-    text_output.seek(0)
-    # FIXME: We can use StringIOWrapper around a BytesIO, then we don't
-    #        need to convert at the end!
-    output = BytesIO()
-
-    for line in text_output.readlines():
-        output.write(line.encode('utf-8'))
-
-    return output
+    return output.detach()
 
 
 def convert_xls_to_csv(
@@ -377,8 +374,13 @@ def convert_xls_to_csv(
     else:
         sheet = excel.sheet_by_index(0)
 
-    text_output = StringIO()
-    writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
+    output = TextIOWrapper(
+        BytesIO(),
+        encoding='utf-8',
+        newline='',
+        write_through=True
+    )
+    writecsv = csv_writer(output, quoting=QUOTE_ALL)
 
     for rownum in range(sheet.nrows):
         values = []
@@ -406,15 +408,7 @@ def convert_xls_to_csv(
 
         writecsv.writerow(values)
 
-    text_output.seek(0)
-    # FIXME: We can use StringIOWrapper around a BytesIO, then we don't
-    #        need to convert at the end!
-    output = BytesIO()
-
-    for line in text_output.readlines():
-        output.write(line.encode('utf-8'))
-
-    return output
+    return output.detach()
 
 
 def convert_excel_to_csv(

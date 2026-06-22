@@ -128,7 +128,7 @@ class Search(Pagination[Any]):
     @property
     def q(self) -> str:
         """
-        Returns the user's query term from the search field of the UI
+        The user's query term from the search field of the UI.
 
         """
         return self.query

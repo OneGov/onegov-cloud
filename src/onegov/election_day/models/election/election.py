@@ -152,17 +152,13 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def progress(self) -> tuple[int, int]:
-        """ Returns a tuple with the first value being the number of counted
-        election results and the second value being the number of total
-        results.
-
-        """
+        """ A tuple of (counted results, total results). """
 
         return sum(r.counted for r in self.results), len(self.results)
 
     @property
     def counted_entities(self) -> list[str]:
-        """ Returns the names of the already counted entities.
+        """ The names of the already counted entities.
 
         Might contain an empty string in case of expats.
 
@@ -172,7 +168,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def has_results(self) -> bool:
-        """ Returns True, if the election has any results. """
+        """ True if the election has any results. """
 
         for result in self.results:
             if result.counted:
@@ -286,7 +282,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def elected_candidates(self) -> list[tuple[str, str]]:
-        """ Returns the first and last names of the elected candidates. """
+        """ The first and last names of the elected candidates. """
 
         return sorted(
             (

@@ -82,8 +82,8 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def siblings_by_agency(self) -> Query[Self]:
-        """ Returns a query that includes all siblings by agency, including
-        the item itself ordered by `order_within_agency`.
+        """ A query including all siblings by agency (including self), ordered
+        by `order_within_agency`.
         """
         # FIXME: This has the same problem as AdjacencyList.siblings
         cls = self.__class__
@@ -96,8 +96,8 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def siblings_by_person(self) -> Query[Self]:
-        """ Returns a query that includes all siblings by person, including
-        the item itself ordered by `order_within_person`.
+        """ A query including all siblings by person (including self), ordered
+        by `order_within_person`.
         """
         # FIXME: This has the same problem as AdjacencyList.siblings
         cls = self.__class__

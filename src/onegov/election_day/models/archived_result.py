@@ -262,7 +262,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
     @property
     def is_complex_vote(self) -> bool:
-        """ Returns True if this result represents a complex vote. """
+        """ True if this result represents a complex vote. """
 
         if self.type == 'complex_vote':
             return True
@@ -270,10 +270,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         return False
 
     def is_fetched(self, request: ElectionDayRequest) -> bool:
-        """ Returns True, if this results has been fetched from another
-        instance.
-
-        """
+        """ True if this result has been fetched from another instance. """
         return self.schema != request.app.schema
 
     def is_fetched_by_municipality(

@@ -94,7 +94,7 @@ class ContentExtension:
 
     @property
     def content_extensions(self) -> Iterator[type[ContentExtension]]:
-        """ Returns all base classes of the current class which themselves have
+        """ All base classes of the current class that have
         ``ContentExtension`` as baseclass.
 
         """
@@ -441,7 +441,7 @@ class PersonLinkExtension(ContentExtension):
 
     @property
     def people(self) -> list[PersonWithFunction] | None:
-        """ Returns the people linked to this content or None.
+        """ The people linked to this content, or None.
 
         The context specific function is temporarily stored on the
         ``context_specific_function`` attribute on each object in the

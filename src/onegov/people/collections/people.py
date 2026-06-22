@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from sqlalchemy import func
+from sqlalchemy import func, type_coerce
 
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
+from onegov.core.orm.types import JSON
 from onegov.people.models import Person
 
 from typing import Any
@@ -96,10 +97,16 @@ class PersonCollection(BasePersonCollection[Person]):
                                                     Person.first_name)
         if org:
             query = query.filter(
-                func.jsonb_contains(Person.content['organisations_multiple'],
-                                    f'["{org}"]'))
+                func.jsonb_contains(
+                    Person.content['organisations_multiple'],
+                    type_coerce([org], JSON)
+                )
+            )
         if sub_org:
             query = query.filter(
-                func.jsonb_contains(Person.content['organisations_multiple'],
-                                    f'["-{sub_org}"]'))
+                func.jsonb_contains(
+                    Person.content['organisations_multiple'],
+                    type_coerce([f'-{sub_org}'], JSON)
+                )
+            )
         return query.all()

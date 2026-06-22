@@ -99,7 +99,7 @@ class SharedMethods:
 
     @property
     def calendar_date_range(self) -> tuple[datetime, datetime]:
-        """ Returns the date range set by the fullcalendar specific params. """
+        """ The date range set by the fullcalendar specific params. """
 
         if self.date:
             date = datetime(self.date.year, self.date.month, self.date.day)
