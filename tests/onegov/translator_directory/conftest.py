@@ -80,6 +80,7 @@ def create_translator_app(
     org = create_new_organisation(app, name="Übersetzerverzeichnis")
     org.meta['reply_to'] = 'mails@govikon.ch'
     org.meta['locales'] = 'de_CH'
+    org.meta['enable_time_tracking'] = True
 
     # usually we don't want to create the users directly, anywhere else you
     # *need* to go through the UserCollection. Here however, we can improve
