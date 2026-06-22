@@ -23,8 +23,12 @@ def test_sort_topics(client: Client) -> None:
     page = page.click('Sortieren')
     page = page.follow()
 
+    # Ensure no edit mode links
+    assert "Speichern" not in page
+    assert "Abbrechen" not in page
     assert "Topic 1" in page
     assert "Topic 2" in page
+    assert "Zurück zur Seite" in page
 
 
 def get_select_option_id_by_text(
