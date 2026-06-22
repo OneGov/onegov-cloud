@@ -165,11 +165,12 @@ def view_agencies_sort(
 
     layout = AgencyCollectionLayout(self, request)
     layout.edit_mode = True
-    layout.editmode_links = layout.editmode_links[1:]
+    layout.editmode_links = None
 
     return {
         'title': _('Sort'),
         'layout': layout,
+        'agency': self,
         'items': (
             (
                 _('Agencies'),
@@ -220,6 +221,7 @@ def view_agency_sort(
     return {
         'title': _('Sort'),
         'layout': layout,
+        'agency': self,
         'items': (
             (
                 _('Suborganizations'),
@@ -238,7 +240,6 @@ def view_agency_sort(
                 )
             ),
         ),
-        'agency': self,
     }
 
 

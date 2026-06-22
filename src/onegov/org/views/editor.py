@@ -336,6 +336,7 @@ def view_topics_sort(
     page = cast('Topic | News', self.page)
 
     layout = layout or EditorLayout(self, request, 'sort')
+    layout.editmode_links = None
 
     return {
         'title': _('Sort'),
