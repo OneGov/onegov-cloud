@@ -235,6 +235,7 @@ def view_sort_person(
     return {
         'title': _('Sort'),
         'layout': layout,
+        'agency': self,
         'items': (
             (
                 _('Memberships'),
