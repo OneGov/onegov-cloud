@@ -60,8 +60,8 @@ class OrgRequest(CoreRequest):
 
     @cached_property
     def is_manager(self) -> bool:
-        """ Returns true if the current user is logged in, and has the role
-        editor or admin.
+        """ True if the current user is logged in and has the role editor or
+        admin.
 
         """
 
@@ -72,33 +72,25 @@ class OrgRequest(CoreRequest):
 
     @cached_property
     def is_admin(self) -> bool:
-        """ Returns true if the current user is an admin.
-
-        """
+        """ True if the current user is an admin. """
 
         return self.has_role('admin')
 
     @cached_property
     def is_editor(self) -> bool:
-        """ Returns true if the current user is an editor.
-
-        """
+        """ True if the current user is an editor. """
 
         return self.has_role('editor')
 
     @cached_property
     def is_supporter(self) -> bool:
-        """ Returns true if the current user is a supporter.
-
-        """
+        """ True if the current user is a supporter. """
 
         return self.has_role('supporter')
 
     @cached_property
     def is_member(self) -> bool:
-        """ Returns true if the current user is a member.
-
-        """
+        """ True if the current user is a member. """
 
         return self.has_role('member')
 
@@ -310,7 +302,7 @@ class OrgRequest(CoreRequest):
 
     @property
     def analytics_provider(self) -> AnalyticsProvider | None:
-        """ Returns the active analytics provider. """
+        """ The active analytics provider. """
         if name := self.app.org.analytics_provider_name:
             return self.app.available_analytics_providers.get(name)
         return None

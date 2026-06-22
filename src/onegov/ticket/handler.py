@@ -134,13 +134,13 @@ class Handler:
 
     @property
     def email(self) -> str | None:
-        """ Returns the email address behind the ticket request. """
+        """ The email address behind the ticket request. """
         raise NotImplementedError
 
     @property
     def email_changeable(self) -> bool:
-        """ Returns whether or not the email address behind the ticket request
-        may be changed.
+        """ Whether or not the email address behind the ticket request may be
+        changed.
         """
         return False
 
@@ -158,47 +158,47 @@ class Handler:
 
     @property
     def submitter_name(self) -> str | None:
-        """ Returns the name of the submitter """
+        """ The name of the submitter. """
         return None
 
     @property
     def submitter_address(self) -> str | None:
-        """ Returns the address of the submitter """
+        """ The address of the submitter. """
         return None
 
     @property
     def submitter_phone(self) -> str | None:
-        """ Returns the phone of the submitter """
+        """ The phone of the submitter. """
         return None
 
     @property
     def title(self) -> str:
-        """ Returns the title of the ticket. If this title may change over
-        time, the handler must call :meth:`self.refresh` when there's a change.
+        """ The title of the ticket. If this title may change over time, the
+        handler must call :meth:`self.refresh` when there's a change.
 
         """
         raise NotImplementedError
 
     @property
     def subtitle(self) -> str | None:
-        """ Returns the subtitle of the ticket. If this title may change over
-        time, the handler must call :meth:`self.refresh` when there's a change.
+        """ The subtitle of the ticket. If this subtitle may change over time,
+        the handler must call :meth:`self.refresh` when there's a change.
 
         """
         raise NotImplementedError
 
     @property
     def group(self) -> str | None:
-        """ Returns the group of the ticket. If this group may change over
-        time, the handler must call :meth:`self.refresh` when there's a change.
+        """ The group of the ticket. If this group may change over time, the
+        handler must call :meth:`self.refresh` when there's a change.
 
         """
         raise NotImplementedError
 
     @property
     def deleted(self) -> bool:
-        """ Returns true if the underlying model was deleted. It is best to
-        never let that happen, as we want tickets to stay around forever.
+        """ True if the underlying model was deleted. It is best to never let
+        that happen, as we want tickets to stay around forever.
 
         However, this can make sense in certain scenarios. Note that if
         you do delete your underlying model, make sure to call
@@ -230,8 +230,8 @@ class Handler:
 
     @property
     def undecided(self) -> bool:
-        """ Returns true if there has been no decision about the subject
-        of this handler.
+        """ True if there has been no decision about the subject of this
+        handler.
 
         For example, if a reservation ticket has been accepted, but the
         reservation has been neither confirmed nor cancelled, the ticket

@@ -86,13 +86,12 @@ class Person(
 
     @property
     def title(self) -> str:
-        """Returns the Eastern-ordered name."""
+        """The Eastern-ordered name."""
         return f'{self.last_name} {self.first_name}'
 
     @property
     def spoken_title(self) -> str:
-        """Returns the Western-ordered name. Includes the academic title if
-        available.
+        """The Western-ordered name. Includes the academic title if available.
 
         """
         parts = []
@@ -331,7 +330,7 @@ class Person(
 
     @property
     def memberships_by_agency(self) -> list[AgencyMembership]:
-        """Returns the memberships sorted alphabetically by the agency."""
+        """The memberships sorted by order_within_person."""
 
         def sortkey(membership: AgencyMembership) -> int:
             return membership.order_within_person

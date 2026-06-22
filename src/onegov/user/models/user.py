@@ -291,8 +291,8 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     @property
     def yubikey_serial(self) -> int | None:
-        """ Returns the yubikey serial of the yubikey associated with this
-        user (if any).
+        """ The yubikey serial of the yubikey associated with this user (if
+        any).
 
         """
 

@@ -382,8 +382,8 @@ class Associable:
 
     @property
     def links(self) -> QueryChain[Base]:
-        """ Returns a query chain with all records of all models which attach
-        to the associable model.
+        """ A query chain with all records of all models which attach to the
+        associable model.
 
         """
         assert self.registered_links is not None, 'No links registered'

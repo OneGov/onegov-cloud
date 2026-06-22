@@ -180,7 +180,7 @@ class SearcheableCollection[M: DeclarativeBase](GenericCollection[M]):
     else:
         @property
         def term_filter_cols(self) -> dict[str, TextColumn]:
-            """ Returns a dict of column names to search in with term.
+            """ A dict of column names to search in with term.
             Must be attributes of self.model_class.
             """
             raise NotImplementedError
@@ -247,7 +247,7 @@ class Pagination[M: DeclarativeBase]:
 
     @property
     def page_index(self) -> int:
-        """ Returns the current page index (starting at 0). """
+        """ The current page index (starting at 0). """
         raise NotImplementedError
 
     def page_by_index(self, index: int) -> Self:
@@ -268,9 +268,7 @@ class Pagination[M: DeclarativeBase]:
 
     @cached_property
     def subset_count(self) -> int:
-        """ Returns the total number of elements this pagination represents.
-
-        """
+        """ The total number of elements this pagination represents. """
 
         # the ordering is entirely unnecessary for a count, so remove it
         # to count things faster
@@ -278,7 +276,7 @@ class Pagination[M: DeclarativeBase]:
 
     @cached_property
     def batch(self) -> tuple[M, ...]:
-        """ Returns the elements on the current page. """
+        """ The elements on the current page. """
         query = self.cached_subset.slice(
             self.offset, self.offset + self.batch_size
         )
@@ -286,12 +284,12 @@ class Pagination[M: DeclarativeBase]:
 
     @property
     def offset(self) -> int:
-        """ Returns the offset applied to the current subset. """
+        """ The offset applied to the current subset. """
         return self.page * self.batch_size
 
     @property
     def pages_count(self) -> int:
-        """ Returns the number of pages. """
+        """ The number of pages. """
         if not self.batch_size:
             return 1
         return math.ceil(self.subset_count / self.batch_size)
@@ -304,20 +302,20 @@ class Pagination[M: DeclarativeBase]:
 
     @property
     def pages(self) -> Iterator[Self]:
-        """ Yields all page objects of this Pagination. """
+        """ All page objects of this Pagination. """
         for page in range(self.pages_count):
             yield self.page_by_index(page)
 
     @property
     def previous(self) -> Self | None:
-        """ Returns the previous page or None. """
+        """ The previous page, or None. """
         if self.page - 1 >= 0:
             return self.page_by_index(self.page - 1)
         return None
 
     @property
     def next(self) -> Self | None:
-        """ Returns the next page or None. """
+        """ The next page, or None. """
         if self.page + 1 < self.pages_count:
             return self.page_by_index(self.page + 1)
         return None
@@ -352,7 +350,7 @@ class RangedPagination[M: DeclarativeBase]:
 
     @property
     def page_range(self) -> tuple[int, int]:
-        """ Returns the current page range (starting at (0, 0)). """
+        """ The current page range (starting at (0, 0)). """
         raise NotImplementedError
 
     def by_page_range(self, page_range: tuple[int, int]) -> Self:
@@ -404,9 +402,7 @@ class RangedPagination[M: DeclarativeBase]:
 
     @cached_property
     def subset_count(self) -> int:
-        """ Returns the total number of elements this pagination represents.
-
-        """
+        """ The total number of elements this pagination represents. """
 
         # the ordering is entirely unnecessary for a count, so remove it
         # to count things faster
@@ -414,7 +410,7 @@ class RangedPagination[M: DeclarativeBase]:
 
     @cached_property
     def batch(self) -> tuple[M, ...]:
-        """ Returns the elements on the current page range. """
+        """ The elements on the current page range. """
         s, e = self.page_range
 
         s = s * self.batch_size
@@ -426,7 +422,7 @@ class RangedPagination[M: DeclarativeBase]:
 
     @property
     def pages_count(self) -> int:
-        """ Returns the number of pages. """
+        """ The number of pages. """
         if not self.batch_size:
             return 1
 
@@ -434,7 +430,7 @@ class RangedPagination[M: DeclarativeBase]:
 
     @property
     def previous(self) -> Self | None:
-        """ Returns the previous page or None. """
+        """ The previous page, or None. """
         s, _e = self.page_range
 
         if s > 0:
@@ -443,7 +439,7 @@ class RangedPagination[M: DeclarativeBase]:
 
     @property
     def next(self) -> Self | None:
-        """ Returns the next page range or None. """
+        """ The next page range, or None. """
         _s, e = self.page_range
 
         if e + 1 < self.pages_count:

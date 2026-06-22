@@ -90,7 +90,7 @@ class UserApp(WebassetsApp):
 
     @property
     def providers(self) -> Mapping[str, _AuthenticationProvider]:
-        """ Returns a mapping of availabe providers. """
+        """ A mapping of available providers. """
 
         return getattr(self, 'available_providers', {})
 

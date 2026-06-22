@@ -112,10 +112,7 @@ class PolicyAreaField(SelectMultipleField):
 
     @property
     def tree(self) -> list[PolicyAreaTreeNode]:
-        """ Returns the tree data and automatically preselects the selected
-        select options.
-
-        """
+        """ The tree data with the selected options pre-selected. """
         tree = deepcopy(self._tree)
 
         def preselect(item: PolicyAreaTreeNode) -> bool:

@@ -106,55 +106,52 @@ class Searchable:
 
     @property
     def fts_access(self) -> str:
-        """ Returns access level of the model. Defaults to `public`.
-
-        """
+        """ The access level of the model. Defaults to `public`. """
         return getattr(self, 'access', 'public')
 
     @property
     def fts_public(self) -> bool:
-        """ Returns True if the model is available to be found by the public.
-        If false, only editors/admins will see this object in the search
-        results.
+        """ True if the model is available to be found by the public. If
+        False, only editors/admins will see this object in the search results.
 
         """
         raise NotImplementedError
 
     @property
     def fts_skip(self) -> bool:
-        """ Returns True if the indexing of this specific model instance
-        should be skipped. """
+        """ True if the indexing of this specific model instance should be
+        skipped. """
         return False
 
     @property
     def fts_suggestion(self) -> Sequence[str] | str:
-        """ Returns suggest-as-you-type value of the document.
-        The field used for this property should also be indexed, or the
-        suggestion will lead to nowhere.
+        """ The suggest-as-you-type value of the document. The field used for
+        this property should also be indexed, or the suggestion will lead to
+        nowhere.
 
-        If a single string is returned, the completion input equals the
-        completion output. (My Title -> My Title)
+        If a single string, the completion input equals the completion output.
+        (My Title -> My Title)
 
-        If an array of strings is returned, all values are possible inputs and
-        the first value is the output. (My Title/Title My -> My Title)
+        If an array of strings, all values are possible inputs and the first
+        value is the output. (My Title/Title My -> My Title)
 
         """
         return self.title  # type:ignore[attr-defined]
 
     @property
     def fts_publication_start(self) -> datetime | None:
-        """ Returns the date when the document should become public. """
+        """ The date when the document should become public. """
         return getattr(self, 'publication_start', None)
 
     @property
     def fts_publication_end(self) -> datetime | None:
-        """ Returns the date when the document should stop being public. """
+        """ The date when the document should stop being public. """
         return getattr(self, 'publication_end', None)
 
     @property
     def fts_last_change(self) -> datetime | None:
         """
-        Returns the date the document was created/last modified.
+        The date the document was created/last modified.
 
         Returning `None` indicates that the document's age/recency must not
         influence search ranking: the item should be treated as equally
@@ -164,7 +161,7 @@ class Searchable:
 
     @property
     def fts_tags(self) -> list[str] | None:
-        """ Returns a list of tags associated with this content. """
+        """ A list of tags associated with this content. """
         return None
 
 
