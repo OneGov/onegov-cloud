@@ -437,7 +437,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     @cached_property
     def used_timezones(self) -> list[str]:
-        """ Returns a list of all the timezones used by the occurrences. """
+        """ All timezones used by the occurrences. """
 
         return [
             tz for tz, in self.session.query(distinct(Occurrence.timezone))
@@ -445,7 +445,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     @cached_property
     def used_sources(self) -> list[str]:
-        """ Returns a list of all the source prefixes used by the events. """
+        """ All source prefixes used by the events. """
 
         return sorted({
             '-'.join(source.split('-', 2)[:2])
@@ -459,9 +459,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     @cached_property
     def used_tags(self) -> set[str]:
-        """ Returns a list of all the tags used by all future occurrences.
-
-        """
+        """ All tags used by future occurrences. """
         if 'tag_counts' in self.__dict__:
             # if we already cached the tag_counts we can just use those
             return {
@@ -478,8 +476,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
     @cached_property
     def tag_counts(self) -> dict[str, int]:
         """
-        Returns a dict with all existing tags as keys and the number of
-        existence as value.
+        A dict with all existing tags as keys and their occurrence count as
+        values.
 
         """
         return defaultdict(int, self.apply_common_filters(

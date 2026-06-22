@@ -83,7 +83,7 @@ class InvoiceReference(Base, TimestampMixin):
 
     @property
     def readable(self) -> str:
-        """ Returns the human formatted variant of the reference. """
+        """ The human-readable variant of the reference. """
 
         return KNOWN_SCHEMAS[self.schema]().format(self.reference)
 

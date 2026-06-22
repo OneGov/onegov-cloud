@@ -244,7 +244,7 @@ class Translator(
 
     @property
     def title(self) -> str:
-        """ Returns title with lastname in uppercase. """
+        """ Title with lastname in uppercase. """
         return f'{self.last_name.upper()}, {self.first_name}'
 
     @property
@@ -256,7 +256,7 @@ class Translator(
 
     @property
     def full_name(self) -> str:
-        """ Returns the full name with lastname in uppercase. """
+        """ The full name with lastname in uppercase. """
         return f'{self.first_name} {self.last_name.upper()}'
 
     @property

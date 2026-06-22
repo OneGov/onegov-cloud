@@ -155,10 +155,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
 
     @property
     def next_submission(self) -> FormSubmission | None:
-        """ Returns the submission next in line. In other words, the next
-        submission in order of first come, first serve.
-
-        """
+        """ The submission next in line (first come, first serve). """
         session = object_session(self)
         assert session is not None
         q = session.query(FormSubmission)
@@ -182,7 +179,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
 
     @property
     def claimed_spots(self) -> int:
-        """ Returns the number of actually claimed spots. """
+        """ The number of actually claimed spots. """
 
         session = object_session(self)
         assert session is not None
@@ -195,12 +192,12 @@ class FormRegistrationWindow(Base, TimestampMixin):
 
     @property
     def requested_spots(self) -> int:
-        """ Returns the number of requested spots.
+        """ The number of requested spots.
 
-        When the claim has not been made yet, `spots` are counted as
-        requested. When the claim has been partially made, the difference is
-        counted as requested. If the claim has been fully made, the result is
-        0. If the claim has been relinquished, the result is 0.
+        When the claim has not been made yet, `spots` are counted as requested.
+        When the claim has been partially made, the difference is counted as
+        requested. If the claim has been fully made, the result is 0. If the
+        claim has been relinquished, the result is 0.
 
         """
         session = object_session(self)

@@ -364,7 +364,7 @@ class TranslatorCollectionLayout(DefaultLayout):
 
     @cached_property
     def export_link(self) -> str | None:
-        """ Returns the export link with current filters included, or None """
+        """ The export link with current filters included, or None. """
         if not self.request.is_admin:
             return None
 

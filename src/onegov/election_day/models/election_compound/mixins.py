@@ -71,7 +71,7 @@ class DerivedAttributesMixin:
 
     @property
     def completed(self) -> bool:
-        """ Returns True, if all elections are completed. """
+        """ True if all elections are completed. """
 
         elections = self.elections
         if not elections:

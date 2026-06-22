@@ -153,8 +153,8 @@ class BookingPeriodMixin:
 
     @property
     def is_prebooking_in_past(self) -> bool:
-        """Returns true if current date is after start of booking phase or if
-        current date is after prebooking end. """
+        """True if current date is after start of booking phase or after
+        prebooking end."""
         now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
         end = self.as_local_datetime(self.prebooking_end, end_of_day=True)
@@ -204,7 +204,7 @@ class BookingPeriodMixin:
 
     @property
     def booking_limit(self) -> int | None:
-        """ Returns the max_bookings_per_attendee limit if it applies. """
+        """ The max_bookings_per_attendee limit if it applies. """
         return self.max_bookings_per_attendee
 
 

@@ -154,9 +154,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def current_sort_by(self) -> str:
-        """ Returns the currently used sorting key.
-
-        Defaults to a reasonable value.
+        """ The currently used sorting key. Defaults to a reasonable value.
 
         """
         if self.sort_by in self.SORT_BYS:
@@ -166,9 +164,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def current_sort_order(self) -> str:
-        """ Returns the currently used sorting order.
-
-        Defaults to a reasonable value.
+        """ The currently used sorting order. Defaults to a reasonable value.
 
         """
         if self.sort_by in self.SORT_BYS:
@@ -222,8 +218,8 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def order_by(self) -> ColumnElement[Any]:
-        """ Returns an SqlAlchemy expression for ordering queries based
-        on the current sorting key and ordering.
+        """ An SQLAlchemy expression for ordering queries based on the current
+        sorting key and ordering.
 
         """
 
@@ -273,8 +269,8 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def term_filter_numeric(self) -> list[ColumnElement[bool]]:
-        """ Returns a list of SqlAlchemy filter statements matching possible
-        numeric attributes based on the term.
+        """ A list of SQLAlchemy filter statements matching possible numeric
+        attributes based on the term.
 
         """
 
@@ -291,8 +287,8 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def term_filter_text(self) -> list[ColumnElement[bool]]:
-        """ Returns a list of SqlAlchemy filter statements matching possible
-        fulltext attributes based on the term.
+        """ A list of SQLAlchemy filter statements matching possible fulltext
+        attributes based on the term.
 
         """
         term = SwissVote.search_term_expression(self.term)
@@ -340,8 +336,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def term_filter(self) -> list[ColumnElement[bool]]:
-        """ Returns a list of SqlAlchemy filter statements based on the search
-        term.
+        """ A list of SQLAlchemy filter statements based on the search term.
 
         """
 
@@ -478,7 +473,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @cached_property
     def available_descriptors(self) -> list[set[Decimal]]:
-        """ Returns a list of the used descriptor values (level 1-3). """
+        """ A list of the used descriptor values (level 1-3). """
 
         query = self.session.query
         return [
@@ -559,7 +554,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def last_modified(self) -> datetime | None:
-        """ Returns the last change of any votes. """
+        """ The date of the last change across all votes. """
         return self.session.query(func.max(SwissVote.last_change)).scalar()
 
     def export_csv(self, file: IO[str]) -> None:

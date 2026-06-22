@@ -156,7 +156,7 @@ class ElectionCompoundPart(
 
     @property
     def has_results(self) -> bool:
-        """ Returns True, if the election compound has any results. """
+        """ True if the election compound has any results. """
 
         if self.has_party_results:
             return True
@@ -168,7 +168,7 @@ class ElectionCompoundPart(
 
     @property
     def elected_candidates(self) -> list[tuple[str, str]]:
-        """ Returns the first and last names of the elected candidates. """
+        """ The first and last names of the elected candidates. """
 
         result = []
         for election in self.elections:

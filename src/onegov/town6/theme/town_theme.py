@@ -170,9 +170,8 @@ class TownTheme(BaseTheme):
 
     @property
     def additional_font_families(self) -> dict[str, str]:
-        """ Returns the filenames as they are to use as label in the settings
-        as well as to construct the font-family string.
-        Only sans-serif fonts are supported by now.
+        """ Filenames for use as labels in the settings and to construct the
+        font-family string. Only sans-serif fonts are currently supported.
         """
         if not os.path.exists(self.font_search_path):
             return {}

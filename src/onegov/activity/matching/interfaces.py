@@ -60,7 +60,7 @@ class MatchableOccasion(Protocol):
     @property
     @abstractmethod
     def dates(self) -> Sequence[MatchableOccasionDate]:
-        """ Returns the dates of the occasion. """
+        """ The dates of the occasion. """
 
     @property
     @abstractmethod
@@ -103,17 +103,17 @@ class MatchableBooking(Protocol):
     @property
     @abstractmethod
     def occasion_id(self) -> SupportsRichComparison:
-        """ Returns the id of the occasion this booking belongs to. """
+        """ The id of the occasion this booking belongs to. """
 
     @property
     @abstractmethod
     def attendee_id(self) -> SupportsRichComparison:
-        """ Returns the id of the attendee this booking belongs to. """
+        """ The id of the attendee this booking belongs to. """
 
     @property
     @abstractmethod
     def state(self) -> BookingState:
-        """ Returns the state of the booking, one of:
+        """ The state of the booking, one of:
 
         * "open" (for unassigned bookings)
         * "accepted" (for already accepted bookings)
@@ -124,7 +124,7 @@ class MatchableBooking(Protocol):
     @property
     @abstractmethod
     def priority(self) -> int:
-        """ Returns the priority of the booking. The higher the priority
+        """ The priority of the booking. The higher the priority
         the further up the wishlist.
 
         Bookings further up the wishlist are first passed to the occasions.
@@ -136,7 +136,7 @@ class MatchableBooking(Protocol):
     @property
     @abstractmethod
     def dates(self) -> Sequence[MatchableOccasionDate]:
-        """ Returns the dates of the booking. """
+        """ The dates of the booking. """
 
     @property
     @abstractmethod

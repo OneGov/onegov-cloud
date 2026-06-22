@@ -455,7 +455,7 @@ class GroupContext(GroupContextGuard):
 
     @property
     def appcfgs(self) -> Iterator[ApplicationConfig]:
-        """ Returns the matching appconfigs.
+        """ The matching appconfigs.
 
         Since there's only one appconfig per namespace, we ignore the path
         part of the selector and only focus on the namespace::
@@ -488,7 +488,7 @@ class GroupContext(GroupContextGuard):
 
     @property
     def all_wildcard_selectors(self) -> Iterator[str]:
-        """ Returns all selectors targeting a namespace by wildcard. """
+        """ All selectors targeting a namespace by wildcard. """
 
         for appcfg in self.config.applications:
             if appcfg.path.endswith('*'):
@@ -496,7 +496,7 @@ class GroupContext(GroupContextGuard):
 
     @property
     def all_specific_selectors(self) -> Iterator[str]:
-        """ Returns all selectors targeting an application directly. """
+        """ All selectors targeting an application directly. """
 
         for appcfg in self.config.applications:
             if not appcfg.path.endswith('*'):
@@ -507,7 +507,7 @@ class GroupContext(GroupContextGuard):
 
     @property
     def matches(self) -> Iterator[str]:
-        """ Returns the specific selectors matching the context selector.
+        """ The specific selectors matching the context selector.
 
         That is, a combination of namespace / application id is returned.
         Since we only know an exhaustive list of application id's *if* we have

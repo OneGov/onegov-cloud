@@ -35,7 +35,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
 
     @property
     def is_adjustable(self) -> bool:
-        """ Returns whether or not the reservation is adjustable.
+        """ Whether or not the reservation is adjustable.
 
         A reservation is adjustable when it's not yet been accepted,
         its start date is in the future and its target allocation is

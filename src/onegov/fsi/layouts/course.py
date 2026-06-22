@@ -70,7 +70,7 @@ class CourseCollectionLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        """ Returns the breadcrumbs for the current page. """
+        """ The breadcrumbs for the current page. """
         links = super().breadcrumbs
         assert isinstance(links, list)
         links.append(
@@ -136,7 +136,7 @@ class CourseLayout(CourseCollectionLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        """ Returns the breadcrumbs for the detail page. """
+        """ The breadcrumbs for the detail page. """
         links = super().breadcrumbs
         assert isinstance(links, list)
         links.append(
