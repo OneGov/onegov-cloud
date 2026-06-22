@@ -35,7 +35,7 @@ ALLOWANCE_ROLES: dict[str, str] = {
 # (amtliche Missionen Kantonsratspräsidiums)
 FIBU_KONTO_ALLOWANCE = '3000.30'
 LOHNART_ALLOWANCE_NR = '2411'
-LOHNART_ALLOWANCE_TEXT = 'Jahreszulage KR-Präsidium'
+LOHNART_ALLOWANCE_TEXT = 'Zulage Amtliche Missionen'
 
 
 class PresidentialAllowance(Base, TimestampMixin):
