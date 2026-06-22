@@ -11,11 +11,11 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import ForeignKey
+from sqlalchemy import event, ForeignKey
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import mapped_column, relationship, Mapped
+from sqlalchemy.orm import mapped_column, relationship, Mapped, Session
 from translationstring import TranslationString
 from uuid import uuid4, UUID
 
@@ -142,6 +142,8 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         self.content.changed()  # type:ignore[attr-defined]
 
     def update_content_hash(self) -> None:
+        # Must be called explicitly after any mutation to values or files.
+        # Directory.update() does this; bypass it and the hash goes stale.
         values_part = json.dumps(self.values, sort_keys=True, default=str)
         files_part = '|'.join(sorted(
             f.checksum or f.id for f in self.files
@@ -157,3 +159,16 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
                     self.id, self.content_hash, new_hash
                 )
             self.content_hash = new_hash
+
+
+@event.listens_for(Session, 'before_flush')
+def set_content_hash_before_flush(
+    session: Session,
+    flush_context: object,
+    instances: object
+) -> None:
+    # Safety net: ensure entries always have a hash even if update_content_hash
+    # was not called by the caller (new entry added directly, or hash cleared).
+    for obj in (*session.new, *session.dirty):
+        if isinstance(obj, DirectoryEntry) and obj.content_hash is None:
+            obj.update_content_hash()

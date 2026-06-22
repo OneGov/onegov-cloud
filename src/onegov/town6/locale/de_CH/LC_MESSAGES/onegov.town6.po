@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-06-01 13:53+0200\n"
+"POT-Creation-Date: 2026-06-22 07:44+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -530,9 +530,6 @@ msgstr "Benachrichtigungen bei neuen Einträgen erhalten"
 msgid "Propose a new entry"
 msgstr "Neuen Eintrag vorschlagen"
 
-msgid "Internal Comments"
-msgstr "Internes Kommentarfeld"
-
 msgid "Internal Notes"
 msgstr "Interne Notizen"
 
@@ -544,6 +541,9 @@ msgstr "Weiterführende Informationen"
 
 msgid "Propose a change to this entry"
 msgstr "Änderung für diesen Eintrag vorschlagen"
+
+msgid "Hash"
+msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
@@ -2599,6 +2599,9 @@ msgstr "Archivieren"
 
 msgid "Archive selected"
 msgstr "Selektierte Archivieren"
+
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
