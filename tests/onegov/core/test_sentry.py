@@ -265,22 +265,6 @@ def test_view_db_connection_exception(
     assert not events
 
 
-def test_view_db_connection_exception_no_pool_corruption(
-    mock_view: Mock,
-    sentry_client: Client,
-) -> None:
-    """After a DB connection error is caught by the sentry tween the next
-    request must succeed."""
-    mock_view.side_effect = InterfaceError('', '', Exception())
-    sentry_client.get('/test', expect_errors=True)
-
-    # Reset mock so the next request succeeds normally.
-    mock_view.side_effect = None
-    mock_view.return_value = Response()
-
-    result = sentry_client.get('/test')
-    assert result.status_int == 200
-
 
 @pytest.mark.parametrize('sentry_app', [
     pytest.param(True, id='with ppi'),

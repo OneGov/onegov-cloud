@@ -9,6 +9,7 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
 from unittest.mock import patch
@@ -406,10 +407,11 @@ def test_savepoint_rollback_blocked_by_activate_schema(
     with engine.connect().execution_options(schema=schema) as conn:
         conn.execute(text('SELECT 1'))
         raw = conn.connection.driver_connection
+        assert raw is not None
 
         nested = conn.begin_nested()
 
-        with pytest.raises(Exception):
+        with pytest.raises(DatabaseError):
             conn.execute(text('SELECT 1/0'))
 
         assert (
@@ -459,6 +461,7 @@ def test_infailedsqltransaction_after_corrupt_pool_connection(
     # Return a connection with an aborted transaction to the pool
     # without ROLLBACK.
     raw = app.session_manager.engine.raw_connection()
+    assert raw.driver_connection is not None
     cursor = raw.driver_connection.cursor()
     for statement in trigger_sql.split(';'):
         try:
