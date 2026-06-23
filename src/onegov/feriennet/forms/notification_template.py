@@ -74,6 +74,9 @@ class NotificationTemplateSendForm(Form):
             ('inactive_organisers', _(
                 'Organisers without occasions'
             )),
+            ('volunteers', _(
+                'Volunteers'
+            )),
             ('by_role', _(
                 'Users of a given role'
             )),
@@ -92,10 +95,7 @@ class NotificationTemplateSendForm(Form):
             ('by_occasion', _(
                 'Users with attenedees that have an occasion on their '
                 'wish- or booking-list'
-            )),
-            (('volunteers', _(
-                'Volunteers'
-            )))
+            ))
         ],
         default='by_role'
     )
