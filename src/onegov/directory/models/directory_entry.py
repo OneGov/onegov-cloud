@@ -144,13 +144,15 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def update_content_hash(self) -> None:
         # Must be called explicitly after any mutation to values or files.
         # Directory.update() does this; bypass it and the hash goes stale.
-        values_part = json.dumps(self.values, sort_keys=True, default=str)
-        files_part = '|'.join(sorted(
-            f.checksum or f.id for f in self.files
+        hash_obj = hashlib.sha1(usedforsecurity=False)
+        hash_obj.update(ormsgpack.packb(
+            self.values,
+            default=str,
+            options=ormsgpack.OPT_SORT_KEYS
         ))
-        new_hash = hashlib.sha256(
-            f'{values_part}:{files_part}'.encode()
-        ).hexdigest()
+        for file_part in sorted(f.checksum or f.id for f in self.files):
+            hash_obj.update(file_part.encode())
+        new_hash = hash_obj.hexdigest()
 
         if self.content_hash != new_hash:
             if self.content_hash is not None:
