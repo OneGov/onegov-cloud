@@ -241,7 +241,7 @@ class AdjacencyList(Base):
 
     @property
     def root(self) -> AdjacencyList:
-        """ Returns the root of this item. """
+        """ The root of this item. """
         if self.parent is None:
             return self
         else:
@@ -249,17 +249,14 @@ class AdjacencyList(Base):
 
     @property
     def ancestors(self) -> Iterator[AdjacencyList]:
-        """ Returns all ancestors of this item. """
+        """ All ancestors of this item. """
         if self.parent:
             yield from self.parent.ancestors
             yield self.parent
 
     @property
     def siblings(self) -> Query[Self]:
-        """ Returns a query that includes all siblings, including the item
-        itself.
-
-        """
+        """ A query including all siblings and the item itself. """
         session = object_session(self)
         assert session is not None
 
@@ -278,7 +275,7 @@ class AdjacencyList(Base):
 
     @property
     def path(self) -> str:
-        """ Returns the path of this item. """
+        """ The path of this item. """
         return '/'.join(
             chain(
                 (a.name for a in self.ancestors),
@@ -393,7 +390,7 @@ class AdjacencyListCollection[L: AdjacencyList]:
 
     @property
     def roots(self) -> list[L]:
-        """ Returns the root elements. """
+        """ The root elements. """
         return self.query().filter(
             self.__listclass__.parent_id.is_(None)
         ).all()

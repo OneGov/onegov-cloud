@@ -70,7 +70,6 @@ class GeverClientCAS:
             json={'username': self.username, 'password': self.password}
         )
         # Get CSRF token that was returned by server in a cookie
-        # FIXME: See https://github.com/jawah/niquests/issues/401
         csrf_token = self.portal_session.cookies['csrftoken']
 
         # Send the CSRF token as a request header in subsequent requests
@@ -143,7 +142,6 @@ class GeverClientCAS:
             return resp  # fail early
 
         # The server will return a temporary upload URL 'location' in header
-        # FIXME: See https://github.com/jawah/niquests/issues/401#issuecomment-4498876553
         location: str = resp.headers['Location']
         headers = {
             'Accept': 'application/json',

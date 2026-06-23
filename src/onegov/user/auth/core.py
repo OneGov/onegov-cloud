@@ -439,7 +439,7 @@ class Auth:
 
     @property
     def permitted_role_for_registration(self) -> str | None:
-        """ Returns the permitted role for the current signup token. """
+        """ The permitted role for the current signup token. """
 
         if not self.signup_token:
             return 'member'

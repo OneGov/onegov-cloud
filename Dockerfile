@@ -103,6 +103,14 @@ RUN git rev-parse --short HEAD > .commit \
     && rm -rf /var/cache/wheels \
     && rm -rf /var/cache/pip
 
+# install dart-sass (SCSS compiler)
+ARG DART_SASS_VERSION=1.100.0
+RUN curl -sL "https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz" \
+    | tar xz -C /tmp \
+    && mv /tmp/dart-sass /app/dart-sass \
+    && ln -s /app/dart-sass/sass /app/bin/sass \
+    && ln -s /app/bin/sass /usr/local/bin/sass
+
 # configure timezone
 RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
     && dpkg-reconfigure --frontend noninteractive tzdata

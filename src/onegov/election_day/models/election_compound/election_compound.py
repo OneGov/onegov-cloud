@@ -172,7 +172,7 @@ class ElectionCompound(
 
     @property
     def progress(self) -> tuple[int, int]:
-        """ Returns a tuple with the current progress.
+        """ The current progress as a tuple.
 
         If the elections define a `domain_supersegment` (i.e. superregions),
         this is the number of fully counted supersegments vs. the total number
@@ -198,7 +198,7 @@ class ElectionCompound(
 
     @property
     def has_results(self) -> bool:
-        """ Returns True, if the election compound has any results. """
+        """ True if the election compound has any results. """
 
         if self.has_party_results:
             return True
@@ -212,7 +212,7 @@ class ElectionCompound(
 
     @property
     def elected_candidates(self) -> list[tuple[str, str]]:
-        """ Returns the first and last names of the elected candidates. """
+        """ The first and last names of the elected candidates. """
 
         result = []
         for election in self.elections:

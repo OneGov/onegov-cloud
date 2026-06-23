@@ -63,6 +63,14 @@ class TranslatorDirectoryApp(TownApp):
     def accountant_email(self) -> str | None:
         return self.org.meta.get('accountant_email')
 
+    @property
+    def enable_time_tracking(self) -> bool:
+        return bool(self.org.meta.get('enable_time_tracking', False))
+
+    @enable_time_tracking.setter
+    def enable_time_tracking(self, value: bool) -> None:
+        self.org.meta['enable_time_tracking'] = bool(value)
+
     def redirect_after_login(
         self,
         identity: Identity | NoIdentity,

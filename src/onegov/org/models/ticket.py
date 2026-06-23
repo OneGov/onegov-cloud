@@ -1871,9 +1871,14 @@ def apply_search_term[T: Query[Any]](
         language = 'simple'
 
     query = query.join(SearchIndex, SearchIndex.owner_id_uuid == Ticket.id)
-    query = query.filter(SearchIndex.data_vector.op('@@')(
-        func.websearch_to_tsquery(language, term)
-    ))
+    query = query.filter(
+        or_(
+            SearchIndex.data_vector.op('@@')(
+                func.websearch_to_tsquery(language, term)
+            ),
+            Ticket.number.ilike(f'%{term}%'),
+        )
+    )
     return query
 
 

@@ -1123,7 +1123,7 @@ def test_auto_accept_reservations(client: Client) -> None:
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
     assert message is not None
-    assert 'Ihre Reservationen wurden bestätigt' in message['Subject']
+    assert 'Tageskarte - 28.08.2015 - Angenommen' in message['Subject']
     assert 'Foobar' in message['TextBody']
     assert message['Attachments']
     _, pdf_content = extract_pdf_info(BytesIO(

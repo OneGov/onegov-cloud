@@ -2332,6 +2332,39 @@ def test_member_cannot_submit_mutation(
     client.get(f'/translator/{translator.id.hex}/report-change', status=403)
 
 
+def test_time_tracking_setting_toggles_button(client: Client) -> None:
+    session = client.app.session()
+    translators = TranslatorCollection(client.app)
+    translator_id = translators.add(
+        first_name='Test',
+        last_name='Translator',
+        admission='certified',
+        email='translator@example.org',
+    ).id
+    transaction.commit()
+
+    client.login_admin()
+
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeit erfassen' in page
+
+    settings = client.get('/directory-settings')
+    settings.form['enable_time_tracking'] = False
+    settings.form.submit().follow()
+
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeit erfassen' not in page
+
+    client.get(f'/translator/{translator_id}/add-time-report', status=403)
+
+    settings = client.get('/directory-settings')
+    settings.form['enable_time_tracking'] = True
+    settings.form.submit().follow()
+
+    page = client.get(f'/translator/{translator_id}')
+    assert 'Zeit erfassen' in page
+
+
 def test_view_time_reports(client: Client) -> None:
 
     session = client.app.session()

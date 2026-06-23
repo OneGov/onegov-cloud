@@ -69,7 +69,7 @@ class MailLayout(DefaultLayout):
 
     @cached_property
     def optout_link(self) -> str:
-        """ Returns the opt-out link of the principal. """
+        """ The opt-out link of the principal. """
 
         return self.request.link(
             self.request.app.principal, 'unsubscribe-email'

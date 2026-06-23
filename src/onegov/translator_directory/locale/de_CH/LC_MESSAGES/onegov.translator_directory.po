@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-25 10:35+0100\n"
+"POT-Creation-Date: 2026-06-22 15:17+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -253,8 +253,8 @@ msgstr "Telefon Mobile"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
-#. will be set in on_request
 #.
+#. will be set in on_request
 msgid "Legal"
 msgstr "Rechtliches"
 
@@ -367,8 +367,8 @@ msgstr "Aktueller Auszug aus dem Zentralstrafregister (PDF)"
 msgid ""
 "Maximum 6 months since issue. Online order at www.strafregister.admin.ch"
 msgstr ""
-"Max. 6 Monate seit Ausstellung. Online-Bestellung unter "
-"www.strafregister.admin.ch"
+"Max. 6 Monate seit Ausstellung. Online-Bestellung unter www.strafregister."
+"admin.ch"
 
 msgid "Certificate of Capability (PDF)"
 msgstr "Handlungsfähigkeitszeugnis (PDF)"
@@ -469,13 +469,6 @@ msgstr ""
 "Fachkenntnisse nach Berufssparte (andere) können kommagetrennt aufgeführt "
 "werden."
 
-msgid ""
-"If you would like to change the e-mail address, please note this in the "
-"message."
-msgstr ""
-"Wenn Sie die E-Mail Adresse ändern möchten, vermerken Sie dies bitte in "
-"Ihrer Nachricht."
-
 msgid "Please enter a message, suggest changes, or upload documents."
 msgstr ""
 "Bitte geben Sie eine Nachricht ein, schlagen Sie Änderungen vor oder laden "
@@ -533,6 +526,19 @@ msgstr "Link zur Einverständniserklärung"
 
 msgid "Accreditation"
 msgstr "Akkreditierung"
+
+msgid "Enable time tracking"
+msgstr "Zeiterfassung aktivieren"
+
+msgid ""
+"Shows the \"Add Time Report\" button and allows translators to record their "
+"working time."
+msgstr ""
+"Zeigt die Schaltfläche «Zeit erfassen» an und erlaubt Übersetzer/innen, "
+"ihre Arbeitszeit zu erfassen."
+
+msgid "Time tracking"
+msgstr "Zeiterfassung"
 
 msgid ""
 "No user with this email address exists. Please create a user account first."
@@ -707,6 +713,9 @@ msgid "All accountant users must have the editor or admin role"
 msgstr ""
 "Alle Benutzer des Rechnungswesen müssen Editoren oder Administratoren sein."
 
+msgid "Add Time Report"
+msgstr "Zeit erfassen"
+
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -733,9 +742,6 @@ msgstr "Abbrechen"
 
 msgid "Mail templates"
 msgstr "Briefvorlagen"
-
-msgid "Add Time Report"
-msgstr "Zeit erfassen"
 
 msgid "Report change"
 msgstr "Mutation melden"
@@ -896,6 +902,9 @@ msgstr "Dateien nach Kategorie"
 msgid "No files uploaded yet"
 msgstr "Noch keine Dateien hochgeladen"
 
+msgid "Move"
+msgstr "Verschieben"
+
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
@@ -989,18 +998,12 @@ msgstr ""
 "Eine Zeiterfassung wurde für Sie eingereicht und wird nun durch unsere "
 "interne Kontrollstelle geprüft:"
 
-msgid "Please carefully review and report any discrepancies immediately."
-msgstr "Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden"
-
 msgid ""
 "Once the review is complete, you will be informed again. Thank you for your "
 "service and best regards."
 msgstr ""
-"Sobald die Kontrolle abgeschlossen ist, werden Sie wieder informiert. "
-"Besten Dank für Ihren Einsatz und mit freundlichen Grüssen."
-
-msgid "If you have any questions, please contact:"
-msgstr "Bei Fragen wenden Sie sich bitte an:"
+"Sobald die Kontrolle abgeschlossen ist, werden Sie wieder informiert. Besten "
+"Dank für Ihren Einsatz und mit freundlichen Grüssen."
 
 msgid "Time report edited"
 msgstr "Zeiterfassung bearbeitet"
@@ -1254,3 +1257,16 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#~ msgid ""
+#~ "If you would like to change the e-mail address, please note this in the "
+#~ "message."
+#~ msgstr ""
+#~ "Wenn Sie die E-Mail Adresse ändern möchten, vermerken Sie dies bitte in "
+#~ "Ihrer Nachricht."
+
+#~ msgid "Please carefully review and report any discrepancies immediately."
+#~ msgstr "Bitte sorgfältig überprüfen und Unstimmigkeiten umgehend melden"
+
+#~ msgid "If you have any questions, please contact:"
+#~ msgstr "Bei Fragen wenden Sie sich bitte an:"

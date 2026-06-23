@@ -21,17 +21,13 @@ class FeriennetRequest(TownRequest[AppT]):
 
     @cached_property
     def is_organiser(self) -> bool:
-        """ Returns true if the current user is an organiser or better.
-
-        """
+        """ True if the current user is an organiser or better. """
 
         return self.has_role('admin', 'editor')
 
     @cached_property
     def is_organiser_only(self) -> bool:
-        """ Returns true if the current user is an organiser, but not an admin.
-
-        """
+        """ True if the current user is an organiser, but not an admin. """
 
         return self.is_editor
 
@@ -46,6 +42,6 @@ class FeriennetRequest(TownRequest[AppT]):
 
     @cached_property
     def is_admin(self) -> bool:
-        """ Returns true if the current user is an admin. """
+        """ True if the current user is an admin. """
 
         return self.has_role('admin')

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-11 10:23+0200\n"
+"POT-Creation-Date: 2026-06-19 09:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1975,11 +1975,10 @@ msgstr "Tägliche Reservationen"
 
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
-"be sent to the recipient above at 06:00."
+"be sent to the recipient above."
 msgstr ""
 "An jedem unten ausgewählten Tag wird eine Benachrichtigung mit den "
-"Reservierungen des Tages um 06:00 Uhr an den oben genannten Empfänger "
-"gesendet."
+"Reservierungen des Tages an den oben genannten Empfänger gesendet."
 
 msgid "Customer Messages"
 msgstr "Kunden Nachrichten"
@@ -1991,9 +1990,6 @@ msgstr ""
 "Jedes Mal, wenn ein Kunde eine neue Nachricht zu einem Ticket für eine "
 "Reservierung hinzufügt, wird eine eine Benachrichtigung an den oben "
 "genannten Empfänger gesendet."
-
-msgid "Internal Comments"
-msgstr "Internes Kommentarfeld"
 
 msgid "Internal Notes"
 msgstr "Interne Notizen"
@@ -2018,6 +2014,26 @@ msgstr ""
 
 msgid "Send on"
 msgstr "Senden am"
+
+msgid "Delivery Times"
+msgstr "Zustellungszeiten"
+
+msgid "e.g. 07:05"
+msgstr "z.B. 07:05"
+
+#. type: ignore[attr-defined]
+msgid "Please enter at least one delivery time."
+msgstr "Bitte mindestens eine Zustellungszeit eingeben."
+
+#. type: ignore[attr-defined]
+#, python-format
+msgid "Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
+msgstr ""
+"Ungültige Zeit \"${time}\". Bitte im Format HH:MM eingeben (z.B. 06:00)."
+
+#. type: ignore[attr-defined]
+msgid "Minutes must be a multiple of 5 (e.g. 06:10, 16:35)."
+msgstr "Minuten müssen ein Vielfaches von 5 sein (z.B. 06:10, 16:35)."
 
 msgid "Please add at least one notification."
 msgstr "Bitte wählen sie mindestens eine Benachrichtigung."
@@ -3735,9 +3751,6 @@ msgstr "Der Eintrag wurde übernommen"
 msgid "The entry is not valid, please adjust it"
 msgstr "Der Eintrag ist nicht gültig, bitte korrigieren"
 
-msgid "An entry with this name already exists"
-msgstr "Ein Eintrag mit diesem Namen existiert bereits"
-
 msgid "Your directory submission has been adopted"
 msgstr "Ihr Verzeichniseintrag wurde übernommen"
 
@@ -3906,6 +3919,12 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Inhalt löschen"
+
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
+
+msgid "Administrative"
+msgstr "Administrativ"
 
 msgid "Photo album"
 msgstr "Fotoalbum"
@@ -4364,8 +4383,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -5180,8 +5199,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -6335,8 +6354,8 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -6522,9 +6541,6 @@ msgstr "Kunden-Login bestätigen"
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
-
-msgid "Administrative"
-msgstr "Administrativ"
 
 msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
@@ -7399,6 +7415,9 @@ msgstr "Neue Termine für ${title}"
 msgid "Confirm your reservation"
 msgstr "Bestätigen Sie Ihre Reservation"
 
+msgid "Request"
+msgstr "Anfrage"
+
 #. by default we will redirect to the created ticket
 msgid "Thank you for your reservation!"
 msgstr "Vielen Dank für Ihre Reservation!"
@@ -7420,8 +7439,8 @@ msgstr ""
 "${site_id} ist fehlgeschlagen. Bitte stellen Sie sicher, dass die "
 "hinterlegten Zugangsdaten immer noch gültig sind."
 
-msgid "Your reservations were accepted"
-msgstr "Ihre Reservationen wurden bestätigt"
+msgid "Accepted"
+msgstr "Angenommen"
 
 #, python-format
 msgid "Reservation(s) confirmed ${org} ${resource}"
@@ -7456,9 +7475,6 @@ msgid ""
 msgstr ""
 "Die mit der Reservation verknüpfte Zahlung muss rückgängig gemacht werden "
 "bevor die Reservation gelöscht werden kann"
-
-msgid "The following reservations were rejected"
-msgstr "Die folgenden Reservationen wurden abgelehnt"
 
 #, python-format
 msgid "${org} Rejected Reservation"
@@ -8029,8 +8045,23 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
+#~ msgid "e.g. 07:00 or 07:00, 14:30"
+#~ msgstr "z.B. 07:00 oder 07:00, 14:30"
+
+#~ msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
+#~ msgstr "Minuten müssen ein Vielfaches von 5 sein (z.B. 06:00, 06:30)."
+
+#~ msgid "An entry with this name already exists"
+#~ msgstr "Ein Eintrag mit diesem Namen existiert bereits"
+
 #~ msgid "Back"
 #~ msgstr "Zurück"
+
+#~ msgid "Your reservations were accepted"
+#~ msgstr "Ihre Reservationen wurden bestätigt"
+
+#~ msgid "The following reservations were rejected"
+#~ msgstr "Die folgenden Reservationen wurden abgelehnt"
 
 #, python-format
 #~ msgid "The entry ${name} exists twice"

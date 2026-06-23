@@ -74,7 +74,7 @@ class StatusMixin:
 
     @property
     def completed(self) -> bool:
-        """ Returns True, if the election or vote is completed.
+        """ True if the election or vote is completed.
 
         The status is evaluated in the first place. If the status is not known,
         it is guessed from the progress / counted fields.

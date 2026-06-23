@@ -208,12 +208,12 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     @property
     def title(self) -> str | None:
-        """ Return a human readable title for this endpoint """
+        """ A human readable title for this endpoint. """
         return None
 
     @property
     def description(self) -> str | None:
-        """ Return a human readable description for this endpoint """
+        """ A human readable description for this endpoint. """
         return None
 
     def for_page(self, page: int | None) -> Self | None:
@@ -337,7 +337,7 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     @property
     def links(self) -> dict[str, Self | None]:
-        """ Returns a dictionary with pagination instances. """
+        """ A dictionary with pagination instances. """
 
         result: dict[str, Self | None] = {'prev': None, 'next': None}
 
@@ -351,10 +351,7 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     @property
     def batch(self) -> dict[ApiEndpointItem[M], M]:
-        """ Returns a dictionary with endpoint item instances and their
-        titles.
-
-        """
+        """ A dictionary with endpoint item instances and their titles. """
         return {
             self.for_item(item): item
             for item in self.collection.batch
@@ -479,8 +476,7 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     @property
     def collection(self) -> PaginationWithById[M, Any]:
-        """ Return an instance of the collection with filters and page set.
-        """
+        """ An instance of the collection with filters and page set. """
 
         raise NotImplementedError()
 

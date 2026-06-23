@@ -115,7 +115,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
     @property
     def results_by_district(self) -> Query[ResultsByDistrictRow]:
-        """ Returns the results aggregated by the distict.  """
+        """ The results aggregated by district. """
         session = object_session(self)
         assert session is not None
 
@@ -169,11 +169,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
     @property
     def progress(self) -> tuple[int, int]:
-        """ Returns a tuple with the first value being the number of counted
-        ballot results and the second value being the number of total ballot
-        results.
-
-        """
+        """ A tuple of (counted ballot results, total ballot results). """
 
         return (
             sum(1 for result in self.results if result.counted),

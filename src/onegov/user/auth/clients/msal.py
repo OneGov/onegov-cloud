@@ -71,10 +71,9 @@ class MSALClient:
 
     @cached_property
     def connection(self) -> msal.ConfidentialClientApplication:
-        """ Returns the msal instance. Upon initiation, the client tries to
-        connect to the authority endpoint. msal always validate the the tenant
-        with an tenant discovery, `validate_authority` will additionally check
-        the host/instance.
+        """ The msal instance. Upon initiation, the client tries to connect to
+        the authority endpoint. msal always validates the tenant with a tenant
+        discovery; `validate_authority` additionally checks the host/instance.
         """
         try:
             client = msal.ConfidentialClientApplication(

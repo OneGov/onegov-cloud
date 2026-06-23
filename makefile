@@ -1,4 +1,6 @@
-install: ensure_uv
+DART_SASS_VERSION := 1.100.0
+
+install: ensure_uv ensure_sass
 	# install all dependencies
 	uv pip compile setup.cfg --all-extras | uv pip install -r /dev/stdin
 
@@ -26,6 +28,23 @@ update: ensure_uv
 
 	# apply install step to avoid deviations
 	make install
+
+ensure_sass: in_virtual_env
+	@if which sass > /dev/null 2>&1; then true; else \
+		if [ "$$(uname -s)" = "Darwin" ]; then \
+			brew install sass/sass/sass; \
+		else \
+			echo "Installing Dart Sass $(DART_SASS_VERSION)..."; \
+			ARCH=$$(uname -m); \
+			if [ "$$ARCH" = "x86_64" ]; then ARCH="x64"; \
+			elif [ "$$ARCH" = "aarch64" ]; then ARCH="arm64"; fi; \
+			curl -sL "https://github.com/sass/dart-sass/releases/download/$(DART_SASS_VERSION)/dart-sass-$(DART_SASS_VERSION)-linux-$${ARCH}.tar.gz" \
+				| tar xz -C /tmp; \
+			mv /tmp/dart-sass "$$VIRTUAL_ENV/dart-sass"; \
+			ln -sf "$$VIRTUAL_ENV/dart-sass/sass" "$$VIRTUAL_ENV/bin/sass"; \
+			rm -rf /tmp/dart-sass; \
+		fi; \
+	fi
 
 ensure_uv: in_virtual_env
 	@if which uv; then true; else pip install uv; fi

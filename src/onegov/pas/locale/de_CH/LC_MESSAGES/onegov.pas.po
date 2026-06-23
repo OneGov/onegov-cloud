@@ -110,7 +110,7 @@ msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
 
 msgid "Commission meeting"
-msgstr "Kommissionsitzung"
+msgstr "Kommissionssitzung"
 
 msgid "Shortest meeting"
 msgstr "Kürzestsitzung"

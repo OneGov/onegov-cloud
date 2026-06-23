@@ -57,7 +57,7 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
 
     @property
     def principal(self) -> Canton | Municipality:
-        """ Returns the principal of the election day app. See
+        """ The principal of the election day app. See
         :class:`onegov.election_day.models.principal.Principal`.
 
         """
@@ -86,10 +86,7 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
 
     @property
     def logo(self) -> FilestorageFile | None:
-        """ Returns the logo as
-        :class:`onegov.core.filestorage.FilestorageFile`.
-
-        """
+        """ The logo as :class:`onegov.core.filestorage.FilestorageFile`. """
         logo_path = self.cache.get_or_create('logo', self.load_logo)
         if logo_path is not None:
             return FilestorageFile(logo_path)
