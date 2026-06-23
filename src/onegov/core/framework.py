@@ -91,14 +91,6 @@ if TYPE_CHECKING:
     from .security.permissions import Intent
     from .types import EmailJsonDict, SequenceOrScalar
 
-# Monkey patch
-# https://linear.app/onegovcloud/issue/OGC-853/404-navigation-js-fehler
-# This should be in more.webassets:
-# https://github.com/morepath/more.webassets/blob/master/more/webassets/core.py#L55
-if not WebassetsApp.dectate._directives[0][0].kw:
-    from morepath.core import excview_tween_factory
-    WebassetsApp.dectate._directives[0][0].kw['over'] = excview_tween_factory
-
 
 class Framework(
     TransactionApp,
