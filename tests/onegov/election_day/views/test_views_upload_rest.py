@@ -9,7 +9,7 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
-from sqlalchemy.exc import DatabaseError
+from sqlalchemy.exc import DatabaseError, InternalError
 from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
 from unittest.mock import patch
@@ -390,12 +390,13 @@ def test_view_rest_xml(election_day_app_zg: TestApp) -> None:
 def test_savepoint_rollback_blocked_by_activate_schema(
     election_day_app_zg: TestApp,
 ) -> None:
-    """OGC-3223: ROLLBACK TO SAVEPOINT was skipped because activate_schema and
-    limit_session_lifetime both fire on every cursor execution via
-    before_cursor_execute. On an INERROR connection their inner
-    cursor.execute() calls raise InFailedSqlTransaction before the ROLLBACK TO
-    SAVEPOINT reaches PostgreSQL. Both handlers now return early on INERROR
-    so recovery works.
+    """OGC-3223: ROLLBACK TO SAVEPOINT must reach PostgreSQL even on INERROR
+    connections so that begin_nested() recovery works.
+
+    activate_schema and limit_session_lifetime both fire on every cursor
+    execution via before_cursor_execute. They now return early for ROLLBACK TO
+    SAVEPOINT statements, letting the ROLLBACK reach PostgreSQL and return the
+    connection to INTRANS.
     """
     import psycopg2.extensions
     from sqlalchemy import text
@@ -443,12 +444,16 @@ def test_infailedsqltransaction_after_corrupt_pool_connection(
     trigger_sql: str,
 ) -> None:
     """OGC-3223: a connection returned to the pool with an aborted PostgreSQL
-    transaction causes InFailedSqlTransaction on the next request's SET
-    search_path. The pool checkout event must roll it back before use.
+    transaction must surface as a visible error on the next request rather than
+    crashing with a raw InFailedSqlTransaction from inside an event handler.
+
+    activate_schema and limit_session_lifetime return early on INERROR (instead
+    of trying SET commands that would raise from within before_cursor_execute).
+    The actual query then fails through SQLAlchemy's normal error path and the
+    request returns a 5xx response.
 
     Two triggers: division_by_zero (any PostgreSQL error leaves INERROR) and
-    statement_timeout (QueryCanceled swallowed by sentry_tween as
-    DB_CONNECTION_ERRORS, leaving the connection in INERROR without ROLLBACK).
+    statement_timeout (QueryCanceled leaves the connection in INERROR).
     """
     from sqlalchemy.pool.base import ResetStyle
 
@@ -475,5 +480,17 @@ def test_infailedsqltransaction_after_corrupt_pool_connection(
     finally:
         pool._reset_on_return = original
 
-    result = Client(app).get('/', expect_errors=True)
-    assert result.status_int == 200
+    # The first request must fail visibly. The important regression to guard
+    # against is activate_schema raising a raw psycopg2 exception from INSIDE
+    # the before_cursor_execute event handler (which bypasses SQLAlchemy's
+    # error wrapping). With the INERROR early-return fix, SET search_path is
+    # skipped and the actual query fails through SQLAlchemy's normal path,
+    # surfacing as InternalError (not a raw psycopg2 exception).
+    with pytest.raises(InternalError, match='InFailedSqlTransaction'):
+        Client(app).get('/')
+
+    # The failure is self-healing: transaction_tween catches the exception,
+    # calls manager.abort() → session.rollback() → ROLLBACK on the DBAPI
+    # connection, which clears INERROR and returns the connection to IDLE.
+    # A follow-up request must succeed.
+    assert Client(app).get('/').status_int == 200

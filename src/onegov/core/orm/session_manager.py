@@ -26,6 +26,11 @@ from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.engine import Connection, Engine, Result
+    from sqlalchemy.engine.interfaces import (
+        DBAPICursor,
+        ExecutionContext,
+        _DBAPIAnyExecuteParams,
+    )
     from sqlalchemy.orm import DeclarativeBase, ORMExecuteState
     from sqlalchemy.orm.session import Session, SessionTransaction
     from types import FrameType
@@ -410,45 +415,29 @@ class SessionManager:
 
         """
 
-        @event.listens_for(engine, 'checkout')
-        def rollback_aborted_connection(
-            dbapi_connection: Any,
-            connection_record: Any,
-            connection_proxy: Any,
-        ) -> None:
-            """ Roll back connections that were returned to the pool while a
-            PostgreSQL transaction was still in an aborted state.
-
-            Without this, the next request that checks out such a connection
-            will fail with InFailedSqlTransaction when activate_schema tries
-            to run SET search_path (OGC-3223).
-            """
-            if (
-                dbapi_connection.get_transaction_status()
-                == psycopg2.extensions.TRANSACTION_STATUS_INERROR
-            ):
-                log.warning(
-                    'Pool checked out a connection with an aborted PostgreSQL '
-                    'transaction — issuing ROLLBACK before use'
-                )
-                dbapi_connection.rollback()
-
         @event.listens_for(engine, 'before_cursor_execute')
         def activate_schema(
             connection: Connection,
-            cursor: Any,
-            *args: Any,
-            **kwargs: Any
+            cursor: DBAPICursor,
+            statement: str,
+            parameters: _DBAPIAnyExecuteParams,
+            context: ExecutionContext | None,
+            executemany: bool,
         ) -> None:
             """ Share the 'info' dictionary of Session with Connection
             objects.
 
             """
 
-            # Skip on INERROR: SET search_path would block ROLLBACK
-            # TO SAVEPOINT.
+            if statement.startswith('ROLLBACK TO SAVEPOINT'):
+                return
+
             if (cursor.connection.get_transaction_status()
                     == psycopg2.extensions.TRANSACTION_STATUS_INERROR):
+                log.error(
+                    f'Attempt to execute statement on INERROR connection '
+                    f'(OGC-3223): {statement[:200]!r}'
+                )
                 return
 
             # execution options have priority!
@@ -466,13 +455,17 @@ class SessionManager:
         @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
             connection: Connection,
-            cursor: Any,
-            *args: Any,
-            **kwargs: Any
+            cursor: DBAPICursor,
+            statement: str,
+            parameters: _DBAPIAnyExecuteParams,
+            context: ExecutionContext | None,
+            executemany: bool,
         ) -> None:
             """ Kills idle sessions after a while, freeing up memory. """
 
-            # Skip on INERROR: SET would block ROLLBACK TO SAVEPOINT.
+            if statement.startswith('ROLLBACK TO SAVEPOINT'):
+                return
+
             if (cursor.connection.get_transaction_status()
                     == psycopg2.extensions.TRANSACTION_STATUS_INERROR):
                 return
