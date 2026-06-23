@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import psycopg2.extensions
 import re
 import sys
 import threading
@@ -432,14 +431,6 @@ class SessionManager:
             if statement.startswith('ROLLBACK TO SAVEPOINT'):
                 return
 
-            if (cursor.connection.get_transaction_status()
-                    == psycopg2.extensions.TRANSACTION_STATUS_INERROR):
-                log.error(
-                    f'Attempt to execute statement on INERROR connection '
-                    f'(OGC-3223): {statement[:200]!r}'
-                )
-                return
-
             # execution options have priority!
             if 'schema' in connection._execution_options:
                 schema = connection._execution_options['schema']
@@ -464,10 +455,6 @@ class SessionManager:
             """ Kills idle sessions after a while, freeing up memory. """
 
             if statement.startswith('ROLLBACK TO SAVEPOINT'):
-                return
-
-            if (cursor.connection.get_transaction_status()
-                    == psycopg2.extensions.TRANSACTION_STATUS_INERROR):
                 return
 
             cursor.execute(

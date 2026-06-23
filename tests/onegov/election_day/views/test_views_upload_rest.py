@@ -9,7 +9,8 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
-from sqlalchemy.exc import DatabaseError, InternalError
+import psycopg2.errors
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
 from unittest.mock import patch
@@ -444,13 +445,9 @@ def test_infailedsqltransaction_after_corrupt_pool_connection(
     trigger_sql: str,
 ) -> None:
     """OGC-3223: a connection returned to the pool with an aborted PostgreSQL
-    transaction must surface as a visible error on the next request rather than
-    crashing with a raw InFailedSqlTransaction from inside an event handler.
-
-    activate_schema and limit_session_lifetime return early on INERROR (instead
-    of trying SET commands that would raise from within before_cursor_execute).
-    The actual query then fails through SQLAlchemy's normal error path and the
-    request returns a 5xx response.
+    transaction causes InFailedSqlTransaction on the next request's SET
+    search_path. The error surfaces visibly; psycopg2.InternalError is in
+    DB_CONNECTION_ERRORS so the server returns 503 in production.
 
     Two triggers: division_by_zero (any PostgreSQL error leaves INERROR) and
     statement_timeout (QueryCanceled leaves the connection in INERROR).
@@ -480,13 +477,11 @@ def test_infailedsqltransaction_after_corrupt_pool_connection(
     finally:
         pool._reset_on_return = original
 
-    # The first request must fail visibly. The important regression to guard
-    # against is activate_schema raising a raw psycopg2 exception from INSIDE
-    # the before_cursor_execute event handler (which bypasses SQLAlchemy's
-    # error wrapping). With the INERROR early-return fix, SET search_path is
-    # skipped and the actual query fails through SQLAlchemy's normal path,
-    # surfacing as InternalError (not a raw psycopg2 exception).
-    with pytest.raises(InternalError, match='InFailedSqlTransaction'):
+    # The first request must fail visibly with InFailedSqlTransaction raised
+    # from activate_schema's SET search_path. The handlers only return early
+    # for ROLLBACK TO SAVEPOINT statements; all other statements on INERROR
+    # connections fail naturally and surface in Sentry.
+    with pytest.raises(psycopg2.errors.InFailedSqlTransaction):
         Client(app).get('/')
 
     # The failure is self-healing: transaction_tween catches the exception,
