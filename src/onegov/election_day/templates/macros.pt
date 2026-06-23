@@ -1323,7 +1323,7 @@
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
-            <li tal:condition="item.domain_segment|None"><a href="${request.link(layout.municipality_archive.for_municipality(item.domain_segment))}">${item.domain_segment}</a></li>
+            <li tal:condition="item.domain_segment|None"><a href="${request.link(layout.municipality_archive.for_municipality(item.domain_segment))}">${layout.principal.municipality_display_name_by_slug.get(item.domain_segment, item.domain_segment)}</a></li>
             <li tal:condition="compound"><a href="${request.link(compound)}"><span metal:use-macro="layout.macros['short-title-translation']" tal:define="item compound"/></a></li>
             <li><a href="${request.link(item)}" aria-current="page"><span metal:use-macro="layout.macros['short-title-translation']" tal:define="item item"/></a></li>
         </ul>
@@ -1332,14 +1332,14 @@
 
 <metal:election_header define-macro="election_header" i18n:domain="onegov.election_day">
     <h1>
-        <small tal:condition="election.domain_segment|None">${election.domain_segment}</small>
+        <small tal:condition="election.domain_segment|None">${layout.principal.municipality_display_name_by_slug.get(election.domain_segment, election.domain_segment)}</small>
         <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/></h1>
     <hr>
 </metal:election_header>
 
 <metal:vote_header define-macro="vote_header" i18n:domain="onegov.election_day">
     <h1>
-        <small tal:condition="vote.domain_segment|None">${vote.domain_segment}</small>
+        <small tal:condition="vote.domain_segment|None">${layout.principal.municipality_display_name_by_slug.get(vote.domain_segment, vote.domain_segment)}</small>
         <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
         <tal:b tal:condition="layout.answer">
             <br>
