@@ -287,7 +287,10 @@ def test_views_vote_municipal_and_municipality(
     t2 = 'Urnenabstimmung betreffend das Hochwasserschutzprojekt «Dorfbach»'
     assert t2 in balgach_page
     assert '75.15' in balgach_page
-    assert balgach_page.click('Dorfbach').maybe_follow().status_code == 200
+    # municipality name must be capitalized in the vote header
+    vote_page = balgach_page.click('Dorfbach').maybe_follow()
+    assert vote_page.status_code == 200
+    assert 'Balgach' in vote_page
 
 
 def test_view_vote_shows_long_title(election_day_app_zg: TestApp) -> None:

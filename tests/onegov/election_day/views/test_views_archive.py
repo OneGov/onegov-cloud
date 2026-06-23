@@ -251,12 +251,23 @@ def test_view_archive_all_municipal(election_day_app_sg: TestApp) -> None:
 
     page = client.get('/archive/municipal')
     assert 'Kommunale Wahlen und Abstimmungen nach Gemeinde' in page
-    assert 'Au' in page
-    assert 'Wil' in page
-    assert '/municipality/au' in page
-    assert '/municipality/wil' in page
-    # Only links — no result tables
+
+    # year-specific URL when results exist; au has 2024 + 2025 so latest
+    # is 2025
+    assert '/municipality/au/2025' in page
+    assert '/municipality/wil/2025' in page
+
+    # slug resolved to proper display name
+    assert 'Au (SG)' in page
+    assert 'Wil (SG)' in page
+
+    # municipality with no results links to base URL (no year suffix)
+    assert '/municipality/rorschach"' in page
+    assert '/municipality/rorschach/2' not in page
+
+    # only links shown, no inline result titles
     assert 'Au Abstimmung 2025' not in page
+    assert 'Au Wahl 2024' not in page
 
 
 def test_view_archive_municipal_by_date(election_day_app_sg: TestApp) -> None:

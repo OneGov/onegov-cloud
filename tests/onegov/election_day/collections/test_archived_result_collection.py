@@ -465,6 +465,68 @@ def test_archived_result_collection_updates(session: Session) -> None:
     assert result.url == 'https://wab.govikon.ch/vote/2001'
 
 
+def test_all_municipal_archived_result_collection(session: Session) -> None:
+    from onegov.election_day.collections import (
+        AllMunicipalArchivedResultCollection,
+        MunicipalityArchivedResultCollection,
+    )
+
+    collection = AllMunicipalArchivedResultCollection(session)
+    mun_archive = MunicipalityArchivedResultCollection(session)
+
+    results, last_modified = collection.by_all()
+    assert results == []
+    assert last_modified is None
+    assert mun_archive.get_latest_year_by_municipality() == {}
+
+    def add(domain: str, slug: str, title: str, d: date, type_: str) -> None:
+        session.add(ArchivedResult(
+            date=d,
+            type=type_,
+            domain=domain,
+            name=title,
+            url=f'https://example.com/{type_}/{title}',
+            title_translations={'de_CH': title},
+            meta={'domain_segment': slug} if slug else {},
+            schema='test',
+        ))
+
+    add('municipality', 'baar', 'baar', date(2023, 6, 1), 'election')
+    add('municipality', 'baar', 'baar', date(2022, 1, 1), 'vote')
+    add('municipality', 'zug', 'zug', date(2022, 1, 1), 'election')
+    add('federation', '', 'Bundeswahl', date(2023, 1, 1), 'election')
+    add('canton', '', 'Kantonsratswahl', date(2023, 1, 1), 'election')
+    session.flush()
+
+    results, _ = collection.by_all()
+    names = {r.name for r in results}
+    assert 'Bundeswahl' not in names
+    assert 'Kantonsratswahl' not in names
+    assert len(results) == 3
+    assert [r.name for r in results] == ['baar', 'baar', 'zug']
+
+    latest = mun_archive.get_latest_year_by_municipality()
+    assert latest == {'baar': 2023, 'zug': 2022}
+
+    # group_items groups by domain_segment → type, not by date (unlike parent)
+    class Req:
+        pass
+    groups = collection.group_items(results, Req())  # type: ignore[arg-type]
+    assert groups is not None
+    assert set(groups.keys()) == {'baar', 'zug'}
+    assert 'election' in groups['baar']
+    assert 'vote' in groups['baar']
+    assert 'election' in groups['zug']
+    assert 'vote' not in groups['zug']
+
+    assert collection.group_items([], Req()) is None  # type: ignore[arg-type]
+
+    assert set(mun_archive.get_years()) == {2022, 2023}
+
+    zug_coll = MunicipalityArchivedResultCollection(session, 'zug')
+    assert zug_coll.get_years() == [2022]
+
+
 def test_sanitize_municipality() -> None:
     from onegov.election_day.collections import (
         MunicipalityArchivedResultCollection,

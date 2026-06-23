@@ -1072,3 +1072,6 @@ def test_views_election_municipal_and_municipality(
     assert election_page.status_code == 200
     assert long_title in election_page
     assert short_title in election_page  # breadcrumb still uses short title
+
+    # municipality name must be capitalized in the election header
+    assert 'Goldach' in election_page
