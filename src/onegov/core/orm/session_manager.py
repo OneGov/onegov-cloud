@@ -428,7 +428,7 @@ class SessionManager:
 
             """
 
-            if statement.startswith('ROLLBACK TO SAVEPOINT'):
+            if statement.startswith('ROLLBACK'):
                 return
 
             # execution options have priority!
@@ -454,7 +454,7 @@ class SessionManager:
         ) -> None:
             """ Kills idle sessions after a while, freeing up memory. """
 
-            if statement.startswith('ROLLBACK TO SAVEPOINT'):
+            if statement.startswith('ROLLBACK'):
                 return
 
             cursor.execute(
