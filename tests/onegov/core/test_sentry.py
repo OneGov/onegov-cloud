@@ -265,7 +265,6 @@ def test_view_db_connection_exception(
     assert not events
 
 
-
 @pytest.mark.parametrize('sentry_app', [
     pytest.param(True, id='with ppi'),
     pytest.param(False, id='without ppi'),
