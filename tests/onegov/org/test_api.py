@@ -20,6 +20,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from .conftest import Client
     from onegov.agency import AgencyApp
+    from onegov.org.models import ExtendedDirectory
     from unittest.mock import MagicMock
 
 
@@ -680,7 +681,9 @@ def test_api_people_endpoint_hides_unpublished_entries(client: Client) -> None:
 
 def test_api_directory_content_hash(client: Client) -> None:
     session = client.app.session()
-    directory = DirectoryCollection(session, type='extended').add(
+    directory: ExtendedDirectory = DirectoryCollection(
+        session, type='extended'
+    ).add(
         title='Clubs',
         structure='Name *= ___',
         configuration=DirectoryConfiguration(title='Name', order=['Name']),
