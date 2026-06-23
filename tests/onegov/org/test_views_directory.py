@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import transaction
+from unittest.mock import patch, PropertyMock
 
 from datetime import timedelta, datetime
 from io import BytesIO
@@ -15,6 +16,7 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
+from onegov.org.request import OrgRequest
 from purl import URL
 from pytz import UTC
 from textwrap import dedent
@@ -1196,3 +1198,11 @@ def test_directory_entry_hash_shown_without_change_requests(
     anon = client.spawn()
     page = anon.get(entry_url)
     assert not page.pyquery('.directory-entry-hash')
+
+    # mTAN-authenticated user sees the hash
+    with patch.object(
+        OrgRequest, 'active_mtan_session', new_callable=PropertyMock,
+        return_value=True
+    ):
+        page = anon.get(entry_url)
+        assert page.pyquery('.directory-entry-hash')

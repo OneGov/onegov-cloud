@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 import pytest
 import re
+from unittest.mock import patch, PropertyMock
+from onegov.org.request import OrgRequest
 
 from typing import TYPE_CHECKING
 
@@ -308,3 +310,11 @@ def test_directory_entry_hash_shown_without_change_requests(
     anon = client.spawn()
     page = anon.get(entry_url)
     assert not page.pyquery('.directory-entry-hash')
+
+    # mTAN-authenticated user sees the hash
+    with patch.object(
+        OrgRequest, 'active_mtan_session', new_callable=PropertyMock,
+        return_value=True
+    ):
+        page = anon.get(entry_url)
+        assert page.pyquery('.directory-entry-hash')
