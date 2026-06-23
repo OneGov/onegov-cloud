@@ -10,7 +10,7 @@
                     people None;
                     contact entry.contact;
                     coordinates entry.directory.enable_map in ('everywhere', 'entry') and entry.coordinates;
-                    show_side_panel python:(layout.model.directory.enable_change_requests or entry.content_hash);
+                    show_side_panel python:(layout.model.directory.enable_change_requests or (request.is_manager and entry.content_hash));
                     ">
 
             <div metal:fill-slot="before-lead">
@@ -60,8 +60,8 @@
                         </ul>
                     </div>
                 </div>
-                <div class="side-panel" tal:condition="entry.content_hash">
-                    <h3 i18n:translate>Hash</h3>
+                <div class="side-panel" tal:condition="request.is_manager and entry.content_hash">
+                    <h3 title="Fingerprint of the entry's content. Changes whenever the entry data is modified." i18n:translate i18n:attributes="title">Hash</h3>
                     <div class="side-panel-with-bg">
                         <div>
                             <i class="fa fa-fw fa-key" aria-hidden="true"></i>

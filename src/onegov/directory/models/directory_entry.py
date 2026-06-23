@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
+
+import ormsgpack
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
@@ -148,7 +149,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         hash_obj.update(ormsgpack.packb(
             self.values,
             default=str,
-            options=ormsgpack.OPT_SORT_KEYS
+            option=ormsgpack.OPT_SORT_KEYS
         ))
         for file_part in sorted(f.checksum or f.id for f in self.files):
             hash_obj.update(file_part.encode())
