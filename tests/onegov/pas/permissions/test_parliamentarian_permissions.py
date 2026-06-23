@@ -491,7 +491,7 @@ def test_parliamentarian_self_bookings_show_in_list(
         assert page.form.submit().maybe_follow().status_code == 200
 
     list_page = client.get('/attendences')
-    for label in ('Kommissionsitzung', 'Kürzestsitzung', 'Aktenstudium'):
+    for label in ('Kommissionssitzung', 'Kürzestsitzung', 'Aktenstudium'):
         assert label in list_page, f'{label} missing\n\n{list_page}'
 
     filtered = client.get('/attendences?type=study')

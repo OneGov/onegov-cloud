@@ -533,6 +533,9 @@ def add_time_report(
     form: TranslatorTimeReportForm,
 ) -> RenderData | BaseResponse:
 
+    if not request.app.enable_time_tracking:
+        raise HTTPForbidden()
+
     if form.submitted(request):
 
         session = request.session

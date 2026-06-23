@@ -139,6 +139,18 @@ class TranslatorLayout(DefaultLayout):
             category=None
         )
 
+    @property
+    def time_tracking_links(self) -> list[Link]:
+        if not self.request.app.enable_time_tracking:
+            return []
+        return [
+            Link(
+                _('Add Time Report'),
+                url=self.request.link(self.model, name='add-time-report'),
+                attrs={'class': 'plus'},
+            )
+        ]
+
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_admin:
@@ -196,11 +208,7 @@ class TranslatorLayout(DefaultLayout):
                     ),
                     attrs={'class': 'envelope'}
                 ),
-                Link(
-                    _('Add Time Report'),
-                    url=self.request.link(self.model, name='add-time-report'),
-                    attrs={'class': 'plus'},
-                ),
+                *self.time_tracking_links,
             ]
         elif self.request.is_editor:
             return [
@@ -216,20 +224,10 @@ class TranslatorLayout(DefaultLayout):
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
                 ),
-                Link(
-                    _('Add Time Report'),
-                    url=self.request.link(self.model, name='add-time-report'),
-                    attrs={'class': 'plus'},
-                ),
+                *self.time_tracking_links,
             ]
         elif self.request.is_member:
-            return [
-                Link(
-                    _('Add Time Report'),
-                    url=self.request.link(self.model, name='add-time-report'),
-                    attrs={'class': 'plus'},
-                ),
-            ]
+            return [*self.time_tracking_links]
         elif self.translator_data_outdated():
             return [
                 Link(

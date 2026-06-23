@@ -35,7 +35,7 @@ NEW_LOHNART_MAPPING = {
     'plenary': {'nr': '2405', 'text': 'Plenarsitzung KR'},
     'commission': {
         'nr': '2410',
-        'text': 'Kommissionsitzung KR'
+        'text': 'Kommissionssitzung KR'
     },
     'study': {'nr': '2421', 'text': 'Aktenstudium KR'},
     'shortest': {
