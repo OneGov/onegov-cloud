@@ -305,8 +305,8 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
     @property
     def latest_occurrence(self) -> Occurrence | None:
-        """ Returns the occurrence which is presently occurring, the next
-        one to occur or the last occurrence.
+        """ The presently occurring occurrence, the next one to occur, or the
+        last occurrence.
 
         """
 

@@ -5,6 +5,7 @@ from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
 from onegov.user import User
 from sqlalchemy import func
+from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import URLField
 from wtforms.validators import Optional
@@ -38,6 +39,15 @@ class TranslatorDirectorySettingsForm(Form):
         validators=[URL(), Optional()]
     )
 
+    enable_time_tracking = BooleanField(
+        label=_('Enable time tracking'),
+        description=_(
+            'Shows the "Add Time Report" button and allows translators '
+            'to record their working time.'
+        ),
+        fieldset=_('Time tracking'),
+    )
+
     def validate_accountant_email(self, field: EmailField) -> None:
         if field.data:
             field.data = field.data.lower()
@@ -59,7 +69,9 @@ class TranslatorDirectorySettingsForm(Form):
         if self.coordinates.data:
             app.coordinates = self.coordinates.data
         app.org.meta['declaration_link'] = self.declaration_link.data
+        app.enable_time_tracking = bool(self.enable_time_tracking.data)
 
     def apply_model(self, app: TranslatorDirectoryApp) -> None:
         self.coordinates.data = app.coordinates
         self.declaration_link.data = app.org.meta.get('declaration_link', '')
+        self.enable_time_tracking.data = app.enable_time_tracking

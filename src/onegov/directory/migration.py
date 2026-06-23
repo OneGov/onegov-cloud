@@ -60,7 +60,7 @@ class DirectoryMigration:
 
     @property
     def possible(self) -> bool:
-        """ Returns True if the migration is possible, False otherwise. """
+        """ True if the migration is possible, False otherwise. """
         if not self.directory.entries:
             return True
 

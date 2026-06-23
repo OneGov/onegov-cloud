@@ -120,7 +120,7 @@
                                 <span i18n:translate>The payment was found twice.</span>
                             </li>
                             <li>
-                                <i class="fa-li fa fa-check-circle-o gray-dark" aria-hidden="true"></i>
+                                <i class="fa-li fa fa-check-circle gray-dark" aria-hidden="true"></i>
                                 <span i18n:translate>The payment has already been imported.</span>
                             </li>
                             <li>

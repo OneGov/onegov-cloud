@@ -272,11 +272,6 @@ class Auth:
         """ Returns the morepath identity of the given user. """
 
         return self.identity_class(
-            # FIXME: We should consider switching to user.id.hex
-            #        for userid and provide username in a separate field
-            #        instead, but this was the less intrusive step
-            #        in the meantime. We use identity.userid in quite
-            #        a few places after all.
             userid=user.username,
             uid=user.id.hex,
             groupids=frozenset(group.id.hex for group in user.groups),
@@ -286,9 +281,12 @@ class Auth:
 
     def by_identity(self, identity: Identity | NoIdentity) -> User | None:
         """ Returns the user record of the given identity. """
-        if identity.userid is None:
+
+        uid = getattr(identity, 'uid', None)
+        if uid is None:
             return None
-        return self.users.by_username(identity.userid)
+
+        return self.users.by_id(uid)
 
     def login_to(
         self,
@@ -441,7 +439,7 @@ class Auth:
 
     @property
     def permitted_role_for_registration(self) -> str | None:
-        """ Returns the permitted role for the current signup token. """
+        """ The permitted role for the current signup token. """
 
         if not self.signup_token:
             return 'member'

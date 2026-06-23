@@ -170,8 +170,8 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def page_id(self) -> str:
-        """ Returns the unique page id of the rendered page. Used to have
-        a useful id in the body element for CSS/JS.
+        """ The unique page id of the rendered page, used as the id attribute
+        on the body element for CSS/JS.
 
         """
         page_id = self.request.path_info

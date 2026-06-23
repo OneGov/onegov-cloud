@@ -127,6 +127,7 @@ To run OneGov Cloud locally, you must meet the following requirements:
 * Python 3.14+
 * Redis 5+
 * NodeJS 9+
+* [Dart Sass](https://github.com/sass/dart-sass/releases) (standalone binary, not the npm version)
 * Docker Compose
 
 To install the requirements for Ubuntu do:

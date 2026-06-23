@@ -47,7 +47,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def all_tabs(self) -> tuple[str, ...]:
-        """Return all tabs. Ordering is important for the main view."""
+        """All tabs. Ordering is important for the main view."""
         return (
             'entities',
             'districts',
@@ -325,8 +325,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def pdf_path(self) -> str | None:
-        """ Returns the path to the PDF file or None, if it is not available.
-        """
+        """ The path to the PDF file, or None if it is not available. """
 
         assert self.request.locale
         path = 'pdf/{}'.format(
@@ -349,8 +348,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def svg_path(self) -> str | None:
-        """ Returns the path to the SVG file or None, if it is not available.
-        """
+        """ The path to the SVG file, or None if it is not available. """
 
         if not self.ballot:
             return None
@@ -373,7 +371,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def svg_link(self) -> str:
-        """ Returns a link to the SVG download view. """
+        """ A link to the SVG download view. """
 
         return self.request.link(
             self.ballot, name='{}-svg'.format(self.svg_prefix)
@@ -381,7 +379,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def svg_name(self) -> str:
-        """ Returns a nice to read SVG filename. """
+        """ A human-readable SVG filename. """
 
         return '{}.svg'.format(
             normalize_for_url(

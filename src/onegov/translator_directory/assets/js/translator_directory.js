@@ -91,7 +91,20 @@ function setupTimeReportForm() {
 }
 
 
+function setupDocumentMove() {
+    var table = document.querySelector('.translator-documents');
+    if (!table) { return; }
+
+    table.querySelectorAll('.move-category-select').forEach(function(sel) {
+        sel.addEventListener('change', function() {
+            var form = sel.closest('.move-category-form');
+            if (form) { form.submit(); }
+        });
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     moveMailTemplateButtonToEnd();
     setupTimeReportForm();
+    setupDocumentMove();
 });
