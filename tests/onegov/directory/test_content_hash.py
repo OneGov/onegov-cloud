@@ -26,7 +26,7 @@ def test_content_hash_on_create(session: Session) -> None:
     conference = rooms.add(values=dict(name='Conference Room'))
 
     assert conference.content_hash is not None
-    assert len(conference.content_hash) == 64  # SHA-256 hex digest
+    assert len(conference.content_hash) == 40  # SHA-1 hex digest
 
 
 def test_content_hash_changes_on_update(session: Session) -> None:
@@ -131,7 +131,7 @@ def test_content_hash_set_by_before_flush_listener(session: Session) -> None:
     session.flush()
 
     assert conference.content_hash is not None
-    assert len(conference.content_hash) == 64
+    assert len(conference.content_hash) == 40  # SHA-1 hex digest
 
 
 def test_upgrade_preserves_modified_timestamp(session: Session) -> None:

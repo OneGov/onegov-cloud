@@ -304,7 +304,7 @@ def test_directory_entry_hash_shown_without_change_requests(
     page = client.get(entry_url)
     assert page.pyquery('.directory-entry-hash')
 
-    # anonymous user also sees it (hash is public)
+    # anonymous user does not see the hash (manager-only)
     anon = client.spawn()
     page = anon.get(entry_url)
-    assert page.pyquery('.directory-entry-hash')
+    assert not page.pyquery('.directory-entry-hash')
