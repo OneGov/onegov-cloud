@@ -277,7 +277,9 @@ def _parse_horw_personen_row(v: tuple[object, ...]) -> dict[str, object]:
         'phone': _v(v[9]),
         # v[10] = Fax Arbeit (no model field)
         'phone_direct': _v(v[11]) if len(v) > 11 else None,
-        # v[12..14] = Oberinstanzen / Instanzen / Behörden (skip)
+        '_horw_org': _v(v[12]) if len(v) > 12 else None,     # Oberinstanzen
+        '_horw_sub_org': _v(v[13]) if len(v) > 13 else None,  # Instanzen
+        # v[14] = Behörden (not used for person fields)
     }
 
 
@@ -288,7 +290,7 @@ def _parse_horw_behoerden_row(v: tuple[object, ...]) -> dict[str, object]:
     # 19: PLZ | 20: Ort | 21: Telefon Arbeit | 22: Mobile Arbeit |
     # 23: Telefon Privat | 24: Mobile Privat |
     # 25: Partei | 26: Fraktion Einwohnerrat | 27: Kategorie
-    function = ', '.join(filter(None, (_v(v[10]), _v(v[0]))))
+    function = ' '.join(filter(None, (_v(v[10]), _v(v[0]))))
     return {
         'last_name': _v(v[11]) or '',
         'first_name': _v(v[12]) or '',
@@ -376,10 +378,12 @@ def import_horw(
 
         if header == _HORW_PERSONEN_HEADER:
             parse_row = _parse_horw_personen_row
+            is_personen = True
             deduplicate = False
             click.secho('Detected format: Personen', fg='yellow')
         elif header == _HORW_BEHOERDEN_HEADER:
             parse_row = _parse_horw_behoerden_row
+            is_personen = False
             deduplicate = True
             click.secho('Detected format: Behörden', fg='yellow')
         else:
@@ -388,10 +392,23 @@ def import_horw(
                 click.secho(f'  {col!r}', fg='red')
             return
 
+        # Build valid org → sub-orgs lookup from the configured hierarchy
+        hierarchy = getattr(
+            getattr(app, 'org', None), 'organisation_hierarchy', None
+        ) or []
+        valid_orgs: dict[str, set[str]] = {}
+        for item in hierarchy:
+            if isinstance(item, dict):
+                for top, subs in item.items():
+                    valid_orgs[top] = set(subs)
+            elif isinstance(item, str):
+                valid_orgs[item] = set()
+
         seen: set[tuple[str, str]] = set()
         count = 0
+        errors = 0
 
-        for values in all_rows[1:]:
+        for row_num, values in enumerate(all_rows[1:], start=2):
             fields = parse_row(values)
 
             first_name = fields['first_name']
@@ -410,8 +427,36 @@ def import_horw(
 
             extra = {
                 k: v for k, v in fields.items()
-                if k not in ('first_name', 'last_name') and v is not None
+                if k not in ('first_name', 'last_name', '_horw_org',
+                             '_horw_sub_org')
+                and v is not None
             }
+
+            if is_personen:
+                raw_org = fields.get('_horw_org')
+                raw_sub_org = fields.get('_horw_sub_org')
+                if isinstance(raw_org, str) and raw_org:
+                    if valid_orgs and raw_org not in valid_orgs:
+                        click.secho(
+                            f'Row {row_num} ({last_name} {first_name}): '
+                            f'org {raw_org!r} not in hierarchy',
+                            fg='red')
+                        errors += 1
+                    elif isinstance(raw_sub_org, str) and raw_sub_org:
+                        if (valid_orgs and raw_org in valid_orgs
+                                and raw_sub_org not in valid_orgs[raw_org]):
+                            click.secho(
+                                f'Row {row_num} ({last_name} {first_name}): '
+                                f'sub-org {raw_sub_org!r} not in org '
+                                f'{raw_org!r}',
+                                fg='red')
+                            errors += 1
+                        else:
+                            extra['organisations_multiple'] = [
+                                raw_org, f'-{raw_sub_org}']
+                    else:
+                        extra['organisations_multiple'] = [raw_org]
+
             _upsert_horw_person(people, first_name, last_name, extra)
             count += 1
 
@@ -421,6 +466,8 @@ def import_horw(
                 f'Dry run: would import {count} person(s)', fg='yellow')
         else:
             click.secho(f'Imported {count} person(s)', fg='green')
+        if errors:
+            click.secho(f'{errors} org/sub-org error(s)', fg='red')
 
     return _import
 
