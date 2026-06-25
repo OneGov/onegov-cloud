@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-06-23 10:57+0200\n"
+"POT-Creation-Date: 2026-06-19 09:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4381,8 +4381,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -4474,16 +4474,6 @@ msgstr "Richiesta di modifica"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr "Trovato un errore? Proponi una modifica a questo elemento."
-
-msgid ""
-"Fingerprint of the entry's content. Changes whenever the entry data is "
-"modified."
-msgstr ""
-"Impronta del contenuto della voce. Cambia ogni volta che i dati della voce "
-"vengono modificati."
-
-msgid "Hash"
-msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
@@ -5196,8 +5186,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -6353,8 +6343,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 

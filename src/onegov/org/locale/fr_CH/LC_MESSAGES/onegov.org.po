@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-23 10:57+0200\n"
+"POT-Creation-Date: 2026-06-19 09:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4390,8 +4390,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Paiement"
 
@@ -4485,16 +4485,6 @@ msgid "Found an error? Propose a change to this entry."
 msgstr ""
 "Vous avez trouvé une erreur ? Proposez une modification à apporter à cette "
 "entrée."
-
-msgid ""
-"Fingerprint of the entry's content. Changes whenever the entry data is "
-"modified."
-msgstr ""
-"Empreinte du contenu de l'entrée. Change chaque fois que les données de "
-"l'entrée sont modifiées."
-
-msgid "Hash"
-msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
@@ -5216,8 +5206,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6378,8 +6368,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 

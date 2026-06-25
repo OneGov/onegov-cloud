@@ -564,7 +564,6 @@
         </tal:b>
         <tal:b condition="people or contact or coordinates or files or show_side_panel or sidepanel_links|False">
             <div class="small-12 medium-8 columns page-content-main">
-                <div metal:define-slot="before-lead"></div>
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
 

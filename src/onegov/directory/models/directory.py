@@ -464,8 +464,6 @@ class Directory(Base, ContentMixin, TimestampMixin,
         if session and not session._flushing:
             session.flush()
 
-        entry.update_content_hash()
-
         return entry
 
     @observes('title')

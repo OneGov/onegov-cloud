@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import re
 import transaction
-from unittest.mock import patch, PropertyMock
 
 from datetime import timedelta, datetime
 from io import BytesIO
@@ -16,7 +15,6 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
-from onegov.org.request import OrgRequest
 from purl import URL
 from pytz import UTC
 from textwrap import dedent
@@ -1170,39 +1168,3 @@ def test_directory_migration(client: Client) -> None:
     assert 'Die verlangte Änderung kann nicht durchgeführt' in page
     assert ('Feld "Choice" kann nicht von Typ "checkbox" zu "radio" '
             'konvertiert werden') in page
-
-
-def test_directory_entry_hash_shown_without_change_requests(
-    client: Client
-) -> None:
-    client.login_admin()
-
-    page = client.get('/directories').click('^Verzeichnis$')
-    page.form['title'] = 'Clubs'
-    page.form['structure'] = 'Name *= ___'
-    page.form['title_format'] = '[Name]'
-    page.form['enable_change_requests'] = False
-    page = page.form.submit().follow()
-
-    page = page.click('Eintrag', index=0)
-    page.form['name'] = 'Chess Club'
-    page = page.form.submit().follow()
-
-    entry_url = '/directories/clubs/chess-club'
-
-    # admin sees the hash panel
-    page = client.get(entry_url)
-    assert page.pyquery('.directory-entry-hash')
-
-    # anonymous user does not see the hash (manager-only)
-    anon = client.spawn()
-    page = anon.get(entry_url)
-    assert not page.pyquery('.directory-entry-hash')
-
-    # mTAN-authenticated user sees the hash
-    with patch.object(
-        OrgRequest, 'active_mtan_session', new_callable=PropertyMock,
-        return_value=True
-    ):
-        page = anon.get(entry_url)
-        assert page.pyquery('.directory-entry-hash')

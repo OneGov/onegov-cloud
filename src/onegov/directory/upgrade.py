@@ -8,9 +8,7 @@ from __future__ import annotations
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.directory import Directory
-from onegov.directory.models import DirectoryEntry
-from sqlalchemy import Column, Integer, Text, text
-from sqlalchemy.orm import joinedload
+from sqlalchemy import Column, Integer
 
 
 @upgrade_task('Add entries count')
@@ -86,38 +84,3 @@ def add_meta_data_and_content_columns_to_entry_recipients(
     if not context.has_column('entry_recipients', 'content'):
         context.operations.add_column('entry_recipients',
                                       Column('content', JSON))
-
-
-@upgrade_task('Add content hash to directory entries')
-def add_content_hash_to_directory_entries(context: UpgradeContext) -> None:
-    if context.has_column('directory_entries', 'content_hash'):
-        return
-
-    context.operations.add_column(
-        'directory_entries',
-        Column('content_hash', Text, nullable=True)
-    )
-
-
-@upgrade_task('Calc content hash for directory entries')
-def calc_content_hash_for_directory_entries(context: UpgradeContext) -> None:
-    if not context.has_column('directory_entries', 'content_hash'):
-        return
-
-    entries = (
-        context.session.query(DirectoryEntry)
-        .filter(DirectoryEntry.content_hash.is_(None))
-        .options(joinedload(DirectoryEntry.files))
-    )
-
-    for entry in entries:
-        entry.update_content_hash()
-
-        # Write only content_hash via raw SQL so modified is never touched,
-        # then expire the entry so the ORM doesn't re-flush the dirty state.
-        context.session.execute(
-            text('UPDATE directory_entries SET content_hash = :hash'
-                 ' WHERE id = :id'),
-            {'hash': entry.content_hash, 'id': entry.id}
-        )
-        context.session.expire(entry)
