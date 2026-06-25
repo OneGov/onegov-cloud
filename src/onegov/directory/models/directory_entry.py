@@ -12,7 +12,7 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import ForeignKey, inspect as sa_inspect
+from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
@@ -167,10 +167,4 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         content: dict[str, Any] | None,
         files: set[Any]
     ) -> None:
-        if (
-            self.content_hash is not None
-            and 'values' not in (content or {})
-            and not sa_inspect(self).attrs.files.history.has_changes()
-        ):
-            return
         self.update_content_hash()
