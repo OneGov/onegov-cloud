@@ -244,17 +244,15 @@ def _join_address(*parts: object) -> str | None:
     return joined or None
 
 
-def _read_excel_rows(file: IO[bytes]) -> list[tuple[object, ...]]:
+def _read_excel_rows(path: str) -> list[tuple[object, ...]]:
     """Read all rows from an .xls or .xlsx file as tuples of cell values."""
-    name = getattr(file, 'name', '')
-    if name.lower().endswith('.xls'):
+    if path.lower().endswith('.xls'):
         import xlrd
-        data = file.read()
-        book = xlrd.open_workbook(file_contents=data)
+        book = xlrd.open_workbook(path)
         sheet = book.sheet_by_index(0)
         return [tuple(sheet.row_values(i)) for i in range(sheet.nrows)]
     else:
-        book = load_workbook(file, data_only=True)
+        book = load_workbook(path, data_only=True)
         sheet = book.active
         if TYPE_CHECKING:
             from openpyxl.worksheet.worksheet import Worksheet
@@ -347,10 +345,10 @@ def _upsert_horw_person(
 
 
 @cli.command('import-horw')
-@click.argument('file', type=click.File('rb'))
+@click.argument('file', type=click.Path(exists=True))
 @click.option('--dry-run', is_flag=True, default=False)
 def import_horw(
-    file: IO[bytes],
+    file: str,
     dry_run: bool,
 ) -> Callable[[CoreRequest, Framework], None]:
     """ Imports people from a Horw municipality Excel export.
