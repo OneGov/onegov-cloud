@@ -86,8 +86,12 @@ def view_people(
     if selected_sub_org and selected_sub_org not in sub_orgs:
         sub_orgs.append(selected_sub_org)
 
-    people = self.people_by_organisation(
-        selected_org, selected_sub_org, selected_search)
+    query = self.query()
+    query = self.people_by_organisation(
+        selected_org, selected_sub_org, query=query
+    )
+    query = self.people_by_search_term(selected_search, query=query)
+    people = query.all()
 
     class AtoZPeople(AtoZ[Person]):
 

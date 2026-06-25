@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy import func, or_, type_coerce
+from sqlalchemy_utils import escape_like
 
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
@@ -10,6 +11,7 @@ from onegov.people.models import Person
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from sqlalchemy.orm import Query
     from uuid import UUID
 
 
@@ -82,20 +84,18 @@ class PersonCollection(BasePersonCollection[Person]):
     def model_class(self) -> type[Person]:
         return Person
 
+    def query(self) -> Query[Person]:
+        return super().query().order_by(Person.last_name, Person.first_name)
+
     def people_by_organisation(
         self,
         org: str | None,
         sub_org: str | None,
-        search: str | None = None,
-    ) -> list[Person]:
+        query: Query[Person],
+    ) -> Query[Person]:
         """
-        Returns all persons of a given organisation and sub-organisation.
-
-        If organisation and sub-organisation are both None, all persons are
-        returned. Optionally filters by a search term across name and function.
+        Returns a query filtered by organisation and sub-organisation.
         """
-        query = self.session.query(Person).order_by(Person.last_name,
-                                                    Person.first_name)
         if org:
             query = query.filter(
                 func.jsonb_contains(
@@ -110,11 +110,22 @@ class PersonCollection(BasePersonCollection[Person]):
                     type_coerce([f'-{sub_org}'], JSON)
                 )
             )
-        if search:
-            term = f'%{search}%'
-            query = query.filter(or_(
-                Person.last_name.ilike(term),
-                Person.first_name.ilike(term),
-                Person.function.ilike(term),
-            ))
-        return query.all()
+        return query
+
+    def people_by_search_term(
+        self,
+        search_term: str | None,
+        query: Query[Person],
+    ) -> Query[Person]:
+        """
+        Applies a search term filter on name and function to a query.
+        """
+        if not search_term:
+            return query
+
+        term = f'%{escape_like(search_term)}%'
+        return query.filter(or_(
+            Person.last_name.ilike(term, escape='*'),
+            Person.first_name.ilike(term, escape='*'),
+            Person.function.ilike(term, escape='*'),
+        ))
