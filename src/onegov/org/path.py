@@ -15,6 +15,7 @@ from onegov.core.converters import datetime_year_converter
 from onegov.core.converters import json_converter
 from onegov.core.converters import LiteralConverter
 from onegov.core.orm.abstract import MoveDirection
+from onegov.core.security import Public
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
@@ -132,6 +133,28 @@ if TYPE_CHECKING:
 @OrgApp.path(model=Organisation, path='/')
 def get_org(app: OrgApp) -> Organisation:
     return app.org
+
+
+class ShortLink:
+
+    __slots__ = ('name', 'to')
+
+    def __init__(self, name: str, to: str) -> None:
+        self.name = name
+        self.to = to
+
+
+@OrgApp.path(model=ShortLink, path='/@{name}')
+def get_short_link(app: OrgApp, name: str) -> ShortLink | None:
+    redirect_path = app.org.short_links_dict.get(name)
+    if redirect_path is None:
+        return None
+    return ShortLink(name, redirect_path)
+
+
+@OrgApp.view(model=ShortLink, permission=Public)
+def view_short_link(self: ShortLink, request: OrgRequest) -> Response:
+    return request.redirect(self.to)
 
 
 @OrgApp.path(model=Auth, path='/auth', converters={'skip': bool})
