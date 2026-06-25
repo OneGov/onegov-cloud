@@ -90,7 +90,8 @@ def view_people(
     query = self.people_by_organisation(
         selected_org, selected_sub_org, query=query
     )
-    query = self.people_by_search_term(selected_search, query=query)
+    query = self.people_by_search_term(
+        selected_search, query=query, language=request.locale)
     people = query.all()
 
     class AtoZPeople(AtoZ[Person]):

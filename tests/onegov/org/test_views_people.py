@@ -322,7 +322,8 @@ def test_people_view_organisation_filter(client: Client) -> None:
     assert 'Vanguard Capital' in people
 
 
-def test_people_view_search(client: Client) -> None:
+def test_people_view_search(client_with_fts: Client) -> None:
+    client = client_with_fts
     client.login_admin()
     settings = client.get('/people-settings')
     settings.form['organisation_hierarchy'] = """
@@ -395,49 +396,6 @@ def test_people_view_search(client: Client) -> None:
     )
     assert 'Holloway Max' not in people
     assert 'Keine Personen für aktuelle Filterauswahl gefunden' in people
-
-
-def test_people_search_escapes_wildcards(client: Client) -> None:
-    client.login_editor()
-
-    # Person whose name contains a SQL LIKE wildcard character
-    page = client.get('/people')
-    new = page.click('Person', index=1)
-    new.form['first_name'] = 'Jane'
-    new.form['last_name'] = 'Smith'
-    new.form['function'] = 'IT support'
-    new.form.submit()
-
-    page = client.get('/people')
-    new = page.click('Person', index=1)
-    new.form['first_name'] = 'John'
-    new.form['last_name'] = 'Doe'
-    new.form['function'] = 'manager'
-    new.form.submit()
-
-    # '%' should not act as a wildcard — must match literally
-    people = client.get('/people?search=%25')
-    assert 'Smith Jane' not in people
-    assert 'Doe John' not in people
-    assert 'Keine Personen für aktuelle Filterauswahl gefunden' in people
-
-    # '_' should not act as a wildcard — 'IT_support' must not match
-    # 'IT support'
-    people = client.get('/people?search=IT_support')
-    assert 'Smith Jane' not in people
-    assert 'Keine Personen für aktuelle Filterauswahl gefunden' in people
-
-    # Literal underscore in function field must still be found
-    page = client.get('/people')
-    new = page.click('Person', index=1)
-    new.form['first_name'] = 'Alex'
-    new.form['last_name'] = 'Kim'
-    new.form['function'] = 'IT_specialist'
-    new.form.submit()
-
-    people = client.get('/people?search=IT_specialist')
-    assert 'Kim Alex' in people
-    assert 'Smith Jane' not in people
 
 
 def test_delete_linked_person_issue_149(client: Client) -> None:

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from sqlalchemy import func, or_, type_coerce
-from sqlalchemy_utils import escape_like
+from sqlalchemy import and_, func, type_coerce
 
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
 from onegov.core.orm.types import JSON
 from onegov.people.models import Person
+from onegov.search import SearchIndex
+from onegov.search.utils import language_from_locale
 
 from typing import Any
 from typing import TYPE_CHECKING
@@ -116,16 +117,22 @@ class PersonCollection(BasePersonCollection[Person]):
         self,
         search_term: str | None,
         query: Query[Person],
+        language: str | None = None,
     ) -> Query[Person]:
         """
-        Applies a search term filter on name and function to a query.
+        Filters people using the full-text search index.
         """
         if not search_term:
             return query
 
-        term = f'%{escape_like(search_term)}%'
-        return query.filter(or_(
-            Person.last_name.ilike(term, escape='*'),
-            Person.first_name.ilike(term, escape='*'),
-            Person.function.ilike(term, escape='*'),
+        language = language_from_locale(language)
+
+        return query.join(
+            SearchIndex,
+            and_(
+                SearchIndex.owner_id_uuid == Person.id,
+                SearchIndex.owner_type == 'Person'
+            )
+        ).filter(SearchIndex.data_vector.op('@@')(
+            func.websearch_to_tsquery(language, search_term)
         ))
