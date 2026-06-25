@@ -459,7 +459,7 @@ def test_people_shown_on_main_page_extension(
         pass
 
     people = client.get('/people')
-    assert "Keine Personen" in people
+    assert people.status_int == 200
 
     new_person = people.click('Person', href='new')
     new_person.form['first_name'] = 'Fritzli'

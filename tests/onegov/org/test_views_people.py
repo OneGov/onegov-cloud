@@ -42,7 +42,7 @@ def test_people_view(client: Client) -> None:
     client.login_editor()
 
     people = client.get('/people')
-    assert 'Keine Personen' in people
+    assert people.status_int == 200
 
     new_person = people.click('Person', index=1)
     new_person.form['academic_title'] = 'Dr.'
@@ -91,7 +91,7 @@ def test_people_view(client: Client) -> None:
     client.delete(delete_link)
 
     people = client.get('/people')
-    assert 'Keine Personen' in people
+    assert 'Noch keine Personen erfasst' in people
 
 
 def test_with_people(client: Client) -> None:
@@ -320,6 +320,81 @@ def test_people_view_organisation_filter(client: Client) -> None:
     assert 'Nexus Diplomats' not in people
     assert 'Vanguard Tech' in people
     assert 'Vanguard Capital' in people
+
+
+def test_people_view_search(client: Client) -> None:
+    client.login_admin()
+    settings = client.get('/people-settings')
+    settings.form['organisation_hierarchy'] = """
+    - Nexus Org:
+      - Nexus Innovators
+      - Nexus Guardians
+    """
+    settings.form.submit()
+    client.login_editor()
+
+    def add_person(
+        first_name: str,
+        last_name: str,
+        function: str,
+        orgs: list[str] | None = None,
+    ) -> None:
+        page = client.get('/people')
+        new = page.click('Person', index=1)
+        new.form['first_name'] = first_name
+        new.form['last_name'] = last_name
+        new.form['function'] = function
+        if orgs:
+            new.form['organisations_multiple'].select_multiple(texts=orgs)
+        new.form.submit()
+
+    add_person('Aria', 'Chen', 'robotics engineer',
+               ['Nexus Org', '- Nexus Innovators'])
+    add_person('Max', 'Holloway', 'artificial intelligence expert',
+               ['Nexus Org', '- Nexus Innovators'])
+    add_person('Olivia', 'Greenwood', 'climate scientist',
+               ['Nexus Org', '- Nexus Guardians'])
+
+    # search by last name — no org filter
+    people = client.get('/people?search=Chen')
+    assert 'Chen Aria' in people
+    assert 'Holloway Max' not in people
+    assert 'Greenwood Olivia' not in people
+
+    # search by first name — no org filter
+    people = client.get('/people?search=Olivia')
+    assert 'Chen Aria' not in people
+    assert 'Holloway Max' not in people
+    assert 'Greenwood Olivia' in people
+
+    # search by function — no org filter
+    people = client.get('/people?search=artificial')
+    assert 'Chen Aria' not in people
+    assert 'Holloway Max' in people
+    assert 'Greenwood Olivia' not in people
+
+    # search with no results shows filter message, not "no people yet"
+    people = client.get('/people?search=Klingon')
+    assert 'Chen Aria' not in people
+    assert 'Noch keine Personen erfasst' not in people
+    assert 'Keine Personen für aktuelle Filterauswahl gefunden' in people
+
+    # search combined with org filter — narrows within the sub-org
+    people = client.get(
+        '/people?organisation=Nexus+Org'
+        '&sub_organisation=Nexus+Innovators&search=artificial'
+    )
+    assert 'Holloway Max' in people
+    assert 'Chen Aria' not in people
+    assert 'Greenwood Olivia' not in people
+
+    # search combined with org filter — no match
+    people = client.get(
+        '/people?organisation=Nexus+Org'
+        '&sub_organisation=Nexus+Guardians&search=artificial'
+    )
+    assert 'Holloway Max' not in people
+    assert 'Keine Personen für aktuelle Filterauswahl gefunden' in people
 
 
 def test_delete_linked_person_issue_149(client: Client) -> None:

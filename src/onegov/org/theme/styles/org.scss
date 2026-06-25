@@ -2525,6 +2525,12 @@ $person-website-icon: '\f0c1';
 $person-phone-icon: '\f095';
 $person-email-icon: '\f003';
 
+#people-filters {
+    .people-filter-select {
+        margin-bottom: .75rem;
+    }
+}
+
 .person-card {
     margin: 0 1em 1em 0;
 

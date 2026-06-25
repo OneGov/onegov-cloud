@@ -64,13 +64,19 @@ def view_people(
     layout: PersonCollectionLayout | None = None
 ) -> RenderData:
 
-    selected_org = str(request.params.get('organisation', ''))
-    selected_sub_org = str(request.params.get('sub_organisation', ''))
+    _org = request.params.get('organisation')
+    selected_org: str | None = _org if isinstance(_org, str) and _org else None
+    _sub_org = request.params.get('sub_organisation')
+    selected_sub_org: str | None = (
+        _sub_org if isinstance(_sub_org, str) and _sub_org else None)
+    _search = request.params.get('search')
+    selected_search: str | None = (
+        _search if isinstance(_search, str) and _search else None)
 
     top_orgs = get_top_level_organisations(
-        request.app.org.organisation_hierarchy)
+        request.app.org.organisation_hierarchy or [])
     sub_orgs = get_sub_organisations(
-            request.app.org.organisation_hierarchy)
+        request.app.org.organisation_hierarchy or [])
     if selected_org:
         index = top_orgs.index(selected_org)
         top_org = request.app.org.organisation_hierarchy[index]
@@ -80,7 +86,8 @@ def view_people(
     if selected_sub_org and selected_sub_org not in sub_orgs:
         sub_orgs.append(selected_sub_org)
 
-    people = self.people_by_organisation(selected_org, selected_sub_org)
+    people = self.people_by_organisation(
+        selected_org, selected_sub_org, selected_search)
 
     class AtoZPeople(AtoZ[Person]):
 
@@ -99,7 +106,8 @@ def view_people(
         'organisations': sorted(top_orgs),
         'sub_organisations': sorted(sub_orgs),
         'selected_organisation': selected_org,
-        'selected_sub_organisation': selected_sub_org
+        'selected_sub_organisation': selected_sub_org,
+        'selected_search': selected_search,
     }
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import func, type_coerce
+from sqlalchemy import func, or_, type_coerce
 
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
@@ -85,13 +85,14 @@ class PersonCollection(BasePersonCollection[Person]):
     def people_by_organisation(
         self,
         org: str | None,
-        sub_org: str | None
+        sub_org: str | None,
+        search: str | None = None,
     ) -> list[Person]:
         """
         Returns all persons of a given organisation and sub-organisation.
 
         If organisation and sub-organisation are both None, all persons are
-        returned.
+        returned. Optionally filters by a search term across name and function.
         """
         query = self.session.query(Person).order_by(Person.last_name,
                                                     Person.first_name)
@@ -109,4 +110,11 @@ class PersonCollection(BasePersonCollection[Person]):
                     type_coerce([f'-{sub_org}'], JSON)
                 )
             )
+        if search:
+            term = f'%{search}%'
+            query = query.filter(or_(
+                Person.last_name.ilike(term),
+                Person.first_name.ilike(term),
+                Person.function.ilike(term),
+            ))
         return query.all()
