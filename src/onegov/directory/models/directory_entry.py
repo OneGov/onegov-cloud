@@ -5,18 +5,18 @@ import logging
 
 import ormsgpack
 
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import event, ForeignKey
+from sqlalchemy import ForeignKey, inspect as sa_inspect
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import mapped_column, relationship, Mapped, Session
+from sqlalchemy.orm import mapped_column, relationship, Mapped
 from translationstring import TranslationString
 from uuid import uuid4, UUID
 
@@ -83,7 +83,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: Describes the entry briefly
     lead: Mapped[str | None]
 
-    #: SHA-256 hash of the entry values and associated file checksums
+    #: SHA-1 hash of the entry values and associated file checksums
     content_hash: Mapped[str | None] = mapped_column(default=None)
 
     #: All keywords defined for this entry (indexed)
@@ -143,8 +143,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         self.content.changed()  # type:ignore[attr-defined]
 
     def update_content_hash(self) -> None:
-        # Must be called explicitly after any mutation to values or files.
-        # Directory.update() does this; bypass it and the hash goes stale.
         hash_obj = hashlib.sha1(usedforsecurity=False)
         hash_obj.update(ormsgpack.packb(
             self.values,
@@ -163,15 +161,16 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
                 )
             self.content_hash = new_hash
 
-
-@event.listens_for(Session, 'before_flush')
-def set_content_hash_before_flush(
-    session: Session,
-    flush_context: object,
-    instances: object
-) -> None:
-    # Safety net: ensure entries always have a hash even if update_content_hash
-    # was not called by the caller (new entry added directly, or hash cleared).
-    for obj in (*session.new, *session.dirty):
-        if isinstance(obj, DirectoryEntry) and obj.content_hash is None:
-            obj.update_content_hash()
+    @observes('content', 'files')
+    def content_hash_observer(
+        self,
+        content: dict[str, Any] | None,
+        files: set[Any]
+    ) -> None:
+        if (
+            self.content_hash is not None
+            and 'values' not in (content or {})
+            and not sa_inspect(self).attrs.files.history.has_changes()
+        ):
+            return
+        self.update_content_hash()

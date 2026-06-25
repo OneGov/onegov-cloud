@@ -680,6 +680,7 @@ def test_api_people_endpoint_hides_unpublished_entries(client: Client) -> None:
 
 
 def test_api_directory_content_hash(client: Client) -> None:
+    from onegov.directory import DirectoryEntry
     session = client.app.session()
     directory: ExtendedDirectory = DirectoryCollection(
         session, type='extended'
@@ -696,4 +697,17 @@ def test_api_directory_content_hash(client: Client) -> None:
     item_data = api_item_data(items[0])
     assert 'content_hash' in item_data
     assert item_data['content_hash'] is not None
+    assert len(item_data['content_hash']) == 40  # SHA-1 hex digest
     assert 'modified' in item_data
+
+    first_hash = item_data['content_hash']
+
+    # update the entry — hash must change in the API response
+    session = client.app.session()
+    entry = session.query(DirectoryEntry).one()
+    entry.directory.update(entry, {'name': 'Updated Club'})
+    transaction.commit()
+
+    items = api_items(client, '/api/clubs')
+    item_data = api_item_data(items[0])
+    assert item_data['content_hash'] != first_hash
