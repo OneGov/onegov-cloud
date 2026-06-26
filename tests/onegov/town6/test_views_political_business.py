@@ -110,6 +110,9 @@ def test_political_businesses(client_with_fts: Client) -> None:
             '/political-businesses?q=----------------------------------light'
         )
 
+        # out-of-range year parameter must not raise a ValueError
+        client.get('/political-businesses?years=843169290', status=200)
+
     # delete businesses
     (client.get('/political-businesses')
      .click('ow many congressmen does it take to change a light bulb?')

@@ -290,7 +290,7 @@ class PoliticalBusinessCollection(
         self.term = term
         self.status = set(status) if status else set()
         self.types = set(types) if types else set()
-        self.years = set(years) if years else set()
+        self.years = {y for y in years if 1 <= y <= 9998} if years else set()
         self.batch_size = 20
 
     @property
