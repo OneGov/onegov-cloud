@@ -9,6 +9,7 @@
                 <form method="get" id="people-filters">
                     <input type="search" name="search"
                            style="font-family: inherit"
+                           tal:condition="request.app.fts_search_enabled"
                            tal:attributes="value selected_search"
                            i18n:attributes="placeholder"
                            placeholder="Search people"/>

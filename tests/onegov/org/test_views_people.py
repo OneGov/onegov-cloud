@@ -398,6 +398,32 @@ def test_people_view_search(client_with_fts: Client) -> None:
     assert 'Keine Personen für aktuelle Filterauswahl gefunden' in people
 
 
+def test_people_view_search_disabled(client: Client) -> None:
+    # not using `client_with_fts`
+    assert client.app.fts_search_enabled is False
+    client.login_editor()
+
+    page = client.get('/people')
+    new = page.click('Person', index=1)
+    new.form['first_name'] = 'Aria'
+    new.form['last_name'] = 'Chen'
+    new.form.submit()
+
+    new = client.get('/people').click('Person', index=1)
+    new.form['first_name'] = 'Max'
+    new.form['last_name'] = 'Holloway'
+    new.form.submit()
+
+    # search input is not rendered when FTS is disabled
+    people = client.get('/people')
+    assert 'type="search"' not in people
+
+    # search param is ignored — all people still returned
+    people = client.get('/people?search=Chen')
+    assert 'Chen Aria' in people
+    assert 'Holloway Max' in people
+
+
 def test_delete_linked_person_issue_149(client: Client) -> None:
     client.login_editor()
 

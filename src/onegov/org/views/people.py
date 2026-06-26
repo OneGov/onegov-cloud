@@ -69,9 +69,12 @@ def view_people(
     _sub_org = request.params.get('sub_organisation')
     selected_sub_org: str | None = (
         _sub_org if isinstance(_sub_org, str) and _sub_org else None)
-    _search = request.params.get('search')
-    selected_search: str | None = (
-        _search if isinstance(_search, str) and _search else None)
+    selected_search: str | None = None
+    if request.app.fts_search_enabled:
+        _search = request.params.get('search')
+        selected_search = (
+            _search if isinstance(_search, str) and _search else None
+        )
 
     top_orgs = get_top_level_organisations(
         request.app.org.organisation_hierarchy or [])
