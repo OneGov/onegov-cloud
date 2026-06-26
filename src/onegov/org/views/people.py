@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import morepath
 from morepath.request import Response
+from sqlalchemy import and_, func, type_coerce
 from sqlalchemy.orm import undefer
+from onegov.core.orm.types import JSON
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -10,6 +12,8 @@ from onegov.org.forms import PersonForm
 from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic
 from onegov.people import Person, PersonCollection
+from onegov.search import SearchIndex
+from onegov.search.utils import language_from_locale
 from markupsafe import Markup
 
 
@@ -18,6 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
+    from sqlalchemy.orm import Query
     from webob import Response as BaseResponse
 
 
@@ -57,6 +62,49 @@ def get_sub_organisations(
     return list(sub_organisations)
 
 
+def people_by_organisation(
+    query: Query[Person],
+    org: str | None,
+    sub_org: str | None,
+) -> Query[Person]:
+    if org:
+        query = query.filter(
+            func.jsonb_contains(
+                Person.content['organisations_multiple'],
+                type_coerce([org], JSON)
+            )
+        )
+    if sub_org:
+        query = query.filter(
+            func.jsonb_contains(
+                Person.content['organisations_multiple'],
+                type_coerce([f'-{sub_org}'], JSON)
+            )
+        )
+    return query
+
+
+def people_by_search_term(
+    query: Query[Person],
+    search_term: str | None,
+    language: str | None = None,
+) -> Query[Person]:
+    if not search_term:
+        return query
+
+    language = language_from_locale(language)
+
+    return query.join(
+        SearchIndex,
+        and_(
+            SearchIndex.owner_id_uuid == Person.id,
+            SearchIndex.owner_type == 'Person'
+        )
+    ).filter(SearchIndex.data_vector.op('@@')(
+        func.websearch_to_tsquery(language, search_term)
+    ))
+
+
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
 def view_people(
     self: PersonCollection,
@@ -89,12 +137,9 @@ def view_people(
     if selected_sub_org and selected_sub_org not in sub_orgs:
         sub_orgs.append(selected_sub_org)
 
-    query = self.query()
-    query = self.people_by_organisation(
-        selected_org, selected_sub_org, query=query
-    )
-    query = self.people_by_search_term(
-        selected_search, query=query, language=request.locale)
+    query = self.query().order_by(Person.last_name, Person.first_name)
+    query = people_by_organisation(query, selected_org, selected_sub_org)
+    query = people_by_search_term(query, selected_search, request.locale)
     people = query.all()
 
     class AtoZPeople(AtoZ[Person]):

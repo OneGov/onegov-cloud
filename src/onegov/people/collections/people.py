@@ -1,18 +1,12 @@
 from __future__ import annotations
 
-from sqlalchemy import and_, func, type_coerce
-
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
-from onegov.core.orm.types import JSON
 from onegov.people.models import Person
-from onegov.search import SearchIndex
-from onegov.search.utils import language_from_locale
 
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Query
     from uuid import UUID
 
 
@@ -84,55 +78,3 @@ class PersonCollection(BasePersonCollection[Person]):
     @property
     def model_class(self) -> type[Person]:
         return Person
-
-    def query(self) -> Query[Person]:
-        return super().query().order_by(Person.last_name, Person.first_name)
-
-    def people_by_organisation(
-        self,
-        org: str | None,
-        sub_org: str | None,
-        query: Query[Person],
-    ) -> Query[Person]:
-        """
-        Returns a query filtered by organisation and sub-organisation.
-        """
-        if org:
-            query = query.filter(
-                func.jsonb_contains(
-                    Person.content['organisations_multiple'],
-                    type_coerce([org], JSON)
-                )
-            )
-        if sub_org:
-            query = query.filter(
-                func.jsonb_contains(
-                    Person.content['organisations_multiple'],
-                    type_coerce([f'-{sub_org}'], JSON)
-                )
-            )
-        return query
-
-    def people_by_search_term(
-        self,
-        search_term: str | None,
-        query: Query[Person],
-        language: str | None = None,
-    ) -> Query[Person]:
-        """
-        Filters people using the full-text search index.
-        """
-        if not search_term:
-            return query
-
-        language = language_from_locale(language)
-
-        return query.join(
-            SearchIndex,
-            and_(
-                SearchIndex.owner_id_uuid == Person.id,
-                SearchIndex.owner_type == 'Person'
-            )
-        ).filter(SearchIndex.data_vector.op('@@')(
-            func.websearch_to_tsquery(language, search_term)
-        ))
