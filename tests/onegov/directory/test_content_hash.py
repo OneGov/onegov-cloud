@@ -276,45 +276,12 @@ def test_content_hash_observer_with_none_content(session: Session) -> None:
     hash_after_none = conference.content_hash
     assert hash_after_none is not None
 
-    # Setting content without a 'values' key must not recalculate the hash.
+    # content without a 'values' key still triggers the observer, but the
+    # computed hash is identical (values is empty in both cases).
     conference.content = {'indexes': {'a': 'aaa'}}
     session.flush()
 
     assert conference.content_hash == hash_after_none
-
-
-# --- Guard: skips update_content_hash when nothing relevant changed ---
-
-
-def test_guard_skips_update_when_no_relevant_change(session: Session) -> None:
-    # Validates the observer guard by counting how many times
-    # update_content_hash is actually called.
-    rooms = DirectoryCollection(session).add(
-        title='Rooms',
-        structure='Name *= ___',
-        configuration=DirectoryConfiguration(title='Name', order=['Name']),
-    )
-
-    conference = rooms.add(values=dict(name='Conference Room'))
-
-    call_count = 0
-    original = conference.update_content_hash
-
-    def counting_update() -> None:
-        nonlocal call_count
-        call_count += 1
-        original()
-
-    conference.update_content_hash = counting_update  # type: ignore[method-assign]
-
-    # Neither content=None nor non-values content should trigger
-    # a recalculation.
-    conference.content = None  # type: ignore[assignment]
-    session.flush()
-    conference.content = {'indexes': {'a': 'aaa'}}
-    session.flush()
-
-    assert call_count == 0
 
 
 # --- Known gap: in-place mutation bypasses the observer ---
@@ -357,6 +324,8 @@ def test_content_hash_changes_on_new_field(session: Session) -> None:
     )
 
     conference = rooms.add(values=dict(name='Conference Room'))
+    session.flush()
+
     original_hash = conference.content_hash
     assert original_hash is not None
 

@@ -167,9 +167,4 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         content: dict[str, Any] | None,
         files: set[Any]
     ) -> None:
-        if (
-            self.content_hash is None
-            or (content is not None and 'values' in content)
-            or inspect(self).attrs.files.history.has_changes()
-        ):
-            self.update_content_hash()
+        self.update_content_hash()
