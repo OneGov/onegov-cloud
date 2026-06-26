@@ -7437,3 +7437,9 @@ code {
 p.full-text-width {
     max-width: 100% !important;
 }
+
+.directory-entry-hash {
+    font-family: $font-family-monospace;
+    font-size: .75rem;
+    background-color: $gray-pastel;
+}
