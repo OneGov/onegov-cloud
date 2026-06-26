@@ -110,8 +110,14 @@ def test_political_businesses(client_with_fts: Client) -> None:
             '/political-businesses?q=----------------------------------light'
         )
 
-        # out-of-range year parameter must not raise a ValueError
-        client.get('/political-businesses?years=843169290', status=200)
+        # out-of-range year and invalid status/type params must not error
+        # and must not filter out valid results
+        assert '02.10.2025' in client.get(
+            '/political-businesses?years=843169290')
+        assert '02.10.2025' in client.get(
+            '/political-businesses?status=bogus')
+        assert '02.10.2025' in client.get(
+            '/political-businesses?types=mabis')
 
     # delete businesses
     (client.get('/political-businesses')
