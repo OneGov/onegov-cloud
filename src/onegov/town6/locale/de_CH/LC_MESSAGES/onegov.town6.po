@@ -2184,6 +2184,15 @@ msgstr "Organisation wählen"
 msgid "Select sub organisation"
 msgstr "Unterorganisation wählen"
 
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Nach Organisation oder Unterorganisation filtern"
+
+msgid "Search people"
+msgstr "Personen suchen"
+
+msgid "No people added yet."
+msgstr "Noch keine Personen erfasst."
+
 msgid "No people found for current filter selection."
 msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
 
