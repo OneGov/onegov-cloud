@@ -254,6 +254,69 @@ def test_observer_fires_on_direct_file_content_change(
     assert entry.content_hash != hash_with_v1
 
 
+# --- None / empty content ---
+
+
+def test_content_hash_observer_with_none_content(session: Session) -> None:
+    # If content is reset to None after a hash was already computed, the
+    # observer must not crash on `'values' in content` and must still
+    # produce a valid hash (reflecting empty values).
+    rooms = DirectoryCollection(session).add(
+        title='Rooms',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+
+    conference = rooms.add(values=dict(name='Conference Room'))
+    assert conference.content_hash is not None
+
+    conference.content = None  # type: ignore[assignment]
+    session.flush()
+
+    hash_after_none = conference.content_hash
+    assert hash_after_none is not None
+
+    # Setting content without a 'values' key must not recalculate the hash.
+    conference.content = {'indexes': {'a': 'aaa'}}
+    session.flush()
+
+    assert conference.content_hash == hash_after_none
+
+
+# --- Guard: skips update_content_hash when nothing relevant changed ---
+
+
+def test_guard_skips_update_when_no_relevant_change(session: Session) -> None:
+    # Validates the observer guard by counting how many times
+    # update_content_hash is actually called.
+    rooms = DirectoryCollection(session).add(
+        title='Rooms',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+
+    conference = rooms.add(values=dict(name='Conference Room'))
+
+    call_count = 0
+    original = conference.update_content_hash
+
+    def counting_update() -> None:
+        nonlocal call_count
+        call_count += 1
+        original()
+
+    conference.update_content_hash = counting_update  # type: ignore[method-assign]
+
+    # Neither content=None nor non-values content should trigger
+    # a recalculation.
+    conference.content = None  # type: ignore[assignment]
+    session.flush()
+    conference.content = {'indexes': {'a': 'aaa'}}
+    session.flush()
+
+    assert call_count == 0
+
+
 # --- Known gap: in-place mutation bypasses the observer ---
 
 

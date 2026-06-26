@@ -12,7 +12,7 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, inspect
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
@@ -169,7 +169,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     ) -> None:
         if (
             self.content_hash is None
-            or 'values' in content
-            or inspect(self).state.attrs.files.history.has_changes()
+            or (content is not None and 'values' in content)
+            or inspect(self).attrs.files.history.has_changes()
         ):
             self.update_content_hash()
