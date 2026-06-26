@@ -12,7 +12,7 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import ForeignKey, inspect
+from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
