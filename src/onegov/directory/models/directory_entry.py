@@ -83,7 +83,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: Describes the entry briefly
     lead: Mapped[str | None]
 
-    #: SHA-1 hash of the entry values and associated file checksums
+    #: SHA-1 hash of the entry values, keywords, and associated file checksums
     content_hash: Mapped[str | None] = mapped_column(default=None)
 
     #: content_hash at the time of the last admin notification
@@ -152,6 +152,8 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
             default=str,
             option=ormsgpack.OPT_SORT_KEYS
         ))
+        for keyword in sorted(self.keywords):
+            hash_obj.update(keyword.encode())
         for file_part in sorted(f.checksum or f.id for f in self.files):
             hash_obj.update(file_part.encode())
         new_hash = hash_obj.hexdigest()
@@ -164,10 +166,11 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
                 )
             self.content_hash = new_hash
 
-    @observes('content', 'files')
+    @observes('content', 'files', '_keywords')
     def content_hash_observer(
         self,
         content: dict[str, Any] | None,
-        files: set[Any]
+        files: set[Any],
+        keywords: dict[str, str] | None
     ) -> None:
         self.update_content_hash()

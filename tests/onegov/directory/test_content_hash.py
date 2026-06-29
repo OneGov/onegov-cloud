@@ -313,6 +313,41 @@ def test_inplace_values_mutation_does_not_update_hash(
     assert conference.content_hash != original_hash
 
 
+# --- Keywords / categories ---
+
+
+def test_content_hash_changes_with_keywords(session: Session) -> None:
+    # Adding, removing, or reordering keywords (categories) must update or
+    # preserve the hash accordingly.
+    rooms = DirectoryCollection(session).add(
+        title='Rooms',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+
+    entry = rooms.add(values=dict(name='Conference Room'))
+    hash_no_keywords = entry.content_hash
+    assert hash_no_keywords is not None
+
+    # adding keywords changes the hash
+    entry.keywords = {'Sport', 'Kultur'}
+    session.flush()
+    hash_two_keywords = entry.content_hash
+    assert hash_two_keywords != hash_no_keywords
+
+    # removing one keyword changes the hash again
+    entry.keywords = {'Sport'}
+    session.flush()
+    assert entry.content_hash != hash_two_keywords
+
+    # same set of keywords in a different iteration order yields the same hash
+    entry.keywords = {'Sport', 'Kultur'}
+    session.flush()
+    entry.keywords = {'Kultur', 'Sport'}
+    session.flush()
+    assert entry.content_hash == hash_two_keywords
+
+
 # --- Structure migration ---
 
 
