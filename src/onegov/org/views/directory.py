@@ -5,6 +5,8 @@ import re
 import morepath
 import transaction
 
+from datetime import UTC, datetime
+
 from collections import defaultdict
 from decimal import Decimal
 from onegov.core.html import html_to_text
@@ -232,6 +234,8 @@ def handle_edit_directory(
                             save_changes = False
 
             if save_changes:
+                previous_notification_address = (
+                    self.directory.notification_address)
                 try:
                     form.populate_obj(self.directory)
                     self.session.flush()
@@ -246,6 +250,13 @@ def handle_edit_directory(
                     )
                     transaction.abort()
                 else:
+                    if (not previous_notification_address
+                            and self.directory.notification_address):
+                        # Seed notified_hash to avoid flood of emails
+                        # on first configure.
+                        for entry in self.directory.entries:
+                            if entry.content_hash:
+                                entry.notified_hash = entry.content_hash
                     request.success(_('Your changes were saved'))
                     return request.redirect(request.link(self))
 
@@ -645,6 +656,128 @@ def send_email_notification_for_directory_entry(
     request.app.send_transactional_email_batch(email_iter())
 
 
+def _send_admin_email(
+    directory: ExtendedDirectory,
+    request: OrgRequest,
+    subject: str,
+    template: str,
+    context: dict[str, Any],
+) -> None:
+    content = render_template(template, request, {
+        'layout': DefaultMailLayout(object(), request),
+        'title': subject,
+        'generated_at': datetime.now(UTC),
+        **context,
+    })
+    assert directory.notification_address is not None
+    request.app.send_transactional_email(
+        receivers=(directory.notification_address,),
+        reply_to=request.app.org.reply_to,
+        subject=subject,
+        content=content,
+        plaintext=html_to_text(content),
+    )
+
+
+def send_admin_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest,
+    is_update: bool = False
+) -> None:
+    if not directory.notification_address:
+        return
+
+    if is_update:
+        title = request.translate(_(
+            '${org}: Updated Entry "${entry}" in "${directory}"',
+            mapping={'org': request.app.org.title,
+                     'entry': entry.title,
+                     'directory': directory.title},
+        ))
+    else:
+        title = request.translate(_(
+            '${org}: New Entry "${entry}" in "${directory}"',
+            mapping={'org': request.app.org.title,
+                     'entry': entry.title,
+                     'directory': directory.title},
+        ))
+
+    _send_admin_email(
+        directory, request, title,
+        'mail_directory_entry_admin_notification.pt',
+        {
+            'directory': directory,
+            'entry_title': entry.title,
+            'entry_link': request.link(entry),
+            'publication_start': entry.publication_start,
+            'publication_end': entry.publication_end,
+            'content_hash': entry.content_hash,
+            'is_update': is_update,
+        },
+    )
+
+
+def send_admin_expiry_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest,
+) -> None:
+    if not directory.notification_address:
+        return
+
+    title = request.translate(_(
+        '${org}: Publication Period Ended for "${entry}" in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'entry': entry.title,
+                 'directory': directory.title},
+    ))
+    _send_admin_email(
+        directory, request, title,
+        'mail_directory_entry_admin_deletion.pt',
+        {
+            'directory': directory,
+            'entry_title': entry.title,
+            'publication_start': entry.publication_start,
+            'publication_end': entry.publication_end,
+            'content_hash': entry.content_hash,
+            'deleted': False,
+            'auto_deleted': False,
+        },
+    )
+
+
+def send_admin_deletion_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest,
+    *,
+    auto_deleted: bool = False,
+) -> None:
+    if not directory.notification_address:
+        return
+
+    title = request.translate(_(
+        '${org}: Deleted Entry "${entry}" in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'entry': entry.title,
+                 'directory': directory.title},
+    ))
+    _send_admin_email(
+        directory, request, title,
+        'mail_directory_entry_admin_deletion.pt',
+        {
+            'directory': directory,
+            'entry_title': entry.title,
+            'publication_start': entry.publication_start,
+            'publication_end': entry.publication_end,
+            'content_hash': entry.content_hash,
+            'deleted': True,
+            'auto_deleted': auto_deleted,
+        },
+    )
+
+
 @OrgApp.form(
     model=ExtendedDirectoryEntryCollection,
     permission=Private,
@@ -916,6 +1049,11 @@ def delete_directory_entry(
 ) -> None:
 
     request.assert_valid_csrf_token()
+
+    if isinstance(self, ExtendedDirectoryEntry):
+        send_admin_deletion_notification_for_directory_entry(
+            self.directory, self, request
+        )
 
     session = request.session
     session.delete(self)

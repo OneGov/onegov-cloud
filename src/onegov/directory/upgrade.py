@@ -99,6 +99,15 @@ def add_content_hash_to_directory_entries(context: UpgradeContext) -> None:
     )
 
 
+@upgrade_task('Add notified hash to directory entries')
+def add_notified_hash_to_directory_entries(context: UpgradeContext) -> None:
+    if not context.has_column('directory_entries', 'notified_hash'):
+        context.operations.add_column(
+            'directory_entries',
+            Column('notified_hash', Text, nullable=True)
+        )
+
+
 @upgrade_task('Calc content hash for directory entries')
 def calc_content_hash_for_directory_entries(context: UpgradeContext) -> None:
     if not context.has_column('directory_entries', 'content_hash'):

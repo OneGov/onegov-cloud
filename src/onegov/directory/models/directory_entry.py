@@ -86,6 +86,9 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: SHA-1 hash of the entry values and associated file checksums
     content_hash: Mapped[str | None] = mapped_column(default=None)
 
+    #: content_hash at the time of the last admin notification
+    notified_hash: Mapped[str | None] = mapped_column(default=None)
+
     #: All keywords defined for this entry (indexed)
     _keywords: Mapped[dict[str, str] | None] = mapped_column(
         MutableDict.as_mutable(HSTORE),
