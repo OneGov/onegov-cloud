@@ -313,6 +313,36 @@ def test_inplace_values_mutation_does_not_update_hash(
     assert conference.content_hash != original_hash
 
 
+# --- Publication dates ---
+
+
+def test_content_hash_changes_with_publication_dates(session: Session) -> None:
+    # Changing publication_start or publication_end must update the hash.
+    rooms = DirectoryCollection(session).add(
+        title='Rooms',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+
+    entry = rooms.add(values=dict(name='Conference Room'))
+    hash_no_dates = entry.content_hash
+    assert hash_no_dates is not None
+
+    entry.publication_start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    session.flush()
+    hash_with_start = entry.content_hash
+    assert hash_with_start != hash_no_dates
+
+    entry.publication_end = datetime(2026, 12, 31, tzinfo=timezone.utc)
+    session.flush()
+    hash_with_both = entry.content_hash
+    assert hash_with_both != hash_with_start
+
+    entry.publication_end = datetime(2027, 6, 30, tzinfo=timezone.utc)
+    session.flush()
+    assert entry.content_hash != hash_with_both
+
+
 # --- Keywords / categories ---
 
 
