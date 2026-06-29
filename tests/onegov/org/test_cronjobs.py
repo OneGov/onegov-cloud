@@ -2688,8 +2688,8 @@ def test_admin_notification_new_entry(
     assert message['To'] == 'admin@example.org'
     assert 'Neuer Eintrag' in message['Subject']
     assert 'Baugesuche' in message['Subject']
-    assert 'Anton' in message['Subject']
-    assert 'Anton' in message['TextBody']
+    assert 'Anton Müller' in message['Subject']
+    assert 'Anton Müller' in message['TextBody']
     assert _fmt_date(pub_start) in message['TextBody']  # publication_start
     assert _fmt_date(pub_end) in message['TextBody']    # publication_end
     session = client.app.session()
@@ -2718,8 +2718,8 @@ def test_admin_notification_new_entry(
     assert message['To'] == 'admin@example.org'
     assert 'Aktualisierter Eintrag' in message['Subject']
     assert 'Baugesuche' in message['Subject']
-    assert 'Anton' in message['Subject']
-    assert 'Anton' in message['TextBody']
+    assert 'Anton Müller' in message['Subject']
+    assert 'Anton Müller' in message['TextBody']
     assert _fmt_date(pub_start) in message['TextBody']  # publication_start
     assert _fmt_date(pub_end) in message['TextBody']    # publication_end
     db_entry = (
@@ -2813,8 +2813,8 @@ def test_admin_notification_new_field(
     assert len(os.listdir(client.app.maildir)) == 2
     subjects = {client.get_email(i)['Subject'] for i in (0, 1)}
     assert all('Neuer Eintrag' in s for s in subjects)
-    assert any('Anton' in s for s in subjects)
-    assert any('Berta' in s for s in subjects)
+    assert any('Anton Müller' in s for s in subjects)
+    assert any('Berta Schmid' in s for s in subjects)
 
     # add new field to both entries → hash changes for each → one email each
     transaction.begin()
@@ -2829,8 +2829,8 @@ def test_admin_notification_new_field(
     assert len(os.listdir(client.app.maildir)) == 4
     subjects = {client.get_email(i)['Subject'] for i in (2, 3)}
     assert all('Aktualisierter Eintrag' in s for s in subjects)
-    assert any('Anton' in s for s in subjects)
-    assert any('Berta' in s for s in subjects)
+    assert any('Anton Müller' in s for s in subjects)
+    assert any('Berta Schmid' in s for s in subjects)
     for i in (2, 3):
         message = client.get_email(i)
         assert message['To'] == 'admin@example.org'
@@ -2890,9 +2890,9 @@ def test_admin_notification_publication_date_reached(
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
     assert message['To'] == 'admin@example.org'
-    assert 'Carla' in message['Subject']
+    assert 'Carla Huber' in message['Subject']
     assert 'Baugesuche' in message['Subject']
-    assert 'Carla' in message['TextBody']
+    assert 'Carla Huber' in message['TextBody']
     assert _fmt_date(pub_start) in message['TextBody']  # publication_start
     assert _fmt_date(pub_end) in message['TextBody']    # publication_end
     db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
@@ -2985,9 +2985,10 @@ def test_admin_notification_delete_before_cron(
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
     assert message['To'] == 'admin@example.org'
-    assert 'Franziska' in message['Subject']
+    assert 'Franziska Brun' in message['Subject']
     assert 'Baugesuche' in message['Subject']
     assert 'Gelöscht' in message['Subject']
+    assert 'Franziska Brun' in message['TextBody']
     assert _fmt_date(pub_start) in message['TextBody']  # publication_start
     assert _fmt_date(pub_end) in message['TextBody']    # publication_end
     assert entry_hash in message['TextBody']
@@ -3037,9 +3038,10 @@ def test_admin_notification_publication_end_no_delete(
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)
     assert message['To'] == 'admin@example.org'
-    assert 'Georg' in message['Subject']
+    assert 'Georg Huber' in message['Subject']
     assert 'Baugesuche' in message['Subject']
     assert 'Publikationsfrist' in message['Subject']
+    assert 'Georg Huber' in message['TextBody']
     assert 'abgelaufen' in message['TextBody'].lower()
     assert 'automatisch gelöscht' not in message['TextBody'].lower()
     assert _fmt_date(pub_start) in message['TextBody']  # publication_start
@@ -3105,10 +3107,10 @@ def test_admin_notification_publication_end_reached(
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)
     assert message['To'] == 'admin@example.org'
-    assert 'David' in message['Subject']
+    assert 'David Frei' in message['Subject']
     assert 'Baugesuche' in message['Subject']
     assert 'Gelöscht' in message['Subject']
-    assert 'David' in message['TextBody']
+    assert 'David Frei' in message['TextBody']
     assert 'automatisch gelöscht' in message['TextBody'].lower()
     assert _fmt_date(pub_start) in message['TextBody']  # publication_start
     assert _fmt_date(pub_end) in message['TextBody']    # publication_end
@@ -3157,8 +3159,9 @@ def test_admin_notification_delete_after_cron(
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)
     assert message['To'] == 'admin@example.org'
-    assert 'Eva' in message['Subject']
+    assert 'Eva Roth' in message['Subject']
     assert 'Gelöscht' in message['Subject']
+    assert 'Eva Roth' in message['TextBody']
     assert 'automatisch gelöscht' not in message['TextBody'].lower()
     assert _fmt_date(pub_start) in message['TextBody']  # publication_start
     assert _fmt_date(pub_end) in message['TextBody']    # publication_end
