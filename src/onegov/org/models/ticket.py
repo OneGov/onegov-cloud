@@ -1076,7 +1076,35 @@ class ReservationHandler(Handler):
             for r in self.reservations
         )
 
-        if not all(accepted):
+        cancellation_requested = self.data.get('cancellation_requested', False)
+
+        if cancellation_requested:
+            links.append(
+                Link(
+                    text=_('Accept cancellation'),
+                    url=request.link(self.ticket, 'accept-cancellation'),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to accept the '
+                                'cancellation?'
+                            ),
+                            _(
+                                'This will cancel the reservation and cannot '
+                                'be undone.'
+                            ),
+                            _('Accept cancellation'),
+                            _('Cancel'),
+                        ),
+                        Intercooler(
+                            request_method='GET', redirect_after=request.url
+                        ),
+                    ),
+                )
+            )
+
+        if not all(accepted) and not cancellation_requested:
             links.append(
                 Link(
                     text=_('Accept all reservations'),

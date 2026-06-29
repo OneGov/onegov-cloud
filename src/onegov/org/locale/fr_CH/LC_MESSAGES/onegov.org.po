@@ -5653,6 +5653,12 @@ msgstr "1 réservation ajoutée."
 msgid "${count} reservations added."
 msgstr "${count} réservations ajoutées."
 
+msgid "Cancellation requested for 1 reservation."
+msgstr "Demande d'annulation pour 1 réservation."
+
+msgid "Cancellation requested for ${count} reservations."
+msgstr "Demande d'annulation pour ${count} réservations."
+
 msgid "1 reservation adjusted:"
 msgstr "1 réservation ajustée:"
 
@@ -8065,6 +8071,69 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+msgid "Enable cancel reservation"
+msgstr "Permettre l'annulation de réservations"
+
+msgid "Cancellation"
+msgstr "Annulation"
+
+msgid "Request cancellation"
+msgstr "Demander l'annulation"
+
+msgid "Request Cancellation"
+msgstr "Demander l'annulation"
+
+msgid "You are about to submit a cancellation request for the following reservations. An administrator will review your request and confirm the cancellation."
+msgstr "Vous êtes sur le point de soumettre une demande d'annulation pour les réservations suivantes. Un administrateur examinera votre demande et confirmera l'annulation."
+
+msgid "Would you like to cancel your reservation?"
+msgstr "Souhaitez-vous annuler votre réservation?"
+
+msgid "Your cancellation request has been submitted. You will be notified once it has been processed."
+msgstr "Votre demande d'annulation a été soumise. Vous serez informé(e) une fois qu'elle aura été traitée."
+
+msgid "A cancellation request can only be submitted for accepted reservations."
+msgstr "Une demande d'annulation ne peut être soumise que pour des réservations acceptées."
+
+msgid "A cancellation request has already been submitted."
+msgstr "Une demande d'annulation a déjà été soumise."
+
+msgid "A cancellation request cannot be submitted because the payment has already been invoiced or paid."
+msgstr "Une demande d'annulation ne peut pas être soumise car le paiement a déjà été facturé ou payé."
+
+msgid "Accept cancellation"
+msgstr "Accepter l'annulation"
+
+msgid "Do you really want to accept the cancellation?"
+msgstr "Voulez-vous vraiment accepter l'annulation?"
+
+msgid "This will cancel the reservation and cannot be undone."
+msgstr "Cela annulera la réservation et ne peut pas être annulé."
+
+msgid "Cancellation accepted."
+msgstr "Annulation acceptée."
+
+msgid "The cancellation request was accepted."
+msgstr "La demande d'annulation a été acceptée."
+
+msgid "A cancellation has been requested for this reservation."
+msgstr "Une annulation a été demandée pour cette réservation."
+
+msgid "Cancellation accepted"
+msgstr "Annulation acceptée"
+
+msgid "${org} Accepted Cancellation"
+msgstr "${org} Annulation acceptée"
+
+msgid "The following reservations have been cancelled:"
+msgstr "Les réservations suivantes ont été annulées:"
+
+msgid "This is a notification for accepted cancellation requests for ${organisation}. If you no longer wish to receive these notifications, please contact an administrator so they can remove you from the recipients list."
+msgstr "Ceci est une notification pour les demandes d'annulation acceptées pour ${organisation}. Si vous ne souhaitez plus recevoir ces notifications, veuillez contacter un administrateur."
+
+msgid "Your cancellation request has been accepted. The following reservations have been cancelled:"
+msgstr "Votre demande d'annulation a été acceptée. Les réservations suivantes ont été annulées:"
 
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "p.ex. 07:00 ou 07:00, 14:30"

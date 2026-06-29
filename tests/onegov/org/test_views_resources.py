@@ -22,6 +22,7 @@ from onegov.org.models import ResourceRecipientCollection
 from onegov.pay import Payment, PaymentCollection, InvoiceCollection
 from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import Resource, ResourceCollection
+from onegov.reservation.models.custom_reservation import CustomReservation
 from onegov.ticket import TicketCollection, TicketInvoice
 from onegov.user import UserCollection, User
 from openpyxl import load_workbook
@@ -4925,3 +4926,292 @@ def test_migration_removes_reservation_when_slot_is_taken(
         .all()
     )
     assert any('irrtümlich storniert' in (n.text or '') for n in notes)
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reservation_cancellation_request(client: Client) -> None:
+    from onegov.chat import MessageCollection
+
+    # setup: resource with cancellation enabled and a recipient for rejections
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    resource.allow_cancellation_requests = True
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    recipients = ResourceRecipientCollection(client.app.session())
+    recipients.add(
+        name='Admin',
+        medium='email',
+        address='admin@example.org',
+        rejected_reservations=True,
+        resources=[resource.id.hex],
+    )
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=1,
+        quota_limit=1,
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create reservation and submit form
+    result = reserve(quota=1, whole_day=True)
+    assert result.json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Test'
+    ticket_page = formular.form.submit().follow().form.submit().follow()
+    ticket_url = ticket_page.request.url
+
+    # accept the reservation as supporter
+    client.login_supporter()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+    ticket.click('Ticket abschliessen')
+    client.logout()
+
+    # cancel link appears in the accepted email
+    assert len(os.listdir(client.app.maildir)) == 3  # open + accepted + closed
+    accepted_email = client.get_email(1)
+    assert 'Stornierung beantragen' in accepted_email['HtmlBody']
+    cancel_link_in_email = re.search(
+        r'href="([^"]*request-cancellation[^"]*)"',
+        accepted_email['HtmlBody']
+    )
+    assert cancel_link_in_email is not None
+    cancel_url_from_email = cancel_link_in_email.group(1)
+
+    # same link appears on the status page
+    status = client.get(ticket_url)
+    cancel_link_on_status = re.search(
+        r'href="([^"]*request-cancellation[^"]*)"',
+        status.text
+    )
+    assert cancel_link_on_status is not None
+    assert cancel_link_on_status.group(1) == cancel_url_from_email
+
+    cancel_page = client.get(cancel_url_from_email)
+    assert 'Stornierungsanfrage' in cancel_page
+    status = cancel_page.form.submit().follow()
+    assert 'Stornierungsanfrage wurde eingereicht' in status
+
+    # ticket is back to 'open', cancel link no longer shown on status page
+    assert 'Stornierung beantragen' not in status
+
+    session = client.app.session()
+    tickets = TicketCollection(session)
+    ticket_obj = tickets.query().filter_by(handler_code='RSV').one()
+    assert ticket_obj.state == 'open'
+    assert ticket_obj.handler_data.get('cancellation_requested') is True
+
+    messages = (
+        MessageCollection(session, channel_id=ticket_obj.number)
+        .query()
+        .all()
+    )
+    changes = [m.meta.get('change') for m in messages if hasattr(m, 'meta')]
+    assert 'cancellation_requested' in changes
+
+    # manager sees the callout and accept-cancellation button
+    client.login_supporter()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'Stornierung beantragt' in ticket
+    assert 'Stornierung akzeptieren' in ticket
+
+    # manager accepts the cancellation
+    accept_link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
+    ticket = client.get(accept_link).follow()
+    assert 'Stornierung akzeptiert' in ticket
+
+    # reservation is deleted
+    session = client.app.session()
+    assert session.query(Reservation).count() == 0
+
+    # two emails: cancellation-accepted to customer and
+    # notification to admin recipient
+    assert len(os.listdir(client.app.maildir)) == 5
+    emails_3_4 = [client.get_email(3), client.get_email(4)]
+    customer_emails = [e for e in emails_3_4 if 'info@example.org' in e['To']]
+    admin_emails = [e for e in emails_3_4 if 'admin@example.org' in e['To']]
+    assert len(customer_emails) == 1, 'Expected one customer email'
+    assert len(admin_emails) == 1, 'Expected one admin notification'
+    assert 'Stornierung akzeptiert' in customer_emails[0]['Subject']
+    assert (
+        'Stornierungsanfrage wurde akzeptiert'
+        in customer_emails[0]['TextBody']
+    )
+    assert 'Reservationen wurden storniert' in admin_emails[0]['TextBody']
+    assert 'Abgelehnte Reservation' not in admin_emails[0]['Subject']
+
+    # activity feed shows cancellation_accepted, flag is cleared
+    # from handler_data
+    ticket_obj = tickets.query().filter_by(handler_code='RSV').one()
+    assert not ticket_obj.handler_data.get('cancellation_requested')
+
+    messages = (
+        MessageCollection(session, channel_id=ticket_obj.number)
+        .query()
+        .all()
+    )
+    changes = [m.meta.get('change') for m in messages if hasattr(m, 'meta')]
+    assert 'cancellation_accepted' in changes
+
+    # no rejection notification was sent to the resource recipient, as
+    # we cancel
+    all_subjects = [client.get_email(i)['Subject'] for i in range(5)]
+    assert not any('Abgelehnte Reservation' in s for s in all_subjects)
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reservation_cancellation_request_payment_guard(
+    client: Client,
+) -> None:
+    from decimal import Decimal
+    from onegov.pay import Payment
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    resource.allow_cancellation_requests = True
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    result = reserve(quota=1, whole_day=True)
+    assert result.json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Test'
+    ticket_page = formular.form.submit().follow().form.submit().follow()
+    ticket_url = ticket_page.request.url
+
+    client.login_supporter()
+    client.get('/tickets/ALL/open').click('Annehmen').follow().click(
+        'Alle Reservationen annehmen').follow().click('Ticket abschliessen')
+    client.logout()
+
+    # cancel link appears on status page (no payment yet)
+    status = client.get(ticket_url)
+    assert 'Stornierung beantragen' in status
+    cancel_link = re.search(
+        r'href="([^"]*request-cancellation[^"]*)"', status.text
+    )
+    assert cancel_link is not None
+    cancel_url = cancel_link.group(1)
+
+    # attach an invoiced payment to the reservation
+    session = client.app.session()
+    reservation = session.query(CustomReservation).one()
+    reservation.payment = Payment(
+        source='manual',
+        amount=Decimal('10'),
+        currency='CHF',
+        state='invoiced',
+    )
+    transaction.commit()
+
+    # cancel link must not appear when payment is invoiced
+    status = client.get(ticket_url)
+    assert 'Stornierung beantragen' not in status
+
+    # direct access must redirect with an alert
+    response = client.get(cancel_url).follow()
+    assert 'Zahlung bereits in Rechnung gestellt' in response
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reservation_cancellation_request_state_guard(client: Client) -> None:
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    resource.allow_cancellation_requests = True
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    result = reserve(quota=1, whole_day=True)
+    assert result.json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Test'
+    ticket_page = formular.form.submit().follow().form.submit().follow()
+    ticket_url = ticket_page.request.url
+
+    # ticket is 'open' (not yet accepted/closed) — cancel link must not show
+    status = client.get(ticket_url)
+    assert 'Stornierung beantragen' not in status
+
+    # derive cancel URL from ticket status URL (same base path, different name)
+    assert '/status' in ticket_url
+    cancel_url = ticket_url.replace('/status', '/request-cancellation')
+
+    # direct access to request-cancellation on an open ticket
+    # redirects to status view
+    response = client.get(cancel_url).follow()
+    assert response.request.url.endswith('/status')
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reservation_cancellation_request_disabled(client: Client) -> None:
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    # allow_cancellation_requests is False by default
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    result = reserve(quota=1, whole_day=True)
+    assert result.json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Test'
+    ticket_page = formular.form.submit().follow().form.submit().follow()
+    ticket_url = ticket_page.request.url
+
+    client.login_supporter()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen').follow().click(
+        'Ticket abschliessen'
+    )
+    client.logout()
+
+    # cancel link must not appear when cancellation requests are disabled
+    status = client.get(ticket_url)
+    assert 'Stornierung beantragen' not in status
+
+    # direct access to request-cancellation returns 404
+    ticket_obj = TicketCollection(client.app.session()).query().filter_by(
+        handler_code='RSV'
+    ).one()
+    cancel_url = (
+        f'/ticket/{ticket_obj.handler_code}/{ticket_obj.handler_id}'
+        '/request-cancellation'
+    )
+    assert client.get(cancel_url, expect_errors=True).status_int == 404

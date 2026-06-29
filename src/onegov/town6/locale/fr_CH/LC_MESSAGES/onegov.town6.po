@@ -2887,6 +2887,42 @@ msgstr "Vue d'ensemble des notifications push"
 msgid "New Note"
 msgstr "Nouveau commentaire"
 
+msgid "Cancellation requested for 1 reservation."
+msgstr "Demande d'annulation pour 1 réservation."
+
+msgid "Cancellation requested for ${count} reservations."
+msgstr "Demande d'annulation pour ${count} réservations."
+
+msgid "You are about to submit a cancellation request for the following reservations. An administrator will review your request and confirm the cancellation."
+msgstr "Vous êtes sur le point de soumettre une demande d'annulation pour les réservations suivantes. Un administrateur examinera votre demande et confirmera l'annulation."
+
+msgid "Cancellation accepted."
+msgstr "Annulation acceptée."
+
+msgid "A cancellation has been requested for this reservation."
+msgstr "Une annulation a été demandée pour cette réservation."
+
+msgid "Your cancellation request has been accepted. The following reservations have been cancelled:"
+msgstr "Votre demande d'annulation a été acceptée. Les réservations suivantes ont été annulées:"
+
+msgid "${org} Accepted Cancellation"
+msgstr "${org} Annulation acceptée"
+
+msgid "The following reservations have been cancelled:"
+msgstr "Les réservations suivantes ont été annulées:"
+
+msgid "This is a notification for accepted cancellation requests for ${organisation}. If you no longer wish to receive these notifications, please contact an administrator so they can remove you from the recipients list."
+msgstr "Ceci est une notification pour les demandes d'annulation acceptées pour ${organisation}. Si vous ne souhaitez plus recevoir ces notifications, veuillez contacter un administrateur."
+
+msgid "A cancellation request can only be submitted for accepted reservations."
+msgstr "Une demande d'annulation ne peut être soumise que pour des réservations acceptées."
+
+msgid "A cancellation request has already been submitted."
+msgstr "Une demande d'annulation a déjà été soumise."
+
+msgid "A cancellation request cannot be submitted because the payment has already been invoiced or paid."
+msgstr "Une demande d'annulation ne peut pas être soumise car le paiement a déjà été facturé ou payé."
+
 #~ msgid "Topics"
 #~ msgstr "Sujets"
 

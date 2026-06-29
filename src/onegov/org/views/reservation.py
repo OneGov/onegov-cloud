@@ -1092,6 +1092,10 @@ def accept_reservation(
                 origin='internal',
             )
 
+        _cancel_url = (
+            request.link(ticket, 'request-cancellation')
+            if resource.allow_cancellation_requests else None
+        )
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
@@ -1111,6 +1115,7 @@ def accept_reservation(
                 'my_reservations_url': get_my_reservations_url(
                     request, self.email
                 ),
+                'cancel_url': _cancel_url,
             },
             attachments=(
                 Attachment(
@@ -1278,13 +1283,13 @@ def accept_reservation_with_message_from_ticket(
     )
 
 
-@OrgApp.view(model=Reservation, name='reject', permission=Private)
-def reject_reservation(
+def _remove_reservation(
     self: Reservation,
     request: OrgRequest,
     text: str | None = None,
     notify: bool = False,
-    view_ticket: ReservationTicket | None = None
+    view_ticket: ReservationTicket | None = None,
+    change: str = 'rejected',
 ) -> Response | None:
 
     def respond() -> Response | None:
@@ -1346,7 +1351,7 @@ def reject_reservation(
         return respond()
 
     savepoint = transaction.savepoint()
-    ReservationMessage.create(targeted, ticket, request, 'rejected')
+    ReservationMessage.create(targeted, ticket, request, change)
 
     message = None
     if text:
@@ -1359,12 +1364,22 @@ def reject_reservation(
             notify=notify,
             origin='internal')
 
+    if change == 'cancellation_accepted':
+        mail_template = 'mail_cancellation_accepted.pt'
+        mail_subject = reservation_subject(
+            resource.title, targeted,
+            request.translate(_('Cancellation accepted'))
+        )
+    else:
+        mail_template = 'mail_reservation_rejected.pt'
+        mail_subject = reservation_subject(
+            resource.title, targeted, request.translate(_('Rejected'))
+        )
+
     send_ticket_mail(
         request=request,
-        template='mail_reservation_rejected.pt',
-        subject=reservation_subject(
-            resource.title, targeted, request.translate(_('Rejected'))
-        ),
+        template=mail_template,
+        subject=mail_subject,
         receivers=(self.email, ),
         ticket=ticket,
         content={
@@ -1393,22 +1408,32 @@ def reject_reservation(
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
     if submission:
-        title = request.translate(
-            _(
-                '${org} Rejected Reservation',
-                mapping={'org': request.app.org.title},
+        if change == 'cancellation_accepted':
+            notification_template = 'mail_cancelled_reservation_notification'
+            notification_title = request.translate(
+                _(
+                    '${org} Accepted Cancellation',
+                    mapping={'org': request.app.org.title},
+                )
             )
-        )
+        else:
+            notification_template = 'mail_rejected_reservation_notification'
+            notification_title = request.translate(
+                _(
+                    '${org} Rejected Reservation',
+                    mapping={'org': request.app.org.title},
+                )
+            )
 
         form = submission.form_obj
 
         assert hasattr(ticket, 'reference')
         content = render_template(
-            'mail_rejected_reservation_notification',
+            notification_template,
             request,
             {
                 'layout': DefaultMailLayout(object(), request),
-                'title': title,
+                'title': notification_title,
                 'form': form,
                 'model': self,
                 'resource': resource,
@@ -1425,7 +1450,7 @@ def reject_reservation(
             for recipient_addr in recipients_with_mail_for_reservation():
                 yield request.app.prepare_email(
                     receivers=(recipient_addr,),
-                    subject=title,
+                    subject=notification_title,
                     content=content,
                     plaintext=plaintext,
                     category='transactional',
@@ -1488,7 +1513,13 @@ def reject_reservation(
                     log.info('Kaba API error', exc_info=True)
                 failed_to_revoke = True
 
-        if len(targeted) > 1:
+        if change == 'cancellation_accepted':
+            ticket.handler_data = {
+                k: v for k, v in ticket.handler_data.items()
+                if k != 'cancellation_requested'
+            }
+            request.success(_('The cancellation request was accepted.'))
+        elif len(targeted) > 1:
             request.success(_('The reservations were rejected'))
         else:
             request.success(_('The reservation was rejected'))
@@ -1507,6 +1538,14 @@ def reject_reservation(
     return respond()
 
 
+@OrgApp.view(model=Reservation, name='reject', permission=Private)
+def reject_reservation(
+    self: Reservation,
+    request: OrgRequest,
+) -> Response | None:
+    return _remove_reservation(self, request)
+
+
 @OrgApp.view(
     model=ReservationTicket,
     name='reject-reservation',
@@ -1520,7 +1559,7 @@ def reject_reservation_from_ticket(
     if self.handler.deleted:
         raise exc.HTTPNotFound()
 
-    return reject_reservation(
+    return _remove_reservation(
         self.handler.reservations[0],
         request,
         view_ticket=self
@@ -1550,7 +1589,7 @@ def reject_reservation_with_message(
         return request.redirect(request.link(self))
 
     if form.submitted(request):
-        return reject_reservation(
+        return _remove_reservation(
             self, request,
             text=form.text.data,
             notify=form.notify.data if form.notify is not None else True,

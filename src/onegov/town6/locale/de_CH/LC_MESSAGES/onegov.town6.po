@@ -2885,6 +2885,42 @@ msgstr "Übersicht Push-Benachrichtigungen"
 msgid "New Note"
 msgstr "Neue Notiz"
 
+msgid "Cancellation requested for 1 reservation."
+msgstr "Stornierung für 1 Reservation beantragt."
+
+msgid "Cancellation requested for ${count} reservations."
+msgstr "Stornierung für ${count} Reservationen beantragt."
+
+msgid "You are about to submit a cancellation request for the following reservations. An administrator will review your request and confirm the cancellation."
+msgstr "Sie sind dabei, eine Stornierungsanfrage für die folgenden Reservationen einzureichen. Ein Administrator wird Ihre Anfrage prüfen und die Stornierung bestätigen."
+
+msgid "Cancellation accepted."
+msgstr "Stornierung akzeptiert."
+
+msgid "A cancellation has been requested for this reservation."
+msgstr "Für diese Reservation wurde eine Stornierung beantragt."
+
+msgid "Your cancellation request has been accepted. The following reservations have been cancelled:"
+msgstr "Ihre Stornierungsanfrage wurde akzeptiert. Die folgenden Reservationen wurden storniert:"
+
+msgid "${org} Accepted Cancellation"
+msgstr "${org} Stornierung akzeptiert"
+
+msgid "The following reservations have been cancelled:"
+msgstr "Die folgenden Reservationen wurden storniert:"
+
+msgid "This is a notification for accepted cancellation requests for ${organisation}. If you no longer wish to receive these notifications, please contact an administrator so they can remove you from the recipients list."
+msgstr "Dies ist eine Benachrichtigung für akzeptierte Stornierungsanfragen für ${organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten möchten, wenden Sie sich bitte an einen Administrator."
+
+msgid "A cancellation request can only be submitted for accepted reservations."
+msgstr "Eine Stornierungsanfrage kann nur für angenommene Reservationen eingereicht werden."
+
+msgid "A cancellation request has already been submitted."
+msgstr "Eine Stornierungsanfrage wurde bereits eingereicht."
+
+msgid "A cancellation request cannot be submitted because the payment has already been invoiced or paid."
+msgstr "Eine Stornierungsanfrage kann nicht eingereicht werden, da die Zahlung bereits in Rechnung gestellt oder bezahlt wurde."
+
 #~ msgid "Topics"
 #~ msgstr "Themen"
 

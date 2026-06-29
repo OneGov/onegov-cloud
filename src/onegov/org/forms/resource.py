@@ -380,6 +380,12 @@ class ResourceBaseForm(Form):
         ),
     )
 
+    allow_cancellation_requests = BooleanField(
+        label=_('Enable cancel reservation'),
+        fieldset=_('Cancellation'),
+        default=False,
+    )
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type != 'room':

@@ -65,9 +65,13 @@
                     </tal:block>
                 </tal:b>
 
-                <p class="panel" tal:condition="ticket.state == 'closed'" i18n:translate style="text-align: center;">
+                <p class="panel" tal:condition="ticket.state == 'closed' and not cancel_url|nothing" i18n:translate style="text-align: center;">
                     New messages have been disabled because the ticket has been closed.
                 </p>
+                <div class="panel" tal:condition="cancel_url|nothing">
+                    <p i18n:translate>Would you like to cancel your reservation?</p>
+                    <a href="${cancel_url}" class="button alert small" i18n:translate>Request cancellation</a>
+                </div>
 
             </div>
         </div>
