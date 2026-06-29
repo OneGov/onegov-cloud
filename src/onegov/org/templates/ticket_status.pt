@@ -41,7 +41,7 @@
                 <div tal:condition="feed_data"
                     class="timeline"
                         data-feed-data="${feed_data}"
-                        data-feed-order="asc"
+                        data-feed-order="desc"
                         data-feed='static'>
                 </div>
 
