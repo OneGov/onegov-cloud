@@ -685,9 +685,6 @@ def send_admin_notification_for_directory_entry(
     request: OrgRequest,
     is_update: bool = False
 ) -> None:
-    if not directory.notification_address:
-        return
-
     if is_update:
         title = request.translate(_(
             '${org}: Updated Entry "${entry}" in "${directory}"',

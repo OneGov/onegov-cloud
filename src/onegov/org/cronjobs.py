@@ -39,7 +39,8 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from cryptography.fernet import InvalidToken
-from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
+from onegov.org.models import (
+    ExtendedDirectory, ExtendedDirectoryEntry, TicketMessage)
 from onegov.org.notification_service import (
     get_notification_service,
 )
@@ -63,7 +64,7 @@ from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import contains_eager, undefer
 from urllib3.util import Retry
 from uuid import UUID
 
@@ -274,8 +275,10 @@ def handle_directory_admin_notifications(request: OrgRequest) -> None:
     After notifying, notified_hash is updated to content_hash so subsequent
     runs don't re-send for the same content.
     """
-    entries = request.session.query(ExtendedDirectoryEntry).options(
-        joinedload(ExtendedDirectoryEntry.directory)
+    entries = request.session.query(ExtendedDirectoryEntry).join(
+        ExtendedDirectoryEntry.directory
+    ).options(
+        contains_eager(ExtendedDirectoryEntry.directory)
     ).filter(
         ExtendedDirectoryEntry.published,
         ExtendedDirectoryEntry.content_hash.isnot(None),
@@ -283,13 +286,12 @@ def handle_directory_admin_notifications(request: OrgRequest) -> None:
             ExtendedDirectoryEntry.notified_hash.is_(None),
             ExtendedDirectoryEntry.content_hash
             != ExtendedDirectoryEntry.notified_hash
-        )
+        ),
+        ExtendedDirectory.meta['notification_address'].astext.isnot(None),
     )
 
     for entry in entries:
         directory = entry.directory
-        if not directory.notification_address:
-            continue
         is_update = entry.notified_hash is not None
         send_admin_notification_for_directory_entry(
             directory, entry, request, is_update=is_update)
