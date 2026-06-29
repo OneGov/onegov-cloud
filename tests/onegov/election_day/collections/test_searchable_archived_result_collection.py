@@ -127,6 +127,12 @@ def test_searchable_archive(
     archive.domains = ['municipality']
     assert archive.query().count() == 1
 
+    archive.domains = ['@@CX6d3', 'invalid-value']
+    assert archive.query().count() == 11  # invalid values ignored → no filter
+
+    archive.domains = ['federation', '@@CX6d3']
+    assert archive.query().count() == 9  # invalid value stripped, valid kept
+
     # Test voting result
     results = session.query(ArchivedResult).filter_by(type='vote').all()
     for item in results:
