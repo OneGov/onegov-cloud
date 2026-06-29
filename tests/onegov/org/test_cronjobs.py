@@ -2686,6 +2686,7 @@ def test_admin_notification_new_entry(
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
     assert message['To'] == 'admin@example.org'
+    assert 'Neuer Eintrag' in message['Subject']
     assert 'Baugesuche' in message['Subject']
     assert 'Anton' in message['Subject']
     assert 'Anton' in message['TextBody']
@@ -2715,6 +2716,7 @@ def test_admin_notification_new_entry(
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)
     assert message['To'] == 'admin@example.org'
+    assert 'Aktualisierter Eintrag' in message['Subject']
     assert 'Baugesuche' in message['Subject']
     assert 'Anton' in message['Subject']
     assert 'Anton' in message['TextBody']
@@ -2810,6 +2812,7 @@ def test_admin_notification_new_field(
         client.get(get_cronjob_url(job))
     assert len(os.listdir(client.app.maildir)) == 2
     subjects = {client.get_email(i)['Subject'] for i in (0, 1)}
+    assert all('Neuer Eintrag' in s for s in subjects)
     assert any('Anton' in s for s in subjects)
     assert any('Berta' in s for s in subjects)
 
@@ -2825,6 +2828,7 @@ def test_admin_notification_new_field(
 
     assert len(os.listdir(client.app.maildir)) == 4
     subjects = {client.get_email(i)['Subject'] for i in (2, 3)}
+    assert all('Aktualisierter Eintrag' in s for s in subjects)
     assert any('Anton' in s for s in subjects)
     assert any('Berta' in s for s in subjects)
     for i in (2, 3):
