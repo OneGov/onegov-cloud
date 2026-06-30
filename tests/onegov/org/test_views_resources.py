@@ -1000,11 +1000,14 @@ def test_allocation_holidays(client: Client) -> None:
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
 
-    assert len(slots.json) == 4
-    assert slots.json[0]['start'].startswith('2019-07-30')
-    assert slots.json[1]['start'].startswith('2019-07-31')
-    assert slots.json[2]['start'].startswith('2019-08-01')
-    assert slots.json[3]['start'].startswith('2019-08-02')
+    assert len(slots.json) == 5
+    # the first slot is the national holiday
+    assert slots.json[0]['title'] == 'Nationalfeiertag'
+    assert slots.json[0]['start'] == '2019-08-01'
+    assert slots.json[1]['start'].startswith('2019-07-30')
+    assert slots.json[2]['start'].startswith('2019-07-31')
+    assert slots.json[3]['start'].startswith('2019-08-01')
+    assert slots.json[4]['start'].startswith('2019-08-02')
 
     # allocations that are not made during holidays
     page = client.get('/resources').click('Raum')
@@ -1023,10 +1026,12 @@ def test_allocation_holidays(client: Client) -> None:
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
 
-    assert len(slots.json) == 3
-    assert slots.json[0]['start'].startswith('2019-07-30')
-    assert slots.json[1]['start'].startswith('2019-07-31')
-    assert slots.json[2]['start'].startswith('2019-08-02')
+    assert len(slots.json) == 4
+    assert slots.json[0]['title'] == 'Nationalfeiertag'
+    assert slots.json[0]['start'] == '2019-08-01'
+    assert slots.json[1]['start'].startswith('2019-07-30')
+    assert slots.json[2]['start'].startswith('2019-07-31')
+    assert slots.json[3]['start'].startswith('2019-08-02')
 
 
 def test_allocation_school_holidays(client: Client) -> None:
@@ -1053,11 +1058,15 @@ def test_allocation_school_holidays(client: Client) -> None:
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
 
-    assert len(slots.json) == 4
-    assert slots.json[0]['start'].startswith('2019-07-30')
-    assert slots.json[1]['start'].startswith('2019-07-31')
-    assert slots.json[2]['start'].startswith('2019-08-01')
-    assert slots.json[3]['start'].startswith('2019-08-02')
+    assert len(slots.json) == 5
+    # the first slot is the holiday itself
+    assert slots.json[0]['title'] == 'Schulferien'
+    assert slots.json[0]['start'] == '2019-07-31'
+    assert slots.json[0]['end'] == '2019-08-02'
+    assert slots.json[1]['start'].startswith('2019-07-30')
+    assert slots.json[2]['start'].startswith('2019-07-31')
+    assert slots.json[3]['start'].startswith('2019-08-01')
+    assert slots.json[4]['start'].startswith('2019-08-02')
 
     # allocations that are not made during holidays
     page = client.get('/resources').click('Raum')
@@ -1076,9 +1085,12 @@ def test_allocation_school_holidays(client: Client) -> None:
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
 
-    assert len(slots.json) == 2
-    assert slots.json[0]['start'].startswith('2019-07-30')
-    assert slots.json[1]['start'].startswith('2019-08-02')
+    assert len(slots.json) == 3
+    assert slots.json[0]['title'] == 'Schulferien'
+    assert slots.json[0]['start'] == '2019-07-31'
+    assert slots.json[0]['end'] == '2019-08-02'
+    assert slots.json[1]['start'].startswith('2019-07-30')
+    assert slots.json[2]['start'].startswith('2019-08-02')
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -4308,8 +4320,13 @@ def test_allocation_rules_with_holidays(client: Client) -> None:
         s = '2000-01-01'
         e = '2050-01-31'
 
-        return len(client.get(
-            f'/resource/daypass/slots?start={s}&end={e}').json)
+        return sum(
+            1
+            for slot in client.get(
+                f'/resource/daypass/slots?start={s}&end={e}'
+            ).json
+            if slot['kind'] == 'allocation'
+        )
 
     def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
@@ -4360,8 +4377,13 @@ def test_allocation_rules_with_school_holidays(client: Client) -> None:
         s = '2000-01-01'
         e = '2050-01-31'
 
-        return len(client.get(
-            f'/resource/daypass/slots?start={s}&end={e}').json)
+        return sum(
+            1
+            for slot in client.get(
+                f'/resource/daypass/slots?start={s}&end={e}'
+            ).json
+            if slot['kind'] == 'allocation'
+        )
 
     def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')

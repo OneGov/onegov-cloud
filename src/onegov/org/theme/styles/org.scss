@@ -3396,6 +3396,14 @@ button {
             font-size: .9em;
         }
 
+        .fc-daygrid-body-natural .fc-daygrid-day-events {
+            margin-bottom: 0 !important;
+        }
+
+        .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+            min-height: 0;
+        }
+
         .fc-event {
             overflow: hidden;
             border: 0;
@@ -3424,6 +3432,11 @@ button {
 
         .event-available {
             background-color: $green;
+        }
+
+        .event-holiday {
+            background-color: $red;
+            cursor: default !important;
         }
 
         // fix borders missing with zurb foundation
