@@ -30,3 +30,21 @@ def test_view_files(client: Client) -> None:
         expect_errors=True
     )
     assert response.status_code == 400
+
+    # POST with a file field and string as file
+    response = client.post(
+        f'/files/upload?csrf-token={client.csrf_token}&file=foo',
+        expect_errors=True
+    )
+    assert response.status_code == 400
+
+    # POST with unsupported media type.
+    # Content type is detected from file bytes by python-magic, not the
+    # filename. MZ magic bytes are identified as application/x-dosexec
+    # which is not in the whitelist.
+    response = client.post(
+        f'/files/upload?csrf-token={client.csrf_token}',
+        {'file': Upload('payload.exe', b'MZ\x90\x00' + b'\x00' * 60)},
+        expect_errors=True
+    )
+    assert response.status_code == 415
