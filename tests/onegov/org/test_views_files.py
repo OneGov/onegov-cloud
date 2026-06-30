@@ -23,3 +23,10 @@ def test_view_files(client: Client) -> None:
     files_page = client.get('/files')
     assert "Noch keine Dateien hochgeladen" not in files_page
     assert 'Test.txt' in files_page
+
+    # POST without a file field
+    response = client.post(
+        f'/files/upload?csrf-token={client.csrf_token}',
+        expect_errors=True
+    )
+    assert response.status_code == 400
