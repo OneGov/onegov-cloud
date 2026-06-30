@@ -9,7 +9,7 @@ import pytz
 
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from email.headerregistry import Address
 from functools import lru_cache
@@ -666,6 +666,7 @@ class AllocationEventInfo:
             'id': self.allocation.id,
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'title': self.event_title,
             'classNames': list(self.event_classes),
             'display': 'block',
@@ -681,6 +682,84 @@ class AllocationEventInfo:
             ],
             'editurl': self.request.link(self.allocation, name='edit'),
             'reserveurl': self.request.link(self.allocation, name='reserve')
+        }
+
+
+class HolidayEventInfo:
+
+    __slots__ = (
+        'start',
+        'end',
+        'title',
+        'request'
+    )
+
+    def __init__(
+        self,
+        start: date,
+        end: date | None,
+        title: str,
+        request: OrgRequest
+    ) -> None:
+
+        self.start = start
+        self.end = end
+        self.title = request.translate(title)
+        self.request = request
+
+    @classmethod
+    def from_request(
+        cls,
+        request: OrgRequest,
+        start: date,
+        end: date
+    ) -> Iterator[Self]:
+
+        for holiday_start, holiday_end in request.app.org.school_holidays:
+            if sedate.overlaps(
+                holiday_start, holiday_end,
+                start, end
+            ):
+                yield cls(
+                    holiday_start,
+                    holiday_end,
+                    _('School holidays'),
+                    request
+                )
+
+        for holiday_date, descriptions in request.app.org.holidays.between(
+            start,
+            end
+        ):
+            yield cls(
+                holiday_date,
+                None,
+                '\n'.join(descriptions),
+                request
+            )
+
+    @property
+    def event_start(self) -> str:
+        return self.start.isoformat()
+
+    @property
+    def event_end(self) -> str:
+        end = (self.end or self.start)
+        # NOTE: FullCalendar end is exclusive, but ours is inclusive
+        #       so we need to add a day.
+        return (end + timedelta(days=1)).isoformat()
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            'start': self.event_start,
+            'end': self.event_end,
+            'allDay': True,
+            'title': self.title,
+            'editable': False,
+            'classNames': ['event-holiday'],
+            'display': 'block',
+            # extended properties
+            'kind': 'holiday',
         }
 
 
@@ -735,6 +814,7 @@ class AvailabilityEventInfo:
             'id': self.allocation.id,
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'editable': False,
             'display': 'background',
             # extended properties
@@ -836,6 +916,7 @@ class BlockerEventInfo:
             'id': f'blocker-{self.blocker.id}',
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'title': title,
             'editable': editable,
             'classNames': ['event-blocker', *self.css_classes],
@@ -1027,6 +1108,7 @@ class ReservationEventInfo:
             'id': self.reservation.id,
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'backgroundColor': self.color,
             'title': self.event_title,
             'classNames': list(self.event_classes),
@@ -1150,6 +1232,7 @@ class MyReservationEventInfo:
             'id': self.id,
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'title': self.event_title,
             'classNames': list(self.event_classes),
             'url': self.request.class_link(

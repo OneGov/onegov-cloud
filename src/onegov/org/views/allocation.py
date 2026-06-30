@@ -56,6 +56,8 @@ if TYPE_CHECKING:
 def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the allocations in a fullcalendar compatible events feed.
 
+    This also includes events for national/cantonal/school holidays.
+
     See `<https://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
     more information.
 
@@ -66,10 +68,19 @@ def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         return ()
 
-    return tuple(
-        e.as_dict() for e in utils.AllocationEventInfo.from_resource_by_range(
-            request, self, start, end
-        )
+    return (
+        *(
+            event.as_dict()
+            for event in utils.HolidayEventInfo.from_request(
+                request, start.date(), end.date()
+            )
+        ),
+        *(
+            event.as_dict()
+            for event in utils.AllocationEventInfo.from_resource_by_range(
+                request, self, start, end
+            )
+        ),
     )
 
 

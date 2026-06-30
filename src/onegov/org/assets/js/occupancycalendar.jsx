@@ -631,6 +631,10 @@ oc.highlightEvents = function(event, element, view) {
         return;
     }
 
+    if (event.extendedProps.kind !== 'reservation') {
+        return;
+    }
+
     if (min <= event.id && event.id <= max) {
         $(element).addClass('highlight');
     }
