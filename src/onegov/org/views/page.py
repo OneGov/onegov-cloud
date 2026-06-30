@@ -11,7 +11,6 @@ from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
 from onegov.core.utils import append_query_param
 from onegov.org import _, OrgApp
-from onegov.org.app import get_i18n_default_locale
 from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
@@ -179,7 +178,11 @@ def view_news_collection(
                 query_params={'format': 'rss'}
             ) if next_page else None,
             feed_title=request.domain + ' News',
-            language=request.app.org.locales or get_i18n_default_locale(),
+            language=(
+                request.app.org.locales
+                or request.app.default_locale
+                or 'de_CH'
+            ),
         )
         return Response(
             rss_str,

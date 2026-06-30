@@ -77,8 +77,8 @@ def test_news(client: Client) -> None:
     assert "It is lots of fun" not in page.text
     assert '<language>' in page.text
 
-    # RSS feed must not crash when org has no locales configured
-    client.app.org.locales = None
+    # RSS feed must not crash when org has no locales configured (KeyError)
+    client.app.org.meta.pop('locales', None)
     transaction.commit()
     page = client.get('/news?format=rss')
     assert '<language>de_CH</language>' in page.text
