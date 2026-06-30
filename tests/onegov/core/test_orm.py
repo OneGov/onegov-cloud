@@ -24,6 +24,7 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import StripWhitespaceMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm import orm_cached, request_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime
@@ -33,10 +34,12 @@ from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sedate import utcnow
-from sqlalchemy import and_, func, inspect, select, text, ForeignKey, Integer
+from sqlalchemy import (
+    and_, event, func, inspect, select, text, ForeignKey, Integer
+)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import mapped_column, registry, relationship
+from sqlalchemy.orm import mapped_column, registry, relationship, validates
 from sqlalchemy.orm import DeclarativeBase, Mapped
 from sqlalchemy_utils import aggregated
 from threading import Thread
@@ -171,6 +174,37 @@ def test_create_schema(postgres_dsn: str) -> None:
 
     assert 'new' in existing_schemas()
     assert 'document' in schema_tables('new')
+
+    mgr.dispose()
+
+
+def test_schema_init_query_count(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    # create enough tables so the difference between O(1) and O(N) is clear
+    for i in range(20):
+        type(f'Table{i}', (Base,), {
+            '__tablename__': f'table_{i}',
+            'id': mapped_column(Integer, primary_key=True),
+        })
+
+    mgr = SessionManager(postgres_dsn, Base)
+
+    query_count = 0
+
+    def count_queries(*args: Any, **kwargs: Any) -> None:
+        nonlocal query_count
+        query_count += 1
+
+    event.listen(mgr.engine, 'before_cursor_execute', count_queries)
+    mgr.ensure_schema_exists('test_query_count')
+
+    table_count = len(Base.metadata.sorted_tables)
+    # O(1) implementation: fixed overhead + 1 get_table_names call
+    # O(N) implementation: fixed overhead + 1 has_table call per table
+    print('query count:', query_count, 'table count:', table_count)
+    assert query_count < 2 * table_count
 
     mgr.dispose()
 
@@ -2426,3 +2460,39 @@ def test_postgres_timezone(postgres_dsn: str) -> None:
         ALTER DATABASE onegov SET timezone TO 'UTC';
     to change the default timezone, then restart postgres service.
     """
+
+
+def test_strip_whitespace_mixin(postgres_dsn: str) -> None:
+
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    class Record(Base, StripWhitespaceMixin):
+        __tablename__ = 'records'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        first_name: Mapped[str]
+        last_name: Mapped[str]
+        city: Mapped[str | None]
+
+        @validates('first_name', 'last_name', 'city')
+        def strip_names(self, key: str, value: str | None) -> str | None:
+            return super().strip_names(key, value)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+    session = mgr.session()
+
+    rec = Record(first_name=' Alice ', last_name='Smith ', city=' Bern ')
+    session.add(rec)
+    session.flush()
+
+    assert rec.first_name == 'Alice'
+    assert rec.last_name == 'Smith'
+    assert rec.city == 'Bern'
+
+    rec.first_name = '  Bob  '
+    rec.last_name = ''
+    rec.city = None
+    assert rec.first_name == 'Bob'
+    assert rec.last_name == ''
+    assert rec.city is None

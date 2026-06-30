@@ -22,6 +22,10 @@
     <!--! To be override by other applications -->
 </metal:b>
 
+<metal:b define-macro="before_occurrence_lead">
+    <!--! To be override by other applications -->
+</metal:b>
+
 <metal:b define-macro="extra_usermanagement_fields">
     <!--! To be override by other applications -->
 </metal:b>
@@ -617,7 +621,7 @@
         <metal:newlist use-macro="layout.macros['news-item-full']" tal:define="heading 'h4'" />
     </div>
     <div class="newslist grid-x align-center">
-        <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All articles</span></a>
+        <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All posts</span></a>
     </div>
 </metal:newslist>
 
@@ -880,7 +884,7 @@
             <div class="small-12 medium-7 cell page-content-main content">
                 <div class="theiaStickySidebar">
                     <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
-
+                    <div metal:define-slot="before-lead"></div>
                     <div class="limit-line-width">
                         <span class="page-lead h5" tal:condition="lead" tal:content="lead" />
                     </div>

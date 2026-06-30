@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-04-16 09:07+0200\n"
+"POT-Creation-Date: 2026-06-22 07:44+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -16,14 +16,20 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Lingua 3.12\n"
 
-msgid "Events"
-msgstr "Événements"
+msgid "Meetings"
+msgstr "Réunions"
 
-msgid "Latest news"
-msgstr "Dernières nouvelles"
+msgid "Political Businesses"
+msgstr "Affaires politiques"
 
-msgid "Topics"
-msgstr "Sujets"
+msgid "Parliamentarians"
+msgstr "Parlementaires"
+
+msgid "Commissions"
+msgstr "Commissions"
+
+msgid "Parliamentary groups"
+msgstr "Groupes Parlementaires"
 
 msgid "Chats"
 msgstr "Chats"
@@ -207,6 +213,9 @@ msgstr "Activer le système d'information du conseil (RIS)"
 msgid "Enables the RIS integration for this organisation."
 msgstr "Active l'intégration RIS pour cette organisation."
 
+msgid "Events"
+msgstr "Événements"
+
 msgid "All events"
 msgstr "Tous les événements"
 
@@ -329,9 +338,6 @@ msgstr "Fichiers"
 msgid "Chat Archive"
 msgstr "Archives des chats"
 
-msgid "Meetings"
-msgstr "Réunions"
-
 msgid "Meeting"
 msgstr "Réunion"
 
@@ -346,9 +352,6 @@ msgstr "Cela ne peut être effectué."
 
 msgid "Delete meeting"
 msgstr "Supprimer la réunion"
-
-msgid "Parliamentarians"
-msgstr "Parlementaires"
 
 msgid "Parliamentarian"
 msgstr "Parlementaire"
@@ -371,9 +374,6 @@ msgstr "Voulez-vous vraiment supprimer ce rôle ?"
 msgid "Remove role"
 msgstr "Supprimer le rôle"
 
-msgid "Parliamentary groups"
-msgstr "Groupes Parlementaires"
-
 msgid "Parliamentary group"
 msgstr "Groupe Parlementaire"
 
@@ -389,9 +389,6 @@ msgstr "Partis politiques"
 msgid "Political Party"
 msgstr "Parti"
 
-msgid "Commissions"
-msgstr "Commissions"
-
 msgid "Commission"
 msgstr "Commission"
 
@@ -400,9 +397,6 @@ msgstr "Voulez-vous vraiment supprimer cette commission ?"
 
 msgid "Delete commission"
 msgstr "Supprimer la commission"
-
-msgid "Political Businesses"
-msgstr "Affaires politiques"
 
 msgid "Political Business"
 msgstr "Business politique"
@@ -502,14 +496,14 @@ msgstr "Aucun chat actif."
 msgid "Contact"
 msgstr "Contact"
 
+msgid "Filters"
+msgstr "Filtres"
+
 msgid "Function"
 msgstr "Fonction"
 
 msgid "No active commissions."
 msgstr "Aucune commission active."
-
-msgid "Filters"
-msgstr "Filtres"
 
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
@@ -549,6 +543,9 @@ msgstr "Plus de renseignements"
 
 msgid "Propose a change to this entry"
 msgstr "Proposer une modification pour cette entrée"
+
+msgid "Hash"
+msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
@@ -825,8 +822,8 @@ msgstr "Déposez des fichiers pour télécharger"
 msgid "read more"
 msgstr "en savoir plus"
 
-msgid "All articles"
-msgstr "Toutes les contributions"
+msgid "All posts"
+msgstr "Toutes les publications"
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
@@ -1488,8 +1485,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -1666,6 +1663,9 @@ msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Pour utiliser votre compte, vous aurez besoin de la Yubikey avec le numéro "
 "de série ${number}"
+
+msgid "Latest news"
+msgstr "Dernières nouvelles"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -2610,6 +2610,9 @@ msgstr "Archiver"
 msgid "Archive selected"
 msgstr "Archiver la sélection"
 
+msgid "Internal Comments"
+msgstr "Commentaires internes"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -2883,6 +2886,9 @@ msgstr "Vue d'ensemble des notifications push"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Topics"
+#~ msgstr "Sujets"
 
 #~ msgid "Activate/deactivate modules"
 #~ msgstr "Activer/désactiver les modules"

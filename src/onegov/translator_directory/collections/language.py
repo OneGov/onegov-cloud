@@ -53,10 +53,7 @@ class LanguageCollection(GenericCollection[Language], Pagination[Language]):
 
     @cached_property
     def used_letters(self) -> list[str]:
-        """ Returns a list of all the distinct first letters of the peoples
-        last names.
-
-        """
+        """ All distinct first letters of the languages' names. """
         letter = func.left(Language.name, 1)
         letter = func.unaccent(letter)
         query = self.session.query(letter.distinct().label('letter'))

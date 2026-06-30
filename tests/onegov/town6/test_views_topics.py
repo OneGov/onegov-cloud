@@ -23,8 +23,12 @@ def test_sort_topics(client: Client) -> None:
     page = page.click('Sortieren')
     page = page.follow()
 
+    # Ensure no edit mode links
+    assert "Speichern" not in page
+    assert "Abbrechen" not in page
     assert "Topic 1" in page
     assert "Topic 2" in page
+    assert "Zurück zur Seite" in page
 
 
 def get_select_option_id_by_text(
@@ -105,6 +109,37 @@ def test_move_topics(client: Client) -> None:
     assert page.pyquery('.alert')
     assert page.pyquery('.error')
     assert 'Ungültiger Zielort gewählt' in page
+
+
+def test_topic_keywords(client: Client) -> None:
+    client.login_admin()
+
+    page = client.get('/topics/themen')
+    new_page = page.click('Thema')
+    new_page.form['title'] = "Einwohnerdienste"
+    new_page.form['keywords'] = "Einwohnerkontrolle,Einwohneramt"
+    page = new_page.form.submit().follow()
+    assert 'Einwohnerdienste' in page
+
+    edit_page = page.click('Bearbeiten')
+    assert 'Einwohnerkontrolle' in edit_page
+    assert 'Einwohneramt' in edit_page
+
+    # keywords meta tag is rendered in the HTML head
+    keywords_meta = edit_page.pyquery(
+        "meta[name='keywords']"
+    )
+    assert not keywords_meta  # edit page has no model meta tags
+
+    page = client.get('/topics/themen/einwohnerdienste')
+    keywords_meta = page.pyquery("meta[name='keywords']")
+    assert keywords_meta
+    assert 'Einwohnerkontrolle' in keywords_meta.attr('content')
+    assert 'Einwohneramt' in keywords_meta.attr('content')
+
+    # keywords field is absent when editing news
+    news = client.get('/news').click('Nachricht')
+    assert 'keywords' not in news.form.fields
 
 
 def test_contact_info_visible(client: Client) -> None:

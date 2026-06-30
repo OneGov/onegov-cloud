@@ -542,10 +542,11 @@ def send_monthly_ticket_statistics(request: OrgRequest) -> None:
         )
 
 
-@OrgApp.cronjob(hour=6, minute=5, timezone='Europe/Zurich')
+@OrgApp.cronjob(hour='*', minute='*/5', timezone='Europe/Zurich')
 def send_daily_resource_usage_overview(request: OrgRequest) -> None:
     today = to_timezone(utcnow(), 'Europe/Zurich')
     weekday = WEEKDAYS[today.weekday()]
+    current_time = f'{today.hour:02d}:{today.minute:02d}'
 
     # get all recipients which require an e-mail today
     recipients_q = (
@@ -561,11 +562,13 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
 
     # If the key 'daily_reservations' doesn't exist, the recipient was
     # created before anything else was an option, therefore it must be true
+    # Legacy recipients without 'daily_reservations_times' default to 06:00.
     recipients = [
         (address, content['resources'])
         for address, content in recipients_q
         if content.get('daily_reservations', True)
         and weekday in content['send_on']
+        and current_time in content.get('daily_reservations_times', ['06:00'])
     ]
 
     if not recipients:

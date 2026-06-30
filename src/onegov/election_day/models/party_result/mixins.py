@@ -83,9 +83,9 @@ class HistoricalPartyResultsMixin:
 
     @property
     def historical_party_results(self) -> list[PartyResult]:
-        """ Returns the party results while adding party results from the last
-        legislative period, Requires that a related election or compound has
-        been set with type "historical".
+        """ The party results, augmented with results from the last legislative
+        period. Requires that a related election or compound has been set with
+        type "historical".
 
         """
 

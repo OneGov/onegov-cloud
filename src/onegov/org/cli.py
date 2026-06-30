@@ -17,6 +17,7 @@ import transaction
 import yaml
 
 from collections import defaultdict
+from itertools import chain
 from datetime import date, datetime, timedelta
 from io import BytesIO
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
@@ -762,33 +763,69 @@ def fetch(
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
 
-                added, updated, purged = local_events.from_import(
-                    remote_events(),
-                    to_purge=[f'fetch-{key}'],
-                    publish_immediately=False,
-                    valid_state_transfers=valid_state_transfers,
-                    published_only=published_only
-                )
+                with app.session_manager.disable_change_signals():
+                    added, updated, purged = local_events.from_import(
+                        remote_events(),
+                        to_purge=[f'fetch-{key}'],
+                        publish_immediately=False,
+                        valid_state_transfers=valid_state_transfers,
+                        published_only=published_only,
+                    )
 
-                for event_ in added:
-                    event_.submit()
-                    if not create_tickets:
-                        event_.publish()
-                        continue
+                    for event_ in added:
+                        event_.submit()
+                        if not create_tickets:
+                            event_.publish()
+                            continue
 
-                    assert local_admin is not None
-                    with local_session.no_autoflush:
-                        tickets = TicketCollection(local_session)
-                        new_ticket = tickets.open_ticket(
-                            handler_code='EVN', handler_id=event_.id.hex,
-                            source=event_.meta['source'],
-                            user=local_admin.username
+                        assert local_admin is not None
+                        with local_session.no_autoflush:
+                            tickets = TicketCollection(local_session)
+                            new_ticket = tickets.open_ticket(
+                                handler_code='EVN',
+                                handler_id=event_.id.hex,
+                                source=event_.meta['source'],
+                                user=local_admin.username,
+                            )
+                            new_ticket.muted = True
+                            TicketNote.create(
+                                new_ticket,
+                                request,
+                                (f'Importiert von Instanz {key}'),
+                                owner=local_admin.username,
+                            )
+
+                if getattr(app, 'fts_search_enabled', False):
+                    if added or updated:
+                        app.fts_indexer.process(
+                            (
+                                task
+                                for event_ in chain(added, updated)
+                                if (
+                                    task := app.fts_orm_events.index_task(
+                                        local_schema,
+                                        event_,
+                                    )
+                                )
+                                is not None
+                            ),
+                            local_session,
                         )
-                        new_ticket.muted = True
-                        TicketNote.create(new_ticket, request, (
-                            f'Importiert von Instanz {key}'
-
-                        ), owner=local_admin.username)
+                    if purged:
+                        app.fts_indexer.process(
+                            (
+                                {
+                                    'action': 'delete',
+                                    'schema': local_schema,
+                                    'tablename': 'events',
+                                    'owner_type': 'Event',
+                                    'id': eid,
+                                }
+                                for eid in purged
+                            ),
+                            local_session,
+                        )
+                    local_session.flush()
 
                 helper_request: OrgRequest = Bunch(  # type:ignore
                     current_username=local_admin and local_admin.username,
@@ -871,6 +908,66 @@ def fix_directory_files(
                 f'{app.schema} - {count} files adapted with type `directory`',
                 fg='green'
             )
+    return execute
+
+
+@cli.command('fix-submission-file-sizes')
+@pass_group_context
+def fix_submission_file_sizes(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    Updates the file size stored in form submission data to reflect the
+    actual stored size (after resizing/compression) rather than the original
+    upload size.
+
+        `onegov-org --select /onegov_org/* fix-submission-file-sizes`
+        `onegov-org --select /onegov_town6/* fix-submission-file-sizes`
+
+    """
+
+    def file_dicts(data: dict[str, object]) -> list[dict[str, object]]:
+        """ Yields all single-file and multi-file dicts from submission
+        data."""
+        result = []
+        for value in data.values():
+            if isinstance(value, dict):
+                result.append(value)
+            elif isinstance(value, list):
+                result.extend(item for item in value if isinstance(item, dict))
+        return result
+
+    def execute(request: OrgRequest, app: OrgApp) -> None:
+        count = 0
+        for submission in request.session.query(FormSubmission).all():
+            changed = False
+            for file_dict in file_dicts(submission.data):
+                ref = file_dict.get('data', '')
+                if not isinstance(ref, str) or not ref.startswith('@'):
+                    continue
+                file = request.session.query(File).filter_by(
+                    id=ref[1:]
+                ).first()
+                if file is None:
+                    continue
+                try:
+                    actual_size = file.reference.file.content_length
+                except OSError:
+                    continue
+                if file_dict.get('size') == actual_size:
+                    continue
+                file_dict['size'] = actual_size
+                changed = True
+                count += 1
+
+            if changed:
+                submission.data.changed()  # type:ignore[attr-defined]
+
+        click.secho(
+            f'{app.schema} - updated sizes for {count} file field(s)',
+            fg='green'
+        )
+
     return execute
 
 

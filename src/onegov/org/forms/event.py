@@ -20,8 +20,10 @@ from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.utils import get_fields_from_class
+from onegov.file.attachments import IMAGE_MAX_SIZE
 from onegov.form.validators import (
     FileSizeLimit,
+    ImageSizeLimit,
     ValidPhoneNumber,
     ValidFilterFormDefinition,
     MIME_TYPES_EXCEL,
@@ -128,7 +130,8 @@ class EventForm(Form):
         file_class=EventFile,
         validators=[
             Optional(),
-            FileSizeLimit(5 * 1024 * 1024)
+            ImageSizeLimit(
+                max_bytes=5 * 1024 * 1024, max_dimensions=IMAGE_MAX_SIZE)
         ],
         allowed_mimetypes=(
             'image/gif',

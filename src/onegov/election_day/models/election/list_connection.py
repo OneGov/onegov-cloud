@@ -73,13 +73,13 @@ class ListConnection(Base, TimestampMixin):
 
     @property
     def total_votes(self) -> int:
-        """ Returns the total number of votes. """
+        """ The total number of votes. """
 
         return self.votes + sum(child.total_votes for child in self.children)
 
     @property
     def total_number_of_mandates(self) -> int:
-        """ Returns the total number of mandates. """
+        """ The total number of mandates. """
 
         return self.number_of_mandates + sum(
             child.total_number_of_mandates for child in self.children

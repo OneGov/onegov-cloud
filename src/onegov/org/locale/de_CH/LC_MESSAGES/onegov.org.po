@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-05-13 10:36+0200\n"
+"POT-Creation-Date: 2026-06-23 10:57+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -35,6 +35,15 @@ msgstr "Aktuelles"
 
 msgid "Topics"
 msgstr "Themen"
+
+msgid "Forms"
+msgstr "Formulare"
+
+msgid "Resources"
+msgstr "Reservationen"
+
+msgid "People"
+msgstr "Personen"
 
 msgid "Important information regarding online payments"
 msgstr "Wichtige Information bezüglich Online-Zahlungen"
@@ -232,12 +241,6 @@ msgstr "Newsletter"
 
 msgid "Directories"
 msgstr "Verzeichnisse"
-
-msgid "People"
-msgstr "Personen"
-
-msgid "Forms"
-msgstr "Formulare"
 
 msgid "Surveys"
 msgstr "Umfragen"
@@ -1432,11 +1435,18 @@ msgstr ""
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
+msgid "Keywords"
+msgstr "Schlagworte"
+
+msgid ""
+"Additional search terms and synonyms for this page. Helps visitors find this "
+"page even if they use different words."
+msgstr ""
+"Zusätzliche Suchbegriffe und Synonyme für diese Seite. Hilft Besuchern, "
+"diese Seite zu finden, auch wenn sie andere Wörter verwenden."
+
 msgid "Show the lead if accessing the parent page"
 msgstr "Zeige Einleitung auf übergeordneter Seite"
-
-msgid "(Redesign only)"
-msgstr "(verfügbar im Redesign)"
 
 msgid ""
 "There are currently no allowed domains for iFrames. To enable domains for "
@@ -1965,11 +1975,10 @@ msgstr "Tägliche Reservationen"
 
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
-"be sent to the recipient above at 06:00."
+"be sent to the recipient above."
 msgstr ""
 "An jedem unten ausgewählten Tag wird eine Benachrichtigung mit den "
-"Reservierungen des Tages um 06:00 Uhr an den oben genannten Empfänger "
-"gesendet."
+"Reservierungen des Tages an den oben genannten Empfänger gesendet."
 
 msgid "Customer Messages"
 msgstr "Kunden Nachrichten"
@@ -2006,11 +2015,31 @@ msgstr ""
 msgid "Send on"
 msgstr "Senden am"
 
-msgid "Resources"
-msgstr "Reservationen"
+msgid "Delivery Times"
+msgstr "Zustellungszeiten"
+
+msgid "e.g. 07:05"
+msgstr "z.B. 07:05"
+
+#. type: ignore[attr-defined]
+msgid "Please enter at least one delivery time."
+msgstr "Bitte mindestens eine Zustellungszeit eingeben."
+
+#. type: ignore[attr-defined]
+#, python-format
+msgid "Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
+msgstr ""
+"Ungültige Zeit \"${time}\". Bitte im Format HH:MM eingeben (z.B. 06:00)."
+
+#. type: ignore[attr-defined]
+msgid "Minutes must be a multiple of 5 (e.g. 06:10, 16:35)."
+msgstr "Minuten müssen ein Vielfaches von 5 sein (z.B. 06:10, 16:35)."
 
 msgid "Please add at least one notification."
 msgstr "Bitte wählen sie mindestens eine Benachrichtigung."
+
+msgid "Application Description"
+msgstr "Beschreibung der Applikation"
 
 msgid "Languages"
 msgstr "Sprachen"
@@ -2023,6 +2052,13 @@ msgstr "Französisch"
 
 msgid "Italian"
 msgstr "Italienisch"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
+"Grösse beträgt 1200:630px."
 
 msgid "Logo"
 msgstr "Logo"
@@ -2047,13 +2083,6 @@ msgstr "Icon 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icon SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Bild für die Social Media Link-Vorschau (Rückfalloption). Die optimale "
-"Grösse beträgt 1200:630px."
 
 msgid "Primary Color"
 msgstr "Primärfarbe"
@@ -3722,9 +3751,6 @@ msgstr "Der Eintrag wurde übernommen"
 msgid "The entry is not valid, please adjust it"
 msgstr "Der Eintrag ist nicht gültig, bitte korrigieren"
 
-msgid "An entry with this name already exists"
-msgstr "Ein Eintrag mit diesem Namen existiert bereits"
-
 msgid "Your directory submission has been adopted"
 msgstr "Ihr Verzeichniseintrag wurde übernommen"
 
@@ -3893,6 +3919,12 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Inhalt löschen"
+
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
+
+msgid "Administrative"
+msgstr "Administrativ"
 
 msgid "Photo album"
 msgstr "Fotoalbum"
@@ -4369,8 +4401,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -4463,6 +4495,16 @@ msgstr "Änderung vorschlagen"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
+
+msgid ""
+"Fingerprint of the entry's content. Changes whenever the entry data is "
+"modified."
+msgstr ""
+"Prüfsumme des Eintraginhalts. Ändert sich, wenn die Eintragsdaten geändert "
+"werden."
+
+msgid "Hash"
+msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
@@ -5185,8 +5227,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -5735,9 +5777,6 @@ msgstr ""
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
 
-msgid "Back"
-msgstr "Zurück"
-
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
@@ -5803,6 +5842,15 @@ msgstr "Organisation wählen"
 
 msgid "Select sub organisation"
 msgstr "Unterorganisation wählen"
+
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Nach Organisation oder Unterorganisation filtern"
+
+msgid "Search people"
+msgstr "Personen suchen"
+
+msgid "No people added yet."
+msgstr "Noch keine Personen erfasst."
 
 msgid "No people found for current filter selection."
 msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
@@ -6343,8 +6391,8 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -6530,13 +6578,6 @@ msgstr "Kunden-Login bestätigen"
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
-
-msgid "Administrative"
-msgstr "Administrativ"
-
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "Der Eintrag ${name} existiert zweimal"
 
 msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
@@ -7411,6 +7452,9 @@ msgstr "Neue Termine für ${title}"
 msgid "Confirm your reservation"
 msgstr "Bestätigen Sie Ihre Reservation"
 
+msgid "Request"
+msgstr "Anfrage"
+
 #. by default we will redirect to the created ticket
 msgid "Thank you for your reservation!"
 msgstr "Vielen Dank für Ihre Reservation!"
@@ -7432,8 +7476,8 @@ msgstr ""
 "${site_id} ist fehlgeschlagen. Bitte stellen Sie sicher, dass die "
 "hinterlegten Zugangsdaten immer noch gültig sind."
 
-msgid "Your reservations were accepted"
-msgstr "Ihre Reservationen wurden bestätigt"
+msgid "Accepted"
+msgstr "Angenommen"
 
 #, python-format
 msgid "Reservation(s) confirmed ${org} ${resource}"
@@ -7468,9 +7512,6 @@ msgid ""
 msgstr ""
 "Die mit der Reservation verknüpfte Zahlung muss rückgängig gemacht werden "
 "bevor die Reservation gelöscht werden kann"
-
-msgid "The following reservations were rejected"
-msgstr "Die folgenden Reservationen wurden abgelehnt"
 
 #, python-format
 msgid "${org} Rejected Reservation"

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import StripWhitespaceMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.mixins import content_property
@@ -12,6 +13,7 @@ from onegov.search import ORMSearchable
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import validates
 from sqlalchemy.orm import DynamicMapped
 from sqlalchemy.orm import Mapped
 from translationstring import TranslationString
@@ -27,9 +29,15 @@ if TYPE_CHECKING:
     from vobject.base import Component
 
 
-class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
-             UTCPublicationMixin):
-    """ A person. """
+class Person(
+    Base,
+    StripWhitespaceMixin,
+    ContentMixin,
+    TimestampMixin,
+    ORMSearchable,
+    UTCPublicationMixin,
+):
+    """A person."""
 
     __tablename__ = 'people'
 
@@ -67,6 +75,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     def fts_last_change(self) -> None:
         return None
 
+    @validates('first_name', 'last_name', 'function')
+    def strip_names(self, key: str, value: str | None) -> str | None:
+        return super().strip_names(key, value)
+
     @property
     def phone_fts(self) -> list[str]:
         numbers = (self.phone, self.phone_direct)
@@ -74,13 +86,12 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def title(self) -> str:
-        """ Returns the Eastern-ordered name. """
+        """The Eastern-ordered name."""
         return f'{self.last_name} {self.first_name}'
 
     @property
     def spoken_title(self) -> str:
-        """ Returns the Western-ordered name. Includes the academic title if
-        available.
+        """The Western-ordered name. Includes the academic title if available.
 
         """
         parts = []
@@ -92,10 +103,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return ' '.join(parts)
 
     #: the unique id, part of the url
-    id: Mapped[UUID] = mapped_column(
-        primary_key=True,
-        default=uuid4
-    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
     #: the salutation used for the person
     salutation: Mapped[str | None]
@@ -122,7 +130,8 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     organisation: Mapped[str | None]
 
     #: multiple organisations the person belongs to
-    organisations_multiple: dict_property[list[str] | None] = content_property(
+    organisations_multiple: dict_property[list[str] | None] = (
+        content_property()
     )
 
     # a sub organisation the person belongs to
@@ -181,9 +190,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     def vcard_object(
         self,
         exclude: Collection[str] | None = None,
-        include_memberships: bool = True
+        include_memberships: bool = True,
     ) -> Component:
-        """ Returns the person as vCard (3.0) object.
+        """Returns the person as vCard (3.0) object.
 
         Allows to specify the included attributes, provides a reasonable
         default if none are specified. Always includes the first and last
@@ -263,23 +272,29 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line.value = self.website
 
         if (
-            'postal_address' not in exclude and self.postal_address
-            and 'postal_code_city' not in exclude and self.postal_code_city
+            'postal_address' not in exclude
+            and self.postal_address
+            and 'postal_code_city' not in exclude
+            and self.postal_code_city
         ):
             line = result.add('adr')
             code, city = split_code_from_city(self.postal_code_city)
-            line.value = Address(street=self.postal_address,
-                                 code=code, city=city)
+            line.value = Address(
+                street=self.postal_address, code=code, city=city
+            )
             line.charset_param = 'utf-8'
 
         if (
-            'location_address' not in exclude and self.location_address
-            and 'location_code_city' not in exclude and self.location_code_city
+            'location_address' not in exclude
+            and self.location_address
+            and 'location_code_city' not in exclude
+            and self.location_code_city
         ):
             line = result.add('adr')
             code, city = split_code_from_city(self.location_code_city)
-            line.value = Address(street=self.location_address,
-                                 code=code, city=city)
+            line.value = Address(
+                street=self.location_address, code=code, city=city
+            )
             line.charset_param = 'utf-8'
 
         if 'notes' not in exclude and self.notes:
@@ -287,12 +302,15 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line.value = self.notes
             line.charset_param = 'utf-8'
 
-        if include_memberships and (memberships := [
-            f'{m.agency.title}, {m.title}' for m in self.memberships.options(
-                # eagerly load the agency along with the membership
-                joinedload(AgencyMembership.agency)
-            )
-        ]):
+        if include_memberships and (
+            memberships := [
+                f'{m.agency.title}, {m.title}'
+                for m in self.memberships.options(
+                    # eagerly load the agency along with the membership
+                    joinedload(AgencyMembership.agency)
+                )
+            ]
+        ):
             line = result.add('org')
             line.value = ['; '.join(memberships)]
             line.charset_param = 'utf-8'
@@ -300,7 +318,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return result
 
     def vcard(self, exclude: Collection[str] | None = None) -> str:
-        """ Returns the person as vCard (3.0).
+        """Returns the person as vCard (3.0).
 
         Allows to specify the included attributes, provides a reasonable
         default if none are specified. Always includes the first and last
@@ -312,7 +330,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def memberships_by_agency(self) -> list[AgencyMembership]:
-        """ Returns the memberships sorted alphabetically by the agency. """
+        """The memberships sorted by order_within_person."""
 
         def sortkey(membership: AgencyMembership) -> int:
             return membership.order_within_person

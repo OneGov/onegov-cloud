@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-04-16 09:07+0200\n"
+"POT-Creation-Date: 2026-06-22 07:44+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -17,14 +17,20 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Events"
-msgstr "Veranstaltungen"
+msgid "Meetings"
+msgstr "Sitzungen"
 
-msgid "Latest news"
-msgstr "Aktuelles"
+msgid "Political Businesses"
+msgstr "Politische Geschäfte"
 
-msgid "Topics"
-msgstr "Themen"
+msgid "Parliamentarians"
+msgstr "Parlamentsmitglieder"
+
+msgid "Commissions"
+msgstr "Kommissionen"
+
+msgid "Parliamentary groups"
+msgstr "Fraktionen"
 
 msgid "Chats"
 msgstr "Chats"
@@ -204,6 +210,9 @@ msgstr "Ratsinformationssystem (RIS) aktivieren"
 msgid "Enables the RIS integration for this organisation."
 msgstr "Aktiviert die RIS-Integration für diese Organisation."
 
+msgid "Events"
+msgstr "Veranstaltungen"
+
 msgid "All events"
 msgstr "Alle Veranstaltungen"
 
@@ -327,9 +336,6 @@ msgstr "Dateien"
 msgid "Chat Archive"
 msgstr "Chat-Archiv"
 
-msgid "Meetings"
-msgstr "Sitzungen"
-
 msgid "Meeting"
 msgstr "Sitzung"
 
@@ -344,9 +350,6 @@ msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Delete meeting"
 msgstr "Sitzung löschen"
-
-msgid "Parliamentarians"
-msgstr "Parlamentsmitglieder"
 
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
@@ -369,9 +372,6 @@ msgstr "Rolle wirklich entfernen?"
 msgid "Remove role"
 msgstr "Rolle entfernen"
 
-msgid "Parliamentary groups"
-msgstr "Fraktionen"
-
 msgid "Parliamentary group"
 msgstr "Fraktion"
 
@@ -387,9 +387,6 @@ msgstr "Parteien"
 msgid "Political Party"
 msgstr "Partei"
 
-msgid "Commissions"
-msgstr "Kommissionen"
-
 msgid "Commission"
 msgstr "Kommission"
 
@@ -398,9 +395,6 @@ msgstr "Möchten Sie die Kommission wirklich löschen?"
 
 msgid "Delete commission"
 msgstr "Kommission löschen"
-
-msgid "Political Businesses"
-msgstr "Politische Geschäfte"
 
 msgid "Political Business"
 msgstr "Politisches Geschäft"
@@ -500,14 +494,14 @@ msgstr "Keine aktiven Chats."
 msgid "Contact"
 msgstr "Kontakt"
 
+msgid "Filters"
+msgstr "Filter"
+
 msgid "Function"
 msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
-
-msgid "Filters"
-msgstr "Filter"
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -547,6 +541,9 @@ msgstr "Weiterführende Informationen"
 
 msgid "Propose a change to this entry"
 msgstr "Änderung für diesen Eintrag vorschlagen"
+
+msgid "Hash"
+msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
@@ -821,8 +818,8 @@ msgstr "Dateien hierhin ziehen um sie hochzuladen"
 msgid "read more"
 msgstr "weiterlesen"
 
-msgid "All articles"
-msgstr "Alle News"
+msgid "All posts"
+msgstr "Alle Beiträge"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -1488,8 +1485,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -1666,6 +1663,9 @@ msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
 "${number}"
+
+msgid "Latest news"
+msgstr "Aktuelles"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -2184,6 +2184,15 @@ msgstr "Organisation wählen"
 msgid "Select sub organisation"
 msgstr "Unterorganisation wählen"
 
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Nach Organisation oder Unterorganisation filtern"
+
+msgid "Search people"
+msgstr "Personen suchen"
+
+msgid "No people added yet."
+msgstr "Noch keine Personen erfasst."
+
 msgid "No people found for current filter selection."
 msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
 
@@ -2600,6 +2609,9 @@ msgstr "Archivieren"
 msgid "Archive selected"
 msgstr "Selektierte Archivieren"
 
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -2872,6 +2884,9 @@ msgstr "Übersicht Push-Benachrichtigungen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Topics"
+#~ msgstr "Themen"
 
 #~ msgid "Activate/deactivate modules"
 #~ msgstr "Module aktivieren/deaktivieren"

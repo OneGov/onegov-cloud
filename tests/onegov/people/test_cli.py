@@ -4,6 +4,8 @@ from click.testing import CliRunner
 from onegov.people.cli import cli
 from onegov.people.models import Person
 from pathlib import Path
+from sqlalchemy import text
+import transaction
 from transaction import commit
 
 
@@ -157,3 +159,51 @@ def test_cli(
     ])
     assert result.exit_code == 0
     assert 'Imported 0 person(s)' in result.output
+
+    # Strip whitespace (simulate legacy data with spaces via raw SQL)
+    session.add(Person(
+        first_name='Flash', last_name='Gordon', function='Hero'))
+    session.add(Person(first_name='Ming', last_name='the Merciless'))
+    session.flush()
+    session.execute(text(
+        "UPDATE people SET first_name = ' Flash', last_name = 'Gordon ',"
+        " function = ' Hero ' WHERE last_name = 'Gordon'"
+    ))
+    commit()
+    session.expunge_all()
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'strip-whitespace-from-names',
+        '--dry-run'
+    ])
+    assert result.exit_code == 0
+    assert 'Stripped whitespace from 1 person(s)' in result.output
+
+    session.expunge_all()
+    flash = session.query(Person).filter_by(last_name='Gordon ').first()
+    assert flash is not None, 'dry-run must not commit'
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'strip-whitespace-from-names'
+    ])
+    assert result.exit_code == 0
+    assert 'Stripped whitespace from 1 person(s)' in result.output
+
+    # A second run must report 0 — proving the first run persisted the changes.
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'strip-whitespace-from-names'
+    ])
+    assert result.exit_code == 0
+    assert 'Stripped whitespace from 0 person(s)' in result.output
+
+    transaction.abort()
+    session.expunge_all()
+    flash = session.query(Person).filter_by(last_name='Gordon').one()
+    assert flash.first_name == 'Flash'
+    assert flash.function == 'Hero'

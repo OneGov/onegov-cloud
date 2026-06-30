@@ -145,6 +145,10 @@ def test_views_general(client: Client[AgencyApp]) -> None:
 
     # ... sort agencies
     sort = client.get('/organizations').click('Sortieren')
+    # verify no edit mode menu, but back button at the bottom
+    assert 'Speichern' not in sort
+    assert 'Abbrechen' not in sort
+    assert 'Zurück zur Seite' in sort
     url = sort.pyquery('ul[data-sortable]').attr('data-sortable-url')
 
     url = url.replace('%7Bsubject_id%7D', '2')

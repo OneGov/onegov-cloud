@@ -5,12 +5,14 @@ import pytest
 from datetime import timedelta
 from io import BytesIO
 from onegov.file import File
+from onegov.file.attachments import IMAGE_QUALITY
 from onegov.form import CompleteFormSubmission
 from onegov.form import FormCollection
 from onegov.form import parse_form
 from onegov.form import PendingFormSubmission
 from onegov.form.errors import UnableToComplete
 from onegov.form.utils import hash_definition
+from PIL import Image
 from sedate import utcnow
 from sqlalchemy.exc import IntegrityError
 from textwrap import dedent
@@ -494,3 +496,34 @@ def test_add_externally_defined_submission(session: Session) -> None:
     collection.submissions.remove_old_pending_submissions(
         older_than=date, include_external=True)
     assert collection.submissions.query().count() == 0
+
+
+def test_upload_image_size_stored_as_actual_size(session: Session) -> None:
+    """ The size stored in the submission data must reflect the actual stored
+    file size, not the original upload size. """
+    collection = FormCollection(session)
+
+    definition = collection.definitions.add(
+        'Photo', definition="Photo = *.jpg|*.png"
+    )
+
+    img = Image.new('RGB', (200, 200), color=(255, 0, 0))
+    buf = BytesIO()
+    img.save(buf, format='JPEG', quality=IMAGE_QUALITY)
+    buf.seek(0)
+
+    data: Any = FileMultiDict()
+    data.add_file('photo', buf, filename='photo.jpg')
+
+    submission = collection.submissions.add(
+        'photo', definition.form_class(data), state='pending'
+    )
+    session.flush()
+    session.refresh(submission)
+
+    assert len(submission.files) == 1
+    stored_file = submission.files[0]
+    actual_size = stored_file.reference.file.content_length
+
+    # the size in the submission data must match the actual stored file size
+    assert submission.data['photo']['size'] == actual_size

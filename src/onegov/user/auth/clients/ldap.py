@@ -78,7 +78,7 @@ class LDAPClient:
 
     @cached_property
     def connection(self) -> Connection:
-        """ Returns the read-only connection to the LDAP server.
+        """ The read-only connection to the LDAP server.
 
         Calling this property is not enough to ensure that the connection is
         possible. You should use :meth:`try_configuration` for that.

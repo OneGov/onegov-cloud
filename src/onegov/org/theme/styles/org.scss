@@ -688,6 +688,25 @@ $footer-border-width: 0;
     }
 }
 
+.internal-notes {
+    background: $gray-pastel;
+    border-left: 3px solid $blue-dark;
+    border-radius: 2px;
+    font-size: .875rem;
+    margin-bottom: 1.5rem;
+    padding: .75rem 1rem;
+
+    strong {
+        color: $blue-dark;
+        display: block;
+        margin-bottom: .25rem;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+}
+
 /*
     top navigation
 */
@@ -2505,6 +2524,12 @@ div#redactor-droparea {
 $person-website-icon: '\f0c1';
 $person-phone-icon: '\f095';
 $person-email-icon: '\f003';
+
+#people-filters {
+    .people-filter-select {
+        margin-bottom: .75rem;
+    }
+}
 
 .person-card {
     margin: 0 1em 1em 0;
@@ -7417,4 +7442,10 @@ code {
 
 p.full-text-width {
     max-width: 100% !important;
+}
+
+.directory-entry-hash {
+    font-family: $font-family-monospace;
+    font-size: .75rem;
+    background-color: $gray-pastel;
 }

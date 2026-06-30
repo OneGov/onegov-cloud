@@ -135,8 +135,8 @@ class List(Base, TimestampMixin):
 
     @property
     def percentage_by_entity(self) -> dict[int, EntityPercentage]:
-        """ Returns the percentage of votes by the entity. Includes uncounted
-        entities and entities with no results available.
+        """ The percentage of votes by entity. Includes uncounted entities and
+        entities with no results available.
 
         """
         query = self.election.results_query
@@ -190,8 +190,8 @@ class List(Base, TimestampMixin):
 
     @property
     def percentage_by_district(self) -> dict[str, DistrictPercentage]:
-        """ Returns the percentage of votes aggregated by the distict. Includes
-        uncounted districts and districts with no results available.
+        """ The percentage of votes aggregated by district. Includes uncounted
+        districts and districts with no results available.
 
         """
         query = self.election.results_query.order_by(None).with_entities(

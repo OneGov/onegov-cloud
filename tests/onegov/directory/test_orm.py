@@ -10,7 +10,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
-from onegov.directory.errors import DuplicateEntryError, ValidationError
+from onegov.directory.errors import ValidationError
 from onegov.file import File
 from wtforms.validators import ValidationError as WtfValidationError
 
@@ -171,6 +171,45 @@ def test_directory_form(session: Session) -> None:
 
     assert form['first_name'].data == 'Rick'
     assert form['last_name'].data == 'Sanchez'
+
+
+def test_directory_form_field_named_text(session: Session) -> None:
+    # Users can name directory fields after any property on DirectoryEntry
+    # (e.g. text, values, external_link) without causing an AttributeError
+    # during populate_obj.
+    faq = DirectoryCollection(session).add(
+        title='FAQ',
+        structure="""
+            Title *= ___
+            Text *= ___
+            External Link = ___
+            External Link Title = ___
+            Directory Name = ___
+            Values = ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Title]",
+            order=['Title'],
+        )
+    )
+
+    form = faq.form_class()
+    form['title'].data = 'What is onegov?'
+    form['text'].data = 'A government platform.'
+    form['external_link'].data = 'https://example.com'
+    form['external_link_title'].data = 'Example'
+    form['directory_name'].data = 'faq'
+    form['values'].data = 'some value'
+
+    entry = DirectoryEntry(content={})
+    form.populate_obj(entry)
+
+    assert entry.title == 'What is onegov?'
+    assert entry.values['text'] == 'A government platform.'
+    assert entry.values['external_link'] == 'https://example.com'
+    assert entry.values['external_link_title'] == 'Example'
+    assert entry.values['directory_name'] == 'faq'
+    assert entry.values['values'] == 'some value'
 
 
 def test_directory_entry_collection(session: Session) -> None:
@@ -695,16 +734,24 @@ def test_add_duplicate_entry(session: Session) -> None:
         title="Foos",
         structure="Name *= ___",
         configuration=DirectoryConfiguration(
-            title='Name',
+            title='Foobar',
             order=['Name'],
         )
     )
 
     foos.add(values=dict(name='foobar'))
     session.flush()
+    foos.add(values=dict(name='foobar'))
+    session.flush()
+    foos.add(values=dict(name='foobar'))
+    session.flush()
 
-    with pytest.raises(DuplicateEntryError):
-        foos.add(values=dict(name='foobar'))
+    # test collection entry names
+    assert sorted(d.name for d in foos.entries) == [
+        'foobar',
+        'foobar-1',
+        'foobar-2',
+    ]
 
 
 def test_custom_order(session: Session) -> None:

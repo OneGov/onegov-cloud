@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from morepath import redirect
 from onegov.translator_directory import _
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
@@ -17,6 +18,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
+    from webob import Response
 
 
 @TranslatorDirectoryApp.html(
@@ -37,6 +39,7 @@ def view_translator_documents(
         'grouped': self.files_by_category,
         'title': _('Documents'),
         'categories': self.unique_categories,
+        'move_url': layout.move_url,
         'format_date': lambda dt: layout.format_date(dt, 'datetime'),
         'actions_url': lambda file_id: request.class_link(
             File, name='details', variables={'id': file_id}
@@ -84,3 +87,29 @@ def view_upload_file_translator(
             file.name
         )
     })
+
+
+@TranslatorDirectoryApp.view(
+    model=TranslatorDocumentCollection,
+    name='move',
+    request_method='POST',
+    permission=Secret
+)
+def view_move_file(
+    self: TranslatorDocumentCollection,
+    request: TranslatorAppRequest
+) -> Response:
+    request.assert_valid_csrf_token()
+    file_id = request.POST.get('file_id')
+    new_category = request.POST.get('new_category')
+    if (
+        isinstance(file_id, str)
+        and isinstance(new_category, str)
+        and new_category
+    ):
+        file = request.session.query(File).filter_by(
+            id=file_id
+        ).first()
+        if file:
+            file.note = new_category
+    return redirect(request.link(self))

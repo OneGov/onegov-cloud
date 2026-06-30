@@ -13,6 +13,8 @@ class ResourceRecipient(GenericRecipient):
     __mapper_args__ = {'polymorphic_identity': 'resource'}
 
     daily_reservations: dict_property[bool | None] = content_property()
+    daily_reservations_times: dict_property[list[str] | None] = (
+        content_property())
     new_reservations: dict_property[bool | None] = content_property()
     customer_messages: dict_property[bool | None] = content_property()
     internal_notes: dict_property[bool | None] = content_property()

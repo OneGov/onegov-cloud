@@ -119,34 +119,34 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     @property
     def duration_hours(self) -> Decimal:
-        """Return duration in hours for display."""
+        """Duration in hours for display."""
         return Decimal(self.duration) / Decimal(60)
 
     @property
     def break_time_hours(self) -> Decimal:
-        """Return break time in hours for display."""
+        """Break time in hours for display."""
         return Decimal(self.break_time) / Decimal(60)
 
     @property
     def night_hours_decimal(self) -> Decimal:
-        """Return night hours in decimal format for calculations."""
+        """Night hours in decimal format for calculations."""
         return Decimal(self.night_minutes) / Decimal(60)
 
     @property
     def weekend_holiday_hours_decimal(self) -> Decimal:
-        """Return weekend/holiday hours in decimal format for calculations."""
+        """Weekend/holiday hours in decimal format for calculations."""
         return Decimal(self.weekend_holiday_minutes) / Decimal(60)
 
     @property
     def day_hours_decimal(self) -> Decimal:
-        """Return day hours (total - night) in decimal format."""
+        """Day hours (total minus night) in decimal format."""
         day_hours = self.duration_hours - self.night_hours_decimal
         # Ensure non-negative (handle rounding edge cases)
         return max(day_hours, Decimal('0'))
 
     @property
     def night_hourly_rate(self) -> Decimal:
-        """Return night hourly rate (base rate + 50% surcharge)."""
+        """Night hourly rate (base rate + 50% surcharge)."""
         return self.hourly_rate * (
             1 + self.SURCHARGE_RATES['night_work'] / 100
         )
@@ -257,14 +257,14 @@ class TranslatorTimeReport(Base, TimestampMixin):
 
     @property
     def meal_allowance(self) -> Decimal:
-        """Return meal allowance if duration >= 6 hours."""
+        """Meal allowance if duration >= 6 hours, otherwise zero."""
         if self.assignment_type == 'schriftlich':
             return Decimal('0')
         return Decimal('30.0') if self.duration_hours >= 6 else Decimal('0')
 
     @property
     def title(self) -> str:
-        """Return a readable title for this time report."""
+        """A readable title for this time report."""
         date_str = self.assignment_date.strftime('%Y-%m-%d')
         if self.assignment_type:
             return f'{self.assignment_type} - {date_str}'

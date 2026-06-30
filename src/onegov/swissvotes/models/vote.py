@@ -290,7 +290,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @property
     def bfs_map_host(self) -> str | None:
-        """ Returns the Host of the BFS Map link for CSP. """
+        """ The host of the BFS Map link, used for CSP. """
 
         if self.bfs_map is None:
             return None
@@ -477,7 +477,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def policy_areas(self) -> list[PolicyArea]:
-        """ Returns the policy areas / descriptors of the vote. """
+        """ The policy areas / descriptors of the vote. """
 
         def get_level(number: int, level: int) -> PolicyArea | None:
             value = getattr(self, f'descriptor_{number}_level_{level}')
@@ -568,7 +568,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def results_cantons(self) -> dict[str, list[Region]]:
-        """ Returns the results of all cantons. """
+        """ The results of all cantons. """
 
         result: dict[int, list[Region]] = {}
         value: int | None
@@ -678,12 +678,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     @cached_property
     def sorted_actors_list(self) -> list[str]:
         """
-         Returns a list of actors of the current vote sorted by:
+        Actors of the current vote sorted by:
 
         1. codes for recommendations (strength table)
         2. by electoral share (descending)
 
-        It filters out those parties who have no electoral share
+        Parties with no electoral share are filtered out.
 
         """
         result = []
@@ -837,9 +837,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def has_national_council_share_data(self) -> bool:
-        """ Returns true, if the vote contains national council share data.
+        """ True if the vote contains national council share data.
 
-        Returns true, if a national council year is set and
+        True if a national council year is set and:
 
         * any aggregated national council share data is present (yeas, nays,
             none, empty, free vote, neutral, unknown)

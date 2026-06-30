@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <a stype="display:none;" class="button back-button" href="${overview}" i18n:translate="">Back</a>
+        <metal:b use-macro="layout.macros['before_occurrence_lead']" />
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="page-lead">

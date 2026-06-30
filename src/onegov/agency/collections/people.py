@@ -179,10 +179,7 @@ class ExtendedPersonCollection(
 
     @cached_property
     def used_letters(self) -> list[str]:
-        """ Returns a list of all the distinct first letters of people's
-        last names.
-
-        """
+        """ All distinct first letters of people's last names. """
         letter = func.left(ExtendedPerson.last_name, 1)
         letter = func.upper(func.unaccent(letter))
         query = self.session.query(letter.distinct().label('letter'))
@@ -191,9 +188,7 @@ class ExtendedPersonCollection(
 
     @cached_property
     def used_agencies(self) -> list[str]:
-        """ Returns a list of all the agencies people are members of.
-
-        """
+        """ All agencies people are members of. """
         query = self.session.query(Agency.title)
         query = query.filter(Agency.memberships.any())
         query = query.order_by(func.upper(func.unaccent(Agency.title)))

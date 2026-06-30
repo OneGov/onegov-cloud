@@ -1,4 +1,4 @@
-$sort-icon: '\f0dc';
+$sort-icon: '\f074';
 $chevron-up: '\f077';
 $chevron-down: '\f078';
 $building-icon: '\f0f7';
@@ -63,6 +63,11 @@ $arrow-right: '\f061';
     .view-hidden::before { @include icon('\f070'); }
     .sort::before { @include icon-bold($sort-icon); }
     .change-url::before { @include icon-bold('\f0c1'); }
+}
+
+.sort-items {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
 }
 
 
@@ -138,15 +143,15 @@ ul.agency-nav {
         justify-content: flex-end;
 
         .button {
-            @media #{$large-up} {
-                margin-top: -2.15rem;
-                position: absolute;
-            }
-
             margin-bottom: 0;
             margin-top: .5rem;
             padding-bottom: .4rem !important;
             padding-top: .4rem !important;
+
+            @media #{$large-up} {
+                margin-top: -2.15rem;
+                position: absolute;
+            }
         }
     }
 

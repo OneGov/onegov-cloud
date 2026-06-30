@@ -95,7 +95,7 @@ class Layout:
 
     @cached_property
     def app(self) -> Framework:
-        """ Returns the application behind the request. """
+        """ The application behind the request. """
         return self.request.app
 
     @overload
@@ -141,8 +141,8 @@ class Layout:
 
     @property
     def csrf_token(self) -> str:
-        """ Returns a csrf token for use with DELETE links (forms do their
-        own thing automatically).
+        """ A CSRF token for use with DELETE links (forms do their own thing
+        automatically).
 
         """
         return self.request.csrf_token
@@ -235,8 +235,8 @@ class Layout:
 
     @property
     def view_name(self) -> str | None:
-        """ Returns the view name of the current view, or None if it is the
-        default view.
+        """ The view name of the current view, or None if it is the default
+        view.
 
         Note: This relies on morepath internals and is experimental in nature!
 
@@ -263,12 +263,12 @@ class ChameleonLayout(Layout):
 
     @cached_property
     def template_loader(self) -> TemplateLoader:
-        """ Returns the chameleon template loader. """
+        """ The chameleon template loader. """
         return self.request.template_loader
 
     @cached_property
     def base(self) -> PageTemplateFile:
-        """ Returns the layout, which defines the base layout of all pages.
+        """ The layout template, which defines the base layout of all pages.
 
         See ``templates/layout.pt``.
 
@@ -277,7 +277,7 @@ class ChameleonLayout(Layout):
 
     @cached_property
     def macros(self) -> MacrosLookup:
-        """ Returns the macros, which offer often used html constructs.
+        """ The macros offering often used html constructs.
         See ``templates/macros.pt``.
 
         """

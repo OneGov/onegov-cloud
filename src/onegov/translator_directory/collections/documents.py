@@ -50,8 +50,7 @@ class TranslatorDocumentCollection(FileCollection[File]):
 
     @cached_property
     def unique_categories(self) -> list[str]:
-        """Returns a list of the defined default categories and the ones in
-        the database."""
+        """The defined default categories plus those found in the database."""
         q = self.session.query(File.note).filter(File.note.isnot(None))
         from_files = tuple(f.note for f in q.distinct())
         return sorted(set(from_files + DEFAULT_DOCUMENT_CATEGORIES))

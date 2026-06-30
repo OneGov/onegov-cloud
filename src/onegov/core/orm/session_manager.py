@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core import log
 from onegov.core.custom import json
-from sqlalchemy import create_engine, event, select, text
+from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm.query import Query
@@ -25,6 +25,11 @@ from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.engine import Connection, Engine, Result
+    from sqlalchemy.engine.interfaces import (
+        DBAPICursor,
+        ExecutionContext,
+        _DBAPIAnyExecuteParams,
+    )
     from sqlalchemy.orm import DeclarativeBase, ORMExecuteState
     from sqlalchemy.orm.session import Session, SessionTransaction
     from types import FrameType
@@ -412,14 +417,19 @@ class SessionManager:
         @event.listens_for(engine, 'before_cursor_execute')
         def activate_schema(
             connection: Connection,
-            cursor: Any,
-            *args: Any,
-            **kwargs: Any
+            cursor: DBAPICursor,
+            statement: str,
+            parameters: _DBAPIAnyExecuteParams,
+            context: ExecutionContext | None,
+            executemany: bool,
         ) -> None:
             """ Share the 'info' dictionary of Session with Connection
             objects.
 
             """
+
+            if statement.startswith('ROLLBACK'):
+                return
 
             # execution options have priority!
             if 'schema' in connection._execution_options:
@@ -436,11 +446,16 @@ class SessionManager:
         @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
             connection: Connection,
-            cursor: Any,
-            *args: Any,
-            **kwargs: Any
+            cursor: DBAPICursor,
+            statement: str,
+            parameters: _DBAPIAnyExecuteParams,
+            context: ExecutionContext | None,
+            executemany: bool,
         ) -> None:
             """ Kills idle sessions after a while, freeing up memory. """
+
+            if statement.startswith('ROLLBACK'):
+                return
 
             cursor.execute(
                 'SET SESSION idle_in_transaction_session_timeout = %s',
@@ -875,9 +890,26 @@ class SessionManager:
 
             try:
                 with engine.begin() as conn:
+                    existing_tables = set(
+                        inspect(conn).get_table_names(schema=schema)
+                    )
                     for base in self.bases:
                         base.metadata.schema = schema
-                        base.metadata.create_all(conn)
+                        # FIXME: this is a workaround to resolve n+1 queries
+                        #        being detected by sentry. Started a
+                        #        discussion on the sqlalchemy,
+                        #        https://github.com/sqlalchemy/sqlalchemy/discussions/13295.
+                        #        Derived issue from discussion:
+                        #        https://github.com/sqlalchemy/sqlalchemy/issues/13311
+                        missing = [
+                            t for t in base.metadata.sorted_tables
+                            if t.name not in existing_tables
+                        ]
+                        if missing:
+                            base.metadata.create_all(
+                                conn, tables=missing, checkfirst=False
+                            )
+                            existing_tables.update(t.name for t in missing)
 
                         declared_classes.update(
                             base.registry._class_registry.values()

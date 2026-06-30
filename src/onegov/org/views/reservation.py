@@ -51,7 +51,20 @@ if TYPE_CHECKING:
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Reservation
+
+
+def reservation_subject(
+    resource_title: str,
+    reservations: Sequence[Any],
+    activity: str,
+) -> str:
+    dates = sorted(
+        {r.display_start().strftime('%d.%m.%Y') for r in reservations}
+    )
+    date_str = ', '.join(dates[:3])
+    if len(dates) > 3:
+        date_str += ', ...'
+    return f'{resource_title} - {date_str} - {activity}'
 
 
 def assert_anonymous_access_only_temporary(
@@ -335,6 +348,12 @@ def handle_reservation_form(
     reservations on a resource.
 
     """
+    # remove all expired session before loading on POST
+    if request.POST:
+        self.remove_expired_reservation_sessions(  # type: ignore[attr-defined]
+            expiration_date=sedate.utcnow() - timedelta(hours=2)
+        )
+
     reservations_query = self.bound_reservations(request, with_data=True)  # type: ignore[attr-defined]
     reservations: tuple[Reservation, ...] = tuple(reservations_query)
 
@@ -381,10 +400,6 @@ def handle_reservation_form(
                 data['ticket_tag'] = form.ticket_tag.data
                 if filtered_meta:
                     data['ticket_tag_meta'] = filtered_meta
-
-        # while we re at it, remove all expired sessions
-        # FIXME: Should this be part of the base class?
-        self.remove_expired_reservation_sessions()  # type: ignore[attr-defined]
 
         # add the submission if it doesn't yet exist
         if self.definition and not submission:
@@ -821,7 +836,9 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     send_ticket_mail(
         request=request,
         template='mail_ticket_opened.pt',
-        subject=_('Your request has been registered'),
+        subject=reservation_subject(
+            self.title, reservations, request.translate(_('Request'))
+        ),
         receivers=(reservations[0].email,),
         ticket=ticket,
         content={
@@ -836,7 +853,9 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened_info.pt',
-            subject=_('New ticket'),
+            subject=reservation_subject(
+                self.title, reservations, request.translate(_('New ticket'))
+            ),
             ticket=ticket,
             receivers=(email, ),
             content={
@@ -1076,7 +1095,9 @@ def accept_reservation(
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
-            subject=_('Your reservations were accepted'),
+            subject=reservation_subject(
+                resource.title, reservations, request.translate(_('Accepted'))
+            ),
             receivers=(self.email,),
             ticket=ticket,
             content={
@@ -1341,7 +1362,9 @@ def reject_reservation(
     send_ticket_mail(
         request=request,
         template='mail_reservation_rejected.pt',
-        subject=_('The following reservations were rejected'),
+        subject=reservation_subject(
+            resource.title, targeted, request.translate(_('Rejected'))
+        ),
         receivers=(self.email, ),
         ticket=ticket,
         content={
@@ -1587,6 +1610,8 @@ def send_reservation_summary(
     if self.handler.deleted or not self.handler.reservations:
         raise exc.HTTPNotFound()
 
+    resource = self.handler.resource
+    assert resource is not None
     recipient = self.handler.email
     if recipient:
         assert request.current_username
@@ -1602,13 +1627,17 @@ def send_reservation_summary(
         send_ticket_mail(
             request=request,
             template='mail_reservation_summary.pt',
-            subject=_('Reservation summary'),
+            subject=reservation_subject(
+                resource.title,
+                self.handler.reservations,
+                request.translate(_('Summary')),
+            ),
             receivers=(recipient, ),
             ticket=self,
             force=True,
             content={
                 'model': self,
-                'resource': self.handler.resource,
+                'resource': resource,
                 'reservations': self.handler.reservations,
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),

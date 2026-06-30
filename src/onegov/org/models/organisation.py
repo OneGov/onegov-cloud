@@ -161,7 +161,6 @@ class Organisation(Base, TimestampMixin):
     instagram_url: dict_property[str | None] = meta_property()
     linkedin_url: dict_property[str | None] = meta_property()
     tiktok_url: dict_property[str | None] = meta_property()
-    og_logo_default: dict_property[str | None] = meta_property()
 
     # custom links
     impressum_url: dict_property[str | None] = meta_property()
@@ -290,6 +289,10 @@ class Organisation(Base, TimestampMixin):
 
     assembly_title: dict_property[str | None] = meta_property()
 
+    # organisation profil
+    og_description: dict_property[str | None] = meta_property()
+    og_logo_default: dict_property[str | None] = meta_property()
+
     # Kaba settings
     @property
     def kaba_configurations(self) -> list[RawKabaConfiguration]:
@@ -376,8 +379,8 @@ class Organisation(Base, TimestampMixin):
 
     @property
     def holidays(self) -> SwissHolidays:
-        """ Returns a SwissHolidays instance, as configured by the
-        holiday_settings on the UI.
+        """ A SwissHolidays instance as configured by the holiday_settings on
+        the UI.
 
         """
         return SwissHolidays(
@@ -387,15 +390,12 @@ class Organisation(Base, TimestampMixin):
 
     @property
     def has_school_holidays(self) -> bool:
-        """ Returns whether any school holidays have been configured
-        """
+        """ Whether any school holidays have been configured. """
         return bool(self.holiday_settings.get('school', ()))
 
     @property
     def school_holidays(self) -> Iterator[tuple[date, date]]:
-        """ Returns an iterable that yields date pairs of start
-        and end dates of school holidays
-        """
+        """ Date pairs of start and end dates of school holidays. """
         for y1, m1, d1, y2, m2, d2 in self.holiday_settings.get('school', ()):
             yield date(y1, m1, d1), date(y2, m2, d2)
 

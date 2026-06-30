@@ -326,8 +326,8 @@ class File(Base, Associable, TimestampMixin):
 
     @property
     def claimed_extension(self) -> str:
-        """ Returns the extension as defined by the file name or by the
-        content type (whatever is found first in this order).
+        """ The extension as defined by the file name or content type
+        (whichever is found first).
 
         Note that this extension could therefore not be correct. It is mainly
         meant for display purposes.
@@ -414,7 +414,7 @@ def metadata_lock(
                 fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except OSError:
                 if monotonic() - start_time >= timeout:
-                    yield False  # noqa: RUF075
+                    yield False
                     break
             else:
                 try:

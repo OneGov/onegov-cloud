@@ -1410,8 +1410,26 @@ def test_error_mixed_checkboxes() -> None:
             [ ] B
         """
     )
-    with pytest.raises(errors.MixedTypeError):
+    with pytest.raises(errors.MixedTypeError) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.field_name == 'Auswahl'
+
+
+def test_field_with_no_field_type_definition() -> None:
+    # A bare "Label =" line with no field type definition following raises
+    # FieldCompileError rather than an unhandled AttributeError as field
+    # is None
+    with pytest.raises(errors.FieldCompileError) as excinfo:
+        parse_formcode("Text =")
+    assert excinfo.value.field_name == 'Text'
+
+    with pytest.raises(errors.FieldCompileError) as excinfo:
+        parse_formcode("Comment = \nWebseite = ___")
+    assert excinfo.value.field_name == 'Comment'
+
+    with pytest.raises(errors.FieldCompileError) as excinfo:
+        parse_formcode("Title = ___\nNo type field= \nWebseite = ___")
+    assert excinfo.value.field_name == 'No type field'
 
 
 def test_help_indentation_error() -> None:

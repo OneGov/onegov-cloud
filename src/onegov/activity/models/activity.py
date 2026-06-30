@@ -171,8 +171,8 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     @property
     def active_occasions(self) -> list[Occasion]:
-        """ Returns the list of active occasions for this activity. An occasion
-        is active if its period is the currently active period.
+        """ Active occasions for this activity. An occasion is active if its
+        period is the currently active period.
         """
         session = object_session(self)
         assert session is not None

@@ -22,6 +22,10 @@
     <!--! To be override by other applications -->
 </metal:b>
 
+<metal:b define-macro="before_occurrence_lead">
+    <!--! To be override by other applications -->
+</metal:b>
+
 <metal:b define-macro="extra_usermanagement_fields">
     <!--! To be override by other applications -->
 </metal:b>
@@ -560,6 +564,7 @@
         </tal:b>
         <tal:b condition="people or contact or coordinates or files or show_side_panel or sidepanel_links|False">
             <div class="small-12 medium-8 columns page-content-main">
+                <div metal:define-slot="before-lead"></div>
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
 
@@ -2420,6 +2425,9 @@
 <meta property="og:description" tal:attributes="content og_description" tal:define="og_description layout.og_description" tal:condition="og_description">
 <meta property="og:locale" tal:attributes="content layout.og_locale">
 <meta tal:repeat="locale layout.og_locale_alternate" property="og:locale:alternate" tal:attributes="content locale">
+<tal:b tal:define="meta_keywords python: getattr(layout.model, 'keywords', None)" tal:condition="meta_keywords">
+<meta name="keywords" tal:attributes="content python:', '.join(meta_keywords)" />
+</tal:b>
 </metal:open_graph_tags>
 
 <metal:modal define-macro="modal">

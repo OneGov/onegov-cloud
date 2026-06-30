@@ -144,8 +144,8 @@ class PaymentProvider[PaymentT: Payment = Payment](
 
     @property
     def connected(self) -> bool:
-        """ Returns True if the provider is properly hooked up to the
-        payment provider.
+        """ True if the provider is properly hooked up to the payment
+        provider.
 
         """
         return False

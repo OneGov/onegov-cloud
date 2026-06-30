@@ -937,6 +937,9 @@ def import_contract_numbers_cli(
             'kantonsgericht',
             'verkehrsabteilung_staatsanwaltschaft',
             'jugendanwaltschaft',
+            'ombudsstelle',
+            'friedensrichteramt',
+            'schlichtungsstelle_mietsachen',
         ]
     ),
     help='New finanzstelle key',
@@ -1016,3 +1019,47 @@ def change_finanzstelle_cli(
             click.secho('Changes committed', fg='green')
 
     return do_change
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    """Strips leading/trailing whitespace from first_name and last_name
+    of all translators.
+
+    Example:
+
+        `onegov-translator --select /translator_directory/*
+        strip-whitespace-from-names`
+
+    """
+
+    def _strip(
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
+    ) -> None:
+        session = app.session()
+        count = 0
+        for translator in session.query(Translator):
+            first_name = translator.first_name.strip()
+            last_name = translator.last_name.strip()
+            if (first_name, last_name) != (
+                translator.first_name,
+                translator.last_name,
+            ):
+                translator.first_name = first_name
+                translator.last_name = last_name
+                count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} translator(s)',
+            fg='green'
+        )
+
+    return _strip

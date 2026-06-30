@@ -149,7 +149,7 @@ class Vote(
 
     @property
     def has_results(self) -> bool:
-        """ Returns True, if there are any results. """
+        """ True if there are any results. """
 
         for ballot in self.ballots:
             for result in ballot.results:
@@ -182,8 +182,7 @@ class Vote(
 
     @property
     def progress(self) -> tuple[int, int]:
-        """ Returns a tuple with the first value being the number of counted
-        entities and the second value being the number of total entities.
+        """ A tuple of (counted entities, total entities).
 
         For complex votes, it is assumed that every ballot has the same
         progress.
@@ -199,7 +198,7 @@ class Vote(
 
     @property
     def counted_entities(self) -> list[str]:
-        """ Returns the names of the already counted entities.
+        """ The names of the already counted entities.
 
         Might contain an empty string in case of expats.
 

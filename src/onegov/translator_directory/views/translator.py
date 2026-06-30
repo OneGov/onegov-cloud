@@ -3,7 +3,6 @@ from __future__ import annotations
 from decimal import Decimal
 from io import BytesIO
 from morepath import redirect
-from datetime import datetime
 from morepath.request import Response
 from sedate import utcnow
 from onegov.core.custom import json
@@ -533,6 +532,9 @@ def add_time_report(
     request: TranslatorAppRequest,
     form: TranslatorTimeReportForm,
 ) -> RenderData | BaseResponse:
+
+    if not request.app.enable_time_tracking:
+        raise HTTPForbidden()
 
     if form.submitted(request):
 
