@@ -75,6 +75,13 @@ def test_news(client: Client) -> None:
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" not in page.text
+    assert '<language>' in page.text
+
+    # RSS feed must not crash when org has no locales configured
+    client.app.org.locales = None
+    transaction.commit()
+    page = client.get('/news?format=rss')
+    assert '<language>de_CH</language>' in page.text
 
     page = client.get('/news/we-have-a-new-homepage')
     client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
