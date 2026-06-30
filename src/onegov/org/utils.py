@@ -671,6 +671,7 @@ class AllocationEventInfo:
             'classNames': list(self.event_classes),
             'display': 'block',
             # extended properties
+            'kind': 'allocation',
             'wholeDay': self.allocation.whole_day,
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
