@@ -521,13 +521,13 @@ ul.tags {
 }
 
 .VOL-link::before {
-    @include icon-bold('\f007');
+    @include icon-bold('\f4c4');
     display: inline-block;
     margin-right: 1ex;
 }
 
 .ticket-handler-VOL td:first-child::before {
-    @include icon-bold('\f007');
+    @include icon-bold('\f4c4');
 }
 
 /*
