@@ -316,8 +316,9 @@ def test_inplace_values_mutation_does_not_update_hash(
 # --- Publication dates ---
 
 
-def test_content_hash_changes_with_publication_dates(session: Session) -> None:
-    # Changing publication_start or publication_end must update the hash.
+def test_content_hash_stable_with_publication_dates(session: Session) -> None:
+    # Publication dates are not part of the hash — changing them must not
+    # update it.
     rooms = DirectoryCollection(session).add(
         title='Rooms',
         structure='Name *= ___',
@@ -325,30 +326,23 @@ def test_content_hash_changes_with_publication_dates(session: Session) -> None:
     )
 
     entry = rooms.add(values=dict(name='Conference Room'))
-    hash_no_dates = entry.content_hash
-    assert hash_no_dates is not None
+    original_hash = entry.content_hash
+    assert original_hash is not None
 
     entry.publication_start = datetime(2026, 1, 1, tzinfo=timezone.utc)
     session.flush()
-    hash_with_start = entry.content_hash
-    assert hash_with_start != hash_no_dates
+    assert entry.content_hash == original_hash
 
     entry.publication_end = datetime(2026, 12, 31, tzinfo=timezone.utc)
     session.flush()
-    hash_with_both = entry.content_hash
-    assert hash_with_both != hash_with_start
-
-    entry.publication_end = datetime(2027, 6, 30, tzinfo=timezone.utc)
-    session.flush()
-    assert entry.content_hash != hash_with_both
+    assert entry.content_hash == original_hash
 
 
 # --- Keywords / categories ---
 
 
-def test_content_hash_changes_with_keywords(session: Session) -> None:
-    # Adding, removing, or reordering keywords (categories) must update or
-    # preserve the hash accordingly.
+def test_content_hash_stable_with_keywords(session: Session) -> None:
+    # Keywords are not part of the hash — changing them must not update it.
     rooms = DirectoryCollection(session).add(
         title='Rooms',
         structure='Name *= ___',
@@ -356,26 +350,16 @@ def test_content_hash_changes_with_keywords(session: Session) -> None:
     )
 
     entry = rooms.add(values=dict(name='Conference Room'))
-    hash_no_keywords = entry.content_hash
-    assert hash_no_keywords is not None
+    original_hash = entry.content_hash
+    assert original_hash is not None
 
-    # adding keywords changes the hash
     entry.keywords = {'Sport', 'Kultur'}
     session.flush()
-    hash_two_keywords = entry.content_hash
-    assert hash_two_keywords != hash_no_keywords
+    assert entry.content_hash == original_hash
 
-    # removing one keyword changes the hash again
     entry.keywords = {'Sport'}
     session.flush()
-    assert entry.content_hash != hash_two_keywords
-
-    # same set of keywords in a different iteration order yields the same hash
-    entry.keywords = {'Sport', 'Kultur'}
-    session.flush()
-    entry.keywords = {'Kultur', 'Sport'}
-    session.flush()
-    assert entry.content_hash == hash_two_keywords
+    assert entry.content_hash == original_hash
 
 
 # --- Structure migration ---

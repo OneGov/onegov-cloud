@@ -552,6 +552,21 @@ msgstr ""
 msgid "Hash"
 msgstr "Hash"
 
+msgid "Entry checksum"
+msgstr "Prüfsumme des Verzeichniseintrages"
+
+msgid "Size"
+msgstr "Grösse"
+
+msgid "Form fields"
+msgstr "Formularfelder"
+
+msgid "Attachments"
+msgstr "Anhänge"
+
+msgid "Publication details"
+msgstr "Publikationsdetails"
+
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
 

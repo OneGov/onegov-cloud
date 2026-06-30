@@ -153,12 +153,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
             default=str,
             option=ormsgpack.OPT_SORT_KEYS
         ))
-        for keyword in sorted(self.keywords):
-            hash_obj.update(keyword.encode())
-        if self.publication_start is not None:
-            hash_obj.update(self.publication_start.isoformat().encode())
-        if self.publication_end is not None:
-            hash_obj.update(self.publication_end.isoformat().encode())
         for file_part in sorted(f.checksum or f.id for f in self.files):
             hash_obj.update(file_part.encode())
         new_hash = hash_obj.hexdigest()
@@ -171,14 +165,15 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
                 )
             self.content_hash = new_hash
 
-    @observes('content', 'files', '_keywords', 'publication_start',
-              'publication_end')
+    @observes('content', 'files')
     def content_hash_observer(
         self,
         content: dict[str, Any] | None,
         files: set[Any],
-        keywords: dict[str, str] | None,
-        publication_start: Any,
-        publication_end: Any,
     ) -> None:
         self.update_content_hash()
+
+    @observes('publication_start')
+    def publication_start_observer(self, publication_start: Any) -> None:
+        # reset the notified hash when the publication date changes
+        self.notified_hash = None

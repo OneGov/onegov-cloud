@@ -705,6 +705,7 @@ def send_admin_notification_for_directory_entry(
         'mail_directory_entry_admin_notification.pt',
         {
             'directory': directory,
+            'entry': entry,
             'entry_title': entry.title,
             'entry_link': request.link(entry),
             'publication_start': entry.publication_start,
@@ -731,9 +732,10 @@ def send_admin_expiry_notification_for_directory_entry(
     ))
     _send_admin_email(
         directory, request, title,
-        'mail_directory_entry_admin_deletion.pt',
+        'mail_directory_entry_admin_publication_ended.pt',
         {
             'directory': directory,
+            'entry': entry,
             'entry_title': entry.title,
             'publication_start': entry.publication_start,
             'publication_end': entry.publication_end,
@@ -762,9 +764,10 @@ def send_admin_deletion_notification_for_directory_entry(
     ))
     _send_admin_email(
         directory, request, title,
-        'mail_directory_entry_admin_deletion.pt',
+        'mail_directory_entry_admin_publication_ended.pt',
         {
             'directory': directory,
+            'entry': entry,
             'entry_title': entry.title,
             'publication_start': entry.publication_start,
             'publication_end': entry.publication_end,

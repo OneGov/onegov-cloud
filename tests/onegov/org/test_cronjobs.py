@@ -2899,6 +2899,78 @@ def test_admin_notification_publication_date_reached(
     assert db_entry.content_hash in message['TextBody']
 
 
+def test_admin_notification_re_publication(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    Email is sent every time an entry goes live, even if content unchanged.
+    Changing publication_start resets notified_hash so the next publish
+    triggers a fresh notification.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+    pub_start_1 = real_now - timedelta(hours=1)
+    pub_end_1 = real_now + timedelta(days=30)
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Carla Huber',
+            adresse='Seeweg 2',
+            publication_start=pub_start_1,
+            publication_end=pub_end_1,
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    # first publish → email sent, notified_hash set
+    client.get(get_cronjob_url(job))
+    assert len(os.listdir(client.app.maildir)) == 1
+    transaction.begin()
+    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
+    assert db_entry.notified_hash == db_entry.content_hash
+    transaction.commit()
+    close_all_sessions()
+
+    # re-run → no duplicate
+    client.get(get_cronjob_url(job))
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # changing publication_start resets notified_hash
+    pub_start_2 = real_now + timedelta(hours=24)
+    transaction.begin()
+    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
+    db_entry.publication_start = pub_start_2
+    transaction.commit()
+    close_all_sessions()
+
+    transaction.begin()
+    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
+    assert db_entry.notified_hash is None
+    transaction.commit()
+    close_all_sessions()
+
+    # not yet published — no email
+    client.get(get_cronjob_url(job))
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # move new publication_start to the past
+    transaction.begin()
+    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
+    db_entry.publication_start = real_now - timedelta(minutes=5)
+    transaction.commit()
+    close_all_sessions()
+
+    # goes live again → second email
+    client.get(get_cronjob_url(job))
+    assert len(os.listdir(client.app.maildir)) == 2
+
+
 def test_admin_notification_no_notification_address(
     client: Client['TestOrgApp'],
 ) -> None:

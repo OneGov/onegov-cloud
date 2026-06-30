@@ -4512,6 +4512,21 @@ msgstr ""
 msgid "Hash"
 msgstr "Hash"
 
+msgid "Form fields"
+msgstr "Formularfelder"
+
+msgid "Attachments"
+msgstr "Anhänge"
+
+msgid "Publication details"
+msgstr "Publikationsdetails"
+
+msgid "Size"
+msgstr "Grösse"
+
+msgid "Entry checksum"
+msgstr "Prüfsumme des Verzeichniseintrages"
+
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
 

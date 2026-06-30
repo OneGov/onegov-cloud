@@ -551,6 +551,21 @@ msgstr ""
 msgid "Hash"
 msgstr "Hash"
 
+msgid "Entry checksum"
+msgstr "Checksum della voce"
+
+msgid "Size"
+msgstr "Dimensione"
+
+msgid "Form fields"
+msgstr "Campi del modulo"
+
+msgid "Attachments"
+msgstr "Allegati"
+
+msgid "Publication details"
+msgstr "Dettagli della pubblicazione"
+
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
 
