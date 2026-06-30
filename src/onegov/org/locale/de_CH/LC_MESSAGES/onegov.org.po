@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-25 13:18+0200\n"
+"POT-Creation-Date: 2026-06-30 13:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2278,6 +2278,19 @@ msgstr ""
 msgid "Open files in separate window"
 msgstr "Dateien in separatem Fenster öffnen"
 
+msgid "Short links"
+msgstr "Kurzlinks"
+
+#, python-format
+msgid ""
+"Malformed short link on line ${number}. Each line needs to be a pair of "
+"name: path where path is either a valid path starting with a backslash, or a "
+"complete URL with schema and host."
+msgstr ""
+"Ungültiger Kurzlink auf Zeile ${number}. Jede Zeile muss dem Format Name: "
+"Pfad entsprechen, wobei Pfad entweder ein Pfad ohne Schema oder Hostname "
+"oder eine komplette URL ist."
+
 msgid "Announcement"
 msgstr "Ankündigung"
 
@@ -2358,21 +2371,8 @@ msgstr "Ja, ein nicht gelisteter Pfad"
 msgid "Path"
 msgstr "Pfad"
 
-msgid "Short links"
-msgstr "Kurzlinks"
-
 msgid "Please enter a path without schema or host"
 msgstr "Bitte geben Sie einen Pfad ohne Schema oder Hostname an"
-
-#, python-format
-msgid ""
-"Malformed short link on line ${number}. Each line needs to be a pair of "
-"name: path where path is either a valid path starting with a backslash, or a "
-"complete URL with schema and host."
-msgstr ""
-"Ungültiger Kurzlink auf Zeile ${number}. Jede Zeile muss dem Format Name: "
-"Pfad entsprechen, wobei Pfad entweder ein Pfad ohne Schema oder Hostname "
-"oder eine komplette URL ist."
 
 msgid "Duration of mTAN session"
 msgstr "Dauer der mTAN-Session"
@@ -4491,6 +4491,16 @@ msgstr "Änderung vorschlagen"
 msgid "Found an error? Propose a change to this entry."
 msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
 
+msgid ""
+"Fingerprint of the entry's content. Changes whenever the entry data is "
+"modified."
+msgstr ""
+"Prüfsumme des Eintraginhalts. Ändert sich, wenn die Eintragsdaten geändert "
+"werden."
+
+msgid "Hash"
+msgstr "Hash"
+
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
 
@@ -5822,11 +5832,20 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Referenz Anfrage"
 
+msgid "Search people"
+msgstr "Personen suchen"
+
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Nach Organisation oder Unterorganisation filtern"
+
 msgid "Select organisation"
 msgstr "Organisation wählen"
 
 msgid "Select sub organisation"
 msgstr "Unterorganisation wählen"
+
+msgid "No people added yet."
+msgstr "Noch keine Personen erfasst."
 
 msgid "No people found for current filter selection."
 msgstr "Keine Personen für aktuelle Filterauswahl gefunden."

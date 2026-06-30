@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-25 13:18+0200\n"
+"POT-Creation-Date: 2026-06-30 13:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2279,6 +2279,20 @@ msgstr ""
 msgid "Open files in separate window"
 msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
 
+msgid "Short links"
+msgstr "Lien court"
+
+#, python-format
+msgid ""
+"Malformed short link on line ${number}. Each line needs to be a pair of "
+"name: path where path is either a valid path starting with a backslash, or a "
+"complete URL with schema and host."
+msgstr ""
+"Lien court mal formé à la ligne ${number}. Chaque ligne doit prendre la "
+"forme « nom : chemin », où « chemin » correspond soit à un chemin valide "
+"commençant par une barre oblique inversée, soit à une URL complète "
+"comprenant le schéma et l'hôte."
+
 msgid "Announcement"
 msgstr "Annonce"
 
@@ -2362,22 +2376,8 @@ msgstr "Oui, vers un chemin non listé"
 msgid "Path"
 msgstr "Chemin"
 
-msgid "Short links"
-msgstr "Lien court"
-
 msgid "Please enter a path without schema or host"
 msgstr "Veuillez entrer un chemin d'accès sans schéma ou hôte"
-
-#, python-format
-msgid ""
-"Malformed short link on line ${number}. Each line needs to be a pair of "
-"name: path where path is either a valid path starting with a backslash, or a "
-"complete URL with schema and host."
-msgstr ""
-"Lien court mal formé à la ligne ${number}. Chaque ligne doit prendre la "
-"forme « nom : chemin », où « chemin » correspond soit à un chemin valide "
-"commençant par une barre oblique inversée, soit à une URL complète "
-"comprenant le schéma et l'hôte."
 
 msgid "Duration of mTAN session"
 msgstr "Durée de la séance mTAN"
@@ -4500,6 +4500,16 @@ msgstr ""
 "Vous avez trouvé une erreur ? Proposez une modification à apporter à cette "
 "entrée."
 
+msgid ""
+"Fingerprint of the entry's content. Changes whenever the entry data is "
+"modified."
+msgstr ""
+"Empreinte du contenu de l'entrée. Change chaque fois que les données de "
+"l'entrée sont modifiées."
+
+msgid "Hash"
+msgstr "Hash"
+
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
 
@@ -5832,11 +5842,20 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Référence"
 
+msgid "Search people"
+msgstr "Rechercher des personnes"
+
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Filtrer par organisation ou sous-organisation"
+
 msgid "Select organisation"
 msgstr "Sélectionner une organisation"
 
 msgid "Select sub organisation"
 msgstr "Sélectionner une sous-organisation"
+
+msgid "No people added yet."
+msgstr "Aucune personne n'a encore été ajoutée."
 
 msgid "No people found for current filter selection."
 msgstr "Aucune personne n'a été trouvée pour la sélection de filtre actuelle."

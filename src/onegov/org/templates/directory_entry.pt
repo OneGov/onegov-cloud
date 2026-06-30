@@ -10,7 +10,8 @@
                     people None;
                     contact entry.contact;
                     coordinates entry.directory.enable_map in ('everywhere', 'entry') and entry.coordinates;
-                    show_side_panel layout.model.directory.enable_change_requests|nothing;
+                    show_hash python:(request.is_manager or request.active_mtan_session) and entry.content_hash;
+                    show_side_panel python:(layout.model.directory.enable_change_requests or show_hash);
                     ">
 
             <div metal:fill-slot="before-lead">
@@ -46,8 +47,8 @@
                 </dl>
             </div>
 
-            <div metal:fill-slot="after-panels" tal:condition="request.is_manager or layout.model.directory.enable_change_requests|nothing">
-                <div class="submit-yours">
+            <div metal:fill-slot="after-panels">
+                <div class="submit-yours" tal:condition="request.is_manager or layout.model.directory.enable_change_requests|nothing">
                     <dl>
                         <dt>
                             <a href="${request.link(layout.model, 'change-request')}">
@@ -58,6 +59,15 @@
                         </dt>
                         <dd i18n:translate>Found an error? Propose a change to this entry.</dd>
                     </dl>
+                </div>
+                <div class="borderless-side-panel" tal:condition="show_hash">
+                    <h2 title="Fingerprint of the entry's content. Changes whenever the entry data is modified." i18n:translate i18n:attributes="title">Hash</h2>
+                    <p>
+                        <i class="fa fa-fw fa-key" aria-hidden="true"></i>
+                        <span class="directory-entry-hash">${entry.content_hash}</span>
+                        <br />
+                        <small>${layout.format_date(entry.last_change, 'datetime')}</small>
+                    </p>
                 </div>
             </div>
         </tal:b>

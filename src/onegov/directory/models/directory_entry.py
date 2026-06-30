@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from onegov.core.orm import Base
+import hashlib
+import logging
+
+import ormsgpack
+
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
@@ -14,6 +19,9 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from translationstring import TranslationString
 from uuid import uuid4, UUID
+
+
+log = logging.getLogger('onegov.directory')
 
 
 from typing import Any, TYPE_CHECKING
@@ -75,6 +83,9 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: Describes the entry briefly
     lead: Mapped[str | None]
 
+    #: SHA-1 hash of the entry values and associated file checksums
+    content_hash: Mapped[str | None] = mapped_column(default=None)
+
     #: All keywords defined for this entry (indexed)
     _keywords: Mapped[dict[str, str] | None] = mapped_column(
         MutableDict.as_mutable(HSTORE),
@@ -130,3 +141,30 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         self.content = self.content or {}
         self.content['values'] = values
         self.content.changed()  # type:ignore[attr-defined]
+
+    def update_content_hash(self) -> None:
+        hash_obj = hashlib.sha1(usedforsecurity=False)
+        hash_obj.update(ormsgpack.packb(
+            self.values,
+            default=str,
+            option=ormsgpack.OPT_SORT_KEYS
+        ))
+        for file_part in sorted(f.checksum or f.id for f in self.files):
+            hash_obj.update(file_part.encode())
+        new_hash = hash_obj.hexdigest()
+
+        if self.content_hash != new_hash:
+            if self.content_hash is not None:
+                log.info(
+                    'Content hash changed for directory entry %s: %s -> %s',
+                    self.id, self.content_hash, new_hash
+                )
+            self.content_hash = new_hash
+
+    @observes('content', 'files')
+    def content_hash_observer(
+        self,
+        content: dict[str, Any] | None,
+        files: set[Any]
+    ) -> None:
+        self.update_content_hash()
