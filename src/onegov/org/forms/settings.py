@@ -526,6 +526,47 @@ class LinksSettingsForm(Form):
         label=_('Open files in separate window')
     )
 
+    short_links = TextAreaField(
+        label=_('Short links'),
+        description=(
+            'kalender: /a/b/kalender\n'
+            'support: https://my.support'
+        ),
+        render_kw={'rows': 10}
+    )
+
+    def validate_short_links(self, field: TextAreaField) -> None:
+        if not field.data:
+            return
+
+        for number, line in enumerate(field.data.splitlines(), start=1):
+            parts = line.split(':', 1)
+            if len(parts) == 2:
+                _name, redirect_path = parts
+
+                try:
+                    url = URL(redirect_path.strip())
+                except ValueError:
+                    # fall-through to the end which will raise
+                    pass
+                else:
+                    if url.scheme():
+                        if url.host():
+                            # valid, skip to the next pair
+                            continue
+                    elif not url.host() and (path := url.path()):
+                        if path.startswith('/'):
+                            # valid, skip to the next pair
+                            continue
+
+            raise ValidationError(_(
+                'Malformed short link on line ${number}. '
+                'Each line needs to be a pair of name: path where '
+                'path is either a valid path starting with a '
+                'backslash, or a complete URL with schema and host.',
+                mapping={'number': number}
+            ))
+
 
 class HeaderSettingsForm(Form):
 

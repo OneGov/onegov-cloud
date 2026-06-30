@@ -121,6 +121,7 @@ class Organisation(Base, TimestampMixin):
     locales: dict_property[str | None] = meta_property()
     redirect_homepage_to: dict_property[str | None] = meta_property()
     redirect_path: dict_property[str | None] = meta_property()
+    short_links: dict_property[str | None] = meta_property()
     hidden_people_fields: dict_property[list[str]] = meta_property(
         default=lambda: ['external_user_id']
     )
@@ -418,6 +419,24 @@ class Organisation(Base, TimestampMixin):
     @cached_property
     def opening_hours_html(self) -> Markup:
         return paragraphify(linkify(self.opening_hours))
+
+    @cached_property
+    def short_links_dict(self) -> dict[str, str]:
+        return {
+            parts[0].strip(): parts[1].strip()
+            for line in (self.short_links or '').splitlines()
+            if len(parts := line.split(':', 1)) == 2
+        }
+
+    @short_links.inplace.setter
+    def _short_links_setter(self, value: str | None) -> None:
+        self.meta['short_links'] = value
+        # update cache
+        self.__dict__['short_links_dict'] = {
+            parts[0].strip(): parts[1].strip()
+            for line in (self.short_links or '').splitlines()
+            if len(parts := line.split(':', 1)) == 2
+        }
 
     @property
     def title(self) -> str:

@@ -694,6 +694,8 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
             data['coordinates'] = get_geo_location(item)
             data['contact'] = item.contact
 
+        data['content_hash'] = item.content_hash
+        data['modified'] = get_modified_iso_format(item)
         return data
 
     def item_links(self, item: ExtendedDirectoryEntry) -> dict[str, Any]:

@@ -16,6 +16,7 @@ from onegov.election_day.models import Vote
 from onegov.election_day.utils import replace_url
 from sedate import as_datetime
 from sqlalchemy import cast
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy import desc
 from sqlalchemy import distinct
 from sqlalchemy import extract
@@ -588,11 +589,15 @@ class SearchableArchivedResultCollection(
                 query = query.filter(ArchivedResult.type == self.item_type)
 
         if self.domains:
-            domains = set(self.domains)
+            domain_col = ArchivedResult.__table__.c['domain']
+            assert isinstance(domain_col.type, SAEnum)
+            valid = set(domain_col.type.enums)
+            domains = set(self.domains) & valid
             if 'region' in domains:
                 domains.add('district')
                 domains.add('none')
-            query = query.filter(ArchivedResult.domain.in_(domains))
+            if domains:
+                query = query.filter(ArchivedResult.domain.in_(domains))
 
         if self.to_date:
             if self.to_date > date.today():
@@ -616,8 +621,8 @@ class SearchableArchivedResultCollection(
 
         # order by date and type
         order = (
-            'federation', 'canton', 'region', 'district', 'none',
-            'municipality'
+            'federation', 'canton', 'region', 'district', 'municipality',
+            'none'
         )
         if self.app.principal.domain == 'municipality':
             order = (

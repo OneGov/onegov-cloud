@@ -2525,6 +2525,12 @@ $person-website-icon: '\f0c1';
 $person-phone-icon: '\f095';
 $person-email-icon: '\f003';
 
+#people-filters {
+    .people-filter-select {
+        margin-bottom: .75rem;
+    }
+}
+
 .person-card {
     margin: 0 1em 1em 0;
 
@@ -3390,6 +3396,14 @@ button {
             font-size: .9em;
         }
 
+        .fc-daygrid-body-natural .fc-daygrid-day-events {
+            margin-bottom: 0 !important;
+        }
+
+        .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+            min-height: 0;
+        }
+
         .fc-event {
             overflow: hidden;
             border: 0;
@@ -3418,6 +3432,11 @@ button {
 
         .event-available {
             background-color: $green;
+        }
+
+        .event-holiday {
+            background-color: $red;
+            cursor: default !important;
         }
 
         // fix borders missing with zurb foundation
@@ -7436,4 +7455,10 @@ code {
 
 p.full-text-width {
     max-width: 100% !important;
+}
+
+.directory-entry-hash {
+    font-family: $font-family-monospace;
+    font-size: .75rem;
+    background-color: $gray-pastel;
 }
