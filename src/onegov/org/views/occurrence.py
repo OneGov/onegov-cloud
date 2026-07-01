@@ -8,6 +8,11 @@ from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
+from onegov.event.models.event import EventFilterValue
+from onegov.form import as_internal_id
+from onegov.org.models.organisation import (
+    flatten_event_filter_fields_from_definition,
+)
 from onegov.form.errors import (InvalidFormSyntax, MixedTypeError,
                                 DuplicateLabelError)
 from onegov.org import _, OrgApp
@@ -234,15 +239,71 @@ def handle_edit_event_filters(
 
     try:
         if form.submitted(request):
-            keywords = (form.keyword_fields.data or '').splitlines()
-            request.app.org.event_filter_configuration = {
-                'order': [],
-                'keywords': keywords
+            old_keywords = {
+                as_internal_id(k)
+                for k in
+                request.app.org.event_filter_configuration.get('keywords', [])
             }
-            request.app.org.event_filter_definition = form.definition.data
+            new_keywords = {
+                as_internal_id(k)
+                for k in (form.keyword_fields.data or '').splitlines()
+            }
+            old_field_choices = {
+                f.id: {c.label for c in getattr(f, 'choices', ())}
+                for f in request.app.org.event_filter_fields
+            }
+            new_field_choices = {
+                f.id: {c.label for c in getattr(f, 'choices', ())}
+                for f in flatten_event_filter_fields_from_definition(
+                    form.definition.data
+                )
+            }
+            blocked = False
+            for keyword in old_keywords - new_keywords:
+                count = (
+                    request.session.query(EventFilterValue)
+                    .filter_by(keyword=keyword)
+                    .count()
+                )
+                if count:
+                    request.alert(_(
+                        'The filter "${keyword}" is still applied to '
+                        '${count} events and cannot be removed. Clear '
+                        'the filter on those events first.',
+                        mapping={'keyword': keyword, 'count': count}
+                    ))
+                    blocked = True
 
-            request.success(_('Your changes were saved'))
-            return request.redirect(request.link(self))
+            for keyword in old_keywords & new_keywords:
+                removed_choices = (
+                    old_field_choices.get(keyword, set())
+                    - new_field_choices.get(keyword, set())
+                )
+                for choice in removed_choices:
+                    count = (
+                        request.session.query(EventFilterValue)
+                        .filter_by(keyword=keyword, value=choice)
+                        .count()
+                    )
+                    if count:
+                        request.alert(_(
+                            'The filter choice "${choice}" is still applied '
+                            'to ${count} events and cannot be removed. Clear '
+                            'the filter on those events first.',
+                            mapping={'choice': choice, 'count': count}
+                        ))
+                        blocked = True
+
+            if not blocked:
+                keywords = (form.keyword_fields.data or '').splitlines()
+                request.app.org.event_filter_configuration = {
+                    'order': [],
+                    'keywords': keywords
+                }
+                request.app.org.event_filter_definition = form.definition.data
+
+                request.success(_('Your changes were saved'))
+                return request.redirect(request.link(self))
 
         elif not request.POST:
             # Store the model data on the form
