@@ -39,8 +39,8 @@ from onegov.event import Occurrence
 from onegov.event import EventCollection
 from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
-from onegov.file import File
 from onegov.file.collection import FileCollection
+from onegov.file.models import File, SigningRequest
 from onegov.form import (
     FormCollection,
     FormDefinition,
@@ -1495,12 +1495,40 @@ def mtan_statistics(
         if mtan_count:
             org_name = app.org.name if hasattr(app, 'org') else None
             title = f'{org_name} ({app.schema})' if org_name else app.schema
-            click.echo(
-                f'{title}: '
-                f'Sent {mtan_count} mTAN SMS'
-            )
+            click.echo(f'{title}: Sent {mtan_count} mTAN SMS')
 
     return mtan_statistics
+
+
+@cli.command(context_settings={'default_selector': '*'})
+@click.argument('year', type=click.IntRange(1900, date.today().year))
+@click.argument('month', type=click.IntRange(1, 12))
+@pass_group_context
+def signing_service_statistics(
+    group_context: GroupContext,
+    year: int,
+    month: int,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Generate mTAN SMS statistics for the given year and month. """
+
+    if date(year, month, 1) >= date.today().replace(day=1):
+        abort('Year and month needs to be fully in the past')
+
+    def signing_service_statistics(request: OrgRequest, app: OrgApp) -> None:
+        signing_request_counts: dict[str, int] = dict(request.session.query(
+            SigningRequest.service_name,
+            func.count(SigningRequest.id)
+        ).filter(and_(
+            func.extract('year', SigningRequest.created) == year,
+            func.extract('month', SigningRequest.created) == month,
+        )).group_by(SigningRequest.service_name).tuples())
+        if signing_request_counts:
+            org_name = app.org.name if hasattr(app, 'org') else None
+            title = f'{org_name} ({app.schema})' if org_name else app.schema
+            for name, count in signing_request_counts.items():
+                click.echo(f'{title}: Signed {count} PDFs via {name}')
+
+    return signing_service_statistics
 
 
 def ul(inner: str) -> str:

@@ -11,7 +11,9 @@ from typing import Any, ClassVar, Protocol, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead, SupportsWrite
     from collections.abc import Iterator
+    from onegov.file.models import File, SigningRequest
     from onegov.file.types import SigningServiceConfig
+    from sqlalchemy.orm import Session
 
     class SupportsReadAndHasName(SupportsRead[bytes], Protocol):
         @property
@@ -65,9 +67,11 @@ class SigningService:
 
     def sign(
         self,
+        session: Session,
         infile: SupportsRead[bytes],
-        outfile: SupportsWrite[bytes]
-    ) -> str:
+        outfile: SupportsWrite[bytes],
+        file: File | None = None,
+    ) -> SigningRequest:
         """ Signs the input file and writes it to the given output file.
 
         Arguments
@@ -90,11 +94,12 @@ class SigningService:
         Return Value
         ============
 
-        The sign function *must* return a unique request id for each signed
-        file. This function should be composed of the service name and a
-        unique identifier. For example: 'my_service/0b86854'. Using this
-        identifier it should be possible to query the signing service backend
-        for more information (in case we ever need to investigate).
+        The sign function *must* return a `SigningRequest` with unique request
+        id for each signed file and add it to the given session. This
+        identifier should be composed of the service name and a unique
+        identifier. For example: 'my_service/0b86854'. Using this identifier
+        it should be possible to query the signing service backend for more
+        information (in case we ever need to investigate).
 
         It is up to the signing service to know what should be part of this
         unique identifer. The only thing that can't be part of the identifer
