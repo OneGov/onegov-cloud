@@ -38,31 +38,31 @@ from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
-from types import MethodType
 from webob import Response
 from webob.exc import WSGIHTTPException
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Sequence)
     from more.content_security import ContentSecurityPolicy
-    from morepath.authentication import Identity, NoIdentity
+    from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from onegov.core.mail import Attachment
     from onegov.core.types import EmailJsonDict, SequenceOrScalar
     from onegov.pay import Price
     from onegov.ticket import Ticket
     from onegov.ticket.collection import TicketCount
-    from reg.dispatch import _KeyLookup
+    from reg.types import KeyLookup
 
 
 class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
              PayApp, FormApp, UserApp, WebsocketsApp, ApiApp):
 
     serve_static_files = True
-    request_class = OrgRequest
+    request_class: type[OrgRequest[Self]] = OrgRequest
 
     #: org directives
     homepage_widget = directive(directives.HomepageWidgetAction)
@@ -175,9 +175,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
         # it on the instance, this should be a unique instance of the method
         # per instance, and an unique instance of the function per class
         get_view_meth = self.get_view
-        assert isinstance(get_view_meth, MethodType)
         get_view = get_view_meth.__func__
-        assert hasattr(get_view, 'key_lookup')
         key_lookup = get_view.key_lookup
         if not isinstance(key_lookup, KeyLookupWithMTANHook):
             get_view.key_lookup = KeyLookupWithMTANHook(key_lookup)
@@ -193,7 +191,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
             # this should be safe, since each class gets its own dispatch
             # but it is ugly that we have to access the dispatch using the
             # __self__ on one of the methods
-            assert hasattr(get_view, 'clean')
+            assert hasattr(get_view.clean, '__self__')
             dispatch = get_view.clean.__self__
             if not getattr(dispatch, '_mtan_hook_configured', False):
                 orig_get_key_lookup = dispatch.get_key_lookup
@@ -1025,7 +1023,7 @@ def wrap_with_mtan_hook(
 
 
 class KeyLookupWithMTANHook:
-    def __init__(self, key_lookup: _KeyLookup):
+    def __init__(self, key_lookup: KeyLookup):
         self.key_lookup = key_lookup
 
     def component(
@@ -1051,5 +1049,5 @@ class KeyLookupWithMTANHook:
     def all(
         self,
         key: Sequence[Any]
-    ) -> Iterator[Callable[..., Any]]:
+    ) -> Iterable[Callable[..., Any]]:
         return self.key_lookup.all(key)

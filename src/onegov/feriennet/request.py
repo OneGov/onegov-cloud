@@ -4,14 +4,20 @@ from functools import cached_property
 from onegov.town6.request import TownRequest
 
 
-from typing import TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.feriennet.app import FeriennetApp
 
 
-class FeriennetRequest(TownRequest):
+AppT = TypeVar(
+    'AppT',
+    bound='FeriennetApp',
+    default='FeriennetApp',
+    covariant=True
+)
 
-    app: FeriennetApp
+
+class FeriennetRequest(TownRequest[AppT]):
 
     @cached_property
     def is_organiser(self) -> bool:

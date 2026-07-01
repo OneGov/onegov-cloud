@@ -4,15 +4,16 @@ from functools import cached_property
 from onegov.town6.request import TownRequest
 
 
+from typing import TypeVar
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from onegov.agency.app import AgencyApp
 
 
-class AgencyRequest(TownRequest):
+AppT = TypeVar('AppT', bound='AgencyApp', default='AgencyApp', covariant=True)
 
-    app: AgencyApp
+
+class AgencyRequest(TownRequest[AppT]):
 
     @cached_property
     def current_role(self) -> str | None:

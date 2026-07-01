@@ -26,15 +26,15 @@ from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
 
-from typing import cast, overload, Any, NamedTuple, TYPE_CHECKING
+from typing import cast, overload, Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from dectate import Sentinel
     from gettext import GNUTranslations
     from markupsafe import Markup
-    from morepath import App
-    from morepath.authentication import Identity, NoIdentity
-    from onegov.core import Framework
+    from morepath import reify
+    from morepath.authentication import NoIdentity
+    from onegov.core import Framework, Identity
     from onegov.core.browser_session import BrowserSession
     from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol, TypeGuard
     from webob import Response
-    from webob.multidict import MultiDict
+    from webob.multidict import GetDict, MultiDict
     from webob.request import _FieldStorageWithFile
     from wtforms import Form
     from uuid import UUID
@@ -82,13 +82,16 @@ else:
     _BaseRequest = object
 
 
+AppT = TypeVar('AppT', bound='Framework', default='Framework', covariant=True)
+
+
 @msgpack.make_serializable(tag=11)
 class Message(NamedTuple):
     text: str
     type: MessageType
 
 
-class ReturnToMixin(_BaseRequest):
+class ReturnToMixin:
     """ Provides a safe and convenient way of using return-to links.
 
     Return-to links are links with an added 'return-to' query parameter
@@ -118,6 +121,13 @@ class ReturnToMixin(_BaseRequest):
     links. Those are meant for internally generated links!
 
     """
+
+    if TYPE_CHECKING:
+        # forward declare required attributes
+        @property
+        def url(self) -> str: ...
+        @property
+        def GET(self) -> GetDict: ...  # noqa: N802
 
     @property
     def identity_secret(self) -> str:
@@ -152,7 +162,11 @@ def is_logged_in(identity: Identity | NoIdentity) -> TypeGuard[Identity]:
     return identity is not NO_IDENTITY
 
 
-class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
+class CoreRequest(
+    IncludeRequest[AppT],
+    ContentSecurityRequest[AppT],
+    ReturnToMixin
+):
     """ Extends the default Morepath request with virtual host support and
     other useful methods.
 
@@ -161,7 +175,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     """
 
-    app: Framework
+    if TYPE_CHECKING:
+        @reify
+        def identity(self) -> Identity | NoIdentity: ...
 
     @cached_property
     def identity_secret(self) -> str:
@@ -909,7 +925,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     def resolve_path(
         self,
         path: str,
-        app: App | Sentinel = SAME_APP
+        app: Framework | Sentinel = SAME_APP  # type: ignore[override]
     ) -> Any | None:
         """Resolve a path to a model instance.
 
@@ -934,7 +950,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         environ.pop('webob._parsed_post_vars', None)
         request = self.__class__(
             environ,
-            cast('App', app),
+            cast('AppT', app),
             method='GET',
             path_info=path_info,
             query_string=query_string,

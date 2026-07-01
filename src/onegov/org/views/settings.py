@@ -74,6 +74,7 @@ def view_settings(
         q = Query('view').filter(model=Organisation)
 
         for action, fn in q(request.app):
+            assert hasattr(action, 'predicates')
             if 'setting' in action.predicates:
                 setting = copy(action.predicates)
                 # exclude this setting view if it's disabled for the app

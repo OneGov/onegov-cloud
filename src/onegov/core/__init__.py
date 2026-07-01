@@ -96,8 +96,9 @@ email_validator.CHECK_DELIVERABILITY = False
 
 from onegov.core.framework import Framework
 from onegov.core.filestorage import get_filestorage_file  # noqa: F401
+from onegov.core.identity import OneGovIdentity as Identity
 
 # include the filters module so they get picked up by webassets
 from onegov.core import filters  # noqa: F401
 
-__all__ = ['Framework', 'log']
+__all__ = ['Framework', 'Identity', 'log']

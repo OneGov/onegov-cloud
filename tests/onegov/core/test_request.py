@@ -26,7 +26,7 @@ def test_url_safe_token() -> None:
         'SERVER_NAME': '',
         'SERVER_PORT': '',
         'SERVER_PROTOCOL': 'https'
-    }, app=Bunch(identity_secret='asdf', lookup=None))  # type: ignore[arg-type]
+    }, app=Bunch(identity_secret='asdf', lookup=None))  # type: ignore[type-var]
 
     token = request.new_url_safe_token({'foo': 'bar'})
 
@@ -55,7 +55,7 @@ def test_return_to_mixin() -> None:
     def param(url: str) -> str:
         return url.split('=')[1]
 
-    r = Request()  # type: ignore[call-arg]
+    r = Request()
 
     assert r.return_to('https://example.org', '/').startswith(
         'https://example.org?return-to=')
@@ -89,7 +89,7 @@ def test_vhm_root_urls() -> None:
         'SERVER_PROTOCOL': 'https',
         'HTTP_HOST': 'example.com',
         'HTTP_X_VHM_ROOT': '/town/example/',
-    }, app=Bunch())  # type: ignore[arg-type]
+    }, app=Bunch())  # type: ignore[type-var]
 
     assert request.x_vhm_root == '/town/example'
     assert request.application_url == 'https://example.com'

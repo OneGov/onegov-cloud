@@ -84,13 +84,13 @@ class HomepageWidgetAction(Action):
     def __init__(self, tag: str) -> None:
         self.tag = tag
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         homepage_widget_registry: dict[str, RegisteredHomepageWidget]
     ) -> str:
         return self.tag
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: Callable[[], HomepageWidget],
         homepage_widget_registry: dict[str, RegisteredHomepageWidget]
@@ -113,13 +113,13 @@ class ExportAction(Action):
         self.kwargs = kwargs
         self.kwargs['id'] = id
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         export_registry: dict[str, Any]
     ) -> str:
         return self.id
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         cls: Callable[..., Any],
         export_registry: dict[str, Any]
@@ -139,13 +139,13 @@ class UserlinkAction(Action):
     def __init__(self) -> None:
         self.name = next(self.counter)
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         linkgroup_registry: list[LinkGroupFactory]
     ) -> int:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: LinkGroupFactory,
         linkgroup_registry: list[LinkGroupFactory]
@@ -163,13 +163,13 @@ class DirectorySearchWidgetAction(Action):
     def __init__(self, name: str) -> None:
         self.name = name
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         directory_search_widget_registry: DirectorySearchWidgetRegistry
     ) -> str:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         cls: type[DirectorySearchWidget[Any]],
         directory_search_widget_registry: DirectorySearchWidgetRegistry
@@ -194,13 +194,13 @@ class EventSearchWidgetAction(Action):
     def __init__(self, name: str) -> None:
         self.name = name
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         event_search_widget_registry: EventSearchWidgetRegistry
     ) -> str:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         cls: type[EventSearchWidget],
         event_search_widget_registry: EventSearchWidgetRegistry
@@ -236,23 +236,23 @@ class Boardlet(Action):
         """
 
         self.name = name
-        self.order = order
+        self.boardlet_order = order
         self.icon = icon
         self.kind = kind
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         boardlets_registry: dict[BoardletKind, dict[str, BoardletConfig]]
     ) -> str:
         return f'{self.kind}-{self.name}'
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: type[_Boardlet],
         boardlets_registry: dict[BoardletKind, dict[str, BoardletConfig]]
     ) -> None:
         boardlets_registry[self.kind][self.name] = {
             'cls': func,
-            'order': self.order,
+            'order': self.boardlet_order,
             'icon': self.icon,
         }

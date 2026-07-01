@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from morepath import Identity
 from onegov.core.browser_session import BrowserSession
 from onegov.core.framework import Framework
+from onegov.core.identity import OneGovIdentity as Identity
 
 
 from typing import TYPE_CHECKING

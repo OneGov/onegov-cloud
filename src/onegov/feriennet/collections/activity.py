@@ -7,8 +7,9 @@ from sqlalchemy.orm import selectinload
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from morepath.authentication import Identity, NoIdentity
+    from morepath.authentication import NoIdentity
     from onegov.activity.collections.activity import ActivityFilter
+    from onegov.core import Identity
     from onegov.feriennet.models import VacationActivity
     from sqlalchemy.orm import Query, Session
     from typing import Self
