@@ -359,7 +359,7 @@ def import_horw(
 
     Example:
 
-        onegov-people --select '/onegov_town6/horw' import-horw export.xls
+        onegov-people --select /onegov_town6/horw import-horw export.xls
 
     """
 
@@ -434,26 +434,60 @@ def import_horw(
                 raw_org = fields.get('_horw_org')
                 raw_sub_org = fields.get('_horw_sub_org')
                 if isinstance(raw_org, str) and raw_org:
-                    if valid_orgs and raw_org not in valid_orgs:
-                        click.secho(
-                            f'Row {row_num} ({last_name} {first_name}): '
-                            f'org {raw_org!r} not in hierarchy',
-                            fg='red')
-                        errors += 1
-                    elif isinstance(raw_sub_org, str) and raw_sub_org:
-                        if (valid_orgs and raw_org in valid_orgs
-                                and raw_sub_org not in valid_orgs[raw_org]):
+                    top_orgs = [s for s in (
+                        p.strip() for p in raw_org.split(',')
+                    ) if s]
+                    # validate top-level orgs; collect valid ones in order
+                    valid_tops: list[str] = []
+                    for top in top_orgs:
+                        if valid_orgs and top not in valid_orgs:
                             click.secho(
                                 f'Row {row_num} ({last_name} {first_name}): '
-                                f'sub-org {raw_sub_org!r} not in org '
-                                f'{raw_org!r}',
+                                f'org {top!r} not in hierarchy',
                                 fg='red')
                             errors += 1
                         else:
-                            extra['organisations_multiple'] = [
-                                raw_org, f'-{raw_sub_org}']
-                    else:
-                        extra['organisations_multiple'] = [raw_org]
+                            valid_tops.append(top)
+                    # assign each sub-org to its parent top-level org
+                    subs_by_top: dict[str, list[str]] = {
+                        t: [] for t in valid_tops
+                    }
+                    if valid_tops and isinstance(raw_sub_org, str) and raw_sub_org:
+                        all_valid_subs: set[str] = set().union(
+                            *(valid_orgs.get(t, set()) for t in valid_tops)
+                        )
+                        # try the full value first (handles names with commas),
+                        # fall back to comma-splitting
+                        if raw_sub_org in all_valid_subs:
+                            sub_candidates = [raw_sub_org]
+                        else:
+                            sub_candidates = [
+                                s for s in (
+                                    p.strip() for p in raw_sub_org.split(',')
+                                ) if s
+                            ]
+                        for sub in sub_candidates:
+                            parent = next(
+                                (t for t in valid_tops
+                                 if sub in valid_orgs.get(t, set())),
+                                None
+                            )
+                            if parent is None:
+                                click.secho(
+                                    f'Row {row_num} ({last_name} '
+                                    f'{first_name}): sub-org {sub!r} '
+                                    f'not in hierarchy',
+                                    fg='red')
+                                errors += 1
+                            else:
+                                subs_by_top[parent].append(sub)
+                    # build flat list: each org immediately followed by its subs
+                    orgs: list[str] = []
+                    for top in valid_tops:
+                        orgs.append(top)
+                        orgs.extend(f'-{s}' for s in subs_by_top[top])
+                    if orgs:
+                        extra['organisations_multiple'] = orgs
 
             _upsert_horw_person(people, first_name, last_name, extra)
             count += 1
