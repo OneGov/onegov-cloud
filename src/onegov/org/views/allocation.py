@@ -723,8 +723,7 @@ def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
         Allocation.group.notin_(reservations.scalar_subquery()))
 
     # delete the allocations
-    for count, candidate in enumerate(candidates, start=1):
-        request.session.delete(candidate)
+    count = candidates.delete('fetch')
 
     delete_rule(self, rule_id)
 
