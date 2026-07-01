@@ -23,6 +23,7 @@ from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import ExtendedInternalTicketChatMessageForm
 from onegov.org.forms import ManualInvoiceItemForm
+from onegov.org.forms import RequestCancellationForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChangeTagForm
 from onegov.org.forms import TicketChatMessageForm
@@ -1525,12 +1526,12 @@ def view_ticket_status(
     name='request-cancellation',
     template='request_cancellation.pt',
     permission=Public,
-    form=Form
+    form=RequestCancellationForm
 )
 def request_cancellation(
     self: ReservationTicket,
     request: OrgRequest,
-    form: Form,
+    form: RequestCancellationForm,
     layout: DefaultLayout | None = None,
 ) -> RenderData | BaseResponse:
     resource = self.handler.resource
@@ -1559,12 +1560,20 @@ def request_cancellation(
         return morepath.redirect(request.link(self, 'status'))
 
     if form.submitted(request):
+        reservations = self.handler.reservations
+        if 'reservation_ids' in form:
+            selected_ids = list(form.reservation_ids.data or [])
+            targeted = [r for r in reservations if r.id in selected_ids]
+        else:
+            targeted = list(reservations)
+            selected_ids = []
+
         self.last_state_change = self.timestamp()
         self.state = 'open'
         self.user = None
 
         ReservationMessage.create(
-            self.handler.reservations,
+            targeted,
             self,
             request,
             'cancellation_requested'
@@ -1573,6 +1582,7 @@ def request_cancellation(
         self.handler_data = {
             **self.handler_data,
             'cancellation_requested': True,
+            'cancellation_reservation_ids': selected_ids,
         }
 
         request.success(_('Your cancellation request has been submitted. '
@@ -1611,11 +1621,15 @@ def accept_cancellation(
     if not self.handler_data.get('cancellation_requested'):
         raise exc.HTTPNotFound()
 
+    stored_ids = self.handler_data.get('cancellation_reservation_ids')
+    targeted_ids = set(stored_ids) if stored_ids else None
+
     return _remove_reservation(
         self.handler.reservations[0],
         request,
         view_ticket=self,
         change='cancellation_accepted',
+        targeted_ids=targeted_ids,
     )
 
 

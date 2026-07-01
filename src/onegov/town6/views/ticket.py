@@ -13,8 +13,9 @@ from onegov.org.views.ticket import (
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import (
-    TicketNoteForm, TicketAssignmentForm, TicketChangeTagForm,
-    ExtendedInternalTicketChatMessageForm, ManualInvoiceItemForm)
+    RequestCancellationForm, TicketNoteForm, TicketAssignmentForm,
+    TicketChangeTagForm, ExtendedInternalTicketChatMessageForm,
+    ManualInvoiceItemForm)
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.models import TicketNote
 from onegov.org.models.resource import FindYourSpotCollection
@@ -241,12 +242,12 @@ def town_view_my_tickets(
     name='request-cancellation',
     template='request_cancellation.pt',
     permission=Public,
-    form=Form
+    form=RequestCancellationForm
 )
 def town_request_cancellation(
     self: ReservationTicket,
     request: TownRequest,
-    form: Form,
+    form: RequestCancellationForm,
 ) -> RenderData | Response:
     return request_cancellation(
         self, request, form, TicketChatMessageLayout(self, request)

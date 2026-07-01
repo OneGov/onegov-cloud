@@ -17,6 +17,7 @@
         <p><b>${resource.title}</b></p>
         <tal:b metal:use-macro="layout.macros['reservations']"></tal:b>
 
+        <!--? may extend the template showing the remaining reservations only if it was multiple originally -->
         <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
         </p>

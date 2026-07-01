@@ -1290,6 +1290,7 @@ def _remove_reservation(
     notify: bool = False,
     view_ticket: ReservationTicket | None = None,
     change: str = 'rejected',
+    targeted_ids: set[int] | None = None,
 ) -> Response | None:
 
     def respond() -> Response | None:
@@ -1309,7 +1310,12 @@ def _remove_reservation(
         .order_by(Reservation.start).all()
     )
     targeted: Sequence[Reservation]
-    if reservation_id_str is not None:
+    if targeted_ids is not None:
+        targeted = tuple(r for r in all_reservations if r.id in targeted_ids)
+        if not targeted:
+            request.warning(_('The targeted reservation no longer exists'))
+            return respond()
+    elif reservation_id_str is not None:
         if not (
             isinstance(reservation_id_str, str)
             and reservation_id_str.isdigit()
@@ -1324,8 +1330,10 @@ def _remove_reservation(
     else:
         targeted = all_reservations
 
-    targeted_ids = {r.id for r in targeted}
-    excluded = tuple(r for r in all_reservations if r.id not in targeted_ids)
+    targeted_id_set = {r.id for r in targeted}
+    excluded = tuple(
+        r for r in all_reservations if r.id not in targeted_id_set
+    )
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
@@ -1508,8 +1516,8 @@ def _remove_reservation(
         for site_id, visit_id in kaba_visits_to_revoke:
             try:
                 clients[site_id].revoke_visit(visit_id)
-            except (KeyError, KabaApiError) as exc:
-                if isinstance(exc, KabaApiError):
+            except (KeyError, KabaApiError) as kaba_exc:
+                if isinstance(kaba_exc, KabaApiError):
                     log.info('Kaba API error', exc_info=True)
                 failed_to_revoke = True
 

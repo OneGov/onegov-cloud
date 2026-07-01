@@ -12,8 +12,19 @@
                     The record behind this ticket was removed. The following information
                     is a snapshot kept for future reference.
                 </div>
-                <div tal:condition="handler.data.get('cancellation_requested', False)" class="panel callout warning" i18n:translate>
-                    A cancellation has been requested for this reservation.
+                <div class="ticket-summary" tal:condition="handler.data.get('cancellation_requested', False)">
+                    <div class="panel callout warning" i18n:translate>
+                        A cancellation has been requested for this reservation.
+                    </div>
+                    <tal:b
+                        tal:define="
+                            cancellation_ids handler.data.get('cancellation_reservation_ids');
+                            reservations [r for r in handler.reservations if r.id in set(cancellation_ids)] if cancellation_ids else handler.reservations;
+                            get_links handler.get_cancellation_links if is_manager and ticket.state == 'pending' else None;
+                            get_occupancy_url handler.get_occupancy_url
+                        "
+                        metal:use-macro="layout.macros['reservations']">
+                    </tal:b>
                 </div>
                 <div class="ticket-summary" id="summary">
                     <tal:b replace="summary" />
@@ -294,8 +305,19 @@
                     The record behind this ticket was removed. The following information
                     is a snapshot kept for future reference.
                 </div>
-                <div tal:condition="handler.data.get('cancellation_requested', False)" class="panel callout warning" i18n:translate>
-                    A cancellation has been requested for this reservation.
+                <div class="ticket-summary" tal:condition="handler.data.get('cancellation_requested', False)">
+                    <div class="panel callout warning" i18n:translate>
+                        A cancellation has been requested for this reservation.
+                    </div>
+                    <tal:b
+                        tal:define="
+                            cancellation_ids handler.data.get('cancellation_reservation_ids');
+                            reservations [r for r in handler.reservations if r.id in set(cancellation_ids)] if cancellation_ids else handler.reservations;
+                            get_links handler.get_cancellation_links if is_manager and ticket.state == 'pending' else None;
+                            get_occupancy_url handler.get_occupancy_url
+                        "
+                        metal:use-macro="layout.macros['reservations']">
+                    </tal:b>
                 </div>
                 <div class="ticket-summary">
                     <h2 i18n:translate>Summary</h2>

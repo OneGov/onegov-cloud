@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-06-22 07:44+0200\n"
+"POT-Creation-Date: 2026-07-01 14:24+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -540,6 +540,13 @@ msgstr "Conferma"
 
 msgid "Propose a change to this entry"
 msgstr "Suggerisci una modifica per questa voce"
+
+msgid ""
+"Fingerprint of the entry's content. Changes whenever the entry data is "
+"modified."
+msgstr ""
+"Impronta digitale del contenuto della voce. Cambia quando i dati della "
+"voce vengono modificati."
 
 msgid "Hash"
 msgstr "Hash"
@@ -1410,11 +1417,46 @@ msgstr ""
 "Se ritieni che si tratti di un errore, ignora questo messaggio e non ti "
 "disturberemo mai più."
 
-msgid "Below you can see your chat conversation:"
-msgstr "Qui di seguito potete vedere la vostra conversazione in chat:"
+msgid ""
+"Your cancellation request has been accepted. The following reservations have "
+"been cancelled:"
+msgstr ""
+"La tua richiesta di cancellazione è stata accettata. Le seguenti "
+"prenotazioni sono state cancellate:"
+
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
+msgid "Check request status"
+msgstr "Controlla lo stato della richiesta"
+
+msgid "The following reservations have been cancelled:"
+msgstr "Le seguenti prenotazioni sono state cancellate:"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Tag"
+msgstr "Tag"
+
+msgid "See Ticket ${link} for additional information."
+msgstr "Per ulteriori informazioni, consultare il biglietto ${link}."
 
 msgid "Have a great day!"
 msgstr "Ti auguro una buona giornata!"
+
+msgid ""
+"This is a notification for accepted cancellation requests for "
+"${organisation}. If you no longer wish to receive these notifications, "
+"please contact an administrator so they can remove you from the recipients "
+"list."
+msgstr ""
+"Questa è una notifica per le richieste di cancellazione accettate per "
+"${organisation}. Se non si desidera più ricevere queste notifiche, "
+"contattare un amministratore."
+
+msgid "Below you can see your chat conversation:"
+msgstr "Qui di seguito potete vedere la vostra conversazione in chat:"
 
 msgid "Your e-mail address was just used to send a login link to ${homepage}."
 msgstr ""
@@ -1479,9 +1521,6 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
-
 #. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
@@ -1508,9 +1547,6 @@ msgstr "Per oggi sono previste le seguenti prenotazioni."
 
 msgid "Whole day"
 msgstr "Giorno intero"
-
-msgid "E-Mail"
-msgstr "E-mail"
 
 msgid "No reservations today."
 msgstr "Nessuna prenotazione oggi."
@@ -1577,9 +1613,6 @@ msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 msgid "Your directory submission has been adopted:"
 msgstr "L'invio della cartella è stato adottato:"
 
-msgid "Check request status"
-msgstr "Controlla lo stato della richiesta"
-
 msgid "Your change request has been applied:"
 msgstr "La richiesta di modifica è stata applicata:"
 
@@ -1620,12 +1653,6 @@ msgstr "Non desideri più ricevere queste notifiche?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
-
-msgid "Tag"
-msgstr "Tag"
-
-msgid "See Ticket ${link} for additional information."
-msgstr "Per ulteriori informazioni, consultare il biglietto ${link}."
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1735,6 +1762,9 @@ msgstr ""
 
 msgid "Key Code"
 msgstr "Codice chiave"
+
+msgid "Request cancellation"
+msgstr "Richiedere la cancellazione"
 
 msgid "See all your reservations"
 msgstr "Vedere tutte le prenotazioni"
@@ -1882,6 +1912,15 @@ msgstr "1 prenotazione aggiunta."
 
 msgid "${count} reservations added."
 msgstr "${count} prenotazioni aggiunte."
+
+msgid "Cancellation requested for 1 reservation."
+msgstr "Richiesta di cancellazione per 1 prenotazione."
+
+msgid "Cancellation requested for ${count} reservations."
+msgstr "Richiesta di cancellazione per ${count} prenotazioni."
+
+msgid "Cancellation accepted."
+msgstr "Cancellazione accettata."
 
 msgid "1 reservation adjusted:"
 msgstr "1 prenotazione regolata:"
@@ -2172,11 +2211,20 @@ msgstr "Imposta:"
 msgid "No payments yet."
 msgstr "Nessun pagamento ancora."
 
+msgid "Search people"
+msgstr "Cercare persone"
+
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Filtrare per organizzazione o sottoorganizzazione"
+
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
 
 msgid "Select sub organisation"
 msgstr "Selezionare la sotto-organizzazione"
+
+msgid "No people added yet."
+msgstr "Nessuna persona ancora aggiunta."
 
 msgid "No people found for current filter selection."
 msgstr "Non sono state trovate persone per la selezione del filtro corrente."
@@ -2251,6 +2299,22 @@ msgstr "Iscritto il"
 
 msgid "submitted"
 msgstr "inviato"
+
+msgid ""
+"You are about to submit a cancellation request for the following "
+"reservation. An administrator will review your request and confirm the "
+"cancellation."
+msgstr ""
+"Stai per inviare una richiesta di cancellazione per la seguente "
+"prenotazione. Un amministratore esaminerà la tua richiesta e confermerà la "
+"cancellazione."
+
+msgid ""
+"Please select the reservations you would like to cancel. An administrator "
+"will review your request and confirm the cancellation."
+msgstr ""
+"Seleziona le prenotazioni che desideri cancellare. Un amministratore "
+"esaminerà la tua richiesta e confermerà la cancellazione."
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Nessuna data trovata, seleziona prima le date nel calendario"
@@ -2457,6 +2521,9 @@ msgstr ""
 "Il record su cui è basato questo biglietto è stato rimosso. Le seguenti "
 "informazioni sono un'istantanea conservata per riferimento futuro."
 
+msgid "A cancellation has been requested for this reservation."
+msgstr "È stata richiesta una cancellazione per questa prenotazione."
+
 msgid "Timeline"
 msgstr "Timeline"
 
@@ -2581,6 +2648,9 @@ msgstr "Aggiungi un messaggio al biglietto."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr ""
 "I nuovi messaggi sono stati disabilitati perché il biglietto è stato chiuso."
+
+msgid "Would you like to cancel your reservation?"
+msgstr "Desideri cancellare la tua prenotazione?"
 
 msgid ""
 "Enable notifications about new tickets. Only works when being logged in and "
@@ -2876,41 +2946,33 @@ msgstr "Panoramica delle notifiche push"
 msgid "New Note"
 msgstr "Nuova nota"
 
-msgid "Cancellation requested for 1 reservation."
-msgstr "Richiesta di cancellazione per 1 prenotazione."
+#~ msgid "Cancellation requested for"
+#~ msgstr "Richiesta di cancellazione per"
 
-msgid "Cancellation requested for ${count} reservations."
-msgstr "Richiesta di cancellazione per ${count} prenotazioni."
+#~ msgid "All reservations"
+#~ msgstr "Tutte le prenotazioni"
 
-msgid "You are about to submit a cancellation request for the following reservations. An administrator will review your request and confirm the cancellation."
-msgstr "Stai per inviare una richiesta di cancellazione per le seguenti prenotazioni. Un amministratore esaminerà la tua richiesta e confermerà la cancellazione."
+#~ msgid "Select reservations to cancel"
+#~ msgstr "Seleziona le prenotazioni da cancellare"
 
-msgid "Cancellation accepted."
-msgstr "Cancellazione accettata."
+#~ msgid "${org} Accepted Cancellation"
+#~ msgstr "${org} Cancellazione accettata"
 
-msgid "A cancellation has been requested for this reservation."
-msgstr "È stata richiesta una cancellazione per questa prenotazione."
+#~ msgid ""
+#~ "A cancellation request can only be submitted for accepted reservations."
+#~ msgstr ""
+#~ "Una richiesta di cancellazione può essere inviata solo per prenotazioni "
+#~ "accettate."
 
-msgid "Your cancellation request has been accepted. The following reservations have been cancelled:"
-msgstr "La tua richiesta di cancellazione è stata accettata. Le seguenti prenotazioni sono state cancellate:"
+#~ msgid "A cancellation request has already been submitted."
+#~ msgstr "Una richiesta di cancellazione è già stata inviata."
 
-msgid "${org} Accepted Cancellation"
-msgstr "${org} Cancellazione accettata"
-
-msgid "The following reservations have been cancelled:"
-msgstr "Le seguenti prenotazioni sono state cancellate:"
-
-msgid "This is a notification for accepted cancellation requests for ${organisation}. If you no longer wish to receive these notifications, please contact an administrator so they can remove you from the recipients list."
-msgstr "Questa è una notifica per le richieste di cancellazione accettate per ${organisation}. Se non si desidera più ricevere queste notifiche, contattare un amministratore."
-
-msgid "A cancellation request can only be submitted for accepted reservations."
-msgstr "Una richiesta di cancellazione può essere inviata solo per prenotazioni accettate."
-
-msgid "A cancellation request has already been submitted."
-msgstr "Una richiesta di cancellazione è già stata inviata."
-
-msgid "A cancellation request cannot be submitted because the payment has already been invoiced or paid."
-msgstr "Una richiesta di cancellazione non può essere inviata perché il pagamento è già stato fatturato o pagato."
+#~ msgid ""
+#~ "A cancellation request cannot be submitted because the payment has "
+#~ "already been invoiced or paid."
+#~ msgstr ""
+#~ "Una richiesta di cancellazione non può essere inviata perché il pagamento "
+#~ "è già stato fatturato o pagato."
 
 #~ msgid "Topics"
 #~ msgstr "Argomenti"
