@@ -4179,6 +4179,48 @@ def test_allocation_rules_edit(client: Client) -> None:
     assert 'Renamed room' in edit_page
 
 
+def test_allocation_rules_delete(client: Client) -> None:
+    client.login_admin()
+
+    resources_page = client.get('/resources')
+
+    page = resources_page.click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def count_allocations() -> int:
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
+
+    def run_cronjob() -> None:
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
+    assert count_allocations() == 2
+
+    # delete the rule
+    edit_page = client.get('/resource/room').click("Verfügbarkeitszeiträume")
+    delete_links = edit_page.html.find_all('a', string='Löschen')
+    client.post(str(delete_links[0].attrs['ic-post-to']))
+    page = client.get(edit_page.request.path)
+    assert 'wurde gelöscht, zusammen mit 2 Verfügbarkeiten' in page
+
+
 def test_allocation_rules_copy_paste(client: Client) -> None:
     client.login_admin()
 
