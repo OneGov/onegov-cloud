@@ -40,7 +40,7 @@ class UploadRestForm(Form):
         label=_('Results'),
         validators=[
             DataRequired(),
-            FileSizeLimit(50 * 1024 * 1024)
+            FileSizeLimit(100 * 1024 * 1024)
         ],
         allowed_mimetypes=ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML,
         render_kw={'force_simple': True}
