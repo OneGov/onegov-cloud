@@ -7215,22 +7215,22 @@ msgid "This week"
 msgstr "Diese Woche"
 
 #, python-format
-msgid ""
-"The filter \"${keyword}\" is still applied to ${count} events and cannot be "
-"removed. Clear the filter on those events first."
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
 msgstr ""
-"Der Filter \"${keyword}\" ist noch bei ${count} Veranstaltungen gesetzt und "
-"kann nicht entfernt werden. Entfernen Sie den Filter zuerst bei diesen "
-"Veranstaltungen."
+"Der Filter \"${keyword}\" ist noch bei ${count} Veranstaltung(en) gesetzt."
 
 #, python-format
 msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} events and "
-"cannot be removed. Clear the filter on those events first."
+"The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
-"Die Filterauswahl \"${choice}\" ist noch bei ${count} Veranstaltungen "
-"gesetzt und kann nicht entfernt werden. Entfernen Sie den Filter zuerst bei "
-"diesen Veranstaltungen."
+"Die Filterauswahl \"${choice}\" ist noch bei ${count} Veranstaltung(en) "
+"gesetzt."
+
+msgid "Remove these filters from all affected events"
+msgstr "Diese(n) Filter bei allen betroffenen Veranstaltungen entfernen"
+
+msgid "Confirmation"
+msgstr "Bestätigung"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Filterkonfiguration für Veranstaltungen bearbeiten"

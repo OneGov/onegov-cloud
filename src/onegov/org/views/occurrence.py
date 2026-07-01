@@ -237,6 +237,7 @@ def handle_edit_event_filters(
     layout: OccurrencesLayout | None = None
 ) -> RenderData | BaseResponse:
 
+    show_force_remove = False
     try:
         if form.submitted(request):
             old_keywords = {
@@ -258,43 +259,67 @@ def handle_edit_event_filters(
                     form.definition.data
                 )
             }
-            blocked = False
-            for keyword in old_keywords - new_keywords:
-                count = (
-                    request.session.query(EventFilterValue)
-                    .filter_by(keyword=keyword)
-                    .count()
-                )
-                if count:
-                    request.alert(_(
-                        'The filter "${keyword}" is still applied to '
-                        '${count} events and cannot be removed. Clear '
-                        'the filter on those events first.',
-                        mapping={'keyword': keyword, 'count': count}
-                    ))
-                    blocked = True
 
-            for keyword in old_keywords & new_keywords:
-                removed_choices = (
+            removed_keywords = old_keywords - new_keywords
+            removed_choices: dict[str, set[str]] = {
+                keyword: (
                     old_field_choices.get(keyword, set())
                     - new_field_choices.get(keyword, set())
                 )
-                for choice in removed_choices:
+                for keyword in old_keywords & new_keywords
+                if old_field_choices.get(keyword, set())
+                - new_field_choices.get(keyword, set())
+            }
+
+            if form.force_remove.data:
+                for keyword in removed_keywords:
+                    (
+                        request.session.query(EventFilterValue)
+                        .filter_by(keyword=keyword)
+                        .delete()
+                    )
+                for keyword, choices in removed_choices.items():
+                    for choice in choices:
+                        (
+                            request.session.query(EventFilterValue)
+                            .filter_by(keyword=keyword, value=choice)
+                            .delete()
+                        )
+            else:
+                blocked = False
+                for keyword in removed_keywords:
                     count = (
                         request.session.query(EventFilterValue)
-                        .filter_by(keyword=keyword, value=choice)
+                        .filter_by(keyword=keyword)
                         .count()
                     )
                     if count:
                         request.alert(_(
-                            'The filter choice "${choice}" is still applied '
-                            'to ${count} events and cannot be removed. Clear '
-                            'the filter on those events first.',
-                            mapping={'choice': choice, 'count': count}
+                            'The filter "${keyword}" is still applied to '
+                            '${count} event(s).',
+                            mapping={'keyword': keyword, 'count': count}
                         ))
                         blocked = True
 
-            if not blocked:
+                for keyword, choices in removed_choices.items():
+                    for choice in choices:
+                        count = (
+                            request.session.query(EventFilterValue)
+                            .filter_by(keyword=keyword, value=choice)
+                            .count()
+                        )
+                        if count:
+                            request.alert(_(
+                                'The filter choice "${choice}" is still '
+                                'applied to ${count} event(s).',
+                                mapping={'choice': choice, 'count': count}
+                            ))
+                            blocked = True
+
+                if blocked:
+                    show_force_remove = True
+
+            if not show_force_remove:
                 keywords = (form.keyword_fields.data or '').splitlines()
                 request.app.org.event_filter_configuration = {
                     'order': [],
@@ -327,6 +352,9 @@ def handle_edit_event_filters(
         request.warning(
             _('Error: Duplicate label ${label}', mapping={'label': e.label})
         )
+
+    if not show_force_remove:
+        form.delete_field('force_remove')
 
     layout = layout or OccurrencesLayout(self, request)
     layout.include_code_editor()
