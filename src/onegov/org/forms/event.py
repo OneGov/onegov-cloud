@@ -707,3 +707,8 @@ class EventConfigurationForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
+
+    force_remove = BooleanField(
+        label=_('Remove these filters from all affected events'),
+        fieldset=_('Confirmation'),
+    )
