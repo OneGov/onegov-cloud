@@ -20,6 +20,7 @@ from onegov.directory import (DirectoryEntryCollection,
 from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import EventCollection, OccurrenceCollection, Event
 from onegov.event.utils import as_rdates
+from onegov.file.models import SigningRequest
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import (
     ExtendedDirectoryEntry,
@@ -1173,6 +1174,113 @@ def test_monthly_mtan_statistics(client: Client[TestOrgApp]) -> None:
     assert message['Subject'] == (
         'Govikon: mTAN Statistik Januar 2016')
     assert "5 mTAN SMS versendet" in message['TextBody']
+
+    # we only run on first monday of the month
+    with freeze_time(datetime(2016, 2, 2, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 3, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 4, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 5, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 6, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 7, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 8, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 15, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 22, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 29, tzinfo=tz)):
+        client.get(url)
+
+    # no additional mails have been sent
+    assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_monthly_signing_service_statistics(
+    client: Client[TestOrgApp]
+) -> None:
+    job = get_cronjob_by_name(client.app, 'monthly_signing_service_statistics')
+    assert job is not None
+    job.app = client.app
+
+    url = get_cronjob_url(job)
+
+    tz = ensure_timezone('Europe/Zurich')
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    # don't send an email if no mTANs have been sent
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    transaction.begin()
+
+    session = client.app.session()
+    collection = TANCollection(session, scope='test')
+
+    session.add(SigningRequest(  # outside
+        service_name='foo',
+        request_id='foo/1',
+        created=datetime(2015, 12, 30, 10, tzinfo=tz),
+    ))
+    session.add(SigningRequest(
+        service_name='foo',
+        request_id='foo/2',
+        created=datetime(2016, 1, 4, 10, tzinfo=tz),
+    ))
+    session.add(SigningRequest(
+        service_name='foo',
+        request_id='foo/3',
+        created=datetime(2016, 1, 9, 10, tzinfo=tz)
+    ))
+    session.add(SigningRequest(
+        service_name='foo',
+        request_id='foo/4',
+        created=datetime(2016, 1, 19, 10, tzinfo=tz)
+    ))
+    session.add(SigningRequest(
+        service_name='foo',
+        request_id='foo/5',
+        created=datetime(2016, 1, 24, 10, tzinfo=tz)
+    ))
+    session.add(SigningRequest(
+        service_name='bar',
+        request_id='bar/1',
+        created=datetime(2016, 1, 29, 10, tzinfo=tz)
+    ))
+    session.add(SigningRequest(  # also outside
+        service_name='bar',
+        request_id='bar/2',
+        created=datetime(2016, 2, 1, 10, tzinfo=tz)
+    ))
+    transaction.commit()
+
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message is not None
+    assert message['Subject'] == (
+        'Govikon: PDF Signatur Statistik Januar 2016')
+    assert "4 PDFs signiert via foo" in message['TextBody']
+    assert "1 PDFs signiert via bar" in message['TextBody']
 
     # we only run on first monday of the month
     with freeze_time(datetime(2016, 2, 2, tzinfo=tz)):

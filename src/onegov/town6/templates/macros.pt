@@ -717,7 +717,7 @@
     <tal:b condition="not: item.published">
         <div class="grid-x">
             <div class="small-12 cell">
-                <div class="panel">
+                <div class="panel callout">
                     <p i18n:translate>
                         This site is not published.
                     </p>

@@ -7292,6 +7292,24 @@ msgstr "Ce week-end"
 msgid "This week"
 msgstr "Cette semaine"
 
+#, python-format
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
+msgstr ""
+"Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
+
+#, python-format
+msgid ""
+"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgstr ""
+"Le choix de filtre \"${choice}\" est encore appliqué à ${count} "
+"événement(s)."
+
+msgid "Remove these filters from all affected events"
+msgstr "Supprimer ces filtres de tous les événements concernés"
+
+msgid "Confirmation"
+msgstr "Confirmation"
+
 msgid "Edit Event Filter Configuration"
 msgstr "Modifier la configuration du filtre d'événements"
 

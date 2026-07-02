@@ -21,6 +21,7 @@ from onegov.core.templates import render_template
 from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
+from onegov.file.models import SigningRequest
 from onegov.form import FormSubmission, parse_form, Form
 from onegov.newsletter.models import Recipient
 from onegov.newsletter import (Newsletter, NewsletterCollection,
@@ -108,6 +109,7 @@ def hourly_maintenance_tasks(request: OrgRequest) -> None:
     send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
+    delete_old_signing_requests(request)
     request.app.org.meta['hourly_maintenance_tasks_last_run'] = now
     # NOTE: Shouldn't be necessary, but better safe than sorry, since
     #       `maybe_merge` in `request_cached` can fail if we try to
@@ -265,10 +267,6 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
 def delete_old_tans(request: OrgRequest) -> None:
     """
     Deletes TANs that are older than half a year.
-
-    Technically we could delete them as soon as they expire
-    but for debugging purposes it makes sense to keep them
-    around a while longer.
     """
 
     cutoff = utcnow() - timedelta(days=180)
@@ -290,6 +288,20 @@ def delete_old_tan_accesses(request: OrgRequest) -> None:
 
     cutoff = utcnow() - timedelta(days=180)
     query = request.session.query(TANAccess).filter(TANAccess.created < cutoff)
+    # cronjobs happen outside a regular request, so we don't need
+    # to synchronize with the session
+    with request.app.session_manager.ignore_bulk_deletes():
+        query.delete(synchronize_session=False)
+
+
+def delete_old_signing_requests(request: OrgRequest) -> None:
+    """
+    Deletes signing requests that are older than a year.
+    """
+
+    cutoff = utcnow() - timedelta(days=366)
+    query = request.session.query(SigningRequest).filter(
+        SigningRequest.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
     with request.app.session_manager.ignore_bulk_deletes():
@@ -829,6 +841,56 @@ def send_monthly_mtan_statistics(request: OrgRequest) -> None:
         plaintext=(
             f'{org_name} hatte im {month_name} {year}\n'
             f'{mtan_count} mTAN SMS versendet'
+        )
+    )
+
+
+@OrgApp.cronjob(hour=9, minute=45, timezone='Europe/Zurich')
+def send_monthly_signing_service_statistics(request: OrgRequest) -> None:
+
+    today = to_timezone(utcnow(), 'Europe/Zurich')
+
+    if today.weekday() != MON or today.day > 7:
+        return
+
+    year = today.year
+    month = today.month
+
+    # rewind to previous month
+    if month == 1:
+        month = 12
+        year -= 1
+    else:
+        month -= 1
+
+    # count all the signing requests created in that period
+    # we use UTC as a reference for day boundaries so we don't have to
+    # calculate the boundaries ourselves and risk creating overlapping
+    # intervals
+    signing_request_counts: dict[str, int] = dict(request.session.query(
+        SigningRequest.service_name,
+        func.count(SigningRequest.id)
+    ).filter(and_(
+        func.extract('year', SigningRequest.created) == year,
+        func.extract('month', SigningRequest.created) == month,
+    )).group_by(SigningRequest.service_name).tuples())
+    if not signing_request_counts:
+        # don't send a mail if we generated no mTANs
+        return
+
+    month_name = get_month_names('wide', locale='de_CH')[month]
+    org_name = request.app.org.name
+
+    # FIXME: Make e-mail configurable and text translatable
+    request.app.send_transactional_email(
+        receivers='info@seantis.ch',
+        subject=f'{org_name}: PDF Signatur Statistik {month_name} {year}',
+        plaintext=(
+            f'{org_name} hat im {month_name} {year}\n'
+            '\n'.join(
+                f'{count} PDFs signiert via {name}'
+                for name, count in signing_request_counts.items()
+            )
         )
     )
 
