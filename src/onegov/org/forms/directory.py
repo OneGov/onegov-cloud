@@ -340,6 +340,17 @@ class DirectoryBaseForm(Form):
         fieldset=_('Notifications'),
         default=False)
 
+    notification_address = EmailField(
+        label=_('Admin notification address'),
+        description=_(
+            'Receives an e-mail when entries are published or de-published '
+            '(sent out hourly). Useful e.g. for permit directories as proof '
+            'of publication.'
+        ),
+        fieldset=_('Notifications'),
+        validators=[Optional(), Email()]
+    )
+
     submitter_meta_fields = MultiCheckboxField(
         label=_('Information to be provided in addition to the E-mail'),
         choices=(

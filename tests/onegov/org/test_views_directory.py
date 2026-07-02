@@ -1217,3 +1217,51 @@ def test_directory_entry_hash_shown_without_change_requests(
     ):
         page = anon.get(entry_url)
         assert page.pyquery('.directory-entry-hash')
+
+
+def test_edit_published_entry_requires_future_publication_start(
+    client: Client,
+) -> None:
+    """Editing a published entry in a directory with a notification address
+    must set publication_start to a future date."""
+    utc_now = utcnow()
+    tz = 'Europe/Zurich'
+    now_local = to_timezone(utc_now, tz)
+
+    client.login_admin()
+
+    # Create a directory with notification_address via the admin form
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Permits'
+    page.form['structure'] = 'Name *= ___'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_publication'] = True
+    page.form['required_publication'] = True
+    page.form['notification_address'] = 'admin@example.org'
+    page.form['enable_change_requests'] = False
+    page = page.form.submit().follow()
+
+    # Create an entry that is currently published (pub_start in the past)
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(
+        now_local - timedelta(hours=1)
+    )
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    page = page.form.submit().follow()
+    assert 'Permit One' in page
+
+    # Edit the entry — keeping publication_start in the past must fail
+    page = page.click('Bearbeiten')
+    page.form['publication_start'] = dt_for_form(
+        now_local - timedelta(hours=2)
+    )
+    page = page.form.submit()
+    assert 'currently published' in page or 'aktuell veröffentlicht' in page
+
+    # Setting publication_start to a future date must succeed
+    page.form['publication_start'] = dt_for_form(
+        now_local + timedelta(hours=1)
+    )
+    page = page.form.submit().follow()
+    assert 'Permit One' in page
