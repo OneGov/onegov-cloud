@@ -4516,7 +4516,8 @@ ul.search-results {
 /*
     Ticket summary customisations
 */
-.ticket-summary {
+.ticket-summary,
+.ticket-cancellation-request {
     margin-bottom: 1.5rem;
 
     > div {
@@ -5587,6 +5588,7 @@ h2 + div.timeline {
     }
 
     .ticket-summary h2,
+    .ticket-cancellation-request h2,
     .ticket-timeline h2 {
         font-weight: bold;
     }
@@ -5595,7 +5597,8 @@ h2 + div.timeline {
         display: none;
     }
 
-    .ticket-summary {
+    .ticket-summary,
+    .ticket-cancellation-request {
         margin-bottom: 0;
 
         * {

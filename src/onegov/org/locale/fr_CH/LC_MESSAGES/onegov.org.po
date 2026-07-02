@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-01 07:55+0200\n"
+"POT-Creation-Date: 2026-07-02 11:01+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1084,6 +1084,12 @@ msgstr "Créé"
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
 
+msgid "Remove these filters from all affected events"
+msgstr "Supprimer ces filtres de tous les événements concernés"
+
+msgid "Confirmation"
+msgstr "Confirmation"
+
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -1942,6 +1948,18 @@ msgstr "Seulement les prix dans les champs supplémentaires"
 
 msgid "The total price at the end"
 msgstr "Le prix total à la fin"
+
+msgid "Enable cancel reservation"
+msgstr "Permettre l'annulation de réservations"
+
+msgid "Cancellation"
+msgstr "Annulation"
+
+msgid ""
+"An e-mail reply address is required when cancellation requests are enabled."
+msgstr ""
+"Une adresse e-mail de réponse est requise lorsque les demandes d'annulation "
+"sont activées."
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -3157,6 +3175,9 @@ msgstr "Email"
 msgid "User"
 msgstr "Utilisateur"
 
+msgid "Select reservations to cancel"
+msgstr "Sélectionner les réservations à annuler"
+
 msgid "Admin"
 msgstr "Admin"
 
@@ -4156,6 +4177,15 @@ msgstr "Refuser la réservation"
 
 msgid "Adjust"
 msgstr "Ajuster"
+
+msgid "Accept cancellation"
+msgstr "Accepter l'annulation"
+
+msgid "Do you really want to accept the cancellation?"
+msgstr "Voulez-vous vraiment accepter l'annulation?"
+
+msgid "This will cancel the reservation and cannot be undone."
+msgstr "Cela annulera la réservation et ne peut pas être annulé."
 
 msgid "Accept all reservations"
 msgstr "Accepter toutes les réservations"
@@ -5162,6 +5192,44 @@ msgstr ""
 "Si vous pensez que c'est une erreur, ignorez ce message et nous ne vous "
 "importunerons plus jamais."
 
+msgid ""
+"Your cancellation request has been accepted. The following reservations have "
+"been cancelled:"
+msgstr ""
+"Votre demande d'annulation a été acceptée. Les réservations suivantes ont "
+"été annulées:"
+
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
+msgid "The following reservation remains active:"
+msgstr "La réservation suivante reste active:"
+
+msgid "The following reservations remain active:"
+msgstr "Les réservations suivantes restent actives:"
+
+msgid "Check request status"
+msgstr "Vérifier l'état de la demande"
+
+msgid "The following reservations have been cancelled:"
+msgstr "Les réservations suivantes ont été annulées:"
+
+msgid "See Ticket ${link} for additional information."
+msgstr "Pour plus d'informations, consultez le ticket ${link}."
+
+msgid "Have a great day!"
+msgstr "Passez une bonne journée!"
+
+msgid ""
+"This is a notification for accepted cancellation requests for "
+"${organisation}. If you no longer wish to receive these notifications, "
+"please contact an administrator so they can remove you from the recipients "
+"list."
+msgstr ""
+"Ceci est une notification pour les demandes d'annulation acceptées pour "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"veuillez contacter un administrateur."
+
 msgid "Your e-mail address was just used to send a login link to ${homepage}."
 msgstr ""
 "Votre adresse e-mail vient d'être utilisée pour envoyer un lien de connexion "
@@ -5227,9 +5295,6 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-msgid "${author} wrote"
-msgstr "${author} a écrit"
-
 #. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
@@ -5238,9 +5303,6 @@ msgstr "Veuillez vous rendre sur ${link} pour répondre."
 #. Used in sentence: "Please ${link} to reply."
 msgid "visit the request page"
 msgstr "visitez la page de la demande"
-
-msgid "Have a great day!"
-msgstr "Passez une bonne journée!"
 
 msgid ""
 "This is the notification for customer messages on reservations for ${request."
@@ -5351,9 +5413,6 @@ msgstr ""
 msgid "Your directory submission has been adopted:"
 msgstr "Votre proposition de répertoire a été adoptée :"
 
-msgid "Check request status"
-msgstr "Vérifier l'état de la demande"
-
 msgid "Your change request has been applied:"
 msgstr "Votre demande de modification a été effectuée:"
 
@@ -5407,9 +5466,6 @@ msgstr "Ne souhaitez-vous plus recevoir ces notifications ?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Les réservations suivantes ont été acceptées:"
-
-msgid "See Ticket ${link} for additional information."
-msgstr "Pour plus d'informations, consultez le ticket ${link}."
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -5521,6 +5577,9 @@ msgstr ""
 "${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
+
+msgid "Request cancellation"
+msgstr "Demander l'annulation"
 
 msgid "See all your reservations"
 msgstr "Voir toutes vos réservations"
@@ -5666,6 +5725,15 @@ msgstr "1 réservation ajoutée."
 
 msgid "${count} reservations added."
 msgstr "${count} réservations ajoutées."
+
+msgid "Cancellation requested for 1 reservation."
+msgstr "Demande d'annulation pour 1 réservation."
+
+msgid "Cancellation requested for ${count} reservations."
+msgstr "Demande d'annulation pour ${count} réservations."
+
+msgid "Cancellation accepted."
+msgstr "Annulation acceptée."
 
 msgid "1 reservation adjusted:"
 msgstr "1 réservation ajustée:"
@@ -5906,6 +5974,22 @@ msgstr "Pas de notifications"
 msgid "submitted"
 msgstr "soumis"
 
+msgid ""
+"You are about to submit a cancellation request for the following "
+"reservation. An administrator will review your request and confirm the "
+"cancellation."
+msgstr ""
+"Vous êtes sur le point de soumettre une demande d'annulation pour la "
+"réservation suivante. Un administrateur examinera votre demande et "
+"confirmera l'annulation."
+
+msgid ""
+"Please select the reservations you would like to cancel. An administrator "
+"will review your request and confirm the cancellation."
+msgstr ""
+"Veuillez sélectionner les réservations que vous souhaitez annuler. Un "
+"administrateur examinera votre demande et confirmera l'annulation."
+
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Aucune date trouvée, sélectionnez les dates dans le calendrier d'abord"
 
@@ -6103,6 +6187,9 @@ msgstr ""
 
 msgid "No surveys defined yet."
 msgstr "Aucun sondage n'est encore défini."
+
+msgid "A cancellation has been requested for this reservation."
+msgstr "Une annulation a été demandée pour cette réservation."
 
 msgid "No activities yet."
 msgstr "Aucune activité pour le moment."
@@ -7229,21 +7316,12 @@ msgstr "Cette semaine"
 
 #, python-format
 msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
-msgstr ""
-"Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
+msgstr "Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
 
 #, python-format
-msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
-"Le choix de filtre \"${choice}\" est encore appliqué à ${count} "
-"événement(s)."
-
-msgid "Remove these filters from all affected events"
-msgstr "Supprimer ces filtres de tous les événements concernés"
-
-msgid "Confirmation"
-msgstr "Confirmation"
+"Le choix de filtre \"${choice}\" est encore appliqué à ${count} événement(s)."
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifier la configuration du filtre d'événements"
@@ -7539,9 +7617,19 @@ msgstr ""
 "Le paiement associé à cette réservation doit être remboursé avant qu'elle "
 "puisse être rejetée"
 
+msgid "Cancellation accepted"
+msgstr "Annulation acceptée"
+
+#, python-format
+msgid "${org} Accepted Cancellation"
+msgstr "${org} Annulation acceptée"
+
 #, python-format
 msgid "${org} Rejected Reservation"
 msgstr "${org} Réservation rejetée"
+
+msgid "The cancellation request was accepted."
+msgstr "La demande d'annulation a été acceptée."
 
 msgid "The reservations were rejected"
 msgstr "Les réservations ont été rejetées"
@@ -7555,6 +7643,43 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Refuser toutes les réservations avec le message"
+
+msgid "All reservations for this ticket have already been cancelled."
+msgstr "Toutes les réservations pour ce ticket ont déjà été annulées."
+
+msgid "Cancellation requests are not enabled for this resource."
+msgstr "Les demandes d'annulation ne sont pas activées pour cette ressource."
+
+msgid "A cancellation request has already been submitted."
+msgstr "Une demande d'annulation a déjà été soumise."
+
+msgid "A cancellation request can only be submitted for accepted reservations."
+msgstr ""
+"Une demande d'annulation ne peut être soumise que pour des réservations "
+"acceptées.Une demande d'annulation ne peut être soumise que pour des "
+"réservations acceptées."
+
+msgid ""
+"A cancellation request cannot be submitted because the payment has already "
+"been invoiced or paid."
+msgstr ""
+"Une demande d'annulation ne peut pas être soumise car le paiement a déjà été "
+"facturé ou payé."
+
+msgid ""
+"Your cancellation request has been submitted. You will be notified once it "
+"has been processed."
+msgstr ""
+"Votre demande d'annulation a été soumise. Vous serez informé(e) une fois "
+"qu'elle aura été traitée."
+
+#. We adjust the wording for users that do not know what a ticket is
+#.
+msgid "Request Status"
+msgstr "Status Demand"
+
+msgid "Request Cancellation"
+msgstr "Demander l'annulation"
 
 msgid "Reservation summary"
 msgstr "Résumé des réservations"
@@ -8014,10 +8139,6 @@ msgstr "Votre demande est actuellement en attente"
 msgid "Your request has been processed"
 msgstr "Votre demande a été traitée"
 
-#. We adjust the wording for users that do not know what a ticket is
-msgid "Request Status"
-msgstr "Status Demand"
-
 msgid "The request has already been closed"
 msgstr "Votre demand a déjà été clòturée. "
 
@@ -8106,6 +8227,15 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Would you like to cancel your reservation?"
+#~ msgstr "Souhaitez-vous annuler votre réservation?"
+
+#~ msgid "Cancellation requested for"
+#~ msgstr "Demande d'annulation pour"
+
+#~ msgid "All reservations"
+#~ msgstr "Toutes les réservations"
 
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "p.ex. 07:00 ou 07:00, 14:30"

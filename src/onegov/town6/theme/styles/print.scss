@@ -63,6 +63,7 @@
     }
 
     .ticket-summary h2,
+    .ticket-cancellation-request h2,
     .ticket-timeline h2 {
         font-weight: bold;
     }
@@ -71,7 +72,8 @@
         display: none;
     }
 
-    .ticket-summary {
+    .ticket-summary,
+    .ticket-cancellation-request {
         margin-bottom: 0;
 
         * {

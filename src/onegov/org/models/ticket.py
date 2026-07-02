@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from functools import cached_property
 from markupsafe import Markup
 from onegov.chat import Message, MessageCollection
@@ -1038,6 +1039,42 @@ class ReservationHandler(Handler):
 
         return links
 
+    def get_cancellation_links(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> list[Link]:
+        id_set = set(self.data.get('cancellation_reservation_ids') or ())
+        if id_set:
+            targeted = [r for r in self.reservations if r.id in id_set]
+        else:
+            targeted = list(self.reservations)
+        if self.ticket.state != 'pending':
+            return []
+        confirm_items = json.dumps([
+            {'title': self.get_reservation_title(r)} for r in targeted
+        ])
+        return [Link(
+            text=_('Accept cancellation'),
+            url=request.link(self.ticket, 'accept-cancellation'),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to accept the cancellation?'),
+                    _(
+                        'This will cancel the reservation and cannot '
+                        'be undone.'
+                    ),
+                    _('Accept cancellation'),
+                    _('Cancel'),
+                    items=confirm_items,
+                ),
+                Intercooler(
+                    request_method='GET', redirect_after=request.url
+                ),
+            ),
+        )]
+
     def get_occupancy_url(
         self,
         reservation: Reservation,
@@ -1076,7 +1113,14 @@ class ReservationHandler(Handler):
             for r in self.reservations
         )
 
-        if not all(accepted):
+        cancellation_requested = self.data.get('cancellation_requested', False)
+
+        if cancellation_requested:
+            links.extend(
+                self.get_cancellation_links(self.reservations[0], request)
+            )
+
+        if not all(accepted) and not cancellation_requested:
             links.append(
                 Link(
                     text=_('Accept all reservations'),

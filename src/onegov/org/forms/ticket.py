@@ -5,6 +5,7 @@ from onegov.core.security import Private
 from onegov.form import Form
 from onegov.form.fields import (ChosenSelectField,
                                 ChosenSelectMultipleEmailField, PanelField)
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TextAreaFieldWithTextModules
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.filters import strip_whitespace
@@ -17,6 +18,7 @@ from onegov.user import UserCollection
 from wtforms.fields import BooleanField
 from wtforms.fields import TextAreaField
 from functools import cached_property
+from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
 from wtforms.validators import Optional
@@ -25,6 +27,7 @@ from wtforms.validators import ValidationError
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.org.models.ticket import ReservationTicket
     from onegov.org.request import OrgRequest
 
 
@@ -180,3 +183,35 @@ class TicketChangeTagForm(Form):
             for tag in (item.keys() if isinstance(item, dict) else (item,))
         ]
         choices.insert(0, ('', ''))
+
+
+class RequestCancellationForm(Form):
+    """Cancellation request form for reservation tickets.
+
+    Shows reservation checkboxes when there are multiple reservations,
+    allowing the user to select which ones to cancel. For a single
+    reservation the checkbox field is removed and the form acts as a
+    plain confirmation.
+    """
+
+    if TYPE_CHECKING:
+        model: ReservationTicket
+
+    reservation_ids = MultiCheckboxField(
+        label=_('Select reservations to cancel'),
+        coerce=int,
+        validators=[DataRequired()],
+    )
+
+    def on_request(self) -> None:
+        reservations = self.model.handler.reservations
+        if len(reservations) <= 1:
+            self.delete_field('reservation_ids')
+            return
+
+        self.reservation_ids.choices = [
+            (r.id, self.model.handler.get_reservation_title(r))
+            for r in reservations
+        ]
+        if not self.request.POST:
+            self.reservation_ids.data = [r.id for r in reservations]
