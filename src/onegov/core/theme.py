@@ -42,6 +42,8 @@ Note that for the theme to work you need to define a filestorage. See
 """
 from __future__ import annotations
 
+import subprocess
+
 from onegov.core import __version__
 from onegov.core.framework import Framework
 from onegov.core import log
@@ -51,6 +53,7 @@ from onegov.core.filestorage import FilestorageFile
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from fs.base import FS, SubFS
 
 
@@ -90,6 +93,29 @@ class Theme:
     def compile(self, options: dict[str, Any] | None = None) -> str:
         """ Returns a single css that represents the theme. """
         raise NotImplementedError
+
+
+def compile_sass(
+    source: str,
+    include_paths: Sequence[str],
+    compress: bool = True,
+) -> str:
+    style = 'compressed' if compress else 'expanded'
+    result = subprocess.run(  # nosec B603 B607
+        [
+            'sass',
+            '--stdin',
+            '--no-source-map',
+            f'--style={style}',
+            '--quiet-deps',
+            *(f'--load-path={p}' for p in include_paths),
+        ],
+        input=source,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout
 
 
 def get_filename(theme: Theme, options: dict[str, Any] | None = None) -> str:

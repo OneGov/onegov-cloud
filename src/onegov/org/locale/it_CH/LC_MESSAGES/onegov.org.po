@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-06-01 12:55+0200\n"
+"POT-Creation-Date: 2026-07-01 07:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1979,10 +1979,10 @@ msgstr "Prenotazioni giornaliere"
 
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
-"be sent to the recipient above at 06:00."
+"be sent to the recipient above."
 msgstr ""
-"Alle ore 6:00 di ogni giorno selezionato qui sotto, al suddetto destinatario "
-"verrà inviata una notifica con le prenotazioni del giorno."
+"Per ogni giorno selezionato qui sotto, al suddetto destinatario verrà "
+"inviata una notifica con le prenotazioni del giorno."
 
 msgid "Customer Messages"
 msgstr "Messaggi dei clienti"
@@ -2017,8 +2017,30 @@ msgstr ""
 msgid "Send on"
 msgstr "Invia il"
 
+msgid "Delivery Times"
+msgstr "Orari di invio"
+
+msgid "e.g. 07:05"
+msgstr "es. 07:05"
+
+#. type: ignore[attr-defined]
+msgid "Please enter at least one delivery time."
+msgstr "Inserire almeno un orario di invio."
+
+#. type: ignore[attr-defined]
+#, python-format
+msgid "Invalid time \"${time}\". Use HH:MM format (e.g. 06:00)."
+msgstr "Orario non valido \"${time}\". Usare il formato HH:MM (es. 06:00)."
+
+#. type: ignore[attr-defined]
+msgid "Minutes must be a multiple of 5 (e.g. 06:10, 16:35)."
+msgstr "I minuti devono essere un multiplo di 5 (es. 06:10, 16:35)."
+
 msgid "Please add at least one notification."
 msgstr "Aggiungere almeno una notifica."
+
+msgid "Application Description"
+msgstr "Descrizione dell'applicazione"
 
 msgid "Languages"
 msgstr "Lingue"
@@ -2031,6 +2053,13 @@ msgstr "Francese"
 
 msgid "Italian"
 msgstr "Italiano"
+
+msgid ""
+"Default social media preview image for rich link previews. Optimal size is "
+"1200:630 px."
+msgstr ""
+"Immagine di anteprima dei social media predefinita per le anteprime dei "
+"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
 
 msgid "Logo"
 msgstr "Logo"
@@ -2055,13 +2084,6 @@ msgstr "Icona 57x57 PNG (iPhone, iPod, iPad)"
 
 msgid "Icon SVG 20x20 (Safari)"
 msgstr "Icona SVG 20x20 (Safari)"
-
-msgid ""
-"Default social media preview image for rich link previews. Optimal size is "
-"1200:630 px."
-msgstr ""
-"Immagine di anteprima dei social media predefinita per le anteprime dei "
-"collegamenti avanzati. La dimensione ottimale è 1200x630 px."
 
 msgid "Primary Color"
 msgstr "Colore primario"
@@ -2258,6 +2280,19 @@ msgstr ""
 
 msgid "Open files in separate window"
 msgstr "Apri i file in una finestra separata"
+
+msgid "Short links"
+msgstr "Link abbreviato"
+
+#, python-format
+msgid ""
+"Malformed short link on line ${number}. Each line needs to be a pair of "
+"name: path where path is either a valid path starting with a backslash, or a "
+"complete URL with schema and host."
+msgstr ""
+"Link abbreviato non valido alla riga ${number}. Ogni riga deve essere "
+"costituita da una coppia nome:percorso, dove percorso è un percorso valido "
+"che inizia con una barra rovesciata oppure un URL completo con schema e host."
 
 msgid "Announcement"
 msgstr "Annuncio"
@@ -3731,9 +3766,6 @@ msgstr "L'iscrizione è stata adottata"
 msgid "The entry is not valid, please adjust it"
 msgstr "L'elemento non è valido, modificalo"
 
-msgid "An entry with this name already exists"
-msgstr "Esiste già un elemento con questo nome"
-
 msgid "Your directory submission has been adopted"
 msgstr "L'invio della cartella è stato adottato"
 
@@ -3903,6 +3935,12 @@ msgstr ""
 
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
+
+msgid "Internal Comments"
+msgstr "Commenti interni"
+
+msgid "Administrative"
+msgstr "Administrativo"
 
 msgid "Photo album"
 msgstr "Album fotografico"
@@ -4449,6 +4487,16 @@ msgstr "Richiesta di modifica"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr "Trovato un errore? Proponi una modifica a questo elemento."
+
+msgid ""
+"Fingerprint of the entry's content. Changes whenever the entry data is "
+"modified."
+msgstr ""
+"Impronta del contenuto della voce. Cambia ogni volta che i dati della voce "
+"vengono modificati."
+
+msgid "Hash"
+msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
@@ -5707,9 +5755,6 @@ msgstr ""
 "controllare l'URL per eventuali errori o utilizza la casella di ricerca in "
 "alto."
 
-msgid "Back"
-msgstr "Indietro"
-
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
 
@@ -5771,11 +5816,20 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Riferimento della richiesta"
 
+msgid "Search people"
+msgstr "Cerca persone"
+
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Filtra per organizzazione o sotto-organizzazione"
+
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
 
 msgid "Select sub organisation"
 msgstr "Selezionare la sotto-organizzazione"
+
+msgid "No people added yet."
+msgstr "Non è stato aggiunto nessuno."
 
 msgid "No people found for current filter selection."
 msgstr "Non sono state trovate persone per la selezione del filtro corrente."
@@ -6501,16 +6555,6 @@ msgstr "Confermare l'accesso del cliente"
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
 
-msgid "Administrative"
-msgstr "Administrativo"
-
-#. NOTE: The alert needs to be emitted after, so it doesn't get rolled back as
-#. well.
-#.
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "L'elemento ${name} è duplicato"
-
 msgid "Added a new directory"
 msgstr "Aggiunta una nuova cartella"
 
@@ -7147,6 +7191,23 @@ msgstr "Questo fine settimana"
 msgid "This week"
 msgstr "Questa settimana"
 
+#, python-format
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
+msgstr ""
+"Il filtro \"${keyword}\" è ancora applicato a ${count} evento/i."
+
+#, python-format
+msgid ""
+"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgstr ""
+"La scelta del filtro \"${choice}\" è ancora applicata a ${count} evento/i."
+
+msgid "Remove these filters from all affected events"
+msgstr "Rimuovi questi filtri da tutti gli eventi interessati"
+
+msgid "Confirmation"
+msgstr "Conferma"
+
 msgid "Edit Event Filter Configuration"
 msgstr "Modifica configurazione filtro eventi"
 
@@ -7379,6 +7440,9 @@ msgstr "Nuove date per ${title}"
 msgid "Confirm your reservation"
 msgstr "Conferma la prenotazione"
 
+msgid "Request"
+msgstr "Richiesta"
+
 #. by default we will redirect to the created ticket
 msgid "Thank you for your reservation!"
 msgstr "Grazie per la tua prenotazione!"
@@ -7399,8 +7463,8 @@ msgstr ""
 "Impossibile creare visite con l'API di dormakaba per l'ID del sito "
 "${site_id}. Assicurarsi che le credenziali siano ancora valide."
 
-msgid "Your reservations were accepted"
-msgstr "Le tue prenotazioni sono state accettate"
+msgid "Accepted"
+msgstr "Accettato"
 
 #, python-format
 msgid "Reservation(s) confirmed ${org} ${resource}"
@@ -7435,9 +7499,6 @@ msgid ""
 msgstr ""
 "Il pagamento associato a questa prenotazione deve essere rimborsato prima "
 "che la prenotazione possa essere rifiutata"
-
-msgid "The following reservations were rejected"
-msgstr "Le seguenti prenotazioni sono state rifiutate"
 
 #, python-format
 msgid "${org} Rejected Reservation"
@@ -8002,6 +8063,28 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "e.g. 07:00 or 07:00, 14:30"
+#~ msgstr "es. 07:00 o 07:00, 14:30"
+
+#~ msgid "Minutes must be a multiple of 5 (e.g. 06:00, 06:30)."
+#~ msgstr "I minuti devono essere un multiplo di 5 (es. 06:00, 06:30)."
+
+#~ msgid "An entry with this name already exists"
+#~ msgstr "Esiste già un elemento con questo nome"
+
+#~ msgid "Back"
+#~ msgstr "Indietro"
+
+#~ msgid "Your reservations were accepted"
+#~ msgstr "Le tue prenotazioni sono state accettate"
+
+#~ msgid "The following reservations were rejected"
+#~ msgstr "Le seguenti prenotazioni sono state rifiutate"
+
+#, python-format
+#~ msgid "The entry ${name} exists twice"
+#~ msgstr "L'elemento ${name} è duplicato"
 
 #~ msgid "(Redesign only)"
 #~ msgstr "(Solo riprogettazione)"

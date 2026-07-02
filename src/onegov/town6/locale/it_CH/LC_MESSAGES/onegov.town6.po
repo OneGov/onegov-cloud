@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-06-01 13:53+0200\n"
+"POT-Creation-Date: 2026-06-22 07:44+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -540,6 +540,9 @@ msgstr "Conferma"
 
 msgid "Propose a change to this entry"
 msgstr "Suggerisci una modifica per questa voce"
+
+msgid "Hash"
+msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
@@ -2594,6 +2597,9 @@ msgstr "Fare Archivio"
 
 msgid "Archive selected"
 msgstr "Archivio selezionato"
+
+msgid "Internal Comments"
+msgstr "Commenti interni"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "

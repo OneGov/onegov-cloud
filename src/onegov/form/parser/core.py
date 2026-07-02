@@ -1253,6 +1253,9 @@ def parse_field_block(
     key, field = next(i for i in field_block.items())
     field_help = field_block.get('field_help')
 
+    if field is None:
+        raise errors.FieldCompileError(field_name=key.rstrip('= '))
+
     identifier_src = key.rstrip('= ') + '='
     identifier = ELEMENTS.identifier.parse_string(identifier_src)
 
@@ -1272,7 +1275,7 @@ def parse_field_block(
         assert types <= {'radio', 'checkbox'}
 
         if not len(types) == 1:
-            raise errors.MixedTypeError(key)
+            raise errors.MixedTypeError(key.rstrip('= '))
 
     result: ParsedField = field_classes[field.type].create(
         field, identifier, parent, fieldset, field_help)

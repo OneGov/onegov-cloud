@@ -181,7 +181,8 @@ def increment_name(name: str) -> str:
     For example::
 
         foo => foo-1
-        foo-1 => foo-2
+        foo-2 => foo-3
+        foo-99 => foo-100
 
     """
 

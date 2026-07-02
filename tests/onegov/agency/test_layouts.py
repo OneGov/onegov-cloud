@@ -159,12 +159,12 @@ def test_agency_layout(session: Session) -> None:
     assert list(hrefs(layout.editbar_links)) == [
         'AgencyProxy/edit',
         'AgencyProxy/move',
-        'AgencyProxy/sort',
         'AgencyProxy/change-url',
         'ExtendedAgency/?csrf-token=x',
         'AgencyProxy/create-pdf',
         'AgencyProxy/new',
         'AgencyProxy/new-membership',
+        'AgencyProxy/sort',
         'AgencyProxy/sort-children?csrf-token=x',
         'AgencyProxy/sort-relationships?csrf-token=x',
     ]

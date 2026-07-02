@@ -17,7 +17,6 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryZipArchive
 from onegov.directory.archive import DirectoryFileNotFound
 from onegov.directory.collections.directory import EntryRecipientCollection
-from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
@@ -174,17 +173,7 @@ def handle_new_directory(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        try:
-            directory = self.add_by_form(form, properties=('configuration', ))
-        except DuplicateEntryError as e:
-            transaction.abort()
-            # NOTE: The alert needs to be emitted after, so it doesn't get
-            #       rolled back as well.
-            request.alert(_('The entry ${name} exists twice', mapping={
-                'name': e.name
-            }))
-            return request.redirect(request.link(self))
-
+        directory = self.add_by_form(form, properties=('configuration', ))
         request.success(_('Added a new directory'))
         return request.redirect(
             request.link(ExtendedDirectoryEntryCollection(directory)))
@@ -670,20 +659,10 @@ def handle_new_directory_entry(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        try:
-            entry = self.directory.add_by_form(
-                form,
-                type='extended'
-            )
-        except DuplicateEntryError as e:
-            transaction.abort()
-            # NOTE: The alert needs to be emitted after, so it doesn't get
-            #       rolled back as well.
-            request.alert(_('The entry ${name} exists twice', mapping={
-                'name': e.name
-            }))
-            return request.redirect(request.link(self))
-
+        entry = self.directory.add_by_form(
+            form,
+            type='extended'
+        )
         if self.directory.enable_update_notifications and entry.access in (
             'public',
             'mtan'
@@ -1076,10 +1055,6 @@ def view_import(
             })
         except MissingFileError as e:
             message = _('The file ${name} is missing', mapping={
-                'name': e.name
-            })
-        except DuplicateEntryError as e:
-            message = _('The entry ${name} exists twice', mapping={
                 'name': e.name
             })
         except ValidationError as e:

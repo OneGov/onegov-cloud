@@ -54,9 +54,7 @@ class GroupInvite:
 
     @property
     def exists(self) -> bool:
-        """ Returns True if the group_code associated with this invite exists.
-
-        """
+        """ True if the group_code associated with this invite exists. """
         return self.session.query(self.bookings().exists()).scalar()
 
     def bookings(self) -> Query[Booking]:
@@ -94,7 +92,7 @@ class GroupInvite:
 
     @cached_property
     def attendees(self) -> tuple[tuple[Attendee, Booking], ...]:
-        """ Returns the attendees linked to this invite. """
+        """ The attendees linked to this invite. """
         return tuple(
             (booking.attendee, booking)
             for booking in self.bookings().order_by(

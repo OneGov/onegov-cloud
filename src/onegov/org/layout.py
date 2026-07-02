@@ -76,6 +76,7 @@ from onegov.people import PersonCollection, Person
 from onegov.qrcode import QrCode
 from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
+from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket
 from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
@@ -223,8 +224,8 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def page_id(self) -> str:
-        """ Returns the unique page id of the rendered page. Used to have
-        a useful id in the body element for CSS/JS.
+        """ The unique page id of the rendered page, for use as the body
+        element id in CSS/JS.
 
         """
         page_id = self.request.path_info
@@ -238,7 +239,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def body_classes(self) -> Iterator[str]:
-        """ Yields a list of body classes used on the body. """
+        """ Body classes used on the body element. """
 
         if self.request.is_logged_in:
             yield 'is-logged-in'
@@ -250,20 +251,16 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def top_navigation(self) -> Sequence[Link] | None:
-        """ Returns a list of :class:`onegov.org.elements.Link` objects.
-        Those links are used for the top navigation.
-
-        If nothing is returned, no top navigation is displayed.
+        """ A list of :class:`onegov.org.elements.Link` objects for the top
+        navigation. If None, no top navigation is displayed.
 
         """
         return None
 
     @cached_property
     def breadcrumbs(self) -> Sequence[Link] | None:
-        """ Returns a list of :class:`onegov.org.elements.Link` objects.
-        Those links are used for the breadcrumbs.
-
-        If nothing is returned, no top breadcrumbs are displayed.
+        """ A list of :class:`onegov.org.elements.Link` objects for the
+        breadcrumbs. If None, no breadcrumbs are displayed.
 
         """
         return None
@@ -302,7 +299,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def files_url(self) -> str:
-        """ Returns the url to the files view. """
+        """ The URL to the files view. """
         url = self.request.link(
             GeneralFileCollection(self.request.session)
         )
@@ -317,7 +314,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def file_upload_url(self) -> str:
-        """ Returns the url to the file upload action. """
+        """ The URL to the file upload action. """
         url = self.request.link(
             GeneralFileCollection(self.request.session), name='upload'
         )
@@ -340,7 +337,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def image_upload_url(self) -> str:
-        """ Returns the url to the image upload action. """
+        """ The URL to the image upload action. """
         url = self.request.link(
             ImageFileCollection(self.request.session), name='upload'
         )
@@ -368,17 +365,17 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def homepage_url(self) -> str:
-        """ Returns the url to the main page. """
+        """ The URL to the main page. """
         return self.request.link(self.app.org)
 
     @cached_property
     def search_url(self) -> str:
-        """ Returns the url to the search page. """
+        """ The URL to the search page. """
         return self.request.class_link(Search)
 
     @cached_property
     def suggestions_url(self) -> str:
-        """ Returns the url to the suggestions json view. """
+        """ The URL to the suggestions JSON view. """
         return self.request.class_link(Search, name='suggest')
 
     @cached_property
@@ -913,7 +910,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
     @cached_property
     def breadcrumbs(self) -> Sequence[Link] | None:
-        """ Returns the breadcrumbs for the current page. """
+        """ The breadcrumbs for the current page. """
         return [Link(_('Homepage'), self.homepage_url)]
 
     def exclude_invisible[T](self, items: Iterable[T]) -> Sequence[T]:
@@ -996,8 +993,8 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
 
     @cached_property
     def contact_html(self) -> Markup:
-        """ Returns the contacts html, but instead of breaking it into multiple
-        lines (like on the site footer), this version puts it all on one line.
+        """ The contact HTML on a single line (rather than multiline like the
+        site footer).
 
         """
 
@@ -3398,6 +3395,9 @@ class UserGroupLayout(DefaultLayout):
     @cached_property
     def collection(self) -> UserGroupCollection[UserGroup]:
         return UserGroupCollection(self.request.session)
+
+    def handler_label(self, code: str) -> str:
+        return ticket_handlers.code_label(self.request, code)
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

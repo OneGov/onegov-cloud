@@ -282,8 +282,7 @@ def change_username(
         if users.exists(new_username):
             abort(f'{new_username} already exists')
 
-        user.logout_all_sessions(request.app)
-        user.username = new_username
+        user.change_username(new_username, request.app)
 
         # Run application-specific callback
         app.settings.user.change_username_callback(user, request)

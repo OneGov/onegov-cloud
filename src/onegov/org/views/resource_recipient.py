@@ -89,9 +89,11 @@ def handle_new_resource_recipient(
             medium='email',
             address=form.address.data,
             daily_reservations=form.daily_reservations.data,
+            daily_reservations_times=form.daily_reservations_times.data,
             new_reservations=form.new_reservations.data,
             customer_messages=form.customer_messages.data,
             internal_notes=form.internal_notes.data,
+            rejected_reservations=form.rejected_reservations.data,
             send_on=form.send_on.data,
             resources=form.resources.data,
         )
@@ -136,6 +138,8 @@ def handle_edit_resource_recipient(
         )
     elif not request.POST:
         form.process(obj=self)
+        if not form.daily_reservations_times.data:
+            form.daily_reservations_times.data = ['06:00']
 
     title = _('Edit Recipient')
 

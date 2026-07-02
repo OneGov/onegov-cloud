@@ -97,19 +97,19 @@ class PolicyArea:
 
     @cached_property
     def descriptor(self) -> int:
-        """ Returns the highest descriptor, e.g. 121 if "1.12.121". """
+        """ The highest descriptor, e.g. 121 if "1.12.121". """
 
         return int(self.value.rsplit('.', 1)[-1])
 
     @cached_property
     def descriptor_path(self) -> list[int]:
-        """ Returns all descriptors, e.g [1, 12, 121] if "1.12.121". """
+        """ All descriptors, e.g [1, 12, 121] if "1.12.121". """
 
         return [int(part) for part in self.value.split('.')]
 
     @cached_property
     def descriptor_decimal(self) -> Decimal:
-        """ Returns the descriptor as float for the dataset, e.g 1.121 if
+        """ The descriptor as a decimal for the dataset, e.g. 1.121 if
         "1.12.121".
 
         """
@@ -118,7 +118,7 @@ class PolicyArea:
 
     @cached_property
     def label(self) -> str:
-        """ Returns a translatable label of the highest descriptor, e.g.
+        """ A translatable label of the highest descriptor, e.g.
         "Bundesverfassung" if "1.12.121".
 
         """
@@ -127,7 +127,7 @@ class PolicyArea:
 
     @cached_property
     def label_path(self) -> list[str]:
-        """ Returns translatable labels for all descriptor levels, e.g.
+        """ Translatable labels for all descriptor levels, e.g.
         ["Staatsordnung", "Politisches System", "Bundesverfassung"] if
         "1.12.121".
 

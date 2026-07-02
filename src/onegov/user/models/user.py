@@ -291,8 +291,8 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     @property
     def yubikey_serial(self) -> int | None:
-        """ Returns the yubikey serial of the yubikey associated with this
-        user (if any).
+        """ The yubikey serial of the yubikey associated with this user (if
+        any).
 
         """
 
@@ -362,3 +362,8 @@ class User(Base, TimestampMixin, ORMSearchable):
         self.cleanup_sessions(app)
 
         return count
+
+    def change_username(self, new_username: str, app: Framework) -> None:
+        """ Changes the username, logging out all active sessions first. """
+        self.logout_all_sessions(app)
+        self.username = new_username

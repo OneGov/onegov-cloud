@@ -35,7 +35,7 @@ from uuid import uuid4
 from webtest import Upload
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from unittest.mock import MagicMock
     from .conftest import Client
@@ -1000,11 +1000,14 @@ def test_allocation_holidays(client: Client) -> None:
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
 
-    assert len(slots.json) == 4
-    assert slots.json[0]['start'].startswith('2019-07-30')
-    assert slots.json[1]['start'].startswith('2019-07-31')
-    assert slots.json[2]['start'].startswith('2019-08-01')
-    assert slots.json[3]['start'].startswith('2019-08-02')
+    assert len(slots.json) == 5
+    # the first slot is the national holiday
+    assert slots.json[0]['title'] == 'Nationalfeiertag'
+    assert slots.json[0]['start'] == '2019-08-01'
+    assert slots.json[1]['start'].startswith('2019-07-30')
+    assert slots.json[2]['start'].startswith('2019-07-31')
+    assert slots.json[3]['start'].startswith('2019-08-01')
+    assert slots.json[4]['start'].startswith('2019-08-02')
 
     # allocations that are not made during holidays
     page = client.get('/resources').click('Raum')
@@ -1023,10 +1026,12 @@ def test_allocation_holidays(client: Client) -> None:
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
 
-    assert len(slots.json) == 3
-    assert slots.json[0]['start'].startswith('2019-07-30')
-    assert slots.json[1]['start'].startswith('2019-07-31')
-    assert slots.json[2]['start'].startswith('2019-08-02')
+    assert len(slots.json) == 4
+    assert slots.json[0]['title'] == 'Nationalfeiertag'
+    assert slots.json[0]['start'] == '2019-08-01'
+    assert slots.json[1]['start'].startswith('2019-07-30')
+    assert slots.json[2]['start'].startswith('2019-07-31')
+    assert slots.json[3]['start'].startswith('2019-08-02')
 
 
 def test_allocation_school_holidays(client: Client) -> None:
@@ -1053,11 +1058,15 @@ def test_allocation_school_holidays(client: Client) -> None:
 
     slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
 
-    assert len(slots.json) == 4
-    assert slots.json[0]['start'].startswith('2019-07-30')
-    assert slots.json[1]['start'].startswith('2019-07-31')
-    assert slots.json[2]['start'].startswith('2019-08-01')
-    assert slots.json[3]['start'].startswith('2019-08-02')
+    assert len(slots.json) == 5
+    # the first slot is the holiday itself
+    assert slots.json[0]['title'] == 'Schulferien'
+    assert slots.json[0]['start'] == '2019-07-31'
+    assert slots.json[0]['end'] == '2019-08-02'
+    assert slots.json[1]['start'].startswith('2019-07-30')
+    assert slots.json[2]['start'].startswith('2019-07-31')
+    assert slots.json[3]['start'].startswith('2019-08-01')
+    assert slots.json[4]['start'].startswith('2019-08-02')
 
     # allocations that are not made during holidays
     page = client.get('/resources').click('Raum')
@@ -1076,9 +1085,12 @@ def test_allocation_school_holidays(client: Client) -> None:
 
     slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
 
-    assert len(slots.json) == 2
-    assert slots.json[0]['start'].startswith('2019-07-30')
-    assert slots.json[1]['start'].startswith('2019-08-02')
+    assert len(slots.json) == 3
+    assert slots.json[0]['title'] == 'Schulferien'
+    assert slots.json[0]['start'] == '2019-07-31'
+    assert slots.json[0]['end'] == '2019-08-02'
+    assert slots.json[1]['start'].startswith('2019-07-30')
+    assert slots.json[2]['start'].startswith('2019-08-02')
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -1123,7 +1135,7 @@ def test_auto_accept_reservations(client: Client) -> None:
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
     assert message is not None
-    assert 'Ihre Reservationen wurden bestätigt' in message['Subject']
+    assert 'Tageskarte - 28.08.2015 - Angenommen' in message['Subject']
     assert 'Foobar' in message['TextBody']
     assert message['Attachments']
     _, pdf_content = extract_pdf_info(BytesIO(
@@ -1735,6 +1747,56 @@ def test_reserve_allocation_adjustment_invoice_change(client: Client) -> None:
     assert "11:00" in ticket
     assert "12:00" in ticket
     assert "10.00" in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_reject_one_reservation_does_not_break_sibling_adjust(
+    client: Client
+) -> None:
+    # Regression test for Sentry issue: two reservations on the same
+    # partly_available allocation share the same token. Rejecting one used to
+    # delete the sibling's ReservedSlot (because reserved_slots_by_reservation
+    # filtered only by allocation_id, not by time range). The sibling's
+    # subsequent adjust then raised NoResultFound -> unhandled 500.
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    # One partly_available allocation covering the whole day.
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 8), datetime(2015, 8, 28, 16)),
+        whole_day=False,
+        partly_available=True
+    )
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # Two bookings on the same allocation, same session -> same token.
+    assert reserve('08:00', '12:00').json == {'success': True}
+    assert reserve('13:00', '16:00').json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'user@example.org'
+    ticket = formular.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    client.login_admin()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    # Reject the first reservation (08:00-12:00).
+    ticket = ticket.click('Absagen', index=0).follow()
+
+    # The second reservation (13:00-16:00) must still be adjustable.
+    # Before the fix this raised NoResultFound -> 500 because rejecting
+    # the first reservation also deleted the second's ReservedSlot.
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '13:00'
+    adjust.form['end_time'] = '15:00'
+    ticket = adjust.form.submit().follow()
+    assert '13:00' in ticket
+    assert '15:00' in ticket
 
 
 @freeze_time("2015-08-28", tick=True)
@@ -4117,6 +4179,48 @@ def test_allocation_rules_edit(client: Client) -> None:
     assert 'Renamed room' in edit_page
 
 
+def test_allocation_rules_delete(client: Client) -> None:
+    client.login_admin()
+
+    resources_page = client.get('/resources')
+
+    page = resources_page.click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def count_allocations() -> int:
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
+
+    def run_cronjob() -> None:
+        client.get('/resource/room/process-rules')
+
+    page = client.get('/resource/room').click(
+        "Verfügbarkeitszeiträume").click("Verfügbarkeitszeitraum")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
+    assert count_allocations() == 2
+
+    # delete the rule
+    edit_page = client.get('/resource/room').click("Verfügbarkeitszeiträume")
+    delete_links = edit_page.html.find_all('a', string='Löschen')
+    client.post(str(delete_links[0].attrs['ic-post-to']))
+    page = client.get(edit_page.request.path)
+    assert 'wurde gelöscht, zusammen mit 2 Verfügbarkeiten' in page
+
+
 def test_allocation_rules_copy_paste(client: Client) -> None:
     client.login_admin()
 
@@ -4157,15 +4261,15 @@ def test_allocation_rules_copy_paste(client: Client) -> None:
 
     # Copy the rule
     edit_page = client.get('/resource/room-1').click('Verfügbarkeitszeiträume')
-    copy_links = edit_page.html.find_all('a', string='Kopieren')  # type: ignore[call-overload]
-    client.post(copy_links[0].attrs['ic-post-to'])
+    copy_links = edit_page.html.find_all('a', string='Kopieren')
+    client.post(str(copy_links[0].attrs['ic-post-to']))
     edit_page = client.get(edit_page.request.path)
     assert 'in die Zwischenablage kopiert' in edit_page
 
     # Paste the rule in the other room
     edit_page = client.get('/resource/room-2').click('Verfügbarkeitszeiträume')
-    paste_links = edit_page.html.find_all('a', string='Einfügen')  # type: ignore[call-overload]
-    client.post(paste_links[0].attrs['ic-post-to'])
+    paste_links = edit_page.html.find_all('a', string='Einfügen')
+    client.post(str(paste_links[0].attrs['ic-post-to']))
     edit_page = client.get(edit_page.request.path)
     assert 'wurde eingefügt' in edit_page
     assert count_allocations(1) == 2
@@ -4258,8 +4362,13 @@ def test_allocation_rules_with_holidays(client: Client) -> None:
         s = '2000-01-01'
         e = '2050-01-31'
 
-        return len(client.get(
-            f'/resource/daypass/slots?start={s}&end={e}').json)
+        return sum(
+            1
+            for slot in client.get(
+                f'/resource/daypass/slots?start={s}&end={e}'
+            ).json
+            if slot['kind'] == 'allocation'
+        )
 
     def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
@@ -4310,8 +4419,13 @@ def test_allocation_rules_with_school_holidays(client: Client) -> None:
         s = '2000-01-01'
         e = '2050-01-31'
 
-        return len(client.get(
-            f'/resource/daypass/slots?start={s}&end={e}').json)
+        return sum(
+            1
+            for slot in client.get(
+                f'/resource/daypass/slots?start={s}&end={e}'
+            ).json
+            if slot['kind'] == 'allocation'
+        )
 
     def run_cronjob() -> None:
         client.get('/resource/daypass/process-rules')
@@ -4697,3 +4811,181 @@ def test_reserve_form_session_expiry(
 
     with freeze_time(frozen_at):
         formular.form.submit(status=expected_status)
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_migration_recreates_missing_reserved_slot(
+    client: Client
+) -> None:
+    # Migration test mirroring the real bug: two reservations on the same
+    # partly-available allocation share one token (same session). The morning
+    # slot's ReservedSlots are deleted (simulating the libres bug), while the
+    # afternoon slot remains intact. The migration must recreate only the
+    # missing morning slots, leave the afternoon slots untouched, and the
+    # morning reservation must be adjustable afterwards.
+    from libres.db.models import ReservedSlot
+    from onegov.org.upgrade import fix_missing_reserved_slots
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource_id = resource.id
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 8), datetime(2015, 8, 28, 16)),
+        whole_day=False,
+        partly_available=True
+    )
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # Two bookings in the same session → same token.
+    assert reserve('08:00', '12:00').json == {'success': True}
+    assert reserve('13:00', '16:00').json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'user@example.org'
+    ticket = formular.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    client.login_admin()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+
+    # Simulate the libres bug: delete only the morning reservation's slots.
+    session = client.app.session()
+    reservations = (
+        session.query(Reservation)
+        .filter_by(resource=resource_id)
+        .order_by(Reservation.start)
+        .all()
+    )
+    assert len(reservations) == 2
+    morning_res, afternoon_res = reservations
+    shared_token = morning_res.token
+    afternoon_start = (
+        afternoon_res.start
+    )  # capture before commit expires state
+    morning_end = morning_res.end
+
+    afternoon_slot_count = (
+        session.query(ReservedSlot)
+        .filter(
+            ReservedSlot.reservation_token == shared_token,
+            ReservedSlot.start >= afternoon_start,
+        )
+        .count()
+    )
+
+    session.query(ReservedSlot).filter(
+        ReservedSlot.reservation_token == shared_token,
+        ReservedSlot.end <= morning_end,
+    ).delete()
+    transaction.commit()
+
+    # Migration recreates the missing morning slots only.
+    session = client.app.session()
+    recreated_starts, deleted_starts = fix_missing_reserved_slots(session)
+    transaction.commit()
+
+    assert len(recreated_starts) == 1
+    assert deleted_starts == []
+
+    # Afternoon slots must be untouched.
+    session = client.app.session()
+    assert (
+        session.query(ReservedSlot)
+        .filter(
+            ReservedSlot.reservation_token == shared_token,
+            ReservedSlot.start >= afternoon_start,
+        )
+        .count()
+    ) == afternoon_slot_count
+
+    # Morning reservation must now be adjustable.
+    adjust = ticket.click('Anpassen', index=0)
+    adjust.form['start_time'] = '08:00'
+    adjust.form['end_time'] = '10:00'
+    ticket = adjust.form.submit().follow()
+    assert '08:00' in ticket
+    assert '10:00' in ticket
+
+
+@freeze_time("2015-08-28", tick=True)
+def test_migration_removes_reservation_when_slot_is_taken(
+    client: Client
+) -> None:
+    # Migration test: when the slot originally belonging to a reservation is
+    # now owned by a different reservation, the migration deletes the orphaned
+    # reservation and adds a note to its ticket.
+    from libres.db.models import ReservedSlot
+    from onegov.chat import MessageCollection
+    from onegov.org.upgrade import fix_missing_reserved_slots
+    from onegov.ticket import TicketCollection
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource_id = resource.id
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    assert reserve('10:00', '12:00').json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'user@example.org'
+    ticket = formular.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    client.login_admin()
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket_page.click('Alle Reservationen annehmen').follow()
+
+    # Simulate a conflict: reassign the reservation's slots to a foreign token
+    # so the time range is now "taken" by another owner.
+    other_token = uuid4()
+    session = client.app.session()
+    reservation = (
+        session.query(Reservation).filter_by(resource=resource_id).one()
+    )
+    reservation_id = reservation.id
+    reservation_token = reservation.token
+
+    session.query(ReservedSlot).filter_by(
+        reservation_token=reservation_token
+    ).update({'reservation_token': other_token})
+    transaction.commit()
+
+    # Migration must detect the conflict, delete the reservation, and note it.
+    session = client.app.session()
+    recreated_starts, deleted_starts = fix_missing_reserved_slots(session)
+    transaction.commit()
+
+    assert recreated_starts == []
+    assert len(deleted_starts) == 1
+    _start, noted = deleted_starts[0]
+    assert noted is True  # reservation is in the future → ticket note added
+
+    # The orphaned reservation must be gone.
+    session = client.app.session()
+    assert (
+        session.query(Reservation).filter_by(id=reservation_id).first() is None
+    )
+
+    # A note must have been added to the ticket.
+    t = TicketCollection(session).by_handler_id(reservation_token.hex)
+    assert t is not None
+    notes: list[Any] = (
+        MessageCollection(session, type='ticket_note', channel_id=t.number)
+        .query()
+        .all()
+    )
+    assert any('irrtümlich storniert' in (n.text or '') for n in notes)

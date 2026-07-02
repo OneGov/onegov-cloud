@@ -293,7 +293,7 @@ class Framework(
 
     @property
     def has_filestorage(self) -> bool:
-        """ Returns true if :attr:`fs` is available. """
+        """ True if :attr:`fs` is available. """
         return self._global_file_storage is not None
 
     def handle_exception(
@@ -1182,10 +1182,7 @@ class Framework(
 
     @property
     def can_deliver_sms(self) -> bool:
-        """ Returns whether or not the current schema is configured for
-        SMS delivery.
-
-        """
+        """Whether or not the current schema is configured for SMS delivery."""
         if not self.sms_directory:
             return False
 
@@ -1330,8 +1327,8 @@ class Framework(
 
     @cached_property
     def serve_static_files(self) -> bool:
-        """ Returns True if ``/static`` files should be served. Needs to be
-        enabled manually.
+        """ True if ``/static`` files should be served. Needs to be enabled
+        manually.
 
         Note that even if the static files are not served, ``/static`` path
         is still served, it just won't return anything but a 404.
@@ -1360,7 +1357,7 @@ class Framework(
 
     @property
     def filestorage(self) -> SubFS[FS] | None:
-        """ Returns a filestorage object bound to the current application.
+        """ A filestorage object bound to the current application.
         Based on this nifty module:
 
         `<https://docs.pyfilesystem.org/en/latest/>`_
@@ -1414,8 +1411,7 @@ class Framework(
 
     @property
     def themestorage(self) -> SubFS[FS] | None:
-        """ Returns a storage object meant for themes, shared by all
-        applications.
+        """ A storage object meant for themes, shared by all applications.
 
         Only use this for theming, nothing else!
 
@@ -1428,12 +1424,12 @@ class Framework(
 
     @property
     def theme_options(self) -> dict[str, Any]:
-        """ Returns the application-bound theme options. """
+        """ The application-bound theme options. """
         return {}
 
     @cached_property
     def translations(self) -> dict[str, GNUTranslations]:
-        """ Returns all available translations keyed by language. """
+        """ All available translations keyed by language. """
 
         try:
             if not self.settings.i18n.localedirs:
@@ -1447,14 +1443,14 @@ class Framework(
 
     @cached_property
     def chameleon_translations(self) -> dict[str, _ChameleonTranslate]:
-        """ Returns all available translations for chameleon. """
+        """ All available translations for chameleon. """
         return self.modules.i18n.wrap_translations_for_chameleon(
             self.translations
         )
 
     @cached_property
     def locales(self) -> set[str]:
-        """ Returns all available locales in a set. """
+        """ All available locales in a set. """
         try:
             if self.settings.i18n.locales:
                 return self.settings.i18n.locales
@@ -1465,7 +1461,7 @@ class Framework(
 
     @cached_property
     def default_locale(self) -> str | None:
-        """ Returns the default locale. """
+        """ The default locale. """
         try:
             if self.settings.i18n.default_locale:
                 return self.settings.i18n.default_locale

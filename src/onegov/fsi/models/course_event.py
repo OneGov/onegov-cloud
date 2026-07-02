@@ -224,8 +224,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     @property
     def description_html(self) -> Markup:
         """
-        Returns the portrait that is saved as HTML from the redactor js
-        plugin.
+        The description saved as HTML from the redactor js plugin.
         """
         return self.description
 

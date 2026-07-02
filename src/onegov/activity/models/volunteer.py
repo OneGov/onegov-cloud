@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin
+from onegov.core.orm.mixins import (
+    ContentMixin,
+    StripWhitespaceMixin,
+    TimestampMixin,
+)
 from sqlalchemy import Enum, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
@@ -19,7 +23,7 @@ type VolunteerState = Literal[
 ]
 
 
-class Volunteer(Base, ContentMixin, TimestampMixin):
+class Volunteer(Base, StripWhitespaceMixin, ContentMixin, TimestampMixin):
     """ Describes a volunteer that has signed up to fulfill an
     occasion need.
 

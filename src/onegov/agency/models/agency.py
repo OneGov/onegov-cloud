@@ -86,10 +86,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     @property
     def pdf_file(self) -> StoredFile | None:
-        """ Returns the PDF content for the agency (and all its
-        suborganizations).
-
-        """
+        """ The PDF content for the agency (and all its suborganizations). """
 
         try:
             return self.pdf.reference.file if self.pdf else None
@@ -112,8 +109,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     @property
     def portrait_html(self) -> Markup | None:
-        """ Returns the portrait that is saved as HTML from the redactor js
-        plugin. """
+        """ The portrait saved as HTML from the redactor js plugin. """
 
         return self.portrait
 

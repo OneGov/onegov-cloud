@@ -93,7 +93,7 @@ class TraitInfo:
 
     @property
     def trait(self) -> str | None:
-        """ Gets the trait of the page. """
+        """ The trait of the page. """
         return self.meta.get('trait')
 
     @trait.setter
@@ -103,18 +103,18 @@ class TraitInfo:
 
     @property
     def trait_messages(self) -> dict[str, dict[str, str]]:
-        """ Returns all trait_messages. """
+        """ All trait messages. """
         return TRAIT_MESSAGES
 
     @property
     def allowed_subtraits(self) -> Sequence[str]:
-        """ Returns a list of traits that this page may contain. """
+        """ A list of traits that this page may contain. """
         raise NotImplementedError
 
     @property
     def paste_target(self) -> TraitInfo:
-        """ Returns the page that should be used as parent for the content
-        pasting if paste is called on the current page (self).
+        """ The page that should be used as parent for content pasting when
+        paste is called on the current page (self).
 
         This is usually just self. If the paste action should put the content
         alongside the current page, it would be the parent.

@@ -5,6 +5,7 @@ import transaction
 from base64 import b64encode
 from datetime import timedelta
 from collection_json import Collection  # type: ignore[import-untyped]
+from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.form import FormCollection
 from onegov.org.models.external_link import (
     ExternalFormLink, ExternalResourceLink)
@@ -19,6 +20,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from .conftest import Client
     from onegov.agency import AgencyApp
+    from onegov.org.models import ExtendedDirectory
     from unittest.mock import MagicMock
 
 
@@ -675,3 +677,37 @@ def test_api_people_endpoint_hides_unpublished_entries(client: Client) -> None:
     assert 'Person Hidden' not in titles
 
     client.get(f'/api/people/{hidden_id.hex}', status=404)
+
+
+def test_api_directory_content_hash(client: Client) -> None:
+    from onegov.directory import DirectoryEntry
+    session = client.app.session()
+    directory: ExtendedDirectory = DirectoryCollection(
+        session, type='extended'
+    ).add(
+        title='Clubs',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+    directory.add(values={'name': 'Chess Club'})
+    transaction.commit()
+
+    items = api_items(client, '/api/clubs')
+    assert len(items) == 1
+    item_data = api_item_data(items[0])
+    assert 'content_hash' in item_data
+    assert item_data['content_hash'] is not None
+    assert len(item_data['content_hash']) == 40  # SHA-1 hex digest
+    assert 'modified' in item_data
+
+    first_hash = item_data['content_hash']
+
+    # update the entry — hash must change in the API response
+    session = client.app.session()
+    entry = session.query(DirectoryEntry).one()
+    entry.directory.update(entry, {'name': 'Updated Club'})
+    transaction.commit()
+
+    items = api_items(client, '/api/clubs')
+    item_data = api_item_data(items[0])
+    assert item_data['content_hash'] != first_hash

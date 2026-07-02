@@ -60,7 +60,7 @@ class DirectoryMigration:
 
     @property
     def possible(self) -> bool:
-        """ Returns True if the migration is possible, False otherwise. """
+        """ True if the migration is possible, False otherwise. """
         if not self.directory.entries:
             return True
 
@@ -155,6 +155,7 @@ class DirectoryMigration:
             return
         self.migrate_values(entry.values)
         self.directory.update(entry, entry.values, force_update=update)
+        entry.update_content_hash()
 
     def migrate_values(self, values: dict[str, Any]) -> None:
         self.add_new_fields(values)

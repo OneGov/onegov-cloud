@@ -121,6 +121,7 @@ class Organisation(Base, TimestampMixin):
     locales: dict_property[str | None] = meta_property()
     redirect_homepage_to: dict_property[str | None] = meta_property()
     redirect_path: dict_property[str | None] = meta_property()
+    short_links: dict_property[str | None] = meta_property()
     hidden_people_fields: dict_property[list[str]] = meta_property(
         default=lambda: ['external_user_id']
     )
@@ -161,7 +162,6 @@ class Organisation(Base, TimestampMixin):
     instagram_url: dict_property[str | None] = meta_property()
     linkedin_url: dict_property[str | None] = meta_property()
     tiktok_url: dict_property[str | None] = meta_property()
-    og_logo_default: dict_property[str | None] = meta_property()
 
     # custom links
     impressum_url: dict_property[str | None] = meta_property()
@@ -290,6 +290,10 @@ class Organisation(Base, TimestampMixin):
 
     assembly_title: dict_property[str | None] = meta_property()
 
+    # organisation profil
+    og_description: dict_property[str | None] = meta_property()
+    og_logo_default: dict_property[str | None] = meta_property()
+
     # Kaba settings
     @property
     def kaba_configurations(self) -> list[RawKabaConfiguration]:
@@ -376,8 +380,8 @@ class Organisation(Base, TimestampMixin):
 
     @property
     def holidays(self) -> SwissHolidays:
-        """ Returns a SwissHolidays instance, as configured by the
-        holiday_settings on the UI.
+        """ A SwissHolidays instance as configured by the holiday_settings on
+        the UI.
 
         """
         return SwissHolidays(
@@ -387,15 +391,12 @@ class Organisation(Base, TimestampMixin):
 
     @property
     def has_school_holidays(self) -> bool:
-        """ Returns whether any school holidays have been configured
-        """
+        """ Whether any school holidays have been configured. """
         return bool(self.holiday_settings.get('school', ()))
 
     @property
     def school_holidays(self) -> Iterator[tuple[date, date]]:
-        """ Returns an iterable that yields date pairs of start
-        and end dates of school holidays
-        """
+        """ Date pairs of start and end dates of school holidays. """
         for y1, m1, d1, y2, m2, d2 in self.holiday_settings.get('school', ()):
             yield date(y1, m1, d1), date(y2, m2, d2)
 
@@ -418,6 +419,24 @@ class Organisation(Base, TimestampMixin):
     @cached_property
     def opening_hours_html(self) -> Markup:
         return paragraphify(linkify(self.opening_hours))
+
+    @cached_property
+    def short_links_dict(self) -> dict[str, str]:
+        return {
+            parts[0].strip(): parts[1].strip()
+            for line in (self.short_links or '').splitlines()
+            if len(parts := line.split(':', 1)) == 2
+        }
+
+    @short_links.inplace.setter
+    def _short_links_setter(self, value: str | None) -> None:
+        self.meta['short_links'] = value
+        # update cache
+        self.__dict__['short_links_dict'] = {
+            parts[0].strip(): parts[1].strip()
+            for line in (self.short_links or '').splitlines()
+            if len(parts := line.split(':', 1)) == 2
+        }
 
     @property
     def title(self) -> str:

@@ -614,7 +614,7 @@ class Form(BaseForm):
 
     @property
     def has_required_email_field(self) -> bool:
-        """ Returns True if the form has a required e-mail field. """
+        """ True if the form has a required e-mail field. """
         matches = self.match_fields(
             include_classes=(EmailField, ),
             required=True,
@@ -832,7 +832,7 @@ class Form(BaseForm):
 
     @property
     def ensurances(self) -> Iterator[Callable[[], bool]]:
-        """ Returns the ensurances that need to be checked when validating.
+        """ The ensurances that need to be checked when validating.
 
         This property may be overridden if only a subset of all ensurances
         should actually be enforced.
@@ -914,7 +914,7 @@ class Fieldset:
 
     @property
     def non_empty_fields(self) -> dict[str, CallableProxyType[Field]]:
-        """ Returns only the fields which are not empty. """
+        """ Only the fields which are not empty. """
         return OrderedDict(
             (id, field) for id, field in self.fields.items() if field.data)
 

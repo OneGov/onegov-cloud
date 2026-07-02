@@ -115,13 +115,13 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
 
     @property
     def remote_url(self) -> str:
-        """ Returns the url of this object on the payment provider. """
+        """ The URL of this object on the payment provider. """
         raise NotImplementedError
 
     @property
     def remote_references(self) -> list[str]:
-        """ Returns any additional payment provider specific reference numbers
-        other than `remote_id`.
+        """ Any additional payment provider specific reference numbers other
+        than `remote_id`.
 
         """
         return []

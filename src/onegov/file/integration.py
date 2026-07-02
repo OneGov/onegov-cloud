@@ -353,7 +353,8 @@ class DepotApp(App):
 
         with SpooledTemporaryFile(max_size=16 * mb, mode='wb') as signed:
             old_digest = digest(file.reference.file)
-            request_id = self.signing_service.sign(file.reference.file, signed)
+            request = self.signing_service.sign(
+                session, file.reference.file, signed, file)
             new_digest = digest(signed)
 
             signed.seek(0)
@@ -368,7 +369,7 @@ class DepotApp(App):
             'new_digest': new_digest,
             'signee': signee,
             'timestamp': utcnow().isoformat(),
-            'request_id': request_id,
+            'request_id': request.request_id,
             'token': token,
             'token_type': token_type
         }

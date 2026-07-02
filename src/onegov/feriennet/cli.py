@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import click
+import transaction
 
 from onegov.activity import Activity
-from onegov.core.cli import command_group
 from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
+from onegov.activity.models import Volunteer
+from onegov.core.cli import command_group
 from sqlalchemy import text
 
 
@@ -202,3 +204,47 @@ def delete_activity(
         request.session.delete(activity)
 
     return delete_activity
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
+    """ Strips leading/trailing whitespace from first_name and last_name
+    of all volunteers.
+
+    Example:
+
+        `onegov-feriennet --select /onegov_feriennet/*
+        strip-whitespace-from-names`
+
+    """
+
+    def _strip(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+        session = app.session()
+        count = 0
+        for volunteer in session.query(Volunteer):
+            first_name = volunteer.first_name.strip()
+            last_name = volunteer.last_name.strip()
+            if (first_name, last_name) != (
+                volunteer.first_name,
+                volunteer.last_name,
+            ):
+                volunteer.first_name = first_name
+                volunteer.last_name = last_name
+                count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} volunteer(s)',
+            fg='green'
+        )
+
+    return _strip

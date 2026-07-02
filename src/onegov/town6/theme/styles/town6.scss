@@ -1026,6 +1026,8 @@ $pageref-color-hover: $iron;
 .sort-items {
     list-style: none;
     margin-left: 0;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
 
     li {
         background: #f5f5f5;
@@ -1869,4 +1871,8 @@ a.category-anchor {
             border: 2px solid $primary-color !important;
         }
     }
+}
+
+ol li a:not(.button) {
+  display: inline !important;
 }

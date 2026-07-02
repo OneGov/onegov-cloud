@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-03-25 09:27+0100\n"
+"POT-Creation-Date: 2026-06-09 12:54+0200\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -159,6 +159,10 @@ msgstr "Ungültige Eingabe."
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr "Die Datei ist zu gross, bitte senden Sie eine Datei kleiner als {}."
 
+#, python-format
+msgid "The image is too large, please provide an image smaller than {}."
+msgstr "Das Bild ist zu gross, bitte senden Sie ein Bild kleiner als {}."
+
 msgid ""
 "The password you wanted to use was found on list of commonly used passwords, "
 "please use a more secure password."
@@ -168,6 +172,18 @@ msgstr ""
 
 msgid "The form could not be parsed."
 msgstr "Das Formular ist nicht gültig."
+
+#, python-format
+msgid ""
+"The field '{label}' has no type defined. For example use '___' for a text "
+"field."
+msgstr ""
+"Das Feld '{label}' hat keinen Typ definiert. Verwenden Sie zum Beispiel "
+"'___' für ein Textfeld."
+
+#, python-format
+msgid "The field '{label}' cannot mix radio buttons and checkboxes."
+msgstr "Das Feld '{label}' kann keine Radiobuttons und Checkboxen mischen."
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
 msgstr ""
@@ -239,8 +255,7 @@ msgstr ""
 "entfernen Sie die leere Gruppe oder fügen Felder hinzu."
 
 #, python-format
-msgid ""
-"Nested fieldsets (`#`) are not supported, please remove line {line}."
+msgid "Nested fieldsets (`#`) are not supported, please remove line {line}."
 msgstr ""
 "Verschachtelte Fieldsets (`#`) werden nicht unterstützt, bitte entfernen Sie "
 "die Zeile {line}."

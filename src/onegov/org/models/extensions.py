@@ -94,7 +94,7 @@ class ContentExtension:
 
     @property
     def content_extensions(self) -> Iterator[type[ContentExtension]]:
-        """ Returns all base classes of the current class which themselves have
+        """ All base classes of the current class that have
         ``ContentExtension`` as baseclass.
 
         """
@@ -441,7 +441,7 @@ class PersonLinkExtension(ContentExtension):
 
     @property
     def people(self) -> list[PersonWithFunction] | None:
-        """ Returns the people linked to this content or None.
+        """ The people linked to this content, or None.
 
         The context specific function is temporarily stored on the
         ``context_specific_function`` attribute on each object in the
@@ -1218,6 +1218,30 @@ class DeletableContentExtension(ContentExtension):
             )
 
         return DeletableContentForm
+
+
+class InternalNotesExtension(ContentExtension):
+
+    internal_notes: dict_property[str | None] = content_property()
+
+    def extend_form[T: Form](
+        self, form_class: type[T], request: OrgRequest
+    ) -> type[T]:
+
+        class InternalNotesForm(form_class):  # type:ignore
+            internal_notes = TextAreaField(
+                label=_('Internal Comments'),
+                fieldset=_('Administrative'),
+                render_kw={'rows': 7},
+            )
+
+            def on_request(self) -> None:
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
+                if not self.request.is_manager:
+                    self.delete_field('internal_notes')
+
+        return InternalNotesForm
 
 
 class InlinePhotoAlbumExtension(ContentExtension):
