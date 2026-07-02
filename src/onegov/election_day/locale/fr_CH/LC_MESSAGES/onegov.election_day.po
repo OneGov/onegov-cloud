@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-20 12:30+0100\n"
+"POT-Creation-Date: 2026-03-25 09:38+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -24,9 +24,15 @@ msgstr "Les nouveaux résultats sont disponibles"
 msgid "New results are available on ${url}"
 msgstr "Les nouveaux résultats sont disponibles sur ${url}"
 
+#. even though this is technically a transactional e-mail we send it as
+#. marketing, since the actual subscription is sent as a marketing e-mail as
+#. well
 msgid "Please confirm your email"
 msgstr "Veuillez confirmer votre e-mail"
 
+#. even though this is technically a transactional e-mail we send it as
+#. marketing, since the actual subscription is sent as a marketing e-mail as
+#. well
 msgid "Please confirm your unsubscription"
 msgstr "Veuillez confirmer votre désinscription"
 
@@ -107,7 +113,9 @@ msgstr "Format de fichier non pris en charge"
 
 #, python-format
 msgid "Cannot import election information. Year ${year} does not exist."
-msgstr "Impossible d'importer les informations de l'élection. L'année ${year} n'existe pas."
+msgstr ""
+"Impossible d'importer les informations de l'élection. L'année ${year} "
+"n'existe pas."
 
 msgid "Domain not supported"
 msgstr "Domaine non pris en charge."
@@ -117,7 +125,9 @@ msgstr "Le changement de types n'est pas pris en charge"
 
 #, python-format
 msgid "Cannot import election results. Year ${year} does not exist."
-msgstr "Impossible d'importer les résultats de l'élection. L'année ${year} n'existe pas."
+msgstr ""
+"Impossible d'importer les résultats de l'élection. L'année ${year} n'existe "
+"pas."
 
 msgid "Election does not exist"
 msgstr "L'élection n'existe pas"
@@ -264,6 +274,8 @@ msgstr "Résultat de la votation"
 msgid "Accepted"
 msgstr "Accepté"
 
+#.
+#. Answer
 msgid "Rejected"
 msgstr "Refusé"
 
@@ -705,6 +717,8 @@ msgstr "Candidats"
 msgid "Parties"
 msgstr "Partis"
 
+#.
+#. Statistics
 msgid "Election statistics"
 msgstr "Statistiques des élections"
 
@@ -775,12 +789,17 @@ msgstr "Abonnés"
 msgid "Mappings"
 msgstr "Cartographie"
 
+#.
+#. Statistics
 msgid "Statistics"
 msgstr "Statistiques"
 
 msgid "Proposal"
 msgstr "Objet de la votation"
 
+#.
+#. type:ignore
+#. type:ignore
 msgid "Tie-Breaker"
 msgstr "Question subsidiaire"
 
@@ -820,9 +839,6 @@ msgstr "Counter proposal %"
 #, python-format
 msgid "Regional (${on})"
 msgstr "Régional (${on})"
-
-msgid "Other"
-msgstr "Autre"
 
 msgid "district_label_bl"
 msgstr "District électoral"
@@ -948,12 +964,12 @@ msgstr "Aucune candidature."
 msgid "Download diagram"
 msgstr "Télécharger le diagramme"
 
-#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
+#.
 msgid "figcaption_connections"
 msgstr ""
 "Le diagramme montre la répartition des voix et des mandats sur la liste et "
@@ -977,11 +993,11 @@ msgstr "Aucun candidat n'a encore été élu."
 msgid "Note on the voters count"
 msgstr "Note sur le nombre d'électeurs"
 
-#.
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
+#.
 msgid "figcaption_list_groups"
 msgstr ""
 "Dans une première étape - appelée répartition supérieure - on considère "
@@ -1092,17 +1108,17 @@ msgstr "Votes blancs"
 msgid "Invalid votes"
 msgstr "Votes non valides"
 
-#.
 #. Default: Turnout
 #. Default: Voter turnout
+#.
 msgid "turnout_vote"
 msgstr "Participation au vote"
 
 msgid "List connection"
 msgstr "Connexion de listes"
 
-#.
 #. Default: Votes
+#.
 msgid "single_votes"
 msgstr "Votes"
 
@@ -1250,6 +1266,8 @@ msgstr "Initiative et contre-projet rejetées"
 msgid "Proposal accepted"
 msgstr "Initiative acceptée"
 
+#.
+#. type:ignore[attr-defined]
 msgid "Tie breaker in favor of the proposal"
 msgstr "Jeu décisif en faveur de l'initiative"
 
@@ -1308,10 +1326,10 @@ msgstr "Vos résultats n'ont pas pu être mis à jour."
 msgid "Line"
 msgstr "Ligne"
 
-#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
+#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Le diagramme montre les votes et les mandats des partis. Les barres à rebord "
@@ -1324,10 +1342,10 @@ msgstr "Année"
 msgid "Difference"
 msgstr "Différence"
 
-#.
 #. Default: The diagram shows the origin of votes won and lost by panache. On
 #. the left side are the lost votes, on the right side the won votes. The width
 #. of the bars and the connections is proportional to the number of votes.
+#.
 msgid "figcaption_panachage"
 msgstr ""
 "Le diagramme montre l'origine des votes gagnés et perdus par le panache. Sur "
@@ -1424,6 +1442,9 @@ msgstr "Titre"
 
 msgid "New election"
 msgstr "Nouveau election"
+
+msgid "Other"
+msgstr "Autre"
 
 msgid "New screen"
 msgstr "Nouvel écran"
@@ -1540,6 +1561,7 @@ msgstr "Résultats interm."
 msgid "Intermediate results: ${counted} of ${total} ${entities}"
 msgstr "Résultats intermédiaires: ${counted} de ${total} ${entities}"
 
+#. type:ignore
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
 
@@ -1557,6 +1579,7 @@ msgstr ""
 msgid "Password changed."
 msgstr "Mot de passe changé."
 
+#. type:ignore[attr-defined]
 msgid "Wrong username or password reset link not valid any more."
 msgstr ""
 "Identifiant ou mot de passe erroné. Le lien de réinitialisation du mot de "
@@ -1852,16 +1875,16 @@ msgid ""
 "Final results of the cantonal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Résultats finaux de l'élection cantonale \"${title}\", ${date}, "
-"${principal}, répartis par municipalités et par candidats."
+"Résultats finaux de l'élection cantonale \"${title}\", ${date}, $"
+"{principal}, répartis par municipalités et par candidats."
 
 #, python-format
 msgid ""
 "Final results of the regional election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Résultats finaux de l'élection régionale \"${title}\", ${date}, "
-"${principal}, répartis par municipalités et par candidats."
+"Résultats finaux de l'élection régionale \"${title}\", ${date}, $"
+"{principal}, répartis par municipalités et par candidats."
 
 #, python-format
 msgid ""
@@ -1921,6 +1944,13 @@ msgstr ""
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'année ${year} n'est pas encore prise en charge"
+
+msgid ""
+"A file was submitted instead of a string. Use --form \"type=xml\" instead of "
+"--form \"type=@file\""
+msgstr ""
+"Un fichier a été fourni à la place d'une chaîne de caractères. Utilisez --"
+"form \"type=xml\" au lieu de --form \"type=@file\""
 
 msgid "Invalid id"
 msgstr "Mauvaise référence"

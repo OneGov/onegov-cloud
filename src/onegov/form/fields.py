@@ -67,7 +67,6 @@ if TYPE_CHECKING:
         FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
     from typing import NotRequired, TypedDict, Self
     from webob.request import _FieldStorageWithFile
-    from wtforms.fields.choices import _Choice
     from wtforms.form import BaseForm
     from wtforms.meta import (
         _MultiDictLikeWithGetlist, _SupportsGettextAndNgettext, DefaultMeta)
@@ -174,7 +173,12 @@ class URLField(StringField):
 
         # if no scheme was given, use the default scheme
         value = valuelist[0]
-        if value and self.default_scheme and '://' not in value:
+        if (
+            isinstance(value, str)
+            and value
+            and self.default_scheme
+            and '://' not in value
+        ):
             valuelist[0] = f'{self.default_scheme}://{value}'
 
         super().process_formdata(valuelist)
@@ -739,6 +743,13 @@ class TagsField(StringField):
     #        passed in by the form or the object?! This seems like a bug
     data: str | list[str]  # type:ignore[assignment]
 
+    def _value(self) -> str:
+        # Without this override, we had the underlying data corrupted
+        # containing strings like ["['[]']"]
+        if isinstance(self.data, list):
+            return ','.join(self.data)
+        return self.data or ''
+
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
             self.data = []
@@ -789,6 +800,8 @@ class PhoneNumberField(TelField):
 
 
 class _TreeSelectMixin(_TreeSelectMixinBase):
+
+    widget: TreeSelectWidget
 
     def __init__(
         self,
@@ -850,9 +863,13 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
     def flatten_choices(
         self,
         choices: Iterable[TreeSelectNode]
-    ) -> Iterator[_Choice]:
+    ) -> Iterator[tuple[str, str]]:
+        multiple = self.widget.multiple
         for choice in choices:
-            yield choice['value'], choice['name']
+            if not choice.get('disabled', False) and (
+                multiple or choice.get('isGroupSelectable', True)
+            ):
+                yield choice['value'], choice['name']
             yield from self.flatten_choices(choice['children'])
 
     def set_choices(self, choices: Iterable[TreeSelectNode]) -> None:
@@ -861,6 +878,9 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
 
         self.render_kw['data-choices'] = json.dumps(choices)
         self.choices = list(self.flatten_choices(choices))
+        if not self.widget.multiple:
+            # NOTE: Add a blank choice so the field can be cleared
+            self.choices.insert(0, ('', ''))
 
 
 class TreeSelectField(_TreeSelectMixin, SelectField):
@@ -1068,8 +1088,8 @@ class ColorField(StringField):
                 value = name_to_hex(value)
             return normalize_hex(value)
         except ValueError:
-            msg = self.gettext(_('Not a valid color.'))
-            raise ValueError(msg) from None
+            msg = _('Not a valid color.')
+            raise ValueError(self.gettext(msg)) from None
 
     def process_data(self, value: object) -> None:
         self.data = self.coerce(value)

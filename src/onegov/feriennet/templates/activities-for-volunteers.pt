@@ -28,7 +28,7 @@
                         <div class="subpage-cards small-12 medium-6 large-4 cell" tal:define="occasions occasions_for_volunteer(activity)" tal:condition="python: any(wants_more_volunteers(need) for occasion in occasions for need in occasion.needs)">
                             <div class="activity-list-item card">
                                 <div class="grid-x align-middle">
-                                    <div tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
+                                    <div class="activity-image" tal:condition="activity.thumbnail|nothing" style="width: 100%; padding-bottom: 60%; background-image: url('${activity.thumbnail}'); background-size: cover;"></div>
                                     <div class="cell small-12 card-section">
                                         <a href="${request.link(activity)}">
                                         <h5>${activity.title}</h5>
@@ -47,7 +47,7 @@
                                                         <h3 i18n:translate>Needs</h3>
                                                         <ul class="dense needs">
                                                             <tal:b repeat="need occasion.needs">
-                                                                <li tal:condition="need.accept_signups" tal:condition="wants_more_volunteers(need)">
+                                                                <li tal:condition="need.accept_signups and wants_more_volunteers(need)">
                                                                     <span>${need.name}</span>
 
                                                                     <a class="button narrow" data-need="${need.id.hex}" data-error-container="#error-for-${occasion.id.hex}">

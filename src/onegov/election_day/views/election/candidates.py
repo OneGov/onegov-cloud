@@ -30,7 +30,8 @@ election_incomplete_text = _(
 @ElectionDayApp.json(
     model=Election,
     name='candidates-data',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_candidates_data(
     self: Election,

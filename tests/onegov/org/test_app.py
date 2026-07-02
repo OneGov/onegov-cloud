@@ -36,6 +36,7 @@ def test_send_email(maildir: str) -> None:
             )
 
     app = App()
+    app.namespace = 'test'
     app.mail = {
         'marketing': {
             'directory': maildir,
@@ -46,6 +47,7 @@ def test_send_email(maildir: str) -> None:
             'sender': 'mails@govikon.ch'
         }
     }
+    app.set_application_id('test/foo')
     app.maildir = maildir  # type: ignore[attr-defined]
     client = Client(app)
 

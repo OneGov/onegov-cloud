@@ -90,7 +90,10 @@ class ExportForm(Form):
         if self.format == 'json':
             return Response(
                 json_body=results,
-                content_type='application/json'
+                content_type='application/json',
+                content_disposition='attachment; filename={}.json'.format(
+                    normalize_for_url(title)
+                )
             )
 
         if self.format == 'csv':

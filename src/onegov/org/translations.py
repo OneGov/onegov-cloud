@@ -6,14 +6,17 @@ from __future__ import annotations
 
 from onegov.org import _
 
-# messages defined in wtforms-components
-_('Not a valid color.')
+# lingua ignores the first translation string in this file for some reason
+_('')
+
+# messages not translated by wtforms
+_('Not a valid choice')
 _('CSRF failed.')
 _('CSRF token missing.')
 _('CSRF token expired.')
 
-# messages not translated by wtforms
-_('Not a valid choice')
+# messages defined in wtforms-components
+_('Not a valid color.')
 
 # Roles in plural form are not defined as translatable texts anywhere
 _('Admins')

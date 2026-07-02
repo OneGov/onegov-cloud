@@ -3,11 +3,13 @@ from __future__ import annotations
 import pytest
 
 from onegov.pas.importer.json_import import (
+    MembershipImporter,
     PeopleImporter,
     OrganizationImporter,
 )
 from onegov.pas.models import (
     PASCommission,
+    PASCommissionMembership,
     PASParliamentarian,
     Party,
 )
@@ -208,7 +210,119 @@ def test_organization_importer_existing(
     assert party_count == 1
 
 
-# FIXME: Use me or delete me
+def test_membership_importer_role_transition(
+    session: Session,
+) -> None:
+    """Same person promoted from Mitglied to Präsident in same
+    commission. Both memberships must be imported — the old key
+    (parliamentarian_id, commission_id) collapsed them into one."""
+
+    from uuid import UUID
+
+    person_kub_id = 'person-lustenberger'
+    commission_kub_id = 'commission-gesundheit'
+
+    parl = PASParliamentarian(
+        first_name='Andreas',
+        last_name='Lustenberger',
+        external_kub_id=UUID('d6cdb745-6b69-4df7-afc0-46a81b47b8f7'),
+    )
+    commission = PASCommission(
+        name='Kommission Gesundheit und Soziales',
+        external_kub_id=UUID('a8e8fd19-d0aa-42f7-9515-22cdc26b89e3'),
+    )
+    session.add_all([parl, commission])
+    session.flush()
+
+    importer = MembershipImporter(session)
+    importer.init(
+        session=session,
+        parliamentarian_map={person_kub_id: parl},
+        commission_map={commission_kub_id: commission},
+        parliamentary_group_map={},
+        party_map={},
+        other_organization_map={},
+    )
+
+    memberships_data: list[Any] = [
+        {
+            'id': 'membership-president',
+            'organization': {
+                'id': commission_kub_id,
+                'name': 'Kommission Gesundheit und Soziales',
+                'organizationTypeTitle': 'Kommission',
+            },
+            'person': {
+                'id': person_kub_id,
+                'firstName': 'Andreas',
+                'officialName': 'Lustenberger',
+                'fullName': 'Lustenberger Andreas',
+                'salutation': 'Herr',
+                'title': '',
+                'isActive': True,
+                'primaryEmail': False,
+                'thirdPartyId': '58',
+                'username': False,
+            },
+            'role': 'Präsident/-in',
+            'start': '2024-07-03',
+            'end': None,
+            'primaryAddress': False,
+            'primaryEmail': False,
+        },
+        {
+            'id': 'membership-member',
+            'organization': {
+                'id': commission_kub_id,
+                'name': 'Kommission Gesundheit und Soziales',
+                'organizationTypeTitle': 'Kommission',
+            },
+            'person': {
+                'id': person_kub_id,
+                'firstName': 'Andreas',
+                'officialName': 'Lustenberger',
+                'fullName': 'Lustenberger Andreas',
+                'salutation': 'Herr',
+                'title': '',
+                'isActive': True,
+                'primaryEmail': False,
+                'thirdPartyId': '58',
+                'username': False,
+            },
+            'role': 'Mitglied',
+            'start': '2024-04-15',
+            'end': '2024-07-02',
+            'primaryAddress': False,
+            'primaryEmail': False,
+        },
+    ]
+
+    importer.bulk_import(memberships_data)
+    session.flush()
+
+    cms = (
+        session.query(PASCommissionMembership)
+        .filter_by(parliamentarian_id=parl.id)
+        .order_by(PASCommissionMembership.start)
+        .all()
+    )
+
+    assert len(cms) == 2, (
+        f'Expected 2 memberships, got {len(cms)}: '
+        f'{[(c.role, str(c.start)) for c in cms]}'
+    )
+
+    member_cm = cms[0]
+    assert member_cm.role == 'member'
+    assert str(member_cm.start) == '2024-04-15'
+    assert str(member_cm.end) == '2024-07-02'
+
+    president_cm = cms[1]
+    assert president_cm.role == 'president'
+    assert str(president_cm.start) == '2024-07-03'
+    assert president_cm.end is None
+
+
 @pytest.fixture
 def sample_memberships() -> list[dict[str, Any]]:
     """Provide test membership data covering all organization types and

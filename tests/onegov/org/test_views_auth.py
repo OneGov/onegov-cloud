@@ -671,7 +671,7 @@ def test_mtan_access_limit(client: Client, smsdir: str) -> None:
         client.login_admin()
 
         # set a rate limit
-        settings_page = client.get('/module-settings')
+        settings_page = client.get('/access-settings')
         settings_page.form['mtan_session_duration_seconds'] = '86400'
         settings_page.form['mtan_access_window_requests'] = '1'
         settings_page.form['mtan_access_window_seconds'] = '3600'
@@ -805,7 +805,7 @@ def test_citizen_login(client: Client) -> None:
 
     # let's enable it
     admin.login_admin()
-    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings = admin.get('/').click('Module aktivieren/deaktivieren')
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 
@@ -873,7 +873,8 @@ def test_citizen_login_via_confirm_url(client: Client) -> None:
 
     # let's enable it
     admin.login_admin()
-    settings = admin.get('/').click('Einstellungen').click('Kunden-Login')
+    settings = admin.get('/').click(
+        'Module aktivieren/deaktivieren')
     settings.form['citizen_login_enabled'].checked = True
     settings.form.submit().follow()
 

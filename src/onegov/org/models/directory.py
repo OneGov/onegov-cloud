@@ -11,7 +11,7 @@ from onegov.core.orm.mixins import (
 from onegov.core.utils import linkify
 from onegov.directory import (
     Directory, DirectoryEntry, DirectoryEntryCollection)
-from onegov.directory.errors import DuplicateEntryError, ValidationError
+from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
@@ -25,7 +25,7 @@ from onegov.org.observer import observes
 from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, func, text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.attributes import set_committed_value
 
@@ -207,9 +207,6 @@ class DirectorySubmissionAction:
             else:
                 entry = self.create_new_entry(request, data)
 
-        except DuplicateEntryError:
-            request.alert(_('An entry with this name already exists'))
-            return
         except ValidationError:
             request.alert(_('The entry is not valid, please adjust it'))
             return
@@ -641,8 +638,32 @@ class ExtendedDirectoryEntryCollection(
     if TYPE_CHECKING:
         directory: ExtendedDirectory
 
-    def query(self) -> Query[ExtendedDirectoryEntry]:
-        query = super().query()
+    def keyword_counts(self) -> dict[str, dict[str, int]]:
+        valid_keywords = tuple(
+            as_internal_id(k)
+            for k in self.directory.configuration.keywords or ()
+        )
+        counts: dict[str, dict[str, int]] = {}
+        for item, count in self.apply_common_filters(
+            self.session.query(
+                func.skeys(ExtendedDirectoryEntry._keywords),
+                func.count(text('1'))
+            )
+            .filter(ExtendedDirectoryEntry.directory_id == self.directory.id)
+            .group_by(func.skeys(ExtendedDirectoryEntry._keywords))
+        ):
+            parts = item.split(':', 1)
+            if len(parts) != 2:
+                # malformed keyword, value pair, for now we just ignore it
+                continue
+
+            keyword, value = parts
+            if keyword not in valid_keywords:
+                continue
+            counts.setdefault(keyword, {})[value] = count
+        return counts
+
+    def apply_common_filters[T](self, query: Query[T]) -> Query[T]:
         available_accesses: tuple[str, ...]
         if self.request is None:
             # assume highest access level or we filter later
@@ -672,3 +693,6 @@ class ExtendedDirectoryEntryCollection(
         elif self.upcoming_only:
             query = query.filter(self.model_class.publication_started == False)
         return query
+
+    def query(self) -> Query[ExtendedDirectoryEntry]:
+        return self.apply_common_filters(super().query())

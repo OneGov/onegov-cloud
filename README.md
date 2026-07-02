@@ -23,7 +23,7 @@ looking for, you might appreciate these links:
 <br>Where you can start your own free instance of our solution for muncipalities
 
 ---
-[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![prek](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json)](https://github.com/j178/prek)
 
 ## Developing
 
@@ -124,9 +124,10 @@ To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
 * Postgres 10+
-* Python 3.12+
+* Python 3.14+
 * Redis 5+
 * NodeJS 9+
+* [Dart Sass](https://github.com/sass/dart-sass/releases) (standalone binary, not the npm version)
 * Docker Compose
 
 To install the requirements for Ubuntu do:

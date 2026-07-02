@@ -10,12 +10,15 @@
                     <h2 i18n:translate class="h3">Parliamentarians</h2>
                     <dd>
                         <ul class="more-list">
-                            <li tal:repeat="membership commission.memberships">
+                            <li tal:repeat="membership memberships">
                                 <a href="${request.link(membership.parliamentarian)}" class="list-link">
                                     <span tal:content="membership.parliamentarian.title" class="list-title"></span>
                                 </a>
                                 <span class="list-lead preview">
                                     ${membership.role_label}
+                                    <tal:b tal:condition="membership.start or membership.end">
+                                        (${layout.format_date_range(membership.start, membership.end)})
+                                    </tal:b>
                                 </span>
                             </li>
                         </ul>
@@ -27,17 +30,18 @@
                     <div class="side-panel">
                         <div tal:condition="commission.description">
                             <h2 class="h3" i18n:translate>Contact</h2>
-                            <div tal:content="commission.description"></div>
+                            <div>${commission.description}</div>
                         </div>
                         <div tal:condition="commission.start">
                             <h6 i18n:translate>Start</h6>
-                            <span>${layout.format_date(commission.start, 'date')}</span>
+                            <p>${layout.format_date(commission.start, 'date')}</p>
                         </div>
-                        <p>
                         <div tal:condition="commission.end">
                             <h6 i18n:translate>End</h6>
-                            <span>${layout.format_date(commission.end, 'date')}</span>
+                            <p>${layout.format_date(commission.end, 'date')}</p>
                         </div>
+                        <h2 i18n:translate class="h3">Filters</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
                     </div>
                 </div>
             </div>

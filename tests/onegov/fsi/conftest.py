@@ -31,7 +31,7 @@ from tests.shared.utils import create_app
 from tests.shared import Client as BaseClient
 
 
-from typing import Any, Protocol, TypeVar, TYPE_CHECKING
+from typing import Any, Protocol, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator
     from sqlalchemy.orm import Session
@@ -39,22 +39,12 @@ if TYPE_CHECKING:
     from tests.shared.client import ExtendedResponse
     from uuid import UUID
 
-    _T_co = TypeVar('_T_co', covariant=True)
-    _FsiAppT = TypeVar(
-        '_FsiAppT',
-        bound=FsiApp,
-        default='TestFsiApp',
-        covariant=True
-    )
-
-    class Factory(Protocol[_T_co]):
+    class Factory[T_co](Protocol):
         def __call__(
             self,
             session: Session,
             **kwargs: Any
-        ) -> tuple[_T_co, dict[str, Any]]: ...
-else:
-    _FsiAppT = TypeVar('_FsiAppT', bound=FsiApp)
+        ) -> tuple[T_co, dict[str, Any]]: ...
 
 
 class TestFsiApp(FsiApp):
@@ -62,7 +52,7 @@ class TestFsiApp(FsiApp):
     maildir: str
 
 
-class Client(BaseClient[_FsiAppT]):
+class Client[AppT: FsiApp = TestFsiApp](BaseClient[AppT]):
 
     use_intercooler = True
     skip_n_forms = 1

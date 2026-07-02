@@ -99,7 +99,7 @@ class SharedMethods:
 
     @property
     def calendar_date_range(self) -> tuple[datetime, datetime]:
-        """ Returns the date range set by the fullcalendar specific params. """
+        """ The date range set by the fullcalendar specific params. """
 
         if self.date:
             date = datetime(self.date.year, self.date.month, self.date.day)
@@ -197,13 +197,17 @@ class SharedMethods:
         self,
         start: datetime | None = None,
         end: datetime | None = None,
-        exclude_pending: bool = True
+        exclude_pending: bool = True,
+        only_managed: bool = True
     ) -> Query[Reservation]:
         """ Returns a query which joins this resource's reservations between
         start and end with the tickets table.
 
         """
-        query = self.scheduler.managed_reservations()
+        if only_managed:
+            query = self.scheduler.managed_reservations()
+        else:
+            query = self.scheduler.visible_reservations()
         if start:
             query = query.filter(start <= Reservation.start)
         if end:

@@ -17,7 +17,7 @@ def test_political_businesses(client_with_fts: Client) -> None:
     assert client.get('/political-businesses/new', status=404)
 
     # enable ris
-    settings = client.get('/ris-enable')
+    settings = client.get('/module-activation-settings')
     settings.form['ris_enabled'] = True
     settings.form.submit()
 
@@ -109,6 +109,15 @@ def test_political_businesses(client_with_fts: Client) -> None:
         assert '02.10.2025' not in client.get(
             '/political-businesses?q=----------------------------------light'
         )
+
+        # out-of-range year and invalid status/type params must not error
+        # and must not filter out valid results
+        assert '02.10.2025' in client.get(
+            '/political-businesses?years=843169290')
+        assert '02.10.2025' in client.get(
+            '/political-businesses?status=bogus')
+        assert '02.10.2025' in client.get(
+            '/political-businesses?types=mabis')
 
     # delete businesses
     (client.get('/political-businesses')

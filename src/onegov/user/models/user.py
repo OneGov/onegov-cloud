@@ -291,8 +291,8 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     @property
     def yubikey_serial(self) -> int | None:
-        """ Returns the yubikey serial of the yubikey associated with this
-        user (if any).
+        """ The yubikey serial of the yubikey associated with this user (if
+        any).
 
         """
 
@@ -330,14 +330,17 @@ class User(Base, TimestampMixin, ORMSearchable):
     def save_current_session(self, request: CoreRequest) -> None:
         """ Stores the current browser session. """
 
+        # NOTE: We cleanup before we add the current session
+        #       since the current session may not yet have been
+        #       persisted, so `remembered` may yield `False`.
+        self.cleanup_sessions(request.app)
+
         self.sessions = self.sessions or {}
         self.sessions[request.browser_session._token] = {
             'address': request.client_addr,
             'timestamp': utcnow().replace(tzinfo=None).isoformat(),
             'agent': request.user_agent
         }
-
-        self.cleanup_sessions(request.app)
 
     def remove_current_session(self, request: CoreRequest) -> None:
         """ Removes the current browser session. """
@@ -359,3 +362,8 @@ class User(Base, TimestampMixin, ORMSearchable):
         self.cleanup_sessions(app)
 
         return count
+
+    def change_username(self, new_username: str, app: Framework) -> None:
+        """ Changes the username, logging out all active sessions first. """
+        self.logout_all_sessions(app)
+        self.username = new_username

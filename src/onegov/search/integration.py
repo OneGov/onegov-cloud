@@ -136,12 +136,13 @@ class SearchApp(morepath.App):
                     dict_name = 'german_unaccent'
                 else:
                     try:
-                        connection.execute(text("""
-                            CREATE TEXT SEARCH DICTIONARY german_unaccent (
-                                template = unaccent,
-                                rules = 'german'
-                            )
-                        """))
+                        with connection.begin_nested():
+                            connection.execute(text("""
+                                CREATE TEXT SEARCH DICTIONARY german_unaccent (
+                                    template = unaccent,
+                                    rules = 'german'
+                                )
+                            """))
                     except Exception:
                         index_log.exception(
                             'Failed to create german_unaccent dictionary '
@@ -217,8 +218,8 @@ class SearchApp(morepath.App):
             for model in self.searchable_models()
         }
 
-    def perform_reindex(self) -> None:
-        """ Re-indexes all content.
+    def perform_reindex(self, dispose_session: bool = True) -> None:
+        """Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
 
@@ -267,6 +268,7 @@ class SearchApp(morepath.App):
         with ThreadPoolExecutor() as executor:
             executor.map(reindex_model, self.indexable_base_models())
 
-        session.invalidate()
-        if session.bind and hasattr(session.bind, 'dispose'):
-            session.bind.dispose()
+        if dispose_session:
+            session.invalidate()
+            if session.bind and hasattr(session.bind, 'dispose'):
+                session.bind.dispose()

@@ -55,7 +55,8 @@ def view_vote(
 @ElectionDayApp.json(
     model=Vote,
     name='json',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_vote_json(
     self: Vote,
@@ -68,7 +69,6 @@ def view_vote_json(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     embed = defaultdict(list)
@@ -185,7 +185,8 @@ def view_vote_json(
 @ElectionDayApp.json(
     model=Vote,
     name='summary',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_vote_summary(
     self: Vote,
@@ -195,7 +196,6 @@ def view_vote_summary(
 
     @request.after
     def add_headers(response: Response) -> None:
-        add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
     return get_vote_summary(self, request)

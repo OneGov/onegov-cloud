@@ -1,9 +1,16 @@
 from __future__ import annotations
 
-from onegov.chat import MessageCollection, TextModuleCollection
+from onegov.chat import MessageCollection
 from onegov.core.elements import Link, LinkGroup
+from onegov.directory import DirectoryCollection
+from onegov.event import OccurrenceCollection
 from onegov.form.collection import FormCollection, SurveyCollection
+from onegov.newsletter import NewsletterCollection
 from onegov.org import _, OrgApp
+from onegov.org.api import (
+    DirectoryEntryApiEndpoint, EventApiEndpoint, FormApiEndpoint,
+    NewsApiEndpoint, PersonApiEndpoint, ResourceApiEndpoint,
+    TopicApiEndpoint)
 from onegov.org.models import (
     CitizenDashboard,
     Dashboard,
@@ -11,10 +18,12 @@ from onegov.org.models import (
     ImageFileCollection,
     Organisation,
 )
-from onegov.pay import PaymentProviderCollection, PaymentCollection
+from onegov.org.models.directory import ExtendedDirectory
+from onegov.org.models.page import News
+from onegov.pay import PaymentCollection
+from onegov.people import PersonCollection
 from onegov.reservation import Reservation, ResourceCollection
 from onegov.ticket import TicketCollection, TicketInvoiceCollection
-from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
 from sqlalchemy import func
@@ -22,15 +31,111 @@ from sqlalchemy import func
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Callable, Iterator
+    from onegov.org.api import ApiEndpoint
     from onegov.org.request import OrgRequest
 
 
 @OrgApp.template_variables()
 def get_template_variables(request: OrgRequest) -> dict[str, Any]:
     return {
-        'global_tools': tuple(get_global_tools(request))
+        'global_tools': tuple(get_global_tools(request)),
+        'modules': get_modules(request)
     }
+
+
+@OrgApp.setting(section='api', name='endpoints')
+def get_api_endpoints_handler(
+) -> Callable[[OrgRequest], Iterator[ApiEndpoint[Any]]]:
+    return get_api_endpoints
+
+
+def get_modules(request: OrgRequest) -> LinkGroup:
+    links = []
+    if request.is_admin:
+        # Modules
+        links.append(
+            Link(
+                _('Activate/deactivate modules'), request.link(
+                    request.app.org, 'module-activation-settings'
+                ), attrs={'class': 'settings'}
+            )
+        )
+
+    if request.is_logged_in:
+        links.append(
+            Link(
+                _('Latest news'),
+                request.class_link(News, {'absorb': ''}),
+                attrs={'class': 'news'}
+            )
+        )
+
+        if request.app.org.show_newsletter:
+            links.append(
+                Link(
+                    _('Newsletter'),
+                    request.class_link(
+                        NewsletterCollection),
+                    attrs={'class': 'newsletter'}
+                )
+            )
+
+        links.append(
+            Link(
+                _('Events'),
+                request.class_link(
+                    OccurrenceCollection),
+                attrs={'class': 'events'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Reservations'),
+                request.class_link(
+                    ResourceCollection),
+                attrs={'class': 'reservations'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Directories'),
+                request.class_link(
+                    DirectoryCollection),
+                attrs={'class': 'directories'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('People'),
+                request.class_link(
+                    PersonCollection),
+                attrs={'class': 'people'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Forms'),
+                request.class_link(
+                    FormCollection),
+                attrs={'class': 'forms'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Surveys'),
+                request.class_link(
+                    SurveyCollection),
+                attrs={'class': 'surveys'}
+            )
+        )
+
+    return LinkGroup(_('Modules'), classes=('modules', ), links=links)
 
 
 def logout_path(request: OrgRequest) -> str:
@@ -124,15 +229,6 @@ def get_global_tools(
             )
         )
 
-        if request.is_admin and request.app.payment_providers_enabled:
-            links.append(
-                Link(
-                    _('Payment Provider'),
-                    request.class_link(PaymentProviderCollection),
-                    attrs={'class': 'payment-provider'}
-                )
-            )
-
         links.append(
             Link(
                 _('Payments'),
@@ -150,22 +246,7 @@ def get_global_tools(
                 )
             )
 
-        links.append(
-            Link(
-                _('Text modules'), request.class_link(TextModuleCollection),
-                attrs={'class': 'text-modules'}
-            )
-        )
-
         if request.is_admin:
-            links.append(
-                Link(
-                    _('Settings'), request.link(
-                        request.app.org, 'settings'
-                    ), attrs={'class': 'settings'}
-                )
-            )
-
             links.append(
                 Link(
                     _('Users'), request.class_link(
@@ -183,14 +264,14 @@ def get_global_tools(
                 )
             )
 
-            if request.app.org.ris_enabled:
-                links.append(
-                    Link(
-                        _('RIS Settings'),
-                        request.link(request.app.org, 'ris-settings'),
-                        attrs={'class': 'ris-settings'}
-                    ),
+        if request.is_admin:
+            links.append(
+                Link(
+                    _('Settings'), request.link(
+                        request.app.org, 'settings'
+                    ), attrs={'class': 'settings'}
                 )
+            )
 
             links.append(
                 Link(
@@ -200,32 +281,14 @@ def get_global_tools(
                 )
             )
 
-        links.append(
-            Link(
-                _('Archived Tickets'),
-                request.class_link(
-                    ArchivedTicketCollection, {'handler': 'ALL'}),
-                attrs={'class': 'ticket-archive'}
-            )
-        )
-
-        links.append(
-            Link(
-                _('Forms'),
-                request.class_link(
-                    FormCollection),
-                attrs={'class': 'forms'}
-            )
-        )
-
-        links.append(
-            Link(
-                _('Surveys'),
-                request.class_link(
-                    SurveyCollection),
-                attrs={'class': 'surveys'}
-            )
-        )
+            # Currently hidden, it doesn't work as it should
+            # links.append(
+            #     Link(
+            #         _('Link Migration'),
+            #         request.class_link(Organisation, name='link-check'),
+            #         attrs={'class': 'migrate-links'}
+            #     )
+            # )
 
         yield LinkGroup(_('Management'), classes=('management', ), links=links)
 
@@ -357,4 +420,20 @@ def get_global_tools(
             attrs={
                 'class': ('citizen-tickets'),
             }
+        )
+
+
+def get_api_endpoints(request: OrgRequest) -> Iterator[ApiEndpoint[Any]]:
+    yield EventApiEndpoint(request)
+    yield FormApiEndpoint(request)
+    yield NewsApiEndpoint(request)
+    yield PersonApiEndpoint(request)
+    yield ResourceApiEndpoint(request)
+    yield TopicApiEndpoint(request)
+    directories = request.exclude_invisible(
+        request.session.query(ExtendedDirectory))
+    for directory in directories:
+        yield DirectoryEntryApiEndpoint(
+            request=request,
+            name=directory.name
         )

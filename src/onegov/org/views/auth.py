@@ -191,7 +191,7 @@ def handle_registration(
             )
             request.success(_(
                 'Thank you for registering. Please follow the instructions '
-                'on the activiation e-mail sent to you. Please check your '
+                'on the activation e-mail sent to you. Please check your '
                 'spam folder if you have not received the email.'
             ))
 
@@ -332,9 +332,11 @@ def handle_password_reset_request(
 
         response = morepath.redirect(request.link(self, name='login'))
         request.success(
-            _(('A password reset link has been sent to ${email}, provided an '
-               'active account exists for this email address.'),
-              mapping={'email': form.email.data})
+            _(
+                'A password reset link has been sent to ${email}, provided an '
+                'active account exists for this email address.',
+                mapping={'email': form.email.data}
+            )
         )
         return response
 

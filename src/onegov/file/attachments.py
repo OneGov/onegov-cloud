@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         exif: NotRequired[Image.Exif]
 
 
-IMAGE_MAX_SIZE = 2048
+IMAGE_MAX_SIZE = 4096
 IMAGE_QUALITY = 85
 CHECKSUM_FUNCTION = 'md5'
 
@@ -41,11 +41,14 @@ def get_svg_size_or_default(content: IO[bytes]) -> tuple[str, str]:
     return width, height
 
 
-def strip_exif_and_limit_and_store_image_size(
+def strip_exif_and_store_image_size(
     file: ProcessedUploadedFile,
     content: IO[bytes],
     content_type: str | None
 ) -> IO[bytes] | None:
+    # Resizing is NOT done here — it is the caller's responsibility
+    # (BaseImageFileCollection.add or ImageSizeLimit validator).  Plain File
+    # objects created outside those paths are stored at their original size.
 
     if content_type == 'image/svg+xml':
         file.size = get_svg_size_or_default(content)
@@ -69,23 +72,16 @@ def strip_exif_and_limit_and_store_image_size(
         # treat any other internal error as an UnidentifiedImageError
         raise UnidentifiedImageError from None
 
-    needs_resample = max(image.size) > IMAGE_MAX_SIZE
     has_exif = bool(hasattr(image, 'getexif') and image.getexif())
 
-    if needs_resample or has_exif:
+    if has_exif:
         params: _ImageSaveOptionalParams = {}
 
-        if has_exif:
-            # bake EXIF orientation into the image
-            ImageOps.exif_transpose(image, in_place=True)
+        # bake EXIF orientation into the image
+        ImageOps.exif_transpose(image, in_place=True)
 
-            # replace EXIF section with an empty one
-            params['exif'] = Image.Exif()
-
-        if needs_resample:
-            image.thumbnail(
-                (IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.Resampling.LANCZOS
-            )
+        # replace EXIF section with an empty one
+        params['exif'] = Image.Exif()
 
         content = SpooledTemporaryFile(INMEMORY_FILESIZE)  # noqa: SIM115
         try:
@@ -98,6 +94,48 @@ def strip_exif_and_limit_and_store_image_size(
     file.size = get_image_size(image)
 
     return content
+
+
+def resize_image(
+    content: IO[bytes],
+    max_size: int = IMAGE_MAX_SIZE
+) -> IO[bytes]:
+    """Resize an image so that neither dimension exceeds *max_size*.
+
+    When a resize is performed the EXIF orientation is baked in and the EXIF
+    block is stripped in the same pass, so the depot processor's EXIF-stripping
+    step becomes a no-op and the image is only encoded once.
+
+    Non-image streams and images that are already within the limit are returned
+    unchanged (seeked to 0).  Large images are resampled into a new
+    SpooledTemporaryFile.
+    """
+    content.seek(0)
+    try:
+        image = Image.open(content)
+        image.load()
+    except Exception:
+        content.seek(0)
+        return content
+
+    if max(image.size) <= max_size:
+        content.seek(0)
+        return content
+
+    params: _ImageSaveOptionalParams = {}
+    if hasattr(image, 'getexif') and image.getexif():
+        ImageOps.exif_transpose(image, in_place=True)
+        params['exif'] = Image.Exif()
+
+    image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+
+    out = SpooledTemporaryFile(INMEMORY_FILESIZE)  # noqa: SIM115
+    try:
+        image.save(out, image.format, quality=IMAGE_QUALITY, **params)
+    except ValueError:
+        image.save(out, image.format, **params)
+    out.seek(0)
+    return out
 
 
 def store_checksum(
@@ -141,7 +179,7 @@ class ProcessedUploadedFile(UploadedFile):
 
     processors = (
         store_checksum,
-        strip_exif_and_limit_and_store_image_size,
+        strip_exif_and_store_image_size,
         sanitize_svg_images,
         store_extract_and_pages,
     )

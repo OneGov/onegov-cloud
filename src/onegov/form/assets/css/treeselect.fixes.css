@@ -1,3 +1,17 @@
 select.treeselect {
     display: none !important;
 }
+
+.treeselect-list__item--disabled {
+    cursor: default !important;
+}
+
+.treeselect-list__item--disabled .treeselect-list__item-icon {
+    color: #999 !important;
+    cursor: default !important;
+    pointer-events: none;
+}
+
+.treeselect-list__item--disabled .treeselect-list__item-label {
+    color: #999 !important;
+}

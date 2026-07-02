@@ -1,7 +1,6 @@
 """ The onegov org collection of images uploaded to the site. """
 from __future__ import annotations
 
-from collections import defaultdict
 from datetime import date
 from markupsafe import Markup
 from morepath import redirect
@@ -9,7 +8,11 @@ from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
+from onegov.event.models.event import EventFilterValue
 from onegov.form import as_internal_id
+from onegov.org.models.organisation import (
+    flatten_event_filter_fields_from_definition,
+)
 from onegov.form.errors import (InvalidFormSyntax, MixedTypeError,
                                 DuplicateLabelError)
 from onegov.org import _, OrgApp
@@ -46,7 +49,6 @@ def get_filters(
 ) -> list[Filter]:
 
     filters = []
-    empty = ()
 
     radio_fields = {
         f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
@@ -60,10 +62,11 @@ def get_filters(
         return f'{value} ({count})'
 
     for keyword, title, values in self.available_filters(sort_choices=False):
-        filters.append(Filter(title=title, tags=tuple(
+        selected = self.filter_keywords.getall(keyword)
+        options = tuple(
             CoreLink(
                 text=link_title(keyword, value),
-                active=value in self.filter_keywords.get(keyword, empty),
+                active=value in selected,
                 url=request.link(
                     self.for_toggled_keyword_value(
                         keyword,
@@ -74,53 +77,12 @@ def get_filters(
                 ),
                 rounded=keyword in radio_fields
             ) for value in values if get_count(keyword, value)
-        )))
+        )
+        if not options:
+            continue
+        filters.append(Filter(title=title, tags=options))
 
     return filters
-
-
-def keyword_count(
-    request: OrgRequest,
-    collection: OccurrenceCollection
-) -> dict[str, dict[str, int]]:
-
-    self = collection
-
-    filter_config = request.app.org.event_filter_configuration
-    keywords = tuple(
-        as_internal_id(keyword)
-        for keyword in filter_config.get('keywords', set())
-    )
-
-    fields = {
-        field.id: field
-        for field in request.app.org.event_filter_fields
-        if field.id in keywords
-    }
-
-    counts: dict[str, dict[str, int]] = {}
-
-    # NOTE: The counting can get incredibly expensive with many entries
-    #       so we should skip it when we know we can skip it
-    if not fields:
-        return counts
-
-    # FIXME: This is incredibly slow. We need to think of a better way.
-    for model in self.without_keywords_and_tags().query():
-        if not request.is_visible(model):
-            continue
-
-        for keyword, values in model.filter_keywords.items() if (
-                model.filter_keywords) else ():
-            if keyword in fields:
-                if not isinstance(values, list):
-                    values = [values]
-
-                for value in values:
-                    f_count = counts.setdefault(keyword, defaultdict(int))
-                    f_count[value] += 1
-
-    return counts
 
 
 @OrgApp.html(model=OccurrenceCollection, template='occurrences.pt',
@@ -153,7 +115,7 @@ def view_occurrences(
         self.set_event_filter_configuration(filter_config)
         self.set_event_filter_fields(request.app.org.event_filter_fields)
 
-        keyword_counts = keyword_count(request, self)
+        keyword_counts = self.keyword_counts()
         filters = get_filters(request, self, keyword_counts)
 
     if filter_type in ('tags', 'tags_and_filters'):
@@ -224,7 +186,6 @@ def view_occurrences(
         ),
         'header_html': request.app.org.event_header_html,
         'footer_html': request.app.org.event_footer_html,
-        'time_suffix': request.translate(_("o'clock")),
     }
 
 
@@ -246,9 +207,12 @@ def view_occurrence(
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
 
+    filter_names = {f.id: f.label for f in request.app.org.event_filter_fields}
+
     return {
         'description': description,
         'framed': framed,
+        'filter_names': filter_names,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
         'organizer_phone': self.event.organizer_phone,
@@ -256,12 +220,10 @@ def view_occurrence(
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
-        'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
-        'time_suffix': request.translate(_("o'clock")),
     }
 
 
@@ -275,17 +237,98 @@ def handle_edit_event_filters(
     layout: OccurrencesLayout | None = None
 ) -> RenderData | BaseResponse:
 
+    show_force_remove = False
     try:
         if form.submitted(request):
-            keywords = (form.keyword_fields.data or '').splitlines()
-            request.app.org.event_filter_configuration = {
-                'order': [],
-                'keywords': keywords
+            old_keywords = {
+                as_internal_id(k)
+                for k in
+                request.app.org.event_filter_configuration.get('keywords', [])
             }
-            request.app.org.event_filter_definition = form.definition.data
+            new_keywords = {
+                as_internal_id(k)
+                for k in (form.keyword_fields.data or '').splitlines()
+            }
+            old_field_choices = {
+                f.id: {c.label for c in getattr(f, 'choices', ())}
+                for f in request.app.org.event_filter_fields
+            }
+            new_field_choices = {
+                f.id: {c.label for c in getattr(f, 'choices', ())}
+                for f in flatten_event_filter_fields_from_definition(
+                    form.definition.data
+                )
+            }
 
-            request.success(_('Your changes were saved'))
-            return request.redirect(request.link(self))
+            removed_keywords = old_keywords - new_keywords
+            removed_choices: dict[str, set[str]] = {
+                keyword: (
+                    old_field_choices.get(keyword, set())
+                    - new_field_choices.get(keyword, set())
+                )
+                for keyword in old_keywords & new_keywords
+                if old_field_choices.get(keyword, set())
+                - new_field_choices.get(keyword, set())
+            }
+
+            if form.force_remove.data:
+                for keyword in removed_keywords:
+                    (
+                        request.session.query(EventFilterValue)
+                        .filter_by(keyword=keyword)
+                        .delete()
+                    )
+                for keyword, choices in removed_choices.items():
+                    for choice in choices:
+                        (
+                            request.session.query(EventFilterValue)
+                            .filter_by(keyword=keyword, value=choice)
+                            .delete()
+                        )
+            else:
+                blocked = False
+                for keyword in removed_keywords:
+                    count = (
+                        request.session.query(EventFilterValue)
+                        .filter_by(keyword=keyword)
+                        .count()
+                    )
+                    if count:
+                        request.alert(_(
+                            'The filter "${keyword}" is still applied to '
+                            '${count} event(s).',
+                            mapping={'keyword': keyword, 'count': count}
+                        ))
+                        blocked = True
+
+                for keyword, choices in removed_choices.items():
+                    for choice in choices:
+                        count = (
+                            request.session.query(EventFilterValue)
+                            .filter_by(keyword=keyword, value=choice)
+                            .count()
+                        )
+                        if count:
+                            request.alert(_(
+                                'The filter choice "${choice}" is still '
+                                'applied to ${count} event(s).',
+                                mapping={'choice': choice, 'count': count}
+                            ))
+                            blocked = True
+
+                if blocked:
+                    show_force_remove = True
+
+            if not show_force_remove:
+                keywords = (form.keyword_fields.data or '').splitlines()
+                request.app.org.event_filter_configuration = {
+                    'order': [],
+                    'keywords': keywords
+                }
+                request.app.org.event_filter_definition = form.definition.data
+
+                request.success(_('Your changes were saved'))
+                return request.redirect(request.link(self))
 
         elif not request.POST:
             # Store the model data on the form
@@ -310,6 +353,9 @@ def handle_edit_event_filters(
             _('Error: Duplicate label ${label}', mapping={'label': e.label})
         )
 
+    if not show_force_remove:
+        form.delete_field('force_remove')
+
     layout = layout or OccurrencesLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
@@ -317,7 +363,7 @@ def handle_edit_event_filters(
 
     return {
         'layout': layout,
-        'title': 'Edit Event Filter Configuration',
+        'title': _('Edit Event Filter Configuration'),
         'form': form,
         'form_width': 'large',
         'migration': None,
@@ -382,8 +428,13 @@ def export_occurrences(
     }
 
 
-@OrgApp.json(model=OccurrenceCollection, name='json', permission=Public)
-def json_export_occurences(
+@OrgApp.json(
+    model=OccurrenceCollection,
+    name='json',
+    permission=Public,
+    open_data=False
+)
+def json_export_occurrences(
     self: OccurrenceCollection,
     request: OrgRequest
 ) -> JSON_ro:
@@ -392,10 +443,6 @@ def json_export_occurences(
     This is used for the senantis.dir.eventsportlet.
 
     """
-
-    @request.after
-    def cors(response: BaseResponse) -> None:
-        response.headers.add('Access-Control-Allow-Origin', '*')
 
     query = self.for_filter(
         tags=request.params.getall('cat1'),  # type:ignore[arg-type]

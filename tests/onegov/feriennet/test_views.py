@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import niquests_mock
 import onegov.feriennet
 import os
 import pytest
 import re
-import requests_mock
 import transaction
 
 from datetime import datetime, timedelta, date, time
@@ -1879,24 +1879,26 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     assert "Jetzt online bezahlen" in page
 
     # pay online
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
-        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/123456/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'foobar'
         page.form.submit().follow()
 
     # sync the charges
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         page = client.get('/payments')
         assert ">Offen<" in page
 
-        m.get('https://api.stripe.com/v1/charges?limit=100', json={
+        m.get('https://api.stripe.com/v1/charges?limit=100').respond(json={
             "object": "list",
             "url": "/v1/charges",
             "has_more": False,
@@ -1915,7 +1917,9 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
             ]
         })
 
-        m.get('https://api.stripe.com/v1/payouts?limit=100&status=paid', json={
+        m.get(
+            'https://api.stripe.com/v1/payouts?limit=100&status=paid'
+        ).respond(json={
             "object": "list",
             "url": "/v1/payouts",
             "has_more": False,
@@ -1943,11 +1947,11 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     assert "3.20" in page
 
     # refund the charge
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '123456'
         }
-        m.post('https://api.stripe.com/v1/refunds', json=charge)
+        m.post('https://api.stripe.com/v1/refunds').respond(json=charge)
         page.click("Zahlung rückerstatten")
         # client.post(get_post_url(page, 'payment-refund'))
 
@@ -1974,14 +1978,16 @@ def test_online_payment(client: Client, scenario: Scenario) -> None:
     client.get('/billing?state=all').click("Rechnung als unbezahlt markieren")
 
     # pay again (leading to a refunded and an open charge)
-    with requests_mock.Mocker() as m:
+    with niquests_mock.MockRouter() as m:
         charge = {
             'id': '654321'
         }
 
-        m.post('https://api.stripe.com/v1/charges', json=charge)
-        m.get('https://api.stripe.com/v1/charges/654321', json=charge)
-        m.post('https://api.stripe.com/v1/charges/654321/capture', json=charge)
+        m.post('https://api.stripe.com/v1/charges').respond(json=charge)
+        m.get('https://api.stripe.com/v1/charges/654321').respond(json=charge)
+        m.post(
+            'https://api.stripe.com/v1/charges/654321/capture'
+        ).respond(json=charge)
 
         page.form['payment_token'] = 'barfoo'
         page.form.submit().follow()
@@ -3834,3 +3840,150 @@ def test_add_manual_booking(client: Client, scenario: Scenario) -> None:
     page = client.get(page_url)
     assert 'Tom' in page
     assert 'Discount for being nice to the admin' in page
+
+
+def test_send_message_to_different_recipients(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+
+    scenario.add_user(username='sue@example.org', role='editor',
+                      realname="Sue", phone="000 000 00 13",
+                      email="sue@example.org")
+
+    scenario.add_activity(title="Photography", state='accepted')
+    occasion = scenario.add_occasion(cost=100)
+
+    # Tom with Dustin has no bookings
+    scenario.add_user(username='tom@example.org', role='member',
+                      realname="Tom", phone="000 000 00 11",
+                      email="tom@example.org")
+
+    scenario.add_attendee(name="Dustin", birth_date=date(2000, 1, 1))
+
+    # Doc with Mike has a booking
+    doc = scenario.add_user(username='doc@example.org', role='member',
+                      realname="Doc", show_contact_data_to_others=True,
+                      phone="000 000 00 12", email="doc@example.org")
+
+    mike = scenario.add_attendee(name="Mike", birth_date=date(2000, 1, 1))
+
+    scenario.add_booking(
+        occasion=occasion,
+        user=doc,
+        attendee=mike
+    )
+
+    scenario.commit()
+
+    # Create notification
+    client.login_admin()
+    page = client.get('/notifications')
+    page = page.click('Neue Mitteilungs-Vorlage')
+    page.form['subject'] = 'with_no_wishes_or_bookings'
+    page.form['text'] = 'test'
+    page.form.submit()
+
+    # Send message to users with no wishes or booking
+    page = client.get('/notifications')
+    page = page.click('Vorlage verwenden')
+    page.form['send_to'] = 'with_no_wishes_or_bookings'
+    page.form['no_spam'] = 'y'
+    page.form.submit()
+
+    # Only Tom should get a message
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message['To'] == 'tom@example.org'
+
+    # Send message to organizers with no current occasions
+    page = client.get('/notifications')
+    page = page.click('Vorlage verwenden')
+    page.form['send_to'] = 'inactive_organisers'
+    page.form['no_spam'] = 'y'
+    page.form.submit()
+
+    # Sue shouldn't get a message since she has an activity
+    assert len(os.listdir(client.app.maildir)) == 2
+    message = client.get_email(1)
+    assert message['To'] != 'sue@example.org'
+
+
+def test_send_message_to_volunteer(
+    client: Client,
+    scenario: Scenario
+) -> None:
+
+    scenario.add_period(title="2026", confirmed=True, finalized=False)
+    scenario.add_activity(title="Photography", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_need(
+        name="Begleiter",
+        number=BoundedIntegerRange(1, 3),
+        accept_signups=True
+    )
+
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/feriennet-settings')
+    page.form['volunteers'] = 'enabled'
+    page.form.submit()
+
+    scenario.add_volunteer(
+        first_name='Mia',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='mia@test.com',
+        phone='041 322 22 22',
+        state='open'
+    )
+    scenario.add_volunteer(
+        first_name='Emilia',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='emilia@test.com',
+        phone='041 322 22 22',
+        state='contacted'
+    )
+    scenario.add_volunteer(
+        first_name='Roy',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='roy@test.com',
+        phone='041 322 22 22',
+        state='confirmed'
+    )
+
+    scenario.commit()
+
+    page = client.get('/notifications')
+    page = page.click('Neue Mitteilungs-Vorlage')
+    page.form['subject'] = 'test_volunteers'
+    page.form['text'] = 'test'
+    page.form.submit()
+
+    # Send message to confirmed volunteers
+    page = client.get('/notifications')
+    page = page.click('Vorlage verwenden')
+    page.form['send_to'] = 'volunteers'
+    page.form['volunteer_state'] = 'confirmed'
+    page.form['no_spam'] = 'y'
+    page.form.submit()
+
+    # Only Roy should get a message
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message['To'] == 'roy@test.com'

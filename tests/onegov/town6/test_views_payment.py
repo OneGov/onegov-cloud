@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import json
 import transaction
 
 from datetime import datetime, timezone
 from decimal import Decimal
+from onegov.org.models.ticket import FormSubmissionTicket
 from onegov.pay import Payment, PaymentProvider
+from onegov.ticket import TicketInvoice
+from uuid import uuid4
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -144,11 +149,6 @@ def test_view_payments_filter_by_payment_type(client: Client) -> None:
 
 
 def test_view_payments_invoices_handle_batch_set(client: Client) -> None:
-    import json
-    from onegov.org.models.ticket import FormSubmissionTicket
-    from onegov.ticket import TicketInvoice
-    from uuid import uuid4
-
     client.login_admin()
     session = client.app.session()
 

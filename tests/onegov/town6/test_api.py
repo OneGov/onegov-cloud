@@ -1,190 +1,228 @@
 from __future__ import annotations
 
-import json
-from base64 import b64encode
-from collection_json import Collection  # type: ignore[import-untyped]
-from tests.onegov.api.test_views import patch_collection_json  # noqa: F401
-from unittest.mock import patch
+import transaction
 
+from onegov.org.models.meeting import Meeting
+from onegov.org.models.parliament import (
+    RISCommission, RISParliamentarian, RISParliamentaryGroup)
+from onegov.org.models.political_business import PoliticalBusiness
+from sedate import utcnow
+from uuid import uuid4
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.agency import AgencyApp
-    from tests.shared.client import Client
-    from unittest.mock import MagicMock
+    from .conftest import Client
 
 
-def get_base64_encoded_json_string(data: Any) -> str:
-    return b64encode(json.dumps(data).encode('ascii')).decode('ascii')
-
-
-@patch('onegov.websockets.integration.connect')
-@patch('onegov.websockets.integration.broadcast')
-@patch('onegov.websockets.integration.authenticate')
-def test_view_api(
-    authenticate: MagicMock,
-    broadcast: MagicMock,
-    connect: MagicMock,
-    client: Client[AgencyApp]
-) -> None:
-
-    client.login_admin()  # prevent rate limit
-
-    def collection(url: str) -> Collection:
-        return Collection.from_json(client.get(url).body)
-
-    def data(item: Any) -> dict[str, Any]:
-        return {x.name: x.value for x in item.data}
-
-    def filters(item: Any) -> dict[str, Any]:
-        return {x.name: x.prompt for x in item.data}
-
-    def links(item: Any) -> dict[str, str]:
-        return {x.rel: x.href for x in item.links}
-
-    def template(item: Any) -> set[str]:
-        return {x.name for x in item.template.data}
-
-    endpoints = collection('/api')
-    assert len(endpoints.queries) == 3
-
-    # Endpoints with query hints
-    assert endpoints.queries[0].rel == 'events'
-    assert endpoints.queries[0].href == 'http://localhost/api/events?page=0'
-    assert filters(endpoints.queries[0]).keys() == {
-        'start',
-        'end',
-        'locations',
-        'sources',
-        'tags',
+def api_item_data(item: dict[str, Any]) -> dict[str, Any]:
+    return {
+        entry['name']: entry['value']
+        for entry in item['data']
     }
-    # Additional endpoints
-    assert endpoints.queries[1].rel == 'news'
-    assert endpoints.queries[1].href == 'http://localhost/api/news?page=0'
-    assert not endpoints.queries[1].data
-    assert endpoints.queries[2].rel == 'topics'
-    assert endpoints.queries[2].href == 'http://localhost/api/topics?page=0'
-    assert not endpoints.queries[2].data
 
-    # Configure event filters
-    settings = client.get('/event-settings')
-    settings.form['event_filter_type'] = 'filters'
-    settings.form.submit().follow()
 
-    events_page = client.get('/events')
-    filter_settings = events_page.click('Konfigurieren')
-    filter_settings.form['definition'] = """
-        Altersgruppe =
-            [ ] Kind
-            [ ] Jugend
-            [ ] Familie
-            [ ] Alter
+def api_items(
+    client: Client,
+    url: str,
+    page: int | None = None,
+) -> list[dict[str, Any]]:
+    page_param = '' if page is None else f'?page={page}'
+    response = client.get(f'{url}{page_param}')
+    assert response.status_code == 200
+    return response.json['collection']['items']
 
-        Highlight =
-            [ ] Ja
-    """
-    filter_settings.form['keyword_fields'].value = 'Altersgruppe\nHighlight'
-    filter_settings.form.submit().follow()
 
-    endpoints = collection('/api')
-    event_fiters = filters(endpoints.queries[0])
-    assert event_fiters.keys() == {
-        'start',
-        'end',
-        'locations',
-        'sources',
-        'altersgruppe',
-        'highlight',
-    }
-    assert event_fiters['altersgruppe'] == (
-        "One of 'Kind', 'Jugend', 'Familie', 'Alter'"
-        " (Can be specified multiple times)"
+def test_api_lists_ris_endpoints(client: Client) -> None:
+    response = client.get('/api')
+    assert response.status_code == 200
+
+    data = response.json
+    queries = data['collection']['queries']
+    endpoint_names = [q['rel'] for q in queries]
+
+    assert 'meetings' not in endpoint_names
+    assert 'political_businesses' not in endpoint_names
+    assert 'parliamentarians' not in endpoint_names
+    assert 'commissions' not in endpoint_names
+    assert 'parliamentary_groups' not in endpoint_names
+
+    client.app.org.ris_enabled = True
+    transaction.commit()
+    response = client.get('/api')
+    assert response.status_code == 200
+
+    data = response.json
+    queries = data['collection']['queries']
+    endpoint_names = [q['rel'] for q in queries]
+
+    assert 'meetings' in endpoint_names
+    assert 'political_businesses' in endpoint_names
+    assert 'parliamentarians' in endpoint_names
+    assert 'commissions' in endpoint_names
+    assert 'parliamentary_groups' in endpoint_names
+
+
+def test_api_meetings_endpoint(client: Client) -> None:
+    session = client.app.session()
+    client.app.org.ris_enabled = True
+    now = utcnow()
+    session.add(Meeting(
+        title='Council Meeting',
+        start_datetime=now,
+        address='Town Hall, Main Street 1',
+    ))
+    transaction.commit()
+
+    response = client.get('/api/meetings')
+    assert response.status_code == 200
+    data = response.json
+    items = data['collection']['items']
+    assert len(items) == 1
+
+    item_data = api_item_data(items[0])
+    assert item_data['title'] == 'Council Meeting'
+    assert item_data['start_datetime'] is not None
+    assert 'Town Hall' in (item_data['address'] or '')
+
+
+def test_api_political_businesses_endpoint(client: Client) -> None:
+    session = client.app.session()
+    client.app.org.ris_enabled = True
+    session.add(PoliticalBusiness(
+        title='Motion about parks',
+        number='2024.001',
+        political_business_type='motion',
+        status='pendent_legislative',
+    ))
+    transaction.commit()
+
+    response = client.get('/api/political_businesses')
+    assert response.status_code == 200
+    data = response.json
+    items = data['collection']['items']
+    assert len(items) == 1
+
+    item_data = api_item_data(items[0])
+    assert item_data['title'] == 'Motion about parks'
+    assert item_data['number'] == '2024.001'
+    assert item_data['political_business_type'] == 'motion'
+    assert item_data['status'] == 'pendent_legislative'
+    assert item_data['display_name'] == '2024.001 Motion about parks'
+
+
+def test_api_parliamentarians_endpoint(client: Client) -> None:
+    session = client.app.session()
+    client.app.org.ris_enabled = True
+    session.add(RISParliamentarian(
+        first_name='Anna',
+        last_name='Mueller',
+        party='SP',
+    ))
+    transaction.commit()
+
+    response = client.get('/api/parliamentarians')
+    assert response.status_code == 200
+    data = response.json
+    items = data['collection']['items']
+    assert len(items) == 1
+
+    item_data = api_item_data(items[0])
+    assert item_data['first_name'] == 'Anna'
+    assert item_data['last_name'] == 'Mueller'
+    assert item_data['party'] == 'SP'
+
+
+def test_api_commissions_endpoint(client: Client) -> None:
+    session = client.app.session()
+    client.app.org.ris_enabled = True
+    session.add(RISCommission(name='Finance Commission'))
+    transaction.commit()
+
+    response = client.get('/api/commissions')
+    assert response.status_code == 200
+    data = response.json
+    items = data['collection']['items']
+    assert len(items) == 1
+
+    item_data = api_item_data(items[0])
+    assert item_data['name'] == 'Finance Commission'
+
+
+def test_api_parliamentary_groups_endpoint(client: Client) -> None:
+    session = client.app.session()
+    client.app.org.ris_enabled = True
+    session.add(RISParliamentaryGroup(name='Green Party Group'))
+    transaction.commit()
+
+    response = client.get('/api/parliamentary_groups')
+    assert response.status_code == 200
+    data = response.json
+    items = data['collection']['items']
+    assert len(items) == 1
+
+    item_data = {d['name']: d['value'] for d in items[0]['data']}
+    assert item_data['name'] == 'Green Party Group'
+
+
+def test_api_meetings_endpoint_hides_private_entries(client: Client) -> None:
+    session = client.app.session()
+    client.app.org.ris_enabled = True
+    public_meeting = Meeting(
+        title='Public Meeting',
+        start_datetime=utcnow(),
+        address='Town Hall',
     )
-    assert event_fiters['highlight'] == "Either 'Ja' or left unspecified"
+    hidden_id = uuid4()
+    hidden_meeting = Meeting(
+        id=hidden_id,
+        title='Hidden Meeting',
+        start_datetime=utcnow(),
+        address='Secret Hall',
+    )
+    hidden_meeting.access = 'private'
+    session.add(public_meeting)
+    session.add(hidden_meeting)
+    transaction.commit()
 
-    # Configure tags and filters
-    settings = client.get('/event-settings')
-    settings.form['event_filter_type'] = 'tags_and_filters'
-    settings.form.submit().follow()
+    items = api_items(client, '/api/meetings')
+    titles = {api_item_data(item)['title'] for item in items}
 
-    endpoints = collection('/api')
-    assert filters(endpoints.queries[0]).keys() == {
-        'start',
-        'end',
-        'locations',
-        'sources',
-        'tags',
-        'altersgruppe',
-        'highlight',
-    }
+    assert 'Public Meeting' in titles
+    assert 'Hidden Meeting' not in titles
 
-    # Events
-    # TODO: Test with custom content and get rid of implicit dependency
-    #       on initial content.
-    events = {
-        item.data[0].value: item.href
-        for item in collection('/api/events').items
-    }
-    assert set(events) == {
-        '150 Jahre Govikon',
-        'Generalversammlung',
-        'Gemeinsames Turnen',
-        'Fussballturnier'
-    }
+    client.get(f'/api/meetings/{hidden_id.hex}', status=404)
 
-    celebration = collection(events['150 Jahre Govikon']).items[0]
-    celebration_data = data(celebration)
-    assert celebration_data['title'] == '150 Jahre Govikon'
-    assert celebration_data['tags'] == ['Party']
-    assert celebration_data['organizer'] == 'Govikon'
-    assert celebration_data['location'] == 'Sportanlage'
 
-    # TODO: Test start/end filters
+def test_api_political_businesses_endpoint_hides_private_entries(
+    client: Client
+) -> None:
+    session = client.app.session()
+    client.app.org.ris_enabled = True
+    session.add(PoliticalBusiness(
+        title='Public Business',
+        number='2024.010',
+        political_business_type='motion',
+        status='pendent_legislative',
+    ))
+    hidden_id = uuid4()
+    hidden_business = PoliticalBusiness(
+        id=hidden_id,
+        title='Hidden Business',
+        number='2024.011',
+        political_business_type='motion',
+        status='pendent_legislative',
+    )
+    hidden_business.access = 'private'
+    session.add(hidden_business)
+    transaction.commit()
 
-    # test event filter locations
-    assert {
-        item.data[0].value
-        for item in collection(
-            '/api/events?locations=Sportanlage').items
-    } == {'150 Jahre Govikon', 'Fussballturnier'}
+    items = api_items(client, '/api/political_businesses')
+    titles = {api_item_data(item)['title'] for item in items}
 
-    # test event filter sources
-    # TODO: Test sources properly with custom events
-    assert {
-        item.data[0].value
-        for item in collection(
-            '/api/events?sources=Sportverein+Govikon').items
-    } == set()
+    assert 'Public Business' in titles
+    assert 'Hidden Business' not in titles
 
-    # test event filter tags
-    assert {
-        item.data[0].value
-        for item in collection(
-            '/api/events?tags=Party').items
-    } == {'150 Jahre Govikon'}
-
-    # test event custom filter
-    # TODO: Test custom filters properly with custom events
-    assert {
-        item.data[0].value
-        for item in collection(
-            '/api/events?altersgruppe=Kind&altersgruppe=Jugend').items
-    } == set()
-
-    # News
-    # TODO: Test with custom content and get rid of implicit dependency
-    #       on initial content.
-    assert {
-        item.data[0].value
-        for item in collection('/api/news').items
-    } == {'Wir haben eine neue Webseite!'}
-
-    # Topics
-    # TODO: Test with custom content and get rid of implicit dependency
-    #       on initial content.
-    topics = {
-        data(item)['title']
-        for item in collection('/api/topics').items
-    } == {'Organisation', 'Themen', 'Kontakt'}
-
-# TODO: Test directory API
+    client.get(
+        f'/api/political_businesses/{hidden_id.hex}',
+        status=404,
+    )

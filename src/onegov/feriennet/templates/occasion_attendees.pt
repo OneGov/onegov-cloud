@@ -86,7 +86,7 @@
                                 <span i18n:translate>Place:</span>
                                 <span>${details.info.place}</span>
                             </div>
-                            <div tal:condition="details.group_code">
+                            <div tal:condition="period.with_group_code" tal:condition="details.group_code">
                                 <span i18n:translate>Group:</span>
                                 <span class="group-code">${details.group_code}</span>
                             </div>

@@ -189,7 +189,7 @@ def test_inject_default_vars(temporary_directory: str, redis_url: str) -> None:
     child_page = Client(child).get('/')
     assert 'parent' not in child_page
     assert 'child' in child_page
-    assert 'padre' in child_page
+    assert 'padre' not in child_page
     assert 'niño' in child_page
 
 

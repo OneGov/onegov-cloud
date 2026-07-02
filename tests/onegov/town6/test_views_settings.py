@@ -1,16 +1,23 @@
 from __future__ import annotations
 
-from onegov.api.models import ApiKey
 from xml.etree.ElementTree import tostring
 
+import transaction
+from markupsafe import Markup
 
-from typing import TYPE_CHECKING
+from onegov.api.models import ApiKey
+from onegov.core.utils import Bunch
+from onegov.org.models import News
+from onegov.org.models import Topic
+from onegov.org.models.page import TopicCollection, NewsCollection
+
+from typing import TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from .conftest import Client
 
 
 def test_gever_settings_only_https_allowed(client: Client) -> None:
-
     client.login_admin()
     settings = client.get('/settings').click('Gever API')
     settings.form['gever_username'] = 'foo'
@@ -30,7 +37,6 @@ def test_gever_settings_only_https_allowed(client: Client) -> None:
 
 
 def test_api_keys_create_and_delete(client: Client) -> None:
-
     client.login_admin()
 
     settings = client.get('/api-keys')
@@ -73,11 +79,16 @@ def test_general_settings(client: Client) -> None:
     page = client.get('/topics/themen')
     assert 'class="header-image"' not in page
 
-    settings = client.get('/general-settings')
+    # Appearance settings
+    settings = client.get('/appearance-settings')
     settings.form['standard_image'] = 'standard_image.png'
     settings.form['page_image_position'] = 'header'
-    settings.form['reply_to'] = 'info@govikon.ch'
     settings.form['custom_css'] = 'h2 { text-decoration: underline; }'
+    page = settings.form.submit().follow()
+
+    # Organisation settings
+    settings = client.get('/organisation-settings')
+    settings.form['reply_to'] = 'info@govikon.ch'
     page = settings.form.submit().follow()
 
     assert '<style>h2 { text-decoration: underline; }</style>' in page
@@ -121,9 +132,7 @@ def test_analytics_settings(client: Client) -> None:
     ) in settings
 
 
-
 def test_firebase_settings(client: Client) -> None:
-
     client.login_admin()
 
     # Pretend this is real data (it's completely random)
@@ -155,7 +164,7 @@ def test_firebase_settings(client: Client) -> None:
 def test_resource_settings(client: Client) -> None:
     client.login_admin()
 
-    settings = client.get('/settings').click('Reservationen')
+    settings = client.get('/settings').click('Reservationen', index=1)
     settings.form['resource_header_html'] = '<h1>foo</h1>'
     settings.form['resource_footer_html'] = '<p>bar</p>'
     assert ('Ihre Änderungen wurden gespeichert' in
@@ -165,3 +174,85 @@ def test_resource_settings(client: Client) -> None:
     assert 'Allgemeine Informationen zu Reservationen' in page
     assert '<h1>foo</h1>' in page
     assert '<p>bar</p>' in page
+
+
+def test_migrate_links(client: Client) -> None:
+    session = client.app.session()
+    request: Any = Bunch(**{
+        'session': session,
+        'identity.role': 'admin'
+    })
+    old_domain = 'foo.ch'
+
+    # create topic
+    topic = Topic(title='Foo Topic', name='foo-topic')
+    topic.text = Markup('<p>Wow, <a href="https://foo.ch/abc">foo</a> is a '
+                        'great page!</p>')
+    session.add(topic)
+    topic_text = topic.text
+
+    # add news article (must be under the seeded /news/ root)
+    from onegov.page import PageCollection
+    news_root = PageCollection(session).by_path('/news/', ensure_type='news')
+    assert isinstance(news_root, News)
+    news = News(title='Big News', name='big-news', parent=news_root)
+    news.text = Markup(
+        '<p>Big news https://foo.ch/big-news and '
+        '<a href="https://foo.ch/bigger-news">bigger news</a> can be found '
+        'here</p>'
+    )
+    session.add(news)
+    news_text = news.text
+
+    transaction.commit()
+
+    def verify_tags_in_text(text: Markup) -> None:
+        # verify p tag not escaped
+        assert '<p>' in text
+        assert '&lt;p&gt;' not in text
+
+        # verify a tag not escaped
+        assert '<a href="' in text
+        assert '</a>' in text
+        assert '&lt;a&gt;' not in text
+
+    def get_topic_text() -> Markup:
+        t = TopicCollection(request).by_name('foo-topic')
+        assert t is not None and t.text is not None
+        verify_tags_in_text(t.text)
+        return t.text
+
+    def get_news_text() -> Markup:
+        n = NewsCollection(request).by_title('Big News')
+        assert n is not None and n.text is not None
+        verify_tags_in_text(n.text)
+        return n.text
+
+    assert old_domain in get_topic_text()
+    assert old_domain in get_news_text()
+
+    # execute migrate links as test
+    client.login_admin()
+    migrate_page = client.get('/migrate-links')
+    migrate_page.form['old_domain'] = old_domain
+    migrate_page.form['test'] = True
+    result = migrate_page.form.submit()
+    assert 'Total 3 Links gefunden' in result
+
+    assert old_domain in get_topic_text()
+    assert old_domain in get_news_text()
+
+    # execute migrate links
+    migrate_page = client.get('/migrate-links')
+    migrate_page.form['old_domain'] = old_domain
+    migrate_page.form['test'] = False
+    result = migrate_page.form.submit().follow()
+    assert '3 Links migriert' in result
+
+    topic_text_new = get_topic_text()
+    news_text_new = get_news_text()
+    assert old_domain not in topic_text_new
+    assert old_domain not in news_text_new
+
+    assert topic_text.replace('foo.ch', 'localhost') == topic_text_new
+    assert news_text.replace('foo.ch', 'localhost') == news_text_new

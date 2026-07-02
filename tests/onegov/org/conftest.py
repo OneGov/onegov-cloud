@@ -34,7 +34,7 @@ from uuid import uuid4
 from yaml import dump
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from libres.db.models import Allocation
@@ -51,13 +51,6 @@ if TYPE_CHECKING:
     from tests.shared.client import ExtendedResponse
     from typing import Protocol
     from uuid import UUID
-
-    _OrgAppT = TypeVar(
-        '_OrgAppT',
-        bound=OrgApp,
-        default='TestOrgApp',
-        covariant=True
-    )
 
     class _ReserveFunc(Protocol):
         def __call__(
@@ -79,8 +72,6 @@ if TYPE_CHECKING:
 
     class _RenderFunc(Protocol):
         def __call__(self, element: Element) -> ExtendedResponse: ...
-else:
-    _OrgAppT = TypeVar('_OrgAppT', bound=OrgApp)
 
 
 class TestOrgApp(OrgApp):
@@ -135,7 +126,7 @@ def cfg_path(
     return cfg_path
 
 
-class Client(BaseClient[_OrgAppT]):
+class Client[AppT: OrgApp = TestOrgApp](BaseClient[AppT]):
     skip_n_forms = 1
     use_intercooler = True
 
@@ -244,12 +235,12 @@ def org_app_url(
     server.stop()
 
 
-def create_org_app(
+def create_org_app[AppT: OrgApp = TestOrgApp](
     request: pytest.FixtureRequest,
     org_name: str = 'Govikon',
     enable_search: bool = False,
-    cls: type[_OrgAppT] = TestOrgApp  # type: ignore[assignment]
-) -> _OrgAppT:
+    cls: type[AppT] = TestOrgApp  # type: ignore[assignment]
+) -> AppT:
     app = create_app(
         cls,
         request,

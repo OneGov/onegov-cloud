@@ -4,21 +4,18 @@ from onegov.file import File
 from operator import attrgetter
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
     from onegov.swissvotes.models import SwissVote
     from onegov.swissvotes.models import TranslatablePage
     from sqlalchemy.orm import Mapped
     from typing import Protocol
-    from typing import TypeVar
 
-    FileT = TypeVar('FileT', bound=File)
+    class HasFiles[T: File](Protocol):
+        files: list[T]
 
-    class HasFiles(Protocol[FileT]):
-        files: list[FileT]
-
-    class HasFilesAndSessionManager(HasFiles[FileT], Protocol):
+    class HasFilesAndSessionManager[T: File](HasFiles[T], Protocol):
         @property
         def session_manager(self) -> SessionManager | None: ...
 
@@ -65,11 +62,11 @@ class FileSubCollection:
     def __set_name__(self, owner: type[object], name: str) -> None:
         self.name = name
 
-    def __get__(
+    def __get__[T: File](
         self,
-        instance: HasFiles[FileT] | None,
+        instance: HasFiles[T] | None,
         owner: type[object]
-    ) -> list[FileT]:
+    ) -> list[T]:
 
         if instance:
             return sorted((
@@ -109,7 +106,7 @@ class LocalizedFile:
 
     def __get_localized_name__(
         self,
-        instance: HasFilesAndSessionManager[FileT],
+        instance: HasFilesAndSessionManager[Any],
         locale: str | None = None
     ) -> str:
 
@@ -118,31 +115,31 @@ class LocalizedFile:
             locale = instance.session_manager.current_locale
         return f'{self.name}-{locale}'
 
-    def __get_by_locale__(
+    def __get_by_locale__[T: File](
         self,
-        instance: HasFilesAndSessionManager[FileT] | None,
+        instance: HasFilesAndSessionManager[T] | None,
         locale: str | None = None
-    ) -> FileT | None:
+    ) -> T | None:
 
         if instance:
             name = self.__get_localized_name__(instance, locale)
-            file: FileT
+            file: T
             for file in instance.files:
                 if file.name == name:
                     return file
         return None
 
-    def __get__(
+    def __get__[T: File](
         self,
-        instance: HasFilesAndSessionManager[FileT] | None,
+        instance: HasFilesAndSessionManager[T] | None,
         owner: type[object]
-    ) -> FileT | None:
+    ) -> T | None:
         return self.__get_by_locale__(instance)
 
-    def __set_by_locale__(
+    def __set_by_locale__[T: File](
         self,
-        instance: HasFilesAndSessionManager[FileT],
-        value: FileT,
+        instance: HasFilesAndSessionManager[T],
+        value: T,
         locale: str | None = None
     ) -> None:
 
@@ -150,17 +147,17 @@ class LocalizedFile:
         self.__delete_by_locale__(instance, locale)
         instance.files.append(value)
 
-    def __set__(
+    def __set__[T: File](
         self,
-        instance: HasFilesAndSessionManager[FileT],
-        value: FileT
+        instance: HasFilesAndSessionManager[T],
+        value: T
     ) -> None:
 
         return self.__set_by_locale__(instance, value)
 
     def __delete_by_locale__(
         self,
-        instance: HasFilesAndSessionManager[FileT],
+        instance: HasFilesAndSessionManager[Any],
         locale: str | None = None
     ) -> None:
 
@@ -170,7 +167,7 @@ class LocalizedFile:
             if file.name == name:
                 instance.files.remove(file)
 
-    def __delete__(self, instance: HasFilesAndSessionManager[FileT]) -> None:
+    def __delete__(self, instance: HasFilesAndSessionManager[Any]) -> None:
         self.__delete_by_locale__(instance)
 
 

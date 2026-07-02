@@ -211,7 +211,8 @@ def view_invoices(
     model=TicketInvoiceCollection,
     name='batch-set',
     request_method='POST',
-    permission=Private
+    permission=Private,
+    open_data=False
 )
 def handle_batch_set(
     self: TicketInvoiceCollection,

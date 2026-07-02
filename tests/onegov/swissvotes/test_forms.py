@@ -14,6 +14,7 @@ from onegov.swissvotes.forms import UpdateDatasetForm
 from onegov.swissvotes.forms import UpdateExternalResourcesForm
 from onegov.swissvotes.forms import UpdateMetadataForm
 from onegov.swissvotes.models import ColumnMapperDataset
+from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import ColumnMapperMetadata
 from onegov.swissvotes.models import TranslatablePage
 from tests.shared.utils import use_locale
@@ -424,7 +425,9 @@ def test_search_form(swissvotes_app: TestApp) -> None:
     votes.to_date = date(2010, 12, 31)
     votes.legal_form = [1, 2]
     votes.result = [0]
-    votes.policy_area = ['6', '7.75', '10.103.1035']
+    votes.policy_area = [
+        PolicyArea('6'), PolicyArea('7.75'), PolicyArea('10.103.1035')
+    ]
     votes.term = 'term'
     votes.full_text = False
     votes.position_federal_council = [2, 3]
@@ -435,6 +438,7 @@ def test_search_form(swissvotes_app: TestApp) -> None:
 
     form.apply_model(votes)
 
+    form = form  # undo narrowing
     assert form.from_date.data == date(2010, 1, 1)
     assert form.to_date.data == date(2010, 12, 31)
     assert form.legal_form.data == [1, 2]

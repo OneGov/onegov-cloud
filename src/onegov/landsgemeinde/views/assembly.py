@@ -53,7 +53,7 @@ def view_assemblies(
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'assemblies': self.query().all(),
+        'assemblies': request.exclude_invisible(self.query()),
         'title': layout.title,
     }
 
@@ -135,6 +135,12 @@ def view_assembly_ticker(
         AgendaItemCollection(request.session)
         .preloaded_by_assembly(self).all()
     )
+
+    # FIXME: For some reason we need there to be a session cookie
+    #        in order for the ticker to work correctly, which does
+    #        not really make much sense, since we don't need the
+    #        browser session for the ticker...
+    request.browser_session.mark_as_dirty()
 
     return {
         'layout': layout,

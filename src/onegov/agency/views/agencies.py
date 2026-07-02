@@ -117,7 +117,8 @@ def view_agencies_chart(
 @AgencyApp.json(
     model=ExtendedAgencyCollection,
     name='json',
-    permission=Public
+    permission=Public,
+    open_data=False
 )
 def view_agencies_json(
     self: ExtendedAgencyCollection,
@@ -164,11 +165,12 @@ def view_agencies_sort(
 
     layout = AgencyCollectionLayout(self, request)
     layout.edit_mode = True
-    layout.editmode_links = layout.editmode_links[1:]
+    layout.editmode_links = None  # type: ignore[assignment]
 
     return {
         'title': _('Sort'),
         'layout': layout,
+        'agency': self,
         'items': (
             (
                 _('Agencies'),
@@ -214,11 +216,12 @@ def view_agency_sort(
 
     layout = AgencyLayout(self, request)
     layout.edit_mode = True
-    layout.editmode_links = layout.editmode_links[1:]
+    layout.editmode_links = None  # type: ignore[assignment]
 
     return {
         'title': _('Sort'),
         'layout': layout,
+        'agency': self,
         'items': (
             (
                 _('Suborganizations'),
@@ -236,7 +239,7 @@ def view_agency_sort(
                     for membership in self.memberships
                 )
             ),
-        )
+        ),
     }
 
 

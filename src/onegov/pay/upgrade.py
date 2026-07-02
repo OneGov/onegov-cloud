@@ -124,3 +124,52 @@ def add_invoicing_party_and_cost_center_to_invoices(
             'invoice_items',
             Column('cost_object', Text, nullable=True)
         )
+
+
+@upgrade_task('Add payment and invoice indexes')
+def add_payment_and_invoice_indexes(context: UpgradeContext) -> None:
+    if context.has_table('payments'):
+        context.operations.create_index(
+            'ix_payments_source',
+            'payments',
+            ['source'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_payments_state',
+            'payments',
+            ['state'],
+            if_not_exists=True
+        )
+    if context.has_table('invoices'):
+        context.operations.create_index(
+            'ix_invoices_type',
+            'invoices',
+            ['type'],
+            if_not_exists=True
+        )
+    if context.has_table('invoice_items'):
+        context.operations.create_index(
+            'ix_invoice_items_type',
+            'invoice_items',
+            ['type'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_invoice_items_invoice_id',
+            'invoice_items',
+            ['invoice_id'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_invoice_items_paid',
+            'invoice_items',
+            ['paid'],
+            if_not_exists=True
+        )
+        context.operations.create_index(
+            'ix_invoice_items_amount',
+            'invoice_items',
+            [text('(unit * quantity)')],
+            if_not_exists=True
+        )

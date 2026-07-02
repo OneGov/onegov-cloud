@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from ldap3.core.connection import Connection as LDAPConnection
     from onegov.translator_directory.app import TranslatorDirectoryApp
     from onegov.translator_directory.request import TranslatorAppRequest
-    from sqlalchemy.orm import Session
     from uuid import UUID
 
 
@@ -33,8 +32,7 @@ cli = command_group()
 
 
 def fetch_users(
-    app: TranslatorDirectoryApp,
-    session: Session,
+    request: TranslatorAppRequest,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -46,6 +44,8 @@ def fetch_users(
 ) -> None:
     """ Implements the fetch-users cli command. """
 
+    app = request.app
+    session = request.session
     admin_group = admin_group.lower()
     editor_group = editor_group.lower()
 
@@ -113,14 +113,16 @@ def fetch_users(
             raise NotImplementedError()
 
         user = ensure_user(
+            request,
             source=source,
             source_id=source_id,
-            session=session,
             username=data['mail'],
             role=data['role'],
             force_role=force_role,
             force_active=True
         )
+        if user is None:
+            continue
 
         synced_users.append(user.id)
 
@@ -178,8 +180,7 @@ def fetch_users_cli(
     ) -> None:
 
         fetch_users(
-            app,
-            request.session,
+            request,
             ldap_server,
             ldap_username,
             ldap_password,
@@ -936,6 +937,9 @@ def import_contract_numbers_cli(
             'kantonsgericht',
             'verkehrsabteilung_staatsanwaltschaft',
             'jugendanwaltschaft',
+            'ombudsstelle',
+            'friedensrichteramt',
+            'schlichtungsstelle_mietsachen',
         ]
     ),
     help='New finanzstelle key',
@@ -1015,3 +1019,47 @@ def change_finanzstelle_cli(
             click.secho('Changes committed', fg='green')
 
     return do_change
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]:
+    """Strips leading/trailing whitespace from first_name and last_name
+    of all translators.
+
+    Example:
+
+        `onegov-translator --select /translator_directory/*
+        strip-whitespace-from-names`
+
+    """
+
+    def _strip(
+        request: TranslatorAppRequest,
+        app: TranslatorDirectoryApp
+    ) -> None:
+        session = app.session()
+        count = 0
+        for translator in session.query(Translator):
+            first_name = translator.first_name.strip()
+            last_name = translator.last_name.strip()
+            if (first_name, last_name) != (
+                translator.first_name,
+                translator.last_name,
+            ):
+                translator.first_name = first_name
+                translator.last_name = last_name
+                count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} translator(s)',
+            fg='green'
+        )
+
+    return _strip

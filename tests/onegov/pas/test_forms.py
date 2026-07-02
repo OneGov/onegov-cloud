@@ -102,12 +102,17 @@ def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
     parliamentarian = parliamentarians.add(
         first_name='a',
         last_name='b',
-        email_primary='test-user@example.com'
+        email_primary='test-user@example.com',
+        zg_username='zgtestuser',
     )
     parliamentarians.add(first_name='p', last_name='q')
 
     roles = PASParliamentarianRoleCollection(session)
-    roles.add(parliamentarian_id=parliamentarian.id, end=date(2023, 1, 1))
+    roles.add(
+        parliamentarian_id=parliamentarian.id,
+        end=date(2025, 1, 1),
+        meta={'org_type': 'Kantonsrat'},
+    )
 
     commissions = PASCommissionCollection(session)
     commission = commissions.add(name='x')
@@ -119,7 +124,7 @@ def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
     form.request = dummy_admin_request
     form.on_request()
 
-    assert len(form.parliamentarian_id.choices) == 2
+    assert len(form.parliamentarian_id.choices) == 1
     assert len(form.commission_id.choices) == 4
 
     form = AttendenceAddForm()
@@ -231,7 +236,11 @@ def test_add_plenary_attendence_form(
     parliamentarians.add(first_name='p', last_name='q')
 
     roles = PASParliamentarianRoleCollection(session)
-    roles.add(parliamentarian_id=parliamentarian.id, end=date(2023, 1, 1))
+    roles.add(
+        parliamentarian_id=parliamentarian.id,
+        end=date(2025, 1, 1),
+        meta={'org_type': 'Kantonsrat'},
+    )
 
     # on request
     form = AttendenceAddPlenaryForm()

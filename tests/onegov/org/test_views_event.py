@@ -9,6 +9,9 @@ import yaml
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, date, timedelta
+
+from freezegun import freeze_time
+
 from onegov.event.models import Event
 from tempfile import TemporaryDirectory
 from tests.shared.utils import create_image, create_pdf
@@ -720,41 +723,54 @@ def test_delete_event(client: Client) -> None:
     assert "Generalversammlung" not in editor.get('/events')
 
 
-def test_import_export_events(client: Client) -> None:
+def clear_submit_accept_single_event(
+    client: Client,
+    custom_tags: list[str] | None = None,
+) -> Any:
     session = client.app.session()
     for event in session.query(Event):
         session.delete(event)
     transaction.commit()
 
     # Submit and publish an event
-    page = client.get('/events').click("Veranstaltung erfassen")
+    page = client.get('/events').click('Veranstaltung erfassen')
     event_date = date.today() + timedelta(days=1)
-    page.form['email'] = "sinfonieorchester@govikon.org"
-    page.form['title'] = "Weihnachtssingen"
-    page.form['description'] = "Das Govikoner Sinfonieorchester lädt ein."
-    page.form['location'] = "Konzertsaal"
-    page.form['price'] = "CHF 75.-"
-    page.form['organizer'] = "Sinfonieorchester"
-    page.form['organizer_email'] = "sinfonieorchester@govikon.org"
-    page.form['organizer_phone'] = "+41 41 123 45 67"
-    page.form['tags'] = ["Music", "Tradition"]
+    page.form['email'] = 'sinfonieorchester@govikon.org'
+    page.form['title'] = 'Weihnachtssingen'
+    page.form['description'] = 'Das Govikoner Sinfonieorchester lädt ein.'
+    page.form['location'] = 'Konzertsaal'
+    page.form['price'] = 'CHF 75.-'
+    page.form['organizer'] = 'Sinfonieorchester'
+    page.form['organizer_email'] = 'sinfonieorchester@govikon.org'
+    page.form['organizer_phone'] = '+41 41 123 45 67'
+    page.form['tags'] = custom_tags if custom_tags else ['Music', 'Tradition']
     page.form['start_date'] = event_date.isoformat()
-    page.form['start_time'] = "18:00"
-    page.form['end_time'] = "22:00"
+    page.form['start_time'] = '18:00'
+    page.form['end_time'] = '22:00'
     page.form['repeat'] = 'without'
     page.form.submit().follow().form.submit().follow()
 
     client.login_editor()
 
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
-    page = page.click("Veranstaltung annehmen").follow()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    page.click('Veranstaltung annehmen').follow()
 
-    assert "Weihnachtssingen" in client.get('/events')
-    assert "Music" in client.get('/events')
-    assert "Tradition" in client.get('/events')
+    client.logout()
+
+
+def test_import_export_events(client: Client) -> None:
+    session = client.app.session()
+
+    clear_submit_accept_single_event(client)
+
+    assert 'Weihnachtssingen' in client.get('/events')
+    assert 'Music' in client.get('/events')
+    assert 'Tradition' in client.get('/events')
+
+    client.login_editor()
 
     # Export
-    page = client.get('/events').click("Export")
+    page = client.get('/events').click('Export')
     page.form['file_format'] = 'xlsx'
     page = page.form.submit()
 
@@ -765,7 +781,7 @@ def test_import_export_events(client: Client) -> None:
     )
 
     # Import (Dry run)
-    page = client.get('/events').click("Import")
+    page = client.get('/events').click('Import')
     page.form['dry_run'] = True
     page.form['file'] = file
     page = page.form.submit()
@@ -773,7 +789,7 @@ def test_import_export_events(client: Client) -> None:
     assert session.query(Event).count() == 1
 
     # Import
-    page = client.get('/events').click("Import")
+    page = client.get('/events').click('Import')
     page.form['file'] = file
     page = page.form.submit().follow()
     assert "1 Veranstaltungen importiert" in page
@@ -806,40 +822,16 @@ def test_import_export_events(client: Client) -> None:
 
 def test_import_export_events_with_custom_tags(client: Client) -> None:
     session = client.app.session()
-    for event in session.query(Event):
-        session.delete(event)
-    transaction.commit()
 
     fs = client.app.filestorage
+    custom_tags = ['Singing', 'Christmas']
     assert fs is not None
-    data = {
-        'event_tags': ['Singing', 'Christmas']
-    }
     with fs.open('eventsettings.yml', 'w') as f:
-        yaml.dump(data, f)
+        yaml.dump({'event_tags': custom_tags}, f)
 
-    # Submit and publish an event
-    page = client.get('/events').click("Veranstaltung erfassen")
-    event_date = date.today() + timedelta(days=1)
-    page.form['email'] = "sinfonieorchester@govikon.org"
-    page.form['title'] = "Weihnachtssingen"
-    page.form['description'] = "Das Govikoner Sinfonieorchester lädt ein."
-    page.form['location'] = "Konzertsaal"
-    page.form['price'] = "CHF 75.-"
-    page.form['organizer'] = "Sinfonieorchester"
-    page.form['organizer_email'] = "sinfonieorchester@govikon.org"
-    page.form['organizer_phone'] = "+41 41 123 45 67"
-    page.form['tags'] = ["Singing", "Christmas"]
-    page.form['start_date'] = event_date.isoformat()
-    page.form['start_time'] = "18:00"
-    page.form['end_time'] = "22:00"
-    page.form['repeat'] = 'without'
-    page.form.submit().follow().form.submit().follow()
+    clear_submit_accept_single_event(client, custom_tags)
 
     client.login_editor()
-
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
-    page = page.click("Veranstaltung annehmen").follow()
 
     assert "Weihnachtssingen" in client.get('/events')
     assert "Singing" in client.get('/events')
@@ -894,6 +886,250 @@ def test_import_export_events_with_custom_tags(client: Client) -> None:
     assert {event.meta['submitter_email'] for event in events} == {
         'sinfonieorchester@govikon.org', 'editor@example.org'
     }
+
+
+def test_export_events_json_xml_csv(client: Client) -> None:
+
+    def verify_event_fields(event_fields: dict[str, str | None]) -> None:
+        assert event_fields['Titel'] == 'Weihnachtssingen'
+        assert (event_fields['Beschreibung'] ==
+                'Das Govikoner Sinfonieorchester lädt ein.')
+        assert event_fields['Veranstaltungsort'] == 'Konzertsaal'
+        assert event_fields['Preis'] == 'CHF 75.-'
+        assert event_fields['Organisator'] == 'Sinfonieorchester'
+
+        if 'Organisator_E-Mail_Adresse' in event_fields:
+            assert (event_fields['Organisator_E-Mail_Adresse'] ==
+                    'sinfonieorchester@govikon.org')
+        else:
+            assert (event_fields['Organisator E-Mail Adresse'] ==
+                    'sinfonieorchester@govikon.org')
+
+        if 'Organisator_Telefonnummer' in event_fields:
+            assert (event_fields['Organisator_Telefonnummer'] ==
+                    '+41 41 123 45 67')
+        else:
+            assert (event_fields['Organisator Telefonnummer'] ==
+                    '+41 41 123 45 67')
+
+        assert event_fields['Schlagworte'] == 'Musik, Brauchtum'
+        assert event_fields['Erstellt'] == '23.03.2026 09:00'
+        assert event_fields['Von'] == '24.03.2026 18:00'
+        assert event_fields['Bis'] == '24.03.2026 22:00'
+
+    with freeze_time('2026-03-23T08:00:00'):
+        # patch send_email to overcome 'file already exists' for
+        # the steps of submitting and accepting an event which
+        # cause emails to be sent.
+        with patch.object(client.app, 'send_email'):
+            clear_submit_accept_single_event(client)
+
+        client.login_editor()
+        page = client.get('/events/export')
+        page.form['file_format'] = 'json'
+        page = page.form.submit()
+        assert page.status_code == 200
+
+        data = json.loads(page.body)
+        assert len(data) == 1
+        event = data[0]
+        verify_event_fields(event)
+
+        page = client.get('/events/export')
+        page.form['file_format'] = 'xml'
+        page = page.form.submit()
+        assert page.status_code == 200
+
+        root = ET.fromstring(page.body)
+        items = root.findall('item')
+        assert len(items) == 1
+        item = items[0]
+        event_fields = {child.tag: child.text for child in item}
+        verify_event_fields(event_fields)
+
+        page = client.get('/events/export')
+        page.form['file_format'] = 'csv'
+        page = page.form.submit()
+        assert page.status_code == 200
+
+        import csv
+        from io import StringIO
+        rows = list(csv.DictReader(StringIO(page.text)))
+        assert len(rows) == 1
+        verify_event_fields(rows[0])
+
+
+def test_event_filter_settings_stale_data(client: Client) -> None:
+    client.login_admin()
+
+    settings = client.get('/event-settings')
+    settings.form['event_filter_type'] = 'filters'
+    settings.form.submit()
+
+    # Set up a filter with two choices
+    page = client.get('/events').click('Konfigurieren')
+    assert 'force_remove' not in page.form.fields  # not shown on initial load
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit()
+
+    # Apply Choice A to an event
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = ['Choice A']
+    page.form.submit()
+
+    # Removing Choice A (in use) is blocked — force_remove checkbox appears
+    page = client.get('/events').click('Konfigurieren')
+    assert 'force_remove' not in page.form.fields
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    response = page.form.submit()
+    assert (
+        'Die Filterauswahl "Choice A" ist noch bei 1 Veranstaltung(en) gesetzt'
+        in response
+    )
+    assert 'force_remove' in response.form.fields
+    assert client.app.org.event_filter_definition is not None
+    assert 'Choice A' in client.app.org.event_filter_definition
+
+    # Checking force_remove cleans up the filter from events and saves
+    response.form['force_remove'] = True
+    response.form.submit().follow()
+    assert 'Choice A' not in (client.app.org.event_filter_definition or '')
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    assert not page.form['my_filter'].value
+
+    # Re-setup: re-add Choice A, re-apply to event
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit()
+
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    assert 'force_remove' not in page.form.fields
+    page.form['my_filter'] = ['Choice A']
+    page.form.submit()
+
+    # Block again — manually clearing the event also allows removing the choice
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    response = page.form.submit()
+    assert 'force_remove' in response.form.fields
+
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = []
+    page.form.submit()
+
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit().follow()
+    assert 'Choice A' not in (client.app.org.event_filter_definition or '')
+
+    # Removing an unused choice (Choice B) is allowed without blocking
+    page = client.get('/events').click('Konfigurieren')
+    assert 'force_remove' not in page.form.fields
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit().follow()
+    assert 'Choice B' not in (client.app.org.event_filter_definition or '')
+
+    # Re-apply a filter to test keyword-level blocking
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = ['Choice A']
+    page.form.submit()
+
+    # Deselecting the whole keyword while events use it is blocked,
+    # checkbox appears
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = ''
+    response = page.form.submit()
+    assert (
+        'Der Filter "my_filter" ist noch bei 1 Veranstaltung(en) gesetzt'
+        in response
+    )
+    assert 'force_remove' in response.form.fields
+    assert client.app.org.event_filter_configuration.get('keywords')
+
+    # force_remove also cleans up keyword-level filters from events
+    response.form['force_remove'] = True
+    response.form.submit().follow()
+    assert not client.app.org.event_filter_configuration.get('keywords')
+
+    # Re-setup: re-enable keyword and re-apply filter to event
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit()
+
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = ['Choice A']
+    page.form.submit()
+
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = ''
+    response = page.form.submit()
+    assert 'force_remove' in response.form.fields
+
+    # Manually clearing the filter from the event also allows deselecting
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = []
+    page.form.submit()
+
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = ''
+    page.form.submit().follow()
+    assert not client.app.org.event_filter_configuration.get('keywords')
 
 
 def test_event_form_with_custom_lead(client: Client) -> None:

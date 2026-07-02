@@ -49,7 +49,7 @@ def test_attendee(
     assert subscription.attendee == attendee_
 
     # Check the event of the the subscription
-    assert attendee_.subscriptions[0].course_event == course_event_  # type: ignore[union-attr]
+    assert attendee_.subscriptions[0].course_event == course_event_
 
     # delete the subscription
     attendee_.subscriptions.remove(subscription)

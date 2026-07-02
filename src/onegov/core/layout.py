@@ -15,7 +15,7 @@ from onegov.core import utils
 from onegov.core.templates import PageTemplate
 from pytz import timezone
 
-from typing import overload, Any, TypeVar, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Collection, Iterable, Iterator
@@ -25,8 +25,6 @@ if TYPE_CHECKING:
     from .framework import Framework
     from .request import CoreRequest
     from .templates import MacrosLookup, TemplateLoader
-
-_T = TypeVar('_T')
 
 
 class Layout:
@@ -97,42 +95,42 @@ class Layout:
 
     @cached_property
     def app(self) -> Framework:
-        """ Returns the application behind the request. """
+        """ The application behind the request. """
         return self.request.app
 
     @overload
-    def batched(
+    def batched[T](
         self,
-        iterable: Iterable[_T],
+        iterable: Iterable[T],
         batch_size: int,
         container_factory: type[tuple] = ...  # type:ignore[type-arg]
-    ) -> Iterator[tuple[_T, ...]]: ...
+    ) -> Iterator[tuple[T, ...]]: ...
 
     @overload
-    def batched(
+    def batched[T](
         self,
-        iterable: Iterable[_T],
+        iterable: Iterable[T],
         batch_size: int,
         container_factory: type[list]  # type:ignore[type-arg]
-    ) -> Iterator[list[_T]]: ...
+    ) -> Iterator[list[T]]: ...
 
     # NOTE: If there were higher order TypeVars, we could properly infer
     #       the type of the Container, for now we just add overloads for
     #       two of the most common container_factories
     @overload
-    def batched(
+    def batched[T](
         self,
-        iterable: Iterable[_T],
+        iterable: Iterable[T],
         batch_size: int,
-        container_factory: Callable[[Iterator[_T]], Collection[_T]]
-    ) -> Iterator[Collection[_T]]: ...
+        container_factory: Callable[[Iterator[T]], Collection[T]]
+    ) -> Iterator[Collection[T]]: ...
 
-    def batched(
+    def batched[T](
         self,
-        iterable: Iterable[_T],
+        iterable: Iterable[T],
         batch_size: int,
-        container_factory: Callable[[Iterator[_T]], Collection[_T]] = tuple
-    ) -> Iterator[Collection[_T]]:
+        container_factory: Callable[[Iterator[T]], Collection[T]] = tuple
+    ) -> Iterator[Collection[T]]:
         """ See :func:`onegov.core.utils.batched`. """
 
         return utils.batched(
@@ -143,8 +141,8 @@ class Layout:
 
     @property
     def csrf_token(self) -> str:
-        """ Returns a csrf token for use with DELETE links (forms do their
-        own thing automatically).
+        """ A CSRF token for use with DELETE links (forms do their own thing
+        automatically).
 
         """
         return self.request.csrf_token
@@ -237,8 +235,8 @@ class Layout:
 
     @property
     def view_name(self) -> str | None:
-        """ Returns the view name of the current view, or None if it is the
-        default view.
+        """ The view name of the current view, or None if it is the default
+        view.
 
         Note: This relies on morepath internals and is experimental in nature!
 
@@ -265,12 +263,12 @@ class ChameleonLayout(Layout):
 
     @cached_property
     def template_loader(self) -> TemplateLoader:
-        """ Returns the chameleon template loader. """
+        """ The chameleon template loader. """
         return self.request.template_loader
 
     @cached_property
     def base(self) -> PageTemplateFile:
-        """ Returns the layout, which defines the base layout of all pages.
+        """ The layout template, which defines the base layout of all pages.
 
         See ``templates/layout.pt``.
 
@@ -279,7 +277,7 @@ class ChameleonLayout(Layout):
 
     @cached_property
     def macros(self) -> MacrosLookup:
-        """ Returns the macros, which offer often used html constructs.
+        """ The macros offering often used html constructs.
         See ``templates/macros.pt``.
 
         """

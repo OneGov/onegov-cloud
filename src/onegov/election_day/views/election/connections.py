@@ -29,7 +29,8 @@ election_incomplete_text = _(
 @ElectionDayApp.json(
     model=Election,
     name='connections-data',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_connections_data(
     self: Election,

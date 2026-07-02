@@ -712,13 +712,96 @@ def test_send_email(tmp_path: Path) -> None:
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
-
+    app.namespace = 'test'
     app.mail = {
         'marketing': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
+    app.set_application_id('test/foo')
+
+    app.send_email(
+        reply_to='info@example.org',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content='This e-mail is just a test. '
+        '<a href="mailto:unsubscribe@example.org">unsubscribe</a>',
+        headers={'List-Unsubscribe': '<mailto:unsubscribe@example.org>'}
+    )
+
+    transaction.commit()
+
+    files = list(maildir.iterdir())
+    assert len(files) == 1
+    messages = json.loads(files[0].read_text('utf-8'))
+    assert len(messages) == 1
+    message = messages[0]
+
+    assert message['From'] == 'noreply@example.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Test E-Mail'
+    assert message['MessageStream'] == 'marketing'
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert headers['List-Unsubscribe'] == '<mailto:unsubscribe@example.org>'
+
+
+def test_send_email_tenants_sender_override(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
+    app = Framework()
+    app.namespace = 'test'
+    app.mail = {
+        'marketing': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org',
+            'tenants': {
+                'test/foo': {'sender': 'noreply@foo.org'}
+            }
+        }
+    }
+    app.set_application_id('test/foo')
+
+    app.send_email(
+        reply_to='info@example.org',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content='This e-mail is just a test. '
+        '<a href="mailto:unsubscribe@example.org">unsubscribe</a>',
+        headers={'List-Unsubscribe': '<mailto:unsubscribe@example.org>'}
+    )
+
+    transaction.commit()
+
+    files = list(maildir.iterdir())
+    assert len(files) == 1
+    messages = json.loads(files[0].read_text('utf-8'))
+    assert len(messages) == 1
+    message = messages[0]
+
+    assert message['From'] == 'noreply@foo.org'
+    assert message['ReplyTo'] == 'info@example.org'
+    assert message['Subject'] == 'Test E-Mail'
+    assert message['MessageStream'] == 'marketing'
+    headers = {h['Name']: h['Value'] for h in message['Headers']}
+    assert headers['List-Unsubscribe'] == '<mailto:unsubscribe@example.org>'
+
+
+def test_send_email_tenants_no_sender_override(tmp_path: Path) -> None:
+    maildir = tmp_path / 'mail'
+    maildir.mkdir()
+    app = Framework()
+    app.namespace = 'test'
+    app.mail = {
+        'marketing': {
+            'directory': str(maildir),
+            'sender': 'noreply@example.org',
+            'tenants': {
+                'test/foo': {'sender': 'noreply@foo.org'}
+            }
+        }
+    }
+    app.set_application_id('test/foo2')
 
     app.send_email(
         reply_to='info@example.org',
@@ -749,12 +832,14 @@ def test_send_email_with_name(tmp_path: Path) -> None:
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
+    app.namespace = 'test'
     app.mail = {
         'transactional': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
+    app.set_application_id('test/foo')
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
@@ -781,12 +866,14 @@ def test_email_attachments(tmp_path: Path) -> None:
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
+    app.namespace = 'test'
     app.mail = {
         'transactional': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
+    app.set_application_id('test/foo')
 
     tempfile = NamedTemporaryFile(suffix='.txt', mode='w', delete=False)
     tempfile.write('First')
@@ -938,12 +1025,14 @@ def test_send_email_plaintext_alternative(tmp_path: Path) -> None:
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
+    app.namespace = 'test'
     app.mail = {
         'transactional': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
+    app.set_application_id('test/foo')
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
@@ -976,13 +1065,14 @@ def test_send_transactional_email_batch(tmp_path: Path) -> None:
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
-
+    app.namespace = 'test'
     app.mail = {
         'transactional': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
+    app.set_application_id('test/foo')
 
     # NOTE: We use plaintext only to speed up the test
     mails = [
@@ -1035,13 +1125,14 @@ def test_send_marketing_email_batch(tmp_path: Path) -> None:
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
-
+    app.namespace = 'test'
     app.mail = {
         'marketing': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
+    app.set_application_id('test/foo')
 
     unsubscribe = 'mailto:info@example.org'
 
@@ -1093,13 +1184,14 @@ def test_send_marketing_email_batch_size_limit(tmp_path: Path) -> None:
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
-
+    app.namespace = 'test'
     app.mail = {
         'marketing': {
             'directory': str(maildir),
             'sender': 'noreply@example.org'
         }
     }
+    app.set_application_id('test/foo')
 
     unsubscribe = 'mailto:info@example.org'
     content = 'a' * 1_000_000  # 1 MB
@@ -1150,7 +1242,7 @@ def test_send_marketing_email_batch_missing_unsubscribe(
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
-
+    app.namespace = 'test'
     app.mail = {
         'marketing': {
             'directory': str(maildir),
@@ -1161,6 +1253,7 @@ def test_send_marketing_email_batch_missing_unsubscribe(
             'sender': 'noreply@example.org'
         },
     }
+    app.set_application_id('test/foo')
 
     # NOTE: We use plaintext only to speed up the test
     with pytest.raises(AssertionError):
@@ -1179,7 +1272,7 @@ def test_send_marketing_email_batch_illegal_category(tmp_path: Path) -> None:
     maildir = tmp_path / 'mail'
     maildir.mkdir()
     app = Framework()
-
+    app.namespace = 'test'
     app.mail = {
         'marketing': {
             'directory': str(maildir),
@@ -1190,6 +1283,7 @@ def test_send_marketing_email_batch_illegal_category(tmp_path: Path) -> None:
             'sender': 'noreply@example.org'
         },
     }
+    app.set_application_id('test/foo')
 
     # NOTE: We use plaintext only to speed up the test
     mails = [

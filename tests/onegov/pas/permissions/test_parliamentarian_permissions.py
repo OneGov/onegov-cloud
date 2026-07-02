@@ -7,9 +7,9 @@ from datetime import date
 from morepath import Identity
 from onegov.core.security import Private
 from onegov.pas.collections import (
-    AttendenceCollection,
     PASCommissionCollection,
-    PASParliamentarianCollection
+    PASParliamentarianCollection,
+    SettlementRunCollection,
 )
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
@@ -36,7 +36,8 @@ def test_view_dashboard_as_parliamentarian(client: Client[TestPasApp]) -> None:
     parliamentarian = parliamentarians.add(
         first_name='Pia',
         last_name='Parliamentarian',
-        email_primary='pia.parliamentarian@example.org'
+        email_primary='pia.parliamentarian@example.org',
+        zg_username='zgpia',
     )
 
     # Add commission membership
@@ -50,15 +51,16 @@ def test_view_dashboard_as_parliamentarian(client: Client[TestPasApp]) -> None:
 
     # Set correct password and role for the created user
     users = UserCollection(session)
-    user = users.by_username('pia.parliamentarian@example.org')
+    user = users.by_username('zgpia')
     assert user is not None
     user.password = 'test'
     user.role = 'parliamentarian'
+    user.active = True
 
     transaction.commit()
 
     # Login as parliamentarian
-    client.login('pia.parliamentarian@example.org', 'test')
+    client.login('zgpia', 'test')
 
     # Should be able to access dashboard
     page = client.get('/pas-settings')
@@ -80,7 +82,8 @@ def test_view_dashboard_as_commission_president(
     parliamentarian = parliamentarians.add(
         first_name='Peter',
         last_name='President',
-        email_primary='peter.president@example.org'
+        email_primary='peter.president@example.org',
+        zg_username='zgpeter',
     )
 
     # Make them commission president
@@ -93,155 +96,21 @@ def test_view_dashboard_as_commission_president(
 
     # Update user role to commission_president
     users = UserCollection(session)
-    user = users.by_username('peter.president@example.org')
+    user = users.by_username('zgpeter')
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
+    user.active = True
 
     transaction.commit()
 
     # Login as commission president
-    page = client.login('peter.president@example.org', 'test')
+    page = client.login('zgpeter', 'test')
     assert 'falsches Passwort' not in page
 
     # Should be able to access dashboard
     page = client.get('/pas-settings')
     assert page.status_code == 200
-
-
-def test_view_attendence_as_parliamentarian(
-    client: Client[TestPasApp]
-) -> None:
-    """Parliamentarians should be able to view individual attendences and
-    create new ones"""
-    session = client.app.session()
-
-    # Create parliamentarian
-    parliamentarians = PASParliamentarianCollection(client.app)
-    parliamentarian = parliamentarians.add(
-        first_name='Bob',
-        last_name='Viewer', email_primary='bob.viewer@example.org'
-    )
-
-    # Set correct password for the created user
-    users = UserCollection(session)
-    user = users.by_username('bob.viewer@example.org')
-    assert user is not None
-    user.password = 'test'
-
-    # Create commission and add parliamentarian to it
-    commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Test Commission')
-    membership = PASCommissionMembership(
-        parliamentarian_id=parliamentarian.id,
-        commission_id=commission.id,
-        role='member',
-    )
-    session.add(membership)
-
-    # Create attendence
-    attendences = AttendenceCollection(session)
-    attendence = attendences.add(
-        parliamentarian_id=parliamentarian.id,
-        type='commission',
-        date=date.today(),
-        duration=120,
-        commission_id=commission.id,
-    )
-
-    # Get the attendence ID before committing
-    attendence_id = attendence.id
-    transaction.commit()
-
-    client.login('bob.viewer@example.org', 'test')
-    # Should be able to view their own
-    page = client.get(f'/attendence/{attendence_id}')
-    assert page.status_code == 200
-
-    # Should be able to access new attendance form
-    # (that's the whole point of the app, really)
-    page = client.get('/attendences/new')
-    assert page.status_code == 200
-
-    # Check if it's actually a form page (most important test)
-    assert 'form' in page
-    assert 'submit' in page
-
-    # Should be able to edit their own attendance
-    page = client.get(f'/attendence/{attendence_id}/edit').maybe_follow()
-    assert page.status_code == 200
-
-    # Fill out and submit the form
-    page.form['date'] = '2024-01-15'
-    page.form['duration'] = '3.5'
-    page.form['type'] = 'study'
-    page.form['parliamentarian_id'].select(text='Bob Viewer')
-
-    # Submit the form
-    page = page.form.submit().maybe_follow()
-    assert page.status_code == 200
-
-
-def test_parliamentarian_cannot_edit_others_attendence(
-    client: Client[TestPasApp]
-) -> None:
-    """Parliamentarians should not be able to change parliamentarian_id
-    when editing their own attendance"""
-    session = client.app.session()
-
-    # Create commission
-    commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Test Commission')
-
-    parliamentarians = PASParliamentarianCollection(client.app)
-    alice = parliamentarians.add(
-        first_name='Alice',
-        last_name='One',
-        email_primary='alice.one@example.org',
-    )
-    bob = parliamentarians.add(
-        first_name='Bob', last_name='Two', email_primary='bob.two@example.org'
-    )
-
-    # Add alice to commission
-    alice_membership = PASCommissionMembership(
-        parliamentarian_id=alice.id, commission_id=commission.id, role='member'
-    )
-    session.add(alice_membership)
-
-    users = UserCollection(session)
-    alice_user = users.by_username('alice.one@example.org')
-    assert alice_user is not None
-    alice_user.password = 'test'
-    alice_user.role = 'parliamentarian'
-
-    attendences = AttendenceCollection(session)
-    alice_attendence = attendences.add(
-        parliamentarian_id=alice.id,
-        type='commission',
-        date=date.today(),
-        duration=120,
-        commission_id=commission.id,
-    )
-
-    alice_attendence_id = alice_attendence.id
-    bob_id = str(bob.id)
-    transaction.commit()
-
-    client.login('alice.one@example.org', 'test')
-
-    page = client.get(f'/attendence/{alice_attendence_id}/edit')
-    assert page.status_code == 200
-
-    page.form['date'] = '2024-01-15'
-    page.form['duration'] = '3.5'
-    page.form['type'] = 'commission'
-
-    page.form['parliamentarian_id'].force_value(bob_id)
-
-    page = page.form.submit()
-
-    assert 'Sie können nur Ihre eigene Anwesenheit bearbeiten' in page
 
 
 def test_commission_president_has_private_access_to_commission(
@@ -259,7 +128,8 @@ def test_commission_president_has_private_access_to_commission(
     parliamentarian = parliamentarians.add(
         first_name='Emma',
         last_name='President',
-        email_primary='emma.president@example.org'
+        email_primary='emma.president@example.org',
+        zg_username='zgemma',
     )
 
     # Make them commission president
@@ -272,10 +142,11 @@ def test_commission_president_has_private_access_to_commission(
 
     # Update user role to commission_president
     users = UserCollection(session)
-    user = users.by_username('emma.president@example.org')
+    user = users.by_username('zgemma')
     assert user is not None
     user.role = 'commission_president'
     user.password = 'test'
+    user.active = True
 
     # Get the commission ID before committing
     commission_id = commission.id
@@ -283,7 +154,7 @@ def test_commission_president_has_private_access_to_commission(
     transaction.commit()
 
     # Login as commission president
-    client.login('emma.president@example.org', 'test')
+    client.login('zgemma', 'test')
 
     # Should have private access to commission
     page = client.get(f'/commission/{commission_id}')
@@ -306,7 +177,8 @@ def test_commission_president_private_access_permission_rule(
     parliamentarian = parliamentarians.add(
         first_name='Frank',
         last_name='President',
-        email_primary='frank.president@example.org'
+        email_primary='frank.president@example.org',
+        zg_username='zgfrank',
     )
 
     # Make them commission president
@@ -319,7 +191,7 @@ def test_commission_president_private_access_permission_rule(
 
     # Update user role to commission_president
     users = UserCollection(session)
-    user = users.by_username('frank.president@example.org')
+    user = users.by_username('zgfrank')
     assert user is not None
     user.role = 'commission_president'
 
@@ -328,7 +200,7 @@ def test_commission_president_private_access_permission_rule(
     # Test permission rule with president identity
     identity = Identity(
         uid='foo',
-        userid='frank.president@example.org',
+        userid='zgfrank',
         role='commission_president',
         application_id=client.app.application_id,
         groupids=frozenset()
@@ -345,54 +217,71 @@ def test_commission_president_private_access_permission_rule(
     ) is True
 
 
-def test_parliamentarian_no_private_access_to_commission(
+def test_parliamentarian_private_access_to_own_commission(
     client: Client[TestPasApp]
 ) -> None:
-    """Regular parliamentarians should not have private access to
-    commissions"""
+    """Parliamentarians can access commissions they are members of,
+    but not other commissions."""
     session = client.app.session()
 
-    # Create commission
     commissions = PASCommissionCollection(session)
-    commission = commissions.add(name='Finance Commission')
+    own_commission = commissions.add(name='Finance Commission')
+    other_commission = commissions.add(name='Other Commission')
 
-    # Create parliamentarian as regular member (not president)
     parliamentarians = PASParliamentarianCollection(client.app)
     parliamentarian = parliamentarians.add(
         first_name='Mary',
         last_name='Member',
-        email_primary='mary.member@example.org'
+        email_primary='mary.member@example.org',
+        zg_username='zgmary',
     )
 
-    # Make them regular commission member
     membership = PASCommissionMembership(
         parliamentarian_id=parliamentarian.id,
-        commission_id=commission.id,
+        commission_id=own_commission.id,
         role='member'
     )
     session.add(membership)
 
-    # Update user role to parliamentarian
+    own_id = own_commission.id
+    other_id = other_commission.id
+
     users = UserCollection(session)
-    user = users.by_username('mary.member@example.org')
+    user = users.by_username('zgmary')
     assert user is not None
     user.role = 'parliamentarian'
 
     transaction.commit()
 
-    # Test permission rule with parliamentarian identity
+    session = client.app.session()
+    own_comm = session.get(PASCommission, own_id)
+    assert own_comm is not None
+    own_commission = own_comm
+    other_comm = session.get(PASCommission, other_id)
+    assert other_comm is not None
+    other_commission = other_comm
+
     identity = Identity(
         uid='foo',
-        userid='mary.member@example.org',
+        userid='zgmary',
         groupids=frozenset(),
         role='parliamentarian',
         application_id=client.app.application_id
     )
 
-    # Should not have private access to commission
-    assert has_private_access_to_commission(
-        client.app, identity, commission, Private
-    ) is False
+    assert (
+        has_private_access_to_commission(
+            client.app, identity, own_commission, Private
+        )
+        is True
+    )
+
+    assert (
+        has_private_access_to_commission(
+            client.app, identity, other_commission, Private
+        )
+        is False
+    )
 
 
 def test_commission_president_no_access_to_different_commission(
@@ -412,7 +301,8 @@ def test_commission_president_no_access_to_different_commission(
     parliamentarian = parliamentarians.add(
         first_name='George',
         last_name='President',
-        email_primary='george.president@example.org'
+        email_primary='george.president@example.org',
+        zg_username='zggeorge',
     )
 
     # Make them president of finance commission only
@@ -425,7 +315,7 @@ def test_commission_president_no_access_to_different_commission(
 
     # Update user role to commission_president
     users = UserCollection(session)
-    user = users.by_username('george.president@example.org')
+    user = users.by_username('zggeorge')
     assert user is not None
     user.role = 'commission_president'
 
@@ -434,7 +324,7 @@ def test_commission_president_no_access_to_different_commission(
     # Test permission rule with president identity
     identity = Identity(
         uid='foo',
-        userid='george.president@example.org',
+        userid='zggeorge',
         groupids=frozenset(),
         role='commission_president',
         application_id=client.app.application_id
@@ -497,14 +387,17 @@ def test_commission_president_with_no_parliamentarian_record(
     ) is False
 
 
-@pytest.mark.parametrize('role,user_email', [
-    ('parliamentarian', 'files.parliamentarian@example.org'),
-    ('commission_president', 'files.president@example.org'),
+@pytest.mark.parametrize('role,user_email,zg_user', [
+    ('parliamentarian', 'files.parliamentarian@example.org',
+     'zgfilesparl'),
+    ('commission_president', 'files.president@example.org',
+     'zgfilespres'),
 ])
 def test_view_files_collection(
     client: Client[TestPasApp],
     role: str,
-    user_email: str
+    user_email: str,
+    zg_user: str,
 ) -> None:
     """Parliamentarians and commission presidents should be able to access
     the files collection"""
@@ -515,7 +408,8 @@ def test_view_files_collection(
     parliamentarian = parliamentarians.add(
         first_name='Files',
         last_name='Viewer',
-        email_primary=user_email
+        email_primary=user_email,
+        zg_username=zg_user,
     )
 
     if role == 'commission_president':
@@ -532,16 +426,106 @@ def test_view_files_collection(
 
     # Set user role and password
     users = UserCollection(session)
-    user = users.by_username(user_email)
+    user = users.by_username(zg_user)
     assert user is not None
     user.role = role
     user.password = 'test'
+    user.active = True
     transaction.commit()
 
     # Login as user
-    client.login(user_email, 'test')
+    client.login(zg_user, 'test')
 
     page = client.get('/files')
     assert page.status_code == 200
 
-    # TODO: Check disallow edit files for non admin
+
+def test_parliamentarian_self_bookings_show_in_list(
+    client: Client[TestPasApp],
+) -> None:
+    """Parliamentarian creates commission/shortest/study via form,
+    all three must appear in /attendences list."""
+    session = client.app.session()
+
+    commissions = PASCommissionCollection(session)
+    commission = commissions.add(name='Test Commission')
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parliamentarian = parliamentarians.add(
+        first_name='Parla',
+        last_name='Mentarian',
+        email_primary='parla.mentarian@example.org',
+        zg_username='zgparla',
+    )
+
+    session.add(PASCommissionMembership(
+        parliamentarian_id=parliamentarian.id,
+        commission_id=commission.id,
+        role='member',
+        start=date(2020, 1, 1),
+    ))
+
+    SettlementRunCollection(session).add(
+        name='Active Run',
+        start=date(2020, 1, 1),
+        end=date(2099, 12, 31),
+        active=True,
+    )
+
+    user = UserCollection(session).by_username('zgparla')
+    assert user is not None
+    user.password = 'test'
+    user.role = 'parliamentarian'
+    user.active = True
+    transaction.commit()
+
+    client.login('zgparla', 'test')
+
+    for a_type in ('commission', 'shortest', 'study'):
+        page = client.get('/attendences/new')
+        page.form['date'] = date.today().isoformat()
+        page.form['duration'] = '2.0'
+        page.form['type'] = a_type
+        page.form['parliamentarian_id'].select(text='Parla Mentarian')
+        page.form['commission_id'].select(text='Test Commission')
+        assert page.form.submit().maybe_follow().status_code == 200
+
+    list_page = client.get('/attendences')
+    for label in ('Kommissionssitzung', 'Kürzestsitzung', 'Aktenstudium'):
+        assert label in list_page, f'{label} missing\n\n{list_page}'
+
+    filtered = client.get('/attendences?type=study')
+    assert 'Aktenstudium' in filtered
+    assert 'Kürzestsitzung' not in filtered.pyquery('table.attendences').text()
+
+    assert 'fa-edit' not in list_page
+
+
+def test_parliamentarian_sees_add_link_but_not_bulk(
+    client: Client[TestPasApp],
+) -> None:
+    """Parliamentarian sees 'New Attendence' in editbar but not
+    bulk options, and no edit icons on rows."""
+    session = client.app.session()
+
+    parliamentarians = PASParliamentarianCollection(client.app)
+    parliamentarians.add(
+        first_name='Eva',
+        last_name='Editbar',
+        email_primary='eva.editbar@example.org',
+        zg_username='zgeva',
+    )
+
+    user = UserCollection(session).by_username('zgeva')
+    assert user is not None
+    user.password = 'test'
+    user.role = 'parliamentarian'
+    user.active = True
+    transaction.commit()
+
+    client.login('zgeva', 'test')
+
+    page = client.get('/attendences')
+    editbar = page.pyquery('.edit-bar').text()
+    assert 'Sitzung' in editbar
+    assert 'Massenbuchung' not in editbar

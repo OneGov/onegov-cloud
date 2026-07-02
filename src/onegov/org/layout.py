@@ -16,37 +16,44 @@ from math import isclose
 from os.path import splitext, basename
 
 from onegov.chat import TextModuleCollection
+from onegov.core import Framework
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
+from onegov.core.framework import layout_predicate
 from onegov.form.collection import SurveyCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify, paragraphify
-from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryCollection, Directory, DirectoryEntry
+from onegov.event import Event
+from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id
+from onegov.form import as_internal_id
+from onegov.form import FormCollection
+from onegov.form import FormDefinition
 from onegov.org.models.document_form import (
     FormDocument,
     FormDocumentCollection)
-from onegov.newsletter import (
-    Newsletter,
-    NewsletterCollection,
-    RecipientCollection,
-)
+from onegov.newsletter import Newsletter
+from onegov.newsletter import NewsletterCollection
+from onegov.newsletter import RecipientCollection
 from onegov.org import _
 from onegov.org import utils
+from onegov.org.app import OrgApp
 from onegov.org.exports.base import OrgExport
 from onegov.org.models import CitizenDashboard
 from onegov.org.models import Clipboard
 from onegov.org.models import ExportCollection, Editor
+from onegov.org.models import GeneralFile
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
+from onegov.org.models import ImageSet
 from onegov.org.models import ImageSetCollection
 from onegov.org.models import News
 from onegov.org.models import PageMove
@@ -55,6 +62,7 @@ from onegov.org.models import PublicationCollection
 from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models import Search
 from onegov.org.models import SiteCollection
+from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.external_link import ExternalLinkCollection
@@ -64,19 +72,22 @@ from onegov.org.theme.org_theme import user_options
 from onegov.org.utils import can_change_username, get_current_tickets_url
 from onegov.org.utils import IMG_URLS
 from onegov.pay import PaymentCollection, PaymentProviderCollection
-from onegov.people import PersonCollection
+from onegov.people import PersonCollection, Person
 from onegov.qrcode import QrCode
+from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
+from onegov.ticket import handlers as ticket_handlers
+from onegov.ticket import Ticket
 from onegov.ticket import TicketCollection, TicketInvoiceCollection
 from onegov.ticket.collection import ArchivedTicketCollection
-from onegov.user import Auth, UserCollection, UserGroupCollection
+from onegov.user import Auth, User, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
 from operator import itemgetter
 from sedate import to_timezone
 from translationstring import TranslationString
 
-
 from typing import overload, Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -86,17 +97,14 @@ if TYPE_CHECKING:
     from onegov.core.security.permissions import Intent
     from onegov.core.templates import MacrosLookup
     from onegov.directory import DirectoryEntryCollection
-    from onegov.event import Event, Occurrence
-    from onegov.form import FormDefinition, FormSubmission
+    from onegov.form import FormSubmission
     from onegov.form.models.definition import (
         SurveySubmission, SurveyDefinition)
     from onegov.org.models import (
-        ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
-    from onegov.org.app import OrgApp
-    from onegov.org.request import OrgRequest, PageMeta
-    from onegov.reservation import Resource
-    from onegov.ticket import Ticket
-    from onegov.user import User, UserGroup
+        ExtendedDirectory, ExtendedDirectoryEntry, Organisation)
+    from onegov.org.request import OrgRequest
+    from onegov.org.request import PageMeta
+    from onegov.user import UserGroup
     from sedate.types import TzInfoOrName
     from webob import Response
     from wtforms import Field
@@ -216,8 +224,8 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def page_id(self) -> str:
-        """ Returns the unique page id of the rendered page. Used to have
-        a useful id in the body element for CSS/JS.
+        """ The unique page id of the rendered page, for use as the body
+        element id in CSS/JS.
 
         """
         page_id = self.request.path_info
@@ -231,7 +239,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def body_classes(self) -> Iterator[str]:
-        """ Yields a list of body classes used on the body. """
+        """ Body classes used on the body element. """
 
         if self.request.is_logged_in:
             yield 'is-logged-in'
@@ -243,20 +251,16 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def top_navigation(self) -> Sequence[Link] | None:
-        """ Returns a list of :class:`onegov.org.elements.Link` objects.
-        Those links are used for the top navigation.
-
-        If nothing is returned, no top navigation is displayed.
+        """ A list of :class:`onegov.org.elements.Link` objects for the top
+        navigation. If None, no top navigation is displayed.
 
         """
         return None
 
     @cached_property
     def breadcrumbs(self) -> Sequence[Link] | None:
-        """ Returns a list of :class:`onegov.org.elements.Link` objects.
-        Those links are used for the breadcrumbs.
-
-        If nothing is returned, no top breadcrumbs are displayed.
+        """ A list of :class:`onegov.org.elements.Link` objects for the
+        breadcrumbs. If None, no breadcrumbs are displayed.
 
         """
         return None
@@ -294,8 +298,23 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         ]
 
     @cached_property
+    def files_url(self) -> str:
+        """ The URL to the files view. """
+        url = self.request.link(
+            GeneralFileCollection(self.request.session)
+        )
+        return self.csrf_protected_url(url)
+
+    def files_url_with_anchor(self, file: GeneralFile | None) -> str:
+        """ Returns the url to the files view including anchor. """
+        if file is None:
+            return self.files_url
+
+        return f'{self.files_url}#{file.name}'
+
+    @cached_property
     def file_upload_url(self) -> str:
-        """ Returns the url to the file upload action. """
+        """ The URL to the file upload action. """
         url = self.request.link(
             GeneralFileCollection(self.request.session), name='upload'
         )
@@ -318,7 +337,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def image_upload_url(self) -> str:
-        """ Returns the url to the image upload action. """
+        """ The URL to the image upload action. """
         url = self.request.link(
             ImageFileCollection(self.request.session), name='upload'
         )
@@ -346,17 +365,17 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     @cached_property
     def homepage_url(self) -> str:
-        """ Returns the url to the main page. """
+        """ The URL to the main page. """
         return self.request.link(self.app.org)
 
     @cached_property
     def search_url(self) -> str:
-        """ Returns the url to the search page. """
+        """ The URL to the search page. """
         return self.request.class_link(Search)
 
     @cached_property
     def suggestions_url(self) -> str:
-        """ Returns the url to the suggestions json view. """
+        """ The URL to the suggestions JSON view. """
         return self.request.class_link(Search, name='suggest')
 
     @cached_property
@@ -378,6 +397,15 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def newsletter_url(self) -> str:
         return self.request.class_link(NewsletterCollection)
+
+    def publications_url(self, year: int | str | None = None) -> str:
+        if year:
+            return self.request.class_link(
+                PublicationCollection,
+                variables={'year': str(year)},
+            )
+
+        return self.request.class_link(PublicationCollection)
 
     @cached_property
     def vat_rate(self) -> Decimal:
@@ -612,11 +640,28 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
         return time_range
 
+    def format_event_time_range(
+        self,
+        start: datetime | time,
+        end: datetime | time
+    ) -> str:
+
+        time_range = utils.render_time_range(start, end)
+
+        if time_range in ('00:00 - 24:00', '00:00 - 23:59'):
+            return self.request.translate(_('all day'))
+
+        suffix = self.request.translate(_("o'clock"))
+        return f'{time_range} {suffix}'
+
     def format_date_range(
         self,
-        start: date | datetime,
-        end: date | datetime
+        start: date | datetime | None,
+        end: date | datetime | None
     ) -> str:
+
+        if start is None and end is None:
+            return ''
 
         if start == end:
             return self.format_date(start, 'date')
@@ -865,7 +910,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
     @cached_property
     def breadcrumbs(self) -> Sequence[Link] | None:
-        """ Returns the breadcrumbs for the current page. """
+        """ The breadcrumbs for the current page. """
         return [Link(_('Homepage'), self.homepage_url)]
 
     def exclude_invisible[T](self, items: Iterable[T]) -> Sequence[T]:
@@ -903,6 +948,17 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
             ),]
 
 
+# registers the `DefaultLayout` as the default layout for all models in
+# org. Look for this kind of decorator `@TownApp.layout(model=<ModelName>)`
+@OrgApp.predicate_fallback(Framework.get_layout, layout_predicate)
+def layout_not_found(
+    self: OrgApp,
+    obj: object,
+    request: OrgRequest
+) -> Layout:
+    return DefaultLayout(obj, request)
+
+
 class DefaultMailLayoutMixin:
     if TYPE_CHECKING:
         # forward declare required attributes
@@ -937,8 +993,8 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
 
     @cached_property
     def contact_html(self) -> Markup:
-        """ Returns the contacts html, but instead of breaking it into multiple
-        lines (like on the site footer), this version puts it all on one line.
+        """ The contact HTML on a single line (rather than multiline like the
+        site footer).
 
         """
 
@@ -1051,6 +1107,7 @@ class SettingsLayout(DefaultLayout):
         return bc
 
 
+@OrgApp.layout(model=Topic)
 class PageLayout(AdjacencyListLayout):
 
     @cached_property
@@ -1071,6 +1128,7 @@ class PageLayout(AdjacencyListLayout):
         return tuple(self.get_sidebar(type='topic'))
 
 
+@OrgApp.layout(model=News)
 class NewsLayout(AdjacencyListLayout):
 
     @cached_property
@@ -1333,6 +1391,22 @@ class FormCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=FormDefinition)
+class FormDefinitionLayout(DefaultLayout):
+
+    @property
+    def forms_url(self) -> str:
+        return self.request.class_link(FormCollection)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Forms'), self.forms_url),
+            Link(self.model.title, '#')
+        ]
+
+
 class SurveySubmissionWindowLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -1556,6 +1630,7 @@ class SurveyCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=FormDocument)
 class FormDocumentLayout(DefaultLayout):
 
     @cached_property
@@ -1651,7 +1726,11 @@ class PersonCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=Person)
 class PersonLayout(DefaultLayout):
+
+    model: Person
+    request: OrgRequest
 
     @cached_property
     def collection(self) -> PersonCollection:
@@ -1664,6 +1743,47 @@ class PersonLayout(DefaultLayout):
             Link(_('People'), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model))
         ]
+
+    @cached_property
+    def organisation_texts(self) -> list[str]:
+        excluded = self.request.app.org.excluded_person_fields(self.request)
+        if 'organisation' in excluded:
+            return []
+        person = self.model
+        parts: list[str] = []
+        if person.organisations_multiple:
+            parent_org: str | None = None
+            suborgs: list[str] = []
+
+            def add_part() -> None:
+                if parent_org is None:
+                    return
+
+                if suborgs:
+                    parts.append(f'{parent_org} - {", ".join(suborgs)}')
+                else:
+                    parts.append(parent_org)
+
+            for org in person.organisations_multiple:
+                if org.startswith('-'):
+                    suborgs.append(org.lstrip('-'))
+                elif parent_org is None:
+                    parent_org = org
+                    suborgs = []
+                else:
+                    add_part()
+                    parent_org = org
+                    suborgs = []
+            add_part()  # add final part
+            return parts
+
+        if person.organisation and person.sub_organisation:
+            parts.append(f'{person.organisation} - {person.sub_organisation}')
+        elif person.organisation:
+            parts.append(person.organisation)
+        elif person.sub_organisation:
+            parts.append(person.sub_organisation)
+        return parts
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -1713,7 +1833,11 @@ class ArchivedTicketsLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Tickets'), '#')
+            Link(_('Tickets'), self.request.class_link(
+                TicketCollection,
+                {'handler': self.model.handler, 'state': 'open'}
+            )),
+            Link(_('Archived Tickets'), '#')
         ]
 
     @cached_property
@@ -1748,8 +1872,8 @@ class ArchivedTicketsLayout(DefaultLayout):
         return links
 
 
+@OrgApp.layout(model=Ticket)
 class TicketLayout(DefaultLayout):
-
     model: Ticket
 
     def __init__(self, model: Ticket, request: OrgRequest) -> None:
@@ -1830,15 +1954,22 @@ class TicketLayout(DefaultLayout):
                     )
 
             elif self.model.state == 'closed':
-                links.append(Link(
-                    text=_('Reopen ticket'),
-                    url=self.request.link(self.model, 'reopen'),
-                    attrs={'class': ('ticket-button', 'ticket-reopen')}
-                ))
-                links.append(Link(
-                    text=_('Archive ticket'),
-                    url=self.request.link(self.model, 'archive'),
-                    attrs={'class': ('ticket-button', 'ticket-archive')})
+                if self.model.handler.reopenable:
+                    links.append(
+                        Link(
+                            text=_('Reopen ticket'),
+                            url=self.request.link(self.model, 'reopen'),
+                            attrs={
+                                'class': ('ticket-button', 'ticket-reopen')
+                            },
+                        )
+                    )
+                links.append(
+                    Link(
+                        text=_('Archive ticket'),
+                        url=self.request.link(self.model, 'archive'),
+                        attrs={'class': ('ticket-button', 'ticket-archive')},
+                    )
                 )
             elif self.model.state == 'archived':
                 links.append(Link(
@@ -2286,8 +2417,8 @@ class ResourceRecipientsFormLayout(DefaultLayout):
         ]
 
 
+@OrgApp.layout(model=Resource)
 class ResourceLayout(DefaultLayout):
-
     model: Resource
 
     def __init__(self, model: Resource, request: OrgRequest) -> None:
@@ -2622,8 +2753,8 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
         return list(links())
 
 
+@OrgApp.layout(model=Occurrence)
 class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
-
     app: OrgApp
     request: OrgRequest
     model: Occurrence
@@ -2737,8 +2868,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
         return None
 
 
+@OrgApp.layout(model=Event)
 class EventLayout(EventLayoutMixin, DefaultLayout):
-
     app: OrgApp
     request: OrgRequest
     model: Event
@@ -2851,6 +2982,7 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
         return [edit_link, delete_link]
 
 
+@OrgApp.layout(model=Newsletter)
 class NewsletterLayout(DefaultLayout):
 
     @cached_property
@@ -2986,9 +3118,10 @@ class NewsletterLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete "{}"?'.format(
-                                self.model.title
-                            )),
+                            _(
+                                'Do you really want to delete "${title}"?',
+                                mapping={'title': self.model.title}
+                            ),
                             _('This cannot be undone.'),
                             _('Delete newsletter'),
                             _('Cancel')
@@ -3071,8 +3204,8 @@ class ImageSetCollectionLayout(DefaultLayout):
         return None
 
 
+@OrgApp.layout(model=ImageSet)
 class ImageSetLayout(DefaultLayout):
-
     model: ImageSet
 
     def __init__(self, model: ImageSet, request: OrgRequest) -> None:
@@ -3116,9 +3249,10 @@ class ImageSetLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete "{}"?'.format(
-                                self.model.title
-                            )),
+                            _(
+                                'Do you really want to delete "${title}"?',
+                                mapping={'title': self.model.title}
+                            ),
                             _('This cannot be undone.'),
                             _('Delete photo album'),
                             _('Cancel')
@@ -3181,8 +3315,8 @@ class UserManagementLayout(DefaultLayout):
         return links
 
 
+@OrgApp.layout(model=User)
 class UserLayout(DefaultLayout):
-
     if TYPE_CHECKING:
         model: User
 
@@ -3261,6 +3395,9 @@ class UserGroupLayout(DefaultLayout):
     @cached_property
     def collection(self) -> UserGroupCollection[UserGroup]:
         return UserGroupCollection(self.request.session)
+
+    def handler_label(self, code: str) -> str:
+        return ticket_handlers.code_label(self.request, code)
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -3477,7 +3614,7 @@ class DirectoryCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Directories'), '#')
+            Link(_('Directories'), '#'),
         ]
 
     @cached_property
@@ -3499,6 +3636,20 @@ class DirectoryCollectionLayout(DefaultLayout):
                 ),
             ]
         return None
+
+
+@OrgApp.layout(model=Directory)
+class DirectoryLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Directories'), self.request.class_link(
+                DirectoryCollection
+            )),
+            Link(self.model.title, '#')
+        ]
 
 
 class DirectoryEntryMixin:
@@ -3735,6 +3886,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         )
 
 
+@OrgApp.layout(model=DirectoryEntry)
 class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
     request: OrgRequest
     model: ExtendedDirectoryEntry
@@ -3875,6 +4027,31 @@ class DashboardLayout(DefaultLayout):
         ]
 
 
+@OrgApp.layout(model=GeneralFile)
+class GeneralFileLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> Sequence[Link]:
+        name = self.model.name[:40]
+        if len(name) == 40:
+            name = name[:37] + '...'
+
+        links = [Link(_('Homepage'), self.homepage_url)]
+        if self.request.is_manager:
+            links.append(Link(_('Files'), self.files_url))
+
+        if (
+            self.model.published
+            and self.model.publication
+            and self.model.claimed_extension == 'pdf'
+        ):
+            year = self.model.created.strftime('%Y')
+            links.append(Link(_('Publications'), self.publications_url(year)))
+
+        links.append(Link(name, '#'))
+        return links
+
+
 class GeneralFileCollectionLayout(DefaultLayout):
     def __init__(self, model: Any, request: OrgRequest) -> None:
         request.include('common')
@@ -3938,14 +4115,30 @@ class HomepageLayout(DefaultLayout):
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
                 ),
-                Link(
-                    _('Add'),
-                    self.request.link(Editor('new-root', self.model, 'page')),
-                    attrs={'class': ('new-page')},
-                    classes=(
-                        'new-page',
-                        'show-new-content-placeholder'
-                    ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=(
+                        Link(
+                            _('Topic'),
+                            self.request.link(
+                                Editor('new-root', self.model, 'page')),
+                            attrs={'class': ('new-page')},
+                            classes=(
+                                'new-page',
+                                'show-new-content-placeholder'
+                            ),
+                        ),
+                        Link(
+                            _('Link'),
+                            self.request.link(
+                                Editor('new-root', self.model, 'link')),
+                            attrs={'class': 'new-root-link'},
+                            classes=(
+                                'new-root-link',
+                                'show-new-content-placeholder'
+                            )
+                        )
+                    )
                 ),
             ]
         return None

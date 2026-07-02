@@ -17,7 +17,6 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryZipArchive
 from onegov.directory.archive import DirectoryFileNotFound
 from onegov.directory.collections.directory import EntryRecipientCollection
-from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
@@ -174,15 +173,7 @@ def handle_new_directory(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        try:
-            directory = self.add_by_form(form, properties=('configuration', ))
-        except DuplicateEntryError as e:
-            request.alert(_('The entry ${name} exists twice', mapping={
-                'name': e.name
-            }))
-            transaction.abort()
-            return request.redirect(request.link(self))
-
+        directory = self.add_by_form(form, properties=('configuration', ))
         request.success(_('Added a new directory'))
         return request.redirect(
             request.link(ExtendedDirectoryEntryCollection(directory)))
@@ -459,39 +450,11 @@ def get_filters(
                 rounded=singular
             )
             for value in values
-            if keyword_counts.get(  # type:ignore[union-attr]
-                keyword, {}).get(value, 0)
+            if keyword_counts is None
+            or keyword_counts.get(keyword, {}).get(value, 0)
         )))
 
     return filters
-
-
-def keyword_count(
-    request: OrgRequest,
-    collection: ExtendedDirectoryEntryCollection
-) -> dict[str, dict[str, int]]:
-
-    self = collection
-    keywords = tuple(
-        as_internal_id(k)
-        for k in self.directory.configuration.keywords or ()
-    )
-    fields = {f.id: f for f in self.directory.fields if f.id in keywords}
-    counts: dict[str, dict[str, int]] = {}
-
-    # NOTE: The counting can get incredibly expensive with many entries
-    #       so we should skip it when we know we can skip it
-    if not fields:
-        return counts
-
-    # FIXME: This is incredibly slow. We need to think of a better way.
-    for model in request.exclude_invisible(self.without_keywords().query()):
-        for entry in model.keywords:
-            field_id, value = entry.split(':', 1)
-            if field_id in fields:
-                f_count = counts.setdefault(field_id, defaultdict(int))
-                f_count[value] += 1
-    return counts
 
 
 @OrgApp.html(
@@ -515,7 +478,14 @@ def view_directory(
             e.number = i + 1
         else:
             e.number = None
-    keyword_counts = keyword_count(request, self)
+    # HACK: Makes sure keyword counts are accurate, it would be more robust
+    #       if we attached the request in the path configuration or do what
+    #       we did in events and allow leaking a bit of access extension
+    #       logic into the base class. Although for directory entries it can
+    #       be a little bit more complex, since they also have to take
+    #       publication status into account.
+    self.request = request
+    keyword_counts = self.keyword_counts()
     filters = get_filters(request, self, keyword_counts)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     if request.is_manager:
@@ -549,7 +519,9 @@ def view_directory(
 @OrgApp.json(
     model=ExtendedDirectoryEntryCollection,
     permission=Public,
-    name='geojson')
+    name='geojson',
+    open_data=False
+)
 def view_geojson(
     self: ExtendedDirectoryEntryCollection,
     request: OrgRequest
@@ -687,18 +659,10 @@ def handle_new_directory_entry(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        try:
-            entry = self.directory.add_by_form(
-                form,
-                type='extended'
-            )
-        except DuplicateEntryError as e:
-            request.alert(_('The entry ${name} exists twice', mapping={
-                'name': e.name
-            }))
-            transaction.abort()
-            return request.redirect(request.link(self))
-
+        entry = self.directory.add_by_form(
+            form,
+            type='extended'
+        )
         if self.directory.enable_update_notifications and entry.access in (
             'public',
             'mtan'
@@ -982,7 +946,14 @@ def view_export(
 
         return request.redirect(url.as_string())
 
-    filters = get_filters(request, self, keyword_count(request, self),
+    # HACK: Makes sure keyword counts are accurate, it would be more robust
+    #       if we attached the request in the path configuration or do what
+    #       we did in events and allow leaking a bit of access extension
+    #       logic into the base class. Although for directory entries it can
+    #       be a little bit more complex, since they also have to take
+    #       publication status into account.
+    self.request = request
+    filters = get_filters(request, self, self.keyword_counts(),
                           view_name='+export')
 
     if filters:
@@ -1073,29 +1044,26 @@ def view_import(
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
+        message: str | None = None
         try:
             imported = form.run_import(target=self.directory)
         except MissingColumnError as e:
             field = self.directory.field_by_id(e.column)
             assert field is not None
-            request.alert(_('The column ${name} is missing', mapping={
+            message = _('The column ${name} is missing', mapping={
                 'name': field.human_id
-            }))
+            })
         except MissingFileError as e:
-            request.alert(_('The file ${name} is missing', mapping={
+            message = _('The file ${name} is missing', mapping={
                 'name': e.name
-            }))
-        except DuplicateEntryError as e:
-            request.alert(_('The entry ${name} exists twice', mapping={
-                'name': e.name
-            }))
+            })
         except ValidationError as e:
             error = e
         except NotImplementedError:
-            request.alert(_(
+            message = _(
                 'The given file is invalid, does it include a metadata.json '
                 'with a data.xlsx, data.csv, or data.json?'
-            ))
+            )
         else:
             notify = request.success if imported else request.warning
             notify(_('Imported ${count} entries', mapping={
@@ -1106,6 +1074,10 @@ def view_import(
 
         # no success if we land here
         transaction.abort()
+        # NOTE: The alert needs to be emitted after, so it doesn't get
+        #       rolled back as well.
+        if message is not None:
+            request.alert(message)
 
     return {
         'layout': layout,
@@ -1166,13 +1138,11 @@ def new_recipient(
                                        directory_id=self.directory.id)
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
-            title = request.translate(
-                _('Registration for notifications on new entries in the '
-                  'directory "${directory}"',
-                  mapping={
-                      'directory': self.directory.title
-                  })
-            )
+            title = request.translate(_(
+                'Registration for notifications on new entries in the '
+                'directory "${directory}"',
+                mapping={'directory': self.directory.title}
+            ))
 
             confirm_mail = render_template(
                 'mail_confirm_directory_subscription.pt',
@@ -1194,10 +1164,11 @@ def new_recipient(
                 },
             )
 
-        request.success(_((
+        request.success(_(
             "Success! We have sent a confirmation link to "
-            "${address}, if we didn't send you one already."
-        ), mapping={'address': form.address.data}))
+            "${address}, if we didn't send you one already.",
+            mapping={'address': form.address.data}
+        ))
         return request.redirect(request.link(self))
 
     return {

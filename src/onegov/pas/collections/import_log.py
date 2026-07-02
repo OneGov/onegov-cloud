@@ -17,10 +17,12 @@ class ImportLogCollection(GenericCollection[ImportLog]):
     def __init__(
         self,
         session: Session,
-        status: str | None = None
+        status: str | None = None,
+        user_id: str | None = None,
     ):
         super().__init__(session)
         self.status = status
+        self.user_id = user_id
 
     @property
     def model_class(self) -> type[ImportLog]:
@@ -32,13 +34,29 @@ class ImportLogCollection(GenericCollection[ImportLog]):
         if self.status is not None:
             query = query.filter(ImportLog.status == self.status)
 
+        if self.user_id is not None:
+            query = query.filter(ImportLog.user_id == self.user_id)
+
         return query.order_by(ImportLog.created.desc())
 
     def for_filter(
-        self,
-        status: str | None = None
+        self, status: str | None = None, user_id: str | None = None
     ) -> Self:
-        return self.__class__(self.session, status)
+        return self.__class__(self.session, status, user_id)
+
+    def distinct_users(self) -> list[User]:
+        return (
+            self.session.query(User)
+            .filter(
+                User.id.in_(
+                    self.session.query(ImportLog.user_id)
+                    .filter(ImportLog.user_id.isnot(None))
+                    .distinct()
+                )
+            )
+            .order_by(User.username)
+            .all()
+        )
 
     def for_listing(self, limit: int = 50) -> Query[ImportLog]:
         """Optimized query for listing import logs with minimal data."""

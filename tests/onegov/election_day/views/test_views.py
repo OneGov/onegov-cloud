@@ -17,6 +17,7 @@ from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
+from tests.shared.utils import get_meta
 from transaction import begin
 from transaction import commit
 from unittest.mock import patch
@@ -33,6 +34,28 @@ if TYPE_CHECKING:
 
 def test_view_permissions() -> None:
     utils.assert_explicit_permissions(election_day, ElectionDayApp)
+
+
+def test_open_graph_tags(election_day_app_zg: TestApp) -> None:
+    client = Client(election_day_app_zg)
+    page = client.get('/')
+
+    assert get_meta(page, 'og:type') == 'website'
+    assert get_meta(page, 'og:title') == 'Kanton Govikon'
+    assert get_meta(page, 'og:site_name') == 'Kanton Govikon'
+    assert get_meta(page, 'og:url') == 'http://localhost/'
+    assert get_meta(page, 'og:locale') == 'de_CH'
+    assert get_meta(page, 'og:description') is None
+    assert get_meta(page, 'og:image') is None
+
+    principal = election_day_app_zg.principal
+    principal.og_description = 'Wahlen und Abstimmungen des Kantons Govikon'
+    election_day_app_zg.cache.set('principal', principal)
+
+    page = client.get('/')
+    assert get_meta(page, 'og:description') == (
+        'Wahlen und Abstimmungen des Kantons Govikon'
+    )
 
 
 def test_view_private(election_day_app_zg: TestApp) -> None:
@@ -130,7 +153,6 @@ def test_cache_control(election_day_app_zg: TestApp) -> None:
 
     response = client.get('/')
     assert 'cache-control' not in response.headers
-    assert 'no_cache' not in response.headers['Set-Cookie']
     assert 'no_cache' not in client.cookies
 
     login(client)
@@ -217,12 +239,8 @@ def test_pages_cache(election_day_app_zg: TestApp) -> None:
     assert 'Set-Cookie' in response.headers  # no_cache
     assert len(election_day_app_zg.pages_cache.keys()) == 0
 
-    anonymous = Client(election_day_app_zg)
-    response = anonymous.get('/vote/0xdeadbeef/entities')
-    assert 'Set-Cookie' in response.headers  # session_id
-    assert len(election_day_app_zg.pages_cache.keys()) == 0
-
     # make sure HEAD requests are cached without qs
+    anonymous = Client(election_day_app_zg)
     anonymous.head('/vote/0xdeadbeef/')
     assert len(election_day_app_zg.pages_cache.keys()) == 1
 

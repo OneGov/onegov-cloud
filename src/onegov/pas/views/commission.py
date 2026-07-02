@@ -1,36 +1,25 @@
 from __future__ import annotations
+from datetime import date
 from itertools import groupby
 
 from onegov.core.elements import Link
 from onegov.core.security import Private, Public
-from onegov.org.forms.commission_membership import CommissionMembershipAddForm
-from onegov.town6.views.commission import (
-    view_commissions,
-    add_commission,
-    delete_commission
-)
-from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import PASCommissionCollection
-from onegov.pas.collections import PASParliamentarianCollection
-from onegov.pas.forms import AttendenceAddCommissionForm
-from onegov.pas.forms import CommissionForm
+from onegov.pas.i18n import _
 from onegov.pas.layouts import PASCommissionCollectionLayout
 from onegov.pas.layouts import PASCommissionLayout
-from onegov.pas.custom import (
-    validate_attendance_date,
-    has_user_set_abschluss_for_settlement_run,
-)
-from onegov.pas.models import Change
 from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
+from onegov.pas.utils import is_active_kantonsrat_member
 from onegov.user import User
+from sqlalchemy import or_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
+    from onegov.pas.request import PasRequest
     from onegov.town6.request import TownRequest
     from webob import Response
 
@@ -41,27 +30,37 @@ if TYPE_CHECKING:
     permission=Private
 )
 def pas_view_commissions(
-    self: PASCommissionCollection,
-    request: TownRequest
+    self: PASCommissionCollection, request: PasRequest
 ) -> RenderData | Response:
-    return view_commissions(
-        self, request, PASCommissionCollectionLayout(self, request))
+    layout = PASCommissionCollectionLayout(self, request)
 
+    filters = {}
+    filters['active'] = [
+        Link(
+            text=request.translate(title),
+            active=self.active == value,
+            url=request.link(self.for_filter(active=value)),
+        )
+        for title, value in ((_('Active'), True), (_('Inactive'), False))
+    ]
 
-@PasApp.form(
-    model=PASCommissionCollection,
-    name='new',
-    template='form.pt',
-    permission=Private,
-    form=CommissionForm
-)
-def pas_add_commission(
-    self: PASCommissionCollection,
-    request: TownRequest,
-    form: CommissionForm
-) -> RenderData | Response:
-    return add_commission(
-        self, request, form, PASCommissionCollectionLayout(self, request))
+    commissions = self.query().all()
+
+    if not request.is_admin:
+        p = request.current_parliamentarian
+        if p:
+            my_ids = {m.commission_id for m in p.commission_memberships}
+            commissions = [c for c in commissions if c.id in my_ids]
+        else:
+            commissions = []
+
+    return {
+        'add_link': request.link(self, name='new'),
+        'filters': filters,
+        'layout': layout,
+        'commissions': commissions,
+        'title': layout.title,
+    }
 
 
 @PasApp.html(
@@ -76,14 +75,22 @@ def pas_view_commission(
 
     layout = PASCommissionLayout(self, request)
 
-    president = None
+    presidents = []
     other_members = []
 
     for membership in self.memberships:
         if membership.role == 'president':
-            president = membership
+            presidents.append(membership)
         else:
             other_members.append(membership)
+
+    president = None
+    if presidents:
+        active = [p for p in presidents if not p.end]
+        president = active[0] if active else presidents[0]
+        other_members.extend(
+            p for p in presidents if p is not president
+        )
 
     return {
         'layout': layout,
@@ -91,162 +98,6 @@ def pas_view_commission(
         'title': layout.title,
         'president': president,
         'other_members': other_members,
-    }
-
-
-@PasApp.form(
-    model=PASCommission,
-    name='edit',
-    template='form.pt',
-    permission=Private,
-    form=CommissionForm
-)
-def pas_edit_commission(
-    self: PASCommission,
-    request: TownRequest,
-    form: CommissionForm
-) -> RenderData | Response:
-
-    if form.submitted(request):
-        form.populate_obj(self)
-        request.success(_('Your changes were saved'))
-        return request.redirect(request.link(self))
-
-    form.process(obj=self)
-
-    layout = PASCommissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.include_editor()
-    layout.edit_mode = True
-
-    return {
-        'layout': layout,
-        'title': layout.title,
-        'form': form,
-        'form_width': 'large'
-    }
-
-
-@PasApp.view(
-    model=PASCommission,
-    request_method='DELETE',
-    permission=Private
-)
-def pas_delete_commission(
-    self: PASCommission,
-    request: TownRequest
-) -> None:
-    return delete_commission(self, request)
-
-
-@PasApp.form(
-    model=PASCommission,
-    name='new-membership',
-    template='form.pt',
-    permission=Private,
-    form=CommissionMembershipAddForm
-)
-def pas_add_commission_membership(
-    self: PASCommission,
-    request: TownRequest,
-    form: CommissionMembershipAddForm
-) -> RenderData | Response:
-
-    if form.submitted(request):
-        self.memberships.append(
-            PASCommissionMembership(**form.get_useful_data())
-        )
-        request.success(_('Added a new parliamentarian'))
-        return request.redirect(request.link(self))
-
-    layout = PASCommissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New parliamentarian'), '#'))
-    layout.include_editor()
-
-    return {
-        'layout': layout,
-        'title': _('New parliamentarian'),
-        'form': form,
-        'form_width': 'large'
-    }
-
-
-@PasApp.form(
-    model=PASCommission,
-    name='add-attendence',
-    template='form.pt',
-    permission=Private,
-    form=AttendenceAddCommissionForm
-)
-def pas_add_plenary_attendence(
-    self: PASCommission,
-    request: TownRequest,
-    form: AttendenceAddCommissionForm
-) -> RenderData | Response:
-
-    if form.submitted(request):
-        if form.date.data:
-            if error := validate_attendance_date(
-                request.session, form.date.data
-            ):
-                request.alert(error)
-                return {
-                    'layout': PASCommissionLayout(self, request),
-                    'title': _('New commission meeting'),
-                    'form': form,
-                    'form_width': 'large'
-                }
-
-        data = form.get_useful_data()
-        parliamentarian_ids = data.pop('parliamentarian_id')
-
-        if not request.is_admin:
-            assert form.date.data is not None
-            blocked_parls = []
-            for parl_id in parliamentarian_ids:
-                if has_user_set_abschluss_for_settlement_run(
-                    request.session, str(parl_id), form.date.data
-                ):
-                    parl = PASParliamentarianCollection(request.app).by_id(
-                        parl_id
-                    )
-                    if parl:
-                        blocked_parls.append(parl.title)
-
-            if blocked_parls:
-                request.alert(
-                    _(
-                        'Cannot book attendance - abschluss already set for: '
-                        '${names}',
-                        mapping={'names': ', '.join(blocked_parls)},
-                    )
-                )
-                return {
-                    'layout': PASCommissionLayout(self, request),
-                    'title': _('New commission meeting'),
-                    'form': form,
-                    'form_width': 'large',
-                }
-
-        collection = AttendenceCollection(request.session)
-        for parliamentarian_id in parliamentarian_ids:
-            attendence = collection.add(
-                parliamentarian_id=parliamentarian_id,
-                **data
-            )
-            Change.add(request, 'add', attendence)
-        request.success(_('Added commission meeting'))
-
-        return request.redirect(request.link(self))
-
-    layout = PASCommissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_('New commission meeting'), '#'))
-
-    return {
-        'layout': layout,
-        'title': _('New commission meeting'),
-        'form': form,
-        'form_width': 'large'
     }
 
 
@@ -259,10 +110,6 @@ def commissions_parliamentarians_json(
     self: PASCommissionCollection, request: TownRequest
 ) -> JSON_ro:
     """Returns all commissions with their parliamentarians."""
-    # TODO: Should we consider all that have been active in
-    # current settlement run to be more precise?
-    # It might happen that some have been active just recently
-    # but not anymore, these will not be selectable currently.
     if not request.is_admin:
         if (not hasattr(request.identity, 'role')
             or request.identity.role not in (
@@ -270,7 +117,17 @@ def commissions_parliamentarians_json(
             return {}
 
     session = request.session
-    memberships = session.query(PASCommissionMembership).all()
+    today = date.today()
+    memberships = (
+        session.query(PASCommissionMembership)
+        .filter(
+            or_(
+                PASCommissionMembership.end.is_(None),
+                PASCommissionMembership.end >= today,
+            )
+        )
+        .all()
+    )
 
     # If user is parliamentarian, filter to only their commissions
     if (hasattr(request.identity, 'role')
@@ -334,6 +191,7 @@ def commissions_parliamentarians_json(
                 'title': m.parliamentarian.title
             }
             for m in group
+            if is_active_kantonsrat_member(m.parliamentarian)
         ]
         for commission_id, group in groupby(sorted_memberships, key=key_func)
     }

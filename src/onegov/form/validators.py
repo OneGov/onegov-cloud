@@ -11,8 +11,10 @@ from datetime import date
 from datetime import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
+from io import BytesIO
 from mimetypes import types_map
-
+from onegov.core.utils import binary_to_dictionary, dictionary_to_binary
+from onegov.file.attachments import resize_image
 from onegov.file.utils import get_supported_image_mime_types
 from onegov.form import _
 from onegov.form.errors import (
@@ -21,14 +23,15 @@ from onegov.form.errors import (
     EmptyFieldsetError,
     InvalidCommentIndentSyntax,
     InvalidCommentLocationSyntax,
-    RequiredFieldAddedError
+    RequiredFieldAddedError,
+    NestedFieldsetError
 )
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
 from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
-from wtforms import DateField, DateTimeLocalField, RadioField, TimeField, Field
+from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -133,6 +136,56 @@ class FileSizeLimit:
             raise ValidationError(message)
 
 
+class ImageSizeLimit(FileSizeLimit):
+    """ Like :class:`FileSizeLimit` but with a default suited for image
+    uploads, image-specific error messaging, and optional automatic resampling.
+
+    When *max_dimensions* is given, images whose longest side exceeds that
+    value are resampled (LANCZOS) before the byte-size check runs, so
+    over-sized images silently shrink rather than trigger a validation error —
+    unless the resampled image still exceeds *max_bytes*.
+
+    Expects an :class:`onegov.form.fields.UploadField` instance.
+
+    """
+
+    DEFAULT_MAX_BYTES = 20_000_000  # 20 MB
+
+    message = _(
+        'The image is too large, please provide an image smaller than {}.'
+    )
+
+    def __init__(
+        self,
+        max_bytes: int = DEFAULT_MAX_BYTES,
+        max_dimensions: int | None = None,
+    ):
+        super().__init__(max_bytes)
+        self.max_dimensions = max_dimensions
+
+    def __call__(self, form: Form, field: Field) -> None:
+        if (field.data
+                and self.max_dimensions is not None
+                and isinstance(field.data, dict)
+                and field.data.get('mimetype', '').startswith('image/')
+                and 'data' in field.data):
+            self._maybe_resize(field)
+        super().__call__(form, field)
+
+    def _maybe_resize(self, field: Field) -> None:
+        assert self.max_dimensions is not None
+        try:
+            binary = dictionary_to_binary(field.data)
+        except Exception:
+            return
+        buf = BytesIO(binary)
+        resized = resize_image(buf, self.max_dimensions)
+        if resized is buf:
+            return
+        filename = field.data.get('filename')
+        field.data = binary_to_dictionary(resized.read(), filename)
+
+
 MIME_TYPES_PDF = {
     'application/pdf',
 }
@@ -193,6 +246,7 @@ MIME_TYPES_AUDIO = {
     'audio/mpeg',
     'audio/wav',
     'audio/webm',  # weba
+    'application/octet-stream',  # fallback landsgemeinde
 }
 
 MIME_TYPES_VIDEO = {
@@ -290,6 +344,13 @@ class ValidFormDefinition:
     """ Makes sure the given text is a valid onegov.form definition. """
 
     message = _('The form could not be parsed.')
+    field_without_type = _(
+        "The field '{label}' has no type defined. "
+        "For example use '___' for a text field."
+    )
+    mixed_type = _(
+        "The field '{label}' cannot mix radio buttons and checkboxes."
+    )
     email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
     syntax = _('The syntax on line {line} is not valid.')
     indent = _('The indentation on line {line} is not valid. '
@@ -315,6 +376,9 @@ class ValidFormDefinition:
     empty_fieldset = _(
         "The '{label}' group is empty and will not be visible. Either remove "
         "the empty group or add fields to it.")
+    nested_fieldsets = _(
+        'Nested fieldsets (`#`) are not supported, please remove line {line}.'
+    )
 
     def __init__(
         self,
@@ -361,9 +425,19 @@ class ValidFormDefinition:
             raise ValidationError(
                 field.gettext(self.duplicate).format(label=exception.label)
             ) from exception
-        except (FieldCompileError, MixedTypeError) as exception:
+        except FieldCompileError as exception:
             raise ValidationError(
-                exception.field_name
+                field.gettext(self.field_without_type).format(
+                    label=exception.field_name)
+            ) from exception
+        except MixedTypeError as exception:
+            raise ValidationError(
+                field.gettext(self.mixed_type).format(
+                    label=exception.field_name)
+            ) from exception
+        except NestedFieldsetError as exception:
+            raise ValidationError(
+                field.gettext(self.nested_fieldsets).format(line=exception.line)
             ) from exception
         except AttributeError as exception:
             raise ValidationError(
@@ -517,8 +591,9 @@ class ValidSurveyDefinition(ValidFormDefinition):
         for field in parsed_form._fields.values():
             if isinstance(field, (UploadField, DateField, TimeField,
                                   DateTimeLocalField)):
-                error = field.gettext(self.invalid_field_type %
-                                      {'label': field.label.text})
+                message = self.invalid_field_type % {
+                    'label': field.label.text}
+                error = field.gettext(message)
                 errors = form['definition'].errors
                 if not isinstance(errors, list):
                     errors = form['definition'].process_errors

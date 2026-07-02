@@ -16,7 +16,7 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Query
 from sqlalchemy_utils import TranslationHybrid as BaseTranslationHybrid
 from zope.sqlalchemy import mark_changed
-from sqlalchemy.exc import InterfaceError, OperationalError
+from sqlalchemy.exc import InterfaceError, InternalError, OperationalError
 from uuid import UUID as PythonUUID
 
 from .types import JSON
@@ -30,8 +30,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.hybrid import hybrid_property
     from sqlalchemy.orm import Mapped
     from sqlalchemy_utils.i18n import _TranslatableColumn
-    from typing import Self, TypeGuard
-    from typing_extensions import TypeIs
+    from typing import Self, TypeGuard, TypeIs
 
 
 MISSING = object()
@@ -39,8 +38,10 @@ MISSING = object()
 DB_CONNECTION_ERRORS = (
     OperationalError,
     InterfaceError,
+    InternalError,
     psycopg.OperationalError,
     psycopg.InterfaceError,
+    psycopg.InternalError,
 )
 
 

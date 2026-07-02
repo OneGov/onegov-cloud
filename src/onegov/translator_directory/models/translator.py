@@ -9,7 +9,8 @@ from sqlalchemy.orm import backref, mapped_column, relationship, Mapped
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (ContentMixin, dict_property,
-                                    meta_property, content_property)
+                                    meta_property, content_property,
+                                    StripWhitespaceMixin)
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
@@ -45,8 +46,15 @@ type InterpretingType = Literal[
 ]
 
 
-class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
-                 CoordinatesMixin, ORMSearchable):
+class Translator(
+    Base,
+    StripWhitespaceMixin,
+    TimestampMixin,
+    AssociatedFiles,
+    ContentMixin,
+    CoordinatesMixin,
+    ORMSearchable,
+):
 
     __tablename__ = 'translators'
 
@@ -236,7 +244,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     @property
     def title(self) -> str:
-        """ Returns title with lastname in uppercase. """
+        """ Title with lastname in uppercase. """
         return f'{self.last_name.upper()}, {self.first_name}'
 
     @property
@@ -248,7 +256,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     @property
     def full_name(self) -> str:
-        """ Returns the full name with lastname in uppercase. """
+        """ The full name with lastname in uppercase. """
         return f'{self.first_name} {self.last_name.upper()}'
 
     @property

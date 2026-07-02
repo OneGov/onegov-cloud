@@ -22,6 +22,9 @@ from onegov.translator_directory import _
 from onegov.translator_directory.collections.certificate import (
     LanguageCertificateCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection,
+)
 from onegov.translator_directory.constants import ADMISSIONS
 from onegov.translator_directory.constants import GENDERS
 from onegov.translator_directory.constants import INTERPRETING_TYPES
@@ -66,8 +69,6 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                      'you want changed.')),
         ('bullet', _('Expertise by professional guild (other) can be listed '
                      'comma-separated.')),
-        ('bullet', _('If you would like to change the e-mail address, please '
-                     'note this in the message.'))
     ]
     locale: str = 'de_CH'
 
@@ -232,17 +233,17 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             return None
 
         result = [
-            as_file(self.declaration_of_authorization, 'Mutationsmeldung'),
-            as_file(self.letter_of_motivation, 'Mutationsmeldung'),
-            as_file(self.resume, 'Mutationsmeldung'),
-            as_file(self.uploaded_certificates, 'Mutationsmeldung'),
-            as_file(self.social_security_card, 'Mutationsmeldung'),
-            as_file(self.passport, 'Mutationsmeldung'),
-            as_file(self.passport_photo, 'Mutationsmeldung'),
-            as_file(self.debt_collection_register_extract, 'Mutationsmeldung'),
-            as_file(self.criminal_register_extract, 'Mutationsmeldung'),
-            as_file(self.certificate_of_capability, 'Mutationsmeldung'),
-            as_file(self.confirmation_compensation_office, 'Mutationsmeldung'),
+            as_file(self.declaration_of_authorization, 'Antrag'),
+            as_file(self.letter_of_motivation, 'Antrag'),
+            as_file(self.resume, 'Antrag'),
+            as_file(self.uploaded_certificates, 'Diplome und Zertifikate'),
+            as_file(self.social_security_card, 'Antrag'),
+            as_file(self.passport, 'Antrag'),
+            as_file(self.passport_photo, 'Antrag'),
+            as_file(self.debt_collection_register_extract, 'Abklärungen'),
+            as_file(self.criminal_register_extract, 'Abklärungen'),
+            as_file(self.certificate_of_capability, 'Abklärungen'),
+            as_file(self.confirmation_compensation_office, 'Abklärungen'),
         ]
         return [r for r in result if r is not None]
 
@@ -669,4 +670,9 @@ class ApplyMutationForm(Form):
         self.changes.data = list(self.model.changes.keys())
 
     def update_model(self) -> None:
-        self.model.apply(self.changes.data or ())
+        items = self.changes.data or ()
+        if 'email' in items and self.model.target is not None:
+            new_email = self.model.changes.get('email')
+            translators = TranslatorCollection(self.request.app)
+            translators.update_user(self.model.target, new_email)
+        self.model.apply(items)

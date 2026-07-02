@@ -33,7 +33,7 @@
                     <span>
                         <button type="button" data-toggle="owners" class="${has_owner_filter and 'primary radius button small' or 'secondary radius button small'} selected-owner">
                             <span i18n:translate class="show-for-sr">Owner:</span>
-                            <span>${owner.text}</span>
+                            <span>${owner}</span>
                         </button>
                         <div id="owners" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
                             <ul class="f-dropdown disable-scroll">

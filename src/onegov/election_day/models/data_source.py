@@ -137,7 +137,7 @@ class DataSourceItem(Base, TimestampMixin):
 
     @property
     def item(self) -> Election | Vote | None:
-        """ Returns the vote or election. """
+        """ The vote or election. """
         if self.source.type == 'vote':
             return self.vote
         else:

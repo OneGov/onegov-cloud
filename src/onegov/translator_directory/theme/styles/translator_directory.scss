@@ -125,6 +125,19 @@ table.translator-documents {
     tr > th:first-of-type {
         font-size: 1.2rem;
     }
+
+    td {
+        vertical-align: middle;
+    }
+
+    .move-category-form {
+        // override the global `form { margin-bottom: 4rem !important }`
+        margin: 0 !important;
+    }
+
+    .move-category-select {
+        margin: 0;
+    }
 }
 
 #fieldset-proposed-changes .long-field-help {

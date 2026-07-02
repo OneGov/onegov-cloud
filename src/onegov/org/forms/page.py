@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import TagsField
 from onegov.form.fields import URLField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -59,10 +60,20 @@ class PageForm(PageBaseForm):
     text = HtmlField(
         label=_('Text'))
 
+    keywords = TagsField(
+        label=_('Keywords'),
+        description=_(
+            'Additional search terms and synonyms for this page. '
+            'Helps visitors find this page even if they use different words.'
+        )
+    )
+
     lead_when_child = BooleanField(
         label=_('Show the lead if accessing the parent page'),
-        description=_('(Redesign only)')
     )
+
+    def on_request(self) -> None:
+        self.request.include('tags-input')
 
 
 class IframeForm(PageBaseForm):
@@ -113,6 +124,9 @@ class IframeForm(PageBaseForm):
                 'child_src', set()):
             self.allowed_domains.append(domain) if domain != "'self'" else None
         if self.allowed_domains:
+            # keep displayed domain order stable
+            self.allowed_domains.sort()
+
             self.domain_hint.text = (
                 self.request.translate(
                     _('The following domains are allowed for iFrames:')

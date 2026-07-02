@@ -11,7 +11,6 @@ from onegov.org.models import (
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
-from onegov.town6.request import TownRequest
 
 
 from typing import TYPE_CHECKING
@@ -22,7 +21,7 @@ if TYPE_CHECKING:
 
 @TownApp.html(
     model=Organisation,
-    name='ris-settings',
+    name='ris-overview',
     template='ris_settings.pt',
     permission=Private
 )

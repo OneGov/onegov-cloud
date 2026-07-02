@@ -145,6 +145,10 @@ def test_views_general(client: Client[AgencyApp]) -> None:
 
     # ... sort agencies
     sort = client.get('/organizations').click('Sortieren')
+    # verify no edit mode menu, but back button at the bottom
+    assert 'Speichern' not in sort
+    assert 'Abbrechen' not in sort
+    assert 'Zurück zur Seite' in sort
     url = sort.pyquery('ul[data-sortable]').attr('data-sortable-url')
 
     url = url.replace('%7Bsubject_id%7D', '2')
@@ -688,13 +692,13 @@ def test_disable_report_changes(client: Client[AgencyApp]) -> None:
     assert "Mutation melden" in page
     person_url = page.request.url
 
-    page = client.get('/settings').click("Organisationen", index=1)
+    page = client.get('/settings').click("Organisationen", index=2)
     page.form['report_changes'] = False
     page.form.submit()
 
     assert "Mutation melden" not in client.get(person_url)
 
-    page = client.get('/settings').click("Organisationen", index=1)
+    page = client.get('/settings').click("Organisationen", index=2)
     page.form['report_changes'] = True
     page.form.submit()
 
@@ -749,7 +753,7 @@ def test_basic_search(client_with_fts: Client[AgencyApp]) -> None:
     assert anom.get('/search/suggest?q=test').json == []
 
     # Add data
-    page = client.get('/settings').click("Organisationen", index=1)
+    page = client.get('/settings').click("Organisationen", index=2)
     page.form['agency_phone_internal_digits'] = 4
     page.form.submit()
 

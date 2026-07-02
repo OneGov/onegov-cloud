@@ -13,7 +13,7 @@ from onegov.core.orm.mixins import (
 )
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
-from sqlalchemy import Enum, ForeignKey
+from sqlalchemy import Enum, ForeignKey, Index
 from sqlalchemy import exists, and_
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
@@ -99,7 +99,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     location: Mapped[str | None]
 
     #: The municipality in which the activity is held, from the location
-    municipality: Mapped[str | None]
+    municipality: Mapped[str | None] = mapped_column()
 
     #: Access the user linked to this activity
     user: Mapped[User] = relationship()
@@ -131,6 +131,13 @@ class Activity(Base, ContentMixin, TimestampMixin):
         'polymorphic_on': 'type',
         'polymorphic_identity': 'generic',
     }
+    __table_args__ = (
+        Index('ix_activities_tags', _tags, postgresql_using='gist'),
+        Index('ix_activities_username', username),
+        Index('ix_activities_municipality', municipality),
+        Index('ix_activities_state', state),
+        Index('ix_activities_type', type),
+    )
 
     @observes('title')
     def title_observer(self, title: str) -> None:
@@ -164,8 +171,8 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     @property
     def active_occasions(self) -> list[Occasion]:
-        """ Returns the list of active occasions for this activity. An occasion
-        is active if its period is the currently active period.
+        """ Active occasions for this activity. An occasion is active if its
+        period is the currently active period.
         """
         session = object_session(self)
         assert session is not None

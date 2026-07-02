@@ -181,7 +181,8 @@ def increment_name(name: str) -> str:
     For example::
 
         foo => foo-1
-        foo-1 => foo-2
+        foo-2 => foo-3
+        foo-99 => foo-100
 
     """
 
@@ -215,11 +216,12 @@ def profile(filename: str) -> Iterator[None]:
     profiler = Profile()
     profiler.enable()
 
-    yield
-
-    profiler.disable()
-    profiler.create_stats()
-    profiler.dump_stats('profiles/{}'.format(filename))
+    try:
+        yield
+    finally:
+        profiler.disable()
+        profiler.create_stats()
+        profiler.dump_stats(f'profiles/{filename}')
 
 
 @contextmanager
@@ -230,14 +232,14 @@ def timing(name: str | None = None) -> Iterator[None]:
     """
     start = perf_counter()
 
-    yield
-
-    duration_ms = 1000.0 * (perf_counter() - start)
-
-    if name:
-        print(f'{name}: {duration_ms:.0f} ms')  # noqa: T201
-    else:
-        print(f'{duration_ms:.0f} ms')  # noqa: T201
+    try:
+        yield
+    finally:
+        duration_ms = 1000.0 * (perf_counter() - start)
+        if name:
+            print(f'{name}: {duration_ms:.0f} ms')  # noqa: T201
+        else:
+            print(f'{duration_ms:.0f} ms')  # noqa: T201
 
 
 @lru_cache(maxsize=32)

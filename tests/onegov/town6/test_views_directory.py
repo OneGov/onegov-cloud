@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 import pytest
 import re
+from unittest.mock import patch, PropertyMock
+from onegov.org.request import OrgRequest
 
 from typing import TYPE_CHECKING
 
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 def test_directory_prev_next(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -64,7 +66,7 @@ def test_directory_prev_next(client: Client) -> None:
 def test_newline_in_directory_header(client: Client) -> None:
     client.login_admin()
     page = client.get('/directories')
-    page = page.click('Verzeichnis')
+    page = page.click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['lead'] = 'this is a multiline\nlead'
     page.form['structure'] = """
@@ -85,7 +87,7 @@ def test_newline_in_directory_header(client: Client) -> None:
 def test_change_directory_url(client: Client) -> None:
     client.login_admin()
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -101,7 +103,7 @@ def test_change_directory_url(client: Client) -> None:
     assert sr.request.url.endswith('/sr')
 
     # now attempt to change url to a directory url which already exists
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Clubs"
     page.form['structure'] = """
         Name *= ___
@@ -122,7 +124,7 @@ def test_directory_entry_subscription(client: Client) -> None:
 
     assert len(os.listdir(client.app.maildir)) == 0
 
-    page = client.get('/directories').click('Verzeichnis')
+    page = client.get('/directories').click('^Verzeichnis$')
     page.form['title'] = "Trainers"
     page.form['structure'] = """
         Name *= ___
@@ -221,7 +223,7 @@ def test_create_directory_accordion_layout(
         title: str,
         hide_labels: str
     ) -> ExtendedResponse:
-        page = (client.get('/directories').click('Verzeichnis'))
+        page = (client.get('/directories').click('^Verzeichnis$'))
         page.form['title'] = title + f' {index}'
         page.form['structure'] = "Question *= ___\nAnswer *= ___"
         page.form['title_format'] = '[Question]'
@@ -280,3 +282,39 @@ def test_create_directory_accordion_layout(
     page = client.get(
         f'/directories/questions-and-answers-about-smurfs-{index.lower()}')
     test_labels()
+
+
+def test_directory_entry_hash_shown_without_change_requests(
+    client: Client
+) -> None:
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Clubs'
+    page.form['structure'] = 'Name *= ___'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_change_requests'] = False
+    page = page.form.submit().follow()
+
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Chess Club'
+    page = page.form.submit().follow()
+
+    entry_url = '/directories/clubs/chess-club'
+
+    # admin sees the hash panel
+    page = client.get(entry_url)
+    assert page.pyquery('.directory-entry-hash')
+
+    # anonymous user does not see the hash (manager-only)
+    anon = client.spawn()
+    page = anon.get(entry_url)
+    assert not page.pyquery('.directory-entry-hash')
+
+    # mTAN-authenticated user sees the hash
+    with patch.object(
+        OrgRequest, 'active_mtan_session', new_callable=PropertyMock,
+        return_value=True
+    ):
+        page = anon.get(entry_url)
+        assert page.pyquery('.directory-entry-hash')

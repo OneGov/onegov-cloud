@@ -66,6 +66,18 @@ def test_auth_login(session: Session) -> None:
     assert identity.application_id == 'my-app'
 
 
+def test_by_identity(session: Session) -> None:
+    user = UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
+    session.flush()
+    auth = Auth(DummyApp(session))  # type: ignore[arg-type]
+
+    identity = auth.as_identity(user)
+    assert auth.by_identity(identity) == user
+
+    assert auth.by_identity(Bunch(uid=None, userid=None)) is None  # type: ignore[arg-type]
+    assert auth.by_identity(Bunch(userid=None)) is None  # type: ignore[arg-type]
+
+
 def test_auth_login_inactive(session: Session) -> None:
     user = UserCollection(session).add(
         'AzureDiamond', 'hunter2', 'irc-user', active=False)
@@ -96,7 +108,7 @@ def test_auth_login_yubikey(session: Session) -> None:
 
     app = DummyApp(session)
     app.yubikey_client_id = 'abc'  # type: ignore[attr-defined]
-    app.yubikey_secret_key = 'dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='  # type: ignore[attr-defined]
+    app.yubikey_secret_key = 'dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='  # type: ignore[attr-defined]  # gitleaks:allow
 
     auth = Auth(app)  # type: ignore[arg-type]
 

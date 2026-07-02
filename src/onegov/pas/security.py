@@ -5,7 +5,8 @@ from onegov.core.security.roles import get_roles_setting as \
     get_roles_setting_base
 from onegov.pas import PasApp
 from onegov.pas.collections import (
-    AttendenceCollection
+    AttendenceCollection,
+    PASCommissionCollection,
 )
 from onegov.org.models import GeneralFile, GeneralFileCollection
 
@@ -22,7 +23,6 @@ if TYPE_CHECKING:
     from typing import Any
     from onegov.core.security.roles import Intent
     from morepath import Identity
-    from onegov.pas.models.parliamentarian import PASParliamentarian
 
 
 """
@@ -238,6 +238,19 @@ def restrict_general_file_access(
     return permission in getattr(app.settings.roles, identity.role)
 
 
+@PasApp.permission_rule(model=PASCommissionCollection, permission=object)
+def restrict_commission_collection_access(
+    app: PasApp,
+    identity: Identity,
+    model: PASCommissionCollection,
+    permission: type[Intent],
+) -> bool:
+    if identity.role in ('parliamentarian', 'commission_president'):
+        if isinstance(permission, type) and issubclass(permission, Private):
+            return True
+    return permission in getattr(app.settings.roles, identity.role)
+
+
 @PasApp.permission_rule(model=Commission, permission=Private)
 def has_private_access_to_commission(
     app: PasApp,
@@ -252,14 +265,11 @@ def has_private_access_to_commission(
     - president of THIS specific commission
     If yes → grants access
     """
-    if identity.role == 'commission_president':
+    if identity.role in ('parliamentarian', 'commission_president'):
         user = app.session().query(User).filter_by(
             username=identity.userid).first()
-        if user:
-            if user.parliamentarian:  # type: ignore[attr-defined]
-                membershps = user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
-                for membership in membershps:
-                    if membership.commission_id == model.id and \
-                            membership.role == 'president':
-                        return True
+        if user and user.parliamentarian:  # type: ignore[attr-defined]
+            for m in user.parliamentarian.commission_memberships:  # type: ignore[attr-defined]
+                if m.commission_id == model.id:
+                    return True
     return permission in getattr(app.settings.roles, identity.role)

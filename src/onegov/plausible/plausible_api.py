@@ -1,9 +1,10 @@
 from __future__ import annotations
-import logging
-from typing import Any
 
-import requests
-from requests import HTTPError
+import logging
+import niquests
+
+
+from typing import Any
 
 log = logging.getLogger('onegov.plausible')
 
@@ -37,10 +38,10 @@ class PlausibleAPI:
             return {'results': []}
 
         try:
-            response = requests.post(
+            response = niquests.post(
                 self.url, headers=self.headers, json=payload, timeout=10)
             response.raise_for_status()
-        except HTTPError:
+        except niquests.HTTPError:
             if response.status_code == 401:
                 log.exception(
                     'Unauthorized: Invalid API key or insufficient permissions'

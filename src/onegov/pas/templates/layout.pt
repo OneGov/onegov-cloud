@@ -140,18 +140,16 @@
 
                         <div class="grid-container navigation">
                             <div class="grid-x">
-                                <div class="large-2 small-2 cell">
-                                    <button class="menu-button" tal:condition="layout.root_pages" data-toggle="offCanvas">
-                                        <i class="fas fa-bars"></i>
-                                    </button>
-                                </div>
-                                <div class="large-2 small-2 cell middle">
-                                </div>
-                                <div class="large-8 small-8 cell right-side">
+                                <div class="large-10 small-10 cell">
                                     <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
                                         <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
                                         <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
                                     </a>
+                                </div>
+                                <div class="large-2 small-2 cell right-side">
+                                    <button class="menu-button" tal:condition="layout.root_pages" data-toggle="offCanvas">
+                                        <i class="fas fa-bars"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>

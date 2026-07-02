@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.parliament import _
 from sqlalchemy import Enum
@@ -39,6 +40,7 @@ type ParliamentaryGroupRole = Literal[
     'none',
     'member',
     'vote_counter',
+    'vice_president',
     'president',
 ]
 
@@ -59,7 +61,7 @@ PARTY_ROLES: dict[PartyRole, str] = {
     'president': _('President'),
 }
 
-PARLIAMENTARY_GROUP_ROLES: dict[PartyRole, str] = {
+PARLIAMENTARY_GROUP_ROLES: dict[ParliamentaryGroupRole, str] = {
     'none': _('none'),
     'member': _('Member'),
     'vote_counter': _('Vote counter'),
@@ -68,7 +70,7 @@ PARLIAMENTARY_GROUP_ROLES: dict[PartyRole, str] = {
 }
 
 
-class ParliamentarianRole(Base, TimestampMixin):
+class ParliamentarianRole(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'par_parliamentarian_roles'
 

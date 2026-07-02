@@ -38,10 +38,17 @@ a > h6 {
 .api-keys,
 .vat-settings,
 .gever-credentials,
+.kaba-settings,
+.firebase,
+.module-activation-settings,
+.access-settings,
+.resource-settings,
+.people-settings,
 .grid-x.field-geo_provider,
 .grid-x.field-about_url,
 .grid-x.field-hide_onegov_footer,
-#fieldset-footer-division {
+#fieldset-footer-division,
+.settings-category h2 {
     display: none;
 }
 
@@ -2294,7 +2301,7 @@ $booking-left-margin: 1.6rem;
         border-color: $gray-dark;
 
         > div:first-child::before {
-            @include icon('\f05d');
+            @include icon('\f058');
             color: $gray-dark;
         }
     }

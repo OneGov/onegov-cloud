@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from babel import Locale
-from requests.exceptions import JSONDecodeError
+from niquests.exceptions import JSONDecodeError
 
 from onegov.user import UserGroup, UserGroupCollection
 from onegov.translator_directory.constants import ASSIGNMENT_LOCATIONS
@@ -14,7 +14,7 @@ from onegov.translator_directory import _
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    import requests
+    import niquests
     from wtforms.fields.choices import _Choice
     from collections.abc import Collection
     from onegov.gis.models.coordinates import AnyCoordinates, RealCoordinates
@@ -27,7 +27,7 @@ def to_tuple(coordinate: RealCoordinates) -> tuple[float, float]:
     return coordinate.lat, coordinate.lon
 
 
-def found_route(response: requests.Response) -> bool:
+def found_route(response: niquests.Response) -> bool:
     try:
         found = response.status_code == 200 and response.json()['code'] == 'Ok'
         if not found:
@@ -66,7 +66,7 @@ def out_of_tolerance(
 
 
 def validate_geocode_result(
-    response: requests.Response,
+    response: niquests.Response,
     zip_code: str | int | None,
     zoom: int | None = None,
     bbox: Collection[RealCoordinates] | None = None
@@ -94,7 +94,7 @@ def validate_geocode_result(
     return None
 
 
-def parse_directions_result(response: requests.Response) -> float:
+def parse_directions_result(response: niquests.Response) -> float:
     assert response.status_code == 200
     data = response.json()
     km = round(data['routes'][0]['distance'] / 1000, 1)
@@ -318,7 +318,9 @@ def get_custom_text(request: OrgRequest, key: str) -> str:
         return _('Error: No custom texts found')
 
     return custom_texts.get(
-        key, _(f"Error: No custom text found for '{key}'"))
+        key,
+        _("Error: No custom text found for '${key}'", mapping={'key': key})
+    )
 
 
 def get_accountant_emails_for_finanzstelle(

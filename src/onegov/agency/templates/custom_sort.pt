@@ -18,6 +18,7 @@
                         </ul>
                     </dd>
                 </dl>
+                <a href="${request.link(agency)}" class="button" i18n:translate="">Back to page</a>
             </div>
         </div>
     </tal:block>

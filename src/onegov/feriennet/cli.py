@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import click
+import transaction
 
-from onegov.core.cli import command_group
+from onegov.activity import Activity
 from onegov.activity.models import BookingPeriod
 from onegov.activity.models import Occasion
+from onegov.activity.models import Volunteer
+from onegov.core.cli import command_group
 from sqlalchemy import text
 
 
@@ -172,3 +175,76 @@ def compute_occasion_durations(
             o.duration = o.compute_duration(o.dates)
 
     return compute_occasion_durations
+
+
+@cli.command(name='delete-activity', context_settings={'singular': True})
+@click.argument('name')
+def delete_activity(
+    name: str
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
+    """ Deletes activities with name (not Title).
+
+    Example::
+
+        onegov-feriennet --select /foo/bar activity "mandala-malen"
+
+    """
+
+    def delete_activity(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+
+        activity = request.session.query(
+            Activity).filter_by(name=name).first()
+
+        if not activity:
+            raise click.ClickException(f'Could not find activity «{name}»')
+
+        request.session.delete(activity)
+
+    return delete_activity
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
+    """ Strips leading/trailing whitespace from first_name and last_name
+    of all volunteers.
+
+    Example:
+
+        `onegov-feriennet --select /onegov_feriennet/*
+        strip-whitespace-from-names`
+
+    """
+
+    def _strip(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+        session = app.session()
+        count = 0
+        for volunteer in session.query(Volunteer):
+            first_name = volunteer.first_name.strip()
+            last_name = volunteer.last_name.strip()
+            if (first_name, last_name) != (
+                volunteer.first_name,
+                volunteer.last_name,
+            ):
+                volunteer.first_name = first_name
+                volunteer.last_name = last_name
+                count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} volunteer(s)',
+            fg='green'
+        )
+
+    return _strip

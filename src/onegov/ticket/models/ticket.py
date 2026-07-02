@@ -275,7 +275,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     @property
     def handler(self) -> Handler:
-        """ Returns an instance of the handler associated with this ticket. """
+        """ An instance of the handler associated with this ticket. """
 
         return handlers.get(self.handler_code)(
             self, self.handler_id, self.handler_data)

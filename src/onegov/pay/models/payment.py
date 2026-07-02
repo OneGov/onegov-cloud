@@ -8,6 +8,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.pay.types import PaymentState
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy import Numeric
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
@@ -80,6 +81,11 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
         'polymorphic_identity': 'generic'
     }
 
+    __table_args__ = (
+        Index('ix_payments_source', source),
+        Index('ix_payments_state', state),
+    )
+
     if TYPE_CHECKING:
         linked_invoice_items: Mapped[list[InvoiceItem]]
 
@@ -109,13 +115,13 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
 
     @property
     def remote_url(self) -> str:
-        """ Returns the url of this object on the payment provider. """
+        """ The URL of this object on the payment provider. """
         raise NotImplementedError
 
     @property
     def remote_references(self) -> list[str]:
-        """ Returns any additional payment provider specific reference numbers
-        other than `remote_id`.
+        """ Any additional payment provider specific reference numbers other
+        than `remote_id`.
 
         """
         return []

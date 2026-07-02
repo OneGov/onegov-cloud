@@ -53,7 +53,6 @@ class Assembly(
 
     __tablename__ = 'landsgemeinde_assemblies'
 
-    fts_public = True
     fts_title_property = None
     fts_properties = {
         'overview': {'type': 'localized', 'weight': 'A'},
@@ -63,6 +62,10 @@ class Assembly(
     def fts_type_title(cls, request: LandsgemeindeRequest) -> str:  # type: ignore[override]
         from onegov.landsgemeinde.layouts import DefaultLayout
         return DefaultLayout(None, request).assembly_type_plural
+
+    @property
+    def fts_public(self) -> bool:
+        return self.state != 'draft'
 
     @property
     def fts_last_change(self) -> datetime:
@@ -156,13 +159,27 @@ class Assembly(
             if file.name not in existing_files:
                 self.files.append(file)
 
-    @observes('files', 'date')
-    def update_assembly_date(self, files: list[File], date: date_t) -> None:
-        if not files or date is None:
+    @observes('files', 'state', 'date')
+    def update_linked_files_meta(
+        self,
+        files: list[File],
+        state: AssemblyState,
+        date: date_t
+    ) -> None:
+        if not files:
             # nothing to do
             return
 
+        public = self.fts_public
+
         for file in files:
-            if file.meta.get('assembly_date') != date:
+            if file.meta is None:
+                file.meta = {}  # type: ignore[unreachable]
+
+            if date is not None and file.meta.get('assembly_date') != date:
                 file.meta['assembly_date'] = date
+                flag_modified(file, 'meta')
+
+            if file.meta.get('fts_public') is not public:
+                file.meta['fts_public'] = public
                 flag_modified(file, 'meta')

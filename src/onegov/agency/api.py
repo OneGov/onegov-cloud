@@ -230,7 +230,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
             self.session,
             page=self.page or 0,
             parent=self.get_filter('parent', None, False),
-            joinedload=['organigram'],
+            joinedload=['organigram', 'parent'],
             undefer=['content']
         )
 

@@ -19,7 +19,8 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='parties-panachage-data',
-    permission=MaybePublic
+    permission=MaybePublic,
+    open_data=True
 )
 def view_election_compound_parties_panachage_data(
     self: ElectionCompound,

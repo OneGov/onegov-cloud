@@ -58,8 +58,9 @@ def test_layout() -> None:
     # basic tests that can be done by mocking
 
     layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
-    layout.request.app = 'test'  # type: ignore[assignment]
-    assert layout.app == 'test'  # type: ignore[comparison-overlap]
+    if not TYPE_CHECKING:
+        layout.request.app = 'test'
+        assert layout.app == 'test'
 
     layout = DefaultLayout(MockModel(), MockRequest())  # type: ignore[arg-type]
     layout.request.path_info = '/'
@@ -183,6 +184,7 @@ def test_template_layout(postgres_dsn: str, redis_url: str) -> None:
         org.open_files_target_blank = True
         org.header_options = header_options
         org.analytics_code = None
+        org.og_description = None
         org.citizen_login_enabled = False
 
         # disable LibresIntegration for this test

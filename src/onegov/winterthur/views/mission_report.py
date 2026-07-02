@@ -27,8 +27,6 @@ from wtforms.validators import NumberRange
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from webob import Response
-
     from onegov.core.types import JSON_ro, RenderData
     from onegov.winterthur.request import WinterthurRequest
 
@@ -177,7 +175,8 @@ def view_mission(
 @WinterthurApp.json(
     model=MissionReportCollection,
     name='json',
-    permission=Public
+    permission=Public,
+    open_data=True
 )
 def view_mission_reports_as_json(
     self: MissionReportCollection,

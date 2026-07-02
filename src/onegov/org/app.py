@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 
-import requests
+import niquests
 import yaml
 
 import morepath
@@ -13,6 +13,7 @@ from functools import wraps
 from more.content_security import SELF
 from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
+from onegov.api import ApiApp
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
@@ -41,8 +42,8 @@ from types import MethodType
 from webob import Response
 from webob.exc import WSGIHTTPException
 
-from typing import Any, Literal, TYPE_CHECKING
 
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from collections.abc import (
@@ -57,8 +58,8 @@ if TYPE_CHECKING:
     from reg.dispatch import _KeyLookup
 
 
-class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
+class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
+             PayApp, FormApp, UserApp, WebsocketsApp, ApiApp):
 
     serve_static_files = True
     request_class = OrgRequest
@@ -69,7 +70,6 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
     userlinks = directive(directives.UserlinkAction)
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
     event_search_widget = directive(directives.EventSearchWidgetAction)
-    settings_view = directive(directives.SettingsView)
     boardlet = directive(directives.Boardlet)
 
     #: cronjob settings
@@ -413,12 +413,12 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
             return yaml.safe_load(f).get('event_form_lead', None)
 
     def load_formcode_specification(self) -> str:
-        response = requests.get(
+        response = niquests.get(
             'https://raw.githubusercontent.com/seantis/docs-admin-digital'
             '/refs/heads/main/content/module/formulare/index.md',
             timeout=(5, 10)
         )
-        if not response.ok:
+        if not response.ok or not response.text:
             # Fallback to our docstring
             import onegov.form.parser.core as parser
             return parser.__doc__
@@ -426,12 +426,12 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         specification = response.text
 
         # try to extend specification with examples
-        response = requests.get(
+        response = niquests.get(
             'https://raw.githubusercontent.com/seantis/docs-admin-digital'
             '/refs/heads/main/content/module/formulare/beispiele.md',
             timeout=(5, 10)
         )
-        if not response.ok:
+        if not response.ok or not response.text:
             return specification
         return f'{specification}\n\n{response.text}'
 

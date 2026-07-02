@@ -23,7 +23,6 @@ from unittest.mock import Mock
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pathlib import Path
     from sqlalchemy.orm import Session
 
 
@@ -265,23 +264,27 @@ def test_pdf_preview_creation_with_erroneous_pdf(
     assert thumb.read() == thumbnail_medium_pdf_preview_fallback.read()
 
 
-def test_max_image_size(session: Session) -> None:
-    session.add(File(name='unchanged.png', reference=create_image(2048, 2048)))
-    session.add(File(name='limited.png', reference=create_image(2049, 2048)))
+def test_image_size_stored_for_base_file(session: Session) -> None:
+    # Plain File objects no longer resize — resizing lives in
+    # BaseImageFileCollection.add(). The processor only strips EXIF and
+    # records dimensions.
+    session.add(
+        File(name='large.png', reference=create_image(2049, 2048)))
+    session.add(
+        File(name='small.png', reference=create_image(2048, 2048)))
 
     transaction.commit()
 
-    limited, unchanged = session.query(File).order_by(File.name).all()
+    large, small = session.query(File).order_by(File.name).all()
 
-    assert Image.open(limited.reference.file).size == (2048, 2047)
-    assert Image.open(unchanged.reference.file).size == (2048, 2048)
+    assert Image.open(large.reference.file).size == (2049, 2048)
+    assert Image.open(small.reference.file).size == (2048, 2048)
 
-    assert unchanged.reference.size == ['2048px', '2048px']
-    assert limited.reference.size == ['2048px', '2047px']
+    assert large.reference.size == ['2049px', '2048px']
+    assert small.reference.size == ['2048px', '2048px']
 
-    assert unchanged.reference.thumbnail_small['size'] == ['512px', '512px']
-    assert limited.reference.thumbnail_small['size'][0] in ['512px', '511px']
-    assert limited.reference.thumbnail_small['size'][1] in ['512px', '511px']
+    assert large.reference.thumbnail_small['size'][0] in ['512px', '511px']
+    assert small.reference.thumbnail_small['size'] == ['512px', '512px']
 
 
 def test_checksum(session: Session) -> None:
@@ -336,7 +339,7 @@ def test_determine_unknown_svg_size(
 
     # use the default max size as the size if we can't determine one
     logo = session.query(File).order_by(File.name).one()
-    assert logo.reference.size == ['2048px', '2048px']
+    assert logo.reference.size == ['4096px', '4096px']
 
 
 def test_associated_files(session: Session) -> None:

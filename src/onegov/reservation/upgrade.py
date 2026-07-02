@@ -10,7 +10,7 @@ from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
-from sqlalchemy import text, Column, Enum, Text
+from sqlalchemy import text, Column, Enum, ForeignKey, Text, UUID
 
 
 from typing import TYPE_CHECKING
@@ -216,3 +216,185 @@ def make_allocation_and_reservation_type_not_nullable(
              WHERE type IS NULL;
         """))
         context.operations.alter_column('reservations', 'type', nullable=False)
+
+
+@upgrade_task('Add resource parent_id column')
+def add_resource_parent_id_column(context: UpgradeContext) -> None:
+    if (
+        context.has_table('resources')
+        and not context.has_column('resources', 'parent_id')
+    ):
+        context.operations.add_column(
+            'resources',
+            Column(
+                'parent_id',
+                UUID(as_uuid=True),
+                ForeignKey('resources.id', ondelete='SET NULL'),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task('Add additional indeces to reserved_slots')
+def add_reserved_slots_indeces(context: UpgradeContext) -> None:
+    context.operations.create_index(
+        'ix_reserved_slots_source_type',
+        'reserved_slots',
+        columns=['source_type'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'start_end_tsrange_ix',
+        'reserved_slots',
+        columns=[text('tsrange(start, "end")')],
+        postgresql_using='gist',
+        if_not_exists=True
+    )
+
+
+@upgrade_task('Add additional indexes to libres tables')
+def add_additional_indexes_to_libres_tables(context: UpgradeContext) -> None:
+    context.operations.create_index(
+        'ix_reserved_slots_end',
+        'reserved_slots',
+        columns=['end'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reserved_slots_allocation_id',
+        'reserved_slots',
+        columns=['allocation_id'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_token',
+        'reservations',
+        columns=['token'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_target',
+        'reservations',
+        columns=['target'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_target_type',
+        'reservations',
+        columns=['target_type'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_type',
+        'reservations',
+        columns=['type'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_resource',
+        'reservations',
+        columns=['resource'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_start',
+        'reservations',
+        columns=['start'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_end',
+        'reservations',
+        columns=['end'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_status',
+        'reservations',
+        columns=['status'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_email',
+        'reservations',
+        columns=['email'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservations_session_id',
+        'reservations',
+        columns=['session_id'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservation_blockers_token',
+        'reservation_blockers',
+        columns=['token'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservation_blockers_target',
+        'reservation_blockers',
+        columns=['target'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservation_blockers_target_type',
+        'reservation_blockers',
+        columns=['target_type'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservation_blockers_resource',
+        'reservation_blockers',
+        columns=['resource'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservation_blockers_start',
+        'reservation_blockers',
+        columns=['start'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_reservation_blockers_end',
+        'reservation_blockers',
+        columns=['end'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_allocations_resource',
+        'allocations',
+        columns=['resource'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_allocations_type',
+        'allocations',
+        columns=['type'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_allocations_mirror_of',
+        'allocations',
+        columns=['mirror_of'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_allocations_group',
+        'allocations',
+        columns=['group'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_allocations_start',
+        'allocations',
+        columns=['_start'],
+        if_not_exists=True
+    )
+    context.operations.create_index(
+        'ix_allocations_end',
+        'allocations',
+        columns=['_end'],
+        if_not_exists=True
+    )

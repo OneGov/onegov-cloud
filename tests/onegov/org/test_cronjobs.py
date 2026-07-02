@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 import logging
+import niquests
 import os
 import pytest
-import requests
 import transaction
 
 from datetime import datetime, timedelta, timezone
@@ -18,6 +18,7 @@ from onegov.directory import (DirectoryEntryCollection,
 from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import EventCollection, OccurrenceCollection, Event
 from onegov.event.utils import as_rdates
+from onegov.file.models import SigningRequest
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import (
     ResourceRecipientCollection, News, PushNotification)
@@ -543,6 +544,7 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
         medium='email',
         address='gym@example.org',
         daily_reservations=True,
+        daily_reservations_times=['06:00'],
         send_on=['FR'],
         resources=[
             gymnasium.id.hex
@@ -553,6 +555,7 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
         medium='email',
         address='day@example.org',
         daily_reservations=True,
+        daily_reservations_times=['06:00'],
         send_on=['FR'],
         resources=[
             dailypass.id.hex
@@ -563,6 +566,7 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
         medium='email',
         address='both@example.org',
         daily_reservations=True,
+        daily_reservations_times=['06:00'],
         send_on=['SA'],
         resources=[
             dailypass.id.hex,
@@ -577,22 +581,25 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
     job.app = client.app
 
     url = get_cronjob_url(job)
-    tz = ensure_timezone('Europe/Zurich')
+    # Naive UTC (avoids pytz LMT bug); tick=True prevents email filename
+    # collisions. January Zurich = CET (UTC+1), so 06:00 CET = 05:00 UTC.
+    fri_0600 = datetime(2017, 1, 6, 5, 0)   # Friday 06:00 Zurich
+    sat_0600 = datetime(2017, 1, 7, 5, 0)   # Saturday 06:00 Zurich
 
     # do not send an e-mail outside the selected days
     for day in [2, 3, 4, 5, 8]:
-        with freeze_time(datetime(2017, 1, day, tzinfo=tz), tick=True):
+        with freeze_time(datetime(2017, 1, day, 5, 0), tick=True):
             client.get(url)
 
             assert len(os.listdir(client.app.maildir)) == 0
 
     # only send e-mails to the users with the right selection
-    with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
+    with freeze_time(fri_0600, tick=True):
         client.get(url)
 
     assert len(os.listdir(client.app.maildir)) == 2
 
-    with freeze_time(datetime(2017, 1, 7, tzinfo=tz), tick=True):
+    with freeze_time(sat_0600, tick=True):
         client.get(url)
 
     assert len(os.listdir(client.app.maildir)) == 3
@@ -601,7 +608,7 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
     # e-mail will not contain any information info
     client.flush_email_queue()
 
-    with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
+    with freeze_time(fri_0600, tick=True):
         client.get(url)
 
     mails = [client.get_email(i) for i in range(2)]
@@ -636,10 +643,10 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
 
     transaction.commit()
 
-    with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
+    with freeze_time(fri_0600, tick=True):
         client.get(url)
 
-    with freeze_time(datetime(2017, 1, 7, tzinfo=tz), tick=True):
+    with freeze_time(sat_0600, tick=True):
         client.get(url)
 
     # NOTE: These seem to not always get sent in the same order...
@@ -665,7 +672,7 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
 
     transaction.commit()
 
-    with freeze_time(datetime(2017, 1, 6, tzinfo=tz), tick=True):
+    with freeze_time(fri_0600, tick=True):
         client.get(url)
 
     # NOTE: These seem to not always get sent in the same order...
@@ -681,6 +688,72 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
         assert 'day-reservation' not in text
     else:
         assert 'day-reservation' in text
+
+
+def test_daily_reservation_overview_delivery_times(
+    client: Client[TestOrgApp],
+) -> None:
+    """Emails are sent only at configured HH:MM times; multiple times work."""
+    resources = ResourceCollection(client.app.libres_context)
+    room = resources.add('Room', 'Europe/Zurich', type='room')
+
+    recipients = ResourceRecipientCollection(client.app.session())
+    # recipient with two delivery times: 06:00 and 14:30 Zurich CET
+    recipients.add(
+        name='Multi',
+        medium='email',
+        address='multi@example.org',
+        daily_reservations=True,
+        daily_reservations_times=['06:00', '14:30'],
+        send_on=['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'],
+        resources=[room.id.hex]
+    )
+    # legacy recipient without daily_reservations_times (defaults to 06:00)
+    recipients.add(
+        name='Legacy',
+        medium='email',
+        address='legacy@example.org',
+        daily_reservations=True,
+        send_on=['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'],
+        resources=[room.id.hex]
+    )
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'daily_resource_usage')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    # All times are naive UTC. January Zurich = CET (UTC+1), so -1h.
+    t_0700_utc = datetime(2017, 1, 6, 6, 0)   # 07:00 Zurich — wrong time
+    t_0600_utc = datetime(2017, 1, 6, 5, 0)   # 06:00 Zurich
+    t_1430_utc = datetime(2017, 1, 6, 13, 30)  # 14:30 Zurich
+    t_1431_utc = datetime(2017, 1, 6, 13, 31)  # 14:31 Zurich — between buckets
+
+    # wrong time: no emails
+    with freeze_time(t_0700_utc, tick=True):
+        client.get(url)
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    # 06:00: multi-time recipient AND legacy recipient both fire
+    with freeze_time(t_0600_utc, tick=True):
+        client.get(url)
+    assert len(os.listdir(client.app.maildir)) == 2
+    client.flush_email_queue()
+
+    # 14:30: only the multi-time recipient fires
+    with freeze_time(t_1430_utc, tick=True):
+        client.get(url)
+    assert len(os.listdir(client.app.maildir)) == 1
+    assert client.get_email(0)['To'] == 'multi@example.org'
+    client.flush_email_queue()
+
+    # 14:31: nothing fires (cronjob runs every 5 min, 14:31 is not a bucket)
+    with freeze_time(t_1431_utc, tick=True):
+        client.get(url)
+    assert len(os.listdir(client.app.maildir)) == 0
+
 
 
 @pytest.mark.parametrize('secret_content_allowed', [False, True])
@@ -1095,6 +1168,113 @@ def test_monthly_mtan_statistics(client: Client[TestOrgApp]) -> None:
     assert message['Subject'] == (
         'Govikon: mTAN Statistik Januar 2016')
     assert "5 mTAN SMS versendet" in message['TextBody']
+
+    # we only run on first monday of the month
+    with freeze_time(datetime(2016, 2, 2, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 3, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 4, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 5, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 6, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 7, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 8, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 15, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 22, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 29, tzinfo=tz)):
+        client.get(url)
+
+    # no additional mails have been sent
+    assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_monthly_signing_service_statistics(
+    client: Client[TestOrgApp]
+) -> None:
+    job = get_cronjob_by_name(client.app, 'monthly_signing_service_statistics')
+    assert job is not None
+    job.app = client.app
+
+    url = get_cronjob_url(job)
+
+    tz = ensure_timezone('Europe/Zurich')
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    # don't send an email if no mTANs have been sent
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    transaction.begin()
+
+    session = client.app.session()
+    collection = TANCollection(session, scope='test')
+
+    session.add(SigningRequest(  # outside
+        service_name='foo',
+        request_id='foo/1',
+        created=datetime(2015, 12, 30, 10, tzinfo=tz),
+    ))
+    session.add(SigningRequest(
+        service_name='foo',
+        request_id='foo/2',
+        created=datetime(2016, 1, 4, 10, tzinfo=tz),
+    ))
+    session.add(SigningRequest(
+        service_name='foo',
+        request_id='foo/3',
+        created=datetime(2016, 1, 9, 10, tzinfo=tz)
+    ))
+    session.add(SigningRequest(
+        service_name='foo',
+        request_id='foo/4',
+        created=datetime(2016, 1, 19, 10, tzinfo=tz)
+    ))
+    session.add(SigningRequest(
+        service_name='foo',
+        request_id='foo/5',
+        created=datetime(2016, 1, 24, 10, tzinfo=tz)
+    ))
+    session.add(SigningRequest(
+        service_name='bar',
+        request_id='bar/1',
+        created=datetime(2016, 1, 29, 10, tzinfo=tz)
+    ))
+    session.add(SigningRequest(  # also outside
+        service_name='bar',
+        request_id='bar/2',
+        created=datetime(2016, 2, 1, 10, tzinfo=tz)
+    ))
+    transaction.commit()
+
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+    assert message is not None
+    assert message['Subject'] == (
+        'Govikon: PDF Signatur Statistik Januar 2016')
+    assert "4 PDFs signiert via foo" in message['TextBody']
+    assert "1 PDFs signiert via bar" in message['TextBody']
 
     # we only run on first monday of the month
     with freeze_time(datetime(2016, 2, 2, tzinfo=tz)):
@@ -1720,7 +1900,7 @@ def test_update_newsletter_email_bounce_statistics(
     transaction.commit()
     close_all_sessions()
 
-    with patch('requests.Session.get') as mock_get:
+    with patch('niquests.Session.get') as mock_get:
         mock_get.side_effect = [
             Bunch(  # answer to bounce request
                 status_code=200,
@@ -1797,7 +1977,7 @@ def test_update_newsletter_email_bounce_statistics(
             'michu@user.ch').is_inactive is True
 
     # reactivate recipients
-    with patch('requests.Session.get') as mock_get:
+    with patch('niquests.Session.get') as mock_get:
         mock_get.side_effect = [
             Bunch(  # answer to bounce request
                 status_code=200,
@@ -1856,12 +2036,12 @@ def test_update_newsletter_email_bounce_statistics(
             'michu@user.ch').is_inactive is True
 
     # test raising runtime warning exception for status code 401
-    with patch('requests.Session.get') as mock_get:
+    with patch('niquests.Session.get') as mock_get:
         mock_get.return_value = Bunch(
             status_code=401,
             json=lambda: {},
             raise_for_status=Mock(
-                side_effect=requests.exceptions.HTTPError('401 Unauthorized')),
+                side_effect=niquests.exceptions.HTTPError('401 Unauthorized')),
         )
 
         # execute cronjob
@@ -1870,16 +2050,16 @@ def test_update_newsletter_email_bounce_statistics(
 
     # for other 30x and 40x status codes, the cronjob shall raise an exception
     for status_code in [301, 302, 303, 400, 402, 403, 404, 405]:
-        with patch('requests.Session.get') as mock_get:
+        with patch('niquests.Session.get') as mock_get:
             mock_get.return_value = Bunch(
                 status_code=status_code,
                 json=lambda: {},
                 raise_for_status=Mock(
-                    side_effect=requests.exceptions.HTTPError()),
+                    side_effect=niquests.exceptions.HTTPError()),
             )
 
             # execute cronjob
-            with pytest.raises(requests.exceptions.HTTPError):
+            with pytest.raises(niquests.exceptions.HTTPError):
                 client.get(get_cronjob_url(job))
 
     recipients = RecipientCollection(client.app.session())
@@ -2253,15 +2433,15 @@ def test_wil_daily_event_import(
     wil_app.azizi_api_token = 'mytoken'
 
     # connection error
-    with patch('requests.get',
-               side_effect=requests.exceptions.ConnectionError):
+    with patch('niquests.get',
+               side_effect=niquests.exceptions.ConnectionError):
         client.get(get_cronjob_url(wil_job))
 
         assert ('Failed to retrieve events for Wil from' in
                 capturelog.records()[-1].message)
 
     # server error
-    with patch('requests.get') as mock_get:
+    with patch('niquests.get') as mock_get:
         mock_response = Mock()
         mock_response.status_code = 500
         mock_response.text = 'Internal Server Error'

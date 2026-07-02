@@ -115,6 +115,46 @@ def test_change_username(client: Client) -> None:
     assert 'editor2@example.org' in users_page
 
 
+def test_change_username_invalidates_sessions(client: Client) -> None:
+    editor = client.spawn()
+    editor.login_editor()
+    assert editor.get('/userprofile').status_code == 200
+
+    # Admin renames the editor via change_username (logs out all sessions)
+    transaction.begin()
+    users = UserCollection(client.app.session())
+    user = users.by_username('editor@example.org')
+    assert user is not None
+    user.change_username('editor.renamed@example.org', client.app)
+    transaction.commit()
+    close_all_sessions()
+
+    # The editor's existing session should now be invalid
+    assert editor.get('/userprofile', expect_errors=True).status_code == 403
+
+
+def test_session_survives_username_rename(client: Client) -> None:
+    editor = client.spawn()
+    editor.login_editor()
+    assert editor.get('/userprofile').status_code == 200
+
+    # Rename the editor directly in the DB, bypassing change_username.
+    # This simulates an LDAP sync or any path that updates the username
+    # without invalidating the session.
+    transaction.begin()
+    users = UserCollection(client.app.session())
+    user = users.by_username('editor@example.org')
+    assert user is not None
+    user.username = 'editor.renamed@example.org'
+    transaction.commit()
+    close_all_sessions()
+
+    # The existing session should still work via primary key lookup.
+    # The stale userid in the session is also updated on this request so
+    # that code reading identity.userid directly sees the correct username.
+    assert editor.get('/userprofile').status_code == 200
+
+
 def test_user_source(client: Client) -> None:
     client.login_admin()
 
@@ -279,7 +319,7 @@ def test_filters(client: Client) -> None:
     assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
 
     # test active filter via Menu user
-    users = client.get('/').click('Benutzer', index=1)
+    users = client.get('/').click('Benutzer', index=2)
     assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
     assert 'arno' in users
     assert 'beno' not in users

@@ -14,7 +14,7 @@ from functools import lru_cache
 from onegov.core import log
 from onegov.core.custom import json
 from psycopg.sql import SQL, Identifier
-from sqlalchemy import create_engine, event, select, text
+from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm.query import Query
@@ -22,20 +22,21 @@ from sqlalchemy.sql import Delete, Update
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
 
 
-from typing import Any, Self, TypeVar, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.engine import Connection, Engine, Result
+    from sqlalchemy.engine.interfaces import (
+        DBAPICursor,
+        ExecutionContext,
+        _DBAPIAnyExecuteParams,
+    )
     from sqlalchemy.orm import DeclarativeBase, ORMExecuteState
     from sqlalchemy.orm.session import Session, SessionTransaction
     from types import FrameType
 
 
-_T = TypeVar('_T')
-_S = TypeVar('_S', bound='Session')
-
-
-class ForceFetchQueryClass(Query[_T]):
+class ForceFetchQueryClass[T](Query[T]):
     """ Alters the builtin query class, ensuring that the delete query
     always fetches the data first, which is important for the bulk delete
     events to get the actual objects affected by the change.
@@ -294,6 +295,7 @@ class SessionManager:
 
         self._ignore_bulk_updates = False
         self._ignore_bulk_deletes = False
+        self._change_signals_disabled = False
 
         self.on_schema_init = Signal()
         self.on_transaction_join = Signal()
@@ -305,7 +307,12 @@ class SessionManager:
         # in the future, this might become something we can configure through
         # the setuptools entry_points -> modules could advertise what they need
         # and the core would install the extensions the modules require
-        self.required_extensions = {'btree_gist', 'hstore', 'unaccent'}
+        self.required_extensions = {
+            'btree_gist',
+            'hstore',
+            'intarray',
+            'unaccent'
+        }
         self.created_extensions: set[str] = set()
 
         # override the isolation level in any case, we cannot allow another
@@ -388,6 +395,16 @@ class SessionManager:
         finally:
             self._ignore_bulk_deletes = previous_state
 
+    @contextmanager
+    def disable_change_signals(self) -> Iterator[Self]:
+        """ Disables the insert/update/delete signals temporarily. """
+        previous_state = self._change_signals_disabled
+        self._change_signals_disabled = True
+        try:
+            yield self
+        finally:
+            self._change_signals_disabled = previous_state
+
     def register_engine(self, engine: Engine) -> None:
         """ Takes the given engine and registers it with the schema
         switching mechanism. Maybe used to register external engines with
@@ -401,14 +418,19 @@ class SessionManager:
         @event.listens_for(engine, 'before_cursor_execute')
         def activate_schema(
             connection: Connection,
-            cursor: Any,
-            *args: Any,
-            **kwargs: Any
+            cursor: DBAPICursor,
+            statement: str,
+            parameters: _DBAPIAnyExecuteParams,
+            context: ExecutionContext | None,
+            executemany: bool,
         ) -> None:
             """ Share the 'info' dictionary of Session with Connection
             objects.
 
             """
+
+            if statement.startswith('ROLLBACK'):
+                return
 
             # execution options have priority!
             if 'schema' in connection._execution_options:
@@ -427,11 +449,16 @@ class SessionManager:
         @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
             connection: Connection,
-            cursor: Any,
-            *args: Any,
-            **kwargs: Any
+            cursor: DBAPICursor,
+            statement: str,
+            parameters: _DBAPIAnyExecuteParams,
+            context: ExecutionContext | None,
+            executemany: bool,
         ) -> None:
             """ Kills idle sessions after a while, freeing up memory. """
+
+            if statement.startswith('ROLLBACK'):
+                return
 
             cursor.execute(SQL(
                 'SET SESSION idle_in_transaction_session_timeout = {}'
@@ -474,6 +501,9 @@ class SessionManager:
             orm_execution_state: ORMExecuteState
         ) -> Result[Any] | None:
             if not orm_execution_state.is_orm_statement:
+                return None
+
+            if self._change_signals_disabled:
                 return None
 
             stmt = orm_execution_state.statement
@@ -563,6 +593,9 @@ class SessionManager:
             session: Session,
             flush_context: Any
         ) -> None:
+            if self._change_signals_disabled:
+                return None
+
             if self.on_insert.receivers:
                 for obj in session.new:
                     self.on_insert.send(self.current_schema, obj=obj)
@@ -768,7 +801,7 @@ class SessionManager:
         if not self.is_schema_found_on_database(schema):
             self.create_schema(schema, validate)
 
-    def bind_session(self, session: _S) -> _S:
+    def bind_session[T: Session](self, session: T) -> T:
         """ Bind the session to the current schema. """
         session.info['schema'] = self.current_schema
         session.connection().info['session'] = weakref.proxy(session)
@@ -859,9 +892,24 @@ class SessionManager:
 
             try:
                 with engine.begin() as conn:
+                    existing_tables = set(
+                        inspect(conn).get_table_names(schema=schema)
+                    )
                     for base in self.bases:
                         base.metadata.schema = schema
-                        base.metadata.create_all(conn)
+                        # FIXME: this is a workaround to resolve n+1 queries
+                        #        being detected by sentry. Started a
+                        #        discussion on the sqlalchemy,
+                        #        https://github.com/sqlalchemy/sqlalchemy/discussions/13295.
+                        #        Derived issue from discussion:
+                        #        https://github.com/sqlalchemy/sqlalchemy/issues/13311
+                        missing = [
+                            t for t in base.metadata.sorted_tables
+                            if t.name not in existing_tables
+                        ]
+                        if missing:
+                            base.metadata.create_all(conn, tables=missing)
+                            existing_tables.update(t.name for t in missing)
 
                         declared_classes.update(
                             base.registry._class_registry.values()

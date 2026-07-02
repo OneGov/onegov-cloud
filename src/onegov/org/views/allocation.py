@@ -29,7 +29,6 @@ from purl import URL
 from sedate import utcnow
 from sqlalchemy import or_, func
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.orm import defer, defaultload
 from uuid import uuid4
 from webob import exc
 
@@ -39,7 +38,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query
     from webob import Response
 
     type AllocationForm = (
@@ -54,9 +52,11 @@ if TYPE_CHECKING:
     )
 
 
-@OrgApp.json(model=Resource, name='slots', permission=Public)
+@OrgApp.json(model=Resource, name='slots', permission=Public, open_data=False)
 def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the allocations in a fullcalendar compatible events feed.
+
+    This also includes events for national/cantonal/school holidays.
 
     See `<https://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
     more information.
@@ -68,24 +68,19 @@ def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         return ()
 
-    # get all allocations (including mirrors), for the availability calculation
-    query: Query[Allocation]
-    query = self.scheduler.allocations_in_range(  # type:ignore[assignment]
-        start, end, masters_only=False)
-    query = query.order_by(Allocation._start)
-    query = query.options(defer(Allocation.data))
-    query = query.options(defer(Allocation.group))
-    query = query.options(
-        defaultload(Allocation.reserved_slots)
-        .defer(ReservedSlot.reservation_token)
-        .defer(ReservedSlot.allocation_id)
-        .defer(ReservedSlot.end))
-
-    # but only return the master allocations
-    return tuple(
-        e.as_dict() for e in utils.AllocationEventInfo.from_allocations(
-            request, self, tuple(query)
-        )
+    return (
+        *(
+            event.as_dict()
+            for event in utils.HolidayEventInfo.from_request(
+                request, start.date(), end.date()
+            )
+        ),
+        *(
+            event.as_dict()
+            for event in utils.AllocationEventInfo.from_resource_by_range(
+                request, self, start, end
+            )
+        ),
     )
 
 
@@ -728,8 +723,7 @@ def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
         Allocation.group.notin_(reservations.scalar_subquery()))
 
     # delete the allocations
-    for count, candidate in enumerate(candidates, start=1):
-        request.session.delete(candidate)
+    count = candidates.delete('fetch')
 
     delete_rule(self, rule_id)
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2025-12-22 16:12+0100\n"
+"POT-Creation-Date: 2026-05-05 11:45+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -23,17 +23,20 @@ msgstr "Dateien"
 msgid "Images"
 msgstr "Bilder"
 
-msgid "Text modules"
-msgstr "Textbausteine"
-
 msgid "Users"
 msgstr "Benutzer"
 
 msgid "Settings"
 msgstr "Einstellungen"
 
+msgid "Assemblies"
+msgstr "Landsgemeinden"
+
 msgid "People"
 msgstr "Personen"
+
+msgid "Modules"
+msgstr "Module"
 
 msgid "Archive"
 msgstr "Archiv"
@@ -205,6 +208,8 @@ msgstr "Der Titel der Versammlungen."
 msgid "Assembly settings"
 msgstr "Einstellungen für Versammlungen"
 
+#.
+#. Keywords
 msgid "Assembly"
 msgstr "Landsgemeinde"
 
@@ -331,9 +336,6 @@ msgstr "Versammlungen"
 msgid "Town Hall Meetings"
 msgstr "Gemeindeversammlungen"
 
-msgid "Assemblies"
-msgstr "Landsgemeinden"
-
 #, python-format
 msgid "Vota of agenda items ${number} of ${assembly_type} from ${date}"
 msgstr ""
@@ -353,6 +355,9 @@ msgstr "laufend"
 
 msgid "completed"
 msgstr "abgeschlossen"
+
+msgid "Motions / Vota"
+msgstr "Anträge / Wortmeldungen"
 
 msgid "Previous agenda item"
 msgstr "Vorheriges Traktandum"
@@ -473,6 +478,7 @@ msgstr "Neue ${assembly}"
 msgid "Open Data"
 msgstr "Open Data"
 
+#. Description
 #, python-format
 msgid "Results from the ${title}, structured as json"
 msgstr "Resultate der ${title}, strukturiert als JSON"
@@ -485,6 +491,9 @@ msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "Text modules"
+#~ msgstr "Textbausteine"
 
 #~ msgid "The assembly has ended."
 #~ msgstr "Die Landsgemeinde ist beendet."

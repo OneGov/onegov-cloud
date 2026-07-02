@@ -3,9 +3,8 @@ from __future__ import annotations
 import json
 import logging
 import queue
-import requests
+import niquests
 import threading
-import urllib3
 import uuid
 from dataclasses import dataclass
 from urllib.parse import urlparse, urlunparse
@@ -34,10 +33,6 @@ class APIAccessibilityError(Exception):
     """Raised when the KUB API is not accessible."""
 
 
-# Disable SSL warnings for self-signed certificates
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-
 @dataclass
 class UpdateResult:
     parliamentarian_id: str
@@ -51,7 +46,7 @@ class UpdateResult:
 def _fetch_custom_data_worker(
     parliamentarian_queue: queue.Queue[Any],
     result_queue: queue.Queue[UpdateResult],
-    session: requests.Session,
+    session: niquests.Session,
     base_url: str
 ) -> None:
     """Worker thread that fetches API data for parliamentarians."""
@@ -80,7 +75,7 @@ def _fetch_custom_data_worker(
                 addresses=addresses,
                 sex=sex
             ))
-        except requests.exceptions.HTTPError as e:
+        except niquests.exceptions.HTTPError as e:
             if e.response is not None and e.response.status_code == 404:
                 log.warning(
                     f'Person not found in API: {parliamentarian.title} '
@@ -142,20 +137,20 @@ class KubImporter:
         self,
         token: str,
         base_url: str,
-        output: OutputHandler | None = None
+        output: OutputHandler | None = None,
+        cert: tuple[str, str] | None = None
     ):
         self.token = token
         self.base_url = base_url.rstrip('/')  # Normalize
         self.output = output
 
-        # Shared requests session for connection pooling
-        self.session = requests.Session()
+        self.session = niquests.Session(timeout=60)
         self.session.headers.update({
             'Authorization': f'Token {token}',
             'Accept': 'application/json'
         })
-        # Disable SSL verification for self-signed certificates
-        self.session.verify = False
+        if cert:
+            self.session.cert = cert
 
     def __enter__(self) -> Self:
         return self
@@ -183,7 +178,7 @@ class KubImporter:
                 )
             if self.output:
                 self.output.success('API is accessible')
-        except requests.exceptions.RequestException as e:
+        except niquests.exceptions.RequestException as e:
             raise APIAccessibilityError(f'API check failed: {e}') from e
 
     def _update_address_fields(
@@ -327,7 +322,7 @@ class KubImporter:
                 else:
                     url = None
 
-            except requests.exceptions.RequestException as e:
+            except niquests.exceptions.RequestException as e:
                 log.warning(f'Failed to fetch from {endpoint}: {e}')
                 if self.output:
                     self.output.error(f'Failed to fetch from {endpoint}: {e}')
@@ -604,6 +599,24 @@ class KubImporter:
             if self.output:
                 self.output.info('Fetching people data...')
             people_raw = self._fetch_api_data_with_pagination('people')
+            if not people_raw:
+                error_msg = 'Fetched 0 people records — aborting import'
+                log.warning(error_msg)
+                import_log.details.update(
+                    {'error': error_msg, 'status': 'failed'}
+                )
+                flag_modified(import_log, 'details')
+                import_log.status = 'failed'
+                if self.output:
+                    self.output.error(error_msg)
+                request.session.flush()
+                return (
+                    {},
+                    people_data,
+                    organization_data,
+                    membership_data,
+                    import_log_id,
+                )
             if self.output:
                 self.output.success(
                     f'Fetched {len(people_raw)} people records'

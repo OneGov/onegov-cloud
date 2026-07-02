@@ -14,7 +14,6 @@ from onegov.people import Person
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.landsgemeinde.models import Assembly
     from sqlalchemy.orm import Session
 
 
@@ -93,10 +92,12 @@ def test_models(session: Session, assembly: Assembly) -> None:
 
     agenda_item.start_time = time(11, 10, 7)
     votum.start_time = time(12, 11, 5)
+    agenda_item, votum = agenda_item, votum  # undo narrowing
     assert agenda_item.calculated_timestamp == '1h9m2s'
     assert votum.calculated_timestamp == '2h10m'
 
     assembly.start_time = None
+    agenda_item, votum = agenda_item, votum  # undo narrowing
     assert agenda_item.calculated_timestamp is None
     assert votum.calculated_timestamp is None
 
@@ -105,6 +106,7 @@ def test_models(session: Session, assembly: Assembly) -> None:
     assert votum.video_url is None
 
     assembly.video_url = 'url'
+    agenda_item, votum = agenda_item, votum  # undo narrowing
     assert agenda_item.video_url == 'url'
     assert votum.video_url == 'url'
 

@@ -10,6 +10,9 @@ from pytz import UTC
 from sedate import to_timezone
 from sedate import utcnow
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
@@ -36,6 +39,18 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     #: Event this occurrence belongs to
     event_id: Mapped[UUID] = mapped_column(ForeignKey('events.id'))
     event: Mapped[Event] = relationship(back_populates='occurrences')
+
+    #: The associated filter keywords as a simple list of key-value tuples
+    filter_keyword_list: AssociationProxy[
+        list[tuple[str, str]]
+    ] = association_proxy('event', 'filter_keyword_list')
+
+    __table_args__ = (
+        Index('ix_event_occurrences_event_id', 'event_id'),
+        Index('ix_event_occurrences_start', 'start'),
+        Index('ix_event_occurrences_end', 'end'),
+        Index('ix_event_occurrences_tags', 'tags', postgresql_using='gist'),
+    )
 
     def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the occurrence as iCalendar string. """

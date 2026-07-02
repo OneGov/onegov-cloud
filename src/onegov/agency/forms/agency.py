@@ -12,11 +12,15 @@ from onegov.agency.models import ExtendedAgency
 from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.security import Private
 from onegov.core.utils import linkify, ensure_scheme
+from onegov.file.attachments import IMAGE_MAX_SIZE
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, HtmlField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
-from onegov.form.validators import FileSizeLimit, MIME_TYPES_IMAGE
+from onegov.form.validators import (
+    ImageSizeLimit,
+    MIME_TYPES_IMAGE,
+)
 from onegov.gis import CoordinatesField
 from sqlalchemy import func
 from wtforms.fields import StringField
@@ -72,7 +76,8 @@ class ExtendedAgencyForm(Form):
     organigram = UploadField(
         label=_('Organigram'),
         validators=[
-            FileSizeLimit(1 * 1024 * 1024)
+            ImageSizeLimit(
+                max_bytes=1 * 1024 * 1024, max_dimensions=IMAGE_MAX_SIZE)
         ],
         allowed_mimetypes=MIME_TYPES_IMAGE,
     )
@@ -177,11 +182,13 @@ class ExtendedAgencyForm(Form):
         self.opening_hours.data = model.opening_hours
         self.export_fields.data = model.export_fields
         if model.organigram_file:
-            fs = cast('_FieldStorageWithFile', FieldStorage())
+            fs = FieldStorage()
             fs.file = BytesIO(model.organigram_file.read())
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
-            self.organigram.data = self.organigram.process_fieldstorage(fs)
+            self.organigram.data = self.organigram.process_fieldstorage(
+                cast('_FieldStorageWithFile', fs)
+            )
         self.coordinates.data = model.coordinates
         if hasattr(self, 'access'):
             self.access.data = model.access

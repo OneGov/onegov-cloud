@@ -70,8 +70,13 @@ var undo_move_element = function(list, element, new_index, old_index) {
 var setup_sortable_list = function(list_element) {
     var list = $(list_element);
     var start = null;
+    $('.nav-bar-sticky').removeClass('sticky');
 
     var sortable = Sortable.create(list_element, {
+        scroll: true,
+        scrollSensitivity: 40,
+        scrollSpeed: 50,
+
         onStart: function(event) {
             if ($(event.element).parent().hasClass('children')) {
                 return;

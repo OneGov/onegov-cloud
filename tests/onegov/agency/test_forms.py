@@ -262,6 +262,7 @@ def test_move_agency_form(session: Session) -> None:
     form = MoveAgencyForm(DummyPostData({'parent_id': '10'}))
     form.request = DummyRequest(session, permissions=all_permissions)
     form.update_model(model)
+    model = model  # undo narrowing
     assert model.parent_id == 10
 
     # update with rename

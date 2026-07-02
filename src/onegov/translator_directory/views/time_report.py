@@ -78,6 +78,7 @@ def view_time_reports(
     request: TranslatorAppRequest,
 ) -> RenderData:
 
+    reports = list(self.query())
     layout = TimeReportCollectionLayout(self, request)
 
     if self.archive:
@@ -90,8 +91,6 @@ def view_time_reports(
             TimeReportCollection(request.app, archive=True)
         )
         archive_toggle_text = _('Show archived (exported) reports')
-
-    reports = list(self.query())
 
     unexported_count = self.for_accounting_export().count()
     export_link = None
@@ -158,6 +157,10 @@ def view_time_reports(
                 ),
             )
 
+    pages_missing_hint = request.translate(
+        _('Written translation without page count')
+    )
+
     return {
         'layout': layout,
         'model': self,
@@ -169,6 +172,7 @@ def view_time_reports(
         'archive': self.archive,
         'archive_toggle_url': archive_toggle_url,
         'archive_toggle_text': archive_toggle_text,
+        'pages_missing_hint': pages_missing_hint,
     }
 
 
@@ -423,7 +427,7 @@ def generate_accounting_export_rows(
             LOHNART_COMPENSATION,
             '0',
             '',
-            'VWG Entschädigung Dolmetscher',
+            f'VWG Entschädigung Dolmetscher {date_str}',
             duration_hours_str,
             '1',
             effective_rate_str,
@@ -460,7 +464,7 @@ def generate_accounting_export_rows(
                 LOHNART_EXPENSES,
                 '0',
                 '',
-                'VWG Reisespesen Dolmetscher',
+                f'VWG Reisespesen Dolmetscher {date_str}',
                 str(report.travel_compensation),
                 '1',
                 '0',
@@ -497,7 +501,7 @@ def generate_accounting_export_rows(
                 LOHNART_EXPENSES,
                 '0',
                 '',
-                'VWG Reisespesen Dolmetscher',  # Verpflegung
+                f'VWG Reisespesen Dolmetscher {date_str}',  # Verpflegung
                 str(report.meal_allowance),
                 '1',
                 '0',

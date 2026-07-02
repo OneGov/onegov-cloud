@@ -18,9 +18,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.elements import Link, LinkGroup
     from sqlalchemy.orm import Session
-    from typing import TypeVar
-
-    _T = TypeVar('_T')
 
 
 class DummyOrg:
@@ -70,7 +67,7 @@ class DummyRequest:
     ) -> str:
         return f'{model.__name__}{variables or ""}/{name}'
 
-    def exclude_invisible(self, objects: _T) -> _T:
+    def exclude_invisible[T](self, objects: T) -> T:
         return objects
 
     def new_csrf_token(self) -> str:
@@ -162,12 +159,12 @@ def test_agency_layout(session: Session) -> None:
     assert list(hrefs(layout.editbar_links)) == [
         'AgencyProxy/edit',
         'AgencyProxy/move',
-        'AgencyProxy/sort',
         'AgencyProxy/change-url',
         'ExtendedAgency/?csrf-token=x',
         'AgencyProxy/create-pdf',
         'AgencyProxy/new',
         'AgencyProxy/new-membership',
+        'AgencyProxy/sort',
         'AgencyProxy/sort-children?csrf-token=x',
         'AgencyProxy/sort-relationships?csrf-token=x',
     ]

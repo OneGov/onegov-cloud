@@ -32,27 +32,20 @@ from urllib.parse import urlparse
 from urllib.parse import urlunparse
 
 from typing import Any
-from typing import Generic
 from typing import NamedTuple
 from typing import TYPE_CHECKING
-from typing_extensions import TypeVar
-
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.orm import SessionManager
     from onegov.swissvotes.request import SwissvotesRequest
     from typing import Protocol
 
-    T = TypeVar('T')
-
-    class HasCodes(Protocol[T]):
+    class HasCodes[T](Protocol):
         def codes(self, attribute: str, /) -> dict[int | None, T]: ...
 
     class HasSessionManager(Protocol):
         @property
         def session_manager(self) -> SessionManager | None: ...
-
-StrT = TypeVar('StrT', bound=str | None, default=str | None)
 
 
 class Poster(NamedTuple):
@@ -78,13 +71,13 @@ class encoded_property:  # noqa: N801
 
     """
 
-    def __set_name__(self, owner: type[HasCodes[T]], name: str) -> None:
+    def __set_name__(self, owner: type[HasCodes[Any]], name: str) -> None:
         self.name = name
         assert not hasattr(owner, f'_{name}'), (
             f'Attribute "_{name}" already defined')
         setattr(owner, f'_{name}', mapped_column(name=name))
 
-    def __get__(
+    def __get__[T](
             self,
             instance: HasCodes[T],
             owner: type[object]
@@ -93,7 +86,7 @@ class encoded_property:  # noqa: N801
         return instance.codes(self.name).get(value)
 
 
-class localized_property(Generic[StrT]):  # noqa: N801
+class localized_property[StrT: str | None = str | None]:  # noqa: N801
     """ A shorthand property to return a localized attribute. Requires at least
     a `xxx_de` attribute and falls back to this.
 
@@ -297,7 +290,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @property
     def bfs_map_host(self) -> str | None:
-        """ Returns the Host of the BFS Map link for CSP. """
+        """ The host of the BFS Map link, used for CSP. """
 
         if self.bfs_map is None:
             return None
@@ -484,7 +477,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def policy_areas(self) -> list[PolicyArea]:
-        """ Returns the policy areas / descriptors of the vote. """
+        """ The policy areas / descriptors of the vote. """
 
         def get_level(number: int, level: int) -> PolicyArea | None:
             value = getattr(self, f'descriptor_{number}_level_{level}')
@@ -575,7 +568,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def results_cantons(self) -> dict[str, list[Region]]:
-        """ Returns the results of all cantons. """
+        """ The results of all cantons. """
 
         result: dict[int, list[Region]] = {}
         value: int | None
@@ -650,7 +643,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             if v != self.ORGANIZATION_NO_LONGER_EXISTS
         }
 
-    def group_recommendations(
+    def group_recommendations[T](
             self,
             recommendations: Iterable[tuple[T, int | None]],
             ignore_unknown: bool = False
@@ -685,12 +678,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     @cached_property
     def sorted_actors_list(self) -> list[str]:
         """
-         Returns a list of actors of the current vote sorted by:
+        Actors of the current vote sorted by:
 
         1. codes for recommendations (strength table)
         2. by electoral share (descending)
 
-        It filters out those parties who have no electoral share
+        Parties with no electoral share are filtered out.
 
         """
         result = []
@@ -844,9 +837,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def has_national_council_share_data(self) -> bool:
-        """ Returns true, if the vote contains national council share data.
+        """ True if the vote contains national council share data.
 
-        Returns true, if a national council year is set and
+        True if a national council year is set and:
 
         * any aggregated national council share data is present (yeas, nays,
             none, empty, free vote, neutral, unknown)

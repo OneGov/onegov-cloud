@@ -288,9 +288,9 @@ class PoliticalBusinessCollection(
         self.request = request
         self.page = page
         self.term = term
-        self.status = set(status) if status else set()
-        self.types = set(types) if types else set()
-        self.years = set(years) if years else set()
+        self.status = {s for s in status if s is not None} if status else set()
+        self.types = {t for t in types if t is not None} if types else set()
+        self.years = {y for y in years if 1 <= y <= 9998} if years else set()
         self.batch_size = 20
 
     @property
@@ -309,6 +309,21 @@ class PoliticalBusinessCollection(
 
     def query(self) -> Query[PoliticalBusiness]:
         query = super().query()
+        role = getattr(self.request.identity, 'role', 'anonymous')
+        available_accesses = {
+            'admin': (),
+            'editor': (),
+            'member': ('member', 'mtan', 'public'),
+        }.get(role, ('mtan', 'public'))
+
+        if available_accesses:
+            query = query.filter(or_(
+                *(
+                    PoliticalBusiness.meta['access'].astext == access
+                    for access in available_accesses
+                ),
+                PoliticalBusiness.meta['access'].is_(None)
+            ))
 
         if self.term:
             language = self.request.locale

@@ -125,7 +125,7 @@ class SwissvoteMetadataField(UploadField):
             raise ValidationError(_('No data.'))
 
         headers = [column.value for column in next(sheet.rows)]
-        missing = set(mapper.columns.values()) - set(headers)  # type:ignore
+        missing = set(mapper.columns.values()) - set(headers)
         if missing:
             raise ValidationError(_(
                 'Some columns are missing: ${columns}.',

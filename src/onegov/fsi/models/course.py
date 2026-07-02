@@ -69,8 +69,7 @@ class Course(Base, ORMSearchable):
     @property
     def description_html(self) -> Markup:
         """
-        Returns the description that is saved as HTML from the redactor js
-        plugin.
+        The description saved as HTML from the redactor js plugin.
         """
         return self.description
 

@@ -18,7 +18,7 @@ from unittest import mock
 def no_requests(monkeypatch: pytest.MonkeyPatch) -> None:
     # prevents tests from making live requests
     mock_session = mock.Mock()
-    monkeypatch.delattr('requests.sessions.Session.request')
+    monkeypatch.delattr('niquests.sessions.Session.request')
 
 
 def test_worldline_fee_policy() -> None:

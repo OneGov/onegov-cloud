@@ -53,6 +53,9 @@ class Plausible(AnalyticsProvider):
 
     def template_variables(self, request: OrgRequest) -> RenderData:
         request.content_security_policy.script_src.add(self.script_src)
+        request.content_security_policy.connect_src.add(
+            URL(self.script_src).path('').as_string().rstrip('/')
+        )
         return {
             'domain': self.domain(request),
             'script_src': self.script_src,

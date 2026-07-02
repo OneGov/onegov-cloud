@@ -1,39 +1,46 @@
 from __future__ import annotations
 
 from sedate import utcnow
-from collections.abc import Iterator
 
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import (
     AttendenceCollection,
 )
+from onegov.pas.collections.presidential_allowance import (
+    PresidentialAllowanceCollection,
+)
 from onegov.pas.custom import get_current_rate_set
 from decimal import Decimal
 from onegov.pas.models.attendence import TYPES
+from onegov.pas.models.presidential_allowance import (
+    FIBU_KONTO_ALLOWANCE,
+    LOHNART_ALLOWANCE_NR,
+    LOHNART_ALLOWANCE_TEXT,
+)
 from onegov.pas.utils import is_commission_president, round_to_five_rappen
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from onegov.town6.request import TownRequest
     from onegov.pas.models import (SettlementRun)
     from datetime import date
-    from collections.abc import Iterator
 
 
 # Document: 'KR-Entschaedigung - 1.Quartal 2024 (1).csv'
 
 
 NEW_LOHNART_MAPPING = {
-    'plenary': {'nr': '2405', 'text': 'Plenarsitzungen'},
+    'plenary': {'nr': '2405', 'text': 'Plenarsitzung KR'},
     'commission': {
         'nr': '2410',
-        'text': 'Kommissionsitzungen'
+        'text': 'Kommissionssitzung KR'
     },
-    'study': {'nr': '2421', 'text': 'Aktenstudium'},
+    'study': {'nr': '2421', 'text': 'Aktenstudium KR'},
     'shortest': {
-        'nr': '2410',
-        'text': 'Kommissionsitzungen'
+        'nr': '2415',
+        'text': 'Kürzesitzung KR'
     }
 }
 
@@ -130,4 +137,44 @@ def generate_fibu_export_rows(
             '', '', '', '', '', '', '', '', '', rate_with_cola,
                 '', '', '', lohnart_text, '', fibu_konto, '1000',
             '', '', '', '', '', year_quarter_str, utcnow().strftime('%d.%m.%Y')
+        ]
+
+    # Presidential allowances linked to this settlement run
+    allowances = PresidentialAllowanceCollection(
+        session,
+        settlement_run_id=settlement_run.id,
+    ).query()
+
+    for allowance in allowances:
+        parliamentarian = allowance.parliamentarian
+        yield [
+            parliamentarian.personnel_number or '',
+            parliamentarian.contract_number or '',
+            LOHNART_ALLOWANCE_NR,
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            round_to_five_rappen(
+                Decimal(str(allowance.amount)) * cola_multiplier
+            ),
+            '',
+            '',
+            '',
+            LOHNART_ALLOWANCE_TEXT,
+            '',
+            FIBU_KONTO_ALLOWANCE,
+            '1000',
+            '',
+            '',
+            '',
+            '',
+            '',
+            year_quarter_str,
+            utcnow().strftime('%d.%m.%Y'),
         ]

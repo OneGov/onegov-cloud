@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from collections.abc import Sequence
     from onegov.agency.models import ExtendedAgency
+    from onegov.agency.models import ExtendedPerson
     from onegov.agency.request import AgencyRequest
     from onegov.core.elements import Trait
 
@@ -41,6 +42,9 @@ class PageLayout(TownPageLayout):
 
 
 class PersonLayout(TownPersonLayout):
+    model: ExtendedPerson
+    request: AgencyRequest
+
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
@@ -267,12 +271,7 @@ class AgencyLayout(
                 Link(
                     text=_('Move'),
                     url=self.request.link(self.model.proxy(), 'move'),
-                    attrs={'class': 'move'}
-                ),
-                Link(
-                    text=_('Sort'),
-                    url=self.request.link(self.model.proxy(), 'sort'),
-                    attrs={'class': 'sort'}
+                    attrs={'class': 'move'},
                 ),
                 Link(
                     text=_('Change URL'),
@@ -298,24 +297,27 @@ class AgencyLayout(
                         Link(
                             text=_('Agency'),
                             url=self.request.link(
-                                self.model.proxy(),
-                                name='new'
+                                self.model.proxy(), name='new'
                             ),
-                            attrs={'class': 'new-agency'}
+                            attrs={'class': 'new-agency'},
                         ),
                         Link(
                             text=_('Membership'),
                             url=self.request.link(
-                                self.model.proxy(),
-                                name='new-membership'
+                                self.model.proxy(), name='new-membership'
                             ),
-                            attrs={'class': 'new-person'}
+                            attrs={'class': 'new-person'},
                         ),
-                    ]
+                    ],
                 ),
                 LinkGroup(
                     title=_('Sort'),
                     links=[
+                        Link(
+                            text=_('Sort'),
+                            url=self.request.link(self.model.proxy(), 'sort'),
+                            attrs={'class': 'sort'},
+                        ),
                         Link(
                             text=_('Suborganizations'),
                             url=self.csrf_protected_url(

@@ -96,6 +96,16 @@ class PeriodForm(Form):
         depends_on=('confirmable', '!y')
     )
 
+    with_group_code = BooleanField(
+        label=_('With group codes'),
+        description=_(
+            'Attendees can get group codes via the link "invite a companion" '
+            'in their booking. Bookings with a group code are preferred in '
+            'the matching process.'
+        ),
+        default=True
+    )
+
     finalizable = BooleanField(
         label=_('With billing'),
         default=True
@@ -156,6 +166,19 @@ class PeriodForm(Form):
             NumberRange(0, 360),
         ],
         depends_on=('deadline', 'rel')
+    )
+
+    book_finalized = BooleanField(
+        label=_('Allow bookings after the bills have been created.'),
+        fieldset=_('Deadline'),
+        description=_(
+            'By default, only admins can create bookings after the billing '
+            'has been confirmed. With this setting, every user can create new '
+            'bookings after confirmation and before the deadline. Booking '
+            'costs incurred after confirmation will be added to the existing '
+            'bill.', markup=True
+        ),
+        depends_on=('deadline', 'rel'),
     )
 
     execution_start = DateField(
@@ -266,18 +289,6 @@ class PeriodForm(Form):
             ('no', _('No'))
         ],
         default='no'
-    )
-
-    book_finalized = BooleanField(
-        label=_('Allow bookings after the bills have been created.'),
-        description=_(
-            'By default, only admins can create bookings after the billing '
-            'has been confirmed. With this setting, every user can create new '
-            'bookings after confirmation and before the deadline. Booking '
-            'costs incurred after confirmation will be added to the existing '
-            'bill.'
-        ),
-        depends_on=('deadline', 'rel'),
     )
 
     cancellation = RadioField(

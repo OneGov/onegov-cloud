@@ -55,7 +55,7 @@ class PredicateAction(dectate.Action):
     _after: _AnyCallable | str
     _before: _AnyCallable | str
     def __init__(
-        self, dispatch: _AnyCallable | str, name: str, default: Any, index: KeyIndex | str, before: _AnyCallable | str | None = None, after: _AnyCallable | str | None = None
+        self, dispatch: _AnyCallable | str, name: str, default: Any, index: type[KeyIndex] | str, before: _AnyCallable | str | None = None, after: _AnyCallable | str | None = None
     ) -> None: ...
     def identifier(self, predicate_registry: PredicateRegistry) -> tuple[_AnyCallable, _AnyCallable, _AnyCallable]: ...  # type:ignore[override]
     def perform(self, obj: Any, predicate_registry: PredicateRegistry) -> None: ...  # type:ignore[override]

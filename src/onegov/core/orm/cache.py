@@ -184,7 +184,7 @@ class OrmCacheApp:
 
     @property
     def orm_cache_descriptors(self) -> Iterator[OrmCacheDescriptor[Any]]:
-        """ Yields all orm cache descriptors installed on the class. """
+        """ All orm cache descriptors installed on the class. """
 
         for member_name, member in inspect.getmembers(self.__class__):
             if isinstance(member, OrmCacheDescriptor):

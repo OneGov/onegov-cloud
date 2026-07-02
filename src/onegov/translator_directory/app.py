@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import cached_property
 from onegov.core import utils
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
@@ -13,6 +12,7 @@ from onegov.translator_directory.forms.user_group import (
 from onegov.org.models import Organisation, GeneralFile, GeneralFileCollection
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
+from onegov.user import User
 from purl import URL
 from sqlalchemy import and_
 
@@ -62,6 +62,14 @@ class TranslatorDirectoryApp(TownApp):
     def accountant_email(self) -> str | None:
         return self.org.meta.get('accountant_email')
 
+    @property
+    def enable_time_tracking(self) -> bool:
+        return bool(self.org.meta.get('enable_time_tracking', False))
+
+    @enable_time_tracking.setter
+    def enable_time_tracking(self, value: bool) -> None:
+        self.org.meta['enable_time_tracking'] = bool(value)
+
     def redirect_after_login(
         self,
         identity: Identity | NoIdentity,
@@ -88,11 +96,16 @@ class TranslatorDirectoryApp(TownApp):
         ).with_entities(GeneralFile.name)
         return [filename for filename, in query]
 
-    @cached_property
+    @property
     def mailto_link(self) -> str:
         from onegov.translator_directory.models.translator import Translator
-        q = self.session().query(Translator).with_entities(
-            Translator.email)
+        q = (
+            self.session()
+            .query(Translator)
+            .with_entities(Translator.email)
+            .join(User, Translator.email == User.username)
+            .filter(User.active == True)
+        )
         emails = q.distinct().all()
         bcc_addresses = '; '.join(str(email) for (email,) in emails if email)
         mailto_link = f'mailto:?bcc={bcc_addresses}'

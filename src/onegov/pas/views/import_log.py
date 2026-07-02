@@ -18,7 +18,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pas.request import PasRequest
     from onegov.core.types import RenderData
-    from webob import Response
 
 
 @PasApp.html(
@@ -43,10 +42,28 @@ def view_import_logs(
         for log in self.for_listing().all()
     ]
 
+    users = self.distinct_users()
+    user_filters = [
+        {
+            'text': request.translate(_('All')),
+            'active': self.user_id is None,
+            'url': request.link(self.for_filter()),
+        }
+    ]
+    user_filters.extend(
+        {
+            'text': user.username or '',
+            'active': self.user_id == str(user.id),
+            'url': request.link(self.for_filter(user_id=str(user.id))),
+        }
+        for user in users
+    )
+
     return {
         'layout': layout,
         'title': _('Import History'),
-        'logs': logs
+        'logs': logs,
+        'user_filters': user_filters,
     }
 
 

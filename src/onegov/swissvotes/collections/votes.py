@@ -17,7 +17,7 @@ from xlsxwriter.workbook import Workbook
 
 from typing import Any
 from typing import IO
-from typing import TypeVar
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -25,9 +25,6 @@ if TYPE_CHECKING:
     from onegov.swissvotes.app import SwissvotesApp
     from sqlalchemy.orm import Query
     from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
-    from typing import Self
-
-T = TypeVar('T')
 
 
 class SwissVoteCollection(Pagination[SwissVote]):
@@ -63,7 +60,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
         to_date: date | None = None,
         legal_form: list[int] | None = None,
         result: list[int] | None = None,
-        policy_area: list[str] | None = None,
+        policy_area: list[PolicyArea] | None = None,
         term: str | None = None,
         full_text: bool | None = None,
         position_federal_council: list[int] | None = None,
@@ -157,9 +154,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def current_sort_by(self) -> str:
-        """ Returns the currently used sorting key.
-
-        Defaults to a reasonable value.
+        """ The currently used sorting key. Defaults to a reasonable value.
 
         """
         if self.sort_by in self.SORT_BYS:
@@ -169,9 +164,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def current_sort_order(self) -> str:
-        """ Returns the currently used sorting order.
-
-        Defaults to a reasonable value.
+        """ The currently used sorting order. Defaults to a reasonable value.
 
         """
         if self.sort_by in self.SORT_BYS:
@@ -225,8 +218,8 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def order_by(self) -> ColumnElement[Any]:
-        """ Returns an SqlAlchemy expression for ordering queries based
-        on the current sorting key and ordering.
+        """ An SQLAlchemy expression for ordering queries based on the current
+        sorting key and ordering.
 
         """
 
@@ -276,8 +269,8 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def term_filter_numeric(self) -> list[ColumnElement[bool]]:
-        """ Returns a list of SqlAlchemy filter statements matching possible
-        numeric attributes based on the term.
+        """ A list of SQLAlchemy filter statements matching possible numeric
+        attributes based on the term.
 
         """
 
@@ -294,8 +287,8 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def term_filter_text(self) -> list[ColumnElement[bool]]:
-        """ Returns a list of SqlAlchemy filter statements matching possible
-        fulltext attributes based on the term.
+        """ A list of SQLAlchemy filter statements matching possible fulltext
+        attributes based on the term.
 
         """
         term = SwissVote.search_term_expression(self.term)
@@ -343,8 +336,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def term_filter(self) -> list[ColumnElement[bool]]:
-        """ Returns a list of SqlAlchemy filter statements based on the search
-        term.
+        """ A list of SQLAlchemy filter statements based on the search term.
 
         """
 
@@ -355,7 +347,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
         query = self.session.query(SwissVote)
 
-        def in_or_none(
+        def in_or_none[T](
             column: SQLCoreOperations[T] | SQLCoreOperations[T | None],
             values: list[T],
             extra: dict[T, T] | None = None
@@ -381,8 +373,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
             ))
         if self.policy_area:
             levels: list[list[Decimal]] = [[], [], []]
-            for area_code in self.policy_area:
-                area = PolicyArea(area_code)
+            for area in self.policy_area:
                 if area.level == 1:
                     levels[0].append(area.descriptor_decimal)
                 if area.level == 2:
@@ -482,7 +473,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @cached_property
     def available_descriptors(self) -> list[set[Decimal]]:
-        """ Returns a list of the used descriptor values (level 1-3). """
+        """ A list of the used descriptor values (level 1-3). """
 
         query = self.session.query
         return [
@@ -563,7 +554,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     @property
     def last_modified(self) -> datetime | None:
-        """ Returns the last change of any votes. """
+        """ The date of the last change across all votes. """
         return self.session.query(func.max(SwissVote.last_change)).scalar()
 
     def export_csv(self, file: IO[str]) -> None:

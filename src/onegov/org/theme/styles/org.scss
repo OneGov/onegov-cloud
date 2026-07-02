@@ -338,6 +338,8 @@ $globals-height: 2.5rem;
     .payment-provider::before { @include icon('\f283'); }
     .profile::before { @include icon('\f2c3'); }
     .management::before { @include icon('\f013'); }
+    .docs::before { @include icon('\f02d');}
+    .modules::before { @include icon('\f009');}
     .images::before { @include icon('\f03e'); }
     .files::before { @include icon('\f016'); }
     .text-modules::before { @include icon('\f249'); }
@@ -351,6 +353,12 @@ $globals-height: 2.5rem;
     .citizen-login::before { @include icon('\f090'); }
     .citizen-tickets::before { @include icon('\f145'); }
     .citizen-reservations::before { @include icon('\f133'); }
+    .reservations::before { @include icon('\f133'); }
+    .directories::before { @include icon('\f03a'); }
+    .people::before { @include icon('\f0c0'); }
+    .events::before { @include icon('\f073'); }
+    .news::before { @include icon('\f1ea'); }
+    .newsletter::before { @include icon('\f0e0'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -677,6 +685,25 @@ $footer-border-width: 0;
     // Zurb lacks a separate color for callout panels.
     &.callout {
         border-color: $callout-panel-border-color;
+    }
+}
+
+.internal-notes {
+    background: $gray-pastel;
+    border-left: 3px solid $blue-dark;
+    border-radius: 2px;
+    font-size: .875rem;
+    margin-bottom: 1.5rem;
+    padding: .75rem 1rem;
+
+    strong {
+        color: $blue-dark;
+        display: block;
+        margin-bottom: .25rem;
+    }
+
+    p {
+        margin-bottom: 0;
     }
 }
 
@@ -1821,6 +1848,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-form::before { @include icon($new-form-icon); }
     .new-document-form::before { @include icon($new-document-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
+    .new-root-link::before { @include icon($new-link-icon); }
     .new-iframe::before { @include icon($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
@@ -2496,6 +2524,12 @@ div#redactor-droparea {
 $person-website-icon: '\f0c1';
 $person-phone-icon: '\f095';
 $person-email-icon: '\f003';
+
+#people-filters {
+    .people-filter-select {
+        margin-bottom: .75rem;
+    }
+}
 
 .person-card {
     margin: 0 1em 1em 0;
@@ -3362,6 +3396,14 @@ button {
             font-size: .9em;
         }
 
+        .fc-daygrid-body-natural .fc-daygrid-day-events {
+            margin-bottom: 0 !important;
+        }
+
+        .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+            min-height: 0;
+        }
+
         .fc-event {
             overflow: hidden;
             border: 0;
@@ -3390,6 +3432,11 @@ button {
 
         .event-available {
             background-color: $green;
+        }
+
+        .event-holiday {
+            background-color: $red;
+            cursor: default !important;
         }
 
         // fix borders missing with zurb foundation
@@ -7408,4 +7455,10 @@ code {
 
 p.full-text-width {
     max-width: 100% !important;
+}
+
+.directory-entry-hash {
+    font-family: $font-family-monospace;
+    font-size: .75rem;
+    background-color: $gray-pastel;
 }

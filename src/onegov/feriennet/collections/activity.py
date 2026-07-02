@@ -11,9 +11,7 @@ if TYPE_CHECKING:
     from onegov.activity.collections.activity import ActivityFilter
     from onegov.feriennet.models import VacationActivity
     from sqlalchemy.orm import Query, Session
-    from typing import Self, TypeVar
-
-    T = TypeVar('T')
+    from typing import Self
 
 
 class VacationActivityCollection(ActivityCollection['VacationActivity']):
@@ -41,7 +39,7 @@ class VacationActivityCollection(ActivityCollection['VacationActivity']):
     def policy(self) -> ActivityQueryPolicy:
         return ActivityQueryPolicy.for_identity(self.identity)
 
-    def transform_batch_query(self, query: Query[T]) -> Query[T]:
+    def transform_batch_query[T](self, query: Query[T]) -> Query[T]:
         return query.options(selectinload(self.model_class.occasions))
 
     def query_base(self) -> Query[VacationActivity]:

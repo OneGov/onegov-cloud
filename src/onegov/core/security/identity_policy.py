@@ -16,7 +16,7 @@ class IdentityPolicy:
 
     """
 
-    required_keys = {'userid', 'groupids', 'role', 'application_id'}
+    required_keys = {'userid', 'uid', 'groupids', 'role', 'application_id'}
 
     def identify(self, request: CoreRequest) -> Identity | None:
         try:
@@ -70,7 +70,8 @@ def forget(app: Framework, session_id: str) -> None:
     """
 
     session = BrowserSession(app.session_cache, session_id)
-    session.flush()
+    # NOTE: We bypass the transaction machinery for this part
+    session._cache.flush()
 
 
 def remembered(app: Framework, session_id: str) -> bool:
@@ -78,6 +79,14 @@ def remembered(app: Framework, session_id: str) -> bool:
     browser session.
 
     """
+
+    # FIXME: This check is a little flaky for a session_id that was created
+    #        in the current transaction, since the changes will not have
+    #        been committed to redis yet, so they will not show up here.
+    #        We may be able to get around this by weakref caching the
+    #        created BrowserSession instances for a given application_id
+    #        and session_id, so we get the same instance as the one
+    #        created by the request here.
     session = BrowserSession(app.session_cache, session_id)
     for key in IdentityPolicy.required_keys:
         if session.has(key):

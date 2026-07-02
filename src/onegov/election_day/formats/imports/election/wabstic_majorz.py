@@ -431,9 +431,9 @@ def import_election_wabstic_majorz(
     session = object_session(election)
     assert session is not None
     # FIXME: Switch to regular `session.execute` with insert statements
-    session.bulk_insert_mappings(Candidate, added_candidates.values())  # type: ignore[arg-type]
+    session.bulk_insert_mappings(Candidate, added_candidates.values())
     session.bulk_insert_mappings(
-        ElectionResult,  # type: ignore[arg-type]
+        ElectionResult,
         (
             {
                 'id': result_uids[entity_id],
@@ -457,7 +457,7 @@ def import_election_wabstic_majorz(
         )
     )
     session.bulk_insert_mappings(
-        CandidateResult,  # type: ignore[arg-type]
+        CandidateResult,
         (
             {
                 'id': uuid4(),
@@ -500,7 +500,7 @@ def import_election_wabstic_majorz(
                 'counted': False
             }
         )
-    session.bulk_insert_mappings(ElectionResult, result_inserts)  # type: ignore[arg-type]
+    session.bulk_insert_mappings(ElectionResult, result_inserts)
     session.flush()
     session.expire_all()
 

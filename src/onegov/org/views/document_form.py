@@ -3,7 +3,6 @@ import morepath
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
-from onegov.form import FormDefinition
 from onegov.form.collection import FormCollection
 from onegov.gis import Coordinates
 from onegov.org.models.document_form import (
@@ -14,14 +13,11 @@ from onegov.org.forms.document_form import DocumentForm
 from onegov.org.layout import FormDocumentLayout, FormEditorLayout
 
 
-from typing import TypeVar, TYPE_CHECKING
-
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
     from webob import Response
-
-    FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
 
 
 def get_form_document_form(

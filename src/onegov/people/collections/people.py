@@ -1,24 +1,19 @@
 from __future__ import annotations
 
-from sqlalchemy import func
-
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
 from onegov.people.models import Person
 
 from typing import Any
-from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from uuid import UUID
 
-PersonT = TypeVar('PersonT', bound=Person)
 
-
-class BasePersonCollection(GenericCollection[PersonT]):
+class BasePersonCollection[T: Person](GenericCollection[T]):
 
     @property
-    def model_class(self) -> type[PersonT]:
+    def model_class(self) -> type[T]:
         raise NotImplementedError()
 
     def add(  # type:ignore[override]
@@ -26,7 +21,7 @@ class BasePersonCollection(GenericCollection[PersonT]):
         first_name: str,
         last_name: str,
         **optional: Any
-    ) -> PersonT:
+    ) -> T:
         person = self.model_class(
             first_name=first_name,
             last_name=last_name,
@@ -44,7 +39,7 @@ class BasePersonCollection(GenericCollection[PersonT]):
         last_name: str,
         compare_names_only: bool = False,
         **optional: Any
-    ) -> PersonT:
+    ) -> T:
         """
         Adds a person if it does not exist yet, otherwise returns the
         existing.
@@ -64,7 +59,7 @@ class BasePersonCollection(GenericCollection[PersonT]):
         else:
             return self.add(first_name, last_name, **optional)
 
-    def by_id(self, id: UUID) -> PersonT | None:  # type:ignore[override]
+    def by_id(self, id: UUID) -> T | None:  # type:ignore[override]
         if utils.is_uuid(id):
             return self.query().filter(self.model_class.id == id).first()
         return None
@@ -83,26 +78,3 @@ class PersonCollection(BasePersonCollection[Person]):
     @property
     def model_class(self) -> type[Person]:
         return Person
-
-    def people_by_organisation(
-        self,
-        org: str | None,
-        sub_org: str | None
-    ) -> list[Person]:
-        """
-        Returns all persons of a given organisation and sub-organisation.
-
-        If organisation and sub-organisation are both None, all persons are
-        returned.
-        """
-        query = self.session.query(Person).order_by(Person.last_name,
-                                                    Person.first_name)
-        if org:
-            query = query.filter(
-                func.jsonb_contains(Person.content['organisations_multiple'],
-                                    f'["{org}"]'))
-        if sub_org:
-            query = query.filter(
-                func.jsonb_contains(Person.content['organisations_multiple'],
-                                    f'["-{sub_org}"]'))
-        return query.all()

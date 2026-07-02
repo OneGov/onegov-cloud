@@ -1,20 +1,17 @@
 from __future__ import annotations
 
-from inspect import isabstract
-from collections import OrderedDict
-
-from markupsafe import Markup
+import niquests
 import pytz
-import requests
 import logging
+
 from babel.dates import get_month_names
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from functools import lru_cache
+from inspect import isabstract
 from itertools import groupby, chain
-
-from requests.adapters import HTTPAdapter
-from urllib3.util import Retry
-
+from markupsafe import Markup
+from niquests.adapters import HTTPAdapter
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models
@@ -24,6 +21,7 @@ from onegov.core.templates import render_template
 from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
+from onegov.file.models import SigningRequest
 from onegov.form import FormSubmission, parse_form, Form
 from onegov.newsletter.models import Recipient
 from onegov.newsletter import (Newsletter, NewsletterCollection,
@@ -64,16 +62,16 @@ from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import undefer
+from urllib3.util import Retry
 from uuid import UUID
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
     from sqlalchemy.orm import Query
-
-    from onegov.org.request import OrgRequest
 
 
 log = logging.getLogger('onegov.org.cronjobs')
@@ -108,6 +106,7 @@ def hourly_maintenance_tasks(request: OrgRequest) -> None:
     send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
+    delete_old_signing_requests(request)
     request.app.org.meta['hourly_maintenance_tasks_last_run'] = now
     # NOTE: Shouldn't be necessary, but better safe than sorry, since
     #       `maybe_merge` in `request_cached` can fail if we try to
@@ -256,10 +255,6 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
 def delete_old_tans(request: OrgRequest) -> None:
     """
     Deletes TANs that are older than half a year.
-
-    Technically we could delete them as soon as they expire
-    but for debugging purposes it makes sense to keep them
-    around a while longer.
     """
 
     cutoff = utcnow() - timedelta(days=180)
@@ -281,6 +276,20 @@ def delete_old_tan_accesses(request: OrgRequest) -> None:
 
     cutoff = utcnow() - timedelta(days=180)
     query = request.session.query(TANAccess).filter(TANAccess.created < cutoff)
+    # cronjobs happen outside a regular request, so we don't need
+    # to synchronize with the session
+    with request.app.session_manager.ignore_bulk_deletes():
+        query.delete(synchronize_session=False)
+
+
+def delete_old_signing_requests(request: OrgRequest) -> None:
+    """
+    Deletes signing requests that are older than a year.
+    """
+
+    cutoff = utcnow() - timedelta(days=366)
+    query = request.session.query(SigningRequest).filter(
+        SigningRequest.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
     with request.app.session_manager.ignore_bulk_deletes():
@@ -545,10 +554,11 @@ def send_monthly_ticket_statistics(request: OrgRequest) -> None:
         )
 
 
-@OrgApp.cronjob(hour=6, minute=5, timezone='Europe/Zurich')
+@OrgApp.cronjob(hour='*', minute='*/5', timezone='Europe/Zurich')
 def send_daily_resource_usage_overview(request: OrgRequest) -> None:
     today = to_timezone(utcnow(), 'Europe/Zurich')
     weekday = WEEKDAYS[today.weekday()]
+    current_time = f'{today.hour:02d}:{today.minute:02d}'
 
     # get all recipients which require an e-mail today
     recipients_q = (
@@ -564,11 +574,13 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
 
     # If the key 'daily_reservations' doesn't exist, the recipient was
     # created before anything else was an option, therefore it must be true
+    # Legacy recipients without 'daily_reservations_times' default to 06:00.
     recipients = [
         (address, content['resources'])
         for address, content in recipients_q
         if content.get('daily_reservations', True)
         and weekday in content['send_on']
+        and current_time in content.get('daily_reservations_times', ['06:00'])
     ]
 
     if not recipients:
@@ -821,6 +833,56 @@ def send_monthly_mtan_statistics(request: OrgRequest) -> None:
     )
 
 
+@OrgApp.cronjob(hour=9, minute=45, timezone='Europe/Zurich')
+def send_monthly_signing_service_statistics(request: OrgRequest) -> None:
+
+    today = to_timezone(utcnow(), 'Europe/Zurich')
+
+    if today.weekday() != MON or today.day > 7:
+        return
+
+    year = today.year
+    month = today.month
+
+    # rewind to previous month
+    if month == 1:
+        month = 12
+        year -= 1
+    else:
+        month -= 1
+
+    # count all the signing requests created in that period
+    # we use UTC as a reference for day boundaries so we don't have to
+    # calculate the boundaries ourselves and risk creating overlapping
+    # intervals
+    signing_request_counts: dict[str, int] = dict(request.session.query(
+        SigningRequest.service_name,
+        func.count(SigningRequest.id)
+    ).filter(and_(
+        func.extract('year', SigningRequest.created) == year,
+        func.extract('month', SigningRequest.created) == month,
+    )).group_by(SigningRequest.service_name).tuples())
+    if not signing_request_counts:
+        # don't send a mail if we generated no mTANs
+        return
+
+    month_name = get_month_names('wide', locale='de_CH')[month]
+    org_name = request.app.org.name
+
+    # FIXME: Make e-mail configurable and text translatable
+    request.app.send_transactional_email(
+        receivers='info@seantis.ch',
+        subject=f'{org_name}: PDF Signatur Statistik {month_name} {year}',
+        plaintext=(
+            f'{org_name} hat im {month_name} {year}\n'
+            '\n'.join(
+                f'{count} PDFs signiert via {name}'
+                for name, count in signing_request_counts.items()
+            )
+        )
+    )
+
+
 @OrgApp.cronjob(hour=4, minute=0, timezone='Europe/Zurich')
 def delete_content_marked_deletable(request: OrgRequest) -> None:
     """ Find all models inheriting from DeletableContentExtension, iterate
@@ -889,13 +951,13 @@ def update_newsletter_email_bounce_statistics(
     # https://postmarkapp.com/developer/api/suppressions-api for the
     # suppression api.
 
-    def create_retry_session() -> requests.Session:
+    def create_retry_session() -> niquests.Session:
         adapter = HTTPAdapter(max_retries=Retry(
             total=3,
             backoff_factor=3,
             status_forcelist=[429, 500, 502, 503, 504],
         ))
-        session = requests.Session()
+        session = niquests.Session(timeout=30)
         session.mount('https://', adapter)
 
         return session
@@ -928,7 +990,7 @@ def update_newsletter_email_bounce_statistics(
             )
             r.raise_for_status()
             return r.json() or {}
-        except requests.exceptions.HTTPError as http_err:
+        except niquests.exceptions.HTTPError as http_err:
             if r and r.status_code == 401:
                 raise RuntimeWarning(
                     f'Postmark API token is not set or invalid: {http_err}'
@@ -1298,13 +1360,13 @@ def wil_daily_event_import(request: OrgRequest) -> None:
 
     log.info(f'Start querying url {minaza_url} for Wil event import')
     try:
-        response = requests.get(
+        response = niquests.get(
             minaza_url, params=params, headers=headers, timeout=60)
     except Exception:
         log.exception(f'Failed to retrieve events for Wil from {minaza_url}')
         return
 
-    if response.status_code != 200:
+    if response.status_code != 200 or not response.content:
         log.error(
             f'Failed to retrieve events for Wil from {minaza_url}, '
             f'with params: {params}, '
@@ -1313,7 +1375,8 @@ def wil_daily_event_import(request: OrgRequest) -> None:
 
     try:
         collection = EventCollection(request.session)
-        added, updated, purged = collection.from_minasa(response.content)
+        added, updated, purged = collection.from_minasa(
+            response.content)
         log.info(f'Wil: Events successfully imported '
                  f'{len(added)} added, {len(updated)} updated, '
                  f'{len(purged)} deleted')

@@ -8,7 +8,9 @@ from datetime import datetime, date
 from freezegun import freeze_time
 from onegov.core.utils import module_path
 from onegov.core.utils import Bunch
+from onegov.file.attachments import IMAGE_MAX_SIZE
 from onegov.org.models import Clipboard, ImageFileCollection, PushNotification
+from PIL import Image
 from onegov.org.models import News, NewsCollection
 from onegov.org.models import Organisation
 from onegov.org.models import SiteCollection
@@ -49,6 +51,29 @@ def test_clipboard(org_app: TestOrgApp) -> None:
 
     clipboard = Clipboard(request, clipboard.token + 'x')
     assert clipboard.url is None
+
+
+def test_clipboard_news_collection(org_app: TestOrgApp) -> None:
+
+    request = OrgRequest(environ={
+        'PATH_INFO': '/',
+        'SERVER_NAME': '',
+        'SERVER_PORT': '',
+        'SERVER_PROTOCOL': 'https',
+        'wsgi.url_scheme': 'https'
+    }, app=org_app)
+
+    news = NewsCollection(request)
+    root = news.root
+    assert root is not None
+    clipboard = Clipboard.from_url(request, request.link(news))
+    assert clipboard.get_object() == root
+
+    clipboard.store_in_session()
+    assert clipboard.from_session(clipboard.request).get_object() == root
+
+    clipboard.clear()
+    assert clipboard.from_session(clipboard.request).get_object() is None
 
 
 def test_news(session: Session) -> None:
@@ -379,7 +404,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) not in o.holidays
     assert date(2000, 1, 3) not in o.holidays
 
-    assert len(o.holidays.all(2000)) == 8
+    assert len(o.holidays.all(2000)) == 10
 
     o.holiday_settings['cantons'] = ['AR', 'ZG']
 
@@ -387,7 +412,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) in o.holidays
     assert date(2000, 1, 3) not in o.holidays
 
-    assert len(o.holidays.all(2000)) == 13
+    assert len(o.holidays.all(2000)) == 15
 
     o.holiday_settings['other'] = [[1, 3, 'Fooyears day']]
 
@@ -395,7 +420,7 @@ def test_holidays() -> None:
     assert date(2000, 1, 2) in o.holidays
     assert date(2000, 1, 3) in o.holidays
 
-    assert len(o.holidays.all(2000)) == 14
+    assert len(o.holidays.all(2000)) == 16
 
 
 def test_cascade_delete(session: Session) -> None:
@@ -442,3 +467,27 @@ def test_duplicate_prevention_push_notifications(session: Session) -> None:
         PushNotification.record_sent_notification(
             session, news_id, "topic1", {"status": "sent"}
         )
+
+
+def test_image_file_collection_resizes_large_images(session: Session) -> None:
+    """ImageFileCollection must resize images that exceed IMAGE_MAX_SIZE."""
+    collection = ImageFileCollection(session)
+
+    large = IMAGE_MAX_SIZE + 500
+    image = collection.add('big.png', create_image(large, large))
+    session.flush()
+
+    stored_size = Image.open(image.reference.file).size
+    assert stored_size[0] <= IMAGE_MAX_SIZE
+    assert stored_size[1] <= IMAGE_MAX_SIZE
+
+    # an image already within the limit must not be altered
+    small = collection.add(
+        'small.png', create_image(IMAGE_MAX_SIZE, IMAGE_MAX_SIZE)
+    )
+    session.flush()
+
+    assert Image.open(small.reference.file).size == (
+        IMAGE_MAX_SIZE,
+        IMAGE_MAX_SIZE,
+    )

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-02-26 13:35+0100\n"
+"POT-Creation-Date: 2026-06-22 07:44+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -17,14 +17,20 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Events"
-msgstr "Veranstaltungen"
+msgid "Meetings"
+msgstr "Sitzungen"
 
-msgid "Latest news"
-msgstr "Aktuelles"
+msgid "Political Businesses"
+msgstr "Politische Geschäfte"
 
-msgid "Topics"
-msgstr "Themen"
+msgid "Parliamentarians"
+msgstr "Parlamentsmitglieder"
+
+msgid "Commissions"
+msgstr "Kommissionen"
+
+msgid "Parliamentary groups"
+msgstr "Fraktionen"
 
 msgid "Chats"
 msgstr "Chats"
@@ -34,6 +40,9 @@ msgstr "Meine Chats"
 
 msgid "Archived Chats"
 msgstr "Archivierte Chats"
+
+msgid "RIS Settings"
+msgstr "Ratsinformationssystem"
 
 msgid "Name"
 msgstr "Name"
@@ -178,12 +187,6 @@ msgstr "Sa"
 msgid "Su"
 msgstr "So"
 
-msgid "Enable RIS"
-msgstr "RIS aktivieren"
-
-msgid "Enables the RIS integration for this organisation."
-msgstr "Aktiviert die RIS-Integration für diese Organisation."
-
 msgid "URL path for the RIS main page"
 msgstr "URL-Pfad für die RIS-Hauptseite"
 
@@ -201,6 +204,15 @@ msgstr ""
 "Kategorie sollte durch ein Semikolon getrennt sein. Beispiel: Kat 1 Text; "
 "Kat 2 Text; Kat 3 Text"
 
+msgid "Enable Ratsinformationssystem (RIS)"
+msgstr "Ratsinformationssystem (RIS) aktivieren"
+
+msgid "Enables the RIS integration for this organisation."
+msgstr "Aktiviert die RIS-Integration für diese Organisation."
+
+msgid "Events"
+msgstr "Veranstaltungen"
+
 msgid "All events"
 msgstr "Alle Veranstaltungen"
 
@@ -212,9 +224,6 @@ msgstr "Formulare und Gesuche"
 
 msgid "Publications"
 msgstr "Publikationen"
-
-msgid "Official Documents"
-msgstr "Amtliche Dokumente"
 
 msgid "Reservations"
 msgstr "Reservationen"
@@ -321,14 +330,11 @@ msgstr "iFrame"
 msgid "Homepage"
 msgstr "Startseite"
 
+msgid "Files"
+msgstr "Dateien"
+
 msgid "Chat Archive"
 msgstr "Chat-Archiv"
-
-msgid "Meetings"
-msgstr "Sitzungen"
-
-msgid "RIS Settings"
-msgstr "Ratsinformationssystem"
 
 msgid "Meeting"
 msgstr "Sitzung"
@@ -344,9 +350,6 @@ msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Delete meeting"
 msgstr "Sitzung löschen"
-
-msgid "Parliamentarians"
-msgstr "Parlamentsmitglieder"
 
 msgid "Parliamentarian"
 msgstr "Parlamentsmitglied"
@@ -369,9 +372,6 @@ msgstr "Rolle wirklich entfernen?"
 msgid "Remove role"
 msgstr "Rolle entfernen"
 
-msgid "Parliamentary groups"
-msgstr "Fraktionen"
-
 msgid "Parliamentary group"
 msgstr "Fraktion"
 
@@ -387,9 +387,6 @@ msgstr "Parteien"
 msgid "Political Party"
 msgstr "Partei"
 
-msgid "Commissions"
-msgstr "Kommissionen"
-
 msgid "Commission"
 msgstr "Kommission"
 
@@ -398,9 +395,6 @@ msgstr "Möchten Sie die Kommission wirklich löschen?"
 
 msgid "Delete commission"
 msgstr "Kommission löschen"
-
-msgid "Political Businesses"
-msgstr "Politische Geschäfte"
 
 msgid "Political Business"
 msgstr "Politisches Geschäft"
@@ -500,14 +494,14 @@ msgstr "Keine aktiven Chats."
 msgid "Contact"
 msgstr "Kontakt"
 
+msgid "Filters"
+msgstr "Filter"
+
 msgid "Function"
 msgstr "Funktion"
 
 msgid "No active commissions."
 msgstr "Keine aktiven Kommissionen."
-
-msgid "Filters"
-msgstr "Filter"
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -547,6 +541,9 @@ msgstr "Weiterführende Informationen"
 
 msgid "Propose a change to this entry"
 msgstr "Änderung für diesen Eintrag vorschlagen"
+
+msgid "Hash"
+msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"
@@ -730,9 +727,6 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "This album does not contain any images yet."
 msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 
-msgid "Cannot display"
-msgstr "Kann nicht anzeigen"
-
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
 
@@ -824,8 +818,8 @@ msgstr "Dateien hierhin ziehen um sie hochzuladen"
 msgid "read more"
 msgstr "weiterlesen"
 
-msgid "All articles"
-msgstr "Alle News"
+msgid "All posts"
+msgstr "Alle Beiträge"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -1134,6 +1128,24 @@ msgstr "${count} Seiten"
 
 msgid "Further occurrences:"
 msgstr "Weitere Termine:"
+
+msgid "Former member or parliament"
+msgstr "Ehemaliges Parlamentsmitglied"
+
+msgid "Parliament"
+msgstr "Parlament"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Status"
+msgstr "Status"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
@@ -1652,6 +1664,9 @@ msgstr ""
 "Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
 "${number}"
 
+msgid "Latest news"
+msgstr "Aktuelles"
+
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
 "newsletter."
@@ -2051,9 +2066,6 @@ msgstr "Dies ist eine importierte Veranstaltung"
 msgid "General information about the event calendar"
 msgstr "Allgemeine Informationen zum Veranstaltungskalender"
 
-msgid "Date"
-msgstr "Datum"
-
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
@@ -2062,9 +2074,6 @@ msgstr "Veranstaltung erfassen"
 
 msgid "Functions"
 msgstr "Funktionen"
-
-msgid "Parliament"
-msgstr "Parlament"
 
 msgid "in"
 msgstr "der"
@@ -2086,9 +2095,6 @@ msgstr "Personalnummer"
 
 msgid "Contract number"
 msgstr "Vertragsnummer"
-
-msgid "Party"
-msgstr "Party"
 
 msgid "Private address"
 msgstr "Privatadresse"
@@ -2178,6 +2184,15 @@ msgstr "Organisation wählen"
 msgid "Select sub organisation"
 msgstr "Unterorganisation wählen"
 
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Nach Organisation oder Unterorganisation filtern"
+
+msgid "Search people"
+msgstr "Personen suchen"
+
+msgid "No people added yet."
+msgstr "Noch keine Personen erfasst."
+
 msgid "No people found for current filter selection."
 msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
 
@@ -2190,14 +2205,8 @@ msgstr "Elektronische Visitenkarte (vCard)"
 msgid "Information"
 msgstr "Information"
 
-msgid "Number"
-msgstr "Nummer"
-
 msgid "Business Type"
 msgstr "Geschäftsart"
-
-msgid "Status"
-msgstr "Status"
 
 msgid "Submission/publication date"
 msgstr "Einreichungs-/Publikationsdatum"
@@ -2372,9 +2381,6 @@ msgstr ""
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
-
-msgid "Confirm selection"
-msgstr "Auswahl bestätigen"
 
 msgid "This newsletter has not been sent yet."
 msgstr "Dieser Newsletter wurde noch nicht gesendet."
@@ -2603,6 +2609,9 @@ msgstr "Archivieren"
 msgid "Archive selected"
 msgstr "Selektierte Archivieren"
 
+msgid "Internal Comments"
+msgstr "Internes Kommentarfeld"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -2785,33 +2794,6 @@ msgstr "Neuer Empfänger"
 msgid "Edit Recipient"
 msgstr "Empfänger Bearbeiten"
 
-msgid "Online Counter Label"
-msgstr "Onlineschalter Label"
-
-msgid "Hide Online Counter on Homepage"
-msgstr "Online-Schalter auf der Homepage ausblenden"
-
-msgid "Reservations Label"
-msgstr "Reservationen Label"
-
-msgid "Hide Reservations on Homepage"
-msgstr "Reservationen auf der Homepage ausblenden"
-
-msgid "SBB Daypass Label"
-msgstr "SBB Tageskarte Label"
-
-msgid "Publications Label"
-msgstr "Publikationen Label"
-
-msgid "Hide Publications on Homepage"
-msgstr "Publikationen auf der Homepage ausblenden"
-
-msgid "E-Move Label"
-msgstr "E-Umzug Label"
-
-msgid "E-Move Url"
-msgstr "E-Umzug Url"
-
 msgid "News and Events"
 msgstr "News und Events"
 
@@ -2830,44 +2812,20 @@ msgstr "Zeige die Fusszeile auf allen Seiten, ausser für Administratoren"
 msgid "Partner display"
 msgstr "Anzeige Partner"
 
-msgid "Favicon"
-msgstr "Favicon"
+msgid "Organisation Profile"
+msgstr "Organisationsprofil"
 
-msgid "Social Media"
-msgstr "Soziale Medien"
+msgid "Tickets"
+msgstr "Tickets"
 
-msgid "Chat"
-msgstr "Chat"
+msgid "Appearance"
+msgstr "Erscheinungsbild"
 
 msgid "Header"
 msgstr "Kopfzeile"
 
 msgid "Footer"
 msgstr "Fusszeile"
-
-msgid "Modules"
-msgstr "Module"
-
-msgid "Analytics"
-msgstr "Web-Statistik"
-
-msgid "Holidays"
-msgstr "Feiertage / Schulferien"
-
-msgid "Tickets"
-msgstr "Tickets"
-
-msgid "Newsletter"
-msgstr "Newsletter"
-
-msgid "Link Migration"
-msgstr "Migration Links"
-
-msgid "Resources"
-msgstr "Reservationen"
-
-msgid "OneGov API"
-msgstr "OneGov API"
 
 msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"
@@ -2879,8 +2837,32 @@ msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
 
-msgid "Push Notification Overview"
-msgstr "Übersicht Push-Benachrichtigungen"
+msgid "Access (mTAN)"
+msgstr "Zugang (mTAN)"
+
+msgid "Holidays"
+msgstr "Feiertage / Schulferien"
+
+msgid "Analytics"
+msgstr "Web-Statistik"
+
+msgid "Optional modules"
+msgstr "Optionale Module"
+
+msgid "Modules"
+msgstr "Module"
+
+msgid "Newsletter"
+msgstr "Newsletter"
+
+msgid "Resources"
+msgstr "Reservationen"
+
+msgid "People directory"
+msgstr "Personenverzeichnis"
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Ratsinformationssystem"
 msgstr "Ratsinformationssystem"
@@ -2888,5 +2870,74 @@ msgstr "Ratsinformationssystem"
 msgid "Ratsinformationssystem (RIS)"
 msgstr "Ratsinformationssystem (RIS)"
 
+msgid "Advanced Settings"
+msgstr "Erweiterte Einstellungen"
+
+msgid "OneGov API"
+msgstr "OneGov API"
+
+msgid "Firebase (App)"
+msgstr "Firebase (App)"
+
+msgid "Push Notification Overview"
+msgstr "Übersicht Push-Benachrichtigungen"
+
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Topics"
+#~ msgstr "Themen"
+
+#~ msgid "Activate/deactivate modules"
+#~ msgstr "Module aktivieren/deaktivieren"
+
+#~ msgid "Enable RIS"
+#~ msgstr "RIS aktivieren"
+
+#~ msgid "Confirm selection"
+#~ msgstr "Auswahl bestätigen"
+
+#~ msgid "Online Counter Label"
+#~ msgstr "Onlineschalter Label"
+
+#~ msgid "Hide Online Counter on Homepage"
+#~ msgstr "Online-Schalter auf der Homepage ausblenden"
+
+#~ msgid "Reservations Label"
+#~ msgstr "Reservationen Label"
+
+#~ msgid "Hide Reservations on Homepage"
+#~ msgstr "Reservationen auf der Homepage ausblenden"
+
+#~ msgid "SBB Daypass Label"
+#~ msgstr "SBB Tageskarte Label"
+
+#~ msgid "Publications Label"
+#~ msgstr "Publikationen Label"
+
+#~ msgid "Official Documents"
+#~ msgstr "Amtliche Dokumente"
+
+#~ msgid "Hide Publications on Homepage"
+#~ msgstr "Publikationen auf der Homepage ausblenden"
+
+#~ msgid "E-Move Label"
+#~ msgstr "E-Umzug Label"
+
+#~ msgid "E-Move Url"
+#~ msgstr "E-Umzug Url"
+
+#~ msgid "Favicon"
+#~ msgstr "Favicon"
+
+#~ msgid "Social Media"
+#~ msgstr "Soziale Medien"
+
+#~ msgid "Link Migration"
+#~ msgstr "Migration Links"
+
+#~ msgid "Cannot display"
+#~ msgstr "Kann nicht anzeigen"
+
+#~ msgid "Party"
+#~ msgstr "Party"

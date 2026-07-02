@@ -153,8 +153,8 @@ class BookingPeriodMixin:
 
     @property
     def is_prebooking_in_past(self) -> bool:
-        """Returns true if current date is after start of booking phase or if
-        current date is after prebooking end. """
+        """True if current date is after start of booking phase or after
+        prebooking end."""
         now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
         end = self.as_local_datetime(self.prebooking_end, end_of_day=True)
@@ -204,7 +204,7 @@ class BookingPeriodMixin:
 
     @property
     def booking_limit(self) -> int | None:
-        """ Returns the max_bookings_per_attendee limit if it applies. """
+        """ The max_bookings_per_attendee limit if it applies. """
         return self.max_bookings_per_attendee
 
 
@@ -214,6 +214,7 @@ class _BookinPeriodMeta(NamedTuple):
     active: bool
     confirmed: bool
     confirmable: bool
+    with_group_code: bool
     finalized: bool
     finalizable: bool
     archived: bool
@@ -286,6 +287,9 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
     # legacy reasons (even though it doesn't sound sane to have an
     # unconfirmable period that is confirmed).
     confirmable: Mapped[bool] = mapped_column(default=True)
+
+    #: Groups can be used to get better scoring for matching.
+    with_group_code: Mapped[bool] = mapped_column(default=True)
 
     #: A finalized period may not have any change in bookings anymore
     finalized: Mapped[bool] = mapped_column(default=False)
@@ -388,7 +392,9 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
             'active',
             unique=True,
             postgresql_where=column('active') == True
-        )
+        ),
+        Index('ix_periods_booking_cost', booking_cost),
+        Index('ix_periods_all_inclusive', all_inclusive),
     )
 
     #: The occasions linked to this period
@@ -564,7 +570,8 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
         assert session is not None
         return Scoring.from_settings(
             settings=self.data.get('match-settings', {}),
-            session=session
+            session=session,
+            period=self
         )
 
     @scoring.setter

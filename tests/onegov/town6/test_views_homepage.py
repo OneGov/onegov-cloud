@@ -76,7 +76,7 @@ def test_homepage(client: Client) -> None:
     assert '<b>0xdeadbeef</b>' not in homepage
     assert 'Alle Veranstaltungen' in homepage
     assert 'admin.digital' in homepage
-    assert 'Alle News' in homepage
+    assert 'Alle Beiträge' in homepage
 
 
 def test_add_new_root_topic(client: Client) -> None:
@@ -84,9 +84,10 @@ def test_add_new_root_topic(client: Client) -> None:
     client.login_admin().follow()
 
     page = client.get('/')
-    assert "Hinzufügen" in page
+    assert 'Hinzufügen' in page
+    assert 'Thema' in page
 
-    page = page.click('Hinzufügen')
+    page = page.click('Thema')
     page.form['title'] = 'Super Thema'
     page = page.form.submit().follow()
     assert page.status_code == 200

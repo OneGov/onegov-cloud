@@ -135,8 +135,8 @@ class SwissHolidays:
 
     def between(
         self,
-        start: date | datetime,
-        end: date | datetime
+        start: date,
+        end: date
     ) -> list[tuple[date, list[str]]]:
         """ Returns all the holidays between the given start and end date in
         the same manner ass :meth:`all`.
@@ -148,9 +148,7 @@ class SwissHolidays:
         if start.year == end.year:
             years = (start.year, )
         else:
-            # FIXME: This does not the match the docstring, have we never
-            #        tested this more than two years?
-            years = (start.year, end.year)
+            years = range(start.year, end.year + 1)
 
         def generate() -> Iterator[tuple[date, list[str]]]:
             for year in years:
@@ -212,11 +210,11 @@ class SwissHolidays:
         yield easter(year), (_('Ostern'), )
 
         # Good Friday is celebrated if we have a canton other than TI, VS
-        if self._cantons > {'TI', 'VS'}:
+        if self._cantons - {'TI', 'VS'}:
             yield easter(year) - rd(days=2), (_('Karfreitag'), )
 
         # Easter Monday is celebrated if we have a canton other than VS
-        if self._cantons > {'VS'}:
+        if self._cantons - {'VS'}:
             yield easter(year) + rd(weekday=MO), (_('Ostermontag'), )
 
         if self._cantons & {

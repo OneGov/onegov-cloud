@@ -304,8 +304,7 @@ def fetch_users_cli(
             app.es_orm_events.stopped = True
 
         fetch_users(
-            app,
-            request.session,
+            request,
             ldap_server,
             ldap_username,
             ldap_password,
@@ -320,8 +319,7 @@ def fetch_users_cli(
 
 
 def fetch_users(
-    app: FsiApp,
-    session: Session,
+    request: FsiRequest,
     ldap_server: str,
     ldap_username: str,
     ldap_password: str,
@@ -334,6 +332,7 @@ def fetch_users(
 ) -> None:
     """ Implements the fetch-users cli command. """
 
+    session = request.session
     admin_group = admin_group.lower()
     editor_group = editor_group.lower()
     sources = ZugUserSource.factory(verbose=verbose)
@@ -395,14 +394,16 @@ def fetch_users(
             raise NotImplementedError()
 
         user = ensure_user(
+            request,
             source=source,
             source_id=source_id,
-            session=session,
             username=data['mail'],
             role=data['role'],
             force_role=force_role,
             force_active=True
         )
+        if user is None:
+            continue
 
         synced_users.append(user.id)
 
@@ -428,3 +429,51 @@ def fetch_users(
 
     if dry_run:
         transaction.abort()
+
+
+@cli.command('strip-whitespace-from-names')
+@click.option('--dry-run/--no-dry-run', default=False)
+def strip_whitespace_from_names(
+    dry_run: bool
+) -> Callable[[FsiRequest, FsiApp], None]:
+    """ Strips leading/trailing whitespace from first_name and last_name
+    of all course attendees.
+
+    Example:
+
+        `onegov-fsi --select /fsi/* strip-whitespace-from-names`
+
+    """
+
+    def _strip(request: FsiRequest, app: FsiApp) -> None:
+        session = app.session()
+        count = 0
+        for attendee in session.query(CourseAttendee):
+            first_name = (
+                attendee.first_name.strip()
+                if attendee.first_name
+                else attendee.first_name
+            )
+            last_name = (
+                attendee.last_name.strip()
+                if attendee.last_name
+                else attendee.last_name
+            )
+            if (first_name, last_name) != (
+                attendee.first_name,
+                attendee.last_name,
+            ):
+                attendee.first_name = first_name
+                attendee.last_name = last_name
+                count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(
+            f'{app.schema}: Stripped whitespace from {count} attendee(s)',
+            fg='green'
+        )
+
+    return _strip

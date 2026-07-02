@@ -15,18 +15,18 @@ from csv import Error as CsvError
 from csv import reader as csv_reader
 from csv import writer as csv_writer
 from datetime import datetime
-from editdistance import eval as distance
 from functools import lru_cache
-from io import BytesIO, StringIO
+from io import BytesIO, StringIO, TextIOWrapper
 from itertools import permutations
 from onegov.core import errors
 from ordered_set import OrderedSet
+from rapidfuzz.distance import Levenshtein
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
 from onegov.core.utils import normalize_for_url
 
 
-from typing import overload, Any, Generic, IO, TypeVar, TYPE_CHECKING
+from typing import overload, Any, IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from openpyxl.worksheet.worksheet import Worksheet
     from typing import Protocol
 
-    class _RowType[T_co](Protocol):
+    class _RowConstructor[T_co](Protocol):
         def __call__(self, *, rownumber: int, **kwargs: str) -> T_co: ...
 
     class DefaultRow(Protocol):
@@ -45,9 +45,6 @@ if TYPE_CHECKING:
 
     type KeyFunc[T] = Callable[[T], SupportsRichComparison]
     type DefaultCSVFile = CSVFile[DefaultRow]
-    _RowT = TypeVar('_RowT', default=DefaultRow)
-else:
-    _RowT = TypeVar('_RowT')
 
 
 VALID_CSV_DELIMITERS = ',;\t'
@@ -60,8 +57,7 @@ large_chars = 'GHMWQ_'
 max_width = 75
 
 
-# FIXME: Switch to PEP-695/PEP-696 generic for Python 3.13
-class CSVFile(Generic[_RowT]):  # noqa: UP046
+class CSVFile[RowT = DefaultRow]:
     """ Provides access to a csv file.
 
     :param csvfile:
@@ -120,30 +116,7 @@ class CSVFile(Generic[_RowT]):  # noqa: UP046
 
     """
 
-    rowtype: _RowType[_RowT]
-
-    @overload
-    def __init__(
-        self: DefaultCSVFile,
-        csvfile: IO[bytes],
-        expected_headers: Collection[str] | None = None,
-        dialect: type[Dialect] | Dialect | str | None = None,
-        encoding: str | None = None,
-        rename_duplicate_column_names: bool = False,
-        rowtype: None = None
-    ): ...
-
-    @overload
-    def __init__(
-        self: CSVFile[_RowT],
-        csvfile: IO[bytes],
-        expected_headers: Collection[str] | None = None,
-        dialect: type[Dialect] | Dialect | str | None = None,
-        encoding: str | None = None,
-        rename_duplicate_column_names: bool = False,
-        *,
-        rowtype: _RowType[_RowT]
-    ): ...
+    rowtype: _RowConstructor[RowT]
 
     def __init__(
         self,
@@ -152,8 +125,8 @@ class CSVFile(Generic[_RowT]):  # noqa: UP046
         dialect: type[Dialect] | Dialect | str | None = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
-        rowtype: _RowType[_RowT] | None = None
-    ):
+        rowtype: _RowConstructor[RowT] | None = None
+    ) -> None:
 
         # guess the encoding if not already provided
         encoding = encoding or detect_encoding(csvfile)
@@ -210,11 +183,11 @@ class CSVFile(Generic[_RowT]):  # noqa: UP046
             result = result[1:]
         return result
 
-    def __iter__(self) -> Iterator[_RowT]:
+    def __iter__(self) -> Iterator[RowT]:
         yield from self.lines
 
     @property
-    def lines(self) -> Iterator[_RowT]:
+    def lines(self) -> Iterator[RowT]:
         self.csvfile.seek(0)
 
         encountered_empty_line = False
@@ -337,8 +310,13 @@ def convert_xlsx_to_csv(
     if TYPE_CHECKING:
         assert isinstance(sheet, Worksheet)
 
-    text_output = StringIO()
-    writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
+    output = TextIOWrapper(
+        BytesIO(),
+        encoding='utf-8',
+        newline='',
+        write_through=True
+    )
+    writecsv = csv_writer(output, quoting=QUOTE_ALL)
 
     for row in range(1, sheet.max_row + 1):
         values = []
@@ -367,15 +345,7 @@ def convert_xlsx_to_csv(
         if any(values):
             writecsv.writerow(values)
 
-    text_output.seek(0)
-    # FIXME: We can use StringIOWrapper around a BytesIO, then we don't
-    #        need to convert at the end!
-    output = BytesIO()
-
-    for line in text_output.readlines():
-        output.write(line.encode('utf-8'))
-
-    return output
+    return output.detach()
 
 
 def convert_xls_to_csv(
@@ -404,8 +374,13 @@ def convert_xls_to_csv(
     else:
         sheet = excel.sheet_by_index(0)
 
-    text_output = StringIO()
-    writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
+    output = TextIOWrapper(
+        BytesIO(),
+        encoding='utf-8',
+        newline='',
+        write_through=True
+    )
+    writecsv = csv_writer(output, quoting=QUOTE_ALL)
 
     for rownum in range(sheet.nrows):
         values = []
@@ -433,15 +408,7 @@ def convert_xls_to_csv(
 
         writecsv.writerow(values)
 
-    text_output.seek(0)
-    # FIXME: We can use StringIOWrapper around a BytesIO, then we don't
-    #        need to convert at the end!
-    output = BytesIO()
-
-    for line in text_output.readlines():
-        output.write(line.encode('utf-8'))
-
-    return output
+    return output.detach()
 
 
 def convert_excel_to_csv(
@@ -845,13 +812,19 @@ def match_headers(
     if len(headers) > 1:
         sane_distance = min((
             sane_distance,
-            min(distance(a, b) for a, b in permutations(headers, 2))
+            min(
+                Levenshtein.distance(a, b)
+                for a, b in permutations(headers, 2)
+            )
         ))
 
     if len(expected) > 1:
         sane_distance = min((
             sane_distance,
-            min(distance(a, b) for a, b in permutations(expected, 2))
+            min(
+                Levenshtein.distance(a, b)
+                for a, b in permutations(expected, 2)
+            )
         ))
 
     sane_distance = min((
@@ -865,7 +838,7 @@ def match_headers(
 
     for column in expected:
         normalized = normalize_header(column)
-        distances = {h: distance(normalized, h) for h in headers}
+        distances = {h: Levenshtein.distance(normalized, h) for h in headers}
 
         closest = min(distances.values())
 

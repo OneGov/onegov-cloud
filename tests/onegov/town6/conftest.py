@@ -16,7 +16,7 @@ from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
 
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from libres.db.models import Allocation
@@ -24,13 +24,6 @@ if TYPE_CHECKING:
     from tests.shared.browser import ExtendedBrowser
     from tests.shared.client import ExtendedResponse
     from typing import Protocol
-
-    _TownAppT = TypeVar(
-        '_TownAppT',
-        bound=TownApp,
-        default='TestTownApp',
-        covariant=True
-    )
 
     class _ReserveFunc(Protocol):
         def __call__(
@@ -40,8 +33,6 @@ if TYPE_CHECKING:
             quota: int = 1,
             whole_day: bool = ...,
         ) -> ExtendedResponse: ...
-else:
-    _TownAppT = TypeVar('_OrgAppT', bound=TownApp)
 
 
 class TestTownApp(TownApp):
@@ -49,7 +40,7 @@ class TestTownApp(TownApp):
     maildir: str
 
 
-class Client(BaseClient[_TownAppT]):
+class Client[AppT: TownApp = TestTownApp](BaseClient[AppT]):
     skip_n_forms = 1
     use_intercooler = True
 

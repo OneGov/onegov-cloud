@@ -7,6 +7,7 @@ from onegov.core.crypto import random_password
 from onegov.parliament.collections import ParliamentarianCollection
 from onegov.pas.models import PASParliamentarian
 from onegov.user import UserCollection
+from sqlalchemy.orm import selectinload
 
 log = logging.getLogger('onegov.pas.collections.parliamentarian')
 
@@ -45,13 +46,8 @@ class PASParliamentarianCollection(
 
     def add(self, **kwargs: Any) -> PASParliamentarian:
         item = super().add(**kwargs)
-        if not item.email_primary:
-            log.warning(
-                f'Creating parliamentarian {item.title} without'
-                'email_primary. This will prevent user account'
-                'creation and may cause permission-related failures.'
-            )
-        self.update_user(item, item.email_primary)
+        if item.zg_username:
+            self.update_user(item, item.zg_username)
         self.session.flush()
         return item
 
@@ -74,81 +70,101 @@ class PASParliamentarianCollection(
             for membership in item.commission_memberships
         )
 
+    def _representatives_by_zg_username(
+        self,
+        parliamentarians: list[PASParliamentarian],
+    ) -> dict[str, PASParliamentarian]:
+        """Pick one parliamentarian per unique zg_username,
+        prioritizing commission presidents."""
+
+        by_username: dict[str, PASParliamentarian] = {}
+        for parl in parliamentarians:
+            if not parl.zg_username:
+                continue
+            key = parl.zg_username.lower()
+            existing = by_username.get(key)
+            if existing is None or (
+                self._is_current_commission_president(parl)
+                and not self._is_current_commission_president(existing)
+            ):
+                by_username[key] = parl
+        return by_username
+
     def update_user(
         self,
         item: PASParliamentarian,
-        new_email: str | None,
+        new_username: str | None,
         users_cache: dict[str, Any] | None = None,
     ) -> None:
         """Keep the parliamentarian and its user account in sync.
 
-        * Creates a new user account if an email address is set (if not already
-          existing).
-        * Disable user accounts if an email has been deleted.
-        * Change usernames if an email has changed.
-        * Make sure used user accounts have the right role.
-        * Make sure used user accounts are activated.
-        * Make sure the password is changed if activated or disabled.
+        Uses zg_username as the User.username identifier.
 
-         Optional users_cache parameter allows to pre-fetch the users to avoid
-         N+1 queries.
+        * Creates a new user if zg_username is set.
+        * Disables user if zg_username has been removed.
+        * Changes usernames if zg_username changed.
+        * Ensures correct role and active state.
 
+        Optional users_cache pre-fetches users to avoid
+        N+1 queries.
         """
 
-        old_email = item.email_primary
+        old_username = item.zg_username
         users = UserCollection(self.session)
 
         if users_cache is not None:
             old_user = (
-                users_cache.get(old_email.lower()) if old_email
-                else None
+                users_cache.get(old_username.lower()) if old_username else None
             )
             new_user = (
-                users_cache.get(new_email.lower()) if new_email
-                else None
+                users_cache.get(new_username.lower()) if new_username else None
             )
         else:
-            old_user = users.by_username(old_email) if old_email else None
-            new_user = users.by_username(new_email) if new_email else None
+            old_user = (
+                users.by_username(old_username) if old_username else None
+            )
+            new_user = (
+                users.by_username(new_username) if new_username else None
+            )
 
         create = False
         enable = None
         disable = []
 
-        if not new_email:
-            # email has been unset: disable obsolete users
+        if not new_username:
             disable.extend([old_user, new_user])
         else:
-            if new_email == old_email:
-                # email has not changed, old_user == new_user
+            if new_username == old_username:
                 if not old_user:
                     create = True
                 else:
                     enable = old_user
             else:
-                # email has changed: ensure user exist
                 if old_user and new_user:
                     disable.append(old_user)
                     enable = new_user
                 elif not old_user and not new_user:
                     create = True
                 else:
-                    enable = old_user if old_user else new_user
+                    enable = old_user or new_user
 
         if create:
-            assert new_email is not None
+            assert new_username is not None
             role = (
                 'commission_president'
-                 if self._is_current_commission_president(item)
-                 else 'parliamentarian'
+                if self._is_current_commission_president(item)
+                else 'parliamentarian'
             )
-            log.info(f'Creating user {new_email} with role {role}')
+            log.info(f'Creating user {new_username} with role {role}')
             new_user_obj = users.add(
-                new_email, random_password(16), role=role,
-                realname=item.title
+                new_username,
+                random_password(16),
+                role=role,
+                realname=item.title,
+                active=False,
             )
             if users_cache is not None:
-                users_cache[new_email.lower()] = new_user_obj
+                users_cache[new_username.lower()] = new_user_obj
 
         if enable:
             if enable.role == 'admin':
@@ -158,12 +174,19 @@ class PASParliamentarianCollection(
                 if self._is_current_commission_president(item)
                 else 'parliamentarian'
             )
+            saml_sources = {'saml2', 'ldap'}
             corrections = {
-                'username': new_email,
+                'username': new_username,
                 'role': role,
                 'active': True,
-                'source': None,
-                'source_id': None,
+                **(
+                    {}
+                    if enable.source in saml_sources
+                    else {
+                        'source': None,
+                        'source_id': None,
+                    }
+                ),
             }
             corrections = {
                 attribute: value
@@ -183,3 +206,49 @@ class PASParliamentarianCollection(
                 log.info(f'Deactivating user {user.username}')
                 user.active = False
                 user.logout_all_sessions(self.app)
+
+    def sync_user_accounts(self) -> dict[str, Any]:
+        """Sync user accounts for all parliamentarians.
+
+        Groups by zg_username, picks one representative per
+        username to avoid role conflicts. Prioritizes
+        commission presidents.
+
+        Returns dict with 'synced', 'skipped', and
+        'created' (list of new usernames).
+        """
+
+        parliamentarians = (
+            self.query()
+            .options(selectinload(self.model_class.commission_memberships))
+            .all()
+        )
+
+        users_cache = {
+            user.username.lower(): user
+            for user in UserCollection(self.session).query()
+        }
+
+        representatives = self._representatives_by_zg_username(
+            parliamentarians
+        )
+
+        synced = 0
+        skipped = 0
+        created: list[str] = []
+        for parl in representatives.values():
+            username = parl.zg_username
+            assert username is not None
+
+            is_new = username.lower() not in users_cache
+            self.update_user(parl, username, users_cache)
+            if is_new:
+                created.append(username)
+            synced += 1
+
+        self.session.flush()
+        return {
+            'synced': synced,
+            'skipped': skipped,
+            'created': created,
+        }

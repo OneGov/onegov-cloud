@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+
 from functools import cached_property
 from onegov.core.custom import msgpack
 from onegov.core.orm import orm_cached
-from onegov.core.request import CoreRequest
+from onegov.core.request import CoreRequest, is_logged_in
 from onegov.core.security import Private
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import News, TANAccessCollection, Topic
@@ -18,7 +19,9 @@ from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from onegov.core.analytics import AnalyticsProvider
+    from onegov.core.layout import Layout
     from onegov.org.app import OrgApp
+    from onegov.org.layout import DefaultLayout
     from onegov.ticket import Ticket
 
 
@@ -57,8 +60,8 @@ class OrgRequest(CoreRequest):
 
     @cached_property
     def is_manager(self) -> bool:
-        """ Returns true if the current user is logged in, and has the role
-        editor or admin.
+        """ True if the current user is logged in and has the role editor or
+        admin.
 
         """
 
@@ -69,38 +72,34 @@ class OrgRequest(CoreRequest):
 
     @cached_property
     def is_admin(self) -> bool:
-        """ Returns true if the current user is an admin.
-
-        """
+        """ True if the current user is an admin. """
 
         return self.has_role('admin')
 
     @cached_property
     def is_editor(self) -> bool:
-        """ Returns true if the current user is an editor.
-
-        """
+        """ True if the current user is an editor. """
 
         return self.has_role('editor')
 
     @cached_property
     def is_supporter(self) -> bool:
-        """ Returns true if the current user is a supporter.
-
-        """
+        """ True if the current user is a supporter. """
 
         return self.has_role('supporter')
 
     @cached_property
     def is_member(self) -> bool:
-        """ Returns true if the current user is a member.
-
-        """
+        """ True if the current user is a member. """
 
         return self.has_role('member')
 
     @property
     def current_username(self) -> str | None:
+        cached = getattr(self, '_current_user', None)
+        if cached is not None:
+            return cached.username
+
         return self.identity.userid if self.identity else None
 
     # NOTE: Internal cache, don't use directly!
@@ -108,15 +107,21 @@ class OrgRequest(CoreRequest):
 
     @property
     def current_user(self) -> User | None:
-        if not self.identity:
+        if not is_logged_in(self.identity):
             return None
 
         if not hasattr(self, '_current_user'):
             self._current_user = (
                 self.session.query(User)
-                .filter_by(username=self.identity.userid)
+                .filter(User.id == self.identity.uid)
                 .first()
             )
+            if (
+                self._current_user is not None
+                and self.identity.userid != self._current_user.username
+            ):
+                # stale username in session — fix it for subsequent requests
+                self.browser_session['userid'] = self._current_user.username
             return self._current_user
 
         if self._current_user is None:
@@ -297,7 +302,17 @@ class OrgRequest(CoreRequest):
 
     @property
     def analytics_provider(self) -> AnalyticsProvider | None:
-        """ Returns the active analytics provider. """
+        """ The active analytics provider. """
         if name := self.app.org.analytics_provider_name:
             return self.app.available_analytics_providers.get(name)
         return None
+
+    def get_layout(self, model: object) -> Layout | DefaultLayout:
+        """
+        Get the registered layout for a model instance.
+        """
+
+        layout = self.app.get_layout(model, self)
+        assert layout is not None
+
+        return layout

@@ -7,9 +7,9 @@ import html
 import isodate
 import json
 import locale
+import niquests
 import pytz
 import re
-import requests
 import shutil
 import sys
 import textwrap
@@ -17,6 +17,7 @@ import transaction
 import yaml
 
 from collections import defaultdict
+from itertools import chain
 from datetime import date, datetime, timedelta
 from io import BytesIO
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
@@ -38,8 +39,8 @@ from onegov.event import Occurrence
 from onegov.event import EventCollection
 from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
-from onegov.file import File
 from onegov.file.collection import FileCollection
+from onegov.file.models import File, SigningRequest
 from onegov.form import (
     FormCollection,
     FormDefinition,
@@ -577,6 +578,7 @@ def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
 @click.option('--published-only', is_flag=True, default=False,
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
+@click.option('--include-imported', is_flag=True, default=False)
 def fetch(
     group_context: GroupContext,
     source: Sequence[str],
@@ -585,7 +587,8 @@ def fetch(
     create_tickets: bool,
     state_transfers: Sequence[str],
     published_only: bool,
-    delete_orphaned_tickets: bool
+    delete_orphaned_tickets: bool,
+    include_imported: bool
 ) -> Callable[[OrgRequest, OrgApp], None]:
     r""" Fetches events from other instances.
 
@@ -617,6 +620,12 @@ def fetch(
 
         Delete Tickets, TicketNotes and TicketMessasges if an
         event gets deleted automatically.
+
+    - ``--include-imported``
+
+        By default skip events that have a source attribute, which means they
+        have been imported. If the flag is set, imported events will be
+        included in the fetch transfer.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
@@ -671,12 +680,13 @@ def fetch(
                 assert remote_session.info['schema'] == remote_schema
 
                 query = remote_session.query(Event)
-                query = query.filter(
-                    or_(
-                        Event.meta['source'].astext.is_(None),
-                        Event.meta['source'].astext == ''
+                if not include_imported:
+                    query = query.filter(
+                        or_(
+                            Event.meta['source'].astext.is_(None),
+                            Event.meta['source'].astext == ''
+                        )
                     )
-                )
                 if tag:
                     query = query.filter(Event._tags.has_any(array(tag)))
                 if location:
@@ -753,33 +763,69 @@ def fetch(
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
 
-                added, updated, purged = local_events.from_import(
-                    remote_events(),
-                    to_purge=[f'fetch-{key}'],
-                    publish_immediately=False,
-                    valid_state_transfers=valid_state_transfers,
-                    published_only=published_only
-                )
+                with app.session_manager.disable_change_signals():
+                    added, updated, purged = local_events.from_import(
+                        remote_events(),
+                        to_purge=[f'fetch-{key}'],
+                        publish_immediately=False,
+                        valid_state_transfers=valid_state_transfers,
+                        published_only=published_only,
+                    )
 
-                for event_ in added:
-                    event_.submit()
-                    if not create_tickets:
-                        event_.publish()
-                        continue
+                    for event_ in added:
+                        event_.submit()
+                        if not create_tickets:
+                            event_.publish()
+                            continue
 
-                    assert local_admin is not None
-                    with local_session.no_autoflush:
-                        tickets = TicketCollection(local_session)
-                        new_ticket = tickets.open_ticket(
-                            handler_code='EVN', handler_id=event_.id.hex,
-                            source=event_.meta['source'],
-                            user=local_admin.username
+                        assert local_admin is not None
+                        with local_session.no_autoflush:
+                            tickets = TicketCollection(local_session)
+                            new_ticket = tickets.open_ticket(
+                                handler_code='EVN',
+                                handler_id=event_.id.hex,
+                                source=event_.meta['source'],
+                                user=local_admin.username,
+                            )
+                            new_ticket.muted = True
+                            TicketNote.create(
+                                new_ticket,
+                                request,
+                                (f'Importiert von Instanz {key}'),
+                                owner=local_admin.username,
+                            )
+
+                if getattr(app, 'fts_search_enabled', False):
+                    if added or updated:
+                        app.fts_indexer.process(
+                            (
+                                task
+                                for event_ in chain(added, updated)
+                                if (
+                                    task := app.fts_orm_events.index_task(
+                                        local_schema,
+                                        event_,
+                                    )
+                                )
+                                is not None
+                            ),
+                            local_session,
                         )
-                        new_ticket.muted = True
-                        TicketNote.create(new_ticket, request, (
-                            f'Importiert von Instanz {key}'
-
-                        ), owner=local_admin.username)
+                    if purged:
+                        app.fts_indexer.process(
+                            (
+                                {
+                                    'action': 'delete',
+                                    'schema': local_schema,
+                                    'tablename': 'events',
+                                    'owner_type': 'Event',
+                                    'id': eid,
+                                }
+                                for eid in purged
+                            ),
+                            local_session,
+                        )
+                    local_session.flush()
 
                 helper_request: OrgRequest = Bunch(  # type:ignore
                     current_username=local_admin and local_admin.username,
@@ -862,6 +908,66 @@ def fix_directory_files(
                 f'{app.schema} - {count} files adapted with type `directory`',
                 fg='green'
             )
+    return execute
+
+
+@cli.command('fix-submission-file-sizes')
+@pass_group_context
+def fix_submission_file_sizes(
+    group_context: GroupContext
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    Updates the file size stored in form submission data to reflect the
+    actual stored size (after resizing/compression) rather than the original
+    upload size.
+
+        `onegov-org --select /onegov_org/* fix-submission-file-sizes`
+        `onegov-org --select /onegov_town6/* fix-submission-file-sizes`
+
+    """
+
+    def file_dicts(data: dict[str, object]) -> list[dict[str, object]]:
+        """ Yields all single-file and multi-file dicts from submission
+        data."""
+        result = []
+        for value in data.values():
+            if isinstance(value, dict):
+                result.append(value)
+            elif isinstance(value, list):
+                result.extend(item for item in value if isinstance(item, dict))
+        return result
+
+    def execute(request: OrgRequest, app: OrgApp) -> None:
+        count = 0
+        for submission in request.session.query(FormSubmission).all():
+            changed = False
+            for file_dict in file_dicts(submission.data):
+                ref = file_dict.get('data', '')
+                if not isinstance(ref, str) or not ref.startswith('@'):
+                    continue
+                file = request.session.query(File).filter_by(
+                    id=ref[1:]
+                ).first()
+                if file is None:
+                    continue
+                try:
+                    actual_size = file.reference.file.content_length
+                except OSError:
+                    continue
+                if file_dict.get('size') == actual_size:
+                    continue
+                file_dict['size'] = actual_size
+                changed = True
+                count += 1
+
+            if changed:
+                submission.data.changed()  # type:ignore[attr-defined]
+
+        click.secho(
+            f'{app.schema} - updated sizes for {count} file field(s)',
+            fg='green'
+        )
+
     return execute
 
 
@@ -1389,12 +1495,40 @@ def mtan_statistics(
         if mtan_count:
             org_name = app.org.name if hasattr(app, 'org') else None
             title = f'{org_name} ({app.schema})' if org_name else app.schema
-            click.echo(
-                f'{title}: '
-                f'Sent {mtan_count} mTAN SMS'
-            )
+            click.echo(f'{title}: Sent {mtan_count} mTAN SMS')
 
     return mtan_statistics
+
+
+@cli.command(context_settings={'default_selector': '*'})
+@click.argument('year', type=click.IntRange(1900, date.today().year))
+@click.argument('month', type=click.IntRange(1, 12))
+@pass_group_context
+def signing_service_statistics(
+    group_context: GroupContext,
+    year: int,
+    month: int,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """ Generate mTAN SMS statistics for the given year and month. """
+
+    if date(year, month, 1) >= date.today().replace(day=1):
+        abort('Year and month needs to be fully in the past')
+
+    def signing_service_statistics(request: OrgRequest, app: OrgApp) -> None:
+        signing_request_counts: dict[str, int] = dict(request.session.query(
+            SigningRequest.service_name,
+            func.count(SigningRequest.id)
+        ).filter(and_(
+            func.extract('year', SigningRequest.created) == year,
+            func.extract('month', SigningRequest.created) == month,
+        )).group_by(SigningRequest.service_name).tuples())
+        if signing_request_counts:
+            org_name = app.org.name if hasattr(app, 'org') else None
+            title = f'{org_name} ({app.schema})' if org_name else app.schema
+            for name, count in signing_request_counts.items():
+                click.echo(f'{title}: Signed {count} PDFs via {name}')
+
+    return signing_service_statistics
 
 
 def ul(inner: str) -> str:
@@ -1824,8 +1958,8 @@ def import_meetings(
                                         f' {row["cells"][0]}'
                                     )
                                     continue
-                                resp = requests.get(link, timeout=(5, 10))
-                                if resp.status_code == 200:
+                                resp = niquests.get(link, timeout=(5, 10))
+                                if resp.status_code == 200 and resp.content:
                                     if existing_file := file_coll.by_content(
                                         BytesIO(resp.content)
                                     ).first():
@@ -3265,16 +3399,14 @@ def check_forms(
         )
         data_to_parse.extend((x.title, x.structure) for x in directories.all())
 
-        # NOTE: the formcode for resources can be empty but causing
-        # an InvalidFormSyntax
-        # resources = (
-        #     ResourceCollection(app.libres_context)
-        #     .query()
-        #     .with_entities(Resource.title, Resource.definition)
-        # )
-        # data_to_parse.extend(
-        #     (x.title, x.definition) for x in resources.all()
-        # )
+        resources = (
+            ResourceCollection(app.libres_context)
+            .query()
+            .with_entities(Resource.title, Resource.definition)
+        )
+        data_to_parse.extend(
+            (x.title, x.definition) for x in resources.all() if x.definition
+        )
 
         click.echo(f'\nParsing formcode for "{app.org.name}"')
         count = len(data_to_parse)

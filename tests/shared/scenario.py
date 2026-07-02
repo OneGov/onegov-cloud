@@ -4,12 +4,10 @@ import transaction
 from contextlib import contextmanager
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator
     from sqlalchemy.orm import Session
-
-    _T = TypeVar('_T')
 
 
 class BaseScenario:
@@ -37,7 +35,7 @@ class BaseScenario:
         yield
         self.commit()
 
-    def add(self, model: Callable[..., _T], **columns: Any) -> _T:
+    def add[T](self, model: Callable[..., T], **columns: Any) -> T:
         obj = model(**columns)
         self.session.add(obj)
 

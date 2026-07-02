@@ -15,6 +15,7 @@ from onegov.core.converters import datetime_year_converter
 from onegov.core.converters import json_converter
 from onegov.core.converters import LiteralConverter
 from onegov.core.orm.abstract import MoveDirection
+from onegov.core.security import Public
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
@@ -132,6 +133,28 @@ if TYPE_CHECKING:
 @OrgApp.path(model=Organisation, path='/')
 def get_org(app: OrgApp) -> Organisation:
     return app.org
+
+
+class ShortLink:
+
+    __slots__ = ('name', 'to')
+
+    def __init__(self, name: str, to: str) -> None:
+        self.name = name
+        self.to = to
+
+
+@OrgApp.path(model=ShortLink, path='/@{name}')
+def get_short_link(app: OrgApp, name: str) -> ShortLink | None:
+    redirect_path = app.org.short_links_dict.get(name)
+    if redirect_path is None:
+        return None
+    return ShortLink(name, redirect_path)
+
+
+@OrgApp.view(model=ShortLink, permission=Public)
+def view_short_link(self: ShortLink, request: OrgRequest) -> Response:
+    return request.redirect(self.to)
 
 
 @OrgApp.path(model=Auth, path='/auth', converters={'skip': bool})
@@ -785,6 +808,12 @@ def get_occurrences(
     else:
         search_widget = None
 
+    role = getattr(request.identity, 'role', 'anonymous')
+    available_accesses = {
+        'admin': (),  # can see everything
+        'editor': (),  # can see everything
+        'member': ('member', 'mtan', 'public')
+    }.get(role, ('mtan', 'public'))
     return OccurrenceCollection(
         app.session(),
         page=page,
@@ -794,7 +823,7 @@ def get_occurrences(
         tags=tags,
         filter_keywords=filter_keywords,
         locations=locations,
-        only_public=(not request.is_manager),
+        available_accesses=available_accesses,
         search_widget=search_widget,
     )
 
@@ -814,6 +843,7 @@ def get_event(app: OrgApp, name: str) -> Event | None:
     path='/search',
     converters={
         'type': [str],
+        'plain': bool,
         'page': int
     }
 )
@@ -821,9 +851,10 @@ def get_search(
     request: OrgRequest,
     q: str = '',
     type: list[str] | None = None,
+    plain: bool = False,
     page: int = 0
 ) -> Search:
-    return Search(request, q, types=type, page=page)
+    return Search(request, q, types=type, plain=plain, page=page)
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')
@@ -1425,13 +1456,22 @@ def get_commissions(
 @OrgApp.path(
     model=RISCommission,
     path='/commission/{id}',
-    converters={'id': UUID}
+    converters={'id': UUID, 'active_members': bool}
 )
 def get_commission(
     app: OrgApp,
-    id: UUID
+    id: UUID,
+    active_members: bool | None = None
 ) -> RISCommission | None:
-    return RISCommissionCollection(app.session()).by_id(id)
+    # NOTE: This ensures the parameter is only in generated URLs if we
+    #       look for inactive members, if it were always there by default
+    #       it would be a bit of a bother.
+    if active_members is True:
+        active_members = None
+    comission = RISCommissionCollection(app.session()).by_id(id)
+    if comission is not None:
+        comission.active_members = active_members
+    return comission
 
 
 @OrgApp.path(

@@ -6,10 +6,9 @@
         <div class="grid-x grid-padding-x wrapper">
             <div class="medium-7 cell content">
                 <div class="page-lead h5 limit-line-width">
-                    <div tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end); suffix time_suffix|nothing">
+                    <div>
                         ${layout.format_date(occurrence.localized_start, 'event')},
-                        <span tal:condition="python: '00:00' not in time">${time}${' ' + suffix if suffix else ''}</span>
-                        <span tal:condition="python: '00:00' in time">${time}</span>
+                        ${layout.format_event_time_range(occurrence.localized_start, occurrence.localized_end)}
                     </div>
                     <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>
@@ -20,7 +19,7 @@
 
                 <div class="occurrence-filters" tal:condition="occurrence.filter_keywords and show_filters">
                     <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
-                        <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
+                        <span tal:condition="filter[1]" class="blank-label-description">${layout.org.event_filter_names[filter[0]]}:</span>
                         <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
                         <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
                     </div>

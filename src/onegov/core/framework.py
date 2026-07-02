@@ -28,7 +28,7 @@ import random
 import sys
 import traceback
 
-from base64 import b64encode
+from base64 import b64encode, urlsafe_b64encode
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -37,6 +37,7 @@ from dectate import directive
 from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
 from libres.db.models import ORMBase
+from morepath import dispatch_method
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
@@ -46,6 +47,8 @@ from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
+from reg import ClassIndex
+
 from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
@@ -67,7 +70,7 @@ from urllib.parse import urlencode
 from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
-from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
@@ -79,18 +82,14 @@ if TYPE_CHECKING:
     from morepath.settings import SettingRegistry
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
-    from typing_extensions import ParamSpec
     from webob import Response
 
     from .analytics import AnalyticsProvider
+    from .layout import Layout
     from .mail import Attachment
     from .metadata import Metadata
     from .security.permissions import Intent
     from .types import EmailJsonDict, SequenceOrScalar
-
-    _P = ParamSpec('_P')
-
-_T = TypeVar('_T')
 
 # Monkey patch
 # https://linear.app/onegovcloud/issue/OGC-853/404-navigation-js-fehler
@@ -129,6 +128,8 @@ class Framework(
     template_variables = directive(directives.TemplateVariablesAction)
     replace_setting = directive(directives.ReplaceSettingAction)
     replace_setting_section = directive(directives.ReplaceSettingSectionAction)
+    layout = directive(directives.Layout)
+    json = directive(directives.ExtendedJsonAction)  # type: ignore[assignment]
 
     #: sets the same-site cookie directive, (may need removal inside iframes)
     same_site_cookie_policy: str | None = 'Lax'
@@ -179,13 +180,13 @@ class Framework(
 
         return fn
 
-    def with_query_report(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_query_report[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_query_report_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
 
             assert isinstance(self.sql_query_report, str)
             with debug.analyze_sql_queries(self.sql_query_report):
@@ -193,13 +194,13 @@ class Framework(
 
         return with_query_report_wrapper
 
-    def with_profiler(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_profiler[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_profiler_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             filename = '{:%Y-%m-%d %H:%M:%S}.profile'.format(datetime.now())
 
             with utils.profile(filename):
@@ -207,28 +208,28 @@ class Framework(
 
         return with_profiler_wrapper
 
-    def with_request_cache(self, fn: Callable[_P, _T]) -> Callable[_P, _T]:
+    def with_request_cache[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
         @wraps(fn)
         def with_request_cache_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             self.clear_request_cache()
             return fn(*args, **kwargs)
 
         return with_request_cache_wrapper
 
-    def with_print_exceptions(
+    def with_print_exceptions[**P, T](
         self,
-        fn: Callable[_P, _T]
-    ) -> Callable[_P, _T]:
+        fn: Callable[P, T]
+    ) -> Callable[P, T]:
 
         @wraps(fn)
         def with_print_exceptions_wrapper(
-            *args: _P.args,
-            **kwargs: _P.kwargs
-        ) -> _T:
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
             try:
                 return fn(*args, **kwargs)
             except Exception:
@@ -292,7 +293,7 @@ class Framework(
 
     @property
     def has_filestorage(self) -> bool:
-        """ Returns true if :attr:`fs` is available. """
+        """ True if :attr:`fs` is available. """
         return self._global_file_storage is not None
 
     def handle_exception(
@@ -1001,6 +1002,9 @@ class Framework(
         assert category in ('transactional', 'marketing')
         assert self.mail is not None
         sender = self.mail[category]['sender']
+        tenants = self.mail[category].get('tenants', {})
+        config = tenants.get(self.application_id, {})
+        sender = config.get('sender') or sender
         assert sender
 
         # Postmark requires E-Mails in the marketing stream to contain
@@ -1178,10 +1182,7 @@ class Framework(
 
     @property
     def can_deliver_sms(self) -> bool:
-        """ Returns whether or not the current schema is configured for
-        SMS delivery.
-
-        """
+        """Whether or not the current schema is configured for SMS delivery."""
         if not self.sms_directory:
             return False
 
@@ -1326,8 +1327,8 @@ class Framework(
 
     @cached_property
     def serve_static_files(self) -> bool:
-        """ Returns True if ``/static`` files should be served. Needs to be
-        enabled manually.
+        """ True if ``/static`` files should be served. Needs to be enabled
+        manually.
 
         Note that even if the static files are not served, ``/static`` path
         is still served, it just won't return anything but a 404.
@@ -1356,7 +1357,7 @@ class Framework(
 
     @property
     def filestorage(self) -> SubFS[FS] | None:
-        """ Returns a filestorage object bound to the current application.
+        """ A filestorage object bound to the current application.
         Based on this nifty module:
 
         `<https://docs.pyfilesystem.org/en/latest/>`_
@@ -1410,8 +1411,7 @@ class Framework(
 
     @property
     def themestorage(self) -> SubFS[FS] | None:
-        """ Returns a storage object meant for themes, shared by all
-        applications.
+        """ A storage object meant for themes, shared by all applications.
 
         Only use this for theming, nothing else!
 
@@ -1424,12 +1424,12 @@ class Framework(
 
     @property
     def theme_options(self) -> dict[str, Any]:
-        """ Returns the application-bound theme options. """
+        """ The application-bound theme options. """
         return {}
 
     @cached_property
     def translations(self) -> dict[str, GNUTranslations]:
-        """ Returns all available translations keyed by language. """
+        """ All available translations keyed by language. """
 
         try:
             if not self.settings.i18n.localedirs:
@@ -1443,14 +1443,14 @@ class Framework(
 
     @cached_property
     def chameleon_translations(self) -> dict[str, _ChameleonTranslate]:
-        """ Returns all available translations for chameleon. """
+        """ All available translations for chameleon. """
         return self.modules.i18n.wrap_translations_for_chameleon(
             self.translations
         )
 
     @cached_property
     def locales(self) -> set[str]:
-        """ Returns all available locales in a set. """
+        """ All available locales in a set. """
         try:
             if self.settings.i18n.locales:
                 return self.settings.i18n.locales
@@ -1461,7 +1461,7 @@ class Framework(
 
     @cached_property
     def default_locale(self) -> str | None:
-        """ Returns the default locale. """
+        """ The default locale. """
         try:
             if self.settings.i18n.default_locale:
                 return self.settings.i18n.default_locale
@@ -1528,7 +1528,7 @@ class Framework(
         """ Take the sha-256 because we want a key that is 32 bytes long. """
         hash_object = hashlib.sha256()
         hash_object.update(self.identity_secret.encode('utf-8'))
-        return b64encode(hash_object.digest())
+        return urlsafe_b64encode(hash_object.digest())
 
     def encrypt(self, plaintext: str) -> bytes:
         """ Encrypts the given text using Fernet (symmetric encryption).
@@ -1551,6 +1551,28 @@ class Framework(
         return Fernet(
             self.hashed_identity_key
         ).decrypt(cyphertext).decode('utf-8')
+
+    @dispatch_method()
+    def get_layout(
+        self,
+        obj: object,
+        request: CoreRequest
+    ) -> Layout | None:
+        return None
+
+
+@Framework.predicate(
+    Framework.get_layout,
+    name='model',
+    default=None,
+    index=ClassIndex
+)
+def layout_predicate(
+    self: type[Framework],
+    obj: object,
+    request: CoreRequest
+) -> type[object]:
+    return obj.__class__
 
 
 @Framework.webasset_url()
@@ -1869,3 +1891,9 @@ def cache_control_tween_factory(
         return response
 
     return set_cache_control_header_tween
+
+
+@Framework.template_variables()
+def get_template_variables(request: CoreRequest) -> dict[str, Any]:
+    return {
+    }

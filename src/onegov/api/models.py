@@ -23,7 +23,7 @@ from wtforms import HiddenField
 
 from typing import TYPE_CHECKING, Any, ClassVar, NoReturn, Self, overload
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Mapping
+    from collections.abc import Collection, Iterator, Mapping
     from onegov.core import Framework
     from onegov.core.collection import PKType
     from onegov.core.request import CoreRequest
@@ -194,9 +194,11 @@ class ApiEndpoint[M: DeclarativeBase]:
         self.batch_size = 100
 
     @cached_property
-    def filters(self) -> Mapping[str, str | None]:
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
         """ A mapping of the available filter params to their corresponding
-        description.
+        description or a collection of possible values. If possible values
+        are specified it is assumed that the filter can be specfied multiple
+        times.
 
         The description is optional and should only be used for non-trivial
         filters that don't just accept arbitrary strings.
@@ -206,12 +208,12 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     @property
     def title(self) -> str | None:
-        """ Return a human readable title for this endpoint """
+        """ A human readable title for this endpoint. """
         return None
 
     @property
     def description(self) -> str | None:
-        """ Return a human readable description for this endpoint """
+        """ A human readable description for this endpoint. """
         return None
 
     def for_page(self, page: int | None) -> Self | None:
@@ -335,7 +337,7 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     @property
     def links(self) -> dict[str, Self | None]:
-        """ Returns a dictionary with pagination instances. """
+        """ A dictionary with pagination instances. """
 
         result: dict[str, Self | None] = {'prev': None, 'next': None}
 
@@ -349,10 +351,7 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     @property
     def batch(self) -> dict[ApiEndpointItem[M], M]:
-        """ Returns a dictionary with endpoint item instances and their
-        titles.
-
-        """
+        """ A dictionary with endpoint item instances and their titles. """
         return {
             self.for_item(item): item
             for item in self.collection.batch
@@ -477,8 +476,7 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     @property
     def collection(self) -> PaginationWithById[M, Any]:
-        """ Return an instance of the collection with filters and page set.
-        """
+        """ An instance of the collection with filters and page set. """
 
         raise NotImplementedError()
 
@@ -515,11 +513,10 @@ class ApiEndpointCollection:
 
     @cached_property
     def endpoints(self) -> dict[str, ApiEndpoint[Any]]:
+        settings = self.app.config.setting_registry
         return {
             endpoint.endpoint: endpoint
-            for endpoint in self.app.config.setting_registry.api.endpoints(
-                request=self.request
-            )
+            for endpoint in settings.api.endpoints(self.request)
         }
 
     def get_endpoint(
@@ -528,15 +525,15 @@ class ApiEndpointCollection:
             page: int = 0,
             extra_parameters: dict[str, list[str]] | None = None
     ) -> ApiEndpoint[Any] | None:
-        endpoints = self.app.config.setting_registry.api.endpoints(
-            request=self.request,
-            extra_parameters=extra_parameters,
-            page=page
-        )
-        return next((
-            endpoint for endpoint in endpoints
-            if endpoint.endpoint == name
-        ), None)
+        endpoint = self.endpoints.get(name)
+        if endpoint is None:
+            return None
+
+        if extra_parameters:
+            endpoint = endpoint.for_filter(**extra_parameters)
+        if page:
+            endpoint = endpoint.for_page(page)
+        return endpoint
 
 
 class AuthEndpoint:

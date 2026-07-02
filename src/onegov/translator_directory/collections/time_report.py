@@ -5,7 +5,7 @@ from onegov.translator_directory.models.time_report import (
     TranslatorTimeReport,
 )
 from onegov.translator_directory.models.translator import Translator
-from sqlalchemy import asc, desc
+from sqlalchemy import asc
 
 
 from typing import TYPE_CHECKING
@@ -41,12 +41,18 @@ class TimeReportCollection(
         )
 
     def query(self) -> Query[TranslatorTimeReport]:
-        q = self.session.query(TranslatorTimeReport)
+        q = (
+            self.session.query(TranslatorTimeReport)
+            .join(Translator)
+        )
         if self.archive:
             q = q.filter(TranslatorTimeReport.exported == True)
         else:
             q = q.filter(TranslatorTimeReport.exported == False)
-        return q.order_by(desc(TranslatorTimeReport.assignment_date))
+        return q.order_by(
+            asc(Translator.pers_id),
+            asc(TranslatorTimeReport.created),
+        )
 
     @property
     def page_index(self) -> int:

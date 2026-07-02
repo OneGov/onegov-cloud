@@ -135,7 +135,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def organigram_file(self) -> StoredFile | None:
-        """ Returns the file-like content of the organigram. """
+        """ The file-like content of the organigram. """
 
         try:
             return self.organigram.reference.file if self.organigram else None

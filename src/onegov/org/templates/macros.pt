@@ -22,6 +22,10 @@
     <!--! To be override by other applications -->
 </metal:b>
 
+<metal:b define-macro="before_occurrence_lead">
+    <!--! To be override by other applications -->
+</metal:b>
+
 <metal:b define-macro="extra_usermanagement_fields">
     <!--! To be override by other applications -->
 </metal:b>
@@ -560,6 +564,7 @@
         </tal:b>
         <tal:b condition="people or contact or coordinates or files or show_side_panel or sidepanel_links|False">
             <div class="small-12 medium-8 columns page-content-main">
+                <div metal:define-slot="before-lead"></div>
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
 
@@ -1090,7 +1095,9 @@
         </tal:b>
 
         <dt i18n:translate>Title</dt>
-        <dd>${event.title}</dd>
+        <dd>
+            <tal:b condition="event.highlight|nothing"><i class="fa fa-star" aria-hidden="true"></i> </tal:b>${event.title}
+        </dd>
 
         <dt i18n:translate>Description</dt>
         <dd tal:content="escape(event.description).replace('\n', Markup('<br>'))" />
@@ -1158,9 +1165,9 @@
         <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
-                <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
+                <ul tal:repeat="filter event.filter_keywords_ordered().items()" class="no-margin-bottom">
                     <li tal:condition="filter[1]">
-                        <span>${filter[0].title()}:</span>
+                        <span>${layout.org.event_filter_names[filter[0]]}:</span>
                         <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
                         <span tal:condition="not isinstance(filter[1], list) and filter[1]" i18n:translate>${filter[1]}</span>
                     </li>
@@ -1251,28 +1258,26 @@
                 tal:define="
                     date occurrence.localized_start;
                     image occurrence.event.image;
-                    link use_links and request.link(occurrence)
                 "
                 use-macro="layout.macros['calendar-day']"
             />
         </div>
         <div class="large-9 medium-8 small-7 columns calendar-text-column">
             <h3>
-                <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
+                <tal:b condition="occurrence.event.highlight|nothing"><i class="fa fa-star" aria-hidden="true"></i> </tal:b><a tal:attributes="href request.link(occurrence) if use_links else None">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
             </h3>
             <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
             <div class="occurrence-location">${occurrence.location}</div>
-            <div class="occurrence-time" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end); suffix time_suffix|nothing">
-                <span tal:condition="python: '00:00' not in time">${time[0].upper()}${time[1:]}${' ' + suffix if suffix else ''}</span>
-                <span tal:condition="python: '00:00' in time">${time[0].upper()}${time[1:]}</span>
+            <div class="occurrence-time" tal:define="time layout.format_event_time_range(occurrence.localized_start, occurrence.localized_end)">
+                ${time[0].upper()}${time[1:]}
             </div>
             <div tal:condition="occurrence.tags and show_tags" class="occurrence-tags" >
                 <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span>
             </div>
             <div tal:condition="occurrence.filter_keywords and show_filters" class="occurrence-filter">
                 <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
-                    <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
+                    <span tal:condition="filter[1]" class="blank-label-description">${layout.org.event_filter_names[filter[0]]}:</span>
                     <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
                     <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
                 </div>
@@ -1518,7 +1523,6 @@
 <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <p tal:condition="result.function|nothing">${result.function}</p>
-    <p tal:condition="not:result.function|nothing" i18n:translate>People</p>
 </metal:search_result_people>
 
 
@@ -2421,6 +2425,9 @@
 <meta property="og:description" tal:attributes="content og_description" tal:define="og_description layout.og_description" tal:condition="og_description">
 <meta property="og:locale" tal:attributes="content layout.og_locale">
 <meta tal:repeat="locale layout.og_locale_alternate" property="og:locale:alternate" tal:attributes="content locale">
+<tal:b tal:define="meta_keywords python: getattr(layout.model, 'keywords', None)" tal:condition="meta_keywords">
+<meta name="keywords" tal:attributes="content python:', '.join(meta_keywords)" />
+</tal:b>
 </metal:open_graph_tags>
 
 <metal:modal define-macro="modal">

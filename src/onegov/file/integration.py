@@ -9,6 +9,8 @@ import yaml
 
 from blinker import ANY
 from contextlib import contextmanager
+from depot.io.interfaces import StoredFile
+from depot.io.local import LocalStoredFile
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
@@ -37,7 +39,7 @@ from tempfile import SpooledTemporaryFile
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
-    from depot.io.interfaces import FileStorage, StoredFile
+    from depot.io.interfaces import FileStorage
     from functools import cached_property
     from onegov.core.orm import SessionManager
     from onegov.core.request import CoreRequest
@@ -50,6 +52,30 @@ SUPPORTED_STORAGE_BACKENDS = (
     'depot.io.local.LocalFileStorage',
     'depot.io.memory.MemoryFileStorage'
 )
+
+# HACK: Patch __repr__ so it works even if the file raises in __init__
+_StoredFile__repr__ = StoredFile.__repr__
+# HACK: Patch close so that it won't raise if the file doesn't exist
+_LocalStoredFile_close = LocalStoredFile.close
+
+
+def _safe_StoredFile__repr__(self: Any) -> str:  # noqa: N802
+    try:
+        return _StoredFile__repr__(self)
+    except Exception:
+        return f'<{self.__class__.__name__}>'
+
+
+def _safe_LocalStoredFile_close(self: LocalStoredFile) -> None:  # noqa: N802
+    try:
+        _LocalStoredFile_close(self)
+    except FileNotFoundError:
+        # NOTE: If the file doesn't exist, that's okay
+        pass
+
+
+StoredFile.__repr__ = _safe_StoredFile__repr__  # type: ignore[method-assign]
+LocalStoredFile.close = _safe_LocalStoredFile_close  # type: ignore[method-assign]
 
 
 class DepotApp(App):
@@ -327,7 +353,8 @@ class DepotApp(App):
 
         with SpooledTemporaryFile(max_size=16 * mb, mode='wb') as signed:
             old_digest = digest(file.reference.file)
-            request_id = self.signing_service.sign(file.reference.file, signed)
+            request = self.signing_service.sign(
+                session, file.reference.file, signed, file)
             new_digest = digest(signed)
 
             signed.seek(0)
@@ -342,7 +369,7 @@ class DepotApp(App):
             'new_digest': new_digest,
             'signee': signee,
             'timestamp': utcnow().isoformat(),
-            'request_id': request_id,
+            'request_id': request.request_id,
             'token': token,
             'token_type': token_type
         }
@@ -426,15 +453,16 @@ class DepotApp(App):
         )
         self.bind_depot()
 
-        yield
-
-        self.custom_depot_id = None
-        self.clear_depot_cache()
-        self._configure_depot(
-            original_depot_backend,
-            original_depot_storage_path
-        )
-        self.bind_depot()
+        try:
+            yield
+        finally:
+            self.custom_depot_id = None
+            self.clear_depot_cache()
+            self._configure_depot(
+                original_depot_backend,
+                original_depot_storage_path
+            )
+            self.bind_depot()
 
 
 @DepotApp.tween_factory(over=transaction_tween_factory)

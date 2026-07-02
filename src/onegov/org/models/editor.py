@@ -93,7 +93,7 @@ class Editor:
 
     @property
     def page_id(self) -> int:
-        """ Returns the page id so morepath can create a link to this. """
+        """ The page id, used by morepath to create a link to this. """
         if self.action == 'new-root':
             return 0
         assert self.page is not None and hasattr(self.page, 'id')

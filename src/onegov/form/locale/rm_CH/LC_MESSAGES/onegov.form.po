@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-01-27 10:29+0100\n"
+"POT-Creation-Date: 2026-06-09 12:54+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -20,6 +20,9 @@ msgid "Invalid number of hours"
 msgstr ""
 
 msgid "Invalid number of minutes"
+msgstr ""
+
+msgid "Files of this type are not supported."
 msgstr ""
 
 msgid "Not a valid email"
@@ -144,11 +147,15 @@ msgstr ""
 msgid "Markdown"
 msgstr ""
 
+msgid "Invalid input."
+msgstr ""
+
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr ""
 
-msgid "Files of this type are not supported."
+#, python-format
+msgid "The image is too large, please provide an image smaller than {}."
 msgstr ""
 
 msgid ""
@@ -157,6 +164,16 @@ msgid ""
 msgstr ""
 
 msgid "The form could not be parsed."
+msgstr ""
+
+#, python-format
+msgid ""
+"The field '{label}' has no type defined. For example use '___' for a text "
+"field."
+msgstr ""
+
+#, python-format
+msgid "The field '{label}' cannot mix radio buttons and checkboxes."
 msgstr ""
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
@@ -211,6 +228,10 @@ msgstr ""
 msgid ""
 "The '{label}' group is empty and will not be visible. Either remove the "
 "empty group or add fields to it."
+msgstr ""
+
+#, python-format
+msgid "Nested fieldsets (`#`) are not supported, please remove line {line}."
 msgstr ""
 
 #, python-format
@@ -273,13 +294,13 @@ msgstr ""
 msgid "Text modules"
 msgstr ""
 
+msgid "Select Some Options"
+msgstr ""
+
 msgid "Select an Option"
 msgstr ""
 
 msgid "No results match"
-msgstr ""
-
-msgid "Select Some Options"
 msgstr ""
 
 msgid "hours"
