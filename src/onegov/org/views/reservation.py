@@ -20,10 +20,10 @@ from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import (
     AddReservationForm, KabaEditForm, ReservationAdjustmentForm,
-    ReservationForm, InternalTicketChatMessageForm)
+    ReservationForm, InternalTicketChatMessageForm, RequestCancellationForm)
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
-from onegov.org.layout import DefaultMailLayout, TicketLayout
+from onegov.org.layout import DefaultLayout, DefaultMailLayout, TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     TicketMessage, TicketChatMessage, ReservationAdjustedMessage,
@@ -1394,6 +1394,7 @@ def _remove_reservation(
             'model': self,
             'resource': resource,
             'reservations': targeted,
+            'remaining_reservations': excluded if excluded else None,
             'message': message
         }
     )
@@ -1641,6 +1642,124 @@ def reject_reservation_with_message_from_ticket(
         form,
         layout or TicketChatMessageLayout(self, request, internal=True),
         view_ticket=self
+    )
+
+
+@OrgApp.form(
+    model=ReservationTicket,
+    name='request-cancellation',
+    template='request_cancellation.pt',
+    permission=Public,
+    form=RequestCancellationForm
+)
+def request_cancellation(
+        self: ReservationTicket,
+        request: OrgRequest,
+        form: RequestCancellationForm,
+        layout: DefaultLayout | None = None,
+) -> RenderData | Response:
+    if self.handler.deleted:
+        request.warning(_('All reservations for this ticket have '
+                          'already been cancelled.'))
+        return morepath.redirect(request.link(self, 'status'))
+
+    resource = self.handler.resource
+
+    if not resource:
+        raise exc.HTTPNotFound()
+
+    if not resource.allow_cancellation_requests:
+        request.alert(_('Cancellation requests are not enabled for this '
+                        'resource.'))
+        return morepath.redirect(request.link(self, 'status'))
+
+    if self.state != 'closed':
+        if self.handler_data.get('cancellation_requested'):
+            request.alert(
+                _('A cancellation request has already been submitted.')
+            )
+        else:
+            request.alert(_('A cancellation request can only be submitted for '
+                            'accepted reservations.'))
+        return morepath.redirect(request.link(self, 'status'))
+
+    payment = self.handler.payment
+    if payment and payment.state in ('invoiced', 'paid'):
+        request.alert(_('A cancellation request cannot be submitted because '
+                        'the payment has already been invoiced or paid.'))
+        return morepath.redirect(request.link(self, 'status'))
+
+    if form.submitted(request):
+        reservations = self.handler.reservations
+        if 'reservation_ids' in form:
+            selected_ids = list(form.reservation_ids.data or [])
+            targeted = [r for r in reservations if r.id in selected_ids]
+        else:
+            targeted = list(reservations)
+            selected_ids = []
+
+        self.last_state_change = self.timestamp()
+        self.state = 'open'
+        self.user = None
+
+        ReservationMessage.create(
+            targeted,
+            self,
+            request,
+            'cancellation_requested'
+        )
+
+        self.handler_data = {
+            **self.handler_data,
+            'cancellation_requested': True,
+            'cancellation_reservation_ids': selected_ids,
+        }
+
+        request.success(_('Your cancellation request has been submitted. '
+                          'You will be notified once it has been processed.'))
+        return morepath.redirect(request.link(self, 'status'))
+
+    layout = layout or TicketChatMessageLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Request Status'), request.link(self, 'status')),
+        Link(_('Request Cancellation'), '#'),
+    ]
+
+    return {
+        'title': _('Request Cancellation'),
+        'layout': layout,
+        'ticket': self,
+        'resource': resource,
+        'reservations': self.handler.reservations,
+        'form': form,
+    }
+
+
+@OrgApp.view(
+    model=ReservationTicket,
+    name='accept-cancellation',
+    permission=Private,
+)
+def accept_cancellation(
+        self: ReservationTicket,
+        request: OrgRequest,
+) -> Response | None:
+    if self.handler.deleted:
+        raise exc.HTTPNotFound()
+
+    if not self.handler_data.get('cancellation_requested'):
+        raise exc.HTTPNotFound()
+
+    stored_ids = self.handler_data.get('cancellation_reservation_ids')
+    targeted_ids = set(stored_ids) if stored_ids else None
+
+    return _remove_reservation(
+        self.handler.reservations[0],
+        request,
+        view_ticket=self,
+        change='cancellation_accepted',
+        targeted_ids=targeted_ids,
     )
 
 

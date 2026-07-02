@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-01 14:24+0200\n"
+"POT-Creation-Date: 2026-07-01 16:45+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1948,6 +1948,12 @@ msgstr "Permettre l'annulation de réservations"
 
 msgid "Cancellation"
 msgstr "Annulation"
+
+msgid ""
+"An e-mail reply address is required when cancellation requests are enabled."
+msgstr ""
+"Une adresse e-mail de réponse est requise lorsque les demandes d'annulation "
+"sont activées."
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -5176,6 +5182,12 @@ msgstr ""
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
+msgid "The following reservation remains active:"
+msgstr "La réservation suivante reste active:"
+
+msgid "The following reservations remain active:"
+msgstr "Les réservations suivantes restent actives:"
+
 msgid "Check request status"
 msgstr "Vérifier l'état de la demande"
 
@@ -6251,9 +6263,6 @@ msgstr "Ajoutez un message a la demande."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Les nouveaux messages ont été désactivés car le ticket a été fermé."
-
-msgid "Would you like to cancel your reservation?"
-msgstr "Souhaitez-vous annuler votre réservation?"
 
 msgid ""
 "Enable notifications about new tickets. Only works when being logged in and "
@@ -8075,6 +8084,14 @@ msgstr "Votre demand a déjà été clòturée. "
 msgid "Your message has been received"
 msgstr "Votre message a été reçu"
 
+msgid "Cancellation requests are not enabled for this resource."
+msgstr "Les demandes d'annulation ne sont pas activées pour cette ressource."
+
+msgid ""
+"All reservations for this ticket have already been cancelled."
+msgstr ""
+"Toutes les réservations pour ce ticket ont déjà été annulées."
+
 msgid "A cancellation request has already been submitted."
 msgstr "Une demande d'annulation a déjà été soumise."
 
@@ -8183,6 +8200,9 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Would you like to cancel your reservation?"
+#~ msgstr "Souhaitez-vous annuler votre réservation?"
 
 #~ msgid "Cancellation requested for"
 #~ msgstr "Demande d'annulation pour"

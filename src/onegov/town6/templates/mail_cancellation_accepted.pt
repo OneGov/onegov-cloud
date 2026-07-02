@@ -17,7 +17,14 @@
         <p><b>${resource.title}</b></p>
         <tal:b metal:use-macro="layout.macros['reservations']"></tal:b>
 
-        <!--? may extend the template showing the remaining reservations only if it was multiple originally -->
+        <tal:b tal:condition="remaining_reservations|nothing">
+            <p tal:condition="python:len(remaining_reservations) == 1" i18n:translate>The following reservation remains active:</p>
+            <p tal:condition="python:len(remaining_reservations) > 1" i18n:translate>The following reservations remain active:</p>
+            <p><b>${resource.title}</b></p>
+            <tal:b tal:define="reservations remaining_reservations"
+                   metal:use-macro="layout.macros['reservations']"></tal:b>
+        </tal:b>
+
         <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
         </p>

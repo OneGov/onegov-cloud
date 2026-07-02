@@ -386,6 +386,15 @@ class ResourceBaseForm(Form):
         default=False,
     )
 
+    def validate_allow_cancellation_requests(
+        self, field: BooleanField
+    ) -> None:
+        if field.data and not self.reply_to.data:
+            raise ValidationError(_(
+                'An e-mail reply address is required when '
+                'cancellation requests are enabled.'
+            ))
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type != 'room':

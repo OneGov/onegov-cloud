@@ -8,7 +8,8 @@ from onegov.org.views.ticket import (
     view_ticket_status, view_tickets, view_archived_tickets,
     view_pending_tickets, assign_ticket, view_send_to_gever,
     view_delete_all_archived_tickets, delete_ticket, change_tag,
-    view_my_tickets, view_ticket_invoice, add_invoice_item,
+    view_my_tickets, view_ticket_invoice, add_invoice_item)
+from onegov.org.views.reservation import (
     request_cancellation, accept_cancellation)
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp

@@ -12,7 +12,7 @@
                     The record behind this ticket was removed. The following information
                     is a snapshot kept for future reference.
                 </div>
-                <div class="ticket-summary" tal:condition="handler.data.get('cancellation_requested', False)">
+                <div class="ticket-cancellation-request" tal:condition="handler.data.get('cancellation_requested', False)">
                     <div class="panel callout warning" i18n:translate>
                         A cancellation has been requested for this reservation.
                     </div>
@@ -305,7 +305,7 @@
                     The record behind this ticket was removed. The following information
                     is a snapshot kept for future reference.
                 </div>
-                <div class="ticket-summary" tal:condition="handler.data.get('cancellation_requested', False)">
+                <div class="ticket-cancellation-request" tal:condition="handler.data.get('cancellation_requested', False)">
                     <div class="panel callout warning" i18n:translate>
                         A cancellation has been requested for this reservation.
                     </div>

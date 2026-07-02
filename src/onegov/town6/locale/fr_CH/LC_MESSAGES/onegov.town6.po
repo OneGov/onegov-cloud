@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-07-01 14:24+0200\n"
+"POT-Creation-Date: 2026-07-01 16:45+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -548,8 +548,8 @@ msgid ""
 "Fingerprint of the entry's content. Changes whenever the entry data is "
 "modified."
 msgstr ""
-"Empreinte du contenu de l'entrée. Se modifie lorsque les données de "
-"l'entrée sont modifiées."
+"Empreinte du contenu de l'entrée. Se modifie lorsque les données de l'entrée "
+"sont modifiées."
 
 msgid "Hash"
 msgstr "Hash"
@@ -1427,6 +1427,12 @@ msgstr ""
 
 msgid "${author} wrote"
 msgstr "${author} a écrit"
+
+msgid "The following reservation remains active:"
+msgstr "La réservation suivante reste active:"
+
+msgid "The following reservations remain active:"
+msgstr "Les réservations suivantes restent actives:"
 
 msgid "Check request status"
 msgstr "Vérifier l'état de la demande"
@@ -2661,9 +2667,6 @@ msgstr "Ajoutez un message a la demande."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Les nouveaux messages ont été désactivés car le ticket a été fermé."
 
-msgid "Would you like to cancel your reservation?"
-msgstr "Souhaitez-vous annuler votre réservation?"
-
 msgid ""
 "Enable notifications about new tickets. Only works when being logged in and "
 "having the browser with the site open."
@@ -2956,6 +2959,9 @@ msgstr "Vue d'ensemble des notifications push"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Would you like to cancel your reservation?"
+#~ msgstr "Souhaitez-vous annuler votre réservation?"
 
 #~ msgid "Cancellation requested for"
 #~ msgstr "Demande d'annulation pour"

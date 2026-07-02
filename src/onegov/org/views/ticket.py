@@ -23,7 +23,6 @@ from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import ExtendedInternalTicketChatMessageForm
 from onegov.org.forms import ManualInvoiceItemForm
-from onegov.org.forms import RequestCancellationForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChangeTagForm
 from onegov.org.forms import TicketChatMessageForm
@@ -38,7 +37,7 @@ from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
-    CitizenDashboard, ReservationMessage, TicketChatMessage, TicketMessage,
+    CitizenDashboard, TicketChatMessage, TicketMessage,
     TicketNote, ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import (
@@ -47,7 +46,6 @@ from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.pdf.ticket import TicketPdf, TicketsPdf
 from onegov.org.utils import get_current_tickets_url, group_invoice_items
 from onegov.org.views.message import view_messages_feed
-from onegov.org.views.reservation import _remove_reservation
 from onegov.org.views.utils import assert_citizen_logged_in
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
@@ -1485,23 +1483,10 @@ def view_ticket_status(
 
     pick_up_hint = None
     extra_information = None
-    cancel_url = None
     if resource := getattr(self.handler, 'resource', None):
         pick_up_hint = resource.pick_up
         if not self.handler.deleted and not self.handler.undecided:
             extra_information = resource.confirmation_text
-        if (
-            self.handler_code == 'RSV'
-            and self.state == 'closed'
-            and not self.handler.deleted
-            and resource.allow_cancellation_requests
-            and not self.handler_data.get('cancellation_requested', False)
-            and not (
-                (payment := self.handler.payment)
-                and payment.state in ('invoiced', 'paid')
-            )
-        ):
-            cancel_url = request.link(self, 'request-cancellation')
     if submission := getattr(self.handler, 'submission', None):
         if form_definition := getattr(submission, 'form', None):
             pick_up_hint = form_definition.pick_up
@@ -1517,120 +1502,7 @@ def view_ticket_status(
         'form': form,
         'pick_up_hint': pick_up_hint,
         'extra_information': extra_information,
-        'cancel_url': cancel_url,
     }
-
-
-@OrgApp.form(
-    model=ReservationTicket,
-    name='request-cancellation',
-    template='request_cancellation.pt',
-    permission=Public,
-    form=RequestCancellationForm
-)
-def request_cancellation(
-    self: ReservationTicket,
-    request: OrgRequest,
-    form: RequestCancellationForm,
-    layout: DefaultLayout | None = None,
-) -> RenderData | BaseResponse:
-    resource = self.handler.resource
-
-    if (
-        not resource
-        or not resource.allow_cancellation_requests
-        or self.handler.deleted
-    ):
-        raise exc.HTTPNotFound()
-
-    if self.state != 'closed':
-        if self.handler_data.get('cancellation_requested'):
-            request.alert(
-                _('A cancellation request has already been submitted.')
-            )
-        else:
-            request.alert(_('A cancellation request can only be submitted for '
-                            'accepted reservations.'))
-        return morepath.redirect(request.link(self, 'status'))
-
-    payment = self.handler.payment
-    if payment and payment.state in ('invoiced', 'paid'):
-        request.alert(_('A cancellation request cannot be submitted because '
-                        'the payment has already been invoiced or paid.'))
-        return morepath.redirect(request.link(self, 'status'))
-
-    if form.submitted(request):
-        reservations = self.handler.reservations
-        if 'reservation_ids' in form:
-            selected_ids = list(form.reservation_ids.data or [])
-            targeted = [r for r in reservations if r.id in selected_ids]
-        else:
-            targeted = list(reservations)
-            selected_ids = []
-
-        self.last_state_change = self.timestamp()
-        self.state = 'open'
-        self.user = None
-
-        ReservationMessage.create(
-            targeted,
-            self,
-            request,
-            'cancellation_requested'
-        )
-
-        self.handler_data = {
-            **self.handler_data,
-            'cancellation_requested': True,
-            'cancellation_reservation_ids': selected_ids,
-        }
-
-        request.success(_('Your cancellation request has been submitted. '
-                          'You will be notified once it has been processed.'))
-        return morepath.redirect(request.link(self, 'status'))
-
-    layout = layout or TicketChatMessageLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_('Homepage'), layout.homepage_url),
-        Link(_('Request Status'), request.link(self, 'status')),
-        Link(_('Request Cancellation'), '#'),
-    ]
-
-    return {
-        'title': _('Request Cancellation'),
-        'layout': layout,
-        'ticket': self,
-        'resource': resource,
-        'reservations': self.handler.reservations,
-        'form': form,
-    }
-
-
-@OrgApp.view(
-    model=ReservationTicket,
-    name='accept-cancellation',
-    permission=Private,
-)
-def accept_cancellation(
-    self: ReservationTicket,
-    request: OrgRequest,
-) -> BaseResponse | None:
-    if self.handler.deleted:
-        raise exc.HTTPNotFound()
-
-    if not self.handler_data.get('cancellation_requested'):
-        raise exc.HTTPNotFound()
-
-    stored_ids = self.handler_data.get('cancellation_reservation_ids')
-    targeted_ids = set(stored_ids) if stored_ids else None
-
-    return _remove_reservation(
-        self.handler.reservations[0],
-        request,
-        view_ticket=self,
-        change='cancellation_accepted',
-        targeted_ids=targeted_ids,
-    )
 
 
 @OrgApp.view(model=Ticket, name='send-to-gever', permission=Private)

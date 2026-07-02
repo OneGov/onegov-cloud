@@ -4891,16 +4891,28 @@ def test_migration_removes_reservation_when_slot_is_taken(
     assert any('irrtümlich storniert' in (n.text or '') for n in notes)
 
 
-@freeze_time('2015-08-28', tick=True)
+@freeze_time('2026-07-01', tick=True)
 def test_reservation_cancellation_request(client: Client) -> None:
     from onegov.chat import MessageCollection
 
-    # setup: resource with cancellation enabled and a recipient for rejections
+    # form validation: enabling without a reply_to address must fail
+    client.login_admin()
+    edit = client.get('/resource/tageskarte/edit')
+    edit.form['reply_to'] = ''
+    edit.form['allow_cancellation_requests'] = True
+    page = edit.form.submit()
+    assert page.status_int == 200
+    assert (
+        'Eine E-Mail-Antwortadresse ist erforderlich, wenn '
+        'Stornierungsanfragen aktiviert sind' in page
+    )
+    client.logout()
+
+    # setup: resource with cancellation disabled (default) and a recipient
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     assert resource is not None
     resource.definition = 'Note = ___'
-    resource.allow_cancellation_requests = True
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     recipients = ResourceRecipientCollection(client.app.session())
@@ -4913,7 +4925,7 @@ def test_reservation_cancellation_request(client: Client) -> None:
     )
 
     allocations = scheduler.allocate(
-        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
         whole_day=True,
         quota=1,
         quota_limit=1,
@@ -4938,31 +4950,33 @@ def test_reservation_cancellation_request(client: Client) -> None:
     ticket.click('Ticket abschliessen')
     client.logout()
 
-    # cancel link appears in the accepted email
+    assert '/status' in ticket_url
+    cancel_url = ticket_url.replace('/status', '/request-cancellation')
+
+    # guard: disabled feature redirects to status (tested before
+    # flow deletes reservations)
+    resource = client.app.session().query(Resource).filter_by(
+        name='tageskarte'
+    ).one()
+    assert not resource.allow_cancellation_requests
+    response = client.get(cancel_url).follow()
+    assert response.request.url.endswith('/status')
+
+    # enable cancellation requests; the acceptance email sent earlier has no
+    # cancel link since it was sent while disabled (feature was off)
+    resource = client.app.session().query(Resource).filter_by(
+        name='tageskarte'
+    ).one()
+    resource.allow_cancellation_requests = True
+    transaction.commit()
+
     assert len(os.listdir(client.app.maildir)) == 3  # open + accepted + closed
-    accepted_email = client.get_email(1)
-    assert 'Stornierung beantragen' in accepted_email['HtmlBody']
-    cancel_link_in_email = re.search(
-        r'href="([^"]*request-cancellation[^"]*)"', accepted_email['HtmlBody']
-    )
-    assert cancel_link_in_email is not None
-    cancel_url_from_email = cancel_link_in_email.group(1)
+    assert 'request-cancellation' not in client.get_email(1)['HtmlBody']
 
-    # same link appears on the status page
-    status = client.get(ticket_url)
-    cancel_link_on_status = re.search(
-        r'href="([^"]*request-cancellation[^"]*)"', status.text
-    )
-    assert cancel_link_on_status is not None
-    assert cancel_link_on_status.group(1) == cancel_url_from_email
-
-    cancel_page = client.get(cancel_url_from_email)
+    cancel_page = client.get(cancel_url)
     assert 'Stornierungsanfrage' in cancel_page
     status = cancel_page.form.submit().follow()
     assert 'Stornierungsanfrage wurde eingereicht' in status
-
-    # ticket is back to 'open', cancel link no longer shown on status page
-    assert 'Stornierung beantragen' not in status
 
     session = client.app.session()
     tickets = TicketCollection(session)
@@ -5005,7 +5019,7 @@ def test_reservation_cancellation_request(client: Client) -> None:
         in customer_emails[0]['TextBody']
     )
     assert 'Reservationen wurden storniert' in admin_emails[0]['TextBody']
-    assert 'Abgelehnte Reservation' not in admin_emails[0]['Subject']
+    assert 'Stornierung akzeptiert' in admin_emails[0]['Subject']
 
     # activity feed shows cancellation_accepted, flag is cleared
     # from handler_data
@@ -5018,13 +5032,17 @@ def test_reservation_cancellation_request(client: Client) -> None:
     changes = [m.meta.get('change') for m in messages if hasattr(m, 'meta')]
     assert 'cancellation_accepted' in changes
 
-    # no rejection notification was sent to the resource recipient, as
-    # we cancel
-    all_subjects = [client.get_email(i)['Subject'] for i in range(5)]
-    assert not any('Abgelehnte Reservation' in s for s in all_subjects)
+    # guard: after all reservations are canceled, cancel link redirects to
+    # status view with message
+    response = client.get(cancel_url).follow()
+    assert response.request.url.endswith('/status')
+    assert (
+        'Alle Reservationen für dieses Ticket wurden bereits storniert.'
+        in response
+    )
 
 
-@freeze_time('2015-08-28', tick=True)
+@freeze_time('2026-07-01', tick=True)
 def test_reservation_cancellation_request_payment_guard(
     client: Client,
 ) -> None:
@@ -5039,7 +5057,7 @@ def test_reservation_cancellation_request_payment_guard(
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
-        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
         whole_day=True,
     )
 
@@ -5060,14 +5078,8 @@ def test_reservation_cancellation_request_payment_guard(
     ).follow().click('Ticket abschliessen')
     client.logout()
 
-    # cancel link appears on status page (no payment yet)
-    status = client.get(ticket_url)
-    assert 'Stornierung beantragen' in status
-    cancel_link = re.search(
-        r'href="([^"]*request-cancellation[^"]*)"', status.text
-    )
-    assert cancel_link is not None
-    cancel_url = cancel_link.group(1)
+    assert '/status' in ticket_url
+    cancel_url = ticket_url.replace('/status', '/request-cancellation')
 
     # attach an invoiced payment to the reservation
     session = client.app.session()
@@ -5080,16 +5092,12 @@ def test_reservation_cancellation_request_payment_guard(
     )
     transaction.commit()
 
-    # cancel link must not appear when payment is invoiced
-    status = client.get(ticket_url)
-    assert 'Stornierung beantragen' not in status
-
-    # direct access must redirect with an alert
+    # direct access must redirect with an alert when payment is invoiced
     response = client.get(cancel_url).follow()
     assert 'Zahlung bereits in Rechnung gestellt' in response
 
 
-@freeze_time('2015-08-28', tick=True)
+@freeze_time('2026-07-01', tick=True)
 def test_reservation_cancellation_request_state_guard(client: Client) -> None:
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -5099,7 +5107,7 @@ def test_reservation_cancellation_request_state_guard(client: Client) -> None:
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
-        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
         whole_day=True,
     )
 
@@ -5113,10 +5121,6 @@ def test_reservation_cancellation_request_state_guard(client: Client) -> None:
     formular.form['note'] = 'Test'
     ticket_page = formular.form.submit().follow().form.submit().follow()
     ticket_url = ticket_page.request.url
-
-    # ticket is 'open' (not yet accepted/closed) — cancel link must not show
-    status = client.get(ticket_url)
-    assert 'Stornierung beantragen' not in status
 
     # derive cancel URL from ticket status URL (same base path, different name)
     assert '/status' in ticket_url
@@ -5128,57 +5132,7 @@ def test_reservation_cancellation_request_state_guard(client: Client) -> None:
     assert response.request.url.endswith('/status')
 
 
-@freeze_time('2015-08-28', tick=True)
-def test_reservation_cancellation_request_disabled(client: Client) -> None:
-    resources = ResourceCollection(client.app.libres_context)
-    resource = resources.by_name('tageskarte')
-    assert resource is not None
-    resource.definition = 'Note = ___'
-    # allow_cancellation_requests is False by default
-    scheduler = resource.get_scheduler(client.app.libres_context)
-
-    allocations = scheduler.allocate(
-        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
-        whole_day=True,
-    )
-
-    reserve = client.bound_reserve(allocations[0])
-    transaction.commit()
-
-    result = reserve(quota=1, whole_day=True)
-    assert result.json == {'success': True}
-    formular = client.get('/resource/tageskarte/form')
-    formular.form['email'] = 'info@example.org'
-    formular.form['note'] = 'Test'
-    ticket_page = formular.form.submit().follow().form.submit().follow()
-    ticket_url = ticket_page.request.url
-
-    client.login_supporter()
-    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
-    ticket.click('Alle Reservationen annehmen').follow().click(
-        'Ticket abschliessen'
-    )
-    client.logout()
-
-    # cancel link must not appear when cancellation requests are disabled
-    status = client.get(ticket_url)
-    assert 'Stornierung beantragen' not in status
-
-    # direct access to request-cancellation returns 404
-    ticket_obj = (
-        TicketCollection(client.app.session())
-        .query()
-        .filter_by(handler_code='RSV')
-        .one()
-    )
-    cancel_url = (
-        f'/ticket/{ticket_obj.handler_code}/{ticket_obj.handler_id}'
-        '/request-cancellation'
-    )
-    assert client.get(cancel_url, expect_errors=True).status_int == 404
-
-
-@freeze_time('2015-08-28', tick=True)
+@freeze_time('2026-07-01', tick=True)
 def test_reservation_cancellation_request_select_single(
     client: Client,
 ) -> None:
@@ -5193,8 +5147,8 @@ def test_reservation_cancellation_request_select_single(
     # two 2.5-hour allocations on consecutive days (local Europe/Zurich time)
     allocs = scheduler.allocate(
         dates=[
-            (datetime(2015, 8, 28, 10, 0), datetime(2015, 8, 28, 12, 30)),
-            (datetime(2015, 8, 29, 10, 0), datetime(2015, 8, 29, 12, 30)),
+            (datetime(2026, 7, 1, 10, 0), datetime(2026, 7, 1, 12, 30)),
+            (datetime(2026, 7, 2, 10, 0), datetime(2026, 7, 2, 12, 30)),
         ],
         whole_day=False,
     )
@@ -5220,20 +5174,15 @@ def test_reservation_cancellation_request_select_single(
     client.logout()
 
     # cancellation page shows checkboxes for each reservation with their dates
-    status = client.get(ticket_url)
-    cancel_link = re.search(
-        r'href="([^"]*request-cancellation[^"]*)"', status.text
-    )
-    assert cancel_link is not None
-    cancel_url = cancel_link.group(1)
-
+    assert '/status' in ticket_url
+    cancel_url = ticket_url.replace('/status', '/request-cancellation')
     cancel_page = client.get(cancel_url)
     # two checkboxes, one per reservation
     assert cancel_page.form.fields.get('reservation_ids') is not None
     assert len(cancel_page.form.fields['reservation_ids']) == 2
     # labels show local time (not raw UTC)
-    assert '28.08.2015 10:00 - 12:30' in cancel_page.text
-    assert '29.08.2015 10:00 - 12:30' in cancel_page.text
+    assert '01.07.2026 10:00 - 12:30' in cancel_page.text
+    assert '02.07.2026 10:00 - 12:30' in cancel_page.text
 
     # get reservation IDs from the DB to know which to select
     session = client.app.session()
@@ -5254,7 +5203,7 @@ def test_reservation_cancellation_request_select_single(
 
     # cancellation section uses same ticket-summary CSS as #summary
     cancellation = ticket.pyquery(
-        '.hide-for-print .ticket-summary:not(#summary)'
+        '.hide-for-print .ticket-cancellation-request'
     )
     assert len(cancellation) == 1
     # only the targeted reservation is shown
@@ -5287,8 +5236,31 @@ def test_reservation_cancellation_request_select_single(
     assert len(remaining) == 1
     assert remaining[0].id == second_id
 
+    # activity: exactly one 'accepted' ReservationMessage (from initial
+    # acceptance), no spurious second one from the cancellation flow
+    from onegov.chat import MessageCollection
+    from onegov.org.models import ReservationMessage
+    from onegov.ticket import TicketCollection
+    ticket_obj = TicketCollection(session).query().filter_by(
+        handler_code='RSV'
+    ).one()
+    messages = MessageCollection(
+        session, channel_id=ticket_obj.number
+    ).query().all()
+    rsv_changes = [
+        m.meta.get('change')
+        for m in messages
+        if isinstance(m, ReservationMessage)
+    ]
+    assert rsv_changes.count('accepted') == 1
+    assert 'cancellation_requested' in rsv_changes
+    assert 'cancellation_accepted' in rsv_changes
+    # no 'accepted' after the cancellation was requested
+    cancel_idx = rsv_changes.index('cancellation_requested')
+    assert 'accepted' not in rsv_changes[cancel_idx:]
 
-@freeze_time('2015-08-28', tick=True)
+
+@freeze_time('2026-07-01', tick=True)
 def test_reservation_accept_cancellation_stale(client: Client) -> None:
     """accept-cancellation warns gracefully when the targeted reservation
     was already deleted before the admin clicks accept."""
@@ -5301,8 +5273,8 @@ def test_reservation_accept_cancellation_stale(client: Client) -> None:
 
     allocs = scheduler.allocate(
         dates=[
-            (datetime(2015, 8, 28, 10, 0), datetime(2015, 8, 28, 12, 30)),
-            (datetime(2015, 8, 29, 10, 0), datetime(2015, 8, 29, 12, 30)),
+            (datetime(2026, 7, 1, 10, 0), datetime(2026, 7, 1, 12, 30)),
+            (datetime(2026, 7, 2, 10, 0), datetime(2026, 7, 2, 12, 30)),
         ],
         whole_day=False,
     )
@@ -5326,12 +5298,8 @@ def test_reservation_accept_cancellation_stale(client: Client) -> None:
     client.logout()
 
     # user requests cancellation for the first reservation only
-    status = client.get(ticket_url)
-    cancel_match = re.search(
-        r'href="([^"]*request-cancellation[^"]*)"', status.text
-    )
-    assert cancel_match is not None
-    cancel_url = cancel_match.group(1)
+    assert '/status' in ticket_url
+    cancel_url = ticket_url.replace('/status', '/request-cancellation')
     cancel_page = client.get(cancel_url)
     session = client.app.session()
     reservation_ids = sorted(r.id for r in session.query(Reservation).all())

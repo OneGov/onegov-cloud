@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-07-01 14:24+0200\n"
+"POT-Creation-Date: 2026-07-01 16:45+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1427,6 +1427,12 @@ msgstr ""
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
+msgid "The following reservation remains active:"
+msgstr "Die folgende Reservation bleibt aktiv:"
+
+msgid "The following reservations remain active:"
+msgstr "Die folgenden Reservationen bleiben aktiv:"
+
 msgid "Check request status"
 msgstr "Anfragestatus überprüfen"
 
@@ -2651,9 +2657,6 @@ msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
 
-msgid "Would you like to cancel your reservation?"
-msgstr "Möchten Sie Ihre Reservation stornieren?"
-
 msgid ""
 "Enable notifications about new tickets. Only works when being logged in and "
 "having the browser with the site open."
@@ -2945,6 +2948,9 @@ msgstr "Übersicht Push-Benachrichtigungen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Would you like to cancel your reservation?"
+#~ msgstr "Möchten Sie Ihre Reservation stornieren?"
 
 #~ msgid "Cancellation requested for"
 #~ msgstr "Stornierungsanfrage für"

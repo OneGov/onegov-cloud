@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-07-01 14:24+0200\n"
+"POT-Creation-Date: 2026-07-01 16:45+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -545,8 +545,8 @@ msgid ""
 "Fingerprint of the entry's content. Changes whenever the entry data is "
 "modified."
 msgstr ""
-"Impronta digitale del contenuto della voce. Cambia quando i dati della "
-"voce vengono modificati."
+"Impronta digitale del contenuto della voce. Cambia quando i dati della voce "
+"vengono modificati."
 
 msgid "Hash"
 msgstr "Hash"
@@ -1426,6 +1426,12 @@ msgstr ""
 
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
+
+msgid "The following reservation remains active:"
+msgstr "La seguente prenotazione rimane attiva:"
+
+msgid "The following reservations remain active:"
+msgstr "Le seguenti prenotazioni rimangono attive:"
 
 msgid "Check request status"
 msgstr "Controlla lo stato della richiesta"
@@ -2649,9 +2655,6 @@ msgid "New messages have been disabled because the ticket has been closed."
 msgstr ""
 "I nuovi messaggi sono stati disabilitati perché il biglietto è stato chiuso."
 
-msgid "Would you like to cancel your reservation?"
-msgstr "Desideri cancellare la tua prenotazione?"
-
 msgid ""
 "Enable notifications about new tickets. Only works when being logged in and "
 "having the browser with the site open."
@@ -2945,6 +2948,9 @@ msgstr "Panoramica delle notifiche push"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Would you like to cancel your reservation?"
+#~ msgstr "Desideri cancellare la tua prenotazione?"
 
 #~ msgid "Cancellation requested for"
 #~ msgstr "Richiesta di cancellazione per"
