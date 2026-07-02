@@ -229,6 +229,17 @@ _HORW_BEHOERDEN_HEADER = (
     'Partei', 'Fraktion Einwohnerrat', 'Kategorie',
 )
 
+# Full-string replacements applied to the raw Instanzen value before
+# comma-splitting. Use when the comma is part of the sub-org name.
+_HORW_SUB_ORG_STRICT_MAP: dict[str, str] = {
+    'Schulen der Gemeinde Horw, Rektorat': 'Gemeindeschule, Rektorat',
+}
+
+# Per-item replacements applied to each sub-org after comma-splitting.
+_HORW_SUB_ORG_ITEM_MAP: dict[str, str] = {
+    'AHV-Zweigstelle (Einwohnerdienste)': 'Einwohnerdienste',
+}
+
 
 def _v(value: object) -> str | None:
     if value is None:
@@ -452,20 +463,28 @@ def import_horw(
                     subs_by_top: dict[str, list[str]] = {
                         t: [] for t in valid_tops
                     }
-                    if valid_tops and isinstance(raw_sub_org, str) and raw_sub_org:
+                    if (
+                        valid_tops
+                        and isinstance(raw_sub_org, str)
+                        and raw_sub_org
+                    ):
+                        raw_sub_org = _HORW_SUB_ORG_STRICT_MAP.get(
+                            raw_sub_org, raw_sub_org
+                        )
                         all_valid_subs: set[str] = set().union(
                             *(valid_orgs.get(t, set()) for t in valid_tops)
                         )
                         # try the full value first (handles names with commas),
-                        # fall back to comma-splitting
+                        # fall back to comma-splitting with per-item mapping
                         if raw_sub_org in all_valid_subs:
                             sub_candidates = [raw_sub_org]
                         else:
-                            sub_candidates = [
-                                s for s in (
+                            sub_candidates = list(dict.fromkeys(
+                                _HORW_SUB_ORG_ITEM_MAP.get(s, s)
+                                for s in (
                                     p.strip() for p in raw_sub_org.split(',')
                                 ) if s
-                            ]
+                            ))
                         for sub in sub_candidates:
                             parent = next(
                                 (t for t in valid_tops
@@ -481,7 +500,8 @@ def import_horw(
                                 errors += 1
                             else:
                                 subs_by_top[parent].append(sub)
-                    # build flat list: each org immediately followed by its subs
+                    # build flat list: each org immediately followed
+                    # by its subs
                     orgs: list[str] = []
                     for top in valid_tops:
                         orgs.append(top)
