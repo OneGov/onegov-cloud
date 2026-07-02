@@ -3,6 +3,7 @@ from __future__ import annotations
 import click
 
 from contextlib import contextmanager
+from psycopg import ClientCursor
 from psycopg.adapt import Transformer
 from sedate import utcnow
 from sqlalchemy import event
@@ -94,7 +95,7 @@ def analyze_sql_queries(
         ) -> None:
 
             # NOTE: Based on ClientCursor.mogrify
-            pgq = cursor._query_cls(Transformer(cursor))
+            pgq = ClientCursor._query_cls(Transformer(cursor))
             pgq.convert(statement, parameters)
             query = pgq.query
 
