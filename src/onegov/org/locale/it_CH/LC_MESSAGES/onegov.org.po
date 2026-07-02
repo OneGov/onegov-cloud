@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-01 16:45+0200\n"
+"POT-Creation-Date: 2026-07-02 11:01+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1084,6 +1084,12 @@ msgstr "Creato"
 
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Rimuovi questi filtri da tutti gli eventi interessati"
+
+msgid "Confirmation"
+msgstr "Conferma"
 
 msgid "Comment"
 msgstr "Commento"
@@ -2292,6 +2298,19 @@ msgstr ""
 
 msgid "Open files in separate window"
 msgstr "Apri i file in una finestra separata"
+
+msgid "Short links"
+msgstr "Link abbreviato"
+
+#, python-format
+msgid ""
+"Malformed short link on line ${number}. Each line needs to be a pair of "
+"name: path where path is either a valid path starting with a backslash, or a "
+"complete URL with schema and host."
+msgstr ""
+"Link abbreviato non valido alla riga ${number}. Ogni riga deve essere "
+"costituita da una coppia nome:percorso, dove percorso è un percorso valido "
+"che inizia con una barra rovesciata oppure un URL completo con schema e host."
 
 msgid "Announcement"
 msgstr "Annuncio"
@@ -5866,10 +5885,10 @@ msgid "Request Reference"
 msgstr "Riferimento della richiesta"
 
 msgid "Search people"
-msgstr "Cercare persone"
+msgstr "Cerca persone"
 
 msgid "Filter after Organisation or Suborganisation"
-msgstr "Filtrare per organizzazione o sottoorganizzazione"
+msgstr "Filtra per organizzazione o sotto-organizzazione"
 
 msgid "Select organisation"
 msgstr "Selezionare l'organizzazione"
@@ -5878,7 +5897,7 @@ msgid "Select sub organisation"
 msgstr "Selezionare la sotto-organizzazione"
 
 msgid "No people added yet."
-msgstr "Nessuna persona ancora aggiunta."
+msgstr "Non è stato aggiunto nessuno."
 
 msgid "No people found for current filter selection."
 msgstr "Non sono state trovate persone per la selezione del filtro corrente."
@@ -7259,6 +7278,15 @@ msgstr "Questo fine settimana"
 msgid "This week"
 msgstr "Questa settimana"
 
+#, python-format
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
+msgstr "Il filtro \"${keyword}\" è ancora applicato a ${count} evento/i."
+
+#, python-format
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgstr ""
+"La scelta del filtro \"${choice}\" è ancora applicata a ${count} evento/i."
+
 msgid "Edit Event Filter Configuration"
 msgstr "Modifica configurazione filtro eventi"
 
@@ -7577,6 +7605,43 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Rifiuta tutte le prenotazioni con messaggio"
+
+msgid "All reservations for this ticket have already been cancelled."
+msgstr "Tutte le prenotazioni per questo ticket sono già state cancellate."
+
+msgid "Cancellation requests are not enabled for this resource."
+msgstr "Le richieste di cancellazione non sono abilitate per questa risorsa."
+
+msgid "A cancellation request has already been submitted."
+msgstr "Una richiesta di cancellazione è già stata inviata."
+
+msgid "A cancellation request can only be submitted for accepted reservations."
+msgstr ""
+"Una richiesta di cancellazione può essere inviata solo per prenotazioni "
+"accettate.Una richiesta di cancellazione può essere inviata solo per "
+"prenotazioni accettate."
+
+msgid ""
+"A cancellation request cannot be submitted because the payment has already "
+"been invoiced or paid."
+msgstr ""
+"Non è possibile inviare una richiesta di cancellazione perché il pagamento è "
+"già stato fatturato o pagato."
+
+msgid ""
+"Your cancellation request has been submitted. You will be notified once it "
+"has been processed."
+msgstr ""
+"La tua richiesta di cancellazione è stata inviata. Sarai informato/a quando "
+"sarà elaborata."
+
+#. We adjust the wording for users that do not know what a ticket is
+#.
+msgid "Request Status"
+msgstr "Stato della richiesta"
+
+msgid "Request Cancellation"
+msgstr "Richiedere la cancellazione"
 
 msgid "Reservation summary"
 msgstr "Riepilogo della prenotazione"
@@ -8032,50 +8097,11 @@ msgstr "La tua richiesta è attualmente in sospeso"
 msgid "Your request has been processed"
 msgstr "La tua richiesta è stata elaborata"
 
-#. We adjust the wording for users that do not know what a ticket is
-#.
-msgid "Request Status"
-msgstr "Stato della richiesta"
-
 msgid "The request has already been closed"
 msgstr "La richiesta è già stata chiusa"
 
 msgid "Your message has been received"
 msgstr "Il tuo messaggio è stato ricevuto"
-
-msgid "Cancellation requests are not enabled for this resource."
-msgstr "Le richieste di cancellazione non sono abilitate per questa risorsa."
-
-msgid ""
-"All reservations for this ticket have already been cancelled."
-msgstr ""
-"Tutte le prenotazioni per questo ticket sono già state cancellate."
-
-msgid "A cancellation request has already been submitted."
-msgstr "Una richiesta di cancellazione è già stata inviata."
-
-msgid "A cancellation request can only be submitted for accepted reservations."
-msgstr ""
-"Una richiesta di cancellazione può essere inviata solo per prenotazioni "
-"accettate.Una richiesta di cancellazione può essere inviata solo per "
-"prenotazioni accettate."
-
-msgid ""
-"A cancellation request cannot be submitted because the payment has already "
-"been invoiced or paid."
-msgstr ""
-"Non è possibile inviare una richiesta di cancellazione perché il pagamento è "
-"già stato fatturato o pagato."
-
-msgid ""
-"Your cancellation request has been submitted. You will be notified once it "
-"has been processed."
-msgstr ""
-"La tua richiesta di cancellazione è stata inviata. Sarai informato/a quando "
-"sarà elaborata."
-
-msgid "Request Cancellation"
-msgstr "Richiedere la cancellazione"
 
 msgid ""
 "Could not find valid credentials. You can set them in Gever API Settings."

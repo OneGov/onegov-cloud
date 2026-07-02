@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-01 16:45+0200\n"
+"POT-Creation-Date: 2026-07-02 11:01+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1082,6 +1082,12 @@ msgstr "Erstellt"
 
 msgid "Expected header line with the following columns:"
 msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Diese(n) Filter bei allen betroffenen Veranstaltungen entfernen"
+
+msgid "Confirmation"
+msgstr "Bestätigung"
 
 msgid "Comment"
 msgstr "Kommentar"
@@ -2289,6 +2295,19 @@ msgstr ""
 
 msgid "Open files in separate window"
 msgstr "Dateien in separatem Fenster öffnen"
+
+msgid "Short links"
+msgstr "Kurzlinks"
+
+#, python-format
+msgid ""
+"Malformed short link on line ${number}. Each line needs to be a pair of "
+"name: path where path is either a valid path starting with a backslash, or a "
+"complete URL with schema and host."
+msgstr ""
+"Ungültiger Kurzlink auf Zeile ${number}. Jede Zeile muss dem Format Name: "
+"Pfad entsprechen, wobei Pfad entweder ein Pfad ohne Schema oder Hostname "
+"oder eine komplette URL ist."
 
 msgid "Announcement"
 msgstr "Ankündigung"
@@ -7285,6 +7304,17 @@ msgstr "Dieses Wochenende"
 msgid "This week"
 msgstr "Diese Woche"
 
+#, python-format
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
+msgstr ""
+"Der Filter \"${keyword}\" ist noch bei ${count} Veranstaltung(en) gesetzt."
+
+#, python-format
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgstr ""
+"Die Filterauswahl \"${choice}\" ist noch bei ${count} Veranstaltung(en) "
+"gesetzt."
+
 msgid "Edit Event Filter Configuration"
 msgstr "Filterkonfiguration für Veranstaltungen bearbeiten"
 
@@ -7605,6 +7635,43 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Alle Reservationen absagen mit Kommentar"
+
+msgid "All reservations for this ticket have already been cancelled."
+msgstr "Alle Reservationen für dieses Ticket wurden bereits storniert."
+
+msgid "Cancellation requests are not enabled for this resource."
+msgstr "Stornierungsanfragen sind für diese Ressource nicht aktiviert."
+
+msgid "A cancellation request has already been submitted."
+msgstr "Eine Stornierungsanfrage wurde bereits eingereicht."
+
+msgid "A cancellation request can only be submitted for accepted reservations."
+msgstr ""
+"Eine Stornierungsanfrage kann nur für angenommene Reservationen eingereicht "
+"werden.Eine Stornierungsanfrage kann nur für angenommene Reservationen "
+"eingereicht werden."
+
+msgid ""
+"A cancellation request cannot be submitted because the payment has already "
+"been invoiced or paid."
+msgstr ""
+"Eine Stornierungsanfrage kann nicht eingereicht werden, da die Zahlung "
+"bereits in Rechnung gestellt oder bezahlt wurde."
+
+msgid ""
+"Your cancellation request has been submitted. You will be notified once it "
+"has been processed."
+msgstr ""
+"Ihre Stornierungsanfrage wurde eingereicht. Sie werden benachrichtigt, "
+"sobald sie bearbeitet wurde."
+
+#. We adjust the wording for users that do not know what a ticket is
+#.
+msgid "Request Status"
+msgstr "Status Anfrage"
+
+msgid "Request Cancellation"
+msgstr "Stornierung beantragen"
 
 msgid "Reservation summary"
 msgstr "Terminübersicht"
@@ -8065,50 +8132,11 @@ msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
 msgid "Your request has been processed"
 msgstr "Ihr Anliegen wurde abgeschlossen"
 
-#. We adjust the wording for users that do not know what a ticket is
-#.
-msgid "Request Status"
-msgstr "Status Anfrage"
-
 msgid "The request has already been closed"
 msgstr "Ihre Anfrage wurde bereits geschlossen"
 
 msgid "Your message has been received"
 msgstr "Ihre Nachricht wurde übermittelt"
-
-msgid "Cancellation requests are not enabled for this resource."
-msgstr "Stornierungsanfragen sind für diese Ressource nicht aktiviert."
-
-msgid ""
-"All reservations for this ticket have already been cancelled."
-msgstr ""
-"Alle Reservationen für dieses Ticket wurden bereits storniert."
-
-msgid "A cancellation request has already been submitted."
-msgstr "Eine Stornierungsanfrage wurde bereits eingereicht."
-
-msgid "A cancellation request can only be submitted for accepted reservations."
-msgstr ""
-"Eine Stornierungsanfrage kann nur für angenommene Reservationen eingereicht "
-"werden.Eine Stornierungsanfrage kann nur für angenommene Reservationen "
-"eingereicht werden."
-
-msgid ""
-"A cancellation request cannot be submitted because the payment has already "
-"been invoiced or paid."
-msgstr ""
-"Eine Stornierungsanfrage kann nicht eingereicht werden, da die Zahlung "
-"bereits in Rechnung gestellt oder bezahlt wurde."
-
-msgid ""
-"Your cancellation request has been submitted. You will be notified once it "
-"has been processed."
-msgstr ""
-"Ihre Stornierungsanfrage wurde eingereicht. Sie werden benachrichtigt, "
-"sobald sie bearbeitet wurde."
-
-msgid "Request Cancellation"
-msgstr "Stornierung beantragen"
 
 msgid ""
 "Could not find valid credentials. You can set them in Gever API Settings."

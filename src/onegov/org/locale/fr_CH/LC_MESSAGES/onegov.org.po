@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-01 16:45+0200\n"
+"POT-Creation-Date: 2026-07-02 11:01+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1083,6 +1083,12 @@ msgstr "Créé"
 
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Supprimer ces filtres de tous les événements concernés"
+
+msgid "Confirmation"
+msgstr "Confirmation"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -2290,6 +2296,20 @@ msgstr ""
 
 msgid "Open files in separate window"
 msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
+
+msgid "Short links"
+msgstr "Lien court"
+
+#, python-format
+msgid ""
+"Malformed short link on line ${number}. Each line needs to be a pair of "
+"name: path where path is either a valid path starting with a backslash, or a "
+"complete URL with schema and host."
+msgstr ""
+"Lien court mal formé à la ligne ${number}. Chaque ligne doit prendre la "
+"forme « nom : chemin », où « chemin » correspond soit à un chemin valide "
+"commençant par une barre oblique inversée, soit à une URL complète "
+"comprenant le schéma et l'hôte."
 
 msgid "Announcement"
 msgstr "Annonce"
@@ -5903,7 +5923,7 @@ msgid "Select sub organisation"
 msgstr "Sélectionner une sous-organisation"
 
 msgid "No people added yet."
-msgstr "Aucune personne ajoutée pour l'instant."
+msgstr "Aucune personne n'a encore été ajoutée."
 
 msgid "No people found for current filter selection."
 msgstr "Aucune personne n'a été trouvée pour la sélection de filtre actuelle."
@@ -7294,6 +7314,15 @@ msgstr "Ce week-end"
 msgid "This week"
 msgstr "Cette semaine"
 
+#, python-format
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
+msgstr "Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
+
+#, python-format
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgstr ""
+"Le choix de filtre \"${choice}\" est encore appliqué à ${count} événement(s)."
+
 msgid "Edit Event Filter Configuration"
 msgstr "Modifier la configuration du filtre d'événements"
 
@@ -7614,6 +7643,43 @@ msgstr ""
 
 msgid "Reject all reservations with message"
 msgstr "Refuser toutes les réservations avec le message"
+
+msgid "All reservations for this ticket have already been cancelled."
+msgstr "Toutes les réservations pour ce ticket ont déjà été annulées."
+
+msgid "Cancellation requests are not enabled for this resource."
+msgstr "Les demandes d'annulation ne sont pas activées pour cette ressource."
+
+msgid "A cancellation request has already been submitted."
+msgstr "Une demande d'annulation a déjà été soumise."
+
+msgid "A cancellation request can only be submitted for accepted reservations."
+msgstr ""
+"Une demande d'annulation ne peut être soumise que pour des réservations "
+"acceptées.Une demande d'annulation ne peut être soumise que pour des "
+"réservations acceptées."
+
+msgid ""
+"A cancellation request cannot be submitted because the payment has already "
+"been invoiced or paid."
+msgstr ""
+"Une demande d'annulation ne peut pas être soumise car le paiement a déjà été "
+"facturé ou payé."
+
+msgid ""
+"Your cancellation request has been submitted. You will be notified once it "
+"has been processed."
+msgstr ""
+"Votre demande d'annulation a été soumise. Vous serez informé(e) une fois "
+"qu'elle aura été traitée."
+
+#. We adjust the wording for users that do not know what a ticket is
+#.
+msgid "Request Status"
+msgstr "Status Demand"
+
+msgid "Request Cancellation"
+msgstr "Demander l'annulation"
 
 msgid "Reservation summary"
 msgstr "Résumé des réservations"
@@ -8073,50 +8139,11 @@ msgstr "Votre demande est actuellement en attente"
 msgid "Your request has been processed"
 msgstr "Votre demande a été traitée"
 
-#. We adjust the wording for users that do not know what a ticket is
-#.
-msgid "Request Status"
-msgstr "Status Demand"
-
 msgid "The request has already been closed"
 msgstr "Votre demand a déjà été clòturée. "
 
 msgid "Your message has been received"
 msgstr "Votre message a été reçu"
-
-msgid "Cancellation requests are not enabled for this resource."
-msgstr "Les demandes d'annulation ne sont pas activées pour cette ressource."
-
-msgid ""
-"All reservations for this ticket have already been cancelled."
-msgstr ""
-"Toutes les réservations pour ce ticket ont déjà été annulées."
-
-msgid "A cancellation request has already been submitted."
-msgstr "Une demande d'annulation a déjà été soumise."
-
-msgid "A cancellation request can only be submitted for accepted reservations."
-msgstr ""
-"Une demande d'annulation ne peut être soumise que pour des réservations "
-"acceptées.Une demande d'annulation ne peut être soumise que pour des "
-"réservations acceptées."
-
-msgid ""
-"A cancellation request cannot be submitted because the payment has already "
-"been invoiced or paid."
-msgstr ""
-"Une demande d'annulation ne peut pas être soumise car le paiement a déjà été "
-"facturé ou payé."
-
-msgid ""
-"Your cancellation request has been submitted. You will be notified once it "
-"has been processed."
-msgstr ""
-"Votre demande d'annulation a été soumise. Vous serez informé(e) une fois "
-"qu'elle aura été traitée."
-
-msgid "Request Cancellation"
-msgstr "Demander l'annulation"
 
 msgid ""
 "Could not find valid credentials. You can set them in Gever API Settings."

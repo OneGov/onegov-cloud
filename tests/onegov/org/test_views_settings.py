@@ -196,3 +196,32 @@ def test_switch_languages(client: Client) -> None:
     assert 'Tedesco' in page
     assert 'Allemand' not in page
     assert 'Deutsch' not in page
+
+
+def test_settings_short_links(client: Client) -> None:
+    client.login_admin()
+
+    page = client.get('/link-settings')
+
+    # malformed entries trigger validation errors
+    page.form['short_links'] = 'bogus'
+    assert 'Ungültiger Kurzlink auf Zeile 1' in page.form.submit()
+
+    page.form['short_links'] = 'valid: /topics/valid\nbogus: google.com'
+    assert 'Ungültiger Kurzlink auf Zeile 2' in page.form.submit()
+
+    page.form['short_links'] = (
+        'org: /topics/organisation\n'
+        'google: https://www.google.com'
+    )
+    page.form.submit().follow()
+
+    # domain relative short links work
+    page = client.get('/@org')
+    assert page.headers['Location'] == 'http://localhost/topics/organisation'
+    # so do full URL short links
+    page = client.get('/@google')
+    assert page.headers['Location'] == 'https://www.google.com'
+    # unknown short links return 404, as they should
+    page = client.get('/@bogus', expect_errors=True)
+    assert page.status_code == 404
