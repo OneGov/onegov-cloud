@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     ]
 
 
-class BookingCollection(GenericCollection[Booking]):
+class BookingCollection(GenericCollection[Booking, 'UUID']):
 
     def __init__(
         self,

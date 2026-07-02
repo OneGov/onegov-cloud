@@ -11,9 +11,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from typing import Self
+    from uuid import UUID  # noqa: F401
 
 
-class LanguageCollection(GenericCollection[Language], Pagination[Language]):
+class LanguageCollection(
+    GenericCollection[Language, 'UUID'],
+    Pagination[Language]
+):
 
     batch_size = 20
 

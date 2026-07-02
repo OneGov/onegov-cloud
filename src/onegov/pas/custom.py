@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from onegov.pas.request import PasRequest
     from onegov.town6.request import TownRequest
     from sqlalchemy.orm import Session
+    from uuid import UUID
 
 
 def get_global_tools(request: PasRequest) -> Iterator[Link | LinkGroup]:
@@ -204,7 +205,7 @@ def validate_attendance_date(
 
 
 def has_user_set_abschluss_for_settlement_run(
-    session: Session, parliamentarian_id: str, attendance_date: date
+    session: Session, parliamentarian_id: UUID, attendance_date: date
 ) -> bool:
     """Check if parliamentarian has set abschluss in settlement run.
 

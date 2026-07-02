@@ -28,7 +28,7 @@ from purl import URL
 from sedate import utcnow
 from sqlalchemy import and_, desc, func, or_, text
 from sqlalchemy.orm import object_session, undefer
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -43,7 +43,6 @@ if TYPE_CHECKING:
     from onegov.pay import InvoiceItem, InvoiceItemMeta, Payment
     from onegov.ticket.collection import ExtendedTicketState
     from sqlalchemy.orm import Mapped, Query, Session
-    from uuid import UUID
 
     type DateRange = tuple[datetime, datetime]
 
@@ -1727,6 +1726,8 @@ class ChatHandler(Handler):
 
     @cached_property
     def chat(self) -> Chat | None:
+        if isinstance(self.id, str):
+            self.id = UUID(self.id)
         return self.collection.by_id(self.id)
 
     @property

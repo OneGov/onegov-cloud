@@ -25,10 +25,10 @@ from onegov.user import User, UserCollection
 from onegov.websockets import log
 from onegov.websockets.security import (WebsocketSecurityError,
                                         consume_websocket_token)
+from uuid import UUID
 
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from uuid import UUID
 
     from sqlalchemy.orm import Session
     from websockets import Request, Response
@@ -528,7 +528,7 @@ async def handle_staff_chat(
         staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
         staff_connections.add(websocket)
         channel_connections: set[WebSocketServer] = set()
-        open_channel = ''
+        open_channel: UUID | None = None
 
         log.debug(f'added {websocket.id} to staff-connections')
 
@@ -569,6 +569,12 @@ async def handle_staff_chat(
                 # If the type is a message, save to DB
                 if content['type'] == 'message':
 
+                    if open_channel is None:
+                        log.error(
+                            'Attempted to send message without open channel'
+                        )
+                        continue
+
                     chat = (
                         ChatCollection(websocket.session)
                         .by_id(open_channel)
@@ -601,9 +607,12 @@ async def handle_staff_chat(
 
                 elif content['type'] == 'end-chat':
                     log.debug(f'ending chat with id {content["channel"]}')
-                    chat = ChatCollection(websocket.session).by_id(
-                        escape(content['channel'])
-                    )
+                    try:
+                        chat = ChatCollection(websocket.session).by_id(
+                            UUID(content['channel'])
+                        )
+                    except Exception:
+                        chat = None
 
                     if not chat:
                         log.error(
@@ -618,9 +627,16 @@ async def handle_staff_chat(
 
                 elif content['type'] == 'accepted':
                     log.debug('staff-member accepted-request')
-                    open_channel = loads(message)['channel']
+                    raw_open_channel = loads(message)['channel']
+                    try:
+                        open_channel = UUID(raw_open_channel)
+                    except Exception:
+                        log.error(
+                            f'Received malformed channel {raw_open_channel}'
+                        )
+                        continue
                     channel_connections = all_channels.setdefault(
-                        open_channel, set()
+                        open_channel.hex, set()
                     )
                     channel_connections.add(websocket)
 
@@ -656,10 +672,13 @@ async def handle_staff_chat(
                     }))
                     log.debug('sent chat history')
 
-                    # FIXME: Rather than escape we should try to parse this
-                    #        as an UUID, since otherwise the DB update will
-                    #        fail anyways
-                    chat.user_id = escape(content['userId'])  # type:ignore
+                    try:
+                        chat.user_id = UUID(content['userId'])
+                    except Exception:
+                        log.error(
+                            f'Received invalid user id {content['userId']}'
+                        )
+                        continue
                     await websocket.update_database()
 
                 elif content['type'] == 'request-chat-history':
@@ -675,8 +694,8 @@ async def handle_staff_chat(
 
                         continue
 
-                    channel_connections = all_channels.setdefault(open_channel,
-                                                                  set())
+                    channel_connections = all_channels.setdefault(
+                        open_channel.hex, set())
                     channel_connections.add(websocket)
                     log.debug('staff member reconnected')
                     inner = dumps({

@@ -10,9 +10,10 @@ from typing import Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
+    from uuid import UUID  # noqa: F401
 
 
-class PartyCollection(GenericCollection[Party]):
+class PartyCollection(GenericCollection[Party, 'UUID']):
 
     def __init__(
         self,

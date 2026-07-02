@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.directory.models import Directory
     from sqlalchemy.orm import Query
+    from uuid import UUID  # noqa: F401
 
 
 class DirectorySearchWidget[DirectoryEntryT: DirectoryEntry](Protocol):
@@ -34,7 +35,7 @@ class DirectorySearchWidget[DirectoryEntryT: DirectoryEntry](Protocol):
 
 
 class DirectoryEntryCollection[DirectoryEntryT: DirectoryEntry](
-    GenericCollection[DirectoryEntryT],
+    GenericCollection[DirectoryEntryT, 'UUID'],
     Pagination[DirectoryEntryT]
 ):
     """ Provides a view on a directory's entries.

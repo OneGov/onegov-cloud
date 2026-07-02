@@ -7,9 +7,10 @@ from onegov.core.collection import GenericCollection
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
+    from uuid import UUID  # noqa: F401
 
 
-class BookingPeriodCollection(GenericCollection[BookingPeriod]):
+class BookingPeriodCollection(GenericCollection[BookingPeriod, 'UUID']):
 
     @property
     def model_class(self) -> type[BookingPeriod]:

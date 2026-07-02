@@ -52,7 +52,7 @@ class Collection:
         return self.items.get(str(id_))
 
 
-class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
+class Endpoint(ApiEndpoint[Bunch, int]):  # type: ignore[type-var]
     endpoint = 'endpoint'
     form_class = ItemForm
 
@@ -90,13 +90,13 @@ class Endpoint(ApiEndpoint[Bunch]):  # type: ignore[type-var]
 
 @App.setting(section='api', name='endpoints')
 def get_api_endpoints_handler(
-) -> Callable[[CoreRequest], Iterator[ApiEndpoint[Any]]]:
+) -> Callable[[CoreRequest], Iterator[ApiEndpoint[Any, Any]]]:
 
     def get_api_endpoints(
             request: CoreRequest,
             page: int = 0,
             extra_parameters: dict[str, list[str]] | None = None
-    ) -> Iterator[ApiEndpoint[Any]]:
+    ) -> Iterator[ApiEndpoint[Any, Any]]:
         yield Endpoint(request, extra_parameters, page)
         yield PersonApiEndpoint(request, extra_parameters, page)
 

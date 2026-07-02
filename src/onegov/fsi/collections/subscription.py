@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class SubscriptionsCollection(
-    GenericCollection[CourseSubscription],
+    GenericCollection[CourseSubscription, 'UUID'],
     Pagination[CourseSubscription]
 ):
 
@@ -99,10 +99,7 @@ class SubscriptionsCollection(
                 CourseSubscription.course_event_id == self.course_event_id)
         return query
 
-    def by_id(
-        self,
-        id: UUID  # type:ignore[override]
-    ) -> CourseSubscription | None:
+    def by_id(self, id: UUID) -> CourseSubscription | None:
         return super().query().filter(self.primary_key == id).first()
 
     def subset(self) -> Query[CourseSubscription]:

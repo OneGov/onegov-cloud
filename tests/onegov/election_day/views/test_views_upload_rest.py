@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import psycopg.errors
 import pytest
 import transaction
 
@@ -9,7 +10,6 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
-import psycopg2.errors
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
@@ -481,7 +481,7 @@ def test_infailedsqltransaction_after_corrupt_pool_connection(
     # from activate_schema's SET search_path. The handlers only return early
     # for ROLLBACK TO SAVEPOINT statements; all other statements on INERROR
     # connections fail naturally and surface in Sentry.
-    with pytest.raises(psycopg2.errors.InFailedSqlTransaction):
+    with pytest.raises(psycopg.errors.InFailedSqlTransaction):
         Client(app).get('/')
 
     # The failure is self-healing: transaction_tween catches the exception,

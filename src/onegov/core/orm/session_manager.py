@@ -13,6 +13,8 @@ from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core import log
 from onegov.core.custom import json
+from psycopg import ClientCursor
+from psycopg.sql import SQL, Identifier
 from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -324,6 +326,15 @@ class SessionManager:
         engine_config['json_serializer'] = json.dumps
         engine_config['json_deserializer'] = json.loads
 
+        # FIXME: While using ClientCursor improves compatibility of our
+        #        code against the psycopg2 implementation, we also get
+        #        a much smaller performance win out of it. Eventually we
+        #        will want to harden our code, so all queries still work
+        #        if the parameters are submitted in binary format instead
+        #        of text format.
+        connect_args = engine_config.setdefault('connect_args', {})
+        connect_args['cursor_factory'] = ClientCursor
+
         if pool_config:
             engine_config.update(pool_config)
         else:
@@ -441,7 +452,9 @@ class SessionManager:
                     schema = None
 
             if schema is not None:
-                cursor.execute('SET search_path TO %s, extensions', (schema, ))
+                cursor.execute(SQL(
+                    'SET search_path TO {}, extensions'
+                ).format(Identifier(schema)))
 
         @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
@@ -457,10 +470,9 @@ class SessionManager:
             if statement.startswith('ROLLBACK'):
                 return
 
-            cursor.execute(
-                'SET SESSION idle_in_transaction_session_timeout = %s',
-                (f'{CONNECTION_LIFETIME}s', )
-            )
+            cursor.execute(SQL(
+                'SET SESSION idle_in_transaction_session_timeout = {}'
+            ).format(f'{CONNECTION_LIFETIME}s'))
 
     def register_session(self, session: Session | scoped_session[Any]) -> None:
         """ Takes the given session and registers it with zope.sqlalchemy and
