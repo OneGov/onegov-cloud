@@ -906,9 +906,7 @@ class SessionManager:
                             if t.name not in existing_tables
                         ]
                         if missing:
-                            base.metadata.create_all(
-                                conn, tables=missing, checkfirst=False
-                            )
+                            base.metadata.create_all(conn, tables=missing)
                             existing_tables.update(t.name for t in missing)
 
                         declared_classes.update(
