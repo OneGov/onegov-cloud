@@ -40,14 +40,13 @@ from onegov.org.models.extensions import (
 from onegov.org.models.ticket import ReservationHandler
 from cryptography.fernet import InvalidToken
 from onegov.org.models import (
-    ExtendedDirectory, ExtendedDirectoryEntry, TicketMessage)
+    ExtendedDirectoryEntry, TicketMessage)
 from onegov.org.notification_service import (
     get_notification_service,
 )
 from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
-    send_admin_deletion_notification_for_directory_entry,
     send_admin_expiry_notification_for_directory_entry,
     send_admin_notification_for_directory_entry,
     send_email_notification_for_directory_entry)
@@ -64,7 +63,7 @@ from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import contains_eager, undefer
+from sqlalchemy.orm import undefer
 from urllib3.util import Retry
 from uuid import UUID
 
@@ -105,7 +104,6 @@ def hourly_maintenance_tasks(request: OrgRequest) -> None:
     now = utcnow()
     publish_files(request)
     handle_publication_models(request, now)
-    handle_directory_admin_notifications(request)
     send_daily_newsletter(request)
     send_scheduled_newsletter(request)
     delete_old_tans(request)
@@ -254,48 +252,14 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
 
-        if (
-            isinstance(obj, ExtendedDirectoryEntry)
-            and obj.publication_end is not None
-            and now >= obj.publication_end
-        ):
-            send_admin_expiry_notification_for_directory_entry(
-                obj.directory, obj, request)
-
-
-def handle_directory_admin_notifications(request: OrgRequest) -> None:
-    """
-    Sends admin notification emails for published directory entries whose
-    content has changed since the last notification.
-
-    Covers two cases:
-    - Entry newly published (notified_hash is None)
-    - Entry already published but edited (content_hash != notified_hash)
-
-    After notifying, notified_hash is updated to content_hash so subsequent
-    runs don't re-send for the same content.
-    """
-    entries = request.session.query(ExtendedDirectoryEntry).join(
-        ExtendedDirectoryEntry.directory
-    ).options(
-        contains_eager(ExtendedDirectoryEntry.directory)
-    ).filter(
-        ExtendedDirectoryEntry.published,
-        ExtendedDirectoryEntry.content_hash.isnot(None),
-        or_(
-            ExtendedDirectoryEntry.notified_hash.is_(None),
-            ExtendedDirectoryEntry.content_hash
-            != ExtendedDirectoryEntry.notified_hash
-        ),
-        ExtendedDirectory.meta['notification_address'].astext.isnot(None),
-    )
-
-    for entry in entries:
-        directory = entry.directory
-        is_update = entry.notified_hash is not None
-        send_admin_notification_for_directory_entry(
-            directory, entry, request, is_update=is_update)
-        entry.notified_hash = entry.content_hash
+        if isinstance(obj, ExtendedDirectoryEntry):
+            if obj.publication_end is None or obj.publication_end > now:
+                if obj.directory.notification_address:
+                    send_admin_notification_for_directory_entry(
+                        obj.directory, obj, request)
+            else:
+                send_admin_expiry_notification_for_directory_entry(
+                    obj.directory, obj, request)
 
 
 def delete_old_tans(request: OrgRequest) -> None:
@@ -897,10 +861,6 @@ def delete_content_marked_deletable(request: OrgRequest) -> None:
                     if obj.publication_end and obj.publication_end < now:
                         log.info(f'Cron: Delete expired obj for {name}: '
                                  f'{obj.title}')
-                        if isinstance(obj, ExtendedDirectoryEntry):
-                            send_admin_deletion_notification_for_directory_entry(
-                                obj.directory, obj, request,
-                                auto_deleted=True)
                         request.session.delete(obj)
                         count += 1
 

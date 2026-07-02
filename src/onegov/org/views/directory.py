@@ -42,8 +42,10 @@ from purl import URL
 from tempfile import NamedTemporaryFile
 from webob import Response
 from webob.exc import HTTPForbidden
+from sedate import utcnow
 from wtforms import TextAreaField
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError as WTValidationError
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
@@ -56,6 +58,7 @@ if TYPE_CHECKING:
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
+    from wtforms import Field
     from typing import type_check_only
 
     @type_check_only
@@ -106,6 +109,19 @@ def get_directory_entry_form_class(
             elif model.directory.required_publication:
                 self.publication_start.validators[0] = InputRequired()
                 self.publication_end.validators[0] = InputRequired()
+
+        def validate_publication_start(self, field: Field) -> None:
+            if (
+                field.data is not None
+                and isinstance(model, ExtendedDirectoryEntry)
+                and model.published
+                and model.directory.notification_address
+                and field.data <= utcnow()
+            ):
+                raise WTValidationError(_(
+                    'This entry is currently published. Set a future '
+                    'publication start to schedule re-publication.'
+                ))
 
     move_fields(
         InternalNotesAndOptionalMapPublicationForm,
@@ -234,8 +250,6 @@ def handle_edit_directory(
                             save_changes = False
 
             if save_changes:
-                previous_notification_address = (
-                    self.directory.notification_address)
                 try:
                     form.populate_obj(self.directory)
                     self.session.flush()
@@ -250,13 +264,6 @@ def handle_edit_directory(
                     )
                     transaction.abort()
                 else:
-                    if (not previous_notification_address
-                            and self.directory.notification_address):
-                        # Seed notified_hash to avoid flood of emails
-                        # on first configure.
-                        for entry in self.directory.entries:
-                            if entry.content_hash:
-                                entry.notified_hash = entry.content_hash
                     request.success(_('Your changes were saved'))
                     return request.redirect(request.link(self))
 
@@ -683,26 +690,17 @@ def send_admin_notification_for_directory_entry(
     directory: ExtendedDirectory,
     entry: ExtendedDirectoryEntry,
     request: OrgRequest,
-    is_update: bool = False
 ) -> None:
-    if is_update:
-        title = request.translate(_(
-            '${org}: Updated Entry "${entry}" in "${directory}"',
-            mapping={'org': request.app.org.title,
-                     'entry': entry.title,
-                     'directory': directory.title},
-        ))
-    else:
-        title = request.translate(_(
-            '${org}: New Entry "${entry}" in "${directory}"',
-            mapping={'org': request.app.org.title,
-                     'entry': entry.title,
-                     'directory': directory.title},
-        ))
+    title = request.translate(_(
+        '${org}: Published Entry "${entry}" in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'entry': entry.title,
+                 'directory': directory.title},
+    ))
 
     _send_admin_email(
         directory, request, title,
-        'mail_directory_entry_admin_notification.pt',
+        'mail_directory_entry_admin_notification_started.pt',
         {
             'directory': directory,
             'entry': entry,
@@ -711,7 +709,6 @@ def send_admin_notification_for_directory_entry(
             'publication_start': entry.publication_start,
             'publication_end': entry.publication_end,
             'content_hash': entry.content_hash,
-            'is_update': is_update,
         },
     )
 
@@ -740,40 +737,6 @@ def send_admin_expiry_notification_for_directory_entry(
             'publication_start': entry.publication_start,
             'publication_end': entry.publication_end,
             'content_hash': entry.content_hash,
-            'deleted': False,
-            'auto_deleted': False,
-        },
-    )
-
-
-def send_admin_deletion_notification_for_directory_entry(
-    directory: ExtendedDirectory,
-    entry: ExtendedDirectoryEntry,
-    request: OrgRequest,
-    *,
-    auto_deleted: bool = False,
-) -> None:
-    if not directory.notification_address:
-        return
-
-    title = request.translate(_(
-        '${org}: Deleted Entry "${entry}" in "${directory}"',
-        mapping={'org': request.app.org.title,
-                 'entry': entry.title,
-                 'directory': directory.title},
-    ))
-    _send_admin_email(
-        directory, request, title,
-        'mail_directory_entry_admin_publication_ended.pt',
-        {
-            'directory': directory,
-            'entry': entry,
-            'entry_title': entry.title,
-            'publication_start': entry.publication_start,
-            'publication_end': entry.publication_end,
-            'content_hash': entry.content_hash,
-            'deleted': True,
-            'auto_deleted': auto_deleted,
         },
     )
 
@@ -1049,11 +1012,6 @@ def delete_directory_entry(
 ) -> None:
 
     request.assert_valid_csrf_token()
-
-    if isinstance(self, ExtendedDirectoryEntry):
-        send_admin_deletion_notification_for_directory_entry(
-            self.directory, self, request
-        )
 
     session = request.session
     session.delete(self)

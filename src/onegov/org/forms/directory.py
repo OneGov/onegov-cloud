@@ -343,8 +343,9 @@ class DirectoryBaseForm(Form):
     notification_address = EmailField(
         label=_('Admin notification address'),
         description=_(
-            'Receives an e-mail when entries are published, updated or '
-            'deleted. Useful e.g. for permit directories.'
+            'Receives an e-mail when entries are published or de-published '
+            '(sent out hourly). Useful e.g. for permit directories as proof '
+            'of publication.'
         ),
         fieldset=_('Notifications'),
         validators=[Optional(), Email()]

@@ -2653,17 +2653,21 @@ def _make_permit_directory(
     return directory
 
 
-def test_admin_notification_new_entry(
+def test_admin_notification_full_workflow(
     client: Client['TestOrgApp'],
 ) -> None:
-    """New and edited entries trigger separate admin notification emails."""
+    """
+    Full publication lifecycle for an entry in a directory with a
+    notification_address
+    """
     job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
     assert job is not None
     job.app = client.app
 
     real_now = utcnow()
-    pub_start = real_now - timedelta(hours=2)
-    pub_end = real_now + timedelta(days=30)
+    pub_start_1 = real_now - timedelta(minutes=30)
+    pub_start_2 = real_now + timedelta(hours=2)
+    pub_end = real_now + timedelta(hours=4)
 
     transaction.begin()
     directory = _make_permit_directory(client.app.session())
@@ -2671,316 +2675,137 @@ def test_admin_notification_new_entry(
         values=dict(
             gesuchsteller_in='Anton Müller',
             adresse='Hauptstrasse 1',
-            publication_start=pub_start,
-            publication_end=pub_end,
-        )
-    )
-    transaction.commit()
-    close_all_sessions()
-
-    assert len(os.listdir(client.app.maildir)) == 0
-
-    # entry is published in DB — new-entry notification
-    client.get(get_cronjob_url(job))
-
-    assert len(os.listdir(client.app.maildir)) == 1
-    message = client.get_email(0)
-    assert message['To'] == 'admin@example.org'
-    assert 'Neuer Eintrag' in message['Subject']
-    assert 'Baugesuche' in message['Subject']
-    assert 'Anton Müller' in message['Subject']
-    assert 'Anton Müller' in message['TextBody']
-    assert _fmt_date(pub_start) in message['TextBody']  # publication_start
-    assert _fmt_date(pub_end) in message['TextBody']    # publication_end
-    session = client.app.session()
-    db_entry = session.query(ExtendedDirectoryEntry).one()
-    assert db_entry.content_hash is not None
-    assert db_entry.content_hash in message['TextBody']
-
-    # second run — no duplicate
-    client.get(get_cronjob_url(job))
-    assert len(os.listdir(client.app.maildir)) == 1
-
-    # notified_hash is updated to content_hash
-    assert db_entry.notified_hash == db_entry.content_hash
-
-    # edit entry (address changed) — triggers "updated" email
-    transaction.begin()
-    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    db_entry.values = {**db_entry.values, 'adresse': 'Bahnhofstrasse 99'}
-    transaction.commit()
-    close_all_sessions()
-
-    client.get(get_cronjob_url(job))
-
-    assert len(os.listdir(client.app.maildir)) == 2
-    message = client.get_email(1)
-    assert message['To'] == 'admin@example.org'
-    assert 'Aktualisierter Eintrag' in message['Subject']
-    assert 'Baugesuche' in message['Subject']
-    assert 'Anton Müller' in message['Subject']
-    assert 'Anton Müller' in message['TextBody']
-    assert _fmt_date(pub_start) in message['TextBody']  # publication_start
-    assert _fmt_date(pub_end) in message['TextBody']    # publication_end
-    db_entry = (
-        client.app.session()
-        .query(ExtendedDirectoryEntry)
-        .filter(ExtendedDirectoryEntry.title == 'Anton Müller')
-        .one()
-    )
-    assert db_entry.content_hash in message['TextBody']
-
-    # second run without further changes — no more emails
-    client.get(get_cronjob_url(job))
-    assert len(os.listdir(client.app.maildir)) == 2
-
-    # add a second entry — separate notification per entry
-    berta_pub_start = real_now - timedelta(hours=1)
-    transaction.begin()
-    dirs: DirectoryCollection['ExtendedDirectory']
-    dirs = DirectoryCollection(client.app.session(), type='extended')
-    directory2 = dirs.by_name('baugesuche')
-    assert directory2 is not None
-    directory2.add(
-        values=dict(
-            gesuchsteller_in='Berta Schmid',
-            adresse='Seeweg 5',
-            publication_start=berta_pub_start,
-            publication_end=pub_end,
-        )
-    )
-    transaction.commit()
-    close_all_sessions()
-
-    client.get(get_cronjob_url(job))
-
-    assert len(os.listdir(client.app.maildir)) == 3
-    message = client.get_email(2)
-    assert message['To'] == 'admin@example.org'
-    assert 'Berta' in message['TextBody']
-    assert (
-        _fmt_date(berta_pub_start) in message['TextBody']
-    )  # publication_start
-    assert _fmt_date(pub_end) in message['TextBody']          # publication_end
-    berta = (
-        client.app.session()
-        .query(ExtendedDirectoryEntry)
-        .filter(ExtendedDirectoryEntry.title == 'Berta Schmid')
-        .one()
-    )
-    assert berta.content_hash in message['TextBody']
-
-
-def test_admin_notification_new_field(
-    client: Client['TestOrgApp'],
-) -> None:
-    """
-    Each entry gets its own email when a new field value changes its hash.
-    """
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    assert job is not None
-    job.app = client.app
-
-    real_now = utcnow()
-    pub_start = real_now - timedelta(hours=2)
-    pub_end = real_now + timedelta(days=30)
-
-    transaction.begin()
-    directory = _make_permit_directory(client.app.session())
-    directory.add(
-        values=dict(
-            gesuchsteller_in='Anton Müller',
-            adresse='Hauptstrasse 1',
-            publication_start=pub_start,
-            publication_end=pub_end,
-        )
-    )
-    directory.add(
-        values=dict(
-            gesuchsteller_in='Berta Schmid',
-            adresse='Seeweg 5',
-            publication_start=pub_start,
-            publication_end=pub_end,
-        )
-    )
-    transaction.commit()
-    close_all_sessions()
-
-    # both entries published — one email each (tick=True avoids filename
-    # collision)
-    with freeze_time(real_now, tick=True):
-        client.get(get_cronjob_url(job))
-    assert len(os.listdir(client.app.maildir)) == 2
-    subjects = {client.get_email(i)['Subject'] for i in (0, 1)}
-    assert all('Neuer Eintrag' in s for s in subjects)
-    assert any('Anton Müller' in s for s in subjects)
-    assert any('Berta Schmid' in s for s in subjects)
-
-    # add new field to both entries → hash changes for each → one email each
-    transaction.begin()
-    for entry in client.app.session().query(ExtendedDirectoryEntry).all():
-        entry.values = {**entry.values, 'parzellen_nr': '1234'}
-    transaction.commit()
-    close_all_sessions()
-
-    with freeze_time(real_now, tick=True):
-        client.get(get_cronjob_url(job))
-
-    assert len(os.listdir(client.app.maildir)) == 4
-    subjects = {client.get_email(i)['Subject'] for i in (2, 3)}
-    assert all('Aktualisierter Eintrag' in s for s in subjects)
-    assert any('Anton Müller' in s for s in subjects)
-    assert any('Berta Schmid' in s for s in subjects)
-    for i in (2, 3):
-        message = client.get_email(i)
-        assert message['To'] == 'admin@example.org'
-        assert _fmt_date(pub_start) in message['TextBody']
-        assert _fmt_date(pub_end) in message['TextBody']
-    entries = {
-        e.title: e
-        for e in client.app.session().query(ExtendedDirectoryEntry).all()
-    }
-    for i in (2, 3):
-        body = client.get_email(i)['TextBody']
-        matched = next(e for e in entries.values() if e.title in body)
-        assert matched.content_hash in body
-
-
-def test_admin_notification_publication_date_reached(
-    client: Client['TestOrgApp'],
-) -> None:
-    """
-    No email before publication_start; email once publication_start passes.
-    """
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    assert job is not None
-    job.app = client.app
-
-    real_now = utcnow()
-    pub_start_future = real_now + timedelta(hours=24)
-    pub_end = real_now + timedelta(days=30)
-
-    transaction.begin()
-    directory = _make_permit_directory(client.app.session())
-    directory.add(
-        values=dict(
-            gesuchsteller_in='Carla Huber',
-            adresse='Seeweg 2',
-            publication_start=pub_start_future,
-            publication_end=pub_end,
-        )
-    )
-    transaction.commit()
-    close_all_sessions()
-
-    # publication_start is still in the future in DB — no email
-    client.get(get_cronjob_url(job))
-    assert len(os.listdir(client.app.maildir)) == 0
-
-    # move publication_start to the past so DB NOW() sees it as published
-    pub_start = real_now - timedelta(hours=1)
-    transaction.begin()
-    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    db_entry.publication_start = pub_start
-    transaction.commit()
-    close_all_sessions()
-
-    client.get(get_cronjob_url(job))
-
-    assert len(os.listdir(client.app.maildir)) == 1
-    message = client.get_email(0)
-    assert message['To'] == 'admin@example.org'
-    assert 'Carla Huber' in message['Subject']
-    assert 'Baugesuche' in message['Subject']
-    assert 'Carla Huber' in message['TextBody']
-    assert _fmt_date(pub_start) in message['TextBody']  # publication_start
-    assert _fmt_date(pub_end) in message['TextBody']    # publication_end
-    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    assert db_entry.content_hash in message['TextBody']
-
-
-def test_admin_notification_re_publication(
-    client: Client['TestOrgApp'],
-) -> None:
-    """
-    Email is sent every time an entry goes live, even if content unchanged.
-    Changing publication_start resets notified_hash so the next publish
-    triggers a fresh notification.
-    """
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    assert job is not None
-    job.app = client.app
-
-    real_now = utcnow()
-    pub_start_1 = real_now - timedelta(hours=1)
-    pub_end_1 = real_now + timedelta(days=30)
-
-    transaction.begin()
-    directory = _make_permit_directory(client.app.session())
-    directory.add(
-        values=dict(
-            gesuchsteller_in='Carla Huber',
-            adresse='Seeweg 2',
             publication_start=pub_start_1,
-            publication_end=pub_end_1,
+            publication_end=pub_end,
         )
     )
     transaction.commit()
     close_all_sessions()
 
-    # first publish → email sent, notified_hash set
+    # Step 1: pub_start_1 already crossed → notification
     client.get(get_cronjob_url(job))
+
     assert len(os.listdir(client.app.maildir)) == 1
-    transaction.begin()
+    msg = client.get_email(0)
+    assert msg['To'] == 'admin@example.org'
+    assert 'Veröffentlichter Eintrag' in msg['Subject']
+    assert 'Anton Müller' in msg['Subject']
+    assert 'Baugesuche' in msg['Subject']
+    assert 'Anton Müller' in msg['TextBody']
+    assert _fmt_date(pub_start_1) in msg['TextBody']
+    assert _fmt_date(pub_end) in msg['TextBody']
     db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    assert db_entry.notified_hash == db_entry.content_hash
-    transaction.commit()
-    close_all_sessions()
+    assert db_entry.content_hash is not None
+    assert db_entry.content_hash in msg['TextBody']
+    entry_hash = db_entry.content_hash
 
-    # re-run → no duplicate
+    # Step 2: second run → no duplicate
     client.get(get_cronjob_url(job))
     assert len(os.listdir(client.app.maildir)) == 1
 
-    # changing publication_start resets notified_hash
-    pub_start_2 = real_now + timedelta(hours=24)
+    # Step 3: admin moves pub_start to future → no email until clock crosses it
     transaction.begin()
     db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
     db_entry.publication_start = pub_start_2
     transaction.commit()
     close_all_sessions()
 
-    transaction.begin()
-    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    assert db_entry.notified_hash is None
-    transaction.commit()
-    close_all_sessions()
-
-    # not yet published — no email
     client.get(get_cronjob_url(job))
     assert len(os.listdir(client.app.maildir)) == 1
 
-    # move new publication_start to the past
+    # Step 4: clock crosses pub_start_2 → re-publication notification;
+    # content unchanged so same hash
+    with freeze_time(real_now + timedelta(hours=3), tick=True):
+        client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 2
+    msg = client.get_email(1)
+    assert 'Veröffentlichter Eintrag' in msg['Subject']
+    assert 'Anton Müller' in msg['Subject']
+    assert _fmt_date(pub_start_2) in msg['TextBody']
+    assert _fmt_date(pub_end) in msg['TextBody']
+    assert entry_hash in msg['TextBody']
+
+    # Step 5: clock crosses pub_end → expiry notification, entry not deleted
+    with freeze_time(real_now + timedelta(hours=5), tick=True):
+        client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 3
+    msg = client.get_email(2)
+    assert 'Publikationsfrist' in msg['Subject']
+    assert 'Anton Müller' in msg['Subject']
+    assert 'Baugesuche' in msg['Subject']
+    assert 'abgelaufen' in msg['TextBody'].lower()
+    assert _fmt_date(pub_start_2) in msg['TextBody']
+    assert _fmt_date(pub_end) in msg['TextBody']
+    assert entry_hash in msg['TextBody']
+    assert client.app.session().query(ExtendedDirectoryEntry).count() == 1
+
+
+def test_admin_notification_multiple_entries(
+    client: Client['TestOrgApp'],
+) -> None:
+    """Two entries crossing publication_start in the same window each get
+    their own notification email."""
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+    pub_start = real_now - timedelta(minutes=30)
+    pub_end = real_now + timedelta(days=30)
+
     transaction.begin()
-    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    db_entry.publication_start = real_now - timedelta(minutes=5)
+    directory = _make_permit_directory(client.app.session())
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Anton Müller',
+            adresse='Hauptstrasse 1',
+            publication_start=pub_start,
+            publication_end=pub_end,
+        )
+    )
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Berta Schmid',
+            adresse='Seeweg 5',
+            publication_start=pub_start,
+            publication_end=pub_end,
+        )
+    )
     transaction.commit()
     close_all_sessions()
 
-    # goes live again → second email
-    client.get(get_cronjob_url(job))
+    # both publication_starts crossed in the same window — one email each
+    with freeze_time(real_now, tick=True):
+        client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 2
+    subjects = {client.get_email(i)['Subject'] for i in (0, 1)}
+    assert all('Veröffentlichter Eintrag' in s for s in subjects)
+    assert any('Anton Müller' in s for s in subjects)
+    assert any('Berta Schmid' in s for s in subjects)
+    for i in (0, 1):
+        assert client.get_email(i)['To'] == 'admin@example.org'
+        assert _fmt_date(pub_start) in client.get_email(i)['TextBody']
+        assert _fmt_date(pub_end) in client.get_email(i)['TextBody']
+
+    # second run — no duplicates
+    with freeze_time(real_now, tick=True):
+        client.get(get_cronjob_url(job))
     assert len(os.listdir(client.app.maildir)) == 2
 
 
 def test_admin_notification_no_notification_address(
     client: Client['TestOrgApp'],
 ) -> None:
-    """No emails for new, edit, or delete when no notification address set."""
+    """No emails for publication when no notification address set."""
     job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
     assert job is not None
     job.app = client.app
 
     real_now = utcnow()
-    pub_start = real_now - timedelta(hours=2)
+    pub_start = real_now - timedelta(minutes=30)
     pub_end = real_now + timedelta(days=30)
 
     transaction.begin()
@@ -2998,17 +2823,7 @@ def test_admin_notification_no_notification_address(
     transaction.commit()
     close_all_sessions()
 
-    # new entry — no email (no notification_address on directory)
-    client.get(get_cronjob_url(job))
-    assert len(os.listdir(client.app.maildir)) == 0
-
-    # edit entry — no email
-    transaction.begin()
-    entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    entry.values = {**entry.values, 'adresse': 'Bahnhofstrasse 99'}
-    transaction.commit()
-    close_all_sessions()
-
+    # publication_start crossed — but no notification_address, so no email
     client.get(get_cronjob_url(job))
     assert len(os.listdir(client.app.maildir)) == 0
 
@@ -3023,110 +2838,11 @@ def test_admin_notification_no_notification_address(
     assert len(os.listdir(client.app.maildir)) == 0
 
 
-def test_admin_notification_delete_before_cron(
-    client: Client['TestOrgApp'],
-) -> None:
-    """UI deletion before cron ever ran still sends a deletion notification."""
-    real_now = utcnow()
-    pub_start = real_now - timedelta(hours=2)
-    pub_end = real_now + timedelta(days=30)
-
-    transaction.begin()
-    directory = _make_permit_directory(client.app.session())
-    directory.add(
-        values=dict(
-            gesuchsteller_in='Franziska Brun',
-            adresse='Gartenweg 10',
-            publication_start=pub_start,
-            publication_end=pub_end,
-        )
-    )
-    transaction.commit()
-    close_all_sessions()
-
-    entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    entry_name = entry.name
-    entry_hash = entry.content_hash
-
-    client.login_admin()
-    delete_url = (
-        f'/directories/baugesuche/{entry_name}?csrf-token={client.csrf_token}'
-    )
-    client.delete(delete_url)
-
-    assert len(os.listdir(client.app.maildir)) == 1
-    message = client.get_email(0)
-    assert message['To'] == 'admin@example.org'
-    assert 'Franziska Brun' in message['Subject']
-    assert 'Baugesuche' in message['Subject']
-    assert 'Gelöscht' in message['Subject']
-    assert 'Franziska Brun' in message['TextBody']
-    assert _fmt_date(pub_start) in message['TextBody']  # publication_start
-    assert _fmt_date(pub_end) in message['TextBody']    # publication_end
-    assert entry_hash in message['TextBody']
-
-
-def test_admin_notification_publication_end_no_delete(
-    client: Client['TestOrgApp'],
-) -> None:
-    """Hourly job sends publication-period-ended notification when
-    publication_end is reached; entry is not deleted."""
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    assert job is not None
-    job.app = client.app
-
-    real_now = utcnow()
-    pub_start = real_now - timedelta(days=2)
-    # Use a 6h offset: the DB session (UTC+2) would interpret a 2h offset as
-    # "right now", making the entry look expired. 6h leaves a 4h DB-clock
-    # buffer while still being reachable by freeze_time(real_now + 7h).
-    pub_end = real_now + timedelta(hours=6)
-
-    transaction.begin()
-    directory = _make_permit_directory(client.app.session())
-    directory.add(
-        values=dict(
-            gesuchsteller_in='Georg Huber',
-            adresse='Bergstrasse 4',
-            publication_start=pub_start,
-            publication_end=pub_end,
-        )
-    )
-    transaction.commit()
-    close_all_sessions()
-
-    # entry currently published in DB — publication notification sent
-    client.get(get_cronjob_url(job))
-    assert len(os.listdir(client.app.maildir)) == 1
-
-    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    entry_hash = db_entry.content_hash
-
-    # freeze to real_now+7h: Python now > pub_end so handle_publication_models
-    # detects the expiry boundary in its [last_run, now] window
-    with freeze_time(real_now + timedelta(hours=7), tick=True):
-        client.get(get_cronjob_url(job))
-
-    assert len(os.listdir(client.app.maildir)) == 2
-    message = client.get_email(1)
-    assert message['To'] == 'admin@example.org'
-    assert 'Georg Huber' in message['Subject']
-    assert 'Baugesuche' in message['Subject']
-    assert 'Publikationsfrist' in message['Subject']
-    assert 'Georg Huber' in message['TextBody']
-    assert 'abgelaufen' in message['TextBody'].lower()
-    assert 'automatisch gelöscht' not in message['TextBody'].lower()
-    assert _fmt_date(pub_start) in message['TextBody']  # publication_start
-    assert _fmt_date(pub_end) in message['TextBody']    # publication_end
-    assert entry_hash in message['TextBody']
-    assert client.app.session().query(ExtendedDirectoryEntry).count() == 1
-
-
-def test_admin_notification_publication_end_reached(
+def test_admin_notification_auto_delete_no_email(
     client: Client['TestOrgApp'],
     handlers: 'HandlerRegistry',
 ) -> None:
-    """Auto-delete at publication_end sends a 'deleted' notification."""
+    """Auto-delete at publication_end deletes the entry; no deletion email."""
     register_directory_handler(handlers)
 
     hourly_job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
@@ -3139,7 +2855,7 @@ def test_admin_notification_publication_end_reached(
     deletion_job.app = client.app
 
     real_now = utcnow()
-    pub_start = real_now - timedelta(days=2)
+    pub_start = real_now - timedelta(minutes=30)
     # Use 6h offset so the DB (UTC+2 session) still sees the entry as
     # published; handle_publication_models uses Python utcnow() for expiry
     # detection, so freeze_time(real_now+7h) reaches past pub_end correctly.
@@ -3168,74 +2884,10 @@ def test_admin_notification_publication_end_reached(
     assert len(os.listdir(client.app.maildir)) == 1
     assert client.app.session().query(ExtendedDirectoryEntry).count() == 1
 
-    db_entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    entry_hash = db_entry.content_hash
-    assert entry_hash is not None
-
-    # freeze to real_now+7h — Python now > pub_end → deletion triggered
+    # freeze to real_now + 7h — Python now > pub_end → deletion triggered,
+    # no email
     with freeze_time(real_now + timedelta(hours=7)):
         client.get(get_cronjob_url(deletion_job))
 
-    assert len(os.listdir(client.app.maildir)) == 2
-    message = client.get_email(1)
-    assert message['To'] == 'admin@example.org'
-    assert 'David Frei' in message['Subject']
-    assert 'Baugesuche' in message['Subject']
-    assert 'Gelöscht' in message['Subject']
-    assert 'David Frei' in message['TextBody']
-    assert 'automatisch gelöscht' in message['TextBody'].lower()
-    assert _fmt_date(pub_start) in message['TextBody']  # publication_start
-    assert _fmt_date(pub_end) in message['TextBody']    # publication_end
-    assert entry_hash in message['TextBody']
-    assert client.app.session().query(ExtendedDirectoryEntry).count() == 0
-
-
-def test_admin_notification_delete_after_cron(
-    client: Client['TestOrgApp'],
-) -> None:
-    """UI deletion after cron already notified sends a deletion email."""
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    assert job is not None
-    job.app = client.app
-
-    real_now = utcnow()
-    pub_start = real_now - timedelta(days=2)
-    pub_end = real_now + timedelta(days=30)
-
-    transaction.begin()
-    directory = _make_permit_directory(client.app.session())
-    directory.add(
-        values=dict(
-            gesuchsteller_in='Eva Roth',
-            adresse='Dorfplatz 3',
-            publication_start=pub_start,
-            publication_end=pub_end,
-        )
-    )
-    transaction.commit()
-    close_all_sessions()
-
-    # entry currently published in DB — publication notification
-    client.get(get_cronjob_url(job))
     assert len(os.listdir(client.app.maildir)) == 1
-
-    # admin deletes the entry via the UI
-    entry = client.app.session().query(ExtendedDirectoryEntry).one()
-    entry_hash = entry.content_hash
-    client.login_admin()
-    delete_url = (
-        f'/directories/baugesuche/{entry.name}?csrf-token={client.csrf_token}'
-    )
-    client.delete(delete_url)
-
-    assert len(os.listdir(client.app.maildir)) == 2
-    message = client.get_email(1)
-    assert message['To'] == 'admin@example.org'
-    assert 'Eva Roth' in message['Subject']
-    assert 'Gelöscht' in message['Subject']
-    assert 'Eva Roth' in message['TextBody']
-    assert 'automatisch gelöscht' not in message['TextBody'].lower()
-    assert _fmt_date(pub_start) in message['TextBody']  # publication_start
-    assert _fmt_date(pub_end) in message['TextBody']    # publication_end
-    assert entry_hash in message['TextBody']
     assert client.app.session().query(ExtendedDirectoryEntry).count() == 0

@@ -83,12 +83,8 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: Describes the entry briefly
     lead: Mapped[str | None]
 
-    #: SHA-1 hash of the entry values, keywords, publication dates, and
-    #: associated file checksums
+    #: SHA-1 hash of the entry values and associated file checksums
     content_hash: Mapped[str | None] = mapped_column(default=None)
-
-    #: content_hash at the time of the last admin notification
-    notified_hash: Mapped[str | None] = mapped_column(default=None)
 
     #: All keywords defined for this entry (indexed)
     _keywords: Mapped[dict[str, str] | None] = mapped_column(
@@ -172,8 +168,3 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         files: set[Any],
     ) -> None:
         self.update_content_hash()
-
-    @observes('publication_start')
-    def publication_start_observer(self, publication_start: Any) -> None:
-        # reset the notified hash when the publication date changes
-        self.notified_hash = None

@@ -176,6 +176,11 @@
     </p>
 
     <p><u i18n:translate="">Attachments</u></p>
+    <tal:b condition="not: entry.files">
+        <p>
+            - <span i18n:translate="">None</span>
+        </p>
+    </tal:b>
     <tal:b condition="entry.files">
         <p tal:repeat="file entry.files">
             <strong>${file.name}</strong><br/>
