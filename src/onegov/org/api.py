@@ -25,6 +25,7 @@ from onegov.search import SearchIndex
 from onegov.search.utils import language_from_locale
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
+from uuid import UUID
 
 
 from typing import Any, Protocol, Self, TYPE_CHECKING
@@ -38,9 +39,9 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import DeclarativeBase, Query
 
-    class CollectionLike[T: DeclarativeBase](Protocol):
+    class CollectionLike[T: DeclarativeBase, IdT: PKType](Protocol):
         def query(self) -> Query[T]: ...
-        def by_id(self, id: Any, /) -> T | None: ...
+        def by_id(self, id: IdT, /) -> T | None: ...
 
 
 type FormOrExternalLink = FormDefinition | ExternalFormLink
@@ -95,12 +96,12 @@ def apply_visibility_filters[T: DeclarativeBase](
     return query
 
 
-class PaginatedCollection[T: DeclarativeBase](Pagination[T]):
+class PaginatedCollection[T: DeclarativeBase, IdT: PKType](Pagination[T]):
 
     def __init__(
         self,
         request: OrgRequest,
-        collection: CollectionLike[T],
+        collection: CollectionLike[T, IdT],
         model_class: type[T],
         batch_size: int,
         page: int = 0,
@@ -120,7 +121,7 @@ class PaginatedCollection[T: DeclarativeBase](Pagination[T]):
             and self.page == other.page
         )
 
-    def by_id(self, id: PKType) -> T | None:
+    def by_id(self, id: IdT) -> T | None:
         result = self.collection.by_id(id)
         if result and self.request.is_visible(result):
             return result
@@ -147,12 +148,12 @@ class PaginatedCollection[T: DeclarativeBase](Pagination[T]):
         return self.page
 
 
-class PaginatedSumCollection[T: DeclarativeBase](Pagination[T]):
+class PaginatedSumCollection[T: DeclarativeBase, IdT: PKType](Pagination[T]):
 
     def __init__(
         self,
         request: OrgRequest,
-        collections: Sequence[tuple[CollectionLike[T], type[T]]],
+        collections: Sequence[tuple[CollectionLike[T, IdT], type[T]]],
         batch_size: int,
         page: int = 0,
     ) -> None:
@@ -169,7 +170,7 @@ class PaginatedSumCollection[T: DeclarativeBase](Pagination[T]):
             and self.page == other.page
         )
 
-    def by_id(self, id: PKType) -> T | None:
+    def by_id(self, id: IdT) -> T | None:
         for collection, model_class in self.collections:
             result = collection.by_id(id)
             if result is not None:
@@ -246,9 +247,10 @@ class PaginatedSumCollection[T: DeclarativeBase](Pagination[T]):
         return self.page
 
 
-class EventApiEndpoint(ApiEndpoint['Occurrence']):
+class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
     app: OrgApp
     endpoint = 'events'
+    pk_type = UUID
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -438,10 +440,11 @@ class EventApiEndpoint(ApiEndpoint['Occurrence']):
         }
 
 
-class NewsApiEndpoint(ApiEndpoint[News]):
+class NewsApiEndpoint(ApiEndpoint[News, int]):
     app: OrgApp
     request: OrgRequest
     endpoint = 'news'
+    pk_type = int
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -498,10 +501,11 @@ class NewsApiEndpoint(ApiEndpoint[News]):
         }
 
 
-class TopicApiEndpoint(ApiEndpoint[Topic]):
+class TopicApiEndpoint(ApiEndpoint[Topic, int]):
     request: OrgRequest
     app: OrgApp
     endpoint = 'topics'
+    pk_type = int
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -591,10 +595,11 @@ class DummyDirectorySearchWidget:
         raise NotImplementedError()
 
 
-class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
+class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
     request: OrgRequest
     app: OrgApp
     endpoint: str
+    pk_type = UUID
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -718,10 +723,13 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry]):
         return data
 
 
-class FormApiEndpoint(ApiEndpoint[FormOrExternalLink]):
+class FormApiEndpoint(ApiEndpoint[FormOrExternalLink, UUID | str]):
     app: OrgApp
     request: OrgRequest
     endpoint = 'forms'
+    # NOTE: Technically not correct, but conversion will fallback to str
+    #       automatically, so it should be fine.
+    pk_type = UUID
 
     @property
     def title(self) -> str:
@@ -774,10 +782,11 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink]):
         return {'html': item}
 
 
-class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink]):
+class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink, UUID]):
     app: OrgApp
     request: OrgRequest
     endpoint = 'resources'
+    pk_type = UUID
 
     @property
     def title(self) -> str:
@@ -830,10 +839,11 @@ class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink]):
         return {'html': item}
 
 
-class PersonApiEndpoint(ApiEndpoint[Person]):
+class PersonApiEndpoint(ApiEndpoint[Person, UUID]):
     app: OrgApp
     request: OrgRequest
     endpoint = 'people'
+    pk_type = UUID
 
     _public_fields: tuple[str, ...] = (
         'academic_title',

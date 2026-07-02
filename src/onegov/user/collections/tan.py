@@ -12,6 +12,7 @@ from typing import cast, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime, timedelta
     from sqlalchemy.orm import Query, Session
+    from uuid import UUID  # noqa: F401
 
     class _GeneratedTAN(TAN):
         tan: str
@@ -28,7 +29,7 @@ def generate_tan() -> str:
     return ''.join(choice(ALPHABET) for _ in range(6))
 
 
-class TANCollection(GenericCollection[TAN]):
+class TANCollection(GenericCollection[TAN, 'UUID']):
 
     def __init__(
         self,

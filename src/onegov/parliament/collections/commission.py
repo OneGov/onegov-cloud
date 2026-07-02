@@ -10,10 +10,11 @@ from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
+    from uuid import UUID  # noqa: F401
 
 
 class CommissionCollection[CommissionT: Commission = Any](
-    GenericCollection[CommissionT]
+    GenericCollection[CommissionT, 'UUID']
 ):
 
     def __init__(

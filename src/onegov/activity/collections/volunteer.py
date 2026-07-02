@@ -74,7 +74,7 @@ if TYPE_CHECKING:
     type ReportRow = ReportRowWithVolunteer | ReportRowWithoutVolunteer
 
 
-class VolunteerCollection(GenericCollection[Volunteer]):
+class VolunteerCollection(GenericCollection[Volunteer, 'UUID']):
 
     def __init__(
         self,

@@ -14,10 +14,12 @@ if TYPE_CHECKING:
     from onegov.translator_directory.app import TranslatorDirectoryApp
     from sqlalchemy.orm import Query
     from typing import Self
+    from uuid import UUID  # noqa: F401
 
 
 class TimeReportCollection(
-    GenericCollection[TranslatorTimeReport], Pagination[TranslatorTimeReport]
+    GenericCollection[TranslatorTimeReport, 'UUID'],
+    Pagination[TranslatorTimeReport]
 ):
 
     batch_size = 20

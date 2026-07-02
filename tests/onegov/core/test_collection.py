@@ -120,7 +120,7 @@ def test_generic_collection(postgres_dsn: str) -> None:
         id: Mapped[int] = mapped_column(primary_key=True)
         title: Mapped[str | None]
 
-    class DocumentCollection(GenericCollection[Document]):
+    class DocumentCollection(GenericCollection[Document, int]):
 
         @property
         def model_class(self) -> type[Document]:
