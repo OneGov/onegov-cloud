@@ -39,6 +39,7 @@ from onegov.org.views.utils import show_tags, show_filters
 from sedate import utcnow
 from sqlalchemy.orm import undefer
 from string import Template
+from uuid import UUID
 from webob.exc import HTTPNotFound
 
 
@@ -90,6 +91,31 @@ def get_newsletter_form(
     return form
 
 
+# FIXME: Why are we storing these as strings? Is it because we forgot
+#        to add `coerce=int` to a `SelectField`? We should clean this
+#        up and fix the stored values with a migration.
+def clean_news_ids(news_ids: Iterable[str | int] | None) -> list[int]:
+
+    if news_ids is None:
+        return []
+
+    def coerce_int(page_id: object) -> int | None:
+        if isinstance(page_id, str):
+            try:
+                return int(page_id)
+            except ValueError:
+                return None
+        elif isinstance(page_id, int):
+            return page_id
+        return None
+
+    return [
+        news_id
+        for raw_id in news_ids
+        if (news_id := coerce_int(raw_id)) is not None
+    ]
+
+
 def newsletter_news_by_access(
     newsletter: Newsletter,
     request: OrgRequest,
@@ -112,7 +138,7 @@ def newsletter_news_by_access(
     - ValueError: If an invalid access level is provided.
     """
 
-    news_ids = newsletter.content.get('news')
+    news_ids = clean_news_ids(newsletter.content.get('news'))
     if not news_ids:
         return None
 
@@ -141,7 +167,7 @@ def visible_news_by_newsletter(
     visible to the current user.
 
     """
-    news_ids = newsletter.content.get('news')
+    news_ids = clean_news_ids(newsletter.content.get('news'))
     if not news_ids:
         return None
 
@@ -152,6 +178,32 @@ def visible_news_by_newsletter(
     query = query.filter(News.id.in_(news_ids))
 
     return request.exclude_invisible(query.all())
+
+
+# FIXME: Why are we storing these as strings? These should be stored
+#        as UUIDs.
+def clean_occurrence_ids(
+    occurrence_ids: Iterable[str | UUID] | None
+) -> list[UUID]:
+
+    if occurrence_ids is None:
+        return []
+
+    def coerce_uuid(page_id: object) -> UUID | None:
+        if isinstance(page_id, str):
+            try:
+                return UUID(page_id)
+            except ValueError:
+                return None
+        elif isinstance(page_id, UUID):
+            return page_id
+        return None
+
+    return [
+        occurrence_id
+        for raw_id in occurrence_ids
+        if (occurrence_id := coerce_uuid(raw_id)) is not None
+    ]
 
 
 def occurrences_by_newsletter(

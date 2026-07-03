@@ -148,9 +148,7 @@ class VacationActivityHandler(Handler):
 
     @cached_property
     def publication_request(self) -> PublicationRequest | None:
-        if isinstance(self.id, str):
-            self.id = UUID(self.id)
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @property
     def deleted(self) -> bool:

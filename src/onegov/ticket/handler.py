@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from onegov.pay import InvoiceItemMeta, Payment
     from onegov.ticket.models import Ticket
     from sqlalchemy.orm import Query, Session
-    from uuid import UUID
 
     type _LinkOrCallback = tuple[str, str] | Callable[[CoreRequest], str]
 
@@ -45,7 +44,7 @@ class Handler:
     def __init__(
         self,
         ticket: Ticket,
-        handler_id: UUID | str,
+        handler_id: str,
         handler_data: dict[str, Any]
     ):
         self.ticket = ticket
