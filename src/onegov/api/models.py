@@ -287,13 +287,13 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
             )
         return values[0]
 
-    def get_filter[T1 = None, T2 = None, T3 = str](
+    def get_filter[T = str, DefaultT = None, EmptyT = None](
         self,
         name: str,
-        default: T1 = None,  # type: ignore[assignment]
-        empty: T2 = None,  # type: ignore[assignment]
-        coerce: Callable[[str], T3] = str  # type: ignore[assignment]
-    ) -> T1 | T2 | T3:
+        default: DefaultT = None,  # type: ignore[assignment]
+        empty: EmptyT = None,  # type: ignore[assignment]
+        coerce: Callable[[str], T] = str  # type: ignore[assignment]
+    ) -> T | DefaultT | EmptyT:
 
         """Returns the scalar filter value with the given name."""
 

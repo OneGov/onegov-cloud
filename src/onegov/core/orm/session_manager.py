@@ -13,7 +13,6 @@ from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core import log
 from onegov.core.custom import json
-from psycopg import ClientCursor
 from psycopg.sql import SQL, Identifier
 from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -325,15 +324,6 @@ class SessionManager:
 
         engine_config['json_serializer'] = json.dumps
         engine_config['json_deserializer'] = json.loads
-
-        # FIXME: While using ClientCursor improves compatibility of our
-        #        code against the psycopg2 implementation, we also get
-        #        a much smaller performance win out of it. Eventually we
-        #        will want to harden our code, so all queries still work
-        #        if the parameters are submitted in binary format instead
-        #        of text format.
-        connect_args = engine_config.setdefault('connect_args', {})
-        connect_args['cursor_factory'] = ClientCursor
 
         if pool_config:
             engine_config.update(pool_config)
