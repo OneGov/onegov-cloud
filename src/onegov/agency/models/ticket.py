@@ -61,7 +61,13 @@ class AgencyMutationHandler(Handler):
 
     @cached_property
     def agency(self) -> ExtendedAgency | None:
-        return self.collection.by_id(self.data['handler_data']['id'])
+        agency_id = self.data['handler_data']['id']
+        if agency_id is not None and not isinstance(agency_id, int):
+            try:
+                agency_id = int(agency_id)
+            except Exception:
+                agency_id = None
+        return self.collection.by_id(agency_id)
 
     @cached_property
     def mutation(self) -> AgencyMutation | None:

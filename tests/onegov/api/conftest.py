@@ -55,6 +55,7 @@ class Collection:
 class Endpoint(ApiEndpoint[Bunch, int]):  # type: ignore[type-var]
     endpoint = 'endpoint'
     form_class = ItemForm
+    pk_type = int
 
     def __init__(
         self,

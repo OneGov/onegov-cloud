@@ -10,6 +10,8 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
+from psycopg.pq import TransactionStatus
+from sqlalchemy import text
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
@@ -399,8 +401,6 @@ def test_savepoint_rollback_blocked_by_activate_schema(
     SAVEPOINT statements, letting the ROLLBACK reach PostgreSQL and return the
     connection to INTRANS.
     """
-    import psycopg2.extensions
-    from sqlalchemy import text
 
     app = election_day_app_zg
     schema = app.session_manager.session().info['schema']
@@ -416,18 +416,12 @@ def test_savepoint_rollback_blocked_by_activate_schema(
         with pytest.raises(DatabaseError):
             conn.execute(text('SELECT 1/0'))
 
-        assert (
-            raw.get_transaction_status()
-            == psycopg2.extensions.TRANSACTION_STATUS_INERROR
-        )
+        assert raw.info.transaction_status == TransactionStatus.INERROR
 
         nested.rollback()
 
         # INTRANS: ROLLBACK TO SAVEPOINT reached PostgreSQL and recovered.
-        assert (
-            raw.get_transaction_status()
-            == psycopg2.extensions.TRANSACTION_STATUS_INTRANS
-        )
+        assert raw.info.transaction_status == TransactionStatus.INTRANS
 
         result = conn.execute(text('SELECT 1'))
         assert result.scalar() == 1
