@@ -210,7 +210,8 @@ def occurrences_by_newsletter(
     newsletter: Newsletter,
     request: OrgRequest
 ) -> Query[Occurrence] | None:
-    occurrence_ids = newsletter.content.get('occurrences')
+    occurrence_ids = clean_occurrence_ids(
+        newsletter.content.get('occurrences'))
 
     if not occurrence_ids:
         return None

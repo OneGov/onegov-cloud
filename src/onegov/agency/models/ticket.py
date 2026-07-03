@@ -66,7 +66,7 @@ class AgencyMutationHandler(Handler):
             try:
                 agency_id = int(agency_id)
             except Exception:
-                agency_id = None
+                return None
         return self.collection.by_id(agency_id)
 
     @cached_property
