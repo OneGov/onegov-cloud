@@ -263,12 +263,14 @@ def _read_excel_rows(path: str) -> list[tuple[object, ...]]:
         sheet = book.sheet_by_index(0)
         return [tuple(sheet.row_values(i)) for i in range(sheet.nrows)]
     else:
-        book = load_workbook(path, data_only=True)
-        sheet = book.active
+        workbook = load_workbook(path, data_only=True)
+        worksheet = workbook.active
         if TYPE_CHECKING:
             from openpyxl.worksheet.worksheet import Worksheet
-            assert isinstance(sheet, Worksheet)
-        return [tuple(cell.value for cell in row) for row in sheet.rows]
+            assert isinstance(worksheet, Worksheet)
+        return [
+            tuple(cell.value for cell in row) for row in worksheet.rows
+        ]
 
 
 def _parse_horw_personen_row(v: tuple[object, ...]) -> dict[str, object]:
