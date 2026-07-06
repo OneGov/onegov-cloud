@@ -223,3 +223,12 @@ def test_news_filter_invalid_years(client: Client) -> None:
 
     page = client.get('/news?filter_years=2020')
     assert 'Aktuelles' in page
+
+
+def test_news_filter_null_byte(client: Client) -> None:
+    # a null byte in a filter param must not reach the database (where it
+    # would raise an unhandled DataError / HTTP 500), it should simply be
+    # ignored
+    page = client.get('/news?filter_tags=x%00', expect_errors=True)
+    assert page.status_code == 200
+    assert 'Aktuelles' in page

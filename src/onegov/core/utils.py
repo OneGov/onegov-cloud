@@ -175,6 +175,39 @@ def normalize_for_filename(
     return sanitized
 
 
+#: Characters PostgreSQL cannot store in ``text`` / ``jsonb`` columns - null
+#: bytes and lone surrogates - which raise a ``DataError`` when bound as a
+#: query parameter. They only appear in malformed or malicious requests.
+_unstorable_text = re.compile(r'[\x00\ud800-\udfff]')
+
+
+def sanitize_query_param(value: object) -> str | None:
+    """ Returns ``value`` as a non-empty string safe to use as a database
+    query parameter, or ``None``.
+
+    Drops values with characters PostgreSQL cannot store as ``text`` /
+    ``jsonb`` (null bytes, lone surrogates), which would otherwise raise an
+    unhandled ``DataError`` (HTTP 500) when used in a filter.
+    """
+    if not isinstance(value, str) or not value:
+        return None
+    if _unstorable_text.search(value):
+        return None
+    return value
+
+
+def sanitize_query_params(values: Iterable[object] | None) -> list[str]:
+    """ Like :func:`sanitize_query_param`, but for a sequence: drops items
+    that are empty or unsafe to use as a database query parameter. """
+    if not values:
+        return []
+    return [
+        sanitized
+        for value in values
+        if (sanitized := sanitize_query_param(value)) is not None
+    ]
+
+
 def increment_name(name: str) -> str:
     """ Takes the given name and adds a numbered suffix beginning at 1.
 

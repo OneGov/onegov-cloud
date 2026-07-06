@@ -23,6 +23,8 @@ from webob.multidict import MultiDict
 
 from onegov.core.collection import Pagination
 from onegov.core.orm import SessionManager
+from onegov.core.utils import sanitize_query_param
+from onegov.core.utils import sanitize_query_params
 from onegov.core.utils import toggle
 from onegov.event.models import Event
 from onegov.event.models import EventFilterValue
@@ -145,14 +147,14 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         super().__init__(page=page)
         self.session = session
-        self.term = term
+        self.term = sanitize_query_param(term)
         self.range = range if range in self.date_ranges else None
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
-        self.tags = tags if tags else []
+        self.tags = sanitize_query_params(tags)
         self.filter_keywords = cast('MultiDict[str, str]', filter_keywords)
-        self.locations = locations if locations else []
-        self.sources = sources if sources else []
+        self.locations = sanitize_query_params(locations)
+        self.sources = sanitize_query_params(sources)
         self.syndicate = syndicate
         self.highlight = highlight
         self.available_accesses = available_accesses

@@ -6,6 +6,7 @@ from onegov.core.collection import Pagination
 from onegov.core.orm.abstract import AdjacencyListCollection
 from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
+from onegov.core.utils import sanitize_query_param, sanitize_query_params
 from onegov.form import Form, move_fields
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm, IframeForm
@@ -316,7 +317,7 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
         self.request = request
         self.session = request.session
         self.page = page
-        self.term = term
+        self.term = sanitize_query_param(term)
 
     @property
     def q(self) -> str | None:
@@ -403,9 +404,9 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         self.request = request
         self.session = request.session
         self.page = page
-        self.term = term
+        self.term = sanitize_query_param(term)
         self.filter_years = filter_years or []
-        self.filter_tags = filter_tags or []
+        self.filter_tags = sanitize_query_params(filter_tags)
         if root is not None:
             self.root = root
 

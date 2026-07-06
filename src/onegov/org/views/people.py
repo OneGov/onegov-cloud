@@ -6,6 +6,7 @@ from sqlalchemy import and_, func, type_coerce
 from sqlalchemy.orm import undefer
 from onegov.core.orm.types import JSON
 from onegov.core.security import Public, Private
+from onegov.core.utils import sanitize_query_param
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
@@ -112,17 +113,12 @@ def view_people(
     layout: PersonCollectionLayout | None = None
 ) -> RenderData:
 
-    _org = request.params.get('organisation')
-    selected_org: str | None = _org if isinstance(_org, str) and _org else None
-    _sub_org = request.params.get('sub_organisation')
-    selected_sub_org: str | None = (
-        _sub_org if isinstance(_sub_org, str) and _sub_org else None)
+    selected_org = sanitize_query_param(request.params.get('organisation'))
+    selected_sub_org = sanitize_query_param(
+        request.params.get('sub_organisation'))
     selected_search: str | None = None
     if request.app.fts_search_enabled:
-        _search = request.params.get('search')
-        selected_search = (
-            _search if isinstance(_search, str) and _search else None
-        )
+        selected_search = sanitize_query_param(request.params.get('search'))
 
     top_orgs = get_top_level_organisations(
         request.app.org.organisation_hierarchy or [])

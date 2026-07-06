@@ -132,6 +132,27 @@ def test_with_people(client: Client) -> None:
     assert edit_page.form['people-1-context_specific_function'].value == ''
 
 
+def test_people_view_null_byte_filter(client: Client) -> None:
+    # a null byte in a filter param must not reach the database (where it
+    # would raise an unhandled DataError / HTTP 500), it should simply be
+    # ignored - see the path-traversal scanner payload in ONEGOV-CLOUD-5X0
+    client.login_editor()
+
+    new_person = client.get('/people').click('Person', index=1)
+    new_person.form['first_name'] = 'Flash'
+    new_person.form['last_name'] = 'Gordon'
+    new_person.form.submit()
+
+    for param in ('organisation', 'sub_organisation', 'search'):
+        page = client.get(
+            f'/people?{param}=-../../../etc/passwd%00',
+            expect_errors=True
+        )
+        assert page.status_code == 200
+        # the null byte value is dropped, so no filter is applied
+        assert 'Gordon Flash' in page
+
+
 def test_people_view_organisation_filter(client: Client) -> None:
     org_1 = 'The Nexus'
     sub_org_11 = 'Nexus Innovators'

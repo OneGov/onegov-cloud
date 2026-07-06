@@ -91,6 +91,37 @@ def test_normalize_for_filename(
         assert utils.normalize_for_filename(input_text) == expected
 
 
+def test_sanitize_query_param() -> None:
+    # regular, non-empty strings pass through unchanged
+    assert utils.sanitize_query_param('Bildung und Sport') == 'Bildung und Sport'
+    assert utils.sanitize_query_param('../../../etc/passwd') == (
+        '../../../etc/passwd')
+
+    # empty / non-string values are dropped
+    assert utils.sanitize_query_param('') is None
+    assert utils.sanitize_query_param(None) is None
+    assert utils.sanitize_query_param(42) is None
+
+    # values that PostgreSQL cannot store as text/jsonb are dropped, so they
+    # never reach the database as a query parameter (see ONEGOV-CLOUD-5X0)
+    assert utils.sanitize_query_param('-../../../etc/passwd\x00') is None
+    assert utils.sanitize_query_param('foo\x00bar') is None
+    # lone surrogates are rejected for the same reason
+    assert utils.sanitize_query_param('foo\ud800bar') is None
+    assert utils.sanitize_query_param('\udfff') is None
+
+
+def test_sanitize_query_params() -> None:
+    assert utils.sanitize_query_params(['a', 'b']) == ['a', 'b']
+    assert utils.sanitize_query_params(None) == []
+    assert utils.sanitize_query_params([]) == []
+
+    # only the offending values are dropped, the rest are kept in order
+    assert utils.sanitize_query_params(
+        ['keep', 'drop\x00', '', 'also-keep', 'bad\ud800']
+    ) == ['keep', 'also-keep']
+
+
 def test_touch(temporary_directory: str) -> None:
     path = os.path.join(temporary_directory, 'test.txt')
 

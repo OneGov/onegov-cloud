@@ -171,6 +171,19 @@ def test_view_occurrences(client: Client) -> None:
         'Diese Termine exportieren').text.startswith('BEGIN:VCALENDAR')
 
 
+def test_view_occurrences_null_byte_filter(client: Client) -> None:
+    # a null byte in a filter param must not reach the database (where it
+    # would raise an unhandled DataError / HTTP 500)
+    for query in ('tags=x%00', 'locations=x%00'):
+        page = client.get(f'/events/?{query}', expect_errors=True)
+        assert page.status_code == 200
+
+    # the JSON portlet endpoint reads the same filters from cat1/cat2
+    for query in ('cat1=x%00', 'cat2=x%00'):
+        page = client.get(f'/events/json?{query}', expect_errors=True)
+        assert page.status_code == 200
+
+
 def test_view_occurrences_event_filter(client: Client) -> None:
     """
     This test switches the application settings event filter type between
