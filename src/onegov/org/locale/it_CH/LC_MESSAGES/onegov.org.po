@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-02 10:24+0200\n"
+"POT-Creation-Date: 2026-07-02 15:54+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -790,6 +790,16 @@ msgstr ""
 "campi sono visibili, altrimenti gli utenti potrebbero visualizzare dati a "
 "cui non sono autorizzati ad accedere. "
 
+msgid ""
+"Change requests and the admin notification address cannot be enabled at the "
+"same time, because change requests are applied without respecting the "
+"publication restrictions that admin notifications rely on."
+msgstr ""
+"Le richieste di modifica e l'indirizzo di notifica dell'amministratore non "
+"possono essere attivati contemporaneamente, poiché le richieste di modifica "
+"vengono applicate senza rispettare le restrizioni di pubblicazione su cui si "
+"basano le notifiche dell'amministratore."
+
 msgid "Apply directory configuration"
 msgstr "Applica la configurazione della cartella"
 
@@ -1095,6 +1105,12 @@ msgstr "Creato"
 
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Rimuovi questi filtri da tutti gli eventi interessati"
+
+msgid "Confirmation"
+msgstr "Conferma"
 
 msgid "Comment"
 msgstr "Commento"
@@ -3752,6 +3768,13 @@ msgstr "Passato"
 
 msgid "Choose filter"
 msgstr "Scegli filtro"
+
+msgid ""
+"This entry cannot be deleted while it is published, to ensure proof of "
+"publication."
+msgstr ""
+"Questa voce non può essere eliminata finché è pubblicata, per garantire "
+"la prova di pubblicazione."
 
 msgid "Delete entry"
 msgstr "Elimina elemento"
@@ -7257,20 +7280,12 @@ msgstr "Questa settimana"
 
 #, python-format
 msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
-msgstr ""
-"Il filtro \"${keyword}\" è ancora applicato a ${count} evento/i."
+msgstr "Il filtro \"${keyword}\" è ancora applicato a ${count} evento/i."
 
 #, python-format
-msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
 "La scelta del filtro \"${choice}\" è ancora applicata a ${count} evento/i."
-
-msgid "Remove these filters from all affected events"
-msgstr "Rimuovi questi filtri da tutti gli eventi interessati"
-
-msgid "Confirmation"
-msgstr "Conferma"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifica configurazione filtro eventi"
@@ -8127,6 +8142,17 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid ""
+#~ "This entry is published and this directory has an admin notification "
+#~ "address set, so it cannot be deleted. To delete it, wait until its "
+#~ "publication period ends, or remove the notification address in the "
+#~ "directory settings."
+#~ msgstr ""
+#~ "Questa voce è pubblicata e per questa directory è impostato un indirizzo "
+#~ "di notifica dell'amministratore, pertanto non può essere eliminata. Per "
+#~ "eliminarla, attendere la fine del periodo di pubblicazione oppure "
+#~ "rimuovere l'indirizzo di notifica nelle impostazioni della directory."
 
 #~ msgid ""
 #~ "Receives an e-mail when entries are published or de-published. Useful e."

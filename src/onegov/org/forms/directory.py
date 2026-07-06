@@ -348,7 +348,8 @@ class DirectoryBaseForm(Form):
             'of publication.'
         ),
         fieldset=_('Notifications'),
-        validators=[Optional(), Email()]
+        depends_on=('required_publication', 'y'),
+        validators=[Optional(), Email()],
     )
 
     submitter_meta_fields = MultiCheckboxField(
@@ -472,6 +473,34 @@ class DirectoryBaseForm(Form):
 
             return False
         return None
+
+    def ensure_no_change_requests_with_admin_notifications(
+        self
+    ) -> bool | None:
+        """ Change requests are applied without going through the
+        mutability restrictions that protect already published entries
+        from being silently altered, so they would allow bypassing the
+        guarantees the admin notification is meant to provide (e.g. proof
+        of publication for permits). Therefore the two settings are
+        mutually exclusive.
+
+        """
+        if not (self.enable_change_requests.data
+                and self.notification_address.data):
+            return None
+
+        msg = _(
+            'Change requests and the admin notification address cannot '
+            'be enabled at the same time, because change requests are '
+            'applied without respecting the publication restrictions '
+            'that admin notifications rely on.'
+        )
+
+        for i in (self.enable_change_requests, self.notification_address):
+            assert isinstance(i.errors, list)
+            i.errors.append(msg)
+
+        return False
 
     def first_hidden_field(
         self,

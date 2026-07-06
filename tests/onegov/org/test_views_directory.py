@@ -51,6 +51,36 @@ def dir_query(client: Client) -> Query[ExtendedDirectoryEntry]:
     return client.app.session().query(ExtendedDirectoryEntry)
 
 
+def create_notification_directory(client: Client) -> ExtendedResponse:
+    """Creates a publication-enabled 'Permits' directory with an admin
+    notification address (which locks published entries against deletion)
+    and returns its overview page."""
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Permits'
+    page.form['structure'] = 'Name *= ___'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_publication'] = True
+    page.form['required_publication'] = True
+    page.form['notification_address'] = 'admin@example.org'
+    page.form['enable_change_requests'] = False
+    return page.form.submit().follow()
+
+
+def deletable_entry_csrf_token(directory_page: ExtendedResponse) -> str:
+    """Adds a not-yet-published (hence deletable) 'Permit Two' entry and
+    returns a valid csrf token harvested from its delete link, for reuse
+    against locked entries in the same directory."""
+    now_local = to_timezone(utcnow(), 'Europe/Zurich')
+    page = directory_page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit Two'
+    page.form['publication_start'] = dt_for_form(now_local + timedelta(days=1))
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    permit_two = page.form.submit().follow()
+    delete_link = permit_two.pyquery('a.delete-link').attr('ic-delete-from')
+    assert delete_link
+    return URL(delete_link).query_param('csrf-token')
+
+
 def strip_s(dt: datetime, timezone: TzInfoOrName | None = None) -> datetime:
     """Strips the time from seconds ms and seconds according to inputs of
     type datetime-local """
@@ -1219,6 +1249,64 @@ def test_directory_entry_hash_shown_without_change_requests(
         assert page.pyquery('.directory-entry-hash')
 
 
+def test_new_backdated_published_entry_sends_admin_notification(
+    client: Client,
+) -> None:
+    """Creating an entry with a publication_start far enough in the past
+    that the hourly cronjob's catch-up window would never reach it must
+    trigger the admin notification immediately - otherwise it would
+    silently never be sent, since the cronjob only looks at entries
+    whose publication_start falls after its last run."""
+    tz = 'Europe/Zurich'
+    now_local = to_timezone(utcnow(), tz)
+
+    client.login_admin()
+
+    page = create_notification_directory(client)
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    # far enough in the past that the cronjob's hourly catch-up window
+    # (defaulting to "the last hour" since it has never run) misses it
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(
+        now_local - timedelta(days=14)
+    )
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    page = page.form.submit().follow()
+    assert 'Permit One' in page
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    msg = client.get_email(0)
+    assert msg['To'] == 'admin@example.org'
+
+
+def test_new_recently_published_entry_defers_to_cronjob(
+    client: Client,
+) -> None:
+    """Creating an entry with a publication_start within the hourly
+    cronjob's catch-up window must not send the admin notification
+    immediately, to avoid a duplicate once the cronjob runs."""
+    tz = 'Europe/Zurich'
+    now_local = to_timezone(utcnow(), tz)
+
+    client.login_admin()
+
+    page = create_notification_directory(client)
+
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(
+        now_local - timedelta(minutes=10)
+    )
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    page = page.form.submit().follow()
+    assert 'Permit One' in page
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+
 def test_edit_published_entry_requires_future_publication_start(
     client: Client,
 ) -> None:
@@ -1230,16 +1318,7 @@ def test_edit_published_entry_requires_future_publication_start(
 
     client.login_admin()
 
-    # Create a directory with notification_address via the admin form
-    page = client.get('/directories').click('^Verzeichnis$')
-    page.form['title'] = 'Permits'
-    page.form['structure'] = 'Name *= ___'
-    page.form['title_format'] = '[Name]'
-    page.form['enable_publication'] = True
-    page.form['required_publication'] = True
-    page.form['notification_address'] = 'admin@example.org'
-    page.form['enable_change_requests'] = False
-    page = page.form.submit().follow()
+    page = create_notification_directory(client)
 
     # Create an entry that is currently published (pub_start in the past)
     page = page.click('Eintrag', index=0)
@@ -1265,3 +1344,246 @@ def test_edit_published_entry_requires_future_publication_start(
     )
     page = page.form.submit().follow()
     assert 'Permit One' in page
+
+
+def test_edit_expired_entry_extending_end_requires_future_start(
+    client: Client,
+) -> None:
+    """Extending an expired entry's publication_end while leaving its
+    (stale, past) publication_start untouched would immediately
+    resurrect it as published - this must be blocked just like editing
+    an already-published entry, even though the entry itself was not
+    published (per its pre-edit, now-expired state) before the edit.
+
+    The form itself never lets you persist a publication_end in the
+    past (see ``ensure_publication_start_end``), so we simulate an
+    entry that has since expired by moving the clock via a direct
+    database update, the same way it would happen naturally over time.
+    """
+    tz = 'Europe/Zurich'
+    now_local = to_timezone(utcnow(), tz)
+
+    client.login_admin()
+
+    page = create_notification_directory(client)
+
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(
+        now_local - timedelta(days=10)
+    )
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(hours=1))
+    page = page.form.submit().follow()
+    assert 'Permit One' in page
+
+    # simulate the entry having since expired
+    transaction.begin()
+    entry = dir_query(client).one()
+    entry.publication_end = utcnow() - timedelta(days=1)
+    client.app.session().flush()
+    transaction.commit()
+
+    # extending the end date into the future, while leaving the stale
+    # past start untouched, must still be blocked
+    page = client.get(page.request.url)
+    page = page.click('Bearbeiten')
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    page = page.form.submit()
+    assert 'currently published' in page or 'aktuell veröffentlicht' in page
+
+    # setting a future start alongside the extended end date fixes it
+    page.form['publication_start'] = dt_for_form(
+        now_local + timedelta(hours=1)
+    )
+    page = page.form.submit().follow()
+    assert 'Permit One' in page
+
+
+def test_delete_published_entry_with_notifications_forbidden(
+    client: Client,
+) -> None:
+    """Published entries in a directory with a notification address
+    must not be deletable, since this bypasses the proof-of-publication
+    guarantee."""
+    tz = 'Europe/Zurich'
+    now_local = to_timezone(utcnow(), tz)
+
+    client.login_admin()
+
+    directory_page = create_notification_directory(client)
+
+    page = directory_page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(
+        now_local - timedelta(hours=1)
+    )
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    entry = page.form.submit().follow()
+    assert 'Permit One' in entry
+
+    delete_link = entry.pyquery('a.delete-link')
+    assert delete_link
+    assert 'disabled-link' in delete_link.attr('class')
+    assert delete_link.attr('title')
+    assert not delete_link.attr('ic-delete-from')
+
+    # a not-yet-published entry is still deletable and gives us a
+    # valid csrf token to reuse against the published entry's url,
+    # so we know the 403 below comes from the new guard, not a
+    # missing/invalid csrf token
+    csrf_token = deletable_entry_csrf_token(directory_page)
+
+    entry_url = entry.pyquery('a.edit-link').attr('href').replace(
+        '+edit', ''
+    )
+    entry_delete_link = URL(entry_url).query_param(
+        'csrf-token', csrf_token
+    ).as_string()
+    client.delete(entry_delete_link, status=403)
+
+
+def test_delete_entry_expired_before_last_maintenance_run(
+    client: Client,
+) -> None:
+    """An entry whose publication has just ended must stay undeletable
+    until the hourly maintenance cronjob has actually observed it as
+    unpublished. Between publication_end and the next cronjob run the
+    expiry notification has not been sent yet, so deleting the entry then
+    would still bypass the proof-of-publication guarantee."""
+    tz = 'Europe/Zurich'
+    now_local = to_timezone(utcnow(), tz)
+
+    client.login_admin()
+
+    directory_page = create_notification_directory(client)
+
+    # a currently published entry
+    page = directory_page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(
+        now_local - timedelta(hours=2)
+    )
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    entry = page.form.submit().follow()
+
+    csrf_token = deletable_entry_csrf_token(directory_page)
+    entry_url = entry.pyquery('a.edit-link').attr('href').replace('+edit', '')
+
+    # simulate: publication has just ended, but the last maintenance run
+    # was before it ended, so the cronjob has not yet observed the entry
+    # as unpublished (and thus not sent the expiry notification)
+    session = client.app.session()
+    permit_one = dir_query(client).filter_by(name='permit-one').one()
+    permit_one.publication_end = utcnow() - timedelta(minutes=5)
+    client.app.org.hourly_maintenance_tasks_last_run = (
+        utcnow() - timedelta(minutes=30)
+    )
+    session.flush()
+    transaction.commit()
+
+    # by the wall clock the entry is no longer published ...
+    assert dir_query(client).filter_by(name='permit-one').one().published \
+        is False
+
+    # ... but the delete button stays disabled and the delete is
+    # forbidden, since the cronjob has not processed the expiry yet
+    entry_page = client.get(entry_url)
+    assert 'disabled-link' in entry_page.pyquery('a.delete-link').attr('class')
+
+    delete_link = URL(entry_url).query_param(
+        'csrf-token', csrf_token
+    ).as_string()
+    client.delete(delete_link, status=403)
+
+    # once the maintenance run catches up past publication_end, the entry
+    # counts as unpublished and becomes deletable again
+    client.app.org.hourly_maintenance_tasks_last_run = utcnow()
+    transaction.commit()
+
+    entry_page = client.get(entry_url)
+    assert entry_page.pyquery('a.delete-link').attr('ic-delete-from')
+    client.delete(delete_link)
+    assert dir_query(client).filter_by(name='permit-one').first() is None
+
+
+def test_delete_entry_published_before_last_maintenance_run(
+    client: Client,
+) -> None:
+    """An entry that just became published must not be deletable either,
+    even if the hourly cronjob has not run since publication_start passed.
+    It is publicly visible right now, so deleting it would remove a live
+    record and bypass the proof-of-publication guarantee."""
+    tz = 'Europe/Zurich'
+    now_local = to_timezone(utcnow(), tz)
+
+    client.login_admin()
+
+    directory_page = create_notification_directory(client)
+
+    # scheduled for the future (so the form's currently-published guard
+    # doesn't reject it)
+    page = directory_page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(now_local + timedelta(days=1))
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    entry = page.form.submit().follow()
+
+    csrf_token = deletable_entry_csrf_token(directory_page)
+    entry_url = entry.pyquery('a.edit-link').attr('href').replace('+edit', '')
+
+    # simulate: publication has just started, but the last maintenance run
+    # predates publication_start, so the cronjob has not yet observed the
+    # entry as published (nor sent the published notification)
+    session = client.app.session()
+    permit_one = dir_query(client).filter_by(name='permit-one').one()
+    permit_one.publication_start = utcnow() - timedelta(minutes=30)
+    client.app.org.hourly_maintenance_tasks_last_run = (
+        utcnow() - timedelta(minutes=90)
+    )
+    session.flush()
+    transaction.commit()
+
+    # the entry is published (visible) by the wall clock, but was not yet
+    # published as of the last maintenance run
+    permit_one = dir_query(client).filter_by(name='permit-one').one()
+    assert permit_one.published is True
+    assert permit_one.published_as_of(
+        client.app.org.hourly_maintenance_tasks_last_run
+    ) is False
+
+    # it must still be undeletable, since it is live right now
+    entry_page = client.get(entry_url)
+    assert 'disabled-link' in entry_page.pyquery('a.delete-link').attr('class')
+
+    delete_link = URL(entry_url).query_param(
+        'csrf-token', csrf_token
+    ).as_string()
+    client.delete(delete_link, status=403)
+
+
+def test_change_requests_and_notification_address_mutually_exclusive(
+    client: Client,
+) -> None:
+    """Change requests are applied without going through the mutability
+    restrictions admin notifications rely on, so the two settings must
+    not be enabled at the same time."""
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Permits'
+    page.form['structure'] = 'Name *= ___'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_publication'] = True
+    page.form['required_publication'] = True
+    page.form['notification_address'] = 'admin@example.org'
+    page.form['enable_change_requests'] = True
+    page = page.form.submit()
+
+    assert (
+        'cannot be enabled at the same time' in page
+        or 'nicht gleichzeitig aktiviert werden' in page
+    )
+
+    page.form['enable_change_requests'] = False
+    page = page.form.submit().follow()
+    assert 'Permits' in page

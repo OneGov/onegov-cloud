@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-02 10:24+0200\n"
+"POT-Creation-Date: 2026-07-02 15:54+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -788,6 +788,16 @@ msgstr ""
 "wenn alle Felder sichtbar sind können Benutzereingaben akzeptiert werden - "
 "andernfalls ist es möglich dass der Benutzer versteckte Felder sehen kann."
 
+msgid ""
+"Change requests and the admin notification address cannot be enabled at the "
+"same time, because change requests are applied without respecting the "
+"publication restrictions that admin notifications rely on."
+msgstr ""
+"Änderungswünsche und die Admin-Benachrichtigungsadresse können nicht "
+"gleichzeitig aktiviert werden, da Änderungswünsche angewendet werden, ohne "
+"die Veröffentlichungseinschränkungen zu berücksichtigen, auf die sich die "
+"Admin-Benachrichtigung verlässt."
+
 msgid "Apply directory configuration"
 msgstr "Verzeichniskonfiguration anwenden"
 
@@ -1093,6 +1103,12 @@ msgstr "Erstellt"
 
 msgid "Expected header line with the following columns:"
 msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Diese(n) Filter bei allen betroffenen Veranstaltungen entfernen"
+
+msgid "Confirmation"
+msgstr "Bestätigung"
 
 msgid "Comment"
 msgstr "Kommentar"
@@ -3750,6 +3766,13 @@ msgstr "Vergangen"
 
 msgid "Choose filter"
 msgstr "Filter wählen"
+
+msgid ""
+"This entry cannot be deleted while it is published, to ensure proof of "
+"publication."
+msgstr ""
+"Dieser Eintrag kann nicht gelöscht werden, solange er veröffentlicht ist, "
+"um den Nachweis der Veröffentlichung sicherzustellen."
 
 msgid "Delete entry"
 msgstr "Eintrag löschen"
@@ -7284,17 +7307,10 @@ msgstr ""
 "Der Filter \"${keyword}\" ist noch bei ${count} Veranstaltung(en) gesetzt."
 
 #, python-format
-msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
 "Die Filterauswahl \"${choice}\" ist noch bei ${count} Veranstaltung(en) "
 "gesetzt."
-
-msgid "Remove these filters from all affected events"
-msgstr "Diese(n) Filter bei allen betroffenen Veranstaltungen entfernen"
-
-msgid "Confirmation"
-msgstr "Bestätigung"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Filterkonfiguration für Veranstaltungen bearbeiten"
@@ -8158,6 +8174,18 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid ""
+#~ "This entry is published and this directory has an admin notification "
+#~ "address set, so it cannot be deleted. To delete it, wait until its "
+#~ "publication period ends, or remove the notification address in the "
+#~ "directory settings."
+#~ msgstr ""
+#~ "Dieser Eintrag ist veröffentlicht und für dieses Verzeichnis ist eine "
+#~ "Admin-Benachrichtigungsadresse hinterlegt, deshalb kann er nicht gelöscht "
+#~ "werden. Warten Sie, bis die Veröffentlichungsdauer abgelaufen ist, oder "
+#~ "entfernen Sie die Benachrichtigungsadresse in den "
+#~ "Verzeichniseinstellungen, um ihn zu löschen."
 
 #~ msgid ""
 #~ "Receives an e-mail when entries are published or de-published. Useful e."

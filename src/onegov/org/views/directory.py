@@ -111,12 +111,15 @@ def get_directory_entry_form_class(
                 self.publication_end.validators[0] = InputRequired()
 
         def validate_publication_start(self, field: Field) -> None:
+            # NOTE: Use the submitted start/end, not the pre-edit state,
+            #       since either can change whether this save publishes.
+            end = self.publication_end.data
             if (
                 field.data is not None
                 and isinstance(model, ExtendedDirectoryEntry)
-                and model.published
                 and model.directory.notification_address
                 and field.data <= utcnow()
+                and (end is None or end >= utcnow())
             ):
                 raise WTValidationError(_(
                     'This entry is currently published. Set a future '
@@ -766,6 +769,18 @@ def handle_new_directory_entry(
             send_email_notification_for_directory_entry(
                 self.directory, entry, request)
 
+        if self.directory.notification_address and entry.published:
+            # the hourly cronjob only catches entries whose publication_start
+            # falls after its last run, so a backdated start (e.g. a permit
+            # issued earlier) would never be caught - send it directly here
+            last_run = request.app.org.last_hourly_maintenance_run
+            if (
+                entry.publication_start is None
+                or entry.publication_start <= last_run
+            ):
+                send_admin_notification_for_directory_entry(
+                    self.directory, entry, request)
+
         request.success(_('Added a new directory entry'))
         return request.redirect(request.link(entry))
 
@@ -1012,6 +1027,18 @@ def delete_directory_entry(
 ) -> None:
 
     request.assert_valid_csrf_token()
+
+    # Block deletion while published now, or still published as of the last
+    # maintenance run - the latter covers the gap between expiry and the
+    # next cronjob run, before the expiry notification has gone out
+    # (proof-of-publication guarantee).
+    last_run = request.app.org.last_hourly_maintenance_run
+    if (
+        isinstance(self, ExtendedDirectoryEntry)
+        and (self.published or self.published_as_of(last_run))
+        and self.directory.notification_address
+    ):
+        raise HTTPForbidden()
 
     session = request.session
     session.delete(self)
