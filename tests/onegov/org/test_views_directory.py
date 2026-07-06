@@ -78,7 +78,9 @@ def deletable_entry_csrf_token(directory_page: ExtendedResponse) -> str:
     permit_two = page.form.submit().follow()
     delete_link = permit_two.pyquery('a.delete-link').attr('ic-delete-from')
     assert delete_link
-    return URL(delete_link).query_param('csrf-token')
+    token = URL(delete_link).query_param('csrf-token')
+    assert isinstance(token, str)
+    return token
 
 
 def strip_s(dt: datetime, timezone: TzInfoOrName | None = None) -> datetime:
