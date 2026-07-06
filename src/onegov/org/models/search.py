@@ -5,7 +5,6 @@ import math
 from functools import cached_property
 from onegov.core.collection import Pagination
 from onegov.core.orm.types import MarkupText
-from onegov.core.utils import sanitize_query_param
 from onegov.event.models import Event
 from onegov.search import SearchIndex
 from onegov.search.utils import language_from_locale

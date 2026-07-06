@@ -93,7 +93,8 @@ def test_normalize_for_filename(
 
 def test_sanitize_query_param() -> None:
     # regular, non-empty strings pass through unchanged
-    assert utils.sanitize_query_param('Bildung und Sport') == 'Bildung und Sport'
+    assert utils.sanitize_query_param('Bildung und Sport') == (
+        'Bildung und Sport')
     assert utils.sanitize_query_param('../../../etc/passwd') == (
         '../../../etc/passwd')
 
