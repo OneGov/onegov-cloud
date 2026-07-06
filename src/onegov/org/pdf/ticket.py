@@ -140,6 +140,11 @@ class TicketBasePdf(OrgPdf):
                 ]
                 self.table(items, 'even')
 
+    def document_text(self, html: str) -> None:
+        self.h2(_('Document Text'))
+        self.mini_html(html, linkify=True)
+
+
     def ticket_invoice(
         self,
         ticket: Ticket,
@@ -469,11 +474,16 @@ class TicketPdf(TicketBasePdf):
 
         self.ticket_metadata(ticket, layout)
 
+        if hasattr(handler, 'submission'):
+            html = handler.submission.form.document_html
+            print('*** tschupre document html', html)
+
         self.h1(_('Summary'))
         if deleted_message:
             self.p(self.translate(deleted_message))
             self.spacer()
         self.ticket_summary(summary)
+        self.document_text(html) if html else None
         self.ticket_invoice(ticket, layout)
         self.ticket_payment(ticket, layout)
 

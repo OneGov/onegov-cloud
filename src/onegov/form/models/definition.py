@@ -55,6 +55,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #: the form as parsable string
     definition: Mapped[str]
 
+    #: document text for the output document
+    document_html = dict_markup_property('content')
+
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
 

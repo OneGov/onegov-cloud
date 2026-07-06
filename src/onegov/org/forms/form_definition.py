@@ -55,6 +55,11 @@ class FormDefinitionBaseForm(Form):
         hide_label=False
     )
 
+    document_html = HtmlField(
+        label=_('Document Text'),
+        description=_('This text will be included in the output document.')
+    )
+
     pick_up = TextAreaField(
         label=_('Pick-Up'),
         fieldset=_('Pick-Up'),

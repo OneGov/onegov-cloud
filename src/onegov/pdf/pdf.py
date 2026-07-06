@@ -193,7 +193,7 @@ class Pdf(PDFDocument):
         self.style.heading6.textColor = self.style.normal.textColor
         self.style.heading6.leading = 1.2 * self.style.heading6.fontSize
 
-        self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
+        self.style.paragraph.spaceAfter = 1 * self.style.paragraph.fontSize
         self.style.paragraph.leading = 1.2 * self.style.paragraph.fontSize
 
         self.style.ol = Empty()
@@ -651,7 +651,9 @@ class Pdf(PDFDocument):
                         leftIndent=self.style.ol.liIndent,
                         bulletDedent=(
                             self.style.ol.liIndent - self.style.ol.leftIndent
-                        )
+                        ),
+                        spaceBefore=self.style.paragraph.spaceAfter,
+                        spaceAfter=self.style.paragraph.spaceAfter,
                     )
                 )
             elif element.tag == 'ul':
@@ -671,7 +673,9 @@ class Pdf(PDFDocument):
                         leftIndent=self.style.ul.liIndent,
                         bulletDedent=(
                             self.style.ul.liIndent - self.style.ul.leftIndent
-                        )
+                        ),
+                        spaceBefore=self.style.paragraph.spaceAfter,
+                        spaceAfter=self.style.paragraph.spaceAfter,
                     )
                 )
 
