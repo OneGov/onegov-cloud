@@ -15,7 +15,7 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.town6.custom import get_api_endpoints
 from onegov.town6.custom import get_global_tools, get_modules
 from onegov.town6.initial_content import create_new_organisation
-from onegov.town6.theme import TownTheme
+from onegov.town6.theme import TownBootstrapTheme
 from webob import Response
 
 
@@ -96,8 +96,8 @@ def get_template_variables(request: TownRequest) -> RenderData:
 
 
 @TownApp.setting(section='core', name='theme')
-def get_theme() -> TownTheme:
-    return TownTheme()
+def get_theme() -> TownBootstrapTheme:
+    return TownBootstrapTheme()
 
 
 @TownApp.setting(section='i18n', name='locales')
