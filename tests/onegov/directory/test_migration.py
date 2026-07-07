@@ -217,6 +217,44 @@ def test_detect_changed_fields() -> None:
     assert changes.changed_fields == ['Name']
 
 
+def test_migration_possible_with_renamed_and_changed_field(
+    session: Session
+) -> None:
+    # regression for OGC-3241: renaming a field while also toggling its
+    # required flag raised KeyError in DirectoryMigration.possible
+    directories = DirectoryCollection(session)
+    entries = directories.add(
+        title="Clubs",
+        lead="The town's clubs",
+        structure="""
+            Name *= ___
+            Street = ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Name]",
+            order=['Name']
+        )
+    )
+    entries.add(values=dict(name="Chess Club", street="Main Street 1"))
+
+    migration = entries.migration(
+        """
+            Name *= ___
+            Strasse *= ___
+        """,
+        new_configuration=None
+    )
+    assert migration.changes.renamed_fields == {'Street': 'Strasse'}
+    assert migration.changes.changed_fields == ['Strasse']
+    assert migration.possible
+
+    migration.execute()
+
+    entry = entries.entries[0]
+    assert entry.values['strasse'] == 'Main Street 1'
+    assert 'street' not in entry.values
+
+
 def test_add_fieldset_at_top() -> None:
     old = textwrap.dedent("""
     A *= ___
