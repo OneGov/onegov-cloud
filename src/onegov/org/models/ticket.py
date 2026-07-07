@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json
+from onegov.core.custom import json
 from functools import cached_property
 from markupsafe import Markup
 from onegov.chat import Message, MessageCollection
