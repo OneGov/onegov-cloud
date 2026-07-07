@@ -63,7 +63,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    study_normal_president_halfhour = IntegerField(
+    study_normal_president_halfhour = DecimalField(
         label=_('President: File study'),
         render_kw={
             'long_description': _('per 1/2h'),
@@ -95,7 +95,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    study_normal_member_halfhour = IntegerField(
+    study_normal_member_halfhour = DecimalField(
         label=_('Member: File study'),
         render_kw={
             'long_description': _('per 1/2h'),
@@ -116,7 +116,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    study_intercantonal_president_hour = IntegerField(
+    study_intercantonal_president_hour = DecimalField(
         label=_('President: File study'),
         render_kw={
             'long_description': _('per 1h'),
@@ -137,7 +137,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    study_intercantonal_member_hour = IntegerField(
+    study_intercantonal_member_hour = DecimalField(
         label=_('Member: File study'),
         render_kw={
             'long_description': _('per 1h'),

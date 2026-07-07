@@ -77,18 +77,18 @@ class RateSet(Base, ContentMixin, TimestampMixin):
 
     )
 
-    study_normal_president_halfhour: dict_property[int] = (
-        content_property(default=0)
+    study_normal_president_halfhour: dict_property[float] = content_property(
+        default=0.0
     )
 
-    study_normal_member_halfhour: dict_property[int] = (
-        content_property(default=0)
+    study_normal_member_halfhour: dict_property[float] = content_property(
+        default=0.0
     )
 
-    study_intercantonal_president_hour: dict_property[int] = (
-        content_property(default=0)
+    study_intercantonal_president_hour: dict_property[float] = (
+        content_property(default=0.0)
     )
 
-    study_intercantonal_member_hour: dict_property[int] = (
-        content_property(default=0)
+    study_intercantonal_member_hour: dict_property[float] = content_property(
+        default=0.0
     )
