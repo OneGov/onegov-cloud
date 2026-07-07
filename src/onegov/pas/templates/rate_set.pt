@@ -24,47 +24,47 @@
                         <tr>
                             <th rowspan="2" i18n:translate="">Plenary session</th>
                             <td i18n:translate="">President</td>
-                            <td colspan="2">CHF ${rate_set.plenary_none_president_halfday}.- <span i18n:translate="">half-day</span></td>
+                            <td colspan="2">${layout.format_rate(rate_set.plenary_none_president_halfday)} <span i18n:translate="">half-day</span></td>
                             <td></td>
                         </tr>
                         <tr>
                             <td i18n:translate="">Member</td>
-                            <td colspan="2">CHF ${rate_set.plenary_none_member_halfday}.- <span i18n:translate="">half-day</span></td>
+                            <td colspan="2">${layout.format_rate(rate_set.plenary_none_member_halfday)} <span i18n:translate="">half-day</span></td>
                             <td></td>
                         </tr>
                         <tr>
                             <th rowspan="2" i18n:translate="">Commission meeting</th>
                             <td i18n:translate="">President</td>
-                            <td>CHF ${rate_set.commission_normal_president_initial}.- <span i18n:translate="">first 2h</span></td>
-                            <td>CHF ${rate_set.commission_normal_president_additional}.- <span i18n:translate="">per additional 1/2h</span></td>
+                            <td>${layout.format_rate(rate_set.commission_normal_president_initial)} <span i18n:translate="">first 2h</span></td>
+                            <td>${layout.format_rate(rate_set.commission_normal_president_additional)} <span i18n:translate="">per additional 1/2h</span></td>
                             <td>${layout.format_rate(rate_set.study_normal_president_halfhour)} <span i18n:translate="">per 1/2h</span></td>
                         </tr>
                         <tr>
                             <td i18n:translate="">Member</td>
-                            <td>CHF ${rate_set.commission_normal_member_initial}.- <span i18n:translate="">first 2h</span></td>
-                            <td>CHF ${rate_set.commission_normal_member_additional}.- <span i18n:translate="">per additional 1/2h</span></td>
+                            <td>${layout.format_rate(rate_set.commission_normal_member_initial)} <span i18n:translate="">first 2h</span></td>
+                            <td>${layout.format_rate(rate_set.commission_normal_member_additional)} <span i18n:translate="">per additional 1/2h</span></td>
                             <td>${layout.format_rate(rate_set.study_normal_member_halfhour)} <span i18n:translate="">per 1/2h</span></td>
                         </tr>
                         <tr>
                             <th rowspan="2" i18n:translate="">intercantonal commission</th>
                             <td i18n:translate="">President</td>
-                            <td colspan="2">CHF ${rate_set.commission_intercantonal_president_halfday}.- <span i18n:translate="">half-day</span></td>
+                            <td colspan="2">${layout.format_rate(rate_set.commission_intercantonal_president_halfday)} <span i18n:translate="">half-day</span></td>
                             <td>${layout.format_rate(rate_set.study_intercantonal_president_hour)} <span i18n:translate="">per 1h</span></td>
                         </tr>
                         <tr>
                             <td i18n:translate="">Member</td>
-                            <td colspan="2">CHF ${rate_set.commission_intercantonal_member_halfday}.- <span i18n:translate="">half-day</span></td>
+                            <td colspan="2">${layout.format_rate(rate_set.commission_intercantonal_member_halfday)} <span i18n:translate="">half-day</span></td>
                             <td>${layout.format_rate(rate_set.study_intercantonal_member_hour)} <span i18n:translate="">per 1h</span></td>
                         </tr>
                         <tr>
                             <th rowspan="2" i18n:translate="">Shortest meeting</th>
                             <td i18n:translate="">President</td>
-                            <td colspan="2">CHF ${rate_set.shortest_all_president_halfhour}.- <span i18n:translate="">per 1/2h</span></td>
+                            <td colspan="2">${layout.format_rate(rate_set.shortest_all_president_halfhour)} <span i18n:translate="">per 1/2h</span></td>
                             <td></td>
                         </tr>
                         <tr>
                             <td i18n:translate="">Member</td>
-                            <td colspan="2">CHF ${rate_set.shortest_all_member_halfhour}.- <span i18n:translate="">per 1/2h</span></td>
+                            <td colspan="2">${layout.format_rate(rate_set.shortest_all_member_halfhour)} <span i18n:translate="">per 1/2h</span></td>
                             <td></td>
                         </tr>
                     </tbody>

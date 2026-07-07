@@ -423,14 +423,14 @@ def test_rate_set_form(session: Session, dummy_request: Any) -> None:
     assert not form.validate()
     assert 'year' not in form.errors
 
-    # study rates may have decimal places (e.g. 52.45 / 31.70)
+    # all rates may have decimal places (e.g. 52.45 / 43.45 / 31.70)
     data = {
         'year': 2026,
         'cost_of_living_adjustment': '1.5',
         'plenary_none_president_halfday': '1000',
         'plenary_none_member_halfday': '900',
         'commission_normal_president_initial': '300',
-        'commission_normal_president_additional': '100',
+        'commission_normal_president_additional': '43.45',
         'study_normal_president_halfhour': '52.45',
         'commission_normal_member_initial': '250',
         'commission_normal_member_additional': '80',
@@ -449,6 +449,7 @@ def test_rate_set_form(session: Session, dummy_request: Any) -> None:
 
     new_set = collection.add(year=2026)
     form.populate_obj(new_set)
+    assert float(new_set.commission_normal_president_additional) == 43.45
     assert float(new_set.study_normal_president_halfhour) == 52.45
     assert float(new_set.study_normal_member_halfhour) == 31.70
 
