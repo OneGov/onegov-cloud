@@ -770,9 +770,13 @@ def handle_new_directory_entry(
                 self.directory, entry, request)
 
         if self.directory.notification_address and entry.published:
-            # the hourly cronjob only catches entries whose publication_start
-            # falls after its last run, so a backdated start (e.g. a permit
-            # issued earlier) would never be caught - send it directly here
+            # the hourly cronjob only notifies on the publication_start
+            # transition (then <= publication_start <= now), so two published
+            # entries slip through and must be sent directly here:
+            # - publication_start is None: published immediately, there is no
+            #   start transition for the cronjob to catch
+            # - publication_start <= last_run: a backdated start already sits
+            #   before the last run, outside the cronjob's window
             last_run = request.app.org.last_hourly_maintenance_run
             if (
                 entry.publication_start is None

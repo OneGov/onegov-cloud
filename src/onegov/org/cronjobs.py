@@ -18,6 +18,7 @@ from onegov.core.orm import find_models
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.directory import DirectoryEntry
 from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
@@ -64,7 +65,7 @@ from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import undefer, joinedload
 from urllib3.util import Retry
 from uuid import UUID
 
@@ -234,6 +235,8 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
                 )
             )
         )
+        if issubclass(model, DirectoryEntry):
+            query = query.options(joinedload(model.directory))
         objects.update(query)
 
     for obj in objects:
