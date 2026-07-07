@@ -1523,10 +1523,7 @@ def _remove_reservation(
                 failed_to_revoke = True
 
         if change == 'cancellation_accepted':
-            ticket.handler_data = {
-                k: v for k, v in ticket.handler_data.items()
-                if k != 'cancellation_requested'
-            }
+            ticket.handler_data.pop('cancellation_requested', None)
             request.success(_('The cancellation request was accepted.'))
         elif len(targeted) > 1:
             request.success(_('The reservations were rejected'))
