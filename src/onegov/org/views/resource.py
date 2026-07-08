@@ -25,9 +25,11 @@ from onegov.org.forms.resource import AllResourcesExportForm
 from onegov.org import _, OrgApp, utils
 from onegov.org.elements import Link
 from onegov.org.forms import (
-    FindYourSpotForm, ResourceForm, ResourceCleanupForm, ResourceExportForm)
+    FindYourSpotForm, ResourceForm, ResourceChangeUrlForm,
+    ResourceCleanupForm, ResourceExportForm)
 from onegov.org.layout import (
     DefaultLayout, FindYourSpotLayout, ResourcesLayout, ResourceLayout)
+from onegov.org.management import ResourceNameChange
 from onegov.org.models.dashboard import CitizenDashboard
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
@@ -1084,6 +1086,54 @@ def handle_edit_resource(
         'title': self.title,
         'form': form,
         'form_width': 'large'
+    }
+
+
+@OrgApp.form(
+    model=Resource,
+    name='change-url',
+    template='form.pt',
+    permission=Private,
+    form=ResourceChangeUrlForm
+)
+def handle_change_resource_url(
+    self: Resource,
+    request: OrgRequest,
+    form: ResourceChangeUrlForm,
+    layout: ResourceLayout | None = None
+) -> RenderData | BaseResponse:
+
+    messages = [
+        _('Stable URLs are important. Here you can change the '
+          'path to your site independently from the title.'),
+    ]
+
+    if form.submitted(request):
+        migration = ResourceNameChange.from_form(self, form)
+        link_count = migration.execute(test=form['test'].data)
+        if not form['test'].data:
+            request.success(_('Your changes were saved'))
+
+            @request.after
+            def must_revalidate(response: Response) -> None:
+                response.headers.add('cache-control', 'must-revalidate')
+                response.headers.add('cache-control', 'max-age=0, public')
+                response.headers['expires'] = '0'
+
+            return morepath.redirect(request.link(self))
+
+        messages.append(
+            _('${count} links will be replaced by this action.',
+              mapping={'count': link_count}))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'title': _('Change URL'),
+        'layout': layout or ResourceLayout(self, request),
+        'form': form,
+        'callout': ' '.join(request.translate(m) for m in messages)
     }
 
 
