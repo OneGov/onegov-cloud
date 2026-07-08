@@ -9,7 +9,7 @@ from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
-from onegov.foundation6.integration import FoundationApp
+from onegov.bootstrap.integration import BootstrapApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.town6.custom import get_api_endpoints
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
 
-class TownApp(OrgApp, FoundationApp):
+class TownApp(OrgApp, BootstrapApp):
 
     def configure_organisation(
         self,
@@ -245,6 +245,7 @@ def get_webasset_output() -> str:
 
 @TownApp.webasset('common')
 def get_common_asset() -> Iterator[str]:
+    yield 'jquery.js'
     yield 'global.js'
     yield 'polyfills.js'
     yield 'jquery.datetimepicker.css'
@@ -291,7 +292,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'ResizeSensor.js'
     yield 'theia-sticky-sidebar.js'
     yield 'apply-filters.js'
-    yield 'foundation-intercooler.js'
+    # yield 'foundation-intercooler.js'
     yield 'chosen_select_hierarchy.js'
     yield 'iframe_request_parameters.js'
     yield 'ai_formcoder.js'
