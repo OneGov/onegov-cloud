@@ -10,7 +10,6 @@ from onegov.core.orm import Base
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.user import User
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -315,13 +314,10 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
         if self.pk_type is not str and isinstance(id, str):
             try:
                 id = self.pk_type(id)
-            except Exception:  # nosec: B110
-                pass
+            except Exception:
+                return None
 
-        try:
-            return self.__class__(self.request).collection.by_id(id)
-        except SQLAlchemyError:
-            return None
+        return self.__class__(self.request).collection.by_id(id)
 
     @property
     def session(self) -> Session:

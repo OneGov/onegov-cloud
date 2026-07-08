@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import transaction
+
 from datetime import date
 from functools import cached_property
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
@@ -172,7 +174,14 @@ class PaginatedSumCollection[T: DeclarativeBase, IdT: PKType](Pagination[T]):
 
     def by_id(self, id: IdT) -> T | None:
         for collection, model_class in self.collections:
-            result = collection.by_id(id)
+            savepoint = transaction.savepoint()
+            try:
+                result = collection.by_id(id)
+            except SQLAlchemyError:
+                # HACK: Allows mixed pk types to work
+                savepoint.rollback()
+                result = None
+
             if result is not None:
                 break
 
@@ -723,13 +732,30 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
         return data
 
 
+def maybe_uuid(value: str) -> UUID | str:
+    try:
+        return UUID(value)
+    except ValueError:
+        return value
+
+
 class FormApiEndpoint(ApiEndpoint[FormOrExternalLink, UUID | str]):
     app: OrgApp
     request: OrgRequest
     endpoint = 'forms'
-    # NOTE: Technically not correct, but conversion will fallback to str
-    #       automatically, so it should be fine.
-    pk_type = UUID
+
+    # NOTE: Technically not correct if a form name happens to be a valid
+    #       UUID. To be super-robust we would need to always try the raw
+    #       string first and then the UUID. But since we don't do anything
+    #       to deal with overlaps between forms and external links I don't
+    #       think it's worth the effort. Someone would have to maliciously
+    #       manipulate the form names in order to cause issues.
+    @staticmethod
+    def pk_type(value: str) -> UUID | str:
+        try:
+            return UUID(value)
+        except ValueError:
+            return value
 
     @property
     def title(self) -> str:
