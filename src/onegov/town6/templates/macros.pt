@@ -131,21 +131,26 @@
 </metal:header-text>
 
 <metal:editbar define-macro="dropdown-editbar">
-        <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links">
-            <li tal:repeat="group editbar_links|layout.editbar_links">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarEditbar" aria-controls="navbarEditbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarEditbar">
+        <ul class="navbar-nav edit-bar">
+            <li class="nav-item dropdown" tal:repeat="group editbar_links|layout.editbar_links">
                 <tal:b condition="group.links|nothing">
-                    <a href="#" class="${' '.join(group.classes or ())}">${group.title}</a>
-                    <ul class="menu">
+                    <a href="#" role="button" data-bs-toggle="dropdown" class="nav-link dropdown-toggle ${' '.join(group.classes or ())}">${group.title}</a>
+                    <ul class="dropdown-menu">
                         <li tal:repeat="link group.links">
-                            <tal:b replace="link(layout)" />
+                            <tal:b replace="link(layout, ('nav-link', ))" />
                         </li>
                     </ul>
                 </tal:b>
                 <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                    <tal:b replace="link(layout)" />
+                    <tal:b replace="link(layout, ('nav-link', ))" />
                 </tal:b>
             </li>
         </ul>
+    </div>
 </metal:editbar>
 
 <metal:breadcrumbs define-macro="breadcrumbs">
@@ -3490,17 +3495,17 @@
 </metal:invoice_items>
 
 <metal:globals-left define-macro="globals-left">
-    <ul tal:condition="modules and modules.links|nothing" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
-        <li>
-            <a href="#" data-dropdown="modules-dropdown" class="dropdown modules" i18n:translate>Modules</a>
-            <ul id="modules-dropdown" data-dropdown-content class="vertical menu">
+    <ul tal:condition="modules and modules.links|nothing" class="navbar-nav global-tools-menu">
+        <li class="nav-item dropdown">
+            <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="nav-link dropdown-toggle" i18n:translate>Modules</a>
+            <ul id="modules-dropdown" class="dropdown-menu">
                 <li tal:repeat="link modules.links">
-                    <tal:b replace="link(layout)" />
+                    <tal:b replace="link(layout, ('nav-link', ))" />
                 </li>
             </ul>
         </li>
-        <li>
-            <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
+        <li class="nav-item">
+            <a class="docs nav-link" href="https://docs.admin.digital/" i18n:translate>User manual</a>
         </li>
     </ul>
 </metal:globals-left>
