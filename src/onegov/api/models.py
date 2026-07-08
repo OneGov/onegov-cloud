@@ -10,7 +10,6 @@ from onegov.core.orm import Base
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.user import User
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -23,7 +22,7 @@ from wtforms import HiddenField
 
 from typing import TYPE_CHECKING, Any, ClassVar, NoReturn, Self, overload
 if TYPE_CHECKING:
-    from collections.abc import Collection, Iterator, Mapping
+    from collections.abc import Callable, Collection, Iterator, Mapping
     from onegov.core import Framework
     from onegov.core.collection import PKType
     from onegov.core.request import CoreRequest
@@ -121,7 +120,7 @@ class ApiInvalidParamException(ApiException):
         self.status_code = status_code
 
 
-class ApiEndpointItem[M: DeclarativeBase]:
+class ApiEndpointItem[M: DeclarativeBase, IdT: PKType]:
     """ A single instance of an item of a specific endpoint.
 
     Passes all functionality to the specific API endpoint and is mainly used
@@ -136,7 +135,7 @@ class ApiEndpointItem[M: DeclarativeBase]:
         self.id = id
 
     @cached_property
-    def api_endpoint(self) -> ApiEndpoint[M] | None:
+    def api_endpoint(self) -> ApiEndpoint[M, IdT] | None:
         endpoint = ApiEndpointCollection(
             self.request).endpoints.get(self.endpoint)
         return endpoint if endpoint else None
@@ -166,7 +165,7 @@ class ApiEndpointItem[M: DeclarativeBase]:
         return None
 
 
-class ApiEndpoint[M: DeclarativeBase]:
+class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
     """ An API endpoint.
 
     API endpoints wrap collection and do some filter mapping.
@@ -180,6 +179,7 @@ class ApiEndpoint[M: DeclarativeBase]:
 
     endpoint: str = ''
     form_class: ClassVar[type[Form] | None] = None
+    pk_type: Callable[[str], IdT]
 
     def __init__(
         self,
@@ -235,9 +235,9 @@ class ApiEndpoint[M: DeclarativeBase]:
     @overload
     def for_item(self, item: None) -> None: ...
     @overload
-    def for_item(self, item: M) -> ApiEndpointItem[M]: ...
+    def for_item(self, item: M) -> ApiEndpointItem[M, IdT]: ...
 
-    def for_item(self, item: M | None) -> ApiEndpointItem[M] | None:
+    def for_item(self, item: M | None) -> ApiEndpointItem[M, IdT] | None:
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
@@ -249,15 +249,24 @@ class ApiEndpoint[M: DeclarativeBase]:
     @overload
     def for_item_id(self, item_id: None) -> None: ...
     @overload
-    def for_item_id(self, item_id: Any) -> ApiEndpointItem[M]: ...
+    def for_item_id(self, item_id: IdT) -> ApiEndpointItem[M, IdT]: ...
 
-    def for_item_id(self, item_id: Any | None) -> ApiEndpointItem[M] | None:
+    def for_item_id(
+        self,
+        item_id: IdT | None
+    ) -> ApiEndpointItem[M, IdT] | None:
         """ Return a new endpoint item instance with the given item id. """
 
         if not item_id:
             return None
 
-        target = getattr(item_id, 'hex', str(item_id))
+        if isinstance(item_id, int):
+            target = str(item_id)
+        elif isinstance(item_id, str):
+            target = item_id
+        else:
+            target = item_id.hex
+
         return ApiEndpointItem(self.request, self.endpoint, target)
 
     def scalarize_value(
@@ -277,59 +286,38 @@ class ApiEndpoint[M: DeclarativeBase]:
             )
         return values[0]
 
-    @overload
-    def get_filter[T1, T2](
+    def get_filter[T = str, DefaultT = None, EmptyT = None](
         self,
         name: str,
-        default: T1,
-        empty: T2
-    ) -> str | T1 | T2: ...
-
-    @overload
-    def get_filter[T](
-        self,
-        name: str,
-        default: T,
-        empty: None = None
-    ) -> str | T | None: ...
-
-    @overload
-    def get_filter[T](
-        self,
-        name: str,
-        default: None = None,
-        *,
-        empty: T
-    ) -> str | T | None: ...
-
-    @overload
-    def get_filter(
-        self,
-        name: str,
-        default: None = None,
-        empty: None = None
-    ) -> str | None: ...
-
-    def get_filter(
-        self,
-        name: str,
-        default: Any | None = None,
-        empty: Any | None = None
-    ) -> Any | None:
+        default: DefaultT = None,  # type: ignore[assignment]
+        empty: EmptyT = None,  # type: ignore[assignment]
+        coerce: Callable[[str], T] = str  # type: ignore[assignment]
+    ) -> T | DefaultT | EmptyT:
 
         """Returns the scalar filter value with the given name."""
 
         if name not in self.extra_parameters:
             return default
-        return self.scalarize_value(name) or empty
+        value = self.scalarize_value(name)
+        if value is None:
+            return empty
 
-    def by_id(self, id: PKType) -> M | None:
+        if coerce is not str:
+            try:
+                return coerce(value)
+            except Exception:
+                return default
+        return value  # type: ignore[return-value]
+
+    def by_id(self, id: IdT | str) -> M | None:
         """ Return the item with the given ID from the collection. """
+        if self.pk_type is not str and isinstance(id, str):
+            try:
+                id = self.pk_type(id)
+            except Exception:
+                return None
 
-        try:
-            return self.__class__(self.request).collection.by_id(id)
-        except SQLAlchemyError:
-            return None
+        return self.__class__(self.request).collection.by_id(id)
 
     @property
     def session(self) -> Session:
@@ -350,7 +338,7 @@ class ApiEndpoint[M: DeclarativeBase]:
         return result
 
     @property
-    def batch(self) -> dict[ApiEndpointItem[M], M]:
+    def batch(self) -> dict[ApiEndpointItem[M, IdT], M]:
         """ A dictionary with endpoint item instances and their titles. """
         return {
             self.for_item(item): item
@@ -512,7 +500,7 @@ class ApiEndpointCollection:
         self.app = request.app
 
     @cached_property
-    def endpoints(self) -> dict[str, ApiEndpoint[Any]]:
+    def endpoints(self) -> dict[str, ApiEndpoint[Any, Any]]:
         settings = self.app.config.setting_registry
         return {
             endpoint.endpoint: endpoint
@@ -524,7 +512,7 @@ class ApiEndpointCollection:
             name: str,
             page: int = 0,
             extra_parameters: dict[str, list[str]] | None = None
-    ) -> ApiEndpoint[Any] | None:
+    ) -> ApiEndpoint[Any, Any] | None:
         endpoint = self.endpoints.get(name)
         if endpoint is None:
             return None

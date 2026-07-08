@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import psycopg2
+import psycopg
 
 from datetime import datetime
 from markupsafe import escape, Markup
@@ -39,9 +39,9 @@ DB_CONNECTION_ERRORS = (
     OperationalError,
     InterfaceError,
     InternalError,
-    psycopg2.OperationalError,
-    psycopg2.InterfaceError,
-    psycopg2.InternalError,
+    psycopg.OperationalError,
+    psycopg.InterfaceError,
+    psycopg.InternalError,
 )
 
 

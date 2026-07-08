@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class DirectoryCollection[DirectoryT: Directory](
-    GenericCollection[DirectoryT]
+    GenericCollection[DirectoryT, 'UUID']
 ):
 
     @overload
@@ -83,7 +83,7 @@ class EntryRecipientCollection:
     def query(self) -> Query[EntryRecipient]:
         return self.session.query(EntryRecipient)
 
-    def by_id(self, id: str | UUID) -> EntryRecipient | None:
+    def by_id(self, id: UUID) -> EntryRecipient | None:
         if is_uuid(id):
             return self.query().filter(EntryRecipient.id == id).first()
         return None

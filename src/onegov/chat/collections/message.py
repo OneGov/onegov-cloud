@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
 
 
-class MessageCollection[MessageT: Message](GenericCollection[MessageT]):
+class MessageCollection[MessageT: Message](GenericCollection[MessageT, str]):
 
     @overload
     def __init__(
