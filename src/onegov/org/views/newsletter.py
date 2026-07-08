@@ -563,8 +563,10 @@ def send_newsletter(
         title = request.app.org.daily_newsletter_title
 
     daily_link = ''
+    daily_link_text = ''
     if daily:
         daily_link = request.app.org.daily_newsletter_link or ''
+        daily_link_text = request.app.org.daily_newsletter_link_text or ''
 
     _html = render_template(
         'mail_newsletter.pt', request, {
@@ -580,6 +582,7 @@ def send_newsletter(
             'closing_remark': newsletter.closing_remark,
             'daily': daily,
             'daily_link': daily_link,
+            'daily_link_text': daily_link_text,
         }
     )
     html = Template(_html)

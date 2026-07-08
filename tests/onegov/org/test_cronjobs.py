@@ -848,6 +848,7 @@ def test_send_daily_newsletter(client: Client[TestOrgApp]) -> None:
     client.app.org.newsletter_times = ['10', '11', '16']
     client.app.org.show_only_previews = True
     client.app.org.daily_newsletter_link = 'https://example.org/news'
+    client.app.org.daily_newsletter_link_text = 'Read the news'
 
     news = PageCollection(session)
     news_parent = news.query().filter_by(name='news').one()
@@ -901,6 +902,7 @@ def test_send_daily_newsletter(client: Client[TestOrgApp]) -> None:
         assert "News3" not in mail['TextBody']
         assert "News4" not in mail['TextBody']
         assert 'https://example.org/news' in mail['HtmlBody']
+        assert 'Read the news' in mail['HtmlBody']
 
     with freeze_time(datetime(2018, 3, 5, 11, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))

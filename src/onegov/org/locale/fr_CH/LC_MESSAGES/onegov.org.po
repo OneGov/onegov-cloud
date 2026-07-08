@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-01 07:55+0200\n"
+"POT-Creation-Date: 2026-07-08 11:17+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1083,6 +1083,12 @@ msgstr "Créé"
 
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Supprimer ces filtres de tous les événements concernés"
+
+msgid "Confirmation"
+msgstr "Confirmation"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -2780,6 +2786,22 @@ msgstr "Titre des newsletters quotidiennes"
 msgid "Daily news from our town"
 msgstr "Nouvelles quotidiennes de notre ville"
 
+msgid "Link for automatic newsletters"
+msgstr "Lien pour les newsletters automatiques"
+
+msgid ""
+"A static link displayed in every automatic newsletter below the news "
+"articles."
+msgstr ""
+"Un lien statique affiché dans chaque newsletter automatique sous les "
+"articles d'actualité."
+
+msgid "Display name for the link"
+msgstr "Nom d'affichage du lien"
+
+msgid "The text shown for the link. If empty, the link itself is shown."
+msgstr "Le texte affiché pour le lien. S'il est vide, le lien lui-même est affiché."
+
 msgid "Newsletter sending times (24h format)"
 msgstr "Horaires d'envoi de la newsletter (format 24h)"
 
@@ -4404,8 +4426,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Paiement"
 
@@ -5230,8 +5252,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6401,8 +6423,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -7229,21 +7251,12 @@ msgstr "Cette semaine"
 
 #, python-format
 msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
-msgstr ""
-"Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
+msgstr "Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
 
 #, python-format
-msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
-"Le choix de filtre \"${choice}\" est encore appliqué à ${count} "
-"événement(s)."
-
-msgid "Remove these filters from all affected events"
-msgstr "Supprimer ces filtres de tous les événements concernés"
-
-msgid "Confirmation"
-msgstr "Confirmation"
+"Le choix de filtre \"${choice}\" est encore appliqué à ${count} événement(s)."
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifier la configuration du filtre d'événements"

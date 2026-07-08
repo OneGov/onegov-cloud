@@ -21,7 +21,7 @@
 
         <tal:b condition="daily_link">
             <hr>
-            <p><a href="${daily_link}">${daily_link}</a></p>
+            <p><a href="${daily_link}">${daily_link_text or daily_link}</a></p>
         </tal:b>
 
         <tal:b condition="publications">
