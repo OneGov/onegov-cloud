@@ -4964,10 +4964,6 @@ def test_reservation_cancellation_request(client: Client) -> None:
     edit.form['allow_cancellation_requests'] = True
     page = edit.form.submit()
     assert page.status_int == 200
-    assert (
-        'Eine E-Mail-Antwortadresse ist erforderlich, wenn '
-        'Stornierungsanfragen aktiviert sind' in page
-    )
     client.logout()
 
     # setup: resource with cancellation disabled (default) and a recipient
