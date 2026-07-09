@@ -819,10 +819,6 @@ table {
     form style customizations
 */
 form {
-    label {
-        min-width: 75%;
-    }
-
     label > ul,
     .upload-widget > ul,
     .group-label > ul {
@@ -941,6 +937,21 @@ form {
             white-space: nowrap;
             text-overflow: ellipsis;
             break-inside: avoid;
+        }
+    }
+
+    // The "select all / deselect all" controls that multicheckbox.js prepends
+    // as a list item without its own checkbox. Keep the three labels grouped on
+    // one line. The standard form macro already does this via
+    // `.group-label > ul li` (flex), but the search filter renders the
+    // multicheckbox outside that wrapper, so its item needs `display: flex`
+    // here too.
+    ul:has(li input[type="checkbox"]) > li:first-child:not(:has(input)) {
+        display: flex;
+        align-items: baseline;
+
+        label {
+            flex: 0 0 auto;
         }
     }
 
