@@ -1577,6 +1577,7 @@ class NewsletterSettingsForm(Form):
             'below the news articles.'
         ),
         depends_on=('enable_automatic_newsletters', 'y'),
+        validators=[Optional()],
     )
 
     daily_newsletter_link_text = StringField(
