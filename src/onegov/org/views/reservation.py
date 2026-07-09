@@ -1671,14 +1671,15 @@ def request_cancellation(
                         'resource.'))
         return morepath.redirect(request.link(self, 'status'))
 
-    if self.state != 'closed':
-        if self.handler_data.get('cancellation_requested'):
-            request.alert(
-                _('A cancellation request has already been submitted.')
-            )
-        else:
-            request.alert(_('A cancellation request can only be submitted for '
-                            'accepted reservations.'))
+    if self.handler_data.get('cancellation_requested'):
+        request.alert(
+            _('A cancellation request has already been submitted.')
+        )
+        return morepath.redirect(request.link(self, 'status'))
+
+    if self.state not in ('pending', 'closed'):
+        request.alert(_('A cancellation request can only be submitted once '
+                        'the reservation has been accepted.'))
         return morepath.redirect(request.link(self, 'status'))
 
     payment = self.handler.payment
@@ -1711,7 +1712,6 @@ def request_cancellation(
             q = q.with_entities(
                 ResourceRecipient.address, ResourceRecipient.content
             )
-            print('*** tschupre cancellation recipients:', q.count())
 
             for res in q:
                 if resource.id.hex in res.content[
@@ -1729,7 +1729,6 @@ def request_cancellation(
             *((resource.reply_to,) if resource.reply_to else ()),
             *recipients_registered_for_cancellation(),
         )
-        print('*** tschupre cancellation recipients:', receivers)
 
         if not request.app.org.mute_all_tickets or not self.muted:
             send_ticket_mail(
@@ -1747,9 +1746,12 @@ def request_cancellation(
                 force=True,
             )
 
-        self.last_state_change = self.timestamp()
-        self.state = 'open'
-        self.user = None
+        # a closed ticket is reopened and unassigned so it re-enters the
+        # queue; a pending ticket is still being handled and stays as is
+        if self.state == 'closed':
+            self.last_state_change = self.timestamp()
+            self.state = 'open'
+            self.user = None
 
         self.handler_data = {
             **self.handler_data,

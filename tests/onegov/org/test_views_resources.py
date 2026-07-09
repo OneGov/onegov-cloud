@@ -4953,6 +4953,39 @@ def test_migration_removes_reservation_when_slot_is_taken(
     assert any('irrtümlich storniert' in (n.text or '') for n in notes)
 
 
+def _reserve_tageskarte_for_cancellation(client: Client) -> str:
+    """Reserve a whole-day slot on 'tageskarte' with cancellation requests
+    enabled and return the ticket status URL (ticket still open, unaccepted).
+
+    """
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Note = ___'
+    resource.allow_cancellation_requests = True
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
+        whole_day=True,
+        quota=1,
+        quota_limit=1,
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    result = reserve(quota=1, whole_day=True)
+    assert result.json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Test'
+    ticket_page = formular.form.submit().follow().form.submit().follow()
+    ticket_url = ticket_page.request.url
+    assert '/status' in ticket_url
+    return ticket_url
+
+
 @freeze_time('2026-07-01', tick=True)
 def test_reservation_cancellation_request(client: Client) -> None:
     from onegov.chat import MessageCollection
@@ -5146,36 +5179,15 @@ def test_reservation_cancellation_request_payment_guard(
     from decimal import Decimal
     from onegov.pay import Payment
 
-    resources = ResourceCollection(client.app.libres_context)
-    resource = resources.by_name('tageskarte')
-    assert resource is not None
-    resource.definition = 'Note = ___'
-    resource.allow_cancellation_requests = True
-    scheduler = resource.get_scheduler(client.app.libres_context)
+    ticket_url = _reserve_tageskarte_for_cancellation(client)
 
-    allocations = scheduler.allocate(
-        dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
-        whole_day=True,
-    )
-
-    reserve = client.bound_reserve(allocations[0])
-    transaction.commit()
-
-    result = reserve(quota=1, whole_day=True)
-    assert result.json == {'success': True}
-    formular = client.get('/resource/tageskarte/form')
-    formular.form['email'] = 'info@example.org'
-    formular.form['note'] = 'Test'
-    ticket_page = formular.form.submit().follow().form.submit().follow()
-    ticket_url = ticket_page.request.url
-
+    # accept + close as supporter
     client.login_supporter()
     client.get('/tickets/ALL/open').click('Annehmen').follow().click(
         'Alle Reservationen annehmen'
     ).follow().click('Ticket abschliessen')
     client.logout()
 
-    assert '/status' in ticket_url
     cancel_url = ticket_url.replace('/status', '/request-cancellation')
 
     # attach an invoiced payment to the reservation
@@ -5196,37 +5208,48 @@ def test_reservation_cancellation_request_payment_guard(
 
 @freeze_time('2026-07-01', tick=True)
 def test_reservation_cancellation_request_state_guard(client: Client) -> None:
-    resources = ResourceCollection(client.app.libres_context)
-    resource = resources.by_name('tageskarte')
-    assert resource is not None
-    resource.definition = 'Note = ___'
-    resource.allow_cancellation_requests = True
-    scheduler = resource.get_scheduler(client.app.libres_context)
-
-    allocations = scheduler.allocate(
-        dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
-        whole_day=True,
-    )
-
-    reserve = client.bound_reserve(allocations[0])
-    transaction.commit()
-
-    result = reserve(quota=1, whole_day=True)
-    assert result.json == {'success': True}
-    formular = client.get('/resource/tageskarte/form')
-    formular.form['email'] = 'info@example.org'
-    formular.form['note'] = 'Test'
-    ticket_page = formular.form.submit().follow().form.submit().follow()
-    ticket_url = ticket_page.request.url
-
-    # derive cancel URL from ticket status URL (same base path, different name)
-    assert '/status' in ticket_url
+    ticket_url = _reserve_tageskarte_for_cancellation(client)
     cancel_url = ticket_url.replace('/status', '/request-cancellation')
 
-    # direct access to request-cancellation on an open ticket
-    # redirects to status view
+    # an unaccepted (open) ticket cannot request cancellation and is
+    # redirected to the status view
     response = client.get(cancel_url).follow()
     assert response.request.url.endswith('/status')
+
+    # accept the ticket and its reservations, but do NOT close it, so the
+    # ticket stays pending and assigned to the supporter
+    client.login_supporter()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+    client.logout()
+
+    session = client.app.session()
+    tickets = TicketCollection(session)
+    ticket_obj = tickets.query().filter_by(handler_code='RSV').one()
+    assert ticket_obj.state == 'pending'
+    assert ticket_obj.user is not None
+    assigned_username = ticket_obj.user.username
+
+    # a cancellation request can now be submitted for the accepted (pending)
+    # ticket
+    cancel_page = client.get(cancel_url)
+    assert 'Stornierungsanfrage' in cancel_page
+    status = cancel_page.form.submit().follow()
+    assert 'Stornierungsanfrage wurde eingereicht' in status
+
+    # the pending ticket stays pending and assigned; it is not reopened or
+    # unassigned (that only happens for closed tickets)
+    session = client.app.session()
+    tickets = TicketCollection(session)
+    ticket_obj = tickets.query().filter_by(handler_code='RSV').one()
+    assert ticket_obj.state == 'pending'
+    assert ticket_obj.user is not None
+    assert ticket_obj.user.username == assigned_username
+    assert ticket_obj.handler_data.get('cancellation_requested') is True
+
+    # a second request is blocked with the already-submitted alert
+    already = client.get(cancel_url).follow()
+    assert 'Stornierungsanfrage wurde bereits eingereicht' in already
 
 
 @freeze_time('2026-07-01', tick=True)
