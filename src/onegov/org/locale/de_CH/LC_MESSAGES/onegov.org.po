@@ -4182,7 +4182,7 @@ msgstr "Möchten Sie die Stornierung wirklich akzeptieren?"
 msgid "This will cancel the reservation and cannot be undone."
 msgstr ""
 "Damit wird die Reservation storniert und kann nicht rückgängig gemacht "
-"werden.Damit wird die Reservation storniert und kann nicht rückgängig "
+"werden. Damit wird die Reservation storniert und kann nicht rückgängig "
 "gemacht werden."
 
 msgid "Accept all reservations"
