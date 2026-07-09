@@ -1407,6 +1407,11 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
 
     blocking_resources = self.blocking_resources()
     return *(
+        holiday.as_dict()
+        for holiday in utils.HolidayEventInfo.from_request(
+            request, start.date(), end.date()
+        )
+    ), *(
         res.as_dict()
         for res in utils.ReservationEventInfo.from_reservations(
             request,
