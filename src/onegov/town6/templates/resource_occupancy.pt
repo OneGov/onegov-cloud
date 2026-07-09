@@ -16,6 +16,7 @@
             data-resource-active="${resource.name}"
             data-stats-url="${stats_url|None}"
             data-pdf-url="${pdf_url|None}"
+            data-show-holidays="${(request.app.org.holidays or request.app.org.has_school_holidays) and 'true' or 'false'}"
         ></div>
 
     </tal:b>

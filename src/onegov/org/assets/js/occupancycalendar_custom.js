@@ -5,6 +5,7 @@ var setupOccupancyCalendar = function(calendar) {
         minTime: calendar.data('min-time'),
         maxTime: calendar.data('min-time'),
         editable: calendar.data('editable'),
+        showHolidays: calendar.data('show-holidays') || false,
         view: calendar.data('view'),
         date: calendar.data('date'),
         highlights_min: calendar.data('highlights-min'),
