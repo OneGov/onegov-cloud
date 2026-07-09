@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-02 11:01+0200\n"
+"POT-Creation-Date: 2026-07-09 10:38+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1954,12 +1954,6 @@ msgstr "Permettre l'annulation de réservations"
 
 msgid "Cancellation"
 msgstr "Annulation"
-
-msgid ""
-"An e-mail reply address is required when cancellation requests are enabled."
-msgstr ""
-"Une adresse e-mail de réponse est requise lorsque les demandes d'annulation "
-"sont activées."
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -5599,6 +5593,11 @@ msgstr "Rejetée"
 msgid "You have a new ticket"
 msgstr "Vous avez un nouveau ticket"
 
+msgid ""
+"A cancellation request has been submitted for the following ticket: ${link}"
+msgstr ""
+"Une demande d'annulation a été soumise pour le ticket suivant : ${link}"
+
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Un message a été envoyé à propos de ${ref}:"
 
@@ -7610,6 +7609,7 @@ msgstr ""
 msgid "The targeted reservation no longer exists"
 msgstr "La réservation n'existe plus ou a déjà été refusée"
 
+#. currently we don't handle the cancel and refund case yet
 msgid ""
 "The payment associated with this reservation needs to be refunded before the "
 "reservation can be rejected"
@@ -7659,12 +7659,16 @@ msgstr ""
 "acceptées.Une demande d'annulation ne peut être soumise que pour des "
 "réservations acceptées."
 
+#. currently we don't handle the cancel and refund case yet
 msgid ""
 "A cancellation request cannot be submitted because the payment has already "
 "been invoiced or paid."
 msgstr ""
 "Une demande d'annulation ne peut pas être soumise car le paiement a déjà été "
 "facturé ou payé."
+
+msgid "A cancellation request has been submitted"
+msgstr "Une demande d'annulation a été soumise"
 
 msgid ""
 "Your cancellation request has been submitted. You will be notified once it "
@@ -8227,6 +8231,12 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Show ticket"
+#~ msgstr "Afficher le ticket"
+
+#~ msgid "A cancellation request has been submitted."
+#~ msgstr "Une demande d'annulation a été soumise."
 
 #~ msgid "Would you like to cancel your reservation?"
 #~ msgstr "Souhaitez-vous annuler votre réservation?"

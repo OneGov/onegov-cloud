@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-07-01 16:45+0200\n"
+"POT-Creation-Date: 2026-07-09 10:38+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1797,6 +1797,11 @@ msgstr "Les modifications apportées aux réservations que vous avez soumises:"
 msgid "Rejected"
 msgstr "Rejetée"
 
+msgid ""
+"A cancellation request has been submitted for the following ticket: ${link}"
+msgstr ""
+"Une demande d'annulation a été soumise pour le ticket suivant : ${link}"
+
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Un message a été envoyé à propos de ${ref}:"
 
@@ -2959,6 +2964,9 @@ msgstr "Vue d'ensemble des notifications push"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Show ticket"
+#~ msgstr "Afficher le ticket"
 
 #~ msgid "Would you like to cancel your reservation?"
 #~ msgstr "Souhaitez-vous annuler votre réservation?"

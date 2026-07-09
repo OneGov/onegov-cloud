@@ -4971,6 +4971,7 @@ def test_reservation_cancellation_request(client: Client) -> None:
     resource = resources.by_name('tageskarte')
     assert resource is not None
     resource.definition = 'Note = ___'
+    resource.reply_to = 'reply@example.org'
     scheduler = resource.get_scheduler(client.app.libres_context)
 
     recipients = ResourceRecipientCollection(client.app.session())
@@ -5031,10 +5032,32 @@ def test_reservation_cancellation_request(client: Client) -> None:
     assert len(os.listdir(client.app.maildir)) == 3  # open + accepted + closed
     assert 'request-cancellation' not in client.get_email(1)['HtmlBody']
 
+    # auto-accept reservation tickets: request.auto_accept() now returns True,
+    # which would suppress a non-forced ticket mail. The cancellation
+    # notification is forced, so it must still be delivered.
+    client.app.org.ticket_auto_accepts = ['RSV']
+    transaction.commit()
+
     cancel_page = client.get(cancel_url)
     assert 'Stornierungsanfrage' in cancel_page
     status = cancel_page.form.submit().follow()
     assert 'Stornierungsanfrage wurde eingereicht' in status
+
+    # the ticket user's username address is notified about the cancellation
+    # request, despite auto-accept being active
+    assert len(os.listdir(client.app.maildir)) == 4
+    notification_mail = client.get_email(3)
+    assert 'supporter@example.org' in notification_mail['To']
+    assert 'Stornierungsanfrage' in notification_mail['TextBody']
+
+    # a second request while one is already pending shows the
+    # already-submitted alert (the ticket is now reopened, not closed)
+    already = client.get(cancel_url).follow()
+    assert 'Stornierungsanfrage wurde bereits eingereicht' in already
+
+    # reset auto-accept so the downstream (non-forced) accept mails are sent
+    client.app.org.ticket_auto_accepts = []
+    transaction.commit()
 
     session = client.app.session()
     tickets = TicketCollection(session)
@@ -5065,10 +5088,10 @@ def test_reservation_cancellation_request(client: Client) -> None:
 
     # two emails: cancellation-accepted to customer and
     # notification to admin recipient
-    assert len(os.listdir(client.app.maildir)) == 5
-    emails_3_4 = [client.get_email(3), client.get_email(4)]
-    customer_emails = [e for e in emails_3_4 if 'info@example.org' in e['To']]
-    admin_emails = [e for e in emails_3_4 if 'admin@example.org' in e['To']]
+    assert len(os.listdir(client.app.maildir)) == 6
+    emails_4_5 = [client.get_email(4), client.get_email(5)]
+    customer_emails = [e for e in emails_4_5 if 'info@example.org' in e['To']]
+    admin_emails = [e for e in emails_4_5 if 'admin@example.org' in e['To']]
     assert len(customer_emails) == 1, 'Expected one customer email'
     assert len(admin_emails) == 1, 'Expected one admin notification'
     assert 'Stornierung akzeptiert' in customer_emails[0]['Subject']

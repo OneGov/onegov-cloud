@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-02 11:01+0200\n"
+"POT-Creation-Date: 2026-07-09 10:38+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1948,12 +1948,6 @@ msgstr "Stornierung von Reservationen erlauben"
 
 msgid "Cancellation"
 msgstr "Stornierung"
-
-msgid ""
-"An e-mail reply address is required when cancellation requests are enabled."
-msgstr ""
-"Eine E-Mail-Antwortadresse ist erforderlich, wenn Stornierungsanfragen "
-"aktiviert sind."
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -5593,6 +5587,11 @@ msgstr "Abgelehnt"
 msgid "You have a new ticket"
 msgstr "Sie haben ein neues Ticket"
 
+msgid ""
+"A cancellation request has been submitted for the following ticket: ${link}"
+msgstr ""
+"Für das folgende Ticket wurde eine Stornierungsanfrage eingereicht: ${link}"
+
 msgid "A message has been sent regarding ${ref}:"
 msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
 
@@ -7602,6 +7601,7 @@ msgstr ""
 msgid "The targeted reservation no longer exists"
 msgstr "Die Reservation existiert nicht oder wurde bereits abgelehnt"
 
+#. currently we don't handle the cancel and refund case yet
 msgid ""
 "The payment associated with this reservation needs to be refunded before the "
 "reservation can be rejected"
@@ -7651,12 +7651,16 @@ msgstr ""
 "werden.Eine Stornierungsanfrage kann nur für angenommene Reservationen "
 "eingereicht werden."
 
+#. currently we don't handle the cancel and refund case yet
 msgid ""
 "A cancellation request cannot be submitted because the payment has already "
 "been invoiced or paid."
 msgstr ""
 "Eine Stornierungsanfrage kann nicht eingereicht werden, da die Zahlung "
 "bereits in Rechnung gestellt oder bezahlt wurde."
+
+msgid "A cancellation request has been submitted"
+msgstr "Eine Stornierungsanfrage wurde eingereicht"
 
 msgid ""
 "Your cancellation request has been submitted. You will be notified once it "
@@ -8220,6 +8224,12 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Show ticket"
+#~ msgstr "Ticket anzeigen"
+
+#~ msgid "A cancellation request has been submitted."
+#~ msgstr "Eine Stornierungsanfrage wurde eingereicht."
 
 #~ msgid "Would you like to cancel your reservation?"
 #~ msgstr "Möchten Sie Ihre Reservation stornieren?"

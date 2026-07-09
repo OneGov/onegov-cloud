@@ -1351,6 +1351,7 @@ def _remove_reservation(
     # if there's a invoiced/captured payment we cannot continue
     payment = ticket.handler.payment
     if payment and payment.state in ('invoiced', 'paid'):
+        # currently we don't handle the cancel and refund case yet
         request.alert(_(
             'The payment associated with this reservation needs '
             'to be refunded before the reservation can be rejected'
@@ -1650,10 +1651,10 @@ def reject_reservation_with_message_from_ticket(
     form=RequestCancellationForm
 )
 def request_cancellation(
-        self: ReservationTicket,
-        request: OrgRequest,
-        form: RequestCancellationForm,
-        layout: DefaultLayout | None = None,
+    self: ReservationTicket,
+    request: OrgRequest,
+    form: RequestCancellationForm,
+    layout: DefaultLayout | None = None,
 ) -> RenderData | Response:
     if self.handler.deleted:
         request.warning(_('All reservations for this ticket have '
@@ -1682,6 +1683,7 @@ def request_cancellation(
 
     payment = self.handler.payment
     if payment and payment.state in ('invoiced', 'paid'):
+        # currently we don't handle the cancel and refund case yet
         request.alert(_('A cancellation request cannot be submitted because '
                         'the payment has already been invoiced or paid.'))
         return morepath.redirect(request.link(self, 'status'))
@@ -1695,16 +1697,36 @@ def request_cancellation(
             targeted = list(reservations)
             selected_ids = []
 
-        self.last_state_change = self.timestamp()
-        self.state = 'open'
-        self.user = None
-
         ReservationMessage.create(
             targeted,
             self,
             request,
             'cancellation_requested'
         )
+
+        # notify the ticket assignee about the cancellation request. We
+        # force the mail so it is not suppressed by the auto-accept /
+        # self-notification heuristics in send_ticket_mail but need to
+        # check if muted
+        if not request.app.org.mute_all_tickets or not self.muted:
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_cancellation_request.pt',
+                subject=_('A cancellation request has been submitted'),
+                receivers=(self.user.username),
+                ticket=self,
+                content={
+                    'model': self,
+                    'resource': resource,
+                    'reservations': targeted,
+                    'ticket_reference': self.reference(request),
+                },
+                force=True,
+            )
+
+        self.last_state_change = self.timestamp()
+        self.state = 'open'
+        self.user = None
 
         self.handler_data = {
             **self.handler_data,

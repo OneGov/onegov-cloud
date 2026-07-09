@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-07-01 16:45+0200\n"
+"POT-Creation-Date: 2026-07-09 10:38+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1787,6 +1787,12 @@ msgstr "Modifiche alle prenotazioni inviate:"
 msgid "Rejected"
 msgstr "Rifiutata"
 
+msgid ""
+"A cancellation request has been submitted for the following ticket: ${link}"
+msgstr ""
+"È stata inoltrata una richiesta di annullamento per il seguente ticket: "
+"${link}"
+
 msgid "A message has been sent regarding ${ref}:"
 msgstr "È stato inviato un messaggio relativo a ${ref}:"
 
@@ -2948,6 +2954,9 @@ msgstr "Panoramica delle notifiche push"
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Show ticket"
+#~ msgstr "Mostra ticket"
 
 #~ msgid "Would you like to cancel your reservation?"
 #~ msgstr "Desideri cancellare la tua prenotazione?"
