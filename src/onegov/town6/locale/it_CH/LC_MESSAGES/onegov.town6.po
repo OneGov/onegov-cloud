@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-07-09 10:38+0200\n"
+"POT-Creation-Date: 2026-07-09 16:18+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2421,6 +2421,9 @@ msgstr "Riceve le notifiche per le note interne sulle prenotazioni."
 
 msgid "Receives notifications for rejected reservations."
 msgstr "Riceve le notifiche per le prenotazioni rifiutate."
+
+msgid "Receives notifications for cancellation requests."
+msgstr "Riceve le notifiche per le richieste di annullamento."
 
 msgid "Receives notifications for new reservations."
 msgstr "Riceve le notifiche per le nuove prenotazioni."

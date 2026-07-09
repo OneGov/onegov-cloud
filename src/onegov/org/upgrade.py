@@ -22,7 +22,8 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.newsletter import Newsletter
 from onegov.org.models import (
-    Organisation, Topic, News, ExtendedDirectory, PushNotification)
+    Organisation, Topic, News, ExtendedDirectory, PushNotification,
+    ResourceRecipient)
 from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_STATUS, POLITICAL_BUSINESS_TYPE)
 from onegov.org.utils import annotate_html
@@ -963,3 +964,18 @@ def recreate_missing_reserved_slots(context: UpgradeContext) -> None:
             f'({suffix})',
             fg='yellow',
         )
+
+
+@upgrade_task('Subscribe customer-message recipients to cancellation requests')
+def subscribe_customer_message_recipients_to_cancellation_requests(
+    context: UpgradeContext
+) -> None:
+    # recipients who receive customer messages should also be notified about
+    # cancellation requests, which are a customer-initiated action
+    recipients = (
+        context.session.query(ResourceRecipient)
+        .options(undefer(ResourceRecipient.content))
+    )
+    for recipient in recipients:
+        if recipient.customer_messages:
+            recipient.cancellation_requests = True

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-07-09 10:38+0200\n"
+"POT-Creation-Date: 2026-07-09 16:18+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2433,6 +2433,9 @@ msgstr "Reçoit des notifications pour les notes internes sur les réservations.
 
 msgid "Receives notifications for rejected reservations."
 msgstr "Reçoit des notifications pour les réservations rejetées."
+
+msgid "Receives notifications for cancellation requests."
+msgstr "Reçoit des notifications pour les demandes d'annulation."
 
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."

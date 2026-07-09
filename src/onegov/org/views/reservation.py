@@ -1704,16 +1704,39 @@ def request_cancellation(
             'cancellation_requested'
         )
 
-        # notify the ticket assignee about the cancellation request. We
-        # force the mail so it is not suppressed by the auto-accept /
-        # self-notification heuristics in send_ticket_mail but need to
-        # check if muted
+        def recipients_registered_for_cancellation() -> Iterator[str]:
+            q = ResourceRecipientCollection(request.session).query()
+            q = q.filter(ResourceRecipient.medium == 'email')
+            q = q.order_by(None).order_by(ResourceRecipient.address)
+            q = q.with_entities(
+                ResourceRecipient.address, ResourceRecipient.content
+            )
+            print('*** tschupre cancellation recipients:', q.count())
+
+            for res in q:
+                if resource.id.hex in res.content[
+                    'resources'
+                ] and res.content.get('cancellation_requests', False):
+                    yield res.address
+
+        # notify the ticket assignee (if any), the resource's reply-to address
+        # and the recipients registered for cancellation requests about the
+        # cancellation request. We force the mail so it is not suppressed by
+        # the auto-accept / self-notification heuristics in send_ticket_mail,
+        # but still honour the mute settings
+        receivers = (
+            *((self.user.username,) if self.user else ()),
+            *((resource.reply_to,) if resource.reply_to else ()),
+            *recipients_registered_for_cancellation(),
+        )
+        print('*** tschupre cancellation recipients:', receivers)
+
         if not request.app.org.mute_all_tickets or not self.muted:
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_cancellation_request.pt',
                 subject=_('A cancellation request has been submitted'),
-                receivers=(self.user.username),
+                receivers=receivers,
                 ticket=self,
                 content={
                     'model': self,

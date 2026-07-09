@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-09 10:38+0200\n"
+"POT-Creation-Date: 2026-07-09 16:18+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2023,6 +2023,16 @@ msgid ""
 msgstr ""
 "Wenn eine Reservierung storniert wird, wird dem oben genannten Empfänger "
 "eine Benachrichtigung gesendet."
+
+msgid "Cancellation Requests"
+msgstr "Stornierungsanfragen"
+
+msgid ""
+"When a customer requests to cancel a reservation, a notification will be "
+"sent to the above recipient."
+msgstr ""
+"Wenn ein Kunde die Stornierung einer Reservierung beantragt, wird dem oben "
+"genannten Empfänger eine Benachrichtigung gesendet."
 
 msgid "Send on"
 msgstr "Senden am"
@@ -6079,6 +6089,9 @@ msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."
 
 msgid "Receives notifications for rejected reservations."
 msgstr "Erhält Benachrichtigungen für abgelehnte Reservationen."
+
+msgid "Receives notifications for cancellation requests."
+msgstr "Erhält Benachrichtigungen für Stornierungsanfragen."
 
 msgid "Receives notifications for new reservations."
 msgstr "Erhält Benachrichtigungen für neue Reservationen."

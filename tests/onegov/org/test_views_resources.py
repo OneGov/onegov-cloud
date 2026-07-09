@@ -4982,6 +4982,15 @@ def test_reservation_cancellation_request(client: Client) -> None:
         rejected_reservations=True,
         resources=[resource.id.hex],
     )
+    # a recipient registered for cancellation requests must be notified when
+    # a cancellation request is submitted
+    recipients.add(
+        name='Cancellation Watcher',
+        medium='email',
+        address='cancelwatch@example.org',
+        cancellation_requests=True,
+        resources=[resource.id.hex],
+    )
 
     allocations = scheduler.allocate(
         dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
@@ -5048,6 +5057,13 @@ def test_reservation_cancellation_request(client: Client) -> None:
     assert len(os.listdir(client.app.maildir)) == 4
     notification_mail = client.get_email(3)
     assert 'supporter@example.org' in notification_mail['To']
+    # the resource's reply-to and the recipient registered for cancellation
+    # requests are notified as well (single mail, multiple recipients)
+    assert 'reply@example.org' in notification_mail['To']
+    assert 'cancelwatch@example.org' in notification_mail['To']
+    # a recipient registered only for rejected reservations is NOT notified
+    # about the request itself
+    assert 'admin@example.org' not in notification_mail['To']
     assert 'Stornierungsanfrage' in notification_mail['TextBody']
 
     # a second request while one is already pending shows the
