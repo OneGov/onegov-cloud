@@ -1387,6 +1387,24 @@ msgstr "Remises / Suppléments"
 msgid "Lump sum"
 msgstr "Montant forfaitaire"
 
+msgid "Rounding"
+msgstr "Arrondissement"
+
+msgid "Prices"
+msgstr "Prix"
+
+msgid "Round invoice totals to the nearest 0.05"
+msgstr "Arrondir les totaux de facture à 0.05"
+
+msgid ""
+"If enabled, newly generated invoices include a rounding position right "
+"before the total, so the total is always a multiple of 0.05. Existing "
+"invoices are not affected."
+msgstr ""
+"Si activé, les nouvelles factures incluent une position d'arrondissement "
+"avant le total, de sorte que le total est toujours un multiple de 0.05. "
+"Les factures existantes ne sont pas affectées."
+
 msgid "Total"
 msgstr "Total"
 

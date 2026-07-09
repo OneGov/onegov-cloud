@@ -23,6 +23,7 @@ INVOICE_GROUPS = {
     'form': _('Selected Options'),
     'manual': _('Discounts / Surcharges'),
     'migration': _('Lump sum'),
+    'rounding': _('Rounding'),
 }
 
 PAYMENT_STATES: dict[PaymentState, str] = {

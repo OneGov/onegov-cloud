@@ -2483,6 +2483,9 @@
                         <tal:b tal:case="'migration'" i18n:translate>
                             Lump sum
                         </tal:b>
+                        <tal:b tal:case="'rounding'" i18n:translate>
+                            Rounding
+                        </tal:b>
                         <tal:b tal:case="default">
                             ${item.group}
                         </tal:b>

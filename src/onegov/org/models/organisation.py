@@ -321,6 +321,9 @@ class Organisation(Base, TimestampMixin):
     # vat
     vat_rate: dict_property[float | None] = meta_property(default=0.0)
 
+    # prices
+    price_rounding: dict_property[bool] = meta_property(default=False)
+
     # RIS settings
     ris_enabled: dict_property[bool] = meta_property(default=False)
     ris_main_url: dict_property[str | None] = meta_property(default=None)

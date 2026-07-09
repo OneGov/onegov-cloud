@@ -14,6 +14,7 @@ from onegov.org.layout import DefaultLayout, EventLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.org.utils import (
     currency_for_submission,
+    apply_price_rounding,
     invoice_items_for_submission
 )
 from onegov.pay import ManualPayment
@@ -115,6 +116,9 @@ def refresh_submission_invoice_items(
                 if item.group == 'submission':
                     existing = item
                     break
+            elif meta.group == 'rounding':
+                existing = item
+                break
             else:
                 raise AssertionError('unreachable')
 
@@ -631,11 +635,16 @@ class ReservationHandler(Handler):
             extras = []
             discounts = []
 
-        return self.resource.invoice_items_for_reservation(
-            self.reservations,
-            extras,
-            discounts,
-            reduced_amount_label=request.translate(_('Discount'))
+        return (
+            apply_price_rounding(
+                request,
+                self.resource.invoice_items_for_reservation(
+                    self.reservations,
+                    extras,
+                    discounts,
+                    reduced_amount_label=request.translate(_('Discount')),
+                ),
+            )
         ) if self.resource else []
 
     def refresh_invoice_items(self, request: CoreRequest) -> None:
@@ -689,7 +698,7 @@ class ReservationHandler(Handler):
                     if meta.family == item.family:
                         existing = item
                         break
-                elif meta.group == 'reduced_amount':
+                elif meta.group in ('reduced_amount', 'rounding'):
                     existing = item
                     break
                 else:

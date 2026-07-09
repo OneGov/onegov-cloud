@@ -2426,6 +2426,17 @@ class VATSettingsForm(Form):
         validators=[InputRequired(), NumberRange(0, 100)],
     )
 
+    price_rounding = BooleanField(
+        label=_('Round invoice totals to the nearest 0.05'),
+        description=_(
+            'If enabled, newly generated invoices include a '
+            'rounding position right before the total, so the '
+            'total is always a multiple of 0.05. Existing '
+            'invoices are not affected.'
+        ),
+        default=False,
+    )
+
 
 class ModuleActivationSettingsForm(Form):
     show_newsletter = BooleanField(

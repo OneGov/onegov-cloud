@@ -187,6 +187,24 @@ msgstr "Deduzioni / Supplementi"
 msgid "Lump sum"
 msgstr "Somma forfettaria"
 
+msgid "Rounding"
+msgstr "Arrotondamento"
+
+msgid "Prices"
+msgstr "Prezzi"
+
+msgid "Round invoice totals to the nearest 0.05"
+msgstr "Arrotondare i totali delle fatture a 0.05"
+
+msgid ""
+"If enabled, newly generated invoices include a rounding position right "
+"before the total, so the total is always a multiple of 0.05. Existing "
+"invoices are not affected."
+msgstr ""
+"Se attivato, le fatture appena generate includono una posizione di "
+"arrotondamento prima del totale, in modo che il totale sia sempre un "
+"multiplo di 0.05. Le fatture esistenti non vengono modificate."
+
 msgid "Paid"
 msgstr "Pagato"
 

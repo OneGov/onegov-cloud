@@ -1386,6 +1386,24 @@ msgstr "Abzüge / Zuschläge"
 msgid "Lump sum"
 msgstr "Pauschalbetrag"
 
+msgid "Rounding"
+msgstr "Rundung"
+
+msgid "Prices"
+msgstr "Preise"
+
+msgid "Round invoice totals to the nearest 0.05"
+msgstr "Rechnungstotale auf 0.05 runden"
+
+msgid ""
+"If enabled, newly generated invoices include a rounding position right "
+"before the total, so the total is always a multiple of 0.05. Existing "
+"invoices are not affected."
+msgstr ""
+"Wenn aktiviert, wird bei neu erstellten Rechnungen eine Rundungsposition "
+"vor dem Total eingefügt, sodass das Total immer ein Vielfaches von 0.05 "
+"ist. Bestehende Rechnungen werden nicht angepasst."
+
 msgid "Total"
 msgstr "Total"
 

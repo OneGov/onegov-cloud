@@ -27,7 +27,7 @@ from onegov.file import FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
-from onegov.pay import InvoiceItemMeta, Price
+from onegov.pay import InvoiceItemMeta, Price, round_to_five_rappen
 from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import Auth, User, UserGroup
@@ -1978,6 +1978,31 @@ def invoice_items_for_submission(
             items.append(item)
         total = remainder
 
+    return apply_price_rounding(request, items)
+
+
+def apply_price_rounding(
+    request: CoreRequest, items: list[InvoiceItemMeta]
+) -> list[InvoiceItemMeta]:
+    """Appends a rounding position to the invoice items, so the total
+    ends up a multiple of 0.05, if the organisation has price rounding
+    enabled.
+
+    """
+    org = getattr(request.app, 'org', None)
+    if org is None or not org.price_rounding or not items:
+        return items
+
+    total = InvoiceItemMeta.total(items)
+    difference = round_to_five_rappen(total) - total
+    if difference:
+        items.append(
+            InvoiceItemMeta(
+                text=request.translate(_('Rounding')),
+                group='rounding',
+                unit=difference,
+            )
+        )
     return items
 
 
@@ -2015,6 +2040,8 @@ def group_invoice_items[T: InvoiceItem | InvoiceItemMeta](
                 return 1, item.group
             case 'manual' | 'reduced_amount':
                 return 99, 'manual'
+            case 'rounding':
+                return 100, item.group
             case _:
                 return 2, item.group
 

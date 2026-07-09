@@ -634,11 +634,14 @@ def confirm_reservation(
         if failed and failed.isdigit()
     }
 
-    invoice_items = self.invoice_items_for_reservation(
-        reservations,
-        extras,
-        discounts,
-        reduced_amount_label=request.translate(_('Discount'))
+    invoice_items = utils.apply_price_rounding(
+        request,
+        self.invoice_items_for_reservation(
+            reservations,
+            extras,
+            discounts,
+            reduced_amount_label=request.translate(_('Discount')),
+        ),
     )
     total_amount = InvoiceItemMeta.total(invoice_items)
     price = request.app.adjust_price(Price(
@@ -732,11 +735,14 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             extras = []
             discounts = []
 
-        invoice_items = self.invoice_items_for_reservation(
-            reservations,
-            extras,
-            discounts,
-            reduced_amount_label=request.translate(_('Discount'))
+        invoice_items = utils.apply_price_rounding(
+            request,
+            self.invoice_items_for_reservation(
+                reservations,
+                extras,
+                discounts,
+                reduced_amount_label=request.translate(_('Discount')),
+            ),
         )
         amount = InvoiceItemMeta.total(invoice_items)
         price = request.app.adjust_price(Price(

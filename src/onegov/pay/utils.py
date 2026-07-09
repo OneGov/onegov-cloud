@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from functools import cached_property, total_ordering
 from onegov.core.orm import Base
 from onegov.pay.constants import SCALE
@@ -14,6 +14,11 @@ if TYPE_CHECKING:
     from onegov.pay.types import PriceDict
     from sqlalchemy import Table
     from typing import Self, SupportsIndex
+
+
+def round_to_five_rappen(amount: Decimal) -> Decimal:
+    """Rounds the given amount to the nearest 5 Rappen (0.05 CHF)."""
+    return (amount * 20).quantize(Decimal('1'), rounding=ROUND_HALF_UP) / 20
 
 
 class _PriceBase(NamedTuple):

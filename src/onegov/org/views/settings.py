@@ -243,18 +243,23 @@ def handle_footer_settings(
 
 
 @OrgApp.form(
-    model=Organisation, name='vat-settings', template='form.pt',
-    permission=Secret, form=VATSettingsForm, setting=_('Value Added Tax'),
-    icon='fa-money', order=60)
+    model=Organisation,
+    name='vat-settings',
+    template='form.pt',
+    permission=Secret,
+    form=VATSettingsForm,
+    setting=_('Prices'),
+    icon='fa-money',
+    order=60,
+)
 def handle_vat_settings(
         self: Organisation,
         request: OrgRequest,
         form: VATSettingsForm,
         layout: SettingsLayout | None = None
 ) -> RenderData | Response:
-    layout = layout or SettingsLayout(self, request, _('Value Added Tax'))
-    return handle_generic_settings(self, request, form, _('Value Added Tax'),
-                                   layout)
+    layout = layout or SettingsLayout(self, request, _('Prices'))
+    return handle_generic_settings(self, request, form, _('Prices'), layout)
 
 
 @OrgApp.form(
