@@ -3,6 +3,8 @@ from __future__ import annotations
 import click
 
 from contextlib import contextmanager
+from psycopg import ClientCursor
+from psycopg.adapt import Transformer
 from sedate import utcnow
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -13,6 +15,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import timedelta
+    from psycopg import Cursor
     from sqlalchemy.engine import Connection
     from sqlalchemy.engine.interfaces import ExecutionContext
 
@@ -37,7 +40,7 @@ def print_query(query: bytes) -> None:
     formatted = format(query.decode('utf-8'), reindent=True)
     formatted = formatted.replace('\n', '\n  ')
 
-    click.echo('> {}'.format(formatted))
+    click.echo(f'> {formatted}')
 
 
 @contextmanager
@@ -66,7 +69,7 @@ def analyze_sql_queries(
     @event.listens_for(Engine, 'before_cursor_execute')
     def before_exec(
         conn: Connection,
-        cursor: Any,
+        cursor: Cursor,
         statement: str,
         parameters: Any,
         context: ExecutionContext,
@@ -77,7 +80,7 @@ def analyze_sql_queries(
     @event.listens_for(Engine, 'after_cursor_execute')
     def after_exec(
         conn: Connection,
-        cursor: Any,
+        cursor: Cursor,
         statement: str,
         parameters: Any,
         context: ExecutionContext,
@@ -85,7 +88,17 @@ def analyze_sql_queries(
     ) -> None:
         runtime = timer.stop()
 
-        def handle_query(query: bytes) -> None:
+        def handle_query(
+            cursor: Cursor,
+            statement: str,
+            parameters: dict[str, Any]
+        ) -> None:
+
+            # NOTE: Based on ClientCursor.mogrify
+            pgq = ClientCursor._query_cls(Transformer(cursor))
+            pgq.convert(statement, parameters)
+            query = pgq.query
+
             if report == 'all':
                 print_query(query)
 
@@ -95,14 +108,13 @@ def analyze_sql_queries(
                 queries[query] += 1
 
         if isinstance(parameters, dict):
-            handle_query(cursor.mogrify(statement, parameters))
+            handle_query(cursor, statement, parameters)
         else:
             for parameter in parameters:
-                handle_query(cursor.mogrify(statement, parameter))
+                handle_query(cursor, statement, parameter)
 
         if report == 'all':
-            click.echo('< took {}'.format(runtime))
-
+            click.echo(f'< took {runtime}')
     try:
         yield
     finally:
@@ -126,8 +138,10 @@ def analyze_sql_queries(
 
         if total_queries:
             click.echo(
-                f'executed {total_queries_str} queries, '
-                f'{redundant_queries_str} of which were redundant'
+                'executed {} queries, {} of which were redundant'.format(
+                    total_queries_str,
+                    redundant_queries_str
+                )
             )
 
         if redundant_queries and report == 'redundant':

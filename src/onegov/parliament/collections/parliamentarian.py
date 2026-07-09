@@ -9,10 +9,11 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
+    from uuid import UUID  # noqa: F401
 
 
 class ParliamentarianCollection[ParliamentarianT: Parliamentarian = Any](
-    GenericCollection[ParliamentarianT]
+    GenericCollection[ParliamentarianT, 'UUID']
 ):
 
     def __init__(

@@ -25,6 +25,7 @@ from wtforms.fields import FloatField
 from wtforms.fields import RadioField
 from wtforms.validators import InputRequired, ValidationError
 from onegov.user import User
+from uuid import UUID
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -136,7 +137,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             return (False, _('You can only edit your own attendance.'))
 
         target_parl = PASParliamentarianCollection(self.request.app).by_id(
-            parliamentarian_id
+            UUID(parliamentarian_id)
         )
         if not target_parl:
             return (False, _('Target parliamentarian not found.'))

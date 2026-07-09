@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -51,6 +52,12 @@ class RateSetLayout(DefaultLayout):
     @cached_property
     def collection(self) -> RateSetCollection:
         return RateSetCollection(self.request.session)
+
+    def format_rate(self, amount: float | int | Decimal) -> str:
+        value = Decimal(str(amount))
+        if value == value.to_integral_value():
+            return f'CHF {int(value)}.-'
+        return f'CHF {value:.2f}'
 
     @cached_property
     def title(self) -> str:

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class AssemblyCollection(GenericCollection[Assembly]):
+class AssemblyCollection(GenericCollection[Assembly, 'UUID']):
 
     @property
     def model_class(self) -> type[Assembly]:
@@ -22,10 +22,7 @@ class AssemblyCollection(GenericCollection[Assembly]):
     def query(self) -> Query[Assembly]:
         return super().query().order_by(desc(Assembly.date))
 
-    def by_id(
-        self,
-        id: UUID  # type:ignore[override]
-    ) -> Assembly | None:
+    def by_id(self, id: UUID) -> Assembly | None:
         return self.query().filter(Assembly.id == id).first()
 
     def by_date(self, date_: date) -> Assembly | None:

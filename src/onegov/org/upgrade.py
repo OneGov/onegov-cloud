@@ -368,7 +368,7 @@ def add_submission_window_id_to_survey_submissions(
                 ForeignKey('submission_windows.id'),
                 nullable=True
             ),
-            default=None  # type: ignore[arg-type]
+            default=None
         )
 
 

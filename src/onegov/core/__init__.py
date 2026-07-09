@@ -7,7 +7,7 @@
 #
 from __future__ import annotations
 
-__version__ = '2026.33'
+__version__ = '2026.34'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.
@@ -81,11 +81,8 @@ log = logging.getLogger('onegov.core')
 log.addHandler(logging.NullHandler())
 
 ignored_warnings = (
-    # we will keep using psycopg2 instead of psycogp2-binary
-    'The psycopg2 wheel package will be renamed from release 2.8',
-
     # SQLAlchemy-Utils installs its own array_agg function, which seems fine
-    "The GenericFunction 'array_agg' is already registered"
+    "The GenericFunction 'array_agg' is already registered",
 )
 
 for message in ignored_warnings:

@@ -9,9 +9,12 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
+    from uuid import UUID  # noqa: F401
 
 
-class LegislativePeriodCollection(GenericCollection[LegislativePeriod]):
+class LegislativePeriodCollection(
+    GenericCollection[LegislativePeriod, 'UUID']
+):
 
     def __init__(
         self,

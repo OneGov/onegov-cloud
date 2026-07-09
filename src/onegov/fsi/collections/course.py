@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class CourseCollection(GenericCollection[Course]):
+class CourseCollection(GenericCollection[Course, 'UUID']):
     def __init__(
         self,
         session: Session,
@@ -36,7 +36,7 @@ class CourseCollection(GenericCollection[Course]):
 
     def by_id(
         self,
-        id: UUID  # type:ignore[override]
+        id: UUID
     ) -> Course | None:
         return super().query().filter(self.primary_key == id).first()
 

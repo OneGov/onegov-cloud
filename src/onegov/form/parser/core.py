@@ -816,7 +816,7 @@ class Field:
         field_help: str | None = None
     ) -> T:
 
-        return cls(  # type:ignore[return-value]
+        return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
@@ -1108,7 +1108,7 @@ class FileinputBase:
         fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> T:
-        return cls(  # type:ignore[return-value]
+        return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
@@ -1163,7 +1163,7 @@ class OptionsField:
             if c.discount
         }
 
-        return cls(  # type:ignore[return-value]
+        return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,

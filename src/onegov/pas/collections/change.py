@@ -10,9 +10,10 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
+    from uuid import UUID  # noqa: F401
 
 
-class ChangeCollection(GenericCollection[Change], Pagination[Change]):
+class ChangeCollection(GenericCollection[Change, 'UUID'], Pagination[Change]):
 
     batch_size = 20
 

@@ -15,6 +15,7 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.generic import ChangeUrlForm
 from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
 from onegov.org.forms.generic import PaymentForm
@@ -715,3 +716,7 @@ else:
         merge_forms(DateRangeForm, ExportToExcelWorksheets)
     ):
         """ Resource export all resources, with start/end date. """
+
+
+class ResourceChangeUrlForm(ChangeUrlForm):
+    """ Defines the form to change a resource's url. """
