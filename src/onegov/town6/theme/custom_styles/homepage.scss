@@ -1,0 +1,11 @@
+.homepage-image-slider {
+    .carousel-item,
+    .carousel-image {
+        height: 100%;
+    }
+
+    .carousel-image {
+        background-size: cover;
+        background-position: center;
+    }
+}

@@ -121,7 +121,7 @@
                 </tal:b>
 
                 <div class="navigation-header">
-                    <div class="bg-white border-bottom">
+                    <div class="bg-white">
                         <div class="container-fluid">
                             <ul class="nav justify-content-end py-1">
                             <li class="nav-item">

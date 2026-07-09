@@ -93,12 +93,7 @@ class TownBootstrapTheme(BootstrapBaseTheme):
     def post_imports(self) -> list[str]:
         """Our scss code split into various files"""
         return [
-            # 'custom_mixins',
-            # 'typography',
-            # 'header',
-            # 'town6',
-            # 'sortable',
-            # ...
+            'homepage'
         ]
 
     @property
