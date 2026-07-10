@@ -1677,9 +1677,14 @@ def request_cancellation(
         )
         return morepath.redirect(request.link(self, 'status'))
 
-    if self.state not in ('pending', 'closed'):
-        request.alert(_('A cancellation request can only be submitted once '
-                        'the reservation has been accepted.'))
+    if all(r.start < sedate.utcnow() for r in self.handler.reservations):
+        request.alert(_('A cancellation request cannot be submitted for '
+                        'reservations in the past.'))
+        return morepath.redirect(request.link(self, 'status'))
+
+    if self.state == 'archived':
+        request.alert(_('A cancellation request can no longer be submitted '
+                        'once the reservation has been archived.'))
         return morepath.redirect(request.link(self, 'status'))
 
     payment = self.handler.payment
@@ -1705,7 +1710,7 @@ def request_cancellation(
             'cancellation_requested'
         )
 
-        def recipients_registered_for_cancellation() -> Iterator[str]:
+        def recipients_registered_for_cancellation_requests() -> Iterator[str]:
             q = ResourceRecipientCollection(request.session).query()
             q = q.filter(ResourceRecipient.medium == 'email')
             q = q.order_by(None).order_by(ResourceRecipient.address)
@@ -1719,32 +1724,44 @@ def request_cancellation(
                 ] and res.content.get('cancellation_requests', False):
                     yield res.address
 
-        # notify the ticket assignee (if any), the resource's reply-to address
-        # and the recipients registered for cancellation requests about the
-        # cancellation request. We force the mail so it is not suppressed by
-        # the auto-accept / self-notification heuristics in send_ticket_mail,
-        # but still honour the mute settings
+        # notify the ticket assignee (if any) and the recipients registered
+        # for cancellation requests about the new cancellation request.
         receivers = (
             *((self.user.username,) if self.user else ()),
-            *((resource.reply_to,) if resource.reply_to else ()),
-            *recipients_registered_for_cancellation(),
+            *recipients_registered_for_cancellation_requests(),
         )
 
-        if not request.app.org.mute_all_tickets or not self.muted:
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_cancellation_request.pt',
-                subject=_('A cancellation request has been submitted'),
-                receivers=receivers,
-                ticket=self,
-                content={
-                    'model': self,
-                    'resource': resource,
-                    'reservations': targeted,
-                    'ticket_reference': self.reference(request),
-                },
-                force=True,
-            )
+        notification_title = request.translate(
+            _('A cancellation request has been submitted')
+        )
+        assert hasattr(self, 'reference')
+        content = render_template(
+            'mail_ticket_cancellation_request',
+            request,
+            {
+                'layout': DefaultMailLayout(object(), request),
+                'title': notification_title,
+                'model': self,
+                'ticket': self,
+                'resource': resource,
+                'reservations': targeted,
+                'ticket_reference': self.reference(request),
+            },
+        )
+        plaintext = html_to_text(content)
+
+        def email_iter() -> Iterator[EmailJsonDict]:
+            for recipient_addr in receivers:
+                yield request.app.prepare_email(
+                    receivers=(recipient_addr,),
+                    subject=notification_title,
+                    content=content,
+                    plaintext=plaintext,
+                    category='transactional',
+                    attachments=(),
+                )
+
+        request.app.send_transactional_email_batch(email_iter())
 
         # a closed ticket is reopened and unassigned so it re-enters the
         # queue; a pending ticket is still being handled and stays as is
@@ -1793,7 +1810,9 @@ def accept_cancellation(
         raise exc.HTTPNotFound()
 
     if not self.handler_data.get('cancellation_requested'):
-        raise exc.HTTPNotFound()
+        request.alert(_('No cancellation request has been submitted for '
+                        'this ticket.'))
+        return request.redirect(request.link(self))
 
     stored_ids = self.handler_data.get('cancellation_reservation_ids')
     targeted_ids = set(stored_ids) if stored_ids else None

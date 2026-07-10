@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-09 16:45+0200\n"
+"POT-Creation-Date: 2026-07-10 14:47+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -7659,11 +7659,17 @@ msgid "A cancellation request has already been submitted."
 msgstr "Eine Stornierungsanfrage wurde bereits eingereicht."
 
 msgid ""
-"A cancellation request can only be submitted once the reservation has been "
-"accepted."
+"A cancellation request cannot be submitted for reservations in the past."
 msgstr ""
-"Eine Stornierungsanfrage kann erst eingereicht werden, sobald die "
-"Reservation angenommen wurde."
+"Für vergangene Reservationen kann keine Stornierungsanfrage eingereicht "
+"werden."
+
+msgid ""
+"A cancellation request can no longer be submitted once the reservation has "
+"been archived."
+msgstr ""
+"Eine Stornierungsanfrage kann nicht mehr eingereicht werden, sobald die "
+"Reservation archiviert wurde."
 
 #. currently we don't handle the cancel and refund case yet
 msgid ""
@@ -7690,6 +7696,9 @@ msgstr "Status Anfrage"
 
 msgid "Request Cancellation"
 msgstr "Stornierung beantragen"
+
+msgid "No cancellation request has been submitted for this ticket."
+msgstr "Für dieses Ticket wurde keine Stornierung beantragt."
 
 msgid "Reservation summary"
 msgstr "Terminübersicht"
@@ -8238,6 +8247,13 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid ""
+#~ "A cancellation request can only be submitted once the reservation has "
+#~ "been accepted."
+#~ msgstr ""
+#~ "Eine Stornierungsanfrage kann erst eingereicht werden, sobald die "
+#~ "Reservation angenommen wurde."
 
 #~ msgid ""
 #~ "A cancellation request can only be submitted for accepted reservations."

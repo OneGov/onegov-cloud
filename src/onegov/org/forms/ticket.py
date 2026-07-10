@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sedate
+
 from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form
@@ -204,7 +206,12 @@ class RequestCancellationForm(Form):
     )
 
     def on_request(self) -> None:
-        reservations = self.model.handler.reservations
+        now = sedate.utcnow()
+        reservations = [
+            r for r in self.model.handler.reservations
+            if r.start > now
+        ]
+
         if len(reservations) <= 1:
             self.delete_field('reservation_ids')
             return

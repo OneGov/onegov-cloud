@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-09 16:45+0200\n"
+"POT-Creation-Date: 2026-07-10 14:47+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -7630,11 +7630,17 @@ msgid "A cancellation request has already been submitted."
 msgstr "Una richiesta di cancellazione è già stata inviata."
 
 msgid ""
-"A cancellation request can only be submitted once the reservation has been "
-"accepted."
+"A cancellation request cannot be submitted for reservations in the past."
 msgstr ""
-"Una richiesta di annullamento può essere inviata solo dopo che la "
-"prenotazione è stata accettata."
+"Una richiesta di cancellazione non può essere inviata per prenotazioni "
+"passate."
+
+msgid ""
+"A cancellation request can no longer be submitted once the reservation has "
+"been archived."
+msgstr ""
+"Una richiesta di cancellazione non può più essere inviata una volta che la "
+"prenotazione è stata archiviata."
 
 #. currently we don't handle the cancel and refund case yet
 msgid ""
@@ -7661,6 +7667,10 @@ msgstr "Stato della richiesta"
 
 msgid "Request Cancellation"
 msgstr "Richiedere la cancellazione"
+
+msgid "No cancellation request has been submitted for this ticket."
+msgstr ""
+"Per questo ticket non è stata inviata alcuna richiesta di cancellazione."
 
 msgid "Reservation summary"
 msgstr "Riepilogo della prenotazione"
@@ -8204,6 +8214,13 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid ""
+#~ "A cancellation request can only be submitted once the reservation has "
+#~ "been accepted."
+#~ msgstr ""
+#~ "Una richiesta di annullamento può essere inviata solo dopo che la "
+#~ "prenotazione è stata accettata."
 
 #~ msgid ""
 #~ "A cancellation request can only be submitted for accepted reservations."
