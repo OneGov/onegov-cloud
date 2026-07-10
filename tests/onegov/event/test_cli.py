@@ -164,7 +164,7 @@ def test_import_guidle(
         ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "4 added, 0 updated, 0 deleted" in result.output
+    assert "6 added, 0 updated, 0 deleted" in result.output
 
     # Reimport, not changed due to last_update
     with patch('onegov.event.cli.niquests.get', return_value=response):
@@ -216,15 +216,31 @@ def test_import_guidle(
         ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "Tags not in tagmap: \"Kulinarik\"!" in result.output
-    assert "4 added, 0 updated, 0 deleted" in result.output
+    assert "Tags not in tagmap:" in result.output
+    assert '"Kulinarik"' in result.output
+    assert '"Theater"' in result.output
+    assert "6 added, 0 updated, 0 deleted" in result.output
 
     # 'Konzert Pop / Rock / Jazz' maps to two tags, both of which are applied,
     # while the unmapped 'Kulinarik' is dropped without dropping the event
     session_manager.set_current_schema('foo-bar')
     events = session_manager.session().query(Event).all()
-    assert len(events) == 4
-    assert all(sorted(e.tags) == ['Konzert', 'Musik'] for e in events)
+    assert len(events) == 6
+
+    tagged = [e for e in events if e.tags]
+    untagged = [e for e in events if not e.tags]
+
+    # the four schedules of the offer with a mapped tag keep both target tags
+    assert len(tagged) == 4
+    assert all(sorted(e.tags) == ['Konzert', 'Musik'] for e in tagged)
+
+    # the offer without any tags and the offer whose only tag is not in the
+    # tagmap are both imported anyway, just without any tags
+    assert len(untagged) == 2
+    assert {e.title for e in untagged} == {
+        'Vortrag ohne Tags',
+        'Lesung mit unbekanntem Tag',
+    }
 
 
 @pytest.mark.parametrize("xml", [
