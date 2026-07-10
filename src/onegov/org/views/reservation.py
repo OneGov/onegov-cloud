@@ -1677,7 +1677,10 @@ def request_cancellation(
         )
         return morepath.redirect(request.link(self, 'status'))
 
-    if all(r.start < sedate.utcnow() for r in self.handler.reservations):
+    if all(
+        r.start is not None and r.start < sedate.utcnow()
+        for r in self.handler.reservations
+    ):
         request.alert(_('A cancellation request cannot be submitted for '
                         'reservations in the past.'))
         return morepath.redirect(request.link(self, 'status'))

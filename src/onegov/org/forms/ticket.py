@@ -209,7 +209,7 @@ class RequestCancellationForm(Form):
         now = sedate.utcnow()
         reservations = [
             r for r in self.model.handler.reservations
-            if r.start > now
+            if r.start is not None and r.start > now
         ]
 
         if len(reservations) <= 1:
