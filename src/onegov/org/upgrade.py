@@ -22,8 +22,7 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.newsletter import Newsletter
 from onegov.org.models import (
-    Organisation, Topic, News, ExtendedDirectory, PushNotification,
-    ResourceRecipient)
+    Organisation, Topic, News, ExtendedDirectory, PushNotification)
 from onegov.org.models.political_business import (
     POLITICAL_BUSINESS_STATUS, POLITICAL_BUSINESS_TYPE)
 from onegov.org.utils import annotate_html
@@ -32,10 +31,7 @@ from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
-from sqlalchemy import (
-    Boolean, Column, Enum, ForeignKey, Text, UUID, and_, func, text, true,
-    update)
-from sqlalchemy.dialects.postgresql import array
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Text, UUID, text
 from sqlalchemy.orm import undefer, selectinload, load_only
 
 
@@ -975,18 +971,10 @@ def subscribe_customer_message_recipients_to_cancellation_requests(
 ) -> None:
     # customer-message recipients should also be notified about cancellation
     # requests.
-    stmt = update(ResourceRecipient.__table__).where(  # type: ignore[arg-type]
-        and_(
-            ResourceRecipient.content['customer_messages'].as_boolean()
-            .is_(True),
-            ResourceRecipient.type == 'resource',
-        )
-    ).values(
-        content=func.jsonb_set(
-            ResourceRecipient.content,
-            array(['cancellation_requests']),
-            func.to_jsonb(true()),
-        )
-    )
-    context.session.execute(stmt)
-    context.session.flush()
+    if context.has_table('generic_recipients'):
+        context.operations.execute(text("""
+            UPDATE generic_recipients SET content = jsonb_set(
+                content, '{cancellation_requests}', 'true'
+            ) WHERE type = 'resource'
+              AND content->>'customer_messages' = 'true';
+        """))
