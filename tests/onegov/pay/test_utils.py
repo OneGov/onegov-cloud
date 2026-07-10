@@ -169,3 +169,26 @@ def test_apply_price_rounding_empty_list() -> None:
     request = _make_request(price_rounding=True)
     result = apply_price_rounding(request, [])
     assert result == []
+
+
+def test_apply_price_rounding_includes_manual_total() -> None:
+    request = _make_request(price_rounding=True)
+    # 10.00 generated + 0.99 manual discount item on the invoice
+    items = [_item('10.00')]
+    result = apply_price_rounding(
+        request, items, manual_total=Decimal('-0.99')
+    )
+    assert len(result) == 2
+    rounding = result[-1]
+    assert rounding.group == 'rounding'
+    assert rounding.unit == Decimal('-0.01')
+    # grand total: 10.00 - 0.99 - 0.01 == 9.00
+    assert InvoiceItemMeta.total(result) + Decimal('-0.99') == Decimal('9.00')
+
+
+def test_apply_price_rounding_manual_total_already_rounded() -> None:
+    request = _make_request(price_rounding=True)
+    # generated total off-grid, but manual item brings it back on-grid
+    items = [_item('10.03')]
+    result = apply_price_rounding(request, items, manual_total=Decimal('0.02'))
+    assert len(result) == 1
