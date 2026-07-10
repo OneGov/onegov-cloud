@@ -94,6 +94,35 @@ Lorem ipsum dolor sit amet, consetetur <a href="lorem.de">sadipscing</a> elitr, 
                     </guidle:classification>
                 </guidle:classifications>
             </guidle:offer>
+            <guidle:offer id="551262855">
+                <guidle:lastUpdateDate>2017-10-21T22:44:12.834+02:00</guidle:lastUpdateDate>
+                <guidle:offerDetail id="551262858" languageCode="de">
+                    <guidle:title>Vortrag ohne Tags</guidle:title>
+                </guidle:offerDetail>
+                <guidle:schedules>
+                    <guidle:date>
+                        <guidle:startDate>2018-10-26</guidle:startDate>
+                        <guidle:startTime>20:00:00</guidle:startTime>
+                    </guidle:date>
+                </guidle:schedules>
+            </guidle:offer>
+            <guidle:offer id="551262856">
+                <guidle:lastUpdateDate>2017-10-21T22:44:12.834+02:00</guidle:lastUpdateDate>
+                <guidle:offerDetail id="551262859" languageCode="de">
+                    <guidle:title>Lesung mit unbekanntem Tag</guidle:title>
+                </guidle:offerDetail>
+                <guidle:schedules>
+                    <guidle:date>
+                        <guidle:startDate>2018-10-26</guidle:startDate>
+                        <guidle:startTime>20:00:00</guidle:startTime>
+                    </guidle:date>
+                </guidle:schedules>
+                <guidle:classifications>
+                    <guidle:classification id="204591954" name="Veranstaltungskalender" type="PRIMARY">
+                        <guidle:tag id="1585" name="Schauspiel" subcategoryId="204592149" subcategoryName="Theater"/>
+                    </guidle:classification>
+                </guidle:classifications>
+            </guidle:offer>
         </guidle:group>
     </guidle:groupSet>
 </guidle:exportData>
