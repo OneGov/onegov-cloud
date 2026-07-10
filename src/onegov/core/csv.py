@@ -7,7 +7,8 @@ import openpyxl
 import re
 import sys
 import tempfile
-import xlrd  # type:ignore[import-untyped]
+import xlrd
+from xlrd.biffh import XLRDError
 
 from collections import namedtuple, OrderedDict
 from csv import DictWriter, Sniffer, QUOTE_ALL
@@ -367,7 +368,7 @@ def convert_xls_to_csv(
     if sheet_name:
         try:
             sheet = excel.sheet_by_name(sheet_name)
-        except xlrd.XLRDError as exception:
+        except XLRDError as exception:
             raise KeyError(
                 'Could not find the given sheet in this excel file!'
             ) from exception
@@ -392,13 +393,16 @@ def convert_xls_to_csv(
             elif cell.ctype in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK):
                 value = ''
             elif cell.ctype == xlrd.XL_CELL_NUMBER:
-                if cell.value.is_integer():
-                    value = str(int(cell.value))
+                number = float(cell.value)
+                if number.is_integer():
+                    value = str(int(number))
                 else:
-                    value = str(cell.value)
+                    value = str(number)
             elif cell.ctype == xlrd.XL_CELL_DATE:
-                value = xlrd.xldate_as_tuple(cell.value, excel.datemode)
-                value = datetime(*value).isoformat()
+                date_tuple = xlrd.xldate_as_tuple(
+                    float(cell.value), excel.datemode
+                )
+                value = datetime(*date_tuple).isoformat()
             elif cell.ctype == xlrd.XL_CELL_BOOLEAN:
                 value = str(cell.value)
             else:
