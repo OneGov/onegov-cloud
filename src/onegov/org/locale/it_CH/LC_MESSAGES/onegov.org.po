@@ -8215,35 +8215,6 @@ msgstr "Utente creato correttamente"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
-#~ msgid ""
-#~ "A cancellation request can only be submitted once the reservation has "
-#~ "been accepted."
-#~ msgstr ""
-#~ "Una richiesta di annullamento può essere inviata solo dopo che la "
-#~ "prenotazione è stata accettata."
-
-#~ msgid ""
-#~ "A cancellation request can only be submitted for accepted reservations."
-#~ msgstr ""
-#~ "Una richiesta di cancellazione può essere inviata solo per prenotazioni "
-#~ "accettate.Una richiesta di cancellazione può essere inviata solo per "
-#~ "prenotazioni accettate."
-
-#~ msgid "Show ticket"
-#~ msgstr "Mostra ticket"
-
-#~ msgid "A cancellation request has been submitted."
-#~ msgstr "È stata inoltrata una richiesta di annullamento."
-
-#~ msgid "Would you like to cancel your reservation?"
-#~ msgstr "Desideri cancellare la tua prenotazione?"
-
-#~ msgid "Cancellation requested for"
-#~ msgstr "Richiesta di cancellazione per"
-
-#~ msgid "All reservations"
-#~ msgstr "Tutte le prenotazioni"
-
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "es. 07:00 o 07:00, 14:30"
 

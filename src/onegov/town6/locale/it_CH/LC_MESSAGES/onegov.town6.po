@@ -2958,40 +2958,6 @@ msgstr "Panoramica delle notifiche push"
 msgid "New Note"
 msgstr "Nuova nota"
 
-#~ msgid "Show ticket"
-#~ msgstr "Mostra ticket"
-
-#~ msgid "Would you like to cancel your reservation?"
-#~ msgstr "Desideri cancellare la tua prenotazione?"
-
-#~ msgid "Cancellation requested for"
-#~ msgstr "Richiesta di cancellazione per"
-
-#~ msgid "All reservations"
-#~ msgstr "Tutte le prenotazioni"
-
-#~ msgid "Select reservations to cancel"
-#~ msgstr "Seleziona le prenotazioni da cancellare"
-
-#~ msgid "${org} Accepted Cancellation"
-#~ msgstr "${org} Cancellazione accettata"
-
-#~ msgid ""
-#~ "A cancellation request can only be submitted for accepted reservations."
-#~ msgstr ""
-#~ "Una richiesta di cancellazione può essere inviata solo per prenotazioni "
-#~ "accettate."
-
-#~ msgid "A cancellation request has already been submitted."
-#~ msgstr "Una richiesta di cancellazione è già stata inviata."
-
-#~ msgid ""
-#~ "A cancellation request cannot be submitted because the payment has "
-#~ "already been invoiced or paid."
-#~ msgstr ""
-#~ "Una richiesta di cancellazione non può essere inviata perché il pagamento "
-#~ "è già stato fatturato o pagato."
-
 #~ msgid "Topics"
 #~ msgstr "Argomenti"
 
