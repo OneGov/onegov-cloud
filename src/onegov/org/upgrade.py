@@ -32,7 +32,10 @@ from onegov.people import Person
 from onegov.reservation import Resource
 from onegov.ticket import TicketPermission
 from onegov.user import User, UserGroup
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Text, UUID, text
+from sqlalchemy import (
+    Boolean, Column, Enum, ForeignKey, Text, UUID, and_, func, text, true,
+    update)
+from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import undefer, selectinload, load_only
 
 
@@ -970,12 +973,20 @@ def recreate_missing_reserved_slots(context: UpgradeContext) -> None:
 def subscribe_customer_message_recipients_to_cancellation_requests(
     context: UpgradeContext
 ) -> None:
-    # recipients who receive customer messages should also be notified about
-    # cancellation requests, which are a customer-initiated action
-    recipients = (
-        context.session.query(ResourceRecipient)
-        .options(undefer(ResourceRecipient.content))
+    # customer-message recipients should also be notified about cancellation
+    # requests.
+    stmt = update(ResourceRecipient.__table__).where(  # type: ignore[arg-type]
+        and_(
+            ResourceRecipient.content['customer_messages'].as_boolean()
+            .is_(True),
+            ResourceRecipient.type == 'resource',
+        )
+    ).values(
+        content=func.jsonb_set(
+            ResourceRecipient.content,
+            array(['cancellation_requests']),
+            func.to_jsonb(true()),
+        )
     )
-    for recipient in recipients:
-        if recipient.customer_messages:
-            recipient.cancellation_requests = True
+    context.session.execute(stmt)
+    context.session.flush()
