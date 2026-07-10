@@ -568,6 +568,7 @@ class EventImportForm(Form):
             'event_registration_url': self.request.translate(
                 _('Event Registration URL')),
             'tags': self.request.translate(_('Tags')),
+            'syndicate': self.request.translate(_('Syndicate')),
             'highlight': self.request.translate(_('Highlight')),
             'start': self.request.translate(_('From')),
             'end': self.request.translate(_('To')),
