@@ -733,6 +733,7 @@ def clear_submit_accept_single_event(
     transaction.commit()
 
     # Submit and publish an event
+    client.login_admin()
     page = client.get('/events').click('Veranstaltung erfassen')
     event_date = date.today() + timedelta(days=1)
     page.form['email'] = 'sinfonieorchester@govikon.org'
@@ -744,11 +745,14 @@ def clear_submit_accept_single_event(
     page.form['organizer_email'] = 'sinfonieorchester@govikon.org'
     page.form['organizer_phone'] = '+41 41 123 45 67'
     page.form['tags'] = custom_tags if custom_tags else ['Music', 'Tradition']
+    page.form['syndicate'] = False  # requires admin
+    page.form['highlight'] = True  # requires admin
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = '18:00'
     page.form['end_time'] = '22:00'
     page.form['repeat'] = 'without'
     page.form.submit().follow().form.submit().follow()
+    client.logout()
 
     client.login_editor()
 
@@ -913,6 +917,8 @@ def test_export_events_json_xml_csv(client: Client) -> None:
                     '+41 41 123 45 67')
 
         assert event_fields['Schlagworte'] == 'Musik, Brauchtum'
+        assert event_fields['Extern publizieren'] in (True, 'True', 'true')
+        assert event_fields['Highlight'] in (True, 'True', 'true')
         assert event_fields['Erstellt'] == '23.03.2026 09:00'
         assert event_fields['Von'] == '24.03.2026 18:00'
         assert event_fields['Bis'] == '24.03.2026 22:00'
