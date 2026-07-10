@@ -5,9 +5,15 @@ import pytest
 from click.testing import CliRunner
 from onegov.core.utils import module_path
 from onegov.event.cli import cli
+from onegov.event.models import Event
 from os import path
 from unittest.mock import MagicMock
 from unittest.mock import patch
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
 
 
 def test_import_ical(cfg_path: str, temporary_directory: str) -> None:
@@ -140,6 +146,7 @@ def test_import_ical(cfg_path: str, temporary_directory: str) -> None:
 def test_import_guidle(
     cfg_path: str,
     temporary_directory: str,
+    session_manager: SessionManager,
     xml: str
 ) -> None:
 
@@ -190,10 +197,14 @@ def test_import_guidle(
     ], 'y')
     assert result.exit_code == 0
 
-    # Create tagmap
+    # Create tagmap, mapping 'Konzert Pop / Rock / Jazz' to two tags
     tagmap = path.join(temporary_directory, 'tagmap.csv')
     with open(tagmap, 'w') as f:
-        f.write("Konzert Pop / Rock / Jazz,Konzert\nSport,Sport")
+        f.write(
+            "Konzert Pop / Rock / Jazz,Konzert\n"
+            "Konzert Pop / Rock / Jazz,Musik\n"
+            "Sport,Sport"
+        )
 
     # Re-import with tagmap
     with patch('onegov.event.cli.niquests.get', return_value=response):
@@ -205,8 +216,15 @@ def test_import_guidle(
         ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "Tags not in tagmap: \"Kulinarik\"!"
+    assert "Tags not in tagmap: \"Kulinarik\"!" in result.output
     assert "4 added, 0 updated, 0 deleted" in result.output
+
+    # 'Konzert Pop / Rock / Jazz' maps to two tags, both of which are applied,
+    # while the unmapped 'Kulinarik' is dropped without dropping the event
+    session_manager.set_current_schema('foo-bar')
+    events = session_manager.session().query(Event).all()
+    assert len(events) == 4
+    assert all(sorted(e.tags) == ['Konzert', 'Musik'] for e in events)
 
 
 @pytest.mark.parametrize("xml", [

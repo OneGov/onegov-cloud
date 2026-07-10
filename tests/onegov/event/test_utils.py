@@ -66,8 +66,14 @@ def test_import_guidle(session: Session, xml: str) -> None:
         {'Konzert Pop / Rock / Jazz', 'Kulinarik'},
         set()
     )
-    assert offers[0].tags({'Konzert Pop / Rock / Jazz': 'Konzert'}) == (
+    assert offers[0].tags({'Konzert Pop / Rock / Jazz': ['Konzert']}) == (
         {'Konzert'}, {'Kulinarik'}
+    )
+    assert offers[0].tags({
+        'Konzert Pop / Rock / Jazz': ['Konzert', 'Musik'],
+        'Kulinarik': ['Kulinarik'],
+    }) == (
+        {'Konzert', 'Musik', 'Kulinarik'}, set()
     )
 
     schedules = list(offers[0].schedules())
