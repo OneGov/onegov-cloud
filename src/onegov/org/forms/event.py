@@ -568,6 +568,7 @@ class EventImportForm(Form):
             'event_registration_url': self.request.translate(
                 _('Event Registration URL')),
             'tags': self.request.translate(_('Tags')),
+            'highlight': self.request.translate(_('Highlight')),
             'start': self.request.translate(_('From')),
             'end': self.request.translate(_('To')),
             'created': self.request.translate(_('Created')),
@@ -580,7 +581,7 @@ class EventImportForm(Form):
         occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
 
-        def get(occurrence: Occurrence, attribute: str) -> str:
+        def get(occurrence: Occurrence, attribute: str) -> str | bool:
             if attribute in ('start', 'end'):
                 attribute = f'localized_{attribute}'
             result = (
@@ -592,6 +593,8 @@ class EventImportForm(Form):
                     result, occurrence.timezone or 'Europe/Zurich')
             if isinstance(result, datetime):
                 result = result.strftime('%d.%m.%Y %H:%M')
+            if isinstance(result, bool):
+                return result
             if attribute == 'tags':
                 result = ', '.join(
                     self.request.translate(_(tag))
