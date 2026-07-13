@@ -348,7 +348,13 @@ class DirectoryBaseForm(Form):
             'of publication.'
         ),
         fieldset=_('Notifications'),
-        depends_on=('required_publication', 'y'),
+        # only relevant when publication dates are required, and mutually
+        # exclusive with change requests (see the validator below); a
+        # reverse dependency on enable_change_requests would close a cycle
+        # that infinite-loops is_visible_through_dependencies.
+        depends_on=(
+            'required_publication', 'y', 'enable_change_requests', '!y'
+        ),
         validators=[Optional(), Email()],
     )
 

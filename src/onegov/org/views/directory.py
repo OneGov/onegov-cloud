@@ -111,19 +111,13 @@ def get_directory_entry_form_class(
                 self.publication_end.validators[0] = InputRequired()
 
         def validate_publication_start(self, field: Field) -> None:
-            # NOTE: Use the submitted start/end, not the pre-edit state,
-            #       since either can change whether this save publishes.
-            end = self.publication_end.data
             if (
                 field.data is not None
-                and isinstance(model, ExtendedDirectoryEntry)
                 and model.directory.notification_address
                 and field.data <= utcnow()
-                and (end is None or end >= utcnow())
             ):
                 raise WTValidationError(_(
-                    'This entry is currently published. Set a future '
-                    'publication start to schedule re-publication.'
+                    'Publication start must be in the future.'
                 ))
 
     move_fields(
@@ -771,17 +765,10 @@ def handle_new_directory_entry(
 
         if self.directory.notification_address and entry.published:
             # the hourly cronjob only notifies on the publication_start
-            # transition (then <= publication_start <= now), so two published
-            # entries slip through and must be sent directly here:
-            # - publication_start is None: published immediately, there is no
-            #   start transition for the cronjob to catch
-            # - publication_start <= last_run: a backdated start already sits
-            #   before the last run, outside the cronjob's window
-            last_run = request.app.org.last_hourly_maintenance_run
-            if (
-                entry.publication_start is None
-                or entry.publication_start <= last_run
-            ):
+            # transition (then <= publication_start <= now), so an entry
+            # published immediately (publication_start is None) has no start
+            # transition for the cronjob to catch and must be sent here:
+            if entry.publication_start is None:
                 send_admin_notification_for_directory_entry(
                     self.directory, entry, request)
 

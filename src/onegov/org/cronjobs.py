@@ -257,7 +257,8 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
 
-        if isinstance(obj, ExtendedDirectoryEntry) and obj.directory.notification_address:
+        if (isinstance(obj, ExtendedDirectoryEntry) and
+                obj.directory.notification_address):
             if obj.publication_end is None or obj.publication_end > now:
                 send_admin_notification_for_directory_entry(
                     obj.directory, obj, request)

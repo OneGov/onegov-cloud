@@ -1251,45 +1251,38 @@ def test_directory_entry_hash_shown_without_change_requests(
         assert page.pyquery('.directory-entry-hash')
 
 
-def test_new_backdated_published_entry_sends_admin_notification(
+def test_new_scheduled_entry_defers_to_cronjob(
     client: Client,
 ) -> None:
-    """Creating an entry with a publication_start far enough in the past
-    that the hourly cronjob's catch-up window would never reach it must
-    trigger the admin notification immediately - otherwise it would
-    silently never be sent, since the cronjob only looks at entries
-    whose publication_start falls after its last run."""
+    """Creating an entry scheduled for the future must not send the admin
+    notification immediately - the entry is not published yet, so the
+    hourly cronjob sends it once publication_start passes."""
     tz = 'Europe/Zurich'
     now_local = to_timezone(utcnow(), tz)
 
     client.login_admin()
 
     page = create_notification_directory(client)
+
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(
+        now_local + timedelta(days=1)
+    )
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    page = page.form.submit().follow()
+    assert 'Permit One' in page
 
     assert len(os.listdir(client.app.maildir)) == 0
 
-    # far enough in the past that the cronjob's hourly catch-up window
-    # (defaulting to "the last hour" since it has never run) misses it
-    page = page.click('Eintrag', index=0)
-    page.form['name'] = 'Permit One'
-    page.form['publication_start'] = dt_for_form(
-        now_local - timedelta(days=14)
-    )
-    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
-    page = page.form.submit().follow()
-    assert 'Permit One' in page
 
-    assert len(os.listdir(client.app.maildir)) == 1
-    msg = client.get_email(0)
-    assert msg['To'] == 'admin@example.org'
-
-
-def test_new_recently_published_entry_defers_to_cronjob(
+def test_new_backdated_entry_rejected(
     client: Client,
 ) -> None:
-    """Creating an entry with a publication_start within the hourly
-    cronjob's catch-up window must not send the admin notification
-    immediately, to avoid a duplicate once the cronjob runs."""
+    """Backdating a permit is not allowed on the *new* form either (model
+    is the collection there, not the entry): creating an entry with a past
+    publication_start in a directory with a notification address must be
+    rejected, and a future start accepted."""
     tz = 'Europe/Zurich'
     now_local = to_timezone(utcnow(), tz)
 
@@ -1300,12 +1293,48 @@ def test_new_recently_published_entry_defers_to_cronjob(
     page = page.click('Eintrag', index=0)
     page.form['name'] = 'Permit One'
     page.form['publication_start'] = dt_for_form(
-        now_local - timedelta(minutes=10)
-    )
+        now_local - timedelta(hours=1))
     page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    page = page.form.submit()
+    assert ('must be in the future' in page
+            or 'in der Zukunft liegen' in page)
+
+    # a future start is accepted
+    page.form['publication_start'] = dt_for_form(
+        now_local + timedelta(hours=1))
     page = page.form.submit().follow()
     assert 'Permit One' in page
 
+
+def test_edit_scheduled_entry_sends_no_email(
+    client: Client,
+) -> None:
+    """Editing an entry before its publication_start has been reached must
+    not send an admin notification - the entry is not published yet. The
+    hourly cronjob sends exactly one email once the start is reached, then
+    carrying the edited content (see the full workflow test in
+    test_cronjobs.py)."""
+    tz = 'Europe/Zurich'
+    now_local = to_timezone(utcnow(), tz)
+
+    client.login_admin()
+
+    page = create_notification_directory(client)
+
+    # scheduled for the future, hence not published yet
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Permit One'
+    page.form['publication_start'] = dt_for_form(now_local + timedelta(days=1))
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
+    page = page.form.submit().follow()
+    assert 'Permit One' in page
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    # editing it while still scheduled must not notify
+    page = page.click('Bearbeiten')
+    page.form['name'] = 'Permit One Edited'
+    page = page.form.submit().follow()
+    assert 'Permit One Edited' in page
     assert len(os.listdir(client.app.maildir)) == 0
 
 
@@ -1314,31 +1343,37 @@ def test_edit_published_entry_requires_future_publication_start(
 ) -> None:
     """Editing a published entry in a directory with a notification address
     must set publication_start to a future date."""
-    utc_now = utcnow()
     tz = 'Europe/Zurich'
-    now_local = to_timezone(utc_now, tz)
+    now_local = to_timezone(utcnow(), tz)
 
     client.login_admin()
 
     page = create_notification_directory(client)
 
-    # Create an entry that is currently published (pub_start in the past)
+    # Create a scheduled entry (the form rejects a backdated start) ...
     page = page.click('Eintrag', index=0)
     page.form['name'] = 'Permit One'
-    page.form['publication_start'] = dt_for_form(
-        now_local - timedelta(hours=1)
-    )
+    page.form['publication_start'] = dt_for_form(now_local + timedelta(days=1))
     page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
     page = page.form.submit().follow()
     assert 'Permit One' in page
 
+    # ... then move it into the published window via a direct DB update,
+    # the way it would happen naturally once the clock passes the start
+    transaction.begin()
+    entry = dir_query(client).one()
+    entry.publication_start = utcnow() - timedelta(hours=1)
+    client.app.session().flush()
+    transaction.commit()
+
     # Edit the entry — keeping publication_start in the past must fail
-    page = page.click('Bearbeiten')
+    page = client.get(page.request.url).click('Bearbeiten')
     page.form['publication_start'] = dt_for_form(
         now_local - timedelta(hours=2)
     )
     page = page.form.submit()
-    assert 'currently published' in page or 'aktuell veröffentlicht' in page
+    assert ('must be in the future' in page
+            or 'in der Zukunft liegen' in page)
 
     # Setting publication_start to a future date must succeed
     page.form['publication_start'] = dt_for_form(
@@ -1357,9 +1392,10 @@ def test_edit_expired_entry_extending_end_requires_future_start(
     an already-published entry, even though the entry itself was not
     published (per its pre-edit, now-expired state) before the edit.
 
-    The form itself never lets you persist a publication_end in the
-    past (see ``ensure_publication_start_end``), so we simulate an
-    entry that has since expired by moving the clock via a direct
+    The form never lets you persist a backdated start or a past
+    publication_end (see ``ensure_publication_start_end`` and
+    ``validate_publication_start``), so we simulate an entry that was
+    published and has since expired by moving the clock via a direct
     database update, the same way it would happen naturally over time.
     """
     tz = 'Europe/Zurich'
@@ -1371,16 +1407,16 @@ def test_edit_expired_entry_extending_end_requires_future_start(
 
     page = page.click('Eintrag', index=0)
     page.form['name'] = 'Permit One'
-    page.form['publication_start'] = dt_for_form(
-        now_local - timedelta(days=10)
-    )
-    page.form['publication_end'] = dt_for_form(now_local + timedelta(hours=1))
+    page.form['publication_start'] = dt_for_form(now_local + timedelta(days=1))
+    page.form['publication_end'] = dt_for_form(now_local + timedelta(days=2))
     page = page.form.submit().follow()
     assert 'Permit One' in page
 
-    # simulate the entry having since expired
+    # simulate the entry having been published and since expired, leaving
+    # a stale, past publication_start behind
     transaction.begin()
     entry = dir_query(client).one()
+    entry.publication_start = utcnow() - timedelta(days=10)
     entry.publication_end = utcnow() - timedelta(days=1)
     client.app.session().flush()
     transaction.commit()
@@ -1391,7 +1427,8 @@ def test_edit_expired_entry_extending_end_requires_future_start(
     page = page.click('Bearbeiten')
     page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
     page = page.form.submit()
-    assert 'currently published' in page or 'aktuell veröffentlicht' in page
+    assert ('must be in the future' in page
+            or 'in der Zukunft liegen' in page)
 
     # setting a future start alongside the extended end date fixes it
     page.form['publication_start'] = dt_for_form(
@@ -1416,12 +1453,20 @@ def test_delete_published_entry_with_notifications_forbidden(
 
     page = directory_page.click('Eintrag', index=0)
     page.form['name'] = 'Permit One'
-    page.form['publication_start'] = dt_for_form(
-        now_local - timedelta(hours=1)
-    )
+    page.form['publication_start'] = dt_for_form(now_local + timedelta(days=1))
     page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
     entry = page.form.submit().follow()
     assert 'Permit One' in entry
+
+    # move it into the published window (the form rejects a backdated
+    # start, so simulate the clock passing publication_start via the DB)
+    transaction.begin()
+    dir_query(client).filter_by(name='permit-one').one().publication_start = (
+        utcnow() - timedelta(hours=1)
+    )
+    client.app.session().flush()
+    transaction.commit()
+    entry = client.get(entry.request.url)
 
     delete_link = entry.pyquery('a.delete-link')
     assert delete_link
@@ -1459,23 +1504,23 @@ def test_delete_entry_expired_before_last_maintenance_run(
 
     directory_page = create_notification_directory(client)
 
-    # a currently published entry
+    # scheduled for the future (the form rejects a backdated start)
     page = directory_page.click('Eintrag', index=0)
     page.form['name'] = 'Permit One'
-    page.form['publication_start'] = dt_for_form(
-        now_local - timedelta(hours=2)
-    )
+    page.form['publication_start'] = dt_for_form(now_local + timedelta(days=1))
     page.form['publication_end'] = dt_for_form(now_local + timedelta(days=30))
     entry = page.form.submit().follow()
 
     csrf_token = deletable_entry_csrf_token(directory_page)
     entry_url = entry.pyquery('a.edit-link').attr('href').replace('+edit', '')
 
-    # simulate: publication has just ended, but the last maintenance run
-    # was before it ended, so the cronjob has not yet observed the entry
-    # as unpublished (and thus not sent the expiry notification)
+    # simulate: the entry was published and its publication has just ended,
+    # but the last maintenance run was before it ended, so the cronjob has
+    # not yet observed the entry as unpublished (and thus not sent the
+    # expiry notification)
     session = client.app.session()
     permit_one = dir_query(client).filter_by(name='permit-one').one()
+    permit_one.publication_start = utcnow() - timedelta(days=30)
     permit_one.publication_end = utcnow() - timedelta(minutes=5)
     client.app.org.hourly_maintenance_tasks_last_run = (
         utcnow() - timedelta(minutes=30)
@@ -1589,3 +1634,33 @@ def test_change_requests_and_notification_address_mutually_exclusive(
     page.form['enable_change_requests'] = False
     page = page.form.submit().follow()
     assert 'Permits' in page
+
+
+def test_directory_settings_field_dependencies(
+    client: Client,
+) -> None:
+    """The settings that only make sense in context are wired up with
+    ``depends_on`` - the ``data-depends-on`` attribute the client-side
+    ``form_dependencies.js`` reads to show/hide each field. We assert that
+    wiring, which is what the browser consumes:
+
+    - ``required_publication`` shows once publication is enabled;
+    - the notification address shows once publication is *required* and
+      change requests are off. '!y' means "change requests unchecked":
+      form_dependencies.js only inspects *checked* boxes, so a plain 'n'
+      would never match and keep the field hidden forever;
+    - the change request guideline shows once change requests are enabled.
+    """
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+
+    def depends_on(selector: str) -> str | None:
+        return page.pyquery(selector).attr('data-depends-on')
+
+    assert depends_on('input[name="required_publication"]') == (
+        'enable_publication/y')
+    assert depends_on('input[name="notification_address"]') == (
+        'required_publication/y;enable_change_requests/!y')
+    assert depends_on('[name="change_requests_guideline"]') == (
+        'enable_change_requests/y')
