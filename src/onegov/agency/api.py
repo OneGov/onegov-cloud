@@ -7,19 +7,22 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.agency.forms.person import AuthenticatedPersonMutationForm
+from onegov.agency.models import ExtendedAgency
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.api.utils import is_authorized
 from onegov.gis import Coordinates
+from sqlalchemy.orm.attributes import set_committed_value
 from uuid import UUID
 
 
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from onegov.agency.forms import PersonMutationForm
+    from onegov.api.models import ApiEndpointItem
     from onegov.core.request import CoreRequest
     from onegov.agency.app import AgencyApp
-    from onegov.agency.models import ExtendedAgency
     from onegov.agency.models import ExtendedAgencyMembership
     from onegov.agency.models import ExtendedPerson
     from onegov.core.orm.mixins import ContentMixin
@@ -251,6 +254,57 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency', int], ApisMixin):
 
         result.batch_size = self.batch_size
         return result
+
+    @property
+    def batch(
+        self
+    ) -> dict[ApiEndpointItem[ExtendedAgency, int], ExtendedAgency]:
+        result = super().batch
+        self.preload_ancestors(result.values())
+        return result
+
+    def preload_ancestors(self, agencies: Iterable[ExtendedAgency]) -> None:
+        """ Bulk loads all ancestors of the given agencies and wires up their
+        ``parent`` relationship, so walking the parent chain (e.g. to build
+        links) doesn't emit a query per ancestor. """
+
+        session = self.session
+        by_id: dict[int, ExtendedAgency] = {}
+        pending: set[int] = set()
+        for agency in agencies:
+            by_id[agency.id] = agency
+            # the direct parent is already eager loaded (see `collection`)
+            parent = agency.parent
+            if parent is not None:
+                by_id[parent.id] = parent
+                if (
+                    parent.parent_id is not None
+                    and parent.parent_id not in by_id
+                ):
+                    pending.add(parent.parent_id)
+
+        # load the remaining ancestors one level at a time (a handful of
+        # queries bound by the tree depth, instead of one query per ancestor)
+        while pending:
+            ancestors = session.query(ExtendedAgency).filter(
+                ExtendedAgency.id.in_(pending)
+            ).all()
+            pending = set()
+            for ancestor in ancestors:
+                by_id[ancestor.id] = ancestor
+                if (
+                    ancestor.parent_id is not None
+                    and ancestor.parent_id not in by_id
+                ):
+                    pending.add(ancestor.parent_id)
+
+        # populate the parent relationship from the loaded set, so accessing
+        # it later resolves in-memory rather than triggering a lazy load
+        for agency in by_id.values():
+            if agency.parent_id is not None:
+                parent = by_id.get(agency.parent_id)
+                if parent is not None:
+                    set_committed_value(agency, 'parent', parent)
 
     def item_data(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
