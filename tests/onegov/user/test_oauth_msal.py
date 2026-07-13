@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 import textwrap
+from collections.abc import Generator
+from unittest.mock import MagicMock, patch
 
 import morepath
 import pytest
@@ -44,6 +46,14 @@ def app(postgres_dsn: str, redis_url: str) -> App:
     return app
 
 
+@pytest.fixture
+def msal_client_application() -> Generator[MagicMock]:
+    with patch(
+        'onegov.user.auth.clients.msal.msal.ConfidentialClientApplication'
+    ) as client_application:
+        yield client_application
+
+
 def configure_provider(app: App, primary: bool = False) -> None:
     client_id = os.environ.get('MSAL_TEST_CLIENT_ID')
     client_secret = os.environ.get('MSAL_TEST_CLIENT_SECRET')
@@ -73,8 +83,13 @@ def configure_provider(app: App, primary: bool = False) -> None:
     app.configure_authentication_providers(**yaml.safe_load(config))
 
 
-def test_msal_configuration(app: App) -> None:
+def test_msal_configuration(
+    app: App,
+    msal_client_application: MagicMock,
+) -> None:
     configure_provider(app)
+
+    msal_client_application.assert_called_once()
 
     provider = app.providers['msal']
     assert isinstance(provider, AzureADProvider)
@@ -97,8 +112,13 @@ def test_msal_configuration(app: App) -> None:
     assert provider.is_primary(app) is False
 
 
-def test_msal_configuration_primary(app: App) -> None:
+def test_msal_configuration_primary(
+    app: App,
+    msal_client_application: MagicMock,
+) -> None:
     configure_provider(app, primary=True)
+
+    msal_client_application.assert_called_once()
 
     provider = app.providers['msal']
     assert isinstance(provider, AzureADProvider)
