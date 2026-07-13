@@ -578,7 +578,7 @@ class EventImportForm(Form):
     def custom_tags(self) -> list[str] | None:
         return self.request.app.custom_event_tags
 
-    def run_export(self) -> list[dict[str, str]]:
+    def run_export(self) -> list[dict[str, str | bool]]:
         occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
 

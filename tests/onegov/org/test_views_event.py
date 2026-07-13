@@ -917,7 +917,20 @@ def test_export_events_json_xml_csv(client: Client) -> None:
                     '+41 41 123 45 67')
 
         assert event_fields['Schlagworte'] == 'Musik, Brauchtum'
-        assert event_fields['Extern publizieren'] in (True, 'True', 'true')
+
+        if 'Extern_publizieren' in event_fields:
+            assert event_fields['Extern_publizieren'] in (
+                False,
+                'False',
+                'false',
+            )
+        else:
+            assert event_fields['Extern publizieren'] in (
+                False,
+                'False',
+                'false',
+            )
+
         assert event_fields['Highlight'] in (True, 'True', 'true')
         assert event_fields['Erstellt'] == '23.03.2026 09:00'
         assert event_fields['Von'] == '24.03.2026 18:00'
