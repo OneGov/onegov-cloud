@@ -800,6 +800,11 @@ msgstr ""
 "vengono applicate senza rispettare le restrizioni di pubblicazione su cui si "
 "basano le notifiche dell'amministratore."
 
+msgid ""
+"An admin notification address requires publication dates to be required."
+msgstr ""
+"Un indirizzo di notifica admin richiede date di pubblicazione obbligatorie."
+
 msgid "Apply directory configuration"
 msgstr "Applica la configurazione della cartella"
 

@@ -1306,39 +1306,6 @@ def test_new_backdated_entry_rejected(
     assert 'Permit One' in page
 
 
-def test_new_immediately_published_entry_sends_admin_notification(
-    client: Client,
-) -> None:
-    """An entry published immediately on creation (no publication_start) has
-    no start transition for the hourly cronjob to catch, so the admin
-    notification is sent directly from the new-entry view. This needs a
-    notification directory where publication is not required - otherwise a
-    start is mandatory and the entry is never start-less."""
-    client.login_admin()
-
-    # a notification directory that does not require publication dates
-    page = client.get('/directories').click('^Verzeichnis$')
-    page.form['title'] = 'Permits'
-    page.form['structure'] = 'Name *= ___'
-    page.form['title_format'] = '[Name]'
-    page.form['enable_publication'] = True
-    page.form['required_publication'] = False
-    page.form['notification_address'] = 'admin@example.org'
-    page.form['enable_change_requests'] = False
-    page = page.form.submit().follow()
-
-    assert len(os.listdir(client.app.maildir)) == 0
-
-    # an entry with no publication_start is published immediately
-    page = page.click('Eintrag', index=0)
-    page.form['name'] = 'Permit One'
-    page = page.form.submit().follow()
-    assert 'Permit One' in page
-
-    assert len(os.listdir(client.app.maildir)) == 1
-    assert client.get_email(0)['To'] == 'admin@example.org'
-
-
 def test_edit_scheduled_entry_sends_no_email(
     client: Client,
 ) -> None:
@@ -1665,6 +1632,37 @@ def test_change_requests_and_notification_address_mutually_exclusive(
     )
 
     page.form['enable_change_requests'] = False
+    page = page.form.submit().follow()
+    assert 'Permits' in page
+
+
+def test_notification_address_requires_required_publication(
+    client: Client,
+) -> None:
+    """The admin notification workflow is proof-of-publication: it needs
+    every entry to have a publication period. A notification address
+    without required publication would allow start-less, immediately
+    published entries the cronjob never notifies on, so it must be
+    rejected."""
+    client.login_admin()
+
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Permits'
+    page.form['structure'] = 'Name *= ___'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_publication'] = True
+    page.form['required_publication'] = False
+    page.form['notification_address'] = 'admin@example.org'
+    page.form['enable_change_requests'] = False
+    page = page.form.submit()
+
+    assert (
+        'requires publication dates to be required' in page
+        or 'erforderliche Publikationsdaten' in page
+    )
+
+    # requiring publication resolves it
+    page.form['required_publication'] = True
     page = page.form.submit().follow()
     assert 'Permits' in page
 

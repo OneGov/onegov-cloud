@@ -763,15 +763,6 @@ def handle_new_directory_entry(
             send_email_notification_for_directory_entry(
                 self.directory, entry, request)
 
-        if self.directory.notification_address and entry.published:
-            # the hourly cronjob only notifies on the publication_start
-            # transition (then <= publication_start <= now), so an entry
-            # published immediately (publication_start is None) has no start
-            # transition for the cronjob to catch and must be sent here:
-            if entry.publication_start is None:
-                send_admin_notification_for_directory_entry(
-                    self.directory, entry, request)
-
         request.success(_('Added a new directory entry'))
         return request.redirect(request.link(entry))
 

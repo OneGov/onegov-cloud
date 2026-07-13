@@ -508,6 +508,33 @@ class DirectoryBaseForm(Form):
 
         return False
 
+    def ensure_notification_address_requires_required_publication(
+        self
+    ) -> bool | None:
+        """ The admin notification workflow is a proof-of-publication tool:
+        it relies on every entry having a publication period. Without
+        required publication an entry could be published immediately with
+        no start (which the hourly cronjob's start-transition scan never
+        notifies on), so a notification address only makes sense when
+        publication dates are required.
+
+        """
+        if not self.notification_address.data:
+            return None
+        if self.required_publication.data:
+            return None
+
+        msg = _(
+            'An admin notification address requires publication dates to '
+            'be required.'
+        )
+
+        for i in (self.notification_address, self.required_publication):
+            assert isinstance(i.errors, list)
+            i.errors.append(msg)
+
+        return False
+
     def first_hidden_field(
         self,
         configuration: DirectoryConfiguration

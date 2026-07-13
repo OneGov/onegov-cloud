@@ -798,6 +798,12 @@ msgstr ""
 "die Veröffentlichungseinschränkungen zu berücksichtigen, auf die sich die "
 "Admin-Benachrichtigung verlässt."
 
+msgid ""
+"An admin notification address requires publication dates to be required."
+msgstr ""
+"Eine Admin-Benachrichtigungsadresse setzt erforderliche Publikationsdaten "
+"voraus."
+
 msgid "Apply directory configuration"
 msgstr "Verzeichniskonfiguration anwenden"
 

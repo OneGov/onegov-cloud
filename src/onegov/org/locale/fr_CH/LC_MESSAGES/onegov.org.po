@@ -799,6 +799,12 @@ msgstr ""
 "demandes de modification sont appliquées sans respecter les restrictions de "
 "publication dont dépendent les notifications de l'administrateur."
 
+msgid ""
+"An admin notification address requires publication dates to be required."
+msgstr ""
+"Une adresse de notification admin requiert des dates de publication "
+"obligatoires."
+
 msgid "Apply directory configuration"
 msgstr "Appliquer la configuration du dossier"
 
