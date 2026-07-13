@@ -2,9 +2,19 @@
 
 ## 2026.34
 
-`2026-06-26` | [168ae64ff2...76c67c1f20](https://github.com/OneGov/onegov-cloud/compare/168ae64ff2^...76c67c1f20)
+`2026-07-02` | [168ae64ff2...6e560a478e](https://github.com/OneGov/onegov-cloud/compare/168ae64ff2^...6e560a478e)
+
+### Agency
+
+##### Card width
+
+`Bugfix` | [OGC-3222](https://linear.app/onegovcloud/issue/OGC-3222) | [c0f8075076](https://github.com/onegov/onegov-cloud/commit/c0f8075076ee42812ee84fe905d64d4df65fea09)
 
 ### Core
+
+##### Fix changelog generator by preventing sub-release tags to match. Increase to 100 releases listed in CHANGES.md [skip-ci]
+
+`Feature` | [NONE](#NONE) | [256a4228a0](https://github.com/onegov/onegov-cloud/commit/256a4228a04486947d2572728c5d6bb0432658e7)
 
 ##### Fix before_cursor_execute handlers blocking ROLLBACK TO SAVEPOINT on INERROR connections
 
@@ -13,6 +23,10 @@ Both activate_schema and limit_session_lifetime fire on every cursor execution, 
 Fix: check whether the statement parameter starts with ROLLBACK TO SAVEPOINT at the top of both handlers and return early.
 
 `Bugfix` | [OGC-3223](https://linear.app/onegovcloud/issue/OGC-3223) | [f7200ab100](https://github.com/onegov/onegov-cloud/commit/f7200ab100a1c889bfb5856d298d9f8e31837bcb)
+
+##### Fixes regression in metadata creation for enums
+
+`Bugfix` | [34eda1cc02](https://github.com/onegov/onegov-cloud/commit/34eda1cc027e7f72b3758990b9e4575f83ea6e44)
 
 ### Directory
 
@@ -29,11 +43,31 @@ The hash is visible for managers and mTAN authenticated users. Also the hash is 
 
 `Feature` | [OGC-3096](https://linear.app/onegovcloud/issue/OGC-3096) | [1cbafc7da4](https://github.com/onegov/onegov-cloud/commit/1cbafc7da4d7a49ba6ba1a7eb4549ef35f5bfb11)
 
+### Election Day
+
+##### Ignore invalid domain values in archive search filter
+
+`Bugfix` | [HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7579899470](#HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7579899470) | [1aea5c311d](https://github.com/onegov/onegov-cloud/commit/1aea5c311d857fc55d029d06b12189779d05312c)
+
 ### Feriennet
+
+##### Replace banners
+
+`Feature` | [PRO-1574](https://linear.app/projuventute/issue/PRO-1574) | [22faac2878](https://github.com/onegov/onegov-cloud/commit/22faac28785b230bbdc4c0a54947fe669e14d483)
 
 ##### Fixes biling import icon not being rendered.
 
 `Bugfix` | [OGC-1563](https://linear.app/onegovcloud/issue/OGC-1563) | [4654d393f1](https://github.com/onegov/onegov-cloud/commit/4654d393f19c2311b9c6cb9c48f88fe88a9293ed)
+
+### File
+
+##### Stores signing requests, so we can accurately bill customers
+
+This also sends monthly signing statistics and adds a CLI command to
+generate old statistics as far as a year back, once this change has
+been running for at least a year.
+
+`Feature` | [OGC-3099](https://linear.app/onegovcloud/issue/OGC-3099) | [ee94405afa](https://github.com/onegov/onegov-cloud/commit/ee94405afa6ae0726a49bc799daf82dfbd366792)
 
 ### Org
 
@@ -42,6 +76,42 @@ The hash is visible for managers and mTAN authenticated users. Also the hash is 
 Previously, '1234-5678' would not match 'AKK-1234-5678'.
 
 `Feature` | [OGC-3145](https://linear.app/onegovcloud/issue/OGC-3145) | [344d057f1d](https://github.com/onegov/onegov-cloud/commit/344d057f1dddd03ee89aacc4da35f0ec588adba2)
+
+##### Adds user-configurable short links that redirect to a given path
+
+These short links take the form of `https://govikon.ch/@shortlink`
+
+`Feature` | [OGC-3158](https://linear.app/onegovcloud/issue/OGC-3158) | [4a51b3a038](https://github.com/onegov/onegov-cloud/commit/4a51b3a038c8bb67e252efc1a7da92e2c6156351)
+
+##### Displays configured holidays in resource allocation calendars
+
+`Feature` | [OGC-2968](https://linear.app/onegovcloud/issue/OGC-2968) | [d52fcbb9d8](https://github.com/onegov/onegov-cloud/commit/d52fcbb9d85336a7e6b956f2221d36b5d9ed92b9)
+
+##### Fixes default language for RSS feed
+
+If by any reason the organizations locales is not set, the RSS feed failed as no default language was assigned
+
+`Bugfix` | [HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/4098479098](#HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/4098479098) | [9745b56b4d](https://github.com/onegov/onegov-cloud/commit/9745b56b4d6de197ab9824753795344cb9b94ede)
+
+##### Handle missing file field in upload view
+
+`Bugfix` | [HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/4098479098/EVENTS/7A45F0A784BE47518E26AC6366F2458E](#HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/4098479098/EVENTS/7A45F0A784BE47518E26AC6366F2458E) | [f5f888e27f](https://github.com/onegov/onegov-cloud/commit/f5f888e27f2e8d965cca6946f4e6b3d16ce581df)
+
+##### Fixes regression in allocation rule deletion with zero candidates
+
+`Bugfix` | [OGC-3236](https://linear.app/onegovcloud/issue/OGC-3236) | [831cf4ca66](https://github.com/onegov/onegov-cloud/commit/831cf4ca666ec93b90630a7d7e1437767d274f6c)
+
+##### Fixes unstable sort order of whitelisted iFrame domains
+
+`Bugfix` | [OGC-3196](https://linear.app/onegovcloud/issue/OGC-3196) | [45528466f9](https://github.com/onegov/onegov-cloud/commit/45528466f9979c59a9295ba5772e42668ec70e7c)
+
+##### Prevent removing event filters that are still applied on events
+
+`Bugfix` | [OGC-3237](https://linear.app/onegovcloud/issue/OGC-3237) | [57df5a7568](https://github.com/onegov/onegov-cloud/commit/57df5a75689c8e7bf051fe61375d7f677016457c)
+
+##### Fix sortable
+
+`Bugfix` | [OGC-3111](https://linear.app/onegovcloud/issue/OGC-3111) | [3b360d6bc2](https://github.com/onegov/onegov-cloud/commit/3b360d6bc2f0a6505f9cdd197abfeeb84214f7f2)
 
 ### Pas
 
@@ -610,7 +680,7 @@ The KUB importer knows whether a role belongs to Kantonsrat,
 (via organizationTypeTitle), but this information was
 discarded after import. Detecting Kantonsrat membership required a
 fragile heuristic checking three columns for NULL.
-Kantonsrat membership meaning being active in parliament itself, so
+Kantonsrat membership meaning being active in parliament itself, so 
 it's a special kind of `ParliamentarianRole`.
 
 `Bugfix` | [OGC-3143](https://linear.app/onegovcloud/issue/OGC-3143) | [d34177d12c](https://github.com/onegov/onegov-cloud/commit/d34177d12cd18079b9558a911f212a6d90a22e62)
@@ -1713,7 +1783,7 @@ JS components, so they comply with the more strict CSP
 
 The transfer command was using `sudo -u postgres psql` which connects
 to the system postgres user's default instance instead of respecting
-the `onegov.yml` DSN configuration. This commit allows to use ports other
+the `onegov.yml` DSN configuration. This commit allows to use ports other 
 than 5432 locally.
 
 `Bugfix` | [6fc268cab6](https://github.com/onegov/onegov-cloud/commit/6fc268cab6d70a7c6269888acdc82f03bf69d4c8)
@@ -2834,7 +2904,7 @@ Add setting for different names for assemblies
 ##### Refactors the import and fixes some issues.
 
 - Prepares the import to be easily usable in cronjob.
-- Use strategy pattern for logging, we potentially want
+- Use strategy pattern for logging, we potentially want 
   to have better debugging ability and show some logging
   in a view, to see what was imported.
 - Get address of parliamentarian by calling `/people/{id}`
@@ -4877,7 +4947,7 @@ Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
 - Preventing duplicates in push notifications
 - Fix default choices not being in nested list
 - Prevent user from being able to submit an empty list if checkbox ticked
-- Fix inconsistent UI labels (Themen-ID ...)
+- Fix inconsistent UI labels (Themen-ID ...) 
 
 The implementation now uses database constraints to ensure notification
  uniqueness even during simultaneous processing.
@@ -4935,7 +5005,7 @@ Remove unconfirmed subscribers after 7 days of initial subscription. Also displa
 - Implement missing cost-of-living adjustment in parliamentarian export
 - Perform the calculation for getting the Quartal with no assumptions
 - Make sure parliamentarians are correctly linked to their parties during
- the times they attended, not just when they first joined. Indeed, party
+ the times they attended, not just when they first joined. Indeed, party 
 changes should be expected and accounted for
 - Ensure role activity is verified at specific attendance times.
 - Replace manual HTML string formatting

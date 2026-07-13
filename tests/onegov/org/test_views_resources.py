@@ -160,7 +160,29 @@ def test_resources(client: Client) -> None:
     page = new.form.submit()
     assert "Eine Resource mit diesem Namen existiert bereits" in page
 
+    # Test changing the url
     resource = client.get('/resource/meeting-room-1')
+    rename = resource.click('URL ändern')
+    rename = rename.form.submit()
+    assert 'Bitte geben sie einen neuen Namen an' in rename
+
+    rename.form['name'] = 'ME'
+    rename = rename.form.submit()
+    assert 'Ungültiger Name. Ein gültiger Vorschlag ist' in rename
+
+    rename.form['name'] = 'meeting-room-2'
+    rename = rename.form.submit()
+    assert 'Ein Eintrag mit diesem Namen existiert bereits' in rename
+
+    rename.form['name'] = 'meeting-1'
+    rename = rename.form.submit()
+    assert '0 Links' in rename
+
+    rename.form['test'] = False
+    page = rename.form.submit().follow()
+    assert page.request.path_url.endswith('/resource/meeting-1')
+
+    resource = client.get('/resource/meeting-1')
     delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
 
     assert client.delete(delete_link, status=200)

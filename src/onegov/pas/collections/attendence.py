@@ -17,9 +17,10 @@ if TYPE_CHECKING:
     from datetime import date
     from sqlalchemy.orm import Query, Session
     from onegov.pas.request import PasRequest
+    from uuid import UUID  # noqa: F401
 
 
-class AttendenceCollection(GenericCollection[Attendence]):
+class AttendenceCollection(GenericCollection[Attendence, 'UUID']):
     def __init__(
         self,
         session: Session,

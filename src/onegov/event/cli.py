@@ -51,6 +51,20 @@ if TYPE_CHECKING:
 cli = command_group()
 
 
+def parse_tagmap(tagmap_file: TextIOWrapper) -> dict[str, list[str]]:
+    """ Reads a tagmap CSV, mapping each source tag to its target tags.
+
+    Repeating a source tag on multiple rows maps it to multiple target tags.
+
+    """
+    tagmap: dict[str, list[str]] = {}
+    for row in csvreader(tagmap_file):
+        if len(row) < 2:
+            continue
+        tagmap.setdefault(row[0], []).append(row[1])
+    return tagmap
+
+
 @cli.command('clear')
 @pass_group_context
 def clear(
@@ -185,7 +199,7 @@ def import_json(
 
     """
     if tagmap_file is not None:
-        tagmap = {row[0]: row[1] for row in csvreader(tagmap_file)}
+        tagmap = parse_tagmap(tagmap_file)
     else:
         tagmap = None
 
@@ -251,7 +265,11 @@ def import_json(
             tags = item['cat1']
             if tagmap and tags:
                 unknown_tags |= set(tags) - tagmap.keys()
-                tags = {tagmap[tag] for tag in tags if tag in tagmap}
+                tags = {
+                    target
+                    for tag in tags if tag in tagmap
+                    for target in tagmap[tag]
+                }
 
             coordinates = None
             if item['latitude'] and item['longitude']:
@@ -428,7 +446,7 @@ def import_guidle(
 
     """
     if tagmap_file is not None:
-        tagmap = {row[0]: row[1] for row in csvreader(tagmap_file)}
+        tagmap = parse_tagmap(tagmap_file)
     else:
         tagmap = None
 

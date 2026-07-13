@@ -118,7 +118,7 @@ class Meeting(
         return f'<Meeting {self.title}, {self.start_datetime}>'
 
 
-class MeetingCollection(GenericCollection[Meeting]):
+class MeetingCollection(GenericCollection[Meeting, UUID]):
 
     def __init__(
         self,

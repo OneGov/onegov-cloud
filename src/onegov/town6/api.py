@@ -10,6 +10,7 @@ from onegov.org.models.parliament import (
 from onegov.org.models.political_business import (
     PoliticalBusiness, PoliticalBusinessCollection)
 from onegov.town6 import _
+from uuid import UUID
 
 
 from typing import Any, TYPE_CHECKING
@@ -18,17 +19,18 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
 
-class MeetingApiEndpoint(ApiEndpoint[Meeting]):
+class MeetingApiEndpoint(ApiEndpoint[Meeting, UUID]):
     app: TownApp
     request: TownRequest
     endpoint = 'meetings'
+    pk_type = UUID
 
     @property
     def title(self) -> str:
         return self.request.translate(_('Meetings'))
 
     @property
-    def collection(self) -> PaginatedCollection[Meeting]:
+    def collection(self) -> PaginatedCollection[Meeting, UUID]:
         return PaginatedCollection(
             self.request,
             MeetingCollection(self.session),
@@ -58,10 +60,11 @@ class MeetingApiEndpoint(ApiEndpoint[Meeting]):
         return {'html': item}
 
 
-class PoliticalBusinessApiEndpoint(ApiEndpoint[PoliticalBusiness]):
+class PoliticalBusinessApiEndpoint(ApiEndpoint[PoliticalBusiness, UUID]):
     app: TownApp
     request: TownRequest
     endpoint = 'political_businesses'
+    pk_type = UUID
 
     @property
     def title(self) -> str:
@@ -92,17 +95,18 @@ class PoliticalBusinessApiEndpoint(ApiEndpoint[PoliticalBusiness]):
         return {'html': item}
 
 
-class ParliamentarianApiEndpoint(ApiEndpoint[RISParliamentarian]):
+class ParliamentarianApiEndpoint(ApiEndpoint[RISParliamentarian, UUID]):
     app: TownApp
     request: TownRequest
     endpoint = 'parliamentarians'
+    pk_type = UUID
 
     @property
     def title(self) -> str:
         return self.request.translate(_('Parliamentarians'))
 
     @property
-    def collection(self) -> PaginatedCollection[RISParliamentarian]:
+    def collection(self) -> PaginatedCollection[RISParliamentarian, UUID]:
         return PaginatedCollection(
             self.request,
             RISParliamentarianCollection(self.session),
@@ -127,17 +131,18 @@ class ParliamentarianApiEndpoint(ApiEndpoint[RISParliamentarian]):
         }
 
 
-class CommissionApiEndpoint(ApiEndpoint[RISCommission]):
+class CommissionApiEndpoint(ApiEndpoint[RISCommission, UUID]):
     app: TownApp
     request: TownRequest
     endpoint = 'commissions'
+    pk_type = UUID
 
     @property
     def title(self) -> str:
         return self.request.translate(_('Commissions'))
 
     @property
-    def collection(self) -> PaginatedCollection[RISCommission]:
+    def collection(self) -> PaginatedCollection[RISCommission, UUID]:
         return PaginatedCollection(
             self.request,
             RISCommissionCollection(self.session),
@@ -156,17 +161,18 @@ class CommissionApiEndpoint(ApiEndpoint[RISCommission]):
         return {'html': item}
 
 
-class ParliamentaryGroupApiEndpoint(ApiEndpoint[RISParliamentaryGroup]):
+class ParliamentaryGroupApiEndpoint(ApiEndpoint[RISParliamentaryGroup, UUID]):
     app: TownApp
     request: TownRequest
     endpoint = 'parliamentary_groups'
+    pk_type = UUID
 
     @property
     def title(self) -> str:
         return self.request.translate(_('Parliamentary groups'))
 
     @property
-    def collection(self) -> PaginatedCollection[RISParliamentaryGroup]:
+    def collection(self) -> PaginatedCollection[RISParliamentaryGroup, UUID]:
         return PaginatedCollection(
             self.request,
             RISParliamentaryGroupCollection(self.session),

@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
     from typing import Self
+    from uuid import UUID  # noqa: F401
 
 
 order_cols = (
@@ -27,7 +28,7 @@ order_cols = (
 
 
 class TranslatorCollection(
-    GenericCollection[Translator],
+    GenericCollection[Translator, 'UUID'],
     Pagination[Translator]
 ):
 
