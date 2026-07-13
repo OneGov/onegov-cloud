@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-01 07:55+0200\n"
+"POT-Creation-Date: 2026-07-13 16:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1079,11 +1079,23 @@ msgstr "Esecuzione del test"
 msgid "Do not actually import the events."
 msgstr "Gli eventi non vengono salvati."
 
+msgid "Syndicate"
+msgstr "Pubblicare esternamente"
+
+msgid "Highlight"
+msgstr "In evidenza"
+
 msgid "Created"
 msgstr "Creato"
 
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Rimuovi questi filtri da tutti gli eventi interessati"
+
+msgid "Confirmation"
+msgstr "Conferma"
 
 msgid "Comment"
 msgstr "Commento"
@@ -2930,11 +2942,23 @@ msgstr "Filtri configurabili manualmente"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Entrambi, tag predefiniti e filtri configurabili"
 
-msgid "General information above the event list"
-msgstr "Informazioni generali sopra l'elenco degli eventi"
+msgid "Title of text above event list"
+msgstr "Titolo del testo sopra l'elenco degli eventi"
 
-msgid "General information below the event list"
-msgstr "Informazioni generali sotto l'elenco degli eventi"
+msgid "Information above the event list"
+msgstr "Informazioni sopra l'elenco degli eventi"
+
+msgid "Text above the event list"
+msgstr "Testo sopra l'elenco degli eventi"
+
+msgid "Title of text below event list"
+msgstr "Titolo del testo sotto l'elenco degli eventi"
+
+msgid "Information below the event list"
+msgstr "Informazioni sotto l'elenco degli eventi"
+
+msgid "Text below the event list"
+msgstr "Testo sotto l'elenco degli eventi"
 
 msgid "Documents"
 msgstr "Documenti"
@@ -4394,8 +4418,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -5209,8 +5233,8 @@ msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -6375,8 +6399,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -6784,14 +6808,8 @@ msgstr "Sono interessate un totale di ${number} sottopagine."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} collegamenti saranno sostituiti da questa operazione."
 
-msgid "Syndicate"
-msgstr "Pubblicare esternamente"
-
 msgid "Publish this event externally"
 msgstr "Pubblicare questo evento esternamente"
-
-msgid "Highlight"
-msgstr "In evidenza"
 
 msgid "Mark as highlighted event"
 msgstr "Contrassegnare come evento in evidenza"
@@ -7193,20 +7211,12 @@ msgstr "Questa settimana"
 
 #, python-format
 msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
-msgstr ""
-"Il filtro \"${keyword}\" è ancora applicato a ${count} evento/i."
+msgstr "Il filtro \"${keyword}\" è ancora applicato a ${count} evento/i."
 
 #, python-format
-msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
 "La scelta del filtro \"${choice}\" è ancora applicata a ${count} evento/i."
-
-msgid "Remove these filters from all affected events"
-msgstr "Rimuovi questi filtri da tutti gli eventi interessati"
-
-msgid "Confirmation"
-msgstr "Conferma"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifica configurazione filtro eventi"
@@ -8064,6 +8074,12 @@ msgstr "Utente creato correttamente"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
+#~ msgid "General information above the event list"
+#~ msgstr "Informazioni generali sopra l'elenco degli eventi"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Informazioni generali sotto l'elenco degli eventi"
+
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "es. 07:00 o 07:00, 14:30"
 
@@ -8149,12 +8165,6 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
 #~ msgid "Date of death"
 #~ msgstr "Data di morte"
-
-#~ msgid "Information above the event list"
-#~ msgstr "Informazioni sopra l'elenco degli eventi"
-
-#~ msgid "Information below the event list"
-#~ msgstr "Informazioni sotto l'elenco degli eventi"
 
 #~ msgid "Portrait"
 #~ msgstr "Ritratto"
