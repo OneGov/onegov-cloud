@@ -18,6 +18,7 @@ from sqlalchemy import and_, or_, text
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import lazyload
 from sqlalchemy.orm import undefer
 from webob.multidict import MultiDict
 
@@ -772,6 +773,11 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         query = self.session.query(Event).filter(Event.id.in_(event_ids))
         query = query.options(undefer(Event.content))
+        # skip the eager selectin loads get_ical_vevents doesn't need
+        query = query.options(
+            lazyload(Event.occurrences),
+            lazyload(Event.filter_keyword_objects),
+        )
         for event in query:
             for vevent in event.get_ical_vevents(request.link(event)):
                 vcalendar.add_component(vevent)
