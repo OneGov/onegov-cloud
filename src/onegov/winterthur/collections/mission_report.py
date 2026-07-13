@@ -63,7 +63,7 @@ class MissionReportFileCollection(BaseImageFileCollection[MissionReportFile]):
 
 
 class MissionReportCollection(
-    GenericCollection[MissionReport],
+    GenericCollection[MissionReport, 'UUID'],
     Pagination[MissionReport]
 ):
 
@@ -86,10 +86,7 @@ class MissionReportCollection(
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page
 
-    def by_id(
-        self,
-        id: UUID  # type:ignore[override]
-    ) -> MissionReport | None:
+    def by_id(self, id: UUID) -> MissionReport | None:
         # use the parent to get a report by id, so the date filter is
         # not included, which is not desirable on this lookup
         return super().query().filter(self.primary_key == id).first()
@@ -139,7 +136,9 @@ class MissionReportCollection(
             func.sum(MissionReport.mission_count)).scalar()
 
 
-class MissionReportVehicleCollection(GenericCollection[MissionReportVehicle]):
+class MissionReportVehicleCollection(
+    GenericCollection[MissionReportVehicle, 'UUID']
+):
 
     @property
     def model_class(self) -> type[MissionReportVehicle]:

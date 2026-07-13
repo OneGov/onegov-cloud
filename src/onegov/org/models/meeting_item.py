@@ -88,7 +88,7 @@ class MeetingItem(Base, ORMSearchable):
         return f'<Meeting Item {self.number} {self.title}>'
 
 
-class MeetingItemCollection(GenericCollection[MeetingItem]):
+class MeetingItemCollection(GenericCollection[MeetingItem, UUID]):
 
     @property
     def model_class(self) -> type[MeetingItem]:

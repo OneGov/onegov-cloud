@@ -18,17 +18,18 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from typing import TypedDict
     from typing import Unpack
+    from uuid import UUID
 
     class FilterParams(TypedDict, total=False):
-        updated_gt: datetime | str | None
-        updated_ge: datetime | str | None
-        updated_eq: datetime | str | None
-        updated_le: datetime | str | None
-        updated_lt: datetime | str | None
+        updated_gt: datetime | None
+        updated_ge: datetime | None
+        updated_eq: datetime | None
+        updated_le: datetime | None
+        updated_lt: datetime | None
 
 
 class PaginatedMembershipCollection(
-    GenericCollection[ExtendedAgencyMembership],
+    GenericCollection[ExtendedAgencyMembership, 'UUID'],
     Pagination[ExtendedAgencyMembership]
 ):
 
@@ -36,13 +37,13 @@ class PaginatedMembershipCollection(
         self,
         session: Session,
         page: int = 0,
-        agency: str | None = None,
-        person: str | None = None,
-        updated_gt: datetime | str | None = None,
-        updated_ge: datetime | str | None = None,
-        updated_eq: datetime | str | None = None,
-        updated_le: datetime | str | None = None,
-        updated_lt: datetime | str | None = None,
+        agency: int | None = None,
+        person: UUID | None = None,
+        updated_gt: datetime | None = None,
+        updated_ge: datetime | None = None,
+        updated_eq: datetime | None = None,
+        updated_le: datetime | None = None,
+        updated_lt: datetime | None = None,
         exclude_hidden: bool = True
     ) -> None:
         super().__init__(session)

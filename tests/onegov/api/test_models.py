@@ -63,7 +63,7 @@ def test_api_exceptions() -> None:
 def test_api_endpoint_item(app: App, endpoint_class: type[Endpoint]) -> None:
     request: Any = DummyRequest()
     request.app = app
-    item: ApiEndpointItem[Any]
+    item: ApiEndpointItem[Any, Any]
     item = ApiEndpointItem(request, 'endpoint', 1)  # type: ignore[arg-type]
     assert item.api_endpoint.__class__ == endpoint_class
     assert item.item is not None
@@ -76,7 +76,7 @@ def test_api_endpoint(app: App, endpoint_class: type[Endpoint]) -> None:
     request: Any = DummyRequest()
     request.app = app
     # ... for_page
-    new: ApiEndpoint[Any] | None
+    new: ApiEndpoint[Any, Any] | None
     new = ApiEndpoint(request).for_page(None)
     assert new is not None
     assert new.page is None

@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-from sqlalchemy import func, type_coerce
-
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
-from onegov.core.orm.types import JSON
 from onegov.people.models import Person
 
 from typing import Any
@@ -13,7 +10,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class BasePersonCollection[T: Person](GenericCollection[T]):
+class BasePersonCollection[T: Person](GenericCollection[T, 'UUID']):
 
     @property
     def model_class(self) -> type[T]:
@@ -62,7 +59,7 @@ class BasePersonCollection[T: Person](GenericCollection[T]):
         else:
             return self.add(first_name, last_name, **optional)
 
-    def by_id(self, id: UUID) -> T | None:  # type:ignore[override]
+    def by_id(self, id: UUID) -> T | None:
         if utils.is_uuid(id):
             return self.query().filter(self.model_class.id == id).first()
         return None
@@ -81,32 +78,3 @@ class PersonCollection(BasePersonCollection[Person]):
     @property
     def model_class(self) -> type[Person]:
         return Person
-
-    def people_by_organisation(
-        self,
-        org: str | None,
-        sub_org: str | None
-    ) -> list[Person]:
-        """
-        Returns all persons of a given organisation and sub-organisation.
-
-        If organisation and sub-organisation are both None, all persons are
-        returned.
-        """
-        query = self.session.query(Person).order_by(Person.last_name,
-                                                    Person.first_name)
-        if org:
-            query = query.filter(
-                func.jsonb_contains(
-                    Person.content['organisations_multiple'],
-                    type_coerce([org], JSON)
-                )
-            )
-        if sub_org:
-            query = query.filter(
-                func.jsonb_contains(
-                    Person.content['organisations_multiple'],
-                    type_coerce([f'-{sub_org}'], JSON)
-                )
-            )
-        return query.all()

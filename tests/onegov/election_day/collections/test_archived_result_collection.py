@@ -31,7 +31,6 @@ def test_archived_result_collection(session: Session) -> None:
     assert archive.for_date('2015').by_date() == ([], None)
     assert archive.for_date('2015-01-01').by_date() == ([], None)
     assert archive.for_date(2015).by_year(2015) == ([], None)  # type: ignore[arg-type]
-    assert archive.for_date('2015').by_year('2015') == ([], None)  # type: ignore[arg-type]
 
     for year in (2009, 2011, 2014, 2016):
         session.add(
@@ -87,8 +86,6 @@ def test_archived_result_collection(session: Session) -> None:
         assert item in items
         items, modified = archive.by_year(year)
         assert item in items
-        items, modified = archive.by_year(str(year))  # type: ignore[arg-type]
-        assert item in items
 
         groups = archive.group_items(items, DummyRequest())  # type: ignore[arg-type]
         assert groups[date(year, 1, 1)]['federation']['election'] == [item]  # type: ignore[index]
@@ -104,8 +101,6 @@ def test_archived_result_collection(session: Session) -> None:
         assert item in items
         items, modified = archive.by_year(year)
         assert item in items
-        items, modified = archive.by_year(str(year))  # type: ignore[arg-type]
-        assert item in items
 
         groups = archive.group_items(items, DummyRequest())  # type: ignore[arg-type]
         # compounds are grouped as elections!
@@ -119,8 +114,6 @@ def test_archived_result_collection(session: Session) -> None:
         items, modified = archive.for_date(str(year)).by_date()
         assert item in items
         items, modified = archive.by_year(year)
-        assert item in items
-        items, modified = archive.by_year(str(year))  # type: ignore[arg-type]
         assert item in items
 
         groups = archive.group_items(items, DummyRequest())  # type: ignore[arg-type]

@@ -568,6 +568,8 @@ class EventImportForm(Form):
             'event_registration_url': self.request.translate(
                 _('Event Registration URL')),
             'tags': self.request.translate(_('Tags')),
+            'syndicate': self.request.translate(_('Syndicate')),
+            'highlight': self.request.translate(_('Highlight')),
             'start': self.request.translate(_('From')),
             'end': self.request.translate(_('To')),
             'created': self.request.translate(_('Created')),
@@ -576,11 +578,11 @@ class EventImportForm(Form):
     def custom_tags(self) -> list[str] | None:
         return self.request.app.custom_event_tags
 
-    def run_export(self) -> list[dict[str, str]]:
+    def run_export(self) -> list[dict[str, str | bool]]:
         occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
 
-        def get(occurrence: Occurrence, attribute: str) -> str:
+        def get(occurrence: Occurrence, attribute: str) -> str | bool:
             if attribute in ('start', 'end'):
                 attribute = f'localized_{attribute}'
             result = (
@@ -592,6 +594,8 @@ class EventImportForm(Form):
                     result, occurrence.timezone or 'Europe/Zurich')
             if isinstance(result, datetime):
                 result = result.strftime('%d.%m.%Y %H:%M')
+            if isinstance(result, bool):
+                return result
             if attribute == 'tags':
                 result = ', '.join(
                     self.request.translate(_(tag))
@@ -707,3 +711,8 @@ class EventConfigurationForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
+
+    force_remove = BooleanField(
+        label=_('Remove these filters from all affected events'),
+        fieldset=_('Confirmation'),
+    )

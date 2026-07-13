@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class InvoiceCollection[
     InvoiceT: Invoice,
     ItemT: InvoiceItem
-](GenericCollection[InvoiceT]):
+](GenericCollection[InvoiceT, UUID]):
 
     @overload
     def __init__(

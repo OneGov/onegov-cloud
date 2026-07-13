@@ -271,7 +271,7 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
 
 
 class PoliticalBusinessCollection(
-    GenericCollection[PoliticalBusiness],
+    GenericCollection[PoliticalBusiness, UUID],
     Pagination[PoliticalBusiness]
 ):
 
@@ -288,9 +288,9 @@ class PoliticalBusinessCollection(
         self.request = request
         self.page = page
         self.term = term
-        self.status = set(status) if status else set()
-        self.types = set(types) if types else set()
-        self.years = set(years) if years else set()
+        self.status = {s for s in status if s is not None} if status else set()
+        self.types = {t for t in types if t is not None} if types else set()
+        self.years = {y for y in years if 1 <= y <= 9998} if years else set()
         self.batch_size = 20
 
     @property
@@ -436,7 +436,7 @@ class PoliticalBusinessCollection(
 
 
 class PoliticalBusinessParticipationCollection(
-    GenericCollection[PoliticalBusinessParticipation]
+    GenericCollection[PoliticalBusinessParticipation, UUID]
 ):
 
     def __init__(self, session: Session, active: bool | None = None):

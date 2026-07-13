@@ -127,7 +127,7 @@ def cache_password_hashing(monkeysession: MonkeyPatch) -> None:
 
 @pytest.fixture(scope="session")
 def pg_default_preferred_versions() -> list[str]:
-    return ['14', '13', '12', '11', '10']
+    return ['18', '17', '16', '15', '14', '13', '12', '11', '10']
 
 
 @pytest.fixture(scope="session")
@@ -176,20 +176,26 @@ def postgres_dsn(
 
     """
     if pytestconfig.getoption('nopg'):
-        yield 'postgresql://postgres:postgres@127.0.0.1:55432/postgres'
+        yield 'postgresql+psycopg://postgres:postgres@127.0.0.1:55432/postgres'
         return
 
     assert postgres is not None
     postgres.reset_snapshots()
 
-    yield postgres.url()
+    # HACK: We rewrite the DSN so that SQLAlchemy picks the correct backend
+    postgres_dsn = postgres.url().replace(
+        'postgresql://',
+        'postgresql+psycopg://'
+    )
+
+    yield postgres_dsn
 
     transaction.abort()
 
     close_all_sessions()
-    SessionManager(postgres.url(), None).dispose()  # type: ignore[arg-type]
+    SessionManager(postgres_dsn, None).dispose()  # type: ignore[arg-type]
 
-    engine = create_engine(postgres.url(), future=True)
+    engine = create_engine(postgres_dsn, future=True)
     with engine.begin() as conn:
         results = conn.execute(text(
             "SELECT DISTINCT table_schema FROM information_schema.tables"))

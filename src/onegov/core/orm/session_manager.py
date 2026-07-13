@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core import log
 from onegov.core.custom import json
+from psycopg.sql import SQL, Identifier
 from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -25,6 +26,11 @@ from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.engine import Connection, Engine, Result
+    from sqlalchemy.engine.interfaces import (
+        DBAPICursor,
+        ExecutionContext,
+        _DBAPIAnyExecuteParams,
+    )
     from sqlalchemy.orm import DeclarativeBase, ORMExecuteState
     from sqlalchemy.orm.session import Session, SessionTransaction
     from types import FrameType
@@ -412,14 +418,19 @@ class SessionManager:
         @event.listens_for(engine, 'before_cursor_execute')
         def activate_schema(
             connection: Connection,
-            cursor: Any,
-            *args: Any,
-            **kwargs: Any
+            cursor: DBAPICursor,
+            statement: str,
+            parameters: _DBAPIAnyExecuteParams,
+            context: ExecutionContext | None,
+            executemany: bool,
         ) -> None:
             """ Share the 'info' dictionary of Session with Connection
             objects.
 
             """
+
+            if statement.startswith('ROLLBACK'):
+                return
 
             # execution options have priority!
             if 'schema' in connection._execution_options:
@@ -431,21 +442,27 @@ class SessionManager:
                     schema = None
 
             if schema is not None:
-                cursor.execute('SET search_path TO %s, extensions', (schema, ))
+                cursor.execute(SQL(
+                    'SET search_path TO {}, extensions'
+                ).format(Identifier(schema)))
 
         @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
             connection: Connection,
-            cursor: Any,
-            *args: Any,
-            **kwargs: Any
+            cursor: DBAPICursor,
+            statement: str,
+            parameters: _DBAPIAnyExecuteParams,
+            context: ExecutionContext | None,
+            executemany: bool,
         ) -> None:
             """ Kills idle sessions after a while, freeing up memory. """
 
-            cursor.execute(
-                'SET SESSION idle_in_transaction_session_timeout = %s',
-                (f'{CONNECTION_LIFETIME}s', )
-            )
+            if statement.startswith('ROLLBACK'):
+                return
+
+            cursor.execute(SQL(
+                'SET SESSION idle_in_transaction_session_timeout = {}'
+            ).format(f'{CONNECTION_LIFETIME}s'))
 
     def register_session(self, session: Session | scoped_session[Any]) -> None:
         """ Takes the given session and registers it with zope.sqlalchemy and
@@ -891,9 +908,7 @@ class SessionManager:
                             if t.name not in existing_tables
                         ]
                         if missing:
-                            base.metadata.create_all(
-                                conn, tables=missing, checkfirst=False
-                            )
+                            base.metadata.create_all(conn, tables=missing)
                             existing_tables.update(t.name for t in missing)
 
                         declared_classes.update(

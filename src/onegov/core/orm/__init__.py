@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import psycopg2
+import psycopg
 
 from datetime import datetime
 from markupsafe import escape, Markup
@@ -16,7 +16,7 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Query
 from sqlalchemy_utils import TranslationHybrid as BaseTranslationHybrid
 from zope.sqlalchemy import mark_changed
-from sqlalchemy.exc import InterfaceError, OperationalError
+from sqlalchemy.exc import InterfaceError, InternalError, OperationalError
 from uuid import UUID as PythonUUID
 
 from .types import JSON
@@ -38,8 +38,10 @@ MISSING = object()
 DB_CONNECTION_ERRORS = (
     OperationalError,
     InterfaceError,
-    psycopg2.OperationalError,
-    psycopg2.InterfaceError,
+    InternalError,
+    psycopg.OperationalError,
+    psycopg.InterfaceError,
+    psycopg.InternalError,
 )
 
 

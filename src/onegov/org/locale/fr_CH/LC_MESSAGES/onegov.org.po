@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-19 09:20+0200\n"
+"POT-Creation-Date: 2026-07-01 07:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2279,6 +2279,20 @@ msgstr ""
 msgid "Open files in separate window"
 msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
 
+msgid "Short links"
+msgstr "Lien court"
+
+#, python-format
+msgid ""
+"Malformed short link on line ${number}. Each line needs to be a pair of "
+"name: path where path is either a valid path starting with a backslash, or a "
+"complete URL with schema and host."
+msgstr ""
+"Lien court mal formé à la ligne ${number}. Chaque ligne doit prendre la "
+"forme « nom : chemin », où « chemin » correspond soit à un chemin valide "
+"commençant par une barre oblique inversée, soit à une URL complète "
+"comprenant le schéma et l'hôte."
+
 msgid "Announcement"
 msgstr "Annonce"
 
@@ -4390,8 +4404,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Paiement"
 
@@ -4485,6 +4499,16 @@ msgid "Found an error? Propose a change to this entry."
 msgstr ""
 "Vous avez trouvé une erreur ? Proposez une modification à apporter à cette "
 "entrée."
+
+msgid ""
+"Fingerprint of the entry's content. Changes whenever the entry data is "
+"modified."
+msgstr ""
+"Empreinte du contenu de l'entrée. Change chaque fois que les données de "
+"l'entrée sont modifiées."
+
+msgid "Hash"
+msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
@@ -5206,8 +5230,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -5818,11 +5842,20 @@ msgstr ""
 msgid "Request Reference"
 msgstr "Référence"
 
+msgid "Search people"
+msgstr "Rechercher des personnes"
+
+msgid "Filter after Organisation or Suborganisation"
+msgstr "Filtrer par organisation ou sous-organisation"
+
 msgid "Select organisation"
 msgstr "Sélectionner une organisation"
 
 msgid "Select sub organisation"
 msgstr "Sélectionner une sous-organisation"
+
+msgid "No people added yet."
+msgstr "Aucune personne n'a encore été ajoutée."
 
 msgid "No people found for current filter selection."
 msgstr "Aucune personne n'a été trouvée pour la sélection de filtre actuelle."
@@ -6368,8 +6401,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -7193,6 +7226,24 @@ msgstr "Ce week-end"
 
 msgid "This week"
 msgstr "Cette semaine"
+
+#, python-format
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
+msgstr ""
+"Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
+
+#, python-format
+msgid ""
+"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgstr ""
+"Le choix de filtre \"${choice}\" est encore appliqué à ${count} "
+"événement(s)."
+
+msgid "Remove these filters from all affected events"
+msgstr "Supprimer ces filtres de tous les événements concernés"
+
+msgid "Confirmation"
+msgstr "Confirmation"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifier la configuration du filtre d'événements"

@@ -9,9 +9,10 @@ if TYPE_CHECKING:
     from datetime import date
     from onegov.user import User
     from sqlalchemy.orm import Query
+    from uuid import UUID  # noqa: F401
 
 
-class AttendeeCollection(GenericCollection[Attendee]):
+class AttendeeCollection(GenericCollection[Attendee, 'UUID']):
 
     @property
     def model_class(self) -> type[Attendee]:

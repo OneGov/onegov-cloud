@@ -21,6 +21,7 @@ from onegov.core.utils import Bunch
 from onegov.core.utils import scan_morepath_modules, module_path, is_uuid
 from onegov.file import DepotApp, File, FileCollection
 from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS, delete_file
+from onegov.file.models import SigningRequest
 from onegov.file.models.file_message import FileMessage
 from sedate import utcnow
 from tests.shared.utils import create_image
@@ -379,6 +380,7 @@ def test_ais_success(app: TestApp) -> None:
 
     path = module_path('tests.onegov.file', 'fixtures/example.pdf')
     tape = module_path('tests.onegov.file', 'cassettes/ais-success.json')
+    session = app.session()
 
     # recordings were shamelessly copied from AIS.py's unit tests
     with vcr.use_cassette(tape, record_mode='none'):
@@ -387,9 +389,10 @@ def test_ais_success(app: TestApp) -> None:
             infile.seek(0)
 
             outfile = BytesIO()
-            request_id = app.signing_service.sign(infile, outfile)
+            request = app.signing_service.sign(session, infile, outfile)
 
-            name, customer, id = request_id.split('/')
+            assert request.service_name == 'swisscom_ais'
+            name, customer, id = request.request_id.split('/')
             assert name == 'swisscom_ais'
             assert customer == 'foo'
             assert is_uuid(id)
@@ -405,13 +408,14 @@ def test_ais_error(app: TestApp) -> None:
 
     path = module_path('tests.onegov.file', 'fixtures/example.pdf')
     tape = module_path('tests.onegov.file', 'cassettes/ais-error.json')
+    session = app.session()
 
     # recordings were shamelessly copied from AIS.py's unit tests
     with vcr.use_cassette(tape, record_mode='none'):
         with open(path, 'rb') as infile:
             with pytest.raises(AIS.exceptions.AuthenticationFailed):
                 outfile = BytesIO()
-                app.signing_service.sign(infile, outfile)
+                app.signing_service.sign(session, infile, outfile)
 
 
 def test_sign_file(app: TestApp) -> None:
@@ -453,6 +457,11 @@ def test_sign_file(app: TestApp) -> None:
             assert pdf.signature_metadata['token_type'] == 'yubikey'
             assert pdf.signature_metadata['request_id'].startswith(
                 'swisscom_ais/foo/')
+
+            request = app.session().query(SigningRequest).one()
+            assert request.file == pdf
+            assert request.service_name == 'swisscom_ais'
+            assert request.request_id.startswith('swisscom_ais/foo/')
 
             assert len(pdf.reference.file.read()) > 0
 

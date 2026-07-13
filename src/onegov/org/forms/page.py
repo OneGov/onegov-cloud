@@ -124,6 +124,9 @@ class IframeForm(PageBaseForm):
                 'child_src', set()):
             self.allowed_domains.append(domain) if domain != "'self'" else None
         if self.allowed_domains:
+            # keep displayed domain order stable
+            self.allowed_domains.sort()
+
             self.domain_hint.text = (
                 self.request.translate(
                     _('The following domains are allowed for iFrames:')

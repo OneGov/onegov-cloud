@@ -93,7 +93,7 @@ def view_api_endpoints(
     open_data=True
 )
 def view_api_endpoint(
-    self: ApiEndpoint[Any], request: CoreRequest
+    self: ApiEndpoint[Any, Any], request: CoreRequest
 ) -> dict[str, Any]:
 
     headers = check_rate_limit(request)
@@ -161,7 +161,7 @@ def view_api_endpoint(
     open_data=True
 )
 def view_api_endpoint_item(
-    self: ApiEndpointItem[Any], request: CoreRequest
+    self: ApiEndpointItem[Any, Any], request: CoreRequest
 ) -> dict[str, Any]:
     headers = check_rate_limit(request)
 
@@ -229,7 +229,7 @@ def view_api_endpoint_item(
     open_data=False
 )
 def edit_api_endpoint_item(
-    self: ApiEndpointItem[Any], request: CoreRequest
+    self: ApiEndpointItem[Any, Any], request: CoreRequest
 ) -> None:
 
     with ApiException.capture_exceptions():

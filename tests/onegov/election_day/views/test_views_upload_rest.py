@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import psycopg.errors
+import pytest
 import transaction
 
 from io import BytesIO
@@ -8,6 +10,9 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Vote
+from psycopg.pq import TransactionStatus
+from sqlalchemy import text
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
 from unittest.mock import patch
@@ -383,3 +388,98 @@ def test_view_rest_xml(election_day_app_zg: TestApp) -> None:
         assert isinstance(import_.call_args[0][0], Canton)
         assert isinstance(import_.call_args[0][1], BytesIO)
         assert isinstance(import_.call_args[0][2], Session)
+
+
+def test_savepoint_rollback_blocked_by_activate_schema(
+    election_day_app_zg: TestApp,
+) -> None:
+    """OGC-3223: ROLLBACK TO SAVEPOINT must reach PostgreSQL even on INERROR
+    connections so that begin_nested() recovery works.
+
+    activate_schema and limit_session_lifetime both fire on every cursor
+    execution via before_cursor_execute. They now return early for ROLLBACK TO
+    SAVEPOINT statements, letting the ROLLBACK reach PostgreSQL and return the
+    connection to INTRANS.
+    """
+
+    app = election_day_app_zg
+    schema = app.session_manager.session().info['schema']
+    engine = app.session_manager.engine
+
+    with engine.connect().execution_options(schema=schema) as conn:
+        conn.execute(text('SELECT 1'))
+        raw = conn.connection.driver_connection
+        assert raw is not None
+
+        nested = conn.begin_nested()
+
+        with pytest.raises(DatabaseError):
+            conn.execute(text('SELECT 1/0'))
+
+        assert raw.info.transaction_status == TransactionStatus.INERROR
+
+        nested.rollback()
+
+        # INTRANS: ROLLBACK TO SAVEPOINT reached PostgreSQL and recovered.
+        assert raw.info.transaction_status == TransactionStatus.INTRANS
+
+        result = conn.execute(text('SELECT 1'))
+        assert result.scalar() == 1
+
+
+@pytest.mark.parametrize('trigger_sql', [
+    pytest.param('SELECT 1/0', id='division_by_zero'),
+    pytest.param(
+        "SET statement_timeout='1ms'; SELECT pg_sleep(1)",
+        id='statement_timeout',
+    ),
+])
+def test_infailedsqltransaction_after_corrupt_pool_connection(
+    election_day_app_zg: TestApp,
+    trigger_sql: str,
+) -> None:
+    """OGC-3223: a connection returned to the pool with an aborted PostgreSQL
+    transaction causes InFailedSqlTransaction on the next request's SET
+    search_path. The error surfaces visibly; psycopg2.InternalError is in
+    DB_CONNECTION_ERRORS so the server returns 503 in production.
+
+    Two triggers: division_by_zero (any PostgreSQL error leaves INERROR) and
+    statement_timeout (QueryCanceled leaves the connection in INERROR).
+    """
+    from sqlalchemy.pool.base import ResetStyle
+
+    app = election_day_app_zg
+    pool = app.session_manager.engine.pool
+
+    app.session_manager.session_factory.remove()
+    pool.dispose()
+
+    # Return a connection with an aborted transaction to the pool
+    # without ROLLBACK.
+    raw = app.session_manager.engine.raw_connection()
+    assert raw.driver_connection is not None
+    cursor = raw.driver_connection.cursor()
+    for statement in trigger_sql.split(';'):
+        try:
+            cursor.execute(statement.strip())
+        except Exception:
+            break
+    original = pool._reset_on_return
+    pool._reset_on_return = ResetStyle.reset_none
+    try:
+        raw.close()
+    finally:
+        pool._reset_on_return = original
+
+    # The first request must fail visibly with InFailedSqlTransaction raised
+    # from activate_schema's SET search_path. The handlers only return early
+    # for ROLLBACK TO SAVEPOINT statements; all other statements on INERROR
+    # connections fail naturally and surface in Sentry.
+    with pytest.raises(psycopg.errors.InFailedSqlTransaction):
+        Client(app).get('/')
+
+    # The failure is self-healing: transaction_tween catches the exception,
+    # calls manager.abort() → session.rollback() → ROLLBACK on the DBAPI
+    # connection, which clears INERROR and returns the connection to IDLE.
+    # A follow-up request must succeed.
+    assert Client(app).get('/').status_int == 200

@@ -444,8 +444,9 @@ def handle_file_upload[FileT: File](
 
     """
 
-    fs = request.params['file']
-    assert not isinstance(fs, str)
+    fs = request.params.get('file')
+    if isinstance(fs, str) or fs is None:
+        raise exc.HTTPBadRequest()
 
     file = self.add(
         filename=fs.filename,

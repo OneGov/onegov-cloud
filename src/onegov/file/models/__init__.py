@@ -5,6 +5,7 @@ from onegov.file.models.associated_files import (
 from onegov.file.models.file import File, SearchableFile
 from onegov.file.models.fileset import FileSet
 from onegov.file.models.named_file import NamedFile
+from onegov.file.models.signing_request import SigningRequest
 
 __all__ = (
     'AssociatedFiles',
@@ -13,4 +14,5 @@ __all__ = (
     'MultiAssociatedFiles',
     'NamedFile',
     'SearchableFile',
+    'SigningRequest',
 )

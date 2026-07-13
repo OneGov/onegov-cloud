@@ -733,6 +733,7 @@ def clear_submit_accept_single_event(
     transaction.commit()
 
     # Submit and publish an event
+    client.login_admin()
     page = client.get('/events').click('Veranstaltung erfassen')
     event_date = date.today() + timedelta(days=1)
     page.form['email'] = 'sinfonieorchester@govikon.org'
@@ -744,11 +745,14 @@ def clear_submit_accept_single_event(
     page.form['organizer_email'] = 'sinfonieorchester@govikon.org'
     page.form['organizer_phone'] = '+41 41 123 45 67'
     page.form['tags'] = custom_tags if custom_tags else ['Music', 'Tradition']
+    page.form['syndicate'] = False  # requires admin
+    page.form['highlight'] = True  # requires admin
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = '18:00'
     page.form['end_time'] = '22:00'
     page.form['repeat'] = 'without'
     page.form.submit().follow().form.submit().follow()
+    client.logout()
 
     client.login_editor()
 
@@ -913,6 +917,21 @@ def test_export_events_json_xml_csv(client: Client) -> None:
                     '+41 41 123 45 67')
 
         assert event_fields['Schlagworte'] == 'Musik, Brauchtum'
+
+        if 'Extern_publizieren' in event_fields:
+            assert event_fields['Extern_publizieren'] in (
+                False,
+                'False',
+                'false',
+            )
+        else:
+            assert event_fields['Extern publizieren'] in (
+                False,
+                'False',
+                'false',
+            )
+
+        assert event_fields['Highlight'] in (True, 'True', 'true')
         assert event_fields['Erstellt'] == '23.03.2026 09:00'
         assert event_fields['Von'] == '24.03.2026 18:00'
         assert event_fields['Bis'] == '24.03.2026 22:00'
@@ -957,6 +976,179 @@ def test_export_events_json_xml_csv(client: Client) -> None:
         rows = list(csv.DictReader(StringIO(page.text)))
         assert len(rows) == 1
         verify_event_fields(rows[0])
+
+
+def test_event_filter_settings_stale_data(client: Client) -> None:
+    client.login_admin()
+
+    settings = client.get('/event-settings')
+    settings.form['event_filter_type'] = 'filters'
+    settings.form.submit()
+
+    # Set up a filter with two choices
+    page = client.get('/events').click('Konfigurieren')
+    assert 'force_remove' not in page.form.fields  # not shown on initial load
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit()
+
+    # Apply Choice A to an event
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = ['Choice A']
+    page.form.submit()
+
+    # Removing Choice A (in use) is blocked — force_remove checkbox appears
+    page = client.get('/events').click('Konfigurieren')
+    assert 'force_remove' not in page.form.fields
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    response = page.form.submit()
+    assert (
+        'Die Filterauswahl "Choice A" ist noch bei 1 Veranstaltung(en) gesetzt'
+        in response
+    )
+    assert 'force_remove' in response.form.fields
+    assert client.app.org.event_filter_definition is not None
+    assert 'Choice A' in client.app.org.event_filter_definition
+
+    # Checking force_remove cleans up the filter from events and saves
+    response.form['force_remove'] = True
+    response.form.submit().follow()
+    assert 'Choice A' not in (client.app.org.event_filter_definition or '')
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    assert not page.form['my_filter'].value
+
+    # Re-setup: re-add Choice A, re-apply to event
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit()
+
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    assert 'force_remove' not in page.form.fields
+    page.form['my_filter'] = ['Choice A']
+    page.form.submit()
+
+    # Block again — manually clearing the event also allows removing the choice
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    response = page.form.submit()
+    assert 'force_remove' in response.form.fields
+
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = []
+    page.form.submit()
+
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice B
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit().follow()
+    assert 'Choice A' not in (client.app.org.event_filter_definition or '')
+
+    # Removing an unused choice (Choice B) is allowed without blocking
+    page = client.get('/events').click('Konfigurieren')
+    assert 'force_remove' not in page.form.fields
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit().follow()
+    assert 'Choice B' not in (client.app.org.event_filter_definition or '')
+
+    # Re-apply a filter to test keyword-level blocking
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = ['Choice A']
+    page.form.submit()
+
+    # Deselecting the whole keyword while events use it is blocked,
+    # checkbox appears
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = ''
+    response = page.form.submit()
+    assert (
+        'Der Filter "my_filter" ist noch bei 1 Veranstaltung(en) gesetzt'
+        in response
+    )
+    assert 'force_remove' in response.form.fields
+    assert client.app.org.event_filter_configuration.get('keywords')
+
+    # force_remove also cleans up keyword-level filters from events
+    response.form['force_remove'] = True
+    response.form.submit().follow()
+    assert not client.app.org.event_filter_configuration.get('keywords')
+
+    # Re-setup: re-enable keyword and re-apply filter to event
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = 'my_filter'
+    page.form.submit()
+
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = ['Choice A']
+    page.form.submit()
+
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = ''
+    response = page.form.submit()
+    assert 'force_remove' in response.form.fields
+
+    # Manually clearing the filter from the event also allows deselecting
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    page.form['my_filter'] = []
+    page.form.submit()
+
+    page = client.get('/events').click('Konfigurieren')
+    page.form['definition'] = """
+        My Filter =
+            [ ] Choice A
+    """
+    page.form['keyword_fields'].value = ''
+    page.form.submit().follow()
+    assert not client.app.org.event_filter_configuration.get('keywords')
 
 
 def test_event_form_with_custom_lead(client: Client) -> None:

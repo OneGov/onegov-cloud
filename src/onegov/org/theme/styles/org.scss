@@ -819,10 +819,6 @@ table {
     form style customizations
 */
 form {
-    label {
-        min-width: 75%;
-    }
-
     label > ul,
     .upload-widget > ul,
     .group-label > ul {
@@ -941,6 +937,21 @@ form {
             white-space: nowrap;
             text-overflow: ellipsis;
             break-inside: avoid;
+        }
+    }
+
+    // The "select all / deselect all" controls that multicheckbox.js prepends
+    // as a list item without its own checkbox. Keep the three labels grouped on
+    // one line. The standard form macro already does this via
+    // `.group-label > ul li` (flex), but the search filter renders the
+    // multicheckbox outside that wrapper, so its item needs `display: flex`
+    // here too.
+    ul:has(li input[type="checkbox"]) > li:first-child:not(:has(input)) {
+        display: flex;
+        align-items: baseline;
+
+        label {
+            flex: 0 0 auto;
         }
     }
 
@@ -2525,6 +2536,12 @@ $person-website-icon: '\f0c1';
 $person-phone-icon: '\f095';
 $person-email-icon: '\f003';
 
+#people-filters {
+    .people-filter-select {
+        margin-bottom: .75rem;
+    }
+}
+
 .person-card {
     margin: 0 1em 1em 0;
 
@@ -3390,6 +3407,14 @@ button {
             font-size: .9em;
         }
 
+        .fc-daygrid-body-natural .fc-daygrid-day-events {
+            margin-bottom: 0 !important;
+        }
+
+        .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+            min-height: 0;
+        }
+
         .fc-event {
             overflow: hidden;
             border: 0;
@@ -3418,6 +3443,11 @@ button {
 
         .event-available {
             background-color: $green;
+        }
+
+        .event-holiday {
+            background-color: $red;
+            cursor: default !important;
         }
 
         // fix borders missing with zurb foundation
@@ -7436,4 +7466,10 @@ code {
 
 p.full-text-width {
     max-width: 100% !important;
+}
+
+.directory-entry-hash {
+    font-family: $font-family-monospace;
+    font-size: .75rem;
+    background-color: $gray-pastel;
 }

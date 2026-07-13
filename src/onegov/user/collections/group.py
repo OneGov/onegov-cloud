@@ -7,9 +7,10 @@ from onegov.core.collection import GenericCollection
 from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
+    from uuid import UUID  # noqa: F401
 
 
-class UserGroupCollection[T: UserGroup](GenericCollection[T]):
+class UserGroupCollection[T: UserGroup](GenericCollection[T, 'UUID']):
     """ Manages a list of user groups.
 
     Use it like this::

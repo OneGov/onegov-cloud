@@ -28,7 +28,7 @@ from purl import URL
 from sedate import utcnow
 from sqlalchemy import and_, desc, func, or_, text
 from sqlalchemy.orm import object_session, undefer
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -43,7 +43,6 @@ if TYPE_CHECKING:
     from onegov.pay import InvoiceItem, InvoiceItemMeta, Payment
     from onegov.ticket.collection import ExtendedTicketState
     from sqlalchemy.orm import Mapped, Query, Session
-    from uuid import UUID
 
     type DateRange = tuple[datetime, datetime]
 
@@ -317,8 +316,6 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('FRM')
 class FormSubmissionHandler(Handler):
 
-    id: UUID
-
     handler_title = _('Form Submissions')
     code_title = _('Forms')
     invoice_items = submission_invoice_items
@@ -330,7 +327,7 @@ class FormSubmissionHandler(Handler):
 
     @cached_property
     def submission(self) -> FormSubmission | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @cached_property
     def form(self) -> Form:
@@ -558,8 +555,6 @@ class FormSubmissionHandler(Handler):
 @handlers.registered_handler('RSV')
 class ReservationHandler(Handler):
 
-    id: UUID
-
     handler_title = _('Reservations')
     code_title = _('Reservations')
 
@@ -606,7 +601,7 @@ class ReservationHandler(Handler):
 
     @cached_property
     def submission(self) -> FormSubmission | None:
-        return FormSubmissionCollection(self.session).by_id(self.id)
+        return FormSubmissionCollection(self.session).by_id(UUID(self.id))
 
     @property
     def payment(self) -> Payment | None:
@@ -1193,7 +1188,6 @@ class ReservationHandler(Handler):
 @handlers.registered_handler('EVN')
 class EventSubmissionHandler(Handler):
 
-    id: UUID
     handler_title = _('Events')
     code_title = _('Events')
 
@@ -1203,7 +1197,7 @@ class EventSubmissionHandler(Handler):
 
     @cached_property
     def event(self) -> Event | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @property
     def deleted(self) -> bool:
@@ -1375,8 +1369,6 @@ class EventSubmissionHandler(Handler):
 @handlers.registered_handler('DIR')
 class DirectoryEntryHandler(Handler):
 
-    id: UUID
-
     handler_title = _('Directory Entry Submissions')
     code_title = _('Directory Entry Submissions')
     invoice_items = submission_invoice_items
@@ -1388,7 +1380,7 @@ class DirectoryEntryHandler(Handler):
 
     @cached_property
     def submission(self) -> FormSubmission | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @cached_property
     def form(self) -> Form | None:
@@ -1727,7 +1719,7 @@ class ChatHandler(Handler):
 
     @cached_property
     def chat(self) -> Chat | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @property
     def deleted(self) -> bool:

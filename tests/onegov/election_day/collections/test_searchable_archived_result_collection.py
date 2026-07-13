@@ -127,6 +127,12 @@ def test_searchable_archive(
     archive.domains = ['municipality']
     assert archive.query().count() == 1
 
+    archive.domains = ['@@CX6d3', 'invalid-value']
+    assert archive.query().count() == 14  # invalid values ignored → no filter
+
+    archive.domains = ['federation', '@@CX6d3']
+    assert archive.query().count() == 9  # invalid value stripped, valid kept
+
     # Test voting result
     results = session.query(ArchivedResult).filter_by(type='vote').all()
     for item in results:
@@ -190,7 +196,7 @@ def test_searchable_archive(
     archive.from_date = date(2019, 1, 1)
     archive.to_date = date(2019, 1, 1)
     assert [item.domain for item in archive.query()] == [
-        'canton', 'region', 'district', 'none', 'municipality'
+        'canton', 'region', 'district', 'municipality', 'none'
     ]
 
     archive.app.principal.domain = 'municipality'
