@@ -36,7 +36,7 @@ def tzdatetime(
 ])
 def test_import_guidle(session: Session, xml: str) -> None:
     offers = list(GuidleExportData(etree.parse(xml)).offers())
-    assert len(offers) == 1
+    assert len(offers) == 3
 
     assert offers[0].uid == '551262854'
     assert offers[0].title == "Theatervorstellung"
@@ -66,8 +66,27 @@ def test_import_guidle(session: Session, xml: str) -> None:
         {'Konzert Pop / Rock / Jazz', 'Kulinarik'},
         set()
     )
-    assert offers[0].tags({'Konzert Pop / Rock / Jazz': 'Konzert'}) == (
+    assert offers[0].tags({'Konzert Pop / Rock / Jazz': ['Konzert']}) == (
         {'Konzert'}, {'Kulinarik'}
+    )
+    assert offers[0].tags({
+        'Konzert Pop / Rock / Jazz': ['Konzert', 'Musik'],
+        'Kulinarik': ['Kulinarik'],
+    }) == (
+        {'Konzert', 'Musik', 'Kulinarik'}, set()
+    )
+
+    # an offer without any tags yields no known and no unknown tags
+    assert offers[1].tags() == (set(), set())
+    assert offers[1].tags({'Konzert Pop / Rock / Jazz': ['Konzert']}) == (
+        set(), set()
+    )
+
+    # an offer whose tags are not in the tagmap yields no known tags, but
+    # reports all of them as unknown
+    assert offers[2].tags() == ({'Theater'}, set())
+    assert offers[2].tags({'Konzert Pop / Rock / Jazz': ['Konzert']}) == (
+        set(), {'Theater'}
     )
 
     schedules = list(offers[0].schedules())

@@ -217,9 +217,13 @@ class GuidleOffer(GuidleBase):
 
     def tags(
         self,
-        tagmap: Mapping[str, str] | None = None
+        tagmap: Mapping[str, Sequence[str]] | None = None
     ) -> tuple[set[str], set[str]]:
-        """ Returns a set of known and a set of unkonwn tags. """
+        """ Returns a set of known and a set of unkonwn tags.
+
+        A source tag in the tagmap may map to more than one target tag.
+
+        """
 
         tag_elements = self.find(
             'guidle:classifications/'
@@ -233,7 +237,11 @@ class GuidleOffer(GuidleBase):
         }
         if tagmap:
             return (
-                {tagmap[tag] for tag in tags if tag in tagmap},
+                {
+                    target
+                    for tag in tags if tag in tagmap
+                    for target in tagmap[tag]
+                },
                 tags - tagmap.keys()
             )
         return tags, set()

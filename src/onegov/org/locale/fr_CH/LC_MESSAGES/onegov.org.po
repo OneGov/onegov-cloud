@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-01 07:55+0200\n"
+"POT-Creation-Date: 2026-07-13 16:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1096,11 +1096,23 @@ msgstr "Test"
 msgid "Do not actually import the events."
 msgstr "Les événements ne sont pas sauvegardés."
 
+msgid "Syndicate"
+msgstr "Publier en externe"
+
+msgid "Highlight"
+msgstr "Mise en avant"
+
 msgid "Created"
 msgstr "Créé"
 
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Supprimer ces filtres de tous les événements concernés"
+
+msgid "Confirmation"
+msgstr "Confirmation"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -2945,11 +2957,23 @@ msgstr "Filtres configurables manuellement"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Les deux, balises prédéfinies et filtres configurables"
 
-msgid "General information above the event list"
-msgstr "Informations générales au-dessus de la liste des événements"
+msgid "Title of text above event list"
+msgstr "Titre du texte au-dessus de la liste des événements"
 
-msgid "General information below the event list"
-msgstr "Informations générales en dessous de la liste des événements"
+msgid "Information above the event list"
+msgstr "Information au-dessus de la liste des événements"
+
+msgid "Text above the event list"
+msgstr "Texte au-dessus de la liste des événements"
+
+msgid "Title of text below event list"
+msgstr "Titre du texte en dessous de la liste des événements"
+
+msgid "Information below the event list"
+msgstr "Information en dessous de la liste des événements"
+
+msgid "Text below the event list"
+msgstr "Texte en dessous de la liste des événements"
 
 msgid "Documents"
 msgstr "Documents"
@@ -4422,8 +4446,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Paiement"
 
@@ -5248,8 +5272,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6419,8 +6443,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -6841,14 +6865,8 @@ msgstr "Au total, 5 sous-pages sont concernées."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} liens seront remplacés par cette action."
 
-msgid "Syndicate"
-msgstr "Publier en externe"
-
 msgid "Publish this event externally"
 msgstr "Publier cet événement en externe"
-
-msgid "Highlight"
-msgstr "Mise en avant"
 
 msgid "Mark as highlighted event"
 msgstr "Marquer comme événement mis en avant"
@@ -7247,21 +7265,12 @@ msgstr "Cette semaine"
 
 #, python-format
 msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
-msgstr ""
-"Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
+msgstr "Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
 
 #, python-format
-msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
-"Le choix de filtre \"${choice}\" est encore appliqué à ${count} "
-"événement(s)."
-
-msgid "Remove these filters from all affected events"
-msgstr "Supprimer ces filtres de tous les événements concernés"
-
-msgid "Confirmation"
-msgstr "Confirmation"
+"Le choix de filtre \"${choice}\" est encore appliqué à ${count} événement(s)."
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifier la configuration du filtre d'événements"
@@ -8125,6 +8134,12 @@ msgstr "L'utilisateur a bien été créé"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
+#~ msgid "General information above the event list"
+#~ msgstr "Informations générales au-dessus de la liste des événements"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Informations générales en dessous de la liste des événements"
+
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "p.ex. 07:00 ou 07:00, 14:30"
 
@@ -8195,12 +8210,6 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
 #~ msgid "Date of death"
 #~ msgstr "Date de décès"
-
-#~ msgid "Information above the event list"
-#~ msgstr "Information au-dessus de la liste des événements"
-
-#~ msgid "Information below the event list"
-#~ msgstr "Information en dessous de la liste des événements"
 
 #~ msgid "Portrait"
 #~ msgstr "Portrait"
