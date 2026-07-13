@@ -270,41 +270,37 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency', int], ApisMixin):
 
         session = self.session
         by_id: dict[int, ExtendedAgency] = {}
-        pending: set[int] = set()
+        # the direct parents are already eager loaded (see `collection`),
+        # so start the walk from them
+        frontier: list[ExtendedAgency] = []
         for agency in agencies:
             by_id[agency.id] = agency
-            # the direct parent is already eager loaded (see `collection`)
             parent = agency.parent
-            if parent is not None:
+            if parent is not None and parent.id not in by_id:
                 by_id[parent.id] = parent
-                if (
-                    parent.parent_id is not None
-                    and parent.parent_id not in by_id
-                ):
-                    pending.add(parent.parent_id)
+                frontier.append(parent)
 
-        # load the remaining ancestors one level at a time (a handful of
+        # load the remaining ancestors one generation at a time (a handful of
         # queries bound by the tree depth, instead of one query per ancestor)
-        while pending:
-            ancestors = session.query(ExtendedAgency).filter(
-                ExtendedAgency.id.in_(pending)
+        while frontier:
+            parent_ids = {
+                item.parent_id for item in frontier
+                if item.parent_id is not None and item.parent_id not in by_id
+            }
+            if not parent_ids:
+                break
+            frontier = session.query(ExtendedAgency).filter(
+                ExtendedAgency.id.in_(parent_ids)
             ).all()
-            pending = set()
-            for ancestor in ancestors:
-                by_id[ancestor.id] = ancestor
-                if (
-                    ancestor.parent_id is not None
-                    and ancestor.parent_id not in by_id
-                ):
-                    pending.add(ancestor.parent_id)
+            for item in frontier:
+                by_id[item.id] = item
 
         # populate the parent relationship from the loaded set, so accessing
         # it later resolves in-memory rather than triggering a lazy load
         for agency in by_id.values():
-            if agency.parent_id is not None:
-                parent = by_id.get(agency.parent_id)
-                if parent is not None:
-                    set_committed_value(agency, 'parent', parent)
+            parent_id = agency.parent_id
+            if parent_id is not None and parent_id in by_id:
+                set_committed_value(agency, 'parent', by_id[parent_id])
 
     def item_data(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
