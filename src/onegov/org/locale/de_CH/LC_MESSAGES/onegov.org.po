@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-01 07:55+0200\n"
+"POT-Creation-Date: 2026-07-13 14:56+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1077,11 +1077,23 @@ msgstr "Probelauf"
 msgid "Do not actually import the events."
 msgstr "Die Veranstaltungen werden nicht gespeichert."
 
+msgid "Syndicate"
+msgstr "Extern publizieren"
+
+msgid "Highlight"
+msgstr "Highlight"
+
 msgid "Created"
 msgstr "Erstellt"
 
 msgid "Expected header line with the following columns:"
 msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Diese(n) Filter bei allen betroffenen Veranstaltungen entfernen"
+
+msgid "Confirmation"
+msgstr "Bestätigung"
 
 msgid "Comment"
 msgstr "Kommentar"
@@ -4396,8 +4408,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -5222,8 +5234,8 @@ msgstr "Neue Kunden Nachricht in Ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} schrieb"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -6386,8 +6398,8 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -6809,14 +6821,8 @@ msgstr "Insgesamt ${number} Unterseiten sind betroffen."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} Links werden nach dieser Aktion ersetzt."
 
-msgid "Syndicate"
-msgstr "Extern publizieren"
-
 msgid "Publish this event externally"
 msgstr "Veranstaltung extern publizieren"
-
-msgid "Highlight"
-msgstr "Highlight"
 
 msgid "Mark as highlighted event"
 msgstr "Als Highlight markieren"
@@ -7007,11 +7013,14 @@ msgid "This registration window can't be deleted."
 msgstr "Dieser Anmeldezeitraum kann nicht gelöscht werden."
 
 msgid ""
-"There are confirmed or open submissions associated with it. Cancel the "
-"registration window first."
+"There are confirmed or open submissions associated with it and the "
+"registration window is still active. Cancel the registration window first or "
+"set the end date to a past date."
 msgstr ""
-"Bereits bestätigte oder offene Anmeldungen wären betroffen. Sagen Sie den "
-"Zeitraum zuerst ab."
+"Es gibt bestätigte oder offene Anmeldungen die mit diesem Anmeldezeitraum "
+"verbunden sind und der Anmeldezeitraum ist noch aktiv. Bitte stornieren "
+"Sie zuerst den Anmeldezeitraum oder setzen Sie das Enddatum auf ein "
+"Vergangenes Datum."
 
 msgid "Edit Registration Window"
 msgstr "Anmeldezeitraum bearbeiten"
@@ -7220,17 +7229,10 @@ msgstr ""
 "Der Filter \"${keyword}\" ist noch bei ${count} Veranstaltung(en) gesetzt."
 
 #, python-format
-msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
 "Die Filterauswahl \"${choice}\" ist noch bei ${count} Veranstaltung(en) "
 "gesetzt."
-
-msgid "Remove these filters from all affected events"
-msgstr "Diese(n) Filter bei allen betroffenen Veranstaltungen entfernen"
-
-msgid "Confirmation"
-msgstr "Bestätigung"
 
 msgid "Edit Event Filter Configuration"
 msgstr "Filterkonfiguration für Veranstaltungen bearbeiten"
@@ -8094,6 +8096,13 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid ""
+#~ "There are confirmed or open submissions associated with it. Cancel the "
+#~ "registration window first."
+#~ msgstr ""
+#~ "Bereits bestätigte oder offene Anmeldungen wären betroffen. Sagen Sie den "
+#~ "Zeitraum zuerst ab."
 
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "z.B. 07:00 oder 07:00, 14:30"
