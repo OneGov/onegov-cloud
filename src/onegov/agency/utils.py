@@ -123,9 +123,7 @@ def get_html_paragraph_with_line_breaks(text: object) -> Markup:
 def filter_modified_or_created[T](
     query: Query[T],
     relate: Literal['>', '<', '>=', '<=', '=='],
-    # FIXME: This is a bit lax about types, SQLAlchemy is doing the heavy
-    #        lifting here, auto casting ISO formatted date strings
-    comparison_property: datetime | str,
+    comparison_property: datetime,
     collection_class: type[TimestampMixin]
 ) -> Query[T]:
 

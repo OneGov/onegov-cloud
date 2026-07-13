@@ -603,7 +603,7 @@ class FormSubmissionCollection:
 
 
 class FormRegistrationWindowCollection(
-    GenericCollection[FormRegistrationWindow]
+    GenericCollection[FormRegistrationWindow, UUID]
 ):
 
     def __init__(self, session: Session, name: str | None = None):
@@ -831,7 +831,7 @@ class SurveySubmissionCollection:
 
 
 class SurveySubmissionWindowCollection(
-    GenericCollection[SurveySubmissionWindow]
+    GenericCollection[SurveySubmissionWindow, UUID]
 ):
 
     def __init__(self, session: Session, name: str | None = None):

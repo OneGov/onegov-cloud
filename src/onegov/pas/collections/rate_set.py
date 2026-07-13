@@ -9,9 +9,10 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
+    from uuid import UUID  # noqa: F401
 
 
-class RateSetCollection(GenericCollection[RateSet]):
+class RateSetCollection(GenericCollection[RateSet, 'UUID']):
 
     def __init__(
         self,

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class VotumCollection(GenericCollection[Votum]):
+class VotumCollection(GenericCollection[Votum, 'UUID']):
 
     def __init__(
         self,
@@ -44,10 +44,7 @@ class VotumCollection(GenericCollection[Votum]):
         query = query.order_by(Votum.number)
         return query
 
-    def by_id(
-        self,
-        id: UUID  # type:ignore[override]
-    ) -> Votum | None:
+    def by_id(self, id: UUID) -> Votum | None:
         return super().query().filter(Votum.id == id).first()
 
     def by_number(self, number: int) -> Votum | None:

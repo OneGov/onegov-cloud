@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from datetime import date, datetime, time
     from onegov.directory.models import Directory
     from onegov.directory.types import DirectoryConfiguration
+    from onegov.form.parser.core import ParsedField
 
 
 class DirectoryMigration:
@@ -77,7 +78,7 @@ class DirectoryMigration:
             return False
 
         for changed in self.changes.changed_fields:
-            old = self.changes.old[changed]
+            old = self.changes.old_field(changed)
             new = self.changes.new[changed]
 
             # we can turn required into optional fields and vice versa
@@ -184,7 +185,7 @@ class DirectoryMigration:
     def convert_fields(self, values: dict[str, Any]) -> None:
         for changed in self.changes.changed_fields:
             convert = self.fieldtype_migrations.get_converter(
-                self.changes.old[changed].type,
+                self.changes.old_field(changed).type,
                 self.changes.new[changed].type
             )
             assert convert is not None
@@ -458,6 +459,20 @@ class StructuralChanges:
             new = self.new[new_id]
             if old.required != new.required or old.type != new.type:
                 self.changed_fields.append(new_id)
+
+    def old_field(self, changed: str) -> ParsedField:
+        """ Returns the field in the old structure for a changed field.
+
+        ``changed_fields`` holds ids as they appear in the *new* structure,
+        so a field that was renamed (and changed) is stored under its new id,
+        which does not exist in ``self.old``. This resolves the rename to
+        look the field up under its original id.
+
+        """
+        for old_id, new_id in self.renamed_fields.items():
+            if new_id == changed:
+                return self.old[old_id]
+        return self.old[changed]
 
     def detect_added_options(self) -> None:
         self.added_options = []

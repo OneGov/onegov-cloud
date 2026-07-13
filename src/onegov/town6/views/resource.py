@@ -7,14 +7,15 @@ from onegov.org.views.resource import (
     view_resources, view_find_your_spot, get_room_form,
     get_daypass_form, handle_new_room, handle_new_daypass,
     get_resource_form, handle_edit_resource, view_resource,
-    handle_cleanup_allocations, view_occupancy,
+    handle_cleanup_allocations, handle_change_resource_url, view_occupancy,
     view_resource_subscribe, view_export_all, get_item_form,
     handle_new_resource_item, view_export, view_my_reservations,
     view_my_reservations_subscribe
 )
 from onegov.reservation import ResourceCollection, Resource
 from onegov.org.forms import (
-    FindYourSpotForm, ResourceCleanupForm, ResourceExportForm
+    FindYourSpotForm, ResourceChangeUrlForm,
+    ResourceCleanupForm, ResourceExportForm
 )
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.town6 import TownApp
@@ -118,6 +119,22 @@ def town_handle_edit_resource(
     form: ResourceForm
 ) -> RenderData | Response:
     return handle_edit_resource(
+        self, request, form, ResourceLayout(self, request))
+
+
+@TownApp.form(
+    model=Resource,
+    name='change-url',
+    template='form.pt',
+    permission=Private,
+    form=ResourceChangeUrlForm
+)
+def town_handle_change_resource_url(
+    self: Resource,
+    request: TownRequest,
+    form: ResourceChangeUrlForm
+) -> RenderData | Response:
+    return handle_change_resource_url(
         self, request, form, ResourceLayout(self, request))
 
 

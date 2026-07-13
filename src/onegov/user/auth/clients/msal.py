@@ -85,8 +85,7 @@ class MSALClient:
             )
         except Exception as exception:
             raise ValueError(
-                f'MSAL config error in tenant {self.tenant_id}: '
-                '{str(exception)}'
+                f'MSAL config error in tenant {self.tenant_id}: {exception}'
             ) from exception
         return client
 

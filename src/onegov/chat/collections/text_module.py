@@ -8,9 +8,10 @@ from sqlalchemy import or_
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
+    from uuid import UUID  # noqa: F401
 
 
-class TextModuleCollection(GenericCollection[TextModule]):
+class TextModuleCollection(GenericCollection[TextModule, 'UUID']):
 
     def __init__(
         self,

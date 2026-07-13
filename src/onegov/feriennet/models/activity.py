@@ -11,6 +11,7 @@ from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.ticket import OrgTicketMixin
 from onegov.search import SearchableContent
 from onegov.ticket import handlers, Handler, Ticket
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
@@ -147,7 +148,7 @@ class VacationActivityHandler(Handler):
 
     @cached_property
     def publication_request(self) -> PublicationRequest | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @property
     def deleted(self) -> bool:

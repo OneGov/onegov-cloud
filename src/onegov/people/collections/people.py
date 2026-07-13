@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class BasePersonCollection[T: Person](GenericCollection[T]):
+class BasePersonCollection[T: Person](GenericCollection[T, 'UUID']):
 
     @property
     def model_class(self) -> type[T]:
@@ -59,7 +59,7 @@ class BasePersonCollection[T: Person](GenericCollection[T]):
         else:
             return self.add(first_name, last_name, **optional)
 
-    def by_id(self, id: UUID) -> T | None:  # type:ignore[override]
+    def by_id(self, id: UUID) -> T | None:
         if utils.is_uuid(id):
             return self.query().filter(self.model_class.id == id).first()
         return None

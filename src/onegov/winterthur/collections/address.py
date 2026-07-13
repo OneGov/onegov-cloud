@@ -29,7 +29,7 @@ STREETS = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_str.csv'
 ADDRESSES = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_adr.csv'
 
 
-class AddressCollection(GenericCollection[WinterthurAddress]):
+class AddressCollection(GenericCollection[WinterthurAddress, int]):
 
     @property
     def model_class(self) -> type[WinterthurAddress]:
@@ -138,7 +138,7 @@ class AddressCollection(GenericCollection[WinterthurAddress]):
         return CSVFile(buffer)
 
 
-class AddressSubsetCollection(GenericCollection[WinterthurAddress]):
+class AddressSubsetCollection(GenericCollection[WinterthurAddress, int]):
 
     def __init__(self, session: Session, street: str) -> None:
         super().__init__(session)
