@@ -8,9 +8,10 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
+    from uuid import UUID  # noqa: F401
 
 
-class SettlementRunCollection(GenericCollection[SettlementRun]):
+class SettlementRunCollection(GenericCollection[SettlementRun, 'UUID']):
 
     def __init__(
         self,

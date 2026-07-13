@@ -36,6 +36,7 @@ from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import KabaEditForm
 from onegov.org.forms.reservation import ReservationAdjustmentForm
 from onegov.org.forms.reservation import ReservationForm
+from onegov.org.forms.resource import ResourceChangeUrlForm
 from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
 from onegov.org.forms.resource import ResourceForm
@@ -114,6 +115,7 @@ __all__ = (
     'PublicRequestMTANForm',
     'ReservationAdjustmentForm',
     'ReservationForm',
+    'ResourceChangeUrlForm',
     'ResourceCleanupForm',
     'ResourceExportForm',
     'ResourceForm',

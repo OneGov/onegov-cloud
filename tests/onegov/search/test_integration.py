@@ -393,7 +393,7 @@ def test_orm_integration(
     def view_update_document(self: Root, request: CoreRequest) -> None:
         session = request.session
         query = session.query(Document)
-        query = query.filter(Document.id == request.GET['id'])
+        query = query.filter(Document.id == int(request.GET['id']))
 
         document = query.one()
         document.title = request.GET.get('title', document.title)
@@ -403,7 +403,7 @@ def test_orm_integration(
     def view_delete_document(self: Root, request: CoreRequest) -> None:
         session = request.session
         query = session.query(Document)
-        query = query.filter(Document.id == request.params.get('id'))
+        query = query.filter(Document.id == int(request.GET['id']))
         query.delete('fetch')
 
     scan_morepath_modules(App)

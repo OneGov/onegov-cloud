@@ -271,7 +271,7 @@ class PoliticalBusinessParticipation(Base, ContentMixin):
 
 
 class PoliticalBusinessCollection(
-    GenericCollection[PoliticalBusiness],
+    GenericCollection[PoliticalBusiness, UUID],
     Pagination[PoliticalBusiness]
 ):
 
@@ -436,7 +436,7 @@ class PoliticalBusinessCollection(
 
 
 class PoliticalBusinessParticipationCollection(
-    GenericCollection[PoliticalBusinessParticipation]
+    GenericCollection[PoliticalBusinessParticipation, UUID]
 ):
 
     def __init__(self, session: Session, active: bool | None = None):

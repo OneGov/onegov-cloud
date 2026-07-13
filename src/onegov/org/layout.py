@@ -2497,7 +2497,6 @@ class ResourceLayout(DefaultLayout):
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
-                delete_link,
                 Link(
                     text=_('Clean up'),
                     url=self.request.link(self.model, 'cleanup'),
@@ -2523,10 +2522,25 @@ class ResourceLayout(DefaultLayout):
                     url=self.request.link(self.model, 'rules'),
                     attrs={'class': 'rule-link'}
                 ),
-                IFrameLink(
-                    text=_('iFrame'),
-                    url=self.request.link(self.model),
-                    attrs={'class': 'new-iframe'}
+                LinkGroup(
+                    title=_('Advanced'),
+                    links=[
+                        Link(
+                            text=_('Change URL'),
+                            url=self.request.link(
+                                self.model,
+                                name='change-url'
+                            ),
+                            attrs={'class': 'internal-url'}
+                        ),
+                        delete_link,
+                        IFrameLink(
+                            text=_('iFrame'),
+                            url=self.request.link(self.model),
+                            attrs={'class': 'new-iframe'}
+                        ),
+                    ],
+                    right_side=False
                 )
             ]
         elif self.request.has_role('member'):

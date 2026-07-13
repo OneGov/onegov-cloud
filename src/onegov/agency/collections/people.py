@@ -26,11 +26,11 @@ if TYPE_CHECKING:
         agency: str | None
         first_name: str | None
         last_name: str | None
-        updated_gt: datetime | str | None
-        updated_ge: datetime | str | None
-        updated_eq: datetime | str | None
-        updated_le: datetime | str | None
-        updated_lt: datetime | str | None
+        updated_gt: datetime | None
+        updated_ge: datetime | None
+        updated_eq: datetime | None
+        updated_le: datetime | None
+        updated_lt: datetime | None
 
 
 class ExtendedPersonCollection(
@@ -57,11 +57,11 @@ class ExtendedPersonCollection(
         agency: str | None = None,
         first_name: str | None = None,
         last_name: str | None = None,
-        updated_gt: datetime | str | None = None,
-        updated_ge: datetime | str | None = None,
-        updated_eq: datetime | str | None = None,
-        updated_le: datetime | str | None = None,
-        updated_lt: datetime | str | None = None,
+        updated_gt: datetime | None = None,
+        updated_ge: datetime | None = None,
+        updated_eq: datetime | None = None,
+        updated_le: datetime | None = None,
+        updated_lt: datetime | None = None,
         xlsx_modified: str | None = None
     ) -> None:
 

@@ -96,7 +96,7 @@ class CoordinatesField(StringField):
         if isinstance(value, dict):
             self.data = Coordinates(**value)
         elif isinstance(value, Coordinates):
-            self.data = value
+            self.data = value  # type: ignore[assignment]
         else:
             self.data = Coordinates()
 

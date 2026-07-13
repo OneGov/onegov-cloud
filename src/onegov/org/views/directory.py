@@ -337,7 +337,7 @@ def alert_migration_errors(
 
     # check for incompatible type changes
     for changed in migration.changes.changed_fields:
-        old = migration.changes.old[changed]
+        old = migration.changes.old_field(changed)
         new = migration.changes.new[changed]
 
         if not migration.fieldtype_migrations.possible(old.type, new.type):

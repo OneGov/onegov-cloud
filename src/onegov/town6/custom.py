@@ -68,7 +68,7 @@ def get_modules(request: TownRequest) -> LinkGroup:
     return modules
 
 
-def get_api_endpoints(request: TownRequest) -> Iterator[ApiEndpoint[Any]]:
+def get_api_endpoints(request: TownRequest) -> Iterator[ApiEndpoint[Any, Any]]:
     yield from get_api_endpoints_base(request)
     if request.app.org.ris_enabled:
         yield CommissionApiEndpoint(request)
