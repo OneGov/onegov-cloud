@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-01 07:55+0200\n"
+"POT-Creation-Date: 2026-07-13 14:00+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1078,11 +1078,23 @@ msgstr "Test"
 msgid "Do not actually import the events."
 msgstr "Les événements ne sont pas sauvegardés."
 
+msgid "Syndicate"
+msgstr "Publier en externe"
+
+msgid "Highlight"
+msgstr "Mise en avant"
+
 msgid "Created"
 msgstr "Créé"
 
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
+
+msgid "Remove these filters from all affected events"
+msgstr "Supprimer ces filtres de tous les événements concernés"
+
+msgid "Confirmation"
+msgstr "Confirmation"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -3667,6 +3679,9 @@ msgstr "Nouveau"
 msgid "Subscribers"
 msgstr "Abonnés"
 
+msgid "Schedule email delivery"
+msgstr "Planifier la livraison par e-mail"
+
 msgid "Test"
 msgstr "Test"
 
@@ -4404,8 +4419,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Paiement"
 
@@ -5230,8 +5245,8 @@ msgstr "Nouveau message du client dans le ticket ${link}"
 msgid "${author} wrote"
 msgstr "${author} a écrit"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6401,8 +6416,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -6823,14 +6838,8 @@ msgstr "Au total, 5 sous-pages sont concernées."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} liens seront remplacés par cette action."
 
-msgid "Syndicate"
-msgstr "Publier en externe"
-
 msgid "Publish this event externally"
 msgstr "Publier cet événement en externe"
-
-msgid "Highlight"
-msgstr "Mise en avant"
 
 msgid "Mark as highlighted event"
 msgstr "Marquer comme événement mis en avant"
@@ -7229,21 +7238,12 @@ msgstr "Cette semaine"
 
 #, python-format
 msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
-msgstr ""
-"Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
+msgstr "Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
 
 #, python-format
-msgid ""
-"The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
 msgstr ""
-"Le choix de filtre \"${choice}\" est encore appliqué à ${count} "
-"événement(s)."
-
-msgid "Remove these filters from all affected events"
-msgstr "Supprimer ces filtres de tous les événements concernés"
-
-msgid "Confirmation"
-msgstr "Confirmation"
+"Le choix de filtre \"${choice}\" est encore appliqué à ${count} événement(s)."
 
 msgid "Edit Event Filter Configuration"
 msgstr "Modifier la configuration du filtre d'événements"

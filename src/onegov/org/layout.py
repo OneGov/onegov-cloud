@@ -3101,7 +3101,7 @@ class NewsletterLayout(DefaultLayout):
 
             return [
                 Link(
-                    text=_('Send'),
+                    text=_('Schedule email delivery'),
                     url=self.request.link(self.model, 'send'),
                     attrs={'class': 'send-link'}
                 ),
