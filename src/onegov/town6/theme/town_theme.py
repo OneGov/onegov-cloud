@@ -86,14 +86,21 @@ class TownBootstrapTheme(BootstrapBaseTheme):
     @property
     def pre_imports(self) -> list[str]:
         return [
-            *self.additional_font_families
+            *self.additional_font_families,
+            'bootstrap_customizations'
+        ]
+
+    @property
+    def post_variable_imports(self) -> list[str]:
+        return [
+            'post_variable_imports'
         ]
 
     @property
     def post_imports(self) -> list[str]:
         """Our scss code split into various files"""
         return [
-            'homepage'
+            'homepage',
         ]
 
     @property

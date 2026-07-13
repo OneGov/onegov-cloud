@@ -40,13 +40,13 @@
     <tal:b tal:content="request.analytics_code|nothing" />
 </head>
 
-<body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)} town-6" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
+<body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)} town-6 d-flex flex-column min-vh-100" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
 
     <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="searchModalLabel" i18n:translate>Search</h1>
+                    <h1 class="modal-title" id="searchModalLabel" i18n:translate>Search</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -69,7 +69,7 @@
 
 
     <a class="visually-hidden-focusable" href="#content" i18n:translate>Skip navigation</a>
-    <main>
+    <main class="flex-grow-1">
         <header id="header" tal:define="header_options request.app.org.header_options or {}">
             <nav id="globals" class="globals bg-dark navbar navbar-expand-lg"  data-bs-theme="dark" tal:define="toolbox global_tools|False; modules modules|False" tal:condition="request.is_logged_in or request.authenticated_email">
                 <div class="container">
@@ -150,29 +150,10 @@
 
                             <div class="collapse navbar-collapse" id="mainNav">
 
-                                <ul class="navbar-nav me-auto">
-                                    <li class="nav-item">
-                                    <a class="nav-link" href="#">Über Govikon</a>
-                                    </li>
-                                    <li class="nav-item">
-                                    <a class="nav-link" href="#">Leben</a>
-                                    </li>
-                                    <li class="nav-item">
-                                    <a class="nav-link" href="#">Verwaltung</a>
-                                    </li>
-                                    <li class="nav-item">
-                                    <a class="nav-link" href="#">Freizeit &amp; Kultur</a>
-                                    </li>
-                                    <li class="nav-item">
-                                    <a class="nav-link" href="#">Wirtschaft</a>
-                                    </li>
-                                    <li class="nav-item">
-                                    <a class="nav-link" href="#">Kontakt</a>
-                                    </li>
-                                </ul>
+                                <tal:b metal:use-macro="layout.macros['main_navigation']"></tal:b>
 
                                 <div class="d-flex align-items-center gap-3">
-                                    <a href="#" class="fs-4" data-bs-toggle="modal" data-bs-target="#searchModal">
+                                    <a href="#" class="" data-bs-toggle="modal" data-bs-target="#searchModal">
                                         <i class="fa fa-search"></i>
                                     </a>
                                     <a href="#" class="btn btn-primary rounded-pill px-4">
@@ -222,29 +203,25 @@
                 </div>
             </div>
             <article class="content without-sidebar-links" tal:condition="on_homepage">
-                <section role="main" id="content">
+                <section role="main" id="content" class="my-5xl">
                     <div metal:define-slot="content"></div>
                 </section>
             </article>
             <article class="content ${'with-sidebar-links' if sidebar_links else 'without-sidebar-links'}" tal:condition="not: on_homepage" >
-                <div class="grid-container">
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell small-12">
-                            <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
-                            <section role="main" id="content" data-reinit-foundation>
-                                <h1 class="main-title">
-                                    <div metal:define-slot="main-title">
-                                        <div metal:define-slot="pre-title"></div>
-                                        <div metal:define-slot="title"></div>
-                                        <div metal:define-slot="post-title"></div>
-                                    </div>
-                                </h1>
-                                <div metal:define-slot="before-content"></div>
-                                <div metal:define-slot="content"></div>
-                            </section>
-                        </div>
-                    </div>
+                <div class="container-fluid">
+                    <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
                 </div>
+                <section class="container my-5xl" role="main" id="content" data-reinit-foundation>
+                    <h1 class="main-title">
+                        <div metal:define-slot="main-title">
+                            <div metal:define-slot="pre-title"></div>
+                            <div metal:define-slot="title"></div>
+                            <div metal:define-slot="post-title"></div>
+                        </div>
+                    </h1>
+                    <div metal:define-slot="before-content"></div>
+                    <div metal:define-slot="content"></div>
+                </section>
             </article>
         </tal:b>
         <div id="partners-everywhere" class="partners-everywhere" tal:condition="layout.show_partners">
@@ -262,9 +239,9 @@
                 </div>
             </div>
         </div>
-        <metal:footer use-macro="layout.macros['footer']" />
     </main>
-    <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
+    <metal:footer use-macro="layout.macros['footer']" />
+    <div id="clipboard-copy" class="flash-message d-none" i18n:translate>Copied to Clipboard!</div>
 
 </body>
 </html>

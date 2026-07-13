@@ -61,43 +61,35 @@
     </ul>
 </metal:navigation>
 
-<metal:navigation define-macro="side-navigation-nested">
-    <a tal:condition="children" tal:define="page page|None">
-        <div class="navlink ${'current' if nav_page == page else ''}">
-            <span data-click-target="${link.attrs['href']}">
-                ${link.text}
-                <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
-                <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
-            </span>
-        </div>
+<metal:navigation define-macro="main-navigation-nested">
+    <a
+        class="nav-link ${'dropdown-toggle' if children else ''} ${'active' if nav_page.id == (page.id if page else None) else ''}"
+        href="${'#' if children else link.attrs['href']}"
+        tal:attributes="data-bs-toggle python: 'dropdown' if children else None; aria-expanded python: 'false' if children else None"
+        tal:define="page page|None"
+    >
+        ${link.text}
+        <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
     </a>
-    <tal:b tal:condition="not: children" tal:define="page page|None">
-        <a href="${link.attrs['href']}">
-            <div class="navlink ${'current' if nav_page == page else ''}">
-                <span>
-                    ${link.text}
-                    <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
-                    <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
-                </span>
-            </div>
-        </a>
-    </tal:b>
     <tal:b tal:define="ancestors layout.model.ancestors|[]">
-        <ul class="vertical menu nested ${'is-active current-list' if nav_page in ancestors else ''}"  tal:condition="children">
+        <ul tal:condition="children" class="dropdown-menu ${'is-active current-list' if nav_page in ancestors else ''}">
             <tal:b tal:repeat="(nav_page, sublink, c) children">
                 <li data-sortable-id="${nav_page.id}">
-                    <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
+                    <metal:b use-macro="layout.macros['main_navigation_nested']" tal:define="link sublink; children c" />
                 </li>
             </tal:b>
         </ul>
     </tal:b>
 </metal:navigation>
 
-<metal:navigation define-macro="side-navigation">
-    <ul class="vertical menu side-navigation drilldown" data-auto-height="true" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
-        <li tal:repeat="(nav_page, link, children) links" data-sortable-id="${nav_page.id}">
-            <metal:b use-macro="layout.macros['side_navigation_nested']" />
-        </li>
+<metal:navigation define-macro="main-navigation">
+    <ul class="navbar-nav me-auto" tal:define="links top_navigation|layout.top_navigation">
+        <tal:b tal:repeat="(nav_page, link, children) links" >
+            <li class="nav-item ${'dropdown' if children else ''}" data-sortable-id="${nav_page.id}">
+                <metal:b use-macro="layout.macros['main_navigation_nested']" />
+            </li>
+        </tal:b>
     </ul>
 </metal:navigation>
 
@@ -157,11 +149,17 @@
     <tal:b tal:define="bc_level request.GET.get('bc-level', False)">
         <div id="breadcrumbs" class="${'show-in-iframe' if bc_level else ''}">
             <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
-                <ul class="breadcrumbs" tal:condition="layout.breadcrumbs" >
-                    <tal:b repeat="link layout.breadcrumbs[int(bc_level or 0):]">
-                        <li tal:content="link(layout)"></li>
+                <ol class="breadcrumb" tal:condition="layout.breadcrumbs"
+                    tal:define="shown_breadcrumbs layout.breadcrumbs[int(bc_level or 0):];
+                        last_breadcrumb shown_breadcrumbs[-1] if shown_breadcrumbs else None">
+                    <tal:b repeat="link shown_breadcrumbs">
+                        <li
+                            class="breadcrumb-item ${'active' if link is last_breadcrumb else ''}"
+                            tal:content="link(layout)"
+                            tal:attributes="aria-current 'page' if link is last_breadcrumb else None"
+                        ></li>
                     </tal:b>
-                </ul>
+                </ol>
             </nav>
         </div>
     </tal:b>
@@ -177,12 +175,10 @@
 </metal:panel-links>
 
 <metal:footer define-macro="footer">
-    <footer id="footer" class="footer-container">
-        <div class="grid-container">
-            <div class="grid-x grid-padding-x footer-content">
+    <footer id="footer" class="bg-tertiary bg-dark-subtle py-5xl">
+        <div class="container-fluid">
                 <metal:b use-macro="layout.macros['footer_columns']" />
                 <metal:b use-macro="layout.macros['footer_links']" />
-            </div>
         </div>
     </footer>
 </metal:footer>
@@ -869,10 +865,12 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;">
+    <div class="row"
+        tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;"
+    >
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
-                <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
+                <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                 <div metal:define-slot="before-lead"></div>
                 <div class="limit-line-width">
                     <span class="page-lead h5" tal:condition="lead" tal:content="lead" />
@@ -888,7 +886,7 @@
         <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|False">
             <div class="small-12 medium-7 cell page-content-main content">
                 <div class="theiaStickySidebar">
-                    <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
+                    <img class="page-image img-fluid rounded-3" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
                     <div class="limit-line-width">
                         <span class="page-lead h5" tal:condition="lead" tal:content="lead" />

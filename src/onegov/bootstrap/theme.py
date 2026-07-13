@@ -79,6 +79,10 @@ class BootstrapBaseTheme(CoreTheme):
         return []
 
     @property
+    def post_variable_imports(self) -> list[str]:
+        return []
+
+    @property
     def post_imports(self) -> list[str]:
         return []
 
@@ -124,6 +128,10 @@ class BootstrapBaseTheme(CoreTheme):
         print("@import 'variables';", file=theme)
         print("@import 'variables-dark';", file=theme)
         print("@import 'maps';", file=theme)
+
+        print('\n'.join(f"@import '{i}';" for i in self.post_variable_imports),
+                file=theme)
+
         print("@import 'mixins';", file=theme)
         print("@import 'root';", file=theme)
 
