@@ -174,172 +174,123 @@ def town_handle_appearance_settings(
 
 
 @TownApp.form(
-    model=Organisation,
-    name='header-settings',
-    template='form.pt',
-    permission=Secret,
-    form=HeaderSettingsForm,
-    setting=_('Header'),
-    icon='fa-window-maximize',
-    order=40,
-)
+    model=Organisation, name='header-settings', template='form.pt',
+    permission=Secret, form=HeaderSettingsForm, setting=_('Header'),
+    icon='fa-window-maximize', order=40)
 def town_handle_header_settings(
-    self: Organisation, request: TownRequest, form: HeaderSettingsForm
+    self: Organisation,
+    request: TownRequest,
+    form: HeaderSettingsForm
 ) -> RenderData | Response:
     return handle_header_settings(
-        self, request, form, SettingsLayout(self, request)
-    )
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
-    model=Organisation,
-    name='footer-settings',
-    template='form.pt',
-    permission=Secret,
-    form=custom_footer_settings_form,
-    setting=_('Footer'),
-    icon='fa-window-minimize',
-    order=50,
-)
+    model=Organisation, name='footer-settings', template='form.pt',
+    permission=Secret, form=custom_footer_settings_form, setting=_('Footer'),
+    icon='fa-window-minimize', order=50)
 def town_handle_footer_settings(
-    self: Organisation, request: TownRequest, form: FooterSettingsForm
+    self: Organisation,
+    request: TownRequest,
+    form: FooterSettingsForm
 ) -> RenderData | Response:
     return handle_footer_settings(
-        self, request, form, SettingsLayout(self, request)
-    )
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
-    model=Organisation,
-    name='data-retention-settings',
+    model=Organisation, name='data-retention-settings',
     template='form.pt',
-    permission=Secret,
-    form=DataRetentionPolicyForm,
-    setting=_('Data Retention Policy'),
-    icon='far fa-trash',
-    order=60,
+    permission=Secret, form=DataRetentionPolicyForm,
+    setting=_('Data Retention Policy'), icon='far fa-trash', order=60,
 )
 def town_handle_ticket_data_deletion_settings(
-    self: Organisation, request: TownRequest, form: DataRetentionPolicyForm
+    self: Organisation,
+    request: TownRequest,
+    form: DataRetentionPolicyForm
 ) -> RenderData | Response:
-    request.message(
-        _(
-            'Proceed with caution. Tickets and the data they '
-            'contain may be irrevocable deleted.'
-        ),
-        'alert',
-    )
+    request.message(_('Proceed with caution. Tickets and the data they '
+                      'contain may be irrevocable deleted.'), 'alert')
     return handle_generic_settings(
-        self,
-        request,
-        form,
-        _('Data Retention Policy'),
+        self, request, form, _('Data Retention Policy'),
         SettingsLayout(self, request),
     )
 
 
 @TownApp.form(
-    model=Organisation,
-    name='vat-settings',
-    template='form.pt',
-    permission=Secret,
-    form=VATSettingsForm,
-    setting=_('Prices'),
-    icon='fa-file-invoice-dollar',
-    order=70,
+    model=Organisation, name='vat-settings', template='form.pt',
+    permission=Secret, form=VATSettingsForm, setting=_('Prices'),
+    icon='fa-file-invoice-dollar', order=70
 )
 def handle_vat_settings(
-    self: Organisation,
-    request: TownRequest,
-    form: VATSettingsForm,
-    layout: SettingsLayout | None = None,
+        self: Organisation,
+        request: TownRequest,
+        form: VATSettingsForm,
+        layout: SettingsLayout | None = None
 ) -> RenderData | Response:
     layout = layout or SettingsLayout(self, request, _('Prices'))
-    return handle_generic_settings(self, request, form, _('Prices'), layout)
+    return handle_generic_settings(
+        self, request, form, _('Prices'), layout
+    )
 
 
 @TownApp.form(
-    model=Organisation,
-    name='access-settings',
-    template='form.pt',
-    permission=Secret,
-    form=AccessSettingsForm,
-    setting=_('Access (mTAN)'),
-    icon='fa-lock',
-    order=80,
-)
+    model=Organisation, name='access-settings', template='form.pt',
+    permission=Secret, form=AccessSettingsForm, setting=_('Access (mTAN)'),
+    icon='fa-lock', order=80)
 def town_handle_access_settings(
-    self: Organisation, request: TownRequest, form: AccessSettingsForm
+    self: Organisation,
+    request: TownRequest,
+    form: AccessSettingsForm
 ) -> RenderData | Response:
     return handle_access_settings(
-        self, request, form, SettingsLayout(self, request)
-    )
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
-    model=Organisation,
-    name='link-settings',
-    template='form.pt',
-    permission=Secret,
-    form=LinksSettingsForm,
-    setting=_('Links'),
-    icon='fa-link',
-    order=90,
-)
+    model=Organisation, name='link-settings', template='form.pt',
+    permission=Secret, form=LinksSettingsForm, setting=_('Links'),
+    icon='fa-link', order=90)
 def town_handle_links_settings(
-    self: Organisation, request: TownRequest, form: LinksSettingsForm
+    self: Organisation,
+    request: TownRequest,
+    form: LinksSettingsForm
 ) -> RenderData | Response:
     return handle_links_settings(
-        self, request, form, SettingsLayout(self, request)
-    )
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
-    model=Organisation,
-    name='holiday-settings',
-    template='form.pt',
-    permission=Secret,
-    form=HolidaySettingsForm,
-    setting=_('Holidays'),
-    icon='fa-calendar',
-    order=500,
-)
+    model=Organisation, name='holiday-settings', template='form.pt',
+    permission=Secret, form=HolidaySettingsForm, setting=_('Holidays'),
+    icon='fa-calendar', order=500)
 def town_handle_holiday_settings(
-    self: Organisation, request: TownRequest, form: HolidaySettingsForm
+    self: Organisation,
+    request: TownRequest,
+    form: HolidaySettingsForm
 ) -> RenderData | Response:
     return handle_holiday_settings(
-        self, request, form, SettingsLayout(self, request)
-    )
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
-    model=Organisation,
-    name='map-settings',
-    template='form.pt',
-    permission=Secret,
-    form=MapSettingsForm,
-    setting=_('Map'),
-    icon='fa-map-marker-alt',
-    order=100,
-)
+    model=Organisation, name='map-settings', template='form.pt',
+    permission=Secret, form=MapSettingsForm, setting=_('Map'),
+    icon='fa-map-marker-alt', order=100)
 def town_handle_map_settings(
-    self: Organisation, request: TownRequest, form: MapSettingsForm
+    self: Organisation,
+    request: TownRequest,
+    form: MapSettingsForm
 ) -> RenderData | Response:
     return handle_map_settings(
-        self, request, form, SettingsLayout(self, request)
-    )
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(
-    model=Organisation,
-    name='analytics-settings',
-    template='form.pt',
-    permission=Secret,
-    form=AnalyticsSettingsForm,
-    setting=_('Analytics'),
-    icon='fa-chart-bar ',
-    order=110,
-)
+    model=Organisation, name='analytics-settings', template='form.pt',
+    permission=Secret, form=AnalyticsSettingsForm, setting=_('Analytics'),
+    icon='fa-chart-bar ', order=110)
 def town_handle_analytics_settings(
     self: Organisation,
     request: TownRequest,
