@@ -54,3 +54,13 @@ class UTCPublicationMixin:
     @classmethod
     def _published_expression(cls) -> ColumnElement[bool]:
         return and_(cls.publication_started, not_(cls.publication_ended))
+
+    def published_as_of(self, moment: datetime) -> bool:
+        """ Like :attr:`published`, but evaluated against an arbitrary
+        moment instead of the current time. """
+        return (
+            (self.publication_start is None
+             or self.publication_start <= moment)
+            and (self.publication_end is None
+                 or self.publication_end >= moment)
+        )

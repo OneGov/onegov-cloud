@@ -15,6 +15,7 @@ from onegov.form import flatten_fieldsets, parse_formcode
 from onegov.org.theme import user_options
 from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
+from sedate import utcnow
 from sqlalchemy.orm import mapped_column, Mapped
 from uuid import uuid4, UUID
 
@@ -348,6 +349,20 @@ class Organisation(Base, TimestampMixin):
     hourly_maintenance_tasks_last_run: dict_property[datetime | None] = (
         meta_property(default=None)
     )
+
+    @property
+    def last_hourly_maintenance_run(self) -> datetime:
+        """ The effective reference point for the hourly maintenance run.
+
+        Unlike :attr:`hourly_maintenance_tasks_last_run` this never returns
+        ``None`` - if the cronjob has never run we assume it ran an hour ago,
+        matching its cadence. Use this when deciding whether the cronjob has
+        already observed some time-dependent state (e.g. an entry's expiry).
+        """
+        return (
+            self.hourly_maintenance_tasks_last_run
+            or utcnow() - timedelta(hours=1)
+        )
 
     firebase_adminsdk_credential: dict_property[str | None] = meta_property()
     selectable_push_notification_options: dict_property[list[list[str]]] = (

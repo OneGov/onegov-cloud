@@ -165,6 +165,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def content_hash_observer(
         self,
         content: dict[str, Any] | None,
-        files: set[Any]
+        files: set[Any],
     ) -> None:
         self.update_content_hash()
