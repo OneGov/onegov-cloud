@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-13 14:00+0200\n"
+"POT-Creation-Date: 2026-07-13 16:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2792,6 +2792,22 @@ msgstr "Titre des newsletters quotidiennes"
 msgid "Daily news from our town"
 msgstr "Nouvelles quotidiennes de notre ville"
 
+msgid "Link for automatic newsletters"
+msgstr "Lien pour les newsletters automatiques"
+
+msgid ""
+"A static link displayed in every automatic newsletter below the news "
+"articles."
+msgstr ""
+"Un lien statique affiché dans chaque newsletter automatique sous les "
+"articles d'actualité."
+
+msgid "Display name for the link"
+msgstr "Nom d'affichage du lien"
+
+msgid "The text shown for the link. If empty, the link itself is shown."
+msgstr "Le texte affiché pour le lien. S'il est vide, le lien lui-même est affiché."
+
 msgid "Newsletter sending times (24h format)"
 msgstr "Horaires d'envoi de la newsletter (format 24h)"
 
@@ -2939,11 +2955,23 @@ msgstr "Filtres configurables manuellement"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Les deux, balises prédéfinies et filtres configurables"
 
-msgid "General information above the event list"
-msgstr "Informations générales au-dessus de la liste des événements"
+msgid "Title of text above event list"
+msgstr "Titre du texte au-dessus de la liste des événements"
 
-msgid "General information below the event list"
-msgstr "Informations générales en dessous de la liste des événements"
+msgid "Information above the event list"
+msgstr "Information au-dessus de la liste des événements"
+
+msgid "Text above the event list"
+msgstr "Texte au-dessus de la liste des événements"
+
+msgid "Title of text below event list"
+msgstr "Titre du texte en dessous de la liste des événements"
+
+msgid "Information below the event list"
+msgstr "Information en dessous de la liste des événements"
+
+msgid "Text below the event list"
+msgstr "Texte en dessous de la liste des événements"
 
 msgid "Documents"
 msgstr "Documents"
@@ -8107,6 +8135,12 @@ msgstr "L'utilisateur a bien été créé"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
+#~ msgid "General information above the event list"
+#~ msgstr "Informations générales au-dessus de la liste des événements"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Informations générales en dessous de la liste des événements"
+
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "p.ex. 07:00 ou 07:00, 14:30"
 
@@ -8177,12 +8211,6 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
 #~ msgid "Date of death"
 #~ msgstr "Date de décès"
-
-#~ msgid "Information above the event list"
-#~ msgstr "Information au-dessus de la liste des événements"
-
-#~ msgid "Information below the event list"
-#~ msgstr "Information en dessous de la liste des événements"
 
 #~ msgid "Portrait"
 #~ msgstr "Portrait"
