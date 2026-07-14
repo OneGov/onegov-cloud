@@ -142,9 +142,11 @@ class Organisation(Base, TimestampMixin):
     event_filter_configuration: dict_property[dict[str, Any]] = (
         meta_property(default=dict)
     )
+    event_header_title: dict_property[str | None] = meta_property()
     event_header_html: dict_markup_property[Markup | None] = (
         dict_markup_property('meta')
     )
+    event_footer_title: dict_property[str | None] = meta_property()
     event_footer_html: dict_markup_property[Markup | None] = (
         dict_markup_property('meta')
     )
@@ -270,6 +272,8 @@ class Organisation(Base, TimestampMixin):
     newsletter_times: dict_property[list[str] | None] = meta_property()
     daily_newsletter_title: dict_property[str | None] = meta_property()
     show_only_previews: dict_property[bool] = meta_property(default=False)
+    daily_newsletter_link: dict_property[str | None] = meta_property()
+    daily_newsletter_link_text: dict_property[str | None] = meta_property()
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-02 15:54+0200\n"
+"POT-Creation-Date: 2026-07-14 09:26+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1104,6 +1104,12 @@ msgstr "Test"
 
 msgid "Do not actually import the events."
 msgstr "Les événements ne sont pas sauvegardés."
+
+msgid "Syndicate"
+msgstr "Publier en externe"
+
+msgid "Highlight"
+msgstr "Mise en avant"
 
 msgid "Created"
 msgstr "Créé"
@@ -2813,6 +2819,23 @@ msgstr "Titre des newsletters quotidiennes"
 msgid "Daily news from our town"
 msgstr "Nouvelles quotidiennes de notre ville"
 
+msgid "Link for automatic newsletters"
+msgstr "Lien pour les newsletters automatiques"
+
+msgid ""
+"A static link displayed in every automatic newsletter below the news "
+"articles."
+msgstr ""
+"Un lien statique affiché dans chaque newsletter automatique sous les "
+"articles d'actualité."
+
+msgid "Display name for the link"
+msgstr "Nom d'affichage du lien"
+
+msgid "The text shown for the link. If empty, the link itself is shown."
+msgstr ""
+"Le texte affiché pour le lien. S'il est vide, le lien lui-même est affiché."
+
 msgid "Newsletter sending times (24h format)"
 msgstr "Horaires d'envoi de la newsletter (format 24h)"
 
@@ -2960,11 +2983,26 @@ msgstr "Filtres configurables manuellement"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Les deux, balises prédéfinies et filtres configurables"
 
-msgid "General information above the event list"
-msgstr "Informations générales au-dessus de la liste des événements"
+msgid "Title of text above event list"
+msgstr "Titre du texte au-dessus de la liste des événements"
 
-msgid "General information below the event list"
-msgstr "Informations générales en dessous de la liste des événements"
+msgid "General information about the event calendar"
+msgstr "Informations générales sur le calendrier des événements"
+
+msgid "Information above the event list"
+msgstr "Information au-dessus de la liste des événements"
+
+msgid "Text above the event list"
+msgstr "Texte au-dessus de la liste des événements"
+
+msgid "Title of text below event list"
+msgstr "Titre du texte en dessous de la liste des événements"
+
+msgid "Information below the event list"
+msgstr "Information en dessous de la liste des événements"
+
+msgid "Text below the event list"
+msgstr "Texte en dessous de la liste des événements"
 
 msgid "Documents"
 msgstr "Documents"
@@ -6913,14 +6951,8 @@ msgstr "Au total, 5 sous-pages sont concernées."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} liens seront remplacés par cette action."
 
-msgid "Syndicate"
-msgstr "Publier en externe"
-
 msgid "Publish this event externally"
 msgstr "Publier cet événement en externe"
-
-msgid "Highlight"
-msgstr "Mise en avant"
 
 msgid "Mark as highlighted event"
 msgstr "Marquer comme événement mis en avant"
@@ -8240,6 +8272,12 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 #~ msgid "${org}: Deleted Entry \"${entry}\" in \"${directory}\""
 #~ msgstr "${org}: Entrée supprimée \"${entry}\" dans \"${directory}\""
 
+#~ msgid "General information above the event list"
+#~ msgstr "Informations générales au-dessus de la liste des événements"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Informations générales en dessous de la liste des événements"
+
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "p.ex. 07:00 ou 07:00, 14:30"
 
@@ -8310,12 +8348,6 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
 #~ msgid "Date of death"
 #~ msgstr "Date de décès"
-
-#~ msgid "Information above the event list"
-#~ msgstr "Information au-dessus de la liste des événements"
-
-#~ msgid "Information below the event list"
-#~ msgstr "Information en dessous de la liste des événements"
 
 #~ msgid "Portrait"
 #~ msgstr "Portrait"

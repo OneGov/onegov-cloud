@@ -5,16 +5,17 @@
 
     <tal:b metal:fill-slot="content">
 
-        <div class="panel callout" i18n:translate>
-            Clicking "Send" will send the e-mail below to all selected recipients. You will receive a copy of the e-mail if you are not already on the recipients list.
+        <div class="panel callout">
+            <tal:b tal:condition="form.has_recipients"  i18n:translate>
+            Clicking "Send E-Mail Now" will send the e-mail below to all selected recipients. You will receive a copy of the e-mail if you are not already on the recipients list.
+            </tal:b>
+            <tal:b tal:condition="not:form.has_recipients" i18n:translate>
+                There are no subscriptions for this course event.
+            </tal:b>
         </div>
 
         <div class="notification-preview">
             <tal:b metal:use-macro="layout.macros['email_preview']" />
-        </div>
-
-        <div tal:condition="not:form.has_recipients" i18n:translate>
-            There are subscriptions for this course event.
         </div>
 
         <tal:b tal:condition="form.has_recipients" metal:use-macro="layout.macros['form']" />
