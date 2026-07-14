@@ -169,5 +169,39 @@
     </tal:b>
 </metal:payment>
 
+<metal:directory_entry_notification_details define-macro="directory_entry_notification_details" i18n:domain="onegov.town6">
+    <p><u i18n:translate="">Form fields</u></p>
+    <p tal:repeat="field directory.basic_fields">
+        - <strong>${field.human_id}:</strong> ${entry.values.get(field.id, '')}
+    </p>
+
+    <p><u i18n:translate="">Attachments</u></p>
+    <tal:b condition="not: entry.files">
+        <p>
+            - <span i18n:translate="">None</span>
+        </p>
+    </tal:b>
+    <tal:b condition="entry.files">
+        <p tal:repeat="file entry.files">
+            <strong>${file.name}</strong><br/>
+            - <span i18n:translate="">Size</span>: ${file.reference.file.content_length} Bytes<br/>
+            - <span i18n:translate="">Date</span>: ${layout.format_date(file.created, 'datetime_long')}<br/>
+            - <span i18n:translate="">Hash</span>: ${file.checksum or file.id}
+        </p>
+    </tal:b>
+
+    <p><u i18n:translate="">Publication details</u></p>
+    <p>
+        - <strong i18n:translate="">Publication start:</strong>
+        <tal:b condition="publication_start | nothing"> ${layout.format_date(publication_start, 'datetime_long')}</tal:b>
+        <tal:b condition="not: publication_start | nothing"> <span i18n:translate="">Not set</span></tal:b><br/>
+        - <strong i18n:translate="">Publication end:</strong>
+        <tal:b condition="publication_end | nothing"> ${layout.format_date(publication_end, 'datetime_long')}</tal:b>
+        <tal:b condition="not: publication_end | nothing"> <span i18n:translate="">Not set</span></tal:b><br/>
+        - <strong><span i18n:translate="">Access</span>:</strong> ${entry.access}<br/>
+        - <strong><span i18n:translate="">Entry checksum</span>:</strong> ${content_hash}
+    </p>
+</metal:directory_entry_notification_details>
+
 </body>
 </html>

@@ -160,7 +160,7 @@ body .redactor-box-fullscreen {
   display: block;
   color: #333;
   text-align: center;
-  padding: 9px 10px;
+  padding: 9px 9px;
   outline: none;
   border: none;
   text-decoration: none;
@@ -750,8 +750,11 @@ body .redactor-box-fullscreen {
   ##############################################
 */
 .redactor-dropdown .redactor-formatting-blockquote {
-  color: rgba(0, 0, 0, 0.4);
-  font-style: italic;
+  margin: .2rem;
+  padding: .5rem 1rem;
+  color: #777;
+  background-color: #f7f8f8;
+  border-left: 1px solid #cacaca;
 }
 .redactor-dropdown .redactor-formatting-pre {
   font-family: monospace, sans-serif;
@@ -840,11 +843,10 @@ body .redactor-box-fullscreen {
   margin-bottom: 15px;
 }
 .redactor-editor blockquote {
-  margin-left: 1.6em !important;
-  padding: 0;
-  text-align: left;
+  padding: .5rem 1rem;
   color: #777;
-  font-style: italic;
+  background-color: #f7f8f8;
+  border-left: 1px solid #cacaca;
 }
 .redactor-editor blockquote:before,
 .redactor-editor blockquote:after {

@@ -1,8 +1,100 @@
 # Changes
 
+## 2026.35
+
+`2026-07-14` | [3ff298f50b...fd519f1fd1](https://github.com/OneGov/onegov-cloud/compare/3ff298f50b^...fd519f1fd1)
+
+### Core
+
+##### Switches database driver from psycopg2 to psycopg
+
+`Feature` | [OGC-3039](https://linear.app/onegovcloud/issue/OGC-3039) | [ce334dafba](https://github.com/onegov/onegov-cloud/commit/ce334dafba0209adeaebd0225262350268dc8489)
+
+##### Removes pglast pin [skip-ci]
+
+`Feature` | [OGC-3257](https://linear.app/onegovcloud/issue/OGC-3257) | [e0d0828a40](https://github.com/onegov/onegov-cloud/commit/e0d0828a402804f6ed3ad0e3470ccce451392237)
+
+##### Fix linter after removing pglast pin [skip-ci]
+
+`Feature` | [NONE](#NONE) | [04fe0d184b](https://github.com/onegov/onegov-cloud/commit/04fe0d184bbd04452b85bf7845b2182283a31626)
+
+### Directory
+
+##### Admin notification emails for building permit workflow
+
+Admins can get notified when publication starts and ends with all the details and hash to prove publication.
+
+`Feature` | [OGC-3097](https://linear.app/onegovcloud/issue/OGC-3097) | [6c9360ae3a](https://github.com/onegov/onegov-cloud/commit/6c9360ae3afc6d7da91f0fbf2c1aaefaee319bf9)
+
+##### Fix migration for a renamed and changed field
+
+`Bugfix` | [OGC-3241](https://linear.app/onegovcloud/issue/OGC-3241) | [df86ca3a04](https://github.com/onegov/onegov-cloud/commit/df86ca3a04491500b553c051602daad20f157681)
+
+### Event
+
+##### Supports mapping a Guidle tag to multiple tags
+
+The import tagmap now reads repeated source rows as multiple target tags, so a single Guidle/JSON tag can expand into several onegov tags. Example: 'Brauchtum / Fest': ['Brauchtum', 'Fest']. A single tag in Guidle maps to multiple tags in onegov-cloud
+
+`Feature` | [OGC-3208](https://linear.app/onegovcloud/issue/OGC-3208) | [c4d89df409](https://github.com/onegov/onegov-cloud/commit/c4d89df409272bd7285ed436265e03328b631168)
+
+##### Now exports fields `highlight` and `syndicate`
+
+Event exports (excel, csv, json, xml) now contain the fields `highlight` and `syndicate`
+
+`Feature` | [OGC-3238](https://linear.app/onegovcloud/issue/OGC-3238) | [b84abca079](https://github.com/onegov/onegov-cloud/commit/b84abca07925d3e895aa5995576e68c2ce437a3c)
+
+### Fsi
+
+##### Don't autmatically send mails when changing course status
+
+`Feature` | [OGC-3230](https://linear.app/onegovcloud/issue/OGC-3230) | [f5725871d4](https://github.com/onegov/onegov-cloud/commit/f5725871d4aef145125c8322505102e78d19202d)
+
+### Org
+
+##### Allows resource URLs to be changed, like forms and pages
+
+`Feature` | [OGC-3200](https://linear.app/onegovcloud/issue/OGC-3200) | [a7dd17f616](https://github.com/onegov/onegov-cloud/commit/a7dd17f616a17371bee9e3f83930b1dcf3e05756)
+
+##### Displays holidays in occupancy view
+
+`Feature` | [OGC-3255](https://linear.app/onegovcloud/issue/OGC-3255) | [bf4978d647](https://github.com/onegov/onegov-cloud/commit/bf4978d64734be6cdbdd8b03be47654ca3b0b46c)
+
+##### Command line import for Horw
+
+`Feature` | [OGC-3228](https://linear.app/onegovcloud/issue/OGC-3228) | [e94d5f19c3](https://github.com/onegov/onegov-cloud/commit/e94d5f19c3d1547453f9b9d68d41798068556e83)
+
+##### Make title for event list text customizable
+
+`Feature` | [OGC-3034](https://linear.app/onegovcloud/issue/OGC-3034) | [0959dfa101](https://github.com/onegov/onegov-cloud/commit/0959dfa1019e48a534e578390156f0784e89e0fb)
+
+##### Adds ability to add generic link to daily newsletter.
+
+`Feature` | [OGC-3239](https://linear.app/onegovcloud/issue/OGC-3239) | [17be8700ba](https://github.com/onegov/onegov-cloud/commit/17be8700ba2679eb4cfb1f89ae79edec63410222)
+
+##### Select all, deselect all are spread over the full width
+
+`Bugfix` | [OGC-3253](https://linear.app/onegovcloud/issue/OGC-3253) | [32d2acbdd5](https://github.com/onegov/onegov-cloud/commit/32d2acbdd50491576237274c2d39930bfc424f8a)
+
+### Pas
+
+##### Allow decimal places in rate sets.
+
+`Bugfix` | [OGC-3242](https://linear.app/onegovcloud/issue/OGC-3242) | [4cc06c17e4](https://github.com/onegov/onegov-cloud/commit/4cc06c17e460f22bff32b60e1f3b8fa73cefad11)
+
+##### Moves almost all rate set fields to Decimal.
+
+`Bugfix` | [OGC-3242](https://linear.app/onegovcloud/issue/OGC-3242) | [e0bb4b3a7c](https://github.com/onegov/onegov-cloud/commit/e0bb4b3a7c3825869d30373b703f14e3b580521d)
+
+### Town6
+
+##### Make text options dropdown scrollable
+
+`Feature` | [OGC-2953](https://linear.app/onegovcloud/issue/OGC-2953) | [e75ddd6d48](https://github.com/onegov/onegov-cloud/commit/e75ddd6d48c69150ab20d48df6963d15faf32bdb)
+
 ## 2026.34
 
-`2026-07-02` | [168ae64ff2...6e560a478e](https://github.com/OneGov/onegov-cloud/compare/168ae64ff2^...6e560a478e)
+`2026-07-02` | [168ae64ff2...8a49c335f8](https://github.com/OneGov/onegov-cloud/compare/168ae64ff2^...8a49c335f8)
 
 ### Agency
 
@@ -5116,20 +5208,4 @@ JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 ##### Adds provisional import script.
 
 `Feature` | [OGC-1878](https://linear.app/onegovcloud/issue/OGC-1878) | [9bafe68736](https://github.com/onegov/onegov-cloud/commit/9bafe687361c7160c869fd0269b656b9d82d2e16)
-
-## 2025.6
-
-`2025-02-13` | [4a8ed94cb1...952fb7d12f](https://github.com/OneGov/onegov-cloud/compare/4a8ed94cb1^...952fb7d12f)
-
-### Agency
-
-##### Clean up previous implementation.
-
-Uses a meta field for the external_user_id (So we don't have a specific column
-    in org for a specific feature of agency)
-    Make sure the api uses it's own mutation form such that it's seperated form
-    public facing mutations.
-    Make sure hidden_people_fields is honoured everywhere
-
-`Bugfix` | [OGC-2061](https://linear.app/onegovcloud/issue/OGC-2061) | [4a8ed94cb1](https://github.com/onegov/onegov-cloud/commit/4a8ed94cb12db893dc3de0fb73fb4b3c7d1db309)
 

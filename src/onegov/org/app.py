@@ -829,6 +829,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'filemanager.js'
     yield 'imagemanager.js'
     yield 'table.js'
+    yield 'alphalist.js'
     yield 'redactor.de.js'
     yield 'redactor.fr.js'
     yield 'redactor.it.js'
