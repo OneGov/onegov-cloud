@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-08 11:17+0200\n"
+"POT-Creation-Date: 2026-07-13 16:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1078,6 +1078,12 @@ msgstr "Esecuzione del test"
 
 msgid "Do not actually import the events."
 msgstr "Gli eventi non vengono salvati."
+
+msgid "Syndicate"
+msgstr "Pubblicare esternamente"
+
+msgid "Highlight"
+msgstr "In evidenza"
 
 msgid "Created"
 msgstr "Creato"
@@ -2952,11 +2958,23 @@ msgstr "Filtri configurabili manualmente"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Entrambi, tag predefiniti e filtri configurabili"
 
-msgid "General information above the event list"
-msgstr "Informazioni generali sopra l'elenco degli eventi"
+msgid "Title of text above event list"
+msgstr "Titolo del testo sopra l'elenco degli eventi"
 
-msgid "General information below the event list"
-msgstr "Informazioni generali sotto l'elenco degli eventi"
+msgid "Information above the event list"
+msgstr "Informazioni sopra l'elenco degli eventi"
+
+msgid "Text above the event list"
+msgstr "Testo sopra l'elenco degli eventi"
+
+msgid "Title of text below event list"
+msgstr "Titolo del testo sotto l'elenco degli eventi"
+
+msgid "Information below the event list"
+msgstr "Informazioni sotto l'elenco degli eventi"
+
+msgid "Text below the event list"
+msgstr "Testo sotto l'elenco degli eventi"
 
 msgid "Documents"
 msgstr "Documenti"
@@ -6806,14 +6824,8 @@ msgstr "Sono interessate un totale di ${number} sottopagine."
 msgid "${count} links will be replaced by this action."
 msgstr "${count} collegamenti saranno sostituiti da questa operazione."
 
-msgid "Syndicate"
-msgstr "Pubblicare esternamente"
-
 msgid "Publish this event externally"
 msgstr "Pubblicare questo evento esternamente"
-
-msgid "Highlight"
-msgstr "In evidenza"
 
 msgid "Mark as highlighted event"
 msgstr "Contrassegnare come evento in evidenza"
@@ -8078,6 +8090,12 @@ msgstr "Utente creato correttamente"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
+#~ msgid "General information above the event list"
+#~ msgstr "Informazioni generali sopra l'elenco degli eventi"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Informazioni generali sotto l'elenco degli eventi"
+
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "es. 07:00 o 07:00, 14:30"
 
@@ -8163,12 +8181,6 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 
 #~ msgid "Date of death"
 #~ msgstr "Data di morte"
-
-#~ msgid "Information above the event list"
-#~ msgstr "Informazioni sopra l'elenco degli eventi"
-
-#~ msgid "Information below the event list"
-#~ msgstr "Informazioni sotto l'elenco degli eventi"
 
 #~ msgid "Portrait"
 #~ msgstr "Ritratto"

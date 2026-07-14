@@ -2071,13 +2071,26 @@ class EventSettingsForm(Form):
         default='tags'
     )
 
-    event_header_html = HtmlField(
-        label=_('General information above the event list'),
+    event_header_title = StringField(
+        label=_('Title of text above event list'),
+        description=_('General information about the event calendar'),
+        fieldset=_('Information above the event list')
+    )
 
+    event_header_html = HtmlField(
+        label=_('Text above the event list'),
+        fieldset=_('Information above the event list')
+    )
+
+    event_footer_title = StringField(
+        label=_('Title of text below event list'),
+        description=_('General information about the event calendar'),
+        fieldset=_('Information below the event list')
     )
 
     event_footer_html = HtmlField(
-        label=_('General information below the event list'),
+        label=_('Text below the event list'),
+        fieldset=_('Information below the event list')
     )
 
     event_files = UploadOrSelectExistingMultipleFilesField(

@@ -141,9 +141,11 @@ class Organisation(Base, TimestampMixin):
     event_filter_configuration: dict_property[dict[str, Any]] = (
         meta_property(default=dict)
     )
+    event_header_title: dict_property[str | None] = meta_property()
     event_header_html: dict_markup_property[Markup | None] = (
         dict_markup_property('meta')
     )
+    event_footer_title: dict_property[str | None] = meta_property()
     event_footer_html: dict_markup_property[Markup | None] = (
         dict_markup_property('meta')
     )
