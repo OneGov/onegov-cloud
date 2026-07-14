@@ -65,19 +65,7 @@
         </div>
     </div>
 
-    <div class="sidebar-toggler show-for-small-only" data-toggle="offCanvasSidebar">
-            <div class="animated-hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <span class="text"> Sidebar</span>
-    </div>
-
-    <div class="off-canvas position-right show-for-small-only" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas >
-        <!-- Gets filled by sidebar_mobile.js -->
-    </div>
+    <tal:b metal:use-macro="layout.macros['sidebar_mobile']" />
 
     <div class="off-canvas position-right"  tal:condition="not:hide_search_header|nothing" data-transition="overlap" id="offCanvasSearch" data-auto-focus="false" data-off-canvas>
         <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>

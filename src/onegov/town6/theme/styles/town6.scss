@@ -1195,103 +1195,22 @@ ul.recipients {
 }
 
 .sidebar-toggler {
-    align-items: center;
     background: $primary-color;
-    border-top: 1px solid rgba(255, 255, 255, .3);
-    bottom: 0;
-    color: $white;
-    display: flex;
-    justify-content: center;
-    padding-bottom: .3rem;
-    padding-top: .3rem;
+    border-radius: .7rem 0 0 .7rem;
+    border: 1px solid white;
+    border-right: 0;
+    bottom: 10rem;
+    color: white;
+    font-weight: bold;
+    padding: .9rem .2rem .9rem .1rem;
     position: fixed;
-    width: 100%;
-    z-index: 1001;
+    right: 0;
+    white-space: nowrap;
+    writing-mode: vertical-lr;
+    z-index: 99;
 
-    .text {
-        font-weight: bold;
-    }
-
-
-    /* Animated Hamburger */
-
-    $bar-height: 3px;
-
-    .animated-hamburger {
-        cursor: pointer;
-        height: 5 * $bar-height;
-        margin-right: .5rem;
-        -moz-transform: rotate(0deg);
-        -o-transform: rotate(0deg);
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-        -moz-transition: .5s ease-in-out;
-        -o-transition: .5s ease-in-out;
-        -webkit-transition: .5s ease-in-out;
-        transition: .5s ease-in-out;
-        width: 5 * $bar-height + .5 * $bar-height;
-
-
-        span:nth-child(1) {
-            top: 0;
-        }
-
-        span:nth-child(2),
-        span:nth-child(3) {
-            top: 2 * $bar-height;
-        }
-
-        span:nth-child(4) {
-            top: 4 * $bar-height;
-        }
-
-        span {
-            background: $white;
-            border-radius: 9px;
-            display: block;
-            height: $bar-height;
-            left: 0;
-            opacity: 1;
-            position: absolute;
-            -moz-transform: rotate(0deg);
-            -o-transform: rotate(0deg);
-            -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-            -moz-transition: .25s ease-in-out;
-            -o-transition: .25s ease-in-out;
-            -webkit-transition: .25s ease-in-out;
-            transition: .25s ease-in-out;
-            width: 100%;
-        }
-    }
-
-
-    &[aria-expanded="true"] {
-        .animated-hamburger span:nth-child(1) {
-            left: 50%;
-            top: 2 * $bar-height;
-            width: 0%;
-        }
-
-        .animated-hamburger span:nth-child(2) {
-            -moz-transform: rotate(45deg);
-            -o-transform: rotate(45deg);
-            -webkit-transform: rotate(45deg);
-            transform: rotate(45deg);
-        }
-
-        .animated-hamburger span:nth-child(3) {
-            -moz-transform: rotate(-45deg);
-            -o-transform: rotate(-45deg);
-            -webkit-transform: rotate(-45deg);
-            transform: rotate(-45deg);
-        }
-
-        .animated-hamburger span:nth-child(4) {
-            left: 50%;
-            top: 2 * $bar-height;
-            width: 0%;
-        }
+    .fa {
+        margin-bottom: .5rem;
     }
 }
 

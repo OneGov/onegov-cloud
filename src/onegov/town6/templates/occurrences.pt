@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="large-4 medium-4 cell large-offset-1 sidebar occurrence-sidebar">
+            <div class="large-4 medium-4 cell large-offset-1 sidebar occurrence-sidebar" data-sidebar-mobile-title="Filters & Actions" i18n:attributes="data-sidebar-mobile-title">
                 <div class="sidebar-wrapper">
                     <div class="side-panel" tal:condition="filters">
                         <div tal:repeat="filter filters" class="filter-periods">

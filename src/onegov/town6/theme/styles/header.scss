@@ -631,12 +631,17 @@ $editbar-fg-color-active: $white;
 }
 
 #offCanvas,
-#offCanvasFilters {
+#offCanvasFilters,
+#offCanvasSidebar {
     z-index: 1000;
 
     .button-area {
         display: flex;
         justify-content: end;
+    }
+
+    .content-area {
+        padding: 2rem;
     }
 
     .navigation-area {
@@ -824,7 +829,6 @@ $editbar-fg-color-active: $white;
 
 #offCanvasSidebar {
     background: $white;
-    padding: 2rem;
     z-index: 1000;
 }
 
