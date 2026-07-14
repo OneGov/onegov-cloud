@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import math
 import morepath
 import sedate
@@ -12,7 +13,9 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
 from onegov.search import ORMSearchable, SearchApp, SearchIndex
 from onegov.search.datamanager import IndexerDataManager
+from onegov.search.integration import REINDEX_MAX_ATTEMPTS
 from sqlalchemy import func
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from webtest import TestApp as Client
 
@@ -311,6 +314,165 @@ def test_reindex(postgres_dsn: str) -> None:
     session = app.session()
     search = session.query(func.count(SearchIndex.id))
     assert search.scalar() == 2
+
+
+def _reindex_conflict_app(postgres_dsn: str) -> Any:
+    """ Builds a search app with two already-indexed Documents, ready to
+    exercise the reindex conflict handling. """
+
+    class Base(DeclarativeBase):
+        registry = registry()
+
+    class App(Framework, SearchApp):
+        pass
+
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en', 'de'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
+
+        fts_public = True
+        fts_title_property = 'title'
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'}
+        }
+
+        @property
+        def fts_suggestion(self) -> str:
+            return self.title
+
+    scan_morepath_modules(App)
+    morepath.commit(App)
+
+    app = App()
+    app.namespace = 'documents'
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        enable_search=True
+    )
+    app.session_manager.bases[1] = RealBase
+
+    app.set_application_id('documents/home')
+    assert app.fts_search_enabled
+
+    session = app.session()
+    session.add(Document(id=1, title='1'))
+    session.add(Document(id=2, title='2'))
+    transaction.commit()
+
+    return app
+
+
+def _serialization_conflict() -> OperationalError:
+    """ A transient class-40 serialization failure, as raised by a concurrent
+    write during a reindex. """
+
+    class ConcurrentUpdate(Exception):
+        sqlstate = '40001'
+
+    return OperationalError(
+        'INSERT INTO search_index ...',
+        {},
+        ConcurrentUpdate('could not serialize access')
+    )
+
+
+def test_reindex_retries_on_conflict(
+    postgres_dsn: str,
+    caplog: Any
+) -> None:
+    app = _reindex_conflict_app(postgres_dsn)
+
+    original_index = app.fts_indexer.index
+    attempts = {'n': 0}
+
+    # both documents were already indexed via insert events on commit
+    session = app.session()
+    ids_before = {r.id for r in session.query(SearchIndex.id)}
+    assert len(ids_before) == 2
+
+    def flaky_index(tasks: Any, session: Any) -> bool:
+        attempts['n'] += 1
+        if attempts['n'] in (1, 2):
+            raise _serialization_conflict()
+        return original_index(tasks, session)
+
+    app.fts_indexer.index = flaky_index  # type: ignore[method-assign]
+
+    with caplog.at_level(logging.INFO, logger='onegov.search.index'):
+        app.perform_reindex()
+
+    # the first and second attempt failed with a conflict, the retry succeeded
+    assert attempts['n'] == 3
+    session = app.session()
+
+    # the reindex wiped the original rows and wrote fresh ones
+    ids_after = {r.id for r in session.query(SearchIndex.id)}
+    assert len(ids_after) == 2
+    assert ids_after.isdisjoint(ids_before)
+
+    # the two conflicts were logged as retries at INFO, and since the third
+    # attempt succeeded, nothing was logged at ERROR
+    retry_logs = [
+        r for r in caplog.records
+        if (
+            r.levelno == logging.INFO
+            and "Conflict while indexing model 'Document' in schema "
+                "documents-home, retrying"
+            in r.getMessage()
+        )
+    ]
+    assert len(retry_logs) == 2
+    error_logs = [r for r in caplog.records if r.levelno >= logging.ERROR]
+    assert error_logs == []
+
+
+def test_reindex_gives_up_on_persistent_conflict(
+    postgres_dsn: str,
+    caplog: Any
+) -> None:
+    app = _reindex_conflict_app(postgres_dsn)
+
+    attempts = {'n': 0}
+
+    def always_conflicting_index(tasks: Any, session: Any) -> bool:
+        attempts['n'] += 1
+        raise _serialization_conflict()
+
+    app.fts_indexer.index = always_conflicting_index  # type: ignore[method-assign]
+
+    with caplog.at_level(logging.INFO, logger='onegov.search.index'):
+        app.perform_reindex()
+
+    # every attempt was made and then the model was given up on
+    assert attempts['n'] == REINDEX_MAX_ATTEMPTS
+
+    # the reindex deleted the old rows up front and never re-indexed the
+    # model, so it is left completely unsearchable
+    session = app.session()
+    search = session.query(func.count(SearchIndex.id))
+    assert search.scalar() == 0
+
+    # giving up must surface as an ERROR, not be swallowed silently
+    error_logs = [
+        r for r in caplog.records
+        if (
+            r.levelno == logging.ERROR
+            and "Error indexing model 'Document' in schema documents-home"
+            in r.getMessage()
+        )
+    ]
+    assert len(error_logs) == 1
 
 
 def test_orm_integration(
