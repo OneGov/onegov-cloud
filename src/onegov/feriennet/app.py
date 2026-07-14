@@ -367,4 +367,6 @@ def feriennet_content_security_policy() -> ContentSecurityPolicy:
     policy.script_src.add('https://*.google-analytics.com')
     policy.script_src.add('https://*.usercentrics.eu')
     policy.script_src.add('https://stats.g.doubleclick.net')
+
+    policy.child_src.add('https://*.usercentrics.eu')
     return policy
