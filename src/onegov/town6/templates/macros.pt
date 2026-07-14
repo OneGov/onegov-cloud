@@ -31,12 +31,10 @@
 </metal:b>
 
 <metal:b define-macro="consume_messages" i18n:domain="onegov.town6">
-    <div tal:repeat="message request.consume_messages()" data-closable class="callout alert-box ${message.type}">
+    <div tal:repeat="message request.consume_messages()"  class="alert alert-${message.type} alert-dismissible fade show" role="alert">
         ${message.text}
-        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
-            <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 </metal:b>
 
 <metal:navigation define-macro="sort-items-nested">
@@ -122,40 +120,46 @@
     </div>
 </metal:header-text>
 
-<metal:editbar define-macro="dropdown-editbar">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarEditbar" aria-controls="navbarEditbar" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarEditbar">
-        <ul class="navbar-nav edit-bar">
-            <li class="nav-item dropdown" tal:repeat="group editbar_links|layout.editbar_links">
-                <tal:b condition="group.links|nothing">
-                    <a href="#" role="button" data-bs-toggle="dropdown" class="nav-link dropdown-toggle ${' '.join(group.classes or ())}">${group.title}</a>
-                    <ul class="dropdown-menu">
-                        <li tal:repeat="link group.links">
-                            <tal:b replace="link(layout, ('nav-link', ))" />
+<metal:editbar define-macro="editbar">
+    <tal:b define="editbar_links layout.editbar_links if not layout.edit_mode else layout.editmode_links|[]">
+        <nav class="bg-dark navbar navbar-expand-lg p-0"  data-bs-theme="dark" tal:condition="editbar_links">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarEditbar" aria-controls="navbarEditbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarEditbar">
+                    <ul class="navbar-nav edit-bar">
+                        <li class="nav-item dropdown" tal:repeat="group editbar_links|layout.editbar_links">
+                            <tal:b condition="group.links|nothing">
+                                <a href="#" role="button" data-bs-toggle="dropdown" class="nav-link dropdown-toggle ${' '.join(group.classes or ())}">${group.title}</a>
+                                <ul class="dropdown-menu">
+                                    <li tal:repeat="link group.links">
+                                        <tal:b replace="link(layout, ('nav-link', ))" />
+                                    </li>
+                                </ul>
+                            </tal:b>
+                            <tal:b condition="group.url|group.attrs|nothing" define="link group">
+                                <tal:b replace="link(layout, ('nav-link', ))" />
+                            </tal:b>
                         </li>
                     </ul>
-                </tal:b>
-                <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                    <tal:b replace="link(layout, ('nav-link', ))" />
-                </tal:b>
-            </li>
-        </ul>
-    </div>
+                </div>
+            </div>
+        </nav>
+    </tal:b>
 </metal:editbar>
 
 <metal:breadcrumbs define-macro="breadcrumbs">
     <tal:b tal:define="bc_level request.GET.get('bc-level', False)">
         <div id="breadcrumbs" class="${'show-in-iframe' if bc_level else ''}">
             <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
-                <ol class="breadcrumb" tal:condition="layout.breadcrumbs"
+                <ol class="breadcrumb mt-xl" tal:condition="layout.breadcrumbs"
                     tal:define="shown_breadcrumbs layout.breadcrumbs[int(bc_level or 0):];
                         last_breadcrumb shown_breadcrumbs[-1] if shown_breadcrumbs else None">
                     <tal:b repeat="link shown_breadcrumbs">
                         <li
                             class="breadcrumb-item ${'active' if link is last_breadcrumb else ''}"
-                            tal:content="link(layout)"
+                            tal:content="link(layout, ('link-secondary', ))"
                             tal:attributes="aria-current 'page' if link is last_breadcrumb else None"
                         ></li>
                     </tal:b>
