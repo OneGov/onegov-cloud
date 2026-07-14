@@ -22,7 +22,14 @@
                 </tal:b>
             </div>
         </div>
-        <div class="row ${'ogc-login' if primary_separate else ''}">
+        <div class="row" tal:condition="primary_separate">
+            <div class="small-12 medium-7 large-5 columns">
+                <a href="#local-login" data-local-login-toggle
+                   aria-controls="local-login" aria-expanded="true"
+                   i18n:translate>Alternative login methods</a>
+            </div>
+        </div>
+        <div id="local-login" class="row ${'ogc-login' if primary_separate else ''}">
             <div class="small-12 medium-7 large-5 columns${'' if primary_separate is None else ' alternatives'}">
                 <div metal:use-macro="layout.macros['form']" />
             </div>

@@ -951,6 +951,11 @@ def get_scroll_to_username_asset() -> Iterator[str]:
     yield 'scroll_to_username.js'
 
 
+@OrgApp.webasset('local-login')
+def get_local_login_asset() -> Iterator[str]:
+    yield 'local_login.js'
+
+
 @OrgApp.webasset('all_blank')
 def get_all_blank_asset() -> Iterator[str]:
     yield 'all_blank.js'
