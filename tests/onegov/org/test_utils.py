@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+from decimal import Decimal
 from markupsafe import Markup
 from onegov.core.utils import Bunch, generate_fts_phonenumbers
 from onegov.org import utils
 from pytz import timezone
-from onegov.org.utils import emails_for_new_ticket
+from unittest.mock import MagicMock
+from onegov.org.utils import apply_price_rounding, emails_for_new_ticket
+from onegov.pay.utils import InvoiceItemMeta
 from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserGroup, User
 
@@ -411,3 +414,88 @@ def test_generate_fts_phonenumbers() -> None:
 
     # invalid number
     assert ['+41'] == generate_fts_phonenumbers(['+41'])
+
+
+def _make_request(price_rounding: bool) -> MagicMock:
+    request = MagicMock()
+    request.app.org.price_rounding = price_rounding
+    request.translate.side_effect = lambda s: str(s)
+    return request
+
+
+def _item(unit: str, group: str = 'form') -> InvoiceItemMeta:
+    return InvoiceItemMeta(text='Test', group=group, unit=Decimal(unit))
+
+
+def test_apply_price_rounding_disabled() -> None:
+    request = _make_request(price_rounding=False)
+    items = [_item('10.03')]
+    result = apply_price_rounding(request, items)
+    assert len(result) == 1
+    assert InvoiceItemMeta.total(result) == Decimal('10.03')
+
+
+def test_apply_price_rounding_already_rounded() -> None:
+    request = _make_request(price_rounding=True)
+    items = [_item('10.00')]
+    result = apply_price_rounding(request, items)
+    # no rounding item added when total is already a multiple of 0.05
+    assert len(result) == 1
+
+
+def test_apply_price_rounding_adds_item() -> None:
+    request = _make_request(price_rounding=True)
+    items = [_item('10.03')]
+    result = apply_price_rounding(request, items)
+    assert len(result) == 2
+    rounding = result[-1]
+    assert rounding.group == 'rounding'
+    assert InvoiceItemMeta.total(result) == Decimal('10.05')
+
+
+def test_apply_price_rounding_rounds_down() -> None:
+    request = _make_request(price_rounding=True)
+    items = [_item('10.02')]
+    result = apply_price_rounding(request, items)
+    assert len(result) == 2
+    assert result[-1].group == 'rounding'
+    assert result[-1].unit == Decimal('-0.02')
+    assert InvoiceItemMeta.total(result) == Decimal('10.00')
+
+
+def test_apply_price_rounding_no_org() -> None:
+    request = MagicMock(spec=['app', 'translate'])
+    # spec without 'org' means getattr(request.app, 'org', None) → None
+    request.app = MagicMock(spec=[])
+    items = [_item('10.03')]
+    result = apply_price_rounding(request, items)
+    assert result is items
+
+
+def test_apply_price_rounding_empty_list() -> None:
+    request = _make_request(price_rounding=True)
+    result = apply_price_rounding(request, [])
+    assert result == []
+
+
+def test_apply_price_rounding_includes_manual_total() -> None:
+    request = _make_request(price_rounding=True)
+    # 10.00 generated + 0.99 manual discount item on the invoice
+    items = [_item('10.00')]
+    result = apply_price_rounding(
+        request, items, manual_total=Decimal('-0.99')
+    )
+    assert len(result) == 2
+    rounding = result[-1]
+    assert rounding.group == 'rounding'
+    assert rounding.unit == Decimal('-0.01')
+    # grand total: 10.00 - 0.99 - 0.01 == 9.00
+    assert InvoiceItemMeta.total(result) + Decimal('-0.99') == Decimal('9.00')
+
+
+def test_apply_price_rounding_manual_total_already_rounded() -> None:
+    request = _make_request(price_rounding=True)
+    # generated total off-grid, but manual item brings it back on-grid
+    items = [_item('10.03')]
+    result = apply_price_rounding(request, items, manual_total=Decimal('0.02'))
+    assert len(result) == 1
