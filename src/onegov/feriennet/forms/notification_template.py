@@ -13,7 +13,8 @@ from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.models import NotificationTemplate
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, HtmlField
+from onegov.form.fields import (MultiCheckboxField, HtmlField,
+                                TranslatedSelectField)
 from onegov.user import User, UserCollection
 from sqlalchemy import distinct, or_, and_, select, exists
 from uuid import uuid4
@@ -62,7 +63,7 @@ class NotificationTemplateSendForm(Form):
 
     request: FeriennetRequest
 
-    send_to = RadioField(
+    send_to = TranslatedSelectField(
         label=_('Send to'),
         choices=[
             ('myself', _(
