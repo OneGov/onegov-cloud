@@ -3729,6 +3729,9 @@ msgstr "Neu"
 msgid "Subscribers"
 msgstr "Abonnenten"
 
+msgid "Schedule email delivery"
+msgstr "E-Mail Versand planen"
+
 msgid "Test"
 msgstr "Test"
 

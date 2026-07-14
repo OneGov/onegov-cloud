@@ -3738,6 +3738,9 @@ msgstr "Nouveau"
 msgid "Subscribers"
 msgstr "Abonnés"
 
+msgid "Schedule email delivery"
+msgstr "Planifier la livraison par e-mail"
+
 msgid "Test"
 msgstr "Test"
 

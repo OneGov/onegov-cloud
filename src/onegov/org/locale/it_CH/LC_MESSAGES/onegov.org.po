@@ -3730,6 +3730,9 @@ msgstr "Nuovo"
 msgid "Subscribers"
 msgstr "Iscritti"
 
+msgid "Schedule email delivery"
+msgstr "Pianifica la consegna dell'e-mail"
+
 msgid "Test"
 msgstr "Test"
 
