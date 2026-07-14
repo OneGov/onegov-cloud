@@ -19,6 +19,7 @@ from onegov.core.utils import module_path, normalize_for_url
 from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
+from onegov.org.models.ticket import ReservationHandler
 from onegov.pay import Payment, PaymentCollection, InvoiceCollection
 from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import Resource, ResourceCollection
@@ -5501,9 +5502,14 @@ def _push_reservations_into_past(
     session = client.app.session()
     ticket_id = UUID(cancel_url.split('/ticket/RSV/')[1].split('/')[0])
     ticket = session.query(Ticket).filter(Ticket.id == ticket_id).one()
-    reservations = sorted(ticket.handler.reservations, key=lambda r: r.start)
+    handler = ticket.handler
+    assert isinstance(handler, ReservationHandler)
+    reservations = sorted(
+        handler.reservations, key=lambda r: r.start or datetime.min
+    )
     past_ids = []
     for r in reservations[:count]:
+        assert r.start is not None and r.end is not None
         r.start = r.start - timedelta(days=40)
         r.end = r.end - timedelta(days=40)
         past_ids.append(r.id)
