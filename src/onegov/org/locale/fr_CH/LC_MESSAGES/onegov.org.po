@@ -4898,6 +4898,9 @@ msgstr "Durée [s]"
 msgid "Alternatives"
 msgstr "Alternatives"
 
+msgid "Alternative login methods"
+msgstr "Méthodes de connexion alternatives"
+
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
 

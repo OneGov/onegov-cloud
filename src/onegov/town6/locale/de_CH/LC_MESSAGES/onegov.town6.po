@@ -780,6 +780,9 @@ msgstr "In die Zwischenablage kopiert!"
 msgid "Alternatives"
 msgstr "Alternativen"
 
+msgid "Alternative login methods"
+msgstr "Alternative Login-Methoden"
+
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
 
