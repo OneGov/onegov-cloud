@@ -2784,6 +2784,24 @@ msgstr "Titel für tägliche Newsletter"
 msgid "Daily news from our town"
 msgstr "Tägliche Neuigkeiten aus unserer Gemeinde"
 
+msgid "Link for automatic newsletters"
+msgstr "Link für automatische Newsletter"
+
+msgid ""
+"A static link displayed in every automatic newsletter below the news "
+"articles."
+msgstr ""
+"Ein statischer Link, der in jedem automatischen Newsletter unterhalb der "
+"Nachrichten angezeigt wird."
+
+msgid "Display name for the link"
+msgstr "Anzeigename für den Link"
+
+msgid "The text shown for the link. If empty, the link itself is shown."
+msgstr ""
+"Der für den Link angezeigte Text. Wenn leer, wird der Link selbst "
+"angezeigt."
+
 msgid "Newsletter sending times (24h format)"
 msgstr "Newsletter Versandzeiten (24h Format)"
 
