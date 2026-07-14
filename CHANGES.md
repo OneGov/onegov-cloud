@@ -1,8 +1,63 @@
 # Changes
 
+## 2026.36
+
+`2026-07-14` | [6ed7ab5b4f...de2f2a2ab7](https://github.com/OneGov/onegov-cloud/compare/6ed7ab5b4f^...de2f2a2ab7)
+
+### Org
+
+##### Add requested editor options
+
+Added several new options in editor:
+- subscipt
+- alphanumeric lists
+-  blockquote
+
+`Feature` | [7b3dff2fbe](https://github.com/onegov/onegov-cloud/commit/7b3dff2fbee3f09b799886d707fdd314c96ac5e1)
+
+##### Hide local login behind toggle if external providers exist.
+
+`Feature` | [OGC-3264](https://linear.app/onegovcloud/issue/OGC-3264) | [de2f2a2ab7](https://github.com/onegov/onegov-cloud/commit/de2f2a2ab7cd78ea0306859d20fb923ac276666b)
+
+##### Fixes layout in user management.
+
+`Bugfix` | [OGC-3252](https://linear.app/onegovcloud/issue/OGC-3252) | [6ed7ab5b4f](https://github.com/onegov/onegov-cloud/commit/6ed7ab5b4f3bf00b2f31f810b3bc681788294836)
+
+### Pas
+
+##### Sync KUB roles and commission memberships by external ID.
+
+Add `external_kub_id` to parliamentarian roles and commission
+memberships and use it as the stable identity during KUB imports.
+
+The previous importer identified memberships using a tuple of person,
+organisation, role and additional information. Separate membership
+periods with the same values therefore collided, causing closed periods
+to overwrite active ones.
+
+This specifically affected parliamentarians who temporarily left the
+Kantonsrat and later rejoined with the same party, role and additional
+information.
+
+`Bugfix` | [OGC-3263](https://linear.app/onegovcloud/issue/OGC-3263) | [2501f61500](https://github.com/onegov/onegov-cloud/commit/2501f615002e9764d3650039d93a3971fce50aa5)
+
+### Reservation
+
+##### Adds reservation cancellation path to resources
+
+`Feature` | [OGC-3064](https://linear.app/onegovcloud/issue/OGC-3064) | [edd404aa11](https://github.com/onegov/onegov-cloud/commit/edd404aa117ffa3e9e705134f823a0075a753844)
+
+### Town6
+
+##### Newsletter Text
+
+Rename send button text to avoid confusion
+
+`Bugfix` | [OGC-2967](https://linear.app/onegovcloud/issue/OGC-2967) | [45195751d8](https://github.com/onegov/onegov-cloud/commit/45195751d80232580f6158b33af0cd7c445357e6)
+
 ## 2026.35
 
-`2026-07-14` | [3ff298f50b...fd519f1fd1](https://github.com/OneGov/onegov-cloud/compare/3ff298f50b^...fd519f1fd1)
+`2026-07-14` | [3ff298f50b...96fd1197e1](https://github.com/OneGov/onegov-cloud/compare/3ff298f50b^...96fd1197e1)
 
 ### Core
 
@@ -5176,36 +5231,4 @@ JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 ##### Fixes isolation bug between multiple SAML2 providers
 
 `Bugfix` | [e11229b408](https://github.com/onegov/onegov-cloud/commit/e11229b408fe31ab2672f12027f0a9080d698ebf)
-
-## 2025.7
-
-`2025-02-17` | [4297221960...2458cd0a05](https://github.com/OneGov/onegov-cloud/compare/4297221960^...2458cd0a05)
-
-### Agency
-
-##### Staka LU No hierarchical numbering in pdf
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [4297221960](https://github.com/onegov/onegov-cloud/commit/4297221960bd639331463f584ea63829e4dd9aa0)
-
-##### Staka LU Add logo to pdf
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [f60df0f84e](https://github.com/onegov/onegov-cloud/commit/f60df0f84e4ddf5eb2674398d3d6279b5f603be9)
-
-##### Staka LU Support alliance names in import
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [4c79c0cf51](https://github.com/onegov/onegov-cloud/commit/4c79c0cf516473c7b00db7e264eaa2bde7485fcf)
-
-##### Staka LU Use alternative dienststelle name over dienstelle
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [37d46a2e26](https://github.com/onegov/onegov-cloud/commit/37d46a2e26d743e4002c9d067dcb1ca5662dabdf)
-
-##### Staka LU pdf shows now organisation information
-
-`Feature` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [e0ee4b0c7f](https://github.com/onegov/onegov-cloud/commit/e0ee4b0c7f39105e5aa30f4a640bb0ea91d70fbe)
-
-### Pas
-
-##### Adds provisional import script.
-
-`Feature` | [OGC-1878](https://linear.app/onegovcloud/issue/OGC-1878) | [9bafe68736](https://github.com/onegov/onegov-cloud/commit/9bafe687361c7160c869fd0269b656b9d82d2e16)
 
