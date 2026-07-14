@@ -9,6 +9,7 @@ from dogpile.cache.api import NO_VALUE
 from functools import cached_property
 from io import BytesIO
 from onegov.core.custom import json
+from onegov.winterthur import log
 from operator import attrgetter
 from pathlib import Path
 from purl import URL
@@ -182,6 +183,9 @@ class RoadworkClient:
             try:
                 status, body = self.get_uncached(path)
             except pycurl.error as exception:
+                log.exception(
+                    f'Could not connect to {self.hostname}'
+                )
                 raise RoadworkConnectionError(
                     f'Could not connect to {self.hostname}'
                 ) from exception

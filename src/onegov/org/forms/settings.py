@@ -1569,6 +1569,27 @@ class NewsletterSettingsForm(Form):
         default=False
     )
 
+    daily_newsletter_link = URLField(
+        label=_('Link for automatic newsletters'),
+        fieldset=_('Automatic newsletters'),
+        description=_(
+            'A static link displayed in every automatic newsletter '
+            'below the news articles.'
+        ),
+        depends_on=('enable_automatic_newsletters', 'y'),
+        validators=[Optional()],
+    )
+
+    daily_newsletter_link_text = StringField(
+        label=_('Display name for the link'),
+        fieldset=_('Automatic newsletters'),
+        description=_(
+            'The text shown for the link. If empty, the link itself '
+            'is shown.'
+        ),
+        depends_on=('enable_automatic_newsletters', 'y'),
+    )
+
     newsletter_times = TagsField(
         label=_('Newsletter sending times (24h format)'),
         fieldset=_('Automatic newsletters'),
@@ -2050,13 +2071,26 @@ class EventSettingsForm(Form):
         default='tags'
     )
 
-    event_header_html = HtmlField(
-        label=_('General information above the event list'),
+    event_header_title = StringField(
+        label=_('Title of text above event list'),
+        description=_('General information about the event calendar'),
+        fieldset=_('Information above the event list')
+    )
 
+    event_header_html = HtmlField(
+        label=_('Text above the event list'),
+        fieldset=_('Information above the event list')
+    )
+
+    event_footer_title = StringField(
+        label=_('Title of text below event list'),
+        description=_('General information about the event calendar'),
+        fieldset=_('Information below the event list')
     )
 
     event_footer_html = HtmlField(
-        label=_('General information below the event list'),
+        label=_('Text below the event list'),
+        fieldset=_('Information below the event list')
     )
 
     event_files = UploadOrSelectExistingMultipleFilesField(
