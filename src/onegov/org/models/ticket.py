@@ -62,16 +62,12 @@ def submission_invoice_items(
     self: FormSubmissionHandler | DirectoryEntryHandler,
     request: CoreRequest
 ) -> list[InvoiceItemMeta]:
-    return (
-        invoice_items_for_submission(
-            request,
-            self.form,  # type: ignore[arg-type]
-            self.submission,
-            manual_total=manual_invoice_items_total(self.ticket.invoice),
-        )
-        if self.submission
-        else []
-    )
+    return invoice_items_for_submission(
+        request,
+        self.form,  # type: ignore[arg-type]
+        self.submission,
+        manual_total=manual_invoice_items_total(self.ticket.invoice)
+    ) if self.submission else []
 
 
 def refresh_submission_invoice_items(
@@ -641,22 +637,19 @@ class ReservationHandler(Handler):
             extras = []
             discounts = []
 
-        return (
+        if not self.resource:
+            return []
 
-                apply_price_rounding(
-                    request,
-                    self.resource.invoice_items_for_reservation(
-                        self.reservations,
-                        extras,
-                        discounts,
-                        reduced_amount_label=request.translate(_('Discount')),
-                    ),
-                    manual_total=manual_invoice_items_total(
-                        self.ticket.invoice
-                    ),
-                )
-
-        ) if self.resource else []
+        return apply_price_rounding(
+            request,
+            self.resource.invoice_items_for_reservation(
+                self.reservations,
+                extras,
+                discounts,
+                reduced_amount_label=request.translate(_('Discount'))
+            ),
+            manual_total=manual_invoice_items_total(self.ticket.invoice)
+        )
 
     def refresh_invoice_items(self, request: CoreRequest) -> None:
         payment = self.payment
