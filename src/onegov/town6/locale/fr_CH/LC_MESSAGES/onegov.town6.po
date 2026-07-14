@@ -777,6 +777,9 @@ msgstr "Copié dans le presse-papiers!"
 msgid "Alternatives"
 msgstr "Alternatives"
 
+msgid "Alternative login methods"
+msgstr "Autres méthodes de connexion"
+
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
 

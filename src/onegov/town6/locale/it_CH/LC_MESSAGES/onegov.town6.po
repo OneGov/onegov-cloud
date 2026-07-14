@@ -773,6 +773,9 @@ msgstr "Copiato negli appunti!"
 msgid "Alternatives"
 msgstr "Alternative"
 
+msgid "Alternative login methods"
+msgstr "Metodi di accesso alternativi"
+
 msgid "Don't have an account yet?"
 msgstr "Non hai ancora un account?"
 
