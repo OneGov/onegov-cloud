@@ -27,14 +27,9 @@ from onegov.file import FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
-from onegov.pay import InvoiceItemMeta, Price, round_to_five_rappen
+from onegov.pay import InvoiceItemMeta, Price
 from onegov.reservation import Resource
-from onegov.ticket import (
-    Ticket,
-    TicketCollection,
-    TicketInvoice,
-    TicketPermission,
-)
+from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import Auth, User, UserGroup
 from operator import add
 from sqlalchemy import case, nullsfirst
@@ -1945,10 +1940,7 @@ def get_current_tickets_url(request: OrgRequest) -> str:
 
 
 def invoice_items_for_submission(
-    request: CoreRequest,
-    form: Form,
-    submission: FormSubmission,
-    manual_total: Decimal = Decimal(0),
+    request: CoreRequest, form: Form, submission: FormSubmission
 ) -> list[InvoiceItemMeta]:
 
     # NOTE: Eventually we may need something more sophisticated
@@ -1984,47 +1976,6 @@ def invoice_items_for_submission(
             items.append(item)
         total = remainder
 
-    return apply_price_rounding(request, items, manual_total)
-
-
-def manual_invoice_items_total(invoice: TicketInvoice | None) -> Decimal:
-    if invoice is None:
-        return Decimal(0)
-
-    return sum(
-        (item.amount for item in invoice.items if item.group == 'manual'),
-        start=Decimal(0),
-    )
-
-
-def apply_price_rounding(
-    request: CoreRequest,
-    items: list[InvoiceItemMeta],
-    manual_total: Decimal = Decimal(0),
-) -> list[InvoiceItemMeta]:
-    """Appends a rounding position to the invoice items, so the total
-    ends up a multiple of 0.05, if the organisation has price rounding
-    enabled.
-
-    Manually added invoice items are preserved on refresh rather than
-    regenerated, so their total is passed separately to ensure the
-    grand total ends up on the 0.05 grid.
-
-    """
-    org = getattr(request.app, 'org', None)
-    if org is None or not org.price_rounding or not items:
-        return items
-
-    total = InvoiceItemMeta.total(items) + manual_total
-    difference = round_to_five_rappen(total) - total
-    if difference:
-        items.append(
-            InvoiceItemMeta(
-                text=request.translate(_('Rounding')),
-                group='rounding',
-                unit=difference,
-            )
-        )
     return items
 
 

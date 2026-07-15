@@ -3,7 +3,8 @@ from __future__ import annotations
 import pytest
 
 from decimal import Decimal
-from onegov.pay import Price, round_to_five_rappen
+from onegov.pay import InvoiceItemMeta, InvoiceMeta, Price, round_amount
+from typing import NamedTuple
 
 
 def test_price() -> None:
@@ -79,28 +80,149 @@ def test_apply_discount() -> None:
         Price(100, 'CHF', 10).apply_discount(Decimal(.5))
 
 
-def test_round_to_five_rappen() -> None:
-    r = round_to_five_rappen
+def test_round_amount_to_five_rappen() -> None:
+    def r(amount: str) -> Decimal:
+        return round_amount(Decimal(amount), Decimal('0.05'))
 
     # already on a 5-Rappen boundary
-    assert r(Decimal('10.00')) == Decimal('10.00')
-    assert r(Decimal('10.05')) == Decimal('10.05')
-    assert r(Decimal('10.50')) == Decimal('10.50')
+    assert r('10.00') == Decimal('10.00')
+    assert r('10.05') == Decimal('10.05')
+    assert r('10.50') == Decimal('10.50')
 
     # round down
-    assert r(Decimal('10.01')) == Decimal('10.00')
-    assert r(Decimal('10.02')) == Decimal('10.00')
-    assert r(Decimal('10.11')) == Decimal('10.10')
+    assert r('10.01') == Decimal('10.00')
+    assert r('10.02') == Decimal('10.00')
+    assert r('10.11') == Decimal('10.10')
 
     # round up
-    assert r(Decimal('10.03')) == Decimal('10.05')
-    assert r(Decimal('10.04')) == Decimal('10.05')
-    assert r(Decimal('10.13')) == Decimal('10.15')
+    assert r('10.03') == Decimal('10.05')
+    assert r('10.04') == Decimal('10.05')
+    assert r('10.13') == Decimal('10.15')
 
     # half rounds up (ROUND_HALF_UP)
-    assert r(Decimal('10.025')) == Decimal('10.05')
-    assert r(Decimal('10.075')) == Decimal('10.10')
+    assert r('10.025') == Decimal('10.05')
+    assert r('10.075') == Decimal('10.10')
 
     # negative amounts (surcharges/rounding can be negative)
-    assert r(Decimal('-0.02')) == Decimal('0.00')
-    assert r(Decimal('-0.03')) == Decimal('-0.05')
+    assert r('-0.02') == Decimal('0.00')
+    assert r('-0.03') == Decimal('-0.05')
+
+
+def test_round_amount_other_bases() -> None:
+    assert round_amount(Decimal('10.49'), Decimal('1.00')) == Decimal('10.00')
+    assert round_amount(Decimal('10.50'), Decimal('1.00')) == Decimal('11.00')
+    assert round_amount(Decimal('10.04'), Decimal('0.10')) == Decimal('10.00')
+    assert round_amount(Decimal('10.05'), Decimal('0.10')) == Decimal('10.10')
+
+
+class FakeInvoiceItem(NamedTuple):
+    group: str
+    amount: Decimal
+
+
+class FakeInvoice(NamedTuple):
+    items: list[FakeInvoiceItem]
+
+    @property
+    def total_excluding_manual_entries(self) -> Decimal:
+        return sum(
+            (item.amount for item in self.items if item.group != 'manual'),
+            start=Decimal('0'),
+        )
+
+
+def item(unit: str) -> InvoiceItemMeta:
+    return InvoiceItemMeta(text='Item', group='form', unit=Decimal(unit))
+
+
+def test_invoice_meta_no_rounding_base() -> None:
+    meta = InvoiceMeta([item('10.02')])
+    assert meta.rounding_item is None
+    assert list(meta) == meta.items
+    assert meta.total == Decimal('10.02')
+
+
+def test_invoice_meta_already_rounded() -> None:
+    meta = InvoiceMeta([item('10.05')], rounding_base=Decimal('0.05'))
+    assert meta.rounding_item is None
+    assert list(meta) == meta.items
+    assert meta.total == Decimal('10.05')
+
+
+def test_invoice_meta_rounds_down() -> None:
+    meta = InvoiceMeta([item('10.02')], rounding_base=Decimal('0.05'))
+    assert meta.rounding_item is not None
+    assert meta.rounding_item.group == 'rounding'
+    assert meta.rounding_item.amount == Decimal('-0.02')
+    assert list(meta) == [*meta.items, meta.rounding_item]
+    assert meta.total == Decimal('10.00')
+
+
+def test_invoice_meta_rounds_up() -> None:
+    meta = InvoiceMeta([item('10.03')], rounding_base=Decimal('0.05'))
+    assert meta.rounding_item is not None
+    assert meta.rounding_item.amount == Decimal('0.02')
+    assert meta.total == Decimal('10.05')
+
+
+def test_invoice_meta_empty_items() -> None:
+    meta = InvoiceMeta([], rounding_base=Decimal('0.05'))
+    assert meta.rounding_item is None
+    assert list(meta) == []
+    assert meta.total == Decimal('0')
+
+
+def test_invoice_meta_includes_manual_items() -> None:
+    invoice = FakeInvoice(
+        [
+            FakeInvoiceItem('manual', Decimal('0.01')),
+            FakeInvoiceItem('form', Decimal('10.00')),
+        ]
+    )
+    meta = InvoiceMeta(
+        [item('10.00')],
+        rounding_base=Decimal('0.05'),
+        invoice=invoice,  # type: ignore[arg-type]
+    )
+    assert meta.manual_total == Decimal('0.01')
+    assert meta.rounding_item is not None
+    assert meta.rounding_item.amount == Decimal('-0.01')
+    # the grand total including manual items lands on the grid
+    assert meta.total + meta.manual_total == Decimal('10.00')
+
+
+def test_invoice_meta_manual_total_already_rounded() -> None:
+    invoice = FakeInvoice([FakeInvoiceItem('manual', Decimal('0.05'))])
+    meta = InvoiceMeta(
+        [item('10.00')],
+        rounding_base=Decimal('0.05'),
+        invoice=invoice,  # type: ignore[arg-type]
+    )
+    assert meta.rounding_item is None
+
+
+def test_invoice_meta_total_changed() -> None:
+    meta = InvoiceMeta([item('10.02')], rounding_base=Decimal('0.05'))
+    assert meta.total_changed()
+
+    invoice = FakeInvoice(
+        [
+            FakeInvoiceItem('form', Decimal('10.02')),
+            FakeInvoiceItem('rounding', Decimal('-0.02')),
+            FakeInvoiceItem('manual', Decimal('5.00')),
+        ]
+    )
+    meta = InvoiceMeta(
+        [item('10.02')],
+        rounding_base=Decimal('0.05'),
+        invoice=invoice,  # type: ignore[arg-type]
+    )
+    # 10.02 + 5.00 manual rounds to 15.00, so the rounding item and
+    # the total excluding manual entries are unchanged
+    assert meta.rounding_item is not None
+    assert meta.rounding_item.amount == Decimal('-0.02')
+    assert not meta.total_changed()
+
+    # without rounding the total no longer matches the invoice
+    meta = InvoiceMeta([item('10.02')], invoice=invoice)  # type: ignore
+    assert meta.total_changed()

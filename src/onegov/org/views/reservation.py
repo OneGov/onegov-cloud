@@ -32,7 +32,7 @@ from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import emails_for_new_ticket, group_invoice_items
-from onegov.pay import InvoiceItemMeta, PaymentError, Price
+from onegov.pay import InvoiceMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.reservation.collection import ResourceCollection
 from onegov.ticket import TicketCollection, TicketInvoice
@@ -634,16 +634,17 @@ def confirm_reservation(
         if failed and failed.isdigit()
     }
 
-    invoice_items = utils.apply_price_rounding(
-        request,
+    invoice_meta = InvoiceMeta(
         self.invoice_items_for_reservation(
             reservations,
             extras,
             discounts,
             reduced_amount_label=request.translate(_('Discount')),
         ),
+        rounding_base=request.app.org.price_rounding,
+        rounding_text=request.translate(_('Rounding')),
     )
-    total_amount = InvoiceItemMeta.total(invoice_items)
+    total_amount = invoice_meta.total
     price = request.app.adjust_price(Price(
         total_amount,
         self.currency,
@@ -663,7 +664,7 @@ def confirm_reservation(
         'complete_link': request.link(self, 'finish'),
         'edit_link': request.link(self, 'form'),
         'price': price,
-        'invoice_items': group_invoice_items(invoice_items),
+        'invoice_items': group_invoice_items(list(invoice_meta)),
         'total_amount': total_amount,
         # TODO: Once reservations can include VAT, this should change
         'total_vat': None,
@@ -735,16 +736,17 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             extras = []
             discounts = []
 
-        invoice_items = utils.apply_price_rounding(
-            request,
+        invoice_meta = InvoiceMeta(
             self.invoice_items_for_reservation(
                 reservations,
                 extras,
                 discounts,
                 reduced_amount_label=request.translate(_('Discount')),
             ),
+            rounding_base=request.app.org.price_rounding,
+            rounding_text=request.translate(_('Rounding')),
         )
-        amount = InvoiceItemMeta.total(invoice_items)
+        amount = invoice_meta.total
         price = request.app.adjust_price(Price(
             amount,
             self.currency,
@@ -814,14 +816,14 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 ticket.handler_data['key_code'] = key_code
             ticket.tag_meta = tag_meta
 
-        if invoice_items:
+        if invoice_meta.items:
             invoice = TicketInvoice(
                 id=uuid4(),
                 invoicing_party=self.invoicing_party
             )
             request.session.add(invoice)
 
-            for item_meta in invoice_items:
+            for item_meta in invoice_meta:
                 item = item_meta.add_to_invoice(invoice)
                 if payment is not True:
                     if provider and payment.source == provider.type:
@@ -1476,8 +1478,9 @@ def reject_reservation(
         # pretend we already deleted the submission
         ticket.handler.submission = None  # type: ignore[attr-defined]
 
-    if ticket.handler.refreshing_invoice_is_safe(request):
-        ticket.handler.refresh_invoice_items(request)
+    rounding_base = request.app.org.price_rounding
+    if ticket.handler.refreshing_invoice_is_safe(request, rounding_base):
+        ticket.handler.refresh_invoice_items(request, rounding_base)
 
         if len(excluded) == 0 and submission:
             forms.submissions.delete(submission)
@@ -1783,8 +1786,9 @@ def add_reservation(
         return show_form()
 
     request.session.flush()
-    if ticket.handler.refreshing_invoice_is_safe(request):
-        ticket.handler.refresh_invoice_items(request)
+    rounding_base = request.app.org.price_rounding
+    if ticket.handler.refreshing_invoice_is_safe(request, rounding_base):
+        ticket.handler.refresh_invoice_items(request, rounding_base)
     else:
         request.session.flush()
         savepoint.rollback()
@@ -2044,8 +2048,11 @@ def adjust_reservation(
             pass
         elif new_reservation is not None:
             new_reservation.payment = payment  # type: ignore[attr-defined]
-            if ticket.handler.refreshing_invoice_is_safe(request):
-                ticket.handler.refresh_invoice_items(request)
+            rounding_base = request.app.org.price_rounding
+            if ticket.handler.refreshing_invoice_is_safe(
+                request, rounding_base
+            ):
+                ticket.handler.refresh_invoice_items(request, rounding_base)
             else:
                 request.session.flush()
                 savepoint.rollback()

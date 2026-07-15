@@ -45,6 +45,7 @@ from onegov.user import User
 from operator import itemgetter
 from purl import URL
 from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
 from wtforms.fields import FieldList
 from wtforms.fields import FloatField
@@ -2439,15 +2440,14 @@ class VATSettingsForm(Form):
         validators=[InputRequired(), NumberRange(0, 100)],
     )
 
-    price_rounding = BooleanField(
-        label=_('Round invoice totals to the nearest 0.05'),
+    price_rounding = DecimalField(
+        label=_('Rounding of invoice totals'),
         description=_(
-            'If enabled, newly generated invoices include a '
-            'rounding position right before the total, so the '
-            'total is always a multiple of 0.05. Existing '
-            'invoices are not affected.'
+            'If set, invoices include a rounding position so the total is '
+            'a multiple of this amount, for example 0.05. Leave empty to '
+            'disable rounding.'
         ),
-        default=False,
+        validators=[Optional(), NumberRange(min=Decimal('0.01'))],
     )
 
 

@@ -9,16 +9,18 @@ from onegov.pay.constants import SCALE
 
 from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Iterator
     from onegov.pay.models import Invoice, InvoiceItem
     from onegov.pay.types import PriceDict
     from sqlalchemy import Table
     from typing import Self, SupportsIndex
 
 
-def round_to_five_rappen(amount: Decimal) -> Decimal:
-    """Rounds the given amount to the nearest 5 Rappen (0.05 CHF)."""
-    return (amount * 20).quantize(Decimal('1'), rounding=ROUND_HALF_UP) / 20
+def round_amount(amount: Decimal, base: Decimal) -> Decimal:
+    """Rounds the given amount to the nearest multiple of base."""
+    return base * (amount / base).quantize(
+        Decimal('1'), rounding=ROUND_HALF_UP
+    )
 
 
 class _PriceBase(NamedTuple):
@@ -194,6 +196,83 @@ class InvoiceItemMeta:
         for attr, value in (self.extra or {}).items():
             if hasattr(item, attr) and getattr(item, attr) != value:
                 setattr(item, attr, value)
+
+
+@dataclass(frozen=True)
+class InvoiceMeta:
+    """The metadata of a full invoice.
+
+    Contains the freshly generated invoice items, an optional rounding
+    base and an optional reference to an already existing invoice, which
+    may contain manually added items that need to be considered for the
+    rounding.
+
+    Iterating over this yields the generated items plus, if necessary,
+    an extra item that rounds the invoice total to a multiple of the
+    rounding base.
+
+    """
+
+    items: list[InvoiceItemMeta]
+    rounding_base: Decimal | None = None
+    invoice: Invoice | None = None
+    rounding_text: str = 'Rounding'
+
+    @cached_property
+    def manual_total(self) -> Decimal:
+        if self.invoice is None:
+            return Decimal('0')
+        return sum(
+            (
+                item.amount
+                for item in self.invoice.items
+                if item.group == 'manual'
+            ),
+            start=Decimal('0'),
+        )
+
+    @cached_property
+    def rounding_item(self) -> InvoiceItemMeta | None:
+        if not self.items or not self.rounding_base:
+            return None
+
+        total = InvoiceItemMeta.total(self.items) + self.manual_total
+        difference = round_amount(total, self.rounding_base) - total
+        if not difference:
+            return None
+
+        return InvoiceItemMeta(
+            text=self.rounding_text,
+            group='rounding',
+            unit=difference,
+        )
+
+    def __iter__(self) -> Iterator[InvoiceItemMeta]:
+        yield from self.items
+        if self.rounding_item is not None:
+            yield self.rounding_item
+
+    @cached_property
+    def total(self) -> Decimal:
+        """The total amount excluding manual items on an existing
+        invoice, but including the rounding item.
+        """
+        return InvoiceItemMeta.total(self)
+
+    @cached_property
+    def total_vat(self) -> Decimal:
+        return InvoiceItemMeta.total_vat(self)
+
+    def total_changed(self) -> bool:
+        """Whether the total differs from the existing invoice's total,
+        taking rounding into account, but excluding manual items, since
+        they are preserved on refresh.
+        """
+        if self.invoice is None:
+            expected = Decimal('0')
+        else:
+            expected = self.invoice.total_excluding_manual_entries
+        return self.total != expected
 
 
 class _InvoiceDiscountMetaBase(NamedTuple):
