@@ -1570,6 +1570,27 @@ class NewsletterSettingsForm(Form):
         default=False
     )
 
+    daily_newsletter_link = URLField(
+        label=_('Link for automatic newsletters'),
+        fieldset=_('Automatic newsletters'),
+        description=_(
+            'A static link displayed in every automatic newsletter '
+            'below the news articles.'
+        ),
+        depends_on=('enable_automatic_newsletters', 'y'),
+        validators=[Optional()],
+    )
+
+    daily_newsletter_link_text = StringField(
+        label=_('Display name for the link'),
+        fieldset=_('Automatic newsletters'),
+        description=_(
+            'The text shown for the link. If empty, the link itself '
+            'is shown.'
+        ),
+        depends_on=('enable_automatic_newsletters', 'y'),
+    )
+
     newsletter_times = TagsField(
         label=_('Newsletter sending times (24h format)'),
         fieldset=_('Automatic newsletters'),

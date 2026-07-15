@@ -5,6 +5,8 @@ import re
 import morepath
 import transaction
 
+from datetime import UTC, datetime
+
 from collections import defaultdict
 from decimal import Decimal
 from onegov.core.html import html_to_text
@@ -40,8 +42,10 @@ from purl import URL
 from tempfile import NamedTemporaryFile
 from webob import Response
 from webob.exc import HTTPForbidden
+from sedate import utcnow
 from wtforms import TextAreaField
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError as WTValidationError
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
@@ -54,6 +58,7 @@ if TYPE_CHECKING:
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
+    from wtforms import Field
     from typing import type_check_only
 
     @type_check_only
@@ -104,6 +109,16 @@ def get_directory_entry_form_class(
             elif model.directory.required_publication:
                 self.publication_start.validators[0] = InputRequired()
                 self.publication_end.validators[0] = InputRequired()
+
+        def validate_publication_start(self, field: Field) -> None:
+            if (
+                field.data is not None
+                and model.directory.notification_address
+                and field.data <= utcnow()
+            ):
+                raise WTValidationError(_(
+                    'Publication start must be in the future.'
+                ))
 
     move_fields(
         InternalNotesAndOptionalMapPublicationForm,
@@ -645,6 +660,84 @@ def send_email_notification_for_directory_entry(
     request.app.send_transactional_email_batch(email_iter())
 
 
+def _send_admin_email(
+    directory: ExtendedDirectory,
+    request: OrgRequest,
+    subject: str,
+    template: str,
+    context: dict[str, Any],
+) -> None:
+    content = render_template(template, request, {
+        'layout': DefaultMailLayout(object(), request),
+        'title': subject,
+        'generated_at': datetime.now(UTC),
+        **context,
+    })
+    assert directory.notification_address is not None
+    request.app.send_transactional_email(
+        receivers=(directory.notification_address,),
+        reply_to=request.app.org.reply_to,
+        subject=subject,
+        content=content,
+        plaintext=html_to_text(content),
+    )
+
+
+def send_admin_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest,
+) -> None:
+    title = request.translate(_(
+        '${org}: Published Entry "${entry}" in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'entry': entry.title,
+                 'directory': directory.title},
+    ))
+
+    _send_admin_email(
+        directory, request, title,
+        'mail_directory_entry_admin_notification_started.pt',
+        {
+            'directory': directory,
+            'entry': entry,
+            'entry_title': entry.title,
+            'entry_link': request.link(entry),
+            'publication_start': entry.publication_start,
+            'publication_end': entry.publication_end,
+            'content_hash': entry.content_hash,
+        },
+    )
+
+
+def send_admin_expiry_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest,
+) -> None:
+    if not directory.notification_address:
+        return
+
+    title = request.translate(_(
+        '${org}: Publication Period Ended for "${entry}" in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'entry': entry.title,
+                 'directory': directory.title},
+    ))
+    _send_admin_email(
+        directory, request, title,
+        'mail_directory_entry_admin_publication_ended.pt',
+        {
+            'directory': directory,
+            'entry': entry,
+            'entry_title': entry.title,
+            'publication_start': entry.publication_start,
+            'publication_end': entry.publication_end,
+            'content_hash': entry.content_hash,
+        },
+    )
+
+
 @OrgApp.form(
     model=ExtendedDirectoryEntryCollection,
     permission=Private,
@@ -916,6 +1009,18 @@ def delete_directory_entry(
 ) -> None:
 
     request.assert_valid_csrf_token()
+
+    # Block deletion while published now, or still published as of the last
+    # maintenance run - the latter covers the gap between expiry and the
+    # next cronjob run, before the expiry notification has gone out
+    # (proof-of-publication guarantee).
+    last_run = request.app.org.last_hourly_maintenance_run
+    if (
+        isinstance(self, ExtendedDirectoryEntry)
+        and (self.published or self.published_as_of(last_run))
+        and self.directory.notification_address
+    ):
+        raise HTTPForbidden()
 
     session = request.session
     session.delete(self)

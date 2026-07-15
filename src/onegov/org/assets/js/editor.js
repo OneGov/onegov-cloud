@@ -15,6 +15,21 @@ var translation = $.Redactor.opts.langs[language];
     };
 })(jQuery);
 
+(function($) {
+    $.Redactor.prototype.subscript = function() {
+        return {
+            init: function() {
+                var button = this.button.add('subscript', translation.subscript);
+                this.button.addCallback(button, this.subscript.format);
+                button.html('x<sub>2</sub>')
+            },
+            format: function() {
+                this.inline.format('sub');
+            }
+        };
+    };
+})(jQuery);
+
 $(function() {
     _.each($('textarea.editor'), function(el) {
         var textarea = $(el);
@@ -24,8 +39,8 @@ $(function() {
         textarea.redactor({
             buttons: [
                 'formatting', 'bold', 'italic', 'deleted',
-                'unorderedlist', 'orderedlist', 'image', 'file', 'link',
-                'horizontalrule', 'html', 'superscript'
+                'unorderedlist', 'orderedlist', 'alphalist', 'image', 'file',
+                 'link', 'horizontalrule', 'superscript', 'subscript', 'html'
             ],
             formatting: ['p', 'blockquote', 'pre'],
             fileUpload: form.data('file-upload-url'),
@@ -33,7 +48,7 @@ $(function() {
             imageUpload: form.data('image-upload-url'),
             imageManagerJson: form.data('image-list-url'),
             definedLinks: form.data('sitecollection-url'),
-            plugins: ['bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks', 'table', 'superscript'],
+            plugins: ['alphalist', 'bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks', 'table', 'superscript', 'subscript'],
             lang: language,
             convertVideoLinks: false,
             imageResizable: false,
@@ -58,6 +73,10 @@ $(function() {
                     tag: 'p',
                     class: 'edit-note',
                     title: translation.editnote
+                },
+                {
+                    tag: 'blockquote',
+                    title: translation.blockquote
                 }
             ],
             /* defined in input_with_button.js */

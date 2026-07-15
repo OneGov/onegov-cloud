@@ -28,6 +28,7 @@ def test_view_login(client: Client) -> None:
     assert response.status_code == 200
     assert "E-Mail Adresse" in response
     assert "Passwort" in response
+    assert not response.pyquery('[data-local-login-toggle]')
 
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
