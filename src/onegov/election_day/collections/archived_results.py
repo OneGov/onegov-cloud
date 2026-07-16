@@ -580,11 +580,11 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         year_col = cast(extract('year', ArchivedResult.date), Integer)
         rows = (
             self.session.query(
-                ArchivedResult.meta['domain_segment'].astext,
+                ArchivedResult.domain_segment,
                 func.max(year_col),
             )
             .filter(ArchivedResult.domain == 'municipality')
-            .group_by(ArchivedResult.meta['domain_segment'].astext)
+            .group_by(ArchivedResult.domain_segment)
             .all()
         )
         return {name: year for name, year in rows if name}
@@ -595,8 +595,7 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         query = query.filter(ArchivedResult.domain == 'municipality')
         if self.municipality:
             query = query.filter(
-                ArchivedResult.meta['domain_segment'].astext
-                == self.municipality
+                ArchivedResult.domain_segment == self.municipality
             )
         query = query.order_by(desc(year_col))
         return [y for y, in query]
@@ -612,7 +611,7 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
             ArchivedResult.type.in_(['election', 'vote', 'complex_vote'])
         )
         query = query.filter(
-            ArchivedResult.meta['domain_segment'].astext == municipality
+            ArchivedResult.domain_segment == municipality
         )
         return query.order_by(
             ArchivedResult.date,
@@ -796,7 +795,7 @@ class SearchableArchivedResultCollection(
                 ArchivedResult.title, term, self.locale
             ),
             SearchableArchivedResultCollection.filter_text_by_locale(
-                ArchivedResult.meta['domain_segment'].astext, term, self.locale
+                ArchivedResult.domain_segment, term, self.locale
             )
         )
 
