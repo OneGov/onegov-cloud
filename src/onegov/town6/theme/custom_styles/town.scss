@@ -1,0 +1,23 @@
+.anchor-link {
+    display: none !important;
+}
+
+.main-content {
+    .anchor-link {
+        color: $tertiary;
+        display: inline !important;
+        font-size: 80%;
+        opacity: 0;
+        margin-left: .5rem;
+        position: absolute !important;
+        transition: opacity 200ms linear;
+    }
+
+    .anchor-link-heading {
+        position: relative;
+
+        &:hover .anchor-link {
+            opacity: 1;
+        }
+    }
+}

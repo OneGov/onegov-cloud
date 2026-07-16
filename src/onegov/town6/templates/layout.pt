@@ -180,11 +180,6 @@
         </div>
 
         <tal:b tal:define="on_homepage layout.on_homepage; sidebar_links layout.sidebar_links">
-            <article class="content without-sidebar-links" tal:condition="on_homepage">
-                <section role="main" id="content" class="mb-5xl">
-                    <div metal:define-slot="content"></div>
-                </section>
-            </article>
 
             <div class="header-image" tal:condition="not on_homepage and layout.org.theme_options.get('page-image-position', False) == 'header'">
                 <div class="dark-overlay"></div>
@@ -197,28 +192,34 @@
                     </div>
                 </div>
             </div>
-            <article class="content without-sidebar-links" tal:condition="on_homepage">
-                <section role="main" id="content" class="my-5xl">
-                    <div metal:define-slot="content"></div>
-                </section>
-            </article>
-            <article class="content ${'with-sidebar-links' if sidebar_links else 'without-sidebar-links'}" tal:condition="not: on_homepage" >
+
+            <div class="container-fluid">
+                <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
+            </div>
+
+            <div class="content my-5xl" tal:condition="not: on_homepage" >
                 <div class="container-fluid">
-                    <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
-                </div>
-                <section class="container my-5xl" role="main" id="content" data-reinit-foundation>
-                    <h1 class="main-title">
-                        <div metal:define-slot="main-title">
-                            <div metal:define-slot="pre-title"></div>
-                            <div metal:define-slot="title"></div>
-                            <div metal:define-slot="post-title"></div>
+                    <div class="row">
+                        <div class="col-12 col-md-4 col-lg-3">
+                            <h1 class="main-title fs-xs fw-bold">
+                                <tal:b metal:define-slot="title"></tal:b>
+                            </h1>
                         </div>
-                    </h1>
+                        <div class="col-12 col-md-8 col-lg-9">
+                            <p class="lead-text h1 text-primary">
+                                <div metal:define-slot="lead"></div>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-fluid" role="main" id="content" data-reinit-foundation>
                     <div metal:define-slot="before-content"></div>
                     <div metal:define-slot="content"></div>
-                </section>
-            </article>
+                </div>
+            </div>
         </tal:b>
+
         <div id="partners-everywhere" class="partners-everywhere" tal:condition="layout.show_partners">
             <div class="grid-container full gray">
                 <div class="grid-x">

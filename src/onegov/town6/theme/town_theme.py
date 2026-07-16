@@ -100,6 +100,7 @@ class TownBootstrapTheme(BootstrapBaseTheme):
     def post_imports(self) -> list[str]:
         """Our scss code split into various files"""
         return [
+            'town',
             'homepage',
         ]
 

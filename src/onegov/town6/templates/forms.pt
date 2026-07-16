@@ -2,26 +2,15 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
+    <tal:b metal:fill-slot="lead">
+        <tal:b i18n:translate="">Nutzen Sie unsere Online-Formulare, um Ihre Anliegen bequem, einfach und unabhängig von den Öffnungszeiten digital zu erledigen.</tal:b>
+    </tal:b>
     <tal:b metal:fill-slot="content">
         <tal:b metal:use-macro="layout.macros.page_content"
                  tal:define="lead None; text None; people None; coordinates None; contact layout.org.contact_html|None">
             <tal:b metal:fill-slot="after-text">
                 <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
-                <metal:b use-macro="layout.macros['group_by_column']" tal:condition="forms" tal:define="grouped forms; add_pagerefs request.is_logged_in" />
-            </tal:b>
-            <tal:b metal:fill-slot="before-panels">
-                <div class="side-panel" tal:condition="forms">
-                    <h3 i18n:translate="">Categories</h3>
-                    <div class="side-panel-with-bg">
-                        <ul class="more-list">
-                            <li tal:repeat="form forms">
-                                <a class="list-link" href="#${form}">
-                                    <span class="list-title">${form}</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <metal:b use-macro="layout.macros['accordion_grouped_by_column']" tal:condition="forms" tal:define="grouped forms; add_pagerefs request.is_logged_in" />
             </tal:b>
         </tal:b>
     </tal:b>

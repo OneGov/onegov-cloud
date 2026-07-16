@@ -16,3 +16,6 @@ $border-radius:       .625rem;  // 10px
 $border-radius-lg:    1.25rem;  // 20px
 $border-radius-xl:    2.5rem;   // 40px
 $border-radius-pill:  6.25rem;  // 100px
+
+$card-spacer-y: map-get($spacers, "lg"); // 1.5rem / 24px
+$card-spacer-x: map-get($spacers, "lg"); // 1.5rem / 24px
