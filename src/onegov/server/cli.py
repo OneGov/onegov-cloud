@@ -437,7 +437,7 @@ class WsgiProcess(multiprocessing.Process):
 
         click.echo('-' * shutil.get_terminal_size((80, 20)).columns)
 
-    def disable_systemwide_darwin_proxies(self):  # type:ignore
+    def disable_systemwide_darwin_proxies(self) -> None:
         # System-wide proxy settings on darwin need to be disabled, because
         # it leads to crashes in our forked subprocess:
         # https://bugs.python.org/issue27126

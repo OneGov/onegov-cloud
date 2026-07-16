@@ -500,7 +500,7 @@ def test_newsletter_send(client: Client) -> None:
             client.get('/newsletters'))
 
     # send the newsletter
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" not in send
     assert "two@example.org" not in send
@@ -513,7 +513,7 @@ def test_newsletter_send(client: Client) -> None:
     assert "gerade eben" in page
 
     # the send form should now look different
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
     assert "Dieser Newsletter wurde an 2 Abonnenten gesendet." in send
@@ -619,7 +619,7 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     assert "3 Abonnenten registriert" in client.get('/newsletters')
 
     # send the newsletter
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" not in send
     assert "two@example.org" not in send
@@ -634,7 +634,7 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     assert "gerade eben" in page
 
     # the send form should now look different
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
     assert "Dieser Newsletter wurde an 2 Abonnenten gesendet." in send
@@ -660,7 +660,7 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     newsletter = new.form.submit().follow()
 
     # send the newsletter
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" not in send
     assert "two@example.org" not in send
@@ -675,7 +675,7 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     assert "gerade eben" in page
 
     # the send form should now look different
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
     assert "Dieser Newsletter wurde an 3 Abonnenten gesendet." in send
@@ -712,7 +712,7 @@ def test_newsletter_schedule(client: Client) -> None:
 
     transaction.commit()
 
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
     send.form['send'] = 'specify'
 
     # schedule the newsletter too close to execute
