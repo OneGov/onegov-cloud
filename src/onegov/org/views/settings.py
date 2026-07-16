@@ -6,11 +6,13 @@ from itertools import groupby
 from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
+from onegov.api.models import ApiKey
 from onegov.core.elements import Link, Confirm, Intercooler, BackLink
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
 from onegov.form import Form
 from onegov.org import _
+from onegov.org.app import OrgApp
 from onegov.org.forms import AnalyticsSettingsForm
 from onegov.org.forms import FooterSettingsForm
 from onegov.org.forms import AppearanceSettingsForm
@@ -25,14 +27,13 @@ from onegov.org.forms.settings import (
     GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
     VATSettingsForm, EventSettingsForm, KabaSettingsForm,
     ResourceSettingsForm)
-from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
+from onegov.org.management import LinkHealthCheck
 from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
-from onegov.api.models import ApiKey
-from onegov.org.app import OrgApp
+from onegov.org.path import ShortLink
 from uuid import uuid4
 
 
@@ -499,6 +500,44 @@ def preview_holiday_settings(
             'layout': layout,
             'year': layout.today().year,
         }
+    )
+
+
+@OrgApp.form(model=Organisation, name='link-settings-preview',
+             permission=Secret, form=LinksSettingsForm)
+def preview_link_settings(
+    self: Organisation,
+    request: OrgRequest,
+    form: LinksSettingsForm,
+    layout: DefaultLayout | None = None
+) -> str:
+
+    layout = layout or DefaultLayout(self, request)
+    link_names = [
+        parts[0]
+        for line in (form.short_links.data or '').splitlines()
+        if len(parts := line.split(':', 1)) == 2
+    ]
+
+    if not link_names:
+        msg = request.translate(_('No short links defined'))
+        return f'<i class="short-links">{msg}</i>'
+
+    return Markup('<ul class="short-links">{}</ul>').format(
+        Markup('').join(
+            Markup(
+                '<li><a href="{0}" target="_blank">{0}</a></li>'
+            ).format(
+                request.class_link(
+                    ShortLink,
+                    {'name': name}
+                    # NOTE: Even though @ is reserved, it's safe to use
+                    #       in the position we're using it in, browsers
+                    #       will automatically convert them.
+                ).replace('/%40', '/@'),
+            )
+            for name in link_names
+        )
     )
 
 

@@ -535,6 +535,16 @@ class LinksSettingsForm(Form):
         render_kw={'rows': 10}
     )
 
+    preview = PreviewField(
+        label=_('Preview'),
+        fields=('short_links',),
+        events=('change', 'type'),
+        url=lambda meta: meta.request.link(
+            meta.request.app.org,
+            name='link-settings-preview'
+        )
+    )
+
     def validate_short_links(self, field: TextAreaField) -> None:
         if not field.data:
             return
