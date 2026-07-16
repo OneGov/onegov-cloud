@@ -402,32 +402,32 @@ class ElectionForm(Form):
             for key, text in principal.domains_election.items()
         ]
 
+        entities_year = date.today().year
+        if entities_year not in principal.entities and principal.entities:
+            entities_year = max(principal.entities)
+        year_entities = principal.entities.get(entities_year, {})
+
         self.region.label.text = principal.label('region')
-        regions = {
-            region
-            for year in principal.entities.values()
-            for entity in year.values()
-            if (region := entity.get('region', None))
-        }
-        self.region.choices = [(item, item) for item in sorted(regions)]
+        self.region.choices = [
+            (item, item) for item in sorted({
+                r for entity in year_entities.values()
+                for r in (entity.get('region'),) if r
+            })
+        ]
 
         self.district.label.text = principal.label('district')
-        districts = {
-            district
-            for year in principal.entities.values()
-            for entity in year.values()
-            if (district := entity.get('district', None))
-        }
-        self.district.choices = [(item, item) for item in sorted(districts)]
+        self.district.choices = [
+            (item, item) for item in sorted({
+                d for entity in year_entities.values()
+                for d in (entity.get('district'),) if d
+            })
+        ]
 
-        municipalities = {
-            municipality
-            for year in principal.entities.values()
-            for entity in year.values()
-            if (municipality := entity.get('name', None))
-        }
         self.municipality.choices = [
-            (item, item) for item in sorted(municipalities)
+            (item, item) for item in sorted({
+                m for entity in year_entities.values()
+                for m in (entity.get('name'),) if m
+            })
         ]
         if principal.domain == 'municipality':
             assert principal.name is not None

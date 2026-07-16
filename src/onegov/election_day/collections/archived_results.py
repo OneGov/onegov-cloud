@@ -27,11 +27,11 @@ from sqlalchemy.sql.expression import case
 from time import mktime
 from time import strptime
 
-
 from typing import overload
 from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable
@@ -99,7 +99,6 @@ def groupbydict[T1](
     sortfunc: Callable[[T1], Any] | None = None,
     groupfunc: Callable[[Iterable[T1]], Any] = list
 ) -> dict[Any, Any]:
-
     return OrderedDict(
         (key, groupfunc(group))
         for key, group in groupby(
@@ -179,7 +178,11 @@ class ArchivedResultCollection:
                 lambda j: groupbydict(
                     (item for item in j if item.url not in compounded),
                     lambda k: 'vote'
-                    if k.type in ('vote', 'complex_vote') else 'election'
+                    if k.type in ('vote', 'complex_vote') else 'election',
+                    lambda k: (
+                        1 if k.type in ('vote', 'complex_vote') else 0,
+                        (k.meta or {}).get('domain_segment') or '',
+                    ),
                 )
             )
         )
@@ -291,10 +294,23 @@ class ArchivedResultCollection:
         result.name = request.app.principal.name
         result.date = item.date
         result.shortcode = item.shortcode
-        result.title_translations = (
-            item.short_title_translations
-            or item.title_translations
-        )
+
+        # prioritize short title for elections, long title for votes
+        if isinstance(item, Election):
+            short_titles = {
+                k: v
+                for k, v in (item.short_title_translations or {}).items()
+                if v
+            }
+            result.title_translations = dict(
+                short_titles or item.title_translations or {}
+            )
+        else:
+            result.title_translations = dict(
+                item.title_translations
+                or item.short_title_translations
+                or {}
+            )
         result.last_modified = item.last_modified
         result.last_result_change = item.last_result_change
         result.external_id = item.id
@@ -302,7 +318,18 @@ class ArchivedResultCollection:
         result.completed = item.completed
         result.counted_entities, result.total_entities = item.progress
         result.has_results = item.has_results
-        result.meta = result.meta or {}
+        if item.domain == 'municipality':
+            segment = (item.meta or {}).get('domain_segment') or (
+                item.results[0].name if isinstance(item, Election)
+                and item.results else None
+            )
+            if segment:
+                segment = (
+                    MunicipalityArchivedResultCollection.sanitize_municipality(
+                        segment
+                    )
+                )
+                result.meta['domain_segment'] = segment
 
         if isinstance(item, Election):
             result.type = 'election'
@@ -354,7 +381,7 @@ class ArchivedResultCollection:
                 )
                 result.yeas_percentage_tie_breaker = (
                     ballot.yeas_percentage
-                    )
+                )
 
         if add_result:
             self.session.add(result)
@@ -428,11 +455,216 @@ class ArchivedResultCollection:
         self.session.flush()
 
 
+class MunicipalArchivedResultCollection(ArchivedResultCollection):
+
+    """
+    Provides all municipal (`kommunal`) archived results for a given date.
+    """
+
+    def by_date(
+        self,
+        date_: date | None = None
+    ) -> tuple[list[ArchivedResult], datetime | None]:
+        items, last_modified = super().by_date(date_)
+        results = [i for i in items if i.domain == 'municipality']
+        return results, last_modified
+
+    def group_items(
+        self,
+        items: Collection[ArchivedResult],
+        request: ElectionDayRequest
+    ) -> dict[date, dict[str | None, dict[str, list[ArchivedResult]]]] | None:
+        if not items:
+            return None
+
+        return groupbydict(
+            items,
+            lambda i: i.date,
+            lambda i: -(as_datetime(i.date).timestamp() or 0),
+            lambda i: groupbydict(
+                i,
+                lambda j: (j.meta or {}).get('domain_segment') or '',
+                lambda j: (j.meta or {}).get('domain_segment') or '',
+                lambda j: groupbydict(
+                    j,
+                    lambda k: 'vote'
+                    if k.type in ('vote', 'complex_vote') else 'election',
+                )
+            )
+        )
+
+
+class AllMunicipalArchivedResultCollection(MunicipalArchivedResultCollection):
+    """All municipal archived results across all dates."""
+
+    def by_all(self) -> tuple[list[ArchivedResult], datetime | None]:
+        query = self.query()
+        query = query.filter(ArchivedResult.domain == 'municipality')
+        query = query.order_by(
+            ArchivedResult.name,
+            ArchivedResult.shortcode,
+            ArchivedResult.title,
+            ArchivedResult.date,
+        )
+        result = query.all()
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        last_modified = max(last_modifieds) if last_modifieds else None
+        return result, last_modified
+
+    def group_items(  # type: ignore[override]
+        self,
+        items: Collection[ArchivedResult],
+        request: ElectionDayRequest
+    ) -> dict[str, dict[str, list[ArchivedResult]]] | None:
+
+        if not items:
+            return None
+
+        def by_type(
+            group: Iterable[ArchivedResult],
+        ) -> dict[str, list[ArchivedResult]]:
+            return groupbydict(
+                group,
+                lambda k: (
+                    'vote'
+                    if k.type in ('vote', 'complex_vote')
+                    else 'election'
+                ),
+                lambda k: (
+                    'vote'
+                    if k.type in ('vote', 'complex_vote')
+                    else 'election',
+                    k.date and -k.date.toordinal(),
+                ),
+            )
+
+        return groupbydict(
+            items,
+            lambda i: (i.meta or {}).get('domain_segment') or '',
+            lambda i: (i.meta or {}).get('domain_segment') or '',
+            by_type,
+        )
+
+
+class MunicipalityArchivedResultCollection(ArchivedResultCollection):
+
+    def __init__(self, session: Session, municipality: str = ''):
+        super().__init__(session)
+        self.municipality = municipality
+
+    @staticmethod
+    def sanitize_municipality(municipality: str) -> str:
+        """
+        Removes ` (SG)`, removes spaces, `.` and umlauts from municipality.
+        """
+        if '(' in municipality:
+            municipality = municipality.split(' (')[0]
+        municipality = municipality.lower()
+        for umlaut, replacement in (
+            ('ä', 'ae'), ('ö', 'oe'), ('ü', 'ue')
+        ):
+            municipality = municipality.replace(umlaut, replacement)
+        return municipality.replace(' ', '').replace('.', '')
+
+    def for_municipality(self, municipality: str) -> Self:
+        municipality = self.sanitize_municipality(municipality)
+        return self.__class__(self.session, municipality)
+
+    def for_year(self, year: int) -> MunicipalityYearArchivedResultCollection:
+        return MunicipalityYearArchivedResultCollection(
+            self.session, self.municipality, year
+        )
+
+    def get_latest_year_by_municipality(self) -> dict[str, int]:
+        """Returns the latest result year for each municipality name."""
+        year_col = cast(extract('year', ArchivedResult.date), Integer)
+        rows = (
+            self.session.query(
+                ArchivedResult.meta['domain_segment'].astext,
+                func.max(year_col),
+            )
+            .filter(ArchivedResult.domain == 'municipality')
+            .group_by(ArchivedResult.meta['domain_segment'].astext)
+            .all()
+        )
+        return {name: year for name, year in rows if name}
+
+    def get_years(self) -> list[int]:
+        year_col = cast(extract('year', ArchivedResult.date), Integer)
+        query = self.session.query(distinct(year_col))
+        query = query.filter(ArchivedResult.domain == 'municipality')
+        if self.municipality:
+            query = query.filter(
+                ArchivedResult.meta['domain_segment'].astext
+                == self.municipality
+            )
+        query = query.order_by(desc(year_col))
+        return [y for y, in query]
+
+    def _municipality_query(
+        self,
+        municipality: str | None = None
+    ) -> Query[ArchivedResult]:
+        municipality = municipality or self.municipality
+        query = self.query()
+        query = query.filter(ArchivedResult.domain == 'municipality')
+        query = query.filter(
+            ArchivedResult.type.in_(['election', 'vote', 'complex_vote'])
+        )
+        query = query.filter(
+            ArchivedResult.meta['domain_segment'].astext == municipality
+        )
+        return query.order_by(
+            ArchivedResult.date,
+            ArchivedResult.domain,
+            ArchivedResult.name,
+            ArchivedResult.shortcode,
+            ArchivedResult.title
+        )
+
+    def by_municipality(
+        self,
+        municipality: str | None = None
+    ) -> tuple[list[ArchivedResult], datetime | None]:
+        """ Returns the results for a given municipality. """
+
+        result = self._municipality_query(municipality).all()
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        return result, max(last_modifieds) if last_modifieds else None
+
+
+class MunicipalityYearArchivedResultCollection(
+    MunicipalityArchivedResultCollection
+):
+    """Municipality results filtered to a single year."""
+
+    def __init__(self, session: Session, municipality: str = '',
+                 year: int | None = None):
+        super().__init__(session, municipality)
+        self.year = year
+
+    def without_year(self) -> MunicipalityArchivedResultCollection:
+        return MunicipalityArchivedResultCollection(
+            self.session, self.municipality
+        )
+
+    def by_municipality(
+        self,
+        municipality: str | None = None
+    ) -> tuple[list[ArchivedResult], datetime | None]:
+        query = self._municipality_query(municipality)
+        if self.year:
+            year_col = cast(extract('year', ArchivedResult.date), Integer)
+            query = query.filter(year_col == self.year)
+        result = query.all()
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        return result, max(last_modifieds) if last_modifieds else None
+
+
 class SearchableArchivedResultCollection(
     ArchivedResultCollection,
     Pagination[ArchivedResult]
 ):
-
     page: int
 
     def __init__(
@@ -550,6 +782,7 @@ class SearchableArchivedResultCollection(
     @property
     def term_filter(self) -> tuple[
         ColumnElement[str | None],
+        ColumnElement[str | None],
         ColumnElement[str | None]
     ]:
         term = SearchableArchivedResultCollection.term_to_tsquery_string(
@@ -561,6 +794,9 @@ class SearchableArchivedResultCollection(
             ),
             SearchableArchivedResultCollection.filter_text_by_locale(
                 ArchivedResult.title, term, self.locale
+            ),
+            SearchableArchivedResultCollection.filter_text_by_locale(
+                ArchivedResult.meta['domain_segment'].astext, term, self.locale
             )
         )
 
