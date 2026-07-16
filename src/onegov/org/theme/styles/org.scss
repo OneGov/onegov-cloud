@@ -2422,11 +2422,13 @@ div#redactor-droparea {
     }
 }
 
-.form-preview-widget .holidays {
-    display: block;
-    font-size: .875rem;
-    list-style: none;
-    margin: 0 0 1rem;
+.form-preview-widget {
+    .holidays, .short-links {
+        display: block;
+        font-size: .875rem;
+        list-style: none;
+        margin: 0 0 1rem;
+    }
 }
 
 .danger-zone {
