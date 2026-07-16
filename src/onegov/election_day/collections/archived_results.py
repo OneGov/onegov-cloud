@@ -578,13 +578,14 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
     def get_latest_year_by_municipality(self) -> dict[str, int]:
         """Returns the latest result year for each municipality name."""
         year_col = cast(extract('year', ArchivedResult.date), Integer)
+        segment = ArchivedResult.meta['domain_segment'].astext
         rows = (
             self.session.query(
-                ArchivedResult.meta['domain_segment'].astext,
+                segment,
                 func.max(year_col),
             )
             .filter(ArchivedResult.domain == 'municipality')
-            .group_by(ArchivedResult.meta['domain_segment'].astext)
+            .group_by(segment)
             .all()
         )
         return {name: year for name, year in rows if name}
