@@ -71,10 +71,6 @@ def submission_base_invoice_items(
     )
 
 
-def handler_rounding_text(self: Handler, request: CoreRequest) -> str:
-    return request.translate(_('Rounding difference'))
-
-
 def refresh_submission_invoice_items(
     self: FormSubmissionHandler | DirectoryEntryHandler,
     request: CoreRequest,
@@ -331,7 +327,6 @@ class FormSubmissionHandler(Handler):
     handler_title = _('Form Submissions')
     code_title = _('Forms')
     base_invoice_items = submission_base_invoice_items
-    rounding_text = handler_rounding_text
     refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property
@@ -570,7 +565,6 @@ class ReservationHandler(Handler):
 
     handler_title = _('Reservations')
     code_title = _('Reservations')
-    rounding_text = handler_rounding_text
 
     @cached_property
     def resource(self) -> Resource | None:
@@ -1436,7 +1430,6 @@ class DirectoryEntryHandler(Handler):
     handler_title = _('Directory Entry Submissions')
     code_title = _('Directory Entry Submissions')
     base_invoice_items = submission_base_invoice_items
-    rounding_text = handler_rounding_text
     refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property

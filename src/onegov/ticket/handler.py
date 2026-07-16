@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
+from translationstring import TranslationString
 
 
 from typing import Any, TypeVar, TYPE_CHECKING
@@ -89,6 +90,13 @@ class Handler:
         if self.ticket.payment_id != payment_id:
             self.ticket.payment_id = payment_id
 
+    # HACK: We don't want to set up translations in this module for this
+    #       single string, we know we already have a translation in a
+    #       different domain so we just manually specify it for now.
+    rounding_text = TranslationString(
+        'Rounding difference', domain='onegov.org'
+    )
+
     def base_invoice_items(
         self, request: CoreRequest
     ) -> list[InvoiceItemMeta]:
@@ -111,12 +119,8 @@ class Handler:
             items=self.base_invoice_items(request),
             rounding_base=rounding_base,
             invoice=self.ticket.invoice,
-            rounding_text=self.rounding_text(request),
+            rounding_text=request.translate(self.rounding_text),
         )
-
-    def rounding_text(self, request: CoreRequest) -> str:
-        """The localized text used for the rounding invoice item."""
-        return 'Rounding difference'
 
     def refresh_invoice_items(
         self, request: CoreRequest, rounding_base: Decimal | None
