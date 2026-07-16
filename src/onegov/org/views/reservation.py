@@ -816,7 +816,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 ticket.handler_data['key_code'] = key_code
             ticket.tag_meta = tag_meta
 
-        if invoice_meta.items:
+        if invoice_meta:
             invoice = TicketInvoice(
                 id=uuid4(),
                 invoicing_party=self.invoicing_party

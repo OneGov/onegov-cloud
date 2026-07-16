@@ -124,9 +124,9 @@ class FakeInvoice(NamedTuple):
     items: list[FakeInvoiceItem]
 
     @property
-    def total_excluding_manual_entries(self) -> Decimal:
+    def total_amount(self) -> Decimal:
         return sum(
-            (item.amount for item in self.items if item.group != 'manual'),
+            (item.amount for item in self.items),
             start=Decimal('0'),
         )
 
@@ -187,8 +187,9 @@ def test_invoice_meta_includes_manual_items() -> None:
     assert meta.manual_total == Decimal('0.01')
     assert meta.rounding_item is not None
     assert meta.rounding_item.amount == Decimal('-0.01')
-    # the grand total including manual items lands on the grid
-    assert meta.total + meta.manual_total == Decimal('10.00')
+    # the grand total includes manual items and lands on the grid
+    assert meta.total == Decimal('10.00')
+    assert meta.total_excluding_manual_entries == Decimal('9.99')
 
 
 def test_invoice_meta_manual_total_already_rounded() -> None:
@@ -217,10 +218,10 @@ def test_invoice_meta_total_changed() -> None:
         rounding_base=Decimal('0.05'),
         invoice=invoice,  # type: ignore[arg-type]
     )
-    # 10.02 + 5.00 manual rounds to 15.00, so the rounding item and
-    # the total excluding manual entries are unchanged
+    # 10.02 + 5.00 manual rounds to 15.00, matching the invoice total
     assert meta.rounding_item is not None
     assert meta.rounding_item.amount == Decimal('-0.02')
+    assert meta.total == Decimal('15.00')
     assert not meta.total_changed()
 
     # without rounding the total no longer matches the invoice

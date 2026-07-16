@@ -83,7 +83,7 @@ def refresh_submission_invoice_items(
     payment = self.payment
     invoice = self.ticket.invoice
     invoice_meta = self.invoice_items(request, rounding_base)
-    if not invoice_meta.items:
+    if not invoice_meta:
         # delete the invoice and payment (if it exists)
         if invoice is not None:
             for item in invoice.items:
@@ -663,7 +663,7 @@ class ReservationHandler(Handler):
         payment = self.payment
         invoice = self.ticket.invoice
         invoice_meta = self.invoice_items(request, rounding_base)
-        if not invoice_meta.items:
+        if not invoice_meta:
             # delete the invoice and payment (if it exists)
             if invoice is not None:
                 for item in invoice.items:

@@ -252,10 +252,22 @@ class InvoiceMeta:
         if self.rounding_item is not None:
             yield self.rounding_item
 
+    def __bool__(self) -> bool:
+        return bool(self.items)
+
     @cached_property
     def total(self) -> Decimal:
-        """The total amount excluding manual items on an existing
-        invoice, but including the rounding item.
+        """The total amount including the rounding item as well as any
+        manual items on an existing invoice, mirroring
+        :attr:`Invoice.total_amount`.
+        """
+        return self.total_excluding_manual_entries + self.manual_total
+
+    @cached_property
+    def total_excluding_manual_entries(self) -> Decimal:
+        """The total of the generated items and the rounding item,
+        excluding manual items on an existing invoice, mirroring
+        :attr:`Invoice.total_excluding_manual_entries`.
         """
         return InvoiceItemMeta.total(self)
 
@@ -265,13 +277,12 @@ class InvoiceMeta:
 
     def total_changed(self) -> bool:
         """Whether the total differs from the existing invoice's total,
-        taking rounding into account, but excluding manual items, since
-        they are preserved on refresh.
+        taking rounding into account. Manual items are included on both
+        sides, since they are preserved on refresh.
         """
-        if self.invoice is None:
-            expected = Decimal('0')
-        else:
-            expected = self.invoice.total_excluding_manual_entries
+        expected = (
+            Decimal('0') if self.invoice is None else self.invoice.total_amount
+        )
         return self.total != expected
 
 

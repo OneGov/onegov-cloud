@@ -381,7 +381,7 @@ def handle_complete_submission(
                 )
                 TicketMessage.create(ticket, request, 'opened', 'external')
 
-                if invoice_meta.items:
+                if invoice_meta:
                     invoice = TicketInvoice(id=uuid4())
                     request.session.add(invoice)
 
