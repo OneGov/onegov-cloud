@@ -134,9 +134,10 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
         return ''
 
-    @property
-    def domain_segment(self) -> str | None:
-        return (self.meta or {}).get('domain_segment') or None
+    #: The municipality name for results with a `municipality` domain.
+    domain_segment: dict_property[str | None] = meta_property(
+        'domain_segment', value_type=str
+    )
 
     #: Shortcode for cantons that use it
     shortcode: Mapped[str | None]
