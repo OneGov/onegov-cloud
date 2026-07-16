@@ -232,6 +232,19 @@ class InvoiceMeta:
         )
 
     @cached_property
+    def manual_vat(self) -> Decimal:
+        if self.invoice is None:
+            return Decimal('0')
+        return sum(
+            (
+                item.vat
+                for item in self.invoice.items
+                if item.group == 'manual'
+            ),
+            start=Decimal('0'),
+        )
+
+    @cached_property
     def rounding_item(self) -> InvoiceItemMeta | None:
         if not self.items or not self.rounding_base:
             return None
@@ -273,7 +286,10 @@ class InvoiceMeta:
 
     @cached_property
     def total_vat(self) -> Decimal:
-        return InvoiceItemMeta.total_vat(self)
+        """The total VAT including any manual items on an existing
+        invoice, mirroring :attr:`Invoice.total_vat`.
+        """
+        return InvoiceItemMeta.total_vat(self) + self.manual_vat
 
     def total_changed(self) -> bool:
         """Whether the total differs from the existing invoice's total,

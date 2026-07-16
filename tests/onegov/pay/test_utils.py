@@ -118,6 +118,7 @@ def test_round_amount_other_bases() -> None:
 class FakeInvoiceItem(NamedTuple):
     group: str
     amount: Decimal
+    vat: Decimal = Decimal('0')
 
 
 class FakeInvoice(NamedTuple):
@@ -190,6 +191,25 @@ def test_invoice_meta_includes_manual_items() -> None:
     # the grand total includes manual items and lands on the grid
     assert meta.total == Decimal('10.00')
     assert meta.total_excluding_manual_entries == Decimal('9.99')
+
+
+def test_invoice_meta_total_vat_includes_manual() -> None:
+    invoice = FakeInvoice(
+        [FakeInvoiceItem('manual', Decimal('10.80'), vat=Decimal('0.80'))]
+    )
+    generated = InvoiceItemMeta(
+        text='Item',
+        group='form',
+        unit=Decimal('107.00'),
+        vat_rate=Decimal('7'),
+    )
+    meta = InvoiceMeta(
+        [generated],
+        invoice=invoice,  # type: ignore[arg-type]
+    )
+    assert generated.vat == Decimal('7.00')
+    assert meta.manual_vat == Decimal('0.80')
+    assert meta.total_vat == Decimal('7.80')
 
 
 def test_invoice_meta_manual_total_already_rounded() -> None:
