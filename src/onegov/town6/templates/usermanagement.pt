@@ -66,7 +66,7 @@
                     </tal:b>
                 </table>
             </div>
-            <div class="medium-4 cell medium-offset-1 sidebar filter-panel small-order-1 medium-order-2 large-order-2" id="right-sidebar">
+            <div class="medium-4 cell medium-offset-1 sidebar filter-panel small-order-1 medium-order-2 large-order-2">
                 <div class="sidebar-wrapper">
                     <div tal:condition="filters['active']|nothing" class="side-panel filter-active">
                         <h2 class="filter-title h3" i18n:translate>State</h2>

@@ -6,7 +6,8 @@ if (!$('.sidebar-wrapper').length) {
     $('.sidebar-toggler').css('display', 'none');
 }
 
-newSidebarTitle = $('#right-sidebar').data("sidebarMobileTitle");
+newSidebarTitle = $('.sidebar').data("sidebarMobileTitle");
+
 // Take the text of the first two h3 elements in the sidebar and use them as the title
 if (!newSidebarTitle) {
     newSidebarTitle = $('.sidebar-wrapper h3').first().text();
@@ -22,4 +23,4 @@ if (newSidebarTitle) {
     $('.sidebar-toggler span.text').text(newSidebarTitle);
 }
 
-$(".sidebar-wrapper").clone().appendTo("#offCanvasSidebar");
+$(".sidebar-wrapper").clone().appendTo("#offCanvasSidebar .content-area");

@@ -411,7 +411,11 @@ if (level !== 'none' && $('.sidebar-wrapper').length) {
         });
         sidePanel.append(list);
         sidePanel.show();
+    } else {
+        $('.side-panel.content-panel').remove();
     }
+} else {
+    $('.side-panel.content-panel').remove();
 }
 
 $('.is-accordion-submenu-parent a span').on('click', function(e) {

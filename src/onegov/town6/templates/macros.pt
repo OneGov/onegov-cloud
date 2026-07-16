@@ -3504,3 +3504,21 @@
         </li>
     </ul>
 </metal:globals-left>
+
+<metal:sidebar-mobile define-macro="sidebar-mobile">
+    <div class="sidebar-toggler show-for-small-only" data-toggle="offCanvasSidebar">
+        <i class="fa fa-angle-double-left"></i>
+        <span class="text"> Sidebar</span>
+    </div>
+
+    <div class="off-canvas position-right show-for-small-only" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas >
+        <div class="button-area">
+            <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="content-area">
+            <!-- Gets filled by sidebar_mobile.js -->
+        </div>
+    </div>
+</metal:sidebar-mobile>

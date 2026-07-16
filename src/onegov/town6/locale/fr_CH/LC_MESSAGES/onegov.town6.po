@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-07-14 12:32+0200\n"
+"POT-Creation-Date: 2026-07-14 13:40+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1533,8 +1533,11 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -2160,6 +2163,9 @@ msgstr "Il s'agit d'un événement importé"
 
 msgid "General information about the event calendar"
 msgstr "Informations générales sur le calendrier des événements"
+
+msgid "Filters & Actions"
+msgstr "Filtres et actions"
 
 msgid "Export these events"
 msgstr "Exporter ces événements"

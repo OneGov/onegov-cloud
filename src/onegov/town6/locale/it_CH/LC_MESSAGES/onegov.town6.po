@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-07-14 12:32+0200\n"
+"POT-Creation-Date: 2026-07-14 13:40+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1530,8 +1530,11 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -2153,6 +2156,9 @@ msgstr "Questo è un evento importato"
 
 msgid "General information about the event calendar"
 msgstr "Informazioni generali sul calendario degli eventi"
+
+msgid "Filters & Actions"
+msgstr "Filtri e azioni"
 
 msgid "Export these events"
 msgstr "Esporta questi eventi"
