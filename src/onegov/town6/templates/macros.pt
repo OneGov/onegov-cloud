@@ -3428,7 +3428,7 @@
                             Lump sum
                         </tal:b>
                         <tal:b tal:case="'rounding'" i18n:translate>
-                            Rounding
+                            Rounding difference
                         </tal:b>
                         <tal:b tal:case="default">
                             ${item.group}

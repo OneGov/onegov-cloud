@@ -664,7 +664,7 @@ def confirm_reservation(
         'complete_link': request.link(self, 'finish'),
         'edit_link': request.link(self, 'form'),
         'price': price,
-        'invoice_items': group_invoice_items(list(invoice_meta)),
+        'invoice_items': group_invoice_items(invoice_meta),
         'total_amount': total_amount,
         # TODO: Once reservations can include VAT, this should change
         'total_vat': None,

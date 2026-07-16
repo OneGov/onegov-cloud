@@ -233,7 +233,7 @@ def handle_pending_submission(
         # NOTE: The VAT amount can be wrong if the fee is charged to
         #       the customer. So it's better to not show it yet.
         'hide_vat_amount': True,
-        'invoice_items': group_invoice_items(list(invoice_meta)),
+        'invoice_items': group_invoice_items(invoice_meta),
         'total_amount': current_total_amount,
         'total_vat': show_vat and invoice_meta.total_vat,
         'checkout_button': checkout_button
