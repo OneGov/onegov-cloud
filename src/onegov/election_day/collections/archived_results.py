@@ -22,7 +22,6 @@ from sqlalchemy import distinct
 from sqlalchemy import extract
 from sqlalchemy import func
 from sqlalchemy import Integer
-from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import case
 from time import mktime
@@ -579,16 +578,13 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
     def get_latest_year_by_municipality(self) -> dict[str, int]:
         """Returns the latest result year for each municipality name."""
         year_col = cast(extract('year', ArchivedResult.date), Integer)
-        segment = ArchivedResult.meta[
-            literal('domain_segment', literal_execute=True)
-        ].astext
         rows = (
             self.session.query(
-                segment,
+                ArchivedResult.domain_segment,
                 func.max(year_col),
             )
             .filter(ArchivedResult.domain == 'municipality')
-            .group_by(segment)
+            .group_by(ArchivedResult.domain_segment)
             .all()
         )
         return {name: year for name, year in rows if name}
@@ -599,8 +595,7 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
         query = query.filter(ArchivedResult.domain == 'municipality')
         if self.municipality:
             query = query.filter(
-                ArchivedResult.meta['domain_segment'].astext
-                == self.municipality
+                ArchivedResult.domain_segment == self.municipality
             )
         query = query.order_by(desc(year_col))
         return [y for y, in query]
@@ -616,7 +611,7 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
             ArchivedResult.type.in_(['election', 'vote', 'complex_vote'])
         )
         query = query.filter(
-            ArchivedResult.meta['domain_segment'].astext == municipality
+            ArchivedResult.domain_segment == municipality
         )
         return query.order_by(
             ArchivedResult.date,
@@ -800,7 +795,7 @@ class SearchableArchivedResultCollection(
                 ArchivedResult.title, term, self.locale
             ),
             SearchableArchivedResultCollection.filter_text_by_locale(
-                ArchivedResult.meta['domain_segment'].astext, term, self.locale
+                ArchivedResult.domain_segment, term, self.locale
             )
         )
 
