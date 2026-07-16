@@ -5,6 +5,10 @@ import pytest
 from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.election_day.formats.imports.common import load_csv
+from onegov.election_day.formats.imports.common import convert_ech_domain
+from onegov.election_day.models import Canton, Municipality
+from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceType
+from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceTypeType
 
 
 from typing import TYPE_CHECKING
@@ -120,3 +124,73 @@ def test_load_csv_errors(election_day_app_zg: TestApp) -> None:
     )
     assert error is not None
     assert error.error == 'Not a valid xls/xlsx file.'
+
+
+def _doi(
+    type_value: str,
+    identification: str | None = None
+) -> DomainOfInfluenceType:
+    doi = DomainOfInfluenceType()
+    doi.domain_of_influence_type = DomainOfInfluenceTypeType[type_value]
+    doi.domain_of_influence_identification = identification
+    return doi
+
+
+def test_convert_ech_domain() -> None:
+    canton = Canton(name='Kanton Zug', canton='zg')
+    municipality = Municipality(
+        name='Baar', canton='zg', canton_name='Kanton Zug', municipality='1701'
+    )
+    entities = {3231: {'name': 'Au (SG)'}, 3427: {'name': 'Wil (SG)'}}
+
+    assert convert_ech_domain(_doi('CH'), canton, entities) == (
+        True,
+        'federation',
+        '',
+    )
+    assert convert_ech_domain(_doi('CT'), canton, entities) == (
+        True,
+        'canton',
+        '',
+    )
+    assert convert_ech_domain(_doi('BZ'), canton, entities) == (
+        True,
+        'none',
+        '',
+    )
+
+    # canton principal: segment comes from entities dict
+    assert convert_ech_domain(
+        _doi('MU', '3231'), canton, entities) == (
+            True, 'municipality', 'Au (SG)'
+    )
+    assert convert_ech_domain(
+        _doi('MU', '9999'), canton, entities) == (
+            True, 'municipality', ''
+    )
+    # municipality principal: segment is always empty
+    assert convert_ech_domain(
+        _doi('MU', '3231'), municipality, entities) == (
+            True,
+            'municipality',
+            '',
+    )
+
+    assert convert_ech_domain(_doi('AN'), canton, entities) == (
+        True,
+        'none',
+        '',
+    )
+    assert convert_ech_domain(_doi('SK'), canton, entities) == (
+        True,
+        'none',
+        '',
+    )
+
+    for unknown in ('OG', 'KI', 'KO', 'SC'):
+        supported, domain, segment = convert_ech_domain(
+            _doi(unknown), canton, entities
+        )
+        assert supported is False
+        assert domain == 'none'
+        assert segment == ''

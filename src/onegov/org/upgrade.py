@@ -963,3 +963,18 @@ def recreate_missing_reserved_slots(context: UpgradeContext) -> None:
             f'({suffix})',
             fg='yellow',
         )
+
+
+@upgrade_task('Subscribe customer-message recipients to cancellation requests')
+def subscribe_customer_message_recipients_to_cancellation_requests(
+    context: UpgradeContext
+) -> None:
+    # customer-message recipients should also be notified about cancellation
+    # requests.
+    if context.has_table('generic_recipients'):
+        context.operations.execute(text("""
+            UPDATE generic_recipients SET content = jsonb_set(
+                content, '{cancellation_requests}', 'true'
+            ) WHERE type = 'resource'
+              AND content->>'customer_messages' = 'true';
+        """))

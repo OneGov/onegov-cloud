@@ -37,8 +37,8 @@ from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
-    CitizenDashboard, TicketChatMessage, TicketMessage, TicketNote,
-    ResourceRecipient, ResourceRecipientCollection)
+    CitizenDashboard, TicketChatMessage, TicketMessage,
+    TicketNote, ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import (
     ticket_submitter, ReservationHandler, ReservationTicket)

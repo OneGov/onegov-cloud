@@ -2,17 +2,21 @@ from __future__ import annotations
 
 from onegov.core.security import Public, Personal, Private, Secret
 from onegov.form import Form
+from onegov.org.models.ticket import ReservationTicket
 from onegov.org.views.ticket import (
     view_ticket, handle_new_note, handle_edit_note, message_to_submitter,
     view_ticket_status, view_tickets, view_archived_tickets,
     view_pending_tickets, assign_ticket, view_send_to_gever,
     view_delete_all_archived_tickets, delete_ticket, change_tag,
     view_my_tickets, view_ticket_invoice, add_invoice_item)
+from onegov.org.views.reservation import (
+    request_cancellation, accept_cancellation)
 from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import (
-    TicketNoteForm, TicketAssignmentForm, TicketChangeTagForm,
-    ExtendedInternalTicketChatMessageForm, ManualInvoiceItemForm)
+    RequestCancellationForm, TicketNoteForm, TicketAssignmentForm,
+    TicketChangeTagForm, ExtendedInternalTicketChatMessageForm,
+    ManualInvoiceItemForm)
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.models import TicketNote
 from onegov.org.models.resource import FindYourSpotCollection
@@ -232,3 +236,32 @@ def town_view_my_tickets(
     layout: DefaultLayout | None = None
 ) -> RenderData:
     return view_my_tickets(self, request, DefaultLayout(self, request))
+
+
+@TownApp.form(
+    model=ReservationTicket,
+    name='request-cancellation',
+    template='request_cancellation.pt',
+    permission=Public,
+    form=RequestCancellationForm
+)
+def town_request_cancellation(
+    self: ReservationTicket,
+    request: TownRequest,
+    form: RequestCancellationForm,
+) -> RenderData | Response:
+    return request_cancellation(
+        self, request, form, TicketChatMessageLayout(self, request)
+    )
+
+
+@TownApp.view(
+    model=ReservationTicket,
+    name='accept-cancellation',
+    permission=Private,
+)
+def town_accept_cancellation(
+    self: ReservationTicket,
+    request: TownRequest,
+) -> Response | None:
+    return accept_cancellation(self, request)

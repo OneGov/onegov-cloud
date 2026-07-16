@@ -45,6 +45,11 @@ Quando si caricano i risultati di un'elezione regionale, solo gli enti di un dis
 
 ## Formati
 
+### eCH-0252
+
+Vedere [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
+
+
 ### Onegov
 
 Il formato che sarà utilizzato dall'applicazione web per l'esportazione è costituito da un unico file per ogni elezione. È presente una riga per ogni comune e candidato.

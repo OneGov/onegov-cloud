@@ -102,6 +102,12 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     title_translations: Mapped[Mapping[str, str]] = mapped_column(HSTORE)
     title = translation_hybrid(title_translations)
 
+    #: Short title of the election/vote (falls back to title if not set)
+    short_title_translations: Mapped[Mapping[str, str] | None] = (
+        mapped_column(HSTORE)
+    )
+    short_title = translation_hybrid(short_title_translations)
+
     #: Proposal title of the election/vote (complex votes)
     title_proposal_translations: Mapped[Mapping[str, str] | None] = (
         mapped_column(HSTORE)
@@ -127,6 +133,10 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             return self.name or ''
 
         return ''
+
+    @property
+    def domain_segment(self) -> str | None:
+        return (self.meta or {}).get('domain_segment') or None
 
     #: Shortcode for cantons that use it
     shortcode: Mapped[str | None]
@@ -347,6 +357,9 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         self.url = source.url
         self.title_translations = deepcopy(
             dict(source.title_translations)
+        )
+        self.short_title_translations = deepcopy(
+            dict(source.short_title_translations or {}) or None
         )
         self.title_proposal_translations = deepcopy(
             dict(source.title_proposal_translations or {})

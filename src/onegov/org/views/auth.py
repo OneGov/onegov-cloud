@@ -116,6 +116,7 @@ def handle_login(
 
     layout = layout or DefaultLayout(self, request)
     request.include('scroll-to-username')
+    request.include('local-login')
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
         Link(_('Login'), request.link(self, name='login'))
