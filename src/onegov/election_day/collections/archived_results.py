@@ -22,6 +22,7 @@ from sqlalchemy import distinct
 from sqlalchemy import extract
 from sqlalchemy import func
 from sqlalchemy import Integer
+from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy.sql.expression import case
 from time import mktime
@@ -578,7 +579,9 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
     def get_latest_year_by_municipality(self) -> dict[str, int]:
         """Returns the latest result year for each municipality name."""
         year_col = cast(extract('year', ArchivedResult.date), Integer)
-        segment = ArchivedResult.meta['domain_segment'].astext
+        segment = ArchivedResult.meta[
+            literal('domain_segment', literal_execute=True)
+        ].astext
         rows = (
             self.session.query(
                 segment,
