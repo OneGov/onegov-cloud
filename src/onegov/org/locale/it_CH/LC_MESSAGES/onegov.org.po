@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-14 12:32+0200\n"
+"POT-Creation-Date: 2026-07-16 15:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -187,22 +187,8 @@ msgstr "Deduzioni / Supplementi"
 msgid "Lump sum"
 msgstr "Somma forfettaria"
 
-msgid "Rounding"
-msgstr "Arrotondamento"
-
-msgid "Prices"
-msgstr "Prezzi"
-
-msgid "Rounding of invoice totals"
-msgstr "Arrotondamento dei totali delle fatture"
-
-msgid ""
-"If set, invoices include a rounding position so the total is a multiple of "
-"this amount, for example 0.05. Leave empty to disable rounding."
-msgstr ""
-"Se impostato, le fatture includono una posizione di arrotondamento in modo "
-"che il totale sia un multiplo di questo importo, ad esempio 0,05. Lasciare "
-"vuoto per disattivare l’arrotondamento."
+msgid "Rounding difference"
+msgstr "Differenza di arrotondamento"
 
 msgid "Paid"
 msgstr "Pagato"
@@ -3149,6 +3135,17 @@ msgstr ""
 "Si tratta del tasso di IVA in percentuale. Il tasso di IVA si applicherà a "
 "tutti i prezzi nei moduli."
 
+msgid "Rounding of invoice totals"
+msgstr "Arrotondamento dei totali delle fatture"
+
+msgid ""
+"If set, invoices include a rounding position so the total is a multiple of "
+"this amount, for example 0.05. Leave empty to disable rounding."
+msgstr ""
+"Se impostato, le fatture includono una posizione di arrotondamento in modo "
+"che il totale sia un multiplo di questo importo, ad esempio 0,05. Lasciare "
+"vuoto per disattivare l’arrotondamento."
+
 # ", assicurarsi di racchiudere il valore tra virgolette."
 msgid "Enable newsletter"
 msgstr "Attiva la newsletter"
@@ -4519,8 +4516,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -4895,9 +4892,6 @@ msgstr "Errori"
 msgid "Duration [s]"
 msgstr "Durata [s]"
 
-msgid "Alternatives"
-msgstr "Alternative"
-
 msgid "Alternative login methods"
 msgstr "Metodi di accesso alternativi"
 
@@ -4912,6 +4906,9 @@ msgstr "Hai dimenticato la password?"
 
 msgid "Reset password"
 msgstr "Reimposta la password"
+
+msgid "Alternatives"
+msgstr "Alternative"
 
 msgid "You are here"
 msgstr "Ti trovi qui"
@@ -5372,8 +5369,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -6606,8 +6603,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -7939,6 +7936,9 @@ msgstr "Intestazione"
 
 msgid "Footer"
 msgstr "Piè di pagina"
+
+msgid "Prices"
+msgstr "Prezzi"
 
 msgid "Data Retention Policy"
 msgstr "Politica di Conservazione dei Dati"

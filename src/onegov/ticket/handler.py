@@ -116,7 +116,7 @@ class Handler:
 
     def rounding_text(self, request: CoreRequest) -> str:
         """The localized text used for the rounding invoice item."""
-        return 'Rounding'
+        return 'Rounding difference'
 
     def refresh_invoice_items(
         self, request: CoreRequest, rounding_base: Decimal | None

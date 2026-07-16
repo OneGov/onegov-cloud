@@ -72,7 +72,7 @@ def submission_base_invoice_items(
 
 
 def handler_rounding_text(self: Handler, request: CoreRequest) -> str:
-    return request.translate(_('Rounding'))
+    return request.translate(_('Rounding difference'))
 
 
 def refresh_submission_invoice_items(

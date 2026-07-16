@@ -216,7 +216,7 @@ class InvoiceMeta:
     items: list[InvoiceItemMeta]
     rounding_base: Decimal | None = None
     invoice: Invoice | None = None
-    rounding_text: str = 'Rounding'
+    rounding_text: str = 'Rounding difference'
 
     @cached_property
     def manual_total(self) -> Decimal:

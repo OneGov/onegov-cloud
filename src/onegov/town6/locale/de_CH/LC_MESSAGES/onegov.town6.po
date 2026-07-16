@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-07-14 12:32+0200\n"
+"POT-Creation-Date: 2026-07-16 15:23+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -777,9 +777,6 @@ msgstr ""
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
 
-msgid "Alternatives"
-msgstr "Alternativen"
-
 msgid "Alternative login methods"
 msgstr "Alternative Login-Methoden"
 
@@ -794,6 +791,9 @@ msgstr "Sie haben Ihr Passwort vergessen?"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
+
+msgid "Alternatives"
+msgstr "Alternativen"
 
 msgid "You are here"
 msgstr "Sie sind hier"
@@ -1396,22 +1396,8 @@ msgstr "Abzüge / Zuschläge"
 msgid "Lump sum"
 msgstr "Pauschalbetrag"
 
-msgid "Rounding"
-msgstr "Rundung"
-
-msgid "Prices"
-msgstr "Preise"
-
-msgid "Rounding of invoice totals"
-msgstr "Rundung der Rechnungssummen"
-
-msgid ""
-"If set, invoices include a rounding position so the total is a multiple of "
-"this amount, for example 0.05. Leave empty to disable rounding."
-msgstr ""
-"Wenn festgelegt, enthalten Rechnungen eine Rundungsposition, sodass die "
-"Summe ein Vielfaches dieses Betrags ist, zum Beispiel 0.05. Leer lassen, um "
-"die Rundung zu deaktivieren."
+msgid "Rounding difference"
+msgstr "Rundungsdifferenz"
 
 msgid "Total"
 msgstr "Total"
@@ -1550,8 +1536,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Neue Kunden Nachricht in Ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -2966,6 +2952,9 @@ msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
 
+msgid "Prices"
+msgstr "Preise"
+
 msgid "Access (mTAN)"
 msgstr "Zugang (mTAN)"
 
@@ -3013,6 +3002,17 @@ msgstr "Übersicht Push-Benachrichtigungen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Rounding of invoice totals"
+#~ msgstr "Rundung der Rechnungssummen"
+
+#~ msgid ""
+#~ "If set, invoices include a rounding position so the total is a multiple "
+#~ "of this amount, for example 0.05. Leave empty to disable rounding."
+#~ msgstr ""
+#~ "Wenn festgelegt, enthalten Rechnungen eine Rundungsposition, sodass die "
+#~ "Summe ein Vielfaches dieses Betrags ist, zum Beispiel 0.05. Leer lassen, "
+#~ "um die Rundung zu deaktivieren."
 
 #~ msgid "A new entry has been published in the \"${directory}\" directory:"
 #~ msgstr ""

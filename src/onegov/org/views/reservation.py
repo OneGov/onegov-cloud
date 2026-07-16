@@ -642,7 +642,7 @@ def confirm_reservation(
             reduced_amount_label=request.translate(_('Discount')),
         ),
         rounding_base=request.app.org.price_rounding,
-        rounding_text=request.translate(_('Rounding')),
+        rounding_text=request.translate(_('Rounding difference')),
     )
     total_amount = invoice_meta.total
     price = request.app.adjust_price(Price(
@@ -744,7 +744,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 reduced_amount_label=request.translate(_('Discount')),
             ),
             rounding_base=request.app.org.price_rounding,
-            rounding_text=request.translate(_('Rounding')),
+            rounding_text=request.translate(_('Rounding difference')),
         )
         amount = invoice_meta.total
         price = request.app.adjust_price(Price(

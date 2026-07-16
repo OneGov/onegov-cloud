@@ -125,7 +125,7 @@ def handle_pending_submission(
         invoice_items_for_submission(request, form, self),
         rounding_base=request.app.org.price_rounding,
         invoice=ticket.invoice if ticket else None,
-        rounding_text=request.translate(_('Rounding')),
+        rounding_text=request.translate(_('Rounding difference')),
     )
     current_total_amount = invoice_meta.total
 
@@ -331,7 +331,7 @@ def handle_complete_submission(
             invoice_meta = InvoiceMeta(
                 invoice_items_for_submission(request, form, self),
                 rounding_base=request.app.org.price_rounding,
-                rounding_text=request.translate(_('Rounding')),
+                rounding_text=request.translate(_('Rounding difference')),
             )
             amount = invoice_meta.total
             price = request.app.adjust_price(Price(
