@@ -8,7 +8,7 @@ from sqlalchemy import or_
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class TextModuleCollection(GenericCollection[TextModule, 'UUID']):

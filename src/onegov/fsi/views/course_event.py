@@ -137,22 +137,7 @@ def view_edit_course_event(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        previous_status = self.status
         form.update_model(self)
-
-        if (
-            previous_status == 'created'
-            and self.status == 'planned'
-        ):
-            recipients = [a.id for a in self.attendees]
-            if recipients:
-                handle_send_email(
-                    self.reminder_template,
-                    request,
-                    recipients,
-                    cc_to_sender=True,
-                    show_sent_count=True
-                )
 
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))

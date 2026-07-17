@@ -150,7 +150,7 @@ class D3Renderer:
             json={
                 'scripts': self.scripts[chart],
                 'main': self.supported_charts[chart]['main'],
-                'params': loads(dumps(params).replace("'", '’'))  # noqa:RUF001
+                'params': loads(dumps(params).replace("'", '’'))  # ruff:ignore[ambiguous-unicode-character-string]
             },
             timeout=60
         )

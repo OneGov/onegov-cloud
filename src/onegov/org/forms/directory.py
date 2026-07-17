@@ -340,6 +340,24 @@ class DirectoryBaseForm(Form):
         fieldset=_('Notifications'),
         default=False)
 
+    notification_address = EmailField(
+        label=_('Admin notification address'),
+        description=_(
+            'Receives an e-mail when entries are published or de-published '
+            '(sent out hourly). Useful e.g. for permit directories as proof '
+            'of publication.'
+        ),
+        fieldset=_('Notifications'),
+        # only relevant when publication dates are required, and mutually
+        # exclusive with change requests (see the validator below); a
+        # reverse dependency on enable_change_requests would close a cycle
+        # that infinite-loops is_visible_through_dependencies.
+        depends_on=(
+            'required_publication', 'y', 'enable_change_requests', '!y'
+        ),
+        validators=[Optional(), Email()],
+    )
+
     submitter_meta_fields = MultiCheckboxField(
         label=_('Information to be provided in addition to the E-mail'),
         choices=(
@@ -461,6 +479,61 @@ class DirectoryBaseForm(Form):
 
             return False
         return None
+
+    def ensure_no_change_requests_with_admin_notifications(
+        self
+    ) -> bool | None:
+        """ Change requests are applied without going through the
+        mutability restrictions that protect already published entries
+        from being silently altered, so they would allow bypassing the
+        guarantees the admin notification is meant to provide (e.g. proof
+        of publication for permits). Therefore the two settings are
+        mutually exclusive.
+
+        """
+        if not (self.enable_change_requests.data
+                and self.notification_address.data):
+            return None
+
+        msg = _(
+            'Change requests and the admin notification address cannot '
+            'be enabled at the same time, because change requests are '
+            'applied without respecting the publication restrictions '
+            'that admin notifications rely on.'
+        )
+
+        for i in (self.enable_change_requests, self.notification_address):
+            assert isinstance(i.errors, list)
+            i.errors.append(msg)
+
+        return False
+
+    def ensure_notification_address_requires_required_publication(
+        self
+    ) -> bool | None:
+        """ The admin notification workflow is a proof-of-publication tool:
+        it relies on every entry having a publication period. Without
+        required publication an entry could be published immediately with
+        no start (which the hourly cronjob's start-transition scan never
+        notifies on), so a notification address only makes sense when
+        publication dates are required.
+
+        """
+        if not self.notification_address.data:
+            return None
+        if self.required_publication.data:
+            return None
+
+        msg = _(
+            'An admin notification address requires publication dates to '
+            'be required.'
+        )
+
+        for i in (self.notification_address, self.required_publication):
+            assert isinstance(i.errors, list)
+            i.errors.append(msg)
+
+        return False
 
     def first_hidden_field(
         self,

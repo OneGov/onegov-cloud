@@ -49,7 +49,7 @@ from typing import cast, Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
-    from onegov.org.models import GeneralFile  # noqa: F401
+    from onegov.org.models import GeneralFile  # ruff:ignore[unused-import]
     from onegov.org.request import OrgRequest
     from onegov.org.models import ImageSet
     from sqlalchemy.orm import Mapped
@@ -601,9 +601,9 @@ class PersonLinkExtension(ContentExtension):
         PersonForm.Meta = meta
 
         if TYPE_CHECKING:
-            FieldBase = FieldList[FormField[PersonForm]]  # noqa: N806
+            FieldBase = FieldList[FormField[PersonForm]]  # ruff:ignore[non-lowercase-variable-in-function]
         else:
-            FieldBase = FieldList  # noqa: N806
+            FieldBase = FieldList  # ruff:ignore[non-lowercase-variable-in-function]
 
         class PeopleField(FieldBase):
             def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:

@@ -7,9 +7,15 @@ from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
-from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import (
+    AllMunicipalArchivedResultCollection,
+    ArchivedResultCollection,
+    MunicipalArchivedResultCollection,
+    MunicipalityArchivedResultCollection
+)
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.collections import VoteCollection
+from onegov.election_day.models import Principal
 from onegov.user import Auth
 from sedate import utcnow
 
@@ -57,6 +63,10 @@ class DefaultLayout(ChameleonLayout):
 
     def title(self) -> str:
         return ''
+
+    @property
+    def is_root(self) -> bool:
+        return isinstance(self.model, Principal)
 
     @cached_property
     def principal(self) -> Canton | Municipality:
@@ -158,6 +168,28 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def archive(self) -> ArchivedResultCollection:
         return ArchivedResultCollection(self.request.session)
+
+    @cached_property
+    def all_municipal_archive(self) -> AllMunicipalArchivedResultCollection:
+        return AllMunicipalArchivedResultCollection(self.request.session)
+
+    @cached_property
+    def municipal_archive(self) -> MunicipalArchivedResultCollection:
+        return MunicipalArchivedResultCollection(self.request.session)
+
+    @cached_property
+    def municipality_archive(self) -> MunicipalityArchivedResultCollection:
+        return MunicipalityArchivedResultCollection(self.request.session)
+
+    @cached_property
+    def has_municipal_results(self) -> bool:
+        latest_years = (
+            self.municipality_archive.get_latest_year_by_municipality()
+        )
+        return any(
+            slug in latest_years
+            for slug in self.principal.municipality_display_name_by_slug
+        )
 
     @cached_property
     def archive_search_link(self) -> str:

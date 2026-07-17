@@ -71,6 +71,7 @@ $.Redactor.opts.langs['fr'] = {
     align_justify: 'Justifier',
     horizontalrule: 'Ligne horizontale',
 	superscript: 'Exposant',
+    subscript: 'Indice',
     fullscreen: 'Plein écran',
     deleted: 'Supprimer',
     anchor: 'Ancre',
@@ -83,6 +84,8 @@ $.Redactor.opts.langs['fr'] = {
     center: 'Centrer',
     upload_label: 'Déposez le fichier ici ou ',
     redo: 'Refaire',
-    undo: 'Défaire'
+    undo: 'Défaire',
+	alphalist: 'a. Liste alphabétique',
+	blockquote: 'Citation'
 };
 })( jQuery );

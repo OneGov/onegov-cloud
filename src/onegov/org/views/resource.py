@@ -225,7 +225,7 @@ class ResourceGroup(NamedTuple):
                         item.parent_id is not None
                         # avoid infinite loop when there is a cycle
                         and item.parent_id not in seen
-                        and (parent := rooms.get((  # noqa: B023
+                        and (parent := rooms.get((  # ruff:ignore[function-uses-loop-variable]
                             item.parent_id,
                             item.subgroup or ''
                         ))) is not None

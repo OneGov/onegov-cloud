@@ -234,7 +234,7 @@ class Framework(
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print('=' * 80, file=sys.stderr)  # noqa: T201
+                    print('=' * 80, file=sys.stderr)  # ruff:ignore[print]
                     traceback.print_exc()
                 raise
 
@@ -1120,11 +1120,11 @@ class Framework(
         # transactional stream in Postmark is called outbound
         stream = 'marketing' if category == 'marketing' else 'outbound'
 
-        BATCH_LIMIT = 500  # noqa: N806
+        BATCH_LIMIT = 500  # ruff:ignore[non-lowercase-variable-in-function]
         # NOTE: The API specifies MB, so let's not chance it
         #       by assuming they meant MiB and just go with
         #       lower size limit.
-        SIZE_LIMIT = 50_000_000  # 50MB  # noqa: N806
+        SIZE_LIMIT = 50_000_000  # 50MB  # ruff:ignore[non-lowercase-variable-in-function]
         # NOTE: We use a buffer to be a bit more memory efficient
         #       we don't initialize the buffer, so tell gives us
         #       the exact size of the buffer.

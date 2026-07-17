@@ -36,7 +36,7 @@
                                                             <tal:block tal:define="prefix item.title_prefix(request)">
                                                                 <a href="${item.adjusted_url(request)}">
                                                                     <tal:block tal:condition="prefix">${prefix}: </tal:block>
-                                                                    <tal:block metal:use-macro="layout.macros['title-translation']" tal:define="item item"/>
+                                                                    <tal:block metal:use-macro="layout.macros['short-title-translation']" tal:define="item item"/>
                                                                 </a>
                                                             </tal:block>
                                                         </li>

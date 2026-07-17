@@ -72,8 +72,11 @@ def import_votes_ech(
             VoteSubTypeTypeV1.VALUE_2, VoteSubTypeTypeV2.VALUE_2,
             VoteSubTypeTypeV1.VALUE_3, VoteSubTypeTypeV2.VALUE_3
         ):
-            classes[vote_info.vote.main_vote_identification or ''] = (
-                ComplexVote)
+            classes[
+                vote_info.vote.main_vote_identification
+                or vote_info.vote.vote_identification
+                or ''
+            ] = ComplexVote
 
     # get or create votes
     existing_votes = session.query(Vote).filter(
@@ -133,9 +136,17 @@ def import_votes_ech(
                 vote_info.vote.domain_of_influence, principal, entities
             )
             if not supported:
+                doi = vote_info.vote.domain_of_influence
+                doi_value = getattr(
+                    doi.domain_of_influence_type, 'value', None
+                )
                 errors.append(
                     FileImportError(
-                        _('Domain not supported'),
+                        _(
+                            'Domain not supported: ${doi_type}'
+                            ' (supported: CH, CT, BZ, MU, AN)',
+                            mapping={'doi_type': doi_value}
+                        ),
                         filename=identification
                     )
                 )
@@ -202,7 +213,12 @@ def import_votes_ech(
             ballot_result.received = None
             if (
                 circle_info.result_data
-                and circle_info.result_data.fully_counted_true
+                and (
+                    getattr(circle_info.result_data, 'is_fully_counted', None)
+                    or getattr(
+                        circle_info.result_data, 'fully_counted_true', None
+                    )
+                )
             ):
                 ballot_result.counted = True
                 result_data = circle_info.result_data

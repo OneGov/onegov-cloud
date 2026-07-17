@@ -20,7 +20,7 @@ class _Marker(enum.Enum):
     any_type = enum.auto()
 
 
-type any_type_t = Literal[_Marker.any_type]  # noqa: PYI042
+type any_type_t = Literal[_Marker.any_type]  # ruff:ignore[snake-case-type-alias]
 any_type: any_type_t = _Marker.any_type
 
 

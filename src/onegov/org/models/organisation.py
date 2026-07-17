@@ -15,6 +15,7 @@ from onegov.form import flatten_fieldsets, parse_formcode
 from onegov.org.theme import user_options
 from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
+from sedate import utcnow
 from sqlalchemy.orm import mapped_column, Mapped
 from uuid import uuid4, UUID
 
@@ -23,6 +24,7 @@ from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import datetime
+    from decimal import Decimal
     from markupsafe import Markup
     from onegov.core.framework import Framework
     from onegov.form.parser.core import ParsedField
@@ -141,9 +143,11 @@ class Organisation(Base, TimestampMixin):
     event_filter_configuration: dict_property[dict[str, Any]] = (
         meta_property(default=dict)
     )
+    event_header_title: dict_property[str | None] = meta_property()
     event_header_html: dict_markup_property[Markup | None] = (
         dict_markup_property('meta')
     )
+    event_footer_title: dict_property[str | None] = meta_property()
     event_footer_html: dict_markup_property[Markup | None] = (
         dict_markup_property('meta')
     )
@@ -269,6 +273,8 @@ class Organisation(Base, TimestampMixin):
     newsletter_times: dict_property[list[str] | None] = meta_property()
     daily_newsletter_title: dict_property[str | None] = meta_property()
     show_only_previews: dict_property[bool] = meta_property(default=False)
+    daily_newsletter_link: dict_property[str | None] = meta_property()
+    daily_newsletter_link_text: dict_property[str | None] = meta_property()
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
@@ -321,6 +327,9 @@ class Organisation(Base, TimestampMixin):
     # vat
     vat_rate: dict_property[float | None] = meta_property(default=0.0)
 
+    # prices
+    price_rounding: dict_property[Decimal | None] = meta_property(default=None)
+
     # RIS settings
     ris_enabled: dict_property[bool] = meta_property(default=False)
     ris_main_url: dict_property[str | None] = meta_property(default=None)
@@ -344,6 +353,20 @@ class Organisation(Base, TimestampMixin):
     hourly_maintenance_tasks_last_run: dict_property[datetime | None] = (
         meta_property(default=None)
     )
+
+    @property
+    def last_hourly_maintenance_run(self) -> datetime:
+        """ The effective reference point for the hourly maintenance run.
+
+        Unlike :attr:`hourly_maintenance_tasks_last_run` this never returns
+        ``None`` - if the cronjob has never run we assume it ran an hour ago,
+        matching its cadence. Use this when deciding whether the cronjob has
+        already observed some time-dependent state (e.g. an entry's expiry).
+        """
+        return (
+            self.hourly_maintenance_tasks_last_run
+            or utcnow() - timedelta(hours=1)
+        )
 
     firebase_adminsdk_credential: dict_property[str | None] = meta_property()
     selectable_push_notification_options: dict_property[list[list[str]]] = (
