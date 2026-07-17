@@ -10,7 +10,7 @@ from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class CommissionCollection[CommissionT: Commission = Any](
@@ -32,7 +32,7 @@ class CommissionCollection[CommissionT: Commission = Any](
     def query(self) -> Query[CommissionT]:
         query = super().query()
 
-        Commission = self.model_class  # noqa: N806
+        Commission = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
         if self.active is not None:
             if self.active:
                 query = query.filter(

@@ -515,7 +515,7 @@ class DirectoryArchiveWriter:
                     if hasattr(f.reference.file, '_file_path'):
                         src = os.path.abspath(f.reference.file._file_path)
                     else:
-                        tmp = NamedTemporaryFile()  # noqa: SIM115
+                        tmp = NamedTemporaryFile()  # ruff:ignore[open-file-with-context-handler]
                         tmp.write(f.reference.file.read())
                         tempfiles.append(tmp)
                         src = tmp.name
@@ -628,7 +628,7 @@ class DirectoryZipArchive:
     def from_buffer(cls, buffer: SupportsReadAndSeek) -> Self:
         """ Creates a zip archive instance from a file object in memory. """
 
-        f = NamedTemporaryFile()  # noqa: SIM115
+        f = NamedTemporaryFile()  # ruff:ignore[open-file-with-context-handler]
 
         buffer.seek(0)
 

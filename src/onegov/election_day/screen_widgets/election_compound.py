@@ -15,7 +15,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.layouts import DefaultLayout
-    from onegov.election_day.models import ElectionCompound  # noqa: F401
+    from onegov.election_day.models import ElectionCompound  # ruff:ignore[unused-import]
 
 ElectionCompoundWidget = ModelBoundWidget['ElectionCompound']
 

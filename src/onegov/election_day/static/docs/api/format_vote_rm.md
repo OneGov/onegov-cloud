@@ -13,12 +13,12 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
     - [Remartgas preliminaras](#remartgas-preliminaras)
         - [Unitads](#unitads)
     - [Formats](#formats)
+        - [eCH-0252](#ech-0252)
         - [OneGov](#onegov)
         - [Colonnas](#colonnas)
             - [Resultats temporars](#resultats-temporars)
             - [Project](#project)
         - [WabstiCExport](#wabsticexport)
-        - [eCH-0252](#ech-0252)
 
 <!-- /TOC -->
 
@@ -30,6 +30,10 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 In'unitad correspunda ad ina vischnanca (instanzas chantunalas, instanzas communalas senza quartiers) u ad in quartier (instanzas communalas cun quartiers).
 
 ## Formats
+
+### eCH-0252
+
+Vedi [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
 
 
 ### OneGov
@@ -74,7 +78,3 @@ Sch'il status
 ### WabstiCExport
 
 Sustegnida vegn la versiun `>= 2.2`. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program Exporter.
-
-### eCH-0252
-
-Vedi [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

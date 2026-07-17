@@ -42,7 +42,7 @@ repos:
     - id: eslint
       files: '^src/.*\.jsx?$'
       additional_dependencies:
-      - eslint-react
+      - eslint-plugin-react
   - repo: https://github.com/PyCQA/bandit
     rev: 1.9.4
     hooks:

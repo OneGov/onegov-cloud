@@ -8,10 +8,10 @@ from typing import Protocol
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.collections import ExtendedAgencyCollection
-    from onegov.agency.models import ExtendedAgency  # noqa: F401
+    from onegov.agency.models import ExtendedAgency  # ruff:ignore[unused-import]
     from onegov.core.orm import Base
     from onegov.core.orm.abstract import MoveDirection
-    from onegov.people import AgencyMembership  # noqa: F401
+    from onegov.people import AgencyMembership  # ruff:ignore[unused-import]
     from sqlalchemy.orm import Session
     from uuid import UUID
 

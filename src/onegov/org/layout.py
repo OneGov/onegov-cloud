@@ -2682,7 +2682,7 @@ class EventLayoutMixin:
 
         # FIXME: We define a very similar constant in our forms, we should
         #        move this to onegov.org.constants and use it for both.
-        WEEKDAYS = (  # noqa: N806
+        WEEKDAYS = (  # ruff:ignore[non-lowercase-variable-in-function]
             _('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), _('Sa'), _('Su')
         )
 
@@ -3101,7 +3101,7 @@ class NewsletterLayout(DefaultLayout):
 
             return [
                 Link(
-                    text=_('Send'),
+                    text=_('Schedule email delivery'),
                     url=self.request.link(self.model, 'send'),
                     attrs={'class': 'send-link'}
                 ),
@@ -3973,45 +3973,72 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
-            return [
+            links: list[Link | LinkGroup] = [
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 ),
-                Link(
-                    text=_('Delete'),
-                    url=self.csrf_protected_url(
-                        self.request.link(self.model)
-                    ),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _(
-                                'Do you really want to delete "${title}"?',
-                                mapping={
-                                    'title': self.model.title
-                                }
-                            ),
-                            _('This cannot be undone.'),
-                            _('Delete entry'),
-                            _('Cancel')
+            ]
+            # keep the delete button in sync with the delete_directory_entry
+            # guard
+            last_run = self.request.app.org.last_hourly_maintenance_run
+            if ((self.model.published
+                    or self.model.published_as_of(last_run))
+                    and self.model.directory.notification_address):
+                links.append(
+                    Link(
+                        text=_('Delete'),
+                        url='#',
+                        attrs={
+                            'class': 'delete-link disabled-link',
+                            'title': _(
+                                'This entry cannot be deleted while it '
+                                'is published, to ensure proof of '
+                                'publication.'
+                            )
+                        }
+                    )
+                )
+            else:
+                links.append(
+                    Link(
+                        text=_('Delete'),
+                        url=self.csrf_protected_url(
+                            self.request.link(self.model)
                         ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(
-                                ExtendedDirectoryEntryCollection(
-                                    self.directory)
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Confirm(
+                                _(
+                                    'Do you really want to delete '
+                                    '"${title}"?',
+                                    mapping={
+                                        'title': self.model.title
+                                    }
+                                ),
+                                _('This cannot be undone.'),
+                                _('Delete entry'),
+                                _('Cancel')
+                            ),
+                            Intercooler(
+                                request_method='DELETE',
+                                redirect_after=self.request.link(
+                                    ExtendedDirectoryEntryCollection(
+                                        self.directory)
+                                )
                             )
                         )
                     )
-                ),
+                )
+            links.append(
                 QrCodeLink(
                     text=_('QR'),
                     url=self.request.link(self.model),
                     attrs={'class': 'qr-code-link'}
                 )
-            ]
+            )
+            return links
         return None
 
 

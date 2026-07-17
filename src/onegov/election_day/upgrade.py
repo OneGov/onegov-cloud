@@ -345,6 +345,20 @@ def add_complex_vote_to_archived_result_type(context: UpgradeContext) -> None:
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
 
 
+@upgrade_task('Add short title to archived results')
+def add_short_title_to_archived_results(
+    context: UpgradeContext,
+) -> bool | None:
+    if not context.has_table('archived_results'):
+        return False
+    if not context.has_column('archived_results', 'short_title_translations'):
+        context.operations.add_column(
+            'archived_results',
+            Column('short_title_translations', HSTORE, nullable=True)
+        )
+    return None
+
+
 @upgrade_task('Add received to ballot results')
 def add_received_to_ballot_results(context: UpgradeContext) -> None:
     if not context.has_column('ballot_results', 'received'):

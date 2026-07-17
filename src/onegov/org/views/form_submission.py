@@ -33,7 +33,7 @@ from onegov.org.utils import (
     group_invoice_items,
     invoice_items_for_submission,
 )
-from onegov.pay import InvoiceItemMeta, PaymentError, Price
+from onegov.pay import InvoiceMeta, PaymentError, Price
 from onegov.ticket import TicketInvoice
 from purl import URL
 from uuid import uuid4
@@ -121,8 +121,13 @@ def handle_pending_submission(
         collection.submissions.update(self, form)
 
     completable = not form.errors and 'edit' not in request.GET
-    invoice_items = invoice_items_for_submission(request, form, self)
-    current_total_amount = InvoiceItemMeta.total(invoice_items)
+    invoice_meta = InvoiceMeta(
+        invoice_items_for_submission(request, form, self),
+        rounding_base=request.app.org.price_rounding,
+        invoice=ticket.invoice if ticket else None,
+        rounding_text=request.translate(_('Rounding difference')),
+    )
+    current_total_amount = invoice_meta.total
 
     # check minimum price total if set
     minimum_total_amount = self.minimum_price_total or 0.0
@@ -152,8 +157,9 @@ def handle_pending_submission(
 
     if completable and ticket is not None:
         # refresh invoice items if allowed, otherwise show an error
-        if ticket.handler.refreshing_invoice_is_safe(request):
-            ticket.handler.refresh_invoice_items(request)
+        rounding_base = request.app.org.price_rounding
+        if ticket.handler.refreshing_invoice_is_safe(request, rounding_base):
+            ticket.handler.refresh_invoice_items(request, rounding_base)
         else:
             completable = False
             request.alert(_(
@@ -227,9 +233,9 @@ def handle_pending_submission(
         # NOTE: The VAT amount can be wrong if the fee is charged to
         #       the customer. So it's better to not show it yet.
         'hide_vat_amount': True,
-        'invoice_items': group_invoice_items(invoice_items),
+        'invoice_items': group_invoice_items(invoice_meta),
         'total_amount': current_total_amount,
-        'total_vat': show_vat and InvoiceItemMeta.total_vat(invoice_items),
+        'total_vat': show_vat and invoice_meta.total_vat,
         'checkout_button': checkout_button
     }
 
@@ -322,8 +328,12 @@ def handle_complete_submission(
         else:
             provider = request.app.default_payment_provider
             token = provider.get_token(request) if provider else None
-            invoice_items = invoice_items_for_submission(request, form, self)
-            amount = InvoiceItemMeta.total(invoice_items)
+            invoice_meta = InvoiceMeta(
+                invoice_items_for_submission(request, form, self),
+                rounding_base=request.app.org.price_rounding,
+                rounding_text=request.translate(_('Rounding difference')),
+            )
+            amount = invoice_meta.total
             price = request.app.adjust_price(Price(
                 amount=amount,
                 currency=currency_for_submission(form, self),
@@ -371,11 +381,11 @@ def handle_complete_submission(
                 )
                 TicketMessage.create(ticket, request, 'opened', 'external')
 
-                if invoice_items:
+                if invoice_meta:
                     invoice = TicketInvoice(id=uuid4())
                     request.session.add(invoice)
 
-                    for item_meta in invoice_items:
+                    for item_meta in invoice_meta:
                         item = item_meta.add_to_invoice(invoice)
                         if payment is not True:
                             if provider and payment.source == provider.type:

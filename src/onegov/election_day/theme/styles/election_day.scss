@@ -138,6 +138,14 @@ html {
     }
 }
 
+h2 small {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
 /*
     Homepage
 */
@@ -148,6 +156,14 @@ html {
 
     h3 {
         font-size: $h4-font-size;
+    }
+
+    .municipal-view-link {
+        font-size: .875rem;
+        margin-bottom: 2rem;
+        padding-left: 1em;
+        padding-top: 7px;
+        padding-bottom: 7px;
     }
 }
 
@@ -171,12 +187,20 @@ html {
 }
 
 .archive-breadcrumbs {
+    ul, .municipalities-list, p {
+        margin-bottom: 1rem;
+    }
+
     li {
         display: inline-block;
 
         + li::before {
             content: '/ ';
         }
+    }
+
+    .municipalities-list {
+        column-count: 3;
     }
 }
 
@@ -284,6 +308,14 @@ table {
             tr.total:hover {
                 outline: 0;
             }
+        }
+    }
+
+    &.ballot-entities-table,
+    &.ballot-statistics-table {
+        th:first-child,
+        td:first-child {
+            width: 1%;
         }
     }
 
@@ -563,7 +595,7 @@ table {
 }
 
 figure {
-    margin: 4rem 0 2rem;
+    margin: 2rem 0 2rem;
 }
 
 figcaption {
@@ -793,17 +825,26 @@ ul.breadcrumbs {
     border: 0;
     margin-bottom: 2em;
     padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.5em;
+    align-items: baseline;
 
     > * {
+        float: none;
         font-size: 1rem;
         line-height: 1rem;
         text-transform: none;
+        white-space: nowrap;
+    }
+
+    > *:last-child {
+        white-space: normal;
     }
 
     &.back-links {
         background-color: $white-smoke;
         margin-bottom: 1em;
-
     }
 
 }
