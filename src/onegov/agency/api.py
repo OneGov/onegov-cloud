@@ -7,7 +7,6 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.agency.forms.person import AuthenticatedPersonMutationForm
-from onegov.agency.models import ExtendedAgency
 from onegov.api import AdjacencyListApiEndpoint
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.api.utils import is_authorized
@@ -21,6 +20,7 @@ if TYPE_CHECKING:
     from onegov.agency.forms import PersonMutationForm
     from onegov.core.request import CoreRequest
     from onegov.agency.app import AgencyApp
+    from onegov.agency.models import ExtendedAgency
     from onegov.agency.models import ExtendedAgencyMembership
     from onegov.agency.models import ExtendedPerson
     from onegov.core.orm.mixins import ContentMixin
