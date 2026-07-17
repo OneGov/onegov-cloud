@@ -8,6 +8,7 @@ from onegov.api.models import ApiEndpoint, ApiEndpointItem
 from onegov.api.models import ApiInvalidParamException
 from onegov.core.collection import Pagination
 from onegov.core.converters import extended_date_decode
+from onegov.core.orm.abstract import preload_ancestors
 from onegov.event.collections import OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.form.models import FormDefinition
@@ -537,6 +538,12 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
             if key == 'search':
                 result.term = self.scalarize_value(key, values)
         result.batch_size = 25
+        return result
+
+    @property
+    def batch(self) -> dict[ApiEndpointItem[Topic, int], Topic]:
+        result = super().batch
+        preload_ancestors(self.session, Topic, result.values())
         return result
 
     def item_data(self, item: Topic) -> dict[str, Any]:

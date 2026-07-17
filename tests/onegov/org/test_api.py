@@ -5,12 +5,18 @@ import transaction
 from base64 import b64encode
 from datetime import timedelta
 from collection_json import Collection  # type: ignore[import-untyped]
+from freezegun import freeze_time
+from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.form import FormCollection
+from onegov.org.api import TopicApiEndpoint
 from onegov.org.models.external_link import (
     ExternalFormLink, ExternalResourceLink)
+from onegov.page import PageCollection
 from onegov.people import Person
 from sedate import utcnow
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 from tests.onegov.api.test_views import patch_collection_json  # noqa: F401
 from unittest.mock import patch
 from uuid import uuid4
@@ -21,6 +27,7 @@ if TYPE_CHECKING:
     from .conftest import Client
     from onegov.agency import AgencyApp
     from onegov.org.models import ExtendedDirectory
+    from sqlalchemy.orm import Session
     from unittest.mock import MagicMock
 
 
@@ -711,3 +718,66 @@ def test_api_directory_content_hash(client: Client) -> None:
     items = api_items(client, '/api/clubs')
     item_data = api_item_data(items[0])
     assert item_data['content_hash'] != first_hash
+
+
+def test_topic_api_preloads_ancestors(session: Session) -> None:
+    """
+    Rendering the ``html`` link of a topic builds its full path, which walks
+    up the parent chain. The topics API collection doesn't eager load the
+    parent, so without preloading each ancestor that isn't part of the batch
+    is loaded with its own ``SELECT ... WHERE pages.id = ...`` query (N+1).
+    """
+
+    pages = PageCollection(session)
+    # the ancestors are created first (oldest), the leaves last (newest); the
+    # API orders topics by ``published_or_created`` desc, so page 0 of the
+    # batch is filled with leaves while their ancestors land on a later page
+    # and would otherwise be lazy loaded per item while building each link.
+    with freeze_time('2020-01-01'):
+        root = pages.add_root(title='Root', type='topic')
+        a = pages.add(root, title='A', type='topic')
+        b = pages.add(a, title='B', type='topic')
+        session.flush()
+    with freeze_time('2020-06-01'):
+        for i in range(30):
+            pages.add(b, title=f'Leaf {i}', type='topic')
+        session.flush()
+
+    # Drop everything from the identity map so the ancestors that aren't part
+    # of the batch actually have to be (pre)loaded.
+    session.expunge_all()
+
+    pk_lookups: list[str] = []
+
+    def after_cursor_execute(
+        conn: Any, cursor: Any, statement: str, *args: Any
+    ) -> None:
+        if (
+            'FROM pages' in statement
+            and 'pages.id = ' in statement
+            and 'JOIN' not in statement
+        ):
+            pk_lookups.append(statement)
+
+    request: Any = Bunch(
+        app=Bunch(session=lambda: session),
+        session=session,
+        identity=Bunch(role='admin'),
+    )
+    endpoint = TopicApiEndpoint(request)
+
+    event.listen(Engine, 'after_cursor_execute', after_cursor_execute)
+    try:
+        topics = list(endpoint.batch.values())
+        # page 0 holds the 25 newest topics, i.e. only leaves
+        assert len(topics) == 25
+        # walking the ancestors (as ``request.link`` does when building the
+        # ``html`` link) must not emit a query per ancestor
+        for topic in topics:
+            assert topic.path.startswith('root/a/b/')
+    finally:
+        event.remove(Engine, 'after_cursor_execute', after_cursor_execute)
+
+    assert pk_lookups == [], (
+        f'Expected no per-ancestor queries, got {len(pk_lookups)}'
+    )

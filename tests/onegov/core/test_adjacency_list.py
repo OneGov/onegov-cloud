@@ -7,12 +7,15 @@ from onegov.core.orm.abstract import (
     AdjacencyList,
     AdjacencyListCollection,
     MoveDirection,
+    preload_ancestors,
     sort_siblings,
 )
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
@@ -399,3 +402,56 @@ def test_add_uses_binary_gap(session: Session) -> None:
 
     # Verify final list order based on calculated numeric orders
     assert [item.title for item in root.children] == ['a', 'b', 'c']
+
+
+def test_preload_ancestors(session: Session) -> None:
+    family = FamilyMemberCollection(session)
+    adam = family.add_root('Adam')
+    cain = family.add(parent=adam, title='Cain')
+    enoch = family.add(parent=cain, title='Enoch')
+    family.add(parent=enoch, title='Irad')
+    family.add(parent=enoch, title='Mehujael')
+    session.flush()
+    enoch_id = enoch.id
+
+    # Drop everything from the identity map so the ancestors above the direct
+    # parents actually have to be (pre)loaded.
+    session.expunge_all()
+
+    # a "batch" that only contains the leaves; their ancestors (enoch, cain,
+    # adam) are not part of it and would otherwise be lazy loaded per item.
+    leaves = session.query(FamilyMember).filter(
+        FamilyMember.parent_id == enoch_id
+    ).all()
+    assert len(leaves) == 2
+
+    preload_ancestors(session, FamilyMember, leaves)
+
+    pk_lookups: list[str] = []
+
+    def after_cursor_execute(
+        conn: Any, cursor: Any, statement: str, *args: Any
+    ) -> None:
+        if (
+            'FROM familymembers' in statement
+            and 'familymembers.id = ' in statement
+            and 'JOIN' not in statement
+        ):
+            pk_lookups.append(statement)
+
+    event.listen(Engine, 'after_cursor_execute', after_cursor_execute)
+    try:
+        # walking the ancestors (as building a path/link does) must not emit
+        # a query per ancestor now that they've been preloaded
+        for leaf in leaves:
+            names = [a.name for a in leaf.ancestors]
+            assert names == ['adam', 'cain', 'enoch']
+            assert leaf.path.startswith('adam/cain/enoch/')
+        # the shared ancestors are also wired up in-memory
+        assert leaves[0].parent is leaves[1].parent
+    finally:
+        event.remove(Engine, 'after_cursor_execute', after_cursor_execute)
+
+    assert pk_lookups == [], (
+        f'Expected no per-ancestor queries, got {len(pk_lookups)}'
+    )

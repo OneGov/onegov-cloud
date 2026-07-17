@@ -10,15 +10,14 @@ from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 from onegov.agency.models import ExtendedAgency
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.api.utils import is_authorized
+from onegov.core.orm.abstract import preload_ancestors
 from onegov.gis import Coordinates
-from sqlalchemy.orm.attributes import set_committed_value
 from uuid import UUID
 
 
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from onegov.agency.forms import PersonMutationForm
     from onegov.api.models import ApiEndpointItem
     from onegov.core.request import CoreRequest
@@ -260,47 +259,8 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency', int], ApisMixin):
         self
     ) -> dict[ApiEndpointItem[ExtendedAgency, int], ExtendedAgency]:
         result = super().batch
-        self.preload_ancestors(result.values())
+        preload_ancestors(self.session, ExtendedAgency, result.values())
         return result
-
-    def preload_ancestors(self, agencies: Iterable[ExtendedAgency]) -> None:
-        """ Bulk loads all ancestors of the given agencies and wires up their
-        ``parent`` relationship, so walking the parent chain (e.g. to build
-        links) doesn't emit a query per ancestor. """
-
-        session = self.session
-        by_id: dict[int, ExtendedAgency] = {}
-        # the direct parents are already eager loaded (see `collection`),
-        # so start the walk from them
-        frontier: list[ExtendedAgency] = []
-        for agency in agencies:
-            by_id[agency.id] = agency
-            parent = agency.parent
-            if parent is not None and parent.id not in by_id:
-                by_id[parent.id] = parent
-                frontier.append(parent)
-
-        # load the remaining ancestors one generation at a time (a handful of
-        # queries bound by the tree depth, instead of one query per ancestor)
-        while frontier:
-            parent_ids = {
-                item.parent_id for item in frontier
-                if item.parent_id is not None and item.parent_id not in by_id
-            }
-            if not parent_ids:
-                break
-            frontier = session.query(ExtendedAgency).filter(
-                ExtendedAgency.id.in_(parent_ids)
-            ).all()
-            for item in frontier:
-                by_id[item.id] = item
-
-        # populate the parent relationship from the loaded set, so accessing
-        # it later resolves in-memory rather than triggering a lazy load
-        for agency in by_id.values():
-            parent_id = agency.parent_id
-            if parent_id is not None and parent_id in by_id:
-                set_committed_value(agency, 'parent', by_id[parent_id])
 
     def item_data(self, item: ExtendedAgency) -> dict[str, Any]:
         return {
