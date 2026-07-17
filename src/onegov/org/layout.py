@@ -2281,50 +2281,7 @@ class ResourcesLayout(DefaultLayout):
                 Link(
                     text=_('Recipients'),
                     url=self.request.class_link(ResourceRecipientCollection),
-                    attrs={'class': 'manage-recipients'}
-                ),
-                LinkGroup(
-                    title=_('Add'),
-                    links=[
-                        Link(
-                            text=_('Room'),
-                            url=self.request.link(
-                                self.model,
-                                name='new-room'
-                            ),
-                            attrs={'class': 'new-room'}
-                        ),
-                        Link(
-                            text=_('Daypass'),
-                            url=self.request.link(
-                                self.model,
-                                name='new-daypass'
-                            ),
-                            attrs={'class': 'new-daypass'}
-                        ),
-                        Link(
-                            text=_('Resource Item'),
-                            url=self.request.link(
-                                self.model,
-                                name='new-daily-item'
-                            ),
-                            attrs={'class': 'new-daily-item'}
-                        ),
-                        Link(
-                            text=_('External resource link'),
-                            url=self.request.link(
-                                self.external_resources,
-                                query_params={
-                                    'to': self.resources_url,
-                                    'title': self.request.translate(
-                                        _('New external resource')),
-                                    'type': 'resource'
-                                },
-                                name='new'
-                            ),
-                            attrs={'class': 'new-resource-link'}
-                        )
-                    ]
+                    attrs={'class': 'manage-recipients'},
                 ),
                 Link(
                     text=_('Export All'),
@@ -2333,8 +2290,47 @@ class ResourcesLayout(DefaultLayout):
                 IFrameLink(
                     text=_('iFrame'),
                     url=self.request.link(self.model),
-                    attrs={'class': 'new-iframe'}
-                )
+                    attrs={'class': 'new-iframe'},
+                ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Room'),
+                            url=self.request.link(self.model, name='new-room'),
+                            attrs={'class': 'new-room'},
+                        ),
+                        Link(
+                            text=_('Daypass'),
+                            url=self.request.link(
+                                self.model, name='new-daypass'
+                            ),
+                            attrs={'class': 'new-daypass'},
+                        ),
+                        Link(
+                            text=_('Resource Item'),
+                            url=self.request.link(
+                                self.model, name='new-daily-item'
+                            ),
+                            attrs={'class': 'new-daily-item'},
+                        ),
+                        Link(
+                            text=_('External resource link'),
+                            url=self.request.link(
+                                self.external_resources,
+                                query_params={
+                                    'to': self.resources_url,
+                                    'title': self.request.translate(
+                                        _('New external resource')
+                                    ),
+                                    'type': 'resource',
+                                },
+                                name='new',
+                            ),
+                            attrs={'class': 'new-resource-link'},
+                        ),
+                    ],
+                ),
             ]
         return None
 
