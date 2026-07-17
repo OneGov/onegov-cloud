@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-12 15:13+0200\n"
+"POT-Creation-Date: 2026-07-16 13:16+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -945,6 +945,12 @@ msgstr "Risultato"
 msgid "Communal elections and votes by municipality"
 msgstr "Elezioni e votazioni comunali per comune"
 
+msgid "There are no communal elections or votes available yet."
+msgstr "Non sono ancora disponibili elezioni o votazioni comunali."
+
+msgid "All"
+msgstr "Tutti"
+
 msgid "All municipal elections and votes"
 msgstr "Tutte le elezioni e votazioni comunali"
 
@@ -1458,9 +1464,6 @@ msgstr "Ancora niente schermi."
 
 msgid "Cleanup"
 msgstr "Ripulire"
-
-msgid "All"
-msgstr "Tutti"
 
 msgid "Active only"
 msgstr "Solo attivo"

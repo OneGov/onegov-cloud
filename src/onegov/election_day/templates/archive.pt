@@ -297,7 +297,10 @@
             <tal:block tal:condition="all_municipal_view">
                 <h2 i18n:translate="">Communal elections and votes by municipality</h2>
                 <div class="archive-breadcrumbs">
-                    <div class="municipalities-list">
+                    <p tal:condition="not: municipality_links" i18n:translate="">
+                        There are no communal elections or votes available yet.
+                    </p>
+                    <div tal:condition="municipality_links" class="municipalities-list">
                         <div tal:repeat="municipality municipality_links">
                             <a href="${municipality_links[municipality]}">${municipality}</a>
                         </div>
@@ -324,7 +327,7 @@
                         </li>
                     </ul>
                     <tal:block tal:condition="not: municipality_view">
-                        <p><a href="${request.link(layout.all_municipal_archive)}" i18n:translate="">All municipal elections and votes</a></p>
+                        <p tal:condition="layout.has_municipal_results"><a href="${request.link(layout.all_municipal_archive)}" i18n:translate="">All municipal elections and votes</a></p>
                         <p><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
                     </tal:block>
                     <tal:block tal:condition="python:layout.is_root and layout.last_archive_modification">

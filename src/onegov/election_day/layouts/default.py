@@ -182,6 +182,16 @@ class DefaultLayout(ChameleonLayout):
         return MunicipalityArchivedResultCollection(self.request.session)
 
     @cached_property
+    def has_municipal_results(self) -> bool:
+        latest_years = (
+            self.municipality_archive.get_latest_year_by_municipality()
+        )
+        return any(
+            slug in latest_years
+            for slug in self.principal.municipality_display_name_by_slug
+        )
+
+    @cached_property
     def archive_search_link(self) -> str:
         return self.request.class_link(
             SearchableArchivedResultCollection,

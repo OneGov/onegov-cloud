@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.directory.models import Directory
     from sqlalchemy.orm import Query
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class DirectorySearchWidget[DirectoryEntryT: DirectoryEntry](Protocol):
