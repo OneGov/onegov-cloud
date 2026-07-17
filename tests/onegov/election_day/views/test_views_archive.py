@@ -63,6 +63,13 @@ def test_view_archive_no_results(election_day_app_zg: TestApp) -> None:
     assert "Noch keine Resultate" in archive
     assert "Wahl 1. Januar 2013" in archive
 
+    # no municipal results exist, so the municipal archive link is hidden
+    assert "Alle kommunalen Wahlen und Abstimmungen" not in archive
+
+    municipal = client.get('/archive/municipal')
+    assert "Es sind noch keine kommunalen Wahlen und Abstimmungen verfügbar." \
+        in municipal
+
     archive = client.get('/archive/2013-02-02')
     assert "noch keine Wahlen oder Abstimmungen" in archive
 
@@ -261,9 +268,9 @@ def test_view_archive_all_municipal(election_day_app_sg: TestApp) -> None:
     assert 'Au (SG)' in page
     assert 'Wil (SG)' in page
 
-    # municipality with no results links to base URL (no year suffix)
-    assert '/municipality/rorschach"' in page
-    assert '/municipality/rorschach/2' not in page
+    # municipality with no results is not listed at all
+    assert '/municipality/rorschach' not in page
+    assert 'Rorschach' not in page
 
     # only links shown, no inline result titles
     assert 'Au Abstimmung 2025' not in page

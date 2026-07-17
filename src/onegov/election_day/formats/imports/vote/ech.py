@@ -72,8 +72,11 @@ def import_votes_ech(
             VoteSubTypeTypeV1.VALUE_2, VoteSubTypeTypeV2.VALUE_2,
             VoteSubTypeTypeV1.VALUE_3, VoteSubTypeTypeV2.VALUE_3
         ):
-            classes[vote_info.vote.main_vote_identification or ''] = (
-                ComplexVote)
+            classes[
+                vote_info.vote.main_vote_identification
+                or vote_info.vote.vote_identification
+                or ''
+            ] = ComplexVote
 
     # get or create votes
     existing_votes = session.query(Vote).filter(
