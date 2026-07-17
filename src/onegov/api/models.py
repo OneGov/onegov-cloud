@@ -509,7 +509,7 @@ class AdjacencyListApiEndpoint[L: AdjacencyList, IdT: PKType](
         result = super().batch
         items = tuple(result.values())
         if items:
-            type(items[0]).preload_ancestors(self.session, items)
+            items[0].preload_ancestors(self.session, items)
         return result
 
 

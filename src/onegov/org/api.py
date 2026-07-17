@@ -450,6 +450,8 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         }
 
 
+# NOTE: News is a flat two-level tree (one shared root), so it's not an N+1
+#       like topics/agencies -- hence plain ApiEndpoint here.
 class NewsApiEndpoint(ApiEndpoint[News, int]):
     app: OrgApp
     request: OrgRequest
