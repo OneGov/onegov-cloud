@@ -590,7 +590,7 @@ def run_processors(
     #       below.
     processor = processors[0]
 
-    CliApplication: type[Framework]  # noqa: N806
+    CliApplication: type[Framework]  # ruff:ignore[non-lowercase-variable-in-function]
     for appcfg in group_context.appcfgs:
 
         class CliApplication(appcfg.application_class):  # type:ignore

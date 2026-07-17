@@ -524,7 +524,7 @@ class CustomLoader(yaml.SafeLoader):
     """ Extends the default yaml loader with customized constructors. """
 
 
-class constructor:  # noqa: N801
+class constructor:  # ruff:ignore[invalid-class-name]
     """ Adds decorated functions to as constructors to the CustomLoader. """
 
     def __init__(self, tag: str):

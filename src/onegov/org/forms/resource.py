@@ -551,7 +551,7 @@ class ResourceBaseForm(Form):
                 _('Please enter at least one zip-code'))
 
         try:
-            self.zipcodes  # noqa: B018
+            self.zipcodes  # ruff:ignore[useless-expression]
         except ValueError as exception:
             raise ValidationError(
                 _(

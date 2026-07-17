@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     class HasHTML(Protocol):
         def __html__(self, /) -> str: ...
 
-    class _dict_property_factory(Protocol):  # noqa: N801
+    class _dict_property_factory(Protocol):  # ruff:ignore[invalid-class-name]
 
         @overload
         def __call__(
@@ -114,7 +114,7 @@ def is_valid_default(default: object | None) -> bool:
     return False
 
 
-class dict_property[T](hybrid_property[T]):  # noqa: N801
+class dict_property[T](hybrid_property[T]):  # ruff:ignore[invalid-class-name]
     """ Enables access of dictionaries through properties.
 
     Usage::
@@ -371,7 +371,7 @@ class dict_property[T](hybrid_property[T]):  # noqa: N801
         super().__set__(instance, value)
 
 
-class dict_markup_property[MarkupT: (Markup, Markup | None)](  # noqa: N801
+class dict_markup_property[MarkupT: (Markup, Markup | None)](  # ruff:ignore[invalid-class-name]
     dict_property[MarkupT]
 ):
 

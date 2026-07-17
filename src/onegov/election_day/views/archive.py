@@ -135,6 +135,7 @@ def view_archive_all_municipal(
             request.app.principal.municipality_display_name_by_slug.items(),
             key=itemgetter(1),
         )
+        if slug in latest_years
     }
 
     return {

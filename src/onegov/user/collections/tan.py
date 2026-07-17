@@ -12,7 +12,7 @@ from typing import cast, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime, timedelta
     from sqlalchemy.orm import Query, Session
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
     class _GeneratedTAN(TAN):
         tan: str

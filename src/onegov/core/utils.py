@@ -237,9 +237,9 @@ def timing(name: str | None = None) -> Iterator[None]:
     finally:
         duration_ms = 1000.0 * (perf_counter() - start)
         if name:
-            print(f'{name}: {duration_ms:.0f} ms')  # noqa: T201
+            print(f'{name}: {duration_ms:.0f} ms')  # ruff:ignore[print]
         else:
-            print(f'{duration_ms:.0f} ms')  # noqa: T201
+            print(f'{duration_ms:.0f} ms')  # ruff:ignore[print]
 
 
 @lru_cache(maxsize=32)
@@ -689,7 +689,7 @@ def is_subpath(directory: str, path: str) -> bool:
     # e.g. /a/b/c/d.rst and directory is /a/b, the common prefix is /a/b
     # FIXME: This ruff error seems correct, but our tests fail with commonpath
     #        maybe module_path is broken or we need to add/remove a slash
-    return os.path.commonprefix([path, directory]) == directory  # noqa: RUF071
+    return os.path.commonprefix([path, directory]) == directory  # ruff:ignore[os-path-commonprefix]
 
 
 @overload

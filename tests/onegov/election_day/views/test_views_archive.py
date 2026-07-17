@@ -63,6 +63,13 @@ def test_view_archive_no_results(election_day_app_zg: TestApp) -> None:
     assert "Noch keine Resultate" in archive
     assert "Wahl 1. Januar 2013" in archive
 
+    # no municipal results exist, so the municipal archive link is hidden
+    assert "Alle kommunalen Wahlen und Abstimmungen" not in archive
+
+    municipal = client.get('/archive/municipal')
+    assert "Es sind noch keine kommunalen Wahlen und Abstimmungen verfügbar." \
+        in municipal
+
     archive = client.get('/archive/2013-02-02')
     assert "noch keine Wahlen oder Abstimmungen" in archive
 
@@ -245,9 +252,14 @@ def _add_municipal_results(app: TestApp) -> None:
 
 
 def test_view_archive_all_municipal(election_day_app_sg: TestApp) -> None:
-    _add_municipal_results(election_day_app_sg)
     client = Client(election_day_app_sg)
     client.get('/locale/de_CH').follow()
+
+    # link to communal results does not exist
+    main = client.get('/')
+    assert 'Alle kommunalen Wahlen und Abstimmungen' not in main
+
+    _add_municipal_results(election_day_app_sg)
 
     page = client.get('/archive/municipal')
     assert 'Kommunale Wahlen und Abstimmungen nach Gemeinde' in page
@@ -261,13 +273,48 @@ def test_view_archive_all_municipal(election_day_app_sg: TestApp) -> None:
     assert 'Au (SG)' in page
     assert 'Wil (SG)' in page
 
-    # municipality with no results links to base URL (no year suffix)
-    assert '/municipality/rorschach"' in page
-    assert '/municipality/rorschach/2' not in page
+    # municipality with no results is not listed at all
+    assert '/municipality/rorschach' not in page
 
     # only links shown, no inline result titles
     assert 'Au Abstimmung 2025' not in page
     assert 'Au Wahl 2024' not in page
+
+    # link to communal results exists
+    main = client.get('/')
+    assert 'Alle kommunalen Wahlen und Abstimmungen' in main
+
+
+def test_view_archive_all_municipal_link_hidden_for_cantonal_vote(
+    election_day_app_sg: TestApp
+) -> None:
+    # a cantonal/national vote is not a communal vote, so it must not surface
+    # the all-municipal link even though its results are in the archive
+    session = election_day_app_sg.session()
+    session.add(ArchivedResult(
+        date=date(2025, 5, 18),
+        type='vote',
+        domain='canton',
+        name='kantonal',
+        url='https://example.com/vote/kantonal',
+        title_translations={'de_CH': 'Kantonale Abstimmung'},
+        meta={'id': 'kantonal'},
+        schema=election_day_app_sg.schema,
+    ))
+    transaction.commit()
+
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    # the cantonal vote is shown, but there is no all-municipal link ...
+    archive = client.get('/archive/2025-05-18')
+    assert 'Kantonale Abstimmung' in archive
+    assert 'Alle kommunalen Wahlen und Abstimmungen' not in archive
+
+    # ... and the all-municipal page shows the empty state
+    page = client.get('/archive/municipal')
+    assert 'Es sind noch keine kommunalen Wahlen und Abstimmungen verfügbar.' \
+        in page
 
 
 def test_view_archive_municipal_by_date(election_day_app_sg: TestApp) -> None:

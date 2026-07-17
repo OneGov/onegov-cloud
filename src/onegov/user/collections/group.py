@@ -7,7 +7,7 @@ from onegov.core.collection import GenericCollection
 from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class UserGroupCollection[T: UserGroup](GenericCollection[T, 'UUID']):

@@ -139,7 +139,7 @@ class MeetingCollection(GenericCollection[Meeting, UUID]):
     def query(self) -> Query[Meeting]:
         query = super().query()
 
-        Meeting = self.model_class  # noqa: N806
+        Meeting = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
         if self.past is not None:
             if self.past:
                 query = query.filter(Meeting.start_datetime < utcnow())

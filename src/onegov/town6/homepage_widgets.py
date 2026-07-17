@@ -568,7 +568,7 @@ class RSSItem(NamedTuple):
     title: str
     description: str
     guid: str
-    pubDate: datetime | None  # noqa: N815
+    pubDate: datetime | None  # ruff:ignore[mixed-case-variable-in-class-scope]
 
 
 class RSSChannel(NamedTuple):

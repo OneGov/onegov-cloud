@@ -92,9 +92,9 @@ for message in ignored_warnings:
 email_validator.CHECK_DELIVERABILITY = False
 
 from onegov.core.framework import Framework
-from onegov.core.filestorage import get_filestorage_file  # noqa: F401
+from onegov.core.filestorage import get_filestorage_file  # ruff:ignore[unused-import]
 
 # include the filters module so they get picked up by webassets
-from onegov.core import filters  # noqa: F401
+from onegov.core import filters  # ruff:ignore[unused-import]
 
 __all__ = ['Framework', 'log']
