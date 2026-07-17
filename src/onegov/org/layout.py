@@ -3048,15 +3048,16 @@ class NewsletterLayout(DefaultLayout):
         if self.is_collection:
             links: list[Link | LinkGroup] = [
                 Link(
-                    text=_('Subscribers'),
-                    url=self.request.link(self.recipients),
-                    attrs={'class': 'manage-subscribers'}
-                ),
-                Link(
                     text=_('Settings'),
                     url=self.request.link(
-                        self.request.app.org, 'newsletter-settings'),
-                    attrs={'class': 'settings-link'}
+                        self.request.app.org, 'newsletter-settings'
+                    ),
+                    attrs={'class': 'settings-link'},
+                ),
+                Link(
+                    text=_('Subscribers'),
+                    url=self.request.link(self.recipients),
+                    attrs={'class': 'manage-subscribers'},
                 ),
             ]
 
@@ -3097,6 +3098,11 @@ class NewsletterLayout(DefaultLayout):
 
             return [
                 Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
                     text=_('Schedule email delivery'),
                     url=self.request.link(self.model, 'send'),
                     attrs={'class': 'send-link'}
@@ -3114,11 +3120,6 @@ class NewsletterLayout(DefaultLayout):
                         )
                     ),
                     attrs={'class': 'copy-link'},
-                ),
-                Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
                 ),
                 Link(
                     text=_('Delete'),
