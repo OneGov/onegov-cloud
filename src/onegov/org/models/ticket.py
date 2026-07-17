@@ -15,7 +15,7 @@ from onegov.org.layout import DefaultLayout, EventLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.org.utils import (
     currency_for_submission,
-    invoice_items_for_submission
+    invoice_items_for_submission,
 )
 from onegov.pay import ManualPayment
 from onegov.reservation import Allocation, Resource, Reservation
@@ -36,6 +36,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import datetime
+    from decimal import Decimal
     from onegov.chat.models import Chat
     from onegov.core.request import CoreRequest
     from onegov.event import Event
@@ -57,25 +58,28 @@ def ticket_submitter(ticket: Ticket) -> str | None:
     return mail
 
 
-def submission_invoice_items(
+def submission_base_invoice_items(
     self: FormSubmissionHandler | DirectoryEntryHandler,
     request: CoreRequest
 ) -> list[InvoiceItemMeta]:
-    return invoice_items_for_submission(
-        request,
-        self.form,  # type: ignore[arg-type]
-        self.submission
-    ) if self.submission else []
+    return (
+        invoice_items_for_submission(
+            request, self.form, self.submission  # type: ignore[arg-type]
+        )
+        if self.submission
+        else []
+    )
 
 
 def refresh_submission_invoice_items(
     self: FormSubmissionHandler | DirectoryEntryHandler,
-    request: CoreRequest
+    request: CoreRequest,
+    rounding_base: Decimal | None,
 ) -> None:
     payment = self.payment
     invoice = self.ticket.invoice
-    new_item_metas = self.invoice_items(request)
-    if not new_item_metas:
+    invoice_meta = self.invoice_items(request, rounding_base)
+    if not invoice_meta:
         # delete the invoice and payment (if it exists)
         if invoice is not None:
             for item in invoice.items:
@@ -100,7 +104,7 @@ def refresh_submission_invoice_items(
     old_items = sorted(invoice.items, key=attrgetter('group'))
     new_items: list[InvoiceItem] = []
     unused: set[InvoiceItem] = set(old_items)
-    for meta in new_item_metas:
+    for meta in invoice_meta:
         existing: InvoiceItem | None = None
         for item in old_items:
             if item.group != meta.group:
@@ -116,6 +120,9 @@ def refresh_submission_invoice_items(
                 if item.group == 'submission':
                     existing = item
                     break
+            elif meta.group == 'rounding':
+                existing = item
+                break
             else:
                 raise AssertionError('unreachable')
 
@@ -319,7 +326,7 @@ class FormSubmissionHandler(Handler):
 
     handler_title = _('Form Submissions')
     code_title = _('Forms')
-    invoice_items = submission_invoice_items
+    base_invoice_items = submission_base_invoice_items
     refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property
@@ -612,7 +619,9 @@ class ReservationHandler(Handler):
     def deleted(self) -> bool:
         return not self.reservations
 
-    def invoice_items(self, request: CoreRequest) -> list[InvoiceItemMeta]:
+    def base_invoice_items(
+        self, request: CoreRequest
+    ) -> list[InvoiceItemMeta]:
         if self.submission:
             form = request.get_form(
                 self.submission.form_class,
@@ -632,18 +641,23 @@ class ReservationHandler(Handler):
             extras = []
             discounts = []
 
+        if not self.resource:
+            return []
+
         return self.resource.invoice_items_for_reservation(
             self.reservations,
             extras,
             discounts,
-            reduced_amount_label=request.translate(_('Discount'))
-        ) if self.resource else []
+            reduced_amount_label=request.translate(_('Discount')),
+        )
 
-    def refresh_invoice_items(self, request: CoreRequest) -> None:
+    def refresh_invoice_items(
+        self, request: CoreRequest, rounding_base: Decimal | None
+    ) -> None:
         payment = self.payment
         invoice = self.ticket.invoice
-        new_item_metas = self.invoice_items(request)
-        if not new_item_metas:
+        invoice_meta = self.invoice_items(request, rounding_base)
+        if not invoice_meta:
             # delete the invoice and payment (if it exists)
             if invoice is not None:
                 for item in invoice.items:
@@ -672,7 +686,7 @@ class ReservationHandler(Handler):
         old_items = sorted(invoice.items, key=attrgetter('group'))
         new_items: list[InvoiceItem] = []
         unused: set[InvoiceItem] = set(old_items)
-        for meta in new_item_metas:
+        for meta in invoice_meta:
             existing: InvoiceItem | None = None
             for item in old_items:
                 if item.group != meta.group:
@@ -690,7 +704,7 @@ class ReservationHandler(Handler):
                     if meta.family == item.family:
                         existing = item
                         break
-                elif meta.group == 'reduced_amount':
+                elif meta.group in ('reduced_amount', 'rounding'):
                     existing = item
                     break
                 else:
@@ -1415,7 +1429,7 @@ class DirectoryEntryHandler(Handler):
 
     handler_title = _('Directory Entry Submissions')
     code_title = _('Directory Entry Submissions')
-    invoice_items = submission_invoice_items
+    base_invoice_items = submission_base_invoice_items
     refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property

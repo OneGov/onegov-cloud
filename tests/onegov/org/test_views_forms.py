@@ -6,6 +6,7 @@ import transaction
 import zipfile
 
 from datetime import date, timedelta
+from decimal import Decimal
 from freezegun import freeze_time
 from io import BytesIO
 from onegov.core.utils import module_path
@@ -665,6 +666,67 @@ def test_manual_form_payment(client: Client) -> None:
     assert "info@example.org" in payments
     assert "15.00" in payments
     assert "Offen" in payments
+
+
+def test_manual_form_payment_rounding(client: Client) -> None:
+    client.login_admin()
+    settings = client.get('/vat-settings')
+    settings.form['price_rounding'] = '0.05'
+    settings.form.submit()
+    client.logout()
+
+    assert client.app.org.price_rounding == Decimal('0.05')
+
+    collection = FormCollection(client.app.session())
+    collection.definitions.add(
+        'Rounded price',
+        definition=textwrap.dedent(
+            """
+        E-Mail *= @@@
+
+        Product *=
+            (x) Selected (10.03 CHF)
+    """
+        ),
+        type='custom',
+    )
+
+    transaction.commit()
+
+    page = client.get('/form/rounded-price')
+    page.form['e_mail'] = 'info@example.org'
+    page = page.form.submit().follow()
+    assert 'Rundung' in page
+    assert '10.05 CHF' in page
+
+    page = page.form.submit().follow()
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    invoice_page = page.click('Rechnung anzeigen')
+    assert 'Rundung' in invoice_page
+    assert '10.05' in invoice_page
+
+    ticket = TicketCollection(client.app.session()).query().one()
+    assert ticket.invoice is not None
+    rounding_item = next(
+        item for item in ticket.invoice.items if item.group == 'rounding'
+    )
+    assert rounding_item.unit == Decimal('0.02')
+
+    # adding a manual item recalculates the rounding
+    item_page = invoice_page.click('Abzug / Zuschlag')
+    item_page.form['booking_text'] = 'Handling Fee'
+    item_page.form['kind'] = 'surcharge'
+    item_page.form['surcharge'] = '0.01'
+    item_page.form.submit()
+
+    ticket = TicketCollection(client.app.session()).query().one()
+    assert ticket.invoice is not None
+    rounding_item = next(
+        item for item in ticket.invoice.items if item.group == 'rounding'
+    )
+    assert rounding_item.unit == Decimal('0.01')
+    assert ticket.invoice.total_amount == Decimal('10.05')
 
 
 def test_form_payment_required(client: Client) -> None:

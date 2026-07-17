@@ -45,6 +45,7 @@ from onegov.user import User
 from operator import itemgetter
 from purl import URL
 from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
 from wtforms.fields import FieldList
 from wtforms.fields import FloatField
@@ -2468,6 +2469,16 @@ class VATSettingsForm(Form):
         description=_('This is the VAT rate in percent. The VAT rate will '
                       'apply to all prices in the forms.'),
         validators=[InputRequired(), NumberRange(0, 100)],
+    )
+
+    price_rounding = DecimalField(
+        label=_('Rounding of invoice totals'),
+        description=_(
+            'If set, invoices include a rounding position so the total is '
+            'a multiple of this amount, for example 0.05. Leave empty to '
+            'disable rounding.'
+        ),
+        validators=[Optional(), NumberRange(min=Decimal('0.01'))],
     )
 
 

@@ -24,6 +24,7 @@ from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import datetime
+    from decimal import Decimal
     from markupsafe import Markup
     from onegov.core.framework import Framework
     from onegov.form.parser.core import ParsedField
@@ -325,6 +326,9 @@ class Organisation(Base, TimestampMixin):
 
     # vat
     vat_rate: dict_property[float | None] = meta_property(default=0.0)
+
+    # prices
+    price_rounding: dict_property[Decimal | None] = meta_property(default=None)
 
     # RIS settings
     ris_enabled: dict_property[bool] = meta_property(default=False)

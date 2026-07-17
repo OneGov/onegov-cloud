@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-07-14 12:32+0200\n"
+"POT-Creation-Date: 2026-07-16 15:23+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -781,9 +781,6 @@ msgstr ""
 msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"
 
-msgid "Alternatives"
-msgstr "Alternatives"
-
 msgid "Alternative login methods"
 msgstr "Autres méthodes de connexion"
 
@@ -798,6 +795,9 @@ msgstr "Avez-vous oublié votre mot de passe ?"
 
 msgid "Reset password"
 msgstr "Réinitialisez le mot de passe"
+
+msgid "Alternatives"
+msgstr "Alternatives"
 
 msgid "You are here"
 msgstr "Vous êtes ici"
@@ -1397,6 +1397,9 @@ msgstr "Remises / Suppléments"
 msgid "Lump sum"
 msgstr "Montant forfaitaire"
 
+msgid "Rounding difference"
+msgstr "Différence d'arrondi"
+
 msgid "Total"
 msgstr "Total"
 
@@ -1533,8 +1536,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -2960,6 +2963,9 @@ msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
 
+msgid "Prices"
+msgstr "Prix"
+
 msgid "Access (mTAN)"
 msgstr "Accès (mTAN)"
 
@@ -3007,6 +3013,17 @@ msgstr "Vue d'ensemble des notifications push"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Rounding of invoice totals"
+#~ msgstr "Arrondi des totaux de facture"
+
+#~ msgid ""
+#~ "If set, invoices include a rounding position so the total is a multiple "
+#~ "of this amount, for example 0.05. Leave empty to disable rounding."
+#~ msgstr ""
+#~ "Si ce champ est défini, les factures contiennent une position d’arrondi "
+#~ "afin que le total soit un multiple de ce montant, par exemple 0,05. "
+#~ "Laisser vide pour désactiver l’arrondi."
 
 #~ msgid "A new entry has been published in the \"${directory}\" directory:"
 #~ msgstr ""

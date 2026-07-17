@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-14 12:32+0200\n"
+"POT-Creation-Date: 2026-07-16 15:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -185,6 +185,9 @@ msgstr "Abzüge / Zuschläge"
 
 msgid "Lump sum"
 msgstr "Pauschalbetrag"
+
+msgid "Rounding difference"
+msgstr "Rundungsdifferenz"
 
 msgid "Paid"
 msgstr "Bezahlt"
@@ -3123,6 +3126,17 @@ msgstr ""
 "Mehrwertsteuersatz in Prozent. Der Mehrwertsteuersatz wird auf alle Preise "
 "in den Formularen angewendet."
 
+msgid "Rounding of invoice totals"
+msgstr "Rundung der Rechnungssummen"
+
+msgid ""
+"If set, invoices include a rounding position so the total is a multiple of "
+"this amount, for example 0.05. Leave empty to disable rounding."
+msgstr ""
+"Wenn festgelegt, enthalten Rechnungen eine Rundungsposition, sodass die "
+"Summe ein Vielfaches dieses Betrags ist, zum Beispiel 0.05. Leer lassen, um "
+"die Rundung zu deaktivieren."
+
 msgid "Enable newsletter"
 msgstr "Newsletter aktivieren"
 
@@ -4508,8 +4522,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -4886,9 +4900,6 @@ msgstr "Fehler"
 msgid "Duration [s]"
 msgstr "Abfragedauer [s]"
 
-msgid "Alternatives"
-msgstr "Alternativen"
-
 msgid "Alternative login methods"
 msgstr "Alternative Login-Methoden"
 
@@ -4903,6 +4914,9 @@ msgstr "Sie haben Ihr Passwort vergessen?"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
+
+msgid "Alternatives"
+msgstr "Alternativen"
 
 msgid "You are here"
 msgstr "Sie sind hier"
@@ -5372,8 +5386,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Neue Kunden Nachricht in Ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -6603,8 +6617,8 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -7952,6 +7966,9 @@ msgstr "Kopfzeile"
 
 msgid "Footer"
 msgstr "Fusszeile"
+
+msgid "Prices"
+msgstr "Preise"
 
 msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"

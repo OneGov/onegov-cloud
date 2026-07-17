@@ -1360,7 +1360,9 @@ def add_invoice_item(
             item.payments.append(payment)
             item.paid = payment.state == 'paid'
         request.session.flush()
-        self.handler.refresh_invoice_items(request)
+        self.handler.refresh_invoice_items(
+            request, request.app.org.price_rounding
+        )
         return morepath.redirect(request.link(self, 'invoice'))
 
     layout = layout or TicketInvoiceLayout(self, request)
@@ -1415,7 +1417,7 @@ def remove_invoice_item(
     invoice.items.remove(target)
     request.session.delete(target)
     request.session.flush()
-    self.handler.refresh_invoice_items(request)
+    self.handler.refresh_invoice_items(request, request.app.org.price_rounding)
 
 
 @OrgApp.form(model=Ticket, name='status', template='ticket_status.pt',
