@@ -16,6 +16,7 @@ schedule:
       - caicias
       - caicinus
       - caicus
+      - caerus
       - carcinus
   - date: Monday +7 days at 7:00
     nodes:
