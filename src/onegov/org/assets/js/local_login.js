@@ -6,14 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    const setExpanded = (expanded) => {
+        // foundation's grid display beats the hidden attribute
+        login.style.display = expanded ? '' : 'none';
+        link.setAttribute('aria-expanded', String(expanded));
+    };
+
     if (!login.querySelector('.error')) {
-        login.hidden = true;
-        link.setAttribute('aria-expanded', 'false');
+        setExpanded(false);
     }
 
     link.addEventListener('click', (event) => {
         event.preventDefault();
-        login.hidden = !login.hidden;
-        link.setAttribute('aria-expanded', String(!login.hidden));
+        setExpanded(login.style.display === 'none');
     });
 });
