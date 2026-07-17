@@ -3240,17 +3240,17 @@ class ImageSetLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_('Choose images'),
-                    url=self.request.link(self.model, 'select'),
-                    attrs={'class': 'select'}
-                ),
-                Link(
                     text=_('Edit'),
                     url=self.request.link(
                         self.model,
                         name='edit'
                     ),
                     attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Choose images'),
+                    url=self.request.link(self.model, 'select'),
+                    attrs={'class': 'select'}
                 ),
                 Link(
                     text=_('Delete'),
