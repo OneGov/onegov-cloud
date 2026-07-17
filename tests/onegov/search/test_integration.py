@@ -4,6 +4,7 @@ import logging
 import math
 import morepath
 import sedate
+import threading
 import transaction
 
 from datetime import timedelta
@@ -14,8 +15,7 @@ from onegov.core.utils import scan_morepath_modules
 from onegov.search import ORMSearchable, SearchApp, SearchIndex
 from onegov.search.datamanager import IndexerDataManager
 from onegov.search.integration import REINDEX_MAX_ATTEMPTS
-from sqlalchemy import func
-from sqlalchemy.exc import OperationalError
+from sqlalchemy import func, text
 from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from webtest import TestApp as Client
 
@@ -316,9 +316,10 @@ def test_reindex(postgres_dsn: str) -> None:
     assert search.scalar() == 2
 
 
-def _reindex_conflict_app(postgres_dsn: str) -> Any:
+def _reindex_conflict_app(postgres_dsn: str) -> tuple[Any, Any]:
     """ Builds a search app with two already-indexed Documents, ready to
-    exercise the reindex conflict handling. """
+    exercise the reindex conflict handling. Returns the app and the
+    ``Document`` model. """
 
     class Base(DeclarativeBase):
         registry = registry()
@@ -370,59 +371,90 @@ def _reindex_conflict_app(postgres_dsn: str) -> Any:
     session.add(Document(id=2, title='2'))
     transaction.commit()
 
-    return app
+    return app, Document
 
 
-def _serialization_conflict() -> OperationalError:
-    """ A transient class-40 serialization failure, as raised by a concurrent
-    write during a reindex. """
+def _upsert_document_concurrently(
+    app: Any,
+    index: Any,
+    schema: str,
+    document_cls: Any,
+    doc_id: int,
+) -> None:
+    """ Upserts a single document into ``search_index`` from an independent
+    transaction and commits it.
 
-    class ConcurrentUpdate(Exception):
-        sqlstate = '40001'
+    Our sessions run under ``SERIALIZABLE`` isolation, so doing this while a
+    reindex transaction is already open (its snapshot taken) makes that
+    reindex's own upsert of the same row fail with a genuine serialization
+    error -- the exact transient conflict the retry mechanism must survive.
 
-    return OperationalError(
-        'INSERT INTO search_index ...',
-        {},
-        ConcurrentUpdate('could not serialize access')
-    )
+    This runs on its own thread so it gets a session and connection that are
+    independent from the reindex transaction, since our sessions are scoped
+    per thread.
+    """
+    box: dict[str, BaseException] = {}
+
+    def run() -> None:
+        try:
+            session = app.session()
+            document = session.query(document_cls).filter_by(id=doc_id).one()
+            task = app.fts_orm_events.index_task(schema, document)
+            # bypass the patched indexer and perform a real upsert + commit
+            index([task], session)
+            session.execute(text('COMMIT'))
+            session.invalidate()
+        except BaseException as exception:  # noqa: BLE001
+            box['error'] = exception
+
+    thread = threading.Thread(target=run)
+    thread.start()
+    thread.join()
+    if 'error' in box:
+        raise box['error']
 
 
-def test_reindex_retries_on_conflict(
+def test_reindex_recovers_from_real_conflict(
     postgres_dsn: str,
     caplog: Any
 ) -> None:
-    app = _reindex_conflict_app(postgres_dsn)
+    """ Triggers a genuine serialization failure (SQLSTATE 40001) during the
+    reindex and asserts that the retry actually recovers -- i.e. that the
+    aborted connection is discarded and the retry runs against a fresh one. """
 
+    app, Document = _reindex_conflict_app(postgres_dsn)
+    schema = app.schema
     original_index = app.fts_indexer.index
     attempts = {'n': 0}
 
-    # both documents were already indexed via insert events on commit
-    session = app.session()
-    ids_before = {r.id for r in session.query(SearchIndex.id)}
-    assert len(ids_before) == 2
-
-    def flaky_index(tasks: Any, session: Any) -> bool:
+    def conflicting_index(tasks: Any, session: Any) -> bool:
         attempts['n'] += 1
-        if attempts['n'] in (1, 2):
-            raise _serialization_conflict()
+        if attempts['n'] == 1:
+            # the reindex transaction's snapshot has already been taken by the
+            # query that produced these tasks; committing a concurrent upsert
+            # of the same row now makes the upsert below raise a real 40001
+            _upsert_document_concurrently(
+                app, original_index, schema, Document, 1
+            )
         return original_index(tasks, session)
 
-    app.fts_indexer.index = flaky_index  # type: ignore[method-assign]
+    app.fts_indexer.index = conflicting_index  # type: ignore[method-assign]
 
     with caplog.at_level(logging.INFO, logger='onegov.search.index'):
         app.perform_reindex()
 
-    # the first and second attempt failed with a conflict, the retry succeeded
-    assert attempts['n'] == 3
+    # the first attempt hit a real conflict, the retry ran and succeeded
+    assert attempts['n'] == 2
+
     session = app.session()
+    assert session.query(func.count(SearchIndex.id)).scalar() == 2
+    owner_ids = {
+        r.owner_id_int for r in session.query(SearchIndex.owner_id_int)
+    }
+    assert owner_ids == {1, 2}
 
-    # the reindex wiped the original rows and wrote fresh ones
-    ids_after = {r.id for r in session.query(SearchIndex.id)}
-    assert len(ids_after) == 2
-    assert ids_after.isdisjoint(ids_before)
-
-    # the two conflicts were logged as retries at INFO, and since the third
-    # attempt succeeded, nothing was logged at ERROR
+    # exactly one retry was logged at INFO and, since the retry succeeded,
+    # nothing was logged at ERROR
     retry_logs = [
         r for r in caplog.records
         if (
@@ -432,7 +464,7 @@ def test_reindex_retries_on_conflict(
             in r.getMessage()
         )
     ]
-    assert len(retry_logs) == 2
+    assert len(retry_logs) == 1
     error_logs = [r for r in caplog.records if r.levelno >= logging.ERROR]
     assert error_logs == []
 
@@ -441,15 +473,24 @@ def test_reindex_gives_up_on_persistent_conflict(
     postgres_dsn: str,
     caplog: Any
 ) -> None:
-    app = _reindex_conflict_app(postgres_dsn)
+    """ When the serialization failure keeps happening on every attempt, the
+    reindex must give up after ``REINDEX_MAX_ATTEMPTS`` and surface an ERROR
+    instead of retrying forever. """
 
+    app, Document = _reindex_conflict_app(postgres_dsn)
+    schema = app.schema
+    original_index = app.fts_indexer.index
     attempts = {'n': 0}
 
-    def always_conflicting_index(tasks: Any, session: Any) -> bool:
+    def conflicting_index(tasks: Any, session: Any) -> bool:
         attempts['n'] += 1
-        raise _serialization_conflict()
+        # force a genuine conflict on every attempt, including the last one
+        _upsert_document_concurrently(
+            app, original_index, schema, Document, 1
+        )
+        return original_index(tasks, session)
 
-    app.fts_indexer.index = always_conflicting_index  # type: ignore[method-assign]
+    app.fts_indexer.index = conflicting_index  # type: ignore[method-assign]
 
     with caplog.at_level(logging.INFO, logger='onegov.search.index'):
         app.perform_reindex()
@@ -457,11 +498,11 @@ def test_reindex_gives_up_on_persistent_conflict(
     # every attempt was made and then the model was given up on
     assert attempts['n'] == REINDEX_MAX_ATTEMPTS
 
-    # the reindex deleted the old rows up front and never re-indexed the
-    # model, so it is left completely unsearchable
+    # the reindex never managed to commit its own upsert, so the document that
+    # only it writes (id=2) is missing from the index
     session = app.session()
-    search = session.query(func.count(SearchIndex.id))
-    assert search.scalar() == 0
+    indexed = session.query(SearchIndex).filter_by(owner_id_int=2).count()
+    assert indexed == 0
 
     # giving up must surface as an ERROR, not be swallowed silently
     error_logs = [
