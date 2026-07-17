@@ -1,8 +1,44 @@
 # Changes
 
+## 2026.37
+
+`2026-07-17` | [4190ad6573...c2244f1296](https://github.com/OneGov/onegov-cloud/compare/4190ad6573^...c2244f1296)
+
+### Electionday
+
+##### Adds support for eCH-0252 V2 and views for municipality results
+
+`Feature` | [OGC-3103](https://linear.app/onegovcloud/issue/OGC-3103) | [4190ad6573](https://github.com/onegov/onegov-cloud/commit/4190ad6573083cc37ae8e01f85c94dc081140323)
+
+##### Fix GROUP BY error in municipality archive query
+
+`Bugfix` | [OGC-3103](https://linear.app/onegovcloud/issue/OGC-3103) | [75a79952b4](https://github.com/onegov/onegov-cloud/commit/75a79952b40271b6076dd1d2a98a15dd64e270c7)
+
+### Org
+
+##### Adds a preview field for short links
+
+`Feature` | [OGC-3259](https://linear.app/onegovcloud/issue/OGC-3259) | [ffb0067dc6](https://github.com/onegov/onegov-cloud/commit/ffb0067dc6b31a8627e7420c2810d951c4f4837a)
+
+##### Hide local login with JS.
+
+Previous commit of OGC-3264 missed this JS change.
+
+`Feature` | [OGC-3264](https://linear.app/onegovcloud/issue/OGC-3264) | [bc58f9e6c9](https://github.com/onegov/onegov-cloud/commit/bc58f9e6c971099234aa841f5ae425adb1e7ad1e)
+
+##### Round invoice to 0.05 before grand total.
+
+`Feature` | [OGC-2957](https://linear.app/onegovcloud/issue/OGC-2957) | [c2244f1296](https://github.com/onegov/onegov-cloud/commit/c2244f1296efd61fb4d98ad6cf7d0eadb986dfa6)
+
+### Wab
+
+##### Small improvements for municipality views (#2588)
+
+`Feature` | [OGC-3103](https://linear.app/onegovcloud/issue/OGC-3103) | [27942811ee](https://github.com/onegov/onegov-cloud/commit/27942811ee98b7dd98ac1c90ffec1c58f14ae643)
+
 ## 2026.36
 
-`2026-07-14` | [6ed7ab5b4f...de2f2a2ab7](https://github.com/OneGov/onegov-cloud/compare/6ed7ab5b4f^...de2f2a2ab7)
+`2026-07-14` | [6ed7ab5b4f...70aaa8d6a7](https://github.com/OneGov/onegov-cloud/compare/6ed7ab5b4f^...70aaa8d6a7)
 
 ### Org
 
@@ -5176,59 +5212,4 @@ Town6: Adds firebase push notifications.
 ##### Switches away from the deprecated legacy websockets
 
 `Feature` | [OGC-1735](https://linear.app/onegovcloud/issue/OGC-1735) | [61931a3714](https://github.com/onegov/onegov-cloud/commit/61931a3714f26baa84312a2a69f87250b52f4686)
-
-## 2025.8
-
-`2025-02-20` | [7b612693f4...d2765ca4af](https://github.com/OneGov/onegov-cloud/compare/7b612693f4^...d2765ca4af)
-
-### Agency
-
-##### Make the `--clean` option significantly faster.
-
-`Feature` | [OGC-2081](https://linear.app/onegovcloud/issue/OGC-2081) | [7a0f68d105](https://github.com/onegov/onegov-cloud/commit/7a0f68d10518736048552d8668b34aef5be13226)
-
-##### Staka LU PDF with proper spacer
-
-`Bugfix` | [OGC-2071](https://linear.app/onegovcloud/issue/OGC-2071) | [7b612693f4](https://github.com/onegov/onegov-cloud/commit/7b612693f48a8a9484e65558d948e9eb39cfdbe7)
-
-##### Be slighly more robust with added None check.
-
-`Bugfix` | [OGC-2083](https://linear.app/onegovcloud/issue/OGC-2083) | [e74895ad7a](https://github.com/onegov/onegov-cloud/commit/e74895ad7aebdedb89013f8029aa0dd14de56c25)
-
-### Feriennet
-
-##### New weights for admin and organizer children and groups in matching
-
-`Feature` | [PRO-1360](https://linear.app/projuventute/issue/PRO-1360) | [3a359413f1](https://github.com/onegov/onegov-cloud/commit/3a359413f1b649c8b4283a387c70f41a648d86b3)
-
-### Org
-
-##### Improves the ergonomics of find my spot reservations
-
-`Feature` | [OGC-2023](https://linear.app/onegovcloud/issue/OGC-2023) | [e873821c01](https://github.com/onegov/onegov-cloud/commit/e873821c01cd2bd68572bbfaad7cb65e88f22888)
-
-### Town6
-
-##### Slider
-
-Fix bug where sizing of slider only worked after resizing the header.
-
-`Bugfix` | [OGC-2056](https://linear.app/onegovcloud/issue/OGC-2056) | [d1c071cdd2](https://github.com/onegov/onegov-cloud/commit/d1c071cdd2f13de7f629bdd069c6d2253b83da3f)
-
-##### Add missing translation
-
-`Bugfix` | [OGC-2064](https://linear.app/onegovcloud/issue/OGC-2064) | [ebdff10ca3](https://github.com/onegov/onegov-cloud/commit/ebdff10ca304caf485c4b81ae7a219c9118828f0)
-
-##### Fixes sidebar contact.
-
-Go this error:
-JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-
-`Bugfix` | [OGC-2089](https://linear.app/onegovcloud/issue/OGC-2089) | [cc8c03ba1a](https://github.com/onegov/onegov-cloud/commit/cc8c03ba1aea0a05b4cfec1fc13658104426f787)
-
-### User
-
-##### Fixes isolation bug between multiple SAML2 providers
-
-`Bugfix` | [e11229b408](https://github.com/onegov/onegov-cloud/commit/e11229b408fe31ab2672f12027f0a9080d698ebf)
 
