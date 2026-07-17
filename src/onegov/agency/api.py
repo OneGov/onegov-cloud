@@ -8,9 +8,9 @@ from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 from onegov.agency.models import ExtendedAgency
+from onegov.api import AdjacencyListApiEndpoint
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.api.utils import is_authorized
-from onegov.core.orm.abstract import preload_ancestors
 from onegov.gis import Coordinates
 from uuid import UUID
 
@@ -19,7 +19,6 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.forms import PersonMutationForm
-    from onegov.api.models import ApiEndpointItem
     from onegov.core.request import CoreRequest
     from onegov.agency.app import AgencyApp
     from onegov.agency.models import ExtendedAgencyMembership
@@ -215,7 +214,9 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson', UUID], ApisMixin):
         do_report_person_change(item, form.meta.request, form)
 
 
-class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency', int], ApisMixin):
+class AgencyApiEndpoint(
+    AdjacencyListApiEndpoint['ExtendedAgency', int], ApisMixin
+):
     request: CoreRequest
     app: AgencyApp
     endpoint = 'agencies'
@@ -252,14 +253,6 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency', int], ApisMixin):
                                             result=result)
 
         result.batch_size = self.batch_size
-        return result
-
-    @property
-    def batch(
-        self
-    ) -> dict[ApiEndpointItem[ExtendedAgency, int], ExtendedAgency]:
-        result = super().batch
-        preload_ancestors(self.session, ExtendedAgency, result.values())
         return result
 
     def item_data(self, item: ExtendedAgency) -> dict[str, Any]:

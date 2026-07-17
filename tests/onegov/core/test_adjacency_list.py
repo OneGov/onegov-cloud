@@ -7,7 +7,6 @@ from onegov.core.orm.abstract import (
     AdjacencyList,
     AdjacencyListCollection,
     MoveDirection,
-    preload_ancestors,
     sort_siblings,
 )
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
@@ -425,7 +424,7 @@ def test_preload_ancestors(session: Session) -> None:
     ).all()
     assert len(leaves) == 2
 
-    preload_ancestors(session, FamilyMember, leaves)
+    FamilyMember.preload_ancestors(session, leaves)
 
     pk_lookups: list[str] = []
 

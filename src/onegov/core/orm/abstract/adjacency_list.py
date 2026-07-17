@@ -58,50 +58,6 @@ def sort_siblings[L: AdjacencyList](
         sibling.order = Decimal(ix)
 
 
-# why is it not a method of AdjacencyList?
-def preload_ancestors[L: AdjacencyList](
-    session: Session,
-    model_class: type[L],
-    items: Iterable[L]
-) -> None:
-    """ Bulk loads all ancestors of the given items and wires up their
-    ``parent`` relationship, so walking the parent chain later (e.g. to build
-    a link or :attr:`AdjacencyList.path`) doesn't emit a query per ancestor
-    (N+1).
-
-    Ancestors that are already loaded (e.g. eager loaded direct parents) are
-    reused instead of being queried again.
-    """
-    by_id: dict[int, L] = {}
-    for item in items:
-        by_id[item.id] = item
-        # reuse an already-loaded parent without triggering a lazy load
-        parent = item.__dict__.get('parent')
-        if parent is not None:
-            by_id[parent.id] = parent
-
-    # load the missing ancestors one generation at a time (a handful of
-    # queries bound by the tree depth, instead of one query per ancestor)
-    while True:
-        missing = {
-            item.parent_id for item in by_id.values()
-            if item.parent_id is not None and item.parent_id not in by_id
-        }
-        if not missing:
-            break
-        for ancestor in session.query(model_class).filter(
-            model_class.id.in_(missing)
-        ):
-            by_id[ancestor.id] = ancestor
-
-    # populate the parent relationship from the loaded set, so accessing it
-    # later resolves in-memory rather than triggering a lazy load
-    for item in by_id.values():
-        parent_id = item.parent_id
-        if parent_id is not None and parent_id in by_id:
-            set_committed_value(item, 'parent', by_id[parent_id])
-
-
 class AdjacencyList(Base):
     """ An abstract AdjacencyList implementation representing a Tree. """
 
@@ -297,6 +253,48 @@ class AdjacencyList(Base):
         if self.parent:
             yield from self.parent.ancestors
             yield self.parent
+
+    @classmethod
+    def preload_ancestors(
+        cls,
+        session: Session,
+        items: Iterable[Self]
+    ) -> None:
+        """ Bulk loads all ancestors of the given items and wires up their
+        ``parent`` relationship, so walking the parent chain afterwards (e.g.
+        via :attr:`ancestors` or :attr:`path`) doesn't emit a query per
+        ancestor (N+1).
+
+        Ancestors that are already loaded (e.g. eager loaded direct parents)
+        are reused instead of being queried again.
+
+        """
+        by_id: dict[int, Self] = {}
+        for item in items:
+            by_id[item.id] = item
+            # reuse an already-loaded parent without triggering a lazy load
+            parent = item.__dict__.get('parent')
+            if parent is not None:
+                by_id[parent.id] = parent
+
+        # load the missing ancestors one generation at a time (a handful of
+        # queries bound by the tree depth, instead of one query per ancestor)
+        while True:
+            missing = {
+                item.parent_id for item in by_id.values()
+                if item.parent_id is not None and item.parent_id not in by_id
+            }
+            if not missing:
+                break
+            for ancestor in session.query(cls).filter(cls.id.in_(missing)):
+                by_id[ancestor.id] = ancestor
+
+        # populate the parent relationship from the loaded set, so accessing
+        # it later resolves in-memory rather than triggering a lazy load
+        for item in by_id.values():
+            parent_id = item.parent_id
+            if parent_id is not None and parent_id in by_id:
+                set_committed_value(item, 'parent', by_id[parent_id])
 
     @property
     def siblings(self) -> Query[Self]:
