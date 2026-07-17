@@ -2682,7 +2682,7 @@ class EventLayoutMixin:
 
         # FIXME: We define a very similar constant in our forms, we should
         #        move this to onegov.org.constants and use it for both.
-        WEEKDAYS = (  # noqa: N806
+        WEEKDAYS = (  # ruff:ignore[non-lowercase-variable-in-function]
             _('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), _('Sa'), _('Su')
         )
 

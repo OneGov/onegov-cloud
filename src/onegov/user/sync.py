@@ -205,7 +205,7 @@ class ZugUserSource(UserSource):
         if mail and mail.endswith('@zg.ch'):
             return 'ldap'
         elif self.verbose:
-            print(f'No usertype for {mail}')  # noqa: T201
+            print(f'No usertype for {mail}')  # ruff:ignore[print]
         return None
 
     def user_type_default(self, entry: Entry) -> str | None:
@@ -218,7 +218,7 @@ class ZugUserSource(UserSource):
 
         if 'student' in reasons:
             if self.verbose:
-                print('Skip: no user_type for student')  # noqa: T201
+                print('Skip: no user_type for student')  # ruff:ignore[print]
             return None
 
         return 'regular'
@@ -230,22 +230,22 @@ class ZugUserSource(UserSource):
 
         if not mail or not mail[0].strip():
             if self.verbose:
-                print('Excluded: No Mail')  # noqa: T201
+                print('Excluded: No Mail')  # ruff:ignore[print]
             return True
 
         if entry.entry_dn.count(',') <= 1:
             if self.verbose:
-                print(f'Excluded entry_dn.count(",") <= 1: {mail!s}')  # noqa: T201
+                print(f'Excluded entry_dn.count(",") <= 1: {mail!s}')  # ruff:ignore[print]
             return True
 
         if 'ou=HRdeleted' in entry.entry_dn:
             if self.verbose:
-                print(f'Excluded HRdeleted: {mail!s}')  # noqa: T201
+                print(f'Excluded HRdeleted: {mail!s}')  # ruff:ignore[print]
             return True
 
         if 'ou=Other' in entry.entry_dn:
             if self.verbose:
-                print(f'Excluded ou=Other: {mail!s}')  # noqa: T201
+                print(f'Excluded ou=Other: {mail!s}')  # ruff:ignore[print]
             return True
 
         if not self.user_type(entry):
@@ -317,10 +317,10 @@ class ZugUserSource(UserSource):
             count += 1
             yield self.complete_entry(self.map_entry(e), **kwargs)
         if self.verbose:
-            print(f'Base: {base}\t\tFilter: {sf}')  # noqa: T201
-            print(f'- Total: {total}')  # noqa: T201
-            print(f'- Found: {count}')  # noqa: T201
-            print(f'- Excluded: {total - count}')  # noqa: T201
+            print(f'Base: {base}\t\tFilter: {sf}')  # ruff:ignore[print]
+            print(f'- Total: {total}')  # ruff:ignore[print]
+            print(f'- Found: {count}')  # ruff:ignore[print]
+            print(f'- Excluded: {total - count}')  # ruff:ignore[print]
 
     @classmethod
     def factory(cls, verbose: bool = False) -> list[ZugUserSource]:

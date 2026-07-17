@@ -59,14 +59,14 @@ _StoredFile__repr__ = StoredFile.__repr__
 _LocalStoredFile_close = LocalStoredFile.close
 
 
-def _safe_StoredFile__repr__(self: Any) -> str:  # noqa: N802
+def _safe_StoredFile__repr__(self: Any) -> str:  # ruff:ignore[invalid-function-name]
     try:
         return _StoredFile__repr__(self)
     except Exception:
         return f'<{self.__class__.__name__}>'
 
 
-def _safe_LocalStoredFile_close(self: LocalStoredFile) -> None:  # noqa: N802
+def _safe_LocalStoredFile_close(self: LocalStoredFile) -> None:  # ruff:ignore[invalid-function-name]
     try:
         _LocalStoredFile_close(self)
     except FileNotFoundError:

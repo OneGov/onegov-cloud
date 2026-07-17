@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from datetime import date
     from sqlalchemy.orm import Query, Session
     from onegov.pas.request import PasRequest
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class AttendenceCollection(GenericCollection[Attendence, 'UUID']):

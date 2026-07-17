@@ -7,7 +7,7 @@ from onegov.core.collection import GenericCollection
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class BookingPeriodCollection(GenericCollection[BookingPeriod, 'UUID']):
