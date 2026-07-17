@@ -1,0 +1,12 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p i18n:translate>
+            A cancellation request has been submitted for the following ticket:
+            <a href="${request.link(ticket)}" i18n:name="link">${ticket_reference}</a>
+        </p>
+    </tal:b>
+</div>

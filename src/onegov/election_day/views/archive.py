@@ -1,9 +1,24 @@
 from __future__ import annotations
 
+from operator import itemgetter
+
+from morepath import redirect
+
 from fs.errors import ResourceNotFound
 from morepath.request import Response
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.collections import (
+    AllMunicipalArchivedResultCollection
+)
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import MunicipalArchivedResultCollection
+from onegov.election_day.collections import (
+    MunicipalityArchivedResultCollection
+)
+from onegov.election_day.collections import (
+    MunicipalityYearArchivedResultCollection
+)
+from onegov.election_day.models import MunicipalityRedirect
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.forms import ArchiveSearchFormElection
 from onegov.election_day.forms import ArchiveSearchFormVote
@@ -11,6 +26,7 @@ from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts.archive import ArchiveLayout
 from onegov.election_day.models import Principal
 from onegov.election_day.security import MaybePublic
+from onegov.core.security import Public
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_summaries
 from webob.exc import HTTPNotFound
@@ -21,6 +37,21 @@ if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
     from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response as webob_Response
+
+
+@ElectionDayApp.view(model=MunicipalityRedirect, permission=Public)
+def view_municipality_redirect(
+    self: MunicipalityRedirect,
+    request: ElectionDayRequest
+) -> webob_Response:
+    return redirect(
+        request.link(
+            MunicipalityArchivedResultCollection(
+                request.session, self.municipality
+            )
+        )
+    )
 
 
 @ElectionDayApp.html(
@@ -44,7 +75,143 @@ def view_archive(
         'layout': layout,
         'date': self.date,
         'archive_items': self.group_items(results, request),
+        'show_communal_nav': True,
+        'show_archive_links': True,
     }
+
+
+@ElectionDayApp.html(
+    model=MunicipalArchivedResultCollection,
+    template='archive.pt',
+    permission=MaybePublic
+)
+def view_archive_municipal(
+    self: MunicipalArchivedResultCollection,
+    request: ElectionDayRequest
+) -> RenderData:
+    layout = DefaultLayout(self, request)
+    mun_archive = layout.municipality_archive
+    results, _ = self.by_date()
+    latest_years = mun_archive.get_latest_year_by_municipality()
+    slugs = {r.domain_segment for r in results if r.domain_segment}
+
+    municipality_links = {
+        slug: _municipality_archive_url(
+            mun_archive, slug, latest_years, request
+        )
+        for slug in slugs
+    }
+
+    return {
+        'layout': layout,
+        'date': self.date,
+        'archive_items': self.group_items(results, request),
+        'municipal_view': True,
+        'municipality_display_names': (
+            request.app.principal.municipality_display_name_by_slug
+        ),
+        'municipality_links': municipality_links,
+    }
+
+
+@ElectionDayApp.html(
+    model=AllMunicipalArchivedResultCollection,
+    template='archive.pt',
+    permission=MaybePublic
+)
+def view_archive_all_municipal(
+    self: AllMunicipalArchivedResultCollection,
+    request: ElectionDayRequest
+) -> RenderData:
+    layout = DefaultLayout(self, request)
+    mun_archive = layout.municipality_archive
+    latest_years = mun_archive.get_latest_year_by_municipality()
+
+    municipality_links = {
+        name: _municipality_archive_url(
+            mun_archive, slug, latest_years, request
+        )
+        for slug, name in sorted(
+            request.app.principal.municipality_display_name_by_slug.items(),
+            key=itemgetter(1),
+        )
+    }
+
+    return {
+        'layout': layout,
+        'date': None,
+        'archive_items': None,
+        'municipality_links': municipality_links,
+        'all_municipal_view': True,
+    }
+
+
+def _municipality_archive_url(
+    mun_archive: MunicipalityArchivedResultCollection,
+    slug: str,
+    latest_years: dict[str, int],
+    request: ElectionDayRequest,
+) -> str:
+    if slug in latest_years:
+        return request.link(
+            mun_archive.for_municipality(slug).for_year(latest_years[slug])
+        )
+    return request.link(mun_archive.for_municipality(slug))
+
+
+def _municipality_display_name(
+    sanitized: str,
+    request: ElectionDayRequest,
+) -> str:
+    return request.app.principal.municipality_display_name_by_slug.get(
+        sanitized, sanitized
+    )
+
+
+def _municipality_view_data(
+    self: MunicipalityArchivedResultCollection,
+    request: ElectionDayRequest,
+    year: int | None = None
+) -> RenderData:
+    layout = DefaultLayout(self, request)
+    results, _ = self.by_municipality()
+
+    return {
+        'layout': layout,
+        'date': str(year) if year else None,
+        'active_year': year,
+        'archive_items': self.group_items(results, request),
+        'municipality_collection': self,
+        'municipality_name': _municipality_display_name(
+            self.municipality, request
+        ),
+        'municipality_view': True,
+        'show_archive_links': True,
+    }
+
+
+@ElectionDayApp.html(
+    model=MunicipalityArchivedResultCollection,
+    template='archive.pt',
+    permission=MaybePublic
+)
+def view_archive_municipality(
+    self: MunicipalityArchivedResultCollection,
+    request: ElectionDayRequest
+) -> RenderData:
+    return _municipality_view_data(self, request)
+
+
+@ElectionDayApp.html(
+    model=MunicipalityYearArchivedResultCollection,
+    template='archive.pt',
+    permission=MaybePublic
+)
+def view_archive_municipality_year(
+    self: MunicipalityYearArchivedResultCollection,
+    request: ElectionDayRequest
+) -> RenderData:
+    return _municipality_view_data(self, request, year=self.year)
 
 
 @ElectionDayApp.json(
@@ -101,6 +268,8 @@ def view_principal(
         'layout': layout,
         'archive_items': archive.group_items(current, request),
         'date': None,
+        'show_communal_nav': True,
+        'show_archive_links': True,
     }
 
 

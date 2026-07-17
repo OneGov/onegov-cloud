@@ -108,3 +108,5 @@ dump.rdb
 .codebuddy/
 
 .aider*
+
+.DS_Store

@@ -322,6 +322,25 @@ def logout(client: Client[TestResponse, TestApp], to: str = '') -> None:
     client.get(f'/auth/logout?to={to}')
 
 
+def import_ech_from_file(
+    client: Client[TestResponse, TestApp],
+    path: str,
+) -> TestResponse:
+    """
+    Upload an eCH-0252 XML delivery file via the principal upload
+    endpoint.
+    """
+
+    with open(path, 'rb') as f:
+        xml_content = f.read()
+
+    upload = client.get('/upload-ech')
+    upload.form['xml'] = Upload('data.xml', xml_content, 'text/xml')
+    response = upload.form.submit()
+    assert 'Ihre Resultate wurden erfolgreich hochgeladen' in response
+    return response
+
+
 def upload_vote(
     client: Client[TestResponse, TestApp],
     create: bool = True,

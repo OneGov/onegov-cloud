@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from markupsafe import escape, Markup
 from onegov.core.orm.types import MarkupText
-from sqlalchemy import func, type_coerce
+from sqlalchemy import func, literal, type_coerce
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, Mapped
 from onegov.core.orm.types import JSON
@@ -323,7 +323,7 @@ class dict_property[T](hybrid_property[T]):  # noqa: N801
 
     def _default_expr(self, owner: type[Any]) -> ColumnElement[T]:
         column: ColumnElement[dict[str, Any]] = getattr(owner, self.attribute)
-        expr = column[self.key]
+        expr = column[literal(self.key, literal_execute=True)]
         coerced = False
         if self.value_type is None:
             pass
