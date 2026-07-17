@@ -15,11 +15,9 @@ from onegov.election_day.collections import (
 )
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.collections import VoteCollection
-from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Principal
 from onegov.user import Auth
 from sedate import utcnow
-from sqlalchemy import exists
 
 
 from typing import Any
@@ -185,9 +183,13 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def has_municipal_results(self) -> bool:
-        return bool(self.request.session.query(
-            exists().where(ArchivedResult.domain == 'municipality')
-        ).scalar())
+        latest_years = (
+            self.municipality_archive.get_latest_year_by_municipality()
+        )
+        return any(
+            slug in latest_years
+            for slug in self.principal.municipality_display_name_by_slug
+        )
 
     @cached_property
     def archive_search_link(self) -> str:

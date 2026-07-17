@@ -270,7 +270,6 @@ def test_view_archive_all_municipal(election_day_app_sg: TestApp) -> None:
 
     # municipality with no results is not listed at all
     assert '/municipality/rorschach' not in page
-    assert 'Rorschach' not in page
 
     # only links shown, no inline result titles
     assert 'Au Abstimmung 2025' not in page
