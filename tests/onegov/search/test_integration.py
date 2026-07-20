@@ -439,7 +439,7 @@ def test_reindex_recovers_from_real_conflict(
             )
         return original_index(tasks, session)
 
-    app.fts_indexer.index = conflicting_index  # type: ignore[method-assign]
+    app.fts_indexer.index = conflicting_index
 
     with caplog.at_level(logging.INFO, logger='onegov.search.index'):
         app.perform_reindex()
@@ -491,7 +491,7 @@ def test_reindex_gives_up_on_persistent_conflict(
         )
         return original_index(tasks, session)
 
-    app.fts_indexer.index = conflicting_index  # type: ignore[method-assign]
+    app.fts_indexer.index = conflicting_index
 
     with caplog.at_level(logging.INFO, logger='onegov.search.index'):
         app.perform_reindex()

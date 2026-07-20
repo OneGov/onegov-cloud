@@ -263,8 +263,9 @@ class SearchApp(morepath.App):
                                 for obj in query
                                 if (
                                     task := self.fts_orm_events.index_task(
-                                        schema, obj
-                                    )  # type: ignore[arg-type]
+                                        schema,
+                                        obj,  # type: ignore[arg-type]
+                                    )
                                 )
                                 is not None
                             ),
