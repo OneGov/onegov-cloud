@@ -2741,8 +2741,10 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
             if self.request.is_manager:
                 yield Link(
                     text=_('Edit'),
-                    url=self.request.link(self.request.app.org,
-                                          'event-settings'),
+                    url=self.request.return_here(
+                        self.request.link(self.request.app.org,
+                                          'event-settings')
+                    ),
                     attrs={'class': 'edit-link'}
                 )
 

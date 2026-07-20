@@ -1170,7 +1170,7 @@ def test_event_settings_return_to(client: Client) -> None:
     # opening the event settings from the events overview remembers the origin,
     # so both the cancel link and a successful save return to the overview
     events = client.get('/events')
-    settings = events.click('Einstellungen', href='event-settings')
+    settings = events.click('Bearbeiten', href='event-settings')
 
     cancel_href = settings.pyquery('a.cancel-link').attr('href')
     assert cancel_href.endswith('/events')
@@ -1187,8 +1187,7 @@ def test_event_edit_cancel_returns_to_origin(client: Client) -> None:
     client.login_admin()
 
     # the occurrence page links to the edit view with a return-to parameter,
-    # so cancelling the edit returns to that occurrence instead of using the
-    # browser history
+    # so cancelling the edit returns to that occurrence
     occurrence = client.get('/events').click('Generalversammlung')
     origin = occurrence.request.url
 
