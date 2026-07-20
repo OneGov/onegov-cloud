@@ -31,7 +31,7 @@
 </metal:b>
 
 <metal:b define-macro="consume_messages" i18n:domain="onegov.town6">
-    <div tal:repeat="message request.consume_messages()"  class="alert alert-${message.type} alert-dismissible fade show" role="alert">
+    <div tal:repeat="message request.consume_messages()"  class="alert alert-${message.type} alert-dismissible fade show mt-md" role="alert">
         ${message.text}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -1158,39 +1158,65 @@
 </metal:payment>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
-    <div class="person-card person-list-card card-section" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
-        <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-            <div class="person-card-portrait" tal:condition="url" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
-                <i class="fa fa-user" tal:condition="not:url"></i>
-                <div class="cover-image"  style='background-image: url("${url}");'></div>
+    <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request); url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+        <div class="card-body" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
+            <div class="row mb-lg">
+                <div class="col-6 col-md-4">
+                    <div class="ratio square-6xl"
+                        tal:define="initials python: (person.first_name[0] + person.last_name[0]).upper() if western_name_order else (person.last_name[0] + person.first_name[0]).upper()">
+                        <img tal:condition="url"
+                            class="object-fit-cover rounded-1"
+                            src="${url}"
+                            alt="Person image">
+                        <div tal:condition="not url"
+                            class="rounded-1 bg-dark-subtle bg-tertiary d-flex align-items-center justify-content-center">
+                            <span class="fs-xl" tal:content="initials"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </a>
-        <ul class="person-card-details">
-            <li class="person-card-title" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
-                <a href="${link}">
-                    <span tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
-                    <span tal:condition="not western_name_order">${person.title}</span>
-                </a>
-            </li>
-            <li tal:condition="person.function" class="person-card-function">
-                <span title="${person.function}">${person.function}</span>
-            </li>
-            <tal:b define="organisations organisations_as_dict(person)" tal:condition="'organisation' not in exclude">
-                <li tal:repeat="top_organisation organisations.keys()" class="person-card-organisation">
-                    <span tal:define="sub_organisations organisations[top_organisation]" i18n:attributes="title" title="Organisation">${top_organisation}${' - ' if sub_organisations else ''}${', '.join(sub_organisations)}</span>
-                </li>
-            </tal:b>
-            <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
-                <a href="mailto:${person.email}">${person.email}</a>
-            </li>
-            <li tal:condition="person.phone and 'phone' not in exclude" class="person-card-phone">
-                <a href="tel:${layout.format_phone_number(person.phone)}">${layout.format_phone_number(person.phone)}</a>
-            </li>
-            <li tal:condition="person.phone_direct and 'phone_direct' not in exclude" class="person-card-phone_direct">
-                <a href="tel:${layout.format_phone_number(person.phone_direct)}">${layout.format_phone_number(person.phone_direct)}</a>
-            </li>
-        </ul>
-        <a href="${link}"><i class="fa fa-chevron-right"></i></a>
+            <div class="row">
+                <div class="person-card-details col-9">
+                    <p class="mb-sm">
+                        <tal:b tal:condition="person.function">
+                            <span title="${person.function}">${person.function}</span>
+                        </tal:b>
+                    </p>
+                    <h3 class="h4 mb-0">
+                        <a class="text-decoration-none" href="${link}">
+                                <span tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
+                                <span tal:condition="not western_name_order">${person.title}</span>
+                        </a>
+                    </h3>
+                    
+                    <ul class="list-unstyled mb-0 mt-md">
+                        <li tal:condition="person.email and 'email' not in exclude">
+                            <a class="text-body link-underline-primary link-offset-2" href="mailto:${person.email}">${person.email}</a>
+                        </li>
+                        <li tal:condition="person.phone and 'phone' not in exclude" class="person-card-phone">
+                            <a class="text-body link-underline-primary link-offset-2" href="tel:${layout.format_phone_number(person.phone)}">${layout.format_phone_number(person.phone)}</a>
+                        </li>
+                        <li tal:condition="person.phone_direct and 'phone_direct' not in exclude" class="person-card-phone_direct">
+                            <a class="text-body link-underline-primary link-offset-2" href="tel:${layout.format_phone_number(person.phone_direct)}">${layout.format_phone_number(person.phone_direct)}</a>
+                        </li>
+                    </ul>
+                        
+                    <div class="collapse" id="personDetails${person.id}">
+                        <tal:b define="organisations organisations_as_dict(person)" tal:condition="'organisation' not in exclude">
+                            <div tal:repeat="top_organisation organisations.keys()" class="mt-2xl">
+                                <span tal:define="sub_organisations organisations[top_organisation]" i18n:attributes="title" title="Organisation">${top_organisation}${' - ' if sub_organisations else ''}${', '.join(sub_organisations)}</span>
+                            </div>
+                        </tal:b>
+                    </div>
+                </div>
+                
+                <div class="col-3 align-content-end text-end">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#personDetails${person.id}" aria-expanded="false" aria-controls="collapseExample">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </metal:person_card>
 
@@ -1560,14 +1586,18 @@
 </metal:display_event>
 
 <metal:atoz define-macro="atoz" i18n:domain="onegov.town6">
-    <div class="atoz-block" tal:repeat="item items">
-        <h2>${item[0]}</h2>
-        <div class="grid-x grid-padding-x subpage-cards">
-            <div class="cell small-12 medium-6" tal:repeat="detail item[1]">
-                <div class="card">
-                    <div metal:define-slot="item-detail">
-                        <a href="${request.link(detail)}">${detail.title}</a>
-                        <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
+    <div class="atoz-block row mb-lg" tal:repeat="item items">
+        <div class="col-12 col-sm-6 col-md-3">
+            <h2 class="fs-2xl text-primary sticky-top">${item[0]}</h2>
+        </div>
+        <div class="col-12 col-sm-6 col-md-9">
+            <div class="row g-lg">
+                <div class="col-12 col-md-6" tal:repeat="detail item[1]">
+                    <div class="card">
+                        <tal:b metal:define-slot="item-detail">
+                            <a href="${request.link(detail)}">${detail.title}</a>
+                            <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
+                        </tal:b>
                     </div>
                 </div>
             </div>

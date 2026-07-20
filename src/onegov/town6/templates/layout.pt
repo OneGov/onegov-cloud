@@ -156,7 +156,7 @@
                                     <a href="#" class="" data-bs-toggle="modal" data-bs-target="#searchModal">
                                         <i class="fa fa-search"></i>
                                     </a>
-                                    <a href="#" class="btn btn-primary rounded-pill px-4">
+                                    <a href="#" class="btn btn-primary px-4">
                                     Online-Schalter
                                     </a>
                                 </div>
@@ -171,7 +171,7 @@
         </header>
 
         <div class="container" id="alert-boxes">
-            <div tal:condition="form.errors|nothing" class="alert alert-warning alert-dismissible fade show" role="alert">
+            <div tal:condition="form.errors|nothing" class="alert alert-warning alert-dismissible fade show mt-md" role="alert">
                 <tal:b i18n:translate>The form contains errors. Please check the fields marked in red.</tal:b>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -193,27 +193,27 @@
                 </div>
             </div>
 
-            <div class="container-fluid">
+            <div class="container">
                 <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
             </div>
 
             <div class="content my-5xl" tal:condition="not: on_homepage" >
-                <div class="container-fluid">
+                <div id="intro" class="container mb-3xl">
                     <div class="row">
                         <div class="col-12 col-md-4 col-lg-3">
-                            <h1 class="main-title fs-xs fw-bold">
+                            <h1 class="main-title fs-xs fw-bold text-primary">
                                 <tal:b metal:define-slot="title"></tal:b>
                             </h1>
                         </div>
                         <div class="col-12 col-md-8 col-lg-9">
-                            <p class="lead-text h1 text-primary">
+                            <p class="lead-text h1 text-primary mb-0">
                                 <div metal:define-slot="lead"></div>
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="container-fluid" role="main" id="content" data-reinit-foundation>
+                <div class="container" role="main" id="content" data-reinit-foundation>
                     <div metal:define-slot="before-content"></div>
                     <div metal:define-slot="content"></div>
                 </div>

@@ -11,11 +11,27 @@ $spacers: map-merge($spacers, (
   "6xl": 6rem      // 96px
 ));
 
+$gutters: $spacers;
+
+// For squares
+@each $key, $value in $spacers {
+  .square-#{$key} {
+    width: $value !important;
+    height: $value !important;
+  }
+}
+
+$card-spacer-y: map-get($spacers, "lg"); // 1.5rem / 24px
+$card-spacer-x: map-get($spacers, "lg"); // 1.5rem / 24px
+$card-border-width: 2px;
+$card-border-color: $tertiary;
+
 $border-radius-sm:   .3125rem;  // 5px
 $border-radius:       .625rem;  // 10px
 $border-radius-lg:    1.25rem;  // 20px
 $border-radius-xl:    2.5rem;   // 40px
 $border-radius-pill:  6.25rem;  // 100px
 
-$card-spacer-y: map-get($spacers, "lg"); // 1.5rem / 24px
-$card-spacer-x: map-get($spacers, "lg"); // 1.5rem / 24px
+$btn-border-radius:     $border-radius-pill;
+$btn-border-radius-sm:  $border-radius-pill;
+$btn-border-radius-lg:  $border-radius-pill;
