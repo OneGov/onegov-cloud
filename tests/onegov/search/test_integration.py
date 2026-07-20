@@ -420,7 +420,8 @@ def test_reindex_recovers_from_real_conflict(
 ) -> None:
     """ Triggers a genuine serialization failure (SQLSTATE 40001) during the
     reindex and asserts that the retry actually recovers -- i.e. that the
-    aborted connection is discarded and the retry runs against a fresh one. """
+    aborted transaction is rolled back so the retry runs in a fresh one on the
+    same connection. """
 
     app, Document = _reindex_conflict_app(postgres_dsn)
     schema = app.schema
