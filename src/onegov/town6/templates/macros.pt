@@ -122,7 +122,7 @@
 
 <metal:editbar define-macro="editbar">
     <tal:b define="editbar_links layout.editbar_links if not layout.edit_mode else layout.editmode_links|[]">
-        <nav class="bg-dark navbar navbar-expand-lg p-0"  data-bs-theme="dark" tal:condition="editbar_links">
+        <nav class="bg-dark-subtle navbar navbar-expand-lg p-0" tal:condition="editbar_links">
             <div class="container">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarEditbar" aria-controls="navbarEditbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -745,7 +745,7 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="side_panel_card" i18n:domain="onegov.town6">
-    <div class="card me-md-2xl side-panel ${extra_class|''}"
+    <div class="card me-md-2xl side_panel_card mb-md border-1 side-panel ${extra_class|''}"
          tal:attributes="data-toc-level data_toc_level|nothing">
         <div class="card-body">
             <h3><metal:b define-slot="panel-title"></metal:b></h3>
@@ -1157,6 +1157,15 @@
     </tal:b>
 </metal:payment>
 
+<metal:person_card define-macro="person_card_link">
+    <a 
+        class="text-body link-underline-primary link-offset-2"
+        href="${link}"
+    >
+        ${link_text}
+    </a>
+</metal:person_card>
+
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
     <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request); url (person.picture_url and layout.thumbnail_url(person.picture_url))">
         <div class="card-body" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
@@ -1191,13 +1200,22 @@
                     
                     <ul class="list-unstyled mb-0 mt-md">
                         <li tal:condition="person.email and 'email' not in exclude">
-                            <a class="text-body link-underline-primary link-offset-2" href="mailto:${person.email}">${person.email}</a>
+                            <tal:b
+                                metal:use-macro="layout.macros['person_card_link']"
+                                tal:define="link f'mailto:{person.email}'; link_text person.email"
+                            />
                         </li>
                         <li tal:condition="person.phone and 'phone' not in exclude" class="person-card-phone">
-                            <a class="text-body link-underline-primary link-offset-2" href="tel:${layout.format_phone_number(person.phone)}">${layout.format_phone_number(person.phone)}</a>
+                            <tal:b
+                                metal:use-macro="layout.macros['person_card_link']"
+                                tal:define="link f'tel:{layout.format_phone_number(person.phone)}'; link_text layout.format_phone_number(person.phone)"
+                            />
                         </li>
                         <li tal:condition="person.phone_direct and 'phone_direct' not in exclude" class="person-card-phone_direct">
-                            <a class="text-body link-underline-primary link-offset-2" href="tel:${layout.format_phone_number(person.phone_direct)}">${layout.format_phone_number(person.phone_direct)}</a>
+                            <tal:b
+                                metal:use-macro="layout.macros['person_card_link']"
+                                tal:define="link f'tel:{layout.format_phone_number(person.phone_direct)}'; link_text layout.format_phone_number(person.phone_direct)"
+                            />
                         </li>
                     </ul>
                         
@@ -3230,11 +3248,23 @@
 </metal:progress_indicator>
 
 <metal:modal define-macro="modal">
-<div id="${modal_id}" class="reveal" data-reveal>
-    <tal:block metal:define-slot="modal_content"></tal:block>
-    <button class="close-button" data-close aria-label="Close" type="button">
-        <span aria-hidden="true">&times;</span>
-    </button>
+<div class="modal fade" id="${modal_id}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 tal:condition="modal_title|False" class="modal-title fs-5" id="exampleModalLabel">
+                    ${modal_title}
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <tal:block metal:define-slot="modal_body"></tal:block>
+            </div>
+            <div class="modal-footer">
+                <tal:block metal:define-slot="modal_footer"></tal:block>
+            </div>
+        </div>
+    </div>
 </div>
 </metal:modal>
 

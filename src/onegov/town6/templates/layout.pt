@@ -71,12 +71,12 @@
     <a class="visually-hidden-focusable" href="#content" i18n:translate>Skip navigation</a>
     <main class="flex-grow-1">
         <header id="header" tal:define="header_options request.app.org.header_options or {}">
-            <nav id="globals" class="globals bg-dark navbar navbar-expand-lg"  data-bs-theme="dark" tal:define="toolbox global_tools|False; modules modules|False" tal:condition="request.is_logged_in or request.authenticated_email">
+            <nav id="globals" class="globals bg-dark-subtle navbar navbar-expand-lg p-0" tal:define="toolbox global_tools|False; modules modules|False" tal:condition="request.is_logged_in or request.authenticated_email">
                 <div class="container">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarGlobals" aria-controls="navbarGlobals" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="collapse navbar-collapse" id="navbarGlobals">
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarGlobals">
                         <tal:b metal:use-macro="layout.macros['globals-left']"></tal:b>
                         <ul class="navbar-nav global-tools-menu" tal:condition="toolbox">
                             <li class="nav-item dropdown" tal:repeat="tool toolbox">

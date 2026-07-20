@@ -36,7 +36,7 @@
         ${e.text or ''}
     </a>
     <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id e.attrs['data-open']">
-        <tal:block metal:fill-slot="modal_content">
+        <tal:block metal:fill-slot="modal_body">
             <div id="${e.attrs['data-image-parent']}" class="qr-image">
                 <h1 tal:condition="e.title|nothing">${e.title}</h1>
             </div>
@@ -48,8 +48,8 @@
     <a tal:attributes="e.attrs" data-endpoint="${layout.qr_endpoint}">
         ${e.text or ''}
     </a>
-    <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id e.attrs['data-open']">
-        <tal:block metal:fill-slot="modal_content">
+    <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id e.attrs['data-open'];">
+        <tal:block metal:fill-slot="modal_body">
             <h3 i18n:translate>Embed iFrame</h3>
             <p i18n:translate>You can copy the following code to embed this page as an iFrame:</p>
             <div class="panel">
