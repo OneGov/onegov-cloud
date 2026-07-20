@@ -11,11 +11,9 @@
             <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item page"/>
         </tal:b>
 
-        <div class="grid-x grid-padding-x" tal:condition="not: page.parent">
-            <div class="small-12 medium-7 cell">
+        <div class="container" tal:condition="not: page.parent">
                 <div metal:use-macro="layout.macros.newslist" tal:define="news children; hide_title True; lg_span 6; " />
                 <div tal:condition="not: children" i18n:translate>Your search returned no results.</div>
-            </div>
             <tal:b metal:use-macro="layout.macros.page_content_sidebar"
                     tal:define="lead None; text None; people page.people; files page.files; contact layout.contact_html; coordinates None; location False; filter_panel True;">
                 <tal:b metal:fill-slot="before-panels">

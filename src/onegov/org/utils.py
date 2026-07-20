@@ -214,7 +214,7 @@ def annotate_html(
                 parent = parent.getparent()
 
         for img in element.xpath('//img'):
-            img.set('class', 'lazyload-alt')
+            img.set('class', 'lazyload-alt img-fluid')
             images.append(img)
 
     # for the hashtag lookup we need all elements, as we do not use xpath
