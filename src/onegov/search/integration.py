@@ -290,9 +290,6 @@ class SearchApp(morepath.App):
                                 f'retrying '
                                 f'(attempt {attempt}/{REINDEX_MAX_ATTEMPTS})'
                             )
-                            # the failed transaction is aborted and would
-                            # refuse any further query, so we roll it back
-                            # to start a fresh one for the next attempt
                             session.execute(text('ROLLBACK'))
                             continue
 
