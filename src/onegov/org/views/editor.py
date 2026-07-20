@@ -181,6 +181,7 @@ def handle_edit_page(
     layout: EditorLayout | PageLayout | None = None
 ) -> RenderData | Response:
     assert self.page is not None
+    site_title: str
     if self.page.trait == 'news' and self.page.parent is None:
         site_title = _('News Settings')
     else:

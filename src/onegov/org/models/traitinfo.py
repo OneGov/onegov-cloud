@@ -259,8 +259,8 @@ class TraitInfo:
                     yes_button_text=trait_messages['delete_button'],
                     extra_information=extra_warning,
                     redirect_after=(
-                        request.link(self.parent)  # type:ignore[attr-defined]
-                        if self.parent is not None  # type:ignore[attr-defined]
+                        request.link(self.parent)
+                        if self.parent is not None
                         else request.class_link(Organisation)
                     ),
                     items=items,
