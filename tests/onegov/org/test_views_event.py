@@ -203,9 +203,8 @@ def test_view_occurrences_event_filter(client: Client) -> None:
         assert client.login_admin()
         assert client.app.org.event_filter_type in ['filters',
                                                     'tags_and_filters']
-        page = client.get('/events')
-        page = page.click('Konfigurieren')
-        page.form['definition'] = """
+        page = client.get('/event-settings')
+        page.form['event_filter_definition'] = """
             My Special Filter *=
                 [ ] A Filter
                 [ ] B Filter
@@ -283,10 +282,7 @@ def test_many_filters(client: Client) -> None:
     assert client.login_admin()
     page = client.get('/event-settings')
     page.form['event_filter_type'] = 'filters'
-    page.form.submit()
-    page = client.get('/events')
-    page = page.click('Konfigurieren')
-    page.form['definition'] = """
+    page.form['event_filter_definition'] = """
         Weitere Filter =
             [ ] Gemeinde
             [ ] Schule
@@ -986,9 +982,9 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     settings.form.submit()
 
     # Set up a filter with two choices
-    page = client.get('/events').click('Konfigurieren')
+    page = client.get('/event-settings')
     assert 'force_remove' not in page.form.fields  # not shown on initial load
-    page.form['definition'] = """
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
             [ ] Choice B
@@ -1004,9 +1000,9 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form.submit()
 
     # Removing Choice A (in use) is blocked — force_remove checkbox appears
-    page = client.get('/events').click('Konfigurieren')
+    page = client.get('/event-settings')
     assert 'force_remove' not in page.form.fields
-    page.form['definition'] = """
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice B
     """
@@ -1030,8 +1026,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     assert not page.form['my_filter'].value
 
     # Re-setup: re-add Choice A, re-apply to event
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
             [ ] Choice B
@@ -1047,8 +1043,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form.submit()
 
     # Block again — manually clearing the event also allows removing the choice
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice B
     """
@@ -1062,8 +1058,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form['my_filter'] = []
     page.form.submit()
 
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice B
     """
@@ -1072,9 +1068,9 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     assert 'Choice A' not in (client.app.org.event_filter_definition or '')
 
     # Removing an unused choice (Choice B) is allowed without blocking
-    page = client.get('/events').click('Konfigurieren')
+    page = client.get('/event-settings')
     assert 'force_remove' not in page.form.fields
-    page.form['definition'] = """
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
@@ -1091,8 +1087,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
 
     # Deselecting the whole keyword while events use it is blocked,
     # checkbox appears
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
@@ -1111,8 +1107,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     assert not client.app.org.event_filter_configuration.get('keywords')
 
     # Re-setup: re-enable keyword and re-apply filter to event
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
@@ -1125,8 +1121,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form['my_filter'] = ['Choice A']
     page.form.submit()
 
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
@@ -1141,8 +1137,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form['my_filter'] = []
     page.form.submit()
 
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """

@@ -2726,19 +2726,13 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
         def links() -> Iterator[Link | LinkGroup]:
-            if (self.request.is_admin and self.request.app.org.
-                    event_filter_type in ['filters', 'tags_and_filters']):
-                yield Link(
-                    text=_('Configure'),
-                    url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'filters-link'}
-                )
-
             if self.request.is_manager:
                 yield Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.request.app.org,
-                                          'event-settings'),
+                    text=_('Settings'),
+                    url=self.request.return_here(
+                        self.request.link(self.request.app.org,
+                                          'event-settings')
+                    ),
                     attrs={'class': 'edit-link'}
                 )
 

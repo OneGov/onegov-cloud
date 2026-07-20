@@ -90,12 +90,8 @@ def test_view_api(
     # Configure event filters
     settings = client.get('/event-settings')
     settings.form['event_filter_type'] = 'filters'
-    settings.form.submit().follow()
-
-    events_page = client.get('/events')
-    filter_settings = events_page.click('Konfigurieren')
-    filter_settings.form[
-        'definition'
+    settings.form[
+        'event_filter_definition'
     ] = """
         Altersgruppe =
             [ ] Kind
@@ -106,8 +102,8 @@ def test_view_api(
         Empfehlung =
             [ ] Ja
     """
-    filter_settings.form['keyword_fields'].value = 'Altersgruppe\nEmpfehlung'
-    filter_settings.form.submit().follow()
+    settings.form['keyword_fields'].value = 'Altersgruppe\nEmpfehlung'
+    settings.form.submit().follow()
 
     endpoints = collection('/api')
     event_fiters = filters(endpoints.queries[0])
