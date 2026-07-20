@@ -138,14 +138,20 @@ class ReturnToMixin(_BaseRequest):
     def return_here(self, url: str) -> str:
         return self.return_to(url, self.url)
 
-    def redirect(self, url: str) -> Response:
+    def return_to_url(self, default: str) -> str:
+        """ Returns the signed return-to url if one was passed and is valid,
+        otherwise the given default. Useful for links (e.g. a cancel button)
+        that should honor the same return-to parameter as ``redirect``. """
         if 'return-to' in self.GET:
             try:
-                url = self.redirect_signer.loads(self.GET['return-to'])
+                return self.redirect_signer.loads(self.GET['return-to'])
             except BadSignature:
                 pass
 
-        return morepath.redirect(url)
+        return default
+
+    def redirect(self, url: str) -> Response:
+        return morepath.redirect(self.return_to_url(url))
 
 
 def is_logged_in(identity: Identity | NoIdentity) -> TypeGuard[Identity]:

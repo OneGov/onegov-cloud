@@ -5,7 +5,7 @@ import morepath
 
 from morepath.request import Response
 from onegov.core.crypto import random_token
-from onegov.core.elements import BackLink
+from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.form import merge_forms, parse_form
@@ -497,7 +497,15 @@ def handle_edit_event(
 
     layout = layout or EventLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    cancel_url = (
+        request.link(view_ticket) if view_ticket is not None
+        else request.link(self)
+    )
+    layout.editmode_links[1] = CoreLink(
+        text=_('Cancel'),
+        url=request.return_to_url(cancel_url),
+        attrs={'class': 'cancel-link'}
+    )
     layout.edit_mode = True
 
     return {
