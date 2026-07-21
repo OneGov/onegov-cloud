@@ -1702,13 +1702,19 @@ class PersonCollectionLayout(DefaultLayout):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
-            return [
-                Link(
+            links: list[Link | LinkGroup] = []
+
+            if self.request.is_admin:
+                links.append(Link(
                     text=_('Settings'),
-                    url=self.request.link(
-                        self.request.app.org, 'people-settings'),
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'people-settings')
+                    ),
                     attrs={'class': 'settings-link'}
-                ),
+                ))
+
+            links.append(
                 LinkGroup(
                     title=_('Add'),
                     links=[
@@ -1721,8 +1727,9 @@ class PersonCollectionLayout(DefaultLayout):
                             attrs={'class': 'new-person'}
                         )
                     ]
-                ),
-            ]
+                )
+            )
+            return links
         return None
 
 
@@ -2286,6 +2293,7 @@ class ResourcesLayout(DefaultLayout):
                 Link(
                     text=_('Export All'),
                     url=self.request.link(self.model, name='export-all'),
+                    attrs={'class': 'export-link'},
                 ),
                 IFrameLink(
                     text=_('iFrame'),
@@ -2727,14 +2735,15 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
     def editbar_links(self) -> list[Link | LinkGroup]:
         def links() -> Iterator[Link | LinkGroup]:
             if self.request.is_manager:
-                yield Link(
-                    text=_('Settings'),
-                    url=self.request.return_here(
-                        self.request.link(self.request.app.org,
-                                          'event-settings')
-                    ),
-                    attrs={'class': 'edit-link'}
-                )
+                if self.request.is_admin:
+                    yield Link(
+                        text=_('Settings'),
+                        url=self.request.return_here(
+                            self.request.link(self.request.app.org,
+                                              'event-settings')
+                        ),
+                        attrs={'class': 'edit-link'}
+                    )
 
                 yield Link(
                     text=_('Import'),
@@ -3040,20 +3049,24 @@ class NewsletterLayout(DefaultLayout):
             return None
 
         if self.is_collection:
-            links: list[Link | LinkGroup] = [
-                Link(
+            links: list[Link | LinkGroup] = []
+
+            if self.request.is_admin:
+                links.append(Link(
                     text=_('Settings'),
-                    url=self.request.link(
-                        self.request.app.org, 'newsletter-settings'
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'newsletter-settings'
+                        )
                     ),
                     attrs={'class': 'settings-link'},
-                ),
-                Link(
-                    text=_('Subscribers'),
-                    url=self.request.link(self.recipients),
-                    attrs={'class': 'manage-subscribers'},
-                ),
-            ]
+                ))
+
+            links.append(Link(
+                text=_('Subscribers'),
+                url=self.request.link(self.recipients),
+                attrs={'class': 'manage-subscribers'},
+            ))
 
             if self.request.browser_session.has('clipboard_url'):
                 clipboard = Clipboard.from_session(self.request)
