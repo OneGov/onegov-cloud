@@ -117,7 +117,7 @@ def generate_fibu_export_rows(
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=attendance.type,
-            duration_minutes=int(attendance.duration),
+            duration_minutes=attendance.duration,
             is_president=is_president,
             commission_type=(
                 attendance.commission.type if attendance.commission else None

@@ -6,6 +6,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.pas import _
 from sqlalchemy import Enum
+from sqlalchemy import Numeric
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -56,8 +57,9 @@ class Attendence(Base, TimestampMixin):
     #: The date
     date: Mapped[datetime.date] = mapped_column(index=True)
 
-    #: The duration in minutes
-    duration: Mapped[int]
+    #: The duration in minutes. Entered in hours with two places, so a
+    #: duration does not always land on a whole minute (2.01 h = 120.6).
+    duration: Mapped[Decimal] = mapped_column(Numeric(10, 2))
 
     #: The type
     type: Mapped[AttendenceType] = mapped_column(
@@ -143,13 +145,13 @@ class Attendence(Base, TimestampMixin):
             raise ValueError('Duration cannot be negative')
 
         if self.type == 'plenary':
-            return (Decimal(str(self.duration)) / Decimal('60')).quantize(
+            return (self.duration / Decimal('60')).quantize(
                 Decimal('0.01'), rounding=ROUND_HALF_UP
             )
 
         if self.type in ('commission', 'study', 'shortest'):
             # Convert minutes to hours with Decimal for precise calculation
-            duration_hours = Decimal(str(self.duration)) / Decimal('60')
+            duration_hours = self.duration / Decimal('60')
 
             if duration_hours <= Decimal('2'):
                 # Round to 2 decimal places

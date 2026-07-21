@@ -621,7 +621,7 @@ def _get_commission_settlement_data(
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=attendence.type,
-            duration_minutes=int(attendence.duration),
+            duration_minutes=attendence.duration,
             is_president=is_president,
             commission_type=commission.type
         )
@@ -772,7 +772,7 @@ def _get_data_export_all(
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=attendence.type,
-            duration_minutes=int(attendence.duration),
+            duration_minutes=attendence.duration,
             is_president=is_president,
             commission_type=(
                 attendence.commission.type if attendence.commission else None
@@ -851,7 +851,7 @@ def _get_party_settlement_data(
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=attendence.type,
-            duration_minutes=int(attendence.duration),
+            duration_minutes=attendence.duration,
             is_president=is_president,
             commission_type=(
                 attendence.commission.type if attendence.commission else None

@@ -137,7 +137,7 @@ def get_abschlussliste_data(
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
-            duration_minutes=int(att.duration),
+            duration_minutes=att.duration,
             is_president=is_president,
             commission_type=att.commission.type if att.commission else None
         )
@@ -256,7 +256,7 @@ def generate_abschlussliste_xlsx(
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
-            duration_minutes=int(att.duration),
+            duration_minutes=att.duration,
             is_president=is_president,
             commission_type=att.commission.type if att.commission else None
         )
@@ -357,7 +357,7 @@ def generate_buchungen_abrechnungslauf_xlsx(
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
-            duration_minutes=int(att.duration),
+            duration_minutes=att.duration,
             is_president=is_president,
             commission_type=(
                 att.commission.type if att.commission else None

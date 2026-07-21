@@ -275,7 +275,7 @@ def _get_parliamentarian_settlement_data(
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=attendence.type,
-            duration_minutes=int(attendence.duration),
+            duration_minutes=attendence.duration,
             is_president=is_president,
             commission_type=(
                 attendence.commission.type

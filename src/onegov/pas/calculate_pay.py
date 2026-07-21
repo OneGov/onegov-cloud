@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -59,7 +61,7 @@ def calculate_compensation(
 def calculate_attendance_compensation(
     rate_set: RateSet,
     attendence_type: str,
-    duration_minutes: int,
+    duration_minutes: Decimal | int,
     is_president: bool,
     commission_type: str | None = None,
 ) -> Compensation:
@@ -76,10 +78,15 @@ def calculate_attendance_compensation(
     )
 
 
+def periods_of(duration_minutes: Decimal | int, minutes: int) -> int:
+    """How many started periods a duration covers, rounded up."""
+    return math.ceil(Decimal(duration_minutes) / minutes)
+
+
 def calculate_rate(
     rate_set: RateSet,
     attendence_type: str,
-    duration_minutes: int,
+    duration_minutes: Decimal | int,
     is_president: bool,
     commission_type: str | None = None,
 ) -> Decimal:
@@ -119,12 +126,8 @@ def calculate_rate(
                 # This line calculates how many additional 30-minute periods
                 # are needed after the initial 2 hours (120 minutes), with
                 # rounding up.
-                additional_periods = (
-                    duration_minutes - 120 + 29
-                ) // 30  # round up
-                rate = initial + (
-                    additional_periods * additional_per_30min
-                )
+                additional_periods = periods_of(duration_minutes - 120, 30)
+                rate = initial + (additional_periods * additional_per_30min)
 
         else:  # intercantonal
             assert commission_type == 'intercantonal'
@@ -145,9 +148,7 @@ def calculate_rate(
                 if is_president
                 else rate_set.study_normal_member_halfhour
             )
-            periods = (
-                duration_minutes + 29
-            ) // 30  # round up to next 30min
+            periods = periods_of(duration_minutes, 30)
             return Decimal(str(rate_per_30min * periods))
 
         else:  # intercantonal
@@ -156,9 +157,7 @@ def calculate_rate(
                 if is_president
                 else rate_set.study_intercantonal_member_hour
             )
-            periods = (
-                duration_minutes + 59
-            ) // 60  # round up to next hour
+            periods = periods_of(duration_minutes, 60)
             return Decimal(str(rate_per_hour * periods))
 
     elif attendence_type == 'shortest':
@@ -168,7 +167,7 @@ def calculate_rate(
             if is_president
             else rate_set.shortest_all_member_halfhour
         )
-        periods = (duration_minutes + 29) // 30  # round up to next 30min
+        periods = periods_of(duration_minutes, 30)
         return Decimal(str(rate_per_30min * periods))
 
     raise ValueError(

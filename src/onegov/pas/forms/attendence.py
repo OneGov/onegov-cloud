@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import datetime
+
+from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
 
 from wtforms import HiddenField
@@ -21,7 +23,7 @@ from onegov.pas.models import PASCommissionMembership, SettlementRun
 from onegov.pas.models.attendence import TYPES
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
-from wtforms.fields import FloatField
+from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
 from wtforms.validators import InputRequired, ValidationError
 from onegov.user import User
@@ -67,6 +69,23 @@ class SettlementRunBoundMixin:
             self.date.data = settlement_run.start
 
 
+def hours_to_minutes(hours: Decimal | None) -> Decimal:
+    """A duration is entered in hours and stored in minutes. Both are
+    exact, 2.01 h is stored as 120.60 and not as 120.
+
+    """
+    return (hours or Decimal('0')) * 60
+
+
+def minutes_to_hours(minutes: Decimal) -> Decimal:
+    """The inverse of :func:`hours_to_minutes`. Rows written before the
+    duration became fractional are not exact, they get cut down to the two
+    places the field accepts.
+
+    """
+    return (minutes / 60).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+
 class AttendenceForm(Form, SettlementRunBoundMixin):
 
     date = DateField(
@@ -75,7 +94,8 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         default=datetime.date.today
     )
 
-    duration = FloatField(
+    duration = DecimalField(
+        places=2,
         label=_('Duration in hours'),
         validators=[InputRequired()],
     )
@@ -197,7 +217,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
 
     def process_obj(self, obj: Attendence) -> None:  # type:ignore
         super().process_obj(obj)
-        self.duration.data = obj.duration / 60
+        self.duration.data = minutes_to_hours(obj.duration)
 
     def populate_obj(  # type: ignore[override]
         self,
@@ -207,7 +227,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     ) -> None:
         super().populate_obj(obj, exclude, include)
         obj.commission_id = obj.commission_id or None
-        obj.duration *= 60
+        obj.duration = hours_to_minutes(obj.duration)
         if obj.type == 'plenary':
             obj.commission_id = None
 
@@ -216,7 +236,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         result['commission_id'] = result.get('commission_id') or None
         if result.get('type', '') == 'plenary':
             result['commission_id'] = None
-        result['duration'] = int(60 * (result.get('duration') or 0))
+        result['duration'] = hours_to_minutes(result.get('duration'))
         return result
 
     def on_request(self) -> None:
@@ -398,7 +418,8 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         default=datetime.date.today
     )
 
-    duration = FloatField(
+    duration = DecimalField(
+        places=2,
         label=_('Duration in hours'),
         validators=[InputRequired()],
     )
@@ -410,7 +431,7 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
-        result['duration'] = int(60 * (result.get('duration') or 0))
+        result['duration'] = hours_to_minutes(result.get('duration'))
         return result
 
     def on_request(self) -> None:
@@ -446,7 +467,8 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
         default='commission',
     )
 
-    duration = FloatField(
+    duration = DecimalField(
+        places=2,
         label=_('Duration in hours'),
         validators=[InputRequired()],
     )
@@ -469,7 +491,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
-        result['duration'] = int(60 * (result.get('duration') or 0))
+        result['duration'] = hours_to_minutes(result.get('duration'))
         return result
 
     def on_request(self) -> None:
@@ -497,7 +519,8 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
         default=datetime.date.today
     )
 
-    duration = FloatField(
+    duration = DecimalField(
+        places=2,
         label=_('Duration in hours'),
         validators=[InputRequired()],
     )
@@ -526,7 +549,7 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
-        result['duration'] = int(60 * (result.get('duration') or 0))
+        result['duration'] = hours_to_minutes(result.get('duration'))
         return result
 
     def on_request(self) -> None:
@@ -564,7 +587,7 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
             if is_active_kantonsrat_member(m.parliamentarian)
         ]
 
-        self.duration.data = obj.duration / 60
+        self.duration.data = minutes_to_hours(obj.duration)
         self.abschluss.data = obj.abschluss
 
         attendences = AttendenceCollection(
@@ -589,7 +612,7 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
         ]
 
     def populate_obj(self, obj: Attendence) -> None:  # type: ignore[override]
-        obj.duration = int(60 * (self.duration.data or 0))
+        obj.duration = hours_to_minutes(self.duration.data)
         obj.date = self.date.data  # type: ignore[assignment]
         obj.commission_id = self.commission_id.data
         obj.abschluss = self.abschluss.data
@@ -605,7 +628,7 @@ class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
 
     def process_obj(self, obj: Attendence) -> None:   # type: ignore[override]
         super().process_obj(obj)
-        self.duration.data = obj.duration / 60
+        self.duration.data = minutes_to_hours(obj.duration)
 
         attendences = AttendenceCollection(
                 self.request.session).query().filter_by(
@@ -632,7 +655,7 @@ class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
         self.delete_field('commission_id')
 
     def populate_obj(self, obj: Attendence) -> None:  # type: ignore[override]
-        obj.duration = int(60 * (self.duration.data or 0))
+        obj.duration = hours_to_minutes(self.duration.data)
         obj.date = self.date.data  # type: ignore[assignment]
 
 
@@ -644,7 +667,8 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
         default=datetime.date.today
     )
 
-    duration = FloatField(
+    duration = DecimalField(
+        places=2,
         label=_('Duration in hours'),
         validators=[InputRequired()],
     )
@@ -671,7 +695,7 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         result = super().get_useful_data()
         result['commission_id'] = self.model.id
-        result['duration'] = int(60 * (result.get('duration') or 0))
+        result['duration'] = hours_to_minutes(result.get('duration'))
         return result
 
     def on_request(self) -> None:
