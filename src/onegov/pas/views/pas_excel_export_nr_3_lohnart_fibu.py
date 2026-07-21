@@ -17,7 +17,7 @@ from onegov.pas.models.presidential_allowance import (
     LOHNART_ALLOWANCE_NR,
     LOHNART_ALLOWANCE_TEXT,
 )
-from onegov.pas.utils import is_commission_president
+from onegov.pas.utils import is_president_for_attendance
 
 
 from typing import TYPE_CHECKING
@@ -111,7 +111,7 @@ def generate_fibu_export_rows(
             lohnart_nr = lohnart_info['nr']
             lohnart_text = lohnart_info['text']
 
-        is_president = is_commission_president(
+        is_president = is_president_for_attendance(
             parliamentarian, attendance, settlement_run
         )
         compensation = calculate_attendance_compensation(

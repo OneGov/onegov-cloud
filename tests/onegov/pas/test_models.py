@@ -204,7 +204,7 @@ def test_attendence_calculate_value_precision(session: Session) -> None:
     session.flush()
     assert str(att_3.calculate_value()) == '3.50'
 
-    # plenary is returned verbatim
+    # plenary keeps the actual hours, but not more than two places
     att_4 = Attendence(
         date=date(2022, 1, 3),
         duration=h(3.25),
@@ -214,6 +214,16 @@ def test_attendence_calculate_value_precision(session: Session) -> None:
     session.add(att_4)
     session.flush()
     assert str(att_4.calculate_value()) == '3.25'
+
+    att_plenary = Attendence(
+        date=date(2022, 1, 3),
+        duration=205,
+        type='plenary',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_plenary)
+    session.flush()
+    assert str(att_plenary.calculate_value()) == '3.42'
 
     att_5 = Attendence(
         date=date(2022, 1, 4),

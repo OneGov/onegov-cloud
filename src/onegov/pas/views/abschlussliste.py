@@ -1,7 +1,7 @@
 from __future__ import annotations
 from collections import defaultdict
 from io import BytesIO
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from operator import itemgetter
 import xlsxwriter
 
@@ -18,7 +18,7 @@ from onegov.pas.models.presidential_allowance import (
     LOHNART_ALLOWANCE_TEXT,
 )
 from onegov.pas.utils import get_parliamentarians_with_settlements
-from onegov.pas.utils import is_commission_president
+from onegov.pas.utils import is_president_for_attendance
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.pas.models.party import Party
 from sqlalchemy import or_
@@ -133,7 +133,7 @@ def get_abschlussliste_data(
 
     for att in attendances:
         p = att.parliamentarian
-        is_president = is_commission_president(p, att, settlement_run)
+        is_president = is_president_for_attendance(p, att, settlement_run)
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
@@ -252,7 +252,7 @@ def generate_abschlussliste_xlsx(
     for details_row_num, att in enumerate(attendances, start=1):
         p = att.parliamentarian
         party = details_party_lookup[str(p.id)]
-        is_president = is_commission_president(p, att, settlement_run)
+        is_president = is_president_for_attendance(p, att, settlement_run)
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
@@ -349,7 +349,7 @@ def generate_buchungen_abrechnungslauf_xlsx(
         party_name = party.name if party else ''
 
         # Calculate rates
-        is_president = is_commission_president(
+        is_president = is_president_for_attendance(
             parliamentarian,
             att,
             settlement_run,
@@ -463,11 +463,7 @@ def generate_buchungen_abrechnungslauf_xlsx(
         worksheet.write(
             row_num,
             5,
-            float(
-                row_data['value'].quantize(
-                    Decimal('0.01'), rounding=ROUND_HALF_UP
-                )
-            ),
+            float(row_data['value']),
             cell_format,
         )
         worksheet.write(

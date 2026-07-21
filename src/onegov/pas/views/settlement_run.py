@@ -45,6 +45,7 @@ from onegov.pas.utils import (
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
     is_commission_president,
+    is_president_for_attendance,
 )
 from onegov.pas.views.abschlussliste import (
     generate_abschlussliste_xlsx,
@@ -541,6 +542,8 @@ def generate_settlement_pdf(
     else:
         raise ValueError(f'Unsupported entity type: {entity_type}')
 
+    # the Amtliche Mission belongs to the person, it shall only be listed
+    # on the parliamentarian export and on the overview across all parties
     allowances = (
         PresidentialAllowanceCollection(
             request.session,
@@ -548,6 +551,8 @@ def generate_settlement_pdf(
         )
         .query()
         .all()
+        if entity_type == 'all'
+        else []
     )
 
     if allowances:
@@ -668,7 +673,8 @@ def _generate_settlement_html(
                <td>{settlement_row[0].strftime('%d.%m.%Y')}</td>
                <td>{name}</td>
                <td>{settlement_row[2]}</td>
-               <td class="numeric">{settlement_row[3]}</td>
+               <td class="numeric">{format_swiss_number(
+                   settlement_row[3])}</td>
                <td class="numeric">{format_swiss_number(
                    settlement_row[4])}</td>
                <td class="numeric">{format_swiss_number(
@@ -759,7 +765,7 @@ def _get_data_export_all(
     settlement_data: list[SettlementDataRow] = []
 
     for attendence in attendences.query():
-        is_president = is_commission_president(
+        is_president = is_president_for_attendance(
             attendence.parliamentarian, attendence, self
         )
 
@@ -838,7 +844,7 @@ def _get_party_settlement_data(
             continue
 
         # found an export
-        is_president = is_commission_president(
+        is_president = is_president_for_attendance(
             attendence.parliamentarian, attendence, settlement_run
         )
 

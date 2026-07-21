@@ -143,7 +143,9 @@ class Attendence(Base, TimestampMixin):
             raise ValueError('Duration cannot be negative')
 
         if self.type == 'plenary':
-            return Decimal(str(self.duration)) / Decimal('60')
+            return (Decimal(str(self.duration)) / Decimal('60')).quantize(
+                Decimal('0.01'), rounding=ROUND_HALF_UP
+            )
 
         if self.type in ('commission', 'study', 'shortest'):
             # Convert minutes to hours with Decimal for precise calculation

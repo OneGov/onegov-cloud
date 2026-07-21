@@ -129,6 +129,38 @@ def format_swiss_number(value: Decimal | int) -> str:
     return format_decimal(value, format='#,##0.00', locale='de_CH')
 
 
+def is_kantonsrat_president(
+    parliamentarian: PASParliamentarian,
+    on_date: date,
+) -> bool:
+    """The Kantonsratspräsidium is a role on the parliamentarian and not a
+    commission membership.
+
+    """
+    return any(
+        role.role == 'president'
+        and _is_kantonsrat_role(role)
+        and (role.start is None or role.start <= on_date)
+        and (role.end is None or role.end >= on_date)
+        for role in parliamentarian.roles
+    )
+
+
+def is_president_for_attendance(
+    parliamentarian: PASParliamentarian,
+    attendance: Attendence,
+    settlement_run: SettlementRun,
+) -> bool:
+    """Whether the president rate applies. A plenary session has no
+    commission, there the Kantonsratspräsidium decides.
+
+    """
+    if attendance.type == 'plenary':
+        return is_kantonsrat_president(parliamentarian, attendance.date)
+
+    return is_commission_president(parliamentarian, attendance, settlement_run)
+
+
 def is_commission_president(
     parliamentarian: PASParliamentarian,
     attendance_or_commission_id: Attendence | UUID,

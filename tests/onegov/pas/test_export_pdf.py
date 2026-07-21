@@ -25,15 +25,18 @@ from onegov.pas.models import (
 )
 from onegov.pas.models.presidential_allowance import (
     LOHNART_ALLOWANCE_TEXT,
+    PresidentialAllowance,
 )
+import onegov.pas.views.settlement_run as settlement_run_views
 from onegov.pas.views.settlement_run import _get_commission_settlement_data
 from onegov.pas.views.settlement_run import _settlement_totals
+from onegov.pas.views.settlement_run import generate_settlement_pdf
 from onegov.town6.request import TownRequest
 from unittest.mock import Mock
 import pytest
 
 
-from typing import TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
@@ -469,3 +472,260 @@ def test_commission_export_one_member_one_president(session: Session) -> None:
             Decimal('6265.00'),
         ),
     ]
+
+
+def _settlement_pdf_html(
+    settlement_run: SettlementRun,
+    request: TownRequest,
+    entity_type: Literal['all', 'commission', 'party'],
+    entity: PASCommission | Party | None,
+    monkeypatch: pytest.MonkeyPatch,
+) -> str:
+    html = Mock()
+    html.write_pdf.return_value = b'%PDF'
+    html_factory = Mock(return_value=html)
+    monkeypatch.setattr(settlement_run_views, 'HTML', html_factory)
+    monkeypatch.setattr(settlement_run_views, 'CSS', Mock())
+    monkeypatch.setattr(settlement_run_views, 'FontConfiguration', Mock())
+
+    generate_settlement_pdf(settlement_run, request, entity_type, entity)
+    return html_factory.call_args.kwargs['string']
+
+
+def test_settlement_pdf_formats_hours_as_decimal(
+    session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rate_set = RateSet(
+        year=2024,
+        cost_of_living_adjustment=Decimal('21.935'),
+        plenary_none_member_halfday=Decimal('43'),
+    )
+    settlement_run = SettlementRun(
+        name='Q1 2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 3, 31),
+        active=True,
+    )
+    parliamentarian = PASParliamentarian(
+        first_name='Jane',
+        last_name='Member',
+        gender='female',
+    )
+    party = Party(name='Test Party')
+    session.add_all(
+        [
+            rate_set,
+            settlement_run,
+            parliamentarian,
+            party,
+            PASParliamentarianRole(
+                parliamentarian=parliamentarian,
+                role='member',
+                party=party,
+                start=date(2024, 1, 1),
+            ),
+            Attendence(
+                parliamentarian=parliamentarian,
+                date=date(2024, 1, 15),
+                duration=205,
+                type='plenary',
+            ),
+        ]
+    )
+    session.flush()
+
+    request = Mock(spec=TownRequest)
+    request.session = session
+    request.translate = lambda value: value
+
+    entities: tuple[tuple[Literal['all', 'party'], Party | None], ...] = (
+        ('all', None),
+        ('party', party),
+    )
+    for entity_type, entity in entities:
+        html = _settlement_pdf_html(
+            settlement_run, request, entity_type, entity, monkeypatch
+        )
+        assert '3.416666' not in html
+        assert '<td class="numeric">3.42</td>' in html
+
+
+def test_settlement_pdf_lists_allowances_only_in_overview(
+    session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The Amtliche Mission is only listed on the personal settlement and
+    on the overview across all parties, never on a party or commission."""
+
+    rate_set = RateSet(
+        year=2024,
+        cost_of_living_adjustment=Decimal('0'),
+        study_normal_member_halfhour=Decimal('26'),
+    )
+    settlement_run = SettlementRun(
+        name='Q1 2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 3, 31),
+        active=True,
+    )
+    commission = PASCommission(name='Test Commission', type='normal')
+    left = Party(name='Left')
+    right = Party(name='Right')
+    presiding = PASParliamentarian(
+        first_name='Anna',
+        last_name='President',
+        gender='female',
+    )
+    other = PASParliamentarian(
+        first_name='Max',
+        last_name='Member',
+        gender='male',
+    )
+    session.add_all(
+        [
+            rate_set,
+            settlement_run,
+            commission,
+            left,
+            right,
+            presiding,
+            other,
+            PASParliamentarianRole(
+                parliamentarian=presiding,
+                role='member',
+                party=left,
+                start=date(2024, 1, 1),
+            ),
+            PASParliamentarianRole(
+                parliamentarian=other,
+                role='member',
+                party=right,
+                start=date(2024, 1, 1),
+            ),
+            PASCommissionMembership(
+                commission=commission,
+                parliamentarian=other,
+                role='member',
+                start=date(2024, 1, 1),
+            ),
+            Attendence(
+                parliamentarian=other,
+                date=date(2024, 2, 15),
+                duration=60,
+                type='study',
+                commission=commission,
+            ),
+        ]
+    )
+    session.flush()
+    session.add(
+        PresidentialAllowance(
+            role='president',
+            amount=5000,
+            parliamentarian_id=presiding.id,
+            settlement_run_id=settlement_run.id,
+        )
+    )
+    session.flush()
+
+    request = Mock(spec=TownRequest)
+    request.session = session
+    request.translate = lambda value: value
+
+    commission_html = _settlement_pdf_html(
+        settlement_run, request, 'commission', commission, monkeypatch
+    )
+    assert LOHNART_ALLOWANCE_TEXT not in commission_html
+    assert '5,000.00' not in commission_html
+
+    right_html = _settlement_pdf_html(
+        settlement_run, request, 'party', right, monkeypatch
+    )
+    assert LOHNART_ALLOWANCE_TEXT not in right_html
+
+    left_html = _settlement_pdf_html(
+        settlement_run, request, 'party', left, monkeypatch
+    )
+    assert LOHNART_ALLOWANCE_TEXT not in left_html
+
+    all_html = _settlement_pdf_html(
+        settlement_run, request, 'all', None, monkeypatch
+    )
+    assert LOHNART_ALLOWANCE_TEXT in all_html
+
+
+def test_plenary_uses_the_kantonsrat_president_rate(session: Session) -> None:
+    """A plenary session has no commission, the president rate is decided
+    by the Kantonsratspräsidium."""
+
+    rate_set = RateSet(
+        year=2024,
+        cost_of_living_adjustment=Decimal('0'),
+        plenary_none_president_halfday=Decimal('500'),
+        plenary_none_member_halfday=Decimal('300'),
+    )
+    settlement_run = SettlementRun(
+        name='Q1 2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 3, 31),
+        active=True,
+    )
+    president = PASParliamentarian(
+        first_name='Anna',
+        last_name='President',
+        gender='female',
+    )
+    member = PASParliamentarian(
+        first_name='Max',
+        last_name='Member',
+        gender='male',
+    )
+    party = Party(name='Test Party')
+    president_role = PASParliamentarianRole(
+        parliamentarian=president,
+        role='president',
+        party=party,
+        start=date(2023, 12, 20),
+    )
+    president_role.meta = {'org_type': 'Kantonsrat'}
+    member_role = PASParliamentarianRole(
+        parliamentarian=member,
+        role='member',
+        party=party,
+        start=date(2023, 12, 20),
+    )
+    member_role.meta = {'org_type': 'Kantonsrat'}
+    session.add_all(
+        [
+            rate_set,
+            settlement_run,
+            party,
+            president,
+            member,
+            president_role,
+            member_role,
+            Attendence(
+                parliamentarian=president,
+                date=date(2024, 1, 15),
+                duration=205,
+                type='plenary',
+            ),
+            Attendence(
+                parliamentarian=member,
+                date=date(2024, 1, 15),
+                duration=205,
+                type='plenary',
+            ),
+        ]
+    )
+    session.flush()
+
+    request = Mock(spec=TownRequest)
+    request.session = session
+    request.translate = lambda value: value
+
+    amounts = sorted(
+        row[12] for row in generate_fibu_export_rows(settlement_run, request)
+    )
+    assert amounts == [Decimal('300'), Decimal('500')]
