@@ -18,7 +18,11 @@ from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.utils import path_to_filename
-from onegov.form.validators import ValidPhoneNumber, WhitelistedMimeType
+from onegov.form.validators import (
+    ValidPhoneNumber,
+    WhitelistedMimeType,
+    PhoneNumberType,
+)
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import LinkPanelWidget
 from onegov.form.widgets import DurationInput
@@ -786,13 +790,27 @@ class PhoneNumberField(TelField):
         self.country = country
         super().__init__(*args, **kwargs)
 
-        # ensure the ValidPhoneNumber validator gets added
+        allowed_types = {None, *(v.value for v in PhoneNumberType)}
+        assert number_type in allowed_types, (
+            'Invalid number type: {}. Allowed are: {}'.format(
+                # sets have no stable order, so we sort for a stable message
+                number_type, sorted(allowed_types, key=str)
+            )
+        )
+
+        # add a ValidPhoneNumber validator, unless one was passed in
         if not any(isinstance(v, ValidPhoneNumber) for v in self.validators):
-            # validators can be any sequence type, so it might not be mutable
-            # so we have to first convert to a list if that's the case
             if not isinstance(self.validators, list):
                 self.validators = list(self.validators)
-            self.validators.append(ValidPhoneNumber(self.country))
+
+            self.validators.append(
+                ValidPhoneNumber(
+                    self.country,
+                    phone_type=PhoneNumberType.ANY.value
+                    if not number_type
+                    else PhoneNumberType(number_type).value,
+                )
+            )
 
     @property
     def formatted_data(self) -> str | None:

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-09 12:54+0200\n"
+"POT-Creation-Date: 2026-07-21 11:56+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -254,6 +254,30 @@ msgstr ""
 
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
+
+msgid "Not a valid country code."
+msgstr ""
+
+msgid "This phone number has an invalid length."
+msgstr ""
+
+msgid "Please include the area code."
+msgstr ""
+
+msgid "This phone number does not exist."
+msgstr ""
+
+msgid "Please enter a mobile phone number."
+msgstr ""
+
+msgid "Please enter a landline phone number."
+msgstr ""
+
+#, python-format
+msgid ""
+"Phone numbers from this country are not supported. Allowed countries: "
+"${countries}"
+msgstr ""
 
 msgid "Not a valid swiss social security number."
 msgstr ""

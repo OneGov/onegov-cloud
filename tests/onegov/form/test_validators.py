@@ -102,8 +102,11 @@ def test_phone_number_validator() -> None:
     assert error(1234) == 'Not a valid phone number.'
     assert error('not a number') == 'Not a valid phone number.'
 
-    # swiss numbers are 9 or 12 digits long, so anything shorter, longer
-    # or in between reports the same length error
+    # an unknown country code is rejected by the parser
+    assert error('+9991234567') == 'Not a valid country code.'
+    assert error('+99912345') == 'Not a valid country code.'
+
+    # swiss numbers are 9 or 12 digits long, everything else is invalid
     invalid_length = 'This phone number has an invalid length.'
     assert error('1234') == invalid_length
     assert error('00791112233') == invalid_length
@@ -194,8 +197,9 @@ def test_phone_number_validator() -> None:
     assert error('+390612345678').startswith(unsupported)  # IT
 
     # the default country has to be part of the whitelist
-    with raises(AssertionError):
+    with raises(AssertionError) as ex:
         ValidPhoneNumber(country='DE', country_whitelist={'CH'})
+    assert "Invalid country code: DE. Allowed are: ['CH']" in str(ex.value)
 
 
 def test_input_required_if_validator() -> None:

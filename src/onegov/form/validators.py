@@ -686,10 +686,12 @@ class ValidPhoneNumber:
     unknown_number = _('This phone number does not exist.')
     mobile_required = _('Please enter a mobile phone number.')
     fixed_line_required = _('Please enter a landline phone number.')
+    unsupported_country = _(
+        'Phone numbers from this country are not supported. '
+        'Allowed countries: ${countries}'
+    )
 
     length_errors = {
-        phonenumbers.ValidationResult.INVALID_COUNTRY_CODE:
-            invalid_country_code,
         phonenumbers.ValidationResult.TOO_SHORT: invalid_number_length,
         phonenumbers.ValidationResult.TOO_LONG: invalid_number_length,
         phonenumbers.ValidationResult.INVALID_LENGTH: invalid_number_length,
@@ -721,7 +723,11 @@ class ValidPhoneNumber:
         phone_type: str = PhoneNumberType.ANY.value
     ):
         if country_whitelist:
-            assert country in country_whitelist
+            assert country in country_whitelist, (
+                'Invalid country code: {}. Allowed are: {}'.format(
+                    country, sorted(country_whitelist)
+                )
+            )
 
         self.country = country
         self.country_whitelist = country_whitelist
@@ -733,6 +739,10 @@ class ValidPhoneNumber:
 
         try:
             number = phonenumbers.parse(field.data, self.country)
+        except phonenumbers.NumberParseException as exception:
+            if exception.error_type == exception.INVALID_COUNTRY_CODE:
+                raise ValidationError(self.invalid_country_code) from exception
+            raise ValidationError(self.invalid_phone_number) from exception
         except Exception as exception:
             raise ValidationError(self.invalid_phone_number) from exception
 
@@ -749,8 +759,7 @@ class ValidPhoneNumber:
             region = phonenumbers.region_code_for_number(number)
             if region not in self.country_whitelist:
                 raise ValidationError(_(
-                    'Phone numbers from this country are not supported. '
-                    'Allowed countries: ${countries}', mapping={
+                    self.unsupported_country, mapping={
                         'countries': ', '.join(sorted(self.country_whitelist))
                     }
                 ))

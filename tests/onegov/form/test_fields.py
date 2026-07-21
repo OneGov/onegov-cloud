@@ -25,6 +25,7 @@ from onegov.form.fields import UploadMultipleField
 from onegov.form.fields import URLField
 from onegov.form.validators import (
     ValidPhoneNumber, WhitelistedMimeType, MIME_TYPES_JSON, MIME_TYPES_PDF)
+from pytest import raises
 from unittest.mock import patch
 from wtforms.validators import Optional, DataRequired
 from wtforms.validators import URL
@@ -555,6 +556,67 @@ def test_phone_number_field() -> None:
     assert not field.validate(form)
     field.data = '0411112233'
     assert field.validate(form)
+
+    # the number type is passed on to the validator that gets added
+    form = Form()
+    field = PhoneNumberField(number_type=None)
+    field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
+    assert field.validators[-1].phone_type == 'any'
+    field.data = '0791112233'
+    assert field.validate(form)
+    field.data = '0411112233'
+    assert field.validate(form)
+
+    # without a number type any kind of phone number is accepted
+    form = Form()
+    field = PhoneNumberField()
+    field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
+    assert field.validators[-1].phone_type == 'any'
+    field.data = '0411112233'
+    assert field.validate(form)
+
+    form = Form()
+    field = PhoneNumberField(number_type='mobile')
+    field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
+    assert field.validators[-1].phone_type == 'mobile'
+    field.data = '0791112233'
+    assert field.validate(form)
+    field.data = '0411112233'
+    assert not field.validate(form)
+
+    form = Form()
+    field = PhoneNumberField(number_type='fixed_line')
+    field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
+    assert field.validators[-1].phone_type == 'fixed_line'
+    field.data = '0791112233'
+    assert not field.validate(form)
+    field.data = '0411112233'
+    assert field.validate(form)
+
+    # an explicitly passed in validator wins, so the number type is ignored
+    form = Form()
+    field = PhoneNumberField(
+        number_type='mobile',
+        validators=[ValidPhoneNumber(country='CH')]
+    )
+    field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
+    field.data = '0411112233'
+    assert field.validate(form)
+
+    # an unknown number type fails as soon as the field is bound, since
+    # that is when the field actually gets constructed
+    form = Form()
+    field = PhoneNumberField(number_type=None)
+    field.bind(form, 'phone_number')  # type: ignore[attr-defined]
+
+    field = PhoneNumberField(number_type='landline')
+    with raises(AssertionError) as ex:
+        field.bind(form, 'phone_number')  # type: ignore[attr-defined]
+    assert (
+        "Invalid number type: landline. Allowed are: "
+        "[None, 'any', 'fixed_line', 'mobile']"
+        in str(ex.value)
+    )
 
 
 def test_chosen_select_field() -> None:
