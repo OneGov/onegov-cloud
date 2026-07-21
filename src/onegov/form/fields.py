@@ -775,7 +775,13 @@ class IconField(StringField):
 class PhoneNumberField(TelField):
     """ A string field with support for phone numbers. """
 
-    def __init__(self, *args: Any, country: str = 'CH', **kwargs: Any):
+    def __init__(
+        self,
+        *args: Any,
+        country: str = 'CH',
+        number_type: str | None = None,
+        **kwargs: Any
+    ):
 
         self.country = country
         super().__init__(*args, **kwargs)
