@@ -468,10 +468,10 @@
                 </a>
             </tal:b>
             <tal:b condition="not: button_text|nothing">
-                <input type="submit" value="Submit" class="button" i18n:attributes="value">
+                <input type="submit" value="Submit" class="btn btn-primary" i18n:attributes="value">
             </tal:b>
             <tal:b condition="button_text|nothing">
-                <input type="submit" value="${button_text}" class="button" role="button">
+                <input type="submit" value="${button_text}" class="btn btn-primary" role="button">
             </tal:b>
             <a tal:condition="not hide_cancel|False" class="cancel-link" href="#" data-back-link> <span i18n:translate="">Cancel</span></a>
         </tal:b>

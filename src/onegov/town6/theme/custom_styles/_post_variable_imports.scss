@@ -1,3 +1,4 @@
+// Spacers
 $spacers: map-merge($spacers, (
   "xs":  .25rem,   // 4px
   "sm":  .5rem,    // 8px
@@ -21,6 +22,7 @@ $gutters: $spacers;
   }
 }
 
+// Cards
 $card-spacer-y: map-get($spacers, "lg"); // 1.5rem / 24px
 $card-spacer-x: map-get($spacers, "lg"); // 1.5rem / 24px
 $card-border-width: 2px;
@@ -32,6 +34,19 @@ $border-radius-lg:    1.25rem;  // 20px
 $border-radius-xl:    2.5rem;   // 40px
 $border-radius-pill:  6.25rem;  // 100px
 
+//Buttons
 $btn-border-radius:     $border-radius-pill;
 $btn-border-radius-sm:  $border-radius-pill;
 $btn-border-radius-lg:  $border-radius-pill;
+
+$btn-padding-y:    map-get($spacers, "md");
+$btn-padding-x:    map-get($spacers, "lg");
+$btn-font-size:    map-get($font-sizes, "xs");
+
+$btn-padding-y-sm: map-get($spacers, "sm");
+$btn-padding-x-sm: map-get($spacers, "md");
+$btn-font-size-sm: map-get($font-sizes, "xs");
+
+$btn-padding-y-lg: map-get($spacers, "md");
+$btn-padding-x-lg: map-get($spacers, "lg");
+$btn-font-size-lg: map-get($font-sizes, "sm");
