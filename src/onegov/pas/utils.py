@@ -4,7 +4,7 @@ import niquests
 
 from babel.numbers import format_decimal
 from datetime import date
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from lxml import html
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import PASCommission
@@ -127,16 +127,6 @@ def format_swiss_number(value: Decimal | int) -> str:
         value = Decimal(value)
 
     return format_decimal(value, format='#,##0.00', locale='de_CH')
-
-
-def round_to_five_rappen(value: Decimal | int) -> Decimal:
-    """Round a decimal value to the nearest 5 Rappen (0.05 CHF)."""
-    if isinstance(value, int):
-        value = Decimal(value)
-
-    return (value / Decimal('0.05')).quantize(
-        Decimal('1'), rounding=ROUND_HALF_UP
-    ) * Decimal('0.05')
 
 
 def is_commission_president(

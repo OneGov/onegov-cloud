@@ -4,6 +4,7 @@ import transaction
 
 from datetime import date
 from decimal import Decimal
+from io import BytesIO
 from onegov.pas.models import (
     Attendence,
     PASParliamentarian,
@@ -13,6 +14,7 @@ from onegov.pas.models import (
 )
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.settlement_run import SettlementRun
+from openpyxl import load_workbook
 
 
 from typing import TYPE_CHECKING
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
     from .conftest import TestPasApp
 
 
-def test_export_abschlussliste_xlsx(client: Client[TestPasApp]) -> None:
+def test_export_xlsx(client: Client[TestPasApp]) -> None:
 
     client.login_admin()
     session = client.app.session()
@@ -31,7 +33,7 @@ def test_export_abschlussliste_xlsx(client: Client[TestPasApp]) -> None:
     rate_set = RateSet(
         year=2024,
         cost_of_living_adjustment=Decimal('2.0'),  # 2%
-        plenary_none_member_halfday=Decimal('100'),
+        plenary_none_member_halfday=Decimal('100.03'),
         commission_normal_member_initial=Decimal('50'),
         study_normal_member_halfhour=Decimal('20'),
         shortest_all_member_halfhour=Decimal('15')
@@ -74,8 +76,16 @@ def test_export_abschlussliste_xlsx(client: Client[TestPasApp]) -> None:
 
     attendances = [
         Attendence(
-            parliamentarian=parliamentarian1, date=date(2024, 1, 10),
-            duration=240, type='plenary'
+            parliamentarian=parliamentarian1,
+            date=date(2024, 1, 10),
+            duration=205,
+            type='plenary',
+        ),
+        Attendence(
+            parliamentarian=parliamentarian1,
+            date=date(2024, 1, 11),
+            duration=205,
+            type='plenary',
         ),
         Attendence(
             parliamentarian=parliamentarian1, date=date(2024, 1, 15),
@@ -113,3 +123,39 @@ def test_export_abschlussliste_xlsx(client: Client[TestPasApp]) -> None:
     response = client.get(export_link)
 
     assert response.status_code == 200
+    workbook = load_workbook(BytesIO(response.body), data_only=True)
+    overview = workbook['Übersicht']
+    details = workbook['Details']
+    assert Decimal(str(overview.cell(row=2, column=6).value)) == Decimal(
+        '200.10'
+    )
+    plenary_rows = [
+        row
+        for row in details.iter_rows(min_row=2, values_only=True)
+        if row[0] in ('10.01.2024', '11.01.2024')
+    ]
+    assert [Decimal(str(row[8])) for row in plenary_rows] == [
+        Decimal('100.05'),
+        Decimal('100.05'),
+    ]
+
+    export_link = page.pyquery(
+        'a:contains("Buchungen Abrechnungslauf (Kontrollliste)")'
+    ).attr('href')
+    response = client.get(export_link)
+
+    assert response.status_code == 200
+    workbook = load_workbook(BytesIO(response.body), data_only=True)
+    worksheet = workbook['Buchungen Abrechnungslauf']
+    assert [worksheet.cell(row=row, column=6).value for row in (2, 3)] == [
+        3.42,
+        3.42,
+    ]
+    assert [worksheet.cell(row=row, column=7).value for row in (2, 3)] == [
+        100.05,
+        100.05,
+    ]
+    assert [worksheet.cell(row=row, column=8).value for row in (2, 3)] == [
+        102.05,
+        102.05,
+    ]

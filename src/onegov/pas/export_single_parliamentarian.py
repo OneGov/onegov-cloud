@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from onegov.pas.calculate_pay import calculate_rate
+from onegov.pas.calculate_pay import calculate_attendance_compensation
+from onegov.pas.calculate_pay import calculate_compensation
 from onegov.pas.collections import (
     AttendenceCollection,
 )
@@ -18,7 +19,6 @@ from onegov.pas.models.presidential_allowance import (
 )
 from onegov.pas.utils import is_commission_president
 from onegov.pas.utils import format_swiss_number
-from onegov.pas.utils import round_to_five_rappen
 from onegov.core.utils import module_path
 from weasyprint import HTML, CSS  # type: ignore[import-untyped]
 from weasyprint.text.fonts import (  # type: ignore[import-untyped]
@@ -37,8 +37,8 @@ class ParliamentarianEntry:
     date: date
     type_description: str
     calculated_value: Decimal
-    additional_value: Decimal
     base_rate: Decimal
+    adjusted_rate: Decimal
     attendance_type: AttendenceType
 
 
@@ -67,9 +67,6 @@ def generate_parliamentarian_settlement_pdf(
     font_config = FontConfiguration()
     session = request.session
     rate_set = get_current_rate_set(session, settlement_run)
-    cola_multiplier = Decimal(
-        str(1 + (rate_set.cost_of_living_adjustment / 100))
-    )
     quarter = settlement_run.get_run_number_for_year(settlement_run.end)
     css_path = module_path(
         'onegov.pas', 'views/templates/parliamentarian_settlement_pdf.css'
@@ -99,12 +96,6 @@ def generate_parliamentarian_settlement_pdf(
         .query()
         .filter(PresidentialAllowance.parliamentarian_id == parliamentarian.id)
         .all()
-    )
-    cola_multiplier = Decimal(
-        str(1 + (rate_set.cost_of_living_adjustment / 100))
-    )
-    allowance_total = (
-        Decimal(sum(a.amount for a in allowances)) * cola_multiplier
     )
     full_name = (
         f'{parliamentarian.first_name} '
@@ -162,25 +153,30 @@ def generate_parliamentarian_settlement_pdf(
                 <td>{entry.date.strftime('%d.%m.%Y')}</td>
                 <td>{entry.type_description}</td>
                 <td class="numeric">{format_swiss_number(
-                    round_to_five_rappen(entry.calculated_value))}</td>
+                    entry.calculated_value)}</td>
                 <td class="numeric">{format_swiss_number(
-                    round_to_five_rappen(entry.base_rate))}</td>
+                    entry.base_rate)}</td>
             </tr>
         """
         if entry.type_description not in ['Total', 'Auszahlung']:
             type_totals[entry.attendance_type]['entries'].append(entry)
-            type_totals[entry.attendance_type]['total'] += entry.base_rate
+            type_totals[entry.attendance_type]['total'] += entry.adjusted_rate
 
+    allowance_total = Decimal('0')
     for allowance in allowances:
-        amount = Decimal(str(allowance.amount))
+        compensation = calculate_compensation(
+            allowance.amount,
+            rate_set.cost_of_living_adjustment,
+        )
+        allowance_total += compensation.adjusted
         html += f"""
             <tr>
                 <td>{settlement_run.end.strftime('%d.%m.%Y')}</td>
                 <td>{LOHNART_ALLOWANCE_TEXT}</td>
                 <td class="numeric">{format_swiss_number(
-                    round_to_five_rappen(amount))}</td>
+                    compensation.base)}</td>
                 <td class="numeric">{format_swiss_number(
-                    round_to_five_rappen(amount))}</td>
+                    compensation.base)}</td>
             </tr>
         """
 
@@ -195,10 +191,6 @@ def generate_parliamentarian_settlement_pdf(
     # Now, start building the second part of the report document. Notice that
     # this one now is *with* cost of living adjustment.
     total = Decimal('0')
-    total = Decimal('0')
-    cola_multiplier = Decimal(
-        str(1 + (rate_set.cost_of_living_adjustment / 100))
-    )
     type_mappings: list[tuple[str, TotalType]] = [
         ('Total aller Plenarsitzungen inkl. Teuerungszulage',
          'plenary'),
@@ -216,33 +208,27 @@ def generate_parliamentarian_settlement_pdf(
             entry.calculated_value
             for entry in type_totals[type_key]['entries']
         )
-        total_value_rounded = round_to_five_rappen(total_value)
         total_value_str = (
-            format_swiss_number(total_value_rounded)
-            if type_key != 'expenses'
-            else '-'
+            format_swiss_number(total_value) if type_key != 'expenses' else '-'
         )
-        base_total = type_totals[type_key]['total']
-        total_chf = base_total * cola_multiplier
-        total_chf_rounded = round_to_five_rappen(total_chf)
-        total += total_chf_rounded
+        adjusted_total = type_totals[type_key]['total']
+        total += adjusted_total
         html += f"""
             <tr>
                 <td>{type_name}</td>
                 <td class="numeric">{total_value_str}</td>
                 <td class="numeric">{format_swiss_number(
-                    total_chf_rounded)}</td>
+                    adjusted_total)}</td>
             </tr>
         """
     if allowance_total:
-        allowance_total_rounded = round_to_five_rappen(allowance_total)
-        total += allowance_total_rounded
+        total += allowance_total
         html += f"""
             <tr>
                 <td>Total {LOHNART_ALLOWANCE_TEXT}</td>
                 <td class="numeric">-</td>
                 <td class="numeric">{format_swiss_number(
-                    allowance_total_rounded)}</td>
+                    allowance_total)}</td>
             </tr>
         """
 
@@ -286,7 +272,7 @@ def _get_parliamentarian_settlement_data(
         is_president = is_commission_president(
             parliamentarian, attendence, settlement_run
         )
-        base_rate = calculate_rate(
+        compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=attendence.type,
             duration_minutes=int(attendence.duration),
@@ -307,8 +293,8 @@ def _get_parliamentarian_settlement_data(
             date=attendence.date,
             type_description=type_desc,
             calculated_value=attendence.calculate_value(),
-            additional_value=Decimal('0'),
-            base_rate=Decimal(str(base_rate)),
+            base_rate=compensation.base,
+            adjusted_rate=compensation.adjusted,
             attendance_type=attendence.type,
         )
         result.append(entry)

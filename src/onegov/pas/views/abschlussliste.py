@@ -5,7 +5,8 @@ from decimal import Decimal, ROUND_HALF_UP
 from operator import itemgetter
 import xlsxwriter
 
-from onegov.pas.calculate_pay import calculate_rate
+from onegov.pas.calculate_pay import calculate_attendance_compensation
+from onegov.pas.calculate_pay import calculate_compensation
 from onegov.pas.collections import (
     AttendenceCollection,
 )
@@ -16,11 +17,8 @@ from onegov.pas.custom import get_current_rate_set
 from onegov.pas.models.presidential_allowance import (
     LOHNART_ALLOWANCE_TEXT,
 )
-from onegov.pas.utils import (
-    get_parliamentarians_with_settlements,
-    is_commission_president,
-    round_to_five_rappen,
-)
+from onegov.pas.utils import get_parliamentarians_with_settlements
+from onegov.pas.utils import is_commission_president
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.pas.models.party import Party
 from sqlalchemy import or_
@@ -136,7 +134,7 @@ def get_abschlussliste_data(
     for att in attendances:
         p = att.parliamentarian
         is_president = is_commission_president(p, att, settlement_run)
-        compensation = calculate_rate(
+        compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
             duration_minutes=int(att.duration),
@@ -147,16 +145,16 @@ def get_abschlussliste_data(
         data = parl_data[str(p.id)]
         if att.type == 'plenary':
             data['plenum_duration'] += Decimal(att.duration)
-            data['plenum_compensation'] += Decimal(str(compensation))
+            data['plenum_compensation'] += compensation.base
         elif att.type == 'commission':
             data['commission_duration'] += Decimal(att.duration)
-            data['commission_compensation'] += Decimal(str(compensation))
+            data['commission_compensation'] += compensation.base
         elif att.type == 'study':
             data['study_duration'] += Decimal(att.duration)
-            data['study_compensation'] += Decimal(str(compensation))
+            data['study_compensation'] += compensation.base
         elif att.type == 'shortest':
             data['shortest_duration'] += Decimal(att.duration)
-            data['shortest_compensation'] += Decimal(str(compensation))
+            data['shortest_compensation'] += compensation.base
 
     # Add presidential allowances for this settlement run
     allowances = PresidentialAllowanceCollection(
@@ -164,9 +162,11 @@ def get_abschlussliste_data(
     ).query()
     for allowance in allowances:
         pid = str(allowance.parliamentarian_id)
-        parl_data[pid]['presidential_allowance'] += Decimal(
-            str(allowance.amount)
+        compensation = calculate_compensation(
+            allowance.amount,
+            rate_set.cost_of_living_adjustment,
         )
+        parl_data[pid]['presidential_allowance'] += compensation.base
 
     result = []
     for p in parliamentarians:
@@ -253,7 +253,7 @@ def generate_abschlussliste_xlsx(
         p = att.parliamentarian
         party = details_party_lookup[str(p.id)]
         is_president = is_commission_president(p, att, settlement_run)
-        compensation = calculate_rate(
+        compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
             duration_minutes=int(att.duration),
@@ -270,7 +270,7 @@ def generate_abschlussliste_xlsx(
             request.translate(TYPES[att.type]),
             att.commission.name if att.commission else '',
             att.calculate_value(),
-            compensation
+            compensation.base,
         ]
         for col, value in enumerate(details_row):
             details_ws.write(details_row_num, col, value, cell_format)
@@ -339,10 +339,6 @@ def generate_buchungen_abrechnungslauf_xlsx(
         settlement_run.end
     )
 
-    cola_multiplier = Decimal(
-        str(1 + (rate_set.cost_of_living_adjustment / 100))
-    )
-
     # Prepare data rows
     data_rows: list[BookingRowData] = []
     for att in attendances:
@@ -353,10 +349,12 @@ def generate_buchungen_abrechnungslauf_xlsx(
         party_name = party.name if party else ''
 
         # Calculate rates
-        is_president = any(
-            r.role == 'president' for r in parliamentarian.roles
+        is_president = is_commission_president(
+            parliamentarian,
+            att,
+            settlement_run,
         )
-        base_rate = calculate_rate(
+        compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
             duration_minutes=int(att.duration),
@@ -365,9 +363,6 @@ def generate_buchungen_abrechnungslauf_xlsx(
                 att.commission.type if att.commission else None
             ),
         )
-        rate_with_cola = (Decimal(str(base_rate)) * cola_multiplier).quantize(
-            Decimal('0.01'), rounding=ROUND_HALF_UP
-        )
 
         # Build booking type description
         booking_type = request.translate(TYPES[att.type])
@@ -375,17 +370,21 @@ def generate_buchungen_abrechnungslauf_xlsx(
                 or att.type == 'study' and att.commission):
             booking_type = f'{booking_type} - {att.commission.name}'
 
-        data_rows.append({
-            'date': att.date,
-            'person': (f'{parliamentarian.first_name} '
-                      f'{parliamentarian.last_name}'),
-            'party': party_name,
-            'wahlkreis': parliamentarian.district or '',
-            'booking_type': booking_type,
-            'value': att.calculate_value(),
-            'chf': base_rate,
-            'chf_with_cola': rate_with_cola
-        })
+        data_rows.append(
+            {
+                'date': att.date,
+                'person': (
+                    f'{parliamentarian.first_name} '
+                    f'{parliamentarian.last_name}'
+                ),
+                'party': party_name,
+                'wahlkreis': parliamentarian.district or '',
+                'booking_type': booking_type,
+                'value': att.calculate_value(),
+                'chf': compensation.base,
+                'chf_with_cola': compensation.adjusted,
+            }
+        )
 
     # Sort by date, then by person name
     data_rows.sort(key=itemgetter('date', 'person'))
@@ -412,6 +411,10 @@ def generate_buchungen_abrechnungslauf_xlsx(
     for allowance in allowances:
         p = allowance.parliamentarian
         party = allowance_party_lookup.get(str(allowance.parliamentarian_id))
+        compensation = calculate_compensation(
+            allowance.amount,
+            rate_set.cost_of_living_adjustment,
+        )
         data_rows.append(
             {
                 'date': settlement_run.end,
@@ -420,10 +423,8 @@ def generate_buchungen_abrechnungslauf_xlsx(
                 'wahlkreis': p.district or '',
                 'booking_type': LOHNART_ALLOWANCE_TEXT,
                 'value': Decimal('0'),
-                'chf': Decimal(str(allowance.amount)),
-                'chf_with_cola': (
-                    Decimal(str(allowance.amount)) * cola_multiplier
-                ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP),
+                'chf': compensation.base,
+                'chf_with_cola': compensation.adjusted,
             }
         )
 
@@ -462,19 +463,23 @@ def generate_buchungen_abrechnungslauf_xlsx(
         worksheet.write(
             row_num,
             5,
-            float(round_to_five_rappen(row_data['value'])),
+            float(
+                row_data['value'].quantize(
+                    Decimal('0.01'), rounding=ROUND_HALF_UP
+                )
+            ),
             cell_format,
         )
         worksheet.write(
             row_num,
             6,
-            float(round_to_five_rappen(row_data['chf'])),
+            float(row_data['chf']),
             cell_format,
         )
         worksheet.write(
             row_num,
             7,
-            float(round_to_five_rappen(row_data['chf_with_cola'])),
+            float(row_data['chf_with_cola']),
             cell_format,
         )
 

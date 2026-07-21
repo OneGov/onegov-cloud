@@ -6,6 +6,13 @@ from datetime import date
 from decimal import Decimal
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import AttendenceCollection
+from onegov.pas.export_single_parliamentarian import (
+    generate_parliamentarian_settlement_pdf,
+)
+import onegov.pas.export_single_parliamentarian as pdf_export
+from onegov.pas.views.pas_excel_export_nr_3_lohnart_fibu import (
+    generate_fibu_export_rows,
+)
 from onegov.pas.models import (
     Party,
     PASParliamentarian,
@@ -16,14 +23,93 @@ from onegov.pas.models import (
     Attendence,
     PASCommissionMembership,
 )
+from onegov.pas.models.presidential_allowance import (
+    LOHNART_ALLOWANCE_TEXT,
+)
 from onegov.pas.views.settlement_run import _get_commission_settlement_data
+from onegov.pas.views.settlement_run import _settlement_totals
 from onegov.town6.request import TownRequest
 from unittest.mock import Mock
+import pytest
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
+
+
+def test_parliamentarian_pdf_formats_hours_as_decimal(
+    session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rate_set = RateSet(
+        year=2024,
+        cost_of_living_adjustment=Decimal('21.935'),
+        plenary_none_member_halfday=Decimal('43'),
+    )
+    settlement_run = SettlementRun(
+        name='Q1 2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 3, 31),
+        active=True,
+    )
+    parliamentarian = PASParliamentarian(
+        first_name='Jane',
+        last_name='Member',
+        gender='female',
+    )
+    session.add_all(
+        [
+            rate_set,
+            settlement_run,
+            parliamentarian,
+            Attendence(
+                parliamentarian=parliamentarian,
+                date=date(2024, 1, 15),
+                duration=205,
+                type='plenary',
+            ),
+            Attendence(
+                parliamentarian=parliamentarian,
+                date=date(2024, 1, 16),
+                duration=205,
+                type='plenary',
+            ),
+        ]
+    )
+    session.flush()
+
+    html = Mock()
+    html.write_pdf.return_value = b'%PDF'
+    html_factory = Mock(return_value=html)
+    monkeypatch.setattr(pdf_export, 'HTML', html_factory)
+    monkeypatch.setattr(pdf_export, 'CSS', Mock())
+    monkeypatch.setattr(pdf_export, 'FontConfiguration', Mock())
+
+    request = Mock(spec=TownRequest)
+    request.session = session
+    request.translate = lambda value: value
+
+    result = generate_parliamentarian_settlement_pdf(
+        settlement_run,
+        request,
+        parliamentarian,
+    )
+
+    assert result == b'%PDF'
+    rendered_html = html_factory.call_args.kwargs['string']
+    assert rendered_html.count('<td class="numeric">3.42</td>') == 2
+    assert rendered_html.count('<td class="numeric">43.00</td>') == 2
+    assert rendered_html.count('>104.90</td>') == 2
+
+    fibu_rows = list(generate_fibu_export_rows(settlement_run, request))
+    fibu_amounts = [row[12] for row in fibu_rows]
+    assert all(isinstance(amount, Decimal) for amount in fibu_amounts)
+    fibu_total = sum(
+        (amount for amount in fibu_amounts if isinstance(amount, Decimal)),
+        Decimal('0'),
+    )
+    assert fibu_total == Decimal('104.90')
 
 
 def test_parliamentarian_settlement_calculations(session: Session) -> None:
@@ -311,13 +397,75 @@ def test_commission_export_one_member_one_president(session: Session) -> None:
     assert member_row[2] == 'File study'  # attendance type
     assert member_row[3] == Decimal('1.0')  # calculated value (1 hour)
     assert member_row[4] == Decimal('52')  # base rate (26 * 2 half-hours)
-    expected_cola_member = Decimal('52') * Decimal('1.21935')  # 21.935% COLA
-    assert member_row[5] == expected_cola_member
+    assert member_row[5] == Decimal('63.40')
 
     # Verify president data
     president_row = settlement_data[1]  # President comes second alphabetically
     assert president_row[2] == 'File study'  # attendance type
     assert president_row[3] == Decimal('1.0')  # calculated value (1 hour)
     assert president_row[4] == Decimal('86')  # base rate (43 * 2 half-hours)
-    expected_cola_president = Decimal('86') * Decimal('1.21935')  # COLA
-    assert president_row[5] == expected_cola_president
+    assert president_row[5] == Decimal('104.85')
+
+    totals = _settlement_totals(
+        settlement_data,
+        'party',
+        'Total Test',
+        session,
+        settlement_run.start,
+        settlement_run.end,
+    )
+    assert totals == [
+        (
+            'Test Party',
+            Decimal('138.00'),
+            Decimal('0'),
+            Decimal('138.00'),
+            Decimal('30.25'),
+            Decimal('168.25'),
+        ),
+        (
+            'Total Test',
+            Decimal('138.00'),
+            Decimal('0'),
+            Decimal('138.00'),
+            Decimal('30.25'),
+            Decimal('168.25'),
+        ),
+    ]
+
+    settlement_data.append(
+        (
+            settlement_run.end,
+            president,
+            LOHNART_ALLOWANCE_TEXT,
+            Decimal('0'),
+            Decimal('5000.00'),
+            Decimal('6096.75'),
+        )
+    )
+    totals_with_allowance = _settlement_totals(
+        settlement_data,
+        'party',
+        'Total Test',
+        session,
+        settlement_run.start,
+        settlement_run.end,
+    )
+    assert totals_with_allowance == [
+        (
+            'Test Party',
+            Decimal('138.00'),
+            Decimal('0'),
+            Decimal('5138.00'),
+            Decimal('1127.00'),
+            Decimal('6265.00'),
+        ),
+        (
+            'Total Test',
+            Decimal('138.00'),
+            Decimal('0'),
+            Decimal('5138.00'),
+            Decimal('1127.00'),
+            Decimal('6265.00'),
+        ),
+    ]

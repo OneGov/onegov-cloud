@@ -23,7 +23,10 @@
                                     <small class="muted"><tal:b i18n:translate>edited</tal:b>: ${layout.format_date(attendence.modified, 'date')}</small>
                                 </tal:b>
                             </td>
-                            <td>${(attendence.duration/60)} h</td>
+                            <td tal:define="
+                                hours python:attendence.duration / 60">
+                                ${layout.format_number(hours, 2)} h
+                            </td>
                             <td>${attendence.parliamentarian.title}</td>
                             <td>${attendence.type_label}
                                 <tal:block tal:condition="attendence.commission"><br>
@@ -82,7 +85,11 @@
                                             <tal:b tal:condition="attendence.commission">
                                                 ${attendence.commission.title}<br>
                                             </tal:b>
-                                            ${len(group)} <tal:b i18n:translate>Attendences</tal:b>, ${attendence.duration/60} h<br>
+                                            <tal:b tal:define="
+                                                hours python:attendence.duration / 60">
+                                                ${len(group)} <tal:b i18n:translate>Attendences</tal:b>,
+                                                ${layout.format_number(hours, 2)} h<br>
+                                            </tal:b>
                                             <tal:b i18n:translate>edited</tal:b>: ${layout.format_date(attendence.modified or attendence.created, 'datetime')}
                                             <tal:b tal:condition="has_abschluss"><br>
                                                 <span class="abschluss-badge" i18n:translate>Abschluss</span>

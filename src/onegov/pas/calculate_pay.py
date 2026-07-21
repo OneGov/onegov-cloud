@@ -1,11 +1,79 @@
 from __future__ import annotations
 
-from decimal import Decimal
+from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pas.models.rate_set import RateSet
+
+
+@dataclass(frozen=True)
+class Compensation:
+    base: Decimal
+    adjusted: Decimal
+
+    @classmethod
+    def zero(cls) -> Compensation:
+        return cls(base=Decimal('0'), adjusted=Decimal('0'))
+
+    @property
+    def adjustment(self) -> Decimal:
+        return self.adjusted - self.base
+
+    def __add__(self, other: Compensation) -> Compensation:
+        return Compensation(
+            base=self.base + other.base,
+            adjusted=self.adjusted + other.adjusted,
+        )
+
+
+def round_to_five_rappen(value: Decimal | int) -> Decimal:
+    if isinstance(value, int):
+        value = Decimal(value)
+
+    return (value / Decimal('0.05')).quantize(
+        Decimal('1'), rounding=ROUND_HALF_UP
+    ) * Decimal('0.05')
+
+
+def cost_of_living_multiplier(
+    percentage: Decimal | float | int,
+) -> Decimal:
+    return Decimal('1') + Decimal(str(percentage)) / Decimal('100')
+
+
+def calculate_compensation(
+    amount: Decimal | float | int,
+    cost_of_living_adjustment: Decimal | float | int,
+) -> Compensation:
+    base = Decimal(str(amount))
+    adjusted = base * cost_of_living_multiplier(cost_of_living_adjustment)
+    return Compensation(
+        base=round_to_five_rappen(base),
+        adjusted=round_to_five_rappen(adjusted),
+    )
+
+
+def calculate_attendance_compensation(
+    rate_set: RateSet,
+    attendence_type: str,
+    duration_minutes: int,
+    is_president: bool,
+    commission_type: str | None = None,
+) -> Compensation:
+    amount = calculate_rate(
+        rate_set=rate_set,
+        attendence_type=attendence_type,
+        duration_minutes=duration_minutes,
+        is_president=is_president,
+        commission_type=commission_type,
+    )
+    return calculate_compensation(
+        amount,
+        rate_set.cost_of_living_adjustment,
+    )
 
 
 def calculate_rate(
