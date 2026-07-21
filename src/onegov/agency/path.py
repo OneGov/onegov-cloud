@@ -44,11 +44,12 @@ def get_people(
 @AgencyApp.path(
     model=ExtendedAgencyCollection,
     path='/organizations',
+    converters={'browse': int}
 )
 def get_agencies(
     app: AgencyApp,
     root_pdf_modified: str | None = None,
-    browse: str | None = None
+    browse: int | None = None
 ) -> ExtendedAgencyCollection:
     return ExtendedAgencyCollection(app.session(), root_pdf_modified, browse)
 
