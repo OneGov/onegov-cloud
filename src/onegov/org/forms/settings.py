@@ -1023,7 +1023,7 @@ class HolidaySettingsForm(Form):
 
     other_holidays = TextAreaField(
         label=_('Other holidays'),
-        description=('31.10 - Halloween'),
+        description=('31.10 - Halloween / 31.10.2025 - Halloween'),
         render_kw={'rows': 10})
 
     preview = PreviewField(
@@ -1050,16 +1050,29 @@ class HolidaySettingsForm(Form):
                 continue
 
             if line.count('-') < 1:
-                raise ValidationError(_('Format: Day.Month - Description'))
+                raise ValidationError(
+                    _(
+                        'Format: Day.Month[.Year] - Description '
+                        '(year is optional)'
+                    )
+                )
             if line.count('-') > 1:
                 raise ValidationError(_('Please enter one date per line'))
 
             date, _description = line.split('-', 1)
 
-            if date.count('.') < 1:
-                raise ValidationError(_('Format: Day.Month - Description'))
-            if date.count('.') > 1:
-                raise ValidationError(_('Please enter only day and month'))
+            if date.count('.') == 1:
+                continue
+            if date.count('.') == 2:
+                self.parse_date(date.strip())
+                continue
+
+            raise ValidationError(
+                _(
+                    'Format: Day.Month[.Year] - Description '
+                    '(year is optional)'
+                )
+            )
 
     def parse_date(self, date: str) -> datetime.date:
         day, month, year = date.split('.', 2)
@@ -1108,10 +1121,18 @@ class HolidaySettingsForm(Form):
     @property
     def holiday_settings(self) -> dict[str, Any]:
 
-        def parse_other_holidays_line(line: str) -> tuple[int, int, str]:
-            date, desc = line.strip().split('-', 1)
-            day, month = date.split('.')
+        def parse_other_holidays_line(
+            line: str,
+        ) -> tuple[int, int, str] | tuple[int, int, str, int]:
 
+            date, desc = line.strip().split('-', 1)
+            parts = date.strip().split('.')
+
+            if len(parts) == 3:
+                day, month, year = parts
+                return int(month), int(day), desc.strip(), int(year)
+
+            day, month = parts
             return int(month), int(day), desc.strip()
 
         def parse_school_holidays_line(
@@ -1145,7 +1166,11 @@ class HolidaySettingsForm(Form):
     def holiday_settings(self, data: dict[str, Any]) -> None:
         data = data or {}
 
-        def format_other(d: tuple[int, int, str]) -> str:
+        def format_other(
+            d: tuple[int, int, str] | tuple[int, int, str, int],
+        ) -> str:
+            if len(d) == 4:
+                return f'{d[1]:02d}.{d[0]:02d}.{d[3]:04d} - {d[2]}'
             return f'{d[1]:02d}.{d[0]:02d} - {d[2]}'
 
         def format_school(d: tuple[int, int, int, int, int, int]) -> str:
