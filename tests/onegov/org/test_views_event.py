@@ -769,6 +769,13 @@ def test_import_export_events(client: Client) -> None:
 
     client.login_editor()
 
+    # settings are admin-only, the rest of the edit bar is not
+    events = client.get('/events')
+    assert not events.pyquery('.edit-bar a.edit-link')
+    assert events.pyquery('.edit-bar a.export-link')
+    assert client.get(
+        '/event-settings', expect_errors=True).status_code == 403
+
     # Export
     page = client.get('/events').click('Export')
     page.form['file_format'] = 'xlsx'
@@ -977,9 +984,16 @@ def test_export_events_json_xml_csv(client: Client) -> None:
 def test_event_filter_settings_stale_data(client: Client) -> None:
     client.login_admin()
 
-    settings = client.get('/event-settings')
+    # the edit bar link returns here after saving
+    events = client.get('/events')
+    settings_link = events.pyquery('.edit-bar a.edit-link').attr('href')
+    assert settings_link is not None
+    assert 'return-to=' in settings_link
+
+    settings = client.get(settings_link)
     settings.form['event_filter_type'] = 'filters'
-    settings.form.submit()
+    saved = settings.form.submit()
+    assert saved.headers['Location'].endswith('/events')
 
     # Set up a filter with two choices
     page = client.get('/event-settings')
