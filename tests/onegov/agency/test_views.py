@@ -966,9 +966,25 @@ def test_view_agencies_browse(client: Client[AgencyApp]) -> None:
     manage.form['title'] = 'Nationalrat'
     manage.form.submit()
 
+    manage = bund.click('Organisation', href='new')
+    manage.form['title'] = 'Bundesrat'
+    manage.form['access'] = 'private'
+    manage.form.submit()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Kantonsbehörden'
+    kanton = manage.form.submit().follow()
+
+    manage = kanton.click('Organisation', href='new')
+    manage.form['title'] = 'Regierungsrat'
+    manage.form.submit()
+
     session = client.app.session()
     nationalrat = session.query(ExtendedAgency).filter_by(
         title='Nationalrat'
+    ).one()
+    bundesrat = session.query(ExtendedAgency).filter_by(
+        title='Bundesrat'
     ).one()
 
     anonymous = client.spawn()
@@ -979,4 +995,23 @@ def test_view_agencies_browse(client: Client[AgencyApp]) -> None:
     page = anonymous.get(f'/organizations?browse={nationalrat.id}')
     assert 'Nationalrat' in page
 
+    # unrelated branches remain collapsed
+    assert 'Regierungsrat' not in page
+
     anonymous.get('/organizations?browse=bogus', status=400)
+    anonymous.get('/organizations?browse=1&browse=2', status=400)
+    anonymous.get('/organizations?browse=', status=400)
+
+    # remain on main page for invalid id
+    page = anonymous.get('/organizations?browse=999999')
+    assert page.status_code == 200
+    assert 'Bundesbehörden' in page
+    assert 'Nationalrat' not in page
+
+    # browsing a private agency does not reveal it to anonymous users
+    page = anonymous.get(f'/organizations?browse={bundesrat.id}')
+    assert 'Bundesbehörden' in page
+    assert 'Bundesrat' not in page
+
+    page = client.get(f'/organizations?browse={bundesrat.id}')
+    assert 'Bundesrat' in page
