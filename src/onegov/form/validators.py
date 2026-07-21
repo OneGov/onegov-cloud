@@ -720,7 +720,7 @@ class ValidPhoneNumber:
         self,
         country: str = 'CH',
         country_whitelist: Collection[str] | None = None,
-        phone_type: str = PhoneNumberType.ANY.value
+        number_type: str = PhoneNumberType.ANY.value
     ):
         if country_whitelist:
             assert country in country_whitelist, (
@@ -729,9 +729,16 @@ class ValidPhoneNumber:
                 )
             )
 
+        allowed_types = {v.value for v in PhoneNumberType}
+        assert number_type in allowed_types, (
+            'Invalid number type: {}. Allowed are: {}'.format(
+                number_type, sorted(allowed_types)
+            )
+        )
+
         self.country = country
         self.country_whitelist = country_whitelist
-        self.phone_type = phone_type
+        self.number_type = number_type
 
     def __call__(self, form: Form, field: Field) -> None:
         if not field.data:
@@ -764,10 +771,14 @@ class ValidPhoneNumber:
                     }
                 ))
 
-        if self.phone_type == PhoneNumberType.ANY.value:
+        if self.number_type == PhoneNumberType.ANY.value:
             return
 
-        valid_types, error = self.type_errors[self.phone_type]
+        # an unknown number type matches nothing, so we reject the number
+        # instead of blowing up in the middle of a request
+        valid_types, error = self.type_errors.get(
+            self.number_type, ((), self.invalid_phone_number)
+        )
         if phonenumbers.number_type(number) not in valid_types:
             raise ValidationError(error)
 

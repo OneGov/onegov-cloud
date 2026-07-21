@@ -121,7 +121,7 @@ def test_phone_number_validator() -> None:
     validator = ValidPhoneNumber(country='US')
     assert error('2345678') == 'Please include the area code.'
 
-    validator = ValidPhoneNumber(phone_type=PhoneNumberType.ANY.value)
+    validator = ValidPhoneNumber(number_type=PhoneNumberType.ANY.value)
     validator(request, Field('+41791112233'))
     validator(request, Field('0041791112233'))
     validator(request, Field('41791112233'))
@@ -131,7 +131,7 @@ def test_phone_number_validator() -> None:
     validator(request, Field('41761112233'))
     validator(request, Field('41411112233'))
 
-    validator = ValidPhoneNumber(phone_type=PhoneNumberType.MOBILE.value)
+    validator = ValidPhoneNumber(number_type=PhoneNumberType.MOBILE.value)
     validator(request, Field('+41791112233'))
     validator(request, Field('0041791112233'))
     validator(request, Field('41791112233'))
@@ -141,7 +141,7 @@ def test_phone_number_validator() -> None:
     validator(request, Field('41761112233'))
     assert error('41411112233') == 'Please enter a mobile phone number.'
 
-    validator = ValidPhoneNumber(phone_type=PhoneNumberType.FIXED_LINE.value)
+    validator = ValidPhoneNumber(number_type=PhoneNumberType.FIXED_LINE.value)
     landline = 'Please enter a landline phone number.'
     assert error('+41791112233') == landline
     assert error('0041791112233') == landline
@@ -190,7 +190,7 @@ def test_phone_number_validator() -> None:
     # the whitelist is combined with the other checks
     validator = ValidPhoneNumber(
         country_whitelist={'CH', 'AT'},
-        phone_type=PhoneNumberType.MOBILE.value
+        number_type=PhoneNumberType.MOBILE.value
     )
     validator(request, Field('+41791112233'))
     assert error('+41411112233') == 'Please enter a mobile phone number.'
@@ -200,6 +200,14 @@ def test_phone_number_validator() -> None:
     with raises(AssertionError) as ex:
         ValidPhoneNumber(country='DE', country_whitelist={'CH'})
     assert "Invalid country code: DE. Allowed are: ['CH']" in str(ex.value)
+
+    # the same goes for an unknown number type
+    with raises(AssertionError) as ex:
+        ValidPhoneNumber(number_type='typo')
+    assert (
+        "Invalid number type: typo. "
+        "Allowed are: ['any', 'fixed_line', 'mobile']"
+    ) in str(ex.value)
 
 
 def test_input_required_if_validator() -> None:

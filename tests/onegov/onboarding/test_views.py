@@ -73,7 +73,7 @@ def test_town_valid_values(onboarding_app: OnboardingApp) -> None:
     assert "Feld kann nicht länger als 63 Zeichen sein" in a
     assert "Ungültige Email-Adresse" in a
     assert "Ungültige Farbe" in a
-    assert "Ungültige Telefonnummer" in a
+    assert "Diese Telefonnummer hat eine ungültige Länge" in a
 
 
 def test_town_create(

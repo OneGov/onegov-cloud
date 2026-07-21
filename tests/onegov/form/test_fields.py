@@ -523,7 +523,7 @@ def test_phone_number_field() -> None:
 
     form = Form()
     field = PhoneNumberField(
-        validators=[ValidPhoneNumber(country='CH', phone_type='any')]
+        validators=[ValidPhoneNumber(country='CH', number_type='any')]
     )
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
     field.data = '0791112233'
@@ -535,7 +535,7 @@ def test_phone_number_field() -> None:
 
     form = Form()
     field = PhoneNumberField(
-        validators=[ValidPhoneNumber(country='CH', phone_type='mobile')]
+        validators=[ValidPhoneNumber(country='CH', number_type='mobile')]
     )
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
     field.data = '0791112233'
@@ -547,7 +547,7 @@ def test_phone_number_field() -> None:
 
     form = Form()
     field = PhoneNumberField(
-        validators=[ValidPhoneNumber(country='CH', phone_type='fixed_line')]
+        validators=[ValidPhoneNumber(country='CH', number_type='fixed_line')]
     )
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
     field.data = '0791112233'
@@ -561,7 +561,7 @@ def test_phone_number_field() -> None:
     form = Form()
     field = PhoneNumberField(number_type=None)
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
-    assert field.validators[-1].phone_type == 'any'
+    assert field.validators[-1].number_type == 'any'
     field.data = '0791112233'
     assert field.validate(form)
     field.data = '0411112233'
@@ -571,14 +571,14 @@ def test_phone_number_field() -> None:
     form = Form()
     field = PhoneNumberField()
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
-    assert field.validators[-1].phone_type == 'any'
+    assert field.validators[-1].number_type == 'any'
     field.data = '0411112233'
     assert field.validate(form)
 
     form = Form()
     field = PhoneNumberField(number_type='mobile')
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
-    assert field.validators[-1].phone_type == 'mobile'
+    assert field.validators[-1].number_type == 'mobile'
     field.data = '0791112233'
     assert field.validate(form)
     field.data = '0411112233'
@@ -587,7 +587,7 @@ def test_phone_number_field() -> None:
     form = Form()
     field = PhoneNumberField(number_type='fixed_line')
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
-    assert field.validators[-1].phone_type == 'fixed_line'
+    assert field.validators[-1].number_type == 'fixed_line'
     field.data = '0791112233'
     assert not field.validate(form)
     field.data = '0411112233'

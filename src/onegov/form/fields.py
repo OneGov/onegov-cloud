@@ -806,7 +806,7 @@ class PhoneNumberField(TelField):
             self.validators.append(
                 ValidPhoneNumber(
                     self.country,
-                    phone_type=PhoneNumberType.ANY.value
+                    number_type=PhoneNumberType.ANY.value
                     if not number_type
                     else PhoneNumberType(number_type).value,
                 )
