@@ -953,3 +953,30 @@ def test_agency_map(client: Client[AgencyApp]) -> None:
 
     page = client.get('/organization/finanzkontrolle')
     assert 'marker-map' in page
+
+
+def test_view_agencies_browse(client: Client[AgencyApp]) -> None:
+    client.login_admin()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Bundesbehörden'
+    bund = manage.form.submit().follow()
+
+    manage = bund.click('Organisation', href='new')
+    manage.form['title'] = 'Nationalrat'
+    manage.form.submit()
+
+    session = client.app.session()
+    nationalrat = session.query(ExtendedAgency).filter_by(
+        title='Nationalrat'
+    ).one()
+
+    anonymous = client.spawn()
+
+    # the children are loaded lazily, so they are not part of the response
+    assert 'Nationalrat' not in anonymous.get('/organizations')
+
+    page = anonymous.get(f'/organizations?browse={nationalrat.id}')
+    assert 'Nationalrat' in page
+
+    anonymous.get('/organizations?browse=bogus', status=400)
