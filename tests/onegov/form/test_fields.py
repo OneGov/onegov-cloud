@@ -575,7 +575,9 @@ def test_honeypot_field() -> None:
     field.meta.request = Bunch(include=lambda x: None)
     field.data = ''
 
-    assert 'class="lazy-wolves"' in field()
+    rendered = field()
+    assert 'class="form-control lazy-wolves"' in rendered
+    assert 'class="form-control" class="lazy-wolves"' not in rendered
     assert field.validate(form)
 
     field.data = 'me-a-stupid-bot'

@@ -20,6 +20,7 @@ from wtforms import Form as BaseForm
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.meta import DefaultMeta
 from wtforms.validators import InputRequired, DataRequired
 
 
@@ -163,6 +164,33 @@ class Form(BaseForm):
         #       be the way we use forms, see `onegov.core.directives` or more
         #       specifically `wrap_with_generic_form_handler`.
         action: str
+
+    
+    class Meta(DefaultMeta):
+        """ Adds bootstrap classes to all fields """
+
+        def render_field(
+            self,
+            field: Field,
+            render_kw: dict[str, Any]
+        ) -> Markup:
+
+            field_render_kw = field.render_kw or {}
+            existing = field_render_kw.get('class_', field_render_kw.get('class', ''))
+            extra = render_kw.pop('class_', render_kw.pop('class', ''))
+
+            if field.type == 'BooleanField':
+                base = 'form-check-input'
+            elif field.type in ('SelectField', 'SelectMultipleField'):
+                base = 'form-select'
+            else:
+                base = 'form-control'
+
+            render_kw['class_'] = ' '.join(
+                filter(None, [existing, extra, base])
+            )
+
+            return super().render_field(field, render_kw)
 
     def __init__(
         self,

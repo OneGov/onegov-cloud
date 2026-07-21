@@ -580,7 +580,14 @@ class HoneyPotWidget(TextInput):
 
     def __call__(self, field: Field, **kwargs: Any) -> Markup:
         field.meta.request.include('lazy-wolves')
-        kwargs['class_'] = (kwargs.get('class_', '') + ' lazy-wolves').strip()
+
+        classes = [
+            kwargs.pop('class_', ''),
+            kwargs.pop('class', ''),
+            'lazy-wolves'
+        ]
+
+        kwargs['class_'] = ' '.join(filter(None, classes)).strip()
         return super().__call__(field, **kwargs)
 
 
