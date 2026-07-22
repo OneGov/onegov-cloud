@@ -51,7 +51,7 @@ from onegov.form import (
 from onegov.form.errors import FormError
 from onegov.form.utils import remove_empty_links
 from onegov.newsletter.collection import RecipientCollection
-from onegov.org import log
+from onegov.org import log, _
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
 from onegov.org.management import LinkMigration
@@ -3180,70 +3180,167 @@ def ris_wil_meetings_shorten_audio_links(
     return ris_wil_meetings_fix_audio_links
 
 
-@cli.command(name='wil-event-tags-to-german-as-we-use-custom-event-tags')
-def wil_event_tags_to_german_as_we_use_custom_event_tags(
+@cli.command(name='fix-custom-event-tags', context_settings={'logging': False})
+@click.option('--auto', default=True, is_flag=True,
+              help='Automatically map old tags that match new tags '
+                   'after translation')
+@click.option('--dry-run', default=False, is_flag=True,
+              help='Do not write any changes into the database.')
+def fix_custom_event_tags(
+    auto: bool,
+    dry_run: bool
 ) -> Callable[[OrgRequest, OrgApp], None]:
 
-    map = {
-        'Art': 'Kunst',
-        'Cinema': 'Kino',
-        'Concert': 'Konzert',
-        'Congress': 'Kongress',
-        'Culture': 'Kultur',
-        'Dancing': 'Tanzen',
-        'Education': 'Bildung',
-        'Exhibition': 'Ausstellung',
-        'Gastronomy': 'Gastronomie',
-        'Health': 'Gesundheit',
-        'Library': 'Bibliothek',
-        'Literature': 'Literatur',
-        'Market': 'Markt',
-        'Meetup': 'Treffen',
-        'Misc': 'Verschiedenes',
-        'Music School': 'Musikschule',
-        'Nature': 'Natur',
-        'Music': 'Musik',
-        'Party': 'Party',
-        'Politics': 'Politik',
-        'Reading': 'Lesung',
-        'Religion': 'Religion',
-        'Sports': 'Sport',
-        'Talk': 'Vortrag',
-        'Theater': 'Theater',
-        'Tourism': 'Tourismus',
-        'Toy Library': 'Spielzeugbibliothek',
-        'Tradition': 'Tradition',
-        'Youth': 'Jugend',
-        'Elderly': 'Senioren',
-
-        'Diverses': 'Verschiedenes',
-    }
-
-    def event_tags_to_german(
+    def fix_event_tags(
         request: OrgRequest,
         app: OrgApp
     ) -> None:
 
-        click.secho(f'org name: {request.app.org.name}')
-        if request.app.org.name != 'Stadt Wil':
+        click.secho(f'org name: {app.org.name}')
+        custom_tags = set(app.custom_event_tags or ())
+        if not custom_tags:
+            click.secho('This org does not have custom tags', fg='green')
+            return
+
+        used_tags: set[str] = {
+            tag
+            for tag, in request.session.query(
+                func.skeys(Event._tags).distinct()
+            ).union_all(
+                request.session.query(
+                    func.skeys(Occurrence._tags).distinct()
+                )
+            )
+        }
+        old_tags = used_tags - custom_tags
+        if not old_tags:
+            click.secho('This org does not use any old tags', fg='green')
+
+        fixed_map = {
+            str(old_tag): new_tag
+            for old_tag in old_tags
+            if (new_tag := request.translate(_(old_tag))) in custom_tags
+        } if auto else {}
+        removed = old_tags - fixed_map.keys()
+        if removed:
+            formatted = ', '.join(
+                click.style(tag, fg='green')
+                for tag in sorted(custom_tags)
+            )
+            click.secho(
+                f'This instance uses the following custom tags: {formatted}'
+            )
+            actions = ', '.join(
+                f'{click.style(action[0:1], bold=True, fg='blue')}{action[1:]}'
+                for action in ('Replace', 'Keep', 'Delete')
+            )
+
+            for tag in sorted(removed):
+                choices = sorted(custom_tags)
+                formatted = click.style(tag, bold=True, fg='yellow')
+
+                match click.prompt(
+                    f'What should we do with {formatted}? ({actions})',
+                    type=click.Choice(('R', 'K', 'D')),
+                    default='R',
+                    show_choices=False
+                ):
+                    case 'D':
+                        continue
+                    case 'R':
+                        suggestion: str | None = None
+                        translated = request.translate(_(tag))
+                        for candidate in custom_tags:
+                            if translated in candidate or tag in candidate:
+                                suggestion = candidate
+                                break
+                        replacement = click.prompt(
+                            f'What do you want to replace {formatted} with?',
+                            type=click.Choice(choices, case_sensitive=False),
+                            default=suggestion,
+                            show_choices=False
+                        )
+                        fixed_map[tag] = replacement
+                        removed.discard(tag)
+                    case 'K':
+                        translated = request.translate(_(tag))
+                        if translated != tag and click.confirm(
+                            f'Do you want to translate {formatted} to '
+                            f'{click.style(translated, fg='green')}?',
+                            default=True
+                        ):
+                            fixed_map[tag] = translated
+                        removed.discard(tag)
+                    case _:
+                        raise AssertionError('unreachable')
+
+        click.secho('We will replace the following standard tags:')
+        for old_tag, new_tag in sorted(fixed_map.items()):
+            old = click.style(f'{old_tag: <12}', fg='yellow')
+            new = click.style(new_tag, fg='green')
+            click.secho(f'  {old} -> {new}')
+        if removed:
+            click.secho('The following tags will get removed:', fg='red')
+            for tag in sorted(removed):
+                click.secho(f'  {tag}', fg='red')
+        if kept := used_tags - fixed_map.keys() - removed:
+            click.secho(
+                'The following tags will be kept as they are:',
+                fg='green'
+            )
+            for tag in sorted(kept):
+                click.secho(f'  {tag}', fg='green')
+
+        if not dry_run and not click.confirm('Does that look okay?'):
             return
 
         events = EventCollection(request.session).query()
         occurrences = OccurrenceCollection(request.session).query()
 
+        rewritten_count = 0
+        deleted_set = set()
+        deleted_count = 0
         for collection in [events, occurrences]:
             for item in collection:  # type: ignore[attr-defined]
-                new_tags = []
+                new_tags = {}
                 tags = item.tags
                 for tag in tags:
-                    translated = map.get(tag, tag)
-                    new_tags.append(translated)
-                click.secho(f'new tags: {new_tags}', fg='green')
-                item.tags = new_tags
+                    if tag in removed:
+                        deleted_set.add(tag)
+                        deleted_count += 1
+                        continue
 
-            request.session.flush()
+                    fixed = fixed_map.get(tag)
+                    if fixed is None:
+                        fixed = tag
+                    else:
+                        rewritten_count += 1
+                    new_tags[fixed] = ''
+                    rewritten_count += 1
+                # manually write to _tags, to avoid triggering regenerating
+                # the occurrences
+                if not dry_run:
+                    item._tags = new_tags
 
-    return event_tags_to_german
+        deletions = ', '.join(sorted(deleted_set))
+        if dry_run:
+            click.secho(
+                f'This will rewrite {rewritten_count} tags and '
+                f'delete {deleted_count} tags ({deletions}).',
+                fg='yellow'
+            )
+            return
+        click.secho(
+            f'Successfully rewrote {rewritten_count} tags.',
+            fg='green'
+        )
+        if deleted_count:
+            click.secho(
+                f'Successfully deleted {deleted_count} tags ({deletions}).',
+                fg='yellow'
+            )
+
+    return fix_event_tags
 
 
 @cli.command(name='subscribe-parliamentarians-to-newsletter')
