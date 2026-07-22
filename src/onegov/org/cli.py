@@ -3241,7 +3241,7 @@ def fix_custom_event_tags(
 
                 match click.prompt(
                     f'What should we do with {formatted}? ({actions})',
-                    type=click.Choice(('R', 'K', 'D')),
+                    type=click.Choice(('R', 'K', 'D'), case_sensitive=False),
                     default='R',
                     show_choices=False
                 ):
@@ -3273,6 +3273,10 @@ def fix_custom_event_tags(
                         removed.discard(tag)
                     case _:
                         raise AssertionError('unreachable')
+
+        if not fixed_map and not removed:
+            click.secho('No changes necessary', fg='green')
+            return
 
         click.secho('We will replace the following standard tags:')
         for old_tag, new_tag in sorted(fixed_map.items()):
