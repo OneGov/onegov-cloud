@@ -406,10 +406,15 @@ def browser(playwright_browser: Browser) -> Iterator[ExtendedBrowser]:
 
 @pytest.fixture(scope="function")
 def redis_url(redis_server: RedisExecutor) -> Iterator[str]:
+    import onegov.core.cache.redis as redis_cache
     url = f'redis://{redis_server.host}:{redis_server.port}/0'
     yield url
+    with Redis.from_url(url) as client:
+        client.flushall()
 
-    Redis.from_url(url).flushall()
+    # clear the cached connection pools, so they can be gc'd
+    redis_cache.get_pool.cache_clear()
+    redis_cache.get.cache_clear()
 
 
 @pytest.fixture(scope="session")
