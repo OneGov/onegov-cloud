@@ -2,22 +2,11 @@ from __future__ import annotations
 
 from sedate import utcnow
 
-from onegov.pas.calculate_pay import calculate_attendance_compensation
-from onegov.pas.calculate_pay import calculate_compensation
-from onegov.pas.collections import (
-    AttendenceCollection,
-)
-from onegov.pas.collections.presidential_allowance import (
-    PresidentialAllowanceCollection,
-)
-from onegov.pas.custom import get_current_rate_set
-from onegov.pas.models.attendence import TYPES
 from onegov.pas.models.presidential_allowance import (
     FIBU_KONTO_ALLOWANCE,
     LOHNART_ALLOWANCE_NR,
-    LOHNART_ALLOWANCE_TEXT,
 )
-from onegov.pas.utils import is_president_for_attendance
+from onegov.pas.settlement_data import get_settlement_data
 
 
 from typing import TYPE_CHECKING
@@ -84,49 +73,22 @@ def generate_fibu_export_rows(
     #     'Angabe zum Jahr und zum Quartal', 'Exportdatum'  # Z-AA
     # ]
 
-    session = request.session
-    rate_set = get_current_rate_set(session, settlement_run)
-    if not rate_set:
-        return
-
-    # Get all attendences in period
-    attendences = AttendenceCollection(
-        session,
-        date_from=settlement_run.start,
-        date_to=settlement_run.end
-    ).query()
-
+    settlement_data = get_settlement_data(settlement_run, request)
     quarter = settlement_run.get_run_number_for_year(settlement_run.end)
     year_quarter_str = f'{settlement_run.end.year} Q{quarter}'
 
-    for attendance in attendences:
-        parliamentarian = attendance.parliamentarian
-        lohnart_info = NEW_LOHNART_MAPPING.get(attendance.type)
+    for entry in settlement_data.attendances:
+        parliamentarian = entry.parliamentarian
+        lohnart_info = NEW_LOHNART_MAPPING.get(entry.attendance_type)
 
         if not lohnart_info:
             lohnart_nr = ''
-            lohnart_text = request.translate(TYPES.get(
-                attendance.type, ''))
+            lohnart_text = entry.type_label
         else:
             lohnart_nr = lohnart_info['nr']
             lohnart_text = lohnart_info['text']
 
-        is_president = is_president_for_attendance(
-            parliamentarian,
-            attendance,
-        )
-        compensation = calculate_attendance_compensation(
-            rate_set=rate_set,
-            attendence_type=attendance.type,
-            duration_minutes=attendance.duration,
-            is_president=is_president,
-            commission_type=(
-                attendance.commission.type if attendance.commission else None
-            )
-        )
-
-        # Get fibu konto based on attendance type
-        fibu_konto = FIBU_KONTEN_MAPPING.get(attendance.type, '')
+        fibu_konto = FIBU_KONTEN_MAPPING.get(entry.attendance_type, '')
 
         yield [
             parliamentarian.personnel_number or '',
@@ -141,7 +103,7 @@ def generate_fibu_export_rows(
             '',
             '',
             '',
-            compensation.adjusted,
+            entry.compensation.adjusted,
             '',
             '',
             '',
@@ -158,14 +120,8 @@ def generate_fibu_export_rows(
             utcnow().strftime('%d.%m.%Y'),
         ]
 
-    # Presidential allowances linked to this settlement run
-    allowances = PresidentialAllowanceCollection(
-        session,
-        settlement_run_id=settlement_run.id,
-    ).query()
-
-    for allowance in allowances:
-        parliamentarian = allowance.parliamentarian
+    for allowance_entry in settlement_data.allowances:
+        parliamentarian = allowance_entry.parliamentarian
         yield [
             parliamentarian.personnel_number or '',
             parliamentarian.contract_number or '',
@@ -179,14 +135,11 @@ def generate_fibu_export_rows(
             '',
             '',
             '',
-            calculate_compensation(
-                allowance.amount,
-                rate_set.cost_of_living_adjustment,
-            ).adjusted,
+            allowance_entry.compensation.adjusted,
             '',
             '',
             '',
-            LOHNART_ALLOWANCE_TEXT,
+            allowance_entry.type_description,
             '',
             FIBU_KONTO_ALLOWANCE,
             '1000',

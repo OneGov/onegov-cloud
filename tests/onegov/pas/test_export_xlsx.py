@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import csv
 import transaction
 
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
+from io import StringIO
 from onegov.pas.models import (
     Attendence,
     PASParliamentarian,
@@ -138,6 +140,27 @@ def test_export_xlsx(client: Client[TestPasApp]) -> None:
         Decimal('100.05'),
         Decimal('100.05'),
     ]
+    overview_rows = {
+        row[0]: row for row in overview.iter_rows(min_row=2, values_only=True)
+    }
+    assert overview_rows['Musterfrau'][6] == 90
+    assert Decimal(str(overview_rows['Musterfrau'][7])) == Decimal('55')
+
+    details_rows = list(details.iter_rows(min_row=2, values_only=True))
+    details_base_total = sum(
+        (Decimal(str(row[8])) for row in details_rows),
+        Decimal('0'),
+    )
+    overview_base_total = sum(
+        (
+            Decimal(str(row[5] or 0))
+            + Decimal(str(row[7] or 0))
+            + Decimal(str(row[8] or 0))
+            for row in overview_rows.values()
+        ),
+        Decimal('0'),
+    )
+    assert overview_base_total == details_base_total
 
     export_link = page.pyquery(
         'a:contains("Buchungen Abrechnungslauf (Kontrollliste)")'
@@ -159,3 +182,34 @@ def test_export_xlsx(client: Client[TestPasApp]) -> None:
         102.05,
         102.05,
     ]
+    control_rows = list(worksheet.iter_rows(min_row=2, values_only=True))
+    assert len(control_rows) == len(details_rows)
+    assert (
+        sum(
+            (Decimal(str(row[6])) for row in control_rows),
+            Decimal('0'),
+        )
+        == details_base_total
+    )
+
+    export_link = page.pyquery('a:contains("KR-Entschädigungen (CSV)")').attr(
+        'href'
+    )
+    response = client.get(export_link)
+
+    assert response.status_code == 200
+    fibu_rows = list(
+        csv.reader(
+            StringIO(response.body.decode('utf-8-sig')),
+            delimiter=';',
+        )
+    )
+    assert len(fibu_rows) == len(control_rows)
+    assert sum(row[2] == '2421' for row in fibu_rows) == 1
+    assert sum(
+        (Decimal(row[12]) for row in fibu_rows),
+        Decimal('0'),
+    ) == sum(
+        (Decimal(str(row[7])) for row in control_rows),
+        Decimal('0'),
+    )

@@ -1,110 +1,25 @@
 from __future__ import annotations
+
 from collections import defaultdict
-from io import BytesIO
 from decimal import Decimal
-from operator import itemgetter
+from io import BytesIO
+
 import xlsxwriter
 
-from onegov.pas.calculate_pay import calculate_attendance_compensation
-from onegov.pas.calculate_pay import calculate_compensation
-from onegov.pas.collections import (
-    AttendenceCollection,
-)
-from onegov.pas.collections.presidential_allowance import (
-    PresidentialAllowanceCollection,
-)
-from onegov.pas.custom import get_current_rate_set
-from onegov.pas.models.presidential_allowance import (
-    LOHNART_ALLOWANCE_TEXT,
-)
-from onegov.pas.utils import get_parliamentarians_with_settlements
-from onegov.pas.utils import is_president_for_attendance
-from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
-from onegov.pas.models.party import Party
-from sqlalchemy import or_
-
-from onegov.pas.models.attendence import TYPES
+from onegov.pas.settlement_data import SettlementData
+from onegov.pas.settlement_data import SettlementEntry
+from onegov.pas.settlement_data import get_settlement_data
 
 
-from typing import Any, TypedDict, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from datetime import date
-    from onegov.town6.request import TownRequest
     from onegov.pas.models.settlement_run import SettlementRun
-    from sqlalchemy.orm import Session
+    from onegov.town6.request import TownRequest
 
 
-class BookingRowData(TypedDict):
-    date: date
-    person: str
-    party: str
-    wahlkreis: str
-    booking_type: str
-    value: Decimal
-    chf: Decimal
-    chf_with_cola: Decimal
-
-
-def get_party_lookup(
-    session: Session,
-    parliamentarian_ids: set[str],
-    start_date: date,
-    end_date: date
-) -> dict[str, Party | None]:
-    """
-    Bulk fetch party information for parliamentarians during a period.
-    Returns a lookup dictionary to avoid N+1 queries.
-    """
-    # Fetch all relevant roles in one query
-    roles = (
-        session.query(PASParliamentarianRole)
-        .join(Party)
-        .filter(
-            PASParliamentarianRole.parliamentarian_id.in_(parliamentarian_ids),
-            PASParliamentarianRole.party_id.isnot(None),
-            or_(
-                PASParliamentarianRole.end.is_(None),
-                PASParliamentarianRole.end >= start_date,
-            ),
-            PASParliamentarianRole.start <= end_date,
-        )
-        .order_by(PASParliamentarianRole.start.desc())
-        .all()
-    )
-
-    # Build lookup dictionary - take the most recent role for each parl
-    party_lookup: dict[str, Party | None] = {}
-    for parliamentarian_id in parliamentarian_ids:
-        party_lookup[parliamentarian_id] = None
-    for role in roles:
-        parl_id = str(role.parliamentarian_id)
-        if parl_id not in party_lookup or party_lookup[parl_id] is None:
-            party_lookup[parl_id] = role.party
-    return party_lookup
-
-
-def get_abschlussliste_data(
-    settlement_run: SettlementRun,
-    request: TownRequest,
+def aggregate_abschlussliste_data(
+    settlement_data: SettlementData,
 ) -> list[dict[str, Any]]:
-    session = request.session
-    rate_set = get_current_rate_set(session, settlement_run)
-    if not rate_set:
-        return []
-
-    parliamentarians = get_parliamentarians_with_settlements(
-        session,
-        settlement_run.start,
-        settlement_run.end,
-        settlement_run_id=settlement_run.id,
-    )
-
-    # Get bulk party lookup to avoid N+1 queries
-    parliamentarian_ids = {str(p.id) for p in parliamentarians}
-    party_lookup = get_party_lookup(
-        session, parliamentarian_ids, settlement_run.start, settlement_run.end
-    )
-
     parl_data: defaultdict[str, dict[str, Any]] = defaultdict(
         lambda: {
             'plenum_duration': Decimal('0'),
@@ -120,55 +35,31 @@ def get_abschlussliste_data(
         }
     )
 
-    # Use optimized query with eager loading
-    attendances = AttendenceCollection(
-        session,
-        date_from=settlement_run.start,
-        date_to=settlement_run.end,
-    ).query()
+    parliamentarians = {}
+    for entry in settlement_data.attendances:
+        parliamentarian = entry.parliamentarian
+        parliamentarians[parliamentarian.id] = parliamentarian
+        data = parl_data[str(parliamentarian.id)]
+        duration_key = f'{entry.attendance_type}_duration'
+        compensation_key = f'{entry.attendance_type}_compensation'
+        if entry.attendance_type == 'plenary':
+            duration_key = 'plenum_duration'
+            compensation_key = 'plenum_compensation'
+        data[duration_key] += entry.duration_minutes
+        data[compensation_key] += entry.compensation.base
 
-    for att in attendances:
-        p = att.parliamentarian
-        is_president = is_president_for_attendance(p, att)
-        compensation = calculate_attendance_compensation(
-            rate_set=rate_set,
-            attendence_type=att.type,
-            duration_minutes=att.duration,
-            is_president=is_president,
-            commission_type=att.commission.type if att.commission else None
-        )
+    for allowance_entry in settlement_data.allowances:
+        parliamentarian = allowance_entry.parliamentarian
+        parliamentarians[parliamentarian.id] = parliamentarian
+        parl_data[str(parliamentarian.id)][
+            'presidential_allowance'
+        ] += allowance_entry.compensation.base
 
-        data = parl_data[str(p.id)]
-        if att.type == 'plenary':
-            data['plenum_duration'] += Decimal(att.duration)
-            data['plenum_compensation'] += compensation.base
-        elif att.type == 'commission':
-            data['commission_duration'] += Decimal(att.duration)
-            data['commission_compensation'] += compensation.base
-        elif att.type == 'study':
-            data['study_duration'] += Decimal(att.duration)
-            data['study_compensation'] += compensation.base
-        elif att.type == 'shortest':
-            data['shortest_duration'] += Decimal(att.duration)
-            data['shortest_compensation'] += compensation.base
-
-    # Add presidential allowances for this settlement run
-    allowances = PresidentialAllowanceCollection(
-        session, settlement_run_id=settlement_run.id
-    ).query()
-    for allowance in allowances:
-        pid = str(allowance.parliamentarian_id)
-        compensation = calculate_compensation(
-            allowance.amount,
-            rate_set.cost_of_living_adjustment,
-        )
-        parl_data[pid]['presidential_allowance'] += compensation.base
-
-    result = []
-    for p in parliamentarians:
-        party = party_lookup[str(p.id)]
-        data = parl_data[str(p.id)]
-        data['parliamentarian'] = p
+    result: list[dict[str, Any]] = []
+    for parliamentarian in parliamentarians.values():
+        party = settlement_data.party_lookup.get(parliamentarian.id)
+        data = parl_data[str(parliamentarian.id)]
+        data['parliamentarian'] = parliamentarian
         data['party'] = party.name if party else ''
         data['faction'] = party.name if party else ''
         result.append(data)
@@ -179,6 +70,15 @@ def get_abschlussliste_data(
             x['parliamentarian'].last_name,
             x['parliamentarian'].first_name
         )
+    )
+
+
+def get_abschlussliste_data(
+    settlement_run: SettlementRun,
+    request: TownRequest,
+) -> list[dict[str, Any]]:
+    return aggregate_abschlussliste_data(
+        get_settlement_data(settlement_run, request)
     )
 
 
@@ -221,66 +121,41 @@ def generate_abschlussliste_xlsx(
     for col, header in enumerate(details_headers):
         details_ws.write(0, col, header, header_format)
 
-    # Get aggregated data for Übersicht tab
-    data = get_abschlussliste_data(settlement_run, request)
+    settlement_data = get_settlement_data(settlement_run, request)
+    data = aggregate_abschlussliste_data(settlement_data)
 
-    # Get individual attendance records for Details tab
-    session = request.session
-    rate_set = get_current_rate_set(session, settlement_run)
-    attendances = AttendenceCollection(
-        session,
-        date_from=settlement_run.start,
-        date_to=settlement_run.end,
-    ).query().all()
-
-    # Get bulk party lookup for details
-    attendance_parliamentarian_ids = {
-        str(att.parliamentarian.id) for att in attendances
-    }
-    details_party_lookup = get_party_lookup(
-        session,
-        attendance_parliamentarian_ids,
-        settlement_run.start,
-        settlement_run.end
-    )
-
-    # Write Details tab with individual attendance records
-    for details_row_num, att in enumerate(attendances, start=1):
-        p = att.parliamentarian
-        party = details_party_lookup[str(p.id)]
-        is_president = is_president_for_attendance(p, att)
-        compensation = calculate_attendance_compensation(
-            rate_set=rate_set,
-            attendence_type=att.type,
-            duration_minutes=att.duration,
-            is_president=is_president,
-            commission_type=att.commission.type if att.commission else None
-        )
+    for details_row_num, entry in enumerate(
+        settlement_data.attendances,
+        start=1,
+    ):
+        parliamentarian = entry.parliamentarian
+        party = settlement_data.party_lookup.get(parliamentarian.id)
 
         details_row = [
-            att.date.strftime('%d.%m.%Y'),
-            p.last_name,
-            p.first_name,
+            entry.date.strftime('%d.%m.%Y'),
+            parliamentarian.last_name,
+            parliamentarian.first_name,
             party.name if party else '',
-            party.name if party else '',  # faction same as party
-            request.translate(TYPES[att.type]),
-            att.commission.name if att.commission else '',
-            att.calculate_value(),
-            compensation.base,
+            party.name if party else '',
+            entry.type_label,
+            entry.commission.name if entry.commission else '',
+            entry.value,
+            entry.compensation.base,
         ]
         for col, value in enumerate(details_row):
             details_ws.write(details_row_num, col, value, cell_format)
 
-    # Write Übersicht tab with aggregated data
     for row_num, row_data in enumerate(data, 1):
         p = row_data['parliamentarian']
 
-        # Übersicht tab row
         overview_row = [
             p.last_name, p.first_name, row_data['party'], row_data['faction'],
             row_data['plenum_duration'], row_data['plenum_compensation'],
-            row_data['commission_duration'] + row_data['shortest_duration'],
+            row_data['commission_duration']
+            + row_data['study_duration']
+            + row_data['shortest_duration'],
             row_data['commission_compensation']
+            + row_data['study_compensation']
             + row_data['shortest_compensation'],
             row_data['presidential_allowance'],
             row_data['expenses'],
@@ -312,116 +187,7 @@ def generate_buchungen_abrechnungslauf_xlsx(
 
     Data is sorted by date then person name.
     """
-    session = request.session
-    rate_set = get_current_rate_set(session, settlement_run)
-    if not rate_set:
-        return BytesIO()
-
-    # Get all attendences in settlement period
-    attendances = AttendenceCollection(
-        session,
-        date_from=settlement_run.start,
-        date_to=settlement_run.end,
-    ).query().all()
-
-    # Get bulk party lookup for buchungen
-    buchungen_parliamentarian_ids = {
-        str(att.parliamentarian.id) for att in attendances
-    }
-    buchungen_party_lookup = get_party_lookup(
-        session,
-        buchungen_parliamentarian_ids,
-        settlement_run.start,
-        settlement_run.end
-    )
-
-    # Prepare data rows
-    data_rows: list[BookingRowData] = []
-    for att in attendances:
-        parliamentarian = att.parliamentarian
-
-        # Get party from bulk lookup
-        party = buchungen_party_lookup[str(parliamentarian.id)]
-        party_name = party.name if party else ''
-
-        # Calculate rates
-        is_president = is_president_for_attendance(
-            parliamentarian,
-            att,
-        )
-        compensation = calculate_attendance_compensation(
-            rate_set=rate_set,
-            attendence_type=att.type,
-            duration_minutes=att.duration,
-            is_president=is_president,
-            commission_type=(
-                att.commission.type if att.commission else None
-            ),
-        )
-
-        # Build booking type description
-        booking_type = request.translate(TYPES[att.type])
-        if (att.type == 'commission' and att.commission
-                or att.type == 'study' and att.commission):
-            booking_type = f'{booking_type} - {att.commission.name}'
-
-        data_rows.append(
-            {
-                'date': att.date,
-                'person': (
-                    f'{parliamentarian.first_name} '
-                    f'{parliamentarian.last_name}'
-                ),
-                'party': party_name,
-                'wahlkreis': parliamentarian.district or '',
-                'booking_type': booking_type,
-                'value': att.calculate_value(),
-                'chf': compensation.base,
-                'chf_with_cola': compensation.adjusted,
-            }
-        )
-
-    # Sort by date, then by person name
-    data_rows.sort(key=itemgetter('date', 'person'))
-
-    # Add presidential allowances for this settlement run
-    allowances = (
-        PresidentialAllowanceCollection(
-            session, settlement_run_id=settlement_run.id
-        )
-        .query()
-        .all()
-    )
-    allowance_parl_ids = {str(a.parliamentarian_id) for a in allowances}
-    allowance_party_lookup = (
-        get_party_lookup(
-            session,
-            allowance_parl_ids,
-            settlement_run.start,
-            settlement_run.end,
-        )
-        if allowance_parl_ids
-        else {}
-    )
-    for allowance in allowances:
-        p = allowance.parliamentarian
-        party = allowance_party_lookup.get(str(allowance.parliamentarian_id))
-        compensation = calculate_compensation(
-            allowance.amount,
-            rate_set.cost_of_living_adjustment,
-        )
-        data_rows.append(
-            {
-                'date': settlement_run.end,
-                'person': f'{p.first_name} {p.last_name}',
-                'party': party.name if party else '',
-                'wahlkreis': p.district or '',
-                'booking_type': LOHNART_ALLOWANCE_TEXT,
-                'value': Decimal('0'),
-                'chf': compensation.base,
-                'chf_with_cola': compensation.adjusted,
-            }
-        )
+    settlement_data = get_settlement_data(settlement_run, request)
 
     # Create Excel file
     output = BytesIO()
@@ -446,31 +212,67 @@ def generate_buchungen_abrechnungslauf_xlsx(
     for col, header in enumerate(headers):
         worksheet.write(0, col, header, header_format)
 
-    # Write data rows
-    for row_num, row_data in enumerate(data_rows, 1):
+    attendance_entries = sorted(
+        settlement_data.attendances,
+        key=lambda entry: (
+            entry.date,
+            entry.parliamentarian.first_name,
+            entry.parliamentarian.last_name,
+        ),
+    )
+    entries: list[SettlementEntry] = [
+        *attendance_entries,
+        *settlement_data.allowances,
+    ]
+    for row_num, entry in enumerate(entries, 1):
+        parliamentarian = entry.parliamentarian
+        party = settlement_data.party_lookup.get(parliamentarian.id)
         worksheet.write(
-            row_num, 0, row_data['date'].strftime('%d.%m.%Y'), cell_format
+            row_num,
+            0,
+            entry.date.strftime('%d.%m.%Y'),
+            cell_format,
         )
-        worksheet.write(row_num, 1, row_data['person'], cell_format)
-        worksheet.write(row_num, 2, row_data['party'], cell_format)
-        worksheet.write(row_num, 3, row_data['wahlkreis'], cell_format)
-        worksheet.write(row_num, 4, row_data['booking_type'], cell_format)
+        worksheet.write(
+            row_num,
+            1,
+            (f'{parliamentarian.first_name} {parliamentarian.last_name}'),
+            cell_format,
+        )
+        worksheet.write(
+            row_num,
+            2,
+            party.name if party else '',
+            cell_format,
+        )
+        worksheet.write(
+            row_num,
+            3,
+            parliamentarian.district or '',
+            cell_format,
+        )
+        worksheet.write(
+            row_num,
+            4,
+            entry.type_description,
+            cell_format,
+        )
         worksheet.write(
             row_num,
             5,
-            float(row_data['value']),
+            float(entry.value),
             cell_format,
         )
         worksheet.write(
             row_num,
             6,
-            float(row_data['chf']),
+            float(entry.compensation.base),
             cell_format,
         )
         worksheet.write(
             row_num,
             7,
-            float(row_data['chf_with_cola']),
+            float(entry.compensation.adjusted),
             cell_format,
         )
 
