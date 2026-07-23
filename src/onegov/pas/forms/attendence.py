@@ -162,21 +162,20 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         if not target_parl:
             return (False, _('Target parliamentarian not found.'))
 
-        for pres_membership in user.parliamentarian.commission_memberships:  # type: ignore[attr-defined]
-            if pres_membership.role == 'president' and (
-                pres_membership.end is None
-                or pres_membership.end >= date.today()
+        today = date.today()
+        presidencies = user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
+            on_date=today,
+            role='president',
+        )
+        target_memberships = target_parl.commission_memberships_on(
+            on_date=today,
+        )
+        for presidency in presidencies:
+            if any(
+                membership.commission_id == presidency.commission_id
+                for membership in target_memberships
             ):
-                for member_membership in target_parl.commission_memberships:
-                    if (
-                        member_membership.commission_id
-                        == pres_membership.commission_id
-                        and (
-                            member_membership.end is None
-                            or member_membership.end >= date.today()
-                        )
-                    ):
-                        return (True, None)
+                return (True, None)
 
         return (
             False,
@@ -284,25 +283,23 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                     )
                 ]
 
-                for membership in user.parliamentarian.commission_memberships:  # type: ignore[attr-defined]
-                    if membership.role == 'president' and (
-                        membership.end is None
-                        or membership.end >= date.today()
-                    ):
-                        for member_membership in (
-                            self.request.session.query(PASCommissionMembership)
-                            .filter_by(commission_id=membership.commission_id)
-                            .filter(
-                                PASCommissionMembership.end.is_(None)
-                                | (PASCommissionMembership.end >= date.today())
-                            )
+                today = date.today()
+                presidencies = user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
+                    on_date=today,
+                    role='president',
+                )
+                for presidency in presidencies:
+                    memberships = self.request.session.query(
+                        PASCommissionMembership
+                    ).filter_by(commission_id=presidency.commission_id)
+                    for membership in memberships:
+                        if (
+                            membership.is_active_on(today)
+                            and membership.parliamentarian_id
+                            != user.parliamentarian.id  # type: ignore[attr-defined]
                         ):
-                            if (
-                                member_membership.parliamentarian_id
-                                != user.parliamentarian.id  # type: ignore[attr-defined]
-                            ):
-                                member = member_membership.parliamentarian
-                                choices.append((str(member.id), member.title))
+                            member = membership.parliamentarian
+                            choices.append((str(member.id), member.title))
 
                 self.parliamentarian_id.choices = list(dict.fromkeys(choices))
             else:
@@ -329,11 +326,13 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 .first()
             )
             if user and user.parliamentarian:  # type: ignore[attr-defined]
-                memberships = user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
+                parliamentarian = user.parliamentarian  # type: ignore[attr-defined]
+                memberships = parliamentarian.commission_memberships_on(
+                    on_date=date.today(),
+                )
                 commission_ids = [
                     membership.commission_id
                     for membership in memberships
-                    if membership.end is None or membership.end >= date.today()
                 ]
                 self.commission_id.choices = [
                     (commission.id, commission.title)
@@ -381,22 +380,23 @@ class AttendenceAddForm(AttendenceForm):
                            user.parliamentarian.title)]  # type: ignore[attr-defined]
 
                 # Add commission members
-                for membership in user.parliamentarian.commission_memberships:  # type: ignore[attr-defined]
-                    if (membership.role == 'president'
-                        and (membership.end is None
-                             or membership.end >= date.today())):
-                        # Get all members of this commission
-                        for member_membership in (
-                            self.request.session.query(PASCommissionMembership)
-                            .filter_by(commission_id=membership.commission_id)
-                            .filter(PASCommissionMembership.end.is_(None)
-                                   | (PASCommissionMembership.end
-                                      >= date.today()))
+                today = date.today()
+                presidencies = user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
+                    on_date=today,
+                    role='president',
+                )
+                for presidency in presidencies:
+                    memberships = self.request.session.query(
+                        PASCommissionMembership
+                    ).filter_by(commission_id=presidency.commission_id)
+                    for membership in memberships:
+                        if (
+                            membership.is_active_on(today)
+                            and membership.parliamentarian_id
+                            != user.parliamentarian.id  # type: ignore[attr-defined]
                         ):
-                            if (member_membership.parliamentarian_id
-                                != user.parliamentarian.id):  # type: ignore[attr-defined]
-                                member = member_membership.parliamentarian
-                                choices.append((str(member.id), member.title))
+                            member = membership.parliamentarian
+                            choices.append((str(member.id), member.title))
 
                 self.parliamentarian_id.choices = list(dict.fromkeys(choices))
             else:

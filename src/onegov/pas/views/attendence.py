@@ -333,7 +333,7 @@ def add_bulk_attendence(
 ) -> RenderData | Response:
     request.include('custom')
 
-    if not request.is_admin and not request.is_commission_president:
+    if not request.is_admin and not request.has_commission_president_role:
         request.alert(_('Only admins can add bulk attendance records.'))
         return request.redirect(request.class_link(AttendenceCollection))
 

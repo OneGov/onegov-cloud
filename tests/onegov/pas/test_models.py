@@ -72,6 +72,7 @@ def test_models(session: Session) -> None:
     )
     commission_membership = PASCommissionMembership(
         role='president',
+        start=date(2022, 1, 1),
         commission_id=commission.id,
         parliamentarian_id=parliamentarian.id
     )
@@ -117,6 +118,13 @@ def test_models(session: Session) -> None:
     assert parliamentarian.roles == [parliamentarian_role]
     assert parliamentarian.commission_memberships == [commission_membership]
     assert parliamentarian.attendences == [attendence]
+    assert parliamentarian.has_commission_presidency(
+        on_date=date(2022, 6, 6),
+        commission_id=commission.id,
+    )
+    assert not parliamentarian.has_commission_presidency(
+        on_date=date(2021, 12, 31),
+    )
     assert parliamentary_group.roles == [parliamentarian_role]
     assert party.roles == [parliamentarian_role]
     assert change.attendence == attendence
@@ -134,6 +142,9 @@ def test_models(session: Session) -> None:
     commission_membership.end = date(2022, 5, 5)
     parliamentarian = parliamentarian  # undo mypy narrowing
     assert parliamentarian.active is False
+    assert not parliamentarian.has_commission_presidency(
+        on_date=date(2022, 6, 6),
+    )
     parliamentarian.roles = []
     parliamentarian.commission_memberships = []
     parliamentarian = parliamentarian  # undo mypy narrowing

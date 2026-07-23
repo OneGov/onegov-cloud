@@ -156,20 +156,12 @@ def is_president_for_attendance(
     if attendance.type == 'plenary':
         return is_kantonsrat_president(parliamentarian, attendance.date)
 
-    return is_commission_president(parliamentarian, attendance)
+    if attendance.commission_id is None:
+        return False
 
-
-def is_commission_president(
-    parliamentarian: PASParliamentarian,
-    attendance: Attendence,
-) -> bool:
-    """Whether the presidency was active on the attendance date."""
-    return any(
-        membership.role == 'president'
-        and membership.commission_id == attendance.commission_id
-        and (membership.start is None or membership.start <= attendance.date)
-        and (membership.end is None or membership.end >= attendance.date)
-        for membership in parliamentarian.commission_memberships
+    return parliamentarian.has_commission_presidency(
+        on_date=attendance.date,
+        commission_id=attendance.commission_id,
     )
 
 
@@ -285,21 +277,6 @@ def is_parliamentarian_role(role: str | None) -> bool:
     """Check if a role is a parliamentarian role."""
     parls = {'parliamentarian', 'commission_president'}
     return role in parls if role else False
-
-
-def get_active_commission_memberships(
-    user: User | None
-) -> list[PASCommissionMembership]:
-    """Get active commission memberships for a parliamentarian user."""
-    if (not user or not hasattr(user, 'parliamentarian')
-            or not user.parliamentarian):
-        return []
-
-    parliamentarian = user.parliamentarian
-    return [
-        m for m in parliamentarian.commission_memberships
-        if not m.end or m.end >= date.today()
-    ]
 
 
 def get_commissions_with_memberships(
