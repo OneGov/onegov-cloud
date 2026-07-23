@@ -312,7 +312,7 @@
 </metal:panel>
 
 <metal:form define-macro="form">
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data" tal:define="form_two_columns form_two_columns|False">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-photoalbum-list-url layout.photoalbum_list_url; data-sitecollection-url layout.sitecollection_url; data-blocknote-ai-url layout.blocknote_ai_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data" tal:define="form_two_columns form_two_columns|False">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
                 <legend>${fieldset.label}</legend>
@@ -558,7 +558,7 @@
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
 
-                <div class="page-text" tal:condition="text" tal:content="text" />
+                <metal:b tal:condition="text" use-macro="layout.macros['render_rich_text']" />
                 <div metal:define-slot="after-text"></div>
             </div>
         </tal:b>
@@ -568,7 +568,7 @@
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
 
-                <div class="page-text" tal:condition="text" tal:content="text" />
+                <metal:b tal:condition="text" use-macro="layout.macros['render_rich_text']" />
                 <div metal:define-slot="after-text"></div>
                 <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                     <h3 i18n:translate>People</h3>
@@ -1353,6 +1353,32 @@
         </span>
     </tal:b>
 </metal:identicon>
+
+<metal:rich_text define-macro="render_rich_text" i18n:domain="onegov.org">
+    <tal:b tal:define="blocks layout.photo_album_blocks(text); has_inline_images layout.rich_text_has_images(blocks); has_photo_albums any(imageset and imageset.files for html, imageset in blocks); has_photoswipe has_inline_images or has_photo_albums">
+        <tal:b tal:repeat="(html, imageset) blocks">
+            <div class="page-text photoswipe" tal:condition="html" tal:content="html" />
+            <metal:b tal:condition="imageset and imageset.files" use-macro="layout.macros['render_photo_album_grid']" />
+            <p class="onegov-photoalbum-block" tal:condition="imageset and not imageset.files">
+                <a href="${request.link(imageset)}">${imageset.title}</a>
+            </p>
+        </tal:b>
+        <tal:b tal:condition="has_photoswipe" metal:use-macro="layout.macros.photoswipe" />
+    </tal:b>
+</metal:rich_text>
+
+<metal:photo_album define-macro="render_photo_album_grid" i18n:domain="onegov.org">
+    <div class="page-text grid-imageset photoswipe">
+        <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+            <li tal:repeat="image imageset.ordered_files" class="image-box">
+                <tal:b define="width image.reference.thumbnail_small.size[0]|image.reference.size[0]; height image.reference.thumbnail_small.size[1]|image.reference.size[1]">
+                    <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" tal:condition="repeat.image.number &lt;= 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                    <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" class="lazyload" tal:condition="repeat.image.number > 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                </tal:b>
+            </li>
+        </ul>
+    </div>
+</metal:photo_album>
 
 <metal:photoswipe define-macro="photoswipe" i18n:domain="onegov.org">
     <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">

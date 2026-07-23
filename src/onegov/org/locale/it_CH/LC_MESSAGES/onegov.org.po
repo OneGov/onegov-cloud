@@ -5064,6 +5064,21 @@ msgstr "Attiva/disattiva schermo intero"
 msgid "Zoom in/out"
 msgstr "Ingrandisci/riduci"
 
+msgid "Crop image"
+msgstr "Ritaglia immagine"
+
+msgid "Rotation"
+msgstr "Rotazione"
+
+msgid "Apply"
+msgstr "Applica"
+
+msgid "The image could not be cropped."
+msgstr "Non è stato possibile ritagliare l'immagine."
+
+msgid "An image is already being cropped."
+msgstr "È già in corso il ritaglio di un'immagine."
+
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
 "photos to an album and mark it as available for the homepage."

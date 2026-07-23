@@ -645,12 +645,6 @@ ul.tags {
     Hide certain things from non-managers
 */
 .role-member {
-
-    // file upload manager
-    .redactor-toolbar .re-file {
-        display: none;
-    }
-
     .userprofile-settings {
         .field-bank_account,
         .field-bank_beneficiary,

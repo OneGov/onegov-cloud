@@ -3,7 +3,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        exclude: '^src/onegov/org/assets/js/blocknote\.bundle\.min\.js(?:\.LEGAL\.txt)?$'
       - id: mixed-line-ending
+        exclude: '^src/onegov/org/assets/js/blocknote\.bundle\.min\.js(?:\.LEGAL\.txt)?$'
       - id: check-merge-conflict
       - id: check-ast
         language_version: python3.14
@@ -37,11 +39,13 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.7.0
+    rev: v8.56.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
+      exclude: '^src/onegov/org/assets/(js/blocknote\.bundle\.min\.js|src/blocknote/)'
       additional_dependencies:
+      - eslint@8.56.0
       - eslint-plugin-react
   - repo: https://github.com/PyCQA/bandit
     rev: 1.9.4

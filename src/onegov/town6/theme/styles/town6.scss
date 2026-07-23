@@ -160,12 +160,18 @@ footer {
 /*
     image subtitles
 */
-.alt-text {
-    background-color: $vapor;
+.page-text > figure {
+    margin: 1.25rem 0 1.75rem;
+}
+
+.alt-text,
+.page-text figure > figcaption {
+    background-color: transparent;
     color: $monsoon;
     display: block;
     font-size: .875rem;
-    padding: .25em .75em;
+    line-height: 1.4;
+    padding: .4rem 0 0;
     transition: background .5s ease-in-out;
 }
 
@@ -254,8 +260,92 @@ footer {
     page text
 */
 
+.onegov-blocknote-wrapper {
+    --onegov-primary-color: #{$primary-color};
+}
+
 .page-text {
     margin-bottom: 2rem;
+
+    details {
+        border: 1px solid #e9ecef;
+        border-radius: .5rem;
+        margin-bottom: 2rem;
+        max-width: $max-line-width;
+
+        & + details {
+            margin-top: -1rem;
+        }
+
+        > summary {
+            align-items: center;
+            color: #212529;
+            cursor: pointer;
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            list-style: none;
+            padding: 1.5rem 2rem;
+
+            &::-webkit-details-marker {
+                display: none;
+            }
+
+            &::after {
+                align-items: center;
+                border: 1.5px solid $primary-color;
+                border-radius: 50%;
+                color: $primary-color;
+                content: '+';
+                display: flex;
+                flex: 0 0 1.5rem;
+                font-size: 1.15rem;
+                font-weight: 400;
+                height: 1.5rem;
+                justify-content: center;
+                line-height: 1;
+                padding-bottom: .1rem;
+                width: 1.5rem;
+            }
+
+            > h2,
+            > h3,
+            > h4,
+            > h5 {
+                color: inherit;
+                font-size: 1.25rem;
+                line-height: 1.4;
+                margin: 0;
+            }
+
+            > h3,
+            > h4,
+            > h5 {
+                font-size: 1.125rem;
+            }
+        }
+
+        &[open] > summary {
+            border-bottom: 1px solid #e9ecef;
+
+            &::after {
+                content: '\2212';
+            }
+        }
+
+        > summary ~ * {
+            margin-left: 2rem;
+            margin-right: 2rem;
+        }
+
+        > summary + * {
+            margin-top: 1.5rem;
+        }
+
+        > :last-child {
+            margin-bottom: 1.5rem;
+        }
+    }
 
     a {
         display: inline-block;
@@ -659,10 +749,6 @@ ul.pagination li {
 */
 .close-button {
     @include clear-focus-outline;
-}
-
-.redactor-toolbar.redactor-toolbar {
-    @include editor-toolbar;
 }
 
 /*
@@ -1579,6 +1665,13 @@ ul.recipients {
             background: $smoke;
         }
     }
+}
+
+.onegov-photoalbum-block {
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-left: .3rem solid currentColor;
+    padding: .75rem 1rem;
 }
 
 .imageset-date {

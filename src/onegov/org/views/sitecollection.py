@@ -16,11 +16,7 @@ def get_site_collection(
     self: SiteCollection,
     request: OrgRequest
 ) -> JSON_ro:
-    """ Returns a list of internal links to be used by the redactor.
-
-    See `<https://imperavi.com/redactor/plugins/predefined-links/>`_
-
-    """
+    """Returns the internal links offered by the rich-text editor."""
 
     objects = self.get()
 

@@ -244,3 +244,89 @@ def monkey_patch_visit_to_ignore_console_errors(
     browser.visit = functools.partial(  # type: ignore[method-assign]
         original_visit, ignore_all_console_errors=True
     )
+
+
+@pytest.mark.xdist_group(name="browser")
+def test_blocknote_toggle_heading_editor_style(
+    browser: ExtendedBrowser,
+) -> None:
+    browser.login_admin()
+    browser.visit('/editor/new/page/1')
+    browser.fill('title', 'Toggle spacing')
+
+    wrapper = browser.page.locator(
+        '.field-text .onegov-blocknote-wrapper'
+        '[data-onegov-blocknote-wrapper]'
+    )
+    wrapper.wait_for(timeout=15_000)
+    wrapper.locator('button[title="HTML"]').click()
+    wrapper.locator('.onegov-blocknote-dialog textarea').fill(
+        '<details open><summary><h2>Toggle heading</h2></summary>'
+        '<p>Toggle content</p></details>'
+        '<details open><summary><h2>Second toggle</h2></summary>'
+        '<p>Second content</p></details>'
+    )
+    wrapper.locator(
+        '.onegov-blocknote-dialog-actions .button:not(.secondary)'
+    ).click()
+
+    toggle = wrapper.locator(
+        '.bn-block-content[data-content-type="heading"]'
+        '[data-is-toggleable="true"]'
+    ).first
+    toggle.wait_for(timeout=5_000)
+    assert toggle.locator('h2').evaluate(
+        'element => parseFloat(getComputedStyle(element).fontSize)'
+    ) > 16
+    toggle_block = toggle.locator('..')
+    assert toggle_block.evaluate(
+        'element => getComputedStyle(element).backgroundColor'
+    ) != 'rgba(0, 0, 0, 0)'
+    assert toggle_block.evaluate(
+        'element => getComputedStyle(element).borderTopStyle'
+    ) == 'solid'
+    assert toggle_block.locator(':scope > .bn-block-group').evaluate(
+        'element => getComputedStyle(element).borderTopStyle'
+    ) == 'solid'
+    assert toggle_block.evaluate(
+        'element => getComputedStyle(element).borderRadius'
+    ) == '8px'
+    toggle_button = toggle.locator('.bn-toggle-button')
+    toggle_wrapper = toggle.locator('.bn-toggle-wrapper')
+    browser.page.wait_for_function(
+        "element => element.dataset.showChildren === 'true'",
+        arg=toggle_wrapper.element_handle(),
+    )
+    assert toggle_button.evaluate(
+        'element => getComputedStyle(element).display'
+    ) == 'none'
+
+    # Showing the formatting toolbar without a configured AI extension must
+    # not render its AI button or unmount the complete editor.
+    toggle.locator('.bn-inline-content').select_text()
+    formatting_toolbar = browser.page.locator('.bn-formatting-toolbar')
+    formatting_toolbar.wait_for(timeout=5_000)
+    assert formatting_toolbar.get_by_role(
+        'button', name='Mit KI bearbeiten'
+    ).count() == 0
+    assert wrapper.locator('[data-onegov-blocknote-editor]').count() == 1
+
+    second_toggle = wrapper.locator(
+        '.bn-block-content[data-content-type="heading"]'
+        '[data-is-toggleable="true"]'
+    ).nth(1)
+    second_toggle_outer = second_toggle.locator('..').locator('..')
+    assert second_toggle_outer.evaluate(
+        'element => getComputedStyle(element).marginTop'
+    ) == '-16px'
+
+    browser.find_by_text('Speichern').click()
+    browser.page.wait_for_url('**/topics/organisation/toggle-spacing')
+    rendered_toggles = browser.page.locator('.page-text details')
+    assert rendered_toggles.count() == 2
+    assert rendered_toggles.evaluate_all(
+        'elements => elements.every(element => !element.open)'
+    )
+    assert rendered_toggles.nth(1).evaluate(
+        'element => getComputedStyle(element).marginTop'
+    ) == '-16px'

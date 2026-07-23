@@ -20,9 +20,14 @@ SANE_HTML_TAGS = [
     'br',
     'blockquote',
     'code',
+    'col',
+    'colgroup',
     'del',
+    'details',
     'div',
     'em',
+    'figcaption',
+    'figure',
     'i',
     'img',
     'hr',
@@ -31,6 +36,7 @@ SANE_HTML_TAGS = [
     'p',
     'pre',
     'strong',
+    'summary',
     'sup',
     'sub',
     'span',
@@ -76,6 +82,15 @@ VALID_PLAINTEXT_CHARACTERS = re.compile(r"""
 # match empty link expressions
 EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
 
+# BlockNote adds the boolean attribute to exported toggle blocks so their
+# content is visible outside the editor. Public pages should start with these
+# elements closed, including content saved before that became the default.
+DETAILS_TAG = re.compile(r'<details\b[^>]*>', re.IGNORECASE)
+OPEN_ATTRIBUTE = re.compile(
+    r'\s+open(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?',
+    re.IGNORECASE,
+)
+
 
 cleaner = Cleaner(
     tags=SANE_HTML_TAGS,
@@ -90,6 +105,15 @@ def sanitize_html(html: str | None) -> Markup:
     """
 
     return Markup(cleaner.clean(html or ''))  # nosec: B704
+
+
+def close_details(html: str) -> str:
+    """Removes the initial-open state from HTML details elements."""
+
+    return DETAILS_TAG.sub(
+        lambda match: OPEN_ATTRIBUTE.sub('', match.group(0)),
+        html,
+    )
 
 
 def sanitize_svg[T: str](svg: T) -> T:

@@ -65,6 +65,20 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v6
 
+    - name: Set up Node for the BlockNote asset contract
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+        cache: npm
+        cache-dependency-path: src/onegov/org/assets/src/blocknote/package-lock.json
+
+    - name: Verify generated BlockNote assets
+      working-directory: src/onegov/org/assets/src/blocknote
+      run: |
+        npm ci
+        npm run lint
+        npm run check
+
     - name: Install dependencies
       run: |
         source /app/bin/activate

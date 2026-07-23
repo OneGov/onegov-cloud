@@ -7,10 +7,30 @@ var adjustCaption = function(image) {
     });
 };
 
+// BlockNote exports standalone images as figures when they have a caption.
+// Keep that semantic caption as the single visible label instead of adding a
+// second label based on the image name or URL.
+var useFigureCaption = function(image) {
+    image = $(image);
+    var caption = image.closest('figure').children('figcaption').first();
+    var text = caption.text().trim();
+
+    if (!text) {
+        return false;
+    }
+
+    image.attr('alt', text);
+    return true;
+};
+
 // append the alt text below the image in a span element
 var appendAltText = function(image, alt) {
     image = $(image);
     var caption = null;
+
+    if (useFigureCaption(image)) {
+        return;
+    }
 
     image.attr('alt', alt);
 
@@ -32,12 +52,14 @@ var onLazyLoadAltText = function(element) {
     var target = $(element);
     var src = target.attr('src') || target.data('src');
 
-    if (target.parents('.redactor-editor').length !== 0) {
-        return; // skip inside the redactor editor
+    if (target.parents(
+        '.onegov-blocknote-wrapper, .onegov-resource-picker'
+    ).length !== 0) {
+        return; // skip inside editors and resource selection dialogs
     }
 
-    if (target.parents('#redactor-image-manager-box').length !== 0) {
-        return; // skip inside the image manger selection box
+    if (useFigureCaption(target)) {
+        return;
     }
 
     if (target.siblings('.alt-text').length !== 0) {

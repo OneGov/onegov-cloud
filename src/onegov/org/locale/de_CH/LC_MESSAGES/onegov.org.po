@@ -5074,6 +5074,21 @@ msgstr "Vollbild"
 msgid "Zoom in/out"
 msgstr "Zoom"
 
+msgid "Crop image"
+msgstr "Bild zuschneiden"
+
+msgid "Rotation"
+msgstr "Drehung"
+
+msgid "Apply"
+msgstr "Übernehmen"
+
+msgid "The image could not be cropped."
+msgstr "Das Bild konnte nicht zugeschnitten werden."
+
+msgid "An image is already being cropped."
+msgstr "Ein Bild wird bereits zugeschnitten."
+
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
 "photos to an album and mark it as available for the homepage."

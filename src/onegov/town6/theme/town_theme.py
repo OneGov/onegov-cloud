@@ -126,7 +126,6 @@ class TownTheme(BaseTheme):
             'popup',
             'fullcalendar',
             'alert',
-            'redactor',
             'directories',
             'daypicker',
             'payment',

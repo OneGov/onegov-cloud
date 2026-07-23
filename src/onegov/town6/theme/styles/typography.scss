@@ -130,8 +130,7 @@ a {
     }
 }
 
-p.edit-note,
-.redactor-dropdown .redactor-formatting-p-edit-note {
+p.edit-note {
     color: $aluminum;
     font-size: .875rem;
     font-style: italic;
@@ -139,5 +138,17 @@ p.edit-note,
     &::before {
         @include icon('\f249');
         margin-right: .25rem;
+    }
+}
+
+sub {
+    vertical-align: sub !important;
+}
+
+ol.alpha-list {
+    list-style-type: lower-alpha;
+
+    ol:not(.alpha-list) {
+        list-style-type: decimal;
     }
 }

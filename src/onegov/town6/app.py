@@ -299,15 +299,6 @@ def get_common_asset() -> Iterator[str]:
 
 @TownApp.webasset('editor')
 def get_editor_asset() -> Iterator[str]:
-    yield 'bufferbuttons.js'
-    yield 'definedlinks.js'
-    yield 'filemanager.js'
-    yield 'imagemanager.js'
-    yield 'table.js'
-    yield 'alphalist.js'
-    yield 'redactor.de.js'
-    yield 'redactor.fr.js'
-    yield 'redactor.it.js'
     yield 'input_with_button.js'
     yield 'editor.js'
 

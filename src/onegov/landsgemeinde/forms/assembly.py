@@ -150,7 +150,7 @@ class AssemblyForm(NamedFileForm):
 
     def on_request(self) -> None:
         DefaultLayout(self.model, self.request)
-        self.request.include('redactor')
+        self.request.include('blocknote')
         self.request.include('editor')
         self.video_url.description = _(
             'The URL to the video of the ${assembly_type}.',

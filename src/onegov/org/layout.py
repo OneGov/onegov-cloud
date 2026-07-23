@@ -11,7 +11,8 @@ from dateutil import rrule
 from dateutil.rrule import rrulestr
 from decimal import Decimal
 from functools import cached_property
-from markupsafe import Markup
+from html import unescape
+from markupsafe import escape, Markup
 from math import isclose
 from os.path import splitext, basename
 
@@ -22,6 +23,7 @@ from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
 from onegov.core.framework import layout_predicate
+from onegov.core.html import close_details
 from onegov.form.collection import SurveyCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
@@ -85,6 +87,7 @@ from onegov.user.utils import password_reset_url
 from operator import itemgetter
 from sedate import to_timezone
 from translationstring import TranslationString
+from urllib.parse import urlsplit
 
 from typing import overload, Any, TYPE_CHECKING
 
@@ -115,6 +118,20 @@ if TYPE_CHECKING:
 
 
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
+photo_album_paragraph = re.compile(
+    r'<p\b[^>]*>.*?</p>',
+    re.IGNORECASE | re.DOTALL
+)
+photo_album_class = re.compile(
+    r"""(?:^|\s)class\s*=\s*(["'])(.*?)\1""",
+    re.IGNORECASE | re.DOTALL
+)
+photo_album_href = re.compile(
+    r"""<a\b[^>]*\bhref=(["'])(.*?)\1""",
+    re.IGNORECASE | re.DOTALL
+)
+photo_album_path = re.compile(r'/photoalbum/([0-9a-f]{64})/?$')
+rich_text_image = re.compile(r'<img\b', re.IGNORECASE)
 
 
 class Layout(ChameleonLayout, OpenGraphMixin):
@@ -359,9 +376,29 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @cached_property
+    def photoalbum_list_url(self) -> str:
+        """Adds the JSON URL for photo-album lists."""
+        return self.request.link(
+            ImageSetCollection(self.request.session), name='json'
+        )
+
+    @cached_property
     def sitecollection_url(self) -> str:
         """ Adds the json url for internal links lists. """
         return self.request.link(SiteCollection(self.request.session))
+
+    @cached_property
+    def blocknote_ai_url(self) -> str | None:
+        """The private endpoint used by BlockNote's AI transport."""
+        if (
+            not self.request.is_manager
+            or not self.request.app.infomaniak_api_token
+            or not self.request.app.infomaniak_product_id
+        ):
+            return None
+        return self.csrf_protected_url(
+            self.request.link(self.org, name='blocknote-ai')
+        )
 
     @cached_property
     def homepage_url(self) -> str:
@@ -542,7 +579,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         ]
 
     def include_editor(self) -> None:
-        self.request.include('redactor')
+        self.request.include('blocknote')
         self.request.include('editor')
 
     def include_code_editor(self) -> None:
@@ -757,6 +794,94 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         if isinstance(text, Markup):
             return linkified
         return linkified.replace('\n', Markup('<br>'))
+
+    def photo_album_blocks(
+        self,
+        text: str | Markup
+    ) -> list[tuple[Markup | None, ImageSet | None]]:
+        """Splits rich text at embedded photo-album markers.
+
+        Valid local albums are returned as models so the active theme can
+        render their current images at the marker's exact position. Invalid
+        or deleted albums retain their stored link fallback. Albums the
+        current visitor cannot access are omitted completely.
+        """
+
+        # Rich text is stored as Markup. Keep the previous template semantics
+        # for callers passing plain text instead of accidentally trusting it.
+        if not isinstance(text, Markup):
+            return [(escape(text), None)]
+
+        # ``text`` has already crossed the sanitizing boundary and is Markup.
+        # Removing the boolean ``open`` attribute cannot introduce HTML, so
+        # retain that trust once and let Markup slicing preserve it below.
+        source = Markup(close_details(str(text)))  # nosec: B704
+        if rich_text_image.search(source):
+            self.request.include('photoswipe')
+
+        blocks: list[tuple[Markup | None, ImageSet | None]] = []
+        position = 0
+
+        for marker in photo_album_paragraph.finditer(source):
+            marker_html = marker.group(0)
+            opening_tag = marker_html.partition('>')[0]
+            class_match = photo_album_class.search(opening_tag)
+            if (
+                class_match is None
+                or 'onegov-photoalbum-block'
+                not in class_match.group(2).split()
+            ):
+                continue
+
+            if marker.start() > position:
+                blocks.append((source[position:marker.start()], None))
+
+            href_match = photo_album_href.search(marker_html)
+            imageset = None
+            inaccessible = False
+
+            if href_match:
+                href = unescape(href_match.group(2))
+                path = urlsplit(href).path
+                id_match = photo_album_path.search(path)
+                if id_match:
+                    candidate = ImageSetCollection(
+                        self.request.session
+                    ).by_id(id_match.group(1))
+                    if candidate is not None:
+                        expected_path = urlsplit(
+                            self.request.link(candidate)
+                        ).path.rstrip('/')
+                        if path.rstrip('/') == expected_path:
+                            if self.request.is_public(candidate):
+                                imageset = candidate
+                            else:
+                                inaccessible = True
+
+            if inaccessible:
+                pass
+            elif imageset is None:
+                blocks.append((source[marker.start():marker.end()], None))
+            else:
+                blocks.append((None, imageset))
+                if imageset.files:
+                    self.request.include('photoswipe')
+
+            position = marker.end()
+
+        if position < len(source):
+            blocks.append((source[position:], None))
+
+        return blocks if position else [(source, None)]
+
+    @staticmethod
+    def rich_text_has_images(
+        blocks: list[tuple[Markup | None, ImageSet | None]]
+    ) -> bool:
+        return any(
+            html is not None and rich_text_image.search(str(html))
+            for html, _imageset in blocks
+        )
 
     def linkify_field(self, field: Field, rendered: Markup) -> Markup:
         include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')

@@ -824,15 +824,6 @@ def get_code_editor_asset() -> Iterator[str]:
 
 @OrgApp.webasset('editor')
 def get_editor_asset() -> Iterator[str]:
-    yield 'bufferbuttons.js'
-    yield 'definedlinks.js'
-    yield 'filemanager.js'
-    yield 'imagemanager.js'
-    yield 'table.js'
-    yield 'alphalist.js'
-    yield 'redactor.de.js'
-    yield 'redactor.fr.js'
-    yield 'redactor.it.js'
     yield 'input_with_button.js'
     yield 'editor.js'
 
@@ -842,12 +833,10 @@ def get_timeline_asset() -> Iterator[str]:
     yield 'timeline.jsx'
 
 
-# do NOT minify the redactor, or the copyright notice goes away, which
-# is something we are not allowed to do per our license
-@OrgApp.webasset('redactor', filters={'js': None})
-def get_redactor_asset() -> Iterator[str]:
-    yield 'redactor.js'
-    yield 'redactor.css'
+@OrgApp.webasset('blocknote', filters={'js': None, 'css': None})
+def get_blocknote_asset() -> Iterator[str]:
+    yield 'blocknote.bundle.min.js'
+    yield 'blocknote.bundle.min.css'
 
 
 @OrgApp.webasset('upload')

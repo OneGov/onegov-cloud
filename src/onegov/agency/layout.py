@@ -201,7 +201,7 @@ class AgencyLayout(
     request: AgencyRequest
 
     def include_editor(self) -> None:
-        self.request.include('redactor')
+        self.request.include('blocknote')
         self.request.include('editor')
 
     @cached_property

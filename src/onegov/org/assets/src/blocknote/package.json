@@ -1,0 +1,32 @@
+{
+  "name": "onegov-blocknote-editor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned BlockNote browser bundle for OneGov HTML fields",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "packageManager": "npm@11.12.1",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs --check",
+    "lint": "node --check build.mjs && esbuild blocknote-editor.jsx --bundle --conditions=style --format=iife --loader:.woff=dataurl --loader:.woff2=dataurl --outfile=/tmp/onegov-blocknote-lint.js",
+    "verify:clean": "npm ci && npm run lint && npm run check"
+  },
+  "dependencies": {
+    "@blocknote/core": "0.52.1",
+    "@blocknote/mantine": "0.52.1",
+    "@blocknote/react": "0.52.1",
+    "@blocknote/xl-ai": "0.52.1",
+    "@mantine/core": "9.4.2",
+    "@mantine/hooks": "9.4.2",
+    "ai": "6.0.234",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-easy-crop": "6.2.2"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.1"
+  }
+}

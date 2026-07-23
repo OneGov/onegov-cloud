@@ -1,0 +1,489 @@
+.onegov-blocknote-wrapper {
+  border: 1px solid #cacaca;
+  display: flex;
+  flex-direction: column;
+  font-weight: normal;
+  margin: 0 0 1rem;
+  position: relative;
+}
+
+.onegov-blocknote-textarea {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.onegov-blocknote-toolbar {
+  align-items: center;
+  background: #f5f5f5;
+  border-top: 1px solid #cacaca;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .125rem;
+  padding: .25rem;
+}
+
+.onegov-blocknote-toolbar-button {
+  background: transparent;
+  border: 0;
+  border-radius: .2rem;
+  color: #333;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.5;
+  min-height: 2rem;
+  min-width: 2rem;
+  padding: .2rem .45rem;
+}
+
+.onegov-blocknote-toolbar-button:focus,
+.onegov-blocknote-toolbar-button:hover {
+  background: #e2e2e2;
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.onegov-blocknote-view .bn-editor {
+  --onegov-ai-accent: var(--onegov-primary-color, #006fba);
+  min-height: 12rem;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+}
+
+/* AI changes remain suggestions until they are accepted. Keep additions,
+   modifications, and removals visually distinct and do not rely on colour
+   alone. Both selector variants are supported because BlockNote uses semantic
+   marks for AI operations and suggestion classes for block-level changes. */
+.onegov-blocknote-view
+  .bn-editor
+  :is(
+    ins[data-id][data-inline="true"],
+    .bn-suggestion-mark:not(.bn-suggestion-mark--delete)
+  ) {
+  background-color: #e5f2fa;
+  background-color: color-mix(
+    in srgb,
+    var(--onegov-ai-accent) 16%,
+    white
+  );
+  border-bottom: .15rem solid var(--onegov-ai-accent);
+  border-radius: .2rem;
+  box-decoration-break: clone;
+  color: inherit;
+  padding: .05em .12em;
+  text-decoration: none;
+  -webkit-box-decoration-break: clone;
+}
+
+.onegov-blocknote-view
+  .bn-editor
+  :is(
+    ins[data-id][data-inline="false"],
+    .bn-suggestion-node:not(.bn-suggestion-node--delete)
+  )
+  > * {
+  background-color: #e5f2fa;
+  background-color: color-mix(
+    in srgb,
+    var(--onegov-ai-accent) 16%,
+    white
+  );
+  border-radius: .25rem;
+  box-shadow: inset .25rem 0 0 var(--onegov-ai-accent);
+}
+
+.onegov-blocknote-view
+  .bn-editor
+  [data-type="modification"][data-id] {
+  background-color: #eef7fc;
+  background-color: color-mix(
+    in srgb,
+    var(--onegov-ai-accent) 9%,
+    white
+  );
+  text-decoration: underline dashed var(--onegov-ai-accent) .12rem;
+  text-underline-offset: .18rem;
+}
+
+.onegov-blocknote-view
+  .bn-editor
+  :is(
+    del[data-id][data-inline="true"],
+    .bn-suggestion-mark--delete
+  ) {
+  background-color: #fdecec;
+  border-radius: .2rem;
+  color: #8b1e1e;
+  text-decoration: line-through .12rem;
+}
+
+.onegov-blocknote-view
+  .bn-editor
+  :is(
+    del[data-id][data-inline="false"],
+    .bn-suggestion-node--delete
+  )
+  > * {
+  background-color: #fdecec;
+  border-radius: .25rem;
+  box-shadow: inset .25rem 0 0 #b42318;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]
+  .bn-inline-content {
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]
+  h2.bn-inline-content {
+  font-size: 2rem;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]
+  h3.bn-inline-content {
+  font-size: 1.5rem;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]
+  h4.bn-inline-content {
+  font-size: 1.25rem;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]
+  h5.bn-inline-content {
+  font-size: 1.1rem;
+}
+
+/* The side-menu + first inserts a paragraph and immediately changes its type.
+   Keep the new heading's container at its final size while BlockNote still
+   exposes the previous paragraph type for its transition. */
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]:has(h2.bn-inline-content) {
+  font-size: 2rem !important;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]:has(h3.bn-inline-content) {
+  font-size: 1.5rem !important;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]:has(h4.bn-inline-content) {
+  font-size: 1.25rem !important;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"]:has(h5.bn-inline-content) {
+  font-size: 1.1rem !important;
+}
+
+.onegov-blocknote-view
+  .bn-block:has(
+    > .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  ) {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: .5rem;
+  box-sizing: border-box;
+  margin: .5rem 0 1.5rem;
+  padding: 0;
+}
+
+.onegov-blocknote-view
+  .bn-block-outer:has(
+    > .bn-block
+    > .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  )
+  + .bn-block-outer:has(
+    > .bn-block
+    > .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  ) {
+  margin-top: -1rem;
+}
+
+.onegov-blocknote-view
+  .bn-block:has(
+    > .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  )
+  > .bn-block-content {
+  padding: 1.5rem 2rem;
+  width: 100%;
+}
+
+.onegov-blocknote-view
+  .bn-block:has(
+    > .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  )
+  > .bn-block-group {
+  border-top: 1px solid #e9ecef;
+  display: block !important;
+  margin: 0;
+  padding: 1.5rem 2rem;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  > div {
+  width: 100%;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  .bn-toggle-wrapper {
+  gap: 1rem;
+  width: 100%;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  .bn-toggle-button {
+  display: none;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  .bn-inline-content {
+  color: #212529;
+  font-size: 1.25rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+  h3.bn-inline-content {
+  font-size: 1.125rem;
+}
+
+@media (max-width: 36rem) {
+  .onegov-blocknote-view
+    .bn-block:has(
+      > .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+    )
+    > .bn-block-content,
+  .onegov-blocknote-view
+    .bn-block:has(
+      > .bn-block-content[data-content-type="heading"][data-is-toggleable="true"]
+    )
+    > .bn-block-group {
+    padding: 1rem;
+  }
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="bulletListItem"]::before {
+  content: "•" !important;
+  display: flex;
+  justify-content: center;
+  min-width: 24px;
+  padding-right: 4px;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="bulletListItem"]
+  ~ .bn-block-group
+  > .bn-block-outer
+  > .bn-block
+  > .bn-block-content[data-content-type="bulletListItem"]::before {
+  content: "◦" !important;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="bulletListItem"]
+  ~ .bn-block-group
+  .bn-block-content[data-content-type="bulletListItem"]
+  ~ .bn-block-group
+  > .bn-block-outer
+  > .bn-block
+  > .bn-block-content[data-content-type="bulletListItem"]::before {
+  content: "▪\FE0E" !important;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="numberedListItem"]::before {
+  content: attr(data-index) "." !important;
+  display: flex;
+  justify-content: center;
+  min-width: 24px;
+  padding-right: 4px;
+}
+
+.onegov-blocknote-view .bn-block-content[data-content-type="editNote"],
+.onegov-blocknote-edit-note {
+  background: #fff7d6;
+  border-left: .25rem solid #e0ad00;
+  padding: .5rem .75rem;
+}
+
+.onegov-blocknote-photo-album {
+  align-items: center;
+  background: #f7f7f7;
+  border: 1px solid #cacaca;
+  border-radius: .25rem;
+  display: flex;
+  gap: .75rem;
+  min-height: 4rem;
+  padding: .75rem 1rem;
+  width: 100%;
+}
+
+.onegov-blocknote-photo-album-icon {
+  align-items: center;
+  background: #e4e4e4;
+  border-radius: .25rem;
+  display: inline-flex;
+  font-size: 1.5rem;
+  height: 2.5rem;
+  justify-content: center;
+  width: 2.5rem;
+}
+
+.onegov-blocknote-photo-album-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.onegov-blocknote-photo-album-content span {
+  color: #666;
+  font-size: .8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onegov-blocknote-view
+  .bn-block-content[data-content-type="numberedListItem"][data-background-color="onegov-alpha-list"]::before {
+  content: attr(data-text-color) !important;
+}
+
+.onegov-blocknote-icon {
+  align-items: center;
+  display: inline-flex;
+  font-size: .75rem;
+  font-weight: 700;
+  justify-content: center;
+  min-width: 1.2rem;
+}
+
+.onegov-blocknote-dialog-overlay {
+  align-items: center;
+  background: rgba(0, 0, 0, .55);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1rem;
+  position: fixed;
+  z-index: 10060;
+}
+
+.onegov-blocknote-dialog {
+  background: #fff;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, .3);
+  max-height: 90vh;
+  max-width: 64rem;
+  overflow: auto;
+  padding: 1.25rem;
+  width: 100%;
+}
+
+.onegov-blocknote-dialog textarea {
+  font-family: monospace;
+  min-height: 20rem;
+  width: 100%;
+}
+
+.onegov-blocknote-dialog-actions {
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+}
+
+.onegov-image-crop-overlay {
+  align-items: center;
+  background: rgba(0, 0, 0, .65);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1rem;
+  position: fixed;
+  z-index: 10070;
+}
+
+.onegov-image-crop-dialog {
+  background: #fff;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, .35);
+  max-height: 95vh;
+  max-width: 54rem;
+  overflow: auto;
+  padding: 1.25rem;
+  width: 100%;
+}
+
+.onegov-image-crop-dialog h2 {
+  margin-top: 0;
+}
+
+.onegov-image-crop-stage {
+  background: #222;
+  height: min(56vh, 32rem);
+  min-height: 18rem;
+  position: relative;
+  width: 100%;
+}
+
+.onegov-image-crop-controls {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 1rem 0;
+}
+
+.onegov-image-crop-controls label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  gap: .35rem;
+}
+
+.onegov-image-crop-controls input {
+  margin: 0;
+  width: 100%;
+}
+
+.onegov-image-crop-actions {
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+}
+
+.onegov-blocknote-error {
+  color: #b42318;
+}
+
+@media (max-width: 36rem) {
+  .onegov-image-crop-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .onegov-image-crop-stage {
+    min-height: 14rem;
+  }
+}
+
+@media print {
+  .onegov-blocknote-toolbar,
+  .onegov-image-crop-overlay {
+    display: none;
+  }
+}

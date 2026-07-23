@@ -109,7 +109,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     @property
     def portrait_html(self) -> Markup | None:
-        """ The portrait saved as HTML from the redactor js plugin. """
+        """ The portrait saved as HTML from the rich-text editor. """
 
         return self.portrait
 

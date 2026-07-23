@@ -19,7 +19,7 @@ from purl import URL
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.types import RenderData
+    from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
     from webob import Response
 
@@ -53,6 +53,27 @@ def view_imagesets(
         'title': _('Photo Albums'),
         'imagesets': request.exclude_invisible(imagesets)
     }
+
+
+@OrgApp.json(model=ImageSetCollection, name='json', permission=Private,
+             open_data=False)
+def get_imagesets_json(
+    self: ImageSetCollection,
+    request: OrgRequest
+) -> JSON_ro:
+    """Returns the photo albums offered by the rich-text editor."""
+
+    imagesets = sorted(
+        request.exclude_invisible(self.query()),
+        key=lambda imageset: imageset.title.casefold()
+    )
+    return [
+        {
+            'name': imageset.title,
+            'url': request.link(imageset)
+        }
+        for imageset in imagesets
+    ]
 
 
 @OrgApp.html(model=ImageSet, name='select', template='select_images.pt',

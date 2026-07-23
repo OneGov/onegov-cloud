@@ -10,7 +10,11 @@ from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryCollection
 from onegov.file import FileCollection
-from onegov.org.models import ResourceRecipientCollection
+from onegov.org.models import (
+    ImageFileCollection,
+    ImageSetCollection,
+    ResourceRecipientCollection,
+)
 from onegov.people import Person
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -25,6 +29,7 @@ from time import sleep
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from playwright.sync_api import Locator
     from tests.shared.browser import ExtendedBrowser
     from .conftest import Client, TestOrgApp
 
@@ -540,6 +545,867 @@ def test_context_specific_function_are_displayed_in_person_directory(
 
     browser.visit(f"/person/{person.id.hex}")
     browser.find_by_text('All About Berry: Logician')
+
+
+@pytest.mark.xdist_group(name="browser")
+def test_blocknote_editor_roundtrip(
+    browser: ExtendedBrowser,
+    org_app: TestOrgApp,
+) -> None:
+    org_app.infomaniak_api_token = 'blocknote-ai-test-token'
+    org_app.infomaniak_product_id = 'blocknote-ai-test-product'
+    album = ImageSetCollection(org_app.session()).add(title='Sommerfest')
+    album_image = ImageFileCollection(org_app.session()).add(
+        'sommerfest.png',
+        create_image().read(),
+        note='Sommerfest Bild',
+    )
+    album.files = [album_image]
+    transaction.commit()
+
+    browser.login_admin()
+    browser.visit('/editor/new/page/1')
+
+    wrapper = browser.page.locator(
+        '.field-text .onegov-blocknote-wrapper'
+        '[data-onegov-blocknote-wrapper]'
+    )
+    wrapper.wait_for(timeout=15_000)
+    editor = wrapper.locator('[data-onegov-blocknote-editor]')
+    editor.wait_for(timeout=15_000)
+
+    source_field = browser.page.locator('.field-text textarea.editor')
+    assert source_field.get_attribute('aria-hidden') == 'true'
+    assert browser.page.locator('.redactor-editor').count() == 0
+
+    ai_styles = browser.page.evaluate("""() => {
+        const host = document.createElement('div');
+        host.className = 'onegov-blocknote-view';
+        host.style.setProperty('--onegov-primary-color', '#006fba');
+        host.innerHTML = `
+            <div class="bn-editor">
+                <ins data-id="1" data-inline="true">Added</ins>
+                <span data-id="2" data-type="modification">Changed</span>
+                <del data-id="3" data-inline="true">Removed</del>
+            </div>`;
+        document.body.append(host);
+        const added = getComputedStyle(host.querySelector('ins'));
+        const changed = getComputedStyle(host.querySelector(
+            '[data-type="modification"]'
+        ));
+        const removed = getComputedStyle(host.querySelector('del'));
+        const result = {
+            addedBackground: added.backgroundColor,
+            addedBorder: added.borderBottomColor,
+            changedDecoration: changed.textDecorationStyle,
+            removedBackground: removed.backgroundColor,
+            removedDecoration: removed.textDecorationLine,
+        };
+        host.remove();
+        return result;
+    }""")
+    assert ai_styles['addedBackground'] not in (
+        'rgba(0, 0, 0, 0)',
+        'rgb(255, 255, 255)',
+    )
+    assert ai_styles['addedBorder'] == 'rgb(0, 111, 186)'
+    assert ai_styles['changedDecoration'] == 'dashed'
+    assert ai_styles['removedBackground'] == 'rgb(253, 236, 236)'
+    assert ai_styles['removedDecoration'] == 'line-through'
+
+    # The toolbar is displayed below the editor and must not intercept the
+    # normal tab order when entering the rich-text field.
+    toolbar = wrapper.locator('.onegov-blocknote-toolbar')
+    toolbar_box = toolbar.bounding_box()
+    editor_box = editor.bounding_box()
+    assert toolbar_box and editor_box
+    assert toolbar_box['y'] > editor_box['y']
+    browser.page.locator('[name="lead"]').focus()
+    browser.page.keyboard.press('Tab')
+    assert editor.evaluate('element => document.activeElement === element')
+
+    browser.fill('title', 'BlockNote Roundtrip')
+    editor.locator('.bn-inline-content').first.click()
+    wrapper.locator('[data-onegov-blocknote-control="undo"]').click()
+    assert editor.evaluate('element => document.activeElement === element')
+
+    wrapper.locator('button[title="HTML"]').click()
+    wrapper.locator('.onegov-blocknote-dialog textarea').wait_for()
+    browser.page.keyboard.press('Escape')
+    assert editor.evaluate('element => document.activeElement === element')
+
+    wrapper.locator('button[title="HTML"]').click()
+    source = wrapper.locator('.onegov-blocknote-dialog textarea')
+    source.fill(
+        '<h2>Heading</h2>'
+        '<p>Delete me</p>'
+        '<p><strong>Bold</strong>, <em>italic</em>, '
+        '<del>deleted</del>, H<sub>2</sub>O and x<sup>2</sup>.</p>'
+        '<p class="edit-note">Editorial '
+        '<a href="/topics/organisation" title="Home">note</a></p>'
+        '<ol><li>Numeric</li></ol>'
+        '<ol class="alpha-list"><li>First</li><li>Second</li></ol>'
+        '<p>Break</p><ol class="alpha-list"><li>Restart</li></ol>'
+        '<table><tbody><tr><th>Head</th><td>Cell</td></tr></tbody></table>'
+        '<pre>&lt;example&gt;</pre>'
+    )
+    wrapper.locator(
+        '.onegov-blocknote-dialog-actions .button:not(.secondary)'
+    ).click()
+
+    editor.locator(
+        '.bn-block-content[data-content-type="paragraph"] .bn-inline-content'
+    ).first.wait_for(timeout=5_000)
+    editor.locator(
+        '.bn-block-content[data-content-type="paragraph"] .bn-inline-content',
+        has_text='Bold',
+    ).select_text()
+    formatting_toolbar = browser.page.locator('.bn-formatting-toolbar')
+    formatting_toolbar.wait_for(timeout=5_000)
+    assert formatting_toolbar.locator('[data-test="createLink"]').count() == 1
+    assert formatting_toolbar.get_by_role(
+        'button', name='Mit KI bearbeiten'
+    ).count() == 1
+    assert formatting_toolbar.get_by_role(
+        'button', name='Hochgestellt'
+    ).count() == 1
+    assert formatting_toolbar.get_by_role(
+        'button', name='Tiefgestellt'
+    ).count() == 1
+
+    formatting_toolbar.get_by_text('Absatz', exact=True).click()
+    browser.page.get_by_text('Überschrift 2', exact=True).click()
+    formatted_block = editor.locator(
+        '.bn-block-content[data-content-type="heading"]',
+        has_text='Bold',
+    )
+    heading = formatted_block.locator('h2')
+    assert heading.count() == 1
+    heading_size = heading.evaluate(
+        'element => parseFloat(getComputedStyle(element).fontSize)'
+    )
+    paragraph_size = editor.locator(
+        '.bn-block-content[data-content-type="paragraph"] .bn-inline-content',
+        has_text='Delete me',
+    ).evaluate('element => parseFloat(getComputedStyle(element).fontSize)')
+    assert heading_size > paragraph_size
+    formatted_block.locator('.bn-inline-content').select_text()
+    formatting_toolbar.get_by_text('Überschrift 2', exact=True).click()
+    browser.page.get_by_text('Absatz', exact=True).click()
+    paragraph_block = editor.locator(
+        '.bn-block-content[data-content-type="paragraph"]', has_text='Bold'
+    )
+    assert paragraph_block.count() == 1
+
+    paragraph_block.locator('.bn-inline-content').select_text()
+    formatting_toolbar.get_by_text('Absatz', exact=True).click()
+    browser.page.get_by_text('Aufzählungsliste', exact=True).click()
+    bullet_block = editor.locator(
+        '.bn-block-content[data-content-type="bulletListItem"]',
+        has_text='Bold',
+    )
+    assert bullet_block.evaluate(
+        "element => getComputedStyle(element, '::before').content"
+    ).strip('"') == '•'
+
+    bullet_block.locator('.bn-inline-content').select_text()
+    formatting_toolbar.get_by_text('Aufzählungsliste', exact=True).click()
+    browser.page.get_by_text('Nummerierte Liste', exact=True).click()
+    numbered_block = editor.locator(
+        '.bn-block-content[data-content-type="numberedListItem"]',
+        has_text='Bold',
+    )
+    assert numbered_block.evaluate(
+        "element => getComputedStyle(element, '::before').content"
+    ).strip('"') == '1.'
+
+    numbered_block.locator('.bn-inline-content').select_text()
+    formatting_toolbar.get_by_text('Nummerierte Liste', exact=True).click()
+    browser.page.get_by_text('Zitat', exact=True).click()
+    quote_block = editor.locator(
+        '.bn-block-content[data-content-type="quote"]', has_text='Bold'
+    )
+    assert quote_block.locator('blockquote').count() == 1
+
+    quote_block.locator('.bn-inline-content').select_text()
+    formatting_toolbar.get_by_text('Zitat', exact=True).click()
+    browser.page.get_by_text('Absatz', exact=True).click()
+    paragraph_block = editor.locator(
+        '.bn-block-content[data-content-type="paragraph"]', has_text='Bold'
+    )
+    assert paragraph_block.count() == 1
+
+    # Creating a list through the side-menu plus uses a different BlockNote
+    # insertion path than converting an existing paragraph.
+    paragraph_block.hover()
+    wrapper.locator('[data-test="dragHandleAdd"]').click()
+    plus_menu = browser.page.locator('#bn-suggestion-menu').last
+    plus_menu.wait_for(timeout=5_000)
+    plus_menu.get_by_text('Aufzählungsliste', exact=True).click()
+    browser.page.wait_for_function(
+        """() => {
+            const editor = document.querySelector(
+                '[data-onegov-blocknote-editor]'
+            );
+            return editor?.contains(document.activeElement);
+        }"""
+    )
+    assert editor.evaluate(
+        'element => element.contains(document.activeElement)'
+    )
+    added_bullet = editor.locator(
+        '.bn-block-content[data-content-type="bulletListItem"]'
+    ).last
+    assert added_bullet.evaluate(
+        "element => getComputedStyle(element, '::before').content"
+    ).strip('"') == '•'
+    added_bullet.locator('.bn-inline-content').fill('Added list item')
+
+    added_bullet.hover()
+    wrapper.locator('[data-test="dragHandleAdd"]').click()
+    plus_menu.wait_for(timeout=5_000)
+    plus_menu.get_by_text('Überschrift 2', exact=True).click()
+    browser.page.wait_for_function(
+        """() => document.querySelector(
+            '[data-onegov-blocknote-editor]'
+        )?.contains(document.activeElement)"""
+    )
+    assert editor.evaluate(
+        'element => element.contains(document.activeElement)'
+    )
+    added_heading = editor.locator(
+        '.bn-block-content[data-content-type="heading"]'
+    ).last
+    assert added_heading.locator('h2').count() == 1
+    assert added_heading.evaluate(
+        'element => parseFloat(getComputedStyle(element).fontSize)'
+    ) > paragraph_size
+    added_heading.locator('.bn-inline-content').fill('Added heading')
+
+    added_heading.hover()
+    wrapper.locator('[data-test="dragHandleAdd"]').click()
+    plus_menu.wait_for(timeout=5_000)
+    assert plus_menu.get_by_text('Überschrift 4', exact=True).count() == 1
+    assert plus_menu.get_by_text('Überschrift 5', exact=True).count() == 1
+    plus_menu.get_by_text('Überschrift 4', exact=True).click()
+    added_subheading = editor.locator(
+        '.bn-block-content[data-content-type="heading"]'
+    ).last
+    assert added_subheading.locator('h4').count() == 1
+    assert added_subheading.evaluate(
+        'element => parseFloat(getComputedStyle(element).fontSize)'
+    ) > paragraph_size
+    added_subheading.locator('.bn-inline-content').fill('Added subheading')
+
+    added_subheading.hover()
+    wrapper.locator('[data-test="dragHandleAdd"]').click()
+    plus_menu.wait_for(timeout=5_000)
+    assert plus_menu.get_by_text(
+        'Aufklappbare Überschrift 2', exact=True
+    ).count() == 1
+    assert plus_menu.get_by_text(
+        'Aufklappbare Überschrift 3', exact=True
+    ).count() == 1
+    plus_menu.get_by_text(
+        'Aufklappbare Überschrift 2', exact=True
+    ).click()
+    browser.page.wait_for_function(
+        """() => document.querySelector(
+            '[data-onegov-blocknote-editor]'
+        )?.contains(document.activeElement)"""
+    )
+    added_toggle = editor.locator(
+        '.bn-block-content[data-content-type="heading"]'
+        '[data-is-toggleable="true"]'
+    ).last
+    assert added_toggle.locator('h2').count() == 1
+    assert added_toggle.locator('h2').evaluate(
+        'element => parseFloat(getComputedStyle(element).fontSize)'
+    ) > paragraph_size
+    toggle_block = added_toggle.locator('..')
+    assert toggle_block.evaluate(
+        "element => getComputedStyle(element).backgroundColor"
+    ) != 'rgba(0, 0, 0, 0)'
+    assert toggle_block.evaluate(
+        "element => getComputedStyle(element).borderTopStyle"
+    ) == 'solid'
+    added_toggle.locator('.bn-inline-content').fill('Toggle heading')
+    toggle_wrapper = added_toggle.locator('.bn-toggle-wrapper')
+    browser.page.wait_for_function(
+        "element => element.dataset.showChildren === 'true'",
+        arg=toggle_wrapper.element_handle(),
+    )
+    assert added_toggle.locator('.bn-toggle-button').evaluate(
+        "element => getComputedStyle(element).display"
+    ) == 'none'
+    add_toggle_child = added_toggle.locator('.bn-toggle-add-block-button')
+    add_toggle_child.wait_for(timeout=5_000)
+    add_toggle_child.click()
+    toggle_children = toggle_block.locator(':scope > .bn-block-group')
+    toggle_child = toggle_children.locator('.bn-inline-content').first
+    toggle_child.fill('Toggle content')
+    toggle_child.click()
+    browser.page.wait_for_timeout(50)
+    assert toggle_wrapper.get_attribute('data-show-children') == 'true'
+    browser.page.keyboard.type(' edited')
+    assert ' edited' in (toggle_child.text_content() or '')
+    assert toggle_children.evaluate(
+        "element => getComputedStyle(element).borderTopStyle"
+    ) == 'solid'
+    assert toggle_block.evaluate(
+        "element => getComputedStyle(element).borderRadius"
+    ) == '8px'
+    deletable = editor.locator(
+        '.bn-block-content[data-content-type="paragraph"]',
+        has_text='Delete me',
+    )
+    deletable.hover()
+    wrapper.locator(
+        '.bn-side-menu button[aria-label="Blockmenü öffnen"]'
+    ).click()
+    drag_handle_menu = browser.page.locator('.bn-drag-handle-menu')
+    assert drag_handle_menu.get_by_text('Farben', exact=True).count() == 0
+    drag_handle_menu.locator('.bn-menu-item', has_text='Löschen').click()
+    assert deletable.count() == 0
+    assert 'Delete me' not in source_field.input_value()
+
+    alpha_item = editor.locator(
+        '.bn-block-content[data-content-type="numberedListItem"] '
+        '.bn-inline-content'
+    ).nth(2)
+    alpha_item.fill('Second changed')
+    browser.page.wait_for_timeout(100)
+    restart_item = editor.locator(
+        '.bn-block-content[data-content-type="numberedListItem"] '
+        '.bn-inline-content'
+    ).nth(3)
+    alpha_marker = alpha_item.locator('..').evaluate(
+        "element => getComputedStyle(element, '::before').content"
+    )
+    restart_marker = restart_item.locator('..').evaluate(
+        "element => getComputedStyle(element, '::before').content"
+    )
+    assert alpha_marker.strip('"') == 'b.'
+    assert restart_marker.strip('"') == 'a.'
+
+    assert wrapper.locator(
+        '[data-onegov-blocknote-control="image"], '
+        '[data-onegov-blocknote-control="file"], '
+        '[data-onegov-blocknote-control="internal"]'
+    ).count() == 0
+    assert wrapper.locator(
+        '[data-onegov-blocknote-control="undo"], '
+        '[data-onegov-blocknote-control="redo"], '
+        '[data-onegov-blocknote-control="html"]'
+    ).count() == 3
+
+    def open_slash_menu() -> Locator:
+        break_block = editor.locator(
+            '.bn-block-content[data-content-type="paragraph"] '
+            '.bn-inline-content',
+            has_text='Break',
+        )
+        break_block.evaluate("""
+            element => {
+                element.focus();
+                const range = document.createRange();
+                const selection = window.getSelection();
+                range.selectNodeContents(element);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        """)
+        browser.page.keyboard.press('Enter')
+        browser.page.keyboard.type('/')
+        menu = browser.page.locator('#bn-suggestion-menu')
+        menu.wait_for(timeout=5_000)
+        return menu
+
+    slash_menu = open_slash_menu()
+    assert slash_menu.get_by_text('Bild', exact=True).count() == 1
+    assert slash_menu.get_by_text('Datei', exact=True).count() == 1
+    assert slash_menu.get_by_text('Interner Link', exact=True).count() == 1
+    assert slash_menu.get_by_text('Fotoalbum', exact=True).count() == 1
+    assert slash_menu.get_by_text('KI fragen', exact=True).count() == 1
+
+    open_slash_menu().get_by_text('Tabelle', exact=True).click()
+    assert editor.locator(
+        '.bn-block-content[data-content-type="table"]'
+    ).count() == 2
+    inserted_table = editor.locator(
+        '.bn-block-content[data-content-type="table"]'
+    ).first
+    inserted_cells = inserted_table.locator('td')
+    assert inserted_cells.count() == 6
+    for index, cell_text in enumerate((
+        'Und Text',
+        'Und mehr',
+        'Und noch mehr',
+    )):
+        inserted_cells.nth(index).click()
+        browser.page.keyboard.type(cell_text)
+    assert '<colgroup>' in source_field.input_value()
+
+    open_slash_menu().get_by_text('Bild', exact=True).click()
+    picker = browser.page.locator('.onegov-resource-picker-overlay')
+    picker.wait_for(timeout=5_000)
+    picker.locator('.onegov-resource-picker-close').click()
+    picker.wait_for(state='detached', timeout=5_000)
+    assert editor.locator(
+        '.bn-block-content[data-content-type="image"]'
+    ).count() == 0
+
+    image = create_image(
+        width=80,
+        height=80,
+        output=NamedTemporaryFile(suffix='.png'),
+    )
+    open_slash_menu().get_by_text('Bild', exact=True).click()
+    upload_input = browser.page.locator(
+        '.onegov-resource-picker-upload input[type="file"]'
+    )
+    upload_input.set_input_files(image.name)
+    crop_dialog = browser.page.locator('.onegov-image-crop-dialog')
+    crop_dialog.wait_for(timeout=5_000)
+    crop_area = crop_dialog.locator('.reactEasyCrop_CropArea')
+    crop_area.wait_for(timeout=5_000)
+    crop_box = crop_area.bounding_box()
+    assert crop_box
+    assert abs(crop_box['width'] / crop_box['height'] - 4 / 3) < 0.01
+    cancel_crop = crop_dialog.get_by_role('button', name='Abbrechen')
+    assert cancel_crop.evaluate(
+        'element => document.activeElement === element'
+    )
+    cancel_crop.click()
+    crop_dialog.wait_for(state='detached', timeout=5_000)
+    assert browser.page.locator('.onegov-resource-picker-overlay').count() == 1
+    assert editor.locator(
+        '.bn-block-content[data-content-type="image"]'
+    ).count() == 0
+
+    upload_input.set_input_files(image.name)
+    crop_dialog.wait_for(timeout=5_000)
+    crop_dialog.locator('input[name="image-crop-zoom"]').fill('1.2')
+    crop_dialog.locator('input[name="image-crop-rotation"]').fill('10')
+    crop_dialog.get_by_role('button', name='Übernehmen').click()
+    browser.page.locator('.onegov-resource-picker-overlay').wait_for(
+        state='detached', timeout=15_000
+    )
+    inserted_image = editor.locator(
+        '.bn-block-content[data-content-type="image"]'
+    )
+    assert inserted_image.count() == 1
+    inserted_preview = inserted_image.locator('img')
+    inserted_preview.wait_for(timeout=5_000)
+    browser.page.wait_for_function(
+        'element => element.naturalWidth > 0',
+        arg=inserted_preview.element_handle(),
+    )
+    inserted_size = inserted_preview.evaluate(
+        'element => [element.naturalWidth, element.naturalHeight]'
+    )
+    assert abs(inserted_size[0] / inserted_size[1] - 4 / 3) < 0.03
+    inserted_image.click()
+    formatting_toolbar = browser.page.locator('.bn-formatting-toolbar')
+    formatting_toolbar.wait_for(timeout=5_000)
+    assert formatting_toolbar.get_by_role(
+        'button', name='Hochgestellt'
+    ).count() == 0
+    assert formatting_toolbar.get_by_role(
+        'button', name='Tiefgestellt'
+    ).count() == 0
+    assert formatting_toolbar.get_by_role(
+        'button', name='Mit KI bearbeiten'
+    ).count() == 0
+    formatting_toolbar.get_by_role(
+        'button', name='Beschriftung bearbeiten'
+    ).click()
+    caption_input = browser.page.locator('input[name="file-caption"]')
+    caption_input.fill('Sommerfest am See')
+    browser.page.keyboard.press('Enter')
+    assert inserted_image.locator(
+        'figcaption.bn-file-caption', has_text='Sommerfest am See'
+    ).count() == 1
+
+    open_slash_menu().get_by_text('Fotoalbum', exact=True).click()
+    album_picker = browser.page.locator('.onegov-resource-picker-overlay')
+    album_picker.wait_for(timeout=5_000)
+    album_choice = album_picker.locator(
+        '.onegov-resource-picker-choice[aria-label="Sommerfest"]'
+    )
+    album_choice.wait_for(timeout=15_000)
+    assert album_picker.locator(
+        '.onegov-resource-picker-choice[aria-label="Organisation"]'
+    ).count() == 0
+    album_choice.click()
+    album_block = editor.locator(
+        '.bn-block-content[data-content-type="photoAlbum"]',
+        has_text='Sommerfest',
+    )
+    assert album_block.count() == 1
+    assert 'onegov-photoalbum-block' in source_field.input_value()
+
+    open_slash_menu().get_by_text('Datei', exact=True).click()
+    browser.page.locator(
+        '.onegov-resource-picker-upload input[type="file"]'
+    ).set_input_files(module_path('tests.onegov.org', 'fixtures/sample.pdf'))
+    browser.page.locator('.onegov-resource-picker-overlay').wait_for(
+        state='detached', timeout=15_000
+    )
+    assert editor.locator(
+        '.bn-block-content[data-content-type="file"]', has_text='sample.pdf'
+    ).count() == 1
+
+    open_slash_menu().get_by_text('Interner Link', exact=True).click()
+    internal_choice = browser.page.locator(
+        '.onegov-resource-picker-choice'
+    ).first
+    internal_choice.wait_for(timeout=15_000)
+    internal_label = internal_choice.get_attribute('aria-label')
+    assert internal_label
+    internal_choice.click()
+    internal_block = editor.locator(
+        '.bn-block-content[data-content-type="paragraph"] a',
+        has_text=internal_label,
+    )
+    assert internal_block.count() == 1
+
+    # The submit listener must synchronously serialize the latest document.
+    browser.find_by_text('Speichern').click()
+    browser.page.wait_for_url('**/topics/organisation/blocknote-roundtrip')
+
+    assert browser.page.get_by_role(
+        'heading', name='Heading', exact=True, level=2
+    ).count() == 1
+    assert browser.page.get_by_role(
+        'heading', name='Added heading', exact=True, level=2
+    ).count() == 1
+    assert browser.page.get_by_role(
+        'heading', name='Added subheading', exact=True, level=4
+    ).count() == 1
+    rendered_toggle = browser.page.locator(
+        '.page-text details', has_text='Toggle heading'
+    )
+    assert not rendered_toggle.evaluate('element => element.open')
+    assert rendered_toggle.locator(
+        ':scope > summary > h2', has_text='Toggle heading'
+    ).count() == 1
+    rendered_toggle_content = rendered_toggle.locator(':scope > p')
+    assert rendered_toggle_content.count() == 1
+    assert not rendered_toggle_content.is_visible()
+    assert ' edited' in (rendered_toggle_content.text_content() or '')
+    assert rendered_toggle.evaluate(
+        "element => getComputedStyle(element).borderRadius"
+    ) == '8px'
+    rendered_summary = rendered_toggle.locator(':scope > summary')
+    rendered_summary.click()
+    assert rendered_toggle.evaluate('element => element.open')
+    assert rendered_toggle_content.is_visible()
+    assert rendered_summary.evaluate(
+        "element => getComputedStyle(element).borderBottomStyle"
+    ) == 'solid'
+    assert rendered_summary.evaluate(
+        "element => getComputedStyle(element, '::after').borderTopColor"
+    ) == 'rgb(0, 111, 186)'
+    assert browser.page.locator('strong', has_text='Bold').count() == 1
+    assert browser.page.locator('em', has_text='italic').count() == 1
+    assert browser.page.locator('del', has_text='deleted').count() == 1
+    assert browser.page.locator('sub', has_text='2').count() == 1
+    assert browser.page.locator('sup', has_text='2').count() == 1
+    assert browser.page.locator(
+        'p.edit-note a[href="/topics/organisation"]', has_text='note'
+    ).count() == 1
+    assert browser.page.locator(
+        'ol.alpha-list > li', has_text='Second changed'
+    ).count() == 1
+    assert browser.page.locator(
+        'ol.alpha-list > li', has_text='Restart'
+    ).count() == 1
+    assert browser.page.locator('ol.alpha-list').count() == 2
+    assert browser.page.locator(
+        'ol:not(.alpha-list) > li', has_text='Numeric'
+    ).count() == 1
+    assert browser.page.locator(
+        'ul > li', has_text='Added list item'
+    ).count() == 1
+    assert browser.page.locator(
+        '.page-text a', has_text='sample.pdf'
+    ).count() == 1
+    assert browser.page.locator(
+        '.page-text a', has_text=internal_label
+    ).count() >= 1
+    assert browser.page.locator('.page-text img').count() == 2
+    standalone_figure = browser.page.locator(
+        '.page-text figure', has_text='Sommerfest am See'
+    )
+    figure_margins = standalone_figure.evaluate(
+        'element => {'
+        '  const style = getComputedStyle(element);'
+        '  return [parseFloat(style.marginTop), '
+        'parseFloat(style.marginBottom)];'
+        '}'
+    )
+    assert figure_margins[0] > 0
+    assert figure_margins[1] > figure_margins[0]
+    standalone_caption = standalone_figure.locator(
+        'figcaption', has_text='Sommerfest am See'
+    )
+    assert standalone_caption.count() == 1
+    assert standalone_caption.evaluate(
+        'element => getComputedStyle(element).backgroundColor'
+    ) == 'rgba(0, 0, 0, 0)'
+    assert standalone_caption.evaluate(
+        'element => parseFloat(getComputedStyle(element).paddingTop)'
+    ) > 0
+    assert standalone_figure.locator('.alt-text').count() == 0
+    standalone_image = standalone_figure.locator('img')
+    assert standalone_image.get_attribute('alt') == 'Sommerfest am See'
+    assert standalone_image.evaluate(
+        "element => element.closest('.photoswipe') !== null"
+    )
+    standalone_image.click()
+    lightbox = browser.page.locator('.pswp.pswp--open')
+    lightbox.wait_for(timeout=5_000)
+    assert lightbox.locator(
+        '.pswp__caption:not(.pswp__caption--fake)',
+        has_text='Sommerfest am See',
+    ).is_visible()
+    browser.page.wait_for_function(
+        "element => element.classList.contains('pswp--animated-in')",
+        arg=lightbox.element_handle(),
+    )
+    browser.page.keyboard.press('Escape')
+    lightbox.wait_for(state='hidden', timeout=5_000)
+    assert browser.page.locator(
+        '.grid-imageset.photoswipe img[alt="Sommerfest Bild"]'
+    ).count() == 1
+    assert browser.page.locator(
+        '.grid-imageset.photoswipe .alt-text', has_text='Sommerfest Bild'
+    ).count() == 1
+    assert browser.page.locator(
+        '.grid-imageset.photoswipe .alt-text', has_text='Sommerfest Bild'
+    ).evaluate(
+        'element => getComputedStyle(element).backgroundColor'
+    ) == 'rgba(0, 0, 0, 0)'
+    assert browser.page.evaluate(
+        '() => typeof window.PhotoSwipe === "function"'
+    )
+    assert browser.page.locator('table th', has_text='Head').count() == 1
+    assert browser.page.locator('table td', has_text='Cell').count() == 1
+    rendered_table = browser.page.locator('table', has_text='Und Text')
+    assert rendered_table.count() == 1
+    assert rendered_table.locator('colgroup > col').count() == 3
+    assert rendered_table.locator('td', has_text='Und mehr').count() == 1
+    assert all(
+        '<colgroup>' not in text
+        for text in browser.page.locator('.page-text').all_text_contents()
+    )
+    assert browser.page.locator('pre', has_text='<example>').count() == 1
+    assert browser.page.get_by_text('Delete me', exact=True).count() == 0
+
+    # Saving an editor that was not touched must retain accepted legacy HTML
+    # that BlockNote does not model as a native inline style.
+    legacy_markup = (
+        '<p><abbr title="Legacy abbreviation">Legacy</abbr> '
+        '<span>content</span></p><p>Other</p>'
+    )
+    browser.find_by_css('.edit-link').click()
+    wrapper = browser.page.locator(
+        '.field-text .onegov-blocknote-wrapper'
+        '[data-onegov-blocknote-wrapper]'
+    )
+    wrapper.wait_for(timeout=15_000)
+    reopened_editor = wrapper.locator('[data-onegov-blocknote-editor]')
+    assert reopened_editor.locator(
+        '.bn-block-content[data-content-type="image"]'
+    ).count() == 1
+    assert reopened_editor.locator(
+        '.bn-block-content[data-content-type="image"] '
+        'figcaption.bn-file-caption',
+        has_text='Sommerfest am See',
+    ).count() == 1
+    assert reopened_editor.locator(
+        '.bn-block-content[data-content-type="file"]', has_text='sample.pdf'
+    ).count() == 1
+    assert reopened_editor.locator(
+        '.bn-block-content[data-content-type="photoAlbum"]',
+        has_text='Sommerfest',
+    ).count() == 1
+    assert reopened_editor.locator(
+        '.bn-block-content[data-content-type="heading"]'
+        '[data-is-toggleable="true"]',
+        has_text='Toggle heading',
+    ).count() == 1
+    assert reopened_editor.locator(
+        '.bn-block-content[data-content-type="paragraph"] a',
+        has_text=internal_label,
+    ).count() == 1
+    wrapper.locator('button[title="HTML"]').click()
+    wrapper.locator('.onegov-blocknote-dialog textarea').fill(legacy_markup)
+    wrapper.locator(
+        '.onegov-blocknote-dialog-actions .button:not(.secondary)'
+    ).click()
+    browser.find_by_text('Speichern').click()
+    browser.page.wait_for_url('**/topics/organisation/blocknote-roundtrip')
+    assert browser.page.locator(
+        'abbr[title="Legacy abbreviation"]', has_text='Legacy'
+    ).count() == 1
+
+    browser.find_by_css('.edit-link').click()
+    wrapper = browser.page.locator(
+        '.field-text .onegov-blocknote-wrapper'
+        '[data-onegov-blocknote-wrapper]'
+    )
+    wrapper.wait_for(timeout=15_000)
+    browser.fill('title', 'BlockNote Untouched')
+    browser.find_by_text('Speichern').click()
+    browser.page.wait_for_url('**/topics/organisation/blocknote-roundtrip')
+    assert browser.page.locator(
+        'abbr[title="Legacy abbreviation"]', has_text='Legacy'
+    ).count() == 1
+    assert browser.page.locator('.page-text span', has_text='content').count()
+
+    # Editing a sibling block must not flatten untouched legacy markup.
+    browser.find_by_css('.edit-link').click()
+    wrapper = browser.page.locator(
+        '.field-text .onegov-blocknote-wrapper'
+        '[data-onegov-blocknote-wrapper]'
+    )
+    wrapper.wait_for(timeout=15_000)
+    paragraph = wrapper.locator(
+        '.bn-block-content[data-content-type="paragraph"] .bn-inline-content'
+    ).nth(1)
+    paragraph.fill('Other changed')
+    browser.find_by_text('Speichern').click()
+    browser.page.wait_for_url('**/topics/organisation/blocknote-roundtrip')
+    assert browser.page.locator(
+        'abbr[title="Legacy abbreviation"]', has_text='Legacy'
+    ).count() == 1
+    assert browser.page.locator(
+        '.page-text p', has_text='Other changed'
+    ).count() == 1
+
+
+@pytest.mark.xdist_group(name="browser")
+def test_blocknote_keeps_unsaved_block_edits(
+    browser: ExtendedBrowser,
+) -> None:
+    browser.login_admin()
+    browser.visit('/editor/new/page/1')
+    browser.fill('title', 'Unsaved Block Edits')
+
+    wrapper = browser.page.locator(
+        '.field-text .onegov-blocknote-wrapper'
+        '[data-onegov-blocknote-wrapper]'
+    )
+    wrapper.wait_for(timeout=15_000)
+    editor = wrapper.locator('[data-onegov-blocknote-editor]')
+    source_field = browser.page.locator('.field-text textarea.editor')
+
+    wrapper.locator('button[title="HTML"]').click()
+    wrapper.locator('.onegov-blocknote-dialog textarea').fill(
+        '<p><abbr title="Legacy abbreviation">First block</abbr></p>'
+        '<p>Second block</p>'
+    )
+    wrapper.locator(
+        '.onegov-blocknote-dialog-actions .button:not(.secondary)'
+    ).click()
+
+    paragraphs = editor.locator(
+        '.bn-block-content[data-content-type="paragraph"] '
+        '.bn-inline-content'
+    )
+    paragraphs.nth(1).fill('Second block changed before save')
+    paragraphs.nth(0).click()
+
+    assert '<abbr title="Legacy abbreviation">' in source_field.input_value()
+    assert 'Second block changed before save' in source_field.input_value()
+
+    browser.find_by_text('Speichern').click()
+    browser.page.wait_for_url('**/topics/organisation/unsaved-block-edits')
+    assert browser.page.locator(
+        'abbr[title="Legacy abbreviation"]', has_text='First block'
+    ).count() == 1
+    assert browser.page.get_by_text(
+        'Second block changed before save', exact=True
+    ).count() == 1
+    browser.find_by_css('.edit-link').click()
+
+    wrapper = browser.page.locator(
+        '.field-text .onegov-blocknote-wrapper'
+        '[data-onegov-blocknote-wrapper]'
+    )
+    wrapper.wait_for(timeout=15_000)
+    editor = wrapper.locator('[data-onegov-blocknote-editor]')
+    source_field = browser.page.locator('.field-text textarea.editor')
+
+    paragraphs = editor.locator(
+        '.bn-block-content[data-content-type="paragraph"] '
+        '.bn-inline-content'
+    )
+    first = paragraphs.nth(0)
+    second = paragraphs.nth(1)
+    first.fill('First block changed')
+    second.click()
+
+    assert first.text_content() == 'First block changed'
+    assert 'First block changed' in source_field.input_value()
+
+    browser.find_by_text('Speichern').click()
+    browser.page.wait_for_url('**/topics/organisation/unsaved-block-edits')
+    assert browser.page.get_by_text('First block changed', exact=True).count()
+
+
+@pytest.mark.xdist_group(name="browser")
+def test_blocknote_deleting_last_block_serializes_empty(
+    browser: ExtendedBrowser,
+) -> None:
+    browser.login_admin()
+    browser.visit('/editor/new/page/1')
+    browser.fill('title', 'BlockNote Empty')
+
+    wrapper = browser.page.locator(
+        '.field-text .onegov-blocknote-wrapper'
+        '[data-onegov-blocknote-wrapper]'
+    )
+    wrapper.wait_for(timeout=15_000)
+    editor = wrapper.locator('[data-onegov-blocknote-editor]')
+    editor.wait_for(timeout=15_000)
+    source_field = browser.page.locator('.field-text textarea.editor')
+
+    wrapper.locator('button[title="HTML"]').click()
+    wrapper.locator('.onegov-blocknote-dialog textarea').fill(
+        '<p>Only block</p>'
+    )
+    wrapper.locator(
+        '.onegov-blocknote-dialog-actions .button:not(.secondary)'
+    ).click()
+
+    only_block = editor.locator(
+        '.bn-block-content[data-content-type="paragraph"]',
+        has_text='Only block',
+    )
+    only_block.hover()
+    wrapper.locator(
+        '.bn-side-menu button[aria-label="Blockmenü öffnen"]'
+    ).click()
+    browser.page.locator(
+        '.bn-drag-handle-menu .bn-menu-item', has_text='Löschen'
+    ).click()
+
+    assert only_block.count() == 0
+    assert editor.locator(
+        '.bn-block-content[data-content-type="paragraph"]'
+    ).count() == 1
+    assert editor.locator(
+        '.bn-block-content[data-content-type="editNote"]'
+    ).count() == 0
+    assert source_field.input_value() == ''
+
+    browser.find_by_text('Speichern').click()
+    browser.page.wait_for_url('**/topics/organisation/blocknote-empty')
+    assert browser.page.get_by_text('Only block', exact=True).count() == 0
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=None)

@@ -5081,6 +5081,21 @@ msgstr "Basculer en mode plein écran"
 msgid "Zoom in/out"
 msgstr "Zoom avant/arrière"
 
+msgid "Crop image"
+msgstr "Recadrer l’image"
+
+msgid "Rotation"
+msgstr "Rotation"
+
+msgid "Apply"
+msgstr "Appliquer"
+
+msgid "The image could not be cropped."
+msgstr "L’image n’a pas pu être recadrée."
+
+msgid "An image is already being cropped."
+msgstr "Une image est déjà en cours de recadrage."
+
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
 "photos to an album and mark it as available for the homepage."

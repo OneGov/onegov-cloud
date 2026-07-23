@@ -1,10 +1,64 @@
 from __future__ import annotations
 
+import transaction
+
+from onegov.core.html import sanitize_html
+from onegov.org.models import ImageFileCollection, ImageSetCollection
+from onegov.page import PageCollection
+from tests.shared.utils import create_image
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from webtest.forms import Select
     from .conftest import Client
+
+
+def test_photoalbum_rich_text_block(client: Client) -> None:
+    client.login_admin()
+
+    transaction.begin()
+    album = ImageSetCollection(client.app.session()).add(title='Sommerfest')
+    image = ImageFileCollection(client.app.session()).add(
+        'sommerfest.png',
+        create_image().read(),
+        note='Sommerfest Bild',
+    )
+    album.files = [image]
+    album_id = album.id
+
+    pages = PageCollection(client.app.session())
+    parent = pages.by_path('themen')
+    assert parent is not None
+    pages.add(
+        parent=parent,
+        title='Album im Text',
+        name='album-im-text',
+        type='topic',
+        content={
+            'text': sanitize_html(
+                '<p>Vor dem Album</p>'
+                '<p class="onegov-photoalbum-block">'
+                f'<a href="/photoalbum/{album_id}">Sommerfest</a>'
+                '</p>'
+                '<p>Nach dem Album</p>'
+            ),
+            'photo_album_id': album_id,
+        },
+        meta={'trait': 'page', 'access': 'public'},
+    )
+    transaction.commit()
+
+    page = client.get('/topics/themen/album-im-text')
+    before = page.text.index('Vor dem Album')
+    gallery = page.text.index('Sommerfest Bild')
+    after = page.text.index('Nach dem Album')
+    assert before < gallery < after
+    # The legacy appended album and the new in-text block can coexist.
+    assert len(page.pyquery(
+        '.grid-imageset.photoswipe .image-container '
+        'img[alt="Sommerfest Bild"]'
+    )) == 2
 
 
 def test_sort_topics(client: Client) -> None:

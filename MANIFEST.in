@@ -1,4 +1,7 @@
 graft src/onegov
+prune src/onegov/org/assets/src/blocknote/node_modules
+prune src/onegov/org/assets/bundles
+prune src/onegov/town6/assets/bundles
 include *.md
 global-exclude *.mo
 global-exclude *.pyc

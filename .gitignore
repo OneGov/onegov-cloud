@@ -94,6 +94,7 @@ pyvenv.cfg
 
 # npm / jest
 package-lock.json
+!src/onegov/org/assets/src/blocknote/package-lock.json
 
 # pytest-profiling
 prof

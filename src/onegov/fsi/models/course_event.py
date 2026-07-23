@@ -224,7 +224,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     @property
     def description_html(self) -> Markup:
         """
-        The description saved as HTML from the redactor js plugin.
+        The description saved as HTML from the rich-text editor.
         """
         return self.description
 
