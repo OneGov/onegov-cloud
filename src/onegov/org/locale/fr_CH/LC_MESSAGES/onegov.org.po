@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-16 15:23+0200\n"
+"POT-Creation-Date: 2026-07-23 11:27+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -951,43 +951,50 @@ msgid "Elderly"
 msgstr "Âgées"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Mo"
 msgstr "Lu"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Tu"
 msgstr "Ma"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "We"
 msgstr "Me"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Th"
 msgstr "Je"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Fr"
 msgstr "Ve"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Sa"
 msgstr "Sa"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Su"
 msgstr "Di"
@@ -2340,6 +2347,9 @@ msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
 msgid "Short links"
 msgstr "Lien court"
 
+msgid "Preview"
+msgstr "Preview"
+
 #, python-format
 msgid ""
 "Malformed short link on line ${number}. Each line needs to be a pair of "
@@ -2598,9 +2608,6 @@ msgstr "Zurich"
 
 msgid "Other holidays"
 msgstr "Autres jours fériés"
-
-msgid "Preview"
-msgstr "Preview"
 
 msgid "School holidays"
 msgstr "Vacances scolaires"
@@ -6638,6 +6645,37 @@ msgid "The allocation was deleted"
 msgstr "L'allocation a été supprimée"
 
 #, python-format
+msgid ""
+"This availability period overlaps with the following existing availability "
+"periods: ${periods}, as well as with availabilities which no longer belong "
+"to an availability period. Where availabilities overlap, the one which was "
+"created first takes precedence."
+msgstr ""
+"Cette période de disponibilité chevauche les périodes de disponibilité "
+"existantes suivantes : ${periods}, ainsi que des disponibilités qui "
+"n'appartiennent plus à aucune période de disponibilité. En cas de "
+"chevauchement, la disponibilité créée en premier prévaut."
+
+#, python-format
+msgid ""
+"This availability period overlaps with the following existing availability "
+"periods: ${periods}. Where availabilities overlap, the one which was created "
+"first takes precedence."
+msgstr ""
+"Cette période de disponibilité chevauche les périodes de disponibilité "
+"existantes suivantes : ${periods}. En cas de chevauchement, la disponibilité "
+"créée en premier prévaut."
+
+msgid ""
+"This availability period overlaps with existing availabilities which no "
+"longer belong to an availability period. Where availabilities overlap, the "
+"one which was created first takes precedence."
+msgstr ""
+"Cette période de disponibilité chevauche des disponibilités existantes qui "
+"n'appartiennent plus à aucune période de disponibilité. En cas de "
+"chevauchement, la disponibilité créée en premier prévaut."
+
+#, python-format
 msgid "New availability period active, ${n} allocations created"
 msgstr "Nouvelle période de disponibilité active, ${n} allocations créées"
 
@@ -8009,6 +8047,9 @@ msgstr "Jours fériés / Vacances scolaires"
 msgid "No holidays defined"
 msgstr "Aucun jour férié défini"
 
+msgid "No short links defined"
+msgstr "Aucun lien court défini"
+
 msgid "Link Migration"
 msgstr "Migration des liens"
 
@@ -8394,6 +8435,7 @@ msgstr "L'utilisateur a bien été créé"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
+#, python-format
 #~ msgid ""
 #~ "This entry is published and this directory has an admin notification "
 #~ "address set, so it cannot be deleted. To delete it, wait until its "
