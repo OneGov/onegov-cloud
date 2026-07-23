@@ -434,6 +434,18 @@ def test_holidays() -> None:
     assert len(o.holidays.all(2000)) == 17
     assert len(o.holidays.all(2001)) == 16
 
+    o.holiday_settings['other'] = [
+        [7, 15, 'Recurring'],
+        [7, 15, 'Recurring', 2000],
+        [7, 15, 'One time only', 2000],
+    ]
+
+    assert list(o.holidays.other(2000)) == [
+        (date(2000, 7, 15), {'Recurring', 'One time only'})
+    ]
+    assert list(o.holidays.other(2001)) == [(date(2001, 7, 15), {'Recurring'})]
+    assert len(o.holidays.all(2000)) == 16
+
 
 def test_cascade_delete(session: Session) -> None:
     """Test that deleting a news item also deletes related notifications"""

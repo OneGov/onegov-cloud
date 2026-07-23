@@ -1023,7 +1023,7 @@ class HolidaySettingsForm(Form):
 
     other_holidays = TextAreaField(
         label=_('Other holidays'),
-        description=('31.10 - Halloween / 31.10.2025 - Halloween'),
+        description=('31.10 - Halloween'),
         render_kw={'rows': 10})
 
     preview = PreviewField(
