@@ -4182,7 +4182,7 @@ def test_allocation_rules_overlap_warning(client: Client) -> None:
 
     page = page.form.submit().follow()
     assert 'Verfügbarkeitszeitraum aktiv, 5 Verfügbarkeiten erstellt' in page
-    assert 'überschneidet sich' not in page
+    assert not page.pyquery('.alert-box.warning')
 
     # the weekend does not overlap with the weekdays
     page = new_rule()
@@ -4195,7 +4195,7 @@ def test_allocation_rules_overlap_warning(client: Client) -> None:
         page.select_checkbox('except_for', weekday)
 
     page = page.form.submit().follow()
-    assert 'überschneidet sich' not in page
+    assert not page.pyquery('.alert-box.warning')
 
     # this one shares three weekdays and the time of day with 'Intern'
     page = new_rule()
@@ -4211,29 +4211,7 @@ def test_allocation_rules_overlap_warning(client: Client) -> None:
 
     page = page.form.submit().follow()
     warning = page.pyquery('.alert-box.warning').text()
-    assert 'überschneidet sich' in warning
-    assert 'Intern' in warning
-    assert 'Wochenende' not in warning
-
-    # stopping a period keeps its allocations, but they can no longer be
-    # named, since the period itself is gone
-    page = client.get('/resource/room/rules')
-    page.click('Stop', index=0)
-
-    page = new_rule()
-    page.form['title'] = 'Nochmals intern'
-    page.form['start'] = '2019-01-07'
-    page.form['end'] = '2019-01-11'
-    page.form['as_whole_day'] = 'no'
-    page.form['start_time'] = '08:00'
-    page.form['end_time'] = '12:00'
-
-    for weekday in ('Sa', 'So'):
-        page.select_checkbox('except_for', weekday)
-
-    page = page.form.submit().follow()
-    warning = page.pyquery('.alert-box.warning').text()
-    assert 'zu keinem Verfügbarkeitszeitraum mehr gehören' in warning
+    assert '3 Verfügbarkeiten wurden nicht erstellt' in warning
 
 
 def test_allocation_rules_delete(client: Client) -> None:

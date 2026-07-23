@@ -26,7 +26,7 @@ from onegov.reservation import Reservation
 from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from purl import URL
-from sedate import align_range_to_day, standardize_date, utcnow
+from sedate import utcnow
 from sqlalchemy import or_, func
 from sqlalchemy.dialects.postgresql import JSON
 from uuid import uuid4
@@ -356,75 +356,24 @@ def handle_delete_allocation(self: Allocation, request: OrgRequest) -> None:
             response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
 
 
-def warn_about_overlapping_rules(
-    resource: Resource,
-    request: OrgRequest,
-    form: AllocationRuleForm,
-    rule_id: str
+def warn_about_skipped_allocations(
+    request: OrgRequest, form: AllocationRuleForm, created: int
 ) -> None:
-    """ Availability periods may overlap each other, in which case the
-    allocations of the period which was applied first win. Since that is
-    easy to miss, we name the periods we collided with.
-
-    Allocations lose their link to a period when they are edited on their
-    own or when the period is stopped, so we can only point those out in
-    general terms.
+    """Allocations which overlap existing ones are silently skipped by
+    the scheduler, so we point that out.
 
     """
 
-    scheduler = resource.scheduler
-    dates = [
-        (standardize_date(start, scheduler.timezone),
-         standardize_date(end, scheduler.timezone))
-        for start, end in form.dates
-    ]
-    if form.whole_day:
-        dates = [
-            align_range_to_day(start, end, scheduler.timezone)
-            for start, end in dates
-        ]
+    skipped = len(form.dates) - created
 
-    query = scheduler.managed_allocations()
-    query = scheduler.queries.overlapping_allocations(query, dates)
-    query = query.filter(Allocation.resource == scheduler.resource)
-    query = query.with_entities(
-        func.json_extract_path_text(
-            func.cast(Allocation.data, JSON), 'rule'
-        ).label('rule')
-    ).distinct()
-
-    known = {
-        rule['id']: rule['title']
-        for rule in resource.content.get('rules', ())
-    }
-    found = {row.rule for row in query} - {rule_id}
-
-    titles = ', '.join(known[id] for id in known if id in found)
-    detached = bool(found - known.keys())
-
-    if titles and detached:
-        request.warning(_(
-            'This availability period overlaps with the following existing '
-            'availability periods: ${periods}, as well as with '
-            'availabilities which no longer belong to an availability '
-            'period. Where availabilities overlap, the one which was '
-            'created first takes precedence.',
-            mapping={'periods': titles}
-        ))
-    elif titles:
-        request.warning(_(
-            'This availability period overlaps with the following existing '
-            'availability periods: ${periods}. Where availabilities '
-            'overlap, the one which was created first takes precedence.',
-            mapping={'periods': titles}
-        ))
-    elif detached:
-        request.warning(_(
-            'This availability period overlaps with existing availabilities '
-            'which no longer belong to an availability period. Where '
-            'availabilities overlap, the one which was created first takes '
-            'precedence.'
-        ))
+    if skipped > 0:
+        request.warning(
+            _(
+                '${n} availabilities were not created, because they overlap '
+                'with existing ones.',
+                mapping={'n': skipped},
+            )
+        )
 
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
@@ -449,7 +398,7 @@ def handle_allocation_rule(
             'New availability period active, ${n} allocations created',
             mapping={'n': changes}
         ))
-        warn_about_overlapping_rules(self, request, form, form.rule_id)
+        warn_about_skipped_allocations(request, form, changes)
 
         return request.redirect(request.link(self, name='rules'))
 
@@ -584,7 +533,7 @@ def handle_edit_rule(
             )
         )
 
-        warn_about_overlapping_rules(self, request, form, form.rule_id)
+        warn_about_skipped_allocations(request, form, new_allocations_count)
 
         return request.redirect(request.link(self, name='rules'))
 

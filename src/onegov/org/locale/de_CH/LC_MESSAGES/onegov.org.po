@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-23 11:27+0200\n"
+"POT-Creation-Date: 2026-07-16 15:23+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -950,50 +950,43 @@ msgid "Elderly"
 msgstr "Senioren"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
-#. variable-in-function]
+#. to onegov.org.constants and use it for both. noqa: N806
 #.
 msgid "Mo"
 msgstr "Mo"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
-#. variable-in-function]
+#. to onegov.org.constants and use it for both. noqa: N806
 #.
 msgid "Tu"
 msgstr "Di"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
-#. variable-in-function]
+#. to onegov.org.constants and use it for both. noqa: N806
 #.
 msgid "We"
 msgstr "Mi"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
-#. variable-in-function]
+#. to onegov.org.constants and use it for both. noqa: N806
 #.
 msgid "Th"
 msgstr "Do"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
-#. variable-in-function]
+#. to onegov.org.constants and use it for both. noqa: N806
 #.
 msgid "Fr"
 msgstr "Fr"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
-#. variable-in-function]
+#. to onegov.org.constants and use it for both. noqa: N806
 #.
 msgid "Sa"
 msgstr "Sa"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
-#. variable-in-function]
+#. to onegov.org.constants and use it for both. noqa: N806
 #.
 msgid "Su"
 msgstr "So"
@@ -2346,9 +2339,6 @@ msgstr "Dateien in separatem Fenster öffnen"
 msgid "Short links"
 msgstr "Kurzlinks"
 
-msgid "Preview"
-msgstr "Vorschau"
-
 #, python-format
 msgid ""
 "Malformed short link on line ${number}. Each line needs to be a pair of "
@@ -2605,6 +2595,9 @@ msgstr "Zürich"
 
 msgid "Other holidays"
 msgstr "Andere Feiertage"
+
+msgid "Preview"
+msgstr "Vorschau"
 
 msgid "School holidays"
 msgstr "Schulferien"
@@ -6633,37 +6626,14 @@ msgid "The allocation was deleted"
 msgstr "Die Verfügbarkeit wurde gelöscht"
 
 #, python-format
-msgid ""
-"This availability period overlaps with the following existing availability "
-"periods: ${periods}, as well as with availabilities which no longer belong "
-"to an availability period. Where availabilities overlap, the one which was "
-"created first takes precedence."
-msgstr ""
-"Dieser Verfügbarkeitszeitraum überschneidet sich mit folgenden bestehenden "
-"Verfügbarkeitszeiträumen: ${periods} sowie mit Verfügbarkeiten, die zu "
-"keinem Verfügbarkeitszeitraum mehr gehören. Bei Überschneidungen gilt die "
-"zuerst erstellte Verfügbarkeit."
-
 #, python-format
 msgid ""
-"This availability period overlaps with the following existing availability "
-"periods: ${periods}. Where availabilities overlap, the one which was created "
-"first takes precedence."
+"${n} availabilities were not created, because they overlap with existing "
+"ones."
 msgstr ""
-"Dieser Verfügbarkeitszeitraum überschneidet sich mit folgenden bestehenden "
-"Verfügbarkeitszeiträumen: ${periods}. Bei Überschneidungen gilt die zuerst "
-"erstellte Verfügbarkeit."
+"${n} Verfügbarkeiten wurden nicht erstellt, da sie sich mit bestehenden "
+"überschneiden."
 
-msgid ""
-"This availability period overlaps with existing availabilities which no "
-"longer belong to an availability period. Where availabilities overlap, the "
-"one which was created first takes precedence."
-msgstr ""
-"Dieser Verfügbarkeitszeitraum überschneidet sich mit bestehenden "
-"Verfügbarkeiten, die zu keinem Verfügbarkeitszeitraum mehr gehören. Bei "
-"Überschneidungen gilt die zuerst erstellte Verfügbarkeit."
-
-#, python-format
 msgid "New availability period active, ${n} allocations created"
 msgstr "Neuer Verfügbarkeitszeitraum aktiv, ${n} Verfügbarkeiten erstellt"
 
@@ -8039,9 +8009,6 @@ msgstr "Feiertage / Schulferien"
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
 
-msgid "No short links defined"
-msgstr "Keine Kurzlinks definiert"
-
 msgid "Link Migration"
 msgstr "Migration Links"
 
@@ -8427,7 +8394,6 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
-#, python-format
 #~ msgid ""
 #~ "This entry is published and this directory has an admin notification "
 #~ "address set, so it cannot be deleted. To delete it, wait until its "
