@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-16 15:23+0200\n"
+"POT-Creation-Date: 2026-07-20 15:43+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -951,43 +951,50 @@ msgid "Elderly"
 msgstr "Âgées"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Mo"
 msgstr "Lu"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Tu"
 msgstr "Ma"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "We"
 msgstr "Me"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Th"
 msgstr "Je"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Fr"
 msgstr "Ve"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Sa"
 msgstr "Sa"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Su"
 msgstr "Di"
@@ -2340,6 +2347,9 @@ msgstr "Ouvrir les fichiers dans une fenêtre de navigateur séparée"
 msgid "Short links"
 msgstr "Lien court"
 
+msgid "Preview"
+msgstr "Preview"
+
 #, python-format
 msgid ""
 "Malformed short link on line ${number}. Each line needs to be a pair of "
@@ -2599,20 +2609,15 @@ msgstr "Zurich"
 msgid "Other holidays"
 msgstr "Autres jours fériés"
 
-msgid "Preview"
-msgstr "Preview"
-
 msgid "School holidays"
 msgstr "Vacances scolaires"
 
-msgid "Format: Day.Month - Description"
-msgstr "Format : Jour.Mois - Description"
+msgid "Format: Day.Month[.Year] - Description (year is optional)"
+msgstr ""
+"Format : Jour.Mois[.Année] - Description (l'année est facultative)"
 
 msgid "Please enter one date per line"
 msgstr "Veuillez renseigner une date par ligne"
-
-msgid "Please enter only day and month"
-msgstr "Veuillez ne renseigner que des jours et des mois"
 
 #, python-format
 msgid "${date} is not a valid date"
@@ -8009,6 +8014,9 @@ msgstr "Jours fériés / Vacances scolaires"
 msgid "No holidays defined"
 msgstr "Aucun jour férié défini"
 
+msgid "No short links defined"
+msgstr "Aucun lien court défini"
+
 msgid "Link Migration"
 msgstr "Migration des liens"
 
@@ -8393,6 +8401,15 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Format: Day.Month - Description or Day.Month.Year - Description"
+#~ msgstr "Format : Jour.Mois - Description ou Jour.Mois.Année - Description"
+
+#~ msgid "Format: Day.Month - Description"
+#~ msgstr "Format : Jour.Mois - Description"
+
+#~ msgid "Please enter only day and month"
+#~ msgstr "Veuillez ne renseigner que des jours et des mois"
 
 #~ msgid ""
 #~ "This entry is published and this directory has an admin notification "

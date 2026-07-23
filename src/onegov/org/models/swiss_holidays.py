@@ -63,34 +63,36 @@ class SwissHolidays:
     """
 
     _cantons: set[str]
-    _other: dict[tuple[int, int], set[str]]
+    _other: dict[tuple[int, int], dict[int | None, set[str]]]
 
     def __init__(
         self,
         cantons: Iterable[str] = (),
-        other: Iterable[tuple[int, int, str]] = (),
-        timezone: str = 'Europe/Zurich'
+        other: Iterable[tuple[int, int, str] | tuple[int, int, str, int]] = (),
+        timezone: str = 'Europe/Zurich',
     ) -> None:
 
         self._cantons = set()
-        self._other = defaultdict(set)
+        self._other = defaultdict(lambda: defaultdict(set))
 
         for canton in cantons:
             self.add_canton(canton)
 
-        for month, day, description in other:
-            self.add_holiday(month, day, description)
+        for entry in other:
+            self.add_holiday(*entry)
 
     def add_canton(self, canton: str) -> None:
         assert canton in CANTONS
 
         self._cantons.add(canton)
 
-    def add_holiday(self, month: int, day: int, description: str) -> None:
+    def add_holiday(
+        self, month: int, day: int, description: str, year: int | None = None
+    ) -> None:
         assert 1 <= month <= 12
         assert 1 <= day <= 31
 
-        self._other[(month, day)].add(description)
+        self._other[(month, day)][year].add(description)
 
     def __bool__(self) -> bool:
         return (self._cantons or self._other) and True or False
@@ -99,10 +101,11 @@ class SwissHolidays:
         if not isinstance(dt, date) or isinstance(dt, datetime):
             raise TypeError(f'Unsupported type: {type(dt)}')
 
-        if (dt.month, dt.day) in self._other:
+        other_descriptions = self._other.get((dt.month, dt.day), {})
+        if None in other_descriptions or dt.year in other_descriptions:
             return True
 
-        for holiday, descriptions in self.official(dt.year):
+        for holiday, official_descriptions in self.official(dt.year):
             if holiday == dt:
                 return True
 
@@ -123,11 +126,11 @@ class SwissHolidays:
 
         combined: dict[date, set[str]] = defaultdict(set)
 
-        for dt, descriptions in self.official(year):
-            combined[dt].update(descriptions)
+        for dt, official_descriptions in self.official(year):
+            combined[dt].update(official_descriptions)
 
-        for month, day in self._other:
-            combined[date(year, month, day)] |= self._other[(month, day)]
+        for dt, other_descriptions in self.other(year):
+            combined[dt].update(other_descriptions)
 
         dates = sorted(combined.keys())
 
@@ -161,8 +164,12 @@ class SwissHolidays:
     def other(self, year: int) -> Iterator[tuple[date, set[str]]]:
         """ Returns all custom defined holidays for the given year. """
 
-        for month, day in self._other:
-            yield date(year, month, day), self._other[(month, day)]
+        for (month, day), descriptions in self._other.items():
+            combined = descriptions.get(None, set()) | descriptions.get(
+                year, set()
+            )
+            if combined:
+                yield date(year, month, day), combined
 
     def official(self, year: int) -> Iterator[tuple[date, tuple[str, ...]]]:
         """ Like :meth:`all`, but only includes the official holidays,

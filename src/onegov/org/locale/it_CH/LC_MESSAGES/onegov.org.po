@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-16 15:23+0200\n"
+"POT-Creation-Date: 2026-07-20 15:43+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -951,43 +951,50 @@ msgid "Elderly"
 msgstr "Anziani"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Mo"
 msgstr "Lu"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Tu"
 msgstr "Ma"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "We"
 msgstr "Me"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Th"
 msgstr "Gi"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Fr"
 msgstr "Ve"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Sa"
 msgstr "Sa"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Su"
 msgstr "Do"
@@ -2341,6 +2348,9 @@ msgstr "Apri i file in una finestra separata"
 msgid "Short links"
 msgstr "Link abbreviato"
 
+msgid "Preview"
+msgstr "Anteprima"
+
 #, python-format
 msgid ""
 "Malformed short link on line ${number}. Each line needs to be a pair of "
@@ -2600,20 +2610,15 @@ msgstr "Zurigo"
 msgid "Other holidays"
 msgstr "Altre feste"
 
-msgid "Preview"
-msgstr "Anteprima"
-
 msgid "School holidays"
 msgstr "Vacanze scolastiche"
 
-msgid "Format: Day.Month - Description"
-msgstr "Formato: Giorno.Mese - Descrizione"
+msgid "Format: Day.Month[.Year] - Description (year is optional)"
+msgstr ""
+"Formato: Giorno.Mese[.Anno] - Descrizione (l'anno è facoltativo)"
 
 msgid "Please enter one date per line"
 msgstr "Inserisci una data per riga"
-
-msgid "Please enter only day and month"
-msgstr "Inserisci solo giorno e mese"
 
 #, python-format
 msgid "${date} is not a valid date"
@@ -7971,6 +7976,9 @@ msgstr "Festività / Vacanze scolastiche"
 msgid "No holidays defined"
 msgstr "Nessuna festività definita"
 
+msgid "No short links defined"
+msgstr "Nessun link breve definito"
+
 msgid "Link Migration"
 msgstr "Migrazione dei link"
 
@@ -8351,6 +8359,15 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Format: Day.Month - Description or Day.Month.Year - Description"
+#~ msgstr "Formato: Giorno.Mese - Descrizione o Giorno.Mese.Anno - Descrizione"
+
+#~ msgid "Format: Day.Month - Description"
+#~ msgstr "Formato: Giorno.Mese - Descrizione"
+
+#~ msgid "Please enter only day and month"
+#~ msgstr "Inserisci solo giorno e mese"
 
 #~ msgid ""
 #~ "This entry is published and this directory has an admin notification "
