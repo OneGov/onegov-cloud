@@ -83,10 +83,6 @@ def get_party_lookup(
     return party_lookup
 
 
-# these are the two last exports from email
-# We are writing the abschlussliste export,
-
-
 def get_abschlussliste_data(
     settlement_run: SettlementRun,
     request: TownRequest,
@@ -133,7 +129,7 @@ def get_abschlussliste_data(
 
     for att in attendances:
         p = att.parliamentarian
-        is_president = is_president_for_attendance(p, att, settlement_run)
+        is_president = is_president_for_attendance(p, att)
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
@@ -252,7 +248,7 @@ def generate_abschlussliste_xlsx(
     for details_row_num, att in enumerate(attendances, start=1):
         p = att.parliamentarian
         party = details_party_lookup[str(p.id)]
-        is_president = is_president_for_attendance(p, att, settlement_run)
+        is_president = is_president_for_attendance(p, att)
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,
             attendence_type=att.type,
@@ -352,7 +348,6 @@ def generate_buchungen_abrechnungslauf_xlsx(
         is_president = is_president_for_attendance(
             parliamentarian,
             att,
-            settlement_run,
         )
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,

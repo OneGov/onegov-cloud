@@ -44,7 +44,6 @@ from onegov.pas.utils import (
     get_commissions_with_memberships,
     get_parliamentarians_with_settlements,
     get_parties_with_settlements,
-    is_commission_president,
     is_president_for_attendance,
 )
 from onegov.pas.views.abschlussliste import (
@@ -614,8 +613,9 @@ def _get_commission_settlement_data(
     )
     result = []
     for attendence in attendences:
-        is_president = is_commission_president(
-            attendence.parliamentarian, commission.id, settlement_run
+        is_president = is_president_for_attendance(
+            attendence.parliamentarian,
+            attendence,
         )
 
         compensation = calculate_attendance_compensation(
@@ -766,7 +766,8 @@ def _get_data_export_all(
 
     for attendence in attendences.query():
         is_president = is_president_for_attendance(
-            attendence.parliamentarian, attendence, self
+            attendence.parliamentarian,
+            attendence,
         )
 
         compensation = calculate_attendance_compensation(
@@ -845,7 +846,8 @@ def _get_party_settlement_data(
 
         # found an export
         is_president = is_president_for_attendance(
-            attendence.parliamentarian, attendence, settlement_run
+            attendence.parliamentarian,
+            attendence,
         )
 
         compensation = calculate_attendance_compensation(

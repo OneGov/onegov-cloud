@@ -474,6 +474,79 @@ def test_commission_export_one_member_one_president(session: Session) -> None:
     ]
 
 
+def test_commission_export_uses_role_on_attendance_date(
+    session: Session,
+) -> None:
+    rate_set = RateSet(
+        year=2025,
+        study_normal_member_halfhour=10,
+        study_normal_president_halfhour=20,
+    )
+    settlement_run = SettlementRun(
+        name='2025',
+        start=date(2025, 1, 1),
+        end=date(2025, 12, 31),
+        active=True,
+    )
+    commission = PASCommission(name='Test Commission', type='normal')
+    parliamentarian = PASParliamentarian(
+        first_name='Anna',
+        last_name='Example',
+        gender='female',
+    )
+    session.add_all(
+        [
+            rate_set,
+            settlement_run,
+            commission,
+            parliamentarian,
+            PASCommissionMembership(
+                commission=commission,
+                parliamentarian=parliamentarian,
+                role='member',
+                start=date(2025, 1, 1),
+                end=date(2025, 6, 30),
+            ),
+            PASCommissionMembership(
+                commission=commission,
+                parliamentarian=parliamentarian,
+                role='president',
+                start=date(2025, 7, 1),
+            ),
+            Attendence(
+                parliamentarian=parliamentarian,
+                commission=commission,
+                date=date(2025, 2, 1),
+                duration=60,
+                type='study',
+            ),
+            Attendence(
+                parliamentarian=parliamentarian,
+                commission=commission,
+                date=date(2025, 8, 1),
+                duration=60,
+                type='study',
+            ),
+        ]
+    )
+    session.flush()
+
+    request = Mock(spec=TownRequest)
+    request.session = session
+    request.translate = lambda value: value
+
+    settlement_data = _get_commission_settlement_data(
+        settlement_run,
+        request,
+        commission,
+    )
+
+    assert [(row[0], row[4]) for row in settlement_data] == [
+        (date(2025, 2, 1), Decimal('20')),
+        (date(2025, 8, 1), Decimal('40')),
+    ]
+
+
 def _settlement_pdf_html(
     settlement_run: SettlementRun,
     request: TownRequest,

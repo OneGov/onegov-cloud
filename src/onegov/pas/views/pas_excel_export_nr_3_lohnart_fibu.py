@@ -112,7 +112,8 @@ def generate_fibu_export_rows(
             lohnart_text = lohnart_info['text']
 
         is_president = is_president_for_attendance(
-            parliamentarian, attendance, settlement_run
+            parliamentarian,
+            attendance,
         )
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,

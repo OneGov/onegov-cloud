@@ -270,7 +270,8 @@ def _get_parliamentarian_settlement_data(
     result = []
     for attendence in attendences:
         is_president = is_president_for_attendance(
-            parliamentarian, attendence, settlement_run
+            parliamentarian,
+            attendence,
         )
         compensation = calculate_attendance_compensation(
             rate_set=rate_set,

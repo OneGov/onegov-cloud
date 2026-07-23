@@ -17,7 +17,6 @@ from onegov.pas.models.presidential_allowance import (
 )
 from onegov.pas.collections import PASParliamentarianCollection
 from sqlalchemy.orm import selectinload
-from uuid import UUID
 
 
 from typing import TYPE_CHECKING
@@ -27,10 +26,10 @@ if TYPE_CHECKING:
     from onegov.parliament.models.parliamentarian_role import (
         ParliamentarianRole,
     )
-    from onegov.pas.models import SettlementRun
 
     from onegov.user import User
     from sqlalchemy.orm import Session
+    from uuid import UUID
 
 
 def _is_kantonsrat_role(
@@ -149,7 +148,6 @@ def is_kantonsrat_president(
 def is_president_for_attendance(
     parliamentarian: PASParliamentarian,
     attendance: Attendence,
-    settlement_run: SettlementRun,
 ) -> bool:
     """Whether the president rate applies. A plenary session has no
     commission, there the Kantonsratspräsidium decides.
@@ -158,45 +156,21 @@ def is_president_for_attendance(
     if attendance.type == 'plenary':
         return is_kantonsrat_president(parliamentarian, attendance.date)
 
-    return is_commission_president(parliamentarian, attendance, settlement_run)
+    return is_commission_president(parliamentarian, attendance)
 
 
 def is_commission_president(
     parliamentarian: PASParliamentarian,
-    attendance_or_commission_id: Attendence | UUID,
-    settlement_run: SettlementRun
+    attendance: Attendence,
 ) -> bool:
-    """
-    Check if a parliamentarian is president of the commission for the given
-    attendance or commission_id during the settlement run period.
-    """
-    if isinstance(attendance_or_commission_id, UUID):
-        commission_id = attendance_or_commission_id
-        return any(
-            cm.role == 'president'
-            for cm in parliamentarian.commission_memberships
-            if (
-                cm.commission_id == commission_id and (
-                    cm.end is None or cm.end >= settlement_run.start
-                ) and (
-                    cm.start is None or cm.start <= settlement_run.end
-                )
-            )
-        )
-    else:
-        attendance = attendance_or_commission_id
-        return any(
-            cm.role == 'president'
-            for cm in parliamentarian.commission_memberships
-            if (
-                attendance.commission and
-                cm.commission_id == attendance.commission.id and (
-                    cm.end is None or cm.end >= settlement_run.start
-                ) and (
-                    cm.start is None or cm.start <= settlement_run.end
-                )
-            )
-        )
+    """Whether the presidency was active on the attendance date."""
+    return any(
+        membership.role == 'president'
+        and membership.commission_id == attendance.commission_id
+        and (membership.start is None or membership.start <= attendance.date)
+        and (membership.end is None or membership.end >= attendance.date)
+        for membership in parliamentarian.commission_memberships
+    )
 
 
 def get_parliamentarians_with_settlements(
