@@ -4155,6 +4155,65 @@ def test_allocation_rules_edit(client: Client) -> None:
     assert 'Renamed room' in edit_page
 
 
+def test_allocation_rules_overlap_warning(client: Client) -> None:
+    client.login_admin()
+
+    page = client.get('/resources').click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def new_rule() -> Any:
+        return (
+            client.get('/resource/room')
+            .click('Verfügbarkeitszeiträume')
+            .click('Verfügbarkeitszeitraum')
+        )
+
+    page = new_rule()
+    page.form['title'] = 'Intern'
+    page.form['start'] = '2019-01-07'
+    page.form['end'] = '2019-01-11'
+    page.form['as_whole_day'] = 'no'
+    page.form['start_time'] = '08:00'
+    page.form['end_time'] = '12:00'
+
+    for weekday in ('Sa', 'So'):
+        page.select_checkbox('except_for', weekday)
+
+    page = page.form.submit().follow()
+    assert 'Verfügbarkeitszeitraum aktiv, 5 Verfügbarkeiten erstellt' in page
+    assert not page.pyquery('.alert-box.warning')
+
+    # the weekend does not overlap with the weekdays
+    page = new_rule()
+    page.form['title'] = 'Wochenende'
+    page.form['start'] = '2019-01-07'
+    page.form['end'] = '2019-01-13'
+    page.form['as_whole_day'] = 'yes'
+
+    for weekday in ('Mo', 'Di', 'Mi', 'Do', 'Fr'):
+        page.select_checkbox('except_for', weekday)
+
+    page = page.form.submit().follow()
+    assert not page.pyquery('.alert-box.warning')
+
+    # this one shares three weekdays and the time of day with 'Intern'
+    page = new_rule()
+    page.form['title'] = 'Öffentlich'
+    page.form['start'] = '2019-01-09'
+    page.form['end'] = '2019-01-18'
+    page.form['as_whole_day'] = 'no'
+    page.form['start_time'] = '10:00'
+    page.form['end_time'] = '14:00'
+
+    for weekday in ('Sa', 'So'):
+        page.select_checkbox('except_for', weekday)
+
+    page = page.form.submit().follow()
+    warning = page.pyquery('.alert-box.warning').text()
+    assert '3 Verfügbarkeiten wurden nicht erstellt' in warning
+
+
 def test_allocation_rules_delete(client: Client) -> None:
     client.login_admin()
 

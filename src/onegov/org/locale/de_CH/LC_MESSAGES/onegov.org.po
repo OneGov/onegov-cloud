@@ -6626,6 +6626,14 @@ msgid "The allocation was deleted"
 msgstr "Die Verfügbarkeit wurde gelöscht"
 
 #, python-format
+#, python-format
+msgid ""
+"${n} availabilities were not created, because they overlap with existing "
+"ones."
+msgstr ""
+"${n} Verfügbarkeiten wurden nicht erstellt, da sie sich mit bestehenden "
+"überschneiden."
+
 msgid "New availability period active, ${n} allocations created"
 msgstr "Neuer Verfügbarkeitszeitraum aktiv, ${n} Verfügbarkeiten erstellt"
 

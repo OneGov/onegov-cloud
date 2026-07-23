@@ -356,6 +356,26 @@ def handle_delete_allocation(self: Allocation, request: OrgRequest) -> None:
             response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
 
 
+def warn_about_skipped_allocations(
+    request: OrgRequest, form: AllocationRuleForm, created: int
+) -> None:
+    """Allocations which overlap existing ones are silently skipped by
+    the scheduler, so we point that out.
+
+    """
+
+    skipped = len(form.dates) - created
+
+    if skipped > 0:
+        request.warning(
+            _(
+                '${n} availabilities were not created, because they overlap '
+                'with existing ones.',
+                mapping={'n': skipped},
+            )
+        )
+
+
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
              permission=Private, form=get_allocation_rule_form_class)
 def handle_allocation_rule(
@@ -378,6 +398,7 @@ def handle_allocation_rule(
             'New availability period active, ${n} allocations created',
             mapping={'n': changes}
         ))
+        warn_about_skipped_allocations(request, form, changes)
 
         return request.redirect(request.link(self, name='rules'))
 
@@ -511,6 +532,9 @@ def handle_edit_rule(
                 },
             )
         )
+
+        warn_about_skipped_allocations(request, form, new_allocations_count)
+
         return request.redirect(request.link(self, name='rules'))
 
     # Pre-populate the form with existing rule data
