@@ -51,7 +51,7 @@ class AttendenceCollectionLayout(DefaultLayout):
                     attrs={'class': 'new-attendence'},
                 ),
             ])
-        elif self.request.is_commission_president:
+        elif self.request.has_commission_president_role:
             links.append(
                 Link(
                     text=_('Commission session (bulk)'),

@@ -56,20 +56,6 @@ class PASParliamentarianCollection(
         self.session.delete(item)
         self.session.flush()
 
-    def _is_current_commission_president(
-        self,
-        item: PASParliamentarian
-    ) -> bool:
-        """Check if the parliamentarian is currently a president of any
-        commission."""
-        today = date.today()
-        return any(
-            membership.role == 'president' and
-            (membership.start is None or membership.start <= today) and
-            (membership.end is None or membership.end >= today)
-            for membership in item.commission_memberships
-        )
-
     def _representatives_by_zg_username(
         self,
         parliamentarians: list[PASParliamentarian],
@@ -78,14 +64,15 @@ class PASParliamentarianCollection(
         prioritizing commission presidents."""
 
         by_username: dict[str, PASParliamentarian] = {}
+        today = date.today()
         for parl in parliamentarians:
             if not parl.zg_username:
                 continue
             key = parl.zg_username.lower()
             existing = by_username.get(key)
             if existing is None or (
-                self._is_current_commission_president(parl)
-                and not self._is_current_commission_president(existing)
+                parl.has_commission_presidency(on_date=today)
+                and not existing.has_commission_presidency(on_date=today)
             ):
                 by_username[key] = parl
         return by_username
@@ -152,7 +139,7 @@ class PASParliamentarianCollection(
             assert new_username is not None
             role = (
                 'commission_president'
-                if self._is_current_commission_president(item)
+                if item.has_commission_presidency(on_date=date.today())
                 else 'parliamentarian'
             )
             log.info(f'Creating user {new_username} with role {role}')
@@ -171,7 +158,7 @@ class PASParliamentarianCollection(
                 return
             role = (
                 'commission_president'
-                if self._is_current_commission_president(item)
+                if item.has_commission_presidency(on_date=date.today())
                 else 'parliamentarian'
             )
             saml_sources = {'saml2', 'ldap'}
