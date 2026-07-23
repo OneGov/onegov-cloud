@@ -148,7 +148,9 @@ def calculate_rate(
                 if is_president
                 else rate_set.study_normal_member_halfhour
             )
-            periods = periods_of(duration_minutes, 30)
+            periods = periods_of(
+                duration_minutes, 30
+            )  # round up to next 30min
             return Decimal(str(rate_per_30min * periods))
 
         else:  # intercantonal
@@ -157,7 +159,7 @@ def calculate_rate(
                 if is_president
                 else rate_set.study_intercantonal_member_hour
             )
-            periods = periods_of(duration_minutes, 60)
+            periods = periods_of(duration_minutes, 60)  # round up to next hour
             return Decimal(str(rate_per_hour * periods))
 
     elif attendence_type == 'shortest':
@@ -167,7 +169,7 @@ def calculate_rate(
             if is_president
             else rate_set.shortest_all_member_halfhour
         )
-        periods = periods_of(duration_minutes, 30)
+        periods = periods_of(duration_minutes, 30)  # round up to next 30min
         return Decimal(str(rate_per_30min * periods))
 
     raise ValueError(
