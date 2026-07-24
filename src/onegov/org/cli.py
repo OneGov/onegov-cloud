@@ -885,8 +885,8 @@ def fix_directory_files(
     def execute(request: OrgRequest, app: OrgApp) -> None:
         count = 0
         for entry in request.session.query(DirectoryEntry).all():
-            for field in entry.directory.file_fields:
-                field_data = entry.content['values'][field.id]
+            for field_id in entry.directory.file_fields:
+                field_data = entry.content['values'][field_id]
                 if field_data and field_data.get('data', '').startswith('@'):
                     file_id = field_data['data'].lstrip('@')
                     file = request.session.query(File).filter_by(
@@ -899,7 +899,7 @@ def fix_directory_files(
                             reference=file.reference
                         )
                         entry.files.append(new)
-                        entry.content['values'][field.id][
+                        entry.content['values'][field_id][
                             'data'] = f'@{new.id}'
                         entry.content.changed()  # type:ignore[attr-defined]
                         count += 1

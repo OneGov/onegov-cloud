@@ -5,7 +5,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
-from onegov.form import parse_formcode, parse_form, flatten_fieldsets
+from onegov.form import parse_formcode, parse_form, flatten_fields
 from onegov.form.fields import (
     DateTimeLocalField,
     MultiCheckboxField,
@@ -861,7 +861,7 @@ def test_invalid_syntax() -> None:
 
 
 def test_parse_formcode() -> None:
-    fieldsets = parse_formcode("""
+    fields = parse_formcode("""
         # General
         First Name *= ___
         Last Name = ___[10]
@@ -875,38 +875,38 @@ def test_parse_formcode() -> None:
             [x] Burger
     """)
 
-    assert len(fieldsets) == 2
-    assert fieldsets[0].label == 'General'
+    assert len(fields) == 3
+    assert fields[0].fieldset == 'General'
+    assert fields[0].type == 'text'
+    assert fields[0].required
+    assert fields[0].maxlength is None
+    assert fields[0].id() == 'general_first_name'
 
-    assert fieldsets[0].fields[0].type == 'text'
-    assert fieldsets[0].fields[0].required
-    assert fieldsets[0].fields[0].maxlength is None
-    assert fieldsets[0].fields[0].id == 'general_first_name'
+    assert fields[1].fieldset == 'General'
+    assert fields[1].type == 'text'
+    assert not fields[1].required
+    assert fields[1].maxlength == 10
+    assert fields[1].id() == 'general_last_name'
 
-    assert fieldsets[0].fields[1].type == 'text'
-    assert not fieldsets[0].fields[1].required
-    assert fieldsets[0].fields[1].maxlength == 10
-    assert fieldsets[0].fields[1].id == 'general_last_name'
+    assert fields[2].fieldset == 'Order'
+    assert fields[2].type == 'checkbox'
 
-    assert fieldsets[1].label == 'Order'
-    assert fieldsets[1].fields[0].type == 'checkbox'
+    assert fields[2].label == 'Products'
+    assert fields[2].id() == 'order_products'
 
-    assert fieldsets[1].fields[0].label == 'Products'
-    assert fieldsets[1].fields[0].id == 'order_products'
+    assert fields[2].choices[0].label == 'Pizza'
+    assert fields[2].choices[0].display_label == 'Pizza'
+    assert not fields[2].choices[0].selected
 
-    assert fieldsets[1].fields[0].choices[0].key == 'Pizza'
-    assert fieldsets[1].fields[0].choices[0].label == 'Pizza'
-    assert not fieldsets[1].fields[0].choices[0].selected
+    assert fields[2].choices[1].label == 'Burger'
+    assert fields[2].choices[1].display_label == 'Burger'
+    assert fields[2].choices[1].selected
 
-    assert fieldsets[1].fields[0].choices[1].key == 'Burger'
-    assert fieldsets[1].fields[0].choices[1].label == 'Burger'
-    assert fieldsets[1].fields[0].choices[1].selected
-
-    subfields = fieldsets[1].fields[0].choices[0].fields
+    subfields = fields[2].choices[0].fields
     assert subfields is not None
     assert subfields[0].label == 'Type'
-    assert subfields[0].id == 'order_products_type'
-    assert hasattr(subfields[0], 'choices')
+    assert subfields[0].id(fields[2].id()) == 'order_products_type'
+    assert subfields[0].type == 'radio'
     assert subfields[0].choices[0].selected
     assert not subfields[0].choices[1].selected
     assert subfields[0].choices[0].label == 'Default'
@@ -947,8 +947,8 @@ def test_parse_formcode_duplicate_fieldname() -> None:
         """)
 
 
-def test_flatten_fieldsets() -> None:
-    fieldsets = parse_formcode("""
+def test_flatten_fields() -> None:
+    nested_fields = parse_formcode("""
         # General
         First Name *= ___
         Last Name *= ___[10]
@@ -962,7 +962,7 @@ def test_flatten_fieldsets() -> None:
             [x] Burger
     """)
 
-    fields = list(flatten_fieldsets(fieldsets))
+    fields = list(flatten_fields(nested_fields))
 
     assert len(fields) == 4
     assert fields[0].label == 'First Name'
@@ -1105,7 +1105,7 @@ def test_decimal_range() -> None:
 
 
 def test_field_ids() -> None:
-    fs = parse_formcode("""
+    fields = parse_formcode("""
         First Name *= ___
         Last Name = ___[10]
 
@@ -1118,38 +1118,26 @@ def test_field_ids() -> None:
             [x] Burger
     """)
 
-    assert fs[0].fields[0].id == 'first_name'
-    assert fs[0].fields[0].human_id == 'First Name'
-    assert fs[0].fields[1].id == 'last_name'
-    assert fs[0].fields[1].human_id == 'Last Name'
-    assert fs[1].fields[0].id == 'my_order_products'
-    assert fs[1].fields[0].human_id == 'My Order/Products'
-    assert hasattr(fs[1].fields[0], 'choices')
-    subfields = fs[1].fields[0].choices[0].fields
+    assert fields[0].id() == 'first_name'
+    assert fields[0].human_id() == 'First Name'
+    assert fields[1].id() == 'last_name'
+    assert fields[1].human_id() == 'Last Name'
+    assert fields[2].id() == 'my_order_products'
+    assert fields[2].human_id() == 'My Order/Products'
+    assert fields[2].type == 'checkbox'
+    subfields = fields[2].choices[0].fields
     assert subfields is not None
-    assert subfields[0].id == 'my_order_products_type'
-    assert subfields[0].human_id == 'My Order/Products/Type'
+    assert subfields[0].id(fields[2].id()) == 'my_order_products_type'
+    assert subfields[0].human_id(fields[2].id()) == 'My Order/Products/Type'
 
-    assert find_field(fs, None) is fs[0]
-    assert find_field(fs, 'my_order') is fs[1]
-    assert find_field(fs, 'My Order') is fs[1]
-    assert find_field(fs, 'first_name').id == 'first_name'  # type: ignore[union-attr]
-    assert find_field(fs, 'First Name').id == 'first_name'  # type: ignore[union-attr]
-    assert find_field(fs, 'last_name').id == 'last_name'  # type: ignore[union-attr]
-    assert find_field(fs, 'Last Name').id == 'last_name'  # type: ignore[union-attr]
-    assert find_field(fs, 'my_order_products').id == 'my_order_products'  # type: ignore[union-attr]
-    assert find_field(fs, 'My Order/Products').id == 'my_order_products'  # type: ignore[union-attr]
-    assert find_field(  # type: ignore[union-attr]
-        fs, 'my_order_products_type'
-    ).id == 'my_order_products_type'
-    assert find_field(  # type: ignore[union-attr]
-        fs, 'My Order/Products/Type'
-    ).id == 'my_order_products_type'
-
-    assert fs[0].find_field('first_name').id == 'first_name'  # type: ignore[union-attr]
-    assert fs[0].find_field('First Name').id == 'first_name'  # type: ignore[union-attr]
-    assert fs[1].find_field('first_name') is None
-    assert fs[1].find_field('First Name') is None
+    assert find_field(fields, 'first_name') is fields[0]
+    assert find_field(fields, 'First Name') is fields[0]
+    assert find_field(fields, 'last_name') is fields[1]
+    assert find_field(fields, 'Last Name') is fields[1]
+    assert find_field(fields, 'my_order_products') is fields[2]
+    assert find_field(fields, 'My Order/Products') is fields[2]
+    assert find_field(fields, 'my_order_products_type') is subfields[0]
+    assert find_field(fields, 'My Order/Products/Type') is subfields[0]
 
 
 @pytest.mark.parametrize("field,invalid", [
@@ -1194,16 +1182,21 @@ def test_parse_dependency_with_price() -> None:
     """
     )
 
-    fieldsets = parse_formcode(text)
-    assert len(fieldsets) == 1
-    assert fieldsets[0].fields[0].type == "radio"
-    assert len(fieldsets[0].fields) == 1
+    fields = parse_formcode(text)
+    assert len(fields) == 1
+    assert fields[0].type == "radio"
 
     from onegov.form.parser.core import RadioField
 
-    assert isinstance(fieldsets[0].fields[0], RadioField)
-    choices = fieldsets[0].fields[0].choices
+    assert isinstance(fields[0], RadioField)
+    choices = fields[0].choices
     assert len(choices) == 2
+    assert choices[0].pricing is None
+    assert len(choices[0].fields) == 0
+    assert choices[1].pricing is not None
+    assert choices[1].pricing.amount == Decimal('5')
+    assert choices[1].pricing.currency == 'CHF'
+    assert len(choices[1].fields) == 1
 
 
 @pytest.mark.parametrize('indent,edit_checks,shall_raise', [

@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from onegov.directory.models.directory_entry import DirectoryEntry
 from onegov.form import as_internal_id
-from onegov.form import flatten_fieldsets
+from onegov.form import flatten_fields
 from onegov.form import parse_form
 from onegov.form import parse_formcode
-from onegov.form.parser.core import OptionsField
 from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
 from wtforms import ValidationError
@@ -237,16 +236,18 @@ class DirectoryMigration:
         """
         if self.directory.entries:
             return any(
-                f.required for f in self.changes.new.values()
-                if f.human_id in self.changes.added_fields
+                f.required
+                for human_id, f in self.changes.new.items()
+                if human_id in self.changes.added_fields
             )
 
         return False
 
     def get_added_required_field_ids(self) -> list[str]:
         return [
-            f.human_id for f in self.changes.new.values()
-            if f.required and f.human_id in self.changes.added_fields
+            human_id
+            for human_id, f in self.changes.new.items()
+            if f.required and human_id in self.changes.added_fields
         ]
 
 
@@ -313,16 +314,12 @@ class StructuralChanges:
     """
 
     def __init__(self, old_structure: str, new_structure: str) -> None:
-        old_fieldsets = parse_formcode(old_structure)
-        new_fieldsets = parse_formcode(new_structure)
-        self.old = {
-            f.human_id: f for f in flatten_fieldsets(old_fieldsets)
-        }
-        self.new = {
-            f.human_id: f for f in flatten_fieldsets(new_fieldsets)
-        }
-        self.old_fieldsets = old_fieldsets
-        self.new_fieldsets = new_fieldsets
+        old_fields = parse_formcode(old_structure)
+        new_fields = parse_formcode(new_structure)
+        self.old = dict(flatten_fields(old_fields, with_human_id=True))
+        self.new = dict(flatten_fields(new_fields, with_human_id=True))
+        self.old_fields = old_fields
+        self.new_fields = new_fields
 
         self.detect_added_fieldsets()
         self.detect_removed_fieldsets()
@@ -346,29 +343,31 @@ class StructuralChanges:
         )
 
     def detect_removed_fieldsets(self) -> None:
-        new_ids = tuple(f.human_id for f in self.new_fieldsets if f.human_id)
-        self.removed_fieldsets = [
-            f.human_id for f in self.old_fieldsets
-            if f.human_id and f.human_id not in new_ids
-        ]
+        new_fieldsets = {f.fieldset for f in self.new_fields if f.fieldset}
+        self.removed_fieldsets = {
+            f.fieldset for f in self.old_fields
+            if f.fieldset and f.fieldset not in new_fieldsets
+        }
 
     def detect_added_fieldsets(self) -> None:
-        old_ids = tuple(f.human_id for f in self.old_fieldsets if f.human_id)
-        self.added_fieldsets = [
-            f.human_id for f in self.new_fieldsets
-            if f.human_id and f.human_id not in old_ids
-        ]
+        old_fieldsets = {f.fieldset for f in self.old_fields if f.fieldset}
+        self.added_fieldsets = {
+            f.fieldset for f in self.new_fields
+            if f.fieldset and f.fieldset not in old_fieldsets
+        }
 
     def detect_added_fields(self) -> None:
         self.added_fields = [
-            f.human_id for f in self.new.values()
-            if f.human_id not in {f.human_id for f in self.old.values()}
+            human_id
+            for human_id in self.new
+            if human_id not in self.old
         ]
 
     def detect_removed_fields(self) -> None:
         self.removed_fields = [
-            f.human_id for f in self.old.values()
-            if f.human_id not in {f.human_id for f in self.new.values()}
+            human_id
+            for human_id in self.old
+            if human_id not in self.new
         ]
 
     def do_rename(self, removed: str, added: str) -> bool:
@@ -478,9 +477,9 @@ class StructuralChanges:
         self.added_options = []
 
         for old_id, old_field in self.old.items():
-            if isinstance(old_field, OptionsField) and old_id in self.new:
+            if hasattr(old_field, 'choices') and old_id in self.new:
                 new_field = self.new[old_id]
-                if isinstance(new_field, OptionsField):
+                if hasattr(new_field, 'choices'):
                     new_labels = [r.label for r in new_field.choices]
                     old_labels = [r.label for r in old_field.choices]
 
@@ -492,9 +491,9 @@ class StructuralChanges:
         self.removed_options = []
 
         for old_id, old_field in self.old.items():
-            if isinstance(old_field, OptionsField) and old_id in self.new:
+            if hasattr(old_field, 'choices') and old_id in self.new:
                 new_field = self.new[old_id]
-                if isinstance(new_field, OptionsField):
+                if hasattr(new_field, 'choices'):
                     new_labels = [r.label for r in new_field.choices]
                     old_labels = [r.label for r in old_field.choices]
 
@@ -506,9 +505,9 @@ class StructuralChanges:
         self.renamed_options = {}
 
         for old_id, old_field in self.old.items():
-            if isinstance(old_field, OptionsField) and old_id in self.new:
+            if hasattr(old_field, 'choices') and old_id in self.new:
                 new_field = self.new[old_id]
-                if isinstance(new_field, OptionsField):
+                if hasattr(new_field, 'choices'):
                     old_labels = [r.label for r in old_field.choices]
                     new_labels = [r.label for r in new_field.choices]
 

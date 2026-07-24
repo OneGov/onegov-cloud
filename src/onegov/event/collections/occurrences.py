@@ -132,7 +132,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         available_accesses: Collection[str] = (),
         search_widget: OccurenceSearchWidget | None = None,
         event_filter_configuration: dict[str, Any] | None = None,
-        event_filter_fields: Sequence[ParsedField] | None = None,
+        event_filter_fields: Mapping[str, ParsedField] | None = None,
     ) -> None:
 
         if filter_keywords is None:
@@ -159,7 +159,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.available_accesses = available_accesses
         self.search_widget = search_widget
         self.event_filter_configuration = event_filter_configuration or {}
-        self.event_filter_fields = event_filter_fields or ()
+        self.event_filter_fields = event_filter_fields or {}
 
     @property
     def q(self) -> str | None:
@@ -499,10 +499,10 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     def set_event_filter_fields(
         self,
-        fields: Sequence[ParsedField] | None
+        fields: Mapping[str, ParsedField] | None
     ) -> None:
 
-        self.event_filter_fields = fields or ()
+        self.event_filter_fields = fields or {}
 
     def valid_keywords(
         self,
@@ -542,8 +542,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
         )
 
         fields = {
-            f.id: f for f in self.event_filter_fields
-            if f.id in keywords and (
+            f_id: f for f_id, f in self.event_filter_fields.items()
+            if f_id in keywords and (
                 f.type == 'radio'
                 or f.type == 'checkbox'
             )

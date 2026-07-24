@@ -693,17 +693,17 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
             if item.content_fields:
                 data = {f.name: f.object_data for f in item.content_fields}
 
-            for field in item.directory.fields:
+            for field_id, field in item.directory.fields.items():
                 if any(field_type in field.type for field_type in [
                     'fileinput', 'url']):
-                    data.pop(field.id, None)
+                    data.pop(field_id, None)
                 if any(field_type in field.type for field_type in [
-                    'date', 'time']):
-                    if data.get(field.id):
-                        data[field.id] = data[field.id].isoformat()
+                    'date', 'datetime', 'time']):
+                    if value := data.get(field_id):
+                        data[field_id] = value.isoformat()
                 if 'decimal_range' in field.type:
-                    if data.get(field.id) is not None:
-                        data[field.id] = float(data[field.id])
+                    if (value := data.get(field_id)) is not None:
+                        data[field_id] = float(value)
 
             data['coordinates'] = get_geo_location(item)
             data['contact'] = item.contact

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
@@ -85,11 +86,9 @@ def parse_form(
 
     builder = WTFormsClassBuilder(base_class)
 
-    for fieldset in parse_formcode(text, enable_edit_checks):
-        builder.set_current_fieldset(fieldset.label)
-
-        for field in fieldset.fields:
-            handle_field(builder, field)
+    for field in parse_formcode(text, enable_edit_checks):
+        builder.set_current_fieldset(field.fieldset)
+        handle_field(builder, field)
 
     form_class = builder.form_class
     form_class._source = text
@@ -100,12 +99,14 @@ def parse_form(
 def handle_field(
     builder: WTFormsClassBuilder[Any],
     field: ParsedField,
+    parent_id: str | None = None,
     dependency: FieldDependency | None = None
 ) -> None:
     """ Takes the given parsed field and adds it to the form. """
 
     validators: list[Validator[Any, Any]]
     widget: Widget[Any] | None
+    field_id = as_internal_id(field.human_id(parent_id))
     if field.type == 'text':
         render_kw = None
         if field.maxlength:
@@ -119,7 +120,7 @@ def handle_field(
 
         builder.add_field(
             field_class=StringField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -131,7 +132,7 @@ def handle_field(
     elif field.type == 'textarea':
         builder.add_field(
             field_class=TextAreaField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -142,7 +143,7 @@ def handle_field(
     elif field.type == 'password':
         builder.add_field(
             field_class=PasswordField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -152,7 +153,7 @@ def handle_field(
     elif field.type == 'email':
         builder.add_field(
             field_class=EmailField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -163,7 +164,7 @@ def handle_field(
     elif field.type == 'url':
         builder.add_field(
             field_class=URLField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -174,7 +175,7 @@ def handle_field(
     elif field.type == 'video_url':
         builder.add_field(
             field_class=VideoURLField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -185,7 +186,7 @@ def handle_field(
     elif field.type == 'stdnum':
         builder.add_field(
             field_class=StringField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -204,7 +205,7 @@ def handle_field(
 
         builder.add_field(
             field_class=DateField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -224,7 +225,7 @@ def handle_field(
 
         builder.add_field(
             field_class=DateTimeLocalField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -236,7 +237,7 @@ def handle_field(
     elif field.type == 'time':
         builder.add_field(
             field_class=TimeField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -249,7 +250,7 @@ def handle_field(
         accept = ','.join(expected_extensions.whitelist)
         builder.add_field(
             field_class=UploadField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -267,7 +268,7 @@ def handle_field(
         accept = ','.join(expected_extensions.whitelist)
         builder.add_field(
             field_class=UploadMultipleField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -282,14 +283,22 @@ def handle_field(
     elif field.type == 'radio':
         builder.add_field(
             field_class=RadioField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
-            choices=[(c.key, c.label) for c in field.choices],
-            default=next((c.key for c in field.choices if c.selected), None),
-            pricing=field.pricing,
-            discount=field.discount,
+            choices=[(c.label, c.display_label) for c in field.choices],
+            default=next((c.label for c in field.choices if c.selected), None),
+            pricing={
+                c.label: c.pricing.as_tuple()
+                for c in field.choices
+                if c.pricing is not None
+            } or None,
+            discount={
+                c.label: c.discount / Decimal('100')
+                for c in field.choices
+                if c.discount is not None
+            } or None,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help
@@ -298,14 +307,22 @@ def handle_field(
     elif field.type == 'checkbox':
         builder.add_field(
             field_class=MultiCheckboxField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
-            choices=[(c.key, c.label) for c in field.choices],
-            default=[c.key for c in field.choices if c.selected],
-            pricing=field.pricing,
-            discount=field.discount,
+            choices=[(c.label, c.display_label) for c in field.choices],
+            default=next((c.label for c in field.choices if c.selected), None),
+            pricing={
+                c.label: c.pricing.as_tuple()
+                for c in field.choices
+                if c.pricing is not None
+            } or None,
+            discount={
+                c.label: c.discount / Decimal('100')
+                for c in field.choices
+                if c.discount is not None
+            } or None,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help
@@ -314,11 +331,16 @@ def handle_field(
     elif field.type == 'integer_range':
         builder.add_field(
             field_class=IntegerField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
-            pricing=field.pricing,
+            pricing={
+                range(
+                    field.range.start,
+                    field.range.stop
+                ): field.pricing_per_item.as_tuple()
+            } if field.pricing_per_item is not None else None,
             validators=[
                 NumberRange(
                     field.range.start,
@@ -331,7 +353,7 @@ def handle_field(
     elif field.type == 'decimal_range':
         builder.add_field(
             field_class=DecimalField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -347,7 +369,7 @@ def handle_field(
     elif field.type == 'chip_nr':
         builder.add_field(
             field_class=StringField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -358,7 +380,7 @@ def handle_field(
     elif field.type == 'code':
         builder.add_field(
             field_class=TextAreaField,
-            field_id=field.id,
+            field_id=field_id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -370,12 +392,13 @@ def handle_field(
         raise NotImplementedError
 
     if field.type == 'radio' or field.type == 'checkbox':
+        # FIXME: Handle fieldsets in choices
         for choice in field.choices:
             if not choice.fields:
                 continue
-            dependency = FieldDependency(field.id, choice.key)
+            dependency = FieldDependency(field_id, choice.label)
             for choice_field in choice.fields:
-                handle_field(builder, choice_field, dependency)
+                handle_field(builder, choice_field, field_id, dependency)
 
 
 class WTFormsClassBuilder[FormT: Form]:

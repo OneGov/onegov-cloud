@@ -65,8 +65,8 @@ class FieldParser:
     """ Parses records read by the directory archive reader. """
 
     def __init__(self, directory: Directory, archive_path: Path) -> None:
-        self.fields_by_human_id = {f.human_id: f for f in directory.fields}
-        self.fields_by_id = {f.id: f for f in directory.fields}
+        self.fields_by_human_id = directory.fields_by_human_id
+        self.fields_by_id = directory.fields
         self.archive_path = archive_path
 
     def get_field(self, key: str) -> ParsedField | None:
@@ -398,19 +398,19 @@ class DirectoryArchiveWriter:
         """ Writes the directory entries. Allows filtering with custom
         entry_filter function as well as passing a query object """
 
-        fields = directory.fields
+        fields = directory.fields_by_human_id
         paths: dict[str, str] = {}
         fid_to_entry = {}
 
         def file_path(
             entry: DirectoryEntry,
-            field: ParsedField,
+            field_id: str,
             value: dict[str, Any],
             suffix: str = ''
         ) -> str:
 
             return '{folder}/{name}{suffix}{ext}'.format(
-                folder=field.id,
+                folder=field_id,
                 name=entry.name,
                 suffix=suffix,
                 ext=mimetypes.guess_extension(value['mimetype']) or '')
@@ -419,13 +419,18 @@ class DirectoryArchiveWriter:
             entry: DirectoryEntry
         ) -> Iterator[tuple[str, Any | None]]:
 
-            for field in fields:
-                value = entry.values.get(field.id)
+            for human_id, field in fields.items():
+                field_id = as_internal_id(human_id)
+                value = entry.values.get(field_id)
 
                 if field.type == 'fileinput':
                     if value:
                         file_id = value['data'].lstrip('@')
-                        value = paths[file_id] = file_path(entry, field, value)
+                        value = paths[file_id] = file_path(
+                            entry,
+                            field_id,
+                            value
+                        )
                         fid_to_entry[file_id] = entry.name
                     else:
                         value = None
@@ -435,7 +440,7 @@ class DirectoryArchiveWriter:
                             file_id = val['data'].lstrip('@')
                             value[idx] = paths[file_id] = file_path(
                                 entry,
-                                field,
+                                field_id,
                                 val,
                                 f'_{idx + 1}'
                             )
@@ -445,7 +450,7 @@ class DirectoryArchiveWriter:
                     else:
                         value = None
 
-                yield self.transform(field.human_id, value)
+                yield self.transform(human_id, value)
 
         def as_dict(entry: DirectoryEntry) -> dict[str, Any | None]:
             data = OrderedDict(as_tuples(entry))

@@ -69,12 +69,12 @@ def test_directory_fields(session: Session) -> None:
     )
 
     assert len(people.fields) == 2
-    assert people.fields[0].label == 'First Name'
-    assert people.fields[0].type == 'text'
-    assert people.fields[0].required
-    assert people.fields[1].label == 'Last Name'
-    assert people.fields[1].type == 'text'
-    assert people.fields[1].required
+    assert people.fields['first_name'].label == 'First Name'
+    assert people.fields['first_name'].type == 'text'
+    assert people.fields['first_name'].required
+    assert people.fields['last_name'].label == 'Last Name'
+    assert people.fields['last_name'].type == 'text'
+    assert people.fields['last_name'].required
 
 
 def test_directory_configuration(session: Session) -> None:
