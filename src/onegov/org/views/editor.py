@@ -4,7 +4,7 @@ from __future__ import annotations
 import morepath
 from webob.exc import HTTPForbidden, HTTPNotFound
 
-from onegov.core.elements import BackLink, Link
+from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.forms.page import MovePageForm, PageUrlForm, PageForm, LinkForm
@@ -186,7 +186,11 @@ def handle_edit_page(
     layout = layout or EditorLayout(self, request, site_title)
     layout.site_title = site_title  # type:ignore[union-attr]
     layout.edit_mode = True
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.return_to_url(request.link(self.page)),
+        attrs={'class': 'cancel-link'}
+    )
 
     if self.page.deletable and self.page.trait == 'link':
         edit_links = self.page.get_edit_links(request)

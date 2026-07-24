@@ -6,7 +6,7 @@ from markupsafe import Markup
 
 
 from onegov.activity import BookingPeriodCollection
-from onegov.core.elements import BackLink
+from onegov.core.elements import Link as CoreLink
 from onegov.core.html import html_to_text, sanitize_html
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
@@ -139,7 +139,13 @@ def edit_notification(
 
     layout = NotificationTemplateLayout(self, request)
     layout.edit_mode = True
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editmode_links[1] = CoreLink(
+        text=_('Cancel'),
+        url=request.return_to_url(
+            request.class_link(NotificationTemplateCollection)
+        ),
+        attrs={'class': 'cancel-link'}
+    )
 
     return {
         'title': _('Edit'),

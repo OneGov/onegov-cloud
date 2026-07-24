@@ -76,6 +76,21 @@ def test_return_to_mixin() -> None:
     r.GET['return-to'] += 'tampering'
     assert r.redirect('http://safe').location == 'http://safe'
 
+    # return_to_url mirrors redirect, but yields a plain url (e.g. for a
+    # cancel link) instead of a response
+    r.GET.clear()
+    assert r.return_to_url('http://default') == 'http://default'
+
+    r.GET['return-to'] = param(r.return_here('http://safe'))
+    assert r.return_to_url('http://default') == 'http://here'
+
+    r.GET['return-to'] = param(r.return_to('http://safe', 'http://known'))
+    assert r.return_to_url('http://default') == 'http://known'
+
+    r.GET['return-to'] = param(r.return_to('http://safe', 'http://known'))
+    r.GET['return-to'] += 'tampering'
+    assert r.return_to_url('http://default') == 'http://default'
+
 
 def test_vhm_root_urls() -> None:
 

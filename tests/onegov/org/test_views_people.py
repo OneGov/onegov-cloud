@@ -94,6 +94,27 @@ def test_people_view(client: Client) -> None:
     assert 'Noch keine Personen erfasst' in people
 
 
+def test_people_settings_return_to(client: Client) -> None:
+    client.login_admin()
+
+    # opening the settings from the people overview remembers the origin,
+    # so both the cancel link and a successful save return to the overview
+    people = client.get('/people')
+    settings = client.get(people.pyquery('a.settings-link').attr('href'))
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/people')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/people')
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/people-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')
+
+
 def test_with_people(client: Client) -> None:
     client.login_editor()
 

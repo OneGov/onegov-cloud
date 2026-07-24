@@ -358,6 +358,30 @@ def test_newsletter_subscribers_and_edit_bar(client: Client) -> None:
         assert not page.pyquery('a.new-newsletter')
 
 
+def test_newsletter_settings_return_to(client: Client) -> None:
+    client.login_admin()
+    page = client.get('/module-activation-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+
+    # opening the settings from the newsletter overview remembers the origin,
+    # so both the cancel link and a successful save return to the overview
+    newsletters = client.get('/newsletters')
+    settings = client.get(newsletters.pyquery('a.settings-link').attr('href'))
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/newsletters')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/newsletters')
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/newsletter-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')
+
+
 def test_newsletter_subscribers_management(client: Client) -> None:
 
     client.login_admin()

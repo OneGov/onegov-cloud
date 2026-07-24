@@ -1162,3 +1162,37 @@ def test_event_form_with_custom_lead(client: Client) -> None:
 
     page = client.get('/events').click("Veranstaltung erfassen")
     assert 'A completely different lead text' in page
+
+
+def test_event_settings_return_to(client: Client) -> None:
+    client.login_admin()
+
+    # opening the event settings from the events overview remembers the origin,
+    # so both the cancel link and a successful save return to the overview
+    events = client.get('/events')
+    settings = events.click('Bearbeiten', href='event-settings')
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/events')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/events')
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/event-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')
+
+
+def test_event_edit_cancel_returns_to_origin(client: Client) -> None:
+    client.login_admin()
+
+    # the occurrence page links to the edit view with a return-to parameter,
+    # so cancelling the edit returns to that occurrence
+    occurrence = client.get('/events').click('Generalversammlung')
+    origin = occurrence.request.url
+
+    edit = occurrence.click('Bearbeiten')
+    cancel_href = edit.pyquery('a.cancel-link').attr('href')
+    assert cancel_href == origin

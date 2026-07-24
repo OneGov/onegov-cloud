@@ -1705,8 +1705,10 @@ class PersonCollectionLayout(DefaultLayout):
             return [
                 Link(
                     text=_('Settings'),
-                    url=self.request.link(
-                        self.request.app.org, 'people-settings'),
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'people-settings')
+                    ),
                     attrs={'class': 'settings-link'}
                 ),
                 LinkGroup(
@@ -2741,8 +2743,10 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
             if self.request.is_manager:
                 yield Link(
                     text=_('Edit'),
-                    url=self.request.link(self.request.app.org,
-                                          'event-settings'),
+                    url=self.request.return_here(
+                        self.request.link(self.request.app.org,
+                                          'event-settings')
+                    ),
                     attrs={'class': 'edit-link'}
                 )
 
@@ -3058,8 +3062,10 @@ class NewsletterLayout(DefaultLayout):
                 ),
                 Link(
                     text=_('Settings'),
-                    url=self.request.link(
-                        self.request.app.org, 'newsletter-settings'),
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'newsletter-settings')
+                    ),
                     attrs={'class': 'settings-link'}
                 ),
             ]
@@ -4148,7 +4154,9 @@ class HomepageLayout(DefaultLayout):
             return [
                 Link(
                     _('Edit'),
-                    self.request.link(self.model, 'homepage-settings'),
+                    self.request.return_here(
+                        self.request.link(self.model, 'homepage-settings')
+                    ),
                     attrs={'class': ('edit-link')}
                 ),
                 Link(

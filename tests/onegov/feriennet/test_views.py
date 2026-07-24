@@ -3987,3 +3987,25 @@ def test_send_message_to_volunteer(
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
     assert message['To'] == 'roy@test.com'
+
+
+def test_notification_edit_cancel_returns_to_origin(
+    client: Client, scenario: Scenario
+) -> None:
+    scenario.add_period(title="Ferienpass 2016")
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/notifications').click('Neue Mitteilungs-Vorlage')
+    page.form['subject'] = 'Foo'
+    page.form['text'] = 'Bar'
+    page.form.submit().follow()
+
+    # the send view links to the edit view with a return-to back to itself,
+    # so cancelling the edit returns to the send view (not history.back)
+    send = client.get('/notifications').click('Vorlage verwenden')
+    origin = send.request.url
+
+    edit = client.get(send.pyquery('a.control').attr('href'))
+    assert edit.pyquery('a.cancel-link').attr('href') == origin
