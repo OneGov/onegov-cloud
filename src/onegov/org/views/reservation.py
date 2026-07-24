@@ -1084,7 +1084,8 @@ def accept_reservation(
             reservations,
             ticket,
             request,
-            'accepted'
+            'accepted',
+            owner=request.auto_accept_owner()
         )
 
         message = None

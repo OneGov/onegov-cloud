@@ -450,7 +450,8 @@ def handle_complete_submission(
                     )
                     assert isinstance(submission, CompleteFormSubmission)
                     handle_submission_action(
-                        submission, request, 'confirmed', True, raises=True
+                        submission, request, 'confirmed', True, raises=True,
+                        owner=request.auto_accept_owner()
                     )
 
                 except ValueError:
@@ -553,6 +554,7 @@ def handle_submission_action(
     no_messages: bool = False,
     force_email: bool = False,
     return_url: str | None = None,
+    owner: str | None = None,
 ) -> Response | None:
 
     if not ignore_csrf:
@@ -615,7 +617,7 @@ def handle_submission_action(
             force=force_email
         )
 
-        SubmissionMessage.create(ticket, request, action)
+        SubmissionMessage.create(ticket, request, action, owner=owner)
         if not no_messages:
             request.success(success)
     else:

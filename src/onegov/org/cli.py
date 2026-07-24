@@ -551,18 +551,23 @@ def fix_tags(
 
 
 def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
+    # attribute to the logged-in user if any, else the passed acting user
+    owner = request.current_username or user.username
+
     if ticket.state == 'open':
         ticket.accept_ticket(user)
         TicketMessage.create(
             ticket,
             request,
-            'opened'
+            'opened',
+            owner=owner
         )
 
     TicketMessage.create(
         ticket,
         request,
-        'closed'
+        'closed',
+        owner=owner
     )
     ticket.close_ticket()
 
