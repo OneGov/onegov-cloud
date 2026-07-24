@@ -105,7 +105,7 @@ def test_phone_number_validator() -> None:
     assert error(1234) == 'Not a valid phone number.'
     assert error('not a number') == 'Not a valid phone number.'
 
-    # an unknown country code is rejected by the parser
+    # the parser rejects an unknown country code
     assert error('+9991234567') == 'Not a valid country code.'
     assert error('+99912345') == 'Not a valid country code.'
 

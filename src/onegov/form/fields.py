@@ -778,7 +778,7 @@ class IconField(StringField):
 class PhoneNumberField(TelField):
     """ A string field with support for phone numbers. """
 
-    # maps the human readable number types to phonenumbers.PhoneNumberType
+    # maps the human-readable number types to phonenumbers.PhoneNumberType
     number_types = {
         'mobile': phonenumbers.PhoneNumberType.MOBILE,
         'fixed_line': phonenumbers.PhoneNumberType.FIXED_LINE,
@@ -798,7 +798,6 @@ class PhoneNumberField(TelField):
         allowed_types = {None, *self.number_types}
         assert number_type in allowed_types, (
             'Invalid number type: {}. Allowed are: {}'.format(
-                # sets have no stable order, so we sort for a stable message
                 number_type, sorted(allowed_types, key=str)
             )
         )
