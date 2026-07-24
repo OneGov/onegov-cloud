@@ -284,18 +284,18 @@ class DirectoryDaycareAdapter:
             'daycare_url': None,
         }
 
-        for field in self.directory.basic_fields:
+        for field_id, field in self.directory.basic_fields.items():
 
             if 'tarif' in field.label.lower():
-                fieldmap['daycare_rate'] = field.id
+                fieldmap['daycare_rate'] = field_id
                 continue
 
             if 'woche' in field.label.lower():
-                fieldmap['daycare_weeks'] = field.id
+                fieldmap['daycare_weeks'] = field_id
                 continue
 
             if 'web' in field.label.lower():
-                fieldmap['daycare_url'] = field.id
+                fieldmap['daycare_url'] = field_id
                 continue
 
         return fieldmap

@@ -51,7 +51,9 @@ def get_filters(
     filters = []
 
     radio_fields = {
-        f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
+        f_id
+        for f_id, f in request.app.org.event_filter_fields.items()
+        if f.type == 'radio'
     }
 
     def get_count(keyword: str, value: str) -> int:
@@ -207,12 +209,10 @@ def view_occurrence(
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
 
-    filter_names = {f.id: f.label for f in request.app.org.event_filter_fields}
-
     return {
         'description': description,
         'framed': framed,
-        'filter_names': filter_names,
+        'filter_names': request.app.org.event_filter_names,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
         'organizer_phone': self.event.organizer_phone,
@@ -250,14 +250,14 @@ def handle_edit_event_filters(
                 for k in (form.keyword_fields.data or '').splitlines()
             }
             old_field_choices = {
-                f.id: {c.label for c in getattr(f, 'choices', ())}
-                for f in request.app.org.event_filter_fields
+                f_id: {c.label for c in getattr(f, 'choices', ())}
+                for f_id, f in request.app.org.event_filter_fields.items()
             }
             new_field_choices = {
-                f.id: {c.label for c in getattr(f, 'choices', ())}
-                for f in flatten_event_filter_fields_from_definition(
+                f_id: {c.label for c in getattr(f, 'choices', ())}
+                for f_id, f in flatten_event_filter_fields_from_definition(
                     form.definition.data
-                )
+                ).items()
             }
 
             removed_keywords = old_keywords - new_keywords

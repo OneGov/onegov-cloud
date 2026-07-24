@@ -439,7 +439,9 @@ def get_filters(
     #        entries. One could even argue that this should always be a
     #        multi-select, regardless of what the filter form declares.
     radio_fields = {
-        f.id for f in self.directory.fields if f.type == 'radio'
+        f_id
+        for f_id, f in self.directory.fields.items()
+        if f.type == 'radio'
     }
 
     def link_title(field_id: str, value: str) -> str:

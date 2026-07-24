@@ -430,10 +430,10 @@ class EventForm(Form):
 
         if self.request.app.org.event_filter_type in ('filters',
                                                       'tags_and_filters'):
-            filter_keywords = {}
-            for field in self.request.app.org.event_filter_fields:
-                form_field = getattr(self, field.id)
-                filter_keywords[field.id] = form_field.data
+            filter_keywords = {
+                field_id: self[field_id].data
+                for field_id in self.request.app.org.event_filter_fields
+            }
 
             if filter_keywords:
                 model.filter_keywords = filter_keywords
@@ -477,17 +477,17 @@ class EventForm(Form):
         if model.filter_keywords:
             keywords = model.filter_keywords
 
-            for field in self.request.app.org.event_filter_fields:
-                if field.id not in self:
+            for field_id in self.request.app.org.event_filter_fields:
+                if field_id not in self:
                     continue
 
-                form_field = self[field.id]
+                form_field = self[field_id]
                 if not form_field.raw_data:
                     # HACK: This is to get around the fact that we don't know
                     #       whether the field expects a list of values or a
                     #       single value, so we exploit the fact, that the
                     #       field handles that for us when processing formdata
-                    form_field.raw_data = valuelist = keywords.getall(field.id)
+                    form_field.raw_data = valuelist = keywords.getall(field_id)
                     form_field.process_formdata(valuelist)
 
     @cached_property

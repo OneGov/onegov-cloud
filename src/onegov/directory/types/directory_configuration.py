@@ -8,7 +8,7 @@ from datetime import date, datetime, time
 from more_itertools import collapse
 from onegov.core.custom import json
 from onegov.core.utils import normalize_for_url, safe_format, safe_format_keys
-from onegov.form import parse_formcode, flatten_fieldsets, as_internal_id
+from onegov.form import parse_formcode, flatten_fields, as_internal_id
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
@@ -147,8 +147,13 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             {'title': ['Name']}
 
         """
-        formfields = tuple(flatten_fieldsets(parse_formcode(formcode)))
-        known = {field.human_id for field in formfields}
+        known = {
+            human_id
+            for human_id, _ in flatten_fields(
+                parse_formcode(formcode),
+                with_human_id=True
+            )
+        }
 
         errors = defaultdict(list)
 

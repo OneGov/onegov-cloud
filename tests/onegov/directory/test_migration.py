@@ -142,8 +142,8 @@ def test_detect_renamed_fields_changing_fieldsets() -> None:
     }
     assert not changes.removed_fields
     assert not changes.added_fields
-    assert changes.removed_fieldsets == ['General']
-    assert changes.added_fieldsets == ['Personal']
+    assert changes.removed_fieldsets == {'General'}
+    assert changes.added_fieldsets == {'Personal'}
 
     # there is a limit of what can be done...
     # but it should since the order persisted and a new field is only
@@ -194,7 +194,7 @@ def test_detect_changed_fields() -> None:
 
     assert not changes.renamed_fields
     assert changes.changed_fields == ['Name']
-    assert changes.old_field('Name').human_id == 'Name'
+    assert changes.old_field('Name').human_id() == 'Name'
     assert changes.old_field('Name').required is False
     assert changes.new['Name'].required is True
 
@@ -213,7 +213,7 @@ def test_detect_changed_fields() -> None:
     assert changes.changed_fields == ['Name']
     assert 'Name' not in changes.old
     # old_field must resolve the rename back to the original id
-    assert changes.old_field('Name').human_id == 'First Name'
+    assert changes.old_field('Name').human_id() == 'First Name'
     assert changes.old_field('Name').required is False
     assert changes.new['Name'].required is True
 
@@ -246,7 +246,7 @@ def test_detect_changed_fields() -> None:
     assert changes.renamed_fields == {'Contact/Street': 'Strasse'}
     assert changes.changed_fields == ['Strasse']
     assert 'Strasse' not in changes.old
-    assert changes.old_field('Strasse').human_id == 'Contact/Street'
+    assert changes.old_field('Strasse').human_id() == 'Contact/Street'
     assert changes.old_field('Strasse').required is False
     assert changes.new['Strasse'].required is True
 
@@ -263,7 +263,7 @@ def test_detect_changed_fields() -> None:
     assert changes.renamed_fields == {'First Name': 'Name'}
     assert changes.changed_fields == ['Name']
     assert 'Name' not in changes.old
-    assert changes.old_field('Name').human_id == 'First Name'
+    assert changes.old_field('Name').human_id() == 'First Name'
     assert changes.old_field('Name').required is True
     assert changes.new['Name'].required is False
 
@@ -315,7 +315,7 @@ def test_add_fieldset_at_top() -> None:
 
     changes = StructuralChanges(old, '# Main\n' + old)
     assert not changes.removed_fieldsets
-    assert changes.added_fieldsets == ['Main']
+    assert changes.added_fieldsets == {'Main'}
     assert changes.renamed_fields == {'A': 'Main/A'}
     assert not changes.added_fields
     assert not changes.removed_fields
@@ -335,14 +335,14 @@ def test_add_fieldset_at_bottom() -> None:
 
     changes = StructuralChanges('# Main\n' + old, '# Main\n' + new)
     assert not changes.removed_fieldsets
-    assert changes.added_fieldsets == ['Crazy']
+    assert changes.added_fieldsets == {'Crazy'}
     assert changes.renamed_fields == {'Main/C': 'Crazy/C'}
     assert not changes.added_fields
     assert not changes.removed_fields
 
     changes = StructuralChanges(old, new)
     assert not changes.removed_fieldsets
-    assert changes.added_fieldsets == ['Crazy']
+    assert changes.added_fieldsets == {'Crazy'}
     assert changes.renamed_fields == {'C': 'Crazy/C'}
     assert not changes.added_fields
     assert not changes.removed_fields
@@ -364,7 +364,7 @@ def test_remove_fieldset_in_between() -> None:
     assert changes.renamed_fields == {'Main/Name': 'Name'}
     assert not changes.added_fields
     assert not changes.removed_fields
-    assert changes.removed_fieldsets == ['Main']
+    assert changes.removed_fieldsets == {'Main'}
 
     changes = StructuralChanges(old, old.replace('# Cost (A,B;C/D)', ''))
     assert changes.renamed_fields == {
@@ -375,7 +375,7 @@ def test_remove_fieldset_in_between() -> None:
     assert not changes.added_fields
     assert not changes.removed_fields
     assert not changes.added_fieldsets
-    assert changes.removed_fieldsets == ['Cost (A,B;C/D)']
+    assert changes.removed_fieldsets == {'Cost (A,B;C/D)'}
 
     old = """
     # F
@@ -392,7 +392,7 @@ def test_remove_fieldset_in_between() -> None:
     )
     assert changes.renamed_fields == {'S/B': 'F/B', 'S/C': 'F/C'}
     assert not changes.added_fieldsets
-    assert changes.removed_fieldsets == ['S']
+    assert changes.removed_fieldsets == {'S'}
     assert not changes.removed_fields
     assert not changes.added_fields
     assert not changes.changed_fields

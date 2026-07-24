@@ -11,7 +11,8 @@ from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property, TimestampMixin)
 from onegov.core.utils import linkify, paragraphify
 from onegov.file.models.file import File
-from onegov.form import flatten_fieldsets, parse_formcode
+from onegov.form import flatten_fields, parse_formcode
+from onegov.form.utils import as_internal_id
 from onegov.org.theme import user_options
 from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
@@ -22,7 +23,7 @@ from uuid import uuid4, UUID
 
 from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterator, Mapping
     from datetime import datetime
     from decimal import Decimal
     from markupsafe import Markup
@@ -478,19 +479,28 @@ class Organisation(Base, TimestampMixin):
         return [] if request.is_logged_in else self.hidden_people_fields
 
     @property
-    def event_filter_fields(self) -> tuple[ParsedField, ...]:
+    def event_filter_fields(self) -> Mapping[str, ParsedField]:
         return flatten_event_filter_fields_from_definition(
             self.event_filter_definition)
 
     @property
     def event_filter_names(self) -> dict[str, str]:
-        return {f.id: f.label for f in self.event_filter_fields}
+        return {
+            field_id: field.label
+            for field_id, field in self.event_filter_fields.items()
+        }
 
 
 @lru_cache(maxsize=64)
 def flatten_event_filter_fields_from_definition(
     definition: str | None
-) -> tuple[ParsedField, ...]:
+) -> Mapping[str, ParsedField]:
     if not definition:
-        return ()
-    return tuple(flatten_fieldsets(parse_formcode(definition)))
+        return {}
+    return {
+        as_internal_id(human_id): field
+        for human_id, field in flatten_fields(
+            parse_formcode(definition),
+            with_human_id=True
+        )
+    }

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 from onegov.form import as_internal_id
-from onegov.form import flatten_fieldsets
+from onegov.form import flatten_fields
 from onegov.form import merge_forms
 from onegov.form import parse_formcode
 from onegov.form import Form
@@ -505,8 +505,11 @@ class ResourceBaseForm(Form):
         #        so we don't parse the form twice if we access both properties
         try:
             return {
-                field.id for field in
-                flatten_fieldsets(parse_formcode(self.definition.data))
+                as_internal_id(human_id)
+                for human_id, field in flatten_fields(
+                    parse_formcode(self.definition.data),
+                    with_human_id=True
+                )
             }
         except FormError:
             return None
@@ -534,10 +537,10 @@ class ResourceBaseForm(Form):
             raise ValidationError(
                 _('Please select the form field that holds the zip-code'))
 
-        for fieldset in parse_formcode(self.definition.data):
-            for parsed_field in fieldset.fields:
-                if parsed_field.human_id == self.zipcode_field.data:
-                    return
+        # FIXME: What about nested fields? Can they not be selected?
+        for parsed_field in parse_formcode(self.definition.data):
+            if parsed_field.human_id() == self.zipcode_field.data:
+                return
 
         raise ValidationError(
             _('Please select the form field that holds the zip-code'))

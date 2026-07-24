@@ -334,8 +334,8 @@ def analyze_directories(
 
         assert request.app.depot_storage_path is not None
         for entry in request.session.query(DirectoryEntry).all():
-            for field in entry.directory.file_fields:
-                field_data = entry.content['values'][field.id]
+            for field_id in entry.directory.file_fields:
+                field_data = entry.content['values'][field_id]
                 file_data = field_data.get('data', '')
                 if not file_data:
                     continue

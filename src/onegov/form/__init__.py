@@ -32,7 +32,7 @@ from onegov.form.models import (
     CompleteFormSubmission
 )
 from onegov.form.parser import find_field
-from onegov.form.parser import flatten_fieldsets
+from onegov.form.parser import flatten_fields
 from onegov.form.parser import parse_form
 from onegov.form.parser import parse_formcode
 from onegov.form.parser import WTFormsClassBuilder
@@ -44,7 +44,7 @@ __all__ = (
     'CompleteFormSubmission',
     'decimal_range',
     'find_field',
-    'flatten_fieldsets',
+    'flatten_fields',
     'Extendable',
     'FieldDependency',
     'Form',

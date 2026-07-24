@@ -213,8 +213,8 @@ def fix_directory_file_identity(context: UpgradeContext) -> None:
     # Not sure of this doubles the files, but actually the file
     # reference remains, so it shouldn't
     for entry in context.session.query(DirectoryEntry).all():
-        for field in entry.directory.file_fields:
-            field_data = entry.content['values'][field.id]
+        for field_id in entry.directory.file_fields:
+            field_data = entry.content['values'][field_id]
             if field_data and field_data.get('data', '').startswith('@'):
                 file_id = field_data['data'].lstrip('@')
                 file = context.session.query(File).filter_by(
@@ -227,7 +227,7 @@ def fix_directory_file_identity(context: UpgradeContext) -> None:
                         reference=file.reference
                     )
                     entry.files.append(new)
-                    entry.content['values'][field.id]['data'] = f'@{new.id}'
+                    entry.content['values'][field_id]['data'] = f'@{new.id}'
                     entry.content.changed()  # type:ignore[attr-defined]
 
 

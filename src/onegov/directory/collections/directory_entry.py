@@ -196,9 +196,9 @@ class DirectoryEntryCollection[DirectoryEntryT: DirectoryEntry](
             for k in self.directory.configuration.keywords or ()
         )
         fields = {
-            f.id: f
-            for f in self.directory.fields
-            if f.id in keywords and (
+            f_id: f
+            for f_id, f in self.directory.fields.items()
+            if f_id in keywords and (
                 f.type == 'radio'
                 or f.type == 'checkbox'
             )
