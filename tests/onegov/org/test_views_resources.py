@@ -30,6 +30,7 @@ from openpyxl import load_workbook
 from pathlib import Path
 from sqlalchemy import exc
 from sqlalchemy.orm.session import close_all_sessions
+from tests.onegov.org.common import ticket_message_owners
 from tests.shared.utils import add_reservation
 from unittest.mock import patch
 from urllib.parse import quote
@@ -1108,8 +1109,18 @@ def test_allocation_school_holidays(client: Client) -> None:
     assert slots.json[2]['start'].startswith('2019-08-02')
 
 
+@pytest.mark.parametrize('logged_in,expected_owner', [
+    # anonymous requester -> messages attributed to the auto-accept user
+    (False, 'autoaccept@example.org'),
+    # logged-in requester -> messages attributed to that logged-in user
+    (True, 'admin@example.org'),
+])
 @freeze_time('2015-08-28', tick=True)
-def test_auto_accept_reservations(client: Client) -> None:
+def test_auto_accept_reservations(
+    client: Client,
+    logged_in: bool,
+    expected_owner: str,
+) -> None:
     # prepare the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1126,13 +1137,26 @@ def test_auto_accept_reservations(client: Client) -> None:
     )
 
     reserve = client.bound_reserve(allocations[0])
+
+    # add a distinct admin as the configured auto-accept user, so we can
+    # tell it apart from a logged-in requester (OGC-3256)
+    UserCollection(client.app.session()).add(
+        username='autoaccept@example.org', password='hunter2', role='admin'
+    )
     transaction.commit()
 
-    admin_client = client
+    # configure auto-accept via a separate admin client, so the requester
+    # below can stay anonymous
+    admin_client = client.spawn()
     admin_client.login_admin()
     settings = admin_client.get('/ticket-settings')
     settings.form['ticket_auto_accepts'] = ['RSV']
+    settings.form['auto_closing_user'] = 'autoaccept@example.org'
     settings.form.submit()
+
+    # the requester is either anonymous or the logged-in admin
+    if logged_in:
+        client.login_admin()
 
     # create a reservation
     result = reserve(quota=4, whole_day=True)
@@ -1161,13 +1185,21 @@ def test_auto_accept_reservations(client: Client) -> None:
     assert 'Ganztägig' in pdf_content
 
     # close the ticket and check not email is sent
-    tickets = client.get('/tickets/ALL/closed')
+    tickets = admin_client.get('/tickets/ALL/closed')
     assert 'RSV-' in tickets
 
     # Test display of status page of ticket
     # Generic message, shown when ticket is open or closed
     assert 'Ihre Anfrage wurde erfolgreich abgeschlossen' not in page
     assert 'You can pick it up at the counter' in page
+
+    # the auto-accept activity messages are attributed to the acting user
+    session = client.app.session()
+    ticket_obj = TicketCollection(session).query().filter_by(
+        handler_code='RSV').one()
+    messages = ticket_message_owners(session, ticket_obj)
+    assert messages['accepted'] == expected_owner
+    assert messages['closed'] == expected_owner
 
 
 @freeze_time('2015-08-28', tick=True)

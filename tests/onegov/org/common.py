@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.chat import MessageCollection
 from onegov.ticket import Handler, Ticket
 
 
@@ -8,6 +9,7 @@ if TYPE_CHECKING:
     from onegov.core import Framework
     from onegov.core.cronjobs import Job
     from onegov.ticket.handler import HandlerRegistry
+    from sqlalchemy.orm import Session
 
 
 def get_cronjob_by_name(app: Framework, name: str) -> Job[Any] | None:
@@ -66,3 +68,18 @@ class EchoHandler(Handler):
 
 def register_echo_handler(handlers: HandlerRegistry) -> None:
     handlers.register('EHO', EchoHandler)
+
+
+def ticket_message_owners(
+    session: Session,
+    ticket: Ticket
+) -> dict[str | None, str | None]:
+    """ Maps each ticket activity message's change to its owner. """
+    return {
+        m.meta.get('change'): m.owner
+        for m in MessageCollection(session, channel_id=ticket.number)
+        .query().all()
+        if hasattr(m, 'meta')
+    }
+
+

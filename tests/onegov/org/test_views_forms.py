@@ -19,6 +19,7 @@ from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from tempfile import TemporaryDirectory
+from tests.onegov.org.common import ticket_message_owners
 from tests.shared.utils import create_image, create_pdf
 from unittest.mock import patch
 from webtest import Upload
@@ -1147,7 +1148,13 @@ def test_registration_ticket_workflow(client: Client) -> None:
     assert 'Ihr Anliegen wurde abgeschlossen' in page
 
     # check ownership of the ticket
-    client.app.session().query(Ticket).filter_by(user_id=user_id).one()
+    session = client.app.session()
+    auto_ticket = session.query(Ticket).filter_by(user_id=user_id).one()
+
+    # the activity messages are attributed to the auto-accept user
+    messages = ticket_message_owners(session, auto_ticket)
+    assert messages['confirmed'] == username
+    assert messages['closed'] == username
 
     client.login_editor()
     # We rename the form and check if everything still works
