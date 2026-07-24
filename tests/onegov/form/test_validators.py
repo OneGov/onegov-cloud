@@ -5,8 +5,10 @@ from onegov.core.orm import SessionManager
 from onegov.file.attachments import IMAGE_QUALITY
 from onegov.form import Form
 from onegov.form import parse_form
+from phonenumbers import PhoneNumberType
+
 from onegov.form.fields import UploadField
-from onegov.form.validators import ExpectedExtensions, PhoneNumberType
+from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import ImageSizeLimit
 from onegov.form.validators import InputRequiredIf
 from onegov.form.validators import ValidSwissSocialSecurityNumber
@@ -83,6 +85,7 @@ def test_phone_number_validator() -> None:
     validator(request, Field(''))
 
     # non-swiss numbers are allowed by default
+    validator(request, Field('+12398051122'))  # US
     validator(request, Field('+4909562181751'))  # DE
     validator(request, Field('+4319876543'))  # A
     validator(request, Field('+43695621817'))  # A
@@ -121,7 +124,7 @@ def test_phone_number_validator() -> None:
     validator = ValidPhoneNumber(country='US')
     assert error('2345678') == 'Please include the area code.'
 
-    validator = ValidPhoneNumber(number_type=PhoneNumberType.ANY.value)
+    validator = ValidPhoneNumber(number_type=None)
     validator(request, Field('+41791112233'))
     validator(request, Field('0041791112233'))
     validator(request, Field('41791112233'))
@@ -131,7 +134,7 @@ def test_phone_number_validator() -> None:
     validator(request, Field('41761112233'))
     validator(request, Field('41411112233'))
 
-    validator = ValidPhoneNumber(number_type=PhoneNumberType.MOBILE.value)
+    validator = ValidPhoneNumber(number_type=PhoneNumberType.MOBILE)
     validator(request, Field('+41791112233'))
     validator(request, Field('0041791112233'))
     validator(request, Field('41791112233'))
@@ -141,7 +144,7 @@ def test_phone_number_validator() -> None:
     validator(request, Field('41761112233'))
     assert error('41411112233') == 'Please enter a mobile phone number.'
 
-    validator = ValidPhoneNumber(number_type=PhoneNumberType.FIXED_LINE.value)
+    validator = ValidPhoneNumber(number_type=PhoneNumberType.FIXED_LINE)
     landline = 'Please enter a landline phone number.'
     assert error('+41791112233') == landline
     assert error('0041791112233') == landline
@@ -190,11 +193,33 @@ def test_phone_number_validator() -> None:
     # the whitelist is combined with the other checks
     validator = ValidPhoneNumber(
         country_whitelist={'CH', 'AT'},
-        number_type=PhoneNumberType.MOBILE.value
+        number_type=PhoneNumberType.MOBILE
     )
     validator(request, Field('+41791112233'))
     assert error('+41411112233') == 'Please enter a mobile phone number.'
     assert error('+390612345678').startswith(unsupported)  # IT
+
+    # the US can't distinguish fixed line from mobile (numbers resolve to
+    # FIXED_LINE_OR_MOBILE), so the aggregate is accepted for either
+    mobile = ValidPhoneNumber(number_type=PhoneNumberType.MOBILE)
+    fixed_line = ValidPhoneNumber(number_type=PhoneNumberType.FIXED_LINE)
+    mobile(request, Field('+12015550123'))  # US
+    fixed_line(request, Field('+12015550123'))  # US
+
+    # swiss numbers can be distinguished, so the type is enforced
+    mobile(request, Field('+41791112233'))  # CH mobile
+    fixed_line(request, Field('+41411112233'))  # CH landline
+
+    # unsupported type in the region (international numbers) -> check skipped
+    mobile(request, Field('+80012345678'))  # UIFN, region '001'
+    fixed_line(request, Field('+870773111632'))  # Inmarsat, region '001'
+
+    # a non mobile/fixed type: matching passes, mismatching gets generic error
+    toll_free = ValidPhoneNumber(number_type=PhoneNumberType.TOLL_FREE)
+    toll_free(request, Field('+18002223333'))  # US toll free
+    with raises(ValidationError) as exception:
+        toll_free(request, Field('0791112233'))  # CH mobile
+    assert exception.value.args[0].interpolate() == 'Not a valid phone number.'
 
     # the default country has to be part of the whitelist
     with raises(AssertionError) as ex:
@@ -203,11 +228,8 @@ def test_phone_number_validator() -> None:
 
     # the same goes for an unknown number type
     with raises(AssertionError) as ex:
-        ValidPhoneNumber(number_type='typo')
-    assert (
-        "Invalid number type: typo. "
-        "Allowed are: ['any', 'fixed_line', 'mobile']"
-    ) in str(ex.value)
+        ValidPhoneNumber(number_type=999)
+    assert "Invalid number type: 999" in str(ex.value)
 
 
 def test_input_required_if_validator() -> None:

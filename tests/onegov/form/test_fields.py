@@ -4,6 +4,7 @@ import re
 import tempfile
 
 from cgi import FieldStorage
+from phonenumbers import PhoneNumberType
 from copy import deepcopy
 from datetime import datetime
 
@@ -523,7 +524,7 @@ def test_phone_number_field() -> None:
 
     form = Form()
     field = PhoneNumberField(
-        validators=[ValidPhoneNumber(country='CH', number_type='any')]
+        validators=[ValidPhoneNumber(country='CH', number_type=None)]
     )
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
     field.data = '0791112233'
@@ -535,7 +536,10 @@ def test_phone_number_field() -> None:
 
     form = Form()
     field = PhoneNumberField(
-        validators=[ValidPhoneNumber(country='CH', number_type='mobile')]
+        validators=[ValidPhoneNumber(
+            country='CH',
+            number_type=PhoneNumberType.MOBILE
+        )]
     )
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
     field.data = '0791112233'
@@ -547,7 +551,10 @@ def test_phone_number_field() -> None:
 
     form = Form()
     field = PhoneNumberField(
-        validators=[ValidPhoneNumber(country='CH', number_type='fixed_line')]
+        validators=[ValidPhoneNumber(
+            country='CH',
+            number_type=PhoneNumberType.FIXED_LINE
+        )]
     )
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
     field.data = '0791112233'
@@ -561,7 +568,7 @@ def test_phone_number_field() -> None:
     form = Form()
     field = PhoneNumberField(number_type=None)
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
-    assert field.validators[-1].number_type == 'any'
+    assert field.validators[-1].number_type is None
     field.data = '0791112233'
     assert field.validate(form)
     field.data = '0411112233'
@@ -571,14 +578,14 @@ def test_phone_number_field() -> None:
     form = Form()
     field = PhoneNumberField()
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
-    assert field.validators[-1].number_type == 'any'
+    assert field.validators[-1].number_type is None
     field.data = '0411112233'
     assert field.validate(form)
 
     form = Form()
     field = PhoneNumberField(number_type='mobile')
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
-    assert field.validators[-1].number_type == 'mobile'
+    assert field.validators[-1].number_type == PhoneNumberType.MOBILE
     field.data = '0791112233'
     assert field.validate(form)
     field.data = '0411112233'
@@ -587,7 +594,7 @@ def test_phone_number_field() -> None:
     form = Form()
     field = PhoneNumberField(number_type='fixed_line')
     field = field.bind(form, 'phone_number')  # type: ignore[attr-defined]
-    assert field.validators[-1].number_type == 'fixed_line'
+    assert field.validators[-1].number_type == PhoneNumberType.FIXED_LINE
     field.data = '0791112233'
     assert not field.validate(form)
     field.data = '0411112233'
@@ -614,7 +621,7 @@ def test_phone_number_field() -> None:
         field.bind(form, 'phone_number')  # type: ignore[attr-defined]
     assert (
         "Invalid number type: landline. Allowed are: "
-        "[None, 'any', 'fixed_line', 'mobile']"
+        "[None, 'fixed_line', 'mobile']"
         in str(ex.value)
     )
 

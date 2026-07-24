@@ -21,7 +21,6 @@ from onegov.form.utils import path_to_filename
 from onegov.form.validators import (
     ValidPhoneNumber,
     WhitelistedMimeType,
-    PhoneNumberType,
 )
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import LinkPanelWidget
@@ -779,6 +778,12 @@ class IconField(StringField):
 class PhoneNumberField(TelField):
     """ A string field with support for phone numbers. """
 
+    # maps the human readable number types to phonenumbers.PhoneNumberType
+    number_types = {
+        'mobile': phonenumbers.PhoneNumberType.MOBILE,
+        'fixed_line': phonenumbers.PhoneNumberType.FIXED_LINE,
+    }
+
     def __init__(
         self,
         *args: Any,
@@ -790,7 +795,7 @@ class PhoneNumberField(TelField):
         self.country = country
         super().__init__(*args, **kwargs)
 
-        allowed_types = {None, *(v.value for v in PhoneNumberType)}
+        allowed_types = {None, *self.number_types}
         assert number_type in allowed_types, (
             'Invalid number type: {}. Allowed are: {}'.format(
                 # sets have no stable order, so we sort for a stable message
@@ -806,9 +811,10 @@ class PhoneNumberField(TelField):
             self.validators.append(
                 ValidPhoneNumber(
                     self.country,
-                    number_type=PhoneNumberType.ANY.value
-                    if not number_type
-                    else PhoneNumberType(number_type).value,
+                    number_type=(
+                        self.number_types[number_type]
+                        if number_type else None
+                    ),
                 )
             )
 

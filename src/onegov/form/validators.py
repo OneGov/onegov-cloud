@@ -11,7 +11,6 @@ from datetime import date
 from datetime import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
-from enum import Enum
 from io import BytesIO
 from mimetypes import types_map
 from onegov.core.utils import binary_to_dictionary, dictionary_to_binary
@@ -666,16 +665,13 @@ class StrictOptional(Optional):
             raise StopValidation()
 
 
-class PhoneNumberType(Enum):
-    ANY = 'any'
-    MOBILE = 'mobile'
-    FIXED_LINE = 'fixed_line'
-
-
 class ValidPhoneNumber:
     """ Makes sure the given input is valid phone number.
 
     Expects an :class:`wtforms.StringField` instance.
+
+    ``number_type`` restricts the number to a single
+    :class:`phonenumbers.PhoneNumberType` (``None``, the default, accepts any).
 
     """
 
@@ -699,28 +695,17 @@ class ValidPhoneNumber:
             missing_area_code,
     }
 
-    type_errors = {
-        PhoneNumberType.FIXED_LINE.value: (
-            (
-                phonenumbers.PhoneNumberType.FIXED_LINE,
-                phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE
-            ),
-            fixed_line_required
-        ),
-        PhoneNumberType.MOBILE.value: (
-            (
-                phonenumbers.PhoneNumberType.MOBILE,
-                phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE
-            ),
-            mobile_required
-        ),
+    # error shown when a required number type isn't met
+    type_required_errors = {
+        phonenumbers.PhoneNumberType.MOBILE: mobile_required,
+        phonenumbers.PhoneNumberType.FIXED_LINE: fixed_line_required,
     }
 
     def __init__(
         self,
         country: str = 'CH',
         country_whitelist: Collection[str] | None = None,
-        number_type: str = PhoneNumberType.ANY.value
+        number_type: int | None = None
     ):
         if country_whitelist:
             assert country in country_whitelist, (
@@ -729,12 +714,10 @@ class ValidPhoneNumber:
                 )
             )
 
-        allowed_types = {v.value for v in PhoneNumberType}
-        assert number_type in allowed_types, (
-            'Invalid number type: {}. Allowed are: {}'.format(
-                number_type, sorted(allowed_types)
-            )
-        )
+        assert (
+            number_type is None
+            or number_type in phonenumbers.PhoneNumberType.values()
+        ), 'Invalid number type: {}'.format(number_type)
 
         self.country = country
         self.country_whitelist = country_whitelist
@@ -762,8 +745,9 @@ class ValidPhoneNumber:
         if not phonenumbers.is_valid_number(number):
             raise ValidationError(self.unknown_number)
 
+        region = phonenumbers.region_code_for_number(number)
+
         if self.country_whitelist:
-            region = phonenumbers.region_code_for_number(number)
             if region not in self.country_whitelist:
                 raise ValidationError(_(
                     self.unsupported_country, mapping={
@@ -771,16 +755,29 @@ class ValidPhoneNumber:
                     }
                 ))
 
-        if self.number_type == PhoneNumberType.ANY.value:
+        if self.number_type is None:
             return
 
-        # an unknown number type matches nothing, so we reject the number
-        # instead of blowing up in the middle of a request
-        valid_types, error = self.type_errors.get(
-            self.number_type, ((), self.invalid_phone_number)
-        )
-        if phonenumbers.number_type(number) not in valid_types:
-            raise ValidationError(error)
+        # skip if the region can't distinguish the requested type
+        if region is None or self.number_type not in (
+            phonenumbers.supported_types_for_region(region)
+        ):
+            return
+
+        number_type = phonenumbers.number_type(number)
+        if number_type == phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE:
+            # some countries (e.g. the US) can't tell fixed line from mobile,
+            # so accept the aggregate type for either request
+            if self.number_type in (
+                phonenumbers.PhoneNumberType.FIXED_LINE,
+                phonenumbers.PhoneNumberType.MOBILE,
+            ):
+                number_type = self.number_type
+
+        if number_type != self.number_type:
+            raise ValidationError(self.type_required_errors.get(
+                self.number_type, self.invalid_phone_number
+            ))
 
 
 class ValidSwissSocialSecurityNumber:
