@@ -5,21 +5,13 @@ from datetime import date
 from markupsafe import Markup
 from morepath import redirect
 from morepath.request import Response
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Private
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.event.models.event import EventFilterValue
-from onegov.form import as_internal_id
-from onegov.org.models.organisation import (
-    flatten_event_filter_fields_from_definition,
-)
-from onegov.form.errors import (InvalidFormSyntax, MixedTypeError,
-                                DuplicateLabelError)
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.core.elements import Link as CoreLink
 from onegov.org.forms import ExportForm, EventImportForm
-from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
@@ -224,151 +216,6 @@ def view_occurrence(
         'title': self.title,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
-    }
-
-
-@OrgApp.form(model=OccurrenceCollection, name='edit',
-             template='directory_form.pt', permission=Secret,
-             form=EventConfigurationForm)
-def handle_edit_event_filters(
-    self: OccurrenceCollection,
-    request: OrgRequest,
-    form: EventConfigurationForm,
-    layout: OccurrencesLayout | None = None
-) -> RenderData | BaseResponse:
-
-    show_force_remove = False
-    try:
-        if form.submitted(request):
-            old_keywords = {
-                as_internal_id(k)
-                for k in
-                request.app.org.event_filter_configuration.get('keywords', [])
-            }
-            new_keywords = {
-                as_internal_id(k)
-                for k in (form.keyword_fields.data or '').splitlines()
-            }
-            old_field_choices = {
-                f_id: {c.label for c in getattr(f, 'choices', ())}
-                for f_id, f in request.app.org.event_filter_fields.items()
-            }
-            new_field_choices = {
-                f_id: {c.label for c in getattr(f, 'choices', ())}
-                for f_id, f in flatten_event_filter_fields_from_definition(
-                    form.definition.data
-                ).items()
-            }
-
-            removed_keywords = old_keywords - new_keywords
-            removed_choices: dict[str, set[str]] = {
-                keyword: (
-                    old_field_choices.get(keyword, set())
-                    - new_field_choices.get(keyword, set())
-                )
-                for keyword in old_keywords & new_keywords
-                if old_field_choices.get(keyword, set())
-                - new_field_choices.get(keyword, set())
-            }
-
-            if form.force_remove.data:
-                for keyword in removed_keywords:
-                    (
-                        request.session.query(EventFilterValue)
-                        .filter_by(keyword=keyword)
-                        .delete()
-                    )
-                for keyword, choices in removed_choices.items():
-                    for choice in choices:
-                        (
-                            request.session.query(EventFilterValue)
-                            .filter_by(keyword=keyword, value=choice)
-                            .delete()
-                        )
-            else:
-                blocked = False
-                for keyword in removed_keywords:
-                    count = (
-                        request.session.query(EventFilterValue)
-                        .filter_by(keyword=keyword)
-                        .count()
-                    )
-                    if count:
-                        request.alert(_(
-                            'The filter "${keyword}" is still applied to '
-                            '${count} event(s).',
-                            mapping={'keyword': keyword, 'count': count}
-                        ))
-                        blocked = True
-
-                for keyword, choices in removed_choices.items():
-                    for choice in choices:
-                        count = (
-                            request.session.query(EventFilterValue)
-                            .filter_by(keyword=keyword, value=choice)
-                            .count()
-                        )
-                        if count:
-                            request.alert(_(
-                                'The filter choice "${choice}" is still '
-                                'applied to ${count} event(s).',
-                                mapping={'choice': choice, 'count': count}
-                            ))
-                            blocked = True
-
-                if blocked:
-                    show_force_remove = True
-
-            if not show_force_remove:
-                keywords = (form.keyword_fields.data or '').splitlines()
-                request.app.org.event_filter_configuration = {
-                    'order': [],
-                    'keywords': keywords
-                }
-                request.app.org.event_filter_definition = form.definition.data
-
-                request.success(_('Your changes were saved'))
-                return request.redirect(request.link(self))
-
-        elif not request.POST:
-            # Store the model data on the form
-            form.definition.data = request.app.org.event_filter_definition
-            form.keyword_fields.data = '\r\n'.join(
-                request.app.org.event_filter_configuration.get('keywords', []))
-
-    except InvalidFormSyntax as e:
-        request.warning(
-            _('Syntax Error in line ${line}', mapping={'line': e.line})
-        )
-    except AttributeError:
-        request.warning(_('Syntax error in form'))
-
-    except MixedTypeError as e:
-        request.warning(
-            _('Syntax error in field ${field_name}',
-              mapping={'field_name': e.field_name})
-        )
-    except DuplicateLabelError as e:
-        request.warning(
-            _('Error: Duplicate label ${label}', mapping={'label': e.label})
-        )
-
-    if not show_force_remove:
-        form.delete_field('force_remove')
-
-    layout = layout or OccurrencesLayout(self, request)
-    layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editbar_links = []
-
-    return {
-        'layout': layout,
-        'title': _('Edit Event Filter Configuration'),
-        'form': form,
-        'form_width': 'large',
-        'migration': None,
-        'model': self,
-        'error': None,
     }
 
 

@@ -15,6 +15,7 @@ from onegov.search.utils import (
     searchable_sqlalchemy_models,
 )
 from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import undefer
 
 
@@ -25,6 +26,10 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import DeclarativeBase, Session
+
+
+#: retries per model on a transient reindex conflict
+REINDEX_MAX_ATTEMPTS = 3
 
 
 class SearchApp(morepath.App):
@@ -234,32 +239,76 @@ class SearchApp(morepath.App):
         self.fts_indexer.delete_search_index(session)
 
         def reindex_model(model: type[Base]) -> None:
-            """ Load all database objects and index them. """
+            """ Load all database objects and index them.
+
+            Since we run under ``SERIALIZABLE`` isolation, a concurrent write
+            on a busy site can make the bulk upsert fail with a transaction
+            rollback error (e.g. "could not serialize access due to concurrent
+            update"). Such conflicts are transient, so we retry the whole
+            model, mirroring how normal requests handle conflicts.
+            """
             session = self.session()
             try:
-                query = session.query(model).options(undefer('*'))
-                query = apply_searchable_polymorphic_filter(
-                    query,
-                    model,
-                    order_by_polymorphic_identity=True
-                )
+                for attempt in range(1, REINDEX_MAX_ATTEMPTS + 1):
+                    try:
+                        query = session.query(model).options(undefer('*'))
+                        query = apply_searchable_polymorphic_filter(
+                            query, model, order_by_polymorphic_identity=True
+                        )
 
-                # NOTE: we bypass the normal transaction machinery for speed
-                self.fts_indexer.process((
-                    task
-                    for obj in query
-                    if (
-                        task := self.fts_orm_events.index_task(schema, obj)  # type: ignore[arg-type]
-                    ) is not None
-                ), session)
-                session.execute(text('COMMIT'))
+                        # we bypass the normal transaction machinery for speed
+                        self.fts_indexer.process(
+                            (
+                                task
+                                for obj in query
+                                if (
+                                    task := self.fts_orm_events.index_task(
+                                        schema,
+                                        obj,  # type: ignore[arg-type]
+                                    )
+                                )
+                                is not None
+                            ),
+                            session,
+                        )
+                        session.execute(text('COMMIT'))
+                        break
 
-            except Exception:
-                index_log.info(
-                    f"Error indexing model '{model.__name__}' "
-                    f"in schema {schema}",
-                    exc_info=True
-                )
+                    except OperationalError as e:
+                        # Error Class 40 (transaction rollback, e.g.
+                        # serialization failure or deadlock) is transient, so
+                        # retry the model.
+                        orig = getattr(e, 'orig', None)
+                        sqlstate = getattr(orig, 'sqlstate', None)
+                        if (
+                            sqlstate
+                            and sqlstate.startswith('40')
+                            and attempt < REINDEX_MAX_ATTEMPTS
+                        ):
+                            index_log.info(
+                                f'Conflict while indexing model '
+                                f"'{model.__name__}' in schema {schema}, "
+                                f'retrying '
+                                f'(attempt {attempt}/{REINDEX_MAX_ATTEMPTS})'
+                            )
+                            session.execute(text('ROLLBACK'))
+                            continue
+
+                        index_log.error(
+                            f"Error indexing model '{model.__name__}' "
+                            f'in schema {schema}',
+                            exc_info=True,
+                        )
+                        break
+
+                    except Exception:
+                        index_log.error(
+                            f"Error indexing model '{model.__name__}' "
+                            f'in schema {schema}',
+                            exc_info=True,
+                        )
+                        break
+
             finally:
                 session.invalidate()
                 if session.bind and hasattr(session.bind, 'dispose'):

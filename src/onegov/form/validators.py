@@ -552,13 +552,13 @@ class ValidFilterFormDefinition(ValidFormDefinition):
         # limit the definition to MultiCheckboxField, RadioField which can
         # be used for filter definition
         errors = None
-        for field in parsed_form._fields.values():
-            if not isinstance(field, (MultiCheckboxField, RadioField)):
-                error = field.gettext(self.invalid_field_type.format(
-                    label=field.label.text))
-                errors = form['definition'].errors
+        for parsed_field in parsed_form._fields.values():
+            if not isinstance(parsed_field, (MultiCheckboxField, RadioField)):
+                error = parsed_field.gettext(self.invalid_field_type.format(
+                    label=parsed_field.label.text))
+                errors = field.errors
                 if not isinstance(errors, list):
-                    errors = form['definition'].process_errors
+                    errors = field.process_errors
                     assert isinstance(errors, list)
                 errors.append(error)
 

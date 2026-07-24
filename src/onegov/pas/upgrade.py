@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 # pragma: exclude file
 from __future__ import annotations
 
-from sqlalchemy import Boolean, Column, Text, UUID, text
+from sqlalchemy import Boolean, Column, Numeric, Text, UUID, text
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 
@@ -207,3 +207,20 @@ def add_zg_username_column(context: UpgradeContext) -> None:
                 'par_parliamentarians',
                 Column('zg_username', Text, nullable=True)
             )
+
+
+@upgrade_task('Make par_attendence duration fractional')
+def make_attendence_duration_fractional(context: UpgradeContext) -> None:
+    """A duration is entered in hours with two places, which an integer
+    number of minutes cannot hold: 2.01 h is 120.6 minutes.
+
+    """
+    if not context.has_table('par_attendence'):
+        return
+
+    context.operations.alter_column(
+        'par_attendence',
+        'duration',
+        type_=Numeric(10, 2),
+        existing_nullable=False,
+    )

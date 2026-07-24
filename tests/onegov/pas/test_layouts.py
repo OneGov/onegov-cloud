@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from onegov.pas.layouts import DefaultLayout
 from onegov.core.utils import Bunch
 
@@ -28,6 +29,14 @@ def test_layouts() -> None:
     assert layout.format_minutes(None) == ''
     assert layout.format_minutes(0) == ''
     assert layout.format_minutes(-20) == ''
-    assert layout.format_minutes(10).interpolate() == '10 minutes'  # type: ignore[attr-defined]
-    assert layout.format_minutes(60).interpolate() == '1 hours'  # type: ignore[attr-defined]
-    assert layout.format_minutes(123).interpolate() == '2 hours 3 minutes'  # type: ignore[attr-defined]
+
+    formatted: Any = layout.format_minutes(10)
+    assert formatted.interpolate() == '10 minutes'
+    formatted = layout.format_minutes(60)
+    assert formatted.interpolate() == '1 hours'
+    formatted = layout.format_minutes(123)
+    assert formatted.interpolate() == '2 hours 3 minutes'
+    formatted = layout.format_minutes(Decimal('120.60'))
+    assert formatted.interpolate() == '2 hours 0.6 minutes'
+    formatted = layout.format_minutes(Decimal('205.20'))
+    assert formatted.interpolate() == '3 hours 25.2 minutes'

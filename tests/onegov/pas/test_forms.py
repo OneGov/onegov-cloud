@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.org.forms.commission_membership import CommissionMembershipAddForm
@@ -20,6 +21,8 @@ from onegov.pas.forms import AttendenceForm
 from onegov.pas.forms import PASParliamentarianRoleForm
 from onegov.pas.forms import RateSetForm
 from onegov.pas.forms import SettlementRunForm
+from onegov.pas.models import Attendence
+from onegov.pas.models import PASParliamentarian
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from pytest import fixture
@@ -526,3 +529,41 @@ def test_settlement_run_form(session: Session, dummy_request: Any) -> None:
     assert not form.validate()
     assert 'start' not in form.errors
     assert 'end' not in form.errors
+
+
+def test_duration_survives_the_edit_round_trip(session: Session) -> None:
+    """An entered duration has to come back unchanged when the attendance is
+    opened for editing again."""
+
+    parliamentarian = PASParliamentarian(
+        first_name='Jane',
+        last_name='Member',
+        gender='female',
+    )
+    session.add(parliamentarian)
+    session.flush()
+
+    for entered, minutes in (
+        (Decimal('3.42'), Decimal('205.20')),
+        (Decimal('3.57'), Decimal('214.20')),
+        (Decimal('2.82'), Decimal('169.20')),
+        (Decimal('3.5'), Decimal('210.00')),
+        (Decimal('2.01'), Decimal('120.60')),
+    ):
+        attendence = Attendence(
+            parliamentarian=parliamentarian,
+            date=date(2024, 1, 15),
+            duration=Decimal('0'),
+            type='plenary',
+        )
+        submitted_form = AttendenceForm(
+            DummyPostData({'duration': str(entered)})
+        )
+        submitted_form.populate_obj(attendence, include={'duration'})
+        session.add(attendence)
+        session.flush()
+        session.expire(attendence)
+
+        assert attendence.duration == minutes
+        edit_form = AttendenceForm(obj=attendence)
+        assert edit_form.duration.data == entered
