@@ -4,6 +4,11 @@ import json
 from base64 import b64encode
 from collection_json import Collection, Template  # type: ignore[import-untyped]
 from freezegun import freeze_time
+from onegov.agency.api import AgencyApiEndpoint
+from onegov.agency.collections import ExtendedAgencyCollection
+from onegov.core.utils import Bunch
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 from tests.onegov.api.test_views import patch_collection_json  # noqa: F401
 from unittest.mock import patch
 
@@ -11,6 +16,7 @@ from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.agency import AgencyApp
+    from sqlalchemy.orm import Session
     from tests.shared.client import Client
     from unittest.mock import MagicMock
 
@@ -743,3 +749,60 @@ def test_view_api(
             '/api/memberships?updated_gt=2023-05-08T01:02').items
     }
     assert set(memberships) == {'Teacher'}
+
+
+def test_agency_api_preloads_ancestors(session: Session) -> None:
+    """
+    Rendering the ``html`` link of an agency builds its full path, which
+    walks up the parent chain. Only the direct parent is eager loaded by the
+    API collection, so without preloading each ancestor above it is loaded
+    with its own ``SELECT ... WHERE agencies.id = ...`` query (N+1).
+    """
+
+    agencies = ExtendedAgencyCollection(session)
+    root = agencies.add_root(title='Root')
+    a = agencies.add(root, title='A')
+    b = agencies.add(a, title='B')
+    agencies.add(b, title='Leaf 1')
+    agencies.add(b, title='Leaf 2')
+    session.flush()
+    b_id = b.id
+
+    # Drop everything from the identity map so the ancestors above the page's
+    # direct parents actually have to be (pre)loaded.
+    session.expunge_all()
+
+    pk_lookups: list[str] = []
+
+    def after_cursor_execute(
+        conn: Any, cursor: Any, statement: str, *args: Any
+    ) -> None:
+        if (
+            'FROM agencies' in statement
+            and 'agencies.id = ' in statement
+            and 'JOIN' not in statement
+        ):
+            pk_lookups.append(statement)
+
+    # request only the children of ``b``, so their grandparents (``a``,
+    # ``root``) are not part of the batch and would otherwise be lazy loaded
+    # per item while building each agency's ``html`` link.
+    request: Any = Bunch(app=Bunch(session=lambda: session))
+    endpoint = AgencyApiEndpoint(
+        request, extra_parameters={'parent': [str(b_id)]}
+    )
+
+    event.listen(Engine, 'after_cursor_execute', after_cursor_execute)
+    try:
+        leaves = list(endpoint.batch.values())
+        assert len(leaves) == 2
+        # walking the ancestors (as ``request.link`` does when building the
+        # ``html`` link) must not emit a query per ancestor
+        for leaf in leaves:
+            assert leaf.path.startswith('root/a/b/')
+    finally:
+        event.remove(Engine, 'after_cursor_execute', after_cursor_execute)
+
+    assert pk_lookups == [], (
+        f'Expected no per-ancestor queries, got {len(pk_lookups)}'
+    )
