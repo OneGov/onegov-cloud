@@ -1173,14 +1173,16 @@ def test_event_settings_return_to(client: Client) -> None:
     settings = events.click('Bearbeiten', href='event-settings')
 
     cancel_href = settings.pyquery('a.cancel-link').attr('href')
-    assert cancel_href.endswith('/events')
-    assert settings.form.submit().location.endswith('/events')
+    assert cancel_href is not None and cancel_href.endswith('/events')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/events')
 
     # opening it directly (no origin) falls back to the settings index
     settings = client.get('/event-settings')
     cancel_href = settings.pyquery('a.cancel-link').attr('href')
-    assert cancel_href.endswith('/settings')
-    assert settings.form.submit().location.endswith('/settings')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')
 
 
 def test_event_edit_cancel_returns_to_origin(client: Client) -> None:
