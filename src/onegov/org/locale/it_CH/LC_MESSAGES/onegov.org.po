@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-16 15:23+0200\n"
+"POT-Creation-Date: 2026-07-20 08:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -951,43 +951,50 @@ msgid "Elderly"
 msgstr "Anziani"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Mo"
 msgstr "Lu"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Tu"
 msgstr "Ma"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "We"
 msgstr "Me"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Th"
 msgstr "Gi"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Fr"
 msgstr "Ve"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Sa"
 msgstr "Sa"
 
 #. FIXME: We define a very similar constant in our forms, we should move this
-#. to onegov.org.constants and use it for both. noqa: N806
+#. to onegov.org.constants and use it for both. ruff:ignore[non-lowercase-
+#. variable-in-function]
 #.
 msgid "Su"
 msgstr "Do"
@@ -1119,12 +1126,6 @@ msgstr "Creato"
 
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
-
-msgid "Remove these filters from all affected events"
-msgstr "Rimuovi questi filtri da tutti gli eventi interessati"
-
-msgid "Confirmation"
-msgstr "Conferma"
 
 msgid "Comment"
 msgstr "Commento"
@@ -2341,6 +2342,9 @@ msgstr "Apri i file in una finestra separata"
 msgid "Short links"
 msgstr "Link abbreviato"
 
+msgid "Preview"
+msgstr "Anteprima"
+
 #, python-format
 msgid ""
 "Malformed short link on line ${number}. Each line needs to be a pair of "
@@ -2599,9 +2603,6 @@ msgstr "Zurigo"
 
 msgid "Other holidays"
 msgstr "Altre feste"
-
-msgid "Preview"
-msgstr "Anteprima"
 
 msgid "School holidays"
 msgstr "Vacanze scolastiche"
@@ -2987,23 +2988,6 @@ msgstr ""
 "Gli eventi vengono cancellati automaticamente una volta che si sono "
 "verificati"
 
-msgid "Values of the location filter"
-msgstr "Valori del filtro posizione"
-
-msgid "Choose the filter type for events (default is 'Tags')"
-msgstr ""
-"Scegliere il tipo di filtro per gli eventi (l'impostazione predefinita è "
-"'tag')"
-
-msgid "A predefined set of tags"
-msgstr "Un insieme predefinito di tag"
-
-msgid "Manually configurable filters"
-msgstr "Filtri configurabili manualmente"
-
-msgid "Both, predefined tags as well as configurable filters"
-msgstr "Entrambi, tag predefiniti e filtri configurabili"
-
 msgid "Title of text above event list"
 msgstr "Titolo del testo sopra l'elenco degli eventi"
 
@@ -3024,6 +3008,26 @@ msgstr "Informazioni sotto l'elenco degli eventi"
 
 msgid "Text below the event list"
 msgstr "Testo sotto l'elenco degli eventi"
+
+msgid "Values of the location filter"
+msgstr "Valori del filtro posizione"
+
+msgid "Choose the filter type for events (default is 'Tags')"
+msgstr ""
+"Scegliere il tipo di filtro per gli eventi (l'impostazione predefinita è "
+"'tag')"
+
+msgid "A predefined set of tags"
+msgstr "Un insieme predefinito di tag"
+
+msgid "Manually configurable filters"
+msgstr "Filtri configurabili manualmente"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Entrambi, tag predefiniti e filtri configurabili"
+
+msgid "Remove these filters from all affected events"
+msgstr "Rimuovi questi filtri da tutti gli eventi interessati"
 
 msgid "Documents"
 msgstr "Documenti"
@@ -3638,18 +3642,6 @@ msgstr "Elimina modulo di testo"
 msgid "Recipients"
 msgstr "Destinatari"
 
-msgid "Room"
-msgstr "Camera"
-
-msgid "Resource Item"
-msgstr "Elemento risorsa"
-
-msgid "External resource link"
-msgstr "Link a risorse esterne"
-
-msgid "New external resource"
-msgstr "Nuova risorsa esterna"
-
 #.
 #. FIXME: Why are we using ResouceLayout and not ResourcesLayout? this is a
 #. weird hack, if you want to be able to use the ResourceLayout with
@@ -3661,6 +3653,18 @@ msgstr "Esporta tutte"
 
 msgid "iFrame"
 msgstr "iFrame"
+
+msgid "Room"
+msgstr "Camera"
+
+msgid "Resource Item"
+msgstr "Elemento risorsa"
+
+msgid "External resource link"
+msgstr "Link a risorse esterne"
+
+msgid "New external resource"
+msgstr "Nuova risorsa esterna"
 
 msgid "Find Your Spot"
 msgstr "Cerca le date / Prenotazioni ricorrenti"
@@ -3723,9 +3727,6 @@ msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
 #, python-format
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
-
-msgid "Configure"
-msgstr "Configura"
 
 msgid "This event can't be edited."
 msgstr "Questo evento non può essere modificato."
@@ -3826,6 +3827,9 @@ msgstr "Esporta l'esecuzione della fattura come PDF"
 
 msgid "Directory"
 msgstr "Cartella"
+
+msgid "Configure"
+msgstr "Configura"
 
 msgid "All entries will be deleted as well!"
 msgstr "Anche tutti gli elementi verranno eliminati!"
@@ -4516,8 +4520,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -5369,8 +5373,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -6603,8 +6607,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -7004,6 +7008,9 @@ msgstr "Nuovo modulo documento"
 
 msgid "Edit Document Form"
 msgstr "Modifica modulo documento"
+
+msgid "News Settings"
+msgstr "Impostazioni notizie"
 
 msgid ""
 "Notifications have already been sent for this news item. A new notification "
@@ -7424,18 +7431,6 @@ msgstr "Questo fine settimana"
 
 msgid "This week"
 msgstr "Questa settimana"
-
-#, python-format
-msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
-msgstr "Il filtro \"${keyword}\" è ancora applicato a ${count} evento/i."
-
-#, python-format
-msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
-msgstr ""
-"La scelta del filtro \"${choice}\" è ancora applicata a ${count} evento/i."
-
-msgid "Edit Event Filter Configuration"
-msgstr "Modifica configurazione filtro eventi"
 
 msgid "Event Export"
 msgstr "Esportazione degli eventi"
@@ -7962,6 +7957,15 @@ msgstr "Moduli opzionali"
 msgid "People directory"
 msgstr "Elenco persone"
 
+#, python-format
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
+msgstr "Il filtro \"${keyword}\" è ancora applicato a ${count} evento/i."
+
+#, python-format
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgstr ""
+"La scelta del filtro \"${choice}\" è ancora applicata a ${count} evento/i."
+
 msgid "Chat"
 msgstr "Chat"
 
@@ -7970,6 +7974,9 @@ msgstr "Festività / Vacanze scolastiche"
 
 msgid "No holidays defined"
 msgstr "Nessuna festività definita"
+
+msgid "No short links defined"
+msgstr "Nessun link abbreviato definito"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
@@ -8351,6 +8358,12 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Confirmation"
+#~ msgstr "Conferma"
+
+#~ msgid "Edit Event Filter Configuration"
+#~ msgstr "Modifica configurazione filtro eventi"
 
 #~ msgid ""
 #~ "This entry is published and this directory has an admin notification "

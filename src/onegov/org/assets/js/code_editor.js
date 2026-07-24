@@ -5,6 +5,10 @@ $(function() {
         var readonly = textarea.is('[readonly]');
         textarea.css('display', 'none');
 
+        // the editor replaces the textarea with its own widget, so make sure
+        // the field-dependency handling never re-shows the raw textarea
+        textarea.attr('data-always-hidden', '');
+
         var outside = $('<div class="code-editor-wrapper">');
         var inside = $('<div class="code-editor">');
         inside.position('absolute');

@@ -19,13 +19,11 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.utils import get_fields_from_class
 from onegov.file.attachments import IMAGE_MAX_SIZE
 from onegov.form.validators import (
     FileSizeLimit,
     ImageSizeLimit,
     ValidPhoneNumber,
-    ValidFilterFormDefinition,
     MIME_TYPES_EXCEL,
     MIME_TYPES_PDF,
 )
@@ -684,35 +682,3 @@ class EventImportForm(Form):
             transaction.abort()
 
         return count, errors
-
-
-class EventConfigurationForm(Form):
-    """ Form to configure filters for events view. """
-
-    definition = TextAreaField(
-        label=_('Definition'),
-        fieldset=_('General'),
-        validators=[
-            InputRequired(),
-            ValidFilterFormDefinition(
-                require_email_field=False,
-                require_title_fields=False,
-                reserved_fields={name for name, _ in
-                                 get_fields_from_class(EventForm)}
-                | {'syndicate', 'highlight'}
-            )
-        ],
-        render_kw={'rows': 32, 'data-editor': 'form'})
-
-    keyword_fields = TextAreaField(
-        label=_('Filters'),
-        fieldset=_('Display'),
-        render_kw={
-            'class_': 'formcode-select',
-            'data-fields-include': 'radio,checkbox'
-        })
-
-    force_remove = BooleanField(
-        label=_('Remove these filters from all affected events'),
-        fieldset=_('Confirmation'),
-    )

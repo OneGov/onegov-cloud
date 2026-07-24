@@ -181,7 +181,11 @@ def handle_edit_page(
     layout: EditorLayout | PageLayout | None = None
 ) -> RenderData | Response:
     assert self.page is not None
-    site_title = self.page.trait_messages[self.trait]['edit_page_title']
+    site_title: str
+    if self.page.trait == 'news' and self.page.parent is None:
+        site_title = _('News Settings')
+    else:
+        site_title = self.page.trait_messages[self.trait]['edit_page_title']
 
     layout = layout or EditorLayout(self, request, site_title)
     layout.site_title = site_title  # type:ignore[union-attr]
