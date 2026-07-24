@@ -81,5 +81,3 @@ def ticket_message_owners(
         .query().all()
         if hasattr(m, 'meta')
     }
-
-
