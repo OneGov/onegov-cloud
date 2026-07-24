@@ -770,9 +770,9 @@ def test_import_export_events(client: Client) -> None:
     client.login_editor()
 
     # settings are admin-only, the rest of the edit bar is not
-    events = client.get('/events')
-    assert not events.pyquery('.edit-bar a.edit-link')
-    assert events.pyquery('.edit-bar a.export-link')
+    events_page = client.get('/events')
+    assert not events_page.pyquery('.edit-bar a.edit-link')
+    assert events_page.pyquery('.edit-bar a.export-link')
     assert client.get(
         '/event-settings', expect_errors=True).status_code == 403
 
