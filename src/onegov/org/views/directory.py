@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from html import escape
 
 import morepath
 import transaction
@@ -9,7 +10,11 @@ from datetime import UTC, datetime
 
 from collections import defaultdict
 from decimal import Decimal
+from io import BytesIO
+
+
 from onegov.core.html import html_to_text
+from onegov.core.mail import Attachment
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import render_file
@@ -51,11 +56,15 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
 from typing import cast, Any, NamedTuple, TYPE_CHECKING
+
+from onegov.pdf import Pdf, page_fn_footer, page_fn_header_and_footer
+
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence, Iterator
+    from collections.abc import Mapping, Sequence, Iterator, Iterable
     from onegov.core.types import JSON_ro, RenderData, EmailJsonDict
     from onegov.directory.migration import DirectoryMigration
     from onegov.directory.models.directory import DirectoryEntryForm
+    from onegov.form.parser.core import BasicParsedField
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
     from wtforms import Field
@@ -666,6 +675,7 @@ def _send_admin_email(
     subject: str,
     template: str,
     context: dict[str, Any],
+    attachments: Iterable[Attachment] = (),
 ) -> None:
     content = render_template(template, request, {
         'layout': DefaultMailLayout(object(), request),
@@ -680,6 +690,121 @@ def _send_admin_email(
         subject=subject,
         content=content,
         plaintext=html_to_text(content),
+        attachments=attachments,
+    )
+
+
+def create_admin_notification_pdf(
+    request: OrgRequest,
+    filename: str,
+    title: str,
+    entry: ExtendedDirectoryEntry,
+    generated_at: datetime,
+) -> Attachment | None:
+    assert filename
+
+    app = request.app
+    layout = DefaultMailLayout(entry, request)
+
+    f = BytesIO()
+    pdf = Pdf(  # may use a specific pdf class like `TicketBasePdf`
+        f,
+        title=title,
+        author=app.org.title,
+        locale=request.locale,
+        translations=app.translations,
+    )
+    pdf.init_a4_portrait(
+        page_fn=page_fn_footer, page_fn_later=page_fn_header_and_footer
+    )
+    pdf.h(title)
+    title_link = (
+        f'<a href="{request.link(entry)}" color="{pdf.link_color}">'
+        f'<u>{escape(title)}</u></a>'
+    )
+    pdf.p_markup(request.translate(_(
+        'This document certifies the publication "${title}" as follows.',
+        mapping={'title': title_link},
+    )))
+    pdf.h2(request.translate(_('Publication')))
+
+    def field_value(field: BasicParsedField) -> str:
+        value = entry.values.get(field.id)
+        if value and field.type == 'datetime':
+            value = layout.format_date(value, 'datetime_long')
+        elif value and field.type == 'date':
+            value = layout.format_date(value, 'date_long')
+        return escape(str(value or ''))
+
+    items = ''.join(
+        f'<li><strong>{escape(field.human_id)}</strong>: '
+        f'{field_value(field)}</li>'
+        for field in entry.directory.basic_fields
+    )
+    pdf.mini_html(f'<ul>{items}</ul>')
+
+    pdf.h2(request.translate(_('Attachments')))
+    if entry.files:
+        size_label = request.translate(_('Size'))
+        date_label = request.translate(_('Date'))
+        hash_label = request.translate(_('Hash'))
+        bytes_label = request.translate(_('Bytes'))
+        # bullet-less bold filename tight above its list, spaced between files
+        name_style = pdf.style.normal.clone(
+            'attachment_name', spaceBefore=12, spaceAfter=2
+        )
+        for file in entry.files:
+            pdf.p_markup(f'<strong>{escape(file.name)}</strong>', name_style)
+            pdf.mini_html(
+                f'<ul>'
+                f'<li>{size_label}: {file.reference.file.content_length} '
+                f'{bytes_label}</li>'
+                f'<li>{date_label}: '
+                f'{layout.format_date(file.created, "datetime_long")}</li>'
+                f'<li>{hash_label}: {file.checksum or file.id}</li>'
+                f'</ul>'
+            )
+    else:
+        no_files_label = request.translate(_('None'))
+        pdf.mini_html(f'<p>{no_files_label}</p>')
+
+    pdf.h2(request.translate(_('Publication details')))
+    publication_start = entry.publication_start
+    publication_end = entry.publication_end
+    details = '\n'.join([
+        f'<li><strong>{request.translate(_("Publication start:"))}</strong>',
+        f'{layout.format_date(publication_start, "datetime_long")}'
+        if publication_start
+        else request.translate(_('Not set')),
+        f'<li><strong>{request.translate(_("Publication end:"))}</strong>',
+        f'{layout.format_date(publication_end, "datetime_long")}'
+        if publication_end
+        else request.translate(_('Not set')),
+        (
+            f'<li><strong>{request.translate(_("Access"))}:</strong> '
+            f'{request.translate(_(entry.access.capitalize()))}</li>'
+        ),
+        (
+            f'<li><strong>{request.translate(_("Entry checksum"))}:</strong> '
+            f'{entry.content_hash}</li>'
+        ),
+    ])
+    pdf.mini_html(f'<ul>{details}</ul>')
+
+    text = request.translate(_(
+        'Email automatically generated by ${org} at ${timestamp}',
+        mapping={
+            'org': layout.org.title,
+            'timestamp': layout.format_date(generated_at, 'datetime_long'),
+        },
+    ))
+    footer_style = (
+        pdf.style.paragraph.clone('generated_footer', spaceBefore=20))
+    pdf.p_markup(text, footer_style)
+    pdf.generate()
+
+    return Attachment(
+        filename, content=f.getvalue(), content_type='application/pdf'
     )
 
 
@@ -695,6 +820,15 @@ def send_admin_notification_for_directory_entry(
                  'directory': directory.title},
     ))
 
+    generated_at = datetime.now(UTC)
+    pdf = create_admin_notification_pdf(
+        request,
+        filename=entry.title,
+        title=entry.title,
+        entry=entry,
+        generated_at=generated_at,
+    )
+
     _send_admin_email(
         directory, request, title,
         'mail_directory_entry_admin_notification_started.pt',
@@ -706,7 +840,9 @@ def send_admin_notification_for_directory_entry(
             'publication_start': entry.publication_start,
             'publication_end': entry.publication_end,
             'content_hash': entry.content_hash,
+            'generated_at': generated_at,
         },
+        attachments=(pdf,) if pdf else (),
     )
 
 

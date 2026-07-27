@@ -550,7 +550,7 @@ msgstr ""
 "werden."
 
 msgid "Hash"
-msgstr "Hash"
+msgstr "Prüfsumme"
 
 msgid "No subscribers yet"
 msgstr "Noch keine Abonnenten"

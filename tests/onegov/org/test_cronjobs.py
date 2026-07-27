@@ -43,10 +43,12 @@ from onegov.user.collections import TANCollection
 from pathlib import Path
 from sedate import ensure_timezone, to_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
+from webtest import Upload
+from onegov.core.utils import module_path
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.onegov.org.common import register_echo_handler
 from tests.onegov.org.conftest import Client
-from tests.shared.utils import add_reservation
+from tests.shared.utils import add_reservation, extract_pdf_text
 from unittest.mock import patch, Mock
 
 
@@ -2801,7 +2803,11 @@ def test_admin_notification_full_workflow(
         # a permit directory with an editable content field
         page = client.get('/directories').click('^Verzeichnis$')
         page.form['title'] = 'Baugesuche'
-        page.form['structure'] = 'Name *= ___\nBeschreibung *= ___'
+        page.form['structure'] = (
+            'Name *= ___\nBeschreibung *= ___'
+            '\nTermin *= YYYY.MM.DD HH:MM\nFrist *= YYYY.MM.DD'
+            '\nDokument = *.pdf'
+        )
         page.form['title_format'] = '[Name]'
         page.form['enable_publication'] = True
         page.form['required_publication'] = True
@@ -2814,6 +2820,13 @@ def test_admin_notification_full_workflow(
         page = page.click('Eintrag', index=0)
         page.form['name'] = 'Permit One'
         page.form['beschreibung'] = 'Version A'
+        page.form['termin'] = '2026-03-15T09:30'
+        page.form['frist'] = '2026-08-20'
+        sample_pdf = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+        with open(sample_pdf, 'rb') as pdf_file:
+            page.form['dokument'] = Upload(
+                'Baugesuch.pdf', pdf_file.read(), 'application/pdf'
+            )
         page.form['publication_start'] = dt(now_local + timedelta(hours=2))
         page.form['publication_end'] = dt(now_local + timedelta(hours=9))
         page = page.form.submit().follow()
@@ -2842,10 +2855,55 @@ def test_admin_notification_full_workflow(
         assert 'Baugesuche' in msg['Subject']
         assert 'Version B' in msg['TextBody']
         assert 'Version A' not in msg['TextBody']
+        # date/datetime fields are formatted, not printed as raw ISO values
+        assert '15. März 2026 09:30' in msg['TextBody']
+        assert '2026-03-15T09:30' not in msg['TextBody']
+        assert '20. August 2026' in msg['TextBody']
+        assert '2026-08-20' not in msg['TextBody']
         # the entry checksum is part of the notification (proof of content)
         entry = client.app.session().query(ExtendedDirectoryEntry).one()
         assert entry.content_hash
         assert entry.content_hash in msg['TextBody']
+
+        # verify attachment
+        assert msg['Attachments']
+        text = extract_pdf_text(msg['Attachments'][0])
+        print()
+        for i, line in enumerate(text.splitlines(), start=1):
+            print(f'{i:>3}: {line}')
+        expected = (
+            'Permit One',
+            'Dieses Dokument bescheinigt die Publikation "Permit One" wie',
+            'Publikation',
+            'Beschreibung',
+            'Version B',
+            'Termin',
+            '15. März 2026 09:30',
+            'Frist',
+            '20. August 2026',
+            'Anhänge',
+            'Baugesuch.pdf',
+            'Grösse',
+            'Bytes',
+            'Datum',
+            '1. Juli 2026 12:00',
+            'Prüfsumme',
+            'Publikationsdetails',
+            'Publikationsstart',
+            '1. Juli 2026 14:00',
+            'Publikationsende',
+            '1. Juli 2026 21:00',
+            'Zugriff',
+            'Öffentlich',
+            'Prüfsumme des Verzeichniseintrages',
+            entry.content_hash,
+            'E-Mail automatisch generiert von Govikon am 1. Juli 2026 15:00',
+        )
+        for item in expected:
+            assert item in text, f'Error: Expected text {item} in pdf'
+        # date/datetime fields are formatted in the pdf, not raw ISO values
+        assert '2026-03-15 09:30:00' not in text
+        assert '2026-08-20' not in text
 
         # a second run in the same window must not re-notify
         client.get(get_cronjob_url(job))

@@ -171,8 +171,16 @@
 
 <metal:directory_entry_notification_details define-macro="directory_entry_notification_details" i18n:domain="onegov.org">
     <p><u i18n:translate="">Form fields</u></p>
-    <p tal:repeat="field directory.basic_fields">
-        - <strong>${field.human_id}:</strong> ${entry.values.get(field.id, '')}
+    <p>
+        <tal:b tal:repeat="field directory.basic_fields">
+            <tal:b tal:define="value entry.values.get(field.id, '')">
+                - <strong>${field.human_id}:</strong>
+                <tal:b tal:condition="python: value and field.type == 'datetime'">${layout.format_date(value, 'datetime_long')}</tal:b>
+                <tal:b tal:condition="python: value and field.type == 'date'">${layout.format_date(value, 'date_long')}</tal:b>
+                <tal:b tal:condition="python: not (value and field.type in ('datetime', 'date'))">${value}</tal:b>
+                <br tal:condition="not: repeat.field.end"/>
+            </tal:b>
+        </tal:b>
     </p>
 
     <p><u i18n:translate="">Attachments</u></p>
