@@ -4,10 +4,13 @@ import json
 import os
 import pyotp
 import re
+import textwrap
 import transaction
+import yaml
 
 from freezegun import freeze_time
 from lxml.html import document_fromstring
+from onegov.core.utils import module_path
 from onegov.org.models import TANAccessCollection
 from onegov.user import UserCollection
 from sqlalchemy.orm.session import close_all_sessions
@@ -47,6 +50,35 @@ def test_view_login(client: Client) -> None:
     assert response.status_code == 302
     assert client.logout().status_code == 302
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
+
+
+def test_view_login_hides_local_login_with_provider(client: Client) -> None:
+    metadata = module_path('tests.onegov.user', '/fixtures/idp.xml')
+    config = textwrap.dedent(
+        f"""
+        authentication_providers:
+          idp:
+            provider: saml2
+            tenants:
+              "{client.app.application_id}":
+                primary: false
+                metadata: "{metadata}"
+                button_text: Login with SAML2
+    """
+    )
+    client.app.configure_authentication_providers(**yaml.safe_load(config))
+
+    provider = client.app.providers['idp']
+    assert provider.available(client.app)
+    assert not provider.is_primary(client.app)
+
+    response = client.get('/auth/login')
+    assert response.status_code == 200
+
+    # an available provider, even a non-primary one, tucks the local login
+    # behind the toggle
+    assert response.pyquery('[data-local-login-toggle]')
+    assert response.pyquery('#local-login')
 
 
 def test_login(client: Client) -> None:
