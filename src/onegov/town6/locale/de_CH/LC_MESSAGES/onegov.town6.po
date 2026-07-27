@@ -17,6 +17,68 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Information Architecture"
+msgstr "Informationsarchitektur"
+
+msgid ""
+"Explore all pages and their URL hierarchy. Use the controls to zoom, pan, or "
+"change the layout direction."
+msgstr ""
+"Entdecke und behalte den Überblick über alle Seiten und ihre URL-Hierarchie. "
+"Verwende die "
+"Steuerelemente zum Zoomen, Verschieben oder Ändern der Ausrichtung."
+
+msgid "Loading URL hierarchy…"
+msgstr "URL-Hierarchie wird geladen…"
+
+msgid "The URL hierarchy could not be loaded."
+msgstr "Die URL-Hierarchie konnte nicht geladen werden."
+
+msgid "JavaScript is required to display the URL hierarchy."
+msgstr "JavaScript wird benötigt, um die URL-Hierarchie anzuzeigen."
+
+msgid "URL path"
+msgstr "URL-Pfad"
+
+msgid "Clear search"
+msgstr "Suche löschen"
+
+msgid "Search results"
+msgstr "Suchergebnisse"
+
+msgid "Unpublished"
+msgstr "Unveröffentlicht"
+
+msgid "Restricted"
+msgstr "Eingeschränkt"
+
+msgid "Open page"
+msgstr "Seite öffnen"
+
+msgid "Expand branch"
+msgstr "Zweig ausklappen"
+
+msgid "Collapse branch"
+msgstr "Zweig einklappen"
+
+msgid "Export as image"
+msgstr "Als Bild exportieren"
+
+msgid "Exporting image…"
+msgstr "Bild wird exportiert…"
+
+msgid "The image could not be exported."
+msgstr "Das Bild konnte nicht exportiert werden."
+
+msgid "Top to bottom"
+msgstr "Von oben nach unten"
+
+msgid "Left to right"
+msgstr "Von links nach rechts"
+
+msgid "Arranging URL hierarchy…"
+msgstr "URL-Hierarchie wird angeordnet…"
+
 msgid "Meetings"
 msgstr "Sitzungen"
 

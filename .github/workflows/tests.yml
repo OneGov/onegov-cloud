@@ -65,6 +65,19 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v6
 
+    - name: Set up Node for React Flow asset contracts
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+        cache: npm
+        cache-dependency-path: src/onegov/town6/assets/src/react_flow/package-lock.json
+
+    - name: Verify generated React Flow assets
+      working-directory: src/onegov/town6/assets/src/react_flow
+      run: |
+        npm ci
+        npm run verify
+
     - name: Install dependencies
       run: |
         source /app/bin/activate

@@ -16,6 +16,67 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Lingua 3.12\n"
 
+msgid "Information Architecture"
+msgstr "Architecture de l’information"
+
+msgid ""
+"Explore all pages and their URL hierarchy. Use the controls to zoom, pan, or "
+"change the layout direction."
+msgstr ""
+"Explorez toutes les pages et leur hiérarchie d’URL. Utilisez les commandes "
+"pour zoomer, déplacer la vue ou modifier l’orientation."
+
+msgid "Loading URL hierarchy…"
+msgstr "Chargement de la hiérarchie d’URL…"
+
+msgid "The URL hierarchy could not be loaded."
+msgstr "Impossible de charger la hiérarchie d’URL."
+
+msgid "JavaScript is required to display the URL hierarchy."
+msgstr "JavaScript est nécessaire pour afficher la hiérarchie d’URL."
+
+msgid "URL path"
+msgstr "Chemin URL"
+
+msgid "Clear search"
+msgstr "Effacer la recherche"
+
+msgid "Search results"
+msgstr "Résultats de recherche"
+
+msgid "Unpublished"
+msgstr "Non publié"
+
+msgid "Restricted"
+msgstr "Accès restreint"
+
+msgid "Open page"
+msgstr "Ouvrir la page"
+
+msgid "Expand branch"
+msgstr "Développer la branche"
+
+msgid "Collapse branch"
+msgstr "Réduire la branche"
+
+msgid "Export as image"
+msgstr "Exporter comme image"
+
+msgid "Exporting image…"
+msgstr "Exportation de l’image…"
+
+msgid "The image could not be exported."
+msgstr "L’image n’a pas pu être exportée."
+
+msgid "Top to bottom"
+msgstr "De haut en bas"
+
+msgid "Left to right"
+msgstr "De gauche à droite"
+
+msgid "Arranging URL hierarchy…"
+msgstr "Organisation de la hiérarchie d’URL…"
+
 msgid "Meetings"
 msgstr "Réunions"
 

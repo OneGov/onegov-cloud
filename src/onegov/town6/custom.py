@@ -56,6 +56,16 @@ def get_global_tools(request: TownRequest) -> Iterator[Link | LinkGroup]:
 def get_modules(request: TownRequest) -> LinkGroup:
     modules = get_modules_base(request)
     links = list(modules.links)
+    if request.is_manager:
+        links.append(
+            Link(
+                _('Information Architecture'),
+                request.link(
+                    request.app.org, 'information-architecture'
+                ),
+                attrs={'class': 'information-architecture'}
+            )
+        )
     if request.is_admin and request.app.org.ris_enabled:
         links.append(
             Link(

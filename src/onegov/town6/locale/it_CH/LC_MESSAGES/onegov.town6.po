@@ -8,6 +8,67 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 
+msgid "Information Architecture"
+msgstr "Architettura dell’informazione"
+
+msgid ""
+"Explore all pages and their URL hierarchy. Use the controls to zoom, pan, or "
+"change the layout direction."
+msgstr ""
+"Esplora tutte le pagine e la loro gerarchia degli URL. Usa i controlli per "
+"ingrandire, spostare o cambiare l’orientamento."
+
+msgid "Loading URL hierarchy…"
+msgstr "Caricamento della gerarchia degli URL…"
+
+msgid "The URL hierarchy could not be loaded."
+msgstr "Impossibile caricare la gerarchia degli URL."
+
+msgid "JavaScript is required to display the URL hierarchy."
+msgstr "JavaScript è necessario per visualizzare la gerarchia degli URL."
+
+msgid "URL path"
+msgstr "Percorso URL"
+
+msgid "Clear search"
+msgstr "Cancella ricerca"
+
+msgid "Search results"
+msgstr "Risultati della ricerca"
+
+msgid "Unpublished"
+msgstr "Non pubblicato"
+
+msgid "Restricted"
+msgstr "Accesso limitato"
+
+msgid "Open page"
+msgstr "Apri pagina"
+
+msgid "Expand branch"
+msgstr "Espandi il ramo"
+
+msgid "Collapse branch"
+msgstr "Comprimi il ramo"
+
+msgid "Export as image"
+msgstr "Esporta come immagine"
+
+msgid "Exporting image…"
+msgstr "Esportazione dell’immagine…"
+
+msgid "The image could not be exported."
+msgstr "Non è stato possibile esportare l’immagine."
+
+msgid "Top to bottom"
+msgstr "Dall’alto in basso"
+
+msgid "Left to right"
+msgstr "Da sinistra a destra"
+
+msgid "Arranging URL hierarchy…"
+msgstr "Organizzazione della gerarchia degli URL…"
+
 msgid "Meetings"
 msgstr "Riunioni"
 

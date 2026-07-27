@@ -345,3 +345,12 @@ def get_d3_chart_assets() -> Iterator[str]:
     yield 'd3-flextree.js'
     yield 'd3-org-chart.js'
     yield 'd3-display.js'
+
+
+@TownApp.webasset(
+    'information-architecture',
+    filters={'js': None, 'css': None}
+)
+def get_information_architecture_assets() -> Iterator[str]:
+    yield 'information-architecture.bundle.min.js'
+    yield 'information-architecture.bundle.min.css'

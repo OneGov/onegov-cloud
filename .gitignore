@@ -94,6 +94,7 @@ pyvenv.cfg
 
 # npm / jest
 package-lock.json
+!src/onegov/town6/assets/src/react_flow/package-lock.json
 
 # pytest-profiling
 prof

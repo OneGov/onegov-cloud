@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /src/onegov/town6/assets/src/react_flow
+    schedule:
+      interval: monthly
+    versioning-strategy: increase
+    groups:
+      react-runtime:
+        patterns:
+          - react
+          - react-dom
+    ignore:
+      - dependency-name: html-to-image

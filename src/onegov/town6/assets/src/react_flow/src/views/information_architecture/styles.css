@@ -1,0 +1,517 @@
+.information-architecture-tree {
+    --ia-accent: #1779ba;
+    background: #f7f9fc;
+    border: 1px solid #dfe4eb;
+    border-radius: .7rem;
+    height: min(72vh, 56rem);
+    min-height: 38rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.information-architecture-status {
+    align-items: center;
+    color: #4b5563;
+    display: flex;
+    gap: .75rem;
+    height: 100%;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.ia-tree {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.ia-tree__toolbar {
+    align-items: center;
+    background: rgba(255, 255, 255, .96);
+    border-bottom: 1px solid #dfe4eb;
+    display: flex;
+    gap: 1rem;
+    min-height: 3.5rem;
+    padding: .55rem .75rem;
+}
+
+.ia-tree__canvas {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.ia-tree .react-flow__renderer {
+    cursor: grab;
+}
+
+.ia-tree .react-flow__renderer:active {
+    cursor: grabbing;
+}
+
+.ia-tree .react-flow__node-page:hover,
+.ia-tree .react-flow__node-page:focus-within {
+    z-index: 1000 !important;
+}
+
+.ia-tree .react-flow__edge-path {
+    stroke: #aeb8c5;
+    stroke-width: 1.6;
+    transition: opacity 150ms ease;
+}
+
+.ia-tree--search-active .react-flow__edge-path {
+    opacity: .25;
+}
+
+.ia-tree .react-flow__handle {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ia-tree__panel {
+    align-items: center;
+    background: rgba(255, 255, 255, .96);
+    border: 1px solid #dfe4eb;
+    border-radius: .55rem;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .09);
+    display: flex;
+    gap: .4rem;
+    padding: .45rem;
+}
+
+.ia-tree__summary {
+    color: #4b5563;
+    font-size: .82rem;
+    font-weight: 600;
+    margin-right: auto;
+    padding: .25rem .45rem;
+}
+
+.ia-tree__search {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #cfd7e2;
+    border-radius: .45rem;
+    display: flex;
+    flex: 0 1 22rem;
+    margin: 0;
+    min-width: 15rem;
+    overflow: hidden;
+}
+
+.ia-tree__search:focus-within {
+    border-color: var(--ia-accent);
+    box-shadow: 0 0 0 2px color-mix(
+        in srgb, var(--ia-accent) 20%, transparent
+    );
+}
+
+.ia-tree__search > i {
+    color: #77808d;
+    margin-left: .7rem;
+}
+
+.ia-tree .ia-tree__search-input {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    color: #1f2937;
+    flex: 1;
+    font-size: .86rem;
+    height: 2.2rem;
+    margin: 0;
+    min-width: 0;
+    padding: .35rem .55rem;
+}
+
+.ia-tree .ia-tree__search-input:focus {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.ia-tree__search-input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.ia-tree__search-count {
+    border-left: 1px solid #e2e7ed;
+    color: #5b6573;
+    font-size: .72rem;
+    font-variant-numeric: tabular-nums;
+    padding: .2rem .5rem;
+    white-space: nowrap;
+}
+
+.ia-tree__search-clear {
+    align-items: center;
+    align-self: stretch;
+    background: transparent;
+    border: 0;
+    color: #657180;
+    cursor: pointer;
+    display: flex;
+    font-size: 1.15rem;
+    justify-content: center;
+    margin: 0;
+    padding: 0 .65rem;
+}
+
+.ia-tree__search-clear:hover,
+.ia-tree__search-clear:focus-visible {
+    background: #edf1f6;
+    color: #111827;
+    outline: 0;
+}
+
+.ia-tree__export-button {
+    align-items: center;
+    background: var(--ia-accent);
+    border: 1px solid var(--ia-accent);
+    border-radius: .45rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: .8rem;
+    font-weight: 700;
+    gap: .45rem;
+    height: 2.2rem;
+    justify-content: center;
+    margin: 0;
+    padding: .4rem .75rem;
+    white-space: nowrap;
+}
+
+.ia-tree__export-button:hover,
+.ia-tree__export-button:focus-visible {
+    background: color-mix(in srgb, var(--ia-accent) 85%, #000);
+    border-color: color-mix(in srgb, var(--ia-accent) 85%, #000);
+    color: #fff;
+    outline: 0;
+}
+
+.ia-tree__export-button:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(
+        in srgb, var(--ia-accent) 25%, transparent
+    );
+}
+
+.ia-tree__export-button:disabled {
+    cursor: wait;
+    opacity: .58;
+}
+
+.ia-tree__export-error {
+    color: #b42318;
+    font-size: .75rem;
+    font-weight: 600;
+    max-width: 12rem;
+}
+
+.ia-tree__layout-button {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: .35rem;
+    color: #4b5563;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: .78rem;
+    font-weight: 600;
+    gap: .35rem;
+    line-height: 1;
+    margin: 0;
+    padding: .55rem .65rem;
+}
+
+.ia-tree__layout-button:hover,
+.ia-tree__layout-button:focus-visible {
+    background: #edf1f6;
+    color: #111827;
+}
+
+.ia-tree__layout-button[aria-pressed="true"] {
+    background: var(--ia-accent);
+    color: #fff;
+}
+
+.ia-tree__layout-icon {
+    font-size: 1rem;
+}
+
+.ia-tree__layout-status {
+    align-items: center;
+    background: rgba(255, 255, 255, .9);
+    border-radius: 999px;
+    color: #4b5563;
+    display: flex;
+    font-size: .78rem;
+    gap: .45rem;
+    padding: .45rem .7rem;
+}
+
+.ia-node {
+    background: #fff;
+    border: 2px solid #e2e7ed;
+    border-radius: .65rem;
+    box-sizing: border-box;
+    box-shadow: 0 5px 16px rgba(15, 23, 42, .08);
+    color: #1f2937;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    padding: .7rem .85rem;
+    position: relative;
+    text-decoration: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease,
+        opacity 150ms ease, transform 150ms ease;
+    width: 100%;
+}
+
+.ia-node[href]:hover,
+.ia-node[href]:focus-visible {
+    border-color: var(--ia-accent);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, .14);
+    color: #111827;
+    outline: 0;
+    transform: translateY(-1px);
+}
+
+.ia-node__link-icon {
+    color: #77808d;
+    font-size: .9rem;
+    line-height: 1;
+    position: absolute;
+    right: .7rem;
+    top: .65rem;
+}
+
+.ia-node[href]:hover .ia-node__link-icon,
+.ia-node[href]:focus-visible .ia-node__link-icon {
+    color: var(--ia-accent);
+}
+
+.ia-node__toggle {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #cbd4df;
+    border-radius: 50%;
+    color: #465364;
+    cursor: pointer;
+    display: flex;
+    font-size: 1rem;
+    font-weight: 700;
+    height: 1.55rem;
+    justify-content: center;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    pointer-events: all;
+    position: absolute;
+    right: .65rem;
+    top: .55rem;
+    width: 1.55rem;
+    z-index: 2;
+}
+
+.ia-node__toggle--with-link {
+    right: 2.25rem;
+}
+
+.ia-node__toggle:hover,
+.ia-node__toggle:focus-visible {
+    background: var(--ia-accent);
+    border-color: var(--ia-accent);
+    color: #fff;
+    outline: 0;
+}
+
+.ia-node__toggle:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(
+        in srgb, var(--ia-accent) 25%, transparent
+    );
+}
+
+.ia-node__toggle:disabled {
+    background: #eef2f6;
+    color: #77808d;
+    cursor: default;
+}
+
+.ia-node--homepage {
+    background: #f4f9ff;
+    border-color: color-mix(in srgb, var(--ia-accent) 35%, #e2e7ed);
+}
+
+.ia-node--route {
+    background: #f8fafc;
+    border-color: #aeb8c5;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, .06);
+}
+
+.ia-node--route .ia-node__kind {
+    background: #dfe6ee;
+    color: #465364;
+}
+
+.ia-node--route .ia-node__title {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+    font-size: 1rem;
+}
+
+.ia-node--unpublished {
+    border-style: dashed;
+}
+
+.ia-node--search-dimmed {
+    opacity: .2;
+}
+
+.ia-node--search-match {
+    border-color: #d97706;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, .2),
+        0 8px 22px rgba(15, 23, 42, .14);
+}
+
+.ia-node__meta {
+    align-items: center;
+    display: flex;
+    gap: .35rem;
+    margin-bottom: .35rem;
+    min-height: 1.1rem;
+}
+
+.ia-node__kind {
+    background: #eef2f6;
+    border-radius: 999px;
+    color: #5b6573;
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .035em;
+    line-height: 1;
+    padding: .28rem .45rem;
+    text-transform: uppercase;
+}
+
+.ia-node--homepage .ia-node__kind {
+    background: var(--ia-accent);
+    color: #fff;
+}
+
+.ia-node__status {
+    border: 2px solid #fff;
+    border-radius: 50%;
+    height: .65rem;
+    width: .65rem;
+}
+
+.ia-node__status--restricted {
+    background: #d97706;
+}
+
+.ia-node__status--unpublished {
+    background: #6b7280;
+}
+
+.ia-node__title {
+    display: block;
+    font-size: .9rem;
+    font-weight: 700;
+    line-height: 1.2;
+    min-height: 2.4em;
+    overflow-wrap: anywhere;
+}
+
+.ia-node__lead {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: #77808d;
+    display: -webkit-box;
+    font-size: .7rem;
+    line-height: 1.35;
+    margin-top: .28rem;
+    max-height: 2.7em;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.ia-tree .react-flow__node-page:hover .ia-node,
+.ia-tree .react-flow__node-page:focus-within .ia-node {
+    height: auto;
+    min-height: 100%;
+}
+
+.ia-tree .react-flow__node-page:hover .ia-node__lead,
+.ia-tree .react-flow__node-page:focus-within .ia-node__lead {
+    display: block;
+    max-height: none;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}
+
+.ia-tree .react-flow__controls,
+.ia-tree .react-flow__minimap {
+    border: 1px solid #dfe4eb;
+    border-radius: .5rem;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .09);
+    overflow: hidden;
+}
+
+.ia-tree .react-flow__controls-button {
+    border-bottom-color: #e5e7eb;
+}
+
+.ia-tree .react-flow__attribution {
+    background: rgba(255, 255, 255, .8);
+    color: #77808d;
+}
+
+@media screen and (max-width: 39.9375em) {
+    .information-architecture-tree {
+        height: 68vh;
+        min-height: 32rem;
+    }
+
+    .ia-tree__layout-label {
+        display: none;
+    }
+
+    .ia-tree__toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        gap: .35rem;
+    }
+
+    .ia-tree__summary {
+        margin-right: 0;
+    }
+
+    .ia-tree__search {
+        flex-basis: auto;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .ia-tree__export-button {
+        width: 100%;
+    }
+
+    .ia-tree__export-error {
+        max-width: none;
+    }
+
+    .ia-tree__layout-button {
+        padding: .55rem .7rem;
+    }
+
+    .ia-tree .react-flow__minimap {
+        display: none;
+    }
+}

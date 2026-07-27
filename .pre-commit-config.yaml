@@ -41,6 +41,7 @@ repos:
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
+      exclude: '^src/onegov/town6/assets/(js/information-architecture\.bundle\.min\.js|src/react_flow/)'
       additional_dependencies:
       - eslint-plugin-react
   - repo: https://github.com/PyCQA/bandit
