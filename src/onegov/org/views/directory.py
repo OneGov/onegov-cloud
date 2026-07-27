@@ -700,6 +700,7 @@ def create_admin_notification_pdf(
     title: str,
     entry: ExtendedDirectoryEntry,
     generated_at: datetime,
+    ended: bool = False,
 ) -> Attachment | None:
     assert filename
 
@@ -722,10 +723,17 @@ def create_admin_notification_pdf(
         f'<a href="{request.link(entry)}" color="{pdf.link_color}">'
         f'<u>{escape(title)}</u></a>'
     )
-    pdf.p_markup(request.translate(_(
-        'This document certifies the publication "${title}" as follows.',
-        mapping={'title': title_link},
-    )))
+    if ended:
+        intro = _(
+            'The publication "${title}" has ended.',
+            mapping={'title': title_link},
+        )
+    else:
+        intro = _(
+            'This document certifies the publication "${title}" as follows.',
+            mapping={'title': title_link},
+        )
+    pdf.p_markup(request.translate(intro))
     pdf.h2(request.translate(_('Publication')))
 
     def field_value(field: BasicParsedField) -> str:
@@ -736,12 +744,12 @@ def create_admin_notification_pdf(
             value = layout.format_date(value, 'date_long')
         return escape(str(value or ''))
 
-    items = ''.join(
+    field_items = ''.join(
         f'<li><strong>{escape(field.human_id)}</strong>: '
         f'{field_value(field)}</li>'
         for field in entry.directory.basic_fields
     )
-    pdf.mini_html(f'<ul>{items}</ul>')
+    pdf.mini_html(f'<ul>{field_items}</ul>')
 
     pdf.h2(request.translate(_('Attachments')))
     if entry.files:
@@ -769,20 +777,28 @@ def create_admin_notification_pdf(
         pdf.mini_html(f'<p>{no_files_label}</p>')
 
     pdf.h2(request.translate(_('Publication details')))
-    publication_start = entry.publication_start
-    publication_end = entry.publication_end
+    not_set = request.translate(_('Not set'))
+    start = (
+        layout.format_date(entry.publication_start, 'datetime_long')
+        if entry.publication_start else not_set
+    )
+    end = (
+        layout.format_date(entry.publication_end, 'datetime_long')
+        if entry.publication_end else not_set
+    )
+    access = layout.access_label(entry.access)
     details = '\n'.join([
-        f'<li><strong>{request.translate(_("Publication start:"))}</strong>',
-        f'{layout.format_date(publication_start, "datetime_long")}'
-        if publication_start
-        else request.translate(_('Not set')),
-        f'<li><strong>{request.translate(_("Publication end:"))}</strong>',
-        f'{layout.format_date(publication_end, "datetime_long")}'
-        if publication_end
-        else request.translate(_('Not set')),
+        (
+            f'<li><strong>{request.translate(_("Publication start:"))}'
+            f'</strong> {start}</li>'
+        ),
+        (
+            f'<li><strong>{request.translate(_("Publication end:"))}'
+            f'</strong> {end}</li>'
+        ),
         (
             f'<li><strong>{request.translate(_("Access"))}:</strong> '
-            f'{request.translate(_(entry.access.capitalize()))}</li>'
+            f'{access}</li>'
         ),
         (
             f'<li><strong>{request.translate(_("Entry checksum"))}:</strong> '
@@ -804,7 +820,9 @@ def create_admin_notification_pdf(
     pdf.generate()
 
     return Attachment(
-        filename, content=f.getvalue(), content_type='application/pdf'
+        f"{filename.replace('/', '-')}.pdf",
+        content=f.getvalue(),
+        content_type='application/pdf',
     )
 
 
@@ -860,6 +878,16 @@ def send_admin_expiry_notification_for_directory_entry(
                  'entry': entry.title,
                  'directory': directory.title},
     ))
+    generated_at = datetime.now(UTC)
+    pdf = create_admin_notification_pdf(
+        request,
+        filename=entry.title,
+        title=entry.title,
+        entry=entry,
+        generated_at=generated_at,
+        ended=True,
+    )
+
     _send_admin_email(
         directory, request, title,
         'mail_directory_entry_admin_publication_ended.pt',
@@ -870,7 +898,9 @@ def send_admin_expiry_notification_for_directory_entry(
             'publication_start': entry.publication_start,
             'publication_end': entry.publication_end,
             'content_hash': entry.content_hash,
+            'generated_at': generated_at,
         },
+        attachments=(pdf,) if pdf else (),
     )
 
 

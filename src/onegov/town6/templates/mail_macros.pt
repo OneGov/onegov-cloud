@@ -206,7 +206,7 @@
         - <strong i18n:translate="">Publication end:</strong>
         <tal:b condition="publication_end | nothing"> ${layout.format_date(publication_end, 'datetime_long')}</tal:b>
         <tal:b condition="not: publication_end | nothing"> <span i18n:translate="">Not set</span></tal:b><br/>
-        - <strong><span i18n:translate="">Access</span>:</strong> <span i18n:translate="">${entry.access.capitalize()}</span><br/>
+        - <strong><span i18n:translate="">Access</span>:</strong> ${layout.access_label(entry.access)}<br/>
         - <strong><span i18n:translate="">Entry checksum</span>:</strong> ${content_hash}
     </p>
 </metal:directory_entry_notification_details>

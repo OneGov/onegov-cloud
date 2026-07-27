@@ -2855,22 +2855,19 @@ def test_admin_notification_full_workflow(
         assert 'Baugesuche' in msg['Subject']
         assert 'Version B' in msg['TextBody']
         assert 'Version A' not in msg['TextBody']
-        # date/datetime fields are formatted, not printed as raw ISO values
         assert '15. März 2026 09:30' in msg['TextBody']
         assert '2026-03-15T09:30' not in msg['TextBody']
         assert '20. August 2026' in msg['TextBody']
         assert '2026-08-20' not in msg['TextBody']
-        # the entry checksum is part of the notification (proof of content)
+        assert 'Öffentlich' in msg['TextBody']
         entry = client.app.session().query(ExtendedDirectoryEntry).one()
         assert entry.content_hash
         assert entry.content_hash in msg['TextBody']
 
         # verify attachment
         assert msg['Attachments']
-        text = extract_pdf_text(msg['Attachments'][0])
-        print()
-        for i, line in enumerate(text.splitlines(), start=1):
-            print(f'{i:>3}: {line}')
+        assert msg['Attachments'][0]['Name'].endswith('.pdf')
+        pdf_text = extract_pdf_text(msg['Attachments'][0])
         expected = (
             'Permit One',
             'Dieses Dokument bescheinigt die Publikation "Permit One" wie',
@@ -2900,10 +2897,10 @@ def test_admin_notification_full_workflow(
             'E-Mail automatisch generiert von Govikon am 1. Juli 2026 15:00',
         )
         for item in expected:
-            assert item in text, f'Error: Expected text {item} in pdf'
+            assert item in pdf_text, f'Error: Expected text {item} in pdf'
         # date/datetime fields are formatted in the pdf, not raw ISO values
-        assert '2026-03-15 09:30:00' not in text
-        assert '2026-08-20' not in text
+        assert '2026-03-15 09:30:00' not in pdf_text
+        assert '2026-08-20' not in pdf_text
 
         # a second run in the same window must not re-notify
         client.get(get_cronjob_url(job))
@@ -2936,6 +2933,7 @@ def test_admin_notification_full_workflow(
         msg = client.get_email(1)
         assert 'Veröffentlichter Eintrag' in msg['Subject']
         assert 'Version C' in msg['TextBody']
+        assert 'Version C' in extract_pdf_text(msg['Attachments'][0])
 
         # published right now -> deletion is blocked
         entry_page = client.get(entry_url)
@@ -2960,6 +2958,12 @@ def test_admin_notification_full_workflow(
         assert 'Permit One' in msg['Subject']
         assert 'Baugesuche' in msg['Subject']
         assert 'abgelaufen' in msg['TextBody'].lower()
+        assert msg['Attachments']
+        pdf_expiry_text = extract_pdf_text(msg['Attachments'][0])
+        assert (
+            'Die Publikation "Permit One" ist abgelaufen.' in pdf_expiry_text
+        )
+        assert 'Version C' in pdf_expiry_text
         assert client.app.session().query(ExtendedDirectoryEntry).count() == 1
 
         # the expiry notification has now been sent -> deletion is allowed
