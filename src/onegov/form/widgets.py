@@ -65,7 +65,7 @@ class OrderedListWidget(ListWidget):
 
 
 class MultiCheckboxWidget(ListWidget):
-    """ The default list widget with the label behind the checkbox. """
+    """ Render choices as Bootstrap-style checkboxes. """
 
     def __init__(self, html_tag: Literal['ul', 'ol'] = 'ul'):
         super().__init__(html_tag=html_tag, prefix_label=False)
@@ -73,7 +73,44 @@ class MultiCheckboxWidget(ListWidget):
     def __call__(self, field: Field, **kwargs: Any) -> Markup:
         if hasattr(field.meta, 'request'):
             field.meta.request.include('multicheckbox')
-        return super().__call__(field, **kwargs)
+
+        options = []
+        for subfield in field:
+            input_html = subfield()
+            label_html = subfield.label()
+            options.append(
+                '<div class="form-check">'
+                f'{input_html}'
+                f'{label_html}'
+                '</div>'
+            )
+
+        return Markup(
+            f'<div {html_params(**kwargs)}>' + ''.join(options) + '</div>'
+        )
+
+
+class RadioWidget(ListWidget):
+    """Render choices as Bootstrap-style radio buttons using div wrappers."""
+
+    def __init__(self) -> None:
+        super().__init__(html_tag='ul', prefix_label=False)
+
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        options = []
+        for subfield in field:
+            input_html = subfield()
+            label_html = subfield.label()
+            options.append(
+                '<div class="form-check">'
+                f'{input_html}'
+                f'{label_html}'
+                '</div>'
+            )
+
+        return Markup(
+            f'<div {html_params(**kwargs)}>' + ''.join(options) + '</div>'
+        )
 
 
 class OrderedMultiCheckboxWidget(MultiCheckboxWidget, OrderedListWidget):

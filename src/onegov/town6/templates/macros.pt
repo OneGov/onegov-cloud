@@ -480,17 +480,27 @@
 
 <metal:fields define-macro="fields">
     <tal:b repeat="field fields">
-        <div tal:define="hidden form.is_hidden(field)|False" class="${'col-12 col-md-6' if form_two_columns else ''} field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}">
-            <div class=" mb-md">
+        <div
+            tal:define="hidden form.is_hidden(field)|False;
+            radio_field field.type == 'RadioField';
+            checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField');
+            field_list field.type == 'UploadMultipleField'"
+            class="${'col-12 col-md-6' if form_two_columns else ''} field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}"
+        >
+            <div class="mb-md">
                 <tal:b define="input_type field.widget.input_type|None">
                     <tal:b condition="input_type == 'hidden'">
                         ${field()}
                         <small class="error" tal:repeat="error field.errors">${error}</small>
                     </tal:b>
-                    <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField'); field_list field.type == 'UploadMultipleField'">
+                    <tal:b condition="input_type != 'hidden'">
                         <div tal:attributes="class field.errors and not field_list and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
-                            <metal:b use-macro="layout.macros['field']" />
+                            <div class="form-floating">
+                                <metal:b use-macro="layout.macros['field']" />
+                            </div>
                         </div>
+                    </tal:b>
+                </tal:b>
 
                 <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
                     <metal:b use-macro="layout.macros['field']" />
@@ -500,45 +510,20 @@
                         ${error}
                     </small>
                 </tal:b>
-            </tal:b>
-        </tal:b>
-    </div></div>
+            </div>
+        </div>
     </tal:b>
 </metal:fields>
-
-<metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
-    <div class="card" data-aos="fade" data-aos-duration="800"  id="homepage-tile-${item.number}" tal:condition="item.links">
-        <div class="card-divider">
-            <a tal:condition="item.page.url" href="${item.page.url}"><h5>${item.page.text}</h5></a>
-            <h5 tal:condition="not item.page.url">${item.page.text}</h5>
-        </div>
-        <div class="card-section">
-            <ul class="more-list">
-                <li tal:repeat="link item.links" tal:content="link(layout)" />
-            </ul>
-        </div>
-    </div>
-</metal:homepage-tiles>
-
-<metal:homepage-tiles define-macro="homepage-tiles">
-    <div>
-        <div class="grid-x grid-padding-x align-center" >
-            <tal:block tal:repeat="item tiles">
-                <div class="cell small-12 medium-6 large-4 homepage-tile" tal:condition="item.links">
-                    <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
-                </div>
-            </tal:block>
-        </div>
-    </div>
-</metal:homepage-tiles>
 
 <metal:single_field define-macro="field">
      <!--! render the label after the field if it's a boolean field -->
     <tal:b condition="field.type == 'BooleanField'">
         ${field()}
-        <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-        <div class="field-help" tal:condition="field.description">
+        <label class="form-check-label" for="${field.label.text}">
+            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+        </label>
+        <div class="form-text" tal:condition="field.description">
             <tal:b replace="request.translate(field.description)" />
         </div>
     </tal:b>
@@ -551,16 +536,14 @@
             See onegov.core.i18n.get_translation_bound_meta.render_field
         -->
         <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
-            <div class="form-floating">
-                <!--! The field is placed here -->
-                <tal:b replace="content" />
-                <label>
-                    <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-                    <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                </label>
-                <div class="long-field-help" tal:condition="long_description">
-                    <tal:b replace="long_description"/>
-                </div>
+            <!--! The field is placed here -->
+            <tal:b replace="content" />
+            <label>
+                <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+                <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+            </label>
+            <div class="form-text" tal:condition="long_description">
+                <tal:b replace="long_description"/>
             </div>
         </tal:b>
     </tal:b>
