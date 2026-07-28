@@ -41,9 +41,7 @@ repos:
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
-      exclude: '^src/onegov/org/assets/js/redactor\.js$'
       additional_dependencies:
-      - eslint@8.57.0
       - eslint-plugin-react
   - repo: https://github.com/PyCQA/bandit
     rev: 1.9.4
