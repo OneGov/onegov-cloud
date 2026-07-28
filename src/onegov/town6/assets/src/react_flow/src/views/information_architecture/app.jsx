@@ -522,9 +522,27 @@ function PageTree({payload}) {
         <div className={searchActive ?
             'ia-tree ia-tree--search-active' : 'ia-tree'}>
             <div className="ia-tree__toolbar">
-                <span className="ia-tree__summary">
-                    {payload.summary}
-                </span>
+                <div className="ia-tree__toolbar-primary">
+                    <span className="ia-tree__summary">
+                        {payload.summary}
+                    </span>
+                    <div className="ia-tree__layout-controls">
+                        <LayoutButton
+                            active={direction === 'DOWN'}
+                            direction="DOWN"
+                            icon="↓"
+                            label={payload.labels.vertical}
+                            onChange={changeDirection}
+                        />
+                        <LayoutButton
+                            active={direction === 'RIGHT'}
+                            direction="RIGHT"
+                            icon="→"
+                            label={payload.labels.horizontal}
+                            onChange={changeDirection}
+                        />
+                    </div>
+                </div>
                 <PageSearch
                     labels={payload.labels}
                     matchCount={matchingNodeIds.size}
@@ -588,24 +606,6 @@ function PageTree({payload}) {
                         pannable
                         zoomable
                     />
-                    <Panel position="top-right">
-                        <div className="ia-tree__panel">
-                            <LayoutButton
-                                active={direction === 'DOWN'}
-                                direction="DOWN"
-                                icon="↓"
-                                label={payload.labels.vertical}
-                                onChange={changeDirection}
-                            />
-                            <LayoutButton
-                                active={direction === 'RIGHT'}
-                                direction="RIGHT"
-                                icon="→"
-                                label={payload.labels.horizontal}
-                                onChange={changeDirection}
-                            />
-                        </div>
-                    </Panel>
                     {(layouting || layoutError) && (
                         <Panel position="bottom-center">
                             <div

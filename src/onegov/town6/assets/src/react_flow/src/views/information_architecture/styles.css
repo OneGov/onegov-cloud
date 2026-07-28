@@ -32,9 +32,17 @@
     background: rgba(255, 255, 255, .96);
     border-bottom: 1px solid #dfe4eb;
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     min-height: 3.5rem;
     padding: .55rem .75rem;
+}
+
+.ia-tree__toolbar-primary {
+    align-items: center;
+    display: flex;
+    gap: .25rem;
+    margin-right: auto;
 }
 
 .ia-tree__canvas {
@@ -71,12 +79,10 @@
     pointer-events: none;
 }
 
-.ia-tree__panel {
+.ia-tree__layout-controls {
     align-items: center;
-    background: rgba(255, 255, 255, .96);
     border: 1px solid #dfe4eb;
     border-radius: .55rem;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, .09);
     display: flex;
     gap: .4rem;
     padding: .45rem;
@@ -86,8 +92,8 @@
     color: #4b5563;
     font-size: .82rem;
     font-weight: 600;
-    margin-right: auto;
     padding: .25rem .45rem;
+    white-space: nowrap;
 }
 
 .ia-tree__search {
@@ -226,6 +232,7 @@
     line-height: 1;
     margin: 0;
     padding: .55rem .65rem;
+    white-space: nowrap;
 }
 
 .ia-tree__layout-button:hover,
@@ -490,6 +497,15 @@
     }
 
     .ia-tree__summary {
+        margin-right: 0;
+    }
+
+    .ia-tree__toolbar-primary {
+        margin-right: 0;
+    }
+
+    .ia-tree__layout-controls {
+        align-self: flex-start;
         margin-right: 0;
     }
 

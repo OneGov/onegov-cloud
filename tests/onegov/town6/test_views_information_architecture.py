@@ -230,6 +230,13 @@ def test_information_architecture_renders_in_browser(
     nodes.first.wait_for(timeout=10000)
 
     assert nodes.count() > 1
+    toolbar_layout_buttons = browser.page.locator(
+        '.ia-tree__toolbar .ia-tree__layout-button'
+    )
+    assert toolbar_layout_buttons.count() == 2
+    assert browser.page.locator(
+        '.ia-tree__canvas .ia-tree__layout-button'
+    ).count() == 0
     routes = browser.page.locator('.ia-node--route')
     assert routes.count() == 2
     route_text = ' '.join(routes.all_text_contents())
