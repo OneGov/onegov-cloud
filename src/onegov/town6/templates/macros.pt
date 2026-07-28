@@ -1215,7 +1215,7 @@
                 </div>
 
                 <div class="col-3 align-content-end text-end">
-                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#personDetails${person.id}" aria-expanded="false" aria-controls="collapseExample">
+                    <button class="btn p-0 btn-primary rounded-circle square-2xl" type="button" data-bs-toggle="collapse" data-bs-target="#personDetails${person.id}" aria-expanded="false" aria-controls="collapseExample">
                         <i class="fa fa-plus"></i>
                     </button>
                 </div>
@@ -1590,7 +1590,7 @@
 </metal:display_event>
 
 <metal:atoz define-macro="atoz" i18n:domain="onegov.town6">
-    <div class="atoz-block row mb-lg" tal:repeat="item items">
+    <div class="atoz-block row mb-3xl" tal:repeat="item items">
         <div class="col-12 col-sm-6 col-md-3">
             <h2 class="fs-2xl text-primary sticky-top">${item[0]}</h2>
         </div>
