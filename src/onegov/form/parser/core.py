@@ -447,7 +447,6 @@ if TYPE_CHECKING:
     from pydantic import GetCoreSchemaHandler, GetJsonSchemaHandler
     from pydantic.json_schema import JsonSchemaValue
     from pyparsing import ParseResults
-    from re import Pattern
     from yaml.nodes import ScalarNode
 
 
@@ -813,27 +812,27 @@ RelativeDelta = Annotated[relativedelta, _RelativeDeltaAnnotation]
 class _RangeValidationMixin:
     if TYPE_CHECKING:
         start: Any | None
-        end: Any | None
+        stop: Any | None
 
     @model_validator(mode='after')
-    def start_before_end(self) -> Self:
-        start, end = self.start, self.end
-        if start is None or end is None:
+    def start_before_stop(self) -> Self:
+        start, stop = self.start, self.stop
+        if start is None or stop is None:
             return self
 
         if isinstance(start, relativedelta):
             start = approximate_total_days(start)
-            end = approximate_total_days(end)
+            stop = approximate_total_days(stop)
 
-        if start < end:
+        if start < stop:
             return self
 
-        raise ValueError('Invalid range. Starts needs to be smaller than end.')
+        raise ValueError('Invalid range. Start needs to be smaller than stop.')
 
 
 class Range[T](BaseModel, _RangeValidationMixin):
     """
-    A bounded range, between start and end
+    A closed bounded range, between start and stop
     """
 
     model_config = ConfigDict(frozen=True)
@@ -922,15 +921,15 @@ type BasicParsedField = Annotated[
     | DatetimeField | TimeField | StringField | TextAreaField
     | CodeField | StdnumField | IntegerRangeField | DecimalRangeField
     | RadioField | CheckboxField | ChipNrField,
-    Field(discriminator='kind')
+    Field(discriminator='type')
 ]
 type FileParsedField = Annotated[
     FileinputField | MultipleFileinputField,
-    Field(discriminator='kind')
+    Field(discriminator='type')
 ]
 type ParsedField = Annotated[
     BasicParsedField | FileParsedField,
-    Field(discriminator='kind')
+    Field(discriminator='type')
 ]
 
 
@@ -1200,7 +1199,7 @@ class StringField(BaseField[Literal['text']]):
         default=None,
         description='Sets the `maxlength` attribute on the HTML text input'
     )
-    regex: Pattern[str] | None = Field(
+    regex: re.Pattern[str] | None = Field(
         default=None,
         description='Validates the user-submitted text input against this '
             'regex pattern. Generally these patterns should include beginning '
@@ -1555,9 +1554,7 @@ class ParsedForm(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    fields: tuple[ParsedField, ...] = Field(
-        discriminator='kind'
-    )
+    fields: tuple[ParsedField, ...]
 
 
 @lru_cache(maxsize=1)
@@ -1580,20 +1577,26 @@ def parse_formcode(
     )
 
     fields = []
+    # FIXME: This lookup can probably go away, we can just rely
+    #        on pydantic to dispatch to the correct field in
+    #        the union based on the `type` value we give it.
     field_classes: dict[str, type[ParsedField]] = {
-        cls.type: cls  # type:ignore
-        for cls in BaseField.__subclasses__()
+        cls.model_fields['type'].default: cls  # type:ignore
+        for generic in BaseField.__subclasses__()
+        for cls in generic.__subclasses__()
     }
     used_ids: set[str] = set()
 
     for fieldset in parsed:
 
         # fieldsets occur only at the top level
-        label = next(k for k in fieldset.keys())
+        key = next(k for k in fieldset.keys())
+        # FIXME: This hack is only necessary because we translate to yaml
+        label = key if key != '...' else ''
 
         fieldset_fields = [
             parse_field_block(block, field_classes, used_ids, label)
-            for block in (fieldset[label] or ())
+            for block in (fieldset[key] or ())
         ]
         if enable_edit_checks and not fieldset_fields:
             raise errors.EmptyFieldsetError(label)

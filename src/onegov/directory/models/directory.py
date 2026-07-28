@@ -512,9 +512,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
     def fields_from_structure(structure: str) -> Mapping[str, ParsedField]:
         return {
             as_internal_id(human_id): field
-            for human_id, field in Directory.fields_from_structure(
-                structure
-            ).items()
+            for human_id, field in (
+                Directory.fields_from_structure_with_human_id(structure).items()
+            )
         }
 
     @staticmethod
