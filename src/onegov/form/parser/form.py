@@ -312,7 +312,7 @@ def handle_field(
             dependency=dependency,
             required=field.required,
             choices=[(c.label, c.display_label) for c in field.choices],
-            default=next((c.label for c in field.choices if c.selected), None),
+            default=[c.label for c in field.choices if c.selected],
             pricing={
                 c.label: c.pricing.as_tuple()
                 for c in field.choices

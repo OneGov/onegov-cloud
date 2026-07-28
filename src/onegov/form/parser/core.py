@@ -409,7 +409,7 @@ from dateutil import parser as dateutil_parser
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from functools import lru_cache
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
 from pydantic_core import CoreSchema, core_schema
 from pydantic_extra_types.currency_code import Currency  # noqa: TC002
 
@@ -876,15 +876,21 @@ class RangeStartOptional[T](BaseModel, _RangeValidationMixin):
     )
 
 
-type HalfBoundedRange[T] = RangeEndOptional[T] | RangeStartOptional[T]
-type DateRange = Range[date_t] | HalfBoundedRange[RelativeDelta]
+type HalfBoundedRange[T] = Annotated[
+    RangeEndOptional[T] | RangeStartOptional[T],
+    Field(union_mode='left_to_right')
+]
+type DateRange = Annotated[
+    HalfBoundedRange[date_t] | HalfBoundedRange[RelativeDelta],
+    Field(union_mode='left_to_right')
+]
 
 
 class Pricing(BaseModel):
     """
     Pricing information for a priced form input or selection.
     """
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, validate_by_name=True)
 
     amount: Decimal = Field(
         description='The total decimal cost amount of the selection. '
@@ -900,6 +906,7 @@ class Pricing(BaseModel):
     )
     online_payment_required: bool = Field(
         default=False,
+        alias='credit_card_payment',
         description='Whether or not this selection forces the payment to be '
             'made online, directly after form submission. This is useful '
             'for forms, where e.g. the deliverable can optionally be '
@@ -945,7 +952,7 @@ class Choice(BaseModel):
 
     """
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, validate_by_name=True)
 
     label: str = Field(
         description='The label of this option. The label must be unique '
@@ -954,6 +961,7 @@ class Choice(BaseModel):
     )
     selected: bool = Field(
         default=False,
+        alias='checked',
         description='Whether or not this choice should be pre-selected. '
             'For radio fields only a single choice may be pre-selected.'
     )
@@ -965,10 +973,13 @@ class Choice(BaseModel):
             'to a non-empty string.'
     )
     pricing: Pricing | None = Field(
+        default=None,
         description='The pricing applied when this choice is selected. '
             'This field is mutually exclusive with ``discount``.'
     )
     discount: Decimal | None = Field(
+        default=None,
+        validation_alias=AliasPath('discount', 'amount'),
         description='The discount applied when this choice is selected '
             'specified as a percentage. I.e. 50% means the total price '
             'of the form submission is cut in half. Negative percentages '
@@ -996,7 +1007,11 @@ class Choice(BaseModel):
         return self.label
 
 
-def human_id(label: str, fieldset: str, parent_id: str | None = None) -> str:
+def human_id(
+    label: str,
+    fieldset: str | None,
+    parent_id: str | None = None
+) -> str:
     if parent_id:
         return f'{parent_id}/{label}'
 
@@ -1029,8 +1044,8 @@ class BaseField[KindT: str](BaseModel):
         description='Whether or not this field is required. Fields that '
             'are not required, can be left empty, when submitting the form.'
     )
-    fieldset: str = Field(
-        default='',
+    fieldset: str | None = Field(
+        default=None,
         description='Fields are grouped into fieldsets based on this '
             'human readable label. Fields in the same fieldset should '
             'appear together sequentially, they will not be reordered, '
@@ -1073,7 +1088,7 @@ class BaseField[KindT: str](BaseModel):
         cls: type_t[T],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> T:
         return cls.model_validate({  # type:ignore[return-value]
@@ -1139,7 +1154,7 @@ class DateField(BaseField[Literal['date']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1147,7 +1162,10 @@ class DateField(BaseField[Literal['date']]):
             'required': identifier.required,
             'fieldset': fieldset,
             'field_help': field_help,
-            'valid_date_range': field.valid_date_range,
+            'valid_date_range': {
+                'start': field.valid_date_range[0],
+                'stop': field.valid_date_range[1],
+            } if field.valid_date_range else None,
         })
 
 
@@ -1165,7 +1183,7 @@ class DatetimeField(BaseField[Literal['datetime']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1173,7 +1191,10 @@ class DatetimeField(BaseField[Literal['datetime']]):
             'required': identifier.required,
             'fieldset': fieldset,
             'field_help': field_help,
-            'valid_date_range': field.valid_date_range,
+            'valid_date_range': {
+                'start': field.valid_date_range[0],
+                'stop': field.valid_date_range[1],
+            } if field.valid_date_range else None,
         })
 
 
@@ -1211,7 +1232,7 @@ class StringField(BaseField[Literal['text']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1219,7 +1240,7 @@ class StringField(BaseField[Literal['text']]):
             'required': identifier.required,
             'fieldset': fieldset,
             'field_help': field_help,
-            'regex': field.regex,
+            'regex': field.regex or None,
             'maxlength': field.length or None,
         })
 
@@ -1241,7 +1262,7 @@ class TextAreaField(BaseField[Literal['textarea']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1268,7 +1289,7 @@ class CodeField(BaseField[Literal['code']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1306,7 +1327,7 @@ class StdnumField(BaseField[Literal['stdnum']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1357,7 +1378,7 @@ class IntegerRangeField(BaseField[Literal['integer_range']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         pricing = field.pricing
@@ -1370,7 +1391,7 @@ class IntegerRangeField(BaseField[Literal['integer_range']]):
                 'start': field[0].start,
                 'stop': field[0].stop,
             },
-            'pricing': {
+            'pricing_per_item': {
                 'amount': pricing.amount,
                 'currency': pricing.currency,
                 'online_payment_required': pricing.credit_card_payment
@@ -1395,7 +1416,7 @@ class DecimalRangeField(BaseField[Literal['decimal_range']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1431,7 +1452,7 @@ class FileinputField(BaseField[Literal['fileinput']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1464,7 +1485,7 @@ class MultipleFileinputField(BaseField[Literal['multiplefileinput']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1498,7 +1519,7 @@ class RadioField(BaseField[Literal['radio']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1533,7 +1554,7 @@ class CheckboxField(BaseField[Literal['checkbox']]):
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        fieldset: str = '',
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
         return cls.model_validate({
@@ -1592,14 +1613,14 @@ def parse_formcode(
         # fieldsets occur only at the top level
         key = next(k for k in fieldset.keys())
         # FIXME: This hack is only necessary because we translate to yaml
-        label = key if key != '...' else ''
+        label = key if key != '...' else None
 
         fieldset_fields = [
             parse_field_block(block, field_classes, used_ids, label)
             for block in (fieldset[key] or ())
         ]
         if enable_edit_checks and not fieldset_fields:
-            raise errors.EmptyFieldsetError(label)
+            raise errors.EmptyFieldsetError(key)
 
         fields.extend(fieldset_fields)
 
@@ -1612,7 +1633,7 @@ def parse_field_block(
     field_block: dict[str, Any],
     field_classes: dict[str, type[ParsedField]],
     used_ids: set[str],
-    fieldset: str,
+    fieldset: str | None,
     parent_id: str | None = None
 ) -> ParsedField:
     """ Takes the given parsed field block and yields the fields from it """

@@ -476,8 +476,8 @@ def test_parse_radio_with_pricing() -> None:
 
     form = parse_form(text)()
     assert form['drink'].pricing.rules == {
-        'Coffee': Price(2.5, 'CHF'),
-        'Tea': Price(1.5, 'CHF', credit_card_payment=True)
+        'Coffee': Price(Decimal('2.50'), 'CHF'),
+        'Tea': Price(Decimal('1.50'), 'CHF', credit_card_payment=True)
     }
     assert form['drink'].description == 'beer cant be cheaper than water'
 
@@ -492,10 +492,10 @@ def test_parse_checkbox_with_pricing() -> None:
 
     form = parse_form(text)()
     assert form['extras'].pricing.rules == {
-        'Bacon': Price(2.5, 'CHF', credit_card_payment=True),
-        'Cheese': Price(1.5, 'CHF')
+        'Bacon': Price(Decimal('2.50'), 'CHF', credit_card_payment=True),
+        'Cheese': Price(Decimal('1.50'), 'CHF')
     }
-    assert form['extras'].pricing.rules['Bacon'].amount == Decimal(2.5)
+    assert form['extras'].pricing.rules['Bacon'].amount == Decimal('2.50')
     assert form['extras'].pricing.rules['Bacon'].currency == 'CHF'
     assert form['extras'].pricing.rules['Bacon'].credit_card_payment is True
 
@@ -1128,7 +1128,8 @@ def test_field_ids() -> None:
     subfields = fields[2].choices[0].fields
     assert subfields is not None
     assert subfields[0].id(fields[2].id()) == 'my_order_products_type'
-    assert subfields[0].human_id(fields[2].id()) == 'My Order/Products/Type'
+    assert subfields[0].human_id(
+        fields[2].human_id()) == 'My Order/Products/Type'
 
     assert find_field(fields, 'first_name') is fields[0]
     assert find_field(fields, 'First Name') is fields[0]
@@ -1196,7 +1197,7 @@ def test_parse_dependency_with_price() -> None:
     assert choices[1].pricing is not None
     assert choices[1].pricing.amount == Decimal('5')
     assert choices[1].pricing.currency == 'CHF'
-    assert len(choices[1].fields) == 1
+    assert len(choices[1].fields) == 2
 
 
 @pytest.mark.parametrize('indent,edit_checks,shall_raise', [
@@ -1651,14 +1652,15 @@ def test_help_location_error() -> None:
 
 
 def test_empty_fieldset_error() -> None:
-    fieldsets = parse_formcode('\n'.join((
+    fields = parse_formcode('\n'.join((
         "# Section 1",
         "# Section 2",
         "First Name *= ___",
         "Last Name *= ___",
         "E-mail *= @@@"
     )), enable_edit_checks=False)
-    assert len(fieldsets) == 2
+    assert all(f.fieldset == 'Section 2' for f in fields)
+    assert len(fields) == 3
 
     with pytest.raises(errors.EmptyFieldsetError) as e:
         parse_formcode('\n'.join((
