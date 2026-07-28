@@ -105,7 +105,11 @@ var evaluate_dependencies = function(form, input, dependencies) {
         }
 
         input.closest('label, .group-label').show().siblings('.error').toggle(true);
-        input.toggle(true);
+
+        // keep enhancement-hidden inputs (code editor, formcode select) hidden
+        if (!always_hidden) {
+            input.toggle(true);
+        }
     } else {
         input.toggle(false);
         if (hide_label) {

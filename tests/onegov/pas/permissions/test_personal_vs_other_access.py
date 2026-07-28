@@ -460,6 +460,62 @@ def test_commission_president_can_add_for_commission_members(
     assert created_attendance.type == 'commission'
 
 
+def test_future_commission_presidency_does_not_grant_member_access(
+    client: Client[TestPasApp],
+) -> None:
+    session = client.app.session()
+    ensure_active_settlement_run(session)
+
+    president, _ = create_parliamentarian_with_user(
+        client,
+        'Future',
+        'President',
+        'future.president@example.org',
+        role='commission_president',
+    )
+    member, _ = create_parliamentarian_with_user(
+        client,
+        'Commission',
+        'Member',
+        'commission.member@example.org',
+    )
+    setup_commission_with_members(
+        session,
+        'Future Commission',
+        president,
+        member,
+    )
+    presidency = (
+        session.query(PASCommissionMembership)
+        .filter_by(
+            parliamentarian_id=president.id,
+            role='president',
+        )
+        .one()
+    )
+    presidency.start = date.today() + timedelta(days=1)
+    member_id = member.id
+    transaction.commit()
+
+    client.login('futurepresident', 'test')
+    form_page = client.get('/attendences/new')
+    response = client.post(
+        '/attendences/new',
+        {
+            'csrf_token': form_page.form['csrf_token'].value,
+            'parliamentarian_id': str(member_id),
+            'date': date.today().isoformat(),
+            'duration': '2.0',
+            'type': 'plenary',
+        },
+    )
+
+    assert (
+        'Sie können nur für sich selbst oder Ihre Kommissionsmitglieder '
+        'Anwesenheiten bearbeiten.'
+    ) in response
+
+
 def test_commission_president_cannot_add_for_other_commission_members(
     client: Client[TestPasApp]
 ) -> None:

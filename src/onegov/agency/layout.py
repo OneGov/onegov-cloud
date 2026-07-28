@@ -128,7 +128,7 @@ class NavTreeMixin:
             isinstance(self.model, ExtendedAgencyCollection)
             and self.model.browse
         ):
-            return self.model.by_id(self.model.browse)  # type:ignore[arg-type]
+            return self.model.by_id(self.model.browse)
         return None
 
     @cached_property

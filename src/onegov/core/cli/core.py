@@ -225,6 +225,7 @@ if TYPE_CHECKING:
         singular: bool
         creates_path: bool
         skip_search_indexing: bool
+        logging: bool
 
     class ContextSpecificSettings(TypedDict, total=False):
         default_selector: str
@@ -232,6 +233,7 @@ if TYPE_CHECKING:
         singular: bool
         matches_required: bool
         skip_search_indexing: bool
+        logging: bool
 
 else:
     _GroupContextAttrs = object
@@ -243,7 +245,8 @@ CONTEXT_SPECIFIC_SETTINGS = (
     'creates_path',
     'singular',
     'matches_required',
-    'skip_search_indexing'
+    'skip_search_indexing',
+    'logging',
 )
 
 
@@ -373,6 +376,10 @@ class GroupContext(GroupContextGuard):
     :param matches_required:
         True if the selector *must* match at least one application.
 
+    :param logging:
+        Whether or not the application-level logging messages should be
+        visible as part of the command's output.
+
     """
 
     def __init__(
@@ -383,8 +390,11 @@ class GroupContext(GroupContextGuard):
         creates_path: bool = False,
         singular: bool = False,
         skip_search_indexing: bool = False,
-        matches_required: bool = True
-    ):
+        matches_required: bool = True,
+        # FIXME: It might make more sense if this defaults to `False`
+        #        But we will need to check which commands rely on logging
+        logging: bool = True,
+    ) -> None:
 
         if isinstance(config, dict):
             self.config = Config(config)
@@ -394,6 +404,7 @@ class GroupContext(GroupContextGuard):
         self.selector = selector or default_selector
         self.creates_path = creates_path
         self.skip_search_indexing = skip_search_indexing
+        self.logging = logging
 
         if self.creates_path:
             self.singular = True
@@ -658,9 +669,6 @@ def run_processors(
         }),
         # NOTE: For commands that create a new schema this is essential
         #       otherwise the SQLAlchemy metadata may be incomplete
-        # FIXME: For some reason when this is enabled we get noisy logging
-        #        related to i18n, so we should replace the affected logger
-        #        with a NullHandler...
         configure_morepath=group_context.creates_path,
         configure_logging=False
     )
@@ -721,8 +729,9 @@ def command_group() -> click.Group:
             context_settings = get_context_specific_settings(context)
             context.obj = GroupContext(select, config, **context_settings)
             context.obj.validate_guard_conditions(context)
-            context.obj.config.logging.setdefault('version', 1)
-            logging.config.dictConfig(context.obj.config.logging)
+            if context.obj.logging:
+                context.obj.config.logging.setdefault('version', 1)
+                logging.config.dictConfig(context.obj.config.logging)
         except DB_CONNECTION_ERRORS as e:
             click.echo(f'Could not connect to database:\n{e}')
             sys.exit(1)

@@ -175,7 +175,7 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
         href='new', index=1
     )
     page.form['date'] = '2024-02-04'
-    page.form['duration'] = '3'
+    page.form['duration'] = '3.42'
     page = page.form.submit().follow()
     assert 'Plenarsitzung hinzugefügt' in page
 
@@ -183,6 +183,7 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     assert '02.02.2024' in page
     assert '03.02.2024' in page
     assert '04.02.2024' in page
+    assert '3.42 h' in page
 
     # Changes
     page = client.get('/').follow().click('Aktivitäten')
