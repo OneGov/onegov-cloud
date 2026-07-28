@@ -1049,6 +1049,57 @@ def test_allocation_holidays(client: Client) -> None:
     assert slots.json[3]['start'].startswith('2019-08-02')
 
 
+def test_allocation_other_holidays_with_year(client: Client) -> None:
+    client.login_admin()
+
+    # a year-specific other holiday only counts for that year
+    page = client.get('/holiday-settings')
+    page.form['other_holidays'] = '30.07.2019 - One time only'
+    page.form.submit()
+
+    # the value round-trips through the form keeping the year
+    page = client.get('/holiday-settings')
+    assert '30.07.2019 - One time only' in page.form['other_holidays'].value
+
+    page = client.get('/resources').click('Raum')
+    page.form['title'] = 'Foo'
+    page.form.submit()
+
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
+    new.form['start'] = '2019-07-30'
+    new.form['end'] = '2019-07-31'
+    new.form['start_time'] = '07:00'
+    new.form['end_time'] = '12:00'
+    new.form['on_holidays'] = 'no'
+    new.form['is_partly_available'] = 'no'
+    new.form.submit()
+
+    # the 30th of July 2019 is skipped as a holiday, so only the 31st has
+    # an allocation slot (the 30th only shows up as a holiday marker)
+    slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-01')
+    assert len(slots.json) == 2
+    assert slots.json[0]['title'] == 'One time only'
+    assert slots.json[0]['start'] == '2019-07-30'
+    assert slots.json[1]['start'].startswith('2019-07-31')
+
+    # but the same day in another year is a regular day
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 2'
+    new.form['start'] = '2020-07-30'
+    new.form['end'] = '2020-07-31'
+    new.form['start_time'] = '07:00'
+    new.form['end_time'] = '12:00'
+    new.form['on_holidays'] = 'no'
+    new.form['is_partly_available'] = 'no'
+    new.form.submit()
+
+    slots = client.get('/resource/foo/slots?start=2020-07-29&end=2020-08-01')
+    assert len(slots.json) == 2
+    assert slots.json[0]['start'].startswith('2020-07-30')
+    assert slots.json[1]['start'].startswith('2020-07-31')
+
+
 def test_allocation_school_holidays(client: Client) -> None:
     client.login_admin()
 
