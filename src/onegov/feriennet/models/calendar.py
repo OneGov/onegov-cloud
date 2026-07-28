@@ -7,7 +7,7 @@ from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path
 from onegov.feriennet.models import VacationActivity
 from sedate import standardize_date, utcnow
-from sqlalchemy import and_, select
+from sqlalchemy import and_, select, text
 
 
 from typing import Any, ClassVar, TYPE_CHECKING
@@ -136,7 +136,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
         #        booking guarantee that the occassion is not cancelled?
         records = session.execute(select(*stmt.c).where(and_(
             stmt.c.attendee_id == self.attendee_id,
-            stmt.c.state == 'accepted',
+            stmt.c.state == text("'accepted'"),
             stmt.c.confirmed == True
         )))
 

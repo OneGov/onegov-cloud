@@ -15,6 +15,7 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.generic import ChangeUrlForm
 from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
 from onegov.org.forms.generic import PaymentForm
@@ -380,6 +381,12 @@ class ResourceBaseForm(Form):
         ),
     )
 
+    allow_cancellation_requests = BooleanField(
+        label=_('Enable cancel reservation'),
+        fieldset=_('Cancellation'),
+        default=False,
+    )
+
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type != 'room':
@@ -544,7 +551,7 @@ class ResourceBaseForm(Form):
                 _('Please enter at least one zip-code'))
 
         try:
-            self.zipcodes  # noqa: B018
+            self.zipcodes  # ruff:ignore[useless-expression]
         except ValueError as exception:
             raise ValidationError(
                 _(
@@ -709,3 +716,7 @@ else:
         merge_forms(DateRangeForm, ExportToExcelWorksheets)
     ):
         """ Resource export all resources, with start/end date. """
+
+
+class ResourceChangeUrlForm(ChangeUrlForm):
+    """ Defines the form to change a resource's url. """

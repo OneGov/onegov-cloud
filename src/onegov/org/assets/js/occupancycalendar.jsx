@@ -27,6 +27,11 @@ oc.defaultOptions = {
     editable: false,
 
     /*
+        True if the calendar includes holidays
+    */
+    showHolidays: false,
+
+    /*
         Url which returns all available resources in the following format:
         {
             'group': [
@@ -95,7 +100,8 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
     // the fullcalendar default options
     var options = {
         fc: {
-            allDaySlot: false,
+            allDaySlot: ocOptions.showHolidays,
+            allDayContent: '',
             height: 'auto',
             events: ocOptions.feed,
             slotEventOverlap: false,
@@ -174,6 +180,9 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         fcOptions.selectMirror = true;
         fcOptions.unselectCancel = '.popup';
         fcOptions.selectOverlap = function(event) {
+            if (event.extendedProps.kind === 'holiday') {
+                return true;
+            }
             if (event.display === 'background') {
                 oc.overlappingEvents[event.id] = event;
                 return true;
@@ -183,6 +192,9 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
             }
         };
         fcOptions.selectAllow = function(info) {
+            if (info.allDay) {
+                return false;
+            }
             // we only know what to do if we overlap a single valid allocation
             // we only allow to add blockers in the future
             var keys = Object.keys(oc.overlappingEvents);
@@ -236,13 +248,18 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
 
         // edit events on drag&drop, resize
         fcOptions.eventOverlap = function(stillEvent, movingEvent) {
-            if (stillEvent.extendedProps.resource !== movingEvent.extendedProps.resource) {
-                // NOTE: This doesn't take into account the hierarchy, so it is a little bit
-                //       too permissive right now. But the backend still covers us.
+            if (stillEvent.display === 'background' || stillEvent.extendedProps.kind === 'holiday') {
                 return true;
             }
-            return stillEvent.display === 'background';
+            // NOTE: This doesn't take into account the hierarchy, so it is a little bit
+            //       too permissive right now. But the backend still covers us.
+            return stillEvent.extendedProps.resource !== movingEvent.extendedProps.resource;
         };
+
+        // disallow dropping events into the allDay slot
+        fcOptions.eventAllow = function(dropInfo, draggedEvent) {
+            return !dropInfo.allDay;
+        }
 
         fcOptions.eventDrop = fcOptions.eventResize = function(info) {
             var event = info.event;
@@ -340,6 +357,9 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         var changed = false;
         for (var i = 0; i < events.length; i++) {
             var event = events[i];
+            if (event.extendedProps.kind === 'holiday') {
+                continue;
+            }
             // snap to the start of the hour
             var start = moment(event.start).startOf('hour').format('HH:mm');
             if (start < minTime) {

@@ -182,6 +182,7 @@ def test_detect_renamed_fields_changing_fieldsets() -> None:
 
 
 def test_detect_changed_fields() -> None:
+    # required toggle, not renamed
     changes = StructuralChanges(
         """
             Name = ___
@@ -191,8 +192,14 @@ def test_detect_changed_fields() -> None:
         """
     )
 
+    assert not changes.renamed_fields
     assert changes.changed_fields == ['Name']
+    assert changes.old_field('Name').human_id == 'Name'
+    assert changes.old_field('Name').required is False
+    assert changes.new['Name'].required is True
 
+    # renamed *and* required toggled (regression for OGC-3241): changed_fields
+    # holds the new id, which does not exist in the old structure
     changes = StructuralChanges(
         """
             First Name = ___
@@ -204,7 +211,13 @@ def test_detect_changed_fields() -> None:
 
     assert changes.renamed_fields == {'First Name': 'Name'}
     assert changes.changed_fields == ['Name']
+    assert 'Name' not in changes.old
+    # old_field must resolve the rename back to the original id
+    assert changes.old_field('Name').human_id == 'First Name'
+    assert changes.old_field('Name').required is False
+    assert changes.new['Name'].required is True
 
+    # type change, not renamed
     changes = StructuralChanges(
         """
             Name = ___
@@ -214,7 +227,83 @@ def test_detect_changed_fields() -> None:
         """
     )
 
+    assert not changes.renamed_fields
     assert changes.changed_fields == ['Name']
+    # assert changes.old_field('Name').type == 'text'
+    assert changes.new['Name'].type == 'textarea'
+
+    # renamed across a fieldset *and* required toggled
+    changes = StructuralChanges(
+        """
+            # Contact
+            Street = ___
+        """,
+        """
+            Strasse *= ___
+        """
+    )
+
+    assert changes.renamed_fields == {'Contact/Street': 'Strasse'}
+    assert changes.changed_fields == ['Strasse']
+    assert 'Strasse' not in changes.old
+    assert changes.old_field('Strasse').human_id == 'Contact/Street'
+    assert changes.old_field('Strasse').required is False
+    assert changes.new['Strasse'].required is True
+
+    # renamed *and* required removed (required -> optional)
+    changes = StructuralChanges(
+        """
+            First Name *= ___
+        """,
+        """
+            Name = ___
+        """
+    )
+
+    assert changes.renamed_fields == {'First Name': 'Name'}
+    assert changes.changed_fields == ['Name']
+    assert 'Name' not in changes.old
+    assert changes.old_field('Name').human_id == 'First Name'
+    assert changes.old_field('Name').required is True
+    assert changes.new['Name'].required is False
+
+
+def test_migration_possible_with_renamed_and_changed_field(
+    session: Session
+) -> None:
+    # regression for OGC-3241: renaming a field while also toggling its
+    # required flag raised KeyError in DirectoryMigration.possible
+    directories = DirectoryCollection(session)
+    entries = directories.add(
+        title="Clubs",
+        lead="The town's clubs",
+        structure="""
+            Name *= ___
+            Street = ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Name]",
+            order=['Name']
+        )
+    )
+    entries.add(values=dict(name="Chess Club", street="Main Street 1"))
+
+    migration = entries.migration(
+        """
+            Name *= ___
+            Strasse *= ___
+        """,
+        new_configuration=None
+    )
+    assert migration.changes.renamed_fields == {'Street': 'Strasse'}
+    assert migration.changes.changed_fields == ['Strasse']
+    assert migration.possible
+
+    migration.execute()
+
+    entry = entries.entries[0]
+    assert entry.values['strasse'] == 'Main Street 1'
+    assert 'street' not in entry.values
 
 
 def test_add_fieldset_at_top() -> None:

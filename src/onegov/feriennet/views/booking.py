@@ -28,7 +28,7 @@ from onegov.town6.layout import DefaultMailLayout
 from onegov.user import User
 from purl import URL
 from sortedcontainers import SortedList
-from sqlalchemy import select, and_, not_
+from sqlalchemy import and_, not_, select, text
 from sqlalchemy.orm import contains_eager
 from uuid import UUID
 
@@ -159,7 +159,7 @@ def related_attendees(
         select(*stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
-                stmt.c.booking_state == 'accepted',
+                stmt.c.booking_state == text("'accepted'"),
                 stmt.c.show_contact_data_to_others == True
             )
         )

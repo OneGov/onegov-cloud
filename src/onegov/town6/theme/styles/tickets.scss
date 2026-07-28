@@ -605,7 +605,8 @@ button {
 /*
     Ticket summary customisations
 */
-.ticket-summary {
+.ticket-summary,
+.ticket-cancellation-request {
     margin-bottom: 1.5rem;
 
     > div {

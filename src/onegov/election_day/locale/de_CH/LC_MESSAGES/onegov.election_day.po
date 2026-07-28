@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-25 09:38+0100\n"
+"POT-Creation-Date: 2026-07-16 13:16+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -117,8 +117,9 @@ msgid "Cannot import election information. Year ${year} does not exist."
 msgstr ""
 "Konnte Wahlinformationen nicht importieren. Jahr ${year} existiert nicht."
 
-msgid "Domain not supported"
-msgstr "Ebene nicht unterstützt"
+#, python-format
+msgid "Domain not supported: ${doi_type} (supported: CH, CT, BZ, MU, AN)"
+msgstr "Ebene nicht unterstützt: ${doi_type} (unterstützt: CH, CT, BZ, MU, AN)"
 
 msgid "Changing types is not supported"
 msgstr "Der Wechsel von Typen wird nicht unterstützt"
@@ -660,6 +661,9 @@ msgstr "Deaktivieren"
 msgid "File"
 msgstr "Datei"
 
+msgid "Delivery"
+msgstr "Lieferung"
+
 msgid "File format"
 msgstr "Dateiformat"
 
@@ -714,8 +718,8 @@ msgstr "Kandidierende"
 msgid "Parties"
 msgstr "Parteien"
 
-#.
 #. Statistics
+#.
 msgid "Election statistics"
 msgstr "Wahlstatistik"
 
@@ -749,6 +753,9 @@ msgstr "Gegenvorschlag angenommen"
 
 msgid "Manage"
 msgstr "Verwalten"
+
+msgid "eCH-0252 Upload"
+msgstr "eCH-0252 Upload"
 
 msgid "Upload tokens"
 msgstr "Upload Token"
@@ -786,17 +793,17 @@ msgstr "Abonnenten"
 msgid "Mappings"
 msgstr "Zuordnungen"
 
-#.
 #. Statistics
+#.
 msgid "Statistics"
 msgstr "Statistik"
 
 msgid "Proposal"
 msgstr "Vorlage"
 
+#. type:ignore
+#. type:ignore
 #.
-#. type:ignore
-#. type:ignore
 msgid "Tie-Breaker"
 msgstr "Stichfrage"
 
@@ -898,6 +905,9 @@ msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
 msgid "Elections and votes on ${date}"
 msgstr "Urnengang vom ${date}"
 
+msgid "Municipal Elections and Votes"
+msgstr "Kommunale Wahlen und Abstimmungen"
+
 msgid "Federal Elections"
 msgstr "Eidgenössische Wahlen"
 
@@ -910,8 +920,8 @@ msgstr "Regionale Wahlen"
 msgid "Cantonal Elections"
 msgstr "Kantonale Wahlen"
 
-msgid "Communal Elections"
-msgstr "Kommunale Wahlen"
+msgid "Local election and referendum results"
+msgstr "Zu den kommunalen Wahl- und Abstimmungsergebnissen"
 
 msgid "Federal Votes"
 msgstr "Eidgenössische Abstimmungen"
@@ -921,9 +931,6 @@ msgstr "Regionale Abstimmungen"
 
 msgid "Cantonal Votes"
 msgstr "Kantonale Abstimmungen"
-
-msgid "Communal Votes"
-msgstr "Kommunale Abstimmungen"
 
 msgid "Counted"
 msgstr "Ausgezählt"
@@ -936,6 +943,18 @@ msgstr "Noch keine Resultate"
 
 msgid "Result"
 msgstr "Resultat"
+
+msgid "Communal elections and votes by municipality"
+msgstr "Kommunale Wahlen und Abstimmungen nach Gemeinde"
+
+msgid "There are no communal elections or votes available yet."
+msgstr "Es sind noch keine kommunalen Wahlen und Abstimmungen verfügbar."
+
+msgid "All"
+msgstr "Alle"
+
+msgid "All municipal elections and votes"
+msgstr "Alle kommunalen Wahlen und Abstimmungen"
 
 msgid "Archive Search"
 msgstr "Archivsuche"
@@ -961,12 +980,12 @@ msgstr "Keine Kandidaturen."
 msgid "Download diagram"
 msgstr "Diagramm herunterladen"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Das Diagramm zeigt die Verteilung der Stimmen und der Mandate auf die "
@@ -991,11 +1010,11 @@ msgstr "Noch keine Kandidierenden gewählt."
 msgid "Note on the voters count"
 msgstr "Hinweis zur Wählerzahl"
 
+#.
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
-#.
 msgid "figcaption_list_groups"
 msgstr ""
 "In einem ersten Schritt – der sogenannten Oberzuteilung - werden zunächst "
@@ -1099,22 +1118,22 @@ msgid "Cast Ballots"
 msgstr "Eingegangene Stimmzettel"
 
 msgid "Empty votes"
-msgstr "Leere Stimmen"
+msgstr "Leere Stimmzettel"
 
 msgid "Invalid votes"
-msgstr "Ungültige Stimmen"
+msgstr "Ungültige Stimmzettel"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Stimmbeteiligung"
 
 msgid "List connection"
 msgstr "Listenverbindung"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Stimmen"
 
@@ -1259,8 +1278,8 @@ msgstr "Initative und Gegenvorschlag abgelehnt"
 msgid "Proposal accepted"
 msgstr "Initiative angenommen"
 
-#.
 #. type:ignore[attr-defined]
+#.
 msgid "Tie breaker in favor of the proposal"
 msgstr "Stichfrage zugunsten der Initiative"
 
@@ -1316,10 +1335,10 @@ msgstr "Ihre Resultate konnten leider nicht hochgeladen werden."
 msgid "Line"
 msgstr "Zeile"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Das Diagramm zeigt die Anzahl erhaltener Stimmen und die Anzahl erhaltener "
@@ -1333,10 +1352,10 @@ msgstr "Jahr"
 msgid "Difference"
 msgstr "Differenz"
 
+#.
 #. Default: The diagram shows the origin of votes won and lost by panache. On
 #. the left side are the lost votes, on the right side the won votes. The width
 #. of the bars and the connections is proportional to the number of votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Das Diagramm zeigt die Herkunft gewonnenen und verlorenen Stimmen durch "
@@ -1449,9 +1468,6 @@ msgstr "Noch keine Screens."
 msgid "Cleanup"
 msgstr "Bereinigen"
 
-msgid "All"
-msgstr "Alle"
-
 msgid "Active only"
 msgstr "Nur aktive"
 
@@ -1526,15 +1542,15 @@ msgstr "Neue Abstimmung"
 msgid "Your results were uploaded successfully."
 msgstr "Ihre Resultate wurden erfolgreich hochgeladen."
 
-msgid "Click here to trigger the notifications."
-msgstr "Hier klicken um die Benachrichtigungen auszulösen."
-
 msgid "Click here to see the updated results page."
 msgstr ""
 "Hier klicken um die Seite mit den aktualisierten Resultaten anzuzeigen."
 
 msgid "Please use the following format:"
 msgstr "Bitte verwenden Sie das folgende Format:"
+
+msgid "Click here to trigger the notifications."
+msgstr "Hier klicken um die Benachrichtigungen auszulösen."
 
 msgid "No map available for this year."
 msgstr "Keine Karte für dieses Jahr verfügbar."
@@ -1844,16 +1860,16 @@ msgid ""
 "Final results of the cantonal vote \"${title}\", ${date}, ${principal}, "
 "broken down by municipalities."
 msgstr ""
-"Schlussresultate der kantonalen Abstimmung \"${title}\", ${date}, $"
-"{principal}, aufgeschlüsselt nach Gemeinden."
+"Schlussresultate der kantonalen Abstimmung \"${title}\", ${date}, "
+"${principal}, aufgeschlüsselt nach Gemeinden."
 
 #, python-format
 msgid ""
 "Final results of the federal vote \"${title}\", ${date}, ${principal}, "
 "broken down by municipalities."
 msgstr ""
-"Schlussresultate der eidgenössischen Abstimmung \"${title}\", ${date}, $"
-"{principal}, aufgeschlüsselt nach Gemeinden."
+"Schlussresultate der eidgenössischen Abstimmung \"${title}\", ${date}, "
+"${principal}, aufgeschlüsselt nach Gemeinden."
 
 #, python-format
 msgid ""
@@ -1876,8 +1892,8 @@ msgid ""
 "Final results of the federal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Schlussresultate der eidgenössischen Wahl \"${title}\", ${date}, $"
-"{principal}, aufgeschlüsselt nach Kandidaten und Gemeinden."
+"Schlussresultate der eidgenössischen Wahl \"${title}\", ${date}, "
+"${principal}, aufgeschlüsselt nach Kandidaten und Gemeinden."
 
 msgid ""
 "You will receive an email as soon as new results have been published. You "
@@ -1945,3 +1961,6 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
+
+#~ msgid "ech0252 upload"
+#~ msgstr "eCH-0252 Upload"

@@ -28,21 +28,21 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    plenary_none_president_halfday = IntegerField(
+    plenary_none_president_halfday = DecimalField(
         label=_('President'),
         fieldset=_('Plenary session'),
         render_kw={'long_description': _('half-day')},
         validators=[InputRequired()],
     )
 
-    plenary_none_member_halfday = IntegerField(
+    plenary_none_member_halfday = DecimalField(
         label=_('Member'),
         fieldset=_('Plenary session'),
         render_kw={'long_description': _('half-day')},
         validators=[InputRequired()],
     )
 
-    commission_normal_president_initial = IntegerField(
+    commission_normal_president_initial = DecimalField(
         label=_('President'),
         fieldset=_('Commission meeting'),
         render_kw={
@@ -52,7 +52,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    commission_normal_president_additional = IntegerField(
+    commission_normal_president_additional = DecimalField(
         label=_('President'),
         render_kw={
             'long_description': _('per additional 1/2h'),
@@ -74,7 +74,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    commission_normal_member_initial = IntegerField(
+    commission_normal_member_initial = DecimalField(
         label=_('Member'),
         render_kw={
             'long_description': _('first 2h'),
@@ -84,7 +84,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    commission_normal_member_additional = IntegerField(
+    commission_normal_member_additional = DecimalField(
         label=_('Member'),
         render_kw={
             'long_description': _('per additional 1/2h'),
@@ -106,7 +106,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    commission_intercantonal_president_halfday = IntegerField(
+    commission_intercantonal_president_halfday = DecimalField(
         label=_('President'),
         render_kw={
             'long_description': _('half-day'),
@@ -127,7 +127,7 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    commission_intercantonal_member_halfday = IntegerField(
+    commission_intercantonal_member_halfday = DecimalField(
         label=_('Member'),
         render_kw={
             'long_description': _('half-day'),
@@ -148,14 +148,14 @@ class RateSetForm(Form):
         validators=[InputRequired()],
     )
 
-    shortest_all_president_halfhour = IntegerField(
+    shortest_all_president_halfhour = DecimalField(
         label=_('President'),
         render_kw={'long_description': _('per 1/2h')},
         fieldset=_('Shortest meeting'),
         validators=[InputRequired()],
     )
 
-    shortest_all_member_halfhour = IntegerField(
+    shortest_all_member_halfhour = DecimalField(
         label=_('Member'),
         render_kw={'long_description': _('per 1/2h')},
         fieldset=_('Shortest meeting'),

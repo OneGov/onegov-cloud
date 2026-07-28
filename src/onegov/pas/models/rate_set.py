@@ -34,47 +34,44 @@ class RateSet(Base, ContentMixin, TimestampMixin):
     )
 
     # The rates, naming schema is {attendence}_{commission}_{role}_{time}
-    plenary_none_president_halfday: dict_property[int] = (
-        content_property(default=0)
+    plenary_none_president_halfday: dict_property[float] = content_property(
+        default=0.0
     )
 
-    plenary_none_member_halfday: dict_property[int] = (
-        content_property(default=0)
+    plenary_none_member_halfday: dict_property[float] = content_property(
+        default=0.0
     )
 
-    commission_normal_president_initial: dict_property[int] = (
-        content_property(default=0)
+    commission_normal_president_initial: dict_property[float] = (
+        content_property(default=0.0)
     )
 
-    commission_normal_president_additional: dict_property[int] = (
-        content_property(default=0)
+    commission_normal_president_additional: dict_property[float] = (
+        content_property(default=0.0)
     )
 
-    commission_normal_member_initial: dict_property[int] = (
-        content_property(default=0)
+    commission_normal_member_initial: dict_property[float] = content_property(
+        default=0.0
     )
 
-    commission_normal_member_additional: dict_property[int] = (
-        content_property(default=0)
-
+    commission_normal_member_additional: dict_property[float] = (
+        content_property(default=0.0)
     )
 
-    commission_intercantonal_president_halfday: dict_property[int] = (
-        content_property(default=0)
+    commission_intercantonal_president_halfday: dict_property[float] = (
+        content_property(default=0.0)
     )
 
-    commission_intercantonal_member_halfday: dict_property[int] = (
-        content_property(default=0)
-
+    commission_intercantonal_member_halfday: dict_property[float] = (
+        content_property(default=0.0)
     )
 
-    shortest_all_president_halfhour: dict_property[int] = (
-        content_property(default=0)
+    shortest_all_president_halfhour: dict_property[float] = content_property(
+        default=0.0
     )
 
-    shortest_all_member_halfhour: dict_property[int] = (
-        content_property(default=0)
-
+    shortest_all_member_halfhour: dict_property[float] = content_property(
+        default=0.0
     )
 
     study_normal_president_halfhour: dict_property[float] = content_property(

@@ -524,7 +524,7 @@ class CustomLoader(yaml.SafeLoader):
     """ Extends the default yaml loader with customized constructors. """
 
 
-class constructor:  # noqa: N801
+class constructor:  # ruff:ignore[invalid-class-name]
     """ Adds decorated functions to as constructors to the CustomLoader. """
 
     def __init__(self, tag: str):
@@ -816,7 +816,7 @@ class Field:
         field_help: str | None = None
     ) -> T:
 
-        return cls(  # type:ignore[return-value]
+        return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
@@ -1108,7 +1108,7 @@ class FileinputBase:
         fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> T:
-        return cls(  # type:ignore[return-value]
+        return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
@@ -1163,7 +1163,7 @@ class OptionsField:
             if c.discount
         }
 
-        return cls(  # type:ignore[return-value]
+        return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,

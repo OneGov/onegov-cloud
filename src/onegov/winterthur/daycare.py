@@ -16,6 +16,7 @@ from onegov.org.models import Organisation
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import _
 from ordered_set import OrderedSet
+from uuid import UUID
 from wtforms.fields import BooleanField, DecimalField, Field, SelectField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
 
@@ -26,7 +27,6 @@ if TYPE_CHECKING:
     from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
     from sqlalchemy.orm import Session
     from typing import Self
-    from uuid import UUID
     from wtforms.form import BaseForm
 
 
@@ -394,7 +394,7 @@ class DaycareSubsidyCalculator:
     def directory(self) -> ExtendedDirectory:
         directory: ExtendedDirectory | None = (
             DirectoryCollection(self.session, type='extended')
-            .by_id(self.settings.directory)
+            .by_id(UUID(self.settings.directory))
         )
         assert directory is not None
         return directory

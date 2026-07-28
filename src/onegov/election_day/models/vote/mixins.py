@@ -36,7 +36,7 @@ class DerivedAttributesMixin:
         # coalesce will pick the first non-null result
         # nullif will return null if division by zero
         # => when all yeas and nays are zero the yeas percentage is 0%
-        return 100 * (
+        return 100 * (  # type: ignore[return-value]
             cast(cls.yeas, Float) / cast(
                 func.coalesce(
                     func.nullif(cls.yeas + cls.nays, 0), 1

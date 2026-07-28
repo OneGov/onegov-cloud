@@ -54,7 +54,7 @@ def view_import_logs(
         {
             'text': user.username or '',
             'active': self.user_id == str(user.id),
-            'url': request.link(self.for_filter(user_id=str(user.id))),
+            'url': request.link(self.for_filter(user_id=user.id)),
         }
         for user in users
     )

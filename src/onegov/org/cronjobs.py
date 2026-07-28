@@ -18,6 +18,7 @@ from onegov.core.orm import find_models
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.directory import DirectoryEntry
 from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
@@ -40,13 +41,16 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from cryptography.fernet import InvalidToken
-from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
+from onegov.org.models import (
+    ExtendedDirectoryEntry, TicketMessage)
 from onegov.org.notification_service import (
     get_notification_service,
 )
 from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
+    send_admin_expiry_notification_for_directory_entry,
+    send_admin_notification_for_directory_entry,
     send_email_notification_for_directory_entry)
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
@@ -61,7 +65,7 @@ from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import undefer, joinedload
 from urllib3.util import Retry
 from uuid import UUID
 
@@ -231,6 +235,8 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
                 )
             )
         )
+        if issubclass(model, DirectoryEntry):
+            query = query.options(joinedload(model.directory))
         objects.update(query)
 
     for obj in objects:
@@ -250,6 +256,15 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
         ):
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
+
+        if (isinstance(obj, ExtendedDirectoryEntry) and
+                obj.directory.notification_address):
+            if obj.publication_end is None or obj.publication_end > now:
+                send_admin_notification_for_directory_entry(
+                    obj.directory, obj, request)
+            else:
+                send_admin_expiry_notification_for_directory_entry(
+                    obj.directory, obj, request)
 
 
 def delete_old_tans(request: OrgRequest) -> None:

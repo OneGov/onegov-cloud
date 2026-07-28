@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class CourseNotificationTemplateCollection(
-    GenericCollection[CourseNotificationTemplate]
+    GenericCollection[CourseNotificationTemplate, 'UUID']
 ):
 
     def __init__(

@@ -11,7 +11,7 @@ from sqlalchemy import types as sqlalchemy_types
 from uuid import uuid4
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from pglast.ast import RawStmt
@@ -95,7 +95,8 @@ def column_names_with_comments(
     query: str
 ) -> Iterator[tuple[str, str]]:
 
-    for target in statement.stmt.targetList:
+    select = cast('pglast.ast.SelectStmt', statement.stmt)
+    for target in select.targetList or ():
 
         # expression
         if target.name:
@@ -103,7 +104,9 @@ def column_names_with_comments(
 
         # ordinary column
         elif isinstance(target.val, pglast.ast.ColumnRef):
-            string = target.val.fields[-1]
+            fields = target.val.fields
+            assert fields is not None
+            string = fields[-1]
             assert isinstance(string, pglast.ast.String)
             column = string.sval
         else:

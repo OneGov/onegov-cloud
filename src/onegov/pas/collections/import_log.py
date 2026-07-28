@@ -9,16 +9,17 @@ from typing import Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from sqlalchemy.orm import Query
+    from uuid import UUID
 
 
-class ImportLogCollection(GenericCollection[ImportLog]):
+class ImportLogCollection(GenericCollection[ImportLog, 'UUID']):
     """Collection for managing import logs."""
 
     def __init__(
         self,
         session: Session,
         status: str | None = None,
-        user_id: str | None = None,
+        user_id: UUID | None = None,
     ):
         super().__init__(session)
         self.status = status
@@ -40,7 +41,7 @@ class ImportLogCollection(GenericCollection[ImportLog]):
         return query.order_by(ImportLog.created.desc())
 
     def for_filter(
-        self, status: str | None = None, user_id: str | None = None
+        self, status: str | None = None, user_id: UUID | None = None
     ) -> Self:
         return self.__class__(self.session, status, user_id)
 

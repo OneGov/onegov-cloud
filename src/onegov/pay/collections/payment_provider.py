@@ -7,9 +7,12 @@ from onegov.pay.models import PaymentProvider
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.pay.models import Payment
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
-class PaymentProviderCollection(GenericCollection[PaymentProvider['Payment']]):
+class PaymentProviderCollection(
+    GenericCollection[PaymentProvider['Payment'], 'UUID']
+):
     """ Manages the payment providers. """
 
     @property

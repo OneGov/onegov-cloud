@@ -445,10 +445,11 @@ def get_settlement_run_export_all(
 
 @PasApp.path(
     model=ImportLogCollection,
-    path='/import-logs'
+    path='/import-logs',
+    converters={'user_id': UUID}
 )
 def get_import_logs(
-    request: TownRequest, user_id: str | None = None
+    request: TownRequest, user_id: UUID | None = None
 ) -> ImportLogCollection:
     """ Returns the collection of import logs. """
     return ImportLogCollection(request.session, user_id=user_id)

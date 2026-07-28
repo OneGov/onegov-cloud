@@ -12,7 +12,7 @@ $cleanup-link-icon: '\f0d0';
 $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f2ed';
 $disabled-icon: '\f05e';
-$edit-link-icon: '\f044';
+$edit-link-icon: '\f03a';
 $save-link-icon: '\f0c7';
 $cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
@@ -551,7 +551,7 @@ $editbar-fg-color-active: $white;
     .cleanup-link::before { @include icon-bold($cleanup-link-icon); }
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
-    .edit-link::before { @include icon($edit-link-icon); }
+    .edit-link::before { @include icon_bold($edit-link-icon); }
     .save-link::before { @include icon($save-link-icon); }
     .cancel-link::before { @include icon-bold($cancel-link-icon); }
     .move-link::before { @include icon-bold($move-link-icon); }

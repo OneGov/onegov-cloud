@@ -147,7 +147,7 @@ class TranslationMarkup(TranslationString):
         return self.interpolate()
 
 
-def TranslationStringFactory(factory_domain: str) -> TStrCallable:  # noqa: N802
+def TranslationStringFactory(factory_domain: str) -> TStrCallable:  # ruff:ignore[invalid-function-name]
     """
     Creates a TranslationMarkup for Markup and a TranslationString
     otherwise.

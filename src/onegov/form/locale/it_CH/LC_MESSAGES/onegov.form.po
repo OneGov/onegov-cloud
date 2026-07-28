@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-09 12:54+0200\n"
+"POT-Creation-Date: 2026-07-21 11:56+0200\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -160,7 +160,8 @@ msgstr ""
 #, python-format
 msgid "The image is too large, please provide an image smaller than {}."
 msgstr ""
-"L'immagine è troppo grande, si prega di fornire un'immagine più piccola di {}."
+"L'immagine è troppo grande, si prega di fornire un'immagine più piccola di "
+"{}."
 
 msgid ""
 "The password you wanted to use was found on list of commonly used passwords, "
@@ -183,7 +184,8 @@ msgstr ""
 
 #, python-format
 msgid "The field '{label}' cannot mix radio buttons and checkboxes."
-msgstr "Il campo '{label}' non può combinare pulsanti radio e caselle di controllo."
+msgstr ""
+"Il campo '{label}' non può combinare pulsanti radio e caselle di controllo."
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
 msgstr "Definisci almeno un campo e-mail obbligatorio ('E-Mail * = @@@')"
@@ -286,6 +288,32 @@ msgstr ""
 
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
+
+msgid "Not a valid country code."
+msgstr "Prefisso internazionale non valido."
+
+msgid "This phone number has an invalid length."
+msgstr "Questo numero di telefono ha una lunghezza non valida."
+
+msgid "Please include the area code."
+msgstr "Indicare il prefisso."
+
+msgid "This phone number does not exist."
+msgstr "Questo numero di telefono non esiste."
+
+msgid "Please enter a mobile phone number."
+msgstr "Inserire un numero di cellulare."
+
+msgid "Please enter a landline phone number."
+msgstr "Inserire un numero di telefono fisso."
+
+#, python-format
+msgid ""
+"Phone numbers from this country are not supported. Allowed countries: "
+"${countries}"
+msgstr ""
+"I numeri di telefono di questo Paese non sono supportati. Paesi consentiti: "
+"${countries}"
 
 msgid "Not a valid swiss social security number."
 msgstr "Non è un numero di sicurezza sociale svizzero valido."

@@ -88,8 +88,8 @@ def migrate_to_jsonb(
                 AS identity
               FROM information_schema.columns
              WHERE data_type != 'jsonb'
-               AND table_schema IN :schemas
-               AND column_name IN :names
+               AND table_schema IN (:schemas)
+               AND column_name IN (:names)
         """), {
             'schemas': tuple(schemas),
             'names': tuple(c.name for c in columns)

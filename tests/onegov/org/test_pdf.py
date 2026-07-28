@@ -38,7 +38,7 @@ def open_ticket(
         ticket = TicketCollection(request.session).open_ticket(
             handler_code=handler_code, handler_id=token
         )
-        ticket.handler.refresh_invoice_items(request)
+        ticket.handler.refresh_invoice_items(request, None)
         if create_message:
             TicketMessage.create(ticket, request, 'opened')
     return ticket

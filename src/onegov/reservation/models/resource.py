@@ -187,6 +187,12 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
 
+    #: whether users may submit a cancellation request for
+    # accepted reservations
+    allow_cancellation_requests: dict_property[bool] = (
+        content_property(default=False)
+    )
+
     #: the reply_to address to supersede the global reply_to address for
     #: tickets created through this form
     reply_to: dict_property[str | None] = meta_property()

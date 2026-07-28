@@ -219,13 +219,13 @@ def get_editor_assets() -> Iterator[str]:
 
 @AgencyApp.setting(section='api', name='endpoints')
 def get_api_endpoints_handler(
-) -> Callable[[AgencyRequest], Iterator[ApiEndpoint[Any]]]:
+) -> Callable[[AgencyRequest], Iterator[ApiEndpoint[Any, Any]]]:
 
     def get_api_endpoints(
             request: AgencyRequest,
             page: int = 0,
             extra_parameters: dict[str, Any] | None = None
-    ) -> Iterator[ApiEndpoint[Any]]:
+    ) -> Iterator[ApiEndpoint[Any, Any]]:
         yield AgencyApiEndpoint(request, extra_parameters, page)
         yield PersonApiEndpoint(request, extra_parameters, page)
         yield MembershipApiEndpoint(request, extra_parameters, page)

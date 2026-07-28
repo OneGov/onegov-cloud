@@ -9,10 +9,11 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class ParliamentarianCollection[ParliamentarianT: Parliamentarian = Any](
-    GenericCollection[ParliamentarianT]
+    GenericCollection[ParliamentarianT, 'UUID']
 ):
 
     def __init__(
@@ -32,7 +33,7 @@ class ParliamentarianCollection[ParliamentarianT: Parliamentarian = Any](
     def query(self) -> Query[ParliamentarianT]:
         query = super().query()
 
-        Parliamentarian = self.model_class  # noqa: N806
+        Parliamentarian = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
         if self.active:
             query = query.filter(
                 Parliamentarian.active.in_(self.active))

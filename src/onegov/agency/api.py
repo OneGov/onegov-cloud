@@ -10,6 +10,7 @@ from onegov.agency.forms.person import AuthenticatedPersonMutationForm
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.api.utils import is_authorized
 from onegov.gis import Coordinates
+from uuid import UUID
 
 
 from typing import Any
@@ -97,7 +98,7 @@ def get_modified_iso_format(item: TimestampMixin) -> str:
     return item.last_change.isoformat()
 
 
-class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
+class PersonApiEndpoint(ApiEndpoint['ExtendedPerson', UUID], ApisMixin):
     request: CoreRequest
     app: AgencyApp
     endpoint = 'people'
@@ -106,6 +107,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         'last_name': None
     } | dict.fromkeys(UPDATE_FILTER_PARAMS, UPDATE_FILTER_PROMPT)
     form_class = AuthenticatedPersonMutationForm
+    pk_type = UUID
 
     @property
     def title(self) -> str:
@@ -211,7 +213,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
         do_report_person_change(item, form.meta.request, form)
 
 
-class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
+class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency', int], ApisMixin):
     request: CoreRequest
     app: AgencyApp
     endpoint = 'agencies'
@@ -219,6 +221,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
         'parent': None,
         'title': None
     } | dict.fromkeys(UPDATE_FILTER_PARAMS, UPDATE_FILTER_PROMPT)
+    pk_type = int
 
     @property
     def title(self) -> str:
@@ -229,7 +232,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
         result = PaginatedAgencyCollection(
             self.session,
             page=self.page or 0,
-            parent=self.get_filter('parent', None, False),
+            parent=self.get_filter('parent', None, False, coerce=int),
             joinedload=['organigram', 'parent'],
             undefer=['content']
         )
@@ -279,7 +282,7 @@ class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):
 
 
 class MembershipApiEndpoint(
-    ApiEndpoint['ExtendedAgencyMembership'],
+    ApiEndpoint['ExtendedAgencyMembership', UUID],
     ApisMixin
 ):
 
@@ -290,14 +293,15 @@ class MembershipApiEndpoint(
         'agency': None,
         'person': None
     } | dict.fromkeys(UPDATE_FILTER_PARAMS, UPDATE_FILTER_PROMPT)
+    pk_type = UUID
 
     @property
     def collection(self) -> PaginatedMembershipCollection:
         result = PaginatedMembershipCollection(
             self.session,
             page=self.page or 0,
-            agency=self.get_filter('agency'),
-            person=self.get_filter('person'),
+            agency=self.get_filter('agency', coerce=int),
+            person=self.get_filter('person', coerce=UUID),
         )
 
         for key, values in self.extra_parameters.items():

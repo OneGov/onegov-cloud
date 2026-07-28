@@ -394,7 +394,7 @@ def add_invoice_references(context: UpgradeContext) -> None:
         return
 
     # legacy functions obsolete after this migration
-    CODE_TO_ESR_MAPPING = {  # noqa: N806
+    CODE_TO_ESR_MAPPING = {  # ruff:ignore[non-lowercase-variable-in-function]
         character: '{:02d}'.format(value) for value, character in chain(
             enumerate(string.digits, start=1),
             enumerate(string.ascii_lowercase, start=11)

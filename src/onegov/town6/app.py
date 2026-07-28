@@ -203,7 +203,7 @@ def get_disabled_extensions() -> tuple[str, ...]:
 
 @TownApp.setting(section='api', name='endpoints')
 def get_api_endpoints_handler(
-) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any]]]:
+) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any, Any]]]:
     return get_api_endpoints
 
 
@@ -305,6 +305,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'filemanager.js'
     yield 'imagemanager.js'
     yield 'table.js'
+    yield 'alphalist.js'
     yield 'redactor.de.js'
     yield 'redactor.fr.js'
     yield 'redactor.it.js'

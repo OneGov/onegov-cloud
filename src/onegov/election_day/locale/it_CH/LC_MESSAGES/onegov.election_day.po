@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-25 09:38+0100\n"
+"POT-Creation-Date: 2026-07-16 13:16+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -117,8 +117,9 @@ msgstr ""
 "Non è possibile importare le informazioni sull'elezione. L'anno ${year} non "
 "esiste."
 
-msgid "Domain not supported"
-msgstr "Livello non supportato"
+#, python-format
+msgid "Domain not supported: ${doi_type} (supported: CH, CT, BZ, MU, AN)"
+msgstr "Dominio non supportato: ${doi_type} (supportati: CH, CT, BZ, MU, AN)"
 
 msgid "Changing types is not supported"
 msgstr "l cambiamento di tipi non è supportato"
@@ -658,6 +659,9 @@ msgstr "Disattivare"
 msgid "File"
 msgstr "File"
 
+msgid "Delivery"
+msgstr "Transmissione"
+
 msgid "File format"
 msgstr "Formato del file"
 
@@ -712,8 +716,8 @@ msgstr "Candidati"
 msgid "Parties"
 msgstr "Parti"
 
-#.
 #. Statistics
+#.
 msgid "Election statistics"
 msgstr "Statistiche delle elezioni"
 
@@ -747,6 +751,9 @@ msgstr "Controprogetto accettata"
 
 msgid "Manage"
 msgstr "Amministrare"
+
+msgid "eCH-0252 Upload"
+msgstr "eCH-0252 Upload"
 
 msgid "Upload tokens"
 msgstr "Carica token"
@@ -784,17 +791,17 @@ msgstr "Iscritti"
 msgid "Mappings"
 msgstr "Mapping"
 
-#.
 #. Statistics
+#.
 msgid "Statistics"
 msgstr "Statistiche"
 
 msgid "Proposal"
 msgstr "Oggetto della votazione"
 
+#. type:ignore
+#. type:ignore
 #.
-#. type:ignore
-#. type:ignore
 msgid "Tie-Breaker"
 msgstr "Domanda risolutiva"
 
@@ -896,6 +903,9 @@ msgstr "Non sono ancora state inserite elezioni o votazioni."
 msgid "Elections and votes on ${date}"
 msgstr "Elezioni e votazioni del ${date}"
 
+msgid "Municipal Elections and Votes"
+msgstr "Elezioni e votazioni comunali"
+
 msgid "Federal Elections"
 msgstr "Elezioni federali"
 
@@ -908,8 +918,8 @@ msgstr "Elezioni regionali"
 msgid "Cantonal Elections"
 msgstr "Elezioni cantonali"
 
-msgid "Communal Elections"
-msgstr "Elezioni communali"
+msgid "Local election and referendum results"
+msgstr "Ai risultati delle elezioni e votazioni comunali"
 
 msgid "Federal Votes"
 msgstr "Votazioni federali"
@@ -919,9 +929,6 @@ msgstr "Votazioni regionali"
 
 msgid "Cantonal Votes"
 msgstr "Votazioni cantonali"
-
-msgid "Communal Votes"
-msgstr "Votazioni commuali"
 
 msgid "Counted"
 msgstr "Scrutinati"
@@ -934,6 +941,18 @@ msgstr "Ancora nessun risultato"
 
 msgid "Result"
 msgstr "Risultato"
+
+msgid "Communal elections and votes by municipality"
+msgstr "Elezioni e votazioni comunali per comune"
+
+msgid "There are no communal elections or votes available yet."
+msgstr "Non sono ancora disponibili elezioni o votazioni comunali."
+
+msgid "All"
+msgstr "Tutti"
+
+msgid "All municipal elections and votes"
+msgstr "Tutte le elezioni e votazioni comunali"
 
 msgid "Archive Search"
 msgstr "Ricerca in archivio"
@@ -959,12 +978,12 @@ msgstr "Nessuna candidatura."
 msgid "Download diagram"
 msgstr "Scarica il diagramma"
 
+#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
 #. width of the bars and connections is proportional to the votes, blue colored
 #. bars contain the number of mandates.
-#.
 msgid "figcaption_connections"
 msgstr ""
 "Il diagramma mostra la distribuzione dei voti e dei mandati in lista e nelle "
@@ -988,11 +1007,11 @@ msgstr "Ancora nessun candidato eletto."
 msgid "Note on the voters count"
 msgstr "Indicazione riguardo al numero di elettori"
 
+#.
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
-#.
 msgid "figcaption_list_groups"
 msgstr ""
 "In una prima fase, la cosiddetta sovraripartizione, tutti i voti espressi "
@@ -1097,22 +1116,22 @@ msgid "Cast Ballots"
 msgstr "Schede rientrate"
 
 msgid "Empty votes"
-msgstr "Voti in bianco"
+msgstr "Schede bianche"
 
 msgid "Invalid votes"
-msgstr "Voti nulli"
+msgstr "Schede nulle"
 
+#.
 #. Default: Turnout
 #. Default: Voter turnout
-#.
 msgid "turnout_vote"
 msgstr "Partecipazione al voto"
 
 msgid "List connection"
 msgstr "Collegamenti tra liste"
 
-#. Default: Votes
 #.
+#. Default: Votes
 msgid "single_votes"
 msgstr "Voti"
 
@@ -1257,8 +1276,8 @@ msgstr "Iniziativa e controprogetto sono state rifiutate"
 msgid "Proposal accepted"
 msgstr "Iniziativa accettata"
 
-#.
 #. type:ignore[attr-defined]
+#.
 msgid "Tie breaker in favor of the proposal"
 msgstr "Spareggio a favore della iniziativa"
 
@@ -1315,10 +1334,10 @@ msgstr "I Suoi risultati non hanno potuto essere caricati."
 msgid "Line"
 msgstr "Riga"
 
+#.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
-#.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Il diagramma mostra i voti e i mandati dei partiti. Le barre cerchiate "
@@ -1331,10 +1350,10 @@ msgstr "Anno"
 msgid "Difference"
 msgstr "Differenza"
 
+#.
 #. Default: The diagram shows the origin of votes won and lost by panache. On
 #. the left side are the lost votes, on the right side the won votes. The width
 #. of the bars and the connections is proportional to the number of votes.
-#.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagramma mostra l'origine dei voti guadagnati e la destinazione dei voti "
@@ -1446,9 +1465,6 @@ msgstr "Ancora niente schermi."
 msgid "Cleanup"
 msgstr "Ripulire"
 
-msgid "All"
-msgstr "Tutti"
-
 msgid "Active only"
 msgstr "Solo attivo"
 
@@ -1523,14 +1539,14 @@ msgstr "Nuova votazione"
 msgid "Your results were uploaded successfully."
 msgstr "I Suoi risultati sono stati caricati correttamente."
 
-msgid "Click here to trigger the notifications."
-msgstr "Clicca qui per attivare le notifiche."
-
 msgid "Click here to see the updated results page."
 msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
 
 msgid "Please use the following format:"
 msgstr "Utilizzi per favore il formato seguente:"
+
+msgid "Click here to trigger the notifications."
+msgstr "Clicca qui per attivare le notifiche."
 
 msgid "No map available for this year."
 msgstr "Nessuna mappa disponibile per quest'anno."
@@ -1560,8 +1576,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an account exists "
 "for this email address."
 msgstr ""
-"Il collegamento per reimpostare la password è stato inviato all'indirizzo $"
-"{email} (se si tratta di un account esistente)."
+"Il collegamento per reimpostare la password è stato inviato all'indirizzo "
+"${email} (se si tratta di un account esistente)."
 
 msgid "Password changed."
 msgstr "La password è stata modificata."
@@ -1840,40 +1856,40 @@ msgid ""
 "Final results of the cantonal vote \"${title}\", ${date}, ${principal}, "
 "broken down by municipalities."
 msgstr ""
-"Risultati finali della votazione cantonale \"${title}\", ${date}, $"
-"{principal}, suddivisi per municipalit."
+"Risultati finali della votazione cantonale \"${title}\", ${date}, "
+"${principal}, suddivisi per municipalit."
 
 #, python-format
 msgid ""
 "Final results of the federal vote \"${title}\", ${date}, ${principal}, "
 "broken down by municipalities."
 msgstr ""
-"Risultati finali della votazione federale \"${title}\", ${date}, $"
-"{principal}, suddivisi per municipalit."
+"Risultati finali della votazione federale \"${title}\", ${date}, "
+"${principal}, suddivisi per municipalit."
 
 #, python-format
 msgid ""
 "Final results of the cantonal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Risultati finali della elezione cantonale \"${title}\", ${date}, $"
-"{principal}, suddivisi per municipalit e candidati."
+"Risultati finali della elezione cantonale \"${title}\", ${date}, "
+"${principal}, suddivisi per municipalit e candidati."
 
 #, python-format
 msgid ""
 "Final results of the regional election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Risultati finali della elezione regionale \"${title}\", ${date}, $"
-"{principal}, suddivisi per municipalit e candidati."
+"Risultati finali della elezione regionale \"${title}\", ${date}, "
+"${principal}, suddivisi per municipalit e candidati."
 
 #, python-format
 msgid ""
 "Final results of the federal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Risultati finali della elezione federale \"${title}\", ${date}, $"
-"{principal}, suddivisi per municipalit e candidati."
+"Risultati finali della elezione federale \"${title}\", ${date}, "
+"${principal}, suddivisi per municipalit e candidati."
 
 msgid ""
 "You will receive an email as soon as new results have been published. You "
@@ -1944,3 +1960,6 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "ech0252 upload"
+#~ msgstr "eCH-0252 Upload"

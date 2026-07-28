@@ -83,6 +83,7 @@ class TraitInfo:
         # forward declare Page attributes we rely on
         title: Mapped[str]
         meta: Mapped[dict[str, Any]]
+        parent: Mapped[Page | None]
 
         @property
         def editable(self) -> bool: ...
@@ -181,10 +182,13 @@ class TraitInfo:
         """ Yields the edit links shown on the private view of this trait. """
 
         if self.editable:
+            is_news_root = self.trait == 'news' and self.parent is None
             yield Link(
-                _('Edit'),
+                _('Settings') if is_news_root else _('Edit'),
                 request.link(Editor('edit', self)),
-                classes=('edit-link', )
+                classes=(
+                    ('settings-link', ) if is_news_root else ('edit-link', )
+                )
             )
 
             assert request.path_info is not None
@@ -255,8 +259,8 @@ class TraitInfo:
                     yes_button_text=trait_messages['delete_button'],
                     extra_information=extra_warning,
                     redirect_after=(
-                        request.link(self.parent)  # type:ignore[attr-defined]
-                        if self.parent is not None  # type:ignore[attr-defined]
+                        request.link(self.parent)
+                        if self.parent is not None
                         else request.class_link(Organisation)
                     ),
                     items=items,

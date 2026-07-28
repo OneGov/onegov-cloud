@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class CourseAttendeeCollection(
-    GenericCollection[CourseAttendee],
+    GenericCollection[CourseAttendee, 'UUID'],
     Pagination[CourseAttendee]
 ):
 
@@ -122,7 +122,7 @@ class CourseAttendeeCollection(
 
     def by_id(
         self,
-        id: UUID  # type:ignore[override]
+        id: UUID
     ) -> CourseAttendee | None:
         # FIXME: Is this super() call intentional? This means we don't actually
         #        respect all of our filters for this method...

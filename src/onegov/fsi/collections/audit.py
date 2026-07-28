@@ -51,7 +51,7 @@ if TYPE_CHECKING:
 # FIXME: It's not quite kosher that we use a non-model row, so there
 #        may be some methods with incorrect types
 class AuditCollection(
-    GenericCollection['AuditRow'],  # type:ignore[type-var]
+    GenericCollection['AuditRow', 'UUID'],  # type:ignore[type-var]
     Pagination['AuditRow']  # type:ignore[type-var]
 ):
     """

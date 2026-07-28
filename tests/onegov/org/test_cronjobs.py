@@ -7,6 +7,8 @@ import os
 import pytest
 import transaction
 
+from babel import Locale as BabelLocale
+from babel.dates import format_date as babel_format_date
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from freezegun import freeze_time
@@ -21,7 +23,11 @@ from onegov.event.utils import as_rdates
 from onegov.file.models import SigningRequest
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import (
-    ResourceRecipientCollection, News, PushNotification)
+    ExtendedDirectoryEntry,
+    ResourceRecipientCollection,
+    News,
+    PushNotification,
+)
 from onegov.org.models.page import NewsCollection
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
@@ -847,6 +853,8 @@ def test_send_daily_newsletter(client: Client[TestOrgApp]) -> None:
     client.app.org.daily_newsletter_title = 'News aus Govikon'
     client.app.org.newsletter_times = ['10', '11', '16']
     client.app.org.show_only_previews = True
+    client.app.org.daily_newsletter_link = 'https://example.org/news'
+    client.app.org.daily_newsletter_link_text = 'Read the news'
 
     news = PageCollection(session)
     news_parent = news.query().filter_by(name='news').one()
@@ -899,6 +907,8 @@ def test_send_daily_newsletter(client: Client[TestOrgApp]) -> None:
         assert "News2" in mail['TextBody']
         assert "News3" not in mail['TextBody']
         assert "News4" not in mail['TextBody']
+        assert 'https://example.org/news' in mail['HtmlBody']
+        assert 'Read the news' in mail['HtmlBody']
 
     with freeze_time(datetime(2018, 3, 5, 11, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
@@ -2724,3 +2734,332 @@ def test_wil_daily_event_import(
         '100 Meter Race of the Year',
         '100 Meter Race of the Year'
     ]
+
+
+def _fmt_date(dt: datetime) -> str:
+    """Format a datetime the way the admin notification templates do."""
+    tz = ensure_timezone('Europe/Zurich')
+    return babel_format_date(
+        to_timezone(dt, tz), 'd. MMMM yyyy',
+        locale=BabelLocale.parse('de_CH')
+    )
+
+
+def _make_permit_directory(
+    session: 'Session', notification_address: str | None = 'admin@example.org'
+) -> 'ExtendedDirectory':
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Baugesuche',
+        structure="""
+            Gesuchsteller/in *= ___
+            Adresse *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title='[Gesuchsteller/in]',
+            order=['Gesuchsteller/in'],
+        ),
+    )
+    directory.notification_address = notification_address
+    return directory
+
+
+def test_admin_notification_full_workflow(
+    client: Client['TestOrgApp'],
+) -> None:
+    """End-to-end, form-driven publication lifecycle for an entry in a
+    directory with a notification_address, proving:
+
+    - editing a *scheduled* entry sends no email; the single publication
+      email (once the start is reached) carries the edited content and the
+      entry checksum, and a second cronjob run does not duplicate it;
+    - editing a *published* entry is refused until publication_start is
+      moved into the future, and the re-publication email then carries the
+      newly edited content;
+    - the expiry email is sent once publication_end passes;
+    - the entry cannot be deleted until that expiry notification has gone
+      out.
+
+    Everything is driven through the real forms, so the form's backdating
+    guard and the cronjob notification flow are exercised together.
+    """
+    tz = 'Europe/Zurich'
+
+    def dt(local: datetime) -> str:
+        return local.strftime('%Y-%m-%dT%H:%M')
+
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    base = datetime(2026, 7, 1, 10, 0, tzinfo=timezone.utc)
+
+    with freeze_time(base, tick=True):
+        client.login_admin()
+
+        # a permit directory with an editable content field
+        page = client.get('/directories').click('^Verzeichnis$')
+        page.form['title'] = 'Baugesuche'
+        page.form['structure'] = 'Name *= ___\nBeschreibung *= ___'
+        page.form['title_format'] = '[Name]'
+        page.form['enable_publication'] = True
+        page.form['required_publication'] = True
+        page.form['notification_address'] = 'admin@example.org'
+        page.form['enable_change_requests'] = False
+        page = page.form.submit().follow()
+
+        # a scheduled entry (start in 2h)
+        now_local = to_timezone(utcnow(), tz)
+        page = page.click('Eintrag', index=0)
+        page.form['name'] = 'Permit One'
+        page.form['beschreibung'] = 'Version A'
+        page.form['publication_start'] = dt(now_local + timedelta(hours=2))
+        page.form['publication_end'] = dt(now_local + timedelta(hours=9))
+        page = page.form.submit().follow()
+        assert len(os.listdir(client.app.maildir)) == 0
+
+        # editing while scheduled must not notify
+        page = page.click('Bearbeiten')
+        page.form['beschreibung'] = 'Version B'
+        page = page.form.submit().follow()
+        entry_url = page.request.url
+        assert len(os.listdir(client.app.maildir)) == 0
+
+    # cronjob before the start: still nothing (establishes last_run)
+    with freeze_time(base + timedelta(hours=1), tick=True):
+        client.get(get_cronjob_url(job))
+        assert len(os.listdir(client.app.maildir)) == 0
+
+    # cronjob after the start: one publication email carrying 'Version B'
+    with freeze_time(base + timedelta(hours=3), tick=True):
+        client.get(get_cronjob_url(job))
+        assert len(os.listdir(client.app.maildir)) == 1
+        msg = client.get_email(0)
+        assert msg['To'] == 'admin@example.org'
+        assert 'Veröffentlichter Eintrag' in msg['Subject']
+        assert 'Permit One' in msg['Subject']
+        assert 'Baugesuche' in msg['Subject']
+        assert 'Version B' in msg['TextBody']
+        assert 'Version A' not in msg['TextBody']
+        # the entry checksum is part of the notification (proof of content)
+        entry = client.app.session().query(ExtendedDirectoryEntry).one()
+        assert entry.content_hash
+        assert entry.content_hash in msg['TextBody']
+
+        # a second run in the same window must not re-notify
+        client.get(get_cronjob_url(job))
+        assert len(os.listdir(client.app.maildir)) == 1
+
+    # editing the now-published entry is refused until the start is moved
+    # into the future; the reschedule + new content then re-publishes
+    with freeze_time(base + timedelta(hours=4), tick=True):
+        now_local = to_timezone(utcnow(), tz)
+        page = client.get(entry_url).click('Bearbeiten')
+        page.form['beschreibung'] = 'Version C'
+        page = page.form.submit()  # keeps the past start -> rejected
+        assert ('must be in the future' in page
+                or 'in der Zukunft liegen' in page)
+        assert len(os.listdir(client.app.maildir)) == 1
+
+        page.form['publication_start'] = dt(now_local + timedelta(hours=2))
+        page = page.form.submit().follow()
+        assert len(os.listdir(client.app.maildir)) == 1
+
+    # cronjob before the new start: no additional email
+    with freeze_time(base + timedelta(hours=5), tick=True):
+        client.get(get_cronjob_url(job))
+        assert len(os.listdir(client.app.maildir)) == 1
+
+    # cronjob after the new start: re-publication email carrying 'Version C'
+    with freeze_time(base + timedelta(hours=7), tick=True):
+        client.get(get_cronjob_url(job))
+        assert len(os.listdir(client.app.maildir)) == 2
+        msg = client.get_email(1)
+        assert 'Veröffentlichter Eintrag' in msg['Subject']
+        assert 'Version C' in msg['TextBody']
+
+        # published right now -> deletion is blocked
+        entry_page = client.get(entry_url)
+        assert 'disabled-link' in entry_page.pyquery(
+            'a.delete-link').attr('class')
+
+    # publication has ended by the clock, but the cronjob has not observed
+    # it yet, so the expiry notification has not gone out -> still not
+    # deletable
+    with freeze_time(base + timedelta(hours=9, minutes=30), tick=True):
+        entry_page = client.get(entry_url)
+        assert 'disabled-link' in entry_page.pyquery(
+            'a.delete-link').attr('class')
+
+    # cronjob after publication_end: expiry email sent; only now that the
+    # end notification has gone out may the entry be deleted
+    with freeze_time(base + timedelta(hours=10), tick=True):
+        client.get(get_cronjob_url(job))
+        assert len(os.listdir(client.app.maildir)) == 3
+        msg = client.get_email(2)
+        assert 'Publikationsfrist' in msg['Subject']
+        assert 'Permit One' in msg['Subject']
+        assert 'Baugesuche' in msg['Subject']
+        assert 'abgelaufen' in msg['TextBody'].lower()
+        assert client.app.session().query(ExtendedDirectoryEntry).count() == 1
+
+        # the expiry notification has now been sent -> deletion is allowed
+        entry_page = client.get(entry_url)
+        delete_url = entry_page.pyquery('a.delete-link').attr('ic-delete-from')
+        assert delete_url
+        client.delete(delete_url)
+        assert client.app.session().query(ExtendedDirectoryEntry).count() == 0
+
+
+def test_admin_notification_multiple_entries(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    Two entries crossing publication_start in the same window each get
+    their own notification email.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+    pub_start = real_now - timedelta(minutes=30)
+    pub_end = real_now + timedelta(days=30)
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Anton Müller',
+            adresse='Hauptstrasse 1',
+            publication_start=pub_start,
+            publication_end=pub_end,
+        )
+    )
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Berta Schmid',
+            adresse='Seeweg 5',
+            publication_start=pub_start,
+            publication_end=pub_end,
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    # both publication_starts crossed in the same window — one email each
+    with freeze_time(real_now, tick=True):
+        client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 2
+    subjects = {client.get_email(i)['Subject'] for i in (0, 1)}
+    assert all('Veröffentlichter Eintrag' in s for s in subjects)
+    assert any('Anton Müller' in s for s in subjects)
+    assert any('Berta Schmid' in s for s in subjects)
+    for i in (0, 1):
+        assert client.get_email(i)['To'] == 'admin@example.org'
+        assert _fmt_date(pub_start) in client.get_email(i)['TextBody']
+        assert _fmt_date(pub_end) in client.get_email(i)['TextBody']
+
+    # second run — no duplicates
+    with freeze_time(real_now, tick=True):
+        client.get(get_cronjob_url(job))
+    assert len(os.listdir(client.app.maildir)) == 2
+
+
+def test_admin_notification_no_notification_address(
+    client: Client['TestOrgApp'],
+) -> None:
+    """No emails for publication when no notification address set."""
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+    pub_start = real_now - timedelta(minutes=30)
+    pub_end = real_now + timedelta(days=30)
+
+    transaction.begin()
+    directory = _make_permit_directory(
+        client.app.session(), notification_address=None
+    )
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Ernst Wagner',
+            adresse='Dorfstrasse 3',
+            publication_start=pub_start,
+            publication_end=pub_end,
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    # publication_start crossed — but no notification_address, so no email
+    client.get(get_cronjob_url(job))
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    # direct deletion via view — no email
+    entry = client.app.session().query(ExtendedDirectoryEntry).one()
+    entry_name = entry.name
+    client.login_admin()
+    delete_url = (
+        f'/directories/baugesuche/{entry_name}?csrf-token={client.csrf_token}'
+    )
+    client.delete(delete_url)
+    assert len(os.listdir(client.app.maildir)) == 0
+
+
+def test_admin_notification_auto_delete_no_email(
+    client: Client['TestOrgApp'],
+    handlers: 'HandlerRegistry',
+) -> None:
+    """Auto-delete at publication_end deletes the entry; no deletion email."""
+    register_directory_handler(handlers)
+
+    hourly_job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    deletion_job = get_cronjob_by_name(
+        client.app, 'delete_content_marked_deletable'
+    )
+    assert hourly_job is not None
+    assert deletion_job is not None
+    hourly_job.app = client.app
+    deletion_job.app = client.app
+
+    real_now = utcnow()
+    pub_start = real_now - timedelta(minutes=30)
+    # Use 6h offset so the DB (UTC+2 session) still sees the entry as
+    # published; handle_publication_models uses Python utcnow() for expiry
+    # detection, so freeze_time(real_now+7h) reaches past pub_end correctly.
+    pub_end = real_now + timedelta(hours=6)
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    entry = directory.add(
+        values=dict(
+            gesuchsteller_in='David Frei',
+            adresse='Bergweg 7',
+            publication_start=pub_start,
+            publication_end=pub_end,
+        )
+    )
+    entry.delete_when_expired = True
+    transaction.commit()
+    close_all_sessions()
+
+    # entry currently published in DB — publish notification
+    client.get(get_cronjob_url(hourly_job))
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # before expiry (Python now < pub_end) — no deletion
+    client.get(get_cronjob_url(deletion_job))
+    assert len(os.listdir(client.app.maildir)) == 1
+    assert client.app.session().query(ExtendedDirectoryEntry).count() == 1
+
+    # freeze to real_now + 7h — Python now > pub_end → deletion triggered,
+    # no email
+    with freeze_time(real_now + timedelta(hours=7)):
+        client.get(get_cronjob_url(deletion_job))
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    assert client.app.session().query(ExtendedDirectoryEntry).count() == 0

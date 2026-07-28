@@ -187,6 +187,25 @@ class Principal:
 
         return True
 
+    @cached_property
+    def municipality_display_name_by_slug(self) -> dict[str, str]:
+        """
+        Maps sanitized slug → display name, built once from static
+        entities based on the latest year.
+        """
+        from onegov.election_day.collections import (
+            MunicipalityArchivedResultCollection
+        )
+        sanitize = MunicipalityArchivedResultCollection.sanitize_municipality
+        year = date.today().year
+        if year not in self.entities and self.entities:
+            year = max(self.entities)
+        return {
+            sanitize(name): name
+            for entity in self.entities.get(year, {}).values()
+            if (name := entity.get('name'))
+        }
+
     def get_entities(self, year: int) -> set[str]:
         entities = {
             entity.get('name', None)
@@ -706,3 +725,8 @@ class Municipality(Principal, msgpack.Serializable, tag=51, keys=(
         if value == 'entities':
             return _('Quarters') if self.has_quarters else _('Municipalities')
         return ''
+
+
+class MunicipalityRedirect:
+    def __init__(self, municipality: str) -> None:
+        self.municipality = municipality

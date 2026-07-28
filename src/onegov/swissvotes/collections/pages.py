@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
 
 
-class TranslatablePageCollection(GenericCollection[TranslatablePage]):
+class TranslatablePageCollection(GenericCollection[TranslatablePage, str]):
 
     """ A collection of translatable content pages. """
 

@@ -829,6 +829,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'filemanager.js'
     yield 'imagemanager.js'
     yield 'table.js'
+    yield 'alphalist.js'
     yield 'redactor.de.js'
     yield 'redactor.fr.js'
     yield 'redactor.it.js'
@@ -949,6 +950,11 @@ def get_fontpreview_asset() -> Iterator[str]:
 @OrgApp.webasset('scroll-to-username')
 def get_scroll_to_username_asset() -> Iterator[str]:
     yield 'scroll_to_username.js'
+
+
+@OrgApp.webasset('local-login')
+def get_local_login_asset() -> Iterator[str]:
+    yield 'local_login.js'
 
 
 @OrgApp.webasset('all_blank')

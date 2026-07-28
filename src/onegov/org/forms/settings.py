@@ -25,11 +25,14 @@ from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import URLField
+from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import If
 from onegov.form.validators import StrictOptional
+from onegov.form.validators import ValidFilterFormDefinition
 from onegov.form.validators import ValidHostname
 from onegov.gis import CoordinatesField
 from onegov.org import _, log
+from onegov.org.forms.event import EventForm
 from onegov.org.forms.fields import (
     HtmlField,
     UploadOrSelectExistingMultipleFilesField,
@@ -45,6 +48,7 @@ from onegov.user import User
 from operator import itemgetter
 from purl import URL
 from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
 from wtforms.fields import FieldList
 from wtforms.fields import FloatField
@@ -533,6 +537,16 @@ class LinksSettingsForm(Form):
             'support: https://my.support'
         ),
         render_kw={'rows': 10}
+    )
+
+    preview = PreviewField(
+        label=_('Preview'),
+        fields=('short_links',),
+        events=('change', 'type'),
+        url=lambda meta: meta.request.link(
+            meta.request.app.org,
+            name='link-settings-preview'
+        )
     )
 
     def validate_short_links(self, field: TextAreaField) -> None:
@@ -1569,6 +1583,27 @@ class NewsletterSettingsForm(Form):
         default=False
     )
 
+    daily_newsletter_link = URLField(
+        label=_('Link for automatic newsletters'),
+        fieldset=_('Automatic newsletters'),
+        description=_(
+            'A static link displayed in every automatic newsletter '
+            'below the news articles.'
+        ),
+        depends_on=('enable_automatic_newsletters', 'y'),
+        validators=[Optional()],
+    )
+
+    daily_newsletter_link_text = StringField(
+        label=_('Display name for the link'),
+        fieldset=_('Automatic newsletters'),
+        description=_(
+            'The text shown for the link. If empty, the link itself '
+            'is shown.'
+        ),
+        depends_on=('enable_automatic_newsletters', 'y'),
+    )
+
     newsletter_times = TagsField(
         label=_('Newsletter sending times (24h format)'),
         fieldset=_('Automatic newsletters'),
@@ -2035,12 +2070,36 @@ class EventSettingsForm(Form):
         default=False
     )
 
+    event_header_title = StringField(
+        label=_('Title of text above event list'),
+        description=_('General information about the event calendar'),
+        fieldset=_('Information above the event list')
+    )
+
+    event_header_html = HtmlField(
+        label=_('Text above the event list'),
+        fieldset=_('Information above the event list')
+    )
+
+    event_footer_title = StringField(
+        label=_('Title of text below event list'),
+        description=_('General information about the event calendar'),
+        fieldset=_('Information below the event list')
+    )
+
+    event_footer_html = HtmlField(
+        label=_('Text below the event list'),
+        fieldset=_('Information below the event list')
+    )
+
     event_locations = TagsField(
         label=_('Values of the location filter'),
+        fieldset=_('Filters'),
     )
 
     event_filter_type = RadioField(
         label=_("Choose the filter type for events (default is 'Tags')"),
+        fieldset=_('Filters'),
         choices=(
             ('tags', _('A predefined set of tags')),
             ('filters', _('Manually configurable filters')),
@@ -2050,15 +2109,39 @@ class EventSettingsForm(Form):
         default='tags'
     )
 
-    event_header_html = HtmlField(
-        label=_('General information above the event list'),
-
+    event_filter_definition = TextAreaField(
+        label=_('Definition'),
+        fieldset=_('Filters'),
+        depends_on=('event_filter_type', '!tags'),
+        validators=[
+            ValidFilterFormDefinition(
+                require_email_field=False,
+                require_title_fields=False,
+                reserved_fields={name for name, _ in
+                                 get_fields_from_class(EventForm)}
+                                | {'syndicate', 'highlight'}
+            )
+        ],
+        render_kw={'rows': 16, 'data-editor': 'form'}
     )
 
-    event_footer_html = HtmlField(
-        label=_('General information below the event list'),
+    keyword_fields = TextAreaField(
+        label=_('Filters'),
+        fieldset=_('Filters'),
+        depends_on=('event_filter_type', '!tags'),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'radio,checkbox'
+        }
     )
 
+    force_remove = BooleanField(
+        label=_('Remove these filters from all affected events'),
+        fieldset=_('Filters'),
+    )
+
+    # FIXME: keep this last; its upload widget emits a split <label> that
+    # confuses webtest's form parser for any field rendered after it
     event_files = UploadOrSelectExistingMultipleFilesField(
         label=_('Documents'),
         fieldset=_('General event documents')
@@ -2424,6 +2507,16 @@ class VATSettingsForm(Form):
         description=_('This is the VAT rate in percent. The VAT rate will '
                       'apply to all prices in the forms.'),
         validators=[InputRequired(), NumberRange(0, 100)],
+    )
+
+    price_rounding = DecimalField(
+        label=_('Rounding of invoice totals'),
+        description=_(
+            'If set, invoices include a rounding position so the total is '
+            'a multiple of this amount, for example 0.05. Leave empty to '
+            'disable rounding.'
+        ),
+        validators=[Optional(), NumberRange(min=Decimal('0.01'))],
     )
 
 

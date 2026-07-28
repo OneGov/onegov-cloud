@@ -33,7 +33,7 @@ if TYPE_CHECKING:
         def get_useful_data(self) -> SupportsItems[str, Any]: ...
 
 
-class GenericCollection[M: DeclarativeBase]:
+class GenericCollection[M: DeclarativeBase, IdT: PKType]:
 
     def __init__(self, session: Session, **kwargs: Any):
         self.session = session
@@ -53,10 +53,10 @@ class GenericCollection[M: DeclarativeBase]:
     def query(self) -> Query[M]:
         return self.session.query(self.model_class)
 
-    def by_id(self, id: PKType) -> M | None:
+    def by_id(self, id: IdT) -> M | None:
         return self.query().filter(self.primary_key == id).first()
 
-    def by_ids(self, ids: Collection[PKType]) -> list[M]:
+    def by_ids(self, ids: Collection[IdT]) -> list[M]:
         return self.query().filter(
             self.primary_key.in_(ids)
         ).all() if ids else []
@@ -94,7 +94,9 @@ class GenericCollection[M: DeclarativeBase]:
         self.session.flush()
 
 
-class SearcheableCollection[M: DeclarativeBase](GenericCollection[M]):
+class SearcheableCollection[M: DeclarativeBase, IdT: PKType](
+    GenericCollection[M, IdT]
+):
 
     """
     Requires a self.locale and self.term

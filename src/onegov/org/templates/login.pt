@@ -12,7 +12,9 @@
         </div>
         <div class="row">
             <div class="small-12 medium-8 columns">
-                <h2  class="${'ogc-login' if primary_separate else ''}" tal:condition="primary_separate" i18n:translate>Alternatives</h2>
+                <a href="#local-login" class="local-login-toggle ${'ogc-login' if primary_separate else ''}" data-local-login-toggle
+                   aria-controls="local-login" aria-expanded="true"
+                   tal:condition="primary_separate" i18n:translate>Alternative login methods</a>
                 <tal:b define="integrated [p for p in providers if p.kind == 'integrated']">
                     <tal:b tal:repeat="provider integrated">
                         <div class="panel" tal:define="hint provider.hint(request)" tal:condition="hint">
@@ -22,7 +24,7 @@
                 </tal:b>
             </div>
         </div>
-        <div class="row ${'ogc-login' if primary_separate else ''}">
+        <div id="local-login" class="row ${'ogc-login' if primary_separate else ''}">
             <div class="small-12 medium-7 large-5 columns${'' if primary_separate is None else ' alternatives'}">
                 <div metal:use-macro="layout.macros['form']" />
             </div>

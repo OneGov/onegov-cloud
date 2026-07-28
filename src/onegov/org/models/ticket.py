@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from onegov.core.custom import json
 from functools import cached_property
 from markupsafe import Markup
 from onegov.chat import Message, MessageCollection
@@ -14,7 +15,7 @@ from onegov.org.layout import DefaultLayout, EventLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.org.utils import (
     currency_for_submission,
-    invoice_items_for_submission
+    invoice_items_for_submission,
 )
 from onegov.pay import ManualPayment
 from onegov.reservation import Allocation, Resource, Reservation
@@ -28,13 +29,14 @@ from purl import URL
 from sedate import utcnow
 from sqlalchemy import and_, desc, func, or_, text
 from sqlalchemy.orm import object_session, undefer
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import datetime
+    from decimal import Decimal
     from onegov.chat.models import Chat
     from onegov.core.request import CoreRequest
     from onegov.event import Event
@@ -43,7 +45,6 @@ if TYPE_CHECKING:
     from onegov.pay import InvoiceItem, InvoiceItemMeta, Payment
     from onegov.ticket.collection import ExtendedTicketState
     from sqlalchemy.orm import Mapped, Query, Session
-    from uuid import UUID
 
     type DateRange = tuple[datetime, datetime]
 
@@ -57,25 +58,28 @@ def ticket_submitter(ticket: Ticket) -> str | None:
     return mail
 
 
-def submission_invoice_items(
+def submission_base_invoice_items(
     self: FormSubmissionHandler | DirectoryEntryHandler,
     request: CoreRequest
 ) -> list[InvoiceItemMeta]:
-    return invoice_items_for_submission(
-        request,
-        self.form,  # type: ignore[arg-type]
-        self.submission
-    ) if self.submission else []
+    return (
+        invoice_items_for_submission(
+            request, self.form, self.submission  # type: ignore[arg-type]
+        )
+        if self.submission
+        else []
+    )
 
 
 def refresh_submission_invoice_items(
     self: FormSubmissionHandler | DirectoryEntryHandler,
-    request: CoreRequest
+    request: CoreRequest,
+    rounding_base: Decimal | None,
 ) -> None:
     payment = self.payment
     invoice = self.ticket.invoice
-    new_item_metas = self.invoice_items(request)
-    if not new_item_metas:
+    invoice_meta = self.invoice_items(request, rounding_base)
+    if not invoice_meta:
         # delete the invoice and payment (if it exists)
         if invoice is not None:
             for item in invoice.items:
@@ -100,7 +104,7 @@ def refresh_submission_invoice_items(
     old_items = sorted(invoice.items, key=attrgetter('group'))
     new_items: list[InvoiceItem] = []
     unused: set[InvoiceItem] = set(old_items)
-    for meta in new_item_metas:
+    for meta in invoice_meta:
         existing: InvoiceItem | None = None
         for item in old_items:
             if item.group != meta.group:
@@ -116,6 +120,9 @@ def refresh_submission_invoice_items(
                 if item.group == 'submission':
                     existing = item
                     break
+            elif meta.group == 'rounding':
+                existing = item
+                break
             else:
                 raise AssertionError('unreachable')
 
@@ -317,11 +324,9 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('FRM')
 class FormSubmissionHandler(Handler):
 
-    id: UUID
-
     handler_title = _('Form Submissions')
     code_title = _('Forms')
-    invoice_items = submission_invoice_items
+    base_invoice_items = submission_base_invoice_items
     refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property
@@ -330,7 +335,7 @@ class FormSubmissionHandler(Handler):
 
     @cached_property
     def submission(self) -> FormSubmission | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @cached_property
     def form(self) -> Form:
@@ -558,8 +563,6 @@ class FormSubmissionHandler(Handler):
 @handlers.registered_handler('RSV')
 class ReservationHandler(Handler):
 
-    id: UUID
-
     handler_title = _('Reservations')
     code_title = _('Reservations')
 
@@ -606,7 +609,7 @@ class ReservationHandler(Handler):
 
     @cached_property
     def submission(self) -> FormSubmission | None:
-        return FormSubmissionCollection(self.session).by_id(self.id)
+        return FormSubmissionCollection(self.session).by_id(UUID(self.id))
 
     @property
     def payment(self) -> Payment | None:
@@ -616,7 +619,9 @@ class ReservationHandler(Handler):
     def deleted(self) -> bool:
         return not self.reservations
 
-    def invoice_items(self, request: CoreRequest) -> list[InvoiceItemMeta]:
+    def base_invoice_items(
+        self, request: CoreRequest
+    ) -> list[InvoiceItemMeta]:
         if self.submission:
             form = request.get_form(
                 self.submission.form_class,
@@ -636,18 +641,23 @@ class ReservationHandler(Handler):
             extras = []
             discounts = []
 
+        if not self.resource:
+            return []
+
         return self.resource.invoice_items_for_reservation(
             self.reservations,
             extras,
             discounts,
-            reduced_amount_label=request.translate(_('Discount'))
-        ) if self.resource else []
+            reduced_amount_label=request.translate(_('Discount')),
+        )
 
-    def refresh_invoice_items(self, request: CoreRequest) -> None:
+    def refresh_invoice_items(
+        self, request: CoreRequest, rounding_base: Decimal | None
+    ) -> None:
         payment = self.payment
         invoice = self.ticket.invoice
-        new_item_metas = self.invoice_items(request)
-        if not new_item_metas:
+        invoice_meta = self.invoice_items(request, rounding_base)
+        if not invoice_meta:
             # delete the invoice and payment (if it exists)
             if invoice is not None:
                 for item in invoice.items:
@@ -676,7 +686,7 @@ class ReservationHandler(Handler):
         old_items = sorted(invoice.items, key=attrgetter('group'))
         new_items: list[InvoiceItem] = []
         unused: set[InvoiceItem] = set(old_items)
-        for meta in new_item_metas:
+        for meta in invoice_meta:
             existing: InvoiceItem | None = None
             for item in old_items:
                 if item.group != meta.group:
@@ -694,7 +704,7 @@ class ReservationHandler(Handler):
                     if meta.family == item.family:
                         existing = item
                         break
-                elif meta.group == 'reduced_amount':
+                elif meta.group in ('reduced_amount', 'rounding'):
                     existing = item
                     break
                 else:
@@ -1038,6 +1048,42 @@ class ReservationHandler(Handler):
 
         return links
 
+    def get_cancellation_links(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> list[Link]:
+        id_set = set(self.data.get('cancellation_reservation_ids') or ())
+        if id_set:
+            targeted = [r for r in self.reservations if r.id in id_set]
+        else:
+            targeted = list(self.reservations)
+        if self.ticket.state != 'pending':
+            return []
+        confirm_items = json.dumps([
+            {'title': self.get_reservation_title(r)} for r in targeted
+        ])
+        return [Link(
+            text=_('Accept cancellation'),
+            url=request.link(self.ticket, 'accept-cancellation'),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to accept the cancellation?'),
+                    _(
+                        'This will cancel the reservation and cannot '
+                        'be undone.'
+                    ),
+                    _('Accept cancellation'),
+                    _('Cancel'),
+                    items=confirm_items,
+                ),
+                Intercooler(
+                    request_method='GET', redirect_after=request.url
+                ),
+            ),
+        )]
+
     def get_occupancy_url(
         self,
         reservation: Reservation,
@@ -1076,7 +1122,14 @@ class ReservationHandler(Handler):
             for r in self.reservations
         )
 
-        if not all(accepted):
+        cancellation_requested = self.data.get('cancellation_requested', False)
+
+        if cancellation_requested:
+            links.extend(
+                self.get_cancellation_links(self.reservations[0], request)
+            )
+
+        if not all(accepted) and not cancellation_requested:
             links.append(
                 Link(
                     text=_('Accept all reservations'),
@@ -1193,7 +1246,6 @@ class ReservationHandler(Handler):
 @handlers.registered_handler('EVN')
 class EventSubmissionHandler(Handler):
 
-    id: UUID
     handler_title = _('Events')
     code_title = _('Events')
 
@@ -1203,7 +1255,7 @@ class EventSubmissionHandler(Handler):
 
     @cached_property
     def event(self) -> Event | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @property
     def deleted(self) -> bool:
@@ -1375,11 +1427,9 @@ class EventSubmissionHandler(Handler):
 @handlers.registered_handler('DIR')
 class DirectoryEntryHandler(Handler):
 
-    id: UUID
-
     handler_title = _('Directory Entry Submissions')
     code_title = _('Directory Entry Submissions')
-    invoice_items = submission_invoice_items
+    base_invoice_items = submission_base_invoice_items
     refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property
@@ -1388,7 +1438,7 @@ class DirectoryEntryHandler(Handler):
 
     @cached_property
     def submission(self) -> FormSubmission | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @cached_property
     def form(self) -> Form | None:
@@ -1727,7 +1777,7 @@ class ChatHandler(Handler):
 
     @cached_property
     def chat(self) -> Chat | None:
-        return self.collection.by_id(self.id)
+        return self.collection.by_id(UUID(self.id))
 
     @property
     def deleted(self) -> bool:

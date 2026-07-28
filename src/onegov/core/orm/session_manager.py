@@ -13,6 +13,7 @@ from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core import log
 from onegov.core.custom import json
+from psycopg.sql import SQL, Identifier
 from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -441,7 +442,9 @@ class SessionManager:
                     schema = None
 
             if schema is not None:
-                cursor.execute('SET search_path TO %s, extensions', (schema, ))
+                cursor.execute(SQL(
+                    'SET search_path TO {}, extensions'
+                ).format(Identifier(schema)))
 
         @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
@@ -457,10 +460,9 @@ class SessionManager:
             if statement.startswith('ROLLBACK'):
                 return
 
-            cursor.execute(
-                'SET SESSION idle_in_transaction_session_timeout = %s',
-                (f'{CONNECTION_LIFETIME}s', )
-            )
+            cursor.execute(SQL(
+                'SET SESSION idle_in_transaction_session_timeout = {}'
+            ).format(f'{CONNECTION_LIFETIME}s'))
 
     def register_session(self, session: Session | scoped_session[Any]) -> None:
         """ Takes the given session and registers it with zope.sqlalchemy and
