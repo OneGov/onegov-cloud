@@ -1180,7 +1180,7 @@ def test_event_settings_return_to(client: Client) -> None:
     # opening the event settings from the events overview remembers the origin,
     # so both the cancel link and a successful save return to the overview
     events = client.get('/events')
-    settings = events.click('Bearbeiten', href='event-settings')
+    settings = events.click('Einstellungen', href='event-settings')
 
     cancel_href = settings.pyquery('a.cancel-link').attr('href')
     assert cancel_href is not None and cancel_href.endswith('/events')

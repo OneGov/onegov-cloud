@@ -2743,14 +2743,15 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
     def editbar_links(self) -> list[Link | LinkGroup]:
         def links() -> Iterator[Link | LinkGroup]:
             if self.request.is_manager:
-                yield Link(
-                    text=_('Settings'),
-                    url=self.request.return_here(
-                        self.request.link(self.request.app.org,
-                                          'event-settings')
-                    ),
-                    attrs={'class': 'edit-link'}
-                )
+                if self.request.is_admin:
+                    yield Link(
+                        text=_('Settings'),
+                        url=self.request.return_here(
+                            self.request.link(self.request.app.org,
+                                              'event-settings')
+                        ),
+                        attrs={'class': 'edit-link'}
+                    )
 
                 yield Link(
                     text=_('Import'),

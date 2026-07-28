@@ -5580,3 +5580,24 @@ def test_reservation_accept_cancellation_without_request(
         'Für dieses Ticket wurde keine Stornierung beantragt'
         in response
     )
+
+
+def test_resource_settings_return_to(client: Client) -> None:
+    client.login_admin()
+
+    # opening the settings from the resources overview remembers the origin,
+    # so both the cancel link and a successful save return to the overview
+    resources = client.get('/resources')
+    settings = resources.click('Einstellungen', href='resource-settings')
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/resources')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/resources')
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/resource-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')
