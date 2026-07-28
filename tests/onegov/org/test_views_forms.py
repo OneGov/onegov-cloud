@@ -1409,8 +1409,9 @@ def test_event_configuration_validation(client: Client) -> None:
 
     client.login_admin()
 
-    page = client.get('/events/+edit')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_type'] = 'filters'
+    page.form['event_filter_definition'] = """
     Kalender *=
         ( ) Sport Veranstaltungskalender
         ( ) Agenda Verkehrsgarten
@@ -1424,8 +1425,9 @@ def test_event_configuration_validation(client: Client) -> None:
     assert 'Invalid field type for field \'Email Adresse\'.' in page
 
     # test multiple errors
-    page = client.get('/events/+edit')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_type'] = 'filters'
+    page.form['event_filter_definition'] = """
     Kalender *=
         ( ) Sport Veranstaltungskalender
         ( ) Agenda Verkehrsgarten

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-06-09 12:54+0200\n"
+"POT-Creation-Date: 2026-07-21 11:56+0200\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -184,7 +184,9 @@ msgstr ""
 
 #, python-format
 msgid "The field '{label}' cannot mix radio buttons and checkboxes."
-msgstr "Le champ '{label}' ne peut pas mélanger les boutons radio et les cases à cocher."
+msgstr ""
+"Le champ '{label}' ne peut pas mélanger les boutons radio et les cases à "
+"cocher."
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
 msgstr "Définissez au moins un champs e-mail requis ('E-Mail * = @@@')"
@@ -287,6 +289,32 @@ msgstr ""
 
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
+
+msgid "Not a valid country code."
+msgstr "Indicatif de pays non valide."
+
+msgid "This phone number has an invalid length."
+msgstr "Ce numéro de téléphone a une longueur non valide."
+
+msgid "Please include the area code."
+msgstr "Veuillez indiquer l'indicatif régional."
+
+msgid "This phone number does not exist."
+msgstr "Ce numéro de téléphone n'existe pas."
+
+msgid "Please enter a mobile phone number."
+msgstr "Veuillez saisir un numéro de téléphone mobile."
+
+msgid "Please enter a landline phone number."
+msgstr "Veuillez saisir un numéro de téléphone fixe."
+
+#, python-format
+msgid ""
+"Phone numbers from this country are not supported. Allowed countries: "
+"${countries}"
+msgstr ""
+"Les numéros de téléphone de ce pays ne sont pas pris en charge. Pays "
+"autorisés : ${countries}"
 
 msgid "Not a valid swiss social security number."
 msgstr "Numéro de sécurité sociale suisse invalid."

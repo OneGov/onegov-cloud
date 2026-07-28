@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from sqlalchemy import desc, or_
 from sqlalchemy.orm import joinedload
 
@@ -14,7 +15,6 @@ from onegov.pas.models import (
 from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
-    from datetime import date
     from sqlalchemy.orm import Query, Session
     from onegov.pas.request import PasRequest
     from uuid import UUID  # ruff:ignore[unused-import]
@@ -194,14 +194,14 @@ class AttendenceCollection(GenericCollection[Attendence, 'UUID']):
         parliamentarian = user.parliamentarian
 
         if user.role == 'commission_president':
-            from datetime import date
             # Commission presidents see own + commission members' attendances
             # We have to check all but usually president of just one
             active_presidencies = [
                 cm.commission_id
-                for cm in parliamentarian.commission_memberships
-                if (cm.role == 'president' and
-                    (cm.end is None or cm.end >= date.today()))
+                for cm in parliamentarian.commission_memberships_on(
+                    on_date=date.today(),
+                    role='president',
+                )
             ]
 
             if active_presidencies:

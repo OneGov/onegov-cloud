@@ -1127,12 +1127,6 @@ msgstr "Créé"
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
 
-msgid "Remove these filters from all affected events"
-msgstr "Supprimer ces filtres de tous les événements concernés"
-
-msgid "Confirmation"
-msgstr "Confirmation"
-
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -2990,23 +2984,6 @@ msgstr ""
 "Les événements sont automatiquement supprimés une fois qu'ils se sont "
 "produits"
 
-msgid "Values of the location filter"
-msgstr "Valeurs du filtre de localisation"
-
-msgid "Choose the filter type for events (default is 'Tags')"
-msgstr ""
-"Choisissez le type de filtre pour les événements (la valeur par défaut est "
-"'tags')"
-
-msgid "A predefined set of tags"
-msgstr "Un ensemble prédéfini de balises"
-
-msgid "Manually configurable filters"
-msgstr "Filtres configurables manuellement"
-
-msgid "Both, predefined tags as well as configurable filters"
-msgstr "Les deux, balises prédéfinies et filtres configurables"
-
 msgid "Title of text above event list"
 msgstr "Titre du texte au-dessus de la liste des événements"
 
@@ -3027,6 +3004,26 @@ msgstr "Information en dessous de la liste des événements"
 
 msgid "Text below the event list"
 msgstr "Texte en dessous de la liste des événements"
+
+msgid "Values of the location filter"
+msgstr "Valeurs du filtre de localisation"
+
+msgid "Choose the filter type for events (default is 'Tags')"
+msgstr ""
+"Choisissez le type de filtre pour les événements (la valeur par défaut est "
+"'tags')"
+
+msgid "A predefined set of tags"
+msgstr "Un ensemble prédéfini de balises"
+
+msgid "Manually configurable filters"
+msgstr "Filtres configurables manuellement"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Les deux, balises prédéfinies et filtres configurables"
+
+msgid "Remove these filters from all affected events"
+msgstr "Supprimer ces filtres de tous les événements concernés"
 
 msgid "Documents"
 msgstr "Documents"
@@ -3651,18 +3648,6 @@ msgstr "Supprimer le module de texte"
 msgid "Recipients"
 msgstr "Destinataires"
 
-msgid "Room"
-msgstr "Espace"
-
-msgid "Resource Item"
-msgstr "Article"
-
-msgid "External resource link"
-msgstr "Lien de ressource externe"
-
-msgid "New external resource"
-msgstr "Nouvelle ressource externe"
-
 #.
 #. FIXME: Why are we using ResouceLayout and not ResourcesLayout? this is a
 #. weird hack, if you want to be able to use the ResourceLayout with
@@ -3674,6 +3659,18 @@ msgstr "Exporter tout"
 
 msgid "iFrame"
 msgstr "iFrame"
+
+msgid "Room"
+msgstr "Espace"
+
+msgid "Resource Item"
+msgstr "Article"
+
+msgid "External resource link"
+msgstr "Lien de ressource externe"
+
+msgid "New external resource"
+msgstr "Nouvelle ressource externe"
 
 msgid "Find Your Spot"
 msgstr "Rechercher les dates / Réservations récurrentes"
@@ -3736,9 +3733,6 @@ msgstr "Des réservations existantes sont associées à cette ressource"
 #, python-format
 msgid "Every ${days} until ${end}"
 msgstr "Tous les ${days} jusqu'à ${end}"
-
-msgid "Configure"
-msgstr "Configurer"
 
 msgid "This event can't be edited."
 msgstr "Cet événement ne peut pas être édité."
@@ -3839,6 +3833,9 @@ msgstr "Exporter l'exécution de la facture au format PDF"
 
 msgid "Directory"
 msgstr "Dossier"
+
+msgid "Configure"
+msgstr "Configurer"
 
 msgid "All entries will be deleted as well!"
 msgstr "Toutes les entrées seront également supprimées !"
@@ -4532,8 +4529,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Paiement"
 
@@ -5396,8 +5393,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6634,8 +6631,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -7049,6 +7046,9 @@ msgstr "Nouveau formulaire de document"
 
 msgid "Edit Document Form"
 msgstr "Modifier le formulaire de document"
+
+msgid "News Settings"
+msgstr "Paramètres des nouvelles"
 
 msgid ""
 "Notifications have already been sent for this news item. A new notification "
@@ -7466,18 +7466,6 @@ msgstr "Ce week-end"
 
 msgid "This week"
 msgstr "Cette semaine"
-
-#, python-format
-msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
-msgstr "Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
-
-#, python-format
-msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
-msgstr ""
-"Le choix de filtre \"${choice}\" est encore appliqué à ${count} événement(s)."
-
-msgid "Edit Event Filter Configuration"
-msgstr "Modifier la configuration du filtre d'événements"
 
 msgid "Event Export"
 msgstr "Exporter un événement"
@@ -8005,6 +7993,15 @@ msgstr "Modules optionnels"
 msgid "People directory"
 msgstr "Annuaire des personnes"
 
+#, python-format
+msgid "The filter \"${keyword}\" is still applied to ${count} event(s)."
+msgstr "Le filtre \"${keyword}\" est encore appliqué à ${count} événement(s)."
+
+#, python-format
+msgid "The filter choice \"${choice}\" is still applied to ${count} event(s)."
+msgstr ""
+"Le choix de filtre \"${choice}\" est encore appliqué à ${count} événement(s)."
+
 msgid "Chat"
 msgstr "Discussion"
 
@@ -8410,6 +8407,12 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
 #~ msgid "Please enter only day and month"
 #~ msgstr "Veuillez ne renseigner que des jours et des mois"
+
+#~ msgid "Confirmation"
+#~ msgstr "Confirmation"
+
+#~ msgid "Edit Event Filter Configuration"
+#~ msgstr "Modifier la configuration du filtre d'événements"
 
 #~ msgid ""
 #~ "This entry is published and this directory has an admin notification "

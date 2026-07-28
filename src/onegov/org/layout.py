@@ -1702,13 +1702,19 @@ class PersonCollectionLayout(DefaultLayout):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
-            return [
-                Link(
+            links: list[Link | LinkGroup] = []
+
+            if self.request.is_admin:
+                links.append(Link(
                     text=_('Settings'),
-                    url=self.request.link(
-                        self.request.app.org, 'people-settings'),
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'people-settings')
+                    ),
                     attrs={'class': 'settings-link'}
-                ),
+                ))
+
+            links.append(
                 LinkGroup(
                     title=_('Add'),
                     links=[
@@ -1721,8 +1727,9 @@ class PersonCollectionLayout(DefaultLayout):
                             attrs={'class': 'new-person'}
                         )
                     ]
-                ),
-            ]
+                )
+            )
+            return links
         return None
 
 
@@ -2281,34 +2288,39 @@ class ResourcesLayout(DefaultLayout):
                 Link(
                     text=_('Recipients'),
                     url=self.request.class_link(ResourceRecipientCollection),
-                    attrs={'class': 'manage-recipients'}
+                    attrs={'class': 'manage-recipients'},
+                ),
+                Link(
+                    text=_('Export All'),
+                    url=self.request.link(self.model, name='export-all'),
+                    attrs={'class': 'export-link'},
+                ),
+                IFrameLink(
+                    text=_('iFrame'),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'new-iframe'},
                 ),
                 LinkGroup(
                     title=_('Add'),
                     links=[
                         Link(
                             text=_('Room'),
-                            url=self.request.link(
-                                self.model,
-                                name='new-room'
-                            ),
-                            attrs={'class': 'new-room'}
+                            url=self.request.link(self.model, name='new-room'),
+                            attrs={'class': 'new-room'},
                         ),
                         Link(
                             text=_('Daypass'),
                             url=self.request.link(
-                                self.model,
-                                name='new-daypass'
+                                self.model, name='new-daypass'
                             ),
-                            attrs={'class': 'new-daypass'}
+                            attrs={'class': 'new-daypass'},
                         ),
                         Link(
                             text=_('Resource Item'),
                             url=self.request.link(
-                                self.model,
-                                name='new-daily-item'
+                                self.model, name='new-daily-item'
                             ),
-                            attrs={'class': 'new-daily-item'}
+                            attrs={'class': 'new-daily-item'},
                         ),
                         Link(
                             text=_('External resource link'),
@@ -2317,24 +2329,16 @@ class ResourcesLayout(DefaultLayout):
                                 query_params={
                                     'to': self.resources_url,
                                     'title': self.request.translate(
-                                        _('New external resource')),
-                                    'type': 'resource'
+                                        _('New external resource')
+                                    ),
+                                    'type': 'resource',
                                 },
-                                name='new'
+                                name='new',
                             ),
-                            attrs={'class': 'new-resource-link'}
-                        )
-                    ]
+                            attrs={'class': 'new-resource-link'},
+                        ),
+                    ],
                 ),
-                Link(
-                    text=_('Export All'),
-                    url=self.request.link(self.model, name='export-all'),
-                ),
-                IFrameLink(
-                    text=_('iFrame'),
-                    url=self.request.link(self.model),
-                    attrs={'class': 'new-iframe'}
-                )
             ]
         return None
 
@@ -2730,21 +2734,16 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
         def links() -> Iterator[Link | LinkGroup]:
-            if (self.request.is_admin and self.request.app.org.
-                    event_filter_type in ['filters', 'tags_and_filters']):
-                yield Link(
-                    text=_('Configure'),
-                    url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'filters-link'}
-                )
-
             if self.request.is_manager:
-                yield Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.request.app.org,
-                                          'event-settings'),
-                    attrs={'class': 'edit-link'}
-                )
+                if self.request.is_admin:
+                    yield Link(
+                        text=_('Settings'),
+                        url=self.request.return_here(
+                            self.request.link(self.request.app.org,
+                                              'event-settings')
+                        ),
+                        attrs={'class': 'edit-link'}
+                    )
 
                 yield Link(
                     text=_('Import'),
@@ -3050,19 +3049,24 @@ class NewsletterLayout(DefaultLayout):
             return None
 
         if self.is_collection:
-            links: list[Link | LinkGroup] = [
-                Link(
-                    text=_('Subscribers'),
-                    url=self.request.link(self.recipients),
-                    attrs={'class': 'manage-subscribers'}
-                ),
-                Link(
+            links: list[Link | LinkGroup] = []
+
+            if self.request.is_admin:
+                links.append(Link(
                     text=_('Settings'),
-                    url=self.request.link(
-                        self.request.app.org, 'newsletter-settings'),
-                    attrs={'class': 'settings-link'}
-                ),
-            ]
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'newsletter-settings'
+                        )
+                    ),
+                    attrs={'class': 'settings-link'},
+                ))
+
+            links.append(Link(
+                text=_('Subscribers'),
+                url=self.request.link(self.recipients),
+                attrs={'class': 'manage-subscribers'},
+            ))
 
             if self.request.browser_session.has('clipboard_url'):
                 clipboard = Clipboard.from_session(self.request)
@@ -3101,6 +3105,11 @@ class NewsletterLayout(DefaultLayout):
 
             return [
                 Link(
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
                     text=_('Schedule email delivery'),
                     url=self.request.link(self.model, 'send'),
                     attrs={'class': 'send-link'}
@@ -3118,11 +3127,6 @@ class NewsletterLayout(DefaultLayout):
                         )
                     ),
                     attrs={'class': 'copy-link'},
-                ),
-                Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
                 ),
                 Link(
                     text=_('Delete'),
@@ -3243,17 +3247,17 @@ class ImageSetLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_('Choose images'),
-                    url=self.request.link(self.model, 'select'),
-                    attrs={'class': 'select'}
-                ),
-                Link(
                     text=_('Edit'),
                     url=self.request.link(
                         self.model,
                         name='edit'
                     ),
                     attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Choose images'),
+                    url=self.request.link(self.model, 'select'),
+                    attrs={'class': 'select'}
                 ),
                 Link(
                     text=_('Delete'),
