@@ -439,14 +439,14 @@ def handle_event_settings(
                     for k in (form.keyword_fields.data or '').splitlines()
                 }
                 old_field_choices = {
-                    f_id: {c.label for c in getattr(f, 'choices', ())}
-                    for f_id, f in self.event_filter_fields.items()
+                    f.id: {c.label for c in getattr(f, 'choices', ())}
+                    for f in self.event_filter_fields
                 }
                 new_field_choices = {
-                    f_id: {c.label for c in getattr(f, 'choices', ())}
-                    for f_id, f in flatten_event_filter_fields_from_definition(
+                    f.id: {c.label for c in getattr(f, 'choices', ())}
+                    for f in flatten_event_filter_fields_from_definition(
                         form.event_filter_definition.data
-                    ).items()
+                    )
                 }
 
                 removed_keywords = old_keywords - new_keywords

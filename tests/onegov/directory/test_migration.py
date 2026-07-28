@@ -194,7 +194,7 @@ def test_detect_changed_fields() -> None:
 
     assert not changes.renamed_fields
     assert changes.changed_fields == ['Name']
-    assert changes.old_field('Name').human_id() == 'Name'
+    assert changes.old_field('Name').human_id == 'Name'
     assert changes.old_field('Name').required is False
     assert changes.new['Name'].required is True
 
@@ -213,7 +213,7 @@ def test_detect_changed_fields() -> None:
     assert changes.changed_fields == ['Name']
     assert 'Name' not in changes.old
     # old_field must resolve the rename back to the original id
-    assert changes.old_field('Name').human_id() == 'First Name'
+    assert changes.old_field('Name').human_id == 'First Name'
     assert changes.old_field('Name').required is False
     assert changes.new['Name'].required is True
 
@@ -246,7 +246,7 @@ def test_detect_changed_fields() -> None:
     assert changes.renamed_fields == {'Contact/Street': 'Strasse'}
     assert changes.changed_fields == ['Strasse']
     assert 'Strasse' not in changes.old
-    assert changes.old_field('Strasse').human_id() == 'Contact/Street'
+    assert changes.old_field('Strasse').human_id == 'Contact/Street'
     assert changes.old_field('Strasse').required is False
     assert changes.new['Strasse'].required is True
 
@@ -263,7 +263,7 @@ def test_detect_changed_fields() -> None:
     assert changes.renamed_fields == {'First Name': 'Name'}
     assert changes.changed_fields == ['Name']
     assert 'Name' not in changes.old
-    assert changes.old_field('Name').human_id() == 'First Name'
+    assert changes.old_field('Name').human_id == 'First Name'
     assert changes.old_field('Name').required is True
     assert changes.new['Name'].required is False
 

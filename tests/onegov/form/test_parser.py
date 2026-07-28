@@ -880,19 +880,19 @@ def test_parse_formcode() -> None:
     assert fields[0].type == 'text'
     assert fields[0].required
     assert fields[0].maxlength is None
-    assert fields[0].id() == 'general_first_name'
+    assert fields[0].id == 'general_first_name'
 
     assert fields[1].fieldset == 'General'
     assert fields[1].type == 'text'
     assert not fields[1].required
     assert fields[1].maxlength == 10
-    assert fields[1].id() == 'general_last_name'
+    assert fields[1].id == 'general_last_name'
 
     assert fields[2].fieldset == 'Order'
     assert fields[2].type == 'checkbox'
 
     assert fields[2].label == 'Products'
-    assert fields[2].id() == 'order_products'
+    assert fields[2].id == 'order_products'
 
     assert fields[2].choices[0].label == 'Pizza'
     assert fields[2].choices[0].display_label == 'Pizza'
@@ -905,7 +905,7 @@ def test_parse_formcode() -> None:
     subfields = fields[2].choices[0].fields
     assert subfields is not None
     assert subfields[0].label == 'Type'
-    assert subfields[0].id(fields[2].id()) == 'order_products_type'
+    assert subfields[0].id == 'order_products_type'
     assert subfields[0].type == 'radio'
     assert subfields[0].choices[0].selected
     assert not subfields[0].choices[1].selected
@@ -1118,18 +1118,17 @@ def test_field_ids() -> None:
             [x] Burger
     """)
 
-    assert fields[0].id() == 'first_name'
-    assert fields[0].human_id() == 'First Name'
-    assert fields[1].id() == 'last_name'
-    assert fields[1].human_id() == 'Last Name'
-    assert fields[2].id() == 'my_order_products'
-    assert fields[2].human_id() == 'My Order/Products'
+    assert fields[0].id == 'first_name'
+    assert fields[0].human_id == 'First Name'
+    assert fields[1].id == 'last_name'
+    assert fields[1].human_id == 'Last Name'
+    assert fields[2].id == 'my_order_products'
+    assert fields[2].human_id == 'My Order/Products'
     assert fields[2].type == 'checkbox'
     subfields = fields[2].choices[0].fields
     assert subfields is not None
-    assert subfields[0].id(fields[2].id()) == 'my_order_products_type'
-    assert subfields[0].human_id(
-        fields[2].human_id()) == 'My Order/Products/Type'
+    assert subfields[0].id == 'my_order_products_type'
+    assert subfields[0].human_id == 'My Order/Products/Type'
 
     assert find_field(fields, 'first_name') is fields[0]
     assert find_field(fields, 'First Name') is fields[0]

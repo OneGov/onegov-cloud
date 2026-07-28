@@ -236,18 +236,16 @@ class DirectoryMigration:
         """
         if self.directory.entries:
             return any(
-                f.required
-                for human_id, f in self.changes.new.items()
-                if human_id in self.changes.added_fields
+                f.required for f in self.changes.new.values()
+                if f.human_id in self.changes.added_fields
             )
 
         return False
 
     def get_added_required_field_ids(self) -> list[str]:
         return [
-            human_id
-            for human_id, f in self.changes.new.items()
-            if f.required and human_id in self.changes.added_fields
+            f.human_id for f in self.changes.new.values()
+            if f.required and f.human_id in self.changes.added_fields
         ]
 
 
@@ -314,12 +312,14 @@ class StructuralChanges:
     """
 
     def __init__(self, old_structure: str, new_structure: str) -> None:
-        old_fields = parse_formcode(old_structure)
-        new_fields = parse_formcode(new_structure)
-        self.old = dict(flatten_fields(old_fields, with_human_id=True))
-        self.new = dict(flatten_fields(new_fields, with_human_id=True))
-        self.old_fields = old_fields
-        self.new_fields = new_fields
+        self.old = {
+            f.human_id: f
+            for f in flatten_fields(parse_formcode(old_structure))
+        }
+        self.new = {
+            f.human_id: f
+            for f in flatten_fields(parse_formcode(new_structure))
+        }
 
         self.detect_added_fieldsets()
         self.detect_removed_fieldsets()
@@ -343,31 +343,29 @@ class StructuralChanges:
         )
 
     def detect_removed_fieldsets(self) -> None:
-        new_fieldsets = {f.fieldset for f in self.new_fields if f.fieldset}
+        new_ids = {f.fieldset for f in self.new.values() if f.fieldset}
         self.removed_fieldsets = {
-            f.fieldset for f in self.old_fields
-            if f.fieldset and f.fieldset not in new_fieldsets
+            f.fieldset for f in self.old.values()
+            if f.fieldset and f.fieldset not in new_ids
         }
 
     def detect_added_fieldsets(self) -> None:
-        old_fieldsets = {f.fieldset for f in self.old_fields if f.fieldset}
+        old_ids = {f.fieldset for f in self.old.values() if f.fieldset}
         self.added_fieldsets = {
-            f.fieldset for f in self.new_fields
-            if f.fieldset and f.fieldset not in old_fieldsets
+            f.fieldset for f in self.new.values()
+            if f.fieldset and f.fieldset not in old_ids
         }
 
     def detect_added_fields(self) -> None:
         self.added_fields = [
-            human_id
-            for human_id in self.new
-            if human_id not in self.old
+            f.human_id for f in self.new.values()
+            if f.human_id not in {f.human_id for f in self.old.values()}
         ]
 
     def detect_removed_fields(self) -> None:
         self.removed_fields = [
-            human_id
-            for human_id in self.old
-            if human_id not in self.new
+            f.human_id for f in self.old.values()
+            if f.human_id not in {f.human_id for f in self.new.values()}
         ]
 
     def do_rename(self, removed: str, added: str) -> bool:

@@ -378,22 +378,23 @@ class DirectoryBaseForm(Form):
         default='default')
 
     @cached_property
-    def known_fields(self) -> dict[str, ParsedField] | None:
-        if self.known_fields_by_human_id is None:
+    def known_field_ids(self) -> set[str] | None:
+        # FIXME: We should probably define this in relation to known_fields
+        #        so we don't parse the form twice if we access both properties
+        try:
+            return {
+                field.id for field in
+                flatten_fields(parse_formcode(self.structure.data))
+            }
+        except FormError:
             return None
 
-        return {
-            as_internal_id(human_id): field
-            for human_id, field in self.known_fields_by_human_id.items()
-        }
-
     @cached_property
-    def known_fields_by_human_id(self) -> dict[str, ParsedField] | None:
+    def known_fields(self) -> list[ParsedField] | None:
         try:
-            return dict(flatten_fields(
-                parse_formcode(self.structure.data),
-                with_human_id=True
-            ))
+            return list(
+                flatten_fields(parse_formcode(self.structure.data))
+            )
         except FormError:
             return None
 
@@ -405,13 +406,13 @@ class DirectoryBaseForm(Form):
             return None
 
     def extract_field_ids(self, field: Field) -> Iterator[str]:
-        if not self.known_fields:
+        if not self.known_field_ids:
             return
 
         for line in field.data.splitlines():
             line = line.strip()
 
-            if as_internal_id(line) in self.known_fields:
+            if as_internal_id(line) in self.known_field_ids:
                 yield line
 
     def validate_title_format(self, field: Field) -> None:
@@ -540,14 +541,12 @@ class DirectoryBaseForm(Form):
     ) -> ParsedField | None:
         """ Returns the first hidden field, or None. """
 
-        # FIXME: Why not use known_fields? Does this need to bypass the
-        #        cache? If not, just reuse the thing we already cache...
         try:
-            fields = parse_formcode(self.structure.data)
+            fields = flatten_fields(parse_formcode(self.structure.data))
         except FormError:
             return None
-        for human_id, field in flatten_fields(fields, with_human_id=True):
-            if not self.is_public(as_internal_id(human_id), configuration):
+        for field in fields:
+            if not self.is_public(field.id, configuration):
                 return field
         return None
 
@@ -622,8 +621,8 @@ class DirectoryBaseForm(Form):
 
         # Remove file and url fields from search
         file_fields = [
-            human_id
-            for human_id, f in (self.known_fields_by_human_id or {}).items()
+            f.human_id
+            for f in (self.known_fields or ())
             if f.type in ('fileinput', 'multiplefileinput', 'url', 'video_url')
         ]
         searchable_content_fields = [

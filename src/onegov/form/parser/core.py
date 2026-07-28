@@ -404,6 +404,7 @@ import pyparsing as pp
 import re
 import yaml
 
+from functools import cached_property
 from datetime import date as date_t  # noqa: TC003
 from dateutil import parser as dateutil_parser
 from dateutil.relativedelta import relativedelta
@@ -439,7 +440,7 @@ from onegov.form.parser.grammar import video_url
 from onegov.form.utils import as_internal_id
 
 
-from typing import final, overload, Annotated, Any, Literal, Self
+from typing import final, Annotated, Any, Literal, Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from builtins import type as type_t
@@ -680,70 +681,32 @@ def construct_integer_range(
     return ELEMENTS.integer_range.parse_string(node.value)
 
 
-@overload
 def flatten_fields(
-    fields: Sequence[ParsedField] | None,
-    with_human_id: Literal[False] = False,
-    parent_id: str | None = None
-) -> Iterator[ParsedField]: ...
-@overload
-def flatten_fields(
-    fields: Sequence[ParsedField] | None,
-    with_human_id: Literal[True],
-    parent_id: str | None = None
-) -> Iterator[tuple[str, ParsedField]]: ...
-@overload
-def flatten_fields(
-    fields: Sequence[ParsedField] | None,
-    with_human_id: bool,
-    parent_id: str | None = None
-) -> Iterator[ParsedField] | Iterator[tuple[str, ParsedField]]: ...
-
-
-def flatten_fields(
-    fields: Sequence[ParsedField] | None,
-    # NOTE: You only know what id a field has, if you know its parent
-    #       which gets lost when flattening, so this gives you that
-    #       information back.
-    with_human_id: bool = False,
-    parent_id: str | None = None
-) -> Iterator[ParsedField] | Iterator[tuple[str, ParsedField]]:
+    fields: Sequence[ParsedField] | None
+) -> Iterator[ParsedField]:
 
     for field in fields or ():
-        if with_human_id:
-            human_id = field.human_id(parent_id)
-            yield human_id, field
-        else:
-            human_id = None
-            yield field
+        yield field
 
         if hasattr(field, 'choices'):
             for choice in field.choices:
-                yield from flatten_fields(
-                    choice.fields,
-                    with_human_id,
-                    human_id
-                )
+                yield from flatten_fields(choice.fields)
 
 
 def find_field(
     fields: Iterable[ParsedField],
-    id: str | None,
-    parent_id: str | None = None
+    id: str | None
 ) -> ParsedField | None:
 
     id = as_internal_id(id or '')
-    if parent_id and not id.startswith(parent_id):
-        return None
 
     for field in fields:
-        field_id = field.id(parent_id)
-        if field_id == id:
+        if field.id == id:
             return field
 
-        if id.startswith(field_id) and hasattr(field, 'choices'):
+        if id.startswith(field.id) and hasattr(field, 'choices'):
             for choice in field.choices:
-                result = find_field(choice.fields, id, field_id)
+                result = find_field(choice.fields, id)
                 if result is not None:
                     return result
     return None
@@ -919,7 +882,7 @@ class Pricing(BaseModel):
 
     def __str__(self) -> str:
         suffix = '!' if self.online_payment_required else ''
-        return f'{self.amount} {self.currency}{suffix}'
+        return f'{self.amount:.2f} {self.currency}{suffix}'
 
 
 # tagged unions so we can type narrow by type field
@@ -1063,13 +1026,21 @@ class BaseField[KindT: str](BaseModel):
             'field input.'
     )
 
-    def id(self, parent_id: str | None = None) -> str:
-        return as_internal_id(
-            human_id(self.label, self.fieldset, parent_id)
-        )
+    _parent: ParsedField | None = None
 
-    def human_id(self, parent_id: str | None = None) -> str:
-        return human_id(self.label, self.fieldset, parent_id)
+    @cached_property
+    def id(self) -> str:
+        return as_internal_id(self.human_id)
+
+    @cached_property
+    def human_id(self) -> str:
+        if self._parent is not None:
+            return f'{self._parent.human_id}/{self.label}'
+
+        if self.fieldset:
+            return f'{self.fieldset}/{self.label}'
+
+        return self.label
 
     @property
     def display_label(self) -> str:
@@ -1509,6 +1480,15 @@ class RadioField(BaseField[Literal['radio']]):
         min_length=1
     )
 
+    # NOTE: The nested fields need access to the parent field, so they
+    #       can generate their correct unique id
+    @model_validator(mode='after')
+    def insert_parent_reference(self) -> Self:
+        for choice in self.choices:
+            for child in choice.fields:
+                child.__dict__['_parent'] = self
+        return self
+
     def parse(self, value: Any) -> object:
         if isinstance(value, str):
             return next(iter(v.strip() for v in value.split('\n')), None)
@@ -1542,6 +1522,15 @@ class CheckboxField(BaseField[Literal['checkbox']]):
             '``<input type="checkbox">``.',
         min_length=1
     )
+
+    # NOTE: The nested fields need access to the parent field, so they
+    #       can generate their correct unique id
+    @model_validator(mode='after')
+    def insert_parent_reference(self) -> Self:
+        for choice in self.choices:
+            for child in choice.fields:
+                child.__dict__['_parent'] = self
+        return self
 
     def parse(self, value: Any) -> Any:
         if isinstance(value, str):

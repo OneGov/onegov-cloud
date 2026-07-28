@@ -505,11 +505,8 @@ class ResourceBaseForm(Form):
         #        so we don't parse the form twice if we access both properties
         try:
             return {
-                as_internal_id(human_id)
-                for human_id, field in flatten_fields(
-                    parse_formcode(self.definition.data),
-                    with_human_id=True
-                )
+                field.id for field in
+                flatten_fields(parse_formcode(self.definition.data))
             }
         except FormError:
             return None
@@ -537,9 +534,10 @@ class ResourceBaseForm(Form):
             raise ValidationError(
                 _('Please select the form field that holds the zip-code'))
 
-        # FIXME: What about nested fields? Can they not be selected?
         for parsed_field in parse_formcode(self.definition.data):
-            if parsed_field.human_id() == self.zipcode_field.data:
+            # FIXME: What about nested fields? Can those not be selected
+            #        in these kinds of fields?
+            if parsed_field.human_id == self.zipcode_field.data:
                 return
 
         raise ValidationError(

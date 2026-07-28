@@ -17,7 +17,6 @@ from onegov.directory.types import (
 from onegov.file import File, MultiAssociatedFiles
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fields, parse_formcode, parse_form
-from onegov.form.utils import as_internal_id
 from onegov.search import SearchableContent
 from sedate import to_timezone
 from sqlalchemy import and_, exists, func, text, Integer
@@ -35,7 +34,7 @@ from wtforms import FieldList
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from builtins import type as _type  # type is shadowed in model
-    from collections.abc import Mapping
+    from collections.abc import Mapping, Sequence
     from onegov.form import Form
     from onegov.form.parser.core import (
         BasicParsedField, FileParsedField, ParsedField)
@@ -228,16 +227,16 @@ class Directory(Base, ContentMixin, TimestampMixin,
         session = object_session(self)
 
         # replace all existing basic fields
-        updated = {f_id: values[f_id] for f_id in self.basic_fields}
+        updated = {f.id: values[f.id] for f in self.basic_fields}
 
         # treat file fields differently
         known_file_ids = {
-            f_id if idx is None else f'{f_id}:{idx}'
-            for f_id in self.file_fields
+            f.id if idx is None else f'{f.id}:{idx}'
+            for f in self.file_fields
             # add an id for each file in a multiple upload field
             for idx in (
-                range(len(values[f_id]))
-                if hasattr(values[f_id], '__len__')
+                range(len(values[f.id]))
+                if hasattr(values[f.id], '__len__')
                 else [None]
             )
         }
@@ -272,14 +271,14 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     assert session is not None
                     session.delete(file)
 
-            for field_id, field in self.file_fields.items():
-                field_values = values[field_id]
+            for field in self.file_fields:
+                field_values = values[field.id]
                 if not field_values:
-                    updated[field_id] = field_values
+                    updated[field.id] = field_values
                     continue
                 # migrate files during an entry migration
                 if isinstance(field_values, dict):
-                    updated[field_id] = field_values
+                    updated[field.id] = field_values
                     file_id = field_values['data'].lstrip('@')
                     assert session is not None
                     with session.no_autoflush:
@@ -292,11 +291,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
                                 reference=f.reference
                             )
                             entry.files.append(new)
-                            updated[field_id].update({'data': f'@{new.id}'})
+                            updated[field.id].update({'data': f'@{new.id}'})
 
                     continue
                 elif isinstance(field_values, list):
-                    updated[field_id] = field_values
+                    updated[field.id] = field_values
                     for idx, field_value in enumerate(field_values):
                         file_id = field_value['data'].lstrip('@')
                         assert session is not None
@@ -312,7 +311,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                                     reference=f.reference
                                 )
                                 entry.files.append(new)
-                                updated[field_id][idx].update(
+                                updated[field.id][idx].update(
                                     {'data': f'@{new.id}'}
                                 )
 
@@ -320,25 +319,25 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 elif field.type == 'fileinput':
                     # keep files if selected in the dialog
                     if getattr(field_values, 'action', None) == 'keep':
-                        original = (entry.values or {}).get(field_id, {})
-                        updated[field_id] = original
+                        original = (entry.values or {}).get(field.id, {})
+                        updated[field.id] = original
                         continue
 
                     # delete files if selected in the dialog
                     if getattr(field_values, 'action', None) == 'delete':
-                        updated[field_id] = {}
+                        updated[field.id] = {}
                         continue
 
                     # if there was no file supplied, we can't add it
                     if not getattr(field_values, 'file', None):
-                        updated[field_id] = {}
+                        updated[field.id] = {}
                         continue
 
                     # create a new file
                     new_file = DirectoryFile(
                         id=random_token(),
                         name=field_values.filename,
-                        note=field_id,
+                        note=field.id,
                         reference=as_fileintent(
                             content=field_values.file,
                             filename=field_values.filename
@@ -347,7 +346,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     entry.files.append(new_file)
 
                     # keep a reference to the file in the values
-                    updated[field_id] = {
+                    updated[field.id] = {
                         'data': '@' + new_file.id,
                         'filename': field_values.filename,
                         'mimetype': new_file.reference.file.content_type,
@@ -360,9 +359,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 #        try to refactor this so we can handle both more
                 #        easily
                 new_idx = 0
-                updated[field_id] = []
+                updated[field.id] = []
                 for old_idx, subfield_values in enumerate(field_values):
-                    old_values = (entry.values or {}).get(field_id) or []
+                    old_values = (entry.values or {}).get(field.id) or []
 
                     # keep files if selected in the dialog
                     if getattr(subfield_values, 'action', None) == 'keep':
@@ -371,13 +370,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
                             continue
 
                         original = old_values[old_idx]
-                        updated[field_id].append(original)
+                        updated[field.id].append(original)
                         # update the file.note so it points to the correct
                         # index in the list if necessary
                         file_id = original['data'].lstrip('@')
                         for file in entry.files:
                             if file.id == file_id:
-                                new_key = f'{field_id}:{new_idx}'
+                                new_key = f'{field.id}:{new_idx}'
                                 if file.note != new_key:
                                     file.note = new_key
                                 break
@@ -396,7 +395,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     new_file = DirectoryFile(
                         id=random_token(),
                         name=subfield_values.filename,
-                        note=f'{field_id}:{new_idx}',
+                        note=f'{field.id}:{new_idx}',
                         reference=as_fileintent(
                             content=subfield_values.file,
                             filename=subfield_values.filename
@@ -405,7 +404,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     entry.files.append(new_file)
 
                     # keep a reference to the file in the values
-                    updated[field_id].append({
+                    updated[field.id].append({
                         'data': '@' + new_file.id,
                         'filename': subfield_values.filename,
                         'mimetype': new_file.reference.file.content_type,
@@ -500,51 +499,31 @@ class Directory(Base, ContentMixin, TimestampMixin,
         )
 
     @property
-    def fields(self) -> Mapping[str, ParsedField]:
+    def fields(self) -> Sequence[ParsedField]:
         return self.fields_from_structure(self.structure)
 
-    @property
-    def fields_by_human_id(self) -> Mapping[str, ParsedField]:
-        return self.fields_from_structure_with_human_id(self.structure)
-
     @staticmethod
     @lru_cache(maxsize=1)
-    def fields_from_structure(structure: str) -> Mapping[str, ParsedField]:
-        return {
-            as_internal_id(human_id): field
-            for human_id, field in (
-                Directory.fields_from_structure_with_human_id(structure).items()
-            )
-        }
-
-    @staticmethod
-    @lru_cache(maxsize=1)
-    def fields_from_structure_with_human_id(
-        structure: str
-    ) -> Mapping[str, ParsedField]:
-        return dict(flatten_fields(
-            parse_formcode(structure),
-            with_human_id=True
-        ))
+    def fields_from_structure(structure: str) -> Sequence[ParsedField]:
+        return tuple(flatten_fields(parse_formcode(structure)))
 
     @property
-    def basic_fields(self) -> Mapping[str, BasicParsedField]:
-        return {
-            id: f
-            for id, f in self.fields.items()
+    def basic_fields(self) -> Sequence[BasicParsedField]:
+        return tuple(
+            f for f in self.fields
             if f.type != 'fileinput' and f.type != 'multiplefileinput'
-        }
+        )
 
     @property
-    def file_fields(self) -> Mapping[str, FileParsedField]:
-        return {
-            id: f
-            for id, f in self.fields.items()
+    def file_fields(self) -> Sequence[FileParsedField]:
+        return tuple(
+            f for f in self.fields
             if f.type == 'fileinput' or f.type == 'multiplefileinput'
-        }
+        )
 
     def field_by_id(self, id: str) -> ParsedField | None:
-        return self.fields.get(as_internal_id(id))
+        query = (f for f in self.fields if f.human_id == id or f.id == id)
+        return next(query, None)
 
     @property
     def form_obj(self) -> DirectoryEntryForm:
@@ -572,14 +551,14 @@ class Directory(Base, ContentMixin, TimestampMixin,
             def mixed_data(self) -> dict[str, Any]:
                 # use the field data for non-file fields
                 data = {
-                    k: v
-                    for k, v in self.data.items()
-                    if k not in directory.file_fields
+                    k: v for k, v in self.data.items() if k not in {
+                        f.id for f in directory.file_fields
+                    }
                 }
 
                 # use the field objects for file-fields
-                for field_id in directory.file_fields:
-                    data[field_id] = self[field_id]
+                for field in directory.file_fields:
+                    data[field.id] = self[field.id]
 
                 return data
 
@@ -591,7 +570,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
                 # skip directory structure fields, directory.update()
                 # handles those
-                super().populate_obj(obj, exclude=directory.fields.keys())
+                exclude = {f.id for f in directory.fields}
+
+                super().populate_obj(obj, exclude=exclude)
 
                 if directory_update:
                     directory.update(obj, self.mixed_data)
@@ -599,13 +580,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
             def process_obj(self, obj: DirectoryEntry) -> None:
                 super().process_obj(obj)
 
-                for field_id in directory.fields:
-                    form_field = getattr(self, field_id)
+                for field in directory.fields:
+                    form_field = getattr(self, field.id)
 
                     if form_field is None:
                         continue
 
-                    data = obj.values.get(field_id)
+                    data = obj.values.get(field.id)
                     if isinstance(form_field, FieldList):
                         for subdata in data or ():
                             form_field.append_entry(subdata)

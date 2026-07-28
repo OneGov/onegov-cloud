@@ -147,13 +147,8 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             {'title': ['Name']}
 
         """
-        known = {
-            human_id
-            for human_id, _ in flatten_fields(
-                parse_formcode(formcode),
-                with_human_id=True
-            )
-        }
+        formfields = tuple(flatten_fields(parse_formcode(formcode)))
+        known = {field.human_id for field in formfields}
 
         errors = defaultdict(list)
 

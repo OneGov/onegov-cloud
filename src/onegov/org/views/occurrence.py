@@ -43,9 +43,7 @@ def get_filters(
     filters = []
 
     radio_fields = {
-        f_id
-        for f_id, f in request.app.org.event_filter_fields.items()
-        if f.type == 'radio'
+        f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
     }
 
     def get_count(keyword: str, value: str) -> int:

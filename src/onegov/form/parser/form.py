@@ -106,7 +106,6 @@ def handle_field(
 
     validators: list[Validator[Any, Any]]
     widget: Widget[Any] | None
-    field_id = as_internal_id(field.human_id(parent_id))
     if field.type == 'text':
         render_kw = None
         if field.maxlength:
@@ -120,8 +119,8 @@ def handle_field(
 
         builder.add_field(
             field_class=StringField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=validators,
@@ -132,8 +131,8 @@ def handle_field(
     elif field.type == 'textarea':
         builder.add_field(
             field_class=TextAreaField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             render_kw={'rows': field.rows} if field.rows else None,
@@ -143,8 +142,8 @@ def handle_field(
     elif field.type == 'password':
         builder.add_field(
             field_class=PasswordField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             description=field.field_help
@@ -153,8 +152,8 @@ def handle_field(
     elif field.type == 'email':
         builder.add_field(
             field_class=EmailField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[Email()],
@@ -164,8 +163,8 @@ def handle_field(
     elif field.type == 'url':
         builder.add_field(
             field_class=URLField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[URL()],
@@ -175,8 +174,8 @@ def handle_field(
     elif field.type == 'video_url':
         builder.add_field(
             field_class=VideoURLField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[URL()],
@@ -186,8 +185,8 @@ def handle_field(
     elif field.type == 'stdnum':
         builder.add_field(
             field_class=StringField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[Stdnum(field.format)],
@@ -205,8 +204,8 @@ def handle_field(
 
         builder.add_field(
             field_class=DateField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             description=field.field_help,
@@ -225,8 +224,8 @@ def handle_field(
 
         builder.add_field(
             field_class=DateTimeLocalField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             description=field.field_help,
@@ -237,8 +236,8 @@ def handle_field(
     elif field.type == 'time':
         builder.add_field(
             field_class=TimeField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             description=field.field_help
@@ -250,8 +249,8 @@ def handle_field(
         accept = ','.join(expected_extensions.whitelist)
         builder.add_field(
             field_class=UploadField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[
@@ -268,8 +267,8 @@ def handle_field(
         accept = ','.join(expected_extensions.whitelist)
         builder.add_field(
             field_class=UploadMultipleField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[
@@ -283,8 +282,8 @@ def handle_field(
     elif field.type == 'radio':
         builder.add_field(
             field_class=RadioField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             choices=[(c.label, c.display_label) for c in field.choices],
@@ -307,8 +306,8 @@ def handle_field(
     elif field.type == 'checkbox':
         builder.add_field(
             field_class=MultiCheckboxField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             choices=[(c.label, c.display_label) for c in field.choices],
@@ -331,8 +330,8 @@ def handle_field(
     elif field.type == 'integer_range':
         builder.add_field(
             field_class=IntegerField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             pricing={
@@ -353,8 +352,8 @@ def handle_field(
     elif field.type == 'decimal_range':
         builder.add_field(
             field_class=DecimalField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[
@@ -369,8 +368,8 @@ def handle_field(
     elif field.type == 'chip_nr':
         builder.add_field(
             field_class=StringField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[Regexp(r'^[0-9]{15}$')],
@@ -380,8 +379,8 @@ def handle_field(
     elif field.type == 'code':
         builder.add_field(
             field_class=TextAreaField,
-            field_id=field_id,
-            label=field.label,
+            field_id=field.id,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             render_kw={'data-editor': field.syntax},
@@ -396,9 +395,9 @@ def handle_field(
         for choice in field.choices:
             if not choice.fields:
                 continue
-            dependency = FieldDependency(field_id, choice.label)
+            dependency = FieldDependency(field.id, choice.label)
             for choice_field in choice.fields:
-                handle_field(builder, choice_field, field_id, dependency)
+                handle_field(builder, choice_field, field.id, dependency)
 
 
 class WTFormsClassBuilder[FormT: Form]:

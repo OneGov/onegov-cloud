@@ -13,7 +13,7 @@ from onegov.event import EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
-from onegov.form import as_internal_id, flatten_fields, parse_formcode
+from onegov.form import parse_formcode, flatten_fields
 from onegov.gis import Coordinates
 from sedate import replace_timezone
 from sedate import standardize_date
@@ -263,13 +263,7 @@ def test_occurrence_collection_query(session: Session) -> None:
         [ ] B
         [ ] C
     """
-    fields = {
-        as_internal_id(human_id): field
-        for human_id, field in flatten_fields(
-            parse_formcode(definition),
-            with_human_id=True
-        )
-    }
+    fields = tuple(flatten_fields(parse_formcode(definition)))
 
     event = EventCollection(session).add(
         title='Squirrel Park Visit',
@@ -507,13 +501,7 @@ def test_occurrence_collection_for_toggled_keyword_value(
     ( ) C
     """
 
-    fields = {
-        as_internal_id(human_id): field
-        for human_id, field in flatten_fields(
-            parse_formcode(definition),
-            with_human_id=True
-        )
-    }
+    fields = tuple(flatten_fields(parse_formcode(definition)))
     occurrences = OccurrenceCollection(
         session=session,
         filter_keywords={'filter': ['A']}
@@ -815,13 +803,7 @@ def test_occurrence_collection_keyword_counts(session: Session) -> None:
     ( ) B
     ( ) C
     """
-    fields = {
-        as_internal_id(human_id): field
-        for human_id, field in flatten_fields(
-            parse_formcode(definition),
-            with_human_id=True
-        )
-    }
+    fields = tuple(flatten_fields(parse_formcode(definition)))
     year = date.today().year
     month = date.today().month
     day = date.today().day
