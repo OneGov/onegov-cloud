@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-20 08:36+0200\n"
+"POT-Creation-Date: 2026-07-28 09:43+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -386,6 +386,12 @@ msgstr "Kreditkartenzahlungen"
 
 msgid "Exports payments and tickets"
 msgstr "Exportiert Zahlungen und Tickets"
+
+msgid "Availability periods"
+msgstr "Verfügbarkeitszeiträume"
+
+msgid "Target resources"
+msgstr "Zielressourcen"
 
 msgid "Title"
 msgstr "Titel"
@@ -3697,11 +3703,11 @@ msgstr "Aufräumen"
 msgid "Subscribe"
 msgstr "Abonnieren"
 
-msgid "Availability periods"
-msgstr "Verfügbarkeitszeiträume"
-
 msgid "Availability period"
 msgstr "Verfügbarkeitszeitraum"
+
+msgid "Copy availability periods"
+msgstr "Verfügbarkeitszeiträume kopieren"
 
 msgid "Paste"
 msgstr "Einfügen"
@@ -4526,8 +4532,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -5390,8 +5396,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Neue Kunden Nachricht in Ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -6621,8 +6627,8 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -6675,6 +6681,14 @@ msgstr "Der Verfügbarkeitszeitraum wurde gestoppt"
 
 msgid "The availability period was added to the clipboard"
 msgstr "Der Verfügbarkeitszeitraum wurde in die Zwischenablage kopiert"
+
+#, python-format
+msgid ""
+"${periods} availability periods copied to ${resources} resources, creating "
+"${allocations} allocations"
+msgstr ""
+"${periods} Verfügbarkeitszeiträume auf ${resources} Ressourcen kopiert, "
+"${allocations} Verfügbarkeiten erstellt"
 
 msgid "Pasted availability period from to the clipboard"
 msgstr "Der Verfügbarkeitszeitraum aus der Zwischenablage wurde eingefügt"
