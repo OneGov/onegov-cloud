@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from cryptography.fernet import InvalidToken
 from datetime import date, timedelta
-from functools import cached_property, lru_cache
+from functools import cached_property
 from hashlib import sha256
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
@@ -11,7 +11,7 @@ from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property, TimestampMixin)
 from onegov.core.utils import linkify, paragraphify
 from onegov.file.models.file import File
-from onegov.form import flatten_fields, parse_formcode
+from onegov.form.parser import ParsedForm
 from onegov.org.theme import user_options
 from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
@@ -139,7 +139,9 @@ class Organisation(Base, TimestampMixin):
     submit_events_visible: dict_property[bool] = meta_property(default=True)
     delete_past_events: dict_property[bool] = meta_property(default=False)
     event_filter_type: dict_property[str] = meta_property(default='tags')
-    event_filter_definition: dict_property[str | None] = meta_property()
+    event_filter_definition_json: dict_property[dict[str, Any] | None] = (
+        meta_property()
+    )
     event_filter_configuration: dict_property[dict[str, Any]] = (
         meta_property(default=dict)
     )
@@ -477,20 +479,48 @@ class Organisation(Base, TimestampMixin):
     def excluded_person_fields(self, request: OrgRequest) -> list[str]:
         return [] if request.is_logged_in else self.hidden_people_fields
 
+    # FIXME: It might be better to move some of this and use orm_cached
+    #        just like we do for pages_tree. Although this should be
+    #        reasonably inexpensive already.
+    @cached_property
+    def event_filter_parsed_definition(self) -> ParsedForm | None:
+        if definition := self.event_filter_definition_json:
+            return ParsedForm.model_validate_strings(definition)
+        return None
+
+    @property
+    def event_filter_definition(self) -> str | None:
+        if parsed := self.event_filter_parsed_definition:
+            return parsed.formcode
+        return None
+
+    @event_filter_definition.setter
+    def event_filter_definition(self, value: str | None) -> None:
+        if value:
+            parsed = ParsedForm.from_formcode(value)
+            self.event_filter_definition_json = parsed.model_dump(mode='json')
+            self.__dict__['event_filter_parsed_definition'] = parsed
+        else:
+            self.event_filter_definition_json = None
+            self.__dict__['event_filter_parsed_definition'] = None
+
     @property
     def event_filter_fields(self) -> tuple[ParsedField, ...]:
-        return flatten_event_filter_fields_from_definition(
-            self.event_filter_definition)
+        if parsed := self.event_filter_parsed_definition:
+            return parsed.flattened_fields
+        return ()
 
     @property
     def event_filter_names(self) -> dict[str, str]:
         return {f.id: f.label for f in self.event_filter_fields}
 
-
-@lru_cache(maxsize=64)
-def flatten_event_filter_fields_from_definition(
-    definition: str | None
-) -> tuple[ParsedField, ...]:
-    if not definition:
-        return ()
-    return tuple(flatten_fields(parse_formcode(definition)))
+    def __setattr__(self, name: str, value: object) -> None:
+        if name == 'event_filter_parsed_definition':
+            if isinstance(value, ParsedForm):
+                self.event_filter_definition_json = value.model_dump(
+                    mode='json')
+            else:
+                self.event_filter_definition_json = None
+            self.__dict__['event_filter_parsed_definition'] = value
+        else:
+            super().__setattr__(name, value)

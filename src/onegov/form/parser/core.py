@@ -407,16 +407,13 @@ import yaml
 from functools import cached_property
 from datetime import date as date_t  # noqa: TC003
 from dateutil import parser as dateutil_parser
-from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from functools import lru_cache
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
-from pydantic_core import CoreSchema, core_schema
 from pydantic_extra_types.currency_code import Currency  # noqa: TC002
 
 from onegov.core.utils import Bunch
 from onegov.form import errors
-from onegov.form.parser.grammar import approximate_total_days
 from onegov.form.parser.grammar import checkbox
 from onegov.form.parser.grammar import chip_nr
 from onegov.form.parser.grammar import code
@@ -437,16 +434,16 @@ from onegov.form.parser.grammar import textfield
 from onegov.form.parser.grammar import time
 from onegov.form.parser.grammar import url
 from onegov.form.parser.grammar import video_url
+from onegov.form.parser.grammar import RelativeDate
 from onegov.form.utils import as_internal_id
 
 
 from typing import final, Annotated, Any, Literal, Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import SupportsWrite
     from builtins import type as type_t
     from collections.abc import Callable, Iterable, Iterator, Sequence
-    from pydantic import GetCoreSchemaHandler, GetJsonSchemaHandler
-    from pydantic.json_schema import JsonSchemaValue
     from pyparsing import ParseResults
     from yaml.nodes import ScalarNode
 
@@ -712,66 +709,6 @@ def find_field(
     return None
 
 
-def serialize_relativedelta(value: relativedelta) -> dict[str, int]:
-    return {
-        key: val
-        # NOTE: weeks get folded into days
-        for key in ('years', 'months', 'days')
-        if (val := getattr(value, key, 0))
-    }
-
-
-class _RelativeDeltaAnnotation:
-    @classmethod
-    def __get_pydantic_core_schema__(
-        cls, source_type: Any, handler: GetCoreSchemaHandler
-    ) -> CoreSchema:
-        from_dict_schema = core_schema.chain_schema(
-            [
-                core_schema.dict_schema(
-                    keys_schema=core_schema.literal_schema([
-                        'years',
-                        'months',
-                        'weeks',
-                        'days'
-                    ]),
-                    values_schema=core_schema.int_schema(),
-                ),
-                core_schema.no_info_plain_validator_function(
-                    lambda data: relativedelta(**data)
-                ),
-            ]
-        )
-        return core_schema.union_schema(
-            [
-                core_schema.is_instance_schema(relativedelta),
-                from_dict_schema,
-            ],
-            serialization=core_schema.plain_serializer_function_ser_schema(
-                serialize_relativedelta,
-                info_arg=False
-            ),
-        )
-
-    @classmethod
-    def __get_pydantic_json_schema__(
-        cls, _schema: CoreSchema, handler: GetJsonSchemaHandler
-    ) -> JsonSchemaValue:
-        return {
-            'type': 'object',
-            'properties': {
-                'years': {'type': 'integer'},
-                'months': {'type': 'integer'},
-                'weeks': {'type': 'integer'},
-                'days': {'type': 'integer'},
-            },
-            'additionalProperties': False,
-        }
-
-
-RelativeDelta = Annotated[relativedelta, _RelativeDeltaAnnotation]
-
-
 class _RangeValidationMixin:
     if TYPE_CHECKING:
         start: Any | None
@@ -782,10 +719,6 @@ class _RangeValidationMixin:
         start, stop = self.start, self.stop
         if start is None or stop is None:
             return self
-
-        if isinstance(start, relativedelta):
-            start = approximate_total_days(start)
-            stop = approximate_total_days(stop)
 
         if start < stop:
             return self
@@ -844,7 +777,7 @@ type HalfBoundedRange[T] = Annotated[
     Field(union_mode='left_to_right')
 ]
 type DateRange = Annotated[
-    HalfBoundedRange[date_t] | HalfBoundedRange[RelativeDelta],
+    HalfBoundedRange[date_t] | HalfBoundedRange[RelativeDate],
     Field(union_mode='left_to_right')
 ]
 
@@ -1069,6 +1002,28 @@ class BaseField[KindT: str](BaseModel):
             'field_help': field_help
         })
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        raise NotImplementedError()
+
+    def write_formcode(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(indentation)
+        buffer.write(self.display_label)
+        buffer.write(' ')
+        if self.required:
+            buffer.write('*')
+        buffer.write('=')
+        self.write_formcode_value(buffer, indentation)
+        if self.field_help:
+            buffer.write(f'{indentation}<< {self.field_help} >>\n')
+
 
 @final
 class PasswordField(BaseField[Literal['password']]):
@@ -1077,6 +1032,13 @@ class PasswordField(BaseField[Literal['password']]):
     """
 
     type: Literal['password'] = 'password'
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ***\n')
 
 
 @final
@@ -1087,6 +1049,13 @@ class EmailField(BaseField[Literal['email']]):
 
     type: Literal['email'] = 'email'
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' @@@\n')
+
 
 @final
 class UrlField(BaseField[Literal['url']]):
@@ -1095,6 +1064,13 @@ class UrlField(BaseField[Literal['url']]):
     """
 
     type: Literal['url'] = 'url'
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' https://\n')
 
 
 @final
@@ -1105,6 +1081,13 @@ class VideoURLField(BaseField[Literal['video_url']]):
 
     type: Literal['video_url'] = 'video_url'
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' video-url\n')
+
 
 @final
 class DateField(BaseField[Literal['date']]):
@@ -1114,6 +1097,24 @@ class DateField(BaseField[Literal['date']]):
 
     type: Literal['date'] = 'date'
     valid_date_range: DateRange | None = None
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' YYYY.MM.DD')
+
+        if (dr := self.valid_date_range) is not None:
+            buffer.write(' (')
+            if dr.start is not None:
+                buffer.write(f'{dr.start:%d.%m.%Y}')
+            buffer.write('..')
+            if dr.stop is not None:
+                buffer.write(f'{dr.stop:%d.%m.%Y}')
+            buffer.write(')')
+
+        buffer.write('\n')
 
     def parse(self, value: Any) -> object:
         # the first int in an ambiguous date is assumed to be a day
@@ -1149,6 +1150,24 @@ class DatetimeField(BaseField[Literal['datetime']]):
     type: Literal['datetime'] = 'datetime'
     valid_date_range: DateRange | None = None
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' YYYY.MM.DD HH:MM')
+
+        if (dr := self.valid_date_range) is not None:
+            buffer.write(' (')
+            if dr.start is not None:
+                buffer.write(f'{dr.start:%d.%m.%Y}')
+            buffer.write('..')
+            if dr.stop is not None:
+                buffer.write(f'{dr.stop:%d.%m.%Y}')
+            buffer.write(')')
+
+        buffer.write('\n')
+
     @classmethod
     def from_parse_results(
         cls,
@@ -1177,6 +1196,13 @@ class TimeField(BaseField[Literal['time']]):
 
     type: Literal['time'] = 'time'
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' HH:MM\n')
+
     def parse(self, value: Any) -> object:
         return time(*map(int, value.split(':')))
 
@@ -1189,6 +1215,7 @@ class StringField(BaseField[Literal['text']]):
     type: Literal['text'] = 'text'
     maxlength: int | None = Field(
         default=None,
+        gt=0,
         description='Sets the `maxlength` attribute on the HTML text input'
     )
     regex: re.Pattern[str] | None = Field(
@@ -1197,6 +1224,18 @@ class StringField(BaseField[Literal['text']]):
             'regex pattern. Generally these patterns should include beginning '
             'and end markers, e.g. `^[0-9]{0,4}$` for a 4-digit numeric code.'
     )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ___')
+        if self.maxlength is not None:
+            buffer.write(f'[{self.maxlength}]')
+        if self.regex is not None:
+            buffer.write(f'/{self.regex.pattern}')
+        buffer.write('\n')
 
     @classmethod
     def from_parse_results(
@@ -1227,6 +1266,16 @@ class TextAreaField(BaseField[Literal['textarea']]):
         gt=0,
         description='Sets the `rows` attribute on the HTML textarea'
     )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ...')
+        if self.rows is not None:
+            buffer.write(f'[{self.rows}]')
+        buffer.write('\n')
 
     @classmethod
     def from_parse_results(
@@ -1271,6 +1320,15 @@ class CodeField(BaseField[Literal['code']]):
             'syntax': field.syntax,
         })
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' <')
+        buffer.write(self.syntax)
+        buffer.write('>\n')
+
 
 @final
 class StdnumField(BaseField[Literal['stdnum']]):
@@ -1292,6 +1350,15 @@ class StdnumField(BaseField[Literal['stdnum']]):
             'For validating swiss social security numbers you would supply '
             '"ch.ssn".'
     )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write('# ')
+        buffer.write(self.format)
+        buffer.write('\n')
 
     @classmethod
     def from_parse_results(
@@ -1318,6 +1385,13 @@ class ChipNrField(BaseField[Literal['chip_nr']]):
     """
     type: Literal['chip_nr'] = 'chip_nr'
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' chip-nr\n')
+
 
 @final
 class IntegerRangeField(BaseField[Literal['integer_range']]):
@@ -1333,6 +1407,18 @@ class IntegerRangeField(BaseField[Literal['integer_range']]):
         description='The pricing is multiplied by the quantity submitted '
             'by this numeric input'
     )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(f' {self.range.start}..{self.range.stop}')
+
+        if self.pricing_per_item is not None:
+            buffer.write(f' ({self.pricing_per_item})')
+
+        buffer.write('\n')
 
     @property
     def display_label(self) -> str:
@@ -1379,6 +1465,13 @@ class DecimalRangeField(BaseField[Literal['decimal_range']]):
     type: Literal['decimal_range'] = 'decimal_range'
     range: Range[Decimal]
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(f' {self.range.start}..{self.range.stop} \n')
+
     def parse(self, value: Any) -> object:
         return Decimal(value)
 
@@ -1409,7 +1502,9 @@ class FileinputField(BaseField[Literal['fileinput']]):
     file matching the specified file extensions.
     """
     type: Literal['fileinput'] = 'fileinput'
-    extensions: tuple[str, ...] = Field(
+    extensions: tuple[
+        Annotated[str, Field(pattern=r'([A-Za-z0-9]+|\*)')],
+    ...] = Field(
         description='If arbitrary file uploads are allowed, then this '
             'should contain a single element with the value ``*``. If '
             'more than one element is specified, all of them are treated '
@@ -1417,6 +1512,15 @@ class FileinputField(BaseField[Literal['fileinput']]):
             'file extensions with a well known set of associated mimetypes.',
         min_length=1,
     )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ')
+        buffer.write('|'.join(f'*.{ext}' for ext in self.extensions))
+        buffer.write('\n')
 
     @classmethod
     def from_parse_results(
@@ -1450,6 +1554,15 @@ class MultipleFileinputField(BaseField[Literal['multiplefileinput']]):
             'file extensions with a well known set of associated mimetypes.',
         min_length=1,
     )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ')
+        buffer.write('|'.join(f'*.{ext}' for ext in self.extensions))
+        buffer.write(' (multiple)\n')
 
     @classmethod
     def from_parse_results(
@@ -1493,6 +1606,21 @@ class RadioField(BaseField[Literal['radio']]):
         if isinstance(value, str):
             return next(iter(v.strip() for v in value.split('\n')), None)
         return value and value[0] or None
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write('\n')
+        for choice in self.choices:
+            check = 'x' if choice.selected else ' '
+            buffer.write(
+                f'{indentation}    ({check}) {choice.display_label}\n'
+            )
+            for field in choice.fields:
+                # FIXME: Handle nested fieldsets
+                field.write_formcode(buffer, indentation + '        ')
 
     @classmethod
     def from_parse_results(
@@ -1538,6 +1666,21 @@ class CheckboxField(BaseField[Literal['checkbox']]):
 
         return value
 
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write('\n')
+        for choice in self.choices:
+            check = 'x' if choice.selected else ' '
+            buffer.write(
+                f'{indentation}    [{check}] {choice.display_label}\n'
+            )
+            for field in choice.fields:
+                # FIXME: Handle nested fieldsets
+                field.write_formcode(buffer, indentation + '        ')
+
     @classmethod
     def from_parse_results(
         cls,
@@ -1555,16 +1698,6 @@ class CheckboxField(BaseField[Literal['checkbox']]):
             #       corresponding subfields happen inside parse_field_block.
             'choices': field.choices,
         })
-
-
-class ParsedForm(BaseModel):
-    """
-    Represents a parsed form.
-    """
-
-    model_config = ConfigDict(frozen=True)
-
-    fields: tuple[ParsedField, ...]
 
 
 @lru_cache(maxsize=1)
@@ -1886,6 +2019,13 @@ def translate_to_yaml(
                 if not indent_stack.is_identifier(len_indent):
                     raise errors.InvalidCommentIndentSyntax(line=ix + 1)
 
+            # FIXME: Currently this means we get rid of all newlines
+            #        unless there's more than one, and we get rid of
+            #        all leading spaces on every line. So use of things
+            #        like markdown code blocks or nested lists will be
+            #        broken. We should switch to a block scalar, if there
+            #        is more than one line. But we will need to be
+            #        careful about how much each line is indented.
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
                 identifier='field_help',

@@ -24,6 +24,7 @@ from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.directory.models.directory import EntrySubscription
 from onegov.form import FormCollection, as_internal_id, move_fields
+from onegov.form.parser import ParsedForm
 from onegov.form.errors import (
     InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
 from onegov.form.fields import UploadField
@@ -229,7 +230,9 @@ def handle_edit_directory(
             if self.directory.entries:
                 assert form.structure.data is not None
                 migration = self.directory.migration(
-                    form.structure.data,
+                    # FIXME: Make a form field that directly operates
+                    #        on ParsedForm
+                    ParsedForm.from_formcode(form.structure.data),
                     form.configuration
                 )
 

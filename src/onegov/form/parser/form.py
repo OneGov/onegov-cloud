@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from decimal import Decimal
 from html import escape
-from onegov.form import errors
+from functools import cached_property
+from io import StringIO
+from onegov.form import errors, log
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import (
     MultiCheckboxField, DateTimeLocalField, URLField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
-from onegov.form.parser.core import parse_formcode
+from onegov.form.parser.core import flatten_fields, parse_formcode, ParsedField
 from onegov.form.utils import as_internal_id
 from onegov.form.validators import LaxDataRequired
 from onegov.form.validators import ExpectedExtensions
@@ -19,6 +21,7 @@ from onegov.form.validators import StrictOptional
 from onegov.form.validators import ValidDateRange
 from onegov.form.widgets import DateRangeInput
 from onegov.form.widgets import DateTimeLocalRangeInput
+from pydantic import BaseModel, ConfigDict, Field
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
@@ -34,9 +37,8 @@ from wtforms.validators import Regexp
 from wtforms.validators import URL
 
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.form.parser.core import ParsedField
     from onegov.form.types import PricingRules, Validator, Widget
     from wtforms import Field as WTField
 
@@ -45,36 +47,106 @@ MEGABYTE = 1000 ** 2
 DEFAULT_UPLOAD_LIMIT = 100 * MEGABYTE
 
 
-@overload
-def parse_form[T: Form](
-    text: str,
-    enable_edit_checks: bool,
-    base_class: type[T]
-) -> type[T]: ...
+class ParsedForm(BaseModel):
+    """
+    Represents a parsed form.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    fields: tuple[ParsedField, ...]
+    source_code: str | None = Field(
+        default=None,
+        description='The original formcode that was parsed to generate '
+            'this structure. Leave empty, when directly generating a '
+            'form structure. This is mostly useful for preserving '
+            'formatting, when editing the form via formcode. As long as '
+            'this successfully parses back into the same structure, we will '
+            'pre-fill the edit field with this text, instead of generating '
+            'formcode based on the structure.'
+    )
+
+    @cached_property
+    def flattened_fields(self) -> tuple[ParsedField, ...]:
+        return tuple(flatten_fields(self.fields))
+
+    @cached_property
+    def formcode(self) -> str:
+        return self.source_code or self.to_formcode()
+
+    # NOTE: Ideally we only access this when editing formcode, since it
+    #       can be very expensive. If we don't want to ensure that the
+    #       formcode is still valid, we can just access source_code.
+    @cached_property
+    def safe_formcode(self) -> str:
+        if self.source_code is not None:
+            try:
+                if self.fields == tuple(parse_formcode(self.source_code)):
+                    return self.source_code
+            except Exception:
+                log.warning(
+                    f'Failed to parse stored formcode:\n{self.source_code}'
+                )
+        return self.to_formcode()
+
+    def to_formcode(self) -> str:
+        fieldset: str | None = None
+        buffer = StringIO()
+        for field in self.fields:
+            if field.fieldset != fieldset:
+                if fieldset is not None:
+                    # insert an extra newline above the fieldset
+                    buffer.write('\n')
+                fieldset = field.fieldset
+                buffer.write(f'# {fieldset}\n')
+            field.write_formcode(buffer, '')
+        return buffer.getvalue()
+
+    def form_class[T: Form = Form](
+        self,
+        base_class: type[T] = Form  # type: ignore[assignment]
+    ) -> type[T]:
+
+        # NOTE: Since ParsedForm is intended to be immutable, we can
+        #       cache the generated form class per base class.
+        cache = self.__dict__.setdefault('_form_class', {})
+        cached = cache.get(base_class)
+        if cached is not None:
+            return cached
+
+        builder = WTFormsClassBuilder(base_class)
+
+        for field in self.fields:
+            builder.set_current_fieldset(field.fieldset)
+            handle_field(builder, field)
+
+        form_class = cache[base_class] = builder.form_class
+        form_class._parsed = self
+        form_class._source = self.source_code or self.to_formcode()
+
+        return form_class
+
+    @classmethod
+    def from_formcode(
+        cls,
+        definition: str,
+        # FIXME: Eventually we want these to always be enabled
+        #        so we can get rid of this parameter again
+        enable_edit_checks: bool = False
+    ) -> Self:
+        return cls.model_construct(
+            fields=tuple(parse_formcode(definition, enable_edit_checks)),
+            source_code=definition
+        )
 
 
-@overload
-def parse_form[T: Form](
+# FIXME: We can probably get rid of this function and instead just
+#        rely on `ParsedForm`.
+def parse_form[T: Form = Form](
     text: str,
     enable_edit_checks: bool = False,
-    *,
-    base_class: type[T]
-) -> type[T]: ...
-
-
-@overload
-def parse_form(
-    text: str,
-    enable_edit_checks: bool = False,
-    base_class: type[Form] = Form
-) -> type[Form]: ...
-
-
-def parse_form(
-    text: str,
-    enable_edit_checks: bool = False,
-    base_class: type[Form] = Form
-) -> type[Form]:
+    base_class: type[T] = Form  # type: ignore[assignment]
+) -> type[T]:
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
@@ -84,16 +156,8 @@ def parse_form(
     :param base_class: Form base class
     """
 
-    builder = WTFormsClassBuilder(base_class)
-
-    for field in parse_formcode(text, enable_edit_checks):
-        builder.set_current_fieldset(field.fieldset)
-        handle_field(builder, field)
-
-    form_class = builder.form_class
-    form_class._source = text
-
-    return form_class
+    parsed = ParsedForm.from_formcode(text, enable_edit_checks)
+    return parsed.form_class(base_class)
 
 
 def handle_field(

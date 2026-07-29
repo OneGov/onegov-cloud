@@ -15,6 +15,7 @@ from onegov.form import as_internal_id
 from onegov.form import Form
 from onegov.form.errors import (
     DuplicateLabelError, InvalidFormSyntax, MixedTypeError)
+from onegov.form.parser import ParsedForm
 from onegov.org import _
 from onegov.org.app import OrgApp
 from onegov.org.forms import AnalyticsSettingsForm
@@ -37,8 +38,6 @@ from onegov.org.management import LinkHealthCheck
 from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
-from onegov.org.models.organisation import (
-    flatten_event_filter_fields_from_definition)
 from onegov.org.path import ShortLink
 from uuid import uuid4
 
@@ -444,10 +443,10 @@ def handle_event_settings(
                 }
                 new_field_choices = {
                     f.id: {c.label for c in getattr(f, 'choices', ())}
-                    for f in flatten_event_filter_fields_from_definition(
+                    for f in ParsedForm.from_formcode(
                         form.event_filter_definition.data
-                    )
-                }
+                    ).flattened_fields
+                } if form.event_filter_definition.data else {}
 
                 removed_keywords = old_keywords - new_keywords
                 removed_choices: dict[str, set[str]] = {
