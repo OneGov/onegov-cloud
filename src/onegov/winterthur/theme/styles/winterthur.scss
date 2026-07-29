@@ -20,13 +20,10 @@ p, h1, h2, h3, h4, h5 {
 
 input[data-street-search] {
     background: $input-bg-color;
-    border: 0 inset $input-border-color;
-    border-radius: 2px;
-    box-shadow: $input-box-shadow;
+    border: 0 inset $gray-light;
     font-size: 1.1rem;
-    font-weight: bold;
     height: 50px;
-    padding: 10px;
+    padding: 1rem 1rem;
 }
 
 form input[type="radio"] {
@@ -249,13 +246,36 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
     }
 
     list-style-position: inside;
+    column-gap: .3rem;
 
     li {
-        list-style-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3IiBoZWlnaHQ9IjkiIHZpZXdCb3g9IjAgMCA3IDkiPgogIDxjaXJjbGUgY3g9IjMuNSIgY3k9IjMuNSIgcj0iMi41IiBmaWxsPSIjNDQ0NDNGIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz4KPC9zdmc+Cg==");
-        overflow: hidden;
-        padding-bottom: .273em;
+        list-style: none;
         text-overflow: ellipsis;
         white-space: nowrap;
+        margin-bottom: .3rem;
+        background: rgba($beige-ultra-light, 0.6);
+        a {
+            padding: 1rem;
+            width: 100%;
+            display: block;
+            color: black;
+            position: relative;
+
+            &::after {
+                content: "";
+                display: block;
+                width: 16px;
+                height: 20px;
+                flex-shrink: 0;
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23E2001A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg>');
+                background-repeat: no-repeat;
+                background-size: contain;
+                position: absolute;
+                top: 50%;
+                right: 1rem;
+                transform: translateY(-50%);
+            }
+        }
     }
 }
 
