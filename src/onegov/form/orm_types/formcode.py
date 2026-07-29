@@ -6,11 +6,9 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.types import TypeDecorator
 
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.engine import Dialect
-    from sqlalchemy.sql.type_api import _BindProcessorType
-    from sqlalchemy.sql.type_api import _ResultProcessorType
 
 
 class Formcode(TypeDecorator[ParsedForm]):
@@ -31,45 +29,21 @@ class Formcode(TypeDecorator[ParsedForm]):
     def python_type(self) -> type[ParsedForm]:
         return ParsedForm
 
-    # HACK: In order to bypass the dialect's default serializer/deserializer
-    #       we directly override the processors, instead of relying on the
-    #       the default TypeDecorator way which applies our processing on
-    #       top of the implementation's processing. This is a little less
-    #       robust, since it depends on implementation details of the
-    #       JSONB type adapter, which may change in the future and break
-    #       these processors.
-
-    def bind_processor(
+    def process_bind_param(
         self,
+        value: ParsedForm | None,
         dialect: Dialect
-    ) -> _BindProcessorType[ParsedForm]:
+    ) -> str | None:
 
-        def process_parsed_form(value: ParsedForm | None) -> str | None:
-            if value is None:
-                return None
-            return value.model_dump_json(
-                exclude_unset=True,
-                exclude_defaults=True
-            )
+        return None if value is None else value.model_dump_json()
 
-        return self._make_bind_processor(
-            self._str_impl.bind_processor(dialect),
-            process_parsed_form
-        )
-
-    def result_processor(
+    def process_result_value(
         self,
-        dialect: Dialect,
-        coltype: object
-    ) -> _ResultProcessorType[ParsedForm]:
-        string_process = self._str_impl.result_processor(dialect, coltype)
+        value: str | bytes | None,
+        dialect: Dialect
+    ) -> ParsedForm | None:
 
-        def process(value: Any) -> ParsedForm | None:
-            if value is None:
-                return None
-            if string_process:
-                value = string_process(value)
-            # NOTE: We defer parsing the JSON, until we actually need it.
-            return Proxy(lambda: ParsedForm.model_validate_json(value))
+        if not value:
+            return None
 
-        return process
+        return Proxy(lambda: ParsedForm.model_validate_json(value))

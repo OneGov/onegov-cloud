@@ -488,10 +488,10 @@ class Directory(Base, ContentMixin, TimestampMixin,
     @observes('parsed_structure', 'configuration')
     def structure_configuration_observer(
         self,
-        parsed_structure: ParsedForm,
+        parsed_structure: set[tuple[str, Any]],
         configuration: DirectoryConfiguration
     ) -> None:
-        self.migration(parsed_structure, configuration).execute()
+        self.migration(self.parsed_structure, configuration).execute()
 
     def entry_with_name_exists(self, name: str) -> bool:
         session = object_session(self)
