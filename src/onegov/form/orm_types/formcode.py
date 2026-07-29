@@ -44,9 +44,17 @@ class Formcode(TypeDecorator[ParsedForm]):
         dialect: Dialect
     ) -> _BindProcessorType[ParsedForm]:
 
+        def process_parsed_form(value: ParsedForm | None) -> str | None:
+            if value is None:
+                return None
+            return value.model_dump_json(
+                exclude_unset=True,
+                exclude_defaults=True
+            )
+
         return self._make_bind_processor(
             self._str_impl.bind_processor(dialect),
-            ParsedForm.model_dump_json
+            process_parsed_form
         )
 
     def result_processor(
