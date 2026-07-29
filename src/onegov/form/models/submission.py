@@ -177,13 +177,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         return form._fields[name].data if name else None
 
     @observes('parsed')
-    def parsed_observer(self, parsed: ParsedForm) -> None:
+    def parsed_observer(self, parsed: set[tuple[str, Any]]) -> None:
         # FIXME: We might want to switch to a more stable way to hash
         #        formcode, but we would need to ensure continuity across
         #        the change.
-        self.checksum = hash_definition(
-            parsed.source_code or parsed.to_formcode()
-        )
+        self.checksum = hash_definition(self.parsed.formcode)
 
     @observes('state')
     def state_observer(self, state: SubmissionState) -> None:
@@ -396,13 +394,11 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
         return self.form_class(data=self.data)
 
     @observes('parsed')
-    def parsed_observer(self, parsed: ParsedForm) -> None:
+    def parsed_observer(self, parsed: set[tuple[str, Any]]) -> None:
         # FIXME: We might want to switch to a more stable way to hash
         #        formcode, but we would need to ensure continuity across
         #        the change.
-        self.checksum = hash_definition(
-            parsed.source_code or parsed.to_formcode()
-        )
+        self.checksum = hash_definition(self.parsed.formcode)
 
     def update_title(self, survey: Form) -> None:
         title_fields = survey.title_fields
