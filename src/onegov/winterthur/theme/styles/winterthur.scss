@@ -1,6 +1,10 @@
 /*
     General tweaks
 */
+p, h1, h2, h3, h4, h5 {
+    color: $body-font-color;
+}
+
 .small {
     font-size: 17px;
 }
@@ -32,6 +36,41 @@ form input[type="radio"] {
 input[data-street-search]::placeholder {
     color: $input-placeholder-color;
 }
+
+/*
+    Forms
+*/
+input[type="text"], input[type="password"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="week"], input[type="email"], input[type="number"], input[type="search"], input[type="tel"], input[type="time"], input[type="url"], input[type="color"], textarea, select {
+    border: 1px solid $gray-light;
+    border-radius: 4px;
+    background-color: $white;
+    box-shadow: none;
+    // margin-bottom: 1.5rem;
+}
+
+.label-text {
+    color: $dark-blue;
+    font-weight: bold;
+}
+
+.field-help {
+    margin-bottom: 1.5rem;
+}
+
+.label-required {
+    color: $dark-blue !important;
+    font-size: 1.2rem;
+    font-weight: normal !important;
+    margin-left: -.2rem;
+    margin-bottom: -.2rem;
+}
+
+/*
+    Button
+*/
+    .button {
+        border-radius: 2rem !important;
+    }
 
 /*
     Edit bar
@@ -436,6 +475,42 @@ td.mission-nature {
 /*
     Tables
 */
+table {
+    margin-bottom: 1.5rem;
+
+    tr th {
+        color: $dark-blue;
+        padding: .2rem;
+    }
+
+    tr {
+        background: transparent !important;
+
+        &:last-child {
+            th, td {
+                border-bottom: 1px solid $dark-blue;
+            }
+        }
+
+        input[type="checkbox"] {
+            margin-top: 0 !important;
+        }
+    }
+
+    thead {
+        background-color: transparent;
+        border-bottom: 2px solid;
+        tr th {
+            color: $beige;
+            border-bottom: 2px solid $dark-blue !important;
+        }
+    }
+
+    td {
+        border-bottom: 1px solid $gray-light;
+    }
+}
+
 .min-width-column {
     white-space: nowrap;
     width: 1%;

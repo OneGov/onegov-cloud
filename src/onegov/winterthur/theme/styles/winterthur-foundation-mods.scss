@@ -1,11 +1,14 @@
 /*
     Custom colors
 */
-$gray-ultra-light: #f6f6f5;
-$gray-light: #ececea;
-$gray: #dadad6;
-$gray-dark: #44443f;
+$gray-ultra-light: #e1e1e1;
+$gray-light: #b5b5b5;
+$gray: #989898;
+$gray-dark: #5c5c5c;
 $red: #ff1900;
+$dark-blue: #172a3a;
+
+$beige: #766b5b;
 
 $secondary-color: $gray;
 $panel-bg: $gray-light;
@@ -28,7 +31,7 @@ $table-head-border-color: #999;
     Custom fonts
 */
 $base-font-size: 125%;
-$body-font-color: $gray-dark;
+$body-font-color: $dark-blue;
 $small-font-size: 17px;
 $font-family-sans-serif: "NewsGot", Verdana, Arial, sans-serif;
 
