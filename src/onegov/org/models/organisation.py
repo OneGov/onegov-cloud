@@ -485,7 +485,7 @@ class Organisation(Base, TimestampMixin):
     @cached_property
     def event_filter_parsed_definition(self) -> ParsedForm | None:
         if definition := self.event_filter_definition_json:
-            return ParsedForm.model_validate_strings(definition)
+            return ParsedForm.model_validate(definition)
         return None
 
     @property
