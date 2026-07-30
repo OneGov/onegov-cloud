@@ -184,7 +184,7 @@ class DirectorySubmissionAction:
         # the directory might have changed -> migrate what we can
         migration = DirectoryMigration(
             directory=self.directory,
-            old_structure=self.submission.definition
+            old_structure=self.submission.parsed
         )
 
         # whenever we try to adopt a submission, we update its structure

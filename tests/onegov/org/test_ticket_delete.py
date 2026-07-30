@@ -10,6 +10,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.core.utils import Bunch
 from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmissionCollection
+from onegov.form.parser import ParsedForm
 from onegov.org.models.ticket import FormSubmissionHandler
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection, Ticket
@@ -97,13 +98,13 @@ def test_files_from_ticket_form_submission_are_deleted(
     form_submission_collection = FormCollection(client.app.session())
     form_submission_collection.definitions.add(
         'Statistics',
-        definition=textwrap.dedent(
+        parsed=ParsedForm.from_formcode(textwrap.dedent(
             """
             E-Mail * = @@@
             Name * = ___
             Datei * = *.txt
             Datei2 * = *.txt """
-        ),
+        )),
         type='custom',
     )
     transaction.commit()

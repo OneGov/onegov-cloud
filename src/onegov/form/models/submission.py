@@ -8,7 +8,8 @@ from onegov.core.orm.mixins import TimestampMixin, dict_property, meta_property
 from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
 from onegov.form.extensions import Extendable
-from onegov.form.parser import parse_form
+from onegov.form.orm_types import Formcode
+from onegov.form.parser import ParsedForm
 from onegov.form.types import RegistrationState, SubmissionState
 from onegov.form.utils import extract_text_from_html
 from onegov.form.utils import hash_definition
@@ -66,10 +67,10 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     # submitted fields (may be NULL, even for complete submissions)
     email: Mapped[str | None]
 
-    #: the source code of the form at the moment of submission. This is stored
+    #: the pre-parsed form at the moment of submission. This is stored
     #: alongside the submission as the original form may change later. We
     #: want to keep the old form around just in case.
-    definition: Mapped[str]
+    parsed: Mapped[ParsedForm] = mapped_column(Formcode)
 
     #: the exact time this submissions was changed from 'pending' to 'complete'
     received: Mapped[datetime | None]
@@ -125,12 +126,25 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         ),
     )
 
+    @hybrid_property
+    def definition(self) -> str:
+        return self.parsed.formcode
+
+    @definition.inplace.setter
+    def _definition_setter(self, value: str) -> None:
+        self.parsed = ParsedForm.from_formcode(value)
+
+    @definition.inplace.expression
+    @classmethod
+    def _definition_expression(cls) -> ColumnElement[str | None]:
+        return cls.parsed['source_code'].astext
+
     @property
     def form_class(self) -> type[Form]:
-        """ Parses the form definition and returns a form class. """
+        """ The WTForms form class associated with this submission. """
 
         return self.extend_form_class(
-            parse_form(self.definition),
+            self.parsed.form_class(),
             self.extensions or []
         )
 
@@ -162,9 +176,12 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         name = self.get_email_field_name(form)
         return form._fields[name].data if name else None
 
-    @observes('definition')
-    def definition_observer(self, definition: str) -> None:
-        self.checksum = hash_definition(definition)
+    @observes('parsed')
+    def parsed_observer(self, parsed: set[tuple[str, Any]]) -> None:
+        # FIXME: We might want to switch to a more stable way to hash
+        #        formcode, but we would need to ensure continuity across
+        #        the change.
+        self.checksum = hash_definition(self.parsed.formcode)
 
     @observes('state')
     def state_observer(self, state: SubmissionState) -> None:
@@ -321,10 +338,10 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
         back_populates='submissions'
     )
 
-    #: the source code of the form at the moment of submission. This is stored
+    #: the pre-parsed form at the moment of submission. This is stored
     #: alongside the submission as the original form may change later. We
     #: want to keep the old form around just in case.
-    definition: Mapped[str]
+    parsed: Mapped[ParsedForm] = mapped_column(Formcode)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
@@ -349,12 +366,25 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
 
+    @hybrid_property
+    def definition(self) -> str:
+        return self.parsed.formcode
+
+    @definition.inplace.setter
+    def _definition_setter(self, value: str) -> None:
+        self.parsed = ParsedForm.from_formcode(value)
+
+    @definition.inplace.expression
+    @classmethod
+    def _definition_expression(cls) -> ColumnElement[str | None]:
+        return cls.parsed['source_code'].astext
+
     @property
     def form_class(self) -> type[Form]:
         """ Parses the form definition and returns a form class. """
 
         return self.extend_form_class(
-            parse_form(self.definition),
+            self.parsed.form_class(),
             self.extensions or []
         )
 
@@ -363,9 +393,12 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
         """ A form instance containing the submission data. """
         return self.form_class(data=self.data)
 
-    @observes('definition')
-    def definition_observer(self, definition: str) -> None:
-        self.checksum = hash_definition(definition)
+    @observes('parsed')
+    def parsed_observer(self, parsed: set[tuple[str, Any]]) -> None:
+        # FIXME: We might want to switch to a more stable way to hash
+        #        formcode, but we would need to ensure continuity across
+        #        the change.
+        self.checksum = hash_definition(self.parsed.formcode)
 
     def update_title(self, survey: Form) -> None:
         title_fields = survey.title_fields

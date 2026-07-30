@@ -8,7 +8,7 @@ from datetime import date, datetime, time
 from more_itertools import collapse
 from onegov.core.custom import json
 from onegov.core.utils import normalize_for_url, safe_format, safe_format_keys
-from onegov.form import parse_formcode, flatten_fieldsets, as_internal_id
+from onegov.form import as_internal_id
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
@@ -18,6 +18,7 @@ from urllib.parse import quote_plus
 from typing import overload, Any, Literal, NoReturn, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
+    from onegov.form.parser import ParsedForm
     from sqlalchemy.engine import Dialect
 
 # XXX i18n
@@ -134,10 +135,10 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.changed()
         return super().__setattr__(name, value)
 
-    def missing_fields(self, formcode: str | None) -> dict[str, list[str]]:
-        """ Takes the given formcode and returns a dictionary with missing
-        fields per configuration field. If the return-value is falsy, the
-        configuration is valid.
+    def missing_fields(self, parsed: ParsedForm) -> dict[str, list[str]]:
+        """ Takes the given pre-parsed formcode and returns a dictionary with
+        missing fields per configuration field. If the return-value is falsy,
+        the configuration is valid.
 
         For example::
 
@@ -147,8 +148,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             {'title': ['Name']}
 
         """
-        formfields = tuple(flatten_fieldsets(parse_formcode(formcode)))
-        known = {field.human_id for field in formfields}
+        known = {field.human_id for field in parsed.flattened_fields}
 
         errors = defaultdict(list)
 

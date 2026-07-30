@@ -6,7 +6,8 @@
 # Therefore we use a common denominator kind of json encoder/decoder.
 from __future__ import annotations
 
-from sqlalchemy.ext.mutable import MutableDict
+from onegov.core.custom import json
+from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.types import TypeDecorator
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -31,17 +32,46 @@ class JSON(TypeDecorator[dict[str, Any]]):
         self,
         value: dict[str, Any] | None,
         dialect: Dialect
-    ) -> dict[str, Any]:
+    ) -> str:
 
-        return {} if value is None else value
+        return json.dumps({} if value is None else value)
 
     def process_result_value(
         self,
-        value: dict[str, Any] | None,
+        value: str | bytes | None,
         dialect: Dialect
     ) -> dict[str, Any]:
 
-        return {} if value is None else value
+        return {} if value is None else json.loads(value)
+
+
+class JSONArray(TypeDecorator[list[dict[str, Any]]]):
+    """ A JSONB based type that coerces None's to empty lists.
+
+    That is, this JSONB column does not have NULL values, it only has
+    falsy values (an empty list).
+
+    """
+
+    impl = JSONB
+    cache_ok = True
+
+    def process_bind_param(
+        self,
+        value: list[dict[str, Any]] | None,
+        dialect: Dialect
+    ) -> str:
+
+        return json.dumps([] if value is None else value)
+
+    def process_result_value(
+        self,
+        value: str | bytes | None,
+        dialect: Dialect
+    ) -> list[dict[str, Any]]:
+
+        return [] if value is None else json.loads(value)
 
 
 MutableDict.associate_with(JSON)
+MutableList.associate_with(JSONArray)

@@ -22,6 +22,7 @@ from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models.ticket import ReservationHandler
 from onegov.pay import Payment, PaymentCollection, InvoiceCollection
 from onegov.pdf.utils import extract_pdf_info
+from onegov.reservation import Allocation as ResourceAllocation
 from onegov.reservation import Resource, ResourceCollection
 from onegov.reservation.models.custom_reservation import CustomReservation
 from onegov.ticket import Ticket, TicketCollection, TicketInvoice
@@ -30,6 +31,7 @@ from openpyxl import load_workbook
 from pathlib import Path
 from sqlalchemy import exc
 from sqlalchemy.orm.session import close_all_sessions
+from tests.onegov.org.common import ticket_message_owners
 from tests.shared.utils import add_reservation
 from unittest.mock import patch
 from urllib.parse import quote
@@ -1049,6 +1051,57 @@ def test_allocation_holidays(client: Client) -> None:
     assert slots.json[3]['start'].startswith('2019-08-02')
 
 
+def test_allocation_other_holidays_with_year(client: Client) -> None:
+    client.login_admin()
+
+    # a year-specific other holiday only counts for that year
+    page = client.get('/holiday-settings')
+    page.form['other_holidays'] = '30.07.2019 - One time only'
+    page.form.submit()
+
+    # the value round-trips through the form keeping the year
+    page = client.get('/holiday-settings')
+    assert '30.07.2019 - One time only' in page.form['other_holidays'].value
+
+    page = client.get('/resources').click('Raum')
+    page.form['title'] = 'Foo'
+    page.form.submit()
+
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 1'
+    new.form['start'] = '2019-07-30'
+    new.form['end'] = '2019-07-31'
+    new.form['start_time'] = '07:00'
+    new.form['end_time'] = '12:00'
+    new.form['on_holidays'] = 'no'
+    new.form['is_partly_available'] = 'no'
+    new.form.submit()
+
+    # the 30th of July 2019 is skipped as a holiday, so only the 31st has
+    # an allocation slot (the 30th only shows up as a holiday marker)
+    slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-01')
+    assert len(slots.json) == 2
+    assert slots.json[0]['title'] == 'One time only'
+    assert slots.json[0]['start'] == '2019-07-30'
+    assert slots.json[1]['start'].startswith('2019-07-31')
+
+    # but the same day in another year is a regular day
+    new = client.get('/resource/foo/new-rule')
+    new.form['title'] = 'Period 2'
+    new.form['start'] = '2020-07-30'
+    new.form['end'] = '2020-07-31'
+    new.form['start_time'] = '07:00'
+    new.form['end_time'] = '12:00'
+    new.form['on_holidays'] = 'no'
+    new.form['is_partly_available'] = 'no'
+    new.form.submit()
+
+    slots = client.get('/resource/foo/slots?start=2020-07-29&end=2020-08-01')
+    assert len(slots.json) == 2
+    assert slots.json[0]['start'].startswith('2020-07-30')
+    assert slots.json[1]['start'].startswith('2020-07-31')
+
+
 def test_allocation_school_holidays(client: Client) -> None:
     client.login_admin()
 
@@ -1108,8 +1161,18 @@ def test_allocation_school_holidays(client: Client) -> None:
     assert slots.json[2]['start'].startswith('2019-08-02')
 
 
+@pytest.mark.parametrize('logged_in,expected_owner', [
+    # anonymous requester -> messages attributed to the auto-accept user
+    (False, 'autoaccept@example.org'),
+    # logged-in requester -> messages attributed to that logged-in user
+    (True, 'admin@example.org'),
+])
 @freeze_time('2015-08-28', tick=True)
-def test_auto_accept_reservations(client: Client) -> None:
+def test_auto_accept_reservations(
+    client: Client,
+    logged_in: bool,
+    expected_owner: str,
+) -> None:
     # prepare the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1126,13 +1189,26 @@ def test_auto_accept_reservations(client: Client) -> None:
     )
 
     reserve = client.bound_reserve(allocations[0])
+
+    # add a distinct admin as the configured auto-accept user, so we can
+    # tell it apart from a logged-in requester (OGC-3256)
+    UserCollection(client.app.session()).add(
+        username='autoaccept@example.org', password='hunter2', role='admin'
+    )
     transaction.commit()
 
-    admin_client = client
+    # configure auto-accept via a separate admin client, so the requester
+    # below can stay anonymous
+    admin_client = client.spawn()
     admin_client.login_admin()
     settings = admin_client.get('/ticket-settings')
     settings.form['ticket_auto_accepts'] = ['RSV']
+    settings.form['auto_closing_user'] = 'autoaccept@example.org'
     settings.form.submit()
+
+    # the requester is either anonymous or the logged-in admin
+    if logged_in:
+        client.login_admin()
 
     # create a reservation
     result = reserve(quota=4, whole_day=True)
@@ -1161,13 +1237,21 @@ def test_auto_accept_reservations(client: Client) -> None:
     assert 'Ganztägig' in pdf_content
 
     # close the ticket and check not email is sent
-    tickets = client.get('/tickets/ALL/closed')
+    tickets = admin_client.get('/tickets/ALL/closed')
     assert 'RSV-' in tickets
 
     # Test display of status page of ticket
     # Generic message, shown when ticket is open or closed
     assert 'Ihre Anfrage wurde erfolgreich abgeschlossen' not in page
     assert 'You can pick it up at the counter' in page
+
+    # the auto-accept activity messages are attributed to the acting user
+    session = client.app.session()
+    ticket_obj = TicketCollection(session).query().filter_by(
+        handler_code='RSV').one()
+    messages = ticket_message_owners(session, ticket_obj)
+    assert messages['accepted'] == expected_owner
+    assert messages['closed'] == expected_owner
 
 
 @freeze_time('2015-08-28', tick=True)
@@ -4106,6 +4190,7 @@ def test_allocation_rules_on_rooms(client: Client) -> None:
     assert count_allocations() == 7
 
 
+@freeze_time('2018-12-31')
 def test_allocation_rules_edit(client: Client) -> None:
     client.login_admin()
 
@@ -4133,7 +4218,11 @@ def test_allocation_rules_edit(client: Client) -> None:
     page.form['extend'] = 'daily'
     page.form['start'] = '2019-01-01'
     page.form['end'] = '2019-01-02'
-    page.form['as_whole_day'] = 'yes'
+    page.form['as_whole_day'] = 'no'
+    page.form['start_time'] = '08:00'
+    page.form['end_time'] = '12:00'
+    page.form['is_partly_available'] = 'no'
+    page.form['per_time_slot'] = 2
 
     page.select_checkbox('except_for', 'Sa')
     page.select_checkbox('except_for', 'So')
@@ -4142,6 +4231,25 @@ def test_allocation_rules_edit(client: Client) -> None:
 
     assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('room')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = (
+        scheduler.managed_allocations()
+        .order_by(ResourceAllocation._start)
+        .all()
+    )
+    allocation = allocations[0]
+    allocation.quota_limit = 2
+    token = scheduler.reserve(
+        'info@example.org',
+        dates=(allocation.display_start(), allocation.display_end()),
+        quota=2,
+    )
+    scheduler.approve_reservations(token)
+    transaction.commit()
 
     # Modifying the rule applies changes where possible, but
     # existing reserved slots remain unaffected.
@@ -4153,6 +4261,84 @@ def test_allocation_rules_edit(client: Client) -> None:
     edit_page = form.submit().follow()
 
     assert 'Renamed room' in edit_page
+    assert not edit_page.pyquery('.alert-box.warning')
+
+    scheduler.allocate(
+        dates=(
+            datetime(2019, 1, 3, 8),
+            datetime(2019, 1, 3, 12),
+        ),
+    )
+    transaction.commit()
+
+    edit_page = client.get('/resource/room')
+    edit_page = edit_page.click('Verfügbarkeitszeiträume').click('Bearbeiten')
+    form = edit_page.form
+    form['start'] = '2019-01-01'
+    form['end'] = '2019-01-03'
+    edit_page = form.submit().follow()
+
+    warning = edit_page.pyquery('.alert-box.warning').text()
+    assert '1 Verfügbarkeiten wurden nicht erstellt' in warning
+
+
+def test_allocation_rules_overlap_warning(client: Client) -> None:
+    client.login_admin()
+
+    page = client.get('/resources').click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def new_rule() -> Any:
+        return (
+            client.get('/resource/room')
+            .click('Verfügbarkeitszeiträume')
+            .click('Verfügbarkeitszeitraum')
+        )
+
+    page = new_rule()
+    page.form['title'] = 'Intern'
+    page.form['start'] = '2019-01-07'
+    page.form['end'] = '2019-01-11'
+    page.form['as_whole_day'] = 'no'
+    page.form['start_time'] = '08:00'
+    page.form['end_time'] = '12:00'
+
+    for weekday in ('Sa', 'So'):
+        page.select_checkbox('except_for', weekday)
+
+    page = page.form.submit().follow()
+    assert 'Verfügbarkeitszeitraum aktiv, 5 Verfügbarkeiten erstellt' in page
+    assert not page.pyquery('.alert-box.warning')
+
+    # the weekend does not overlap with the weekdays
+    page = new_rule()
+    page.form['title'] = 'Wochenende'
+    page.form['start'] = '2019-01-07'
+    page.form['end'] = '2019-01-13'
+    page.form['as_whole_day'] = 'yes'
+
+    for weekday in ('Mo', 'Di', 'Mi', 'Do', 'Fr'):
+        page.select_checkbox('except_for', weekday)
+
+    page = page.form.submit().follow()
+    assert not page.pyquery('.alert-box.warning')
+
+    # this one shares three weekdays and the time of day with 'Intern'
+    page = new_rule()
+    page.form['title'] = 'Öffentlich'
+    page.form['start'] = '2019-01-09'
+    page.form['end'] = '2019-01-18'
+    page.form['as_whole_day'] = 'no'
+    page.form['start_time'] = '10:00'
+    page.form['end_time'] = '14:00'
+
+    for weekday in ('Sa', 'So'):
+        page.select_checkbox('except_for', weekday)
+
+    page = page.form.submit().follow()
+    warning = page.pyquery('.alert-box.warning').text()
+    assert '3 Verfügbarkeiten wurden nicht erstellt' in warning
 
 
 def test_allocation_rules_delete(client: Client) -> None:
@@ -5618,3 +5804,24 @@ def test_reservation_accept_cancellation_without_request(
         'Für dieses Ticket wurde keine Stornierung beantragt'
         in response
     )
+
+
+def test_resource_settings_return_to(client: Client) -> None:
+    client.login_admin()
+
+    # opening the settings from the resources overview remembers the origin,
+    # so both the cancel link and a successful save return to the overview
+    resources = client.get('/resources')
+    settings = resources.click('Einstellungen', href='resource-settings')
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/resources')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/resources')
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/resource-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')

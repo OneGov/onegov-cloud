@@ -7,7 +7,6 @@ import logging
 from babel.dates import get_month_names
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from functools import lru_cache
 from inspect import isabstract
 from itertools import groupby, chain
 from markupsafe import Markup
@@ -23,7 +22,7 @@ from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
 from onegov.file.models import SigningRequest
-from onegov.form import FormSubmission, parse_form, Form
+from onegov.form import FormSubmission
 from onegov.newsletter.models import Recipient
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
@@ -617,8 +616,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         .with_entities(
             Resource.id,
             Resource.group,
-            Resource.title,
-            Resource.definition
+            Resource.title
         )
         .order_by(Resource.group, Resource.name, Resource.id)
     )
@@ -627,10 +625,6 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         (r.id.hex, f'{r.group or default_group} - {r.title}')
         for r in all_resources
     )
-
-    @lru_cache(maxsize=128)
-    def form(definition: str) -> type[Form]:
-        return parse_form(definition)
 
     # get the reservations of this day
     start = align_date_to_day(today, 'Europe/Zurich', 'down')
@@ -665,7 +659,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
             #        temporary attribute
             reservation.submission = submission  # type:ignore
 
-    # group th reservations by resource
+    # group the reservations by resource
     reservations = {
         resid.hex: tuple(reservations) for resid, reservations in groupby(
             all_reservations, key=lambda r: r.resource
@@ -682,7 +676,6 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         ),
         'organisation': request.app.org.title,
         'resources': resources,
-        'parse_form': form
     }
 
     for address, included_resources in recipients:

@@ -11,6 +11,7 @@ from datetime import date, timedelta, datetime
 from freezegun import freeze_time
 from onegov.chat import MessageCollection
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.reservation import ResourceCollection
 from textwrap import dedent
 from webtest import Upload
@@ -471,10 +472,14 @@ def test_send_ticket_email(client: Client) -> None:
 
     # make sure the same holds true for forms
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=dedent("""
-        Name * = ___
-        E-Mail * = @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(dedent("""
+            Name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
     transaction.commit()
 
     def submit_form(client: Client, email: str) -> None:
@@ -545,10 +550,14 @@ def test_email_for_new_tickets(client: Client) -> None:
 
     # fill out a form to automatically send a notification mail
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=dedent("""
-        Name * = ___
-        E-Mail * = @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(dedent("""
+            Name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
     transaction.commit()
 
     page = client.get('/forms').click('Profile')
@@ -607,11 +616,15 @@ def test_email_for_new_tickets(client: Client) -> None:
 
 def test_ticket_notes(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=dedent("""
-        First name * = ___
-        Last name * = ___
-        E-Mail * = @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(dedent("""
+            First name * = ___
+            Last name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
 
     transaction.commit()
 
@@ -686,11 +699,15 @@ def test_ticket_notes(client: Client) -> None:
 
 def test_ticket_chat(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=dedent("""
-        First name * = ___
-        Last name * = ___
-        E-Mail * = @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(dedent("""
+            First name * = ___
+            Last name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
     client.app.org.ticket_always_notify = False
     transaction.commit()
 

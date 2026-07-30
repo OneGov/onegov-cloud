@@ -243,14 +243,14 @@ def handle_new_definition(
 
     if form.submitted(request):
         assert form.title.data is not None
-        assert form.definition.data is not None
+        assert form.parsed.data is not None
 
         if self.definitions.by_name(normalize_for_url(form.title.data)):
             request.alert(_('A form with this name already exists'))
         else:
             definition = self.definitions.add(
                 title=form.title.data,
-                definition=form.definition.data,
+                parsed=form.parsed.data,
                 type='custom'
             )
             form.populate_obj(definition)
@@ -287,11 +287,11 @@ def handle_edit_definition(
 ) -> RenderData | Response:
 
     if form.submitted(request):
-        assert form.definition.data is not None
-        # why do we exclude definition here? we set it normally right after
+        assert form.parsed.data is not None
+        # why do we exclude parsed here? we set it normally right after
         # which is also what populate_obj should be doing
-        form.populate_obj(self, exclude={'definition'})
-        self.definition = form.definition.data
+        form.populate_obj(self, exclude={'parsed'})
+        self.parsed = form.parsed.data
 
         request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))

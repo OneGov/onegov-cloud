@@ -2609,14 +2609,12 @@ msgstr "Andere Feiertage"
 msgid "School holidays"
 msgstr "Schulferien"
 
-msgid "Format: Day.Month - Description"
-msgstr "Format: Tag.Monat - Beschreibung"
+msgid "Format: Day.Month[.Year] - Description (year is optional)"
+msgstr ""
+"Format: Tag.Monat[.Jahr] - Beschreibung (Jahr ist optional)"
 
 msgid "Please enter one date per line"
 msgstr "Bitte geben Sie ein Datum pro Zeile ein"
-
-msgid "Please enter only day and month"
-msgstr "Bitte geben Sie nur Tag und Monat ein"
 
 #, python-format
 msgid "${date} is not a valid date"
@@ -6636,6 +6634,14 @@ msgid "The allocation was deleted"
 msgstr "Die Verfügbarkeit wurde gelöscht"
 
 #, python-format
+#, python-format
+msgid ""
+"${n} availabilities were not created, because they overlap with existing "
+"ones."
+msgstr ""
+"${n} Verfügbarkeiten wurden nicht erstellt, da sie sich mit bestehenden "
+"überschneiden."
+
 msgid "New availability period active, ${n} allocations created"
 msgstr "Neuer Verfügbarkeitszeitraum aktiv, ${n} Verfügbarkeiten erstellt"
 
@@ -8406,6 +8412,15 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Format: Day.Month - Description or Day.Month.Year - Description"
+#~ msgstr "Format: Tag.Monat - Beschreibung oder Tag.Monat.Jahr - Beschreibung"
+
+#~ msgid "Format: Day.Month - Description"
+#~ msgstr "Format: Tag.Monat - Beschreibung"
+
+#~ msgid "Please enter only day and month"
+#~ msgstr "Bitte geben Sie nur Tag und Monat ein"
 
 #~ msgid "Confirmation"
 #~ msgstr "Bestätigung"
