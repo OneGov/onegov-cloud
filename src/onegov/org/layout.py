@@ -2599,11 +2599,20 @@ class AllocationRulesLayout(ResourceLayout):
             ]
         )
 
+        links: list[Link | LinkGroup] = [add_link]
+        if self.model.content.get('rules'):
+            links.append(
+                Link(
+                    text=_('Copy availability periods'),
+                    url=self.request.link(self.model, 'copy-rules'),
+                    attrs={'class': 'copy-link'},
+                )
+            )
+
         if self.request.browser_session.get(  # type: ignore[call-overload]
             'copied_allocation_rules', {}
         ).get(self.model.type):
-            return [
-                add_link,
+            links.append(
                 Link(
                     text=_('Paste'),
                     url=self.request.csrf_protected_url(
@@ -2615,12 +2624,12 @@ class AllocationRulesLayout(ResourceLayout):
                             request_method='POST',
                             redirect_after=self.request.link(
                                 self.model, 'rules'
-                            )
+                            ),
                         ),
-                    )
+                    ),
                 )
-            ]
-        return [add_link]
+            )
+        return links
 
 
 class AllocationEditFormLayout(DefaultLayout):

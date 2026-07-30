@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-20 15:43+0200\n"
+"POT-Creation-Date: 2026-07-28 09:43+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -387,6 +387,12 @@ msgstr "Pagamenti carta di credito"
 
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
+
+msgid "Availability periods"
+msgstr "Periodi di disponibilità"
+
+msgid "Target resources"
+msgstr "Risorse di destinazione"
 
 msgid "Title"
 msgstr "Titolo"
@@ -3698,11 +3704,11 @@ msgstr "Ripulisci"
 msgid "Subscribe"
 msgstr "Iscriviti"
 
-msgid "Availability periods"
-msgstr "Periodi di disponibilità"
-
 msgid "Availability period"
 msgstr "Periodo di disponibilità"
+
+msgid "Copy availability periods"
+msgstr "Copia periodi di disponibilità"
 
 msgid "Paste"
 msgstr "Incolla"
@@ -4518,8 +4524,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -5371,8 +5377,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -6605,8 +6611,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -6665,6 +6671,14 @@ msgstr "Il periodo di disponibilità è stato fermato"
 
 msgid "The availability period was added to the clipboard"
 msgstr "Il periodo di disponibilità è stato aggiunto agli appunti"
+
+#, python-format
+msgid ""
+"${periods} availability periods copied to ${resources} resources, creating "
+"${allocations} allocations"
+msgstr ""
+"${periods} periodi di disponibilità copiati in ${resources} risorse, creando "
+"${allocations} disponibilità"
 
 msgid "Pasted availability period from to the clipboard"
 msgstr "Incollare il periodo di disponibilità negli appunti"

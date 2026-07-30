@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.org.forms.allocation import AllocationRuleForm
+from onegov.org.forms.allocation import BatchCopyAllocationRulesForm
 from onegov.org.forms.allocation import DaypassAllocationEditForm
 from onegov.org.forms.allocation import DaypassAllocationForm
 from onegov.org.forms.allocation import RoomAllocationEditForm
@@ -72,6 +73,7 @@ __all__ = (
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
     'AppearanceSettingsForm',
+    'BatchCopyAllocationRulesForm',
     'ChangeUsernameForm',
     'CitizenLoginForm',
     'CommissionForm',
