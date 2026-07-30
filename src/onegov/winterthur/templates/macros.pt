@@ -26,19 +26,19 @@
 
 <metal:inline_search define-macro="inline_search" i18n:domain="onegov.winterthur">
     <?python request.include('inline-search') ?>
-    <div class="filter-panel">
+    <div class="">
         <h2 tal:condition="title" class="filter-title" i18n:translate>Search in <tal:b i18n:name="title">${title}</tal:b></h2>
 
         <form id='inline-search' class="searchbox" action="${action}" method="GET">
-            <div class="row collapse">
-                <div class="columns small-10">
+            <div class="input-group">
+                <div class="input">
                     <input id="search-term" type="text" placeholder="Suche" required autocomplete="off" autocorrect="off" value="${term or ''}">
                     <button type="reset" class="reset-button" tabindex="-1"></button>
 
                     <input type="hidden" name='search' value='inline'>
                     <input type="hidden" name='search_query'>
                 </div>
-                <div class="columns small-2">
+                <div class="search-button">
                     <button type="submit" class="button postfix" aria-label="Suche">
                       <i class="fa fa-search"></i>
                     </button>
