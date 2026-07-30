@@ -169,7 +169,7 @@ Video Link
 
 An url field pointing to a video ``video-url``::
 
-    I' am a video link = video-url
+    I am a video link = video-url
 
 In case of vimeo or youtube videos the video will be embedded in the page,
 otherwise the link will be shown.
@@ -814,8 +814,11 @@ class Pricing(BaseModel):
         return self.amount, self.currency, self.online_payment_required
 
     def __str__(self) -> str:
+        return self.__format__('')
+
+    def __format__(self, format_spec: str) -> str:
         suffix = '!' if self.online_payment_required else ''
-        return f'{self.amount:.2f} {self.currency}{suffix}'
+        return f'{self.amount:{format_spec}} {self.currency}{suffix}'
 
 
 # tagged unions so we can type narrow by type field
@@ -896,10 +899,16 @@ class Choice(BaseModel):
 
     @property
     def display_label(self) -> str:
+        return self.__format__('.2f')
+
+    def __str__(self) -> str:
+        return self.__format__('')
+
+    def __format__(self, format_spec: str) -> str:
         if self.pricing is not None:
-            return f'{self.label} ({self.pricing}%)'
+            return f'{self.label} ({self.pricing:{format_spec}})'
         if self.discount is not None:
-            return f'{self.label} ({self.discount:.2f}%)'
+            return f'{self.label} ({self.discount:{format_spec}}%)'
         return self.label
 
 
@@ -1015,7 +1024,7 @@ class BaseField[KindT: str](BaseModel):
         indentation: str = ''
     ) -> None:
         buffer.write(indentation)
-        buffer.write(self.display_label)
+        buffer.write(self.label)
         buffer.write(' ')
         if self.required:
             buffer.write('*')
@@ -1108,10 +1117,10 @@ class DateField(BaseField[Literal['date']]):
         if (dr := self.valid_date_range) is not None:
             buffer.write(' (')
             if dr.start is not None:
-                buffer.write(f'{dr.start:%d.%m.%Y}')
+                buffer.write(f'{dr.start:%Y.%m.%d}')
             buffer.write('..')
             if dr.stop is not None:
-                buffer.write(f'{dr.stop:%d.%m.%Y}')
+                buffer.write(f'{dr.stop:%Y.%m.%d}')
             buffer.write(')')
 
         buffer.write('\n')
@@ -1160,10 +1169,10 @@ class DatetimeField(BaseField[Literal['datetime']]):
         if (dr := self.valid_date_range) is not None:
             buffer.write(' (')
             if dr.start is not None:
-                buffer.write(f'{dr.start:%d.%m.%Y}')
+                buffer.write(f'{dr.start:%Y.%m.%d}')
             buffer.write('..')
             if dr.stop is not None:
-                buffer.write(f'{dr.stop:%d.%m.%Y}')
+                buffer.write(f'{dr.stop:%Y.%m.%d}')
             buffer.write(')')
 
         buffer.write('\n')
@@ -1356,7 +1365,7 @@ class StdnumField(BaseField[Literal['stdnum']]):
         buffer: SupportsWrite[str],
         indentation: str = ''
     ) -> None:
-        buffer.write('# ')
+        buffer.write(' # ')
         buffer.write(self.format)
         buffer.write('\n')
 
@@ -1470,7 +1479,7 @@ class DecimalRangeField(BaseField[Literal['decimal_range']]):
         buffer: SupportsWrite[str],
         indentation: str = ''
     ) -> None:
-        buffer.write(f' {self.range.start}..{self.range.stop} \n')
+        buffer.write(f' {self.range.start}..{self.range.stop}\n')
 
     def parse(self, value: Any) -> object:
         return Decimal(value)
@@ -1615,9 +1624,7 @@ class RadioField(BaseField[Literal['radio']]):
         buffer.write('\n')
         for choice in self.choices:
             check = 'x' if choice.selected else ' '
-            buffer.write(
-                f'{indentation}    ({check}) {choice.display_label}\n'
-            )
+            buffer.write(f'{indentation}    ({check}) {choice}\n')
             for field in choice.fields:
                 # FIXME: Handle nested fieldsets
                 field.write_formcode(buffer, indentation + '        ')
@@ -1674,9 +1681,7 @@ class CheckboxField(BaseField[Literal['checkbox']]):
         buffer.write('\n')
         for choice in self.choices:
             check = 'x' if choice.selected else ' '
-            buffer.write(
-                f'{indentation}    [{check}] {choice.display_label}\n'
-            )
+            buffer.write(f'{indentation}    [{check}] {choice}\n')
             for field in choice.fields:
                 # FIXME: Handle nested fieldsets
                 field.write_formcode(buffer, indentation + '        ')

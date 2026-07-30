@@ -13,6 +13,7 @@ from onegov.form.fields import (
     URLField,
     VideoURLField,
 )
+from onegov.form.parser import ParsedForm
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.form.validators import (
     LaxDataRequired,
@@ -1711,3 +1712,197 @@ def test_nested_fieldset_error() -> None:
         )), enable_edit_checks=True)
 
     assert e.value.line == 7
+
+
+@pytest.mark.parametrize('definition,expected', [
+    # NOTE: We always format the required indicator the same way
+    #       without a space and we always put a newline at the end
+    (
+        'E-Mail * = @@@',
+        'E-Mail *= @@@\n'
+    ),
+    # NOTE: We always put exactly one newline between fieldsets
+    #       and now newlines between fields in the same fieldset
+    (
+        dedent("""\
+            # Intro
+            Hi = ___
+
+            There = ___
+            # Middle
+            How are you? = ___
+
+
+            # End
+            Thank You = ___
+        """),
+        dedent("""\
+            # Intro
+            Hi = ___
+            There = ___
+
+            # Middle
+            How are you? = ___
+
+            # End
+            Thank You = ___
+        """)
+    ),
+    # NOTE: URL fields are lossy we always generate them with https://
+    #       we don't remember what was originally used, since it does
+    #       not affect the resulting form at all.
+    (
+        dedent("""\
+            I'm an url field = http://
+            I'm the exact same = https://
+        """),
+        dedent("""\
+            I'm an url field = https://
+            I'm the exact same = https://
+        """)
+    ),
+    (
+        dedent("""\
+            # Persönliche Informationen
+            Bürgerort = ___
+            Geschlecht =
+                ( ) Männlich
+                ( ) Weiblich
+        """),
+        None
+    ),
+    # examples from docs
+    (
+        dedent("""\
+            Delivery *=
+                (x) I want it delivered
+                    Alternate Address =
+                        (x) No
+                        ( ) Yes
+                            Street = ___
+                            << street >>
+                            Town = ___
+                    << Alt >>
+                ( ) I want to pick it up
+            << delivery >>
+            Kommentar = ...
+            << kommentar >>
+        """),
+        None
+    ),
+    (
+        dedent("""\
+            # Textfield
+            I'm a textfield = ___
+            I'm a limited textfield = ___[50]
+            I'm a numbers-only textfield = ___/^[0-9]+$
+            I'm a length-limited numbers-only textfield = ___[4]/^[0-9]+$
+            I'm a length-limited numbers-only textfield 2 = ___/^[0-9]{0,4}$
+
+            # Textarea
+            I'm a textarea = ...
+            I'm a textarea with 10 rows = ...[10]
+
+            # Password
+            I'm a password = ***
+
+            # E-Mail
+            I'm an e-mail field = @@@
+
+            # URL
+            I'm an url field = https://
+
+            # Video Link
+            I am a video link = video-url
+
+            # Date
+            I'm a date field = YYYY.MM.DD
+            I'm a future date field = YYYY.MM.DD (+1 days..)
+            I'm on today or in the future = YYYY.MM.DD (today..)
+            At least two weeks ago = YYYY.MM.DD (..-2 weeks)
+            Between 2010 and 2020 = YYYY.MM.DD (2010.01.01..2020.12.31)
+
+            # Datetime
+            I'm a datetime field = YYYY.MM.DD HH:MM
+            I'm a futue datetime field = YYYY.MM.DD HH:MM (today..)
+
+            # Time
+            I'm a time field = HH:MM
+
+            # Numbers
+            I'm an integer field = 0..99
+            I'm an integer field of a different range = -100..100
+            I'm a float field = 0.00..99.00
+            I'm a float field of a different range = -100.00..100.00
+            Number of stamps to include = 0..30 (1.00 CHF)
+
+            # Code
+            Description = <markdown>
+
+            # Files
+            I'm a file upload field = *.*
+            I'm a image filed = *.png|*.jpg|*.gif
+            I'm a document = *.doc
+            I'm any document = *.doc|*.pdf
+            I'm a multiple file upload field = *.* (multiple)
+
+            # Standard Numbers
+            I'm a valid IBAN (or empty) = # iban
+            I'm a valid IBAN (required) *= # iban
+
+            # Radio Buttons
+            Gender =
+                ( ) Female
+                ( ) Male
+                (x) I don't want to say
+            Delivery Method =
+                ( ) Pickup
+                    Pickup Time *= ___
+                (x) Address
+                    Street *= ___
+                    Town *= ___
+
+            # Checkboxes
+            Extras =
+                [x] Phone insurance
+                [ ] Phone case
+                [x] Extra battery
+            Additional toppings =
+                [ ] Salami
+                [ ] Olives
+                [ ] Other
+                    Description = ___
+
+            # Pricing Information
+            Node Size =
+                ( ) Small (20 USD)
+                (x) Medium (30 USD)
+                ( ) Large (40 USD)
+            Extras =
+                [x] Second IP Address (20 CHF)
+                [x] Backup (20 CHF)
+            Delivery =
+                (x) Pickup (0 CHF)
+                ( ) Delivery (5 CHF!)
+
+            # Discounts
+            Discount =
+                (x) No discount
+                ( ) Sports club (50%)
+                ( ) School (100%)
+        """),
+        None
+    ),
+])
+def test_roundtrip(
+    definition: str,
+    expected: str | None
+) -> None:
+    if expected is None:
+        expected = definition
+
+    parsed = ParsedForm.from_formcode(definition)
+    unparsed = parsed.to_formcode()
+    assert unparsed == expected
+    # when we re-parse the output we get the same fields again
+    assert ParsedForm.from_formcode(unparsed).fields == parsed.fields
