@@ -981,6 +981,12 @@ def test_export_events_json_xml_csv(client: Client) -> None:
         verify_event_fields(rows[0])
 
 
+def get_event_filter_definition(client: Client) -> str:
+    if parsed := client.app.org.event_filter_parsed_definition:
+        return parsed.formcode
+    return ''
+
+
 def test_event_filter_settings_stale_data(client: Client) -> None:
     client.login_admin()
 
@@ -1027,13 +1033,13 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
         in response
     )
     assert 'force_remove' in response.form.fields
-    assert client.app.org.event_filter_definition is not None
-    assert 'Choice A' in client.app.org.event_filter_definition
+    assert client.app.org.event_filter_parsed_definition is not None
+    assert 'Choice A' in get_event_filter_definition(client)
 
     # Checking force_remove cleans up the filter from events and saves
     response.form['force_remove'] = True
     response.form.submit().follow()
-    assert 'Choice A' not in (client.app.org.event_filter_definition or '')
+    assert 'Choice A' not in get_event_filter_definition(client)
     page = (
         client.get('/events').click('Generalversammlung').click('Bearbeiten')
     )
@@ -1079,7 +1085,7 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     """
     page.form['keyword_fields'].value = 'my_filter'
     page.form.submit().follow()
-    assert 'Choice A' not in (client.app.org.event_filter_definition or '')
+    assert 'Choice A' not in get_event_filter_definition(client)
 
     # Removing an unused choice (Choice B) is allowed without blocking
     page = client.get('/event-settings')
@@ -1090,7 +1096,7 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     """
     page.form['keyword_fields'].value = 'my_filter'
     page.form.submit().follow()
-    assert 'Choice B' not in (client.app.org.event_filter_definition or '')
+    assert 'Choice B' not in get_event_filter_definition(client)
 
     # Re-apply a filter to test keyword-level blocking
     page = (

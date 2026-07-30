@@ -13,6 +13,7 @@ from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import (
     FormCollection, FormDefinitionCollection, as_internal_id)
+from onegov.form.parser import ParsedForm
 from onegov.org.models import TicketNote
 from onegov.org.models.document_form import FormDocument
 from onegov.people import Person
@@ -100,7 +101,11 @@ def test_render_form(client: Client) -> None:
     definition = "\n".join(str(f) for f in fields)
 
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Fields', definition=definition, type='custom')
+    collection.definitions.add(
+        'Fields',
+        parsed=ParsedForm.from_formcode(definition),
+        type='custom'
+    )
 
     transaction.commit()
 
@@ -124,12 +129,17 @@ def test_submit_form(
 ) -> None:
 
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
-        # Your Details
-        First name * = ___
-        Last name * = ___
-        E-Mail * = @@@
-    """), type='custom', pick_up='pickup test message')
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            # Your Details
+            First name * = ___
+            Last name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom',
+        pick_up='pickup test message'
+    )
 
     transaction.commit()
 
@@ -204,10 +214,14 @@ def test_submit_form(
 
 def test_pending_submission_error_file_upload(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Statistics', definition=textwrap.dedent("""
-        Name * = ___
-        Datei * = *.txt|*.csv
-    """), type='custom')
+    collection.definitions.add(
+        'Statistics',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            Name * = ___
+            Datei * = *.txt|*.csv
+        """)),
+        type='custom'
+    )
     transaction.commit()
 
     form_page = client.get('/forms').click('Statistics')
@@ -220,10 +234,14 @@ def test_pending_submission_error_file_upload(client: Client) -> None:
 
 def test_pending_submission_successful_file_upload(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Statistics', definition=textwrap.dedent("""
-        Name * = ___
-        Datei * = *.txt|*.csv
-    """), type='custom')
+    collection.definitions.add(
+        'Statistics',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            Name * = ___
+            Datei * = *.txt|*.csv
+        """)),
+        type='custom'
+    )
     transaction.commit()
 
     form_page = client.get('/forms').click('Statistics')
@@ -458,7 +476,10 @@ def test_delete_custom_form(client: Client) -> None:
 def test_show_uploaded_file(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add(
-        'Text', definition="File * = *.txt\nE-Mail * = @@@", type='custom')
+        'Text',
+        parsed=ParsedForm.from_formcode("File * = *.txt\nE-Mail * = @@@"),
+        type='custom'
+    )
     transaction.commit()
 
     client.login_editor()
@@ -507,9 +528,13 @@ def test_hide_form(client: Client) -> None:
 
 def test_change_email(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Newsletter', definition=textwrap.dedent("""
-        E-Mail *= @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Newsletter',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
+        """)),
+        type='custom'
+    )
 
     transaction.commit()
 
@@ -536,18 +561,22 @@ def test_change_email(client: Client) -> None:
 
 def test_manual_form_payment(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
-        E-Mail *= @@@
+    collection.definitions.add(
+        'Govikon Poster',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
 
-        Posters *=
-            [ ] Local Businesses
-            [ ] Executive Committee (10 CHF)
-            [ ] Town Square (20 CHF)
+            Posters *=
+                [ ] Local Businesses
+                [ ] Executive Committee (10 CHF)
+                [ ] Town Square (20 CHF)
 
-        Delivery *=
-            ( ) Pickup
-            ( ) Delivery (5 CHF)
-    """), type='custom')
+            Delivery *=
+                ( ) Pickup
+                ( ) Delivery (5 CHF)
+        """)),
+        type='custom'
+    )
 
     transaction.commit()
 
@@ -681,14 +710,14 @@ def test_manual_form_payment_rounding(client: Client) -> None:
     collection = FormCollection(client.app.session())
     collection.definitions.add(
         'Rounded price',
-        definition=textwrap.dedent(
+        parsed=ParsedForm.from_formcode(textwrap.dedent(
             """
-        E-Mail *= @@@
+            E-Mail *= @@@
 
-        Product *=
-            (x) Selected (10.03 CHF)
-    """
-        ),
+            Product *=
+                (x) Selected (10.03 CHF)
+            """
+        )),
         type='custom',
     )
 
@@ -732,18 +761,23 @@ def test_manual_form_payment_rounding(client: Client) -> None:
 
 def test_form_payment_required(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
-        E-Mail *= @@@
+    collection.definitions.add(
+        'Govikon Poster',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
 
-        Posters *=
-            [ ] Local Businesses (0 CHF)
-            [ ] Executive Committee (10 CHF)
-            [ ] Town Square (20 CHF)
+            Posters *=
+                [ ] Local Businesses (0 CHF)
+                [ ] Executive Committee (10 CHF)
+                [ ] Town Square (20 CHF)
 
-        Delivery *=
-            ( ) Pickup (0 CHF)
-            ( ) Delivery (5 CHF!)
-    """), type='custom', payment_method='free')
+            Delivery *=
+                ( ) Pickup (0 CHF)
+                ( ) Delivery (5 CHF!)
+        """)),
+        type='custom',
+        payment_method='free'
+    )
 
     transaction.commit()
 
@@ -768,13 +802,17 @@ def test_form_payment_required(client: Client) -> None:
 
 def test_dependent_number_form(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
-        E-Mail *= @@@
-        Country =
-            ( ) Switzerland
-                Email *= @@@
-            (x) Other
-    """), type='custom')
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
+            Country =
+                ( ) Switzerland
+                    Email *= @@@
+                (x) Other
+        """)),
+        type='custom'
+    )
 
     transaction.commit()
 
@@ -787,7 +825,11 @@ def test_dependent_number_form(client: Client) -> None:
 
 def test_registration_form_hints(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    collection.definitions.add(
+        'Meetup',
+        ParsedForm.from_formcode("E-Mail *= @@@"),
+        'custom'
+    )
     transaction.commit()
 
     client.login_editor()
@@ -880,7 +922,11 @@ def test_registration_form_hints(client: Client) -> None:
 def test_registration_complete_after_deadline(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
-    form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    form = collection.definitions.add(
+        'Meetup',
+        ParsedForm.from_formcode("E-Mail *= @@@"),
+        'custom'
+    )
     form.add_registration_window(
         start=date(2018, 1, 1),
         end=date(2018, 1, 31),
@@ -904,7 +950,11 @@ def test_registration_complete_after_deadline(client: Client) -> None:
 def test_registration_race_condition(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
-    form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    form = collection.definitions.add(
+        'Meetup',
+        ParsedForm.from_formcode("E-Mail *= @@@"),
+        'custom'
+    )
     form.add_registration_window(
         start=date(2018, 1, 1),
         end=date(2018, 1, 31),
@@ -937,7 +987,11 @@ def test_registration_race_condition(client: Client) -> None:
 def test_registration_change_limit_after_submissions(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
-    form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    form = collection.definitions.add(
+        'Meetup',
+        ParsedForm.from_formcode("E-Mail *= @@@"),
+        'custom'
+    )
     form.add_registration_window(
         start=date(2018, 1, 1),
         end=date(2018, 1, 31),
@@ -995,7 +1049,10 @@ def test_registration_window_adjust_end_date(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
     form = collection.definitions.add(
-        'Meet Guido van Rossum', "E-Mail *= @@@", 'custom')
+        'Meet Guido van Rossum',
+        ParsedForm.from_formcode("E-Mail *= @@@"),
+        'custom'
+    )
     form.add_registration_window(
         start=date(2024, 4, 1),
         end=date(2024, 4, 2),
@@ -1045,10 +1102,14 @@ def test_registration_ticket_workflow(client: Client) -> None:
     collection = FormCollection(session)
     users = UserCollection(session)
 
-    form = collection.definitions.add('Meetup', textwrap.dedent("""
-        E-Mail *= @@@
-        Name *= ___
-    """), 'custom')
+    form = collection.definitions.add(
+        'Meetup',
+        ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
+            Name *= ___
+        """)),
+        'custom'
+    )
     session.flush()
 
     window = form.add_registration_window(
@@ -1237,7 +1298,11 @@ def test_registration_ticket_workflow(client: Client) -> None:
 def test_registration_not_in_front_of_queue(client: Client) -> None:
     collection = FormCollection(client.app.session())
 
-    form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    form = collection.definitions.add(
+        'Meetup',
+        ParsedForm.from_formcode("E-Mail *= @@@"),
+        'custom'
+    )
     form.add_registration_window(
         start=date(2018, 1, 1),
         end=date(2018, 1, 31),
@@ -1266,10 +1331,14 @@ def test_registration_not_in_front_of_queue(client: Client) -> None:
 
 def test_markdown_in_forms(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Content', definition=textwrap.dedent("""
-        E-Mail *= @@@
-        Content = <markdown>
-    """), type='custom')
+    collection.definitions.add(
+        'Content',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
+            Content = <markdown>
+        """)),
+        type='custom'
+    )
 
     transaction.commit()
 
@@ -1284,10 +1353,14 @@ def test_markdown_in_forms(client: Client) -> None:
 
 def test_exploit_markdown_in_forms(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Content', definition=textwrap.dedent("""
-        E-Mail *= @@@
-        Content = <markdown>
-    """), type='custom')
+    collection.definitions.add(
+        'Content',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
+            Content = <markdown>
+        """)),
+        type='custom'
+    )
 
     transaction.commit()
 
@@ -1429,7 +1502,7 @@ def test_event_configuration_validation(client: Client) -> None:
     """
     page.form['keyword_fields'] = ['kalender', 'sportart']
     page = page.form.submit()
-    assert 'Invalid field type for field \'Email Adresse\'.' in page
+    assert 'Ungültiger Feldtyp für Feld \'Email Adresse\'.' in page
 
     # test multiple errors
     page = client.get('/event-settings')
@@ -1446,8 +1519,8 @@ def test_event_configuration_validation(client: Client) -> None:
     """
     page.form['keyword_fields'] = ['kalender', 'sportart']
     page = page.form.submit()
-    assert 'Invalid field type for field \'Text\'.' in page
-    assert 'Invalid field type for field \'Webpage\'.' in page
+    assert 'Ungültiger Feldtyp für Feld \'Text\'.' in page
+    assert 'Ungültiger Feldtyp für Feld \'Webpage\'.' in page
 
 
 def test_file_export_for_ticket(
@@ -1456,11 +1529,15 @@ def test_file_export_for_ticket(
 ) -> None:
 
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Statistics', definition=textwrap.dedent("""
-        E-Mail * = @@@
-        Name * = ___
-        Datei * = *.txt
-        Datei2 * = *.txt """), type='custom')
+    collection.definitions.add(
+        'Statistics',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail * = @@@
+            Name * = ___
+            Datei * = *.txt
+            Datei2 * = *.txt """)),
+        type='custom'
+    )
     transaction.commit()
 
     client.login_admin()

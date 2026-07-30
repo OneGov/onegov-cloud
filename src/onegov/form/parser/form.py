@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from html import escape
-from onegov.form import errors
+from functools import cached_property
+from io import StringIO
+from onegov.form import errors, log
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import (
     MultiCheckboxField, DateTimeLocalField, URLField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
-from onegov.form.parser.core import parse_formcode
+from onegov.form.parser.core import flatten_fields, parse_formcode, ParsedField
 from onegov.form.utils import as_internal_id
 from onegov.form.validators import LaxDataRequired
 from onegov.form.validators import ExpectedExtensions
@@ -18,6 +21,7 @@ from onegov.form.validators import StrictOptional
 from onegov.form.validators import ValidDateRange
 from onegov.form.widgets import DateRangeInput
 from onegov.form.widgets import DateTimeLocalRangeInput
+from pydantic import BaseModel, ConfigDict, Field
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
@@ -33,9 +37,8 @@ from wtforms.validators import Regexp
 from wtforms.validators import URL
 
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.form.parser.core import ParsedField
     from onegov.form.types import PricingRules, Validator, Widget
     from wtforms import Field as WTField
 
@@ -44,36 +47,113 @@ MEGABYTE = 1000 ** 2
 DEFAULT_UPLOAD_LIMIT = 100 * MEGABYTE
 
 
-@overload
-def parse_form[T: Form](
-    text: str,
-    enable_edit_checks: bool,
-    base_class: type[T]
-) -> type[T]: ...
+class ParsedForm(BaseModel):
+    """
+    Represents a parsed form.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    fields: tuple[ParsedField, ...]
+    source_code: str | None = Field(
+        default=None,
+        description='The original formcode that was parsed to generate '
+            'this structure. Leave empty, when directly generating a '
+            'form structure. This is mostly useful for preserving '
+            'formatting, when editing the form via formcode. As long as '
+            'this successfully parses back into the same structure, we will '
+            'pre-fill the edit field with this text, instead of generating '
+            'formcode based on the structure.'
+    )
+
+    @cached_property
+    def flattened_fields(self) -> tuple[ParsedField, ...]:
+        return tuple(flatten_fields(self.fields))
+
+    @cached_property
+    def formcode(self) -> str:
+        return self.source_code or self.to_formcode()
+
+    # NOTE: Ideally we only access this when editing formcode, since it
+    #       can be very expensive. If we don't want to ensure that the
+    #       formcode is still valid, we can just access source_code.
+    @cached_property
+    def safe_formcode(self) -> str:
+        if self.source_code is not None:
+            try:
+                if self.fields == tuple(parse_formcode(
+                    self.source_code,
+                    enable_edit_checks=True
+                )):
+                    return self.source_code
+            except Exception:
+                log.warning(
+                    f'Failed to parse stored formcode:\n{self.source_code}'
+                )
+        return self.to_formcode()
+
+    def to_formcode(self) -> str:
+        fieldset: str | None = None
+        buffer = StringIO()
+        first_line = True
+        for field in self.fields:
+            if field.fieldset != fieldset:
+                if not first_line:
+                    # insert an extra newline above the fieldset
+                    buffer.write('\n')
+                fieldset = field.fieldset
+                # if we encounter an anonymous fieldset after a
+                # named one we need to display it as `...`
+                buffer.write(f'# {'...' if fieldset is None else fieldset}\n')
+            field.write_formcode(buffer, '')
+            first_line = False
+        return buffer.getvalue()
+
+    def form_class[T: Form = Form](
+        self,
+        base_class: type[T] = Form  # type: ignore[assignment]
+    ) -> type[T]:
+
+        # NOTE: Since ParsedForm is intended to be immutable, we can
+        #       cache the generated form class per base class.
+        cache = self.__dict__.setdefault('_form_class', {})
+        cached = cache.get(base_class)
+        if cached is not None:
+            return cached
+
+        builder = WTFormsClassBuilder(base_class)
+
+        for field in self.fields:
+            builder.set_current_fieldset(field.fieldset)
+            handle_field(builder, field)
+
+        form_class = cache[base_class] = builder.form_class
+        form_class._parsed = self
+        form_class._source = self.source_code or self.to_formcode()
+
+        return form_class
+
+    @classmethod
+    def from_formcode(
+        cls,
+        definition: str,
+        # FIXME: Eventually we want these to always be enabled
+        #        so we can get rid of this parameter again
+        enable_edit_checks: bool = False
+    ) -> Self:
+        return cls.model_construct(
+            fields=tuple(parse_formcode(definition, enable_edit_checks)),
+            source_code=definition
+        )
 
 
-@overload
-def parse_form[T: Form](
+# FIXME: We can probably get rid of this function and instead just
+#        rely on `ParsedForm`.
+def parse_form[T: Form = Form](
     text: str,
     enable_edit_checks: bool = False,
-    *,
-    base_class: type[T]
-) -> type[T]: ...
-
-
-@overload
-def parse_form(
-    text: str,
-    enable_edit_checks: bool = False,
-    base_class: type[Form] = Form
-) -> type[Form]: ...
-
-
-def parse_form(
-    text: str,
-    enable_edit_checks: bool = False,
-    base_class: type[Form] = Form
-) -> type[Form]:
+    base_class: type[T] = Form  # type: ignore[assignment]
+) -> type[T]:
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
@@ -83,23 +163,14 @@ def parse_form(
     :param base_class: Form base class
     """
 
-    builder = WTFormsClassBuilder(base_class)
-
-    for fieldset in parse_formcode(text, enable_edit_checks):
-        builder.set_current_fieldset(fieldset.label)
-
-        for field in fieldset.fields:
-            handle_field(builder, field)
-
-    form_class = builder.form_class
-    form_class._source = text
-
-    return form_class
+    parsed = ParsedForm.from_formcode(text, enable_edit_checks)
+    return parsed.form_class(base_class)
 
 
 def handle_field(
     builder: WTFormsClassBuilder[Any],
     field: ParsedField,
+    parent_id: str | None = None,
     dependency: FieldDependency | None = None
 ) -> None:
     """ Takes the given parsed field and adds it to the form. """
@@ -120,7 +191,7 @@ def handle_field(
         builder.add_field(
             field_class=StringField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=validators,
@@ -132,7 +203,7 @@ def handle_field(
         builder.add_field(
             field_class=TextAreaField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             render_kw={'rows': field.rows} if field.rows else None,
@@ -143,7 +214,7 @@ def handle_field(
         builder.add_field(
             field_class=PasswordField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             description=field.field_help
@@ -153,7 +224,7 @@ def handle_field(
         builder.add_field(
             field_class=EmailField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[Email()],
@@ -164,7 +235,7 @@ def handle_field(
         builder.add_field(
             field_class=URLField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[URL()],
@@ -175,7 +246,7 @@ def handle_field(
         builder.add_field(
             field_class=VideoURLField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[URL()],
@@ -186,7 +257,7 @@ def handle_field(
         builder.add_field(
             field_class=StringField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[Stdnum(field.format)],
@@ -205,7 +276,7 @@ def handle_field(
         builder.add_field(
             field_class=DateField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             description=field.field_help,
@@ -225,7 +296,7 @@ def handle_field(
         builder.add_field(
             field_class=DateTimeLocalField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             description=field.field_help,
@@ -237,7 +308,7 @@ def handle_field(
         builder.add_field(
             field_class=TimeField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             description=field.field_help
@@ -250,7 +321,7 @@ def handle_field(
         builder.add_field(
             field_class=UploadField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[
@@ -268,7 +339,7 @@ def handle_field(
         builder.add_field(
             field_class=UploadMultipleField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[
@@ -283,13 +354,21 @@ def handle_field(
         builder.add_field(
             field_class=RadioField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
-            choices=[(c.key, c.label) for c in field.choices],
-            default=next((c.key for c in field.choices if c.selected), None),
-            pricing=field.pricing,
-            discount=field.discount,
+            choices=[(c.label, c.display_label) for c in field.choices],
+            default=next((c.label for c in field.choices if c.selected), None),
+            pricing={
+                c.label: c.pricing.as_tuple()
+                for c in field.choices
+                if c.pricing is not None
+            } or None,
+            discount={
+                c.label: c.discount / Decimal('100')
+                for c in field.choices
+                if c.discount is not None
+            } or None,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help
@@ -299,13 +378,21 @@ def handle_field(
         builder.add_field(
             field_class=MultiCheckboxField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
-            choices=[(c.key, c.label) for c in field.choices],
-            default=[c.key for c in field.choices if c.selected],
-            pricing=field.pricing,
-            discount=field.discount,
+            choices=[(c.label, c.display_label) for c in field.choices],
+            default=[c.label for c in field.choices if c.selected],
+            pricing={
+                c.label: c.pricing.as_tuple()
+                for c in field.choices
+                if c.pricing is not None
+            } or None,
+            discount={
+                c.label: c.discount / Decimal('100')
+                for c in field.choices
+                if c.discount is not None
+            } or None,
             # do not coerce None into 'None'
             coerce=lambda v: str(v) if v is not None else v,
             description=field.field_help
@@ -315,10 +402,15 @@ def handle_field(
         builder.add_field(
             field_class=IntegerField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
-            pricing=field.pricing,
+            pricing={
+                range(
+                    field.range.start,
+                    field.range.stop
+                ): field.pricing_per_item.as_tuple()
+            } if field.pricing_per_item is not None else None,
             validators=[
                 NumberRange(
                     field.range.start,
@@ -332,7 +424,7 @@ def handle_field(
         builder.add_field(
             field_class=DecimalField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[
@@ -348,7 +440,7 @@ def handle_field(
         builder.add_field(
             field_class=StringField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             validators=[Regexp(r'^[0-9]{15}$')],
@@ -359,7 +451,7 @@ def handle_field(
         builder.add_field(
             field_class=TextAreaField,
             field_id=field.id,
-            label=field.label,
+            label=field.display_label,
             dependency=dependency,
             required=field.required,
             render_kw={'data-editor': field.syntax},
@@ -370,12 +462,13 @@ def handle_field(
         raise NotImplementedError
 
     if field.type == 'radio' or field.type == 'checkbox':
+        # FIXME: Handle fieldsets in choices
         for choice in field.choices:
             if not choice.fields:
                 continue
-            dependency = FieldDependency(field.id, choice.key)
+            dependency = FieldDependency(field.id, choice.label)
             for choice_field in choice.fields:
-                handle_field(builder, choice_field, dependency)
+                handle_field(builder, choice_field, field.id, dependency)
 
 
 class WTFormsClassBuilder[FormT: Form]:

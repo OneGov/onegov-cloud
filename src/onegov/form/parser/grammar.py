@@ -7,6 +7,8 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from functools import lru_cache
 from onegov.form.utils import decimal_range
+from pydantic_core import CoreSchema, core_schema
+from pydantic_extra_types.currency_code import Currency
 from pyparsing import (
     alphanums,
     Combine,
@@ -17,6 +19,7 @@ from pyparsing import (
     pyparsing_unicode,
     OneOrMore,
     Optional,
+    ParseException,
     ParseFatalException,
     ParserElement,
     Regex,
@@ -27,9 +30,11 @@ from pyparsing import (
 from pyparsing.util import _collapse_string_to_ranges
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal as TypingLiteral, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from pydantic import GetCoreSchemaHandler, GetJsonSchemaHandler
+    from pydantic.json_schema import JsonSchemaValue
     from pyparsing.results import ParseResults
     from re import Pattern
 
@@ -118,11 +123,6 @@ def as_date(instring: str, loc: int, tokens: ParseResults) -> dateobj | None:
         raise ParseFatalException(instring, loc, 'Invalid date') from exception
 
 
-def approximate_total_days(delta: relativedelta) -> float:
-    """ Computes an approximate day delta from a relativedelta. """
-    return delta.years * 365.25 + delta.months * 30.5 + delta.days
-
-
 def is_valid_date_range(
     instring: str,
     loc: int,
@@ -144,20 +144,113 @@ def is_valid_date_range(
     elif type(after) is not type(before):
         # invalid
         pass
-    elif isinstance(after, relativedelta):
-        if approximate_total_days(after) < approximate_total_days(before):
-            return tokens
-        # invalid
     elif after < before:
         return tokens
 
     raise ParseFatalException(instring, loc, 'Invalid date range')
 
 
-def as_relative_delta(tokens: ParseResults) -> relativedelta | None:
-    return relativedelta(**{  # type: ignore[arg-type]
-        tokens[1]: int(tokens[0])
-    }) if tokens else None
+def is_valid_currency(
+    instring: str,
+    loc: int, tokens:
+    ParseResults
+) -> str | None:
+
+    if not tokens:
+        return None
+
+    currency = tokens[0].upper()
+    if currency not in Currency.allowed_currencies:
+        # NOTE: We make this non-fatal, so things like (2 Stk) aren't
+        #       interpreted as a price by accident, this is only fatal
+        #       if there is no alternative way to parse the expression.
+        raise ParseException(instring, loc, 'Invalid currency')
+    return currency
+
+
+class RelativeDate(relativedelta):
+    def __init__(
+        self,
+        grain: TypingLiteral['days', 'weeks', 'months', 'years'] | None = None,
+        offset: int = 0
+    ) -> None:
+
+        kw = {} if grain is None else {grain: offset}
+        super().__init__(**kw)  # type: ignore[arg-type]
+
+        # NOTE: We remember these so we can losslessly unparse back
+        #       to formcode
+        self.grain = grain
+        self.offset = offset
+
+    def serialize(self) -> dict[str, Any]:
+        if self.grain is None:
+            return {}
+        return {'grain': self.grain, 'offset': self.offset}
+
+    @property
+    def approximate_total_days(self) -> float:
+        return self.years * 365.25 + self.months * 30.5 + self.days
+
+    def __lt__(self, other: RelativeDate) -> bool:
+        return self.approximate_total_days < other.approximate_total_days
+
+    def __format__(self, format_spec: str) -> str:
+        # NOTE: We ignore the format_spec so we can format an absolute
+        #       date and relative date with the same spec.
+        return str(self)
+
+    def __str__(self) -> str:
+        if self.grain is None:
+            return 'today'
+
+        return f'{self.offset:{'+' if self.offset else ''}} {self.grain}'
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> CoreSchema:
+        return core_schema.union_schema(
+            [
+                core_schema.is_instance_schema(RelativeDate),
+                core_schema.chain_schema([
+                    core_schema.typed_dict_schema({
+                        'grain': core_schema.typed_dict_field(
+                            core_schema.literal_schema([
+                                'years', 'months', 'weeks', 'days'
+                            ])
+                        ),
+                        'offset': core_schema.typed_dict_field(
+                            core_schema.int_schema()
+                        ),
+                    }, total=False),
+                    core_schema.no_info_plain_validator_function(
+                        lambda data: RelativeDate(**data)
+                    ),
+                ]),
+            ],
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                cls.serialize,
+                info_arg=False
+            ),
+        )
+
+    @classmethod
+    def __get_pydantic_json_schema__(
+        cls, _schema: CoreSchema, handler: GetJsonSchemaHandler
+    ) -> JsonSchemaValue:
+        return {
+            'type': 'object',
+            'properties': {
+                'grain': {'enum': ['years', 'months', 'weeks', 'days']},
+                'offset': {'type': 'integer'},
+            },
+            'additionalProperties': False,
+        }
+
+
+def as_relative_date(tokens: ParseResults) -> RelativeDate | None:
+    return RelativeDate(tokens[1], int(tokens[0])) if tokens else None
 
 
 def unwrap(tokens: ParseResults) -> Any | None:
@@ -342,8 +435,8 @@ def absolute_date() -> ParserElement:
     return date_expr.set_parse_action(as_date)
 
 
-def relative_delta() -> ParserElement:
-    """ Returns a relative delta parser.
+def relative_date() -> ParserElement:
+    """ Returns a relative date parser.
 
     Example::
 
@@ -357,7 +450,7 @@ def relative_delta() -> ParserElement:
              | Literal('years'))
     return (
         Combine(sign + numeric) + grain
-    ).set_parse_action(as_relative_delta)
+    ).set_parse_action(as_relative_date)
 
 
 def valid_date_range() -> ParserElement:
@@ -372,9 +465,9 @@ def valid_date_range() -> ParserElement:
     """
 
     today = Literal('today').set_parse_action(
-        literal(relativedelta()))
+        literal(RelativeDate()))
     value_expr = Optional(
-        today | relative_delta() | absolute_date(),
+        today | relative_date() | absolute_date(),
         default=None
     )
     date_range = value_expr('start') + Suppress('..') + value_expr('stop')
@@ -544,7 +637,8 @@ def currency() -> ParserElement:
 
     """
 
-    return Regex(r'[a-zA-Z]{3}').set_parse_action(as_uppercase)('currency')
+    return Regex(r'[a-zA-Z]{3}').set_parse_action(
+        is_valid_currency)('currency')
 
 
 def pricing() -> ParserElement:
