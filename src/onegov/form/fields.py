@@ -18,7 +18,6 @@ from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.errors import FormParsingError
-from onegov.form.parser import ParsedForm
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber, WhitelistedMimeType
 from onegov.form.widgets import ChosenSelectWidget
@@ -65,6 +64,7 @@ if TYPE_CHECKING:
     from onegov.core.types import FileDict as StrictFileDict
     from onegov.file import File
     from onegov.form import Form
+    from onegov.form.parser import ParsedForm
     from onegov.form.types import (
         FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
     from typing import NotRequired, TypedDict, Self
@@ -1241,6 +1241,8 @@ class FormcodeField(TextAreaField):
         if not isinstance(valuelist[0], str):
             raise TypeError
 
+        # FIXME: circular import
+        from onegov.form.parser import ParsedForm
         try:
             self.data = ParsedForm.from_formcode(valuelist[0])
         except FormParsingError as exc:
