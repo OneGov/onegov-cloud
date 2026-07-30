@@ -161,6 +161,14 @@ class OrgRequest(CoreRequest):
             )
         return user or self.first_admin_available
 
+    def auto_accept_owner(self) -> str | None:
+        """ The username an auto-accepted action should be attributed to:
+        the logged-in user if any, otherwise the auto-accept user. """
+        if self.current_username is not None:
+            return self.current_username
+        user = self.auto_accept_user
+        return user.username if user is not None else None
+
     @cached_property
     def email_for_new_tickets(self) -> str | None:
         return self.app.org.email_for_new_tickets
