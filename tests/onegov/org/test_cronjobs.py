@@ -3062,12 +3062,13 @@ def test_admin_notification_multiple_entries(
     assert len(os.listdir(client.app.maildir)) == 2
 
 
-def test_admin_notification_pdf_filename_with_slash(
+def test_admin_notification_pdf_title_special_chars(
     client: Client['TestOrgApp'],
 ) -> None:
     """
     A slash in the entry title is replaced, not cut off — Attachment runs
-    the filename through basename().
+    the filename through basename(). Angle brackets survive in the pdf,
+    which renders headings as markup.
     """
     job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
     assert job is not None
@@ -3077,15 +3078,16 @@ def test_admin_notification_pdf_filename_with_slash(
 
     transaction.begin()
     directory = _make_permit_directory(client.app.session())
+    title = 'Umbau <Haus> Haupt/Nebengebäude'
     entry = directory.add(
         values=dict(
-            gesuchsteller_in='Umbau Haupt/Nebengebäude',
+            gesuchsteller_in=title,
             adresse='Feldweg 2',
             publication_start=real_now - timedelta(minutes=30),
             publication_end=real_now + timedelta(days=30),
         )
     )
-    assert entry.title == 'Umbau Haupt/Nebengebäude'
+    assert entry.title == title
     transaction.commit()
     close_all_sessions()
 
@@ -3095,8 +3097,13 @@ def test_admin_notification_pdf_filename_with_slash(
 
     assert len(os.listdir(client.app.maildir)) == 1
     msg = client.get_email(0)
-    assert msg['Attachments'][0]['Name'] == 'Umbau Haupt-Nebengebäude.pdf'
+    assert msg['Attachments'][0]['Name'] == (
+        'Umbau <Haus> Haupt-Nebengebäude.pdf'
+    )
     _assert_signed_pdf(msg['Attachments'][0])
+    # the heading keeps the angle brackets instead of dropping them
+    pdf_text = extract_pdf_text(msg['Attachments'][0])
+    assert pdf_text.splitlines()[0] == title
 
 
 def test_admin_notification_signing_failure(
@@ -3140,6 +3147,49 @@ def test_admin_notification_signing_failure(
     assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
     assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
     assert client.app.session().query(SigningRequest).count() == 0
+
+
+def test_admin_notification_pdf_failure(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    A failing pdf rendering does not abort the cronjob — the notification
+    is sent without an attachment.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    for name in ('Dora Vogt', 'Emil Roth'):
+        directory.add(
+            values=dict(
+                gesuchsteller_in=name,
+                adresse='Talstrasse 4',
+                publication_start=real_now - timedelta(minutes=30),
+                publication_end=real_now + timedelta(days=30),
+            )
+        )
+    transaction.commit()
+    close_all_sessions()
+
+    with patch(
+        'onegov.org.views.directory.create_admin_notification_pdf'
+    ) as create_pdf:
+        create_pdf.side_effect = OSError('no such file')
+
+        with freeze_time(real_now, tick=True):
+            client.get(get_cronjob_url(job))
+
+    # both entries are still notified, just without a pdf
+    assert len(os.listdir(client.app.maildir)) == 2
+    for i in (0, 1):
+        msg = client.get_email(i)
+        assert 'Veröffentlichter Eintrag' in msg['Subject']
+        assert 'Attachments' not in msg
 
 
 def test_admin_notification_no_notification_address(

@@ -170,7 +170,7 @@
 </metal:payment>
 
 <metal:directory_entry_notification_details define-macro="directory_entry_notification_details" i18n:domain="onegov.org">
-    <p><u i18n:translate="">Form fields</u></p>
+    <p><u i18n:translate="">Publication</u></p>
     <p>
         <tal:b tal:repeat="field directory.basic_fields">
             <tal:b tal:define="value entry.values.get(field.id, '')">

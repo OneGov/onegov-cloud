@@ -718,7 +718,7 @@ def create_admin_notification_pdf(
     pdf.init_a4_portrait(
         page_fn=page_fn_footer, page_fn_later=page_fn_header_and_footer
     )
-    pdf.h(title)
+    pdf.h(escape(title))
     title_link = (
         f'<a href="{request.link(entry)}" color="{pdf.link_color}">'
         f'<u>{escape(title)}</u></a>'
@@ -840,13 +840,18 @@ def send_admin_notification_for_directory_entry(
     ))
 
     generated_at = datetime.now(UTC)
-    pdf = create_admin_notification_pdf(
-        request,
-        filename=entry.title,
-        title=entry.title,
-        entry=entry,
-        generated_at=generated_at,
-    )
+    try:
+        pdf = create_admin_notification_pdf(
+            request,
+            filename=entry.title,
+            title=entry.title,
+            entry=entry,
+            generated_at=generated_at,
+        )
+    except Exception:
+        # a broken pdf must not hold back the notification
+        log.exception('Error while rendering directory publication')
+        pdf = None
     if pdf is not None:
         sign_pdf(pdf, request)
     send_admin_email(
@@ -869,7 +874,6 @@ def send_admin_notification_for_directory_entry(
 def sign_pdf(pdf: Attachment, request: OrgRequest) -> None:
     try:
         signed_pdf = BytesIO()
-        assert request.app.signing_service
         request.app.signing_service.sign(
             request.session,
             BytesIO(pdf.content),
@@ -877,8 +881,9 @@ def sign_pdf(pdf: Attachment, request: OrgRequest) -> None:
             None,
         )
         pdf.content = signed_pdf.getvalue()
-    except (RuntimeError, Exception) as ex:
-        log.error(f'Error while signing directory publication: {ex}')
+    except Exception:
+        # an unsigned pdf is better than no notification at all
+        log.exception('Error while signing directory publication')
 
 
 def send_admin_expiry_notification_for_directory_entry(
@@ -896,14 +901,19 @@ def send_admin_expiry_notification_for_directory_entry(
                  'directory': directory.title},
     ))
     generated_at = datetime.now(UTC)
-    pdf = create_admin_notification_pdf(
-        request,
-        filename=entry.title,
-        title=entry.title,
-        entry=entry,
-        generated_at=generated_at,
-        ended=True,
-    )
+    try:
+        pdf = create_admin_notification_pdf(
+            request,
+            filename=entry.title,
+            title=entry.title,
+            entry=entry,
+            generated_at=generated_at,
+            ended=True,
+        )
+    except Exception:
+        # a broken pdf must not hold back the notification
+        log.exception('Error while rendering directory publication')
+        pdf = None
     if pdf is not None:
         sign_pdf(pdf, request)
     send_admin_email(
