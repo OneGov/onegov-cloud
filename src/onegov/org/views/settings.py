@@ -444,13 +444,12 @@ def handle_event_settings(
 
             removed_keywords = old_keywords - new_keywords
             removed_choices: dict[str, set[str]] = {
-                keyword: (
+                keyword: removed_field_choices
+                for keyword in old_keywords & new_keywords
+                if (removed_field_choices := (
                     old_field_choices.get(keyword, set())
                     - new_field_choices.get(keyword, set())
-                )
-                for keyword in old_keywords & new_keywords
-                if old_field_choices.get(keyword, set())
-                - new_field_choices.get(keyword, set())
+                ))
             }
 
             if form.force_remove.data:

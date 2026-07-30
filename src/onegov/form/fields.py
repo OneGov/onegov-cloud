@@ -1234,7 +1234,7 @@ class FormcodeField(TextAreaField):
         return '' if self.data is None else self.data.safe_formcode
 
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
-        if not valuelist:
+        if not valuelist or not valuelist[0]:
             self.data = None
             return
 
@@ -1246,6 +1246,8 @@ class FormcodeField(TextAreaField):
         try:
             self.data = ParsedForm.from_formcode(valuelist[0])
         except FormParsingError as exc:
+            if hasattr(exc, 'line'):
+                self.render_kw['data-highlight-line'] = str(exc.line)
             raise ValueError(exc.field_message(self)) from exc
         # FIXME: Where is this coming from? We should prevent it
         #        at the source and ensure we raise a FormParsingError

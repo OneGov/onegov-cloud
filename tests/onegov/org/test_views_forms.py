@@ -1495,7 +1495,7 @@ def test_event_configuration_validation(client: Client) -> None:
     """
     page.form['keyword_fields'] = ['kalender', 'sportart']
     page = page.form.submit()
-    assert 'Invalid field type for field \'Email Adresse\'.' in page
+    assert 'Ungültiger Feldtyp für Feld \'Email Adresse\'.' in page
 
     # test multiple errors
     page = client.get('/event-settings')
@@ -1512,8 +1512,8 @@ def test_event_configuration_validation(client: Client) -> None:
     """
     page.form['keyword_fields'] = ['kalender', 'sportart']
     page = page.form.submit()
-    assert 'Invalid field type for field \'Text\'.' in page
-    assert 'Invalid field type for field \'Webpage\'.' in page
+    assert 'Ungültiger Feldtyp für Feld \'Text\'.' in page
+    assert 'Ungültiger Feldtyp für Feld \'Webpage\'.' in page
 
 
 def test_file_export_for_ticket(

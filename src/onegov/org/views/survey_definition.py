@@ -146,10 +146,12 @@ def handle_edit_survey_definition(
         form.parsed.validators = []
 
     if form.submitted(request):
+        exclude = set()
         if self.submissions:
+            exclude.add('parsed')
             form.parsed.data = self.parsed
         assert form.parsed.data is not None
-        form.populate_obj(self)
+        form.populate_obj(self, exclude=exclude)
 
         request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))

@@ -131,6 +131,7 @@ class SurveyDefinitionForm(Form):
     parsed = FormcodeField(
         label=_('Definition'),
         name='definition',
+        require_email_field=False,
         validators=[InputRequired(), ValidSurveyDefinition()])
 
 
