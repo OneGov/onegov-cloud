@@ -489,22 +489,6 @@ class Organisation(Base, TimestampMixin):
         return None
 
     @property
-    def event_filter_definition(self) -> str | None:
-        if parsed := self.event_filter_parsed_definition:
-            return parsed.formcode
-        return None
-
-    @event_filter_definition.setter
-    def event_filter_definition(self, value: str | None) -> None:
-        if value:
-            parsed = ParsedForm.from_formcode(value)
-            self.event_filter_definition_json = parsed.model_dump(mode='json')
-            self.__dict__['event_filter_parsed_definition'] = parsed
-        else:
-            self.event_filter_definition_json = None
-            self.__dict__['event_filter_parsed_definition'] = None
-
-    @property
     def event_filter_fields(self) -> tuple[ParsedField, ...]:
         if parsed := self.event_filter_parsed_definition:
             return parsed.flattened_fields

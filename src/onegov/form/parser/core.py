@@ -934,7 +934,7 @@ class BaseField[KindT: str](BaseModel):
     type: KindT = Field(
         description='The type of form field this is. This corresponds to the '
             'HTML input type in some cases. But also includes some additional '
-            'custom fields.'
+            'custom fields.',
     )
     label: str = Field(
         description='A human readable label for the field. Must be unique '
@@ -1027,11 +1027,34 @@ class BaseField[KindT: str](BaseModel):
         buffer.write(self.label)
         buffer.write(' ')
         if self.required:
-            buffer.write('*')
+            buffer.write('* ')
         buffer.write('=')
         self.write_formcode_value(buffer, indentation)
         if self.field_help:
             buffer.write(f'{indentation}<< {self.field_help} >>\n')
+
+    # NOTE: In order to avoid infinite recursion errors when comparing two
+    #       fields we need to get rid of our parent reference before hand
+    #       off equality checking to the base pydantic implementation
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        # NOTE: This minimal check ensures that the fields don't accidentally
+        #       compare equal if they originate from different branches
+        if self.human_id != other.human_id:
+            return False
+
+        our_parent = self.__dict__.pop('_parent', None)
+        their_parent = other.__dict__.pop('_parent', None)
+        try:
+            return super().__eq__(other)
+        finally:
+            # restore the parents
+            if our_parent is not None:
+                self.__dict__['_parent'] = our_parent
+            if their_parent is not None:
+                self.__dict__['_parent'] = their_parent
 
 
 @final

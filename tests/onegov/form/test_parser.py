@@ -1716,10 +1716,9 @@ def test_nested_fieldset_error() -> None:
 
 @pytest.mark.parametrize('definition,expected', [
     # NOTE: We always format the required indicator the same way
-    #       without a space and we always put a newline at the end
     (
-        'E-Mail * = @@@',
-        'E-Mail *= @@@\n'
+        'E-Mail *= @@@',
+        'E-Mail * = @@@\n'
     ),
     # NOTE: We always put exactly one newline between fieldsets
     #       and now newlines between fields in the same fieldset
@@ -1774,7 +1773,7 @@ def test_nested_fieldset_error() -> None:
     # examples from docs
     (
         dedent("""\
-            Delivery *=
+            Delivery * =
                 (x) I want it delivered
                     Alternate Address =
                         (x) No
@@ -1848,7 +1847,8 @@ def test_nested_fieldset_error() -> None:
 
             # Standard Numbers
             I'm a valid IBAN (or empty) = # iban
-            I'm a valid IBAN (required) *= # iban
+            I'm a valid IBAN (required) * = # iban
+            I'm an animal chip nr = chip-nr
 
             # Radio Buttons
             Gender =
@@ -1857,10 +1857,10 @@ def test_nested_fieldset_error() -> None:
                 (x) I don't want to say
             Delivery Method =
                 ( ) Pickup
-                    Pickup Time *= ___
+                    Pickup Time * = ___
                 (x) Address
-                    Street *= ___
-                    Town *= ___
+                    Street * = ___
+                    Town * = ___
 
             # Checkboxes
             Extras =
@@ -1906,3 +1906,10 @@ def test_roundtrip(
     assert unparsed == expected
     # when we re-parse the output we get the same fields again
     assert ParsedForm.from_formcode(unparsed).fields == parsed.fields
+    # we should also survive a json serialization roundtrip
+    json_roundtripped = ParsedForm.model_validate_json(
+        parsed.model_dump_json(exclude_none=True)
+    )
+    assert json_roundtripped.fields == parsed.fields
+    # without changing the generated formcode
+    assert json_roundtripped.to_formcode() == expected

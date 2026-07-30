@@ -163,10 +163,10 @@ class RelativeDate(relativedelta):
         self.grain = grain
         self.offset = offset
 
-    def serialize(self) -> dict[str, int]:
+    def serialize(self) -> dict[str, Any]:
         if self.grain is None:
             return {}
-        return {self.grain: self.offset}
+        return {'grain': self.grain, 'offset': self.offset}
 
     @property
     def approximate_total_days(self) -> float:
@@ -190,29 +190,24 @@ class RelativeDate(relativedelta):
     def __get_pydantic_core_schema__(
         cls, source_type: Any, handler: GetCoreSchemaHandler
     ) -> CoreSchema:
-        from_dict_schema = core_schema.chain_schema(
-            [
-                core_schema.typed_dict_schema({
-                    'grain': core_schema.typed_dict_field(
-                        core_schema.literal_schema([
-                            'years', 'months', 'weeks', 'days'
-                        ]),
-                        required=False
-                    ),
-                    'offset': core_schema.typed_dict_field(
-                        core_schema.int_schema(),
-                        required=False
-                    ),
-                }),
-                core_schema.no_info_plain_validator_function(
-                    lambda data: RelativeDate(**data)
-                ),
-            ]
-        )
         return core_schema.union_schema(
             [
                 core_schema.is_instance_schema(RelativeDate),
-                from_dict_schema,
+                core_schema.chain_schema([
+                    core_schema.typed_dict_schema({
+                        'grain': core_schema.typed_dict_field(
+                            core_schema.literal_schema([
+                                'years', 'months', 'weeks', 'days'
+                            ])
+                        ),
+                        'offset': core_schema.typed_dict_field(
+                            core_schema.int_schema()
+                        ),
+                    }, total=False),
+                    core_schema.no_info_plain_validator_function(
+                        lambda data: RelativeDate(**data)
+                    ),
+                ]),
             ],
             serialization=core_schema.plain_serializer_function_ser_schema(
                 cls.serialize,

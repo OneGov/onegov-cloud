@@ -35,7 +35,15 @@ class Formcode(TypeDecorator[ParsedForm]):
         dialect: Dialect
     ) -> str | None:
 
-        return None if value is None else value.model_dump_json()
+        return None if value is None else value.model_dump_json(
+            # NOTE: keep the payload as small as possible
+            # FIXME: We would also like to exclude defaults, but that
+            #        doesn't work well with discriminated unions, since
+            #        the discriminator will always be at its default, so
+            #        pydantic will exclude it and then fail to deserialize
+            #        See https://github.com/pydantic/pydantic/issues/6465
+            exclude_none=True
+        )
 
     def process_result_value(
         self,
