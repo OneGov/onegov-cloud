@@ -7,18 +7,16 @@ from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
 from onegov.form import as_internal_id
-from onegov.form import flatten_fields
 from onegov.form import Form
 from onegov.form import merge_forms
 from onegov.form import move_fields
-from onegov.form import parse_formcode
-from onegov.form.errors import FormError
 from onegov.form.fields import ColorField
-from onegov.form.fields import IconField, MultiCheckboxField
+from onegov.form.fields import FormcodeField
+from onegov.form.fields import IconField
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm, ChangeAdjacencyListUrlForm
@@ -84,17 +82,19 @@ class DirectoryBaseForm(Form):
         default='below'
     )
 
-    structure = TextAreaField(
+    parsed_structure = FormcodeField(
         label=_('Definition'),
         fieldset=_('General'),
-        validators=[
-            InputRequired(),
-            ValidFormDefinition(
-                require_email_field=False,
-                require_title_fields=True
-            )
-        ],
-        render_kw={'rows': 32, 'data-editor': 'form'})
+        name='structure',
+        # FIXME: Depending on the configuration there are some
+        #        reserved fields, we should detect that. We will
+        #        however run into validation order issues, since
+        #        some of the settings affecting the reserved fields
+        #        are further below. But maybe we just always
+        #        reserve those fields, regardless of configuration...
+        require_email_field=False,
+        require_title_fields=True
+    )
 
     enable_map = RadioField(
         label=_('Map'),
@@ -379,31 +379,24 @@ class DirectoryBaseForm(Form):
 
     @cached_property
     def known_field_ids(self) -> set[str] | None:
-        # FIXME: We should probably define this in relation to known_fields
-        #        so we don't parse the form twice if we access both properties
-        try:
-            return {
-                field.id for field in
-                flatten_fields(parse_formcode(self.structure.data))
-            }
-        except FormError:
+        if self.parsed_structure.data is None:
             return None
+        return {
+            field.id for field in
+            self.parsed_structure.data.flattened_fields
+        }
 
-    @cached_property
-    def known_fields(self) -> list[ParsedField] | None:
-        try:
-            return list(
-                flatten_fields(parse_formcode(self.structure.data))
-            )
-        except FormError:
+    @property
+    def known_fields(self) -> tuple[ParsedField, ...] | None:
+        if self.parsed_structure.data is None:
             return None
+        return self.parsed_structure.data.flattened_fields
 
     @cached_property
     def missing_fields(self) -> dict[str, list[str]] | None:
-        try:
-            return self.configuration.missing_fields(self.structure.data)
-        except FormError:
+        if self.parsed_structure.data is None:
             return None
+        return self.configuration.missing_fields(self.parsed_structure.data)
 
     def extract_field_ids(self, field: Field) -> Iterator[str]:
         if not self.known_field_ids:
@@ -541,11 +534,10 @@ class DirectoryBaseForm(Form):
     ) -> ParsedField | None:
         """ Returns the first hidden field, or None. """
 
-        try:
-            fields = flatten_fields(parse_formcode(self.structure.data))
-        except FormError:
+        if self.parsed_structure.data is None:
             return None
-        for field in fields:
+
+        for field in self.parsed_structure.data.flattened_fields:
             if not self.is_public(field.id, configuration):
                 return field
         return None

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
-from onegov.form.fields import URLPanelField
-from onegov.form.validators import (
-    Optional, ValidFormDefinition, ValidSurveyDefinition)
+from onegov.form.fields import FormcodeField, URLPanelField
+from onegov.form.parser import ParsedForm
+from onegov.form.validators import ValidSurveyDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm
@@ -12,7 +12,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, Optional
 
 
 from typing import TYPE_CHECKING
@@ -37,13 +37,14 @@ class FormDefinitionBaseForm(Form):
         label=_('Group'),
         description=_('Used to group the form in the overview'))
 
-    definition = TextAreaField(
+    parsed = FormcodeField(
         label=_('Definition'),
+        name='definition',
         description='do bruchts text',
         fieldset=_('Form Definition'),
-        validators=[InputRequired(), ValidFormDefinition()],
-        render_kw={'rows': 32, 'data-editor': 'form'},
-        default='E-Mail *= @@@')
+        validators=[InputRequired()],
+        default=ParsedForm.from_formcode('E-Mail *= @@@')
+    )
 
     formcode_doc_link = URLPanelField(
         label=_('Link to Formcode Documentation'),
@@ -127,10 +128,10 @@ class SurveyDefinitionForm(Form):
         label=_('Group'),
         description=_('Used to group the form in the overview'))
 
-    definition = TextAreaField(
+    parsed = FormcodeField(
         label=_('Definition'),
-        validators=[InputRequired(), ValidSurveyDefinition()],
-        render_kw={'rows': 32, 'data-editor': 'form'})
+        name='definition',
+        validators=[InputRequired(), ValidSurveyDefinition()])
 
 
 class FormDefinitionUrlForm(Form):

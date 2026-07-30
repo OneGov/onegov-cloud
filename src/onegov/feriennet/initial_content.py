@@ -4,6 +4,7 @@ import textwrap
 
 from onegov.core.utils import module_path
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.org.initial_content import add_filesets, load_content, add_pages
 from onegov.org.models import Organisation
 
@@ -51,13 +52,13 @@ def create_new_organisation(
                     'Formular.'
                 )
             },
-            definition=textwrap.dedent("""\
+            parsed=ParsedForm.from_formcode(textwrap.dedent("""\
                 Vorname *= ___
                 Nachname *= ___
                 Telefon *= ___
                 E-Mail *= @@@
                 Mitteilung *= ...[12]
-            """),
+            """)),
             type='builtin'
         )
     elif locale == 'fr_CH':
@@ -71,13 +72,13 @@ def create_new_organisation(
                     'suivant.'
                 )
             },
-            definition=textwrap.dedent("""\
+            parsed=ParsedForm.from_formcode(textwrap.dedent("""\
                 Prénom *= ___
                 Nom *= ___
                 Telefon *= ___
                 Émail *= @@@
                 Message *= ...[12]
-            """),
+            """)),
             type='builtin'
         )
     elif locale == 'it_CH':
@@ -90,13 +91,13 @@ def create_new_organisation(
                     'Potete telefonarci o riempire questo formulario.'
                 )
             },
-            definition=textwrap.dedent("""\
+            parsed=ParsedForm.from_formcode(textwrap.dedent("""\
                 Nome *= ___
                 Cognome *= ___
                 Telefono *= ___
                 E-mail *= @@@
                 Comunicazione *= ...[12]
-            """),
+            """)),
             type='builtin'
         )
     else:

@@ -9,6 +9,7 @@ from datetime import timedelta
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.org.models.page import Page
 from sedate import utcnow
 from webtest import Upload
@@ -289,11 +290,15 @@ def test_ticket_chat_search(client_with_fts: Client) -> None:
     client = client_with_fts
 
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
-        First name * = ___
-        Last name * = ___
-        E-Mail * = @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            First name * = ___
+            Last name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
 
     transaction.commit()
 

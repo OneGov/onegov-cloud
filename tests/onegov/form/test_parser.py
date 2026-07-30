@@ -1405,7 +1405,7 @@ def test_error_mixed_checkboxes() -> None:
     )
     with pytest.raises(errors.MixedTypeError) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
-    assert excinfo.value.field_name == 'Auswahl'
+    assert excinfo.value.label == 'Auswahl'
 
 
 def test_field_with_no_field_type_definition() -> None:
@@ -1414,15 +1414,15 @@ def test_field_with_no_field_type_definition() -> None:
     # is None
     with pytest.raises(errors.FieldCompileError) as excinfo:
         parse_formcode("Text =")
-    assert excinfo.value.field_name == 'Text'
+    assert excinfo.value.label == 'Text'
 
     with pytest.raises(errors.FieldCompileError) as excinfo:
         parse_formcode("Comment = \nWebseite = ___")
-    assert excinfo.value.field_name == 'Comment'
+    assert excinfo.value.label == 'Comment'
 
     with pytest.raises(errors.FieldCompileError) as excinfo:
         parse_formcode("Title = ___\nNo type field= \nWebseite = ___")
-    assert excinfo.value.field_name == 'No type field'
+    assert excinfo.value.label == 'No type field'
 
 
 def test_help_indentation_error() -> None:
@@ -1670,7 +1670,7 @@ def test_empty_fieldset_error() -> None:
             "E-mail *= @@@"
         )), enable_edit_checks=True)
 
-    assert e.value.field_name == 'Section 1'
+    assert e.value.label == 'Section 1'
 
     with pytest.raises(errors.EmptyFieldsetError) as e:
         parse_formcode('\n'.join((
@@ -1682,7 +1682,7 @@ def test_empty_fieldset_error() -> None:
             "# Section 3",
         )), enable_edit_checks=True)
 
-    assert e.value.field_name == 'Section 3'
+    assert e.value.label == 'Section 3'
 
     with pytest.raises(errors.EmptyFieldsetError) as e:
         parse_formcode('\n'.join((
@@ -1694,7 +1694,7 @@ def test_empty_fieldset_error() -> None:
             "E-mail *= @@@",
         )), enable_edit_checks=True)
 
-    assert e.value.field_name == 'Section 2'
+    assert e.value.label == 'Section 2'
 
 
 def test_nested_fieldset_error() -> None:

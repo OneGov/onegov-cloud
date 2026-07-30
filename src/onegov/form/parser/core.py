@@ -1764,7 +1764,7 @@ def parse_field_block(
     field_help = field_block.get('field_help')
 
     if field is None:
-        raise errors.FieldCompileError(field_name=key.rstrip('= '))
+        raise errors.FieldCompileError(key.rstrip('= '))
 
     identifier_src = key.rstrip('= ') + '='
     identifier = ELEMENTS.identifier.parse_string(identifier_src)
@@ -1773,7 +1773,7 @@ def parse_field_block(
         human_id(identifier.label, fieldset, parent_id)
     )
     if result_id in used_ids:
-        raise errors.DuplicateLabelError(label=identifier.label)
+        raise errors.DuplicateLabelError(identifier.label)
 
     used_ids.add(result_id)
 

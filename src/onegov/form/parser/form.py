@@ -81,7 +81,10 @@ class ParsedForm(BaseModel):
     def safe_formcode(self) -> str:
         if self.source_code is not None:
             try:
-                if self.fields == tuple(parse_formcode(self.source_code)):
+                if self.fields == tuple(parse_formcode(
+                    self.source_code,
+                    enable_edit_checks=True
+                )):
                     return self.source_code
             except Exception:
                 log.warning(

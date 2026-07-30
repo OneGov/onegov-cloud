@@ -20,6 +20,7 @@ from onegov.form.fields import (ChosenSelectField, URLPanelField,
                                 ChosenSelectMultipleEmailField)
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
+from onegov.form.fields import FormcodeField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
@@ -2109,20 +2110,23 @@ class EventSettingsForm(Form):
         default='tags'
     )
 
-    event_filter_definition = TextAreaField(
+    event_filter_parsed_definition = FormcodeField(
         label=_('Definition'),
         fieldset=_('Filters'),
+        name='event_filter_definition',
         depends_on=('event_filter_type', '!tags'),
-        validators=[
-            ValidFilterFormDefinition(
-                require_email_field=False,
-                require_title_fields=False,
-                reserved_fields={name for name, _ in
-                                 get_fields_from_class(EventForm)}
-                                | {'syndicate', 'highlight'}
-            )
-        ],
-        render_kw={'rows': 16, 'data-editor': 'form'}
+        require_email_field=False,
+        require_title_fields=False,
+        # FIXME: This is missing other reserved fields added through
+        #        content extensions etc. We might want to optionally
+        #        allow reserved_fields to be callback, that gets invoked
+        #        with the current request, so we can get the proper
+        #        form managers will see.
+        reserved_fields={
+            name for name, _ in get_fields_from_class(EventForm)
+        } | {'syndicate', 'highlight'},
+        validators=[ValidFilterFormDefinition()],
+        render_kw={'rows': 16}
     )
 
     keyword_fields = TextAreaField(

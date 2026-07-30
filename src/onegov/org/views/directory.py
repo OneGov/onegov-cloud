@@ -24,9 +24,6 @@ from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.directory.models.directory import EntrySubscription
 from onegov.form import FormCollection, as_internal_id, move_fields
-from onegov.form.parser import ParsedForm
-from onegov.form.errors import (
-    InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
@@ -223,68 +220,49 @@ def handle_edit_directory(
     migration = None
     error = None
 
-    try:
-        if form.submitted(request):
-            save_changes = True
+    if form.submitted(request):
+        save_changes = True
 
-            if self.directory.entries:
-                assert form.structure.data is not None
-                migration = self.directory.migration(
-                    # FIXME: Make a form field that directly operates
-                    #        on ParsedForm
-                    ParsedForm.from_formcode(form.structure.data),
-                    form.configuration
-                )
+        if self.directory.entries:
+            assert form.parsed_structure.data is not None
+            migration = self.directory.migration(
+                form.parsed_structure.data,
+                form.configuration
+            )
 
-                if migration.changes:
-                    if not migration.possible:
-                        save_changes = False
-                        request.alert(_(
-                            'The requested change cannot be performed, '
-                            'as it is incompatible with existing entries'
-                        ))
-                        alert_migration_errors(migration, request)
-                    else:
-                        if not request.params.get('confirm'):
-                            form.action += '&confirm=1'
-                            save_changes = False
-
-            if save_changes:
-                try:
-                    form.populate_obj(self.directory)
-                    self.session.flush()
-                except ValidationError as e:
-                    error = e
-                    error.link = request.class_link(  # type:ignore
-                        DirectoryEntry,
-                        {
-                            'directory_name': self.directory.name,
-                            'name': e.entry.name
-                        }
-                    )
-                    transaction.abort()
+            if migration.changes:
+                if not migration.possible:
+                    save_changes = False
+                    request.alert(_(
+                        'The requested change cannot be performed, '
+                        'as it is incompatible with existing entries'
+                    ))
+                    alert_migration_errors(migration, request)
                 else:
-                    request.success(_('Your changes were saved'))
-                    return request.redirect(request.link(self))
+                    if not request.params.get('confirm'):
+                        form.action += '&confirm=1'
+                        save_changes = False
 
-        elif not request.POST:
-            form.process(obj=self.directory)
-    except InvalidFormSyntax as e:
-        request.warning(
-            _('Syntax Error in line ${line}', mapping={'line': e.line})
-        )
-    except AttributeError:
-        request.warning(_('Syntax error in form'))
+        if save_changes:
+            try:
+                form.populate_obj(self.directory)
+                self.session.flush()
+            except ValidationError as e:
+                error = e
+                error.link = request.class_link(  # type:ignore
+                    DirectoryEntry,
+                    {
+                        'directory_name': self.directory.name,
+                        'name': e.entry.name
+                    }
+                )
+                transaction.abort()
+            else:
+                request.success(_('Your changes were saved'))
+                return request.redirect(request.link(self))
 
-    except MixedTypeError as e:
-        request.warning(
-            _('Syntax error in field ${field_name}',
-              mapping={'field_name': e.field_name})
-        )
-    except DuplicateLabelError as e:
-        request.warning(
-            _('Error: Duplicate label ${label}', mapping={'label': e.label})
-        )
+    elif not request.POST:
+        form.process(obj=self.directory)
 
     layout = layout or DirectoryCollectionLayout(self, request)
     layout.edit_mode = True
