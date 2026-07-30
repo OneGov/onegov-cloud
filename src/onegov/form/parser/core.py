@@ -410,7 +410,7 @@ from dateutil import parser as dateutil_parser
 from decimal import Decimal
 from functools import lru_cache
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
-from pydantic_extra_types.currency_code import Currency  # noqa: TC002
+from pydantic_extra_types.currency_code import Currency
 
 from onegov.core.utils import Bunch
 from onegov.form import errors
@@ -802,6 +802,7 @@ class Pricing(BaseModel):
     )
     online_payment_required: bool = Field(
         default=False,
+        exclude_if=lambda value: value is False,
         alias='credit_card_payment',
         description='Whether or not this selection forces the payment to be '
             'made online, directly after form submission. This is useful '
@@ -861,11 +862,13 @@ class Choice(BaseModel):
     selected: bool = Field(
         default=False,
         alias='checked',
+        exclude_if=lambda value: value is False,
         description='Whether or not this choice should be pre-selected. '
             'For radio fields only a single choice may be pre-selected.'
     )
     fields: tuple[ParsedField, ...] = Field(
         default=(),
+        exclude_if=lambda value: not value,
         description='Any subfields that should only be displayed as long '
             'as this choice has been selected. Subfields will inherit the '
             'fieldset of the parent field, unless it explicitly is set '
@@ -946,6 +949,7 @@ class BaseField[KindT: str](BaseModel):
     )
     required: bool = Field(
         default=False,
+        exclude_if=lambda value: value is False,
         description='Whether or not this field is required. Fields that '
             'are not required, can be left empty, when submitting the form.'
     )

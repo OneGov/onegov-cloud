@@ -8,6 +8,7 @@ from decimal import Decimal
 from functools import lru_cache
 from onegov.form.utils import decimal_range
 from pydantic_core import CoreSchema, core_schema
+from pydantic_extra_types.currency_code import Currency
 from pyparsing import (
     alphanums,
     Combine,
@@ -18,6 +19,7 @@ from pyparsing import (
     pyparsing_unicode,
     OneOrMore,
     Optional,
+    ParseException,
     ParseFatalException,
     ParserElement,
     Regex,
@@ -146,6 +148,24 @@ def is_valid_date_range(
         return tokens
 
     raise ParseFatalException(instring, loc, 'Invalid date range')
+
+
+def is_valid_currency(
+    instring: str,
+    loc: int, tokens:
+    ParseResults
+) -> str | None:
+
+    if not tokens:
+        return None
+
+    currency = tokens[0].upper()
+    if currency not in Currency.allowed_currencies:
+        # NOTE: We make this non-fatal, so things like (2 Stk) aren't
+        #       interpreted as a price by accident, this is only fatal
+        #       if there is no alternative way to parse the expression.
+        raise ParseException(instring, loc, 'Invalid currency')
+    return currency
 
 
 class RelativeDate(relativedelta):
@@ -617,7 +637,8 @@ def currency() -> ParserElement:
 
     """
 
-    return Regex(r'[a-zA-Z]{3}').set_parse_action(as_uppercase)('currency')
+    return Regex(r'[a-zA-Z]{3}').set_parse_action(
+        is_valid_currency)('currency')
 
 
 def pricing() -> ParserElement:
