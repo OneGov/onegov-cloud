@@ -1244,7 +1244,10 @@ class FormcodeField(TextAreaField):
         # FIXME: circular import
         from onegov.form.parser import ParsedForm
         try:
-            self.data = ParsedForm.from_formcode(valuelist[0])
+            self.data = ParsedForm.from_formcode(
+                valuelist[0],
+                enable_edit_checks=True
+            )
         except FormParsingError as exc:
             if hasattr(exc, 'line'):
                 self.render_kw['data-highlight-line'] = str(exc.line)

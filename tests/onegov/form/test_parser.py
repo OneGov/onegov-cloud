@@ -1715,6 +1715,40 @@ def test_nested_fieldset_error() -> None:
 
 
 @pytest.mark.parametrize('definition,expected', [
+    # NOTE: Anonymous fieldsets are re-rendered properly
+    (
+        dedent("""\
+            # Name
+            First name = ___
+            Last name = ___
+
+            # Address
+            Street = ___
+
+            # ...
+            Comment = ___
+
+            # Addendum
+            Feedback = ___
+        """),
+        None
+    ),
+    # NOTE: But an explicit anonymous fieldset at the start gets dropped
+    (
+        dedent("""\
+            # ...
+            Comment = ___
+
+            # Addendum
+            Feedback = ___
+        """),
+        dedent("""\
+            Comment = ___
+
+            # Addendum
+            Feedback = ___
+        """),
+    ),
     # NOTE: We always format the required indicator the same way
     (
         'E-Mail *= @@@',

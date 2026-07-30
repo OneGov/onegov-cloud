@@ -1035,6 +1035,11 @@ class BaseField[KindT: str](BaseModel):
         buffer.write('=')
         self.write_formcode_value(buffer, indentation)
         if self.field_help:
+            # FIXME: Improve handling of multi-line field helps, for now
+            #        it doesn't matter, since it already gets mangled by
+            #        the YAML parser. So in almost every case it will be
+            #        a single line, even if the original was split across
+            #        multiple lines.
             buffer.write(f'{indentation}<< {self.field_help} >>\n')
 
     # NOTE: In order to avoid infinite recursion errors when comparing two

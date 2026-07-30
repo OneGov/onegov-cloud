@@ -95,14 +95,18 @@ class ParsedForm(BaseModel):
     def to_formcode(self) -> str:
         fieldset: str | None = None
         buffer = StringIO()
+        first_line = True
         for field in self.fields:
             if field.fieldset != fieldset:
-                if fieldset is not None:
+                if not first_line:
                     # insert an extra newline above the fieldset
                     buffer.write('\n')
                 fieldset = field.fieldset
-                buffer.write(f'# {fieldset}\n')
+                # if we encounter an anonymous fieldset after a
+                # named one we need to display it as `...`
+                buffer.write(f'# {'...' if fieldset is None else fieldset}\n')
             field.write_formcode(buffer, '')
+            first_line = False
         return buffer.getvalue()
 
     def form_class[T: Form = Form](
