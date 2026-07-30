@@ -32,7 +32,7 @@ from onegov.form import FormCollection, as_internal_id, move_fields
 from onegov.form.errors import (
     InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
 from onegov.form.fields import UploadField
-from onegov.org import OrgApp, _
+from onegov.org import OrgApp, _, log
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.directory import DirectoryRecipientForm, DirectoryUrlForm
 from onegov.org.forms.generic import ExportForm
@@ -669,7 +669,7 @@ def send_email_notification_for_directory_entry(
     request.app.send_transactional_email_batch(email_iter())
 
 
-def _send_admin_email(
+def send_admin_email(
     directory: ExtendedDirectory,
     request: OrgRequest,
     subject: str,
@@ -708,7 +708,7 @@ def create_admin_notification_pdf(
     layout = DefaultMailLayout(entry, request)
 
     f = BytesIO()
-    pdf = Pdf(  # may use a specific pdf class like `TicketBasePdf`
+    pdf = Pdf(
         f,
         title=title,
         author=app.org.title,
@@ -820,6 +820,7 @@ def create_admin_notification_pdf(
     pdf.generate()
 
     return Attachment(
+        # slashes would be cut off by Attachment's basename()
         f"{filename.replace('/', '-')}.pdf",
         content=f.getvalue(),
         content_type='application/pdf',
@@ -846,8 +847,9 @@ def send_admin_notification_for_directory_entry(
         entry=entry,
         generated_at=generated_at,
     )
-
-    _send_admin_email(
+    if pdf is not None:
+        sign_pdf(pdf, request)
+    send_admin_email(
         directory, request, title,
         'mail_directory_entry_admin_notification_started.pt',
         {
@@ -862,6 +864,21 @@ def send_admin_notification_for_directory_entry(
         },
         attachments=(pdf,) if pdf else (),
     )
+
+
+def sign_pdf(pdf: Attachment, request: OrgRequest) -> None:
+    try:
+        signed_pdf = BytesIO()
+        assert request.app.signing_service
+        request.app.signing_service.sign(
+            request.session,
+            BytesIO(pdf.content),
+            signed_pdf,
+            None,
+        )
+        pdf.content = signed_pdf.getvalue()
+    except (RuntimeError, Exception) as ex:
+        log.error(f'Error while signing directory publication: {ex}')
 
 
 def send_admin_expiry_notification_for_directory_entry(
@@ -887,8 +904,9 @@ def send_admin_expiry_notification_for_directory_entry(
         generated_at=generated_at,
         ended=True,
     )
-
-    _send_admin_email(
+    if pdf is not None:
+        sign_pdf(pdf, request)
+    send_admin_email(
         directory, request, title,
         'mail_directory_entry_admin_publication_ended.pt',
         {

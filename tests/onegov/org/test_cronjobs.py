@@ -6,8 +6,10 @@ import niquests
 import os
 import pytest
 import transaction
+import vcr  # type: ignore[import-untyped]
 
 from babel import Locale as BabelLocale
+from base64 import b64decode
 from babel.dates import format_date as babel_format_date
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
@@ -21,6 +23,7 @@ from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import EventCollection, OccurrenceCollection, Event
 from onegov.event.utils import as_rdates
 from onegov.file.models import SigningRequest
+from onegov.file.sign.swisscom_ais import SwisscomAIS
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import (
     ExtendedDirectoryEntry,
@@ -54,7 +57,7 @@ from unittest.mock import patch, Mock
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Mapping
     from onegov.org.models import ExtendedDirectory
     from onegov.ticket.handler import HandlerRegistry
     from sqlalchemy.orm import Session
@@ -2747,6 +2750,23 @@ def _fmt_date(dt: datetime) -> str:
     )
 
 
+def _ais_cassette() -> Any:
+    """Replays a recorded Swisscom AIS response for each signing request."""
+    return vcr.use_cassette(
+        module_path('tests.onegov.org', 'cassettes/ais-success.json'),
+        record_mode='none',
+        allow_playback_repeats=True,
+    )
+
+
+def _assert_signed_pdf(attachment: Mapping[str, Any]) -> None:
+    """The attached pdf carries a digital signature."""
+    content = b64decode(attachment['Content'])
+    assert b'/SigFlags' in content
+    assert b'/ByteRange' in content
+    assert b'adbe.pkcs7.detached' in content
+
+
 def _make_permit_directory(
     session: 'Session', notification_address: str | None = 'admin@example.org'
 ) -> 'ExtendedDirectory':
@@ -2846,7 +2866,8 @@ def test_admin_notification_full_workflow(
 
     # cronjob after the start: one publication email carrying 'Version B'
     with freeze_time(base + timedelta(hours=3), tick=True):
-        client.get(get_cronjob_url(job))
+        with _ais_cassette():
+            client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 1
         msg = client.get_email(0)
         assert msg['To'] == 'admin@example.org'
@@ -2867,6 +2888,9 @@ def test_admin_notification_full_workflow(
         # verify attachment
         assert msg['Attachments']
         assert msg['Attachments'][0]['Name'].endswith('.pdf')
+        _assert_signed_pdf(msg['Attachments'][0])
+        signing_request = client.app.session().query(SigningRequest).one()
+        assert signing_request.service_name == 'swisscom_ais'
         pdf_text = extract_pdf_text(msg['Attachments'][0])
         expected = (
             'Permit One',
@@ -2928,12 +2952,14 @@ def test_admin_notification_full_workflow(
 
     # cronjob after the new start: re-publication email carrying 'Version C'
     with freeze_time(base + timedelta(hours=7), tick=True):
-        client.get(get_cronjob_url(job))
+        with _ais_cassette():
+            client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 2
         msg = client.get_email(1)
         assert 'Veröffentlichter Eintrag' in msg['Subject']
         assert 'Version C' in msg['TextBody']
         assert 'Version C' in extract_pdf_text(msg['Attachments'][0])
+        _assert_signed_pdf(msg['Attachments'][0])
 
         # published right now -> deletion is blocked
         entry_page = client.get(entry_url)
@@ -2951,7 +2977,8 @@ def test_admin_notification_full_workflow(
     # cronjob after publication_end: expiry email sent; only now that the
     # end notification has gone out may the entry be deleted
     with freeze_time(base + timedelta(hours=10), tick=True):
-        client.get(get_cronjob_url(job))
+        with _ais_cassette():
+            client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 3
         msg = client.get_email(2)
         assert 'Publikationsfrist' in msg['Subject']
@@ -3012,7 +3039,8 @@ def test_admin_notification_multiple_entries(
 
     # both publication_starts crossed in the same window — one email each
     with freeze_time(real_now, tick=True):
-        client.get(get_cronjob_url(job))
+        with _ais_cassette():
+            client.get(get_cronjob_url(job))
 
     assert len(os.listdir(client.app.maildir)) == 2
     subjects = {client.get_email(i)['Subject'] for i in (0, 1)}
@@ -3023,11 +3051,95 @@ def test_admin_notification_multiple_entries(
         assert client.get_email(i)['To'] == 'admin@example.org'
         assert _fmt_date(pub_start) in client.get_email(i)['TextBody']
         assert _fmt_date(pub_end) in client.get_email(i)['TextBody']
+        _assert_signed_pdf(client.get_email(i)['Attachments'][0])
+
+    # one signing request per notification
+    assert client.app.session().query(SigningRequest).count() == 2
 
     # second run — no duplicates
     with freeze_time(real_now, tick=True):
         client.get(get_cronjob_url(job))
     assert len(os.listdir(client.app.maildir)) == 2
+
+
+def test_admin_notification_pdf_filename_with_slash(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    A slash in the entry title is replaced, not cut off — Attachment runs
+    the filename through basename().
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    entry = directory.add(
+        values=dict(
+            gesuchsteller_in='Umbau Haupt/Nebengebäude',
+            adresse='Feldweg 2',
+            publication_start=real_now - timedelta(minutes=30),
+            publication_end=real_now + timedelta(days=30),
+        )
+    )
+    assert entry.title == 'Umbau Haupt/Nebengebäude'
+    transaction.commit()
+    close_all_sessions()
+
+    with freeze_time(real_now, tick=True):
+        with _ais_cassette():
+            client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    msg = client.get_email(0)
+    assert msg['Attachments'][0]['Name'] == 'Umbau Haupt-Nebengebäude.pdf'
+    _assert_signed_pdf(msg['Attachments'][0])
+
+
+def test_admin_notification_signing_failure(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    A failing signing service does not prevent the notification — the pdf
+    is simply attached unsigned.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Clara Meier',
+            adresse='Ringstrasse 9',
+            publication_start=real_now - timedelta(minutes=30),
+            publication_end=real_now + timedelta(days=30),
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    with patch.object(SwisscomAIS, 'sign') as sign:
+        sign.side_effect = RuntimeError('signing service unavailable')
+
+        with freeze_time(real_now, tick=True):
+            client.get(get_cronjob_url(job))
+
+        assert sign.called
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    msg = client.get_email(0)
+    assert 'Veröffentlichter Eintrag' in msg['Subject']
+    assert msg['Attachments']
+    assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
+    assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
+    assert client.app.session().query(SigningRequest).count() == 0
 
 
 def test_admin_notification_no_notification_address(
