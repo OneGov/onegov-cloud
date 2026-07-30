@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Mapping
     from onegov.core import Framework
     from onegov.core.collection import PKType
+    from onegov.core.orm.abstract import AdjacencyList
     from onegov.core.request import CoreRequest
     from onegov.form import Form
     from sqlalchemy.orm import DeclarativeBase, Query, Session
@@ -490,6 +491,26 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
                 for value in values
             )
         )
+
+
+class AdjacencyListApiEndpoint[L: AdjacencyList, IdT: PKType](
+    ApiEndpoint[L, IdT]
+):
+    """ An API endpoint for models deriving from :class:`AdjacencyList`.
+
+    Preloads the ancestors of the whole batch, so building each item's link
+    (which renders its path by walking the parent chain) doesn't emit a query
+    per ancestor (N+1).
+
+    """
+
+    @property
+    def batch(self) -> dict[ApiEndpointItem[L, IdT], L]:
+        result = super().batch
+        items = tuple(result.values())
+        if items:
+            items[0].preload_ancestors(self.session, items)
+        return result
 
 
 class ApiEndpointCollection:

@@ -4,6 +4,7 @@ import transaction
 
 from datetime import date
 from functools import cached_property
+from onegov.api.models import AdjacencyListApiEndpoint
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
 from onegov.api.models import ApiInvalidParamException
 from onegov.core.collection import Pagination
@@ -449,6 +450,8 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         }
 
 
+# NOTE: News is a flat two-level tree (one shared root), so it's not an N+1
+#       like topics/agencies -- hence plain ApiEndpoint here.
 class NewsApiEndpoint(ApiEndpoint[News, int]):
     app: OrgApp
     request: OrgRequest
@@ -510,7 +513,7 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
         }
 
 
-class TopicApiEndpoint(ApiEndpoint[Topic, int]):
+class TopicApiEndpoint(AdjacencyListApiEndpoint[Topic, int]):
     request: OrgRequest
     app: OrgApp
     endpoint = 'topics'

@@ -7,6 +7,7 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.agency.forms.person import AuthenticatedPersonMutationForm
+from onegov.api import AdjacencyListApiEndpoint
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.api.utils import is_authorized
 from onegov.gis import Coordinates
@@ -213,7 +214,9 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson', UUID], ApisMixin):
         do_report_person_change(item, form.meta.request, form)
 
 
-class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency', int], ApisMixin):
+class AgencyApiEndpoint(
+    AdjacencyListApiEndpoint['ExtendedAgency', int], ApisMixin
+):
     request: CoreRequest
     app: AgencyApp
     endpoint = 'agencies'

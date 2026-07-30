@@ -16,14 +16,14 @@ from sqlalchemy.orm import (
     validates,
     Mapped
 )
-from sqlalchemy.orm.attributes import get_history
+from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column, nullsfirst
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
     from sqlalchemy.orm.query import Query
     from sqlalchemy.orm.session import Session
     from typing import Self
@@ -253,6 +253,48 @@ class AdjacencyList(Base):
         if self.parent:
             yield from self.parent.ancestors
             yield self.parent
+
+    @classmethod
+    def preload_ancestors(
+        cls,
+        session: Session,
+        items: Iterable[Self]
+    ) -> None:
+        """ Bulk loads all ancestors of the given items and wires up their
+        ``parent`` relationship, so walking the parent chain afterwards (e.g.
+        via :attr:`ancestors` or :attr:`path`) doesn't emit a query per
+        ancestor (N+1).
+
+        Ancestors that are already loaded (e.g. eager loaded direct parents)
+        are reused instead of being queried again.
+
+        """
+        by_id: dict[int, Self] = {}
+        for item in items:
+            by_id[item.id] = item
+            # reuse an already-loaded parent without triggering a lazy load
+            parent = item.__dict__.get('parent')
+            if parent is not None:
+                by_id[parent.id] = parent
+
+        # load the missing ancestors one generation at a time (a handful of
+        # queries bound by the tree depth, instead of one query per ancestor)
+        while True:
+            missing = {
+                item.parent_id for item in by_id.values()
+                if item.parent_id is not None and item.parent_id not in by_id
+            }
+            if not missing:
+                break
+            for ancestor in session.query(cls).filter(cls.id.in_(missing)):
+                by_id[ancestor.id] = ancestor
+
+        # populate the parent relationship from the loaded set, so accessing
+        # it later resolves in-memory rather than triggering a lazy load
+        for item in by_id.values():
+            parent_id = item.parent_id
+            if parent_id is not None and parent_id in by_id:
+                set_committed_value(item, 'parent', by_id[parent_id])
 
     @property
     def siblings(self) -> Query[Self]:
