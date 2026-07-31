@@ -41,6 +41,55 @@ function branch(nodes, root_id) {
     return result;
 }
 
+// drawn inline, the icon fonts of the themes are not the same everywhere
+const ARROW_UP_ICON = `
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+        <path fill="currentColor" d="M8 1.5 13 7h-3v7.5H6V7H3z"/>
+    </svg>
+`;
+
+const SITEMAP_ICON = `
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+        <path fill="none" stroke="currentColor" stroke-width="1.2"
+              d="M8 4v3.5M3.5 12V7.5h9V12"/>
+        <rect fill="currentColor" x="6" y="1" width="4" height="3"/>
+        <rect fill="currentColor" x="1.5" y="12" width="4" height="3"/>
+        <rect fill="currentColor" x="10.5" y="12" width="4" height="3"/>
+    </svg>
+`;
+
+// the buttons are a screen affordance, they have no place in an export
+function node_buttons(node, view) {
+    if (view.exporting) {
+        return '';
+    }
+
+    let buttons = '';
+
+    // only the root of a drilled down chart has a level above it
+    if (node.data.id === view.root_id && view.parent_id !== null) {
+        buttons += `
+            <button class="drillup"
+                    data-drillup="${escape_html(view.parent_id)}"
+                    title="${escape_html(view.drillup_label)}">
+                ${ARROW_UP_ICON}
+            </button>
+        `;
+    }
+
+    if (node.data._directSubordinates) {
+        buttons += `
+            <button class="drilldown"
+                    data-drilldown="${escape_html(node.data.id)}"
+                    title="${escape_html(view.drilldown_label)}">
+                ${SITEMAP_ICON}
+            </button>
+        `;
+    }
+
+    return buttons;
+}
+
 function node_content(node, view) {
     const name = node.data.name;
     // long words don't fit into a node, so we let the browser hyphenate them
@@ -74,19 +123,13 @@ function node_content(node, view) {
         hyphens ? 'hyphens:auto' : ''
     ].join(';');
 
-    // the button is a screen affordance, it has no place in an export
-    const drilldown = !view.exporting && node.data._directSubordinates ? `
-        <button class="drilldown" data-drilldown="${escape_html(node.data.id)}"
-                title="${escape_html(view.drilldown_label)}">
-            <i class="fas fa-sitemap"></i>
-        </button>
-    ` : '';
-
+    // long titles are clipped by the box, the tooltip shows them in full
     return `
         <a href="${escape_html(node.data.url)}">
-            <div class="${classes.join(' ')}" style="${style}">
+            <div class="${classes.join(' ')}" style="${style}"
+                 title="${escape_html(name)}">
                 <span>${escape_html(name)}</span>
-                ${drilldown}
+                ${node_buttons(node, view)}
             </div>
         </a>
     `;
@@ -203,8 +246,11 @@ function init_topic_chart(container) {
     const view = {
         nodes: [],
         root_id: null,
+        // the node above the current root, null while the whole chart shows
+        parent_id: null,
         exporting: false,
-        drilldown_label: container.dataset.drilldownLabel || ''
+        drilldown_label: container.dataset.drilldownLabel || '',
+        drillup_label: container.dataset.drillupLabel || ''
     };
 
     const chart = new d3.OrgChart()
@@ -220,6 +266,17 @@ function init_topic_chart(container) {
         .nodeContent((node) => node_content(node, view));
 
     const draw = () => {
+        const root = view.nodes.filter((node) => node.id === view.root_id)[0];
+        const parent = root && view.nodes.filter(
+            (node) => node.id === root.parentId
+        )[0];
+
+        // the topmost node is the whole chart, which has no drilled state
+        view.parent_id = null;
+        if (parent) {
+            view.parent_id = parent.parentId ? parent.id : '';
+        }
+
         chart.data(branch(view.nodes, view.root_id)).render().fit();
 
         document.querySelectorAll('[data-chart-action="reset"]').forEach(
@@ -255,10 +312,14 @@ function init_topic_chart(container) {
 
     // the buttons live inside the node links, whose default is not wanted
     container.addEventListener('click', (event) => {
-        const button = event.target.closest('[data-drilldown]');
-        if (button) {
+        const down = event.target.closest('[data-drilldown]');
+        const up = event.target.closest('[data-drillup]');
+
+        if (down || up) {
             event.preventDefault();
-            view.root_id = button.dataset.drilldown;
+            // an empty target drills up to the whole chart
+            view.root_id = down ? down.dataset.drilldown :
+                up.dataset.drillup || null;
             draw();
         }
     });
@@ -286,10 +347,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// the export math and the drill down are unit tested in tests/js
+// the nodes, the export math and the drill down are unit tested in tests/js
 if (typeof module !== 'undefined') {
     module.exports = {
         export_dimensions: export_dimensions,
+        node_content: node_content,
         branch: branch
     };
 }

@@ -38,6 +38,7 @@ def test_view_topic_chart(client: Client) -> None:
 
     # the drill down starts hidden, the nodes are drawn by the browser
     assert container[0].attrib['data-drilldown-label']
+    assert container[0].attrib['data-drillup-label']
     assert 'hidden' in page.pyquery('[data-chart-action="reset"]')[0].attrib
 
     nodes = client.get('/topic-chart-json').json['nodes']

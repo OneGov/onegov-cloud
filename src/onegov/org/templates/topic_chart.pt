@@ -18,11 +18,12 @@
              data-url="${chart_url}"
              data-image-name="${image_name}"
              data-drilldown-label="Show only this branch"
+             data-drillup-label="Show the level above"
              data-error-message="The topics could not be loaded."
              data-export-error-message="The chart is too large for an image, please use the SVG download instead."
-             i18n:attributes="data-error-message; data-export-error-message; data-drilldown-label">
+             i18n:attributes="data-error-message; data-export-error-message; data-drilldown-label; data-drillup-label">
             <div class="loading-info">
-                <i class="fas fa-spinner fa-spin"></i>
+                <i class="fa fa-spinner fa-spin"></i>
                 <span i18n:translate="">Loading topics...</span>
             </div>
         </div>

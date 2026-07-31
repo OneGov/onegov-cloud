@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-31 08:15+0200\n"
+"POT-Creation-Date: 2026-07-31 08:53+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -6479,6 +6479,9 @@ msgstr "Télécharger en SVG"
 
 msgid "Show only this branch"
 msgstr "Afficher uniquement cette branche"
+
+msgid "Show the level above"
+msgstr "Afficher le niveau supérieur"
 
 msgid "The topics could not be loaded."
 msgstr "Les sujets n'ont pas pu être chargés."

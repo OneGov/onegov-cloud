@@ -92,6 +92,7 @@ def test_view_topic_chart_actions(client: Client) -> None:
 
     # the drill down starts hidden, the nodes are drawn by the browser
     assert container.attrib['data-drilldown-label']
+    assert container.attrib['data-drillup-label']
     reset = page.pyquery('[data-chart-action="reset"]')[0]
     assert 'hidden' in reset.attrib
 

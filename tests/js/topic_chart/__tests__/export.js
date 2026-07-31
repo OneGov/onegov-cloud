@@ -113,3 +113,93 @@ describe('Drill down', () => {
         expect(chart.branch(nodes, 'nope')).toBe(nodes);
     });
 });
+
+describe('Node content', () => {
+    const node = function(data) {
+        return {width: 220, height: 90, data: Object.assign({
+            name: 'Topic', url: '/topics/topic', access: 'public',
+            published: true, id: 'topic-1', _directSubordinates: 0
+        }, data)};
+    };
+
+    const view = {exporting: false, drilldown_label: 'Only this branch'};
+
+    it('shows the full title as a tooltip', () => {
+        const long = 'A topic with a title too long for the box';
+        expect(chart.node_content(node({name: long}), view)).toContain(
+            `title="${long}"`);
+    });
+
+    it('escapes the title in the text and the tooltip', () => {
+        const html = chart.node_content(
+            node({name: 'Foo & "Bar" <b>', url: '/a?b=1&c=2'}), view);
+        expect(html).toContain('title="Foo &amp; &quot;Bar&quot; &lt;b&gt;"');
+        expect(html).toContain('<span>Foo &amp; &quot;Bar&quot; &lt;b&gt;</span>');
+        expect(html).not.toContain('<b>');
+        expect(html).toContain('href="/a?b=1&amp;c=2"');
+    });
+
+    it('draws the icons inline, the icon fonts differ per theme', () => {
+        const html = chart.node_content(node({_directSubordinates: 2}), view);
+        expect(html).toContain('<svg');
+        expect(html).not.toContain('<i class');
+    });
+
+    it('offers the drill down to nodes with children only', () => {
+        expect(chart.node_content(node({}), view)).not.toContain('drilldown');
+
+        const parent = chart.node_content(
+            node({_directSubordinates: 2}), view);
+        expect(parent).toContain('data-drilldown="topic-1"');
+        expect(parent).toContain('title="Only this branch"');
+    });
+
+    it('leaves the drill down out of an export', () => {
+        const html = chart.node_content(
+            node({_directSubordinates: 2}), {exporting: true});
+        expect(html).not.toContain('drilldown');
+        expect(html).toContain('title="Topic"');
+    });
+});
+
+describe('Drill up', () => {
+    const node = function(id) {
+        return {width: 220, height: 90, data: {
+            name: 'Topic', url: '/t', access: 'public', published: true,
+            id: id, _directSubordinates: 0}};
+    };
+
+    const view = function(root_id, parent_id) {
+        return {
+            exporting: false, root_id: root_id, parent_id: parent_id,
+            drillup_label: 'Level above'
+        };
+    };
+
+    it('offers the level above on the root of a branch', () => {
+        const html = chart.node_content(node('a'), view('a', 'root'));
+        expect(html).toContain('data-drillup="root"');
+        expect(html).toContain('title="Level above"');
+    });
+
+    it('drills up to the whole chart from the first level', () => {
+        expect(chart.node_content(node('a'), view('a', ''))).toContain(
+            'data-drillup=""');
+    });
+
+    it('leaves the other nodes of the branch alone', () => {
+        expect(chart.node_content(node('a1'), view('a', 'root'))).not.toContain(
+            'drillup');
+    });
+
+    it('has nothing above the whole chart', () => {
+        expect(chart.node_content(node('root'), view(null, null))).not.toContain(
+            'drillup');
+    });
+
+    it('leaves the drill up out of an export', () => {
+        const drilled = view('a', 'root');
+        drilled.exporting = true;
+        expect(chart.node_content(node('a'), drilled)).not.toContain('drillup');
+    });
+});

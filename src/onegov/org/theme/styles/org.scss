@@ -7524,7 +7524,8 @@ p.full-text-width {
         padding: .7rem 1rem;
         position: relative;
 
-        .drilldown {
+        .drilldown,
+        .drillup {
             background: none;
             border: 0;
             color: inherit;
@@ -7540,6 +7541,20 @@ p.full-text-width {
             &:hover {
                 opacity: 1;
             }
+        }
+
+        .drillup {
+            left: .3rem;
+            right: auto;
+        }
+
+        // the text keeps clear of the buttons in the corners
+        &:has(.drillup) span {
+            padding-left: .8rem;
+        }
+
+        &:has(.drilldown) span {
+            padding-right: .8rem;
         }
 
         span {
