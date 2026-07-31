@@ -1688,6 +1688,9 @@ msgstr "Grösse"
 msgid "Publication details"
 msgstr "Publikationsdetails"
 
+msgid "The attached PDF could not be signed, because the signature service was not available."
+msgstr "Das angehängte PDF konnte nicht signiert werden, da der Signaturdienst nicht verfügbar war."
+
 msgid "Publication start:"
 msgstr "Publikationsstart:"
 

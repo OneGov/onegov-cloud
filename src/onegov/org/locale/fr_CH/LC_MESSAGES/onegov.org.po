@@ -6906,6 +6906,9 @@ msgstr "La publication « ${title} » est terminée."
 msgid "This document certifies the publication \"${title}\" as follows."
 msgstr "Ce document atteste la publication « ${title} » comme suit."
 
+msgid "The attached PDF could not be signed, because the signature service was not available."
+msgstr "Le PDF joint n'a pas pu être signé, car le service de signature n'était pas disponible."
+
 msgid "Bytes"
 msgstr "octets"
 

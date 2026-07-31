@@ -6895,6 +6895,9 @@ msgstr "Die Publikation \"${title}\" ist abgelaufen."
 msgid "This document certifies the publication \"${title}\" as follows."
 msgstr "Dieses Dokument bescheinigt die Publikation \"${title}\" wie folgt."
 
+msgid "The attached PDF could not be signed, because the signature service was not available."
+msgstr "Das angehängte PDF konnte nicht signiert werden, da der Signaturdienst nicht verfügbar war."
+
 msgid "Bytes"
 msgstr "Bytes"
 

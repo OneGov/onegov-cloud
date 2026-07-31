@@ -1687,6 +1687,9 @@ msgstr "Taille"
 msgid "Publication details"
 msgstr "Détails de la publication"
 
+msgid "The attached PDF could not be signed, because the signature service was not available."
+msgstr "Le PDF joint n'a pas pu être signé, car le service de signature n'était pas disponible."
+
 msgid "Publication start:"
 msgstr "Début de publication:"
 

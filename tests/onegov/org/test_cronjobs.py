@@ -2881,6 +2881,7 @@ def test_admin_notification_full_workflow(
         assert '20. August 2026' in msg['TextBody']
         assert '2026-08-20' not in msg['TextBody']
         assert 'Öffentlich' in msg['TextBody']
+        assert 'konnte nicht signiert werden' not in msg['TextBody']
         entry = client.app.session().query(ExtendedDirectoryEntry).one()
         assert entry.content_hash
         assert entry.content_hash in msg['TextBody']
@@ -2991,6 +2992,8 @@ def test_admin_notification_full_workflow(
             'Die Publikation "Permit One" ist abgelaufen.' in pdf_expiry_text
         )
         assert 'Version C' in pdf_expiry_text
+        assert 'konnte nicht signiert werden' not in msg['TextBody']
+        _assert_signed_pdf(msg['Attachments'][0])
         assert client.app.session().query(ExtendedDirectoryEntry).count() == 1
 
         # the expiry notification has now been sent -> deletion is allowed
@@ -3146,6 +3149,51 @@ def test_admin_notification_signing_failure(
     assert msg['Attachments']
     assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
     assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
+    assert 'konnte nicht signiert werden' in msg['TextBody']
+    assert client.app.session().query(SigningRequest).count() == 0
+
+
+def test_admin_expiry_notification_signing_failure(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    Same as above for the expiry notification — the pdf is attached
+    unsigned and the email says so.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Clara Meier',
+            adresse='Ringstrasse 9',
+            publication_start=real_now - timedelta(days=2),
+            publication_end=real_now - timedelta(minutes=30),
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    with patch.object(SwisscomAIS, 'sign') as sign:
+        sign.side_effect = RuntimeError('signing service unavailable')
+
+        with freeze_time(real_now, tick=True):
+            client.get(get_cronjob_url(job))
+
+        assert sign.called
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    msg = client.get_email(0)
+    assert 'Publikationsfrist' in msg['Subject']
+    assert msg['Attachments']
+    assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
+    assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
+    assert 'konnte nicht signiert werden' in msg['TextBody']
     assert client.app.session().query(SigningRequest).count() == 0
 
 
