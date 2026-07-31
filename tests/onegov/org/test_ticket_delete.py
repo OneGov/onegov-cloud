@@ -6,17 +6,20 @@ import textwrap
 import transaction
 
 from datetime import datetime
+from decimal import Decimal
 from onegov.core.utils import normalize_for_url
 from onegov.core.utils import Bunch
 from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmissionCollection
 from onegov.form.parser import ParsedForm
 from onegov.org.models.ticket import FormSubmissionHandler
+from onegov.pay import InvoiceCollection
 from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection, Ticket
+from onegov.ticket import TicketCollection, Ticket, TicketInvoice
 from onegov.user import UserCollection
 from sedate import ensure_timezone
 from tests.onegov.org.common import register_echo_handler
+from uuid import uuid4
 from webtest import Upload
 
 
@@ -89,6 +92,59 @@ def test_delete_ticket_without_submission(
     assert session.query(Ticket).filter_by(state='archived').count() == 2
     client.delete('/tickets-archive/ALL/delete')
     assert session.query(Ticket).filter_by(state='archived').count() == 0
+
+
+def test_delete_archived_ticket_with_invoice(
+    client: Client[TestOrgApp]
+) -> None:
+    # invoice items reference the submission, so they have to be deleted
+    # along with the ticket, otherwise we run into a foreign key violation
+
+    session = client.app.session()
+    FormCollection(session).definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode('E-Mail * = @@@'),
+        type='custom',
+    )
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/forms').click('Profile')
+    page.form['e_mail'] = 'citizen@example.org'
+    page.form.submit().follow().form.submit()
+
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket_url = ticket_page.request.path
+    ticket_page.click('Ticket abschliessen').follow()
+    client.get(ticket_url).click('Ticket archivieren').follow()
+
+    transaction.begin()
+    session = client.app.session()
+    ticket = session.query(Ticket).one()
+    assert isinstance(ticket.handler, FormSubmissionHandler)
+    submission = ticket.handler.submission
+    assert submission is not None
+
+    invoice = TicketInvoice(id=uuid4())
+    session.add(invoice)
+    ticket.invoice = invoice
+    invoice.add(
+        group='manual',
+        text='Fee',
+        unit=Decimal(10),
+        submission_id=submission.id,
+    )
+    transaction.commit()
+
+    session = client.app.session()
+    assert InvoiceCollection(session).query_items().count() == 1
+
+    client.delete('/tickets-archive/ALL/delete')
+
+    session = client.app.session()
+    assert session.query(Ticket).count() == 0
+    assert InvoiceCollection(session).query_items().count() == 0
+    assert InvoiceCollection(session).query().count() == 0
 
 
 def test_files_from_ticket_form_submission_are_deleted(

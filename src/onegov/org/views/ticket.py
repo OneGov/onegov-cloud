@@ -1892,6 +1892,15 @@ def delete_tickets_and_related_data(
         ticket.handler.prepare_delete_ticket()
         delete_messages_from_ticket(request, ticket.number)
 
+        if invoice := ticket.invoice:
+            # invoice items reference the submission, delete them first
+            for invoice_item in invoice.items:
+                invoice_item.payments = []
+                request.session.delete(invoice_item)
+
+            ticket.invoice = None
+            request.session.delete(invoice)
+
         if submission := getattr(ticket.handler, 'submission', None):
             # cascade delete should take care of the ticket's files
             request.session.delete(submission)
