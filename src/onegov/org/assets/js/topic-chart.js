@@ -246,7 +246,7 @@ function init_topic_chart(container) {
     const chart = new d3.OrgChart()
         .container(container)
         .nodeWidth(() => 220)
-        .nodeHeight(() => 90)
+        .nodeHeight(() => 120)
         .childrenMargin(() => 60)
         .siblingsMargin(() => 20)
         // the level is the depth of the deepest expanded node, so 1 shows
