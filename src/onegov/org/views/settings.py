@@ -7,7 +7,7 @@ from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
 from onegov.api.models import ApiKey
-from onegov.core.elements import Link, Confirm, Intercooler, BackLink
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
 from onegov.event.models.event import EventFilterValue
@@ -142,16 +142,22 @@ def handle_generic_settings(
     subtitle: str | None = None
 ) -> RenderData | Response:
 
+    settings_url = request.link(self, name='settings')
+
     layout = layout or SettingsLayout(self, request, title)
     layout.edit_mode = True
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.return_to_url(settings_url),
+        attrs={'class': 'cancel-link'}
+    )
     request.include('fontpreview')
 
     if form.submitted(request):
         form.populate_obj(self)
 
         request.success(_('Your changes were saved'))
-        return request.redirect(request.link(self, name='settings'))
+        return request.redirect(settings_url)
     elif request.method == 'GET':
         form.process(obj=self)
 
@@ -418,7 +424,11 @@ def handle_event_settings(
 
     layout = layout or SettingsLayout(self, request, _('Events'))
     layout.edit_mode = True
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.return_to_url(request.link(self, name='settings')),
+        attrs={'class': 'cancel-link'}
+    )
     layout.include_code_editor()
     request.include('fontpreview')
 
