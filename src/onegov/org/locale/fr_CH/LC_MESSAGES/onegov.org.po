@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-20 15:43+0200\n"
+"POT-Creation-Date: 2026-07-31 08:15+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -246,6 +246,9 @@ msgstr "Répertoires"
 
 msgid "Surveys"
 msgstr "Enquêtes"
+
+msgid "Topic chart"
+msgstr "Diagramme des thèmes"
 
 msgid "Modules"
 msgstr "Modules"
@@ -2607,8 +2610,7 @@ msgid "School holidays"
 msgstr "Vacances scolaires"
 
 msgid "Format: Day.Month[.Year] - Description (year is optional)"
-msgstr ""
-"Format : Jour.Mois[.Année] - Description (l'année est facultative)"
+msgstr "Format : Jour.Mois[.Année] - Description (l'année est facultative)"
 
 msgid "Please enter one date per line"
 msgstr "Veuillez renseigner une date par ligne"
@@ -6456,6 +6458,39 @@ msgid ""
 msgstr ""
 "Vous n'êtes pas automatiquement redirigé afin que vous puissiez modifier ou "
 "supprimer ce lien."
+
+msgid "Expand all"
+msgstr "Tout développer"
+
+msgid "Collapse all"
+msgstr "Tout réduire"
+
+msgid "Fit to screen"
+msgstr "Ajuster à l'écran"
+
+msgid "Whole chart"
+msgstr "Diagramme entier"
+
+msgid "Download as PNG"
+msgstr "Télécharger en PNG"
+
+msgid "Download as SVG"
+msgstr "Télécharger en SVG"
+
+msgid "Show only this branch"
+msgstr "Afficher uniquement cette branche"
+
+msgid "The topics could not be loaded."
+msgstr "Les sujets n'ont pas pu être chargés."
+
+msgid ""
+"The chart is too large for an image, please use the SVG download instead."
+msgstr ""
+"Le diagramme est trop grand pour une image, veuillez utiliser le "
+"téléchargement SVG."
+
+msgid "Loading topics..."
+msgstr "Chargement des sujets..."
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."

@@ -209,6 +209,7 @@ $settings-icon: '\f1de';
     .text-modules::before { @include icon('\f249'); }
     .forms::before { @include icon-bold('\f570'); }
     .surveys::before { @include icon-bold('\f681'); }
+    .topic-chart::before { @include icon-bold('\f0e8'); }
     .citizen-login::before { @include icon-bold("\f2f6"); }
     .citizen-tickets::before { @include icon-bold('\f3ff'); }
     .citizen-reservations::before { @include icon('\f073'); }
