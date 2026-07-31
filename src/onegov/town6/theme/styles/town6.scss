@@ -1868,17 +1868,8 @@ a.category-anchor {
             }
         }
 
-        .drillup {
-            left: .3rem;
-            right: auto;
-        }
-
-        // the text keeps clear of the buttons in the corners
-        &:has(.drillup) span {
-            padding-left: .8rem;
-        }
-
-        &:has(.drilldown) span {
+        // only one of the buttons shows at a time, the text keeps clear
+        &:has(button) span {
             padding-right: .8rem;
         }
 
@@ -1904,13 +1895,13 @@ a.category-anchor {
         }
     }
 
-    .node-button-div {
+        .node-button-div {
         span {
             font-size: .8rem !important;
         }
 
         > div {
-            padding: .5rem !important;
+            padding: 0.2rem 0.5rem !important;
             transition: all 200ms linear;
         }
     }

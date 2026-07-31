@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from onegov.core.security import Private
 from onegov.org.models import Organisation
-from onegov.org.views.topic_chart import (
-    view_topic_chart)
+from onegov.org.views.topic_chart import view_topic_chart
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
 

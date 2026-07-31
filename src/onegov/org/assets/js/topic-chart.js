@@ -1,23 +1,22 @@
 /*
-    Renders the topic hierarchy (information architecture) as an org chart.
-
-    The chart is drawn into the element with the 'topic-chart' class whose
-    'data-url' points to a json view returning a flat list of nodes.
+    Renders the topic hierarchy as an org chart, into the element with the
+    'topic-chart' class whose 'data-url' points to a json view returning a
+    flat list of nodes.
 */
+
+const escaper = document.createElement('div');
 
 function escape_html(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
+    escaper.textContent = text;
     // innerHTML does not escape quotes, which we need for attributes
-    return div.innerHTML.replace(/"/g, '&quot;');
+    return escaper.innerHTML.replace(/"/g, '&quot;');
 }
 
-/*
-    Reduces the flat list of nodes to the branch below the given id, which
-    becomes the new root. Without an id the whole chart is returned.
-*/
+// reduces the nodes to the branch below the given id, which becomes the
+// new root - without an id the whole chart is returned
 function branch(nodes, root_id) {
-    if (!root_id) {
+    const root = root_id && nodes.find((node) => node.id === root_id);
+    if (!root) {
         return nodes;
     }
 
@@ -26,11 +25,6 @@ function branch(nodes, root_id) {
         children[node.parentId] = children[node.parentId] || [];
         children[node.parentId].push(node);
     });
-
-    const root = nodes.filter((node) => node.id === root_id)[0];
-    if (!root) {
-        return nodes;
-    }
 
     // the root of a chart is the node without a parent
     const result = [Object.assign({}, root, {parentId: null})];
@@ -41,7 +35,7 @@ function branch(nodes, root_id) {
     return result;
 }
 
-// drawn inline, the icon fonts of the themes are not the same everywhere
+// drawn inline, the themes do not share an icon font
 const ARROW_UP_ICON = `
     <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
         <path fill="currentColor" d="M8 1.5 13 7h-3v7.5H6V7H3z"/>
@@ -67,7 +61,10 @@ function node_buttons(node, view) {
     let buttons = '';
 
     // only the root of a drilled down chart has a level above it
-    if (node.data.id === view.root_id && view.parent_id !== null) {
+    if (
+        view.parent_id &&
+        node.data.id === view.root_id
+    ) {
         buttons += `
             <button class="drillup"
                     data-drillup="${escape_html(view.parent_id)}"
@@ -77,7 +74,8 @@ function node_buttons(node, view) {
         `;
     }
 
-    if (node.data._directSubordinates) {
+    // the root is the branch already, drilling into it changes nothing
+    if (node.data._directSubordinates && node.depth > 0) {
         buttons += `
             <button class="drilldown"
                     data-drilldown="${escape_html(node.data.id)}"
@@ -135,9 +133,8 @@ function node_content(node, view) {
     `;
 }
 
-// browsers refuse to draw canvases beyond ~16'000 pixels per side - the
-// area is limited as well, though in practice the memory of the canvas
-// runs out first, at four bytes per pixel (80 megapixels are ~320 MiB)
+// browsers refuse to draw canvases beyond ~16'000 pixels per side and
+// run out of memory before that, at four bytes per pixel
 const MAX_EXPORT_SIZE = 15000;
 const MAX_EXPORT_AREA = 80 * 1000 * 1000;
 // four pixels per pixel of the chart yields roughly 400 dpi
@@ -145,12 +142,10 @@ const EXPORT_SCALE = 4;
 const EXPORT_MARGIN = 50;
 
 /*
-    Turns the bounds of the chart into the size of the exported image.
-
-    The scale is a multiplier on the natural size, limited by what the
-    browser is able to draw. Anything below 1 would shrink the chart into
-    the image and cost the readability the natural size buys us, so such
-    charts don't fit into a png at all - only the svg export can hold them.
+    Turns the bounds of the chart into the size of the exported image. The
+    scale multiplies the natural size, limited by what the browser can draw
+    - below 1 the chart would be shrunk into the image, which only the svg
+    export can hold in full.
 */
 function export_dimensions(bounds) {
     const width = bounds.right - bounds.left + 2 * EXPORT_MARGIN;
@@ -181,12 +176,9 @@ function set_message(text) {
 }
 
 /*
-    Exports the visible nodes as an image.
-
-    The chart is blown up to its natural size for the export, so the nodes
-    end up as readable in the image as they are on screen - d3's own 'full'
-    export fits the whole chart into the viewport first, which leaves large
-    charts unreadable no matter the resolution.
+    Exports the visible nodes as an image, at the natural size of the chart
+    - d3's own 'full' export fits it into the viewport first, which leaves
+    large charts unreadable no matter the resolution.
 */
 function export_image(chart, container, view) {
     const state = chart.getChartState();
@@ -217,8 +209,7 @@ function export_image(chart, container, view) {
         `translate(${EXPORT_MARGIN - bounds.left},${EXPORT_MARGIN - bounds.top})`
     );
 
-    // the export is serialized in a later tick, so the buttons stay away
-    // until the image is loaded
+    // serialized in a later tick, so the buttons stay away until it loaded
     view.exporting = true;
     chart.restyleForeignObjectElements();
 
@@ -246,7 +237,6 @@ function init_topic_chart(container) {
     const view = {
         nodes: [],
         root_id: null,
-        // the node above the current root, null while the whole chart shows
         parent_id: null,
         exporting: false,
         drilldown_label: container.dataset.drilldownLabel || '',
@@ -265,25 +255,20 @@ function init_topic_chart(container) {
         .imageName(container.dataset.imageName || 'topic-chart')
         .nodeContent((node) => node_content(node, view));
 
-    const draw = () => {
-        const root = view.nodes.filter((node) => node.id === view.root_id)[0];
-        const parent = root && view.nodes.filter(
-            (node) => node.id === root.parentId
-        )[0];
+    const reset_buttons = document.querySelectorAll(
+        '[data-chart-action="reset"]'
+    );
 
-        // the topmost node is the whole chart, which has no drilled state
-        view.parent_id = null;
-        if (parent) {
-            view.parent_id = parent.parentId ? parent.id : '';
-        }
+    const draw = () => {
+        const root = view.nodes.find((node) => node.id === view.root_id);
+
+        // without a level above, the chart shows everything there is
+        view.parent_id = root ? root.parentId : null;
 
         chart.data(branch(view.nodes, view.root_id)).render().fit();
-
-        document.querySelectorAll('[data-chart-action="reset"]').forEach(
-            (button) => {
-                button.hidden = !view.root_id;
-            }
-        );
+        reset_buttons.forEach((button) => {
+            button.hidden = !view.parent_id;
+        });
     };
 
     const actions = {
@@ -317,9 +302,7 @@ function init_topic_chart(container) {
 
         if (down || up) {
             event.preventDefault();
-            // an empty target drills up to the whole chart
-            view.root_id = down ? down.dataset.drilldown :
-                up.dataset.drillup || null;
+            view.root_id = down ? down.dataset.drilldown : up.dataset.drillup;
             draw();
         }
     });
@@ -347,7 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// the nodes, the export math and the drill down are unit tested in tests/js
 if (typeof module !== 'undefined') {
     module.exports = {
         export_dimensions: export_dimensions,

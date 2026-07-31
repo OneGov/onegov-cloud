@@ -47,9 +47,7 @@ def test_view_topic_chart(client: Client) -> None:
     nodes = client.get('/topic-chart-json').json['nodes']
     by_name = {node['name']: node for node in nodes}
 
-    print(by_name)
-
-    # the organization itself is the root of the chart
+    # the organisation itself is the root of the chart
     assert nodes[0]['id'] == 'root'
     assert nodes[0]['parentId'] is None
 

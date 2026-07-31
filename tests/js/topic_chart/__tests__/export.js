@@ -115,11 +115,12 @@ describe('Drill down', () => {
 });
 
 describe('Node content', () => {
-    const node = function(data) {
-        return {width: 220, height: 90, data: Object.assign({
-            name: 'Topic', url: '/topics/topic', access: 'public',
-            published: true, id: 'topic-1', _directSubordinates: 0
-        }, data)};
+    const node = function(data, depth) {
+        return {width: 220, height: 90, depth: depth === undefined ? 1 : depth,
+            data: Object.assign({
+                name: 'Topic', url: '/topics/topic', access: 'public',
+                published: true, id: 'topic-1', _directSubordinates: 0
+            }, data)};
     };
 
     const view = {exporting: false, drilldown_label: 'Only this branch'};
@@ -154,6 +155,11 @@ describe('Node content', () => {
         expect(parent).toContain('title="Only this branch"');
     });
 
+    it('leaves the root of the chart alone, it is the branch already', () => {
+        expect(chart.node_content(node({_directSubordinates: 5}, 0), view))
+            .not.toContain('drilldown');
+    });
+
     it('leaves the drill down out of an export', () => {
         const html = chart.node_content(
             node({_directSubordinates: 2}), {exporting: true});
@@ -182,11 +188,6 @@ describe('Drill up', () => {
         expect(html).toContain('title="Level above"');
     });
 
-    it('drills up to the whole chart from the first level', () => {
-        expect(chart.node_content(node('a'), view('a', ''))).toContain(
-            'data-drillup=""');
-    });
-
     it('leaves the other nodes of the branch alone', () => {
         expect(chart.node_content(node('a1'), view('a', 'root'))).not.toContain(
             'drillup');
@@ -194,6 +195,11 @@ describe('Drill up', () => {
 
     it('has nothing above the whole chart', () => {
         expect(chart.node_content(node('root'), view(null, null))).not.toContain(
+            'drillup');
+    });
+
+    it('has nothing above the organisation, drilled up to it or not', () => {
+        expect(chart.node_content(node('root'), view('root', null))).not.toContain(
             'drillup');
     });
 

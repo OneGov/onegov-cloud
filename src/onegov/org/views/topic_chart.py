@@ -25,10 +25,7 @@ def view_topic_chart(
     request: OrgRequest,
     layout: DefaultLayout | None = None
 ) -> RenderData:
-    """ Shows the topic hierarchy (the information architecture) of the
-    site as an interactive chart.
-
-    """
+    """ Shows the topic hierarchy of the site as an interactive chart. """
 
     request.include('topic-chart')
 
@@ -41,12 +38,8 @@ def view_topic_chart(
     return {
         'title': _('Topic chart'),
         'layout': layout,
-        'chart_url': request.link(
-            self, name='topic-chart-json'
-        ),
-        'image_name': '{}-topic-chart'.format(
-            normalize_for_url(self.name)
-        )
+        'chart_url': request.link(self, name='topic-chart-json'),
+        'image_name': f'{normalize_for_url(self.name)}-topic-chart'
     }
 
 
