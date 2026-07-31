@@ -175,30 +175,29 @@ function set_message(text) {
     }
 }
 
-/*
-    Exports the visible nodes as an image, at the natural size of the chart
-    - d3's own 'full' export fits it into the viewport first, which leaves
-    large charts unreadable no matter the resolution.
-*/
-function export_image(chart, container, view) {
-    const state = chart.getChartState();
-    const nodes = state.root.descendants();
-
-    // the chart uses the 'top' layout, where x is the center of a node
+// the chart uses the 'top' layout, where x is the center of a node
+function chart_bounds(chart) {
     const bounds = {
-        left: d3.min(nodes, (node) => node.x - node.width / 2),
-        right: d3.max(nodes, (node) => node.x + node.width / 2),
-        top: d3.min(nodes, (node) => node.y),
-        bottom: d3.max(nodes, (node) => node.y + node.height)
+        left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity
     };
 
-    const size = export_dimensions(bounds);
+    chart.getChartState().root.descendants().forEach((node) => {
+        bounds.left = Math.min(bounds.left, node.x - node.width / 2);
+        bounds.right = Math.max(bounds.right, node.x + node.width / 2);
+        bounds.top = Math.min(bounds.top, node.y);
+        bounds.bottom = Math.max(bounds.bottom, node.y + node.height);
+    });
 
-    if (!size.fits) {
-        set_message(container.dataset.exportErrorMessage);
-        return;
-    }
-    set_message('');
+    return bounds;
+}
+
+/*
+    Both exports serialize the svg of the chart, which is only as large as
+    the viewport and holds the pan and zoom of the screen - everything
+    outside of it would be cut off, so it is grown to the whole chart.
+*/
+function expand_chart(chart, container, view, bounds, size) {
+    const state = chart.getChartState();
 
     // the enlarged chart would push the page around, so it is clipped
     container.style.overflow = 'hidden';
@@ -209,27 +208,48 @@ function export_image(chart, container, view) {
         `translate(${EXPORT_MARGIN - bounds.left},${EXPORT_MARGIN - bounds.top})`
     );
 
-    // serialized in a later tick, so the buttons stay away until it loaded
+    // the buttons are a screen affordance, they have no place in an export
     view.exporting = true;
     chart.restyleForeignObjectElements();
+}
 
+function restore_chart(chart, container, view) {
+    view.exporting = false;
+    container.style.overflow = '';
+    chart.render().fit();
+}
+
+/*
+    Exports the visible nodes as an image, at the natural size of the chart
+    - d3's own 'full' export fits it into the viewport first, which leaves
+    large charts unreadable no matter the resolution.
+*/
+function export_image(chart, container, view) {
+    const bounds = chart_bounds(chart);
+    const size = export_dimensions(bounds);
+
+    if (!size.fits) {
+        set_message(container.dataset.exportErrorMessage);
+        return;
+    }
+    set_message('');
+
+    expand_chart(chart, container, view, bounds, size);
+
+    // serialized in a later tick, so the chart is restored once it loaded
     chart.exportImg({
         scale: size.scale,
-        onLoad: () => {
-            view.exporting = false;
-            container.style.overflow = '';
-            chart.render().fit();
-        }
+        onLoad: () => restore_chart(chart, container, view)
     });
 }
 
-// the svg is serialized right away, so the buttons come back immediately
-function export_svg(chart, view) {
-    view.exporting = true;
-    chart.restyleForeignObjectElements();
+// vectors have no pixels to run out of, only the size matters here
+function export_svg(chart, container, view) {
+    const bounds = chart_bounds(chart);
+
+    expand_chart(chart, container, view, bounds, export_dimensions(bounds));
     chart.exportSvg();
-    view.exporting = false;
-    chart.restyleForeignObjectElements();
+    restore_chart(chart, container, view);
 }
 
 function init_topic_chart(container) {
@@ -278,7 +298,7 @@ function init_topic_chart(container) {
         export: () => export_image(chart, container, view),
         // the svg keeps the nodes as html inside foreignObject elements,
         // which browsers render, but most vector editors do not
-        'export-svg': () => export_svg(chart, view),
+        'export-svg': () => export_svg(chart, container, view),
         reset: () => {
             view.root_id = null;
             draw();
@@ -333,6 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
 if (typeof module !== 'undefined') {
     module.exports = {
         export_dimensions: export_dimensions,
+        chart_bounds: chart_bounds,
+        export_svg: export_svg,
         node_content: node_content,
         branch: branch
     };
