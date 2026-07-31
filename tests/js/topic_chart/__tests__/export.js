@@ -209,3 +209,93 @@ describe('Drill up', () => {
         expect(chart.node_content(node('a'), drilled)).not.toContain('drillup');
     });
 });
+
+describe('Export of the whole chart', () => {
+    // the nodes carry the layout of the chart, x is the center of a node
+    const laid_out = function(x, y) {
+        return {x: x, y: y, width: 220, height: 90};
+    };
+
+    // records what the export does to the chart instead of drawing it
+    const fake_chart = function(laid_out_nodes) {
+        const svg = {};
+        const center = {};
+        const group = {};
+        const log = [];
+
+        const attrs = function(target) {
+            return {
+                attr: function(name, value) {
+                    target[name] = value;
+                    return this;
+                }
+            };
+        };
+
+        return {
+            svg: svg,
+            center: center,
+            group: group,
+            log: log,
+            getChartState: () => ({
+                root: {descendants: () => laid_out_nodes},
+                svg: attrs(svg),
+                centerG: attrs(center),
+                chart: attrs(group)
+            }),
+            restyleForeignObjectElements: () => log.push('restyle'),
+            exportSvg: () => log.push('export'),
+            render: function() {
+                log.push('render');
+                return this;
+            },
+            fit: function() {
+                log.push('fit');
+                return this;
+            }
+        };
+    };
+
+    it('measures the chart from its nodes', () => {
+        const measured = chart.chart_bounds(fake_chart([
+            laid_out(110, 0), laid_out(610, 150)
+        ]));
+        expect(measured).toEqual({left: 0, right: 720, top: 0, bottom: 240});
+    });
+
+    it('measures nodes left of the origin as well', () => {
+        const measured = chart.chart_bounds(fake_chart([
+            laid_out(-110, -50), laid_out(110, 0)
+        ]));
+        expect(measured).toEqual(
+            {left: -220, right: 220, top: -50, bottom: 90});
+    });
+
+    it('grows the svg to the whole chart, the viewport would cut it', () => {
+        const drawn = fake_chart([laid_out(110, 0), laid_out(610, 150)]);
+        const container = {style: {}, dataset: {}};
+        const view = {exporting: false};
+
+        chart.export_svg(drawn, container, view);
+
+        // the natural size of the chart, margins included
+        expect(drawn.svg.width).toBe(820);
+        expect(drawn.svg.height).toBe(340);
+
+        // no pan and no zoom, the chart starts at the margin
+        expect(drawn.group.transform).toBe('translate(50,50)');
+        expect(drawn.center.transform).toBe('translate(0,0)');
+    });
+
+    it('restores the chart after the export', () => {
+        const drawn = fake_chart([laid_out(110, 0)]);
+        const container = {style: {overflow: ''}, dataset: {}};
+        const view = {exporting: false};
+
+        chart.export_svg(drawn, container, view);
+
+        expect(drawn.log).toEqual(['restyle', 'export', 'render', 'fit']);
+        expect(view.exporting).toBe(false);
+        expect(container.style.overflow).toBe('');
+    });
+});
