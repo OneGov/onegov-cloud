@@ -988,6 +988,14 @@ def get_invoicing() -> Iterator[str]:
     yield 'invoicing.js'
 
 
+@OrgApp.webasset('topic-chart')
+def get_topic_chart_asset() -> Iterator[str]:
+    yield 'd3.v7.min.js'
+    yield 'd3-flextree.js'
+    yield 'd3-org-chart.js'
+    yield 'topic-chart.js'
+
+
 def wrap_with_mtan_hook(
     func: Callable[[OrgApp, Any, OrgRequest], Any]
 ) -> Callable[[OrgApp, Any, OrgRequest], Any]:

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-07-20 15:43+0200\n"
+"POT-Creation-Date: 2026-07-31 08:53+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -248,6 +248,9 @@ msgstr "Cartelle"
 
 msgid "Surveys"
 msgstr "Sondaggi"
+
+msgid "Topic chart"
+msgstr "Diagramma dei temi"
 
 msgid "Modules"
 msgstr "Moduli"
@@ -2608,8 +2611,7 @@ msgid "School holidays"
 msgstr "Vacanze scolastiche"
 
 msgid "Format: Day.Month[.Year] - Description (year is optional)"
-msgstr ""
-"Formato: Giorno.Mese[.Anno] - Descrizione (l'anno è facoltativo)"
+msgstr "Formato: Giorno.Mese[.Anno] - Descrizione (l'anno è facoltativo)"
 
 msgid "Please enter one date per line"
 msgstr "Inserisci una data per riga"
@@ -6426,6 +6428,42 @@ msgid ""
 msgstr ""
 "Non vieni reindirizzato automaticamente, quindi hai la possibilità di "
 "modificare o eliminare questo collegamento."
+
+msgid "Expand all"
+msgstr "Espandi tutto"
+
+msgid "Collapse all"
+msgstr "Comprimi tutto"
+
+msgid "Fit to screen"
+msgstr "Adatta allo schermo"
+
+msgid "Whole chart"
+msgstr "Diagramma intero"
+
+msgid "Download as PNG"
+msgstr "Scarica come PNG"
+
+msgid "Download as SVG"
+msgstr "Scarica come SVG"
+
+msgid "Show only this branch"
+msgstr "Mostra solo questo ramo"
+
+msgid "Show the level above"
+msgstr "Mostra il livello superiore"
+
+msgid "The topics could not be loaded."
+msgstr "Non è stato possibile caricare gli argomenti."
+
+msgid ""
+"The chart is too large for an image, please use the SVG download instead."
+msgstr ""
+"Il diagramma è troppo grande per un'immagine, si prega di utilizzare il "
+"download SVG."
+
+msgid "Loading topics..."
+msgstr "Caricamento degli argomenti..."
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr ""

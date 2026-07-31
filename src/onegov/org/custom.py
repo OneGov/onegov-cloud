@@ -135,6 +135,15 @@ def get_modules(request: OrgRequest) -> LinkGroup:
             )
         )
 
+        links.append(
+            Link(
+                _('Topic chart'),
+                request.class_link(
+                    Organisation, name='topic-chart'),
+                attrs={'class': 'topic-chart'}
+            )
+        )
+
     return LinkGroup(_('Modules'), classes=('modules', ), links=links)
 
 
