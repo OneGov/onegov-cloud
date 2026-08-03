@@ -42,17 +42,17 @@
 
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)} town-6 d-flex flex-column min-vh-100" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
 
-    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div id="searchModal" class="modal fade" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title" id="searchModalLabel" i18n:translate>Search</h1>
+                    <h1 id="searchModalLabel" class="modal-title">Search</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form class="searchbox header-searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
                         <div class="input-group">
-                            <input class="form-control" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                            <input id="search" class="form-control" type="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
                             <button class="btn btn-primary" type="submit">
                                 <i class="fa fa-search"></i>
                             </button>
@@ -71,14 +71,14 @@
     <a class="visually-hidden-focusable" href="#content" i18n:translate>Skip navigation</a>
     <main class="flex-grow-1">
         <header id="header" tal:define="header_options request.app.org.header_options or {}">
-            <nav id="globals" class="globals bg-dark-subtle navbar navbar-expand-lg p-0" tal:define="toolbox global_tools|False; modules modules|False" tal:condition="request.is_logged_in or request.authenticated_email">
+            <nav tal:condition="request.is_logged_in or request.authenticated_email" id="globals" class="globals bg-dark-subtle navbar navbar-expand-lg p-0" tal:define="toolbox global_tools|False; modules modules|False">
                 <div class="container">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarGlobals" aria-controls="navbarGlobals" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="collapse navbar-collapse justify-content-between" id="navbarGlobals">
+                    <div id="navbarGlobals" class="collapse navbar-collapse justify-content-between">
                         <tal:b metal:use-macro="layout.macros['globals-left']"></tal:b>
-                        <ul class="navbar-nav global-tools-menu" tal:condition="toolbox">
+                        <ul tal:condition="toolbox" class="navbar-nav global-tools-menu">
                             <li class="nav-item dropdown" tal:repeat="tool toolbox">
                                 <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
                                 <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="nav-link dropdown-toggle ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
@@ -101,11 +101,9 @@
             id="header_announcement"
             style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
                 <div class="container" tal:define="url header_options.get('announcement_url');">
-                        <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
-                            tal:condition="url" href="${url}">
+                        <a tal:condition="url" style="color: ${header_options.get('announcement_font_color', '#000000')}" href="${url}">
                             ${header_options['announcement']}</a>
-                        <span style="color: ${header_options.get('announcement_font_color', '#000000')}"
-                            tal:condition="not url">${header_options['announcement']}</span>
+                        <span tal:condition="not url" style="color: ${header_options.get('announcement_font_color', '#000000')}">${header_options['announcement']}</span>
                 </div>
             </div>
 
@@ -113,7 +111,7 @@
                 <tal:b metal:use-macro="layout.macros['header_links']"></tal:b>
                 <tal:b metal:use-macro="layout.macros['header-text']"></tal:b>
             </tal:b>
-            <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;" data-top-anchor="sticky-header-area:bottom" data-stick-to="top">
+            <div class="" data-sticky data-options="marginTop:0; stickyOn: small;" data-top-anchor="sticky-header-area:bottom" data-stick-to="top">
 
                 <tal:b tal:condition="header_options.get('header_additions_fixed')">
                     <tal:b metal:use-macro="layout.macros['header_links']"></tal:b>
@@ -124,21 +122,21 @@
                     <div class="bg-white">
                         <div class="container-fluid">
                             <ul class="nav justify-content-end py-1">
-                            <li class="nav-item">
-                                <a class="nav-link link-secondary small px-2" href="#">Metanavigation</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link link-secondary small px-2" href="#">Metanavigation</a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link link-secondary small px-2" href="#">Metanavigation</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link link-secondary small px-2" href="#">Metanavigation</a>
+                                </li>
                             </ul>
                         </div>
                     </div>
 
-                    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+                    <nav class="main-menu navbar navbar-light bg-white py-3">
                         <div class="container-fluid align-items-end">
 
                             <a class="navbar-brand" href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
-                                <img height="100" tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                                <img tal:condition="logo_url" height="100" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
                                 <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
                             </a>
 
@@ -148,7 +146,7 @@
                             <span class="navbar-toggler-icon"></span>
                             </button>
 
-                            <div class="collapse navbar-collapse" id="mainNav">
+                            <div id="mainNav" class="collapse navbar-collapse">
 
                                 <tal:b metal:use-macro="layout.macros['main_navigation']"></tal:b>
 
@@ -181,13 +179,13 @@
 
         <tal:b tal:define="on_homepage layout.on_homepage; sidebar_links layout.sidebar_links">
 
-            <div class="content without-sidebar-links" tal:condition="on_homepage" >
+            <div tal:condition="on_homepage" class="content without-sidebar-links">
                 <div role="main" id="content" data-reinit-foundation>
                     <div metal:define-slot="content"></div>
                 </div>
             </div>
 
-            <div class="header-image" tal:condition="not on_homepage and layout.org.theme_options.get('page-image-position', False) == 'header'">
+            <div tal:condition="not on_homepage and layout.org.theme_options.get('page-image-position', False) == 'header'" class="header-image">
                 <div class="dark-overlay"></div>
                 <div metal:define-slot="header-image"></div>
                 <div class="grid-container">
@@ -203,7 +201,7 @@
                 <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
             </div>
 
-            <div class="content my-5xl" tal:condition="not: on_homepage" >
+            <div tal:condition="not: on_homepage" class="content my-5xl">
                 <div id="intro" class="container mb-3xl">
                     <div class="row">
                         <div class="col-12 col-md-4 col-lg-3">
@@ -226,7 +224,7 @@
             </div>
         </tal:b>
 
-        <div id="partners-everywhere" class="partners-everywhere" tal:condition="layout.show_partners">
+        <div tal:condition="layout.show_partners" id="partners-everywhere" class="partners-everywhere">
             <div class="grid-container full gray">
                 <div class="grid-x">
                     <div class="cell small-12">

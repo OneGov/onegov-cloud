@@ -7,11 +7,11 @@
 
             <div tal:repeat="item settings_by_category" class="settings-category">
                 <h2 class="h3" tal:content="item[0]" />
-                <div class="grid-x grid-margin-x small-up-1 medium-up-2 large-up-4">
-                    <div tal:repeat="setting item[1]" class="${setting.name} cell">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+                    <div tal:repeat="setting item[1]" class="${setting.name} col">
                         <a href="${setting.link}">
                             <div class="card">
-                                <div class="card-section">
+                                <div class="card-body">
                                     <i class="fas ${setting.icon}" aria-hidden="true"></i>
                                     <span>
                                         ${setting.title}
