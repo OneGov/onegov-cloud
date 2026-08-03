@@ -19,10 +19,7 @@ from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
 from onegov.form.errors import FormParsingError
 from onegov.form.utils import path_to_filename
-from onegov.form.validators import (
-    ValidPhoneNumber,
-    WhitelistedMimeType,
-)
+from onegov.form.validators import ValidPhoneNumber, WhitelistedMimeType
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import LinkPanelWidget
 from onegov.form.widgets import DurationInput
@@ -780,44 +777,18 @@ class IconField(StringField):
 class PhoneNumberField(TelField):
     """ A string field with support for phone numbers. """
 
-    # maps the human-readable number types to phonenumbers.PhoneNumberType
-    number_types = {
-        'mobile': phonenumbers.PhoneNumberType.MOBILE,
-        'fixed_line': phonenumbers.PhoneNumberType.FIXED_LINE,
-    }
-
-    def __init__(
-        self,
-        *args: Any,
-        country: str = 'CH',
-        number_type: str | None = None,
-        **kwargs: Any
-    ):
+    def __init__(self, *args: Any, country: str = 'CH', **kwargs: Any):
 
         self.country = country
         super().__init__(*args, **kwargs)
 
-        allowed_types = {None, *self.number_types}
-        assert number_type in allowed_types, (
-            'Invalid number type: {}. Allowed are: {}'.format(
-                number_type, sorted(allowed_types, key=str)
-            )
-        )
-
-        # add a ValidPhoneNumber validator, unless one was passed in
+        # ensure the ValidPhoneNumber validator gets added
         if not any(isinstance(v, ValidPhoneNumber) for v in self.validators):
+            # validators can be any sequence type, so it might not be mutable
+            # so we have to first convert to a list if that's the case
             if not isinstance(self.validators, list):
                 self.validators = list(self.validators)
-
-            self.validators.append(
-                ValidPhoneNumber(
-                    self.country,
-                    number_type=(
-                        self.number_types[number_type]
-                        if number_type else None
-                    ),
-                )
-            )
+            self.validators.append(ValidPhoneNumber(self.country))
 
     @property
     def formatted_data(self) -> str | None:
