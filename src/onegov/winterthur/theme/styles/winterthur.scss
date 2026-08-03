@@ -290,8 +290,7 @@ ul#pubnav {
         margin-bottom: .3rem;
         background: rgba($beige-ultra-light, 0.6);
         border: 0 !important;
-        padding: 1rem !important;
-
+        
         &:hover {
             background: $beige-ultra-light !important;
         }
@@ -320,6 +319,24 @@ ul#pubnav {
     }
 }
 
+.streetlist a {
+    padding: 1rem;
+}
+
+.directory-list li {
+    padding: 0 !important;
+
+    a {
+        padding: 1rem;
+        padding-bottom: 0;
+    }
+
+    .list-lead {
+        margin: 0;
+        padding: 1rem;
+        padding-top: 0;
+    }
+}
 
 
 /*
@@ -529,46 +546,41 @@ ul#pubnav {
     Roadworks List
 */
 .roadwork-list {
-    display: flex;
-    flex-wrap: wrap;
+    list-style: none;
+    margin-top: 2rem;
+    margin-left: 0;
 
-    > dt,
-    > dd {
-        flex: 0 0 100%;
-    }
+    > li {
+         border-top: 1px solid $beige-light;
+         padding: 2rem 0;
 
-    > dd {
-        border-bottom: 1px solid $gray-light;
-        padding-bottom: 15px;
-    }
-
-    > dd:last-of-type {
-        border-bottom: 0;
+         a {
+            color: $black;
+            font-weight: bold;
+            font-size: 1rem;
+         }
     }
 
     .date-label {
-        color: darken($secondary-color, 40%);
-        display: inline-block;
-        width: 4ex;
+        font-weight: normal;
+    }
+
+    .title-roadwork-sections {
+        color: $black;
+        display: block;
+        margin-top: 2rem;
+        margin-bottom: .5rem;
+        font-size: .875rem;
+    }
+
+    .roadwork-sections {
+        list-style: disc;
+
+    * {
+        color: $dark-blue;
+        font-size: .875rem;
     }
 }
-
-.roadwork-sections {
-    padding-left: 4.5ex;
-
-    h2 {
-        font-size: .875rem;
-        margin-top: 15px;
-    }
-
-    dl {
-        font-size: .875rem;
-        margin-bottom: -5px;
-
-        a {
-            font-weight: normal;
-        }
-    }
 }
 
 /*
