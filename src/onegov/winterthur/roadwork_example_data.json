@@ -1,0 +1,168 @@
+{
+  "odata/Baustellen": {
+    "value": [
+      {
+        "Id": 123,
+        "Internet": true,
+        "ProjektBezeichnung": "Baustelle Hauptstrasse",
+        "ProjektBereich": "Zentrumsstrasse",
+        "DauerVon": "2026-08-01T00:00:00+02:00",
+        "DauerBis": "2026-08-20T23:59:59+02:00",
+        "SachbearbeiterBau": "Müller Anna",
+        "SachbearbeiterBauZusatz": "Baudienst",
+        "SachbearbeiterVerkehr": "Schmid Luca",
+        "SachbearbeiterVerkehrZusatz": "Verkehrsamt",
+        "Massnahmen": "Fussweg wird abgesperrt, temporäre Umleitung für Fahrzeuge.",
+        "UrlStadtplan": "https://example.invalid/stadtplan/baustelle-hauptstrasse",
+        "Teilbaustellen": [
+          {
+            "TeilbaustelleId": 456,
+            "Internet": true,
+            "ProjektBezeichnung": "Baustelle Hauptstrasse",
+            "ProjektBereich": "Zentrumsstrasse",
+            "DauerVon": "2026-08-01T00:00:00+02:00",
+            "DauerBis": "2026-08-12T23:59:59+02:00",
+            "SachbearbeiterBau": "Müller Anna",
+            "SachbearbeiterBauZusatz": "Baudienst",
+            "SachbearbeiterVerkehr": "Schmid Luca",
+            "SachbearbeiterVerkehrZusatz": "Verkehrsamt",
+            "Massnahmen": "Einbahnstrassenregelung zwischen Bahnhofstrasse und Marktgasse.",
+            "UrlStadtplan": "https://example.invalid/stadtplan/baustelle-hauptstrasse"
+          }
+        ]
+      },
+      {
+        "Id": 124,
+        "Internet": true,
+        "ProjektBezeichnung": "Sanierung Bahnhofplatz",
+        "ProjektBereich": "Altstadt",
+        "DauerVon": "2026-08-05T00:00:00+02:00",
+        "DauerBis": "2026-08-30T23:59:59+02:00",
+        "SachbearbeiterBau": "Keller Sarah",
+        "SachbearbeiterBauZusatz": "Bauamt",
+        "SachbearbeiterVerkehr": "Bühler Jonas",
+        "SachbearbeiterVerkehrZusatz": "Verkehrsplanung",
+        "Massnahmen": "Parkplätze werden reduziert und Busse umgeleitet.",
+        "UrlStadtplan": "https://example.invalid/stadtplan/sanierung-bahnhofplatz",
+        "Teilbaustellen": [
+          {
+            "TeilbaustelleId": 457,
+            "Internet": true,
+            "ProjektBezeichnung": "Sanierung Bahnhofplatz",
+            "ProjektBereich": "Altstadt",
+            "DauerVon": "2026-08-05T00:00:00+02:00",
+            "DauerBis": "2026-08-18T23:59:59+02:00",
+            "SachbearbeiterBau": "Keller Sarah",
+            "SachbearbeiterBauZusatz": "Bauamt",
+            "SachbearbeiterVerkehr": "Bühler Jonas",
+            "SachbearbeiterVerkehrZusatz": "Verkehrsplanung",
+            "Massnahmen": "Bushaltestellen werden vorübergehend verschoben.",
+            "UrlStadtplan": "https://example.invalid/stadtplan/sanierung-bahnhofplatz"
+          }
+        ]
+      }
+    ]
+  },
+  "odata/Baustellen(123)": {
+    "value": [
+      {
+        "Id": 123,
+        "Internet": true,
+        "ProjektBezeichnung": "Baustelle Hauptstrasse",
+        "ProjektBereich": "Zentrumsstrasse",
+        "DauerVon": "2026-08-01T00:00:00+02:00",
+        "DauerBis": "2026-08-20T23:59:59+02:00",
+        "SachbearbeiterBau": "Müller Anna",
+        "SachbearbeiterBauZusatz": "Baudienst",
+        "SachbearbeiterVerkehr": "Schmid Luca",
+        "SachbearbeiterVerkehrZusatz": "Verkehrsamt",
+        "Massnahmen": "Fussweg wird abgesperrt, temporäre Umleitung für Fahrzeuge.",
+        "UrlStadtplan": "https://example.invalid/stadtplan/baustelle-hauptstrasse",
+        "Teilbaustellen": [
+          {
+            "TeilbaustelleId": 456,
+            "Internet": true,
+            "ProjektBezeichnung": "Baustelle Hauptstrasse",
+            "ProjektBereich": "Zentrumsstrasse",
+            "DauerVon": "2026-08-01T00:00:00+02:00",
+            "DauerBis": "2026-08-12T23:59:59+02:00",
+            "SachbearbeiterBau": "Müller Anna",
+            "SachbearbeiterBauZusatz": "Baudienst",
+            "SachbearbeiterVerkehr": "Schmid Luca",
+            "SachbearbeiterVerkehrZusatz": "Verkehrsamt",
+            "Massnahmen": "Einbahnstrassenregelung zwischen Bahnhofstrasse und Marktgasse.",
+            "UrlStadtplan": "https://example.invalid/stadtplan/baustelle-hauptstrasse"
+          }
+        ]
+      }
+    ]
+  },
+  "odata/Baustellen(124)": {
+    "value": [
+      {
+        "Id": 124,
+        "Internet": true,
+        "ProjektBezeichnung": "Sanierung Bahnhofplatz",
+        "ProjektBereich": "Altstadt",
+        "DauerVon": "2026-08-05T00:00:00+02:00",
+        "DauerBis": "2026-08-30T23:59:59+02:00",
+        "SachbearbeiterBau": "Keller Sarah",
+        "SachbearbeiterBauZusatz": "Bauamt",
+        "SachbearbeiterVerkehr": "Bühler Jonas",
+        "SachbearbeiterVerkehrZusatz": "Verkehrsplanung",
+        "Massnahmen": "Parkplätze werden reduziert und Busse umgeleitet.",
+        "UrlStadtplan": "https://example.invalid/stadtplan/sanierung-bahnhofplatz",
+        "Teilbaustellen": [
+          {
+            "TeilbaustelleId": 457,
+            "Internet": true,
+            "ProjektBezeichnung": "Sanierung Bahnhofplatz",
+            "ProjektBereich": "Altstadt",
+            "DauerVon": "2026-08-05T00:00:00+02:00",
+            "DauerBis": "2026-08-18T23:59:59+02:00",
+            "SachbearbeiterBau": "Keller Sarah",
+            "SachbearbeiterBauZusatz": "Bauamt",
+            "SachbearbeiterVerkehr": "Bühler Jonas",
+            "SachbearbeiterVerkehrZusatz": "Verkehrsplanung",
+            "Massnahmen": "Bushaltestellen werden vorübergehend verschoben.",
+            "UrlStadtplan": "https://example.invalid/stadtplan/sanierung-bahnhofplatz"
+          }
+        ]
+      }
+    ]
+  },
+  "odata/Baustellen(125)": {
+    "value": [
+      {
+        "Id": 125,
+        "Internet": true,
+        "ProjektBezeichnung": "Sanierung Bahnhofplatz",
+        "ProjektBereich": "Altstadt",
+        "DauerVon": "2026-08-05T00:00:00+02:00",
+        "DauerBis": "2026-08-30T23:59:59+02:00",
+        "SachbearbeiterBau": "Keller Sarah",
+        "SachbearbeiterBauZusatz": "Bauamt",
+        "SachbearbeiterVerkehr": "Bühler Jonas",
+        "SachbearbeiterVerkehrZusatz": "Verkehrsplanung",
+        "Massnahmen": "Parkplätze werden reduziert und Busse umgeleitet.",
+        "UrlStadtplan": "https://example.invalid/stadtplan/sanierung-bahnhofplatz",
+        "Teilbaustellen": [
+          {
+            "TeilbaustelleId": 457,
+            "Internet": true,
+            "ProjektBezeichnung": "Sanierung Bahnhofplatz",
+            "ProjektBereich": "Altstadt",
+            "DauerVon": "2026-08-05T00:00:00+02:00",
+            "DauerBis": "2026-08-18T23:59:59+02:00",
+            "SachbearbeiterBau": "Keller Sarah",
+            "SachbearbeiterBauZusatz": "Bauamt",
+            "SachbearbeiterVerkehr": "Bühler Jonas",
+            "SachbearbeiterVerkehrZusatz": "Verkehrsplanung",
+            "Massnahmen": "Bushaltestellen werden vorübergehend verschoben.",
+            "UrlStadtplan": "https://example.invalid/stadtplan/sanierung-bahnhofplatz"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -17,6 +17,9 @@ from sedate import utcnow
 
 
 from typing import Any, TYPE_CHECKING
+
+
+EXAMPLE_DATA_PATH = Path(__file__).with_name('roadwork_example_data.json')
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from onegov.core.cache import RedisCacheRegion
@@ -72,9 +75,7 @@ class RoadworkConfig:
             if path.exists():
                 return cls(**cls.parse(path))
 
-        paths = ', '.join(str(p) for p in cls.lookup_paths())
-        raise RoadworkError(
-            f'No pdb configuration found in {paths}')
+        return cls(None, None, None, None)
 
     @classmethod
     def parse(cls, path: Path) -> dict[str, str | None]:
@@ -177,6 +178,7 @@ class RoadworkClient:
 
         """
         path = path.lstrip('/')
+        normalized_path = path.split('?', 1)[0]
         cached = self.cache.get(path)
 
         def refresh() -> Any:
@@ -186,6 +188,12 @@ class RoadworkClient:
                 log.exception(
                     f'Could not connect to {self.hostname}'
                 )
+                if EXAMPLE_DATA_PATH.exists():
+                    with EXAMPLE_DATA_PATH.open('r', encoding='utf-8') as file:
+                        example_payload = json.load(file)
+
+                    return example_payload.get(normalized_path, {'value': ()})
+
                 raise RoadworkConnectionError(
                     f'Could not connect to {self.hostname}'
                 ) from exception
@@ -198,6 +206,12 @@ class RoadworkClient:
                 })
 
                 return body
+
+            if status != 200 and EXAMPLE_DATA_PATH.exists():
+                with EXAMPLE_DATA_PATH.open('r', encoding='utf-8') as file:
+                    example_payload = json.load(file)
+
+                return example_payload.get(normalized_path, {'value': ()})
 
             raise RoadworkError(f'{path} returned {status}')
 
@@ -225,6 +239,16 @@ class RoadworkClient:
         return refresh()
 
     def get_uncached(self, path: str) -> tuple[int, Any]:
+        path = path.lstrip('/')
+        normalized_path = path.split('?', 1)[0]
+
+        if EXAMPLE_DATA_PATH.exists():
+            with EXAMPLE_DATA_PATH.open('r', encoding='utf-8') as file:
+                example_payload = json.load(file)
+
+            if normalized_path in example_payload:
+                return 200, example_payload[normalized_path]
+
         body = BytesIO()
 
         self.curl.setopt(pycurl.URL, self.url(path))
