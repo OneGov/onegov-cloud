@@ -39,14 +39,14 @@ def handle_new_survey_definition(
 
     if form.submitted(request):
         assert form.title.data is not None
-        assert form.definition.data is not None
+        assert form.parsed.data is not None
 
         if self.definitions.by_name(normalize_for_url(form.title.data)):
             request.alert(_('A survey with this name already exists'))
         else:
             definition = self.definitions.add(
                 title=form.title.data,
-                definition=form.definition.data,
+                parsed=form.parsed.data,
             )
             form.populate_obj(definition)
 
@@ -139,17 +139,19 @@ def handle_edit_survey_definition(
              'please delete all submissions.')
 
     if self.submissions:
-        form.definition.description = info
-        form.definition.render_kw = {
+        form.parsed.description = info
+        form.parsed.render_kw = {
             'rows': 32, 'disabled': 'true', 'title': request.translate(info)
         }
-        form.definition.validators = []
+        form.parsed.validators = []
 
     if form.submitted(request):
+        exclude = set()
         if self.submissions:
-            form.definition.data = self.definition
-        assert form.definition.data is not None
-        form.populate_obj(self)
+            exclude.add('parsed')
+            form.parsed.data = self.parsed
+        assert form.parsed.data is not None
+        form.populate_obj(self, exclude=exclude)
 
         request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))

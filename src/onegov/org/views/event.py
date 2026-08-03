@@ -8,7 +8,7 @@ from onegov.core.crypto import random_token
 from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
-from onegov.form import merge_forms, parse_form
+from onegov.form import merge_forms
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
@@ -110,9 +110,9 @@ def event_form(
     # here
     if request.app.org.event_filter_type in ('filters', 'tags_and_filters'):
         # merge event filter form
-        filter_definition = request.app.org.event_filter_definition
+        filter_definition = request.app.org.event_filter_parsed_definition
         if filter_definition:
-            form = merge_forms(form, parse_form(filter_definition))
+            form = merge_forms(form, filter_definition.form_class())
 
         if request.app.org.event_filter_type == 'filters':
             if not filter_definition:

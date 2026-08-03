@@ -17,6 +17,7 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log, _
+from onegov.form.errors import FormParsingError
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import (
     ValidPhoneNumber,
@@ -66,6 +67,7 @@ if TYPE_CHECKING:
     from onegov.core.types import FileDict as StrictFileDict
     from onegov.file import File
     from onegov.form import Form
+    from onegov.form.parser import ParsedForm
     from onegov.form.types import (
         FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
     from typing import NotRequired, TypedDict, Self
@@ -1195,3 +1197,175 @@ class PlaceAutocompleteField(StringField):
                 effective_autocomplete_attribute.value
         )
         super().__init__(*args, **kwargs)
+
+
+class FormcodeField(TextAreaField):
+
+    data: ParsedForm | None  # type: ignore[assignment]
+    default: ParsedForm | Callable[[], ParsedForm] | None  # type: ignore[assignment]
+
+    def __init__(
+        self,
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        filters: Sequence[Filter] = (),
+        description: str = '',
+        id: str | None = None,
+        default: ParsedForm | Callable[[], ParsedForm] | None = None,
+        widget: Widget[Self] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        reserved_fields: Collection[str] | None = None,
+        require_email_field: bool = True,
+        require_title_fields: bool = False,
+        validate_prices: bool = True,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+    ):
+
+        if render_kw is None:
+            render_kw = {}
+
+        render_kw.setdefault('data-editor', 'form')
+        render_kw.setdefault('rows', 32)
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            filters=filters,
+            description=description,
+            id=id,
+            default=default,  # type: ignore[arg-type]
+            widget=widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
+        self.reserved_fields = reserved_fields or set()
+        self.require_email_field = require_email_field
+        self.require_title_fields = require_title_fields
+        self.validate_prices = validate_prices
+
+    def _value(self) -> str:
+        # NOTE: Make sure to always show what the user submitted
+        if self.raw_data:
+            return self.raw_data[0]
+        return '' if self.data is None else self.data.safe_formcode
+
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
+        if not valuelist or not valuelist[0]:
+            self.data = None
+            return
+
+        if not isinstance(valuelist[0], str):
+            raise TypeError
+
+        # FIXME: circular import
+        from onegov.form.parser import ParsedForm
+        try:
+            self.data = ParsedForm.from_formcode(
+                valuelist[0],
+                enable_edit_checks=True
+            )
+        except FormParsingError as exc:
+            if hasattr(exc, 'line'):
+                self.render_kw['data-highlight-line'] = str(exc.line)
+            raise ValueError(exc.field_message(self)) from exc
+        # FIXME: Where is this coming from? We should prevent it
+        #        at the source and ensure we raise a FormParsingError
+        #        instead
+        except AttributeError as exc:
+            raise ValueError(
+                self.gettext(_('The form could not be parsed.'))
+            ) from exc
+
+    def pre_validate(self, form: BaseForm) -> None:
+        if self.data is None:
+            return
+
+        parsed_form = self.data.form_class()()
+
+        if (
+            self.require_email_field
+            and not parsed_form.has_required_email_field
+        ):
+            raise ValidationError(self.gettext(_(
+                "Define at least one required e-mail field ('E-Mail * = @@@')"
+            )))
+
+        if self.require_title_fields and not parsed_form.title_fields:
+            raise ValidationError(self.gettext(
+                'Define at least one required field'
+            ))
+
+        if self.reserved_fields:
+            for formfield_id, formfield in parsed_form._fields.items():
+                if formfield_id in self.reserved_fields:
+                    raise ValidationError(
+                        self.gettext(_(
+                            "'{label}' is a reserved name. "
+                            "Please use a different name."
+                        )).format(label=formfield.label.text)
+                    )
+
+        if self.validate_prices and 'payment_method' in form:
+            for formfield in parsed_form:
+                if not hasattr(formfield, 'pricing'):
+                    continue
+
+                if not formfield.pricing.has_payment_rule:
+                    continue
+
+                # NOTE: If we end up allowing 'manual' in addition to
+                #       'free' we should also check if the application
+                #       has a payment_provider set.
+                if form['payment_method'].data != 'free':
+                    # add the error message to both affected fields
+                    error = self.gettext(_(
+                        "The field '{label}' contains a price that requires a "
+                        "credit card payment. This is only allowed if credit "
+                        "card payments are optional."
+                    )).format(label=formfield.label.text)
+                    # if the payment_method field is below the form
+                    # definition field, then validate will not have
+                    # been run yet and we can only add process_errors
+                    errors = form['payment_method'].errors
+                    if not isinstance(errors, list):
+                        errors = form['payment_method'].process_errors
+                        assert isinstance(errors, list)
+
+                    errors.append(error)
+                    raise ValidationError(error)
+
+        if self.validate_prices and 'minimum_price_total' in form:
+            has_pricing = 'currency' in form and form['currency'].data or any(
+                hasattr(formfield, 'pricing')
+                for formfield in parsed_form._fields.values()
+            )
+
+            if form['minimum_price_total'].data and not has_pricing:
+                # add the error message to all affected fields
+                error = self.gettext(_(
+                    'A minimum price total can only be set if at least one '
+                    'priced field is defined.'
+                ))
+                # if the minimum_price_total field is below the form
+                # definition field, then validate will not have
+                # been run yet and we can only add process_errors
+                errors = form['minimum_price_total'].errors
+                if not isinstance(errors, list):
+                    errors = form['minimum_price_total'].process_errors
+                    assert isinstance(errors, list)
+
+                errors.append(error)
+                raise ValidationError(error)

@@ -15,11 +15,13 @@ from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinitionCollection
 from onegov.form import FormFile
 from onegov.form import FormSubmission
-from sqlalchemy import Column, Integer, Text, UUID, text
+from onegov.form.parser import ParsedForm
+from onegov.form.orm_types import Formcode
+from sqlalchemy import Column, Integer, Text, UUID, bindparam, text
 from sqlalchemy.engine.reflection import Inspector
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.upgrade import UpgradeContext
 
@@ -211,3 +213,104 @@ def remove_state_from_survey_submissions(context: UpgradeContext) -> None:
     if context.has_table('survey_submissions'):
         if context.has_column('survey_submissions', 'state'):
             context.operations.drop_column('survey_submissions', 'state')
+
+
+@upgrade_task('Switch to JSON serialized form definitions')
+def switch_to_parsed_form(context: UpgradeContext) -> None:
+    table_pairs = (
+        ('forms', 'submissions'),
+        ('surveys', 'survey_submissions')
+    )
+    for definitions_table, submissions_table in table_pairs:
+        if not context.has_table(definitions_table):
+            continue
+
+        # no migration needed, the old column is already gone
+        if not context.has_column(definitions_table, 'definition'):
+            continue
+
+        # first add the new columns, but make them nullable
+        context.operations.add_column(
+            definitions_table,
+            Column('parsed', Formcode, nullable=True)
+        )
+        context.operations.add_column(
+            submissions_table,
+            Column('parsed', Formcode, nullable=True)
+        )
+
+        # so we maximize the chance of re-using the parser cache
+        # from parsing the submissions, we first create a lookup
+        # for all the definitions
+        definitions: dict[str, str] = {  # ruff:ignore[unnecessary-comprehension]
+            name: definition
+            for name, definition in context.session.execute(text(
+                f"""
+                    SELECT name, definition
+                      FROM {definitions_table}
+                     ORDER BY name
+                """
+            ))
+        }
+        definition_values: list[dict[str, Any]] = []
+        submission_values: list[dict[str, Any]] = []
+        current_name: str | None = None
+        for submission_id, name, definition in context.session.execute(text(
+            f"""
+                SELECT id, name, definition
+                  FROM {submissions_table}
+                 ORDER BY name, created
+            """
+        )):
+            # after we parsed the final submission is the best time to
+            # parse the corresponding definition, if it still exists
+            if current_name != name:
+                if current_name is not None and (
+                    defn := definitions.pop(current_name, None)
+                ) is not None:
+                    definition_values.append({
+                        'name': current_name,
+                        'parsed': ParsedForm.from_formcode(defn),
+                    })
+                current_name = name
+
+            submission_values.append({
+                'id': submission_id,
+                'parsed': ParsedForm.from_formcode(definition),
+            })
+
+        # parse any definitions that haven't been parsed yet
+        for name, definition in definitions.items():
+            definition_values.append({
+                'name': name,
+                'parsed': ParsedForm.from_formcode(definition),
+            })
+
+        # bulk update the tables with the parsed definitions
+        if definition_values:
+            context.session.execute(text(f"""
+                UPDATE {definitions_table}
+                   SET parsed = :parsed
+                 WHERE name = :name
+            """).bindparams(
+                bindparam('name', type_=Text),
+                bindparam('parsed', type_=Formcode)
+            ), definition_values)
+        if submission_values:
+            context.session.execute(text(f"""
+                UPDATE {submissions_table}
+                   SET parsed = :parsed
+                 WHERE id = :id
+            """).bindparams(
+                bindparam('id', type_=UUID),
+                bindparam('parsed', type_=Formcode)
+            ), submission_values)
+
+        # finally make the columns not nullable and remove
+        # the old columns
+        context.operations.alter_column(
+            definitions_table, 'parsed', nullable=False)
+        context.operations.alter_column(
+            submissions_table, 'parsed', nullable=False)
+        context.operations.drop_column(definitions_table, 'definition')
+        context.operations.drop_column(submissions_table, 'definition')

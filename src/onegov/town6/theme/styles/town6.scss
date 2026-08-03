@@ -1803,6 +1803,23 @@ a.category-anchor {
     }
 }
 
+.chart-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+
+    .button {
+        margin-bottom: 0;
+    }
+
+    .chart-message {
+        color: $alert-color;
+        margin-bottom: 0;
+    }
+}
+
 // D3 Org Chart customisations
 .chart-container {
     border: 1px solid $smoke;
@@ -1830,6 +1847,31 @@ a.category-anchor {
         color: #444;
         transition: all 200ms linear;
         background: white;
+        position: relative;
+
+        .drilldown,
+        .drillup {
+            background: none;
+            border: 0;
+            color: inherit;
+            cursor: pointer;
+            font-size: .8rem;
+            line-height: 1;
+            opacity: .35;
+            padding: .2rem;
+            position: absolute;
+            right: .3rem;
+            top: .3rem;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        // only one of the buttons shows at a time, the text keeps clear
+        &:has(button) span {
+            padding-right: .8rem;
+        }
 
         span {
             -webkit-line-clamp: 4;
@@ -1842,18 +1884,24 @@ a.category-anchor {
             hyphens: auto;
         }
 
+        &.restricted,
+        &.unpublished {
+            border-style: dashed !important;
+            color: $steel;
+        }
+
         &:hover {
             border: 2px solid $primary-color !important;
         }
     }
 
-    .node-button-div {
+        .node-button-div {
         span {
             font-size: .8rem !important;
         }
 
         > div {
-            padding: .5rem !important;
+            padding: 0.2rem 0.5rem !important;
             transition: all 200ms linear;
         }
     }

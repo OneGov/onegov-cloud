@@ -2,16 +2,13 @@ from __future__ import annotations
 
 from functools import cached_property
 from onegov.form import as_internal_id
-from onegov.form import flatten_fieldsets
 from onegov.form import merge_forms
-from onegov.form import parse_formcode
 from onegov.form import Form
-from onegov.form.errors import FormError
 from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import FormcodeField
 from onegov.form.fields import TreeSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
-from onegov.form.validators import ValidFormDefinition
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
@@ -141,16 +138,12 @@ class ResourceBaseForm(Form):
                       'inform the user')
     )
 
-    definition = TextAreaField(
+    parsed = FormcodeField(
         label=_('Extra Fields Definition'),
-        validators=[
-            Optional(),
-            ValidFormDefinition(
-                require_email_field=False,
-                reserved_fields=RESERVED_FIELDS
-            )
-        ],
-        render_kw={'rows': 32, 'data-editor': 'form'}
+        name='definition',
+        require_email_field=False,
+        reserved_fields=RESERVED_FIELDS,
+        validators=[Optional()],
     )
 
     occupancy_fields = TextAreaField(
@@ -503,13 +496,9 @@ class ResourceBaseForm(Form):
     def known_field_ids(self) -> set[str] | None:
         # FIXME: We should probably define this in relation to known_fields
         #        so we don't parse the form twice if we access both properties
-        try:
-            return {
-                field.id for field in
-                flatten_fieldsets(parse_formcode(self.definition.data))
-            }
-        except FormError:
+        if self.parsed.data is None:
             return None
+        return {field.id for field in self.parsed.data.flattened_fields}
 
     def extract_field_ids(self, field: Field) -> list[str]:
         if not self.known_field_ids:
@@ -534,10 +523,14 @@ class ResourceBaseForm(Form):
             raise ValidationError(
                 _('Please select the form field that holds the zip-code'))
 
-        for fieldset in parse_formcode(self.definition.data):
-            for parsed_field in fieldset.fields:
-                if parsed_field.human_id == self.zipcode_field.data:
-                    return
+        if self.parsed.data is None:
+            return
+
+        # FIXME: What about nested fields? Can those not be selected
+        #        in these kinds of fields?
+        for parsed_field in self.parsed.data.fields:
+            if parsed_field.human_id == self.zipcode_field.data:
+                return
 
         raise ValidationError(
             _('Please select the form field that holds the zip-code'))

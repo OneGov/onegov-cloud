@@ -7,6 +7,7 @@ from io import BytesIO
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.models import TicketMessage, TicketChatMessage
 from onegov.org.pdf.directory_entry import DirectoryEntryPdf
@@ -217,10 +218,14 @@ def test_ticket_pdf_long_message(client: Client) -> None:
     """
 
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Contact', definition=dedent("""
-        Name * = ___
-        E-Mail * = @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Contact',
+        parsed=ParsedForm.from_formcode(dedent("""
+            Name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
     transaction.commit()
 
     client.login_admin()

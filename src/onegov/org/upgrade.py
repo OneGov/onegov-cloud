@@ -20,6 +20,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import File
 from onegov.form import FormDefinition
+from onegov.form.parser import ParsedForm
 from onegov.newsletter import Newsletter
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
@@ -978,3 +979,20 @@ def subscribe_customer_message_recipients_to_cancellation_requests(
             ) WHERE type = 'resource'
               AND content->>'customer_messages' = 'true';
         """))
+
+
+@upgrade_task('Switch to JSON serialized event filter form definitions')
+def switch_to_parsed_event_filters(context: UpgradeContext) -> None:
+    org = context.session.query(Organisation).first()
+
+    if not org:
+        return
+
+    if 'event_filter_definition' not in org.meta:
+        return
+
+    definition = org.meta.pop('event_filter_definition')
+    if not definition:
+        return
+
+    org.event_filter_parsed_definition = ParsedForm.from_formcode(definition)

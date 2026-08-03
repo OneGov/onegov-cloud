@@ -587,14 +587,20 @@ def test_pdf_mini_html_semicolons_and_entities() -> None:
     pdf.mini_html(
         '<p>Preis: 5; inkl. MwSt</p>'
         '<p>AT&T; Inc</p>'
+        '<p>Umbau &lt;b&gt;Haus&lt;/b&gt; &amp; Garten</p>'
+        '<p>Ein <b>fettes</b> &lt;Wort&gt;</p>'
         '<ul><li><strong>Name</strong>: '
         'Umbau &lt;b&gt;Haus&lt;/b&gt; &amp; Garten</li></ul>'
     )
 
     paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
     assert paras[0] == 'Preis: 5; inkl. MwSt'
-    # no second semicolon picked up
-    assert paras[1] == 'AT&T; Inc'
+    # the ampersand is escaped, and keeps its single semicolon
+    assert paras[1] == 'AT&amp;T; Inc'
+    # text nodes are re-escaped, so reportlab keeps them as text ...
+    assert paras[2] == 'Umbau &lt;b&gt;Haus&lt;/b&gt; &amp; Garten'
+    # ... while real child tags still render
+    assert paras[3] == 'Ein <b>fettes</b> &lt;Wort&gt;'
 
     lists = [
         [li.text for li in l._flowables]  # type: ignore[attr-defined]
@@ -609,6 +615,8 @@ def test_pdf_mini_html_semicolons_and_entities() -> None:
     _, text = extract_pdf_info(file)
     assert 'Preis: 5; inkl. MwSt' in text
     assert 'AT&T; Inc' in text
+    assert 'Umbau <b>Haus</b> & Garten' in text
+    assert 'Ein fettes <Wort>' in text
     assert 'Name: Umbau <b>Haus</b> & Garten' in text
 
 

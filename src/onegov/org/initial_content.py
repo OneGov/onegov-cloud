@@ -9,6 +9,7 @@ from onegov.core.utils import module_path
 from onegov.event import EventCollection
 from onegov.file import FileSetCollection, FileCollection
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.org import _
 from onegov.org.models import Organisation
 from onegov.page import PageCollection
@@ -116,7 +117,7 @@ def add_builtin_forms(
             form = forms.add(
                 name=name,
                 title=title,
-                definition=definition,
+                parsed=ParsedForm.from_formcode(definition),
                 type='custom'
             )
 

@@ -8,9 +8,11 @@ from __future__ import annotations
 from libres.db.models import Allocation, Reservation
 from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
+from onegov.form.parser import ParsedForm
+from onegov.form.orm_types import Formcode
 from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
-from sqlalchemy import text, Column, Enum, ForeignKey, Text, UUID
+from sqlalchemy import bindparam, text, Column, Enum, ForeignKey, Text, UUID
 
 
 from typing import TYPE_CHECKING
@@ -398,3 +400,44 @@ def add_additional_indexes_to_libres_tables(context: UpgradeContext) -> None:
         columns=['_end'],
         if_not_exists=True
     )
+
+
+@upgrade_task('Switch to JSON serialized custom resource form definitions')
+def resources_switch_to_parsed_form(context: UpgradeContext) -> None:
+    if not context.has_table('resources'):
+        return
+
+    # no migration needed, the old column is already gone
+    if not context.has_column('resources', 'definition'):
+        return
+
+    # first add the new column
+    context.operations.add_column(
+        'resources',
+        Column('parsed', Formcode, nullable=True)
+    )
+
+    # bulk update the table with the parsed definitions
+    if values := [
+        {
+            'id': directory_id,
+            'parsed': ParsedForm.from_formcode(definition),
+        }
+        for directory_id, definition in context.session.execute(text("""
+            SELECT id, definition
+              FROM resources
+             WHERE definition IS NOT NULL
+               AND definition != ''
+        """))
+    ]:
+        context.session.execute(text("""
+            UPDATE resources
+               SET parsed = :parsed
+             WHERE id = :id
+        """).bindparams(
+            bindparam('id', type_=UUID),
+            bindparam('parsed', type_=Formcode)
+        ), values)
+
+    # finally remove the old column
+    context.operations.drop_column('resources', 'definition')
