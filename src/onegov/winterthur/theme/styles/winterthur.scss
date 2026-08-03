@@ -323,18 +323,22 @@ ul#pubnav {
     padding: 1rem;
 }
 
-.directory-list li {
-    padding: 0 !important;
+.directory-list {
+    margin-top: 2rem;
 
-    a {
-        padding: 1rem;
-        padding-bottom: 0;
-    }
-
-    .list-lead {
-        margin: 0;
-        padding: 1rem;
-        padding-top: 0;
+    li {
+        padding: 0 !important;
+    
+        a {
+            padding: 1rem;
+            padding-bottom: 0;
+        }
+    
+        .list-lead {
+            margin: 0;
+            padding: 1rem;
+            padding-top: 0;
+        }
     }
 }
 
