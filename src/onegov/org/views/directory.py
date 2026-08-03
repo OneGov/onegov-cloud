@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-from html import escape
 
 import morepath
 import transaction
@@ -42,6 +41,7 @@ from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
+from onegov.org.pdf.directory_entry import DirectoryEntryPdf
 from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
@@ -57,14 +57,12 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 from typing import cast, Any, NamedTuple, TYPE_CHECKING
 
-from onegov.pdf import Pdf, page_fn_footer, page_fn_header_and_footer
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence, Iterator, Iterable
     from onegov.core.types import JSON_ro, RenderData, EmailJsonDict
     from onegov.directory.migration import DirectoryMigration
     from onegov.directory.models.directory import DirectoryEntryForm
-    from onegov.form.parser.core import BasicParsedField
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
     from wtforms import Field
@@ -696,133 +694,16 @@ def send_admin_email(
 
 def create_admin_notification_pdf(
     request: OrgRequest,
-    filename: str,
-    title: str,
     entry: ExtendedDirectoryEntry,
     generated_at: datetime,
     ended: bool = False,
-) -> Attachment | None:
-    assert filename
-
-    app = request.app
-    layout = DefaultMailLayout(entry, request)
-
-    f = BytesIO()
-    pdf = Pdf(
-        f,
-        title=title,
-        author=app.org.title,
-        locale=request.locale,
-        translations=app.translations,
-    )
-    pdf.init_a4_portrait(
-        page_fn=page_fn_footer, page_fn_later=page_fn_header_and_footer
-    )
-    pdf.h(escape(title))
-    title_link = (
-        f'<a href="{request.link(entry)}" color="{pdf.link_color}">'
-        f'<u>{escape(title)}</u></a>'
-    )
-    if ended:
-        intro = _(
-            'The publication "${title}" has ended.',
-            mapping={'title': title_link},
-        )
-    else:
-        intro = _(
-            'This document certifies the publication "${title}" as follows.',
-            mapping={'title': title_link},
-        )
-    pdf.p_markup(request.translate(intro))
-    pdf.h2(request.translate(_('Publication')))
-
-    def field_value(field: BasicParsedField) -> str:
-        value = entry.values.get(field.id)
-        if value and field.type == 'datetime':
-            value = layout.format_date(value, 'datetime_long')
-        elif value and field.type == 'date':
-            value = layout.format_date(value, 'date_long')
-        return escape(str(value or ''))
-
-    field_items = ''.join(
-        f'<li><strong>{escape(field.human_id)}</strong>: '
-        f'{field_value(field)}</li>'
-        for field in entry.directory.basic_fields
-    )
-    pdf.mini_html(f'<ul>{field_items}</ul>')
-
-    pdf.h2(request.translate(_('Attachments')))
-    if entry.files:
-        size_label = request.translate(_('Size'))
-        date_label = request.translate(_('Date'))
-        hash_label = request.translate(_('Hash'))
-        bytes_label = request.translate(_('Bytes'))
-        # bullet-less bold filename tight above its list, spaced between files
-        name_style = pdf.style.normal.clone(
-            'attachment_name', spaceBefore=12, spaceAfter=2
-        )
-        for file in entry.files:
-            pdf.p_markup(f'<strong>{escape(file.name)}</strong>', name_style)
-            pdf.mini_html(
-                f'<ul>'
-                f'<li>{size_label}: {file.reference.file.content_length} '
-                f'{bytes_label}</li>'
-                f'<li>{date_label}: '
-                f'{layout.format_date(file.created, "datetime_long")}</li>'
-                f'<li>{hash_label}: {file.checksum or file.id}</li>'
-                f'</ul>'
-            )
-    else:
-        no_files_label = request.translate(_('None'))
-        pdf.mini_html(f'<p>{no_files_label}</p>')
-
-    pdf.h2(request.translate(_('Publication details')))
-    not_set = request.translate(_('Not set'))
-    start = (
-        layout.format_date(entry.publication_start, 'datetime_long')
-        if entry.publication_start else not_set
-    )
-    end = (
-        layout.format_date(entry.publication_end, 'datetime_long')
-        if entry.publication_end else not_set
-    )
-    access = layout.access_label(entry.access)
-    details = '\n'.join([
-        (
-            f'<li><strong>{request.translate(_("Publication start:"))}'
-            f'</strong> {start}</li>'
-        ),
-        (
-            f'<li><strong>{request.translate(_("Publication end:"))}'
-            f'</strong> {end}</li>'
-        ),
-        (
-            f'<li><strong>{request.translate(_("Access"))}:</strong> '
-            f'{access}</li>'
-        ),
-        (
-            f'<li><strong>{request.translate(_("Entry checksum"))}:</strong> '
-            f'{entry.content_hash}</li>'
-        ),
-    ])
-    pdf.mini_html(f'<ul>{details}</ul>')
-
-    text = request.translate(_(
-        'Email automatically generated by ${org} at ${timestamp}',
-        mapping={
-            'org': layout.org.title,
-            'timestamp': layout.format_date(generated_at, 'datetime_long'),
-        },
-    ))
-    footer_style = (
-        pdf.style.paragraph.clone('generated_footer', spaceBefore=20))
-    pdf.p_markup(text, footer_style)
-    pdf.generate()
+) -> Attachment:
 
     return Attachment(
         # slashes would be cut off by Attachment's basename()
-        f"{filename.replace('/', '-')}.pdf",
-        content=f.getvalue(),
+        f"{entry.title.replace('/', '-')}.pdf",
+        content=DirectoryEntryPdf.from_entry(
+            request, entry, generated_at, ended).read(),
         content_type='application/pdf',
     )
 
@@ -842,13 +723,7 @@ def send_admin_notification_for_directory_entry(
     signing_failed = False
 
     try:
-        pdf = create_admin_notification_pdf(
-            request,
-            filename=entry.title,
-            title=entry.title,
-            entry=entry,
-            generated_at=generated_at,
-        )
+        pdf = create_admin_notification_pdf(request, entry, generated_at)
     except Exception:
         # a broken pdf must not hold back the notification
         log.exception('Error while rendering directory publication')
@@ -903,13 +778,7 @@ def send_admin_expiry_notification_for_directory_entry(
 
     try:
         pdf = create_admin_notification_pdf(
-            request,
-            filename=entry.title,
-            title=entry.title,
-            entry=entry,
-            generated_at=generated_at,
-            ended=True,
-        )
+            request, entry, generated_at, ended=True)
     except Exception:
         # a broken pdf must not hold back the notification
         log.exception('Error while rendering directory publication')

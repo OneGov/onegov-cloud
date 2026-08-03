@@ -577,6 +577,41 @@ def test_pdf_mini_html_strip() -> None:
     assert set(paras) == {'Eins zwei drei vier .'}
 
 
+def test_pdf_mini_html_semicolons_and_entities() -> None:
+    """ Semicolons were replaced by '&#59;' for an old reportlab issue,
+    which mangled every entity ('&lt;' rendered as '<;'). """
+
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+    pdf.mini_html(
+        '<p>Preis: 5; inkl. MwSt</p>'
+        '<p>AT&T; Inc</p>'
+        '<ul><li><strong>Name</strong>: '
+        'Umbau &lt;b&gt;Haus&lt;/b&gt; &amp; Garten</li></ul>'
+    )
+
+    paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
+    assert paras[0] == 'Preis: 5; inkl. MwSt'
+    # no second semicolon picked up
+    assert paras[1] == 'AT&T; Inc'
+
+    lists = [
+        [li.text for li in l._flowables]  # type: ignore[attr-defined]
+        for l in pdf.story if isinstance(l, ListFlowable)
+    ]
+    assert lists == [[
+        '<strong>Name</strong>: Umbau &lt;b&gt;Haus&lt;/b&gt; &amp; Garten'
+    ]]
+
+    # entities reach the page decoded, not as '<;b>;'
+    pdf.generate()
+    _, text = extract_pdf_info(file)
+    assert 'Preis: 5; inkl. MwSt' in text
+    assert 'AT&T; Inc' in text
+    assert 'Name: Umbau <b>Haus</b> & Garten' in text
+
+
 def test_pdf_mini_html_linkify() -> None:
     file = BytesIO()
     pdf = Pdf(file)

@@ -14,6 +14,7 @@ from babel.dates import format_date as babel_format_date
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from freezegun import freeze_time
+from io import BytesIO
 from markupsafe import Markup
 from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
@@ -2768,15 +2769,18 @@ def _assert_signed_pdf(attachment: Mapping[str, Any]) -> None:
 
 
 def _make_permit_directory(
-    session: 'Session', notification_address: str | None = 'admin@example.org'
+    session: 'Session',
+    notification_address: str | None = 'admin@example.org',
+    extra_structure: str = '',
 ) -> 'ExtendedDirectory':
     directories: DirectoryCollection[ExtendedDirectory]
     directories = DirectoryCollection(session, type='extended')
     directory = directories.add(
         title='Baugesuche',
-        structure="""
+        structure=f"""
             Gesuchsteller/in *= ___
             Adresse *= ___
+            {extra_structure}
         """,
         configuration=DirectoryConfiguration(
             title='[Gesuchsteller/in]',
@@ -3107,6 +3111,103 @@ def test_admin_notification_pdf_title_special_chars(
     # the heading keeps the angle brackets instead of dropping them
     pdf_text = extract_pdf_text(msg['Attachments'][0])
     assert pdf_text.splitlines()[0] == title
+
+
+def test_admin_notification_pdf_without_attachments(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    An entry without files says so, no dangling heading.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Frida Koch',
+            adresse='Seestrasse 11',
+            publication_start=real_now - timedelta(minutes=30),
+            publication_end=real_now + timedelta(days=30),
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    with freeze_time(real_now, tick=True):
+        with _ais_cassette():
+            client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    msg = client.get_email(0)
+    lines = [
+        line.strip()
+        for line in extract_pdf_text(msg['Attachments'][0]).splitlines()
+        if line.strip()
+    ]
+    assert lines[lines.index('Anhänge') + 1] == 'Keine'
+    assert 'Publikationsdetails' in lines
+
+
+def test_admin_notification_pdf_lists_every_attachment(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    Every file is listed with its own size, date and hash.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(
+        client.app.session(), extra_structure='Dokumente = *.txt (multiple)'
+    )
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Gustav Berger',
+            adresse='Mühleweg 5',
+            dokumente=(
+                Bunch(
+                    data=object(),
+                    file=BytesIO(b'Situationsplan'),
+                    filename='situationsplan.txt',
+                ),
+                Bunch(
+                    data=object(),
+                    file=BytesIO(b'Baubeschrieb'),
+                    filename='baubeschrieb.txt',
+                ),
+            ),
+            publication_start=real_now - timedelta(minutes=30),
+            publication_end=real_now + timedelta(days=30),
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    with freeze_time(real_now, tick=True):
+        with _ais_cassette():
+            client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    msg = client.get_email(0)
+    pdf_text = extract_pdf_text(msg['Attachments'][0])
+    assert 'situationsplan.txt' in pdf_text
+    assert 'baubeschrieb.txt' in pdf_text
+    # one size/date/hash block per file
+    assert pdf_text.count('Grösse:') == 2
+    assert pdf_text.count('Datum:') == 2
+    assert pdf_text.count('Prüfsumme:') == 2
+    assert f'Grösse: {len(b"Situationsplan")} Bytes' in pdf_text
+    assert f'Grösse: {len(b"Baubeschrieb")} Bytes' in pdf_text
+    _assert_signed_pdf(msg['Attachments'][0])
 
 
 def test_admin_notification_signing_failure(
