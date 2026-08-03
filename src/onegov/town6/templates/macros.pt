@@ -109,8 +109,8 @@
     </div>
 </metal:header_links>
 
-<metal:header-text define-macro="header-text">
-    <div id="header_text" tal:condition="header_options['left_header_name']|nothing" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+<metal:header_text define-macro="header_text">
+    <div id="header_text" tal:condition="header_options['left_header_name']|nothing" class="bg-white" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
         <div class="grid-container">
             <a class="h4" href="${header_options.get('left_header_url', '#')}"
                 style="color:${color or '#fff'}; font-size: ${rem_size}rem">
@@ -118,7 +118,7 @@
             </a>
         </div>
     </div>
-</metal:header-text>
+</metal:header_text>
 
 <metal:editbar define-macro="editbar">
     <tal:b define="editbar_links layout.editbar_links if not layout.edit_mode else layout.editmode_links|[]">
