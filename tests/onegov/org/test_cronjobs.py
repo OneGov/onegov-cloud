@@ -3214,8 +3214,9 @@ def test_admin_notification_signing_failure(
     client: Client['TestOrgApp'],
 ) -> None:
     """
-    A failing signing service does not prevent the notification — the pdf
-    is simply attached unsigned.
+    A failing signing service does not prevent the notifications — both
+    the publication and the expiry pdf are attached unsigned, and the same
+    entry still gets its expiry mail after the first signing already failed.
     """
     job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
     assert job is not None
@@ -3230,7 +3231,7 @@ def test_admin_notification_signing_failure(
             gesuchsteller_in='Clara Meier',
             adresse='Ringstrasse 9',
             publication_start=real_now - timedelta(minutes=30),
-            publication_end=real_now + timedelta(days=30),
+            publication_end=real_now + timedelta(hours=2),
         )
     )
     transaction.commit()
@@ -3239,62 +3240,28 @@ def test_admin_notification_signing_failure(
     with patch.object(SwisscomAIS, 'sign') as sign:
         sign.side_effect = RuntimeError('signing service unavailable')
 
+        # the publication start has been crossed ...
         with freeze_time(real_now, tick=True):
             client.get(get_cronjob_url(job))
+        assert len(os.listdir(client.app.maildir)) == 1
 
-        assert sign.called
-
-    assert len(os.listdir(client.app.maildir)) == 1
-    msg = client.get_email(0)
-    assert 'Veröffentlichter Eintrag' in msg['Subject']
-    assert msg['Attachments']
-    assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
-    assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
-    assert 'konnte nicht signiert werden' in msg['TextBody']
-    assert client.app.session().query(SigningRequest).count() == 0
-
-
-def test_admin_expiry_notification_signing_failure(
-    client: Client['TestOrgApp'],
-) -> None:
-    """
-    Same as above for the expiry notification — the pdf is attached
-    unsigned and the email says so.
-    """
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    assert job is not None
-    job.app = client.app
-
-    real_now = utcnow()
-
-    transaction.begin()
-    directory = _make_permit_directory(client.app.session())
-    directory.add(
-        values=dict(
-            gesuchsteller_in='Clara Meier',
-            adresse='Ringstrasse 9',
-            publication_start=real_now - timedelta(days=2),
-            publication_end=real_now - timedelta(minutes=30),
-        )
-    )
-    transaction.commit()
-    close_all_sessions()
-
-    with patch.object(SwisscomAIS, 'sign') as sign:
-        sign.side_effect = RuntimeError('signing service unavailable')
-
-        with freeze_time(real_now, tick=True):
+        # ... and later on the publication end
+        with freeze_time(real_now + timedelta(hours=3), tick=True):
             client.get(get_cronjob_url(job))
 
-        assert sign.called
+        assert sign.call_count == 2
 
-    assert len(os.listdir(client.app.maildir)) == 1
-    msg = client.get_email(0)
-    assert 'Publikationsfrist' in msg['Subject']
-    assert msg['Attachments']
-    assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
-    assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
-    assert 'konnte nicht signiert werden' in msg['TextBody']
+    assert len(os.listdir(client.app.maildir)) == 2
+    published, expired = client.get_email(0), client.get_email(1)
+    assert 'Veröffentlichter Eintrag' in published['Subject']
+    assert 'Publikationsfrist' in expired['Subject']
+
+    for msg in (published, expired):
+        assert msg['Attachments']
+        assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
+        assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
+        assert 'konnte nicht signiert werden' in msg['TextBody']
+
     assert client.app.session().query(SigningRequest).count() == 0
 
 
