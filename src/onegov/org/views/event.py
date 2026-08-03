@@ -5,10 +5,10 @@ import morepath
 
 from morepath.request import Response
 from onegov.core.crypto import random_token
-from onegov.core.elements import BackLink
+from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
-from onegov.form import merge_forms, parse_form
+from onegov.form import merge_forms
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
@@ -110,9 +110,9 @@ def event_form(
     # here
     if request.app.org.event_filter_type in ('filters', 'tags_and_filters'):
         # merge event filter form
-        filter_definition = request.app.org.event_filter_definition
+        filter_definition = request.app.org.event_filter_parsed_definition
         if filter_definition:
-            form = merge_forms(form, parse_form(filter_definition))
+            form = merge_forms(form, filter_definition.form_class())
 
         if request.app.org.event_filter_type == 'filters':
             if not filter_definition:
@@ -497,7 +497,15 @@ def handle_edit_event(
 
     layout = layout or EventLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    cancel_url = (
+        request.link(view_ticket) if view_ticket is not None
+        else request.link(self)
+    )
+    layout.editmode_links[1] = CoreLink(
+        text=_('Cancel'),
+        url=request.return_to_url(cancel_url),
+        attrs={'class': 'cancel-link'}
+    )
     layout.edit_mode = True
 
     return {

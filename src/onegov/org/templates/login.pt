@@ -2,7 +2,7 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
-    <tal:b metal:fill-slot="content" tal:define="primary_separate next((p for p in providers if p.kind == 'separate' and p.is_primary(request.app)), None)">
+    <tal:b metal:fill-slot="content" tal:define="separate_available [p for p in providers if p.kind == 'separate' and p.available(request.app)]; primary_separate next((p for p in separate_available if p.is_primary(request.app)), separate_available[0] if separate_available else None)">
         <div class="row" tal:condition="primary_separate">
             <div class="small-12 medium-7 large-5 columns">
                 <a href="${provider_login(primary_separate)}" class="button">
@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="row" tal:condition="providers">
-            <tal:b define="separate [p for p in providers if p.kind == 'separate' and (primary_separate is None or p.name != primary_separate.name) and p.available(request.app)]" condition="separate">
+            <tal:b define="separate [p for p in separate_available if p.name != primary_separate.name]" condition="separate">
                 <div class="small-12 medium-7 large-5 columns alternatives">
                     <h2 tal:condition="not primary_separate" i18n:translate>Alternatives</h2>
                     <div tal:repeat="provider separate" class="provider-login">

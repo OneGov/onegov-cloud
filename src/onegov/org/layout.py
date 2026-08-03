@@ -2286,6 +2286,14 @@ class ResourcesLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
+                    text=_('Settings'),
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'resource-settings')
+                    ),
+                    attrs={'class': 'settings-link'}
+                ),
+                Link(
                     text=_('Recipients'),
                     url=self.request.class_link(ResourceRecipientCollection),
                     attrs={'class': 'manage-recipients'},
@@ -4152,7 +4160,9 @@ class HomepageLayout(DefaultLayout):
             return [
                 Link(
                     _('Edit'),
-                    self.request.link(self.model, 'homepage-settings'),
+                    self.request.return_here(
+                        self.request.link(self.model, 'homepage-settings')
+                    ),
                     attrs={'class': ('edit-link')}
                 ),
                 Link(

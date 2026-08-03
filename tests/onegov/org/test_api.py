@@ -7,6 +7,7 @@ from datetime import timedelta
 from collection_json import Collection  # type: ignore[import-untyped]
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.org.models.external_link import (
     ExternalFormLink, ExternalResourceLink)
 from onegov.people import Person
@@ -547,14 +548,14 @@ def test_api_forms_paginates_external_links_and_hides_invisible_items(
     for ix in range(100):
         form = forms.definitions.add(
             f'API Form {ix:02d}',
-            'E-Mail *= @@@',
+            parsed=ParsedForm.from_formcode('E-Mail *= @@@'),
             type='custom',
         )
         form.access = 'public'  # type:ignore[attr-defined]
 
     hidden_form = forms.definitions.add(
         'API Form Hidden',
-        'E-Mail *= @@@',
+        parsed=ParsedForm.from_formcode('E-Mail *= @@@'),
         name='hidden',
         type='custom',
     )

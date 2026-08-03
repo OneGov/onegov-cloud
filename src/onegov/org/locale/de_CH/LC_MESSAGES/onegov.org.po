@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-20 08:36+0200\n"
+"POT-Creation-Date: 2026-07-31 08:53+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -247,6 +247,9 @@ msgstr "Verzeichnisse"
 
 msgid "Surveys"
 msgstr "Umfragen"
+
+msgid "Topic chart"
+msgstr "Themendiagramm"
 
 msgid "Modules"
 msgstr "Module"
@@ -2603,14 +2606,11 @@ msgstr "Andere Feiertage"
 msgid "School holidays"
 msgstr "Schulferien"
 
-msgid "Format: Day.Month - Description"
-msgstr "Format: Tag.Monat - Beschreibung"
+msgid "Format: Day.Month[.Year] - Description (year is optional)"
+msgstr "Format: Tag.Monat[.Jahr] - Beschreibung (Jahr ist optional)"
 
 msgid "Please enter one date per line"
 msgstr "Bitte geben Sie ein Datum pro Zeile ein"
-
-msgid "Please enter only day and month"
-msgstr "Bitte geben Sie nur Tag und Monat ein"
 
 #, python-format
 msgid "${date} is not a valid date"
@@ -6445,6 +6445,41 @@ msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
 "den Verweis zu bearbeiten oder zu löschen."
 
+msgid "Expand all"
+msgstr "Alle ausklappen"
+
+msgid "Collapse all"
+msgstr "Alle einklappen"
+
+msgid "Fit to screen"
+msgstr "An Bildschirm anpassen"
+
+msgid "Whole chart"
+msgstr "Ganzes Diagramm"
+
+msgid "Download as PNG"
+msgstr "Als PNG herunterladen"
+
+msgid "Download as SVG"
+msgstr "Als SVG herunterladen"
+
+msgid "Show only this branch"
+msgstr "Nur diesen Zweig anzeigen"
+
+msgid "Show the level above"
+msgstr "Ebene darüber anzeigen"
+
+msgid "The topics could not be loaded."
+msgstr "Die Themen konnten nicht geladen werden."
+
+msgid ""
+"The chart is too large for an image, please use the SVG download instead."
+msgstr ""
+"Das Diagramm ist zu gross für ein Bild, bitte den SVG-Download verwenden."
+
+msgid "Loading topics..."
+msgstr "Themen werden geladen..."
+
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
 
@@ -6630,6 +6665,14 @@ msgid "The allocation was deleted"
 msgstr "Die Verfügbarkeit wurde gelöscht"
 
 #, python-format
+#, python-format
+msgid ""
+"${n} availabilities were not created, because they overlap with existing "
+"ones."
+msgstr ""
+"${n} Verfügbarkeiten wurden nicht erstellt, da sie sich mit bestehenden "
+"überschneiden."
+
 msgid "New availability period active, ${n} allocations created"
 msgstr "Neuer Verfügbarkeitszeitraum aktiv, ${n} Verfügbarkeiten erstellt"
 
@@ -8392,6 +8435,15 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Format: Day.Month - Description or Day.Month.Year - Description"
+#~ msgstr "Format: Tag.Monat - Beschreibung oder Tag.Monat.Jahr - Beschreibung"
+
+#~ msgid "Format: Day.Month - Description"
+#~ msgstr "Format: Tag.Monat - Beschreibung"
+
+#~ msgid "Please enter only day and month"
+#~ msgstr "Bitte geben Sie nur Tag und Monat ein"
 
 #~ msgid "Confirmation"
 #~ msgstr "Bestätigung"

@@ -20,6 +20,7 @@ from onegov.form.fields import (ChosenSelectField, URLPanelField,
                                 ChosenSelectMultipleEmailField)
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
+from onegov.form.fields import FormcodeField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
@@ -1053,16 +1054,29 @@ class HolidaySettingsForm(Form):
                 continue
 
             if line.count('-') < 1:
-                raise ValidationError(_('Format: Day.Month - Description'))
+                raise ValidationError(
+                    _(
+                        'Format: Day.Month[.Year] - Description '
+                        '(year is optional)'
+                    )
+                )
             if line.count('-') > 1:
                 raise ValidationError(_('Please enter one date per line'))
 
             date, _description = line.split('-', 1)
 
-            if date.count('.') < 1:
-                raise ValidationError(_('Format: Day.Month - Description'))
-            if date.count('.') > 1:
-                raise ValidationError(_('Please enter only day and month'))
+            if date.count('.') == 1:
+                continue
+            if date.count('.') == 2:
+                self.parse_date(date.strip())
+                continue
+
+            raise ValidationError(
+                _(
+                    'Format: Day.Month[.Year] - Description '
+                    '(year is optional)'
+                )
+            )
 
     def parse_date(self, date: str) -> datetime.date:
         day, month, year = date.split('.', 2)
@@ -1111,10 +1125,18 @@ class HolidaySettingsForm(Form):
     @property
     def holiday_settings(self) -> dict[str, Any]:
 
-        def parse_other_holidays_line(line: str) -> tuple[int, int, str]:
-            date, desc = line.strip().split('-', 1)
-            day, month = date.split('.')
+        def parse_other_holidays_line(
+            line: str,
+        ) -> tuple[int, int, str] | tuple[int, int, str, int]:
 
+            date, desc = line.strip().split('-', 1)
+            parts = date.strip().split('.')
+
+            if len(parts) == 3:
+                day, month, year = parts
+                return int(month), int(day), desc.strip(), int(year)
+
+            day, month = parts
             return int(month), int(day), desc.strip()
 
         def parse_school_holidays_line(
@@ -1148,7 +1170,11 @@ class HolidaySettingsForm(Form):
     def holiday_settings(self, data: dict[str, Any]) -> None:
         data = data or {}
 
-        def format_other(d: tuple[int, int, str]) -> str:
+        def format_other(
+            d: tuple[int, int, str] | tuple[int, int, str, int],
+        ) -> str:
+            if len(d) == 4:
+                return f'{d[1]:02d}.{d[0]:02d}.{d[3]:04d} - {d[2]}'
             return f'{d[1]:02d}.{d[0]:02d} - {d[2]}'
 
         def format_school(d: tuple[int, int, int, int, int, int]) -> str:
@@ -2109,20 +2135,23 @@ class EventSettingsForm(Form):
         default='tags'
     )
 
-    event_filter_definition = TextAreaField(
+    event_filter_parsed_definition = FormcodeField(
         label=_('Definition'),
         fieldset=_('Filters'),
+        name='event_filter_definition',
         depends_on=('event_filter_type', '!tags'),
-        validators=[
-            ValidFilterFormDefinition(
-                require_email_field=False,
-                require_title_fields=False,
-                reserved_fields={name for name, _ in
-                                 get_fields_from_class(EventForm)}
-                                | {'syndicate', 'highlight'}
-            )
-        ],
-        render_kw={'rows': 16, 'data-editor': 'form'}
+        require_email_field=False,
+        require_title_fields=False,
+        # FIXME: This is missing other reserved fields added through
+        #        content extensions etc. We might want to optionally
+        #        allow reserved_fields to be callback, that gets invoked
+        #        with the current request, so we can get the proper
+        #        form managers will see.
+        reserved_fields={
+            name for name, _ in get_fields_from_class(EventForm)
+        } | {'syndicate', 'highlight'},
+        validators=[ValidFilterFormDefinition()],
+        render_kw={'rows': 16}
     )
 
     keyword_fields = TextAreaField(
