@@ -678,15 +678,40 @@ def create_admin_notification_pdf(
     entry: ExtendedDirectoryEntry,
     generated_at: datetime,
     ended: bool = False,
-) -> Attachment:
+) -> tuple[Attachment | None, bool]:
+    """ Renders and signs the notification pdf for a directory entry.
+
+    Returns a ``(attachment, signing_failed)`` tuple, where ``attachment``
+    is ``None`` if rendering failed and the unsigned pdf if only signing
+    failed.
+    """
+
+    try:
+        content = DirectoryEntryPdf.from_entry(
+            request, entry, generated_at, ended)
+    except Exception:
+        # a broken pdf must not hold back the notification
+        log.exception('Error while rendering directory publication')
+        return None, False
+
+    signing_failed = False
+    signed_pdf = BytesIO()
+    try:
+        request.app.signing_service.sign(
+            request.session, content, signed_pdf, None)
+        pdf_bytes = signed_pdf.getvalue()
+    except Exception:
+        # an unsigned pdf is better than no notification at all
+        log.exception('Error while signing directory publication')
+        signing_failed = True
+        pdf_bytes = content.getvalue()
 
     return Attachment(
         # slashes would be cut off by Attachment's basename()
         f"{entry.title.replace('/', '-')}.pdf",
-        content=DirectoryEntryPdf.from_entry(
-            request, entry, generated_at, ended).read(),
+        content=pdf_bytes,
         content_type='application/pdf',
-    )
+    ), signing_failed
 
 
 def send_admin_notification_for_directory_entry(
@@ -701,25 +726,9 @@ def send_admin_notification_for_directory_entry(
                  'directory': directory.title},
     ))
     generated_at = datetime.now(UTC)
-    signing_failed = False
 
-    try:
-        pdf = create_admin_notification_pdf(request, entry, generated_at)
-    except Exception:
-        # a broken pdf must not hold back the notification
-        log.exception('Error while rendering directory publication')
-        pdf = None
-
-    if pdf is not None:
-        try:
-            signed_pdf = BytesIO()
-            request.app.signing_service.sign(
-                request.session, BytesIO(pdf.content), signed_pdf, None)
-            pdf.content = signed_pdf.getvalue()
-        except Exception:
-            # an unsigned pdf is better than no notification at all
-            log.exception('Error while signing directory publication')
-            signing_failed = True
+    pdf, signing_failed = create_admin_notification_pdf(
+        request, entry, generated_at)
 
     # send email anyway, independent of whether the pdf signed successfully
     send_admin_email(
@@ -755,26 +764,9 @@ def send_admin_expiry_notification_for_directory_entry(
                  'directory': directory.title},
     ))
     generated_at = datetime.now(UTC)
-    signing_failed = False
 
-    try:
-        pdf = create_admin_notification_pdf(
-            request, entry, generated_at, ended=True)
-    except Exception:
-        # a broken pdf must not hold back the notification
-        log.exception('Error while rendering directory publication')
-        pdf = None
-
-    if pdf is not None:
-        try:
-            signed_pdf = BytesIO()
-            request.app.signing_service.sign(
-                request.session, BytesIO(pdf.content), signed_pdf, None)
-            pdf.content = signed_pdf.getvalue()
-        except Exception:
-            # an unsigned pdf is better than no notification at all
-            log.exception('Error while signing directory publication')
-            signing_failed = True
+    pdf, signing_failed = create_admin_notification_pdf(
+        request, entry, generated_at, ended=True)
 
     # send email anyway, independent of whether the pdf signed successfully
     send_admin_email(

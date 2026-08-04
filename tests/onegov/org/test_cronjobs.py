@@ -3298,9 +3298,9 @@ def test_admin_notification_pdf_failure(
     close_all_sessions()
 
     with patch(
-        'onegov.org.views.directory.create_admin_notification_pdf'
-    ) as create_pdf:
-        create_pdf.side_effect = OSError('no such file')
+        'onegov.org.views.directory.DirectoryEntryPdf.from_entry'
+    ) as from_entry:
+        from_entry.side_effect = OSError('no such file')
 
         with (
             freeze_time(real_now, tick=True),
