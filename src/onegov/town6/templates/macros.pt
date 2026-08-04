@@ -60,18 +60,24 @@
 </metal:navigation>
 
 <metal:navigation define-macro="main-navigation-nested">
-    <a
-        class="nav-link ${'dropdown-toggle' if children else ''} ${'active' if nav_page.id == (page.id if page else None) else ''}"
-        href="${'#' if children else link.attrs['href']}"
-        tal:attributes="data-bs-toggle python: 'dropdown' if children else None; aria-expanded python: 'false' if children else None"
-        tal:define="page page|None"
-    >
-        ${link.text}
-        <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
-        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
-    </a>
-    <tal:b tal:define="ancestors layout.model.ancestors|[]">
-        <ul tal:condition="children" class="dropdown-menu ${'is-active current-list' if nav_page in ancestors else ''}">
+    <div class="drilldown-item" tal:define="page page|None">
+        <a class="nav-link drilldown-link ${'active' if nav_page.id == (page.id if page else None) else ''} py-md" href="${link.attrs['href']}">
+            ${link.text}
+            <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
+        </a>
+        <button tal:condition="children" class="drilldown-toggle py-md pe-sm" type="button" data-bs-toggle="drilldown" aria-label="open submenu" i18n:attributes="aria-label">
+             <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <tal:b tal:condition="children" tal:define="ancestors layout.model.ancestors|[]">
+        <ul class="drilldown-menu ${'is-active current-list' if nav_page in ancestors else ''} p-lg">
+            <li class="drilldown-back-item">
+                <button type="button" class="drilldown-back fs-2xs" data-bs-toggle="drilldown-back">
+                    <i class="fas fa-arrow-left"></i> ${link.text}
+                </button>
+            </li>
             <tal:b tal:repeat="(nav_page, sublink, c) children">
                 <li data-sortable-id="${nav_page.id}">
                     <metal:b use-macro="layout.macros['main_navigation_nested']" tal:define="link sublink; children c" />
@@ -82,37 +88,45 @@
 </metal:navigation>
 
 <metal:navigation define-macro="main-navigation">
-    <ul class="navbar-nav me-auto" tal:define="links top_navigation|layout.top_navigation">
-        <tal:b tal:repeat="(nav_page, link, children) links" >
-            <li class="nav-item ${'dropdown' if children else ''}" data-sortable-id="${nav_page.id}">
-                <metal:b use-macro="layout.macros['main_navigation_nested']" />
-            </li>
-        </tal:b>
-    </ul>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offCanvasMainMenu">
+        <div class="offcanvas-header p-lg">
+            <button type="button" class="btn-close primary-color" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="navbar-nav drilldown-menu is-current p-xl" tal:define="links top_navigation|layout.top_navigation">
+                <tal:b tal:repeat="(nav_page, link, children) links">
+                    <li class="nav-item" data-sortable-id="${nav_page.id}">
+                        <metal:b use-macro="layout.macros['main_navigation_nested']" />
+                    </li>
+                </tal:b>
+            </ul>
+        </div>
+    </div>
 </metal:navigation>
 
 <metal:header_links define-macro="header_links">
-    <div id="header_links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
-        <div class="grid-container">
-            <div class="title-bar align-center" data-responsive-toggle="animated-menu" data-hide-for="medium">
-                <button type="button" data-toggle><i class="fa fa-bars"></i> </button>
-                </div>
-
-                <div class="top-bar" id="animated-menu">
-                <div class="top-bar-left">
-                    <ul class="dropdown menu align-center" data-dropdown-menu>
-                        <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
+    <div tal:condition="links" id="header_links" class="text-center" tal:define="links header_options.get('header_links')">
+        <nav class="navbar navbar-expand-lg navbar-light pb-0 pt-lg">
+            <div class="container-fluid">
+                <button class="navbar-toggler mx-auto border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topNav" aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="topNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item" tal:repeat="link links">
+                            <a class="nav-link link-secondary small px-2" href="${link[1]}">${link[0] if link[0] else link[1]}</a>
+                        </li>
                     </ul>
                 </div>
             </div>
-        </div>
+        </nav>
     </div>
 </metal:header_links>
 
 <metal:header_text define-macro="header_text">
-    <div id="header_text" tal:condition="header_options['left_header_name']|nothing" class="bg-white" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
-        <div class="grid-container">
-            <a class="h4" href="${header_options.get('left_header_url', '#')}"
+    <div id="header_text" tal:condition="header_options['left_header_name']|nothing" class="bg-dark" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+        <div class="container-fluid py-xs">
+            <a class="h4 text-decoration-none" href="${header_options.get('left_header_url', '#')}"
                 style="color:${color or '#fff'}; font-size: ${rem_size}rem">
                     ${header_options['left_header_name']}
             </a>

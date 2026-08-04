@@ -67,6 +67,8 @@
         </div>
     </div>
 
+    <tal:b metal:use-macro="layout.macros['main_navigation']"></tal:b>
+
     <a class="visually-hidden-focusable" href="#content" i18n:translate>Skip navigation</a>
     <main class="flex-grow-1" tal:define="header_options request.app.org.header_options or {}">
         <header id="header">
@@ -98,40 +100,27 @@
 
             <div id="header_announcement" tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
             style="background-color: ${header_options.get('announcement_bg_color', '#FFFFFF')};">
-                <div class="container" tal:define="url header_options.get('announcement_url');">
-                        <a tal:condition="url" style="color: ${header_options.get('announcement_font_color', '#000000')}" href="${url}">
-                            ${header_options['announcement']}</a>
-                        <span tal:condition="not url" style="color: ${header_options.get('announcement_font_color', '#000000')}">${header_options['announcement']}</span>
+                <div class="container py-xs" tal:define="url header_options.get('announcement_url');">
+                    <a tal:condition="url" class="text-decoration-none" style="color: ${header_options.get('announcement_font_color', '#000000')}" href="${url}">
+                        ${header_options['announcement']}</a>
+                    <span tal:condition="not url" style="color: ${header_options.get('announcement_font_color', '#000000')}">${header_options['announcement']}</span>
                 </div>
             </div>
 
             <tal:b tal:condition="not header_options.get('header_additions_fixed')">
-                <tal:b metal:use-macro="layout.macros['header_links']"></tal:b>
                 <tal:b metal:use-macro="layout.macros['header_text']"></tal:b>
+                <tal:b metal:use-macro="layout.macros['header_links']"></tal:b>
             </tal:b>
         </header>
 
         <div class="sticky-wrapper">
             <div class="sticky-top">
 
-                <tal:b tal:condition="header_options.get('header_additions_fixed')">
-                    <tal:b metal:use-macro="layout.macros['header_links']"></tal:b>
-                    <tal:b metal:use-macro="layout.macros['header_text']"></tal:b>
-                </tal:b>
-
                 <div class="navigation-header">
-                    <div class="bg-white">
-                        <div class="container-fluid">
-                            <ul class="nav justify-content-end py-1">
-                            <li class="nav-item">
-                                <a class="nav-link link-secondary small px-2" href="#">Metanavigation</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link link-secondary small px-2" href="#">Metanavigation</a>
-                            </li>
-                            </ul>
-                        </div>
-                    </div>
+                    <tal:b tal:condition="header_options.get('header_additions_fixed')">
+                        <tal:b metal:use-macro="layout.macros['header_text']"></tal:b>
+                        <tal:b metal:use-macro="layout.macros['header_links']"></tal:b>
+                    </tal:b>
 
                     <nav class="main-menu navbar sticky-top navbar-light bg-white py-3">
                         <div class="container-fluid align-items-end">
@@ -141,26 +130,19 @@
                                 <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
                             </a>
 
-                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#mainNav" aria-controls="mainNav"
-                                    aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                            </button>
-
-                            <div id="mainNav" class="collapse navbar-collapse">
-
-                                <tal:b metal:use-macro="layout.macros['main_navigation']"></tal:b>
-
-                                <div class="d-flex align-items-center gap-3">
-                                    <a href="#" class="" data-bs-toggle="modal" data-bs-target="#searchModal">
-                                        <i class="fa fa-search"></i>
-                                    </a>
-                                    <a href="#" class="btn btn-primary">
-                                    Online-Schalter
-                                    </a>
-                                </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <a href="#" class="" data-bs-toggle="modal" data-bs-target="#searchModal">
+                                    <i class="fa fa-search"></i>
+                                </a>
+                                <a href="#" class="btn btn-primary">
+                                Online-Schalter
+                                </a>
+                                <a data-bs-toggle="offcanvas" href="#offCanvasMainMenu" role="button" aria-controls="offcanvasExample">
+                                    <i class="fa fa-bars"></i>
+                                </a>
 
                             </div>
+
                         </div>
                     </nav>
                 </div>

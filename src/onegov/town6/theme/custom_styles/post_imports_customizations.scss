@@ -1,0 +1,6 @@
+// OffCanvas
+@include media-breakpoint-up(md) {
+  .offcanvas {
+    --bs-offcanvas-width: 600px;
+  }
+}
