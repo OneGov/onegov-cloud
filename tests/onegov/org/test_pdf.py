@@ -406,6 +406,8 @@ def test_directory_entry_pdf_without_attachments(
     _, text = extract_pdf_info(result)
     assert 'Anhänge Keine' in text
     assert 'Grösse:' not in text
+    assert 'Datum:' not in text
+    assert 'Prüfsumme:' not in text
 
 
 def test_directory_entry_pdf_escapes_markup(org_app: TestOrgApp) -> None:

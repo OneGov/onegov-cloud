@@ -2869,9 +2869,8 @@ def test_admin_notification_full_workflow(
         assert len(os.listdir(client.app.maildir)) == 0
 
     # cronjob after the start: one publication email carrying 'Version B'
-    with freeze_time(base + timedelta(hours=3), tick=True):
-        with _ais_cassette():
-            client.get(get_cronjob_url(job))
+    with freeze_time(base + timedelta(hours=3), tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 1
         msg = client.get_email(0)
         assert msg['To'] == 'admin@example.org'
@@ -2956,9 +2955,8 @@ def test_admin_notification_full_workflow(
         assert len(os.listdir(client.app.maildir)) == 1
 
     # cronjob after the new start: re-publication email carrying 'Version C'
-    with freeze_time(base + timedelta(hours=7), tick=True):
-        with _ais_cassette():
-            client.get(get_cronjob_url(job))
+    with freeze_time(base + timedelta(hours=7), tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 2
         msg = client.get_email(1)
         assert 'Veröffentlichter Eintrag' in msg['Subject']
@@ -2981,9 +2979,8 @@ def test_admin_notification_full_workflow(
 
     # cronjob after publication_end: expiry email sent; only now that the
     # end notification has gone out may the entry be deleted
-    with freeze_time(base + timedelta(hours=10), tick=True):
-        with _ais_cassette():
-            client.get(get_cronjob_url(job))
+    with freeze_time(base + timedelta(hours=10), tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 3
         msg = client.get_email(2)
         assert 'Publikationsfrist' in msg['Subject']
@@ -3045,9 +3042,8 @@ def test_admin_notification_multiple_entries(
     close_all_sessions()
 
     # both publication_starts crossed in the same window — one email each
-    with freeze_time(real_now, tick=True):
-        with _ais_cassette():
-            client.get(get_cronjob_url(job))
+    with freeze_time(real_now, tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
 
     assert len(os.listdir(client.app.maildir)) == 2
     subjects = {client.get_email(i)['Subject'] for i in (0, 1)}
@@ -3098,9 +3094,8 @@ def test_admin_notification_pdf_title_special_chars(
     transaction.commit()
     close_all_sessions()
 
-    with freeze_time(real_now, tick=True):
-        with _ais_cassette():
-            client.get(get_cronjob_url(job))
+    with freeze_time(real_now, tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
 
     assert len(os.listdir(client.app.maildir)) == 1
     msg = client.get_email(0)
@@ -3138,9 +3133,8 @@ def test_admin_notification_pdf_without_attachments(
     transaction.commit()
     close_all_sessions()
 
-    with freeze_time(real_now, tick=True):
-        with _ais_cassette():
-            client.get(get_cronjob_url(job))
+    with freeze_time(real_now, tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
 
     assert len(os.listdir(client.app.maildir)) == 1
     msg = client.get_email(0)
@@ -3192,9 +3186,8 @@ def test_admin_notification_pdf_lists_every_attachment(
     transaction.commit()
     close_all_sessions()
 
-    with freeze_time(real_now, tick=True):
-        with _ais_cassette():
-            client.get(get_cronjob_url(job))
+    with freeze_time(real_now, tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
 
     assert len(os.listdir(client.app.maildir)) == 1
     msg = client.get_email(0)
@@ -3212,6 +3205,7 @@ def test_admin_notification_pdf_lists_every_attachment(
 
 def test_admin_notification_signing_failure(
     client: Client['TestOrgApp'],
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """
     A failing signing service does not prevent the notifications — both
@@ -3237,7 +3231,10 @@ def test_admin_notification_signing_failure(
     transaction.commit()
     close_all_sessions()
 
-    with patch.object(SwisscomAIS, 'sign') as sign:
+    with (
+        patch.object(SwisscomAIS, 'sign') as sign,
+        caplog.at_level(logging.ERROR, logger='onegov.org'),
+    ):
         sign.side_effect = RuntimeError('signing service unavailable')
 
         # the publication start has been crossed ...
@@ -3264,9 +3261,17 @@ def test_admin_notification_signing_failure(
 
     assert client.app.session().query(SigningRequest).count() == 0
 
+    # the signing failure is logged once per signing attempt
+    signing_errors = [
+        r for r in caplog.records
+        if 'Error while signing directory publication' in r.message
+    ]
+    assert len(signing_errors) == 2
+
 
 def test_admin_notification_pdf_failure(
     client: Client['TestOrgApp'],
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """
     A failing pdf rendering does not abort the cronjob — the notification
@@ -3297,7 +3302,10 @@ def test_admin_notification_pdf_failure(
     ) as create_pdf:
         create_pdf.side_effect = OSError('no such file')
 
-        with freeze_time(real_now, tick=True):
+        with (
+            freeze_time(real_now, tick=True),
+            caplog.at_level(logging.ERROR, logger='onegov.org'),
+        ):
             client.get(get_cronjob_url(job))
 
     # both entries are still notified, just without a pdf
@@ -3306,6 +3314,13 @@ def test_admin_notification_pdf_failure(
         msg = client.get_email(i)
         assert 'Veröffentlichter Eintrag' in msg['Subject']
         assert 'Attachments' not in msg
+
+    # the rendering failure is logged once per entry
+    rendering_errors = [
+        r for r in caplog.records
+        if 'Error while rendering directory publication' in r.message
+    ]
+    assert len(rendering_errors) == 2
 
 
 def test_admin_notification_no_notification_address(
