@@ -13,8 +13,9 @@ from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmissionCollection
 from onegov.form.parser import ParsedForm
 from onegov.org.models.ticket import FormSubmissionHandler
-from onegov.pay import InvoiceCollection
+from onegov.pay import InvoiceCollection, Payment, PaymentCollection
 from onegov.reservation import ResourceCollection
+from onegov.reservation.models.custom_reservation import CustomReservation
 from onegov.ticket import TicketCollection, Ticket, TicketInvoice
 from onegov.user import UserCollection
 from sedate import ensure_timezone
@@ -124,6 +125,7 @@ def test_delete_archived_ticket_with_invoice(
     assert isinstance(ticket.handler, FormSubmissionHandler)
     submission = ticket.handler.submission
     assert submission is not None
+    assert ticket.payment is None
 
     invoice = TicketInvoice(id=uuid4())
     session.add(invoice)
@@ -138,6 +140,10 @@ def test_delete_archived_ticket_with_invoice(
 
     session = client.app.session()
     assert InvoiceCollection(session).query_items().count() == 1
+    stored_invoice = InvoiceCollection(session).query().one()
+    assert stored_invoice.outstanding_amount == Decimal(10)
+    assert stored_invoice.paid_amount == Decimal(0)
+    assert stored_invoice.paid == False
 
     client.delete('/tickets-archive/ALL/delete')
 
@@ -145,6 +151,73 @@ def test_delete_archived_ticket_with_invoice(
     assert session.query(Ticket).count() == 0
     assert InvoiceCollection(session).query_items().count() == 0
     assert InvoiceCollection(session).query().count() == 0
+
+
+def test_delete_archived_ticket_with_reservation_payment(
+    client: Client[TestOrgApp]
+) -> None:
+    # a reservation with a payment must NOT be deleted, as the payment might
+    # still be needed for exports; the ticket is redacted and kept instead
+
+    client.login_admin()
+
+    transaction.begin()
+    resource = client.app.libres_resources.by_name('tageskarte')
+    assert resource is not None
+    allocation = resource.scheduler.allocate(
+        dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
+        whole_day=True,
+    )[0]
+    reserve = client.bound_reserve(allocation)
+    transaction.commit()
+
+    assert reserve().json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'citizen@example.org'
+    formular.form.submit().follow().form.submit()
+
+    # accept the reservation and close, then archive the ticket
+    ticket_page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket_url = ticket_page.request.path
+    ticket_page.click('Alle Reservationen annehmen').follow()
+    client.get(ticket_url).click('Ticket abschliessen').follow()
+    client.get(ticket_url).click('Ticket archivieren').follow()
+
+    # attach a payment to the reservation and populate the snapshot the way
+    # the reservation close flow does (resource.py create_snapshot)
+    transaction.begin()
+    session = client.app.session()
+    reservation = session.query(CustomReservation).one()
+    reservation.payment = Payment(
+        source='manual',
+        amount=Decimal(10),
+        currency='CHF',
+        state='paid',
+    )
+    ticket = session.query(Ticket).one()
+    ticket.snapshot = {
+        'summary': 'Reservation summary',
+        'email': 'citizen@example.org',
+    }
+    transaction.commit()
+
+    session = client.app.session()
+    assert session.query(Ticket).filter_by(state='archived').count() == 1
+    assert PaymentCollection(session).query().count() == 1
+
+    client.delete('/tickets-archive/ALL/delete')
+
+    # payment makes the ticket non-deletable: it is retained (redacted)
+    session = client.app.session()
+    assert session.query(Ticket).count() == 1
+    assert session.query(CustomReservation).count() == 1
+    assert PaymentCollection(session).query().count() == 1
+    ticket = session.query(Ticket).one()
+    assert ticket.handler.ticket_deletable == False  # as of payment
+    assert ticket.ticket_email == ''
+    assert ticket.snapshot['summary'] == '[redacted]'
+    assert ticket.snapshot['email'] == ''
 
 
 def test_files_from_ticket_form_submission_are_deleted(
