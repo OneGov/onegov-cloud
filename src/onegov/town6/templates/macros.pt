@@ -74,7 +74,7 @@
     <tal:b tal:condition="children" tal:define="ancestors layout.model.ancestors|[]">
         <ul class="drilldown-menu ${'is-active current-list' if nav_page in ancestors else ''} p-lg">
             <li class="drilldown-back-item">
-                <button type="button" class="drilldown-back fs-2xs" data-bs-toggle="drilldown-back">
+                <button type="button" class="drilldown-back fs-2xs px-0" data-bs-toggle="drilldown-back">
                     <i class="fas fa-arrow-left"></i> ${link.text}
                 </button>
             </li>
@@ -106,7 +106,7 @@
 
 <metal:header_links define-macro="header_links">
     <div tal:condition="links" id="header_links" class="text-center" tal:define="links header_options.get('header_links')">
-        <nav class="navbar navbar-expand-lg navbar-light pb-0 pt-lg">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white pb-0 pt-lg">
             <div class="container-fluid">
                 <button class="navbar-toggler mx-auto border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topNav" aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -917,9 +917,6 @@
             <div class="col-12 col-md-8 offset-md-2 page-content-main">
                 <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                 <div metal:define-slot="before-lead"></div>
-                <div class="limit-line-width">
-                    <span class="page-lead h5" tal:condition="lead" tal:content="lead" />
-                </div>
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="text" />
@@ -934,9 +931,6 @@
                 <div class="theiaStickySidebar">
                     <img class="page-image img-fluid rounded-3" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
-                    <div class="limit-line-width">
-                        <span class="page-lead h5" tal:condition="lead" tal:content="lead" />
-                    </div>
                     <div metal:define-slot="after-lead"></div>
 
                     <div class="page-text" tal:condition="text" tal:content="text" />
