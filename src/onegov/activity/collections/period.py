@@ -5,8 +5,9 @@ from onegov.core.collection import GenericCollection
 
 
 from typing import TYPE_CHECKING
+from datetime import date
+
 if TYPE_CHECKING:
-    from datetime import date
     from uuid import UUID  # ruff:ignore[unused-import]
 
 
@@ -58,3 +59,10 @@ class BookingPeriodCollection(GenericCollection[BookingPeriod, 'UUID']):
 
     def active(self) -> BookingPeriod | None:
         return self.query().filter(BookingPeriod.active == True).first()
+
+    def upcoming(self) -> BookingPeriod | None:
+        return (
+            self.query()
+            .filter(BookingPeriod.booking_end >= date.today())
+            .order_by(BookingPeriod.booking_start).first()
+        )
