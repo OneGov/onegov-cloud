@@ -4619,6 +4619,12 @@ msgstr "Page actuelle"
 msgid "JSON Snapshot"
 msgstr "Instantané JSON"
 
+msgid "Before update"
+msgstr "Avant modification"
+
+msgid "After update"
+msgstr "Après modification"
+
 msgid "No audit entries yet."
 msgstr "Aucune entrée dans le journal d’audit."
 

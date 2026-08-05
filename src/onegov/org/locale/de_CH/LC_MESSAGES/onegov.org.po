@@ -4614,6 +4614,12 @@ msgstr "Aktuelle Seite"
 msgid "JSON Snapshot"
 msgstr "JSON-Snapshot"
 
+msgid "Before update"
+msgstr "Vor der Änderung"
+
+msgid "After update"
+msgstr "Nach der Änderung"
+
 msgid "No audit entries yet."
 msgstr "Noch keine Einträge im Audit Trail."
 

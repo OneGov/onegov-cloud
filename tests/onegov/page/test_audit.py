@@ -36,8 +36,12 @@ def test_page_audit_entries(session: Session) -> None:
     assert all(isinstance(entry.id, UUID) for entry in entries)
     assert entries[0].snapshot['title'] == 'News'
     assert entries[0].snapshot['file_ids'] == []
+    assert entries[0].previous_snapshot == {}
+    assert entries[1].previous_snapshot['title'] == 'News'
+    assert entries[1].previous_snapshot['file_ids'] == []
     assert entries[1].snapshot['title'] == 'Latest News'
     assert entries[2].snapshot['title'] == 'Latest News'
+    assert entries[2].previous_snapshot == {}
     assert all(entry.created is not None for entry in entries)
 
 

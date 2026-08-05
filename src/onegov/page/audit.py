@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from onegov.core.orm.audit import register_audit_model
 from onegov.page.model import Page
-from sqlalchemy import inspect
+from sqlalchemy import inspect, select
 
 
 from typing import Any, TYPE_CHECKING
@@ -20,6 +20,36 @@ def page_snapshot(page: Page) -> dict[str, Any]:
     file_ids.update(file.id for file in state.attrs.files.history.deleted)
     file_ids.update(state.info.get('audit_file_ids', ()))
     data['file_ids'] = sorted(file_ids)
+    return data
+
+
+def page_previous_snapshot(
+    session: Session,
+    page: Page,
+) -> dict[str, Any]:
+    state = inspect(page)
+    columns = [
+        attribute.columns[0].label(attribute.key)
+        for attribute in state.mapper.column_attrs
+    ]
+    data = dict(
+        session.connection()
+        .execute(select(*columns).where(Page.id == page.id))
+        .mappings()
+        .one()
+    )
+
+    association = state.mapper.relationships.files.secondary
+    assert association is not None
+    data['file_ids'] = sorted(
+        session.connection()
+        .execute(
+            select(association.c.file_id).where(
+                association.c.pages_id == page.id
+            )
+        )
+        .scalars()
+    )
     return data
 
 
@@ -56,6 +86,7 @@ def page_delete_snapshot(
 register_audit_model(
     Page,
     snapshot=page_snapshot,
+    previous_snapshot=page_previous_snapshot,
     changed=page_changed,
     delete_snapshot=page_delete_snapshot,
 )

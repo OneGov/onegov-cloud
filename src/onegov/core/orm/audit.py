@@ -14,12 +14,12 @@ from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-
     from sqlalchemy.orm import Query
 
 
 type AuditOperation = Literal['insert', 'update', 'delete']
 type SnapshotFactory = Callable[[Any], dict[str, Any]]
+type PreviousSnapshot = Callable[[Session, Any], dict[str, Any]]
 type Changed = Callable[[Session, Any], bool]
 type DeleteSnapshot = Callable[[Session, Any], dict[str, Any] | None]
 
@@ -30,6 +30,7 @@ STAGED_AUDIT_ENTRIES: str = 'staged_audit_entries'
 
 class AuditModelConfig(NamedTuple):
     snapshot: SnapshotFactory
+    previous_snapshot: PreviousSnapshot
     changed: Changed
     delete_snapshot: DeleteSnapshot | None
 
@@ -41,6 +42,7 @@ class StagedAuditEntry(NamedTuple):
     operation: AuditOperation
     instance: Any
     snapshot: dict[str, Any] | None
+    previous_snapshot: dict[str, Any]
     config: AuditModelConfig
     username: str
     created: datetime
@@ -49,10 +51,16 @@ class StagedAuditEntry(NamedTuple):
 def register_audit_model(
     model: type[Any],
     snapshot: SnapshotFactory,
+    previous_snapshot: PreviousSnapshot,
     changed: Changed,
     delete_snapshot: DeleteSnapshot | None = None,
 ) -> None:
-    AUDIT_MODELS[model] = AuditModelConfig(snapshot, changed, delete_snapshot)
+    AUDIT_MODELS[model] = AuditModelConfig(
+        snapshot,
+        previous_snapshot,
+        changed,
+        delete_snapshot,
+    )
 
 
 def audit_config(instance: Any) -> AuditModelConfig | None:
@@ -87,6 +95,9 @@ class AuditEntry(Base):
     #: The state after insert/update or immediately before delete
     snapshot: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
+    #: The persisted state immediately before an update
+    previous_snapshot: Mapped[dict[str, Any]] = mapped_column(default=dict)
+
     #: The username responsible for the operation
     username: Mapped[str]
 
@@ -117,13 +128,23 @@ def prepare_audit_entries(
     created = utcnow()
 
     staged: list[StagedAuditEntry] = [
-        StagedAuditEntry('insert', instance, None, config, username, created)
+        StagedAuditEntry(
+            'insert', instance, None, {}, config, username, created
+        )
         for instance in session.new
         if (config := audit_config(instance)) is not None
     ]
 
     staged.extend(
-        StagedAuditEntry('update', instance, None, config, username, created)
+        StagedAuditEntry(
+            'update',
+            instance,
+            None,
+            config.previous_snapshot(session, instance),
+            config,
+            username,
+            created,
+        )
         for instance in session.dirty
         if (
             (config := audit_config(instance)) is not None
@@ -137,6 +158,7 @@ def prepare_audit_entries(
             'delete',
             instance,
             snapshot,
+            {},
             config,
             username,
             created,
@@ -174,6 +196,7 @@ def write_audit_entries(session: Session, flush_context: Any) -> None:
                 if entry.snapshot is not None
                 else entry.config.snapshot(entry.instance)
             ),
+            'previous_snapshot': entry.previous_snapshot,
             'username': entry.username,
             'created': entry.created,
         }

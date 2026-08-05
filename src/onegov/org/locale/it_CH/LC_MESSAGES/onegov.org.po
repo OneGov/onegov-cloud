@@ -4608,6 +4608,12 @@ msgstr "Pagina attuale"
 msgid "JSON Snapshot"
 msgstr "Snapshot JSON"
 
+msgid "Before update"
+msgstr "Prima della modifica"
+
+msgid "After update"
+msgstr "Dopo la modifica"
+
 msgid "No audit entries yet."
 msgstr "Nessuna voce nel registro delle modifiche."
 

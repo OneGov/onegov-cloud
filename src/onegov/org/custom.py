@@ -225,13 +225,14 @@ def get_global_tools(
             )
         )
 
-        links.append(
-            Link(
-                _('Audit Trail'),
-                request.class_link(AuditEntryCollection),
-                attrs={'class': 'audit-trail'},
+        if request.is_admin:
+            links.append(
+                Link(
+                    _('Audit Trail'),
+                    request.class_link(AuditEntryCollection),
+                    attrs={'class': 'audit-trail'},
+                )
             )
-        )
 
         links.append(
             Link(

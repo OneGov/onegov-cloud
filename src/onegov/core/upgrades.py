@@ -13,8 +13,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.abstract import Associable
 from onegov.core.orm.types import JSON
-from sqlalchemy import inspect, text
-from sqlalchemy import Numeric
+from sqlalchemy import Column, inspect, Numeric, text
 from sqlalchemy.exc import NoInspectionAvailable
 
 
@@ -22,7 +21,6 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from onegov.core.orm.abstract.associable import RegisteredLink
-    from sqlalchemy import Column
     from sqlalchemy.engine import Connection
 
     from .upgrade import UpgradeContext
@@ -262,3 +260,28 @@ def drop_remaining_gazette_and_notices_tables(context: UpgradeContext) -> None:
     ):
         if context.has_table(table):
             context.operations.drop_table(table)
+
+
+@upgrade_task('Add previous snapshot to audit entries')
+def add_previous_snapshot_to_audit_entries(
+    context: UpgradeContext,
+) -> None:
+    if not context.has_table('audit_entries') or context.has_column(
+        'audit_entries', 'previous_snapshot'
+    ):
+        return
+
+    context.operations.add_column(
+        'audit_entries',
+        Column(
+            'previous_snapshot',
+            JSON,
+            nullable=False,
+            server_default=text(r"'{}'::jsonb"),
+        ),
+    )
+    context.operations.alter_column(
+        'audit_entries',
+        'previous_snapshot',
+        server_default=None,
+    )

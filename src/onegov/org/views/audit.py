@@ -3,7 +3,7 @@ from __future__ import annotations
 from onegov.core.custom import json
 from onegov.core.elements import Link
 from onegov.core.orm.audit import AuditEntry, AuditEntryCollection
-from onegov.core.security import Private
+from onegov.core.security import Secret
 from onegov.org import _, OrgApp
 from onegov.org.layout import AuditTrailLayout
 from onegov.page import Page
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 @OrgApp.html(
     model=AuditEntryCollection,
     template='audit_trail.pt',
-    permission=Private,
+    permission=Secret,
 )
 def view_audit_trail(
     self: AuditEntryCollection,
@@ -63,7 +63,7 @@ def view_audit_trail(
 @OrgApp.html(
     model=AuditEntry,
     template='audit_entry.pt',
-    permission=Private,
+    permission=Secret,
 )
 def view_audit_entry(
     self: AuditEntry,
@@ -90,4 +90,9 @@ def view_audit_entry(
         'operation': operation,
         'current_page': current_page,
         'snapshot': json.dumps(self.snapshot, indent=2),
+        'previous_snapshot': (
+            json.dumps(self.previous_snapshot, indent=2)
+            if self.previous_snapshot
+            else None
+        ),
     }
