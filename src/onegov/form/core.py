@@ -310,7 +310,23 @@ class Form(BaseForm):
                     ),
                     If(
                         field.depends_on.unfulfilled,
-                        StrictOptional()
+                        StrictOptional(),
+                        # NOTE: If someone manually submits data into a hidden
+                        #       field we want to make sure it's still valid
+                        # FIXME: Do we want to make the field read-only instead
+                        #        so it cannot cause any changes? We could
+                        #        insert a validator that calls
+                        #        `field.process(None, data=field.object_data)`
+                        #        to force data to remain as it was before
+                        #        submission.
+                        *(
+                            validator
+                            for validator in validators
+                            if not isinstance(
+                                validator,
+                                (InputRequired, DataRequired)
+                            )
+                        )
                     ),
                 )
 
@@ -430,7 +446,7 @@ class Form(BaseForm):
         if not depends_on:
             return True
 
-        bound_field = getattr(self, field_id)
+        bound_field = self[field_id]
 
         if not depends_on.fulfilled(self, bound_field):
             return False

@@ -5,17 +5,14 @@ from html import escape
 from functools import cached_property
 from io import StringIO
 from onegov.form import errors, log
-from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import (
     MultiCheckboxField, DateTimeLocalField, URLField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
 from onegov.form.parser.core import flatten_fields, parse_formcode, ParsedField
-from onegov.form.utils import as_internal_id
 from onegov.form.validators import LaxDataRequired
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import If
 from onegov.form.validators import Stdnum
 from onegov.form.validators import StrictOptional
 from onegov.form.validators import ValidDateRange
@@ -40,7 +37,7 @@ from wtforms.validators import URL
 from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.form.types import PricingRules, Validator, Widget
-    from wtforms import Field as WTField
+    from wtforms.fields.core import Field as WTField
 
 
 MEGABYTE = 1000 ** 2
@@ -124,7 +121,6 @@ class ParsedForm(BaseModel):
         builder = WTFormsClassBuilder(base_class)
 
         for field in self.fields:
-            builder.set_current_fieldset(field.fieldset)
             handle_field(builder, field)
 
         form_class = cache[base_class] = builder.form_class
@@ -170,8 +166,7 @@ def parse_form[T: Form = Form](
 def handle_field(
     builder: WTFormsClassBuilder[Any],
     field: ParsedField,
-    parent_id: str | None = None,
-    dependency: FieldDependency | None = None
+    depends_on: tuple[str, str] | None = None,
 ) -> None:
     """ Takes the given parsed field and adds it to the form. """
 
@@ -192,7 +187,8 @@ def handle_field(
             field_class=StringField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=validators,
             render_kw=render_kw,
@@ -204,7 +200,8 @@ def handle_field(
             field_class=TextAreaField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             render_kw={'rows': field.rows} if field.rows else None,
             description=field.field_help
@@ -214,8 +211,9 @@ def handle_field(
         builder.add_field(
             field_class=PasswordField,
             field_id=field.id,
+            fieldset=field.real_fieldset,
             label=field.display_label,
-            dependency=dependency,
+            depends_on=depends_on,
             required=field.required,
             description=field.field_help
         )
@@ -225,7 +223,8 @@ def handle_field(
             field_class=EmailField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=[Email()],
             description=field.field_help
@@ -236,7 +235,8 @@ def handle_field(
             field_class=URLField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=[URL()],
             description=field.field_help
@@ -247,7 +247,8 @@ def handle_field(
             field_class=VideoURLField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=[URL()],
             description=field.field_help
@@ -258,7 +259,8 @@ def handle_field(
             field_class=StringField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=[Stdnum(field.format)],
             description=field.field_help
@@ -277,7 +279,8 @@ def handle_field(
             field_class=DateField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             description=field.field_help,
             validators=validators,
@@ -297,7 +300,8 @@ def handle_field(
             field_class=DateTimeLocalField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             description=field.field_help,
             validators=validators,
@@ -309,7 +313,8 @@ def handle_field(
             field_class=TimeField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             description=field.field_help
         )
@@ -322,7 +327,8 @@ def handle_field(
             field_class=UploadField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=[
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
@@ -340,7 +346,8 @@ def handle_field(
             field_class=UploadMultipleField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=[
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
@@ -355,7 +362,8 @@ def handle_field(
             field_class=RadioField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             choices=[(c.label, c.display_label) for c in field.choices],
             default=next((c.label for c in field.choices if c.selected), None),
@@ -379,7 +387,8 @@ def handle_field(
             field_class=MultiCheckboxField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             choices=[(c.label, c.display_label) for c in field.choices],
             default=[c.label for c in field.choices if c.selected],
@@ -403,7 +412,8 @@ def handle_field(
             field_class=IntegerField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             pricing={
                 range(
@@ -425,7 +435,8 @@ def handle_field(
             field_class=DecimalField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=[
                 NumberRange(
@@ -441,7 +452,8 @@ def handle_field(
             field_class=StringField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             validators=[Regexp(r'^[0-9]{15}$')],
             description=field.field_help
@@ -452,7 +464,8 @@ def handle_field(
             field_class=TextAreaField,
             field_id=field.id,
             label=field.display_label,
-            dependency=dependency,
+            fieldset=field.real_fieldset,
+            depends_on=depends_on,
             required=field.required,
             render_kw={'data-editor': field.syntax},
             description=field.field_help
@@ -462,13 +475,56 @@ def handle_field(
         raise NotImplementedError
 
     if field.type == 'radio' or field.type == 'checkbox':
-        # FIXME: Handle fieldsets in choices
-        for choice in field.choices:
-            if not choice.fields:
-                continue
-            dependency = FieldDependency(field.id, choice.label)
-            for choice_field in choice.fields:
-                handle_field(builder, choice_field, field.id, dependency)
+        # NOTE: We have to walk the subfields in a specific order in order
+        #       to make sure we don't create too many fieldsets
+        subfield_stacks = [
+            (choice, list(reversed(choice.fields)))
+            for choice in field.choices
+            if choice.fields
+        ]
+        if not subfield_stacks:
+            return
+
+        current_fieldset = field.real_fieldset
+        branch_index = 0
+        count = 0
+        for _ in range(sum(len(branch) for branch in subfield_stacks)):
+            for idx in range(branch_index, len(subfield_stacks)):
+                choice, stack = subfield_stacks[idx]
+                if not stack:
+                    continue
+
+                if stack[-1].real_fieldset == current_fieldset:
+                    branch_index = idx
+                    subfield = stack.pop()
+                    handle_field(
+                        builder,
+                        subfield,
+                        depends_on=(field.id, choice.label)
+                    )
+                    count += 1
+                    break
+            else:
+                # none of the candidates match the current fieldset
+                # go back to the first non-empty branch and update
+                # the current fieldset
+                for idx, (choice, stack) in enumerate(subfield_stacks):
+                    if not stack:
+                        continue
+
+                    branch_index = idx
+                    subfield = stack.pop()
+                    current_fieldset = subfield.real_fieldset
+                    handle_field(
+                        builder,
+                        subfield,
+                        depends_on=(field.id, choice.label)
+                    )
+                    count += 1
+                    break
+
+        # NOTE: Sanity check to make sure we depleted all of the stacks
+        assert all(not stack for _, stack in subfield_stacks)
 
 
 class WTFormsClassBuilder[FormT: Form]:
@@ -483,7 +539,6 @@ class WTFormsClassBuilder[FormT: Form]:
     """
 
     form_class: type[FormT]
-    current_fieldset: str | None
 
     def __init__(self, base_class: type[FormT]):
 
@@ -491,89 +546,6 @@ class WTFormsClassBuilder[FormT: Form]:
             pass
 
         self.form_class = DynamicForm
-        self.current_fieldset = None
-
-    def set_current_fieldset(self, label: str | None) -> None:
-        self.current_fieldset = label
-
-    def validators_extend(
-        self,
-        validators: list[Validator[Any, Any]],
-        required: bool,
-        dependency: FieldDependency | None
-    ) -> None:
-        if required:
-            if dependency is None:
-                self.validators_add_required(validators)
-            else:
-                self.validators_add_dependency(validators, dependency)
-        else:
-            self.validators_add_optional(validators)
-
-    def validators_add_required(
-        self,
-        validators: list[Validator[Any, Any]]
-    ) -> None:
-        # we use the DataRequired check instead of InputRequired, since
-        # InputRequired only works if the data comes over the wire. We
-        # also want to load forms with data from the database, where
-        # InputRequired will fail, but DataRequired will not.
-        #
-        # As a consequence, falsey values can't be submitted for now.
-        validators.insert(0, LaxDataRequired())
-
-    def validators_add_dependency(
-        self,
-        validators: list[Validator[Any, Any]],
-        dependency: FieldDependency
-    ) -> None:
-        # if the dependency is not fulfilled, the field may be empty
-        # but it must still validate otherwise (invalid = nok, empty = ok)
-        validator = If(dependency.unfulfilled, StrictOptional())
-        validator.field_flags = {'required': True}  # type:ignore[attr-defined]
-        validators.insert(0, validator)
-
-        # if the dependency is fulfilled, the field is required
-        validator = If(dependency.fulfilled, LaxDataRequired())
-        validator.field_flags = {'required': True}  # type:ignore[attr-defined]
-        validators.insert(0, validator)
-
-    def validators_add_optional(
-        self,
-        validators: list[Validator[Any, Any]]
-    ) -> None:
-        validators.insert(0, StrictOptional())
-
-    def mark_as_dependent(
-        self,
-        field_id: str,
-        dependency: FieldDependency
-    ) -> None:
-
-        field = getattr(self.form_class, field_id)
-        if not field.kwargs.get('render_kw'):
-            field.kwargs['render_kw'] = {}
-        field.kwargs['render_kw'].update(dependency.html_data(''))
-
-    def get_unique_field_id(
-        self,
-        label: str,
-        dependency: FieldDependency | None
-    ) -> str:
-        # try to find a smart field_id that contains the dependency or the
-        # current fieldset name - if all fails, an error will be thrown,
-        # as field_ids *need* to be unique
-        if dependency:
-            field_id = dependency.field_id + '_' + as_internal_id(label)
-        elif self.current_fieldset:
-            field_id = as_internal_id(self.current_fieldset + ' ' + label)
-        else:
-            field_id = as_internal_id(label)
-
-        if hasattr(self.form_class, field_id):
-            raise errors.DuplicateLabelError(label=label)
-
-        return field_id
 
     def add_field(
         self,
@@ -581,7 +553,8 @@ class WTFormsClassBuilder[FormT: Form]:
         field_id: str,
         label: str,
         required: bool,
-        dependency: FieldDependency | None = None,
+        fieldset: str | None,
+        depends_on: tuple[str, str] | None = None,
         pricing: PricingRules | None = None,
         validators: list[Validator[Any, Any]] | None = None,
         description: str | None = None,
@@ -589,7 +562,7 @@ class WTFormsClassBuilder[FormT: Form]:
         render_kw: dict[str, Any] | None = None,
         # for field classes that have more than just the base arguments
         **extra_field_kwargs: Any
-    ) -> WTField:
+    ) -> None:
         validators = validators or []
 
         if hasattr(self.form_class, field_id):
@@ -601,21 +574,19 @@ class WTFormsClassBuilder[FormT: Form]:
         # -> quotes are allowed because the label is rendered between tags,
         # not as part of the attributes
         label = type(label)(escape(label, quote=False))
-
-        self.validators_extend(validators, required, dependency)
+        validators.insert(
+            0,
+            LaxDataRequired() if required else StrictOptional()
+        )
 
         setattr(self.form_class, field_id, field_class(
             label=label,
             validators=validators,
-            fieldset=self.current_fieldset,
+            fieldset=fieldset,
             pricing=pricing,
             description=description or '',
             widget=widget,
-            render_kw=render_kw,
+            render_kw=render_kw or {},
+            depends_on=depends_on,
             **extra_field_kwargs
         ))
-
-        if dependency:
-            self.mark_as_dependent(field_id, dependency)
-
-        return getattr(self.form_class, field_id)
