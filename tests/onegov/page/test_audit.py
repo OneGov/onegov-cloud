@@ -1,0 +1,94 @@
+from __future__ import annotations
+
+from uuid import UUID
+
+from onegov.core.orm.audit import AUDIT_USERNAME, AuditEntry
+from onegov.page import PageCollection
+
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
+def test_page_audit_entries(session: Session) -> None:
+    session.info[AUDIT_USERNAME] = 'editor@example.org'
+    pages = PageCollection(session)
+
+    root = pages.add_root('News')
+    session.flush()
+    root.title = 'Latest News'
+    session.flush()
+    root_id = root.id
+    pages.delete(root)
+
+    entries = session.query(AuditEntry).order_by(AuditEntry.created).all()
+
+    assert [entry.operation for entry in entries] == [
+        'insert',
+        'update',
+        'delete',
+    ]
+    assert all(entry.target_table == 'pages' for entry in entries)
+    assert all(entry.target_id == str(root_id) for entry in entries)
+    assert all(entry.username == 'editor@example.org' for entry in entries)
+    assert all(isinstance(entry.id, UUID) for entry in entries)
+    assert entries[0].snapshot['title'] == 'News'
+    assert entries[0].snapshot['file_ids'] == []
+    assert entries[1].snapshot['title'] == 'Latest News'
+    assert entries[2].snapshot['title'] == 'Latest News'
+    assert all(entry.created is not None for entry in entries)
+
+
+def test_page_audit_requires_user(session: Session) -> None:
+    pages = PageCollection(session)
+    page = pages.add_root('News')
+    session.flush()
+    page.title = 'Latest News'
+    session.flush()
+    pages.delete(page)
+
+    assert session.query(AuditEntry).count() == 0
+
+
+def test_page_audit_cascaded_delete(session: Session) -> None:
+    session.info[AUDIT_USERNAME] = 'editor@example.org'
+    pages = PageCollection(session)
+    root = pages.add_root('Root', meta={'root': True})
+    child = pages.add(
+        parent=root,
+        title='Child',
+        content={'text': 'Child content'},
+    )
+    grandchild = pages.add(
+        parent=child,
+        title='Grandchild',
+        meta={'grandchild': True},
+    )
+    session.flush()
+    root_id = root.id
+    child_id = child.id
+    grandchild_id = grandchild.id
+
+    pages.delete(root)
+
+    entries = session.query(AuditEntry).filter_by(operation='delete').all()
+    assert len(entries) == 1
+    assert entries[0].target_id == str(root_id)
+    assert entries[0].snapshot['title'] == 'Root'
+    assert entries[0].snapshot['id'] == root_id
+    assert entries[0].snapshot['meta'] == {'root': True}
+
+    child_data = entries[0].snapshot['children'][0]
+    assert child_data['title'] == 'Child'
+    assert child_data['id'] == child_id
+    assert child_data['parent_id'] == root_id
+    assert child_data['content'] == {'text': 'Child content'}
+
+    grandchild_data = child_data['children'][0]
+    assert grandchild_data['title'] == 'Grandchild'
+    assert grandchild_data['id'] == grandchild_id
+    assert grandchild_data['parent_id'] == child_id
+    assert grandchild_data['meta'] == {'grandchild': True}
+    assert grandchild_data['children'] == []

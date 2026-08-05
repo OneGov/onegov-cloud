@@ -7,6 +7,7 @@ from datetime import timedelta
 from functools import cached_property
 from onegov.core.cache import instance_lru_cache
 from onegov.core.custom import msgpack
+from onegov.core.orm.audit import AUDIT_USERNAME
 from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
@@ -175,7 +176,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     @cached_property
     def session(self) -> Session:
-        return self.app.session()
+        session = self.app.session()
+        session.info.pop(AUDIT_USERNAME, None)
+        if is_logged_in(self.identity):
+            session.info[AUDIT_USERNAME] = self.identity.userid
+        return session
 
     def link_prefix(
         self,

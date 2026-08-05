@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-31 08:53+0200\n"
+"POT-Creation-Date: 2026-08-05 11:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -280,6 +280,9 @@ msgstr "Übersicht"
 
 msgid "Timeline"
 msgstr "Aktivität"
+
+msgid "Audit Trail"
+msgstr "Audit Trail"
 
 msgid "Files"
 msgstr "Dateien"
@@ -4526,8 +4529,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -4589,6 +4592,42 @@ msgstr "Besitzer:"
 
 msgid "Kind:"
 msgstr "Art:"
+
+msgid "When"
+msgstr "Zeitpunkt"
+
+msgid "Action"
+msgstr "Aktion"
+
+msgid "Who"
+msgstr "Benutzer"
+
+msgid "Target table"
+msgstr "Zieltabelle"
+
+msgid "Target ID"
+msgstr "Ziel-ID"
+
+msgid "Current page"
+msgstr "Aktuelle Seite"
+
+msgid "JSON Snapshot"
+msgstr "JSON-Snapshot"
+
+msgid "No audit entries yet."
+msgstr "Noch keine Einträge im Audit Trail."
+
+msgid "Page"
+msgstr "Seite"
+
+msgid "Changed"
+msgstr "Geändert"
+
+msgid "Deleted"
+msgstr "Gelöscht"
+
+msgid "Copy JSON"
+msgstr "JSON kopieren"
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -5390,8 +5429,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Neue Kunden Nachricht in Ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -6656,15 +6695,14 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "The allocation was deleted"
 msgstr "Die Verfügbarkeit wurde gelöscht"
 
-#, python-format
 #, python-format
 msgid ""
 "${n} availabilities were not created, because they overlap with existing "
@@ -6673,6 +6711,7 @@ msgstr ""
 "${n} Verfügbarkeiten wurden nicht erstellt, da sie sich mit bestehenden "
 "überschneiden."
 
+#, python-format
 msgid "New availability period active, ${n} allocations created"
 msgstr "Neuer Verfügbarkeitszeitraum aktiv, ${n} Verfügbarkeiten erstellt"
 
@@ -6729,6 +6768,9 @@ msgstr ""
 
 msgid "Topics A-Z"
 msgstr "Themen A-Z"
+
+msgid "Audit Trail Entry"
+msgstr "Eintrag im Audit Trail"
 
 msgid "Your userprofile is incomplete. Please update it before you continue."
 msgstr ""
@@ -6867,21 +6909,6 @@ msgid ""
 msgstr ""
 "Die verlangte Änderung kann nicht durchgeführt werden, da sie mit den "
 "bereist existierenden Einträgen inkompatibel ist."
-
-#, python-format
-msgid "Syntax Error in line ${line}"
-msgstr "Syntaxfehler auf Zeile ${line}"
-
-msgid "Syntax error in form"
-msgstr "Syntaxfehler im Formular"
-
-#, python-format
-msgid "Syntax error in field ${field_name}"
-msgstr "Syntaxfehler im Feld ${field_name}"
-
-#, python-format
-msgid "Error: Duplicate label ${label}"
-msgstr "Fehler: ${label} zweifach erfasst"
 
 msgid ""
 "Do not mix adding, removing, and renaming options in the same migration. "
@@ -8435,6 +8462,27 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid "Table"
+#~ msgstr "Tabelle"
+
+#~ msgid "Record ID"
+#~ msgstr "Datensatz-ID"
+
+#, python-format
+#~ msgid "Syntax Error in line ${line}"
+#~ msgstr "Syntaxfehler auf Zeile ${line}"
+
+#~ msgid "Syntax error in form"
+#~ msgstr "Syntaxfehler im Formular"
+
+#, python-format
+#~ msgid "Syntax error in field ${field_name}"
+#~ msgstr "Syntaxfehler im Feld ${field_name}"
+
+#, python-format
+#~ msgid "Error: Duplicate label ${label}"
+#~ msgstr "Fehler: ${label} zweifach erfasst"
 
 #~ msgid "Format: Day.Month - Description or Day.Month.Year - Description"
 #~ msgstr "Format: Tag.Monat - Beschreibung oder Tag.Monat.Jahr - Beschreibung"

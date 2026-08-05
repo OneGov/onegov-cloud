@@ -22,6 +22,7 @@ from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
 from onegov.core.framework import layout_predicate
+from onegov.core.orm.audit import AuditEntryCollection
 from onegov.form.collection import SurveyCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
@@ -3291,6 +3292,19 @@ class ImageSetLayout(DefaultLayout):
                 )
             ]
         return None
+
+
+class AuditTrailLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(
+                _('Audit Trail'),
+                self.request.class_link(AuditEntryCollection),
+            ),
+        ]
 
 
 class UserManagementLayout(DefaultLayout):

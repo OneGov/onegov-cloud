@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-07-31 08:53+0200\n"
+"POT-Creation-Date: 2026-08-05 11:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -279,6 +279,9 @@ msgstr "Aperçu"
 
 msgid "Timeline"
 msgstr "Chronologie"
+
+msgid "Audit Trail"
+msgstr "Journal d’audit"
 
 msgid "Files"
 msgstr "Fichiers"
@@ -4531,8 +4534,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Paiement"
 
@@ -4594,6 +4597,42 @@ msgstr "Propriétaire :"
 
 msgid "Kind:"
 msgstr "Type :"
+
+msgid "When"
+msgstr "Date"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Who"
+msgstr "Utilisateur"
+
+msgid "Target table"
+msgstr "Table cible"
+
+msgid "Target ID"
+msgstr "ID cible"
+
+msgid "Current page"
+msgstr "Page actuelle"
+
+msgid "JSON Snapshot"
+msgstr "Instantané JSON"
+
+msgid "No audit entries yet."
+msgstr "Aucune entrée dans le journal d’audit."
+
+msgid "Page"
+msgstr "Page"
+
+msgid "Changed"
+msgstr "Modifié"
+
+msgid "Deleted"
+msgstr "Supprimé"
+
+msgid "Copy JSON"
+msgstr "Copier le JSON"
 
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
@@ -5395,8 +5434,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6669,15 +6708,14 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
 msgid "The allocation was deleted"
 msgstr "L'allocation a été supprimée"
 
-#, python-format
 #, python-format
 msgid ""
 "${n} availabilities were not created, because they overlap with existing "
@@ -6686,6 +6724,7 @@ msgstr ""
 "${n} disponibilités n'ont pas été créées, car elles chevauchent des "
 "disponibilités existantes."
 
+#, python-format
 msgid "New availability period active, ${n} allocations created"
 msgstr "Nouvelle période de disponibilité active, ${n} allocations créées"
 
@@ -6740,6 +6779,9 @@ msgstr ""
 
 msgid "Topics A-Z"
 msgstr "Sujets de A à Z"
+
+msgid "Audit Trail Entry"
+msgstr "Entrée du journal d’audit"
 
 msgid "Your userprofile is incomplete. Please update it before you continue."
 msgstr ""
@@ -6881,21 +6923,6 @@ msgid ""
 msgstr ""
 "Le changement requis ne peut être réalisé, car il est incompatible avec les "
 "entrées existantes"
-
-#, python-format
-msgid "Syntax Error in line ${line}"
-msgstr "Erreur de syntaxe sur la ligne ${line}"
-
-msgid "Syntax error in form"
-msgstr "Erreur de syntaxe dans le formulaire"
-
-#, python-format
-msgid "Syntax error in field ${field_name}"
-msgstr "Erreur de syntaxe dans le champ ${field_name}"
-
-#, python-format
-msgid "Error: Duplicate label ${label}"
-msgstr "Erreur: Duplication de l'étiquette ${label}"
 
 msgid ""
 "Do not mix adding, removing, and renaming options in the same migration. "
@@ -8444,6 +8471,27 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Table"
+#~ msgstr "Table"
+
+#~ msgid "Record ID"
+#~ msgstr "ID de l’enregistrement"
+
+#, python-format
+#~ msgid "Syntax Error in line ${line}"
+#~ msgstr "Erreur de syntaxe sur la ligne ${line}"
+
+#~ msgid "Syntax error in form"
+#~ msgstr "Erreur de syntaxe dans le formulaire"
+
+#, python-format
+#~ msgid "Syntax error in field ${field_name}"
+#~ msgstr "Erreur de syntaxe dans le champ ${field_name}"
+
+#, python-format
+#~ msgid "Error: Duplicate label ${label}"
+#~ msgstr "Erreur: Duplication de l'étiquette ${label}"
 
 #~ msgid "Format: Day.Month - Description or Day.Month.Year - Description"
 #~ msgstr "Format : Jour.Mois - Description ou Jour.Mois.Année - Description"

@@ -326,7 +326,7 @@ $('.side-panel .expand-people a').on('click', function(e) {
     $(e.target).parent().parent().children().filter('.hideable').toggleClass('hidden');
 });
 
-var page_refs = new ClipboardJS('.pageref');
+var page_refs = new ClipboardJS('.pageref, .audit-copy');
 page_refs.on('success', function(e) {
     // var success_msg = e.trigger.getAttribute('data-on-success');
     var msgContainer = $('#clipboard-copy');

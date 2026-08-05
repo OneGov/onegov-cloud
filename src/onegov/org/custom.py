@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from onegov.chat import MessageCollection
 from onegov.core.elements import Link, LinkGroup
+from onegov.core.orm.audit import AuditEntryCollection
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.form.collection import FormCollection, SurveyCollection
@@ -221,6 +222,14 @@ def get_global_tools(
             Link(
                 _('Timeline'), request.class_link(MessageCollection),
                 attrs={'class': 'timeline'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Audit Trail'),
+                request.class_link(AuditEntryCollection),
+                attrs={'class': 'audit-trail'},
             )
         )
 

@@ -1,0 +1,107 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="audit-trail-page">
+            <nav class="audit-trail-filters filter-panel"
+                 aria-label="Action"
+                 i18n:attributes="aria-label">
+                <span class="audit-trail-filter-label">
+                    <i class="fa fa-filter" aria-hidden="true"></i>
+                    <span i18n:translate>Action</span>
+                </span>
+                <div metal:use-macro="layout.macros['tags']"
+                     tal:define="tags filters" />
+            </nav>
+
+            <div class="callout secondary audit-trail-empty"
+                 tal:condition="not:entries">
+                <i class="far fa-clock" aria-hidden="true"></i>
+                <span i18n:translate>No audit entries yet.</span>
+            </div>
+
+            <div class="audit-trail-table-wrapper"
+                 tal:condition="entries">
+                <table class="audit-trail stack hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" i18n:translate>When</th>
+                            <th scope="col" i18n:translate>Action</th>
+                            <th scope="col" i18n:translate>Page</th>
+                            <th scope="col" i18n:translate>Who</th>
+                            <th scope="col">
+                                <span class="show-for-sr"
+                                      i18n:translate>View</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="entry entries">
+                            <td class="audit-trail-date">
+                                <i class="far fa-clock"
+                                   aria-hidden="true"></i>
+                                ${layout.format_date(
+                                    entry.created, 'datetime'
+                                )}
+                            </td>
+                            <td>
+                                <span class="audit-operation
+                                             audit-${entry.operation}">
+                                    <span tal:condition="
+                                              entry.operation == 'insert'"
+                                          i18n:translate>Created</span>
+                                    <span tal:condition="
+                                              entry.operation == 'update'"
+                                          i18n:translate>Changed</span>
+                                    <span tal:condition="
+                                              entry.operation == 'delete'"
+                                          i18n:translate>Deleted</span>
+                                </span>
+                            </td>
+                            <td class="audit-trail-page-title">
+                                <strong>
+                                    ${entry.snapshot.get('title', '-')}
+                                </strong>
+                                <small class="audit-record-id">
+                                    #${entry.target_id}
+                                </small>
+                            </td>
+                            <td class="audit-trail-user">
+                                <i class="far fa-user"
+                                   aria-hidden="true"></i>
+                                ${entry.username}
+                            </td>
+                            <td class="audit-trail-action">
+                                <button class="button clear small audit-copy"
+                                        type="button"
+                                        data-clipboard-action="copy"
+                                        tal:attributes="
+                                            data-clipboard-text
+                                            snapshots[entry.id]"
+                                        title="Copy JSON"
+                                        i18n:attributes="title">
+                                    <i class="far fa-copy"
+                                       aria-hidden="true"></i>
+                                    <span i18n:translate>Copy JSON</span>
+                                </button>
+                                <a class="button clear small"
+                                   href="${request.link(entry)}">
+                                    <span i18n:translate>View</span>
+                                    <i class="fa fa-chevron-right"
+                                       aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div metal:use-macro="layout.macros['pagination']"
+                 tal:define="
+                    collection layout.model;
+                    current_page layout.model;
+                    pagination_centered True" />
+        </div>
+    </tal:b>
+</div>

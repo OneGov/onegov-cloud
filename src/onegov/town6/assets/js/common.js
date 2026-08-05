@@ -314,7 +314,7 @@ $(document).ready(function() {
     });
 });
 
-var page_refs = new ClipboardJS('.pageref');
+var page_refs = new ClipboardJS('.pageref, .audit-copy');
 page_refs.on('success', function(e) {
     // var success_msg = e.trigger.getAttribute('data-on-success');
     var msgContainer = $('#clipboard-copy');
