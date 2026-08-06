@@ -107,24 +107,6 @@ class StadtschulenZug(
                 obj.content['stadtschulen_zug_price_table'] = (
                     self.stadtschulen_zug_price_table.data)
 
-            @property
-            def allocation_data(self) -> dict[str, Any]:
-                data = super().allocation_data
-                if (
-                    'pricing_scheme' in self
-                    and self['pricing_scheme'].data == 'stadtschulen_zug'
-                ):
-                    data['stadtschulen_zug_price_table'] = (
-                        self.stadtschulen_zug_price_table.data)
-                return data
-
-            def apply_data(self, data: dict[str, Any] | None) -> None:
-                super().apply_data(data)
-                if data and data.get('pricing_scheme') == 'stadtschulen_zug':
-                    if 'stadtschulen_zug_price_table' in data:
-                        self.stadtschulen_zug_price_table.data = (
-                            data['stadtschulen_zug_price_table'])
-
             def ensure_valid_form_definition(self) -> bool | None:
                 if 'pricing_scheme' not in self:
                     return None
