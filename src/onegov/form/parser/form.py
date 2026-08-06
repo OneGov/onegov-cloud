@@ -487,14 +487,10 @@ def handle_field(
 
         current_fieldset = field.real_fieldset
         branch_index = 0
-        count = 0
-        for _ in range(sum(len(branch) for branch in subfield_stacks)):
+        for _ in range(sum(len(stack) for _, stack in subfield_stacks)):
             for idx in range(branch_index, len(subfield_stacks)):
                 choice, stack = subfield_stacks[idx]
-                if not stack:
-                    continue
-
-                if stack[-1].real_fieldset == current_fieldset:
+                if stack and stack[-1].real_fieldset == current_fieldset:
                     branch_index = idx
                     subfield = stack.pop()
                     handle_field(
@@ -502,26 +498,22 @@ def handle_field(
                         subfield,
                         depends_on=(field.id, choice.label)
                     )
-                    count += 1
                     break
             else:
                 # none of the candidates match the current fieldset
                 # go back to the first non-empty branch and update
                 # the current fieldset
                 for idx, (choice, stack) in enumerate(subfield_stacks):
-                    if not stack:
-                        continue
-
-                    branch_index = idx
-                    subfield = stack.pop()
-                    current_fieldset = subfield.real_fieldset
-                    handle_field(
-                        builder,
-                        subfield,
-                        depends_on=(field.id, choice.label)
-                    )
-                    count += 1
-                    break
+                    if stack:
+                        branch_index = idx
+                        subfield = stack.pop()
+                        current_fieldset = subfield.real_fieldset
+                        handle_field(
+                            builder,
+                            subfield,
+                            depends_on=(field.id, choice.label)
+                        )
+                        break
 
         # NOTE: Sanity check to make sure we depleted all of the stacks
         assert all(not stack for _, stack in subfield_stacks)

@@ -92,6 +92,14 @@ var evaluate_dependencies = function(form, input, dependencies, _handle_fieldset
     var visible = true;
     var hide_label = true;
     var handle_fieldset = _handle_fieldset || false;
+    var fieldset = null;
+    if (handle_fieldset) {
+        fieldset = input.closest('fieldset');
+        if (fieldset.get(0) === undefined || !$.contains(form.get(0), fieldset.get(0))) {
+            handle_fieldset = false;
+            fieldset = null;
+        }
+    }
 
     _.each(dependencies, function(dependency) {
         visible &= (dependency.invert ^ _.contains(get_choices(form, dependency.name), dependency.value));
