@@ -72,11 +72,12 @@ def test_daypass_single_date() -> None:
     assert form.whole_day == True
     assert form.quota == 4
     assert form.quota_limit == 1
-    assert form.data == {
+    assert form.allocation_data == {
         'access': 'public',
         'pricing_method': 'inherit',
         'price_per_hour': 0.0,
         'price_per_item': 0.0,
+        'pricing_scheme': None,
         'currency': 'CHF',
     }
 
@@ -122,11 +123,12 @@ def test_room_single_date() -> None:
     assert form.whole_day == False
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {
+    assert form.allocation_data == {
         'access': 'public',
         'pricing_method': 'inherit',
         'price_per_hour': 0.0,
         'price_per_item': 0.0,
+        'pricing_scheme': None,
         'currency': 'CHF',
     }
 
@@ -142,11 +144,12 @@ def test_room_whole_day() -> None:
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {
+    assert form.allocation_data == {
         'access': 'public',
         'pricing_method': 'inherit',
         'price_per_hour': 0.0,
         'price_per_item': 0.0,
+        'pricing_scheme': None,
         'currency': 'CHF',
     }
 
@@ -163,11 +166,12 @@ def test_room_access() -> None:
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {
+    assert form.allocation_data == {
         'access': 'private',
         'pricing_method': 'inherit',
         'price_per_hour': 0.0,
         'price_per_item': 0.0,
+        'pricing_scheme': None,
         'currency': 'CHF',
     }
 
@@ -184,11 +188,12 @@ def test_room_pricing_method_free() -> None:
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {
+    assert form.allocation_data == {
         'access': 'public',
         'pricing_method': 'free',
         'price_per_hour': 0.0,
         'price_per_item': 0.0,
+        'pricing_scheme': None,
         'currency': 'CHF',
     }
 
@@ -207,11 +212,12 @@ def test_room_pricing_method_per_hour() -> None:
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {
+    assert form.allocation_data == {
         'access': 'public',
         'pricing_method': 'per_hour',
         'price_per_hour': 30.0,
         'price_per_item': 0.0,
+        'pricing_scheme': None,
         'currency': 'USD',
     }
 
@@ -230,11 +236,12 @@ def test_room_pricing_method_per_item() -> None:
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert form.data == {
+    assert form.allocation_data == {
         'access': 'public',
         'pricing_method': 'per_item',
         'price_per_hour': 0.0,
         'price_per_item': 50.0,
+        'pricing_scheme': None,
         'currency': 'USD',
     }
 
