@@ -295,6 +295,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'chosen_select_hierarchy.js'
     yield 'iframe_request_parameters.js'
     yield 'ai_formcoder.js'
+    yield 'web-components.js'
 
 
 @TownApp.webasset('editor')

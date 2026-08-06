@@ -1,8 +1,71 @@
+<!--? web components test -->
+<template id="og-callout-template">
+    <style>
+        :host {
+            display: block;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent, #2196f3);
+            background: color-mix(in srgb, var(--accent, #2196f3) 8%, transparent);
+        }
+
+        :host([type="alert"]) {
+            --accent: #cc4b37;
+        }
+
+        :host([type="success"]) {
+            --accent: #3adb76;
+        }
+
+        :host([type="warning"]) {
+            --accent: #ffae00;
+        }
+
+        .title {
+            font-weight: bold;
+            margin-bottom: .25rem;
+        }
+
+        /* hide the title row entirely if no title was slotted */
+        .title:not(:has(slot[name="title"]::slotted(*))) {
+        }
+    </style>
+
+    <div class="title">
+        <slot name="title"></slot>
+    </div>   <!-- named slot -->
+    <div class="body">
+        <slot></slot>
+    </div>                 <!-- default slot -->
+</template>
+<!--? end web components test -->
+
 <div metal:use-macro="layout.base" i18n:domain="onegov.town6">
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <!--? web components test -->
+        <og-callout type="success">
+            Well done, you made use of the new web component success message.
+        </og-callout>
+
+        <og-callout type="warning">
+            <span slot="title">Warning</span>
+            This action cannot be undone.
+        </og-callout>
+
+        <og-callout type="alert">
+            <span slot="title">Error</span>
+            Severe error happened while loading page!
+        </og-callout>
+
+        <og-callout>
+            Type less callout
+        </og-callout>
+        <!--? end web components test -->
+
         <div class="grid-x">
             <div class="small-12 cell">
                 <h2 i18n:translate="">Upload</h2>
