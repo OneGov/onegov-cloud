@@ -19,7 +19,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.filters import as_float
 from onegov.org import _
-from onegov.org.forms.util import WEEKDAYS
+from onegov.org.forms.util import PRICING_METHODS, WEEKDAYS
 
 
 from typing import Any, TYPE_CHECKING
@@ -39,6 +39,12 @@ def choices_as_integer(choices: Iterable[str] | None) -> list[int] | None:
         return None
 
     return [int(c) for c in choices]
+
+
+PRICING_METHODS_WITH_INHERIT = (
+    ('inherit', _('Inherit from resource')),
+    *PRICING_METHODS,
+)
 
 
 class AllocationFormHelpers:
@@ -125,6 +131,8 @@ class AllocationRuleForm(Form):
         def quota_limit(self) -> int: ...
         @property
         def partly_available(self) -> bool: ...
+        @property
+        def allocation_data(self) -> dict[str, Any]: ...
 
         def generate_dates(
             self,
@@ -231,7 +239,7 @@ class AllocationRuleForm(Form):
                 weekdays=self.weekdays
             )
 
-        data = {**(self.data or {}), 'rule': self.rule_id}
+        data = {**(self.allocation_data or {}), 'rule': self.rule_id}
 
         return len(resource.scheduler.allocate(
             dates=dates,
@@ -302,12 +310,7 @@ class AllocationForm(Form, AllocationFormHelpers):
         fieldset=_('Payments'),
         default='inherit',
         validators=[InputRequired()],
-        choices=(
-            ('inherit', _('Inherit from resource')),
-            ('free', _('Free of charge')),
-            ('per_item', _('Per item')),
-            ('per_hour', _('Per hour'))
-        )
+        choices=PRICING_METHODS_WITH_INHERIT
     )
 
     price_per_item = DecimalField(
@@ -324,6 +327,14 @@ class AllocationForm(Form, AllocationFormHelpers):
         fieldset=_('Payments'),
         validators=[InputRequired()],
         depends_on=('pricing_method', 'per_hour')
+    )
+
+    pricing_scheme = RadioField(
+        label=_('Pricing scheme'),
+        fieldset=_('Payments'),
+        validators=[InputRequired()],
+        depends_on=('pricing_method', 'pricing_scheme'),
+        choices=()
     )
 
     # NOTE: Having a currency field is a little bit suspect, since we can't
@@ -357,6 +368,18 @@ class AllocationForm(Form, AllocationFormHelpers):
             self.delete_field('on_holidays')
         if not self.request.app.org.has_school_holidays:
             self.delete_field('during_school_holidays')
+
+        scheme_choices = self.pricing_scheme.choices = [
+            (scheme.name, scheme.label)
+            for scheme in self.request.app.resource_pricing_schemes
+        ]
+        if not scheme_choices:
+            self.hide(self.pricing_scheme)
+            self.pricing_method.choices = [
+                (value, label)
+                for value, label in PRICING_METHODS_WITH_INHERIT
+                if value != ' pricing_scheme'
+            ]
 
     def ensure_start_before_end(self) -> bool | None:
         if self.start.data and self.end.data:
@@ -433,16 +456,15 @@ class AllocationForm(Form, AllocationFormHelpers):
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
-    # FIXME: This collides with Form.data which is not ideal, we should
-    #        probably choose a different name for this
     @property
-    def data(self) -> dict[str, Any]:
+    def allocation_data(self) -> dict[str, Any]:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         return {
             'pricing_method': self.pricing_method.data,
             'price_per_item': self.price_per_item.data,
             'price_per_hour': self.price_per_hour.data,
             'currency': self.currency.data,
+            'pricing_scheme': self.pricing_scheme.data,
             'access': self.access.data
         }
 
@@ -456,6 +478,7 @@ class AllocationEditForm(Form, AllocationFormHelpers):
     dates tuple.
 
     """
+    request: OrgRequest
 
     date = DateField(
         label=_('Date'),
@@ -468,12 +491,7 @@ class AllocationEditForm(Form, AllocationFormHelpers):
         fieldset=_('Payments'),
         default='inherit',
         validators=[InputRequired()],
-        choices=(
-            ('inherit', _('Inherit from resource')),
-            ('free', _('Free of charge')),
-            ('per_item', _('Per item')),
-            ('per_hour', _('Per hour'))
-        )
+        choices=PRICING_METHODS_WITH_INHERIT
     )
 
     price_per_item = DecimalField(
@@ -490,6 +508,14 @@ class AllocationEditForm(Form, AllocationFormHelpers):
         fieldset=_('Payments'),
         validators=[InputRequired()],
         depends_on=('pricing_method', 'per_hour')
+    )
+
+    pricing_scheme = RadioField(
+        label=_('Pricing scheme'),
+        fieldset=_('Payments'),
+        validators=[InputRequired()],
+        depends_on=('pricing_method', 'pricing_scheme'),
+        choices=()
     )
 
     currency = StringField(
@@ -514,15 +540,15 @@ class AllocationEditForm(Form, AllocationFormHelpers):
         fieldset=_('Security')
     )
 
-    # FIXME: same here
     @property
-    def data(self) -> dict[str, Any]:
+    def allocation_data(self) -> dict[str, Any]:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         return {
             'pricing_method': self.pricing_method.data,
             'price_per_item': self.price_per_item.data,
             'price_per_hour': self.price_per_hour.data,
             'currency': self.currency.data,
+            'pricing_scheme': self.pricing_scheme.data,
             'access': self.access.data
         }
 
@@ -539,6 +565,21 @@ class AllocationEditForm(Form, AllocationFormHelpers):
             self.price_per_hour.data = data['price_per_hour']
         if 'currency' in data:
             self.currency.data = data['currency']
+        if 'pricing_scheme' in data:
+            self.pricing_scheme.data = data['pricing_scheme']
+
+    def on_request(self) -> None:
+        scheme_choices = self.pricing_scheme.choices = [
+            (scheme.name, scheme.label)
+            for scheme in self.request.app.resource_pricing_schemes
+        ]
+        if not scheme_choices:
+            self.hide(self.pricing_scheme)
+            self.pricing_method.choices = [
+                (value, label)
+                for value, label in PRICING_METHODS_WITH_INHERIT
+                if value != ' pricing_scheme'
+            ]
 
 
 class Daypasses:
@@ -865,6 +906,7 @@ class RoomAllocationEditForm(AllocationEditForm):
         self.per_time_slot.data = model.quota
 
     def on_request(self) -> None:
+        super().on_request()
         if self.partly_available:
             self.hide(self.as_whole_day)
             self.hide(self.per_time_slot)

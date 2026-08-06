@@ -18,7 +18,7 @@ from onegov.org.forms.generic import ExportForm
 from onegov.org.forms.generic import PaymentForm
 from onegov.org.forms.reservation import (
     RESERVED_FIELDS, ExportToExcelWorksheets)
-from onegov.org.forms.util import WEEKDAYS
+from onegov.org.forms.util import PRICING_METHODS, WEEKDAYS
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.reservation import Resource
 from sqlalchemy import func
@@ -38,6 +38,7 @@ from wtforms.validators import ValidationError
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Collection
     from markupsafe import Markup
     from onegov.form.fields import TreeSelectNode
     from onegov.org.request import OrgRequest
@@ -294,6 +295,12 @@ class ResourceBaseForm(Form):
         description=_('Replies to automated e-mails go to this address.')
     )
 
+    allow_cancellation_requests = BooleanField(
+        label=_('Enable cancel reservation'),
+        fieldset=_('Cancellation'),
+        default=False,
+    )
+
     invoicing_party = TextAreaField(
         label=_('Invoicing party'),
         fieldset=_('Invoicing'),
@@ -315,11 +322,7 @@ class ResourceBaseForm(Form):
         fieldset=_('Payments'),
         default='free',
         validators=[InputRequired()],
-        choices=(
-            ('free', _('Free of charge')),
-            ('per_item', _('Per item')),
-            ('per_hour', _('Per hour'))
-        )
+        choices=PRICING_METHODS,
     )
 
     price_per_item = DecimalField(
@@ -336,6 +339,14 @@ class ResourceBaseForm(Form):
         fieldset=_('Payments'),
         validators=[InputRequired()],
         depends_on=('pricing_method', 'per_hour')
+    )
+
+    pricing_scheme = RadioField(
+        label=_('Pricing scheme'),
+        fieldset=_('Payments'),
+        validators=[InputRequired()],
+        depends_on=('pricing_method', 'pricing_scheme'),
+        choices=()
     )
 
     currency = StringField(
@@ -374,12 +385,6 @@ class ResourceBaseForm(Form):
         ),
     )
 
-    allow_cancellation_requests = BooleanField(
-        label=_('Enable cancel reservation'),
-        fieldset=_('Cancellation'),
-        default=False,
-    )
-
     def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type != 'room':
@@ -395,6 +400,18 @@ class ResourceBaseForm(Form):
                 self.delete_field('default_view')
                 self.delete_field('kaba_components')
                 return
+
+        scheme_choices = self.pricing_scheme.choices = [
+            (scheme.name, scheme.label)
+            for scheme in self.request.app.resource_pricing_schemes
+        ]
+        if not scheme_choices:
+            self.delete_field('pricing_scheme')
+            self.pricing_method.choices = [
+                (value, label)
+                for value, label in PRICING_METHODS
+                if value != 'pricing_scheme'
+            ]
 
         # NOTE: For now we only allow parent resources for rooms
         if 'parent_id' in self:
@@ -636,7 +653,12 @@ class ResourceBaseForm(Form):
         self.zipcode_list.data = '\n'.join(
             str(i) for i in sorted(value['zipcode_list']))
 
-    def populate_obj(self, obj: Resource) -> None:  # type:ignore
+    def populate_obj(  # type: ignore[override]
+        self,
+        obj: Resource,  # type: ignore[override]
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None,
+    ) -> None:
         super().populate_obj(obj, exclude={
             'deadline',
             'deadline_unit',
@@ -652,7 +674,8 @@ class ResourceBaseForm(Form):
             'zipcode_field',
             'zipcode_days',
             'zipcode_list',
-        })
+            *(exclude or ())
+        }, include=include)
         obj.deadline = self.deadline
         obj.lead_time = self.lead_time
         obj.zipcode_block = self.zipcode_block

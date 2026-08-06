@@ -6,8 +6,12 @@ from libres.db.models import Allocation, Reservation
 from onegov.core.orm import ModelBase
 from onegov.pay import InvoiceItemMeta, Payable, Price
 from onegov.reservation.models.resource import Resource
+from onegov.reservation.pricing_scheme import PRICING_SCHEMES
 from sedate import utcnow
 from sqlalchemy.orm import object_session
+
+
+from typing import Any
 
 
 class CustomReservation(Reservation, ModelBase, Payable):
@@ -57,28 +61,42 @@ class CustomReservation(Reservation, ModelBase, Payable):
     def invoice_item(
         self,
         resource: Resource | None = None,
-        allocation: Allocation | None = None
+        allocation: Allocation | None = None,
+        submission_data: dict[str, Any] | None = None,
     ) -> InvoiceItemMeta | None:
         """ Returns an invoice item for this reservation. """
 
         allocation = allocation or self.allocation_obj
         data = allocation and allocation.data or {}
         pricing_method = data.get('pricing_method', 'inherit')
-        if pricing_method not in ('inherit', 'per_hour', 'per_item'):
+        if pricing_method not in (
+            'inherit',
+            'per_hour',
+            'per_item',
+            'pricing_scheme'
+        ):
             return None
 
         resource = resource or self.resource_obj
         if pricing_method == 'inherit':
             pricing_method = resource.pricing_method
 
-            if pricing_method not in ('per_hour', 'per_item'):
+            if pricing_method not in (
+                'per_hour',
+                'per_item',
+                'pricing_scheme'
+            ):
                 return None
 
             price_per_hour = resource.price_per_hour
             price_per_item = resource.price_per_item
+            pricing_scheme_name = resource.pricing_scheme
+            inherited = True
         else:
             price_per_hour = data.get('price_per_hour', 0.0)
             price_per_item = data.get('price_per_item', 0.0)
+            pricing_scheme_name = data.get('pricing_scheme', None)
+            inherited = False
 
         # technically we could have multiple allocations per reservation
         # but in practice we don't use that feature. Each reservation
@@ -116,12 +134,38 @@ class CustomReservation(Reservation, ModelBase, Payable):
                 quantity=Decimal(count),
             )
 
+        if pricing_method == 'pricing_scheme':
+            if pricing_scheme_name is None:
+                return None
+
+            pricing_scheme = PRICING_SCHEMES.get(pricing_scheme_name)
+            if pricing_scheme is None:
+                return None
+
+            amount = pricing_scheme.reservation_unit_price(
+                self,
+                resource,
+                None if inherited else data,
+                submission_data
+            )
+            if amount is None:
+                return None
+
+            return InvoiceItemMeta(
+                text=resource.title,
+                group='reservation',
+                cost_object=resource.cost_object,
+                extra={'reservation_id': self.id},
+                unit=amount,
+            )
+
         raise NotImplementedError
 
     def price(
         self,
         resource: Resource | None = None,
         allocation: Allocation | None = None,
+        submission_data: dict[str, Any] | None = None,
     ) -> Price | None:
         """ Returns the price of the reservation.
 
@@ -134,7 +178,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
         resource = resource or self.resource_obj
         allocation = allocation or self.allocation_obj
 
-        item = self.invoice_item(resource, allocation)
+        item = self.invoice_item(resource, allocation, submission_data)
         if item is None:
             return None
 

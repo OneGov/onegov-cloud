@@ -211,15 +211,21 @@ def get_new_allocation_form_class(
     """
 
     if resource.type == 'daypass':
-        return DaypassAllocationForm
+        form_class: type[AllocationForm] = DaypassAllocationForm
 
-    if resource.type == 'room':
-        return RoomAllocationForm
+    elif resource.type == 'room':
+        form_class = RoomAllocationForm
 
-    if resource.type == 'daily-item':
-        return DailyItemAllocationForm
+    elif resource.type == 'daily-item':
+        form_class = DailyItemAllocationForm
 
-    raise NotImplementedError
+    else:
+        raise NotImplementedError
+
+    for pricing_scheme in request.app.resource_pricing_schemes:
+        form_class = pricing_scheme.extend_form(form_class, request)
+
+    return form_class
 
 
 def get_edit_allocation_form_class(
@@ -236,15 +242,21 @@ def get_edit_allocation_form_class(
     assert resource is not None
 
     if resource.type == 'daypass':
-        return DaypassAllocationEditForm
+        form_class: type[AllocationEditForm] = DaypassAllocationEditForm
 
-    if resource.type == 'room':
-        return RoomAllocationEditForm
+    elif resource.type == 'room':
+        form_class = RoomAllocationEditForm
 
-    if resource.type == 'daily-item':
-        return DailyItemAllocationEditForm
+    elif resource.type == 'daily-item':
+        form_class = DailyItemAllocationEditForm
 
-    raise NotImplementedError
+    else:
+        raise NotImplementedError
+
+    for pricing_scheme in request.app.resource_pricing_schemes:
+        form_class = pricing_scheme.extend_form(form_class, request)
+
+    return form_class
 
 
 # NOTE: We would like the return type to be an intersection
@@ -289,6 +301,7 @@ def handle_edit_allocation(
         new_start, new_end = form.dates
 
         try:
+            # FIXME: Why do we ignore form.allocation_data?
             resource.scheduler.move_allocation(
                 master_id=self.id,
                 new_start=new_start,
