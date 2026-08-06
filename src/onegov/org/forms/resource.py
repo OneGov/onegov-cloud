@@ -386,6 +386,18 @@ class ResourceBaseForm(Form):
     )
 
     def on_request(self) -> None:
+        scheme_choices = self.pricing_scheme.choices = [
+            (scheme.name, scheme.label)
+            for scheme in self.request.app.resource_pricing_schemes
+        ]
+        if not scheme_choices:
+            self.delete_field('pricing_scheme')
+            self.pricing_method.choices = [
+                (value, label)
+                for value, label in PRICING_METHODS
+                if value != 'pricing_scheme'
+            ]
+
         if hasattr(self.model, 'type'):
             if self.model.type != 'room':
                 self.delete_field('parent_id')
@@ -400,18 +412,6 @@ class ResourceBaseForm(Form):
                 self.delete_field('default_view')
                 self.delete_field('kaba_components')
                 return
-
-        scheme_choices = self.pricing_scheme.choices = [
-            (scheme.name, scheme.label)
-            for scheme in self.request.app.resource_pricing_schemes
-        ]
-        if not scheme_choices:
-            self.delete_field('pricing_scheme')
-            self.pricing_method.choices = [
-                (value, label)
-                for value, label in PRICING_METHODS
-                if value != 'pricing_scheme'
-            ]
 
         # NOTE: For now we only allow parent resources for rooms
         if 'parent_id' in self:

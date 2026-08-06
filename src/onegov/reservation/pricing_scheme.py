@@ -51,7 +51,6 @@ class ResourcePricingScheme:
         cls,
         reservation: Reservation,
         resource: Resource,
-        allocation_data: dict[str, Any] | None,
         submission_data: dict[str, Any] | None
     ) -> Decimal | None:
         """ Calculates the unit price for the given reservation. """

@@ -72,8 +72,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
         if pricing_method not in (
             'inherit',
             'per_hour',
-            'per_item',
-            'pricing_scheme'
+            'per_item'
         ):
             return None
 
@@ -91,12 +90,10 @@ class CustomReservation(Reservation, ModelBase, Payable):
             price_per_hour = resource.price_per_hour
             price_per_item = resource.price_per_item
             pricing_scheme_name = resource.pricing_scheme
-            inherited = True
         else:
             price_per_hour = data.get('price_per_hour', 0.0)
             price_per_item = data.get('price_per_item', 0.0)
-            pricing_scheme_name = data.get('pricing_scheme', None)
-            inherited = False
+            pricing_scheme_name = None
 
         # technically we could have multiple allocations per reservation
         # but in practice we don't use that feature. Each reservation
@@ -145,7 +142,6 @@ class CustomReservation(Reservation, ModelBase, Payable):
             amount = pricing_scheme.reservation_unit_price(
                 self,
                 resource,
-                None if inherited else data,
                 submission_data
             )
             if amount is None:

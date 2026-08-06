@@ -211,21 +211,15 @@ def get_new_allocation_form_class(
     """
 
     if resource.type == 'daypass':
-        form_class: type[AllocationForm] = DaypassAllocationForm
+        return DaypassAllocationForm
 
-    elif resource.type == 'room':
-        form_class = RoomAllocationForm
+    if resource.type == 'room':
+        return RoomAllocationForm
 
-    elif resource.type == 'daily-item':
-        form_class = DailyItemAllocationForm
+    if resource.type == 'daily-item':
+        return DailyItemAllocationForm
 
-    else:
-        raise NotImplementedError
-
-    for pricing_scheme in request.app.resource_pricing_schemes:
-        form_class = pricing_scheme.extend_form(form_class, request)
-
-    return form_class
+    raise NotImplementedError
 
 
 def get_edit_allocation_form_class(
@@ -242,21 +236,15 @@ def get_edit_allocation_form_class(
     assert resource is not None
 
     if resource.type == 'daypass':
-        form_class: type[AllocationEditForm] = DaypassAllocationEditForm
+        return DaypassAllocationEditForm
 
-    elif resource.type == 'room':
-        form_class = RoomAllocationEditForm
+    if resource.type == 'room':
+        return RoomAllocationEditForm
 
-    elif resource.type == 'daily-item':
-        form_class = DailyItemAllocationEditForm
+    if resource.type == 'daily-item':
+        return DailyItemAllocationEditForm
 
-    else:
-        raise NotImplementedError
-
-    for pricing_scheme in request.app.resource_pricing_schemes:
-        form_class = pricing_scheme.extend_form(form_class, request)
-
-    return form_class
+    raise NotImplementedError
 
 
 # NOTE: We would like the return type to be an intersection

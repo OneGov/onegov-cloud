@@ -1461,8 +1461,8 @@ class FieldTable[FieldT: Field](Field):
             [
                 self.unbound_field.bind(
                     form=None,  # type: ignore[arg-type]
-                    name=f'{self.short_name}{sep}{col}{sep}{row}',
-                    id=f'{self.id}{sep}{col}{sep}{row}',
+                    name=f'{self.short_name}{sep}{row}{sep}{col}',
+                    id=f'{self.id}{sep}{row}{sep}{col}',
                     _meta=self.meta,
                     translations=getattr(self, '_translations', None),
                 )

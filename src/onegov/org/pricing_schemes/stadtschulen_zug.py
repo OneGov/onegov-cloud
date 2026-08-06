@@ -32,7 +32,6 @@ class StadtschulenZug(
         cls,
         reservation: Reservation,
         resource: Resource,
-        allocation_data: dict[str, Any] | None,
         submission_data: dict[str, Any] | None
     ) -> Decimal | None:
         if submission_data is None:
@@ -51,9 +50,7 @@ class StadtschulenZug(
             category = 'C'
 
         col = CATEGORIES.index(category)
-        table = (
-            allocation_data or reservation.data or {}
-        ).get('stadtschulen_zug_price_table')
+        table = (reservation.data or {}).get('stadtschulen_zug_price_table')
         if table is None:
             table = resource.content.get('stadtschulen_zug_price_table')
         if table is None:
@@ -120,6 +117,56 @@ class StadtschulenZug(
                     data['stadtschulen_zug_price_table'] = (
                         self.stadtschulen_zug_price_table.data)
                 return data
+
+            def apply_data(self, data: dict[str, Any] | None) -> None:
+                super().apply_data(data)
+                if data and data.get('pricing_scheme') == 'stadtschulen_zug':
+                    if 'stadtschulen_zug_price_table' in data:
+                        self.stadtschulen_zug_price_table.data = (
+                            data['stadtschulen_zug_price_table'])
+
+            def ensure_valid_form_definition(self) -> bool | None:
+                if 'pricing_scheme' not in self:
+                    return None
+
+                if self['pricing_method'].data != 'pricing_scheme':
+                    return None
+
+                if self['pricing_scheme'].data != 'stadtschulen_zug':
+                    return None
+
+                if self['parsed'].errors:
+                    # if we failed to parse, don't pile on more errors
+                    return None
+
+                parsed = self['parsed'].data
+                field = {
+                    field.id: field
+                    for field in (parsed.fields if parsed else ())
+                }.get('kategorie')
+                if (
+                    field is None
+                    or field.type != 'radio'
+                    or not all(
+                        choice.label.startswith(('A', 'B', 'C'))
+                        for choice in field.choices
+                    )
+                ):
+                    self['parsed'].errors.append(
+                        'Mit Preisschema "Freizeitbetreuungsanlagen" braucht '
+                        'es ein Feld mit Name "Kategorie", in welchem alle '
+                        'Optionen mit einem der drei Kategorie-Codes "A", "B" '
+                        'oder "C" beginnen.'
+                    )
+                    return False
+                elif not field.required:
+                    self['parsed'].errors.append(
+                        'Mit Preisschema "Freizeitbetreuungsanlagen" darf '
+                        'das Feld "Kategorie" nicht optional sein. '
+                        '(Bitte "Kategorie * =" verwenden)'
+                    )
+                    return False
+                return None
 
         return move_fields(
             StadtSchulenZugForm,
