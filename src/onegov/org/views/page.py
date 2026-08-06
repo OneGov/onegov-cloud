@@ -16,8 +16,6 @@ from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, NewsCollection, Topic
 from onegov.org.models.editor import Editor
-from onegov.page import PageCollection
-from onegov.page.audit import prepare_page_delete_audit
 from webob import exc, Response
 
 
@@ -38,10 +36,9 @@ def delete_page(self: Topic | News, request: OrgRequest) -> None:
     if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 
-    prepare_page_delete_audit(self)
+    request.session.delete(self)
     self.files = []
-
-    PageCollection(request.session).delete(self)
+    request.session.flush()
     assert self.trait is not None
     request.success(self.trait_messages[self.trait]['delete_message'])
 

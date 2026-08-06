@@ -18,7 +18,6 @@ def page_snapshot(page: Page) -> dict[str, Any]:
     }
     file_ids = {file.id for file in page.files}
     file_ids.update(file.id for file in state.attrs.files.history.deleted)
-    file_ids.update(state.info.get('audit_file_ids', ()))
     data['file_ids'] = sorted(file_ids)
     return data
 
@@ -53,15 +52,7 @@ def page_previous_snapshot(
     return data
 
 
-def prepare_page_delete_audit(page: Page) -> None:
-    state = inspect(page)
-    state.info['audit_deleting'] = True
-    state.info['audit_file_ids'] = tuple(file.id for file in page.files)
-
-
 def page_changed(session: Session, page: Page) -> bool:
-    if inspect(page).info.get('audit_deleting'):
-        return False
     return (
         session.is_modified(page, include_collections=False)
         or inspect(page).attrs.files.history.has_changes()
