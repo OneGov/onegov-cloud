@@ -173,7 +173,12 @@ def get_resource_form(
     else:
         model = self
 
-    return model.with_content_extensions(ResourceForm, request)
+    form_class = ResourceForm
+
+    for pricing_scheme in request.app.resource_pricing_schemes:
+        form_class = pricing_scheme.extend_form(form_class, request)
+
+    return model.with_content_extensions(form_class, request)
 
 
 class ResourceGroup(NamedTuple):
@@ -854,7 +859,7 @@ def get_find_your_spot_reservations(
 ) -> JSON_ro:
 
     reservations = sorted(
-        (utils.ReservationInfo(resource, reservation, request).as_dict()
+        (utils.ReservationInfo(resource, reservation, None, request).as_dict()
             for resource in request.exclude_invisible(self.query())
             # FIXME: Maybe we should move bound_reservations to the base
             #        Resource class?
@@ -1313,7 +1318,7 @@ def get_reservations(self: Resource, request: OrgRequest) -> RenderData:
 
     return {
         'reservations': [
-            utils.ReservationInfo(self, reservation, request).as_dict()
+            utils.ReservationInfo(self, reservation, None, request).as_dict()
             for reservation in reservations
         ],
         'prediction': prediction
