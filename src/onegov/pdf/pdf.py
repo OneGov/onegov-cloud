@@ -623,6 +623,9 @@ class Pdf(PDFDocument):
         html = cleaner.clean(html)
         # Todo: phone numbers with href="tel:.." are cleaned out
 
+        if not html.strip():
+            return
+
         tree = etree.parse(StringIO(html), etree.HTMLParser())
         body = tree.find('body')
         if body is None:

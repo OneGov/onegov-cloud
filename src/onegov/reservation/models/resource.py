@@ -138,6 +138,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         content_property('price_per_reservation')
     )
 
+    #: the custom resource pricing scheme to use
+    pricing_scheme: dict_property[str | None] = content_property()
+
     #: the invoicing party for this resource
     invoicing_party: dict_property[str | None] = content_property()
 
@@ -348,6 +351,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         reservations: Sequence[CustomReservation],
         extras: Sequence[InvoiceItemMeta] | None = None,
         discounts: Sequence[InvoiceDiscountMeta] | None = None,
+        submission_data: dict[str, Any] | None = None,
         *,
         # HACK: This isn't great, but similarly adding i18n to
         #       the reservation module for a single translation
@@ -366,7 +370,10 @@ class Resource(ORMBase, ModelBase, ContentMixin,
             #        targeted allocations ahead of time and passing
             #        the correct allocation here. Right now there's
             #        a N+1 situation for loading target allocations.
-            item = reservation.invoice_item(self)
+            item = reservation.invoice_item(
+                self,
+                submission_data=submission_data
+            )
             if item is not None:
                 items.append(item)
 

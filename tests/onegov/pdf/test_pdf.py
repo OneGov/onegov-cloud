@@ -482,6 +482,24 @@ def test_pdf_mini_html() -> None:
     )
 
 
+def test_pdf_mini_html_cleaned_empty() -> None:
+    # input built only from tags not allowed by mini_html reduces to
+    # empty/whitespace after cleaning and used to raise
+    # "ElementTree not initialized, missing root"
+    for html in (
+        '<h3></h3>',
+        '<div>   </div>',
+        '<img src=x>',
+        '<span></span>',
+        '   ',
+    ):
+        file = BytesIO()
+        pdf = Pdf(file)
+        pdf.init_a4_portrait()
+        pdf.mini_html(html)
+        assert [p for p in pdf.story if isinstance(p, Paragraph)] == []
+
+
 def test_pdf_mini_html_strip() -> None:
     file = BytesIO()
     pdf = Pdf(file)

@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.chat import TextModule
     from onegov.form.fields import (
-        DurationField, PanelField, PreviewField, UploadField,
+        DurationField, FieldTable, PanelField, PreviewField, UploadField,
         UploadMultipleField, TypeAheadField
     )
     from wtforms import Field, StringField
@@ -692,3 +692,30 @@ class TypeAheadInput(TextInput):
         )
 
         return super().__call__(field, **kwargs)
+
+
+class TableFieldWidget:
+
+    def __call__(self, field: FieldTable[Any], **kwargs: Any) -> Markup:
+        kwargs.setdefault('id', field.id)
+        return Markup(  # nosec: B704
+            f'<table class="table-widget" {html_params(**kwargs)}>'
+            '<thead><tr><th></th>{head}</tr></thead>'
+            '<tbody>{body}</tbody>'
+            '</table>'
+        ).format(
+            head=Markup('').join(
+                Markup('<th>{}</th>').format(field.gettext(label))
+                for label in field.column_labels
+            ),
+            body=Markup('').join(
+                Markup('<tr><th scope="row">{label}</th>{cells}</tr>').format(
+                    label=field.gettext(label),
+                    cells=Markup('').join(
+                        Markup('<td>{}</td>').format(entry())
+                        for entry in entries
+                    )
+                )
+                for label, entries in zip(field.row_labels, field.entries)
+            )
+        )

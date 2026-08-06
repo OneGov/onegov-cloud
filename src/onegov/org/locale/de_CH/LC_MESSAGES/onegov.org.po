@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-08-06 15:36+0200\n"
+"POT-Creation-Date: 2026-08-06 16:21+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -729,8 +729,6 @@ msgstr ""
 "Benutzer können Start und/oder Ende der Publikation des Eintrags bei "
 "Änderungsvorschlägen und Eingaben setzen"
 
-#.
-#. if activated above
 msgid "Publication"
 msgstr "Publikation"
 
@@ -1951,6 +1949,12 @@ msgstr "Monatsansicht"
 msgid "Doors"
 msgstr "Türen"
 
+msgid "Enable cancel reservation"
+msgstr "Stornierung von Reservationen erlauben"
+
+msgid "Cancellation"
+msgstr "Stornierung"
+
 msgid "Invoicing party"
 msgstr "Rechnungssteller"
 
@@ -1966,6 +1970,9 @@ msgid ""
 msgstr ""
 "Wird bei allen Rechnugnspositionen angezeigt, die direkt mit der Reservation "
 "von diesem Objekt im Zusammenhang stehen."
+
+msgid "Pricing scheme"
+msgstr "Preisschema"
 
 msgid "Prices in extra fields are"
 msgstr "Preise in Extra-Felder gelten"
@@ -1991,12 +1998,6 @@ msgstr "Nur den Preis der ausgewählten Extra-Felder"
 
 msgid "The total price at the end"
 msgstr "Den gesamten Totalbetrag am Ende"
-
-msgid "Enable cancel reservation"
-msgstr "Stornierung von Reservationen erlauben"
-
-msgid "Cancellation"
-msgstr "Stornierung"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -3395,6 +3396,9 @@ msgstr "2 Jahre"
 
 msgid "3 years"
 msgstr "3 Jahre"
+
+msgid "Custom pricing scheme"
+msgstr "Vordefiniertes Preisschema"
 
 msgid "Linked file"
 msgstr "Verknüpfte Datei"

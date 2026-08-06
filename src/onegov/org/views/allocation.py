@@ -289,6 +289,7 @@ def handle_edit_allocation(
         new_start, new_end = form.dates
 
         try:
+            # FIXME: Why do we ignore form.allocation_data?
             resource.scheduler.move_allocation(
                 master_id=self.id,
                 new_start=new_start,

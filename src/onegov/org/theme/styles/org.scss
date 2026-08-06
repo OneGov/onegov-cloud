@@ -846,6 +846,25 @@ form {
         }
     }
 
+    .table-widget {
+        thead th {
+            text-align: center !important;
+        }
+
+        tbody {
+            th[scope="row"] {
+                white-space: nowrap;
+            }
+            td input {
+                margin-bottom: 0 !important;
+
+                &[type="number"] {
+                    text-align: right !important;
+                }
+            }
+        }
+    }
+
     .group-label > ul li {
         align-content: flex-start;
         align-items: flex-start;

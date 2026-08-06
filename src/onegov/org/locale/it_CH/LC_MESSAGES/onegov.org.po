@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-08-06 15:36+0200\n"
+"POT-Creation-Date: 2026-08-06 16:21+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -730,8 +730,6 @@ msgstr ""
 "Gli utenti possono suggerire l'inizio e/o la fine della pubblicazione "
 "dell'elemento negli invii e nelle richieste di modifica"
 
-#.
-#. if activated above
 msgid "Publication"
 msgstr "Pubblicazione"
 
@@ -1956,6 +1954,12 @@ msgstr "Visualizzazione mensile"
 msgid "Doors"
 msgstr "Porte"
 
+msgid "Enable cancel reservation"
+msgstr "Consentire la cancellazione delle prenotazioni"
+
+msgid "Cancellation"
+msgstr "Cancellazione"
+
 msgid "Invoicing party"
 msgstr "Soggetto emittente la fattura"
 
@@ -1971,6 +1975,9 @@ msgid ""
 msgstr ""
 "Verrà indicato nelle fatture per eventuali costi direttamente associati alle "
 "prenotazioni su questa risorsa."
+
+msgid "Pricing scheme"
+msgstr "Schema tariffario"
 
 msgid "Prices in extra fields are"
 msgstr "I prezzi nei campi extra sono"
@@ -1996,12 +2003,6 @@ msgstr "Solo i prezzi nei campi aggiuntivi"
 
 msgid "The total price at the end"
 msgstr "Il prezzo totale alla fine"
-
-msgid "Enable cancel reservation"
-msgstr "Consentire la cancellazione delle prenotazioni"
-
-msgid "Cancellation"
-msgstr "Cancellazione"
 
 msgid ""
 "Failed to retrieve the doors from the dormakaba API please make sure your "
@@ -3401,6 +3402,9 @@ msgstr "2 anni"
 
 msgid "3 years"
 msgstr "3 anni"
+
+msgid "Custom pricing scheme"
+msgstr "Schema tariffario personalizzato"
 
 msgid "Linked file"
 msgstr "File collegato"
