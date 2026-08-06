@@ -69,6 +69,32 @@ class If[FormT: BaseForm, FieldT: Field]:
             validator(form, field)
 
 
+class Revert:
+    """ Will revert the field's ``data`` back to the state it would've been
+    if no ``formdata`` had been submitted.
+
+    Mostly useful in conjunction with :class:`onegov.form.validators.If` to
+    implement conditional pseudo read-only fields, that will preserve the
+    original object data.
+    """
+
+    def __call__(self, form: Form, field: Field) -> None:
+        # NOTE: We only revert potential formdata changes
+        if field.raw_data is None:
+            return
+
+        # NOTE: If we have errors other than process errors, then we
+        #       skip the revert, since validation will fail anyways.
+        if field.errors and field.errors != field.process_errors:
+            return
+
+        field.raw_data = None
+        field.process(None, field.object_data)
+        # NOTE: If we somehow fail processing even without formdata
+        #       then we want to fail validation
+        field.errors = list(field.process_errors)
+
+
 class Stdnum:
     """ Validates a string using any python-stdnum format.
 

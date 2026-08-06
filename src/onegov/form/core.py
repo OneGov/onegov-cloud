@@ -13,7 +13,7 @@ from onegov.form.display import render_field
 from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
-from onegov.form.validators import If, StrictOptional
+from onegov.form.validators import If, Revert, StrictOptional
 from onegov.pay import InvoiceDiscountMeta, InvoiceItemMeta, Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
@@ -304,29 +304,12 @@ class Form(BaseForm):
                 field_flags = getattr(validators[0], 'field_flags', None)
 
                 field.kwargs['validators'] = (
-                    If(
-                        field.depends_on.fulfilled,
-                        *validators
-                    ),
+                    If(field.depends_on.fulfilled, *validators),
                     If(
                         field.depends_on.unfulfilled,
+                        Revert(),
                         StrictOptional(),
-                        # NOTE: If someone manually submits data into a hidden
-                        #       field we want to make sure it's still valid
-                        # FIXME: Do we want to make the field read-only instead
-                        #        so it cannot cause any changes? We could
-                        #        insert a validator that calls
-                        #        `field.process(None, data=field.object_data)`
-                        #        to force data to remain as it was before
-                        #        submission.
-                        *(
-                            validator
-                            for validator in validators
-                            if not isinstance(
-                                validator,
-                                (InputRequired, DataRequired)
-                            )
-                        )
+                        *validators
                     ),
                 )
 

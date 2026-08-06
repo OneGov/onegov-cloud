@@ -1166,10 +1166,56 @@ def test_dependency_validation_chain(field: str, invalid: object) -> None:
         # we can supply an empty value if the dependency is not fulfilled
         assert form(data={'select': 'no'}).validate()
 
-        # we cannot supply an invalid value in any case
+        # we cannot supply invalid data in any case
         inv = invalid
         assert not form(data={'select': 'no', 'select_value': inv}).validate()
         assert not form(data={'select': 'ya', 'select_value': inv}).validate()
+
+
+@pytest.mark.parametrize("field,invalid", [
+    ('@@@', 'foo'),
+    ('0..99', '100'),
+    ('0.00..99.99', '100.00'),
+    ('# iban', 'foo')
+])
+def test_dependency_validation_chain_formdata(
+    field: str,
+    invalid: str
+) -> None:
+    for required in (True, False):
+        code = """
+            select *=
+                ( ) ya
+                    value {}= {}
+                (x) no
+        """.format(required and '*' or '', field)
+
+        form = parse_form(code)
+
+        # we cannot supply an empty value if the dependency is fulfilled
+        # and an input is required
+        if required:
+            assert not form(MultiDict([('select', 'ya')])).validate()
+
+        # we can supply an empty value if the dependency is not fulfilled
+        unfulfilled_empty = form(MultiDict([('select', 'no')]))
+        assert unfulfilled_empty.validate()
+
+        # we cannot supply an invalid value if the dependency is fulfilled
+        assert not form(MultiDict([
+            ('select', 'ya'),
+            ('select_value', invalid)
+        ])).validate()
+
+        # we can supply an invalid value if the dependency is unfulfilled
+        # but it is ignored, so the resulting data should be the same as
+        # with not supplying it
+        unfulfilled_invalid = form(MultiDict([
+            ('select', 'no'),
+            ('select_value', invalid)
+        ]))
+        assert unfulfilled_invalid.validate()
+        assert unfulfilled_empty.data == unfulfilled_invalid.data
 
 
 def test_parse_dependency_with_price() -> None:
