@@ -679,7 +679,8 @@ def create_admin_notification_pdf(
     generated_at: datetime,
     ended: bool = False,
 ) -> tuple[Attachment | None, bool]:
-    """ Renders and signs the notification pdf for a directory entry.
+    """ Renders and (optionally) signs the notification pdf for a directory
+    entry.
 
     Returns a ``(attachment, signing_failed)`` tuple, where ``attachment``
     is ``None`` if rendering failed and the unsigned pdf if only signing
@@ -695,16 +696,19 @@ def create_admin_notification_pdf(
         return None, False
 
     signing_failed = False
-    signed_pdf = BytesIO()
-    try:
-        request.app.signing_service.sign(
-            request.session, content, signed_pdf, None)
-        pdf_bytes = signed_pdf.getvalue()
-    except Exception:
-        # an unsigned pdf is better than no notification at all
-        log.exception('Error while signing directory publication')
-        signing_failed = True
+    if entry.directory.enable_notification_pdf_signing is False:
         pdf_bytes = content.getvalue()
+    else:
+        signed_pdf = BytesIO()
+        try:
+            request.app.signing_service.sign(
+                request.session, content, signed_pdf, None)
+            pdf_bytes = signed_pdf.getvalue()
+        except Exception:
+            # an unsigned pdf is better than no notification at all
+            log.exception('Error while signing directory publication')
+            signing_failed = True
+            pdf_bytes = content.getvalue()
 
     return Attachment(
         # slashes would be cut off by Attachment's basename()
@@ -728,7 +732,8 @@ def send_admin_notification_for_directory_entry(
     generated_at = datetime.now(UTC)
 
     pdf, signing_failed = create_admin_notification_pdf(
-        request, entry, generated_at)
+        request, entry, generated_at,
+    )
 
     # send email anyway, independent of whether the pdf signed successfully
     send_admin_email(
@@ -766,7 +771,8 @@ def send_admin_expiry_notification_for_directory_entry(
     generated_at = datetime.now(UTC)
 
     pdf, signing_failed = create_admin_notification_pdf(
-        request, entry, generated_at, ended=True)
+        request, entry, generated_at, ended=True,
+    )
 
     # send email anyway, independent of whether the pdf signed successfully
     send_admin_email(
