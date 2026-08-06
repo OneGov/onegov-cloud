@@ -137,6 +137,7 @@ class Layout(OrgLayout):
                  edit_mode: bool = False) -> None:
         super().__init__(model, request)
         self.request.include('foundation6')
+        self.request.include('components')
         self.edit_mode = edit_mode
 
     @property

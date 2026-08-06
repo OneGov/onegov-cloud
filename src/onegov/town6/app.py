@@ -234,6 +234,11 @@ def get_js_path() -> str:
 
 
 @TownApp.webasset_path()
+def get_components_path() -> str:
+    return 'assets/js/components'
+
+
+@TownApp.webasset_path()
 def get_css_path() -> str:
     return 'assets/css'
 
@@ -295,7 +300,11 @@ def get_common_asset() -> Iterator[str]:
     yield 'chosen_select_hierarchy.js'
     yield 'iframe_request_parameters.js'
     yield 'ai_formcoder.js'
-    yield 'web-components.js'
+
+
+@TownApp.webasset('components')
+def get_common_components() -> Iterator[str]:
+    yield 'callout.js'
 
 
 @TownApp.webasset('editor')
