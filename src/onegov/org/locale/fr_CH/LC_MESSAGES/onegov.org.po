@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-08-03 10:45+0200\n"
+"POT-Creation-Date: 2026-08-06 15:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -728,6 +728,8 @@ msgstr ""
 "Les utilisateurs peuvent suggérer le début et/ou la fin de la publication de "
 "l'entrée sur les soumissions et les demandes de changement"
 
+#.
+#. if activated above
 msgid "Publication"
 msgstr "Publication"
 
@@ -755,6 +757,13 @@ msgstr ""
 "Reçoit un e-mail lorsque des entrées sont publiées ou dépubliées (envoi "
 "toutes les heures). Utile p.ex. pour les répertoires de permis comme preuve "
 "de publication."
+
+msgid ""
+"Whether the PDF attached to the admin notification should be digitally "
+"signed (recommended)."
+msgstr ""
+"Si le PDF joint à la notification administrative doit être signé "
+"numériquement (recommandé)."
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informations complémentaires du demandeur requises à l'e-mail"

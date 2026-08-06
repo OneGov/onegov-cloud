@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-08-03 10:45+0200\n"
+"POT-Creation-Date: 2026-08-06 15:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -730,6 +730,8 @@ msgstr ""
 "Gli utenti possono suggerire l'inizio e/o la fine della pubblicazione "
 "dell'elemento negli invii e nelle richieste di modifica"
 
+#.
+#. if activated above
 msgid "Publication"
 msgstr "Pubblicazione"
 
@@ -756,6 +758,13 @@ msgstr ""
 "Riceve un'e-mail quando le voci vengono pubblicate o depubblicate (invio "
 "orario). Utile ad esempio per i registri dei permessi come prova di "
 "pubblicazione."
+
+msgid ""
+"Whether the PDF attached to the admin notification should be digitally "
+"signed (recommended)."
+msgstr ""
+"Se il PDF allegato alla notifica amministrativa debba essere firmato "
+"digitalmente (consigliato)."
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informazioni da fornire in aggiunta all'e-mail"
@@ -3928,7 +3937,6 @@ msgstr "Elementi della cartella"
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
 
-#. allowing mtan restricted models makes only sense if we can deliver SMS
 msgid "Only by privileged users or after submitting a mTAN"
 msgstr "Solo da utenti autorizzati o dopo l'invio di un mTAN."
 

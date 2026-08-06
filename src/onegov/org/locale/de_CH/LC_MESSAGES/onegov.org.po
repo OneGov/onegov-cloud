@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-08-03 10:45+0200\n"
+"POT-Creation-Date: 2026-08-06 15:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -729,6 +729,8 @@ msgstr ""
 "Benutzer können Start und/oder Ende der Publikation des Eintrags bei "
 "Änderungsvorschlägen und Eingaben setzen"
 
+#.
+#. if activated above
 msgid "Publication"
 msgstr "Publikation"
 
@@ -755,6 +757,13 @@ msgstr ""
 "Erhält eine E-Mail, wenn Einträge veröffentlicht oder depubliziert werden "
 "(Versand stündlich). Nützlich z.B. für Baugesuchsverzeichnisse als Nachweis "
 "der Veröffentlichung."
+
+msgid ""
+"Whether the PDF attached to the admin notification should be digitally "
+"signed (recommended)."
+msgstr ""
+"Ob das der Admin-Benachrichtigung beigefügte PDF digital signiert werden "
+"soll (empfohlen)."
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
@@ -3927,7 +3936,6 @@ msgstr "Verzeichniseinträge"
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
 
-#. allowing mtan restricted models makes only sense if we can deliver SMS
 msgid "Only by privileged users or after submitting a mTAN"
 msgstr "Zeitbegrenzter Zugriff nach Eingabe eines mTANs"
 
