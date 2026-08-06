@@ -112,29 +112,21 @@ def restrict_attendence_access(
                 ).first()
 
                 if attendance_owner and attendance_owner.parliamentarian:  # type: ignore[attr-defined]
-                    # Check if president leads any commission where attendance
-                    # owner is a member
-                    for pres_membership in (
-                        parliamentarian.commission_memberships
+                    today = date.today()
+                    presidencies = parliamentarian.commission_memberships_on(
+                        on_date=today,
+                        role='president',
+                    )
+                    owner = attendance_owner.parliamentarian  # type: ignore[attr-defined]
+                    owner_memberships = owner.commission_memberships_on(
+                        on_date=today,
+                    )
+                    if any(
+                        presidency.commission_id == membership.commission_id
+                        for presidency in presidencies
+                        for membership in owner_memberships
                     ):
-                        if (pres_membership.role == 'president'
-                            and (pres_membership.end is None
-                                 or pres_membership.end >= date.today())):
-
-                            # Check if attendance owner is member of this
-                            # commission
-                            for member_membership in (
-                                attendance_owner.parliamentarian  # type: ignore[attr-defined]
-                                .commission_memberships
-                            ):
-                                if (
-                                    member_membership.commission_id
-                                    == pres_membership.commission_id
-                                    and (member_membership.end is None
-                                         or member_membership.end
-                                         >= date.today())
-                                ):
-                                    return True
+                        return True
 
                 return False
 
@@ -173,22 +165,20 @@ def restrict_parliamentarian_access(
                 if model.id == parliamentarian.id:
                     return True
 
-                # Check if the target parliamentarian is a member of any
-                # commission this president leads
-                for pres_membership in parliamentarian.commission_memberships:
-                    if (pres_membership.role == 'president'
-                        and (pres_membership.end is None
-                             or pres_membership.end >= date.today())):
-
-                        # Check if target parliamentarian is member of this
-                        # commission
-                        for member_membership in model.commission_memberships:
-                            if (member_membership.commission_id
-                                == pres_membership.commission_id
-                                and (member_membership.end is None
-                                     or member_membership.end
-                                     >= date.today())):
-                                return True
+                today = date.today()
+                presidencies = parliamentarian.commission_memberships_on(
+                    on_date=today,
+                    role='president',
+                )
+                memberships = model.commission_memberships_on(
+                    on_date=today,
+                )
+                if any(
+                    presidency.commission_id == membership.commission_id
+                    for presidency in presidencies
+                    for membership in memberships
+                ):
+                    return True
 
                 return False
 

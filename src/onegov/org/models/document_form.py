@@ -90,7 +90,7 @@ class FormDocument(Base, ContentMixin, TimestampMixin, AccessExtension,
         self.order = normalize_for_url(title)
 
 
-class FormDocumentCollection(GenericCollection[FormDocument]):
+class FormDocumentCollection(GenericCollection[FormDocument, UUID]):
 
     supported_collections = {
         'form': FormCollection,
@@ -134,7 +134,9 @@ class FormDocumentCollection(GenericCollection[FormDocument]):
         return self.query().filter(FormDocument.name == name).first()
 
     @classmethod
-    def collection_by_name(cls) -> dict[str, type[GenericCollection[Any]]]:
+    def collection_by_name(
+        cls
+    ) -> dict[str, type[GenericCollection[Any, Any]]]:
         return {m.__name__: m for m in cls.supported_collections.values()}
 
     @property
@@ -145,7 +147,7 @@ class FormDocumentCollection(GenericCollection[FormDocument]):
     def target(
         cls,
         external_link: FormDocument
-    ) -> type[GenericCollection[Any]]:
+    ) -> type[GenericCollection[Any, Any]]:
         assert external_link.member_of is not None
         return cls.collection_by_name()[external_link.member_of]
 

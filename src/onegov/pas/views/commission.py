@@ -13,7 +13,6 @@ from onegov.pas.models import PASCommission
 from onegov.pas.models import PASCommissionMembership
 from onegov.pas.utils import is_active_kantonsrat_member
 from onegov.user import User
-from sqlalchemy import or_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -118,16 +117,11 @@ def commissions_parliamentarians_json(
 
     session = request.session
     today = date.today()
-    memberships = (
-        session.query(PASCommissionMembership)
-        .filter(
-            or_(
-                PASCommissionMembership.end.is_(None),
-                PASCommissionMembership.end >= today,
-            )
-        )
-        .all()
-    )
+    memberships = [
+        membership
+        for membership in session.query(PASCommissionMembership).all()
+        if membership.is_active_on(today)
+    ]
 
     # If user is parliamentarian, filter to only their commissions
     if (hasattr(request.identity, 'role')
@@ -142,7 +136,9 @@ def commissions_parliamentarians_json(
         # Get commission IDs where this parliamentarian is a member
         parliamentarian_commission_ids = {
             str(m.commission_id)
-            for m in user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
+            for m in user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
+                on_date=today,
+            )
         }
 
         # Filter memberships to only those commissions
@@ -164,8 +160,10 @@ def commissions_parliamentarians_json(
         # Get commission IDs where this user is president
         president_commission_ids = {
             str(m.commission_id)
-            for m in user.parliamentarian.commission_memberships  # type: ignore[attr-defined]
-            if m.role == 'president'
+            for m in user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
+                on_date=today,
+                role='president',
+            )
         }
 
         # Filter memberships to only those commissions

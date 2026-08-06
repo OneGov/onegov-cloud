@@ -87,6 +87,12 @@ class ParliamentarianRole(Base, ContentMixin, TimestampMixin):
         default=uuid4
     )
 
+    #: The id of the corresponding membership in KUB.
+    #
+    # Empty for roles which were not imported, they are never touched by the
+    # import.
+    external_kub_id: Mapped[UUID | None] = mapped_column(unique=True)
+
     #: The start date
     start: Mapped[date | None]
 

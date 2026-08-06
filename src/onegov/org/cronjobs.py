@@ -7,7 +7,6 @@ import logging
 from babel.dates import get_month_names
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from functools import lru_cache
 from inspect import isabstract
 from itertools import groupby, chain
 from markupsafe import Markup
@@ -18,10 +17,12 @@ from onegov.core.orm import find_models
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.directory import DirectoryEntry
 from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
-from onegov.form import FormSubmission, parse_form, Form
+from onegov.file.models import SigningRequest
+from onegov.form import FormSubmission
 from onegov.newsletter.models import Recipient
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
@@ -39,13 +40,16 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from cryptography.fernet import InvalidToken
-from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
+from onegov.org.models import (
+    ExtendedDirectoryEntry, TicketMessage)
 from onegov.org.notification_service import (
     get_notification_service,
 )
 from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
+    send_admin_expiry_notification_for_directory_entry,
+    send_admin_notification_for_directory_entry,
     send_email_notification_for_directory_entry)
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
@@ -60,7 +64,7 @@ from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import undefer, joinedload
 from urllib3.util import Retry
 from uuid import UUID
 
@@ -105,6 +109,7 @@ def hourly_maintenance_tasks(request: OrgRequest) -> None:
     send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
+    delete_old_signing_requests(request)
     request.app.org.meta['hourly_maintenance_tasks_last_run'] = now
     # NOTE: Shouldn't be necessary, but better safe than sorry, since
     #       `maybe_merge` in `request_cached` can fail if we try to
@@ -229,6 +234,8 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
                 )
             )
         )
+        if issubclass(model, DirectoryEntry):
+            query = query.options(joinedload(model.directory))
         objects.update(query)
 
     for obj in objects:
@@ -249,14 +256,19 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
 
+        if (isinstance(obj, ExtendedDirectoryEntry) and
+                obj.directory.notification_address):
+            if obj.publication_end is None or obj.publication_end > now:
+                send_admin_notification_for_directory_entry(
+                    obj.directory, obj, request)
+            else:
+                send_admin_expiry_notification_for_directory_entry(
+                    obj.directory, obj, request)
+
 
 def delete_old_tans(request: OrgRequest) -> None:
     """
     Deletes TANs that are older than half a year.
-
-    Technically we could delete them as soon as they expire
-    but for debugging purposes it makes sense to keep them
-    around a while longer.
     """
 
     cutoff = utcnow() - timedelta(days=180)
@@ -278,6 +290,20 @@ def delete_old_tan_accesses(request: OrgRequest) -> None:
 
     cutoff = utcnow() - timedelta(days=180)
     query = request.session.query(TANAccess).filter(TANAccess.created < cutoff)
+    # cronjobs happen outside a regular request, so we don't need
+    # to synchronize with the session
+    with request.app.session_manager.ignore_bulk_deletes():
+        query.delete(synchronize_session=False)
+
+
+def delete_old_signing_requests(request: OrgRequest) -> None:
+    """
+    Deletes signing requests that are older than a year.
+    """
+
+    cutoff = utcnow() - timedelta(days=366)
+    query = request.session.query(SigningRequest).filter(
+        SigningRequest.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
     with request.app.session_manager.ignore_bulk_deletes():
@@ -590,8 +616,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         .with_entities(
             Resource.id,
             Resource.group,
-            Resource.title,
-            Resource.definition
+            Resource.title
         )
         .order_by(Resource.group, Resource.name, Resource.id)
     )
@@ -600,10 +625,6 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         (r.id.hex, f'{r.group or default_group} - {r.title}')
         for r in all_resources
     )
-
-    @lru_cache(maxsize=128)
-    def form(definition: str) -> type[Form]:
-        return parse_form(definition)
 
     # get the reservations of this day
     start = align_date_to_day(today, 'Europe/Zurich', 'down')
@@ -638,7 +659,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
             #        temporary attribute
             reservation.submission = submission  # type:ignore
 
-    # group th reservations by resource
+    # group the reservations by resource
     reservations = {
         resid.hex: tuple(reservations) for resid, reservations in groupby(
             all_reservations, key=lambda r: r.resource
@@ -655,7 +676,6 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         ),
         'organisation': request.app.org.title,
         'resources': resources,
-        'parse_form': form
     }
 
     for address, included_resources in recipients:
@@ -817,6 +837,56 @@ def send_monthly_mtan_statistics(request: OrgRequest) -> None:
         plaintext=(
             f'{org_name} hatte im {month_name} {year}\n'
             f'{mtan_count} mTAN SMS versendet'
+        )
+    )
+
+
+@OrgApp.cronjob(hour=9, minute=45, timezone='Europe/Zurich')
+def send_monthly_signing_service_statistics(request: OrgRequest) -> None:
+
+    today = to_timezone(utcnow(), 'Europe/Zurich')
+
+    if today.weekday() != MON or today.day > 7:
+        return
+
+    year = today.year
+    month = today.month
+
+    # rewind to previous month
+    if month == 1:
+        month = 12
+        year -= 1
+    else:
+        month -= 1
+
+    # count all the signing requests created in that period
+    # we use UTC as a reference for day boundaries so we don't have to
+    # calculate the boundaries ourselves and risk creating overlapping
+    # intervals
+    signing_request_counts: dict[str, int] = dict(request.session.query(
+        SigningRequest.service_name,
+        func.count(SigningRequest.id)
+    ).filter(and_(
+        func.extract('year', SigningRequest.created) == year,
+        func.extract('month', SigningRequest.created) == month,
+    )).group_by(SigningRequest.service_name).tuples())
+    if not signing_request_counts:
+        # don't send a mail if we generated no mTANs
+        return
+
+    month_name = get_month_names('wide', locale='de_CH')[month]
+    org_name = request.app.org.name
+
+    # FIXME: Make e-mail configurable and text translatable
+    request.app.send_transactional_email(
+        receivers='info@seantis.ch',
+        subject=f'{org_name}: PDF Signatur Statistik {month_name} {year}',
+        plaintext=(
+            f'{org_name} hat im {month_name} {year}\n'
+            '\n'.join(
+                f'{count} PDFs signiert via {name}'
+                for name, count in signing_request_counts.items()
+            )
         )
     )
 

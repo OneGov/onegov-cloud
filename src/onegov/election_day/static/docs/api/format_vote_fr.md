@@ -13,12 +13,12 @@ Les formats de fichier acceptés sont les fichiers générés à la main par le 
     - [Avant-propos](#avant-propos)
         - [Entités](#entit%C3%A9s)
     - [Formats](#formats)
+        - [eCH-0252](#ech-0252)
         - [OneGov](#onegov)
             - [Colonnes](#colonnes)
             - [Résultats temporaires](#r%C3%A9sultats-temporaires)
             - [Modèle](#mod%C3%A8le)
         - [WabstiCExport](#wabsticexport)
-        - [eCH-0252](#ech-0252)
 
 <!-- /TOC -->
 
@@ -29,6 +29,10 @@ Les formats de fichier acceptés sont les fichiers générés à la main par le 
 Un entité est soit une municipalité (instances cantonales, instances communales sans quartiers), ou un quartier (instances communales avec quartiers).
 
 ## Formats
+
+### eCH-0252
+
+Voir [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
 
 
 ### OneGov
@@ -74,8 +78,3 @@ Si le statut est
 ### WabstiCExport
 
 La version `>= 2.2` est prise en charge, veuillez vous référer à la documentation fournie par le programme exportateur pour plus d'informations concernant les colonnes des différents fichiers.
-
-
-### eCH-0252
-
-Voir [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

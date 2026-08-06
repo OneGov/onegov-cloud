@@ -91,7 +91,13 @@ def edit_votum(
     layout = VotumLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.edit_mode = True
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.return_to_url(
+            request.link(self.agenda_item, fragment=f'votum-{self.number}')
+        ),
+        attrs={'class': 'cancel-link'}
+    )
 
     return {
         'layout': layout,

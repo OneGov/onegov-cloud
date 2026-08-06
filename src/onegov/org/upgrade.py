@@ -20,6 +20,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import File
 from onegov.form import FormDefinition
+from onegov.form.parser import ParsedForm
 from onegov.newsletter import Newsletter
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
@@ -367,7 +368,7 @@ def add_submission_window_id_to_survey_submissions(
                 ForeignKey('submission_windows.id'),
                 nullable=True
             ),
-            default=None  # type: ignore[arg-type]
+            default=None
         )
 
 
@@ -963,3 +964,35 @@ def recreate_missing_reserved_slots(context: UpgradeContext) -> None:
             f'({suffix})',
             fg='yellow',
         )
+
+
+@upgrade_task('Subscribe customer-message recipients to cancellation requests')
+def subscribe_customer_message_recipients_to_cancellation_requests(
+    context: UpgradeContext
+) -> None:
+    # customer-message recipients should also be notified about cancellation
+    # requests.
+    if context.has_table('generic_recipients'):
+        context.operations.execute(text("""
+            UPDATE generic_recipients SET content = jsonb_set(
+                content, '{cancellation_requests}', 'true'
+            ) WHERE type = 'resource'
+              AND content->>'customer_messages' = 'true';
+        """))
+
+
+@upgrade_task('Switch to JSON serialized event filter form definitions')
+def switch_to_parsed_event_filters(context: UpgradeContext) -> None:
+    org = context.session.query(Organisation).first()
+
+    if not org:
+        return
+
+    if 'event_filter_definition' not in org.meta:
+        return
+
+    definition = org.meta.pop('event_filter_definition')
+    if not definition:
+        return
+
+    org.event_filter_parsed_definition = ParsedForm.from_formcode(definition)

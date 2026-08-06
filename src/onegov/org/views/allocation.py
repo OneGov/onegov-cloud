@@ -2,10 +2,13 @@ from __future__ import annotations
 import json
 
 import morepath
+import sedate
 
 from datetime import timedelta
+from libres.db.models import Allocation as LibresAllocation
 from libres.db.models import ReservedSlot
 from libres.modules.errors import LibresError
+from libres.modules import rasterizer
 
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import is_uuid
@@ -27,7 +30,7 @@ from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from purl import URL
 from sedate import utcnow
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, tuple_
 from sqlalchemy.dialects.postgresql import JSON
 from uuid import uuid4
 from webob import exc
@@ -38,6 +41,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
+    from sqlalchemy.orm import Query
     from webob import Response
 
     type AllocationForm = (
@@ -356,6 +360,60 @@ def handle_delete_allocation(self: Allocation, request: OrgRequest) -> None:
             response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
 
 
+def warn_about_skipped_allocations(
+    request: OrgRequest, form: AllocationRuleForm, created: int
+) -> None:
+    """Allocations which overlap existing ones are silently skipped by
+    the scheduler, so we point that out.
+
+    """
+
+    skipped = len(form.dates) - created
+
+    if skipped > 0:
+        request.warning(
+            _(
+                '${n} availabilities were not created, because they overlap '
+                'with existing ones.',
+                mapping={'n': skipped},
+            )
+        )
+
+
+def count_matching_allocations(
+    allocations: Query[LibresAllocation],
+    form: AllocationRuleForm,
+    timezone: str,
+) -> int:
+    dates = (
+        (
+            sedate.standardize_date(start, timezone),
+            sedate.standardize_date(end, timezone),
+        )
+        for start, end in form.dates
+    )
+    if form.whole_day:
+        dates = (
+            sedate.align_range_to_day(start, end, timezone)
+            for start, end in dates
+        )
+
+    expected = {
+        rasterizer.rasterize_span(start, end, rasterizer.MIN_RASTER)
+        for start, end in dates
+    }
+    if not expected:
+        return 0
+
+    return allocations.filter(
+        LibresAllocation.is_master,
+        tuple_(
+            LibresAllocation._start,
+            LibresAllocation._end,
+        ).in_(expected),
+    ).count()
+
+
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
              permission=Private, form=get_allocation_rule_form_class)
 def handle_allocation_rule(
@@ -378,6 +436,7 @@ def handle_allocation_rule(
             'New availability period active, ${n} allocations created',
             mapping={'n': changes}
         ))
+        warn_about_skipped_allocations(request, form, changes)
 
         return request.redirect(request.link(self, name='rules'))
 
@@ -475,6 +534,10 @@ def handle_edit_rule(
         if 'access' in form:
             new_data['access'] = form['access'].data
 
+        matching_updated_count = count_matching_allocations(
+            updatable_candidates, form, self.timezone
+        )
+
         # NOTE: This is a little bit dodgy, but since allocations aren't
         #       searchable and we don't have any other use-cases currently
         #       where we would want to know about changes to allocations
@@ -511,6 +574,11 @@ def handle_edit_rule(
                 },
             )
         )
+
+        warn_about_skipped_allocations(
+            request, form, new_allocations_count + matching_updated_count
+        )
+
         return request.redirect(request.link(self, name='rules'))
 
     # Pre-populate the form with existing rule data
@@ -723,8 +791,7 @@ def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
         Allocation.group.notin_(reservations.scalar_subquery()))
 
     # delete the allocations
-    for count, candidate in enumerate(candidates, start=1):
-        request.session.delete(candidate)
+    count = candidates.delete('fetch')
 
     delete_rule(self, rule_id)
 

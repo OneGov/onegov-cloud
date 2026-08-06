@@ -1,6 +1,10 @@
 /*
     General tweaks
 */
+p, h1, h2, h3, h4, h5 {
+    color: $body-font-color;
+}
+
 .small {
     font-size: 17px;
 }
@@ -16,13 +20,10 @@
 
 input[data-street-search] {
     background: $input-bg-color;
-    border: 0 inset $input-border-color;
-    border-radius: 2px;
-    box-shadow: $input-box-shadow;
+    border: 0 inset $gray-light;
     font-size: 1.1rem;
-    font-weight: bold;
     height: 50px;
-    padding: 10px;
+    padding: 1rem 1rem;
 }
 
 form input[type="radio"] {
@@ -32,6 +33,73 @@ form input[type="radio"] {
 input[data-street-search]::placeholder {
     color: $input-placeholder-color;
 }
+
+/*
+    Forms
+*/
+input[type="text"], input[type="password"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="week"], input[type="email"], input[type="number"], input[type="search"], input[type="tel"], input[type="time"], input[type="url"], input[type="color"], textarea, select, button.secondary.dropdown {
+    border: 1px solid $gray-light;
+    border-radius: 4px !important;
+    background-color: $white !important;
+    box-shadow: none;
+    color: $black;
+}
+
+button.secondary.dropdown {
+    padding: 1rem;
+    color: $black !important;
+
+    &:hover {
+        background-color: $white !important;
+        color: $black !important;
+    }
+}
+
+ul#pubnav {
+    position: relative !important;
+    left: auto !important;
+    top: -1.25rem !important;
+    border-radius: 4pt;
+    width: 100%;
+    max-width: 100%;
+    margin-top: -1px;
+    border: solid 1px $gray-light;
+    box-shadow: 0px 4px 10px 0px #00000054;
+
+    li {
+        a {
+            color: $black !important;
+        }
+
+        &:hover {
+            background: $gray-ultra-light;
+        }
+    }
+}
+
+.label-text {
+    color: $dark-blue;
+    font-weight: bold;
+}
+
+.field-help {
+    margin-bottom: 1.5rem;
+}
+
+.label-required {
+    color: $dark-blue !important;
+    font-size: 1.2rem;
+    font-weight: normal !important;
+    margin-left: -.2rem;
+    margin-bottom: -.2rem;
+}
+
+/*
+    Button
+*/
+    .button {
+        border-radius: 2rem !important;
+    }
 
 /*
     Edit bar
@@ -52,27 +120,40 @@ input[data-street-search]::placeholder {
 }
 
 /*
-    Sidepanel
+    Sidepanels
 */
 
 .homepage .side-panel:first-child,
-.side-panel.highlighted {
-    background-color: $topbar-bg-color;
-    border: 0;
-    padding: .5rem 1rem 1rem;
+    .side-panel.highlighted {
+        border: 0;
+        padding: 1.5rem 1rem 1.5rem;
 
-
-    .title,
-    h2 {
-        background: $primary-color;
-        color: $white;
-        display: block;
-        margin: -.5rem -1rem 1rem;
-        padding: .75rem 1rem;
-        text-transform: uppercase;
-}
+        .title,
+        h2 {
+            display: block;
+            margin: -.5rem -1rem 1rem;
+            padding: .75rem 1rem;
+    }
 }
 
+.side-panel.highlighted.without-title > ul:first-of-type:not(.bulleted) {
+    padding: 0;
+
+    li {
+        margin: 0;
+        padding: 0;
+
+        &:first-child {
+            background: transparent;
+            color: $body-font-color;
+            font-weight: bold;
+            margin: 0;
+            padding: 0;
+            font-size: 1rem;
+            text-transform: none;
+        }
+    }
+}
 
 .side-panel.highlighted {
     &.without-title {
@@ -87,9 +168,27 @@ input[data-street-search]::placeholder {
     }
 }
 
+.submit-yours {
+    padding: 1.5rem 1rem;
+    background-color: $beige-ultra-light;
+
+    h2 {
+        color: $body-font-color;
+    }
+
+    dd {
+        font-size: .875rem;
+        margin-bottom: 0;
+    }
+}
+
 /*
-    Directory search
+    Directory
 */
+.directory-fields dt {
+    font-size: 1.2rem;
+}
+
 #inline-search {
     $border-width: 0 0 3px;
     $border-color: $gray;
@@ -97,7 +196,6 @@ input[data-street-search]::placeholder {
     input[type="text"],
     input[type="text"]:focus,
     input[type="text"]:active {
-        background-color: $gray-light;
         border-color: $border-color;
         border-width: $border-width;
         box-shadow: none;
@@ -112,8 +210,47 @@ input[data-street-search]::placeholder {
         text-align: right;
     }
 
+    .input-group {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 2rem;
+        padding: .5rem;
+        padding-left: 1rem;
+        border: 2px solid transparent;
+        border-radius: 2rem;
+        box-shadow: 0px 0px 12px 0px rgba(86, 86, 86, 0.25);
+
+        &:focus-within {
+            border: 2px solid $primary-color;
+        }
+
+        .input {
+            flex-grow: 2;
+            display: flex;
+
+            input {
+                border: 0;
+                border-radius: 2rem;
+
+                &:focus {
+                    background: transparent;
+                }
+            }
+        }
+
+        .search-button button {
+            border: 0;
+            background-color: $gray-ultra-light;
+            display: flex;
+            padding: .75rem;
+        }
+    }
+
     .reset-button {
         color: $gray-dark;
+        position: relative;
+        top: 0;
+        right: 1rem;
 
         &::after {
             @include icon('\f00d');
@@ -121,12 +258,95 @@ input[data-street-search]::placeholder {
     }
 }
 
+
+/*
+    Directories, Streetlist
+*/
+.streetlist,
+.directory-list {
+    border: 0 !important;
+
+    @media #{$medium-up} {
+    &.two-columns {
+        -moz-column-count: 2;
+        -moz-column-gap: 2em;
+        -webkit-column-count: 2;
+        -webkit-column-gap: 2em;
+        column-count: 2;
+        column-gap: .3rem;
+        margin-left: 0;
+        list-style: none;
+
+        > li {
+            text-overflow: ellipsis;
+            break-inside: avoid;
+        }
+    }
+    }
+
+    li {
+        list-style: none;
+        text-overflow: ellipsis;
+        margin-bottom: .3rem;
+        background: rgba($beige-ultra-light, 0.6);
+        border: 0 !important;
+        
+        &:hover {
+            background: $beige-ultra-light !important;
+        }
+
+        a {
+            width: 100%;
+            display: block;
+            color: black;
+            position: relative;
+
+            &::after {
+                content: "";
+                display: block;
+                width: 16px;
+                height: 20px;
+                flex-shrink: 0;
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23E2001A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg>');
+                background-repeat: no-repeat;
+                background-size: contain;
+                position: absolute;
+                top: 50%;
+                right: 1rem;
+                transform: translateY(-50%);
+            }
+        }
+    }
+}
+
+.streetlist a {
+    padding: 1rem;
+}
+
+.directory-list {
+    margin-top: 2rem;
+
+    li {
+        padding: 0 !important;
+    
+        a {
+            padding: 1rem;
+            padding-bottom: 0;
+        }
+    
+        .list-lead {
+            margin: 0;
+            padding: 1rem;
+            padding-top: 0;
+        }
+    }
+}
+
+
 /*
     Filter panel
 */
 .filter-panel {
-    background: $gray-light;
-    padding: 1rem 1.1rem;
 
     h2 {
         border-bottom: 0 !important;
@@ -136,11 +356,17 @@ input[data-street-search]::placeholder {
     .tags {
         margin-bottom: 0 !important;
 
+        span {
+            padding: .5rem 1rem;
+        }
+
         span,
         a {
-            background-color: $gray-light;
-            font-size: .85rem;
+            background-color: $beige-ultra-light;
+            border-radius: 2rem;
             line-height: 1.3em;
+            font-weight: bold;
+            border: 0 !important;
         }
 
         span.active,
@@ -150,7 +376,7 @@ input[data-street-search]::placeholder {
         span:hover a {
             background-color: $primary-color !important;
             border-color: $primary-color !important;
-            color: $gray-ultra-light !important;
+            color: $white !important;
         }
     }
 
@@ -166,22 +392,6 @@ input[data-street-search]::placeholder {
     display: initial;
     font-weight: bold;
     font-size: 0.875rem;
-}
-
-.publication-nav {
-    button.dropdown.dropdown {
-        background: $gray-light;
-        font-size: 1rem;
-
-        &::after {
-            border-color: $primary-color transparent transparent;
-        }
-
-        &:hover,
-        &:focus {
-            color: $black;
-        }
-    }
 }
 
 /*
@@ -210,14 +420,7 @@ input[data-street-search]::placeholder {
     }
 
     list-style-position: inside;
-
-    li {
-        list-style-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3IiBoZWlnaHQ9IjkiIHZpZXdCb3g9IjAgMCA3IDkiPgogIDxjaXJjbGUgY3g9IjMuNSIgY3k9IjMuNSIgcj0iMi41IiBmaWxsPSIjNDQ0NDNGIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz4KPC9zdmc+Cg==");
-        overflow: hidden;
-        padding-bottom: .273em;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+    column-gap: .3rem;
 }
 
 .streettable {
@@ -347,46 +550,41 @@ input[data-street-search]::placeholder {
     Roadworks List
 */
 .roadwork-list {
-    display: flex;
-    flex-wrap: wrap;
+    list-style: none;
+    margin-top: 2rem;
+    margin-left: 0;
 
-    > dt,
-    > dd {
-        flex: 0 0 100%;
-    }
+    > li {
+         border-top: 1px solid $beige-light;
+         padding: 2rem 0;
 
-    > dd {
-        border-bottom: 1px solid $gray-light;
-        padding-bottom: 15px;
-    }
-
-    > dd:last-of-type {
-        border-bottom: 0;
+         a {
+            color: $black;
+            font-weight: bold;
+            font-size: 1rem;
+         }
     }
 
     .date-label {
-        color: darken($secondary-color, 40%);
-        display: inline-block;
-        width: 4ex;
+        font-weight: normal;
+    }
+
+    .title-roadwork-sections {
+        color: $black;
+        display: block;
+        margin-top: 2rem;
+        margin-bottom: .5rem;
+        font-size: .875rem;
+    }
+
+    .roadwork-sections {
+        list-style: disc;
+
+    * {
+        color: $dark-blue;
+        font-size: .875rem;
     }
 }
-
-.roadwork-sections {
-    padding-left: 4.5ex;
-
-    h2 {
-        font-size: .875rem;
-        margin-top: 15px;
-    }
-
-    dl {
-        font-size: .875rem;
-        margin-bottom: -5px;
-
-        a {
-            font-weight: normal;
-        }
-    }
 }
 
 /*
@@ -407,7 +605,7 @@ input[data-street-search]::placeholder {
     Mission report list
 */
 .total-missions {
-    @include label($text-size: .875rem, $bg: $gray-pastel, $radius: true);
+    @include label($text-size: .875rem, $bg: rgba($beige-ultra-light, 0.6), $radius: true);
 
     font-size: .875rem;
     margin-bottom: 1rem;
@@ -436,6 +634,42 @@ td.mission-nature {
 /*
     Tables
 */
+table {
+    margin-bottom: 1.5rem;
+
+    tr th {
+        color: $dark-blue;
+        padding: .2rem;
+    }
+
+    tr {
+        background: transparent !important;
+
+        &:last-child {
+            th, td {
+                border-bottom: 1px solid $dark-blue;
+            }
+        }
+
+        input[type="checkbox"] {
+            margin-top: 0 !important;
+        }
+    }
+
+    thead {
+        background-color: transparent;
+        border-bottom: 2px solid;
+        tr th {
+            color: $beige;
+            border-bottom: 2px solid $dark-blue !important;
+        }
+    }
+
+    td {
+        border-bottom: 1px solid $gray-light;
+    }
+}
+
 .min-width-column {
     white-space: nowrap;
     width: 1%;
@@ -546,7 +780,7 @@ table.responsive {
     Mission reports legend
 */
 .mission-report-legend, .mission-report-open-data {
-    background: $gray-pastel;
+    background: rgba($beige-ultra-light, 0.6);
     padding: 1rem 1rem .5rem;
     margin-bottom: .5rem;
 
@@ -1005,4 +1239,49 @@ table.responsive {
         color: $black;
         border: 1px solid $black;
     }
+}
+
+.page-content-main a,
+a.mission-nature-title,
+.side-panel.highlighted.without-title > ul:first-of-type:not(.bulleted) a {
+    font-weight: bold;
+    position: relative;
+    text-decoration: none;
+    color: $black;
+    display: inline-block;
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        width: 100%;
+        height: 2px;
+        background-color: $black;
+    }
+
+    &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        width: 100%;
+        height: 2px;
+        background-color: $primary-color;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.2s ease;
+    }
+
+    &:hover::after {
+        transform: scaleX(1);
+    }
+}
+
+.side-panel.highlighted.without-title > ul:first-of-type:not(.bulleted) a {
+    display: list-item;
+}
+
+a.mission-nature-title {
+    margin-bottom: 1rem;
 }

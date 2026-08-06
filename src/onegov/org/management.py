@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from onegov.page import Page
+    from onegov.reservation import Resource
     from typing import Self
 
 
@@ -197,6 +198,55 @@ class PageNameChange(ModelsWithLinksMixin):
 
     @classmethod
     def from_form(cls, model: Page, form: Form) -> Self:
+        return cls(form.request, model, form['name'].data)  # type:ignore
+
+
+class ResourceNameChange(ModelsWithLinksMixin):
+
+    def __init__(
+        self,
+        request: OrgRequest,
+        resource: Resource,
+        new_name: str
+    ) -> None:
+
+        assert new_name == normalize_for_url(new_name)
+        assert resource.name != new_name
+
+        self.request = request
+        self.resource = resource
+        self.new_name = new_name
+
+    def execute(self, test: bool = False) -> int:
+        """ Executes a resource name change. The old and new url must be
+        swapped in all possible fields of all sites of the SiteCollection.
+        """
+
+        resource = self.resource
+        old_name = resource.name
+
+        def run() -> int:
+            url_before = self.request.link(resource)
+            resource.name = self.new_name
+            url_after = self.request.link(resource)
+            assert url_before != url_after
+
+            migration = LinkMigration(self.request, url_before, url_after)
+            count, _grouped = migration.migrate_site_collection(test=test)
+            return count
+
+        if test:
+            session = object_session(resource)
+            assert session is not None
+            with session.no_autoflush:
+                counter = run()
+                resource.name = old_name
+                transaction.abort()
+                return counter
+        return run()
+
+    @classmethod
+    def from_form(cls, model: Resource, form: Form) -> Self:
         return cls(form.request, model, form['name'].data)  # type:ignore
 
 

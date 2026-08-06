@@ -84,7 +84,7 @@ class ExternalResourceLink(ExternalLink):
     fts_type_title = _('Resources')
 
 
-class ExternalLinkCollection(GenericCollection[ExternalLink]):
+class ExternalLinkCollection(GenericCollection[ExternalLink, UUID]):
 
     supported_collections = {
         'form': FormCollection,
@@ -124,7 +124,9 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
             )
 
     @classmethod
-    def collection_by_name(cls) -> dict[str, type[GenericCollection[Any]]]:
+    def collection_by_name(
+        cls
+    ) -> dict[str, type[GenericCollection[Any, Any]]]:
         return {m.__name__: m for m in cls.supported_collections.values()}
 
     @property
@@ -137,7 +139,7 @@ class ExternalLinkCollection(GenericCollection[ExternalLink]):
     def target(
         cls,
         external_link: ExternalLink
-    ) -> type[GenericCollection[Any]]:
+    ) -> type[GenericCollection[Any, Any]]:
         assert external_link.member_of is not None
         return cls.collection_by_name()[external_link.member_of]
 

@@ -10,6 +10,7 @@ from io import BytesIO
 from itertools import chain, repeat
 from onegov.file import FileCollection
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.org.models import TicketNote
 from onegov.ticket import Ticket
 from onegov.user import UserCollection
@@ -77,10 +78,14 @@ def test_registration_ticket_workflow(client: Client) -> None:
     collection = FormCollection(client.app.session())
     users = UserCollection(client.app.session())
 
-    form = collection.definitions.add('Meetup', textwrap.dedent("""
-        E-Mail *= @@@
-        Name *= ___
-    """), 'custom')
+    form = collection.definitions.add(
+        'Meetup',
+        ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
+            Name *= ___
+        """)),
+        'custom'
+    )
 
     form.add_registration_window(
         start=date(2018, 1, 1),
@@ -349,11 +354,15 @@ def test_forms_without_group_are_displayed(
 
 def test_navbar_links_visibility(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
-        First name * = ___
-        Last name * = ___
-        E-Mail * = @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Profile',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            First name * = ___
+            Last name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
 
     transaction.commit()
 
@@ -386,11 +395,16 @@ def test_file_export_for_ticket(
 ) -> None:
 
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Statistics', definition=textwrap.dedent("""
-        E-Mail * = @@@
-        Name * = ___
-        Datei * = *.txt
-        Datei2 * = *.txt """), type='custom')
+    collection.definitions.add(
+        'Statistics',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail * = @@@
+            Name * = ___
+            Datei * = *.txt
+            Datei2 * = *.txt
+        """)),
+        type='custom'
+    )
     transaction.commit()
 
     client.login_admin()

@@ -1940,9 +1940,7 @@ def get_current_tickets_url(request: OrgRequest) -> str:
 
 
 def invoice_items_for_submission(
-    request: CoreRequest,
-    form: Form,
-    submission: FormSubmission
+    request: CoreRequest, form: Form, submission: FormSubmission
 ) -> list[InvoiceItemMeta]:
 
     # NOTE: Eventually we may need something more sophisticated
@@ -2015,6 +2013,8 @@ def group_invoice_items[T: InvoiceItem | InvoiceItemMeta](
                 return 1, item.group
             case 'manual' | 'reduced_amount':
                 return 99, 'manual'
+            case 'rounding':
+                return 100, item.group
             case _:
                 return 2, item.group
 

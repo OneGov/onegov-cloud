@@ -184,7 +184,7 @@ class DirectorySubmissionAction:
         # the directory might have changed -> migrate what we can
         migration = DirectoryMigration(
             directory=self.directory,
-            old_structure=self.submission.definition
+            old_structure=self.submission.parsed
         )
 
         # whenever we try to adopt a submission, we update its structure
@@ -396,6 +396,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     enable_change_requests: dict_property[bool | None] = meta_property()
     enable_publication: dict_property[bool | None] = meta_property()
     enable_update_notifications: dict_property[bool | None] = meta_property()
+    notification_address: dict_property[str | None] = meta_property()
     required_publication: dict_property[bool | None] = meta_property()
     submitter_meta_fields: dict_property[list[str] | None] = meta_property()
 

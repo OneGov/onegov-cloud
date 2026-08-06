@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="utf-8"?>
+<delivery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ech.ch/xmlns/eCH-0252/2">
+	<deliveryHeader>
+		<senderId xmlns="http://www.ech.ch/xmlns/eCH-0058/5">ABX-VOTING</senderId>
+		<messageId xmlns="http://www.ech.ch/xmlns/eCH-0058/5">ff6817ebf1e140819e0330df9d07214e</messageId>
+		<messageType xmlns="http://www.ech.ch/xmlns/eCH-0058/5">1198</messageType>
+		<sendingApplication xmlns="http://www.ech.ch/xmlns/eCH-0058/5">
+			<manufacturer>Abraxas Informatik AG</manufacturer>
+			<product>Voting.Ausmittlung</product>
+			<productVersion>2.93.0+705</productVersion>
+		</sendingApplication>
+		<comment xmlns="http://www.ech.ch/xmlns/eCH-0058/5">UAT / Live</comment>
+		<messageDate xmlns="http://www.ech.ch/xmlns/eCH-0058/5">2026-04-17T11:33:42.856823Z</messageDate>
+		<action xmlns="http://www.ech.ch/xmlns/eCH-0058/5">1</action>
+		<testDeliveryFlag xmlns="http://www.ech.ch/xmlns/eCH-0058/5">true</testDeliveryFlag>
+	</deliveryHeader>
+	<electionInformationDelivery>
+		<cantonId>17</cantonId>
+		<pollingDay>2025-05-18</pollingDay>
+		<electionGroupInfo>
+			<electionGroup>
+				<electionGroupIdentification>cfa79207-d579-41df-9ab0-e1a986bcf660</electionGroupIdentification>
+				<domainOfInfluence>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">BZ</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">SGGK2</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Gerichtskreis Rorschach</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">GWRO</domainOfInfluenceShortname>
+				</domainOfInfluence>
+				<superiorAuthority>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">BZ</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">SGGK2</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Gerichtskreis Rorschach</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">GWRO</domainOfInfluenceShortname>
+				</superiorAuthority>
+				<electionGroupPosition>1</electionGroupPosition>
+				<electionInformation>
+					<election>
+						<electionIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">cfa79207-d579-41df-9ab0-e1a986bcf660</electionIdentification>
+						<typeOfElection xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</typeOfElection>
+						<electionDescription xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<electionDescriptionInfo>
+								<language>de</language>
+								<electionDescriptionShort>Kreisgericht Rorschach: Ersatzwahl haupt- oder teilamtliche/r Richter/in</electionDescriptionShort>
+								<electionDescription>Kreisgericht Rorschach: Ersatzwahl einer haupt- oder teilamtlichen Richterin oder eines haupt- oder teilamtlichen Richters</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>fr</language>
+								<electionDescriptionShort>Kreisgericht Rorschach: Ersatzwahl haupt- oder teilamtliche/r Richter/in</electionDescriptionShort>
+								<electionDescription>Kreisgericht Rorschach: Ersatzwahl einer haupt- oder teilamtlichen Richterin oder eines haupt- oder teilamtlichen Richters</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>it</language>
+								<electionDescriptionShort>Kreisgericht Rorschach: Ersatzwahl haupt- oder teilamtliche/r Richter/in</electionDescriptionShort>
+								<electionDescription>Kreisgericht Rorschach: Ersatzwahl einer haupt- oder teilamtlichen Richterin oder eines haupt- oder teilamtlichen Richters</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>rm</language>
+								<electionDescriptionShort>Kreisgericht Rorschach: Ersatzwahl haupt- oder teilamtliche/r Richter/in</electionDescriptionShort>
+								<electionDescription>Kreisgericht Rorschach: Ersatzwahl einer haupt- oder teilamtlichen Richterin oder eines haupt- oder teilamtlichen Richters</electionDescription>
+							</electionDescriptionInfo>
+						</electionDescription>
+						<numberOfMandates xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</numberOfMandates>
+					</election>
+					<candidate>
+						<candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">aaed9811-400f-4995-a782-daf82b8fb3eb</candidateIdentification>
+						<familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Däscher</familyName>
+						<firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Hans</firstName>
+						<politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Däscher</politicalFamilyName>
+						<politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Hans</politicalFirstName>
+						<callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Hans</callName>
+						<candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<candidateTextInfo>
+								<language>de</language>
+								<candidateText>1957, lic.iur., diplômé en droit, Notar, Rechtsanwalt, nebenamtlicher Richter, Rorschach, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>fr</language>
+								<candidateText>1957, lic.iur., diplômé en droit, Notar, Rechtsanwalt, nebenamtlicher Richter, Rorschach, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>it</language>
+								<candidateText>1957, lic.iur., diplômé en droit, Notar, Rechtsanwalt, nebenamtlicher Richter, Rorschach, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>rm</language>
+								<candidateText>1957, lic.iur., diplômé en droit, Notar, Rechtsanwalt, nebenamtlicher Richter, Rorschach, parteilos</candidateText>
+							</candidateTextInfo>
+						</candidateText>
+						<dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1957-08-06</dateOfBirth>
+						<sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</sex>
+						<occupationalTitle xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<occupationalTitleInfo>
+								<language>de</language>
+								<occupationalTitle>Notar, Rechtsanwalt, nebenamtlicher Richter</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>fr</language>
+								<occupationalTitle>Notar, Rechtsanwalt, nebenamtlicher Richter</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>it</language>
+								<occupationalTitle>Notar, Rechtsanwalt, nebenamtlicher Richter</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>rm</language>
+								<occupationalTitle>Notar, Rechtsanwalt, nebenamtlicher Richter</occupationalTitle>
+							</occupationalTitleInfo>
+						</occupationalTitle>
+						<dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<town xmlns="http://www.ech.ch/xmlns/eCH-0010/6">Rorschach</town>
+							<swissZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6">9400</swissZipCode>
+							<country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+								<countryId>8100</countryId>
+								<countryIdISO2>CH</countryIdISO2>
+								<countryNameShort>Schweiz</countryNameShort>
+							</country>
+						</dwellingAddress>
+						<swiss xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<origin>Luzein GR, Zürich ZH</origin>
+						</swiss>
+						<title xmlns="http://www.ech.ch/xmlns/eCH-0155/5">lic.iur., diplômé en droit</title>
+						<languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+						<incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+						<candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</candidateReference>
+						<partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<partyAffiliationInfo>
+								<language>de</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>fr</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>it</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>rm</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+						</partyAffiliation>
+					</candidate>
+					<candidate>
+						<candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">00b78bc0-d8e7-43fe-bbe6-e0036f3b4031</candidateIdentification>
+						<familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Keller Haan</familyName>
+						<firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Kathrine</firstName>
+						<politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Keller Haan</politicalFamilyName>
+						<politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Kathrine</politicalFirstName>
+						<callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Kathrine</callName>
+						<candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<candidateTextInfo>
+								<language>de</language>
+								<candidateText>1969, lic.iur., Rechtsanwältin, Notarin, Dozentin, Staad, Die Mitte</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>fr</language>
+								<candidateText>1969, lic.iur., Rechtsanwältin, Notarin, Dozentin, Staad, Die Mitte</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>it</language>
+								<candidateText>1969, lic.iur., Rechtsanwältin, Notarin, Dozentin, Staad, Die Mitte</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>rm</language>
+								<candidateText>1969, lic.iur., Rechtsanwältin, Notarin, Dozentin, Staad, Die Mitte</candidateText>
+							</candidateTextInfo>
+						</candidateText>
+						<dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1969-04-14</dateOfBirth>
+						<sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</sex>
+						<occupationalTitle xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<occupationalTitleInfo>
+								<language>de</language>
+								<occupationalTitle>Rechtsanwältin, Notarin, Dozentin</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>fr</language>
+								<occupationalTitle>Rechtsanwältin, Notarin, Dozentin</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>it</language>
+								<occupationalTitle>Rechtsanwältin, Notarin, Dozentin</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>rm</language>
+								<occupationalTitle>Rechtsanwältin, Notarin, Dozentin</occupationalTitle>
+							</occupationalTitleInfo>
+						</occupationalTitle>
+						<dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<town xmlns="http://www.ech.ch/xmlns/eCH-0010/6">Staad</town>
+							<swissZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6">9422</swissZipCode>
+							<country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+								<countryId>8100</countryId>
+								<countryIdISO2>CH</countryIdISO2>
+								<countryNameShort>Schweiz</countryNameShort>
+							</country>
+						</dwellingAddress>
+						<swiss xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<origin>Rorschach SG</origin>
+						</swiss>
+						<title xmlns="http://www.ech.ch/xmlns/eCH-0155/5">lic.iur.</title>
+						<languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+						<incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+						<candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</candidateReference>
+						<partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<partyAffiliationInfo>
+								<language>de</language>
+								<partyAffiliationShort>Die Mitte</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>fr</language>
+								<partyAffiliationShort>Die Mitte</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>it</language>
+								<partyAffiliationShort>Die Mitte</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>rm</language>
+								<partyAffiliationShort>Die Mitte</partyAffiliationShort>
+							</partyAffiliationInfo>
+						</partyAffiliation>
+					</candidate>
+					<namedElement>
+						<elementName>decisiveMajority</elementName>
+						<text>absolute</text>
+					</namedElement>
+				</electionInformation>
+			</electionGroup>
+			<countingCircle>
+				<countingCircleId>3211</countingCircleId>
+				<countingCircleName>Berg SG</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+			<countingCircle>
+				<countingCircleId>3213</countingCircleId>
+				<countingCircleName>Goldach</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+			<countingCircle>
+				<countingCircleId>3214</countingCircleId>
+				<countingCircleName>Mörschwil</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+			<countingCircle>
+				<countingCircleId>3215</countingCircleId>
+				<countingCircleName>Rorschach</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+			<countingCircle>
+				<countingCircleId>3216</countingCircleId>
+				<countingCircleName>Rorschacherberg</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+			<countingCircle>
+				<countingCircleId>3217</countingCircleId>
+				<countingCircleName>Steinach</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+			<countingCircle>
+				<countingCircleId>3237</countingCircleId>
+				<countingCircleName>Thal</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+			<countingCircle>
+				<countingCircleId>3218</countingCircleId>
+				<countingCircleName>Tübach</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+			<countingCircle>
+				<countingCircleId>3219</countingCircleId>
+				<countingCircleName>Untereggen</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+		</electionGroupInfo>
+		<electionGroupInfo>
+			<electionGroup>
+				<electionGroupIdentification>13b4fc50-12de-4450-8ab3-c9bf1fa599c9</electionGroupIdentification>
+				<domainOfInfluence>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">MU</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3213</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Goldach</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">GH0</domainOfInfluenceShortname>
+				</domainOfInfluence>
+				<superiorAuthority>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">MU</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3213</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Goldach</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">GH0</domainOfInfluenceShortname>
+				</superiorAuthority>
+				<electionGroupPosition>1</electionGroupPosition>
+				<electionInformation>
+					<election>
+						<electionIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">13b4fc50-12de-4450-8ab3-c9bf1fa599c9</electionIdentification>
+						<typeOfElection xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</typeOfElection>
+						<electionDescription xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<electionDescriptionInfo>
+								<language>de</language>
+								<electionDescriptionShort>Wahl Schulpräsidium</electionDescriptionShort>
+								<electionDescription>Ersatzwahl der Schulpräsidentin/des Schulpräsidenten</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>fr</language>
+								<electionDescriptionShort>Wahl Schulpräsidium</electionDescriptionShort>
+								<electionDescription>Ersatzwahl der Schulpräsidentin/des Schulpräsidenten</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>it</language>
+								<electionDescriptionShort>Wahl Schulpräsidium</electionDescriptionShort>
+								<electionDescription>Ersatzwahl der Schulpräsidentin/des Schulpräsidenten</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>rm</language>
+								<electionDescriptionShort>Wahl Schulpräsidium</electionDescriptionShort>
+								<electionDescription>Ersatzwahl der Schulpräsidentin/des Schulpräsidenten</electionDescription>
+							</electionDescriptionInfo>
+						</electionDescription>
+						<numberOfMandates xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</numberOfMandates>
+					</election>
+					<candidate>
+						<candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">aa60eaec-4283-4112-b7d5-48b27adabb23</candidateIdentification>
+						<familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Wasserfallen</familyName>
+						<firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Sandro</firstName>
+						<politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Wasserfallen</politicalFamilyName>
+						<politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Sandro</politicalFirstName>
+						<callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Sandro</callName>
+						<candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<candidateTextInfo>
+								<language>de</language>
+								<candidateText>1985, Goldach, SVP</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>fr</language>
+								<candidateText>1985, Goldach, SVP</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>it</language>
+								<candidateText>1985, Goldach, SVP</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>rm</language>
+								<candidateText>1985, Goldach, SVP</candidateText>
+							</candidateTextInfo>
+						</candidateText>
+						<dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1985-05-03</dateOfBirth>
+						<sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</sex>
+						<occupationalTitle xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<occupationalTitleInfo>
+								<language>de</language>
+								<occupationalTitle>Oberstufenlehrer, Kantonsrat, Vizepräsident des Hochschulrates der PHSG</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>fr</language>
+								<occupationalTitle>Oberstufenlehrer, Kantonsrat, Vizepräsident des Hochschulrates der PHSG</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>it</language>
+								<occupationalTitle>Oberstufenlehrer, Kantonsrat, Vizepräsident des Hochschulrates der PHSG</occupationalTitle>
+							</occupationalTitleInfo>
+							<occupationalTitleInfo>
+								<language>rm</language>
+								<occupationalTitle>Oberstufenlehrer, Kantonsrat, Vizepräsident des Hochschulrates der PHSG</occupationalTitle>
+							</occupationalTitleInfo>
+						</occupationalTitle>
+						<dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<town xmlns="http://www.ech.ch/xmlns/eCH-0010/6">Goldach</town>
+							<swissZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6">9403</swissZipCode>
+							<country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+								<countryId>8100</countryId>
+								<countryIdISO2>CH</countryIdISO2>
+								<countryNameShort>Schweiz</countryNameShort>
+							</country>
+						</dwellingAddress>
+						<swiss xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<origin>Goldach SG</origin>
+						</swiss>
+						<title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+						<languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+						<incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+						<candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</candidateReference>
+						<partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<partyAffiliationInfo>
+								<language>de</language>
+								<partyAffiliationShort>SVP</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>fr</language>
+								<partyAffiliationShort>SVP</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>it</language>
+								<partyAffiliationShort>SVP</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>rm</language>
+								<partyAffiliationShort>SVP</partyAffiliationShort>
+							</partyAffiliationInfo>
+						</partyAffiliation>
+					</candidate>
+					<namedElement>
+						<elementName>decisiveMajority</elementName>
+						<text>absolute</text>
+					</namedElement>
+				</electionInformation>
+			</electionGroup>
+			<countingCircle>
+				<countingCircleId>3213</countingCircleId>
+				<countingCircleName>Goldach</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+		</electionGroupInfo>
+		<electionGroupInfo>
+			<electionGroup>
+				<electionGroupIdentification>6ff90bc8-4c09-4928-9fb0-407291ff2365</electionGroupIdentification>
+				<domainOfInfluence>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">MU</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3236</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">St. Margrethen</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">SM0</domainOfInfluenceShortname>
+				</domainOfInfluence>
+				<superiorAuthority>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">MU</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3236</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">St. Margrethen</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">SM0</domainOfInfluenceShortname>
+				</superiorAuthority>
+				<electionGroupPosition>1</electionGroupPosition>
+				<electionInformation>
+					<election>
+						<electionIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">6ff90bc8-4c09-4928-9fb0-407291ff2365</electionIdentification>
+						<typeOfElection xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</typeOfElection>
+						<electionDescription xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<electionDescriptionInfo>
+								<language>de</language>
+								<electionDescriptionShort>Ersatzwahl</electionDescriptionShort>
+								<electionDescription>Ersatzwahl eines GPK-Mitgliedes</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>fr</language>
+								<electionDescriptionShort>Ersatzwahl</electionDescriptionShort>
+								<electionDescription>Ersatzwahl eines GPK-Mitgliedes</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>it</language>
+								<electionDescriptionShort>Ersatzwahl</electionDescriptionShort>
+								<electionDescription>Ersatzwahl eines GPK-Mitgliedes</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>rm</language>
+								<electionDescriptionShort>Ersatzwahl</electionDescriptionShort>
+								<electionDescription>Ersatzwahl eines GPK-Mitgliedes</electionDescription>
+							</electionDescriptionInfo>
+						</electionDescription>
+						<numberOfMandates xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</numberOfMandates>
+					</election>
+					<candidate>
+						<candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">7a503ae1-e42f-47b5-b687-4a195b2031f6</candidateIdentification>
+						<familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Speck</familyName>
+						<firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Christian</firstName>
+						<politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Speck</politicalFamilyName>
+						<politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Christian</politicalFirstName>
+						<callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Christian</callName>
+						<candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<candidateTextInfo>
+								<language>de</language>
+								<candidateText>1989, St. Margrethen, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>fr</language>
+								<candidateText>1989, St. Margrethen, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>it</language>
+								<candidateText>1989, St. Margrethen, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>rm</language>
+								<candidateText>1989, St. Margrethen, parteilos</candidateText>
+							</candidateTextInfo>
+						</candidateText>
+						<dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1989-10-21</dateOfBirth>
+						<sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</sex>
+						<dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<town xmlns="http://www.ech.ch/xmlns/eCH-0010/6">St. Margrethen</town>
+							<swissZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6">9430</swissZipCode>
+							<country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+								<countryId>8100</countryId>
+								<countryIdISO2>CH</countryIdISO2>
+								<countryNameShort>Schweiz</countryNameShort>
+							</country>
+						</dwellingAddress>
+						<title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+						<languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+						<incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+						<candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</candidateReference>
+						<partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<partyAffiliationInfo>
+								<language>de</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>fr</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>it</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>rm</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+						</partyAffiliation>
+					</candidate>
+					<namedElement>
+						<elementName>decisiveMajority</elementName>
+						<text>absolute</text>
+					</namedElement>
+				</electionInformation>
+			</electionGroup>
+			<countingCircle>
+				<countingCircleId>3236</countingCircleId>
+				<countingCircleName>St. Margrethen</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+		</electionGroupInfo>
+		<electionGroupInfo>
+			<electionGroup>
+				<electionGroupIdentification>2ca49f61-faa8-4797-ab88-2c6829448d04</electionGroupIdentification>
+				<domainOfInfluence>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">MU</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3442</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Gaiserwald</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">GA0</domainOfInfluenceShortname>
+				</domainOfInfluence>
+				<superiorAuthority>
+					<domainOfInfluenceType xmlns="http://www.ech.ch/xmlns/eCH-0155/5">MU</domainOfInfluenceType>
+					<domainOfInfluenceIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3442</domainOfInfluenceIdentification>
+					<domainOfInfluenceName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Gaiserwald</domainOfInfluenceName>
+					<domainOfInfluenceShortname xmlns="http://www.ech.ch/xmlns/eCH-0155/5">GA0</domainOfInfluenceShortname>
+				</superiorAuthority>
+				<electionGroupPosition>1</electionGroupPosition>
+				<electionInformation>
+					<election>
+						<electionIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2ca49f61-faa8-4797-ab88-2c6829448d04</electionIdentification>
+						<typeOfElection xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</typeOfElection>
+						<electionDescription xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<electionDescriptionInfo>
+								<language>de</language>
+								<electionDescriptionShort>Ersatzwahl Mitglied Schulrat (erster Wahlgang)</electionDescriptionShort>
+								<electionDescription>Erster Wahlgang für die Ersatzwahl eines Mitglieds des Schulrates Gaiserwald für den Rest der Amtsdauer 2025/2028</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>fr</language>
+								<electionDescriptionShort>Ersatzwahl Mitglied Schulrat (erster Wahlgang)</electionDescriptionShort>
+								<electionDescription>Erster Wahlgang für die Ersatzwahl eines Mitglieds des Schulrates Gaiserwald für den Rest der Amtsdauer 2025/2028</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>it</language>
+								<electionDescriptionShort>Ersatzwahl Mitglied Schulrat (erster Wahlgang)</electionDescriptionShort>
+								<electionDescription>Erster Wahlgang für die Ersatzwahl eines Mitglieds des Schulrates Gaiserwald für den Rest der Amtsdauer 2025/2028</electionDescription>
+							</electionDescriptionInfo>
+							<electionDescriptionInfo>
+								<language>rm</language>
+								<electionDescriptionShort>Ersatzwahl Mitglied Schulrat (erster Wahlgang)</electionDescriptionShort>
+								<electionDescription>Erster Wahlgang für die Ersatzwahl eines Mitglieds des Schulrates Gaiserwald für den Rest der Amtsdauer 2025/2028</electionDescription>
+							</electionDescriptionInfo>
+						</electionDescription>
+						<numberOfMandates xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</numberOfMandates>
+					</election>
+					<candidate>
+						<candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">43c714cc-e024-45c8-87c2-cf1d8065501b</candidateIdentification>
+						<familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Frei</familyName>
+						<firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Franziska</firstName>
+						<politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Frei</politicalFamilyName>
+						<politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Franziska</politicalFirstName>
+						<callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Franziska</callName>
+						<candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<candidateTextInfo>
+								<language>de</language>
+								<candidateText>1981, Sonderschullehrerin m.A. in Heilpädagogik, Abtwil, SP</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>fr</language>
+								<candidateText>1981, Sonderschullehrerin m.A. in Heilpädagogik, Abtwil, SP</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>it</language>
+								<candidateText>1981, Sonderschullehrerin m.A. in Heilpädagogik, Abtwil, SP</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>rm</language>
+								<candidateText>1981, Sonderschullehrerin m.A. in Heilpädagogik, Abtwil, SP</candidateText>
+							</candidateTextInfo>
+						</candidateText>
+						<dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1981-10-27</dateOfBirth>
+						<sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</sex>
+						<dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<town xmlns="http://www.ech.ch/xmlns/eCH-0010/6">Abtwil</town>
+							<foreignZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+								<countryId>8100</countryId>
+								<countryIdISO2>CH</countryIdISO2>
+								<countryNameShort>Schweiz</countryNameShort>
+							</country>
+						</dwellingAddress>
+						<title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+						<languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+						<incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+						<candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</candidateReference>
+						<partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<partyAffiliationInfo>
+								<language>de</language>
+								<partyAffiliationShort>SP</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>fr</language>
+								<partyAffiliationShort>SP</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>it</language>
+								<partyAffiliationShort>SP</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>rm</language>
+								<partyAffiliationShort>SP</partyAffiliationShort>
+							</partyAffiliationInfo>
+						</partyAffiliation>
+					</candidate>
+					<candidate>
+						<candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">dd697b08-3669-48ca-b664-0d39da1556dd</candidateIdentification>
+						<familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Latzer</familyName>
+						<firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Fabian</firstName>
+						<politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Latzer</politicalFamilyName>
+						<politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Fabian</politicalFirstName>
+						<callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Fabian</callName>
+						<candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<candidateTextInfo>
+								<language>de</language>
+								<candidateText>1994, Sozialpädagoge i.A., Engelburg, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>fr</language>
+								<candidateText>1994, Sozialpädagoge i.A., Engelburg, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>it</language>
+								<candidateText>1994, Sozialpädagoge i.A., Engelburg, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>rm</language>
+								<candidateText>1994, Sozialpädagoge i.A., Engelburg, parteilos</candidateText>
+							</candidateTextInfo>
+						</candidateText>
+						<dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1994-04-24</dateOfBirth>
+						<sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</sex>
+						<dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<town xmlns="http://www.ech.ch/xmlns/eCH-0010/6">Engelburg</town>
+							<foreignZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+								<countryId>8100</countryId>
+								<countryIdISO2>CH</countryIdISO2>
+								<countryNameShort>Schweiz</countryNameShort>
+							</country>
+						</dwellingAddress>
+						<title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+						<languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+						<incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+						<candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">2</candidateReference>
+						<partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<partyAffiliationInfo>
+								<language>de</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>fr</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>it</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>rm</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+						</partyAffiliation>
+					</candidate>
+					<candidate>
+						<candidateIdentification xmlns="http://www.ech.ch/xmlns/eCH-0155/5">6e3030bb-8e63-4f1c-861f-595cde62e624</candidateIdentification>
+						<familyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Traber</familyName>
+						<firstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Matthias</firstName>
+						<politicalFamilyName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Traber</politicalFamilyName>
+						<politicalFirstName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Matthias</politicalFirstName>
+						<callName xmlns="http://www.ech.ch/xmlns/eCH-0155/5">Matthias</callName>
+						<candidateText xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<candidateTextInfo>
+								<language>de</language>
+								<candidateText>1981, Mediator / Schulsozialarbeit / Rechtsanwalt lic.iur., Abtwil, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>fr</language>
+								<candidateText>1981, Mediator / Schulsozialarbeit / Rechtsanwalt lic.iur., Abtwil, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>it</language>
+								<candidateText>1981, Mediator / Schulsozialarbeit / Rechtsanwalt lic.iur., Abtwil, parteilos</candidateText>
+							</candidateTextInfo>
+							<candidateTextInfo>
+								<language>rm</language>
+								<candidateText>1981, Mediator / Schulsozialarbeit / Rechtsanwalt lic.iur., Abtwil, parteilos</candidateText>
+							</candidateTextInfo>
+						</candidateText>
+						<dateOfBirth xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1981-09-17</dateOfBirth>
+						<sex xmlns="http://www.ech.ch/xmlns/eCH-0155/5">1</sex>
+						<dwellingAddress xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<street xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<houseNumber xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<town xmlns="http://www.ech.ch/xmlns/eCH-0010/6">Abtwil</town>
+							<foreignZipCode xmlns="http://www.ech.ch/xmlns/eCH-0010/6"/>
+							<country xmlns="http://www.ech.ch/xmlns/eCH-0010/6">
+								<countryId>8100</countryId>
+								<countryIdISO2>CH</countryIdISO2>
+								<countryNameShort>Schweiz</countryNameShort>
+							</country>
+						</dwellingAddress>
+						<title xmlns="http://www.ech.ch/xmlns/eCH-0155/5"/>
+						<languageOfCorrespondence xmlns="http://www.ech.ch/xmlns/eCH-0155/5">de</languageOfCorrespondence>
+						<incumbentYesNo xmlns="http://www.ech.ch/xmlns/eCH-0155/5">false</incumbentYesNo>
+						<candidateReference xmlns="http://www.ech.ch/xmlns/eCH-0155/5">3</candidateReference>
+						<partyAffiliation xmlns="http://www.ech.ch/xmlns/eCH-0155/5">
+							<partyAffiliationInfo>
+								<language>de</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>fr</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>it</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+							<partyAffiliationInfo>
+								<language>rm</language>
+								<partyAffiliationShort>parteilos</partyAffiliationShort>
+							</partyAffiliationInfo>
+						</partyAffiliation>
+					</candidate>
+					<namedElement>
+						<elementName>decisiveMajority</elementName>
+						<text>absolute</text>
+					</namedElement>
+				</electionInformation>
+			</electionGroup>
+			<countingCircle>
+				<countingCircleId>3442</countingCircleId>
+				<countingCircleName>Gaiserwald</countingCircleName>
+				<domainOfInfluenceType>MU</domainOfInfluenceType>
+			</countingCircle>
+		</electionGroupInfo>
+		<numberOfEntries>4</numberOfEntries>
+	</electionInformationDelivery>
+</delivery>

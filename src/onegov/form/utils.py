@@ -76,7 +76,7 @@ def disable_required_attribute_in_html_inputs() -> None:
         patched_html_params)
 
 
-class decimal_range:  # noqa: N801
+class decimal_range:  # ruff:ignore[invalid-class-name]
     """ Implementation of Python's range builtin using decimal values instead
     of integers.
 

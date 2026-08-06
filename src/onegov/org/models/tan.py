@@ -44,7 +44,7 @@ class TANAccess(Base, TimestampMixin):
     url: Mapped[str] = mapped_column(index=True)
 
 
-class TANAccessCollection(GenericCollection[TANAccess]):
+class TANAccessCollection(GenericCollection[TANAccess, UUID]):
 
     def __init__(
         self,

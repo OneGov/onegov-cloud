@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 
 class CourseEventCollection(
-    GenericCollection[CourseEvent],
+    GenericCollection[CourseEvent, 'UUID'],
     Pagination[CourseEvent]
 ):
 

@@ -5,16 +5,13 @@ from datetime import date
 from markupsafe import Markup
 from morepath import redirect
 from morepath.request import Response
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Private
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.form.errors import (InvalidFormSyntax, MixedTypeError,
-                                DuplicateLabelError)
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.core.elements import Link as CoreLink
 from onegov.org.forms import ExportForm, EventImportForm
-from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
@@ -202,12 +199,10 @@ def view_occurrence(
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
 
-    filter_names = {f.id: f.label for f in request.app.org.event_filter_fields}
-
     return {
         'description': description,
         'framed': framed,
-        'filter_names': filter_names,
+        'filter_names': request.app.org.event_filter_names,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
         'organizer_phone': self.event.organizer_phone,
@@ -219,67 +214,6 @@ def view_occurrence(
         'title': self.title,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
-    }
-
-
-@OrgApp.form(model=OccurrenceCollection, name='edit',
-             template='directory_form.pt', permission=Secret,
-             form=EventConfigurationForm)
-def handle_edit_event_filters(
-    self: OccurrenceCollection,
-    request: OrgRequest,
-    form: EventConfigurationForm,
-    layout: OccurrencesLayout | None = None
-) -> RenderData | BaseResponse:
-
-    try:
-        if form.submitted(request):
-            keywords = (form.keyword_fields.data or '').splitlines()
-            request.app.org.event_filter_configuration = {
-                'order': [],
-                'keywords': keywords
-            }
-            request.app.org.event_filter_definition = form.definition.data
-
-            request.success(_('Your changes were saved'))
-            return request.redirect(request.link(self))
-
-        elif not request.POST:
-            # Store the model data on the form
-            form.definition.data = request.app.org.event_filter_definition
-            form.keyword_fields.data = '\r\n'.join(
-                request.app.org.event_filter_configuration.get('keywords', []))
-
-    except InvalidFormSyntax as e:
-        request.warning(
-            _('Syntax Error in line ${line}', mapping={'line': e.line})
-        )
-    except AttributeError:
-        request.warning(_('Syntax error in form'))
-
-    except MixedTypeError as e:
-        request.warning(
-            _('Syntax error in field ${field_name}',
-              mapping={'field_name': e.field_name})
-        )
-    except DuplicateLabelError as e:
-        request.warning(
-            _('Error: Duplicate label ${label}', mapping={'label': e.label})
-        )
-
-    layout = layout or OccurrencesLayout(self, request)
-    layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_('Edit'), '#'))
-    layout.editbar_links = []
-
-    return {
-        'layout': layout,
-        'title': _('Edit Event Filter Configuration'),
-        'form': form,
-        'form_width': 'large',
-        'migration': None,
-        'model': self,
-        'error': None,
     }
 
 

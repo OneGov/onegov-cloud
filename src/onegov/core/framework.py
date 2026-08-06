@@ -64,7 +64,7 @@ from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
 from operator import itemgetter
-from psycopg2.extensions import TransactionRollbackError
+from psycopg import OperationalError as PostgresOperationalError
 from purl import URL
 from sqlalchemy.exc import OperationalError
 from urllib.parse import urlencode
@@ -226,7 +226,7 @@ class Framework(
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print('=' * 80, file=sys.stderr)  # noqa: T201
+                    print('=' * 80, file=sys.stderr)  # ruff:ignore[print]
                     traceback.print_exc()
                 raise
 
@@ -1113,11 +1113,11 @@ class Framework(
         # transactional stream in Postmark is called outbound
         stream = 'marketing' if category == 'marketing' else 'outbound'
 
-        BATCH_LIMIT = 500  # noqa: N806
+        BATCH_LIMIT = 500  # ruff:ignore[non-lowercase-variable-in-function]
         # NOTE: The API specifies MB, so let's not chance it
         #       by assuming they meant MiB and just go with
         #       lower size limit.
-        SIZE_LIMIT = 50_000_000  # 50MB  # noqa: N806
+        SIZE_LIMIT = 50_000_000  # 50MB  # ruff:ignore[non-lowercase-variable-in-function]
         # NOTE: We use a buffer to be a bit more memory efficient
         #       we don't initialize the buffer, so tell gives us
         #       the exact size of the buffer.
@@ -1756,7 +1756,13 @@ def http_conflict_tween_factory(
             if not hasattr(e, 'orig'):
                 raise
 
-            if not isinstance(e.orig, TransactionRollbackError):
+            # Error Class 40: Transaction Rollback, for details
+            # see https://www.psycopg.org/psycopg3/docs/api/errors.html
+            if not (
+                isinstance(e.orig, PostgresOperationalError)
+                and e.orig.sqlstate
+                and e.orig.sqlstate.startswith('40')
+            ):
                 raise
 
             log.warning('A transaction failed because there was a conflict')

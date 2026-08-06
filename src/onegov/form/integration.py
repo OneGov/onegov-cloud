@@ -4,7 +4,7 @@ from more.webassets import WebassetsApp
 from onegov.core.security import Public
 from onegov.form import _
 from onegov.form.errors import FormError
-from onegov.form.parser.core import flatten_fieldsets, parse_formcode
+from onegov.form.parser.core import flatten_fields, parse_formcode
 from onegov.form.parser.snippets import Snippets
 from onegov.form.utils import disable_required_attribute_in_html_inputs
 from yaml.parser import ParserError
@@ -74,7 +74,7 @@ def view_parse_formcode(
                 'human_id': field.human_id,
                 'type': field.type,
             }
-            for field in flatten_fieldsets(parse_formcode(formcode))
+            for field in flatten_fields(parse_formcode(formcode))
         ]
     except (FormError, AttributeError, TypeError, ParserError):
         return {'error': True}

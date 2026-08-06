@@ -5,10 +5,15 @@ on:
   schedule:
     - cron: '0 4 * * 1'  # run once a week on monday morning
 
+permissions: {}
+
 jobs:
   build:
 
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      packages: read
 
     # we always use the latest container from the master branch
     # this is fine because we still run all our installs just in case
@@ -54,7 +59,9 @@ jobs:
           xdg-utils
 
     - name: Checkout repo
-      uses: actions/checkout@v6
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
 
     - name: Install dependencies
       run: |
@@ -96,8 +103,9 @@ jobs:
         LANG: C.UTF-8
         SKIP_DRIVER_MANAGER: '1'
 
-    - uses: EndBug/add-and-commit@v9
+    - uses: EndBug/add-and-commit@290ea2c423ad77ca9c62ae0f5b224379612c0321 # v10.0.0
       with:
         add: .test_durations
         default_author: github_actions
         message: Updates test durations [skip-ci]
+        pull: '--ff-only'

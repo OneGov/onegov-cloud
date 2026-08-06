@@ -7,18 +7,16 @@ from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
 from onegov.form import as_internal_id
-from onegov.form import flatten_fieldsets
 from onegov.form import Form
 from onegov.form import merge_forms
 from onegov.form import move_fields
-from onegov.form import parse_formcode
-from onegov.form.errors import FormError
 from onegov.form.fields import ColorField
-from onegov.form.fields import IconField, MultiCheckboxField
+from onegov.form.fields import FormcodeField
+from onegov.form.fields import IconField
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm, ChangeAdjacencyListUrlForm
@@ -84,17 +82,19 @@ class DirectoryBaseForm(Form):
         default='below'
     )
 
-    structure = TextAreaField(
+    parsed_structure = FormcodeField(
         label=_('Definition'),
         fieldset=_('General'),
-        validators=[
-            InputRequired(),
-            ValidFormDefinition(
-                require_email_field=False,
-                require_title_fields=True
-            )
-        ],
-        render_kw={'rows': 32, 'data-editor': 'form'})
+        name='structure',
+        # FIXME: Depending on the configuration there are some
+        #        reserved fields, we should detect that. We will
+        #        however run into validation order issues, since
+        #        some of the settings affecting the reserved fields
+        #        are further below. But maybe we just always
+        #        reserve those fields, regardless of configuration...
+        require_email_field=False,
+        require_title_fields=True
+    )
 
     enable_map = RadioField(
         label=_('Map'),
@@ -340,6 +340,24 @@ class DirectoryBaseForm(Form):
         fieldset=_('Notifications'),
         default=False)
 
+    notification_address = EmailField(
+        label=_('Admin notification address'),
+        description=_(
+            'Receives an e-mail when entries are published or de-published '
+            '(sent out hourly). Useful e.g. for permit directories as proof '
+            'of publication.'
+        ),
+        fieldset=_('Notifications'),
+        # only relevant when publication dates are required, and mutually
+        # exclusive with change requests (see the validator below); a
+        # reverse dependency on enable_change_requests would close a cycle
+        # that infinite-loops is_visible_through_dependencies.
+        depends_on=(
+            'required_publication', 'y', 'enable_change_requests', '!y'
+        ),
+        validators=[Optional(), Email()],
+    )
+
     submitter_meta_fields = MultiCheckboxField(
         label=_('Information to be provided in addition to the E-mail'),
         choices=(
@@ -361,31 +379,24 @@ class DirectoryBaseForm(Form):
 
     @cached_property
     def known_field_ids(self) -> set[str] | None:
-        # FIXME: We should probably define this in relation to known_fields
-        #        so we don't parse the form twice if we access both properties
-        try:
-            return {
-                field.id for field in
-                flatten_fieldsets(parse_formcode(self.structure.data))
-            }
-        except FormError:
+        if self.parsed_structure.data is None:
             return None
+        return {
+            field.id for field in
+            self.parsed_structure.data.flattened_fields
+        }
 
-    @cached_property
-    def known_fields(self) -> list[ParsedField] | None:
-        try:
-            return list(
-                flatten_fieldsets(parse_formcode(self.structure.data))
-            )
-        except FormError:
+    @property
+    def known_fields(self) -> tuple[ParsedField, ...] | None:
+        if self.parsed_structure.data is None:
             return None
+        return self.parsed_structure.data.flattened_fields
 
     @cached_property
     def missing_fields(self) -> dict[str, list[str]] | None:
-        try:
-            return self.configuration.missing_fields(self.structure.data)
-        except FormError:
+        if self.parsed_structure.data is None:
             return None
+        return self.configuration.missing_fields(self.parsed_structure.data)
 
     def extract_field_ids(self, field: Field) -> Iterator[str]:
         if not self.known_field_ids:
@@ -462,17 +473,71 @@ class DirectoryBaseForm(Form):
             return False
         return None
 
+    def ensure_no_change_requests_with_admin_notifications(
+        self
+    ) -> bool | None:
+        """ Change requests are applied without going through the
+        mutability restrictions that protect already published entries
+        from being silently altered, so they would allow bypassing the
+        guarantees the admin notification is meant to provide (e.g. proof
+        of publication for permits). Therefore the two settings are
+        mutually exclusive.
+
+        """
+        if not (self.enable_change_requests.data
+                and self.notification_address.data):
+            return None
+
+        msg = _(
+            'Change requests and the admin notification address cannot '
+            'be enabled at the same time, because change requests are '
+            'applied without respecting the publication restrictions '
+            'that admin notifications rely on.'
+        )
+
+        for i in (self.enable_change_requests, self.notification_address):
+            assert isinstance(i.errors, list)
+            i.errors.append(msg)
+
+        return False
+
+    def ensure_notification_address_requires_required_publication(
+        self
+    ) -> bool | None:
+        """ The admin notification workflow is a proof-of-publication tool:
+        it relies on every entry having a publication period. Without
+        required publication an entry could be published immediately with
+        no start (which the hourly cronjob's start-transition scan never
+        notifies on), so a notification address only makes sense when
+        publication dates are required.
+
+        """
+        if not self.notification_address.data:
+            return None
+        if self.required_publication.data:
+            return None
+
+        msg = _(
+            'An admin notification address requires publication dates to '
+            'be required.'
+        )
+
+        for i in (self.notification_address, self.required_publication):
+            assert isinstance(i.errors, list)
+            i.errors.append(msg)
+
+        return False
+
     def first_hidden_field(
         self,
         configuration: DirectoryConfiguration
     ) -> ParsedField | None:
         """ Returns the first hidden field, or None. """
 
-        try:
-            fields = flatten_fieldsets(parse_formcode(self.structure.data))
-        except FormError:
+        if self.parsed_structure.data is None:
             return None
-        for field in fields:
+
+        for field in self.parsed_structure.data.flattened_fields:
             if not self.is_public(field.id, configuration):
                 return field
         return None

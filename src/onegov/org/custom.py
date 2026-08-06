@@ -46,7 +46,7 @@ def get_template_variables(request: OrgRequest) -> dict[str, Any]:
 
 @OrgApp.setting(section='api', name='endpoints')
 def get_api_endpoints_handler(
-) -> Callable[[OrgRequest], Iterator[ApiEndpoint[Any]]]:
+) -> Callable[[OrgRequest], Iterator[ApiEndpoint[Any, Any]]]:
     return get_api_endpoints
 
 
@@ -132,6 +132,15 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                 request.class_link(
                     SurveyCollection),
                 attrs={'class': 'surveys'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Topic chart'),
+                request.class_link(
+                    Organisation, name='topic-chart'),
+                attrs={'class': 'topic-chart'}
             )
         )
 
@@ -423,7 +432,7 @@ def get_global_tools(
         )
 
 
-def get_api_endpoints(request: OrgRequest) -> Iterator[ApiEndpoint[Any]]:
+def get_api_endpoints(request: OrgRequest) -> Iterator[ApiEndpoint[Any, Any]]:
     yield EventApiEndpoint(request)
     yield FormApiEndpoint(request)
     yield NewsApiEndpoint(request)

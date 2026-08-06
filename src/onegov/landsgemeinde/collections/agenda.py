@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class AgendaItemCollection(GenericCollection[AgendaItem]):
+class AgendaItemCollection(GenericCollection[AgendaItem, 'UUID']):
 
     def __init__(self, session: Session, date: date | None = None) -> None:
         self.session = session
@@ -36,10 +36,7 @@ class AgendaItemCollection(GenericCollection[AgendaItem]):
         query = query.order_by(AgendaItem.number)
         return query
 
-    def by_id(
-        self,
-        id: UUID  # type:ignore[override]
-    ) -> AgendaItem | None:
+    def by_id(self, id: UUID) -> AgendaItem | None:
         return super().query().filter(AgendaItem.id == id).first()
 
     def by_number(self, number: int) -> AgendaItem | None:

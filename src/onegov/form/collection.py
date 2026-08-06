@@ -27,6 +27,7 @@ from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator
     from onegov.form import Form
+    from onegov.form.parser import ParsedForm
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query, Session
@@ -129,7 +130,7 @@ class FormDefinitionCollection:
     def add(
         self,
         title: str,
-        definition: str,
+        parsed: ParsedForm,
         type: str = 'generic',
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None,
@@ -143,7 +144,7 @@ class FormDefinitionCollection:
         form = FormDefinition.get_polymorphic_class(type, FormDefinition)()
         form.name = name or normalize_for_url(title)
         form.title = title
-        form.definition = definition
+        form.parsed = parsed
         form.type = type
         form.meta = meta or {}
         form.content = content or {}
@@ -245,9 +246,9 @@ class FormSubmissionCollection:
         spots: int | None = None
     ) -> FormSubmission:
         """ Takes a filled-out form instance and stores the submission
-        in the database. The form instance is expected to have a ``_source``
-        parameter, which contains the source used to build the form (as only
-        forms with this source may be stored).
+        in the database. The form instance is expected to have a ``_parsed``
+        parameter, which contains the ParsedForm used to build the form
+        (as only forms with this source may be stored).
 
         This method expects the name of the form definition stored in the
         database. Use :meth:`add_external` to add a submissions whose
@@ -255,7 +256,7 @@ class FormSubmissionCollection:
 
         """
 
-        assert hasattr(form, '_source')
+        assert hasattr(form, '_parsed')
 
         # this should happen way earlier, we just double check here
         if state == 'complete':
@@ -338,7 +339,7 @@ class FormSubmissionCollection:
         email: str | None = None
     ) -> FormSubmission:
         """ Takes a filled-out form instance and stores the submission
-        in the database. The form instance is expected to have a ``_source``
+        in the database. The form instance is expected to have a ``_parsed``
         parameter, which contains the source used to build the form (as only
         forms with this source may be stored).
 
@@ -398,8 +399,8 @@ class FormSubmissionCollection:
         exclude = set(exclude) if exclude else set()
         exclude.add(form.meta.csrf_field_name)  # never include the csrf token
 
-        assert hasattr(form, '_source')
-        submission.definition = form._source
+        assert hasattr(form, '_parsed')
+        submission.parsed = form._parsed
         submission.data = {
             k: v for k, v in form.data.items() if k not in exclude
         }
@@ -603,7 +604,7 @@ class FormSubmissionCollection:
 
 
 class FormRegistrationWindowCollection(
-    GenericCollection[FormRegistrationWindow]
+    GenericCollection[FormRegistrationWindow, UUID]
 ):
 
     def __init__(self, session: Session, name: str | None = None):
@@ -633,13 +634,13 @@ class SurveyDefinitionCollection:
         return self.session.query(SurveyDefinition)
 
     def add(
-            self,
-            title: str,
-            definition: str,
-            type: str = 'generic',
-            meta: dict[str, Any] | None = None,
-            content: dict[str, Any] | None = None,
-            name: str | None = None,
+        self,
+        title: str,
+        parsed: ParsedForm,
+        type: str = 'generic',
+        meta: dict[str, Any] | None = None,
+        content: dict[str, Any] | None = None,
+        name: str | None = None,
     ) -> SurveyDefinition:
         """ Add the given survey to the database. """
 
@@ -648,7 +649,7 @@ class SurveyDefinitionCollection:
             type, SurveyDefinition)()
         survey.name = name or normalize_for_url(title)
         survey.title = title
-        survey.definition = definition
+        survey.parsed = parsed
         survey.meta = meta or {}
         survey.content = content or {}
 
@@ -728,8 +729,8 @@ class SurveySubmissionCollection:
         meta: dict[str, Any] | None = None,
     ) -> SurveySubmission:
         """ Takes a filled-out survey instance and stores the submission
-        in the database. The survey instance is expected to have a ``_source``
-        parameter, which contains the source used to build the szrvey (as only
+        in the database. The survey instance is expected to have a ``_parsed``
+        parameter, which contains the source used to build the survey (as only
         surveys with this source may be stored).
 
         This method expects the name of the survey definition stored in the
@@ -738,7 +739,7 @@ class SurveySubmissionCollection:
 
         """
 
-        assert hasattr(form, '_source')
+        assert hasattr(form, '_parsed')
 
         form.validate()
 
@@ -792,8 +793,8 @@ class SurveySubmissionCollection:
         exclude = set(exclude) if exclude else set()
         exclude.add(form.meta.csrf_field_name)  # never include the csrf token
 
-        assert hasattr(form, '_source')
-        submission.definition = form._source
+        assert hasattr(form, '_parsed')
+        submission.parsed = form._parsed
         submission.data = {
             k: v for k, v in form.data.items() if k not in exclude
         }
@@ -831,7 +832,7 @@ class SurveySubmissionCollection:
 
 
 class SurveySubmissionWindowCollection(
-    GenericCollection[SurveySubmissionWindow]
+    GenericCollection[SurveySubmissionWindow, UUID]
 ):
 
     def __init__(self, session: Session, name: str | None = None):

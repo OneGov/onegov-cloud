@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class AgencyMembershipCollection(GenericCollection[AgencyMembership]):
+class AgencyMembershipCollection(GenericCollection[AgencyMembership, 'UUID']):
     """ Manages a list of agency memberships.
 
     Use it like this::
@@ -27,7 +27,7 @@ class AgencyMembershipCollection(GenericCollection[AgencyMembership]):
     def model_class(self) -> type[AgencyMembership]:
         return AgencyMembership
 
-    def by_id(self, id: UUID) -> AgencyMembership | None:  # type:ignore
+    def by_id(self, id: UUID) -> AgencyMembership | None:
         return super().query().filter(
             self.primary_key == id).first()
 

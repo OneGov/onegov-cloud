@@ -717,7 +717,7 @@
     <tal:b condition="not: item.published">
         <div class="grid-x">
             <div class="small-12 cell">
-                <div class="panel">
+                <div class="panel callout">
                     <p i18n:translate>
                         This site is not published.
                     </p>
@@ -3426,6 +3426,9 @@
                         </tal:b>
                         <tal:b tal:case="'migration'" i18n:translate>
                             Lump sum
+                        </tal:b>
+                        <tal:b tal:case="'rounding'" i18n:translate>
+                            Rounding difference
                         </tal:b>
                         <tal:b tal:case="default">
                             ${item.group}

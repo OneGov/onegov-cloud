@@ -3,6 +3,27 @@
     height: auto;
 }
 
-.re-superscript {
+.re-superscript,
+.re-subscript {
     font-family: $body-font-family !important;
+}
+
+sub {
+    vertical-align: sub !important;
+}
+
+ol.alpha-list {
+    list-style-type: lower-alpha;
+}
+
+.re-alphalist::before {
+    display: inline-block;
+    font-family: 'Font Awesome 5 Free';
+    font-style: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-rendering: auto;
+    content: "";
+    font-weight: 900;
+    line-height: inherit;
 }

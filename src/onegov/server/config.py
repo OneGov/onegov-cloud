@@ -148,7 +148,17 @@ class ApplicationConfig:
 
     @property
     def configuration(self) -> dict[str, Any]:
-        return self._cfg.get('configuration', {})
+        # HACK: For now we force the default driver to change from psycopg2
+        #       to psycopg by modifying the dsn string. When we upgrade to
+        #       SQLAlchemy 2.1 we no longer need this workaround, since they
+        #       changed the default from psycopg2 to psycopg in that version
+        config = self._cfg.get('configuration', {})
+        if 'dsn' in config:
+            config['dsn'] = config['dsn'].replace(
+                'postgresql://',
+                'postgresql+psycopg://'
+            )
+        return config
 
     @property
     def root(self) -> str:

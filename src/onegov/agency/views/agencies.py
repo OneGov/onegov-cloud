@@ -259,7 +259,7 @@ def view_agency_as_nav_item(
         response.headers.add(
             'X-IC-PushURL',
             request.class_link(
-                ExtendedAgencyCollection, {'browse': str(self.id)})
+                ExtendedAgencyCollection, {'browse': self.id})
         )
 
     return render_macro(

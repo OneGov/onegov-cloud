@@ -6,6 +6,7 @@ from datetime import datetime, date
 from io import BytesIO
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.models import TicketMessage, TicketChatMessage
 from onegov.org.pdf.ticket import TicketBasePdf, TicketPdf
@@ -38,7 +39,7 @@ def open_ticket(
         ticket = TicketCollection(request.session).open_ticket(
             handler_code=handler_code, handler_id=token
         )
-        ticket.handler.refresh_invoice_items(request)
+        ticket.handler.refresh_invoice_items(request, None)
         if create_message:
             TicketMessage.create(ticket, request, 'opened')
     return ticket
@@ -214,10 +215,14 @@ def test_ticket_pdf_long_message(client: Client) -> None:
     """
 
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Contact', definition=dedent("""
-        Name * = ___
-        E-Mail * = @@@
-    """), type='custom')
+    collection.definitions.add(
+        'Contact',
+        parsed=ParsedForm.from_formcode(dedent("""
+            Name * = ___
+            E-Mail * = @@@
+        """)),
+        type='custom'
+    )
     transaction.commit()
 
     client.login_admin()

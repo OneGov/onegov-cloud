@@ -17,21 +17,8 @@ from onegov.core.utils import binary_to_dictionary, dictionary_to_binary
 from onegov.file.attachments import resize_image
 from onegov.file.utils import get_supported_image_mime_types
 from onegov.form import _
-from onegov.form.errors import (
-    DuplicateLabelError,
-    InvalidIndentSyntax,
-    EmptyFieldsetError,
-    InvalidCommentIndentSyntax,
-    InvalidCommentLocationSyntax,
-    RequiredFieldAddedError,
-    NestedFieldsetError
-)
-from onegov.form.errors import FieldCompileError
-from onegov.form.errors import InvalidFormSyntax
-from onegov.form.errors import MixedTypeError
 from stdnum.exceptions import (
     ValidationError as StdnumValidationError)
-from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -46,6 +33,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
     from onegov.form import Form
+    from onegov.form.fields import FormcodeField
     from onegov.form.types import BaseValidator, FieldCondition
     from sqlalchemy.orm import DeclarativeBase
     from wtforms import Field, StringField
@@ -340,257 +328,54 @@ class ValidPassword(Length):
             ))
 
 
-class ValidFormDefinition:
-    """ Makes sure the given text is a valid onegov.form definition. """
-
-    message = _('The form could not be parsed.')
-    field_without_type = _(
-        "The field '{label}' has no type defined. "
-        "For example use '___' for a text field."
-    )
-    mixed_type = _(
-        "The field '{label}' cannot mix radio buttons and checkboxes."
-    )
-    email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
-    syntax = _('The syntax on line {line} is not valid.')
-    indent = _('The indentation on line {line} is not valid. '
-               'Please use a multiple of 4 spaces')
-    comment_indent = _('The indentation on line {line} is not valid. '
-                       'Comments must be indented to the same level as '
-                       'the field definition (`=`) they belong to.')
-    comment_location = _('Incorrect placement of the field description on '
-                         'line {line}. The field description must be placed '
-                         'below the field definition (`=`) and with the same '
-                         'indentation.')
-    duplicate = _("The field '{label}' exists more than once.")
-    reserved = _("'{label}' is a reserved name. Please use a different name.")
-    required = _('Define at least one required field')
-    payment_method = _(
-        "The field '{label}' contains a price that requires a credit card "
-        "payment. This is only allowed if credit card payments are optional."
-    )
-    minimum_price = _(
-        'A minimum price total can only be set if at least one priced field '
-        'is defined.'
-    )
-    empty_fieldset = _(
-        "The '{label}' group is empty and will not be visible. Either remove "
-        "the empty group or add fields to it.")
-    nested_fieldsets = _(
-        'Nested fieldsets (`#`) are not supported, please remove line {line}.'
-    )
-
-    def __init__(
-        self,
-        require_email_field: bool = True,
-        reserved_fields: Collection[str] | None = None,
-        require_title_fields: bool = False,
-        validate_prices: bool = True
-    ):
-        self.require_email_field = require_email_field
-        self.reserved_fields = reserved_fields or set()
-        self.require_title_fields = require_title_fields
-        self.validate_prices = validate_prices
-
-    def __call__(self, form: Form, field: Field) -> Form | None:
-        if not field.data:
-            return None
-
-        try:
-            parsed_form = self._parse_form(field, enable_edit_checks=True)
-        except InvalidFormSyntax as exception:
-            field.render_kw = field.render_kw or {}
-            field.render_kw['data-highlight-line'] = exception.line
-            raise ValidationError(
-                field.gettext(self.syntax).format(line=exception.line)
-            ) from exception
-        except InvalidIndentSyntax as exception:
-            raise ValidationError(
-                field.gettext(self.indent).format(line=exception.line)
-            ) from exception
-        except InvalidCommentIndentSyntax as exception:
-            raise ValidationError(
-                field.gettext(self.comment_indent).format(line=exception.line)
-            ) from exception
-        except InvalidCommentLocationSyntax as exception:
-            raise ValidationError(
-                field.gettext(self.comment_location).format(line=exception.line)
-            ) from exception
-        except EmptyFieldsetError as exception:
-            raise ValidationError(
-                field.gettext(self.empty_fieldset).format(
-                    label=exception.field_name)
-            ) from exception
-        except DuplicateLabelError as exception:
-            raise ValidationError(
-                field.gettext(self.duplicate).format(label=exception.label)
-            ) from exception
-        except FieldCompileError as exception:
-            raise ValidationError(
-                field.gettext(self.field_without_type).format(
-                    label=exception.field_name)
-            ) from exception
-        except MixedTypeError as exception:
-            raise ValidationError(
-                field.gettext(self.mixed_type).format(
-                    label=exception.field_name)
-            ) from exception
-        except NestedFieldsetError as exception:
-            raise ValidationError(
-                field.gettext(self.nested_fieldsets).format(line=exception.line)
-            ) from exception
-        except AttributeError as exception:
-            raise ValidationError(
-                field.gettext(self.message)
-            ) from exception
-        except RequiredFieldAddedError as exception:
-            message = _(
-                '${fields}: New fields cannot be required initially. '
-                'Require them in a separate migration step.', mapping={
-                    'fields': ', '.join(f'"{f}"' for f in
-                                        exception.field_names)
-                }
-            )
-            raise ValidationError(
-                field.gettext(message)
-            ) from exception
-
-        if self.require_email_field:
-            if not parsed_form.has_required_email_field:
-                raise ValidationError(field.gettext(self.email))
-
-        if self.require_title_fields and not parsed_form.title_fields:
-            raise ValidationError(field.gettext(self.required))
-
-        if self.reserved_fields:
-            for formfield_id, formfield in parsed_form._fields.items():
-                if formfield_id in self.reserved_fields:
-
-                    raise ValidationError(
-                        field.gettext(self.reserved).format(
-                            label=formfield.label.text
-                        )
-                    )
-
-        if self.validate_prices and 'payment_method' in form:
-            for formfield in parsed_form:
-                if not hasattr(formfield, 'pricing'):
-                    continue
-
-                if not formfield.pricing.has_payment_rule:
-                    continue
-
-                # NOTE: If we end up allowing 'manual' in addition to
-                #       'free' we should also check if the application
-                #       has a payment_provider set.
-                if form['payment_method'].data != 'free':
-                    # add the error message to both affected fields
-                    error = field.gettext(self.payment_method).format(
-                        label=formfield.label.text
-                    )
-                    # if the payment_method field is below the form
-                    # definition field, then validate will not have
-                    # been run yet and we can only add process_errors
-                    errors = form['payment_method'].errors
-                    if not isinstance(errors, list):
-                        errors = form['payment_method'].process_errors
-                        assert isinstance(errors, list)
-
-                    errors.append(error)
-                    raise ValidationError(error)
-
-        if self.validate_prices and 'minimum_price_total' in form:
-            has_pricing = (
-                hasattr(form, 'currency') and form.currency.data
-                or any(hasattr(formfield, 'pricing')
-                       for formfield in parsed_form._fields.values()))
-
-            if form['minimum_price_total'].data and not has_pricing:
-                # add the error message to all affected fields
-                # FIXME: ideally we would get more consistent about
-                #        having a field like 'pricing_method' that
-                #        we can attach this error to. It doesn't
-                #        really make sense to show it on 'currency'
-                error = field.gettext(self.minimum_price)
-                # if the minimum_price_total field is below the form
-                # definition field, then validate will not have
-                # been run yet and we can only add process_errors
-                errors = form['minimum_price_total'].errors
-                if not isinstance(errors, list):
-                    errors = form['minimum_price_total'].process_errors
-                    assert isinstance(errors, list)
-
-                errors.append(error)
-                raise ValidationError(error)
-
-        return parsed_form
-
-    def _parse_form(
-        self,
-        field: Field,
-        enable_edit_checks: bool = True
-    ) -> Form:
-        # XXX circular import
-        from onegov.form import parse_form
-
-        return parse_form(field.data,
-                          enable_edit_checks=enable_edit_checks)()
-
-
-class ValidFilterFormDefinition(ValidFormDefinition):
+class ValidFilterFormDefinition:
     invalid_field_type = _("Invalid field type for field '{label}'. For "
                            "filters only 'select' or 'multiple select' "
                            "fields are allowed.")
 
-    def __call__(self, form: Form, field: Field) -> Form | None:
-        from onegov.form.fields import MultiCheckboxField
-
-        parsed_form = super().__call__(form, field)
-        if parsed_form is None:
-            return None
+    def __call__(self, form: Form, field: FormcodeField) -> None:
+        if field.data is None:
+            return
 
         # limit the definition to MultiCheckboxField, RadioField which can
         # be used for filter definition
         errors = None
-        for field in parsed_form._fields.values():
-            if not isinstance(field, (MultiCheckboxField, RadioField)):
-                error = field.gettext(self.invalid_field_type.format(
-                    label=field.label.text))
-                errors = form['definition'].errors
+        for parsed_field in field.data.flattened_fields:
+            if parsed_field.type not in ('checkbox', 'radio'):
+                error = field.gettext(self.invalid_field_type).format(
+                    label=parsed_field.label)
+                errors = field.errors
                 if not isinstance(errors, list):
-                    errors = form['definition'].process_errors
+                    errors = field.process_errors
                     assert isinstance(errors, list)
                 errors.append(error)
 
         if errors:
             raise ValidationError()
 
-        return parsed_form
 
-
-class ValidSurveyDefinition(ValidFormDefinition):
+class ValidSurveyDefinition:
     """ Makes sure the given text is a valid onegov.form definition for
     surveys.
     """
 
-    def __init__(self, require_email_field: bool = False):
-        super().__init__(require_email_field)
-
     invalid_field_type = _("Invalid field type for field '${label}'. Please "
                            "use the plus-icon to add allowed field types.")
 
-    def __call__(self, form: Form, field: Field) -> Form | None:
-        from onegov.form.fields import UploadField
-
-        parsed_form = super().__call__(form, field)
-        if parsed_form is None:
-            return None
+    def __call__(self, form: Form, field: FormcodeField) -> None:
+        if field.data is None:
+            return
 
         # Exclude fields that are not allowed in surveys
         errors = None
-        for field in parsed_form._fields.values():
-            if isinstance(field, (UploadField, DateField, TimeField,
-                                  DateTimeLocalField)):
+        for parsed_field in field.data.flattened_fields:
+            if field.type in (
+                'fileinput',
+                'multiplefileinput',
+                'date',
+                'datetime',
+                'time'
+            ):
                 message = self.invalid_field_type % {
                     'label': field.label.text}
                 error = field.gettext(message)
@@ -602,8 +387,6 @@ class ValidSurveyDefinition(ValidFormDefinition):
 
         if errors:
             raise ValidationError()
-
-        return parsed_form
 
 
 class LaxDataRequired(DataRequired):
@@ -670,20 +453,58 @@ class ValidPhoneNumber:
 
     Expects an :class:`wtforms.StringField` instance.
 
+    ``number_type`` restricts the number to a single
+    :class:`phonenumbers.PhoneNumberType` (``None``, the default, accepts any).
+
     """
 
-    message = _('Not a valid phone number.')
+    invalid_phone_number = _('Not a valid phone number.')
+    invalid_country_code = _('Not a valid country code.')
+    invalid_number_length = _('This phone number has an invalid length.')
+    missing_area_code = _('Please include the area code.')
+    unknown_number = _('This phone number does not exist.')
+    mobile_required = _('Please enter a mobile phone number.')
+    fixed_line_required = _('Please enter a landline phone number.')
+    unsupported_country = _(
+        'Phone numbers from this country are not supported. '
+        'Allowed countries: ${countries}'
+    )
+
+    length_errors = {
+        phonenumbers.ValidationResult.TOO_SHORT: invalid_number_length,
+        phonenumbers.ValidationResult.TOO_LONG: invalid_number_length,
+        phonenumbers.ValidationResult.INVALID_LENGTH: invalid_number_length,
+        phonenumbers.ValidationResult.IS_POSSIBLE_LOCAL_ONLY:
+            missing_area_code,
+    }
+
+    # error shown when a required number type isn't met
+    type_required_errors = {
+        phonenumbers.PhoneNumberType.MOBILE: mobile_required,
+        phonenumbers.PhoneNumberType.FIXED_LINE: fixed_line_required,
+    }
 
     def __init__(
         self,
         country: str = 'CH',
-        country_whitelist: Collection[str] | None = None
+        country_whitelist: Collection[str] | None = None,
+        number_type: int | None = None
     ):
         if country_whitelist:
-            assert country in country_whitelist
+            assert country in country_whitelist, (
+                'Invalid country code: {}. Allowed are: {}'.format(
+                    country, sorted(country_whitelist)
+                )
+            )
+
+        assert (
+            number_type is None
+            or number_type in phonenumbers.PhoneNumberType.values()
+        ), 'Invalid number type: {}'.format(number_type)
 
         self.country = country
         self.country_whitelist = country_whitelist
+        self.number_type = number_type
 
     def __call__(self, form: Form, field: Field) -> None:
         if not field.data:
@@ -691,20 +512,55 @@ class ValidPhoneNumber:
 
         try:
             number = phonenumbers.parse(field.data, self.country)
+        except phonenumbers.NumberParseException as exception:
+            if exception.error_type == exception.INVALID_COUNTRY_CODE:
+                raise ValidationError(self.invalid_country_code) from exception
+            raise ValidationError(self.invalid_phone_number) from exception
         except Exception as exception:
-            raise ValidationError(self.message) from exception
+            raise ValidationError(self.invalid_phone_number) from exception
+
+        reason = phonenumbers.is_possible_number_with_reason(number)
+        if reason != phonenumbers.ValidationResult.IS_POSSIBLE:
+            raise ValidationError(
+                self.length_errors.get(reason, self.invalid_phone_number)
+            )
+
+        if not phonenumbers.is_valid_number(number):
+            raise ValidationError(self.unknown_number)
+
+        region = phonenumbers.region_code_for_number(number)
 
         if self.country_whitelist:
-            region = phonenumbers.region_code_for_number(number)
             if region not in self.country_whitelist:
-                # FIXME: Better error message?
-                raise ValidationError(self.message)
+                raise ValidationError(_(
+                    self.unsupported_country, mapping={
+                        'countries': ', '.join(sorted(self.country_whitelist))
+                    }
+                ))
 
-        if not (
-            phonenumbers.is_valid_number(number)
-            and phonenumbers.is_possible_number(number)
+        if self.number_type is None:
+            return
+
+        # skip if the region can't distinguish the requested type
+        if region is None or self.number_type not in (
+            phonenumbers.supported_types_for_region(region)
         ):
-            raise ValidationError(self.message)
+            return
+
+        number_type = phonenumbers.number_type(number)
+        if number_type == phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE:
+            # some countries (e.g. the US) can't tell fixed line from mobile,
+            # so accept the aggregate type for either request
+            if self.number_type in (
+                phonenumbers.PhoneNumberType.FIXED_LINE,
+                phonenumbers.PhoneNumberType.MOBILE,
+            ):
+                number_type = self.number_type
+
+        if number_type != self.number_type:
+            raise ValidationError(self.type_required_errors.get(
+                self.number_type, self.invalid_phone_number
+            ))
 
 
 class ValidSwissSocialSecurityNumber:

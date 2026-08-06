@@ -220,7 +220,7 @@ def town_handle_ticket_data_deletion_settings(
 
 @TownApp.form(
     model=Organisation, name='vat-settings', template='form.pt',
-    permission=Secret, form=VATSettingsForm, setting=_('Value Added Tax'),
+    permission=Secret, form=VATSettingsForm, setting=_('Prices'),
     icon='fa-file-invoice-dollar', order=70
 )
 def handle_vat_settings(
@@ -229,9 +229,9 @@ def handle_vat_settings(
         form: VATSettingsForm,
         layout: SettingsLayout | None = None
 ) -> RenderData | Response:
-    layout = layout or SettingsLayout(self, request, _('Value Added Tax'))
+    layout = layout or SettingsLayout(self, request, _('Prices'))
     return handle_generic_settings(
-        self, request, form, _('Value Added Tax'), layout
+        self, request, form, _('Prices'), layout
     )
 
 

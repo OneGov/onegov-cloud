@@ -5,6 +5,8 @@ import re
 import morepath
 import transaction
 
+from datetime import UTC, datetime
+
 from collections import defaultdict
 from decimal import Decimal
 from onegov.core.html import html_to_text
@@ -22,8 +24,6 @@ from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.directory.models.directory import EntrySubscription
 from onegov.form import FormCollection, as_internal_id, move_fields
-from onegov.form.errors import (
-    InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
@@ -40,8 +40,10 @@ from purl import URL
 from tempfile import NamedTemporaryFile
 from webob import Response
 from webob.exc import HTTPForbidden
+from sedate import utcnow
 from wtforms import TextAreaField
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError as WTValidationError
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
@@ -54,6 +56,7 @@ if TYPE_CHECKING:
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
+    from wtforms import Field
     from typing import type_check_only
 
     @type_check_only
@@ -104,6 +107,16 @@ def get_directory_entry_form_class(
             elif model.directory.required_publication:
                 self.publication_start.validators[0] = InputRequired()
                 self.publication_end.validators[0] = InputRequired()
+
+        def validate_publication_start(self, field: Field) -> None:
+            if (
+                field.data is not None
+                and model.directory.notification_address
+                and field.data <= utcnow()
+            ):
+                raise WTValidationError(_(
+                    'Publication start must be in the future.'
+                ))
 
     move_fields(
         InternalNotesAndOptionalMapPublicationForm,
@@ -207,66 +220,49 @@ def handle_edit_directory(
     migration = None
     error = None
 
-    try:
-        if form.submitted(request):
-            save_changes = True
+    if form.submitted(request):
+        save_changes = True
 
-            if self.directory.entries:
-                assert form.structure.data is not None
-                migration = self.directory.migration(
-                    form.structure.data,
-                    form.configuration
-                )
+        if self.directory.entries:
+            assert form.parsed_structure.data is not None
+            migration = self.directory.migration(
+                form.parsed_structure.data,
+                form.configuration
+            )
 
-                if migration.changes:
-                    if not migration.possible:
-                        save_changes = False
-                        request.alert(_(
-                            'The requested change cannot be performed, '
-                            'as it is incompatible with existing entries'
-                        ))
-                        alert_migration_errors(migration, request)
-                    else:
-                        if not request.params.get('confirm'):
-                            form.action += '&confirm=1'
-                            save_changes = False
-
-            if save_changes:
-                try:
-                    form.populate_obj(self.directory)
-                    self.session.flush()
-                except ValidationError as e:
-                    error = e
-                    error.link = request.class_link(  # type:ignore
-                        DirectoryEntry,
-                        {
-                            'directory_name': self.directory.name,
-                            'name': e.entry.name
-                        }
-                    )
-                    transaction.abort()
+            if migration.changes:
+                if not migration.possible:
+                    save_changes = False
+                    request.alert(_(
+                        'The requested change cannot be performed, '
+                        'as it is incompatible with existing entries'
+                    ))
+                    alert_migration_errors(migration, request)
                 else:
-                    request.success(_('Your changes were saved'))
-                    return request.redirect(request.link(self))
+                    if not request.params.get('confirm'):
+                        form.action += '&confirm=1'
+                        save_changes = False
 
-        elif not request.POST:
-            form.process(obj=self.directory)
-    except InvalidFormSyntax as e:
-        request.warning(
-            _('Syntax Error in line ${line}', mapping={'line': e.line})
-        )
-    except AttributeError:
-        request.warning(_('Syntax error in form'))
+        if save_changes:
+            try:
+                form.populate_obj(self.directory)
+                self.session.flush()
+            except ValidationError as e:
+                error = e
+                error.link = request.class_link(  # type:ignore
+                    DirectoryEntry,
+                    {
+                        'directory_name': self.directory.name,
+                        'name': e.entry.name
+                    }
+                )
+                transaction.abort()
+            else:
+                request.success(_('Your changes were saved'))
+                return request.redirect(request.link(self))
 
-    except MixedTypeError as e:
-        request.warning(
-            _('Syntax error in field ${field_name}',
-              mapping={'field_name': e.field_name})
-        )
-    except DuplicateLabelError as e:
-        request.warning(
-            _('Error: Duplicate label ${label}', mapping={'label': e.label})
-        )
+    elif not request.POST:
+        form.process(obj=self.directory)
 
     layout = layout or DirectoryCollectionLayout(self, request)
     layout.edit_mode = True
@@ -322,7 +318,7 @@ def alert_migration_errors(
 
     # check for incompatible type changes
     for changed in migration.changes.changed_fields:
-        old = migration.changes.old[changed]
+        old = migration.changes.old_field(changed)
         new = migration.changes.new[changed]
 
         if not migration.fieldtype_migrations.possible(old.type, new.type):
@@ -645,6 +641,84 @@ def send_email_notification_for_directory_entry(
     request.app.send_transactional_email_batch(email_iter())
 
 
+def _send_admin_email(
+    directory: ExtendedDirectory,
+    request: OrgRequest,
+    subject: str,
+    template: str,
+    context: dict[str, Any],
+) -> None:
+    content = render_template(template, request, {
+        'layout': DefaultMailLayout(object(), request),
+        'title': subject,
+        'generated_at': datetime.now(UTC),
+        **context,
+    })
+    assert directory.notification_address is not None
+    request.app.send_transactional_email(
+        receivers=(directory.notification_address,),
+        reply_to=request.app.org.reply_to,
+        subject=subject,
+        content=content,
+        plaintext=html_to_text(content),
+    )
+
+
+def send_admin_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest,
+) -> None:
+    title = request.translate(_(
+        '${org}: Published Entry "${entry}" in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'entry': entry.title,
+                 'directory': directory.title},
+    ))
+
+    _send_admin_email(
+        directory, request, title,
+        'mail_directory_entry_admin_notification_started.pt',
+        {
+            'directory': directory,
+            'entry': entry,
+            'entry_title': entry.title,
+            'entry_link': request.link(entry),
+            'publication_start': entry.publication_start,
+            'publication_end': entry.publication_end,
+            'content_hash': entry.content_hash,
+        },
+    )
+
+
+def send_admin_expiry_notification_for_directory_entry(
+    directory: ExtendedDirectory,
+    entry: ExtendedDirectoryEntry,
+    request: OrgRequest,
+) -> None:
+    if not directory.notification_address:
+        return
+
+    title = request.translate(_(
+        '${org}: Publication Period Ended for "${entry}" in "${directory}"',
+        mapping={'org': request.app.org.title,
+                 'entry': entry.title,
+                 'directory': directory.title},
+    ))
+    _send_admin_email(
+        directory, request, title,
+        'mail_directory_entry_admin_publication_ended.pt',
+        {
+            'directory': directory,
+            'entry': entry,
+            'entry_title': entry.title,
+            'publication_start': entry.publication_start,
+            'publication_end': entry.publication_end,
+            'content_hash': entry.content_hash,
+        },
+    )
+
+
 @OrgApp.form(
     model=ExtendedDirectoryEntryCollection,
     permission=Private,
@@ -916,6 +990,18 @@ def delete_directory_entry(
 ) -> None:
 
     request.assert_valid_csrf_token()
+
+    # Block deletion while published now, or still published as of the last
+    # maintenance run - the latter covers the gap between expiry and the
+    # next cronjob run, before the expiry notification has gone out
+    # (proof-of-publication guarantee).
+    last_run = request.app.org.last_hourly_maintenance_run
+    if (
+        isinstance(self, ExtendedDirectoryEntry)
+        and (self.published or self.published_as_of(last_run))
+        and self.directory.notification_address
+    ):
+        raise HTTPForbidden()
 
     session = request.session
     session.delete(self)

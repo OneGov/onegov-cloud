@@ -739,7 +739,7 @@ def test_user_group_form(
     formdefinition = FormDefinition(
         title='A-1',
         name='a',
-        definition='# A',
+        definition='# A\nE-Mail = @@@',
         order='0',
         checksum='x'
     )

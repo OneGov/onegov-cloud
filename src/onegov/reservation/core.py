@@ -14,6 +14,13 @@ if TYPE_CHECKING:
     from libres.context.core import Context
     from libres.context.registry import Registry
     from onegov.core.orm.session_manager import SessionManager
+else:
+    # HACK: Monkeypatch libres' JSON type processor with ours
+    from libres.db.models.types import JSON as _LibresJSON  # ruff:ignore[constant-imported-as-non-constant]
+    from onegov.core.orm.types import JSON as _OnegGovJSON  # ruff:ignore[constant-imported-as-non-constant]
+
+    _LibresJSON.process_bind_param = _OnegGovJSON.process_bind_param
+    _LibresJSON.process_result_value = _OnegGovJSON.process_result_value
 
 
 class LibresIntegration:

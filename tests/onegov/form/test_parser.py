@@ -5,7 +5,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
-from onegov.form import parse_formcode, parse_form, flatten_fieldsets
+from onegov.form import parse_formcode, parse_form, flatten_fields
 from onegov.form.fields import (
     DateTimeLocalField,
     MultiCheckboxField,
@@ -13,6 +13,7 @@ from onegov.form.fields import (
     URLField,
     VideoURLField,
 )
+from onegov.form.parser import ParsedForm
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.form.validators import (
     LaxDataRequired,
@@ -476,8 +477,8 @@ def test_parse_radio_with_pricing() -> None:
 
     form = parse_form(text)()
     assert form['drink'].pricing.rules == {
-        'Coffee': Price(2.5, 'CHF'),
-        'Tea': Price(1.5, 'CHF', credit_card_payment=True)
+        'Coffee': Price(Decimal('2.50'), 'CHF'),
+        'Tea': Price(Decimal('1.50'), 'CHF', credit_card_payment=True)
     }
     assert form['drink'].description == 'beer cant be cheaper than water'
 
@@ -492,10 +493,10 @@ def test_parse_checkbox_with_pricing() -> None:
 
     form = parse_form(text)()
     assert form['extras'].pricing.rules == {
-        'Bacon': Price(2.5, 'CHF', credit_card_payment=True),
-        'Cheese': Price(1.5, 'CHF')
+        'Bacon': Price(Decimal('2.50'), 'CHF', credit_card_payment=True),
+        'Cheese': Price(Decimal('1.50'), 'CHF')
     }
-    assert form['extras'].pricing.rules['Bacon'].amount == Decimal(2.5)
+    assert form['extras'].pricing.rules['Bacon'].amount == Decimal('2.50')
     assert form['extras'].pricing.rules['Bacon'].currency == 'CHF'
     assert form['extras'].pricing.rules['Bacon'].credit_card_payment is True
 
@@ -861,7 +862,7 @@ def test_invalid_syntax() -> None:
 
 
 def test_parse_formcode() -> None:
-    fieldsets = parse_formcode("""
+    fields = parse_formcode("""
         # General
         First Name *= ___
         Last Name = ___[10]
@@ -875,38 +876,38 @@ def test_parse_formcode() -> None:
             [x] Burger
     """)
 
-    assert len(fieldsets) == 2
-    assert fieldsets[0].label == 'General'
+    assert len(fields) == 3
+    assert fields[0].fieldset == 'General'
+    assert fields[0].type == 'text'
+    assert fields[0].required
+    assert fields[0].maxlength is None
+    assert fields[0].id == 'general_first_name'
 
-    assert fieldsets[0].fields[0].type == 'text'
-    assert fieldsets[0].fields[0].required
-    assert fieldsets[0].fields[0].maxlength is None
-    assert fieldsets[0].fields[0].id == 'general_first_name'
+    assert fields[1].fieldset == 'General'
+    assert fields[1].type == 'text'
+    assert not fields[1].required
+    assert fields[1].maxlength == 10
+    assert fields[1].id == 'general_last_name'
 
-    assert fieldsets[0].fields[1].type == 'text'
-    assert not fieldsets[0].fields[1].required
-    assert fieldsets[0].fields[1].maxlength == 10
-    assert fieldsets[0].fields[1].id == 'general_last_name'
+    assert fields[2].fieldset == 'Order'
+    assert fields[2].type == 'checkbox'
 
-    assert fieldsets[1].label == 'Order'
-    assert fieldsets[1].fields[0].type == 'checkbox'
+    assert fields[2].label == 'Products'
+    assert fields[2].id == 'order_products'
 
-    assert fieldsets[1].fields[0].label == 'Products'
-    assert fieldsets[1].fields[0].id == 'order_products'
+    assert fields[2].choices[0].label == 'Pizza'
+    assert fields[2].choices[0].display_label == 'Pizza'
+    assert not fields[2].choices[0].selected
 
-    assert fieldsets[1].fields[0].choices[0].key == 'Pizza'
-    assert fieldsets[1].fields[0].choices[0].label == 'Pizza'
-    assert not fieldsets[1].fields[0].choices[0].selected
+    assert fields[2].choices[1].label == 'Burger'
+    assert fields[2].choices[1].display_label == 'Burger'
+    assert fields[2].choices[1].selected
 
-    assert fieldsets[1].fields[0].choices[1].key == 'Burger'
-    assert fieldsets[1].fields[0].choices[1].label == 'Burger'
-    assert fieldsets[1].fields[0].choices[1].selected
-
-    subfields = fieldsets[1].fields[0].choices[0].fields
+    subfields = fields[2].choices[0].fields
     assert subfields is not None
     assert subfields[0].label == 'Type'
     assert subfields[0].id == 'order_products_type'
-    assert hasattr(subfields[0], 'choices')
+    assert subfields[0].type == 'radio'
     assert subfields[0].choices[0].selected
     assert not subfields[0].choices[1].selected
     assert subfields[0].choices[0].label == 'Default'
@@ -947,8 +948,8 @@ def test_parse_formcode_duplicate_fieldname() -> None:
         """)
 
 
-def test_flatten_fieldsets() -> None:
-    fieldsets = parse_formcode("""
+def test_flatten_fields() -> None:
+    nested_fields = parse_formcode("""
         # General
         First Name *= ___
         Last Name *= ___[10]
@@ -962,7 +963,7 @@ def test_flatten_fieldsets() -> None:
             [x] Burger
     """)
 
-    fields = list(flatten_fieldsets(fieldsets))
+    fields = list(flatten_fields(nested_fields))
 
     assert len(fields) == 4
     assert fields[0].label == 'First Name'
@@ -1105,7 +1106,7 @@ def test_decimal_range() -> None:
 
 
 def test_field_ids() -> None:
-    fs = parse_formcode("""
+    fields = parse_formcode("""
         First Name *= ___
         Last Name = ___[10]
 
@@ -1118,38 +1119,26 @@ def test_field_ids() -> None:
             [x] Burger
     """)
 
-    assert fs[0].fields[0].id == 'first_name'
-    assert fs[0].fields[0].human_id == 'First Name'
-    assert fs[0].fields[1].id == 'last_name'
-    assert fs[0].fields[1].human_id == 'Last Name'
-    assert fs[1].fields[0].id == 'my_order_products'
-    assert fs[1].fields[0].human_id == 'My Order/Products'
-    assert hasattr(fs[1].fields[0], 'choices')
-    subfields = fs[1].fields[0].choices[0].fields
+    assert fields[0].id == 'first_name'
+    assert fields[0].human_id == 'First Name'
+    assert fields[1].id == 'last_name'
+    assert fields[1].human_id == 'Last Name'
+    assert fields[2].id == 'my_order_products'
+    assert fields[2].human_id == 'My Order/Products'
+    assert fields[2].type == 'checkbox'
+    subfields = fields[2].choices[0].fields
     assert subfields is not None
     assert subfields[0].id == 'my_order_products_type'
     assert subfields[0].human_id == 'My Order/Products/Type'
 
-    assert find_field(fs, None) is fs[0]
-    assert find_field(fs, 'my_order') is fs[1]
-    assert find_field(fs, 'My Order') is fs[1]
-    assert find_field(fs, 'first_name').id == 'first_name'  # type: ignore[union-attr]
-    assert find_field(fs, 'First Name').id == 'first_name'  # type: ignore[union-attr]
-    assert find_field(fs, 'last_name').id == 'last_name'  # type: ignore[union-attr]
-    assert find_field(fs, 'Last Name').id == 'last_name'  # type: ignore[union-attr]
-    assert find_field(fs, 'my_order_products').id == 'my_order_products'  # type: ignore[union-attr]
-    assert find_field(fs, 'My Order/Products').id == 'my_order_products'  # type: ignore[union-attr]
-    assert find_field(  # type: ignore[union-attr]
-        fs, 'my_order_products_type'
-    ).id == 'my_order_products_type'
-    assert find_field(  # type: ignore[union-attr]
-        fs, 'My Order/Products/Type'
-    ).id == 'my_order_products_type'
-
-    assert fs[0].find_field('first_name').id == 'first_name'  # type: ignore[union-attr]
-    assert fs[0].find_field('First Name').id == 'first_name'  # type: ignore[union-attr]
-    assert fs[1].find_field('first_name') is None
-    assert fs[1].find_field('First Name') is None
+    assert find_field(fields, 'first_name') is fields[0]
+    assert find_field(fields, 'First Name') is fields[0]
+    assert find_field(fields, 'last_name') is fields[1]
+    assert find_field(fields, 'Last Name') is fields[1]
+    assert find_field(fields, 'my_order_products') is fields[2]
+    assert find_field(fields, 'My Order/Products') is fields[2]
+    assert find_field(fields, 'my_order_products_type') is subfields[0]
+    assert find_field(fields, 'My Order/Products/Type') is subfields[0]
 
 
 @pytest.mark.parametrize("field,invalid", [
@@ -1194,16 +1183,21 @@ def test_parse_dependency_with_price() -> None:
     """
     )
 
-    fieldsets = parse_formcode(text)
-    assert len(fieldsets) == 1
-    assert fieldsets[0].fields[0].type == "radio"
-    assert len(fieldsets[0].fields) == 1
+    fields = parse_formcode(text)
+    assert len(fields) == 1
+    assert fields[0].type == "radio"
 
     from onegov.form.parser.core import RadioField
 
-    assert isinstance(fieldsets[0].fields[0], RadioField)
-    choices = fieldsets[0].fields[0].choices
+    assert isinstance(fields[0], RadioField)
+    choices = fields[0].choices
     assert len(choices) == 2
+    assert choices[0].pricing is None
+    assert len(choices[0].fields) == 0
+    assert choices[1].pricing is not None
+    assert choices[1].pricing.amount == Decimal('5')
+    assert choices[1].pricing.currency == 'CHF'
+    assert len(choices[1].fields) == 2
 
 
 @pytest.mark.parametrize('indent,edit_checks,shall_raise', [
@@ -1412,7 +1406,7 @@ def test_error_mixed_checkboxes() -> None:
     )
     with pytest.raises(errors.MixedTypeError) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
-    assert excinfo.value.field_name == 'Auswahl'
+    assert excinfo.value.label == 'Auswahl'
 
 
 def test_field_with_no_field_type_definition() -> None:
@@ -1421,15 +1415,15 @@ def test_field_with_no_field_type_definition() -> None:
     # is None
     with pytest.raises(errors.FieldCompileError) as excinfo:
         parse_formcode("Text =")
-    assert excinfo.value.field_name == 'Text'
+    assert excinfo.value.label == 'Text'
 
     with pytest.raises(errors.FieldCompileError) as excinfo:
         parse_formcode("Comment = \nWebseite = ___")
-    assert excinfo.value.field_name == 'Comment'
+    assert excinfo.value.label == 'Comment'
 
     with pytest.raises(errors.FieldCompileError) as excinfo:
         parse_formcode("Title = ___\nNo type field= \nWebseite = ___")
-    assert excinfo.value.field_name == 'No type field'
+    assert excinfo.value.label == 'No type field'
 
 
 def test_help_indentation_error() -> None:
@@ -1658,14 +1652,15 @@ def test_help_location_error() -> None:
 
 
 def test_empty_fieldset_error() -> None:
-    fieldsets = parse_formcode('\n'.join((
+    fields = parse_formcode('\n'.join((
         "# Section 1",
         "# Section 2",
         "First Name *= ___",
         "Last Name *= ___",
         "E-mail *= @@@"
     )), enable_edit_checks=False)
-    assert len(fieldsets) == 2
+    assert all(f.fieldset == 'Section 2' for f in fields)
+    assert len(fields) == 3
 
     with pytest.raises(errors.EmptyFieldsetError) as e:
         parse_formcode('\n'.join((
@@ -1676,7 +1671,7 @@ def test_empty_fieldset_error() -> None:
             "E-mail *= @@@"
         )), enable_edit_checks=True)
 
-    assert e.value.field_name == 'Section 1'
+    assert e.value.label == 'Section 1'
 
     with pytest.raises(errors.EmptyFieldsetError) as e:
         parse_formcode('\n'.join((
@@ -1688,7 +1683,7 @@ def test_empty_fieldset_error() -> None:
             "# Section 3",
         )), enable_edit_checks=True)
 
-    assert e.value.field_name == 'Section 3'
+    assert e.value.label == 'Section 3'
 
     with pytest.raises(errors.EmptyFieldsetError) as e:
         parse_formcode('\n'.join((
@@ -1700,7 +1695,7 @@ def test_empty_fieldset_error() -> None:
             "E-mail *= @@@",
         )), enable_edit_checks=True)
 
-    assert e.value.field_name == 'Section 2'
+    assert e.value.label == 'Section 2'
 
 
 def test_nested_fieldset_error() -> None:
@@ -1717,3 +1712,238 @@ def test_nested_fieldset_error() -> None:
         )), enable_edit_checks=True)
 
     assert e.value.line == 7
+
+
+@pytest.mark.parametrize('definition,expected', [
+    # NOTE: Anonymous fieldsets are re-rendered properly
+    (
+        dedent("""\
+            # Name
+            First name = ___
+            Last name = ___
+
+            # Address
+            Street = ___
+
+            # ...
+            Comment = ___
+
+            # Addendum
+            Feedback = ___
+        """),
+        None
+    ),
+    # NOTE: But an explicit anonymous fieldset at the start gets dropped
+    (
+        dedent("""\
+            # ...
+            Comment = ___
+
+            # Addendum
+            Feedback = ___
+        """),
+        dedent("""\
+            Comment = ___
+
+            # Addendum
+            Feedback = ___
+        """),
+    ),
+    # NOTE: We always format the required indicator the same way
+    (
+        'E-Mail *= @@@',
+        'E-Mail * = @@@\n'
+    ),
+    # NOTE: We always put exactly one newline between fieldsets
+    #       and now newlines between fields in the same fieldset
+    (
+        dedent("""\
+            # Intro
+            Hi = ___
+
+            There = ___
+            # Middle
+            How are you? = ___
+
+
+            # End
+            Thank You = ___
+        """),
+        dedent("""\
+            # Intro
+            Hi = ___
+            There = ___
+
+            # Middle
+            How are you? = ___
+
+            # End
+            Thank You = ___
+        """)
+    ),
+    # NOTE: URL fields are lossy we always generate them with https://
+    #       we don't remember what was originally used, since it does
+    #       not affect the resulting form at all.
+    (
+        dedent("""\
+            I'm an url field = http://
+            I'm the exact same = https://
+        """),
+        dedent("""\
+            I'm an url field = https://
+            I'm the exact same = https://
+        """)
+    ),
+    (
+        dedent("""\
+            # Persönliche Informationen
+            Bürgerort = ___
+            Geschlecht =
+                ( ) Männlich
+                ( ) Weiblich
+        """),
+        None
+    ),
+    # examples from docs
+    (
+        dedent("""\
+            Delivery * =
+                (x) I want it delivered
+                    Alternate Address =
+                        (x) No
+                        ( ) Yes
+                            Street = ___
+                            << street >>
+                            Town = ___
+                    << Alt >>
+                ( ) I want to pick it up
+            << delivery >>
+            Kommentar = ...
+            << kommentar >>
+        """),
+        None
+    ),
+    (
+        dedent("""\
+            # Textfield
+            I'm a textfield = ___
+            I'm a limited textfield = ___[50]
+            I'm a numbers-only textfield = ___/^[0-9]+$
+            I'm a length-limited numbers-only textfield = ___[4]/^[0-9]+$
+            I'm a length-limited numbers-only textfield 2 = ___/^[0-9]{0,4}$
+
+            # Textarea
+            I'm a textarea = ...
+            I'm a textarea with 10 rows = ...[10]
+
+            # Password
+            I'm a password = ***
+
+            # E-Mail
+            I'm an e-mail field = @@@
+
+            # URL
+            I'm an url field = https://
+
+            # Video Link
+            I am a video link = video-url
+
+            # Date
+            I'm a date field = YYYY.MM.DD
+            I'm a future date field = YYYY.MM.DD (+1 days..)
+            I'm on today or in the future = YYYY.MM.DD (today..)
+            At least two weeks ago = YYYY.MM.DD (..-2 weeks)
+            Between 2010 and 2020 = YYYY.MM.DD (2010.01.01..2020.12.31)
+
+            # Datetime
+            I'm a datetime field = YYYY.MM.DD HH:MM
+            I'm a futue datetime field = YYYY.MM.DD HH:MM (today..)
+
+            # Time
+            I'm a time field = HH:MM
+
+            # Numbers
+            I'm an integer field = 0..99
+            I'm an integer field of a different range = -100..100
+            I'm a float field = 0.00..99.00
+            I'm a float field of a different range = -100.00..100.00
+            Number of stamps to include = 0..30 (1.00 CHF)
+
+            # Code
+            Description = <markdown>
+
+            # Files
+            I'm a file upload field = *.*
+            I'm a image filed = *.png|*.jpg|*.gif
+            I'm a document = *.doc
+            I'm any document = *.doc|*.pdf
+            I'm a multiple file upload field = *.* (multiple)
+
+            # Standard Numbers
+            I'm a valid IBAN (or empty) = # iban
+            I'm a valid IBAN (required) * = # iban
+            I'm an animal chip nr = chip-nr
+
+            # Radio Buttons
+            Gender =
+                ( ) Female
+                ( ) Male
+                (x) I don't want to say
+            Delivery Method =
+                ( ) Pickup
+                    Pickup Time * = ___
+                (x) Address
+                    Street * = ___
+                    Town * = ___
+
+            # Checkboxes
+            Extras =
+                [x] Phone insurance
+                [ ] Phone case
+                [x] Extra battery
+            Additional toppings =
+                [ ] Salami
+                [ ] Olives
+                [ ] Other
+                    Description = ___
+
+            # Pricing Information
+            Node Size =
+                ( ) Small (20 USD)
+                (x) Medium (30 USD)
+                ( ) Large (40 USD)
+            Extras =
+                [x] Second IP Address (20 CHF)
+                [x] Backup (20 CHF)
+            Delivery =
+                (x) Pickup (0 CHF)
+                ( ) Delivery (5 CHF!)
+
+            # Discounts
+            Discount =
+                (x) No discount
+                ( ) Sports club (50%)
+                ( ) School (100%)
+        """),
+        None
+    ),
+])
+def test_roundtrip(
+    definition: str,
+    expected: str | None
+) -> None:
+    if expected is None:
+        expected = definition
+
+    parsed = ParsedForm.from_formcode(definition)
+    unparsed = parsed.to_formcode()
+    assert unparsed == expected
+    # when we re-parse the output we get the same fields again
+    assert ParsedForm.from_formcode(unparsed).fields == parsed.fields
+    # we should also survive a json serialization roundtrip
+    json_roundtripped = ParsedForm.model_validate_json(
+        parsed.model_dump_json(exclude_none=True)
+    )
+    assert json_roundtripped.fields == parsed.fields
+    # without changing the generated formcode
+    assert json_roundtripped.to_formcode() == expected

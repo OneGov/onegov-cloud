@@ -22,13 +22,13 @@ from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
+from onegov.activity.types import BoundedIntegerRange
 from onegov.core.utils import Bunch
 from onegov.pay.models.invoice_reference import FeriennetSchema
 from onegov.pay.models.invoice_reference import ESRSchema
 from sedate import as_datetime, replace_timezone, standardize_date
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-from psycopg2.extras import NumericRange
 from pytz import utc
 from unittest.mock import patch
 from uuid import uuid4
@@ -570,7 +570,7 @@ def test_no_orphan_occasions(session: Session, owner: User) -> None:
     need = OccasionNeed(
         id=uuid4(),
         name='Helpers',
-        number=NumericRange(1, 2),
+        number=BoundedIntegerRange(1, 2),
         occasion_id=tournament.id
     )
 
@@ -2573,7 +2573,7 @@ def test_date_changes(
 def test_age_barriers(prebooking_period: BookingPeriod) -> None:
     period = prebooking_period
 
-    o = Occasion(age=NumericRange(6, 9), period=period, dates=[
+    o = Occasion(age=BoundedIntegerRange(6, 9), period=period, dates=[
         OccasionDate(
             start=datetime(2017, 7, 26, 10),
             end=datetime(2017, 7, 26, 16),

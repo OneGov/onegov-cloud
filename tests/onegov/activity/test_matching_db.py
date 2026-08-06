@@ -12,8 +12,8 @@ from onegov.activity.matching import PreferInAgeBracket
 from onegov.activity.matching import PreferOrganiserChildren
 from onegov.activity.matching import Scoring
 from onegov.activity.matching import PreferMotivated
+from onegov.activity.types import BoundedIntegerRange
 from onegov.core.utils import Bunch
-from psycopg2.extras import NumericRange
 from uuid import uuid4
 
 
@@ -177,7 +177,7 @@ def test_prefer_in_age_bracket(
     assert b1.state == 'open'
     assert b2.state == 'accepted'
 
-    o.age = NumericRange(20, 50)  # type: ignore[assignment]
+    o.age = BoundedIntegerRange(20, 50)
 
     match(session, prebooking_period.id, score_function=Scoring(
         criteria=[PreferInAgeBracket.from_session(session)]

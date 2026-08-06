@@ -14,10 +14,12 @@ from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.file import MultiAssociatedFiles
-from onegov.form import parse_form
+from onegov.form.parser import ParsedForm
+from onegov.form.orm_types import Formcode
 from onegov.pay import InvoiceItemMeta, Price, process_payment
 from sedate import align_date_to_day, utcnow
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
 
@@ -35,6 +37,7 @@ if TYPE_CHECKING:
         InvoiceDiscountMeta, Payment, PaymentError, PaymentProvider)
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Session
+    from sqlalchemy.sql import ColumnElement
 
     type DeadlineUnit = Literal['d', 'h']
 
@@ -101,8 +104,8 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: the timezone this resource resides in
     timezone: Mapped[str]
 
-    #: the custom form definition used when creating a reservation
-    definition: Mapped[str | None]
+    #: the pre-parsed custom form used when creating a reservation
+    parsed: Mapped[ParsedForm | None] = mapped_column(Formcode)
 
     #: the group to which this resource belongs to (may be any kind of string)
     group: Mapped[str | None]
@@ -187,6 +190,12 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
 
+    #: whether users may submit a cancellation request for
+    # accepted reservations
+    allow_cancellation_requests: dict_property[bool] = (
+        content_property(default=False)
+    )
+
     #: the reply_to address to supersede the global reply_to address for
     #: tickets created through this form
     reply_to: dict_property[str | None] = meta_property()
@@ -219,6 +228,23 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     #: the view to open in the calendar (fullCalendar view name)
     view = 'dayGridMonth'
+
+    @hybrid_property
+    def definition(self) -> str | None:
+        """ The form as a parsable string """
+        return self.parsed.formcode if self.parsed is not None else None
+
+    @definition.inplace.setter
+    def _definition_setter(self, value: str | None) -> None:
+        if not value:
+            self.parsed = None
+        else:
+            self.parsed = ParsedForm.from_formcode(value)
+
+    @definition.inplace.expression
+    @classmethod
+    def _definition_expression(cls) -> ColumnElement[str | None]:
+        return cls.parsed['source_code'].astext
 
     @deadline.inplace.setter
     def set_deadline(self, value: tuple[int, DeadlineUnit] | None) -> None:
@@ -312,10 +338,10 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     def form_class(self) -> type_t[Form] | None:
         """ Parses the form definition and returns a form class. """
 
-        if not self.definition:
+        if self.parsed is None:
             return None
 
-        return parse_form(self.definition)
+        return self.parsed.form_class()
 
     def invoice_items_for_reservation(
         self,

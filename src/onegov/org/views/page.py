@@ -178,7 +178,11 @@ def view_news_collection(
                 query_params={'format': 'rss'}
             ) if next_page else None,
             feed_title=request.domain + ' News',
-            language=request.app.org.meta['locales'],
+            language=(
+                request.app.org.locales
+                or request.app.default_locale
+                or 'de_CH'
+            ),
         )
         return Response(
             rss_str,
