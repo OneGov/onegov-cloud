@@ -22,6 +22,7 @@ from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models.ticket import ReservationHandler
 from onegov.pay import Payment, PaymentCollection, InvoiceCollection
 from onegov.pdf.utils import extract_pdf_info
+from onegov.reservation import Allocation as ResourceAllocation
 from onegov.reservation import Resource, ResourceCollection
 from onegov.reservation.models.custom_reservation import CustomReservation
 from onegov.ticket import Ticket, TicketCollection, TicketInvoice
@@ -4189,6 +4190,7 @@ def test_allocation_rules_on_rooms(client: Client) -> None:
     assert count_allocations() == 7
 
 
+@freeze_time('2018-12-31')
 def test_allocation_rules_edit(client: Client) -> None:
     client.login_admin()
 
@@ -4216,7 +4218,11 @@ def test_allocation_rules_edit(client: Client) -> None:
     page.form['extend'] = 'daily'
     page.form['start'] = '2019-01-01'
     page.form['end'] = '2019-01-02'
-    page.form['as_whole_day'] = 'yes'
+    page.form['as_whole_day'] = 'no'
+    page.form['start_time'] = '08:00'
+    page.form['end_time'] = '12:00'
+    page.form['is_partly_available'] = 'no'
+    page.form['per_time_slot'] = 2
 
     page.select_checkbox('except_for', 'Sa')
     page.select_checkbox('except_for', 'So')
@@ -4225,6 +4231,25 @@ def test_allocation_rules_edit(client: Client) -> None:
 
     assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
     assert count_allocations() == 2
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('room')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = (
+        scheduler.managed_allocations()
+        .order_by(ResourceAllocation._start)
+        .all()
+    )
+    allocation = allocations[0]
+    allocation.quota_limit = 2
+    token = scheduler.reserve(
+        'info@example.org',
+        dates=(allocation.display_start(), allocation.display_end()),
+        quota=2,
+    )
+    scheduler.approve_reservations(token)
+    transaction.commit()
 
     # Modifying the rule applies changes where possible, but
     # existing reserved slots remain unaffected.
@@ -4236,6 +4261,25 @@ def test_allocation_rules_edit(client: Client) -> None:
     edit_page = form.submit().follow()
 
     assert 'Renamed room' in edit_page
+    assert not edit_page.pyquery('.alert-box.warning')
+
+    scheduler.allocate(
+        dates=(
+            datetime(2019, 1, 3, 8),
+            datetime(2019, 1, 3, 12),
+        ),
+    )
+    transaction.commit()
+
+    edit_page = client.get('/resource/room')
+    edit_page = edit_page.click('Verfügbarkeitszeiträume').click('Bearbeiten')
+    form = edit_page.form
+    form['start'] = '2019-01-01'
+    form['end'] = '2019-01-03'
+    edit_page = form.submit().follow()
+
+    warning = edit_page.pyquery('.alert-box.warning').text()
+    assert '1 Verfügbarkeiten wurden nicht erstellt' in warning
 
 
 def test_allocation_rules_overlap_warning(client: Client) -> None:
