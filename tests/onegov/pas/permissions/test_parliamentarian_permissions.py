@@ -4,7 +4,7 @@ import pytest
 import transaction
 
 from datetime import date
-from morepath import Identity
+from onegov.core import Identity
 from onegov.core.security import Private
 from onegov.pas.collections import (
     PASCommissionCollection,

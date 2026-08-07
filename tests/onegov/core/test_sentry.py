@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 import sentry_sdk
-from morepath import Identity
+from onegov.core import Identity
 from onegov.core.framework import Framework
 from onegov.core.security import Public
 from onegov.core.sentry import OneGovCloudIntegration

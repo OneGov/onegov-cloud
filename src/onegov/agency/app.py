@@ -20,6 +20,7 @@ from onegov.town6.app import get_i18n_localedirs as get_org_i18n_localedirs
 
 
 from typing import Any
+from typing import Self
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -36,7 +37,7 @@ if TYPE_CHECKING:
 
 class AgencyApp(TownApp):
 
-    request_class = AgencyRequest
+    request_class: type[AgencyRequest[Self]] = AgencyRequest
 
     if TYPE_CHECKING:
         # FIXME: Maybe we should consider just raising an exception

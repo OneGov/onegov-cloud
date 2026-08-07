@@ -8,7 +8,8 @@ from sqlalchemy import and_, or_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from morepath.authentication import Identity, NoIdentity
+    from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from sqlalchemy.orm import Query
     from typing import Self
 
