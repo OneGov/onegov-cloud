@@ -357,6 +357,15 @@ class DirectoryBaseForm(Form):
         ),
         validators=[Optional(), Email()],
     )
+    enable_notification_pdf_signing = BooleanField(
+        label=_('Whether the PDF attached to the admin notification '
+                'should be digitally signed (recommended).'),
+        fieldset=_('Notifications'),
+        default=True,
+        depends_on=(
+            'notification_address', '!',
+        ),
+    )
 
     submitter_meta_fields = MultiCheckboxField(
         label=_('Information to be provided in addition to the E-mail'),

@@ -64,7 +64,7 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
-from onegov.org.models.extensions import PersonLinkExtension
+from onegov.org.models.extensions import ACCESS_LABELS, PersonLinkExtension
 from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
@@ -1001,6 +1001,10 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
         lines = (l.strip() for l in self.org.meta['contact'].splitlines())
         lines = (l for l in lines if l)
         return linkify(', '.join(lines))
+
+    def access_label(self, access: str) -> str:
+        """ The translated label for a model's ``access`` level. """
+        return self.request.translate(ACCESS_LABELS.get(access, access))
 
 
 class AdjacencyListMixin:
