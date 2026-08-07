@@ -589,7 +589,7 @@ class BillingCollectionLayout(DefaultLayout):
                     || ' CHF)'
                 AS text
                 ,
-                MIN(id::text) AS item,
+                MIN(invoice_items.id::text) AS item,
                 COUNT(*) AS count,
                 family IN (
                     SELECT DISTINCT(family)
@@ -597,10 +597,12 @@ class BillingCollectionLayout(DefaultLayout):
                     WHERE source IS NOT NULL and source != 'xml'
                 ) AS has_online_payments
             FROM invoice_items
+            JOIN invoices ON invoice_items.invoice_id = invoices.id
             WHERE family IS NOT NULL
+              AND invoices.period_id = :period_id
             GROUP BY family, text
             ORDER BY text
-        """)).tuples()
+        """), {'period_id': self.model.period.id}).tuples()
 
     @property
     def family_removal_links(self) -> Iterator[Link]:
