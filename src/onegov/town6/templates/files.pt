@@ -1,6 +1,3 @@
-<!--? web components test -->
-<!--? end web components test -->
-
 <div metal:use-macro="layout.base" i18n:domain="onegov.town6">
     <tal:b metal:fill-slot="title">
         ${title}
@@ -17,7 +14,7 @@
         </og-callout>
 
         <og-callout type="alert">
-            <span slot="title">Error</span>
+            <p slot="title">Error</p>
             Severe error happened while loading page!
         </og-callout>
 

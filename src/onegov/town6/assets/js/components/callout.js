@@ -47,4 +47,9 @@ class OGCallout extends HTMLElement {
     }
 }
 
+// register the tag with the browser so <og-callout> is upgraded into an
+// OGCallout instance wherever it appears in the DOM. the name must contain a
+// hyphen (x-y): that's what marks it as a custom element and keeps it from
+// ever clashing with a current or future built-in tag (which are never
+// hyphenated, e.g. <div>, <span>)
 customElements.define('og-callout', OGCallout);
