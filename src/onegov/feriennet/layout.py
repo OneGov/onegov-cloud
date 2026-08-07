@@ -606,11 +606,11 @@ class BillingCollectionLayout(DefaultLayout):
 
     @property
     def family_removal_links(self) -> Iterator[Link]:
-        attrs = {
-            'class': ('remove-manual', 'extend-to-family')
-        }
-
         for record in self.families:
+            attrs = {
+                'class': ('remove-manual', 'extend-to-family')
+            }
+
             text = _('Delete "${text}"', mapping={
                 'text': record.text,
             })
