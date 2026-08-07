@@ -61,8 +61,10 @@ class BookingPeriodCollection(GenericCollection[BookingPeriod, 'UUID']):
         return self.query().filter(BookingPeriod.active == True).first()
 
     def upcoming(self) -> BookingPeriod | None:
+        """ Returns the next (soonest) period in de future. """
         return (
             self.query()
+            .filter(BookingPeriod.active == False)
             .filter(BookingPeriod.booking_end >= date.today())
             .order_by(BookingPeriod.booking_start).first()
         )
