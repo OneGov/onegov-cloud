@@ -872,7 +872,10 @@ class Choice(BaseModel):
         description='Any subfields that should only be displayed as long '
             'as this choice has been selected. Subfields will inherit the '
             'fieldset of the parent field, unless it explicitly is set '
-            'to a non-empty string.'
+            'to a value other than `null` and none of the preceding fields '
+            'had an explicit fieldset value. This is mostly for convenience '
+            'so the common case of subfields sharing their parent fieldset '
+            'can be achieved by omitting the fieldset on the children.'
     )
     pricing: Pricing | None = Field(
         default=None,
@@ -973,14 +976,30 @@ class BaseField[KindT: str](BaseModel):
     )
 
     _parent: ParsedField | None = None
+    # whether or not this field inherits its fieldset
+    _inherits_fieldset: bool = False
 
     @cached_property
     def id(self) -> str:
         return as_internal_id(self.human_id)
 
     @cached_property
+    def real_fieldset(self) -> str | None:
+        if self._parent is not None and self._inherits_fieldset:
+            return self._parent.real_fieldset
+        return self.fieldset
+
+    @cached_property
     def human_id(self) -> str:
         if self._parent is not None:
+            if self.fieldset is not None:
+                # if we belong to a different fieldset than our parent
+                # then we need to add it to the id.
+                if self.fieldset != self._parent.real_fieldset:
+                    return (
+                        f'{self._parent.human_id}/{self.fieldset}/{self.label}'
+                    )
+
             return f'{self._parent.human_id}/{self.label}'
 
         if self.fieldset:
@@ -1622,6 +1641,37 @@ class MultipleFileinputField(BaseField[Literal['multiplefileinput']]):
         })
 
 
+def write_choices_value(
+    self: RadioField | CheckboxField,
+    buffer: SupportsWrite[str],
+    indentation: str = ''
+) -> None:
+    buffer.write('\n')
+    fallback_fieldset = self.real_fieldset
+    for choice in self.choices:
+        check = 'x' if choice.selected else ' '
+        if self.type == 'radio':
+            buffer.write(f'{indentation}    ({check}) {choice}\n')
+        else:
+            buffer.write(f'{indentation}    [{check}] {choice}\n')
+        first_line = True
+        current_fieldset = fallback_fieldset
+        for field in choice.fields:
+            fieldset = field.real_fieldset
+            if fieldset != current_fieldset:
+                if not first_line:
+                    # insert an extra newline above the fieldset
+                    buffer.write('\n')
+                current_fieldset = fieldset
+                # if we encounter an anonymous fieldset after a
+                # named one we need to display it as `...`
+                label = '...' if fieldset is None else fieldset
+                buffer.write(f'{indentation}        # {label}\n')
+            # FIXME: Handle nested fieldsets
+            field.write_formcode(buffer, indentation + '        ')
+            first_line = False
+
+
 @final
 class RadioField(BaseField[Literal['radio']]):
     type: Literal['radio'] = 'radio'
@@ -1635,11 +1685,17 @@ class RadioField(BaseField[Literal['radio']]):
     )
 
     # NOTE: The nested fields need access to the parent field, so they
-    #       can generate their correct unique id
+    #       can generate their correct unique id, they also need to know
+    #       whether or not they inherit the fieldset from their parent
     @model_validator(mode='after')
     def insert_parent_reference(self) -> Self:
         for choice in self.choices:
+            inherit = True
             for child in choice.fields:
+                if child.fieldset is None and inherit:
+                    child.__dict__['_inherits_fieldset'] = inherit
+                else:
+                    inherit = False
                 child.__dict__['_parent'] = self
         return self
 
@@ -1648,18 +1704,7 @@ class RadioField(BaseField[Literal['radio']]):
             return next(iter(v.strip() for v in value.split('\n')), None)
         return value and value[0] or None
 
-    def write_formcode_value(
-        self,
-        buffer: SupportsWrite[str],
-        indentation: str = ''
-    ) -> None:
-        buffer.write('\n')
-        for choice in self.choices:
-            check = 'x' if choice.selected else ' '
-            buffer.write(f'{indentation}    ({check}) {choice}\n')
-            for field in choice.fields:
-                # FIXME: Handle nested fieldsets
-                field.write_formcode(buffer, indentation + '        ')
+    write_formcode_value = write_choices_value
 
     @classmethod
     def from_parse_results(
@@ -1691,11 +1736,17 @@ class CheckboxField(BaseField[Literal['checkbox']]):
     )
 
     # NOTE: The nested fields need access to the parent field, so they
-    #       can generate their correct unique id
+    #       can generate their correct unique id, they also need to know
+    #       whether or not they inherit the fieldset from their parent
     @model_validator(mode='after')
     def insert_parent_reference(self) -> Self:
         for choice in self.choices:
+            inherit = True
             for child in choice.fields:
+                if child.fieldset is None and inherit:
+                    child.__dict__['_inherits_fieldset'] = inherit
+                else:
+                    inherit = False
                 child.__dict__['_parent'] = self
         return self
 
@@ -1705,18 +1756,7 @@ class CheckboxField(BaseField[Literal['checkbox']]):
 
         return value
 
-    def write_formcode_value(
-        self,
-        buffer: SupportsWrite[str],
-        indentation: str = ''
-    ) -> None:
-        buffer.write('\n')
-        for choice in self.choices:
-            check = 'x' if choice.selected else ' '
-            buffer.write(f'{indentation}    [{check}] {choice}\n')
-            for field in choice.fields:
-                # FIXME: Handle nested fieldsets
-                field.write_formcode(buffer, indentation + '        ')
+    write_formcode_value = write_choices_value
 
     @classmethod
     def from_parse_results(
@@ -1767,21 +1807,28 @@ def parse_formcode(
     }
     used_ids: set[str] = set()
 
-    for fieldset in parsed:
+    current_fieldset: str | None = None
+    current_field_count = 0
+    for idx, item in enumerate(parsed):
+        if isinstance(item, str):
+            target_fieldset = None if item == '...' else item
+            if current_fieldset != target_fieldset:
+                if enable_edit_checks and idx and not current_field_count:
+                    raise errors.EmptyFieldsetError(current_fieldset or '...')
+                current_fieldset = target_fieldset
+                current_field_count = 0
+            continue
 
-        # fieldsets occur only at the top level
-        key = next(k for k in fieldset.keys())
-        # FIXME: This hack is only necessary because we translate to yaml
-        label = key if key != '...' else None
+        fields.append(parse_field_block(
+            item,
+            field_classes,
+            used_ids,
+            current_fieldset
+        ))
+        current_field_count += 1
 
-        fieldset_fields = [
-            parse_field_block(block, field_classes, used_ids, label)
-            for block in (fieldset[key] or ())
-        ]
-        if enable_edit_checks and not fieldset_fields:
-            raise errors.EmptyFieldsetError(key)
-
-        fields.extend(fieldset_fields)
+    if enable_edit_checks and not current_field_count:
+        raise errors.EmptyFieldsetError(current_fieldset or '...')
 
     return fields
 
@@ -1830,16 +1877,20 @@ def parse_field_block(
                 continue
 
             # recursively parse and add children
-            choice['fields'] = [
-                parse_field_block(
+            choice['fields'] = subfields = []
+            current_fieldset = fieldset
+            for child in children:
+                if isinstance(child, str):
+                    current_fieldset = None if child == '...' else child
+                    continue
+
+                subfields.append(parse_field_block(
                     field_block=child,
                     field_classes=field_classes,
                     used_ids=used_ids,
-                    fieldset=fieldset,
+                    fieldset=current_fieldset,
                     parent_id=result_id
-                )
-                for child in children
-            ]
+                ))
 
         choices = [c[0] for c in choices]
         field = Bunch(choices=choices, type=choices[0].type)
@@ -1882,39 +1933,6 @@ def try_parse(expr: pp.ParserElement, text: str) -> pp.ParseResults | None:
         return None
 
 
-def prepare(text: str) -> Iterator[tuple[int, str]]:
-    """ Takes the raw form source and prepares it for the translation into
-    yaml.
-
-    """
-
-    lines = (l.rstrip() for l in text.split('\n'))
-    yield from ensure_a_fieldset((ix, l) for ix, l in enumerate(lines) if l)
-
-
-def ensure_a_fieldset(
-    lines: Iterable[tuple[int, str]]
-) -> Iterator[tuple[int, str]]:
-    """ Makes sure that the given lines all belong to a fieldset. That means
-    adding an empty fieldset before all lines, if none is found first.
-
-    """
-    found_fieldset = False
-
-    for ix, line in lines:
-        if found_fieldset:
-            yield ix, line
-            continue
-
-        if match(ELEMENTS.fieldset_title, line):
-            found_fieldset = True
-            yield ix, line
-        else:
-            found_fieldset = True
-            yield -1, '# ...'
-            yield ix, line
-
-
 def validate_indent(indent: str) -> bool:
     """
     Returns `False` if indent is other than a multiple of 4, else True
@@ -1944,6 +1962,10 @@ class IndentStack(list[int]):
         except ValueError:
             return False
 
+    @property
+    def expect_option(self) -> bool:
+        return len(self) % 2 == 1
+
     def handle_indent(
         self,
         line: int,  # for error messages
@@ -1964,8 +1986,7 @@ class IndentStack(list[int]):
         previous_indent = self[-1]
         if previous_indent < indent:
             # add new level
-            expect_option = len(self) % 2 == 1
-            if is_option is not expect_option:
+            if is_option is not self.expect_option:
                 raise errors.InvalidIndentSyntax(line=line)
             self.append(indent)
             return
@@ -1998,12 +2019,12 @@ def translate_to_yaml(
     editing a form. Should only be active originating from forms.validators.py
     """
 
-    lines = ((ix, l) for ix, l in prepare(text))
     expect_nested = False
     actual_fields = 0
-    ix = 0
+    lineno = 1
     indent_stack = IndentStack(enable_edit_checks=enable_edit_checks)
     expect_option = False
+    help_possible = False
 
     def escape_single(text: str) -> str:
         return text.replace("'", "''")
@@ -2011,27 +2032,33 @@ def translate_to_yaml(
     def escape_double(text: str) -> str:
         return text.replace('"', '\\"')
 
-    for ix, line in lines:
+    for lineno, line in enumerate(text.split('\n'), start=1):
+        line = line.rstrip()
+        if not line:
+            continue
+
         len_indent = len(line) - len(line.lstrip())
-        indent = ' ' * (4 + len_indent)
+        indent = ' ' * len_indent
 
         if enable_edit_checks and not validate_indent(indent):
-            raise errors.InvalidIndentSyntax(line=ix + 1)
+            raise errors.InvalidIndentSyntax(line=lineno)
 
-        # the top level are the fieldsets
+        # fieldsets are plain strings in the nested list of dictionaries
         if match(ELEMENTS.fieldset_title, line):
-            if enable_edit_checks and len_indent > 4:
-                raise errors.NestedFieldsetError(line=ix + 1)
-            yield '- "{}":'.format(escape_double(line.lstrip('# ').rstrip()))
+            yield '{}- "{}"'.format(
+                indent,
+                escape_double(line.lstrip('# ').rstrip())
+            )
             expect_nested = False
-            indent_stack.clear()
+            help_possible = False
+            indent_stack.handle_indent(lineno, len_indent)
             continue
 
         # fields are nested lists of dictionaries
         try:
             parse_result = try_parse(ELEMENTS.single_line_fields, line)
         except re.error as exception:
-            raise errors.InvalidFormSyntax(line=ix + 1) from exception
+            raise errors.InvalidFormSyntax(line=lineno) from exception
 
         if parse_result is not None:
             yield '{indent}- "{identifier}": !{type} \'{definition}\''.format(
@@ -2041,20 +2068,21 @@ def translate_to_yaml(
                 definition=escape_single(line.split('=')[1].strip())
             )
             expect_nested = len(indent) > 4
+            help_possible = True
             actual_fields += 1
 
-            indent_stack.handle_indent(ix + 1, len_indent)
+            indent_stack.handle_indent(lineno, len_indent)
             continue
 
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
             if enable_edit_checks:
-                if expect_option or not indent_stack:
-                    raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+                if expect_option or not help_possible:
+                    raise errors.InvalidCommentLocationSyntax(line=lineno)
 
                 if not indent_stack.is_identifier(len_indent):
-                    raise errors.InvalidCommentIndentSyntax(line=ix + 1)
+                    raise errors.InvalidCommentIndentSyntax(line=lineno)
 
             # FIXME: Currently this means we get rid of all newlines
             #        unless there's more than one, and we get rid of
@@ -2068,7 +2096,7 @@ def translate_to_yaml(
                 identifier='field_help',
                 message=escape_single(parse_result.message)
             )
-            indent_stack.handle_indent(ix + 1, len_indent)
+            indent_stack.handle_indent(lineno, len_indent)
             continue
 
         # checkboxes/radios come without identifier
@@ -2076,7 +2104,7 @@ def translate_to_yaml(
         if parse_result is not None:
 
             if not expect_nested:
-                raise errors.InvalidFormSyntax(line=ix + 1)
+                raise errors.InvalidFormSyntax(line=lineno)
 
             yield "{indent}- !{type} '{definition}':".format(
                 indent=indent,
@@ -2084,8 +2112,9 @@ def translate_to_yaml(
                 definition=escape_single(line.strip())
             )
 
-            indent_stack.handle_indent(ix + 1, len_indent, is_option=True)
+            indent_stack.handle_indent(lineno, len_indent, is_option=True)
             expect_option = False
+            help_possible = True
             continue
 
         # identifiers which are alone contain nested checkboxes/radios
@@ -2093,7 +2122,7 @@ def translate_to_yaml(
 
             # this should have been matched by the single line field above
             if not line.endswith('='):
-                raise errors.InvalidFormSyntax(line=ix + 1)
+                raise errors.InvalidFormSyntax(line=lineno)
 
             yield '{indent}- "{identifier}":'.format(
                 indent=indent,
@@ -2103,11 +2132,12 @@ def translate_to_yaml(
             expect_nested = True
             actual_fields += 1
 
-            indent_stack.handle_indent(ix + 1, len_indent)
+            indent_stack.handle_indent(lineno, len_indent)
             expect_option = True
+            help_possible = True
             continue
 
-        raise errors.InvalidFormSyntax(line=ix + 1)
+        raise errors.InvalidFormSyntax(line=lineno)
 
     if not actual_fields:
-        raise errors.InvalidFormSyntax(line=ix + 1)
+        raise errors.InvalidFormSyntax(line=lineno)
