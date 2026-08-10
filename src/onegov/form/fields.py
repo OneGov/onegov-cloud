@@ -379,12 +379,26 @@ class UploadField(FileField):
             # resend_upload
             action = valuelist[0]
             fieldstorage = valuelist[1]
-            # NOTE: I'm not sure why mypy complains here, a total version
-            #       of a TypedDict should be assignable to a non-total version
-            self.data = binary_to_dictionary(  # type: ignore[assignment]
-                dictionary_to_binary({'data': str(valuelist[3])}),
-                str(valuelist[2])
-            )
+            raw_data = str(valuelist[3])
+            if raw_data.startswith('@'):
+                # reference to a persisted file: keep the loaded metadata
+                # (size, mimetype) so display and validation still work
+                original = self.object_data
+                if isinstance(original, dict) and \
+                        original.get('data') == raw_data:
+                    self.data = original  # type: ignore[assignment]
+                else:
+                    self.data = {
+                        'data': raw_data,
+                        'filename': str(valuelist[2]),
+                    }
+            else:
+                # mypy: total TypedDict assignable to non-total, unclear why
+                self.data = binary_to_dictionary(  # type: ignore[assignment]
+                    dictionary_to_binary({'data': raw_data}),
+                    str(valuelist[2])
+
+                )
         elif len(valuelist) == 2:
             # force_simple
             action, fieldstorage = valuelist
@@ -429,7 +443,8 @@ class UploadField(FileField):
     ) -> None:
         if validation_stopped:
             return
-        if self.data and self.mimetypes:
+        # kept reference has no mimetype; already validated on first upload
+        if self.data and self.mimetypes and self.data.get('mimetype'):
             if self.data.get('mimetype') not in self.mimetypes:
                 raise ValidationError(_(
                     'Files of this type are not supported.'))

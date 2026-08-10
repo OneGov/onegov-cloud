@@ -334,7 +334,7 @@ def handle_field(
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
             allowed_mimetypes=expected_extensions.whitelist,
-            render_kw={'accept': accept},
+            render_kw={'accept': accept, 'resend_upload': True},
             description=field.field_help
         )
 
@@ -353,7 +353,7 @@ def handle_field(
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
             allowed_mimetypes=expected_extensions.whitelist,
-            render_kw={'accept': accept},
+            render_kw={'accept': accept, 'resend_upload': True},
             description=field.field_help
         )
 
