@@ -22,7 +22,7 @@ from pytz import UTC
 from textwrap import dedent
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from tests.shared.utils import (
-    create_image, get_meta, extract_filename_from_response)
+    create_image, create_pdf, get_meta, extract_filename_from_response)
 from webtest import Upload
 
 from typing import TYPE_CHECKING
@@ -102,7 +102,8 @@ def create_directory(
     extended_submitter: bool = False,
     title: str = 'Meetings',
     lead: str | None = None,
-    text: str | None = None
+    text: str | None = None,
+    pdf: bool = False
 ) -> ExtendedResponse:
 
     client.login_admin()
@@ -112,11 +113,18 @@ def create_directory(
         page.form['lead'] = lead
     if text:
         page.form['text'] = text
-    page.form['structure'] = """
+    if pdf:
+        page.form['structure'] = """
+                    Name *= ___
+                    Pic *= *.jpg|*.png|*.gif
+                    Pdf *= *.pdf
+                """
+    else:
+        page.form['structure'] = """
                     Name *= ___
                     Pic *= *.jpg|*.png|*.gif
                 """
-    page.form['content_fields'] = 'Name\nPic'
+    page.form['content_fields'] = 'Name\nPic\nPdf' if pdf else 'Name\nPic'
     page.form['content_hide_labels'] = 'Pic'
     page.form['title_format'] = '[Name]'
     page.form['enable_map'] = 'entry'
@@ -164,8 +172,7 @@ def test_publication_added_by_admin(client: Client) -> None:
     page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
     page = page.form.submit()
     assert 'Das Publikationsende muss in der Zukunft liegen' in page
-    # we have to submit the file again, can't evade that
-    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    # the uploaded file survives the validation error, no need to resend it
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     entry = page.form.submit().follow()
@@ -197,6 +204,73 @@ def test_publication_added_by_admin(client: Client) -> None:
     assert 'publication_start' not in page.form.fields
 
 
+def test_attachment_preserved_on_validation_error(client: Client) -> None:
+    # Uploading a file and submitting an entry with a publication date in
+    # the past triggers a validation error. The already uploaded file must
+    # survive the re-render so the user doesn't lose the attachment.
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=True, pdf=True)
+
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['pdf'] = Upload('annual.pdf', create_pdf().read())
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = page.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the publication date, but do NOT re-upload the files
+    annual_end = now + timedelta(days=1)
+    page.form['publication_end'] = dt_for_form(annual_end)
+    entry = page.form.submit().follow()
+
+    # the image attachment must have been preserved
+    assert get_meta(entry, 'og:image')
+    assert get_meta(entry, 'og:image:alt') == 'annual.jpg'
+
+    # the pdf attachment must have been preserved too
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'annual.pdf' in files
+
+
+def test_attachment_preserved_on_edit_validation_error(
+    client: Client
+) -> None:
+    # Editing an existing entry with an attachment and saving it with a
+    # publication date in the past must not lose the attachment.
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=True, pdf=True)
+
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['pdf'] = Upload('annual.pdf', create_pdf().read())
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=10))
+    entry = page.form.submit().follow()
+    assert get_meta(entry, 'og:image')
+
+    edit = client.get(entry.request.url + '/edit')
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the date without touching the attachments
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    entry = page.form.submit().follow()
+    assert get_meta(entry, 'og:image')
+    assert get_meta(entry, 'og:image:alt') == 'annual.jpg'
+
+    # the pdf attachment must have been preserved too
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'annual.pdf' in files
+
+
 def test_required_publication(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
@@ -213,8 +287,7 @@ def test_required_publication(client: Client) -> None:
     page.form['publication_start'] = dt_for_form(now)
     page = page.form.submit()
     assert 'Dieses Feld wird benötigt' in page
-    # we have to submit the file again, can't evade that
-    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    # the uploaded file survives the validation error, no need to resend it
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     page.form.submit().follow()
