@@ -3,12 +3,17 @@ from __future__ import annotations
 
 from email_validator import validate_email
 from enum import Enum
+from io import BytesIO
 from onegov.core.cache import instance_lru_cache
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.utils import increment_name, normalize_for_url
+from onegov.core.utils import (
+    dictionary_to_binary,
+    increment_name,
+    normalize_for_url,
+)
 from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import (
@@ -280,7 +285,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     value_field is None
                     or value_field.data == {}
                     or value_field.data is not None
-                )
+                ) and getattr(value_field, 'action', None) != 'keep'
 
                 if delete:
                     assert session is not None
@@ -335,7 +340,34 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     # keep files if selected in the dialog
                     if getattr(field_values, 'action', None) == 'keep':
                         original = (entry.values or {}).get(field.id, {})
-                        updated[field.id] = original
+                        if original:
+                            updated[field.id] = original
+                            continue
+
+                        # new entry: rebuild from the resent upload
+                        data = getattr(field_values, 'data', None) or {}
+                        if not data.get('data'):
+                            updated[field.id] = {}
+                            continue
+
+                        new_file = DirectoryFile(
+                            id=random_token(),
+                            name=data['filename'],
+                            note=field.id,
+                            reference=as_fileintent(
+                                content=BytesIO(
+                                    dictionary_to_binary(data)  # type: ignore[arg-type]
+                                ),
+                                filename=data['filename']
+                            )
+                        )
+                        entry.files.append(new_file)
+                        updated[field.id] = {
+                            'data': '@' + new_file.id,
+                            'filename': data['filename'],
+                            'mimetype': new_file.reference.file.content_type,
+                            'size': new_file.reference.file.content_length
+                        }
                         continue
 
                     # delete files if selected in the dialog
