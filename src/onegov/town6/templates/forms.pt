@@ -19,8 +19,8 @@
                                         aria-label="Close" i18n:attributes="aria-label"></button>
                             </div>
                             <div class="modal-body" id="form-modal-body">
-                                <tal:b condition="modal_context"
-                                    define="layout modal_context['layout'];
+                                <tal:b condition="modal_context">
+                                    <tal:b define="layout modal_context['layout'];
                                                 title modal_context['title'];
                                                 form modal_context['form'];
                                                 definition modal_context['definition'];
@@ -35,6 +35,7 @@
                                                 hints_callout modal_context['hints_callout'];
                                                 button_text modal_context['button_text']"
                                     metal:use-macro="layout.macros['form-modal']" />
+                                </tal:b>
                             </div>
                         </div>
                     </div>
