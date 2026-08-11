@@ -95,7 +95,8 @@ def test_formcode_select_empty_checkbox(browser: ExtendedBrowser) -> None:
         watcher.update(arguments[0]);
     """, 'A = ___\nB = ...\nC = *.png')
 
-    assert len(browser.find_by_css('.formcode-select input')) == 2
+    browser.wait_for(
+        lambda: len(browser.find_by_css('.formcode-select input')) == 2)
     browser.find_by_css('.formcode-select input')[0].click()
     browser.find_by_css('.formcode-select input')[1].click()
 
@@ -126,7 +127,8 @@ def test_formcode_select_empty_radio(browser: ExtendedBrowser) -> None:
         watcher.update(arguments[0]);
     """, 'A = ___\nB = ...\nC = *.png')
 
-    assert len(browser.find_by_css('.formcode-select input')) == 2
+    browser.wait_for(
+        lambda: len(browser.find_by_css('.formcode-select input')) == 2)
     browser.find_by_css('.formcode-select input')[0].click()
     assert browser.find_by_css('textarea').value == "A"
 
@@ -158,7 +160,9 @@ def test_formcode_select_prefilled(
         watcher.update(arguments[0]);
     """, 'A = ___\nB = ...\nC = *.png')
 
-    assert len(browser.find_by_css('.formcode-select input:checked')) == 1
+    browser.wait_for(
+        lambda: len(
+            browser.find_by_css('.formcode-select input:checked')) == 1)
 
 
 @pytest.mark.parametrize('input_type', ('checkbox', 'radio'))
@@ -207,8 +211,9 @@ def test_field_errors_should_not_yield_updates(
 
     browser.find_by_css('.formcode-toolbar-element').click()
 
-    assert len(browser.find_by_css('.formcode-snippet')) == 1
-    assert browser.find_by_css('.formcode-snippet').text == "Textfield"
+    browser.wait_for(
+        lambda: len(browser.find_by_css('.formcode-snippet')) == 1
+        and browser.find_by_css('.formcode-snippet').text == "Textfield")
 
     browser.execute_script("document.watcher.update('Test =-= !invalid');")
 
@@ -217,5 +222,6 @@ def test_field_errors_should_not_yield_updates(
 
     browser.execute_script("document.watcher.update('Fixed = ___');")
 
-    assert len(browser.find_by_css('.formcode-snippet')) == 1
-    assert browser.find_by_css('.formcode-snippet').text == "Fixed"
+    browser.wait_for(
+        lambda: len(browser.find_by_css('.formcode-snippet')) == 1
+        and browser.find_by_css('.formcode-snippet').text == "Fixed")
