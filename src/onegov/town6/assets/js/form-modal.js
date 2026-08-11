@@ -1,12 +1,30 @@
-$(document).ready(function() {
-    $('.modal.onload').modal('show');
+document.addEventListener('DOMContentLoaded', function() {
+    var params = new URLSearchParams(window.location.search);
+    var formName = params.get('form');
 
-    $('#form-modal').on('hidden.bs.modal', function() {
+    if (formName) {
+        var link = document.querySelector(
+            '.list-link[data-form-name="' + CSS.escape(formName) + '"]'
+        );
+
+        if (link) {
+            var modalUrl = link.getAttribute('hx-get');
+
+            htmx.ajax('GET', modalUrl, '#form-modal-body').then(function() {
+                var modalEl = document.getElementById('form-modal');
+                var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            });
+        }
+    }
+
+    var formModal = document.getElementById('form-modal');
+    formModal.addEventListener('hidden.bs.modal', function() {
         var url = new URL(window.location.href);
         if (url.searchParams.has('form')) {
             url.searchParams.delete('form');
             window.history.pushState({}, '', url.pathname + url.search);
         }
-        $('#form-modal-body').empty();
+        document.getElementById('form-modal-body').innerHTML = '';
     });
 });

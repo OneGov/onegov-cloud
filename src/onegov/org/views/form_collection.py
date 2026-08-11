@@ -5,16 +5,15 @@ import collections
 from markupsafe import Markup
 from onegov.core.security import Public, Private
 from onegov.form import FormCollection, FormDefinition
-from onegov.form.collection import FormDefinitionCollection, SurveyCollection
+from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.org.models.document_form import FormDocument
 from onegov.org import _, OrgApp
 from onegov.org.layout import FormCollectionLayout, SurveyCollectionLayout
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
-from onegov.org.views.form_definition import get_hints, get_form_modal_context
+from onegov.org.views.form_definition import get_hints
 from onegov.org.utils import group_by_column
-from webob import Response
 
 
 from typing import cast, TYPE_CHECKING
@@ -23,6 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
+    from webob import Response
 
     type SortKey = Callable[
         [FormDefinition | ExternalLink | FormDocument],
@@ -130,19 +130,6 @@ def view_form_collection(
             return request.link(self, query_params={'form': model.name})
         return None
 
-    current_form = request.params.get('form', '')
-    defined_forms = FormDefinitionCollection(request.session)
-    open_form = defined_forms.by_name(
-        str(current_form)) if current_form else None
-
-    modal_context = None
-    if open_form:
-        form_instance = request.get_form(open_form.form_class)
-        result = get_form_modal_context(open_form, request, form_instance)
-        if isinstance(result, Response):
-            return result
-        modal_context = result
-
     # FIXME: Should the hint function be able to deal with ExternalLink?
     def hint(model: FormDefinition) -> str:
         hints = dict(get_hints(layout, model.current_registration_window))
@@ -173,7 +160,6 @@ def view_form_collection(
         'edit_link': edit_link,
         'lead_func': lead_func,
         'modal_url': modal_url,
-        'modal_context': modal_context,
         'form_url': form_url,
         'hint': hint,
     }

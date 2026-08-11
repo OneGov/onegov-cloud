@@ -2675,6 +2675,7 @@
                             hx-get modal_href;
                             hx-target ('#form-modal-body' if modal_href else None);
                             hx-push-url (form_href if modal_href else None);
+                            data-form-name record.name;
                             data-bs-toggle ('modal' if modal_href else None);
                             data-bs-target ('#form-modal' if modal_href else None)">
             <span class="h5 list-title">${record.title}</span>

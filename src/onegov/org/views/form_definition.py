@@ -178,59 +178,7 @@ def handle_change_form_name(
     }
 
 
-@OrgApp.form(
-    model=FormDefinition,
-    template='form.pt', permission=Public,
-    form=lambda self, request: self.form_class
-)
-def handle_defined_form(
-    self: FormDefinition,
-    request: OrgRequest,
-    form: Form,
-    layout: FormSubmissionLayout | None = None
-) -> RenderData | Response:
-    """ Renders the empty form and takes input, even if it's not valid, stores
-    it as a pending submission and redirects the user to the view that handles
-    pending submissions.
-
-    """
-
-    collection = FormCollection(request.session)
-
-    if not self.current_registration_window:
-        spots = 0
-        enabled = True
-    else:
-        spots = 1
-        enabled = self.current_registration_window.accepts_submissions(spots)
-
-    if enabled and request.POST:
-        submission = collection.submissions.add(
-            self.name, form, state='pending', spots=spots)
-
-        return morepath.redirect(request.link(submission))
-
-    layout = layout or FormSubmissionLayout(self, request)
-
-    return {
-        'layout': layout,
-        'title': self.title,
-        'form': enabled and form,
-        'definition': self,
-        'form_width': 'small',
-        'lead': layout.linkify(self.meta.get('lead')),
-        'text': self.text,
-        'people': getattr(self, 'people', None),
-        'files': getattr(self, 'files', None),
-        'contact': getattr(self, 'contact_html', None),
-        'coordinates': getattr(self, 'coordinates', Coordinates()),
-        'hints': tuple(get_hints(layout, self.current_registration_window)),
-        'hints_callout': not enabled,
-        'button_text': _('Continue')
-    }
-
-
-def get_form_modal_context(
+def get_form_context(
     self: FormDefinition,
     request: OrgRequest,
     form: Form,
@@ -273,6 +221,26 @@ def get_form_modal_context(
 
 @OrgApp.form(
     model=FormDefinition,
+    template='form.pt', permission=Public,
+    form=lambda self, request: self.form_class
+)
+def handle_defined_form(
+    self: FormDefinition,
+    request: OrgRequest,
+    form: Form,
+    layout: FormSubmissionLayout | None = None
+) -> RenderData | Response:
+    """ Renders the empty form and takes input, even if it's not valid, stores
+    it as a pending submission and redirects the user to the view that handles
+    pending submissions.
+
+    """
+
+    return get_form_context(self, request, form, layout)
+
+
+@OrgApp.form(
+    model=FormDefinition,
     permission=Public,
     form=lambda self, request: self.form_class,
     name='modal'
@@ -283,7 +251,7 @@ def view_form_modal(
     form: Form,
     layout: FormSubmissionLayout | None = None
 ) -> str | Response:
-    result = get_form_modal_context(self, request, form, layout)
+    result = get_form_context(self, request, form, layout)
     if isinstance(result, Response):
         return result
     return render_macro(result['layout'].macros['form-modal'], request, result)
