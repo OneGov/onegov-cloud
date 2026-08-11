@@ -17,6 +17,7 @@ from onegov.org import _
 from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
 from onegov.user import User
 from onegov.user import UserCollection
+from sqlalchemy.orm import joinedload
 from wtforms.fields import BooleanField
 from wtforms.fields import TextAreaField
 from functools import cached_property
@@ -137,6 +138,8 @@ class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
 
 class TicketAssignmentForm(Form):
 
+    usernames: dict[str, str]
+
     user = ChosenSelectField(
         _('User'),
         choices=[],
@@ -147,12 +150,19 @@ class TicketAssignmentForm(Form):
 
     @property
     def username(self) -> str | None:
-        if self.user.data in (choice[0] for choice in self.user.choices):
-            query = self.request.session.query(User.username)
-            return query.filter_by(id=self.user.data).scalar()
-        return None
+        return self.usernames.get(str(self.user.data))
 
     def on_request(self) -> None:
+        query = UserCollection(self.request.session).query()
+        query = query.filter(User.active.is_(True))
+        query = query.options(joinedload(User.groups))
+
+        users = [
+            user
+            for user in query
+            if self.request.has_permission(self.model, Private, user)
+        ]
+        self.usernames = {str(user.id): user.username for user in users}
         self.user.choices = [
             (
                 str(user.id),
@@ -160,11 +170,7 @@ class TicketAssignmentForm(Form):
                 if user.groups
                 else user.title
             )
-            for user in UserCollection(self.request.session).query()
-            if (
-                self.request.has_permission(self.model, Private, user)
-                and user.active == True
-            )
+            for user in users
         ]
 
 
