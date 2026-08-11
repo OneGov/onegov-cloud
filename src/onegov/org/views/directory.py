@@ -711,8 +711,7 @@ def create_admin_notification_pdf(
             pdf_bytes = content.getvalue()
 
     return Attachment(
-        # slashes would be cut off by Attachment's basename()
-        f"{entry.title.replace('/', '-')}.pdf",
+        f'{entry.name}.pdf',
         content=pdf_bytes,
         content_type='application/pdf',
     ), signing_failed
