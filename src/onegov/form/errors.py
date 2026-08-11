@@ -69,12 +69,6 @@ class InvalidCommentLocationSyntax(_FormParsingErrorWithLineContext):
     )
 
 
-class NestedFieldsetError(_FormParsingErrorWithLineContext):
-    message_template = _(
-        'Nested fieldsets (`#`) are not supported, please remove line {line}.'
-    )
-
-
 class _FormParsingErrorWithLabelContext(FormParsingError):
 
     def __init__(self, label: str):

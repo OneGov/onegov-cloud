@@ -637,9 +637,11 @@ class ReservationHandler(Handler):
                 cost_object=cost_object,
                 extra=item_extra
             )
+            submission_data = self.submission.data
         else:
             extras = []
             discounts = []
+            submission_data = None
 
         if not self.resource:
             return []
@@ -648,6 +650,7 @@ class ReservationHandler(Handler):
             self.reservations,
             extras,
             discounts,
+            submission_data,
             reduced_amount_label=request.translate(_('Discount')),
         )
 
