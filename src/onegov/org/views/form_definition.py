@@ -5,6 +5,7 @@ import niquests
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
+from onegov.core.templates import render_macro
 from onegov.form import FormCollection, FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.gis import Coordinates
@@ -20,7 +21,7 @@ from webob import exc
 from webob import Response
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.layout import Layout
@@ -179,7 +180,7 @@ def handle_change_form_name(
 
 @OrgApp.form(
     model=FormDefinition,
-    template='form_modal.pt', permission=Public,
+    template='form.pt', permission=Public,
     form=lambda self, request: self.form_class
 )
 def handle_defined_form(
@@ -229,19 +230,12 @@ def handle_defined_form(
     }
 
 
-@OrgApp.form(
-    model=FormDefinition,
-    template='form_modal.pt',
-    permission=Public,
-    form=lambda self, request: self.form_class,
-    name='modal'
-)
-def view_form_modal(
+def get_form_modal_context(
     self: FormDefinition,
     request: OrgRequest,
     form: Form,
     layout: FormSubmissionLayout | None = None
-) -> RenderData | Response:
+) -> dict[str, Any] | Response:
 
     collection = FormCollection(request.session)
 
@@ -255,7 +249,6 @@ def view_form_modal(
     if enabled and request.POST:
         submission = collection.submissions.add(
             self.name, form, state='pending', spots=spots)
-
         return morepath.redirect(request.link(submission))
 
     layout = layout or FormSubmissionLayout(self, request)
@@ -276,6 +269,24 @@ def view_form_modal(
         'hints_callout': not enabled,
         'button_text': _('Continue')
     }
+
+
+@OrgApp.form(
+    model=FormDefinition,
+    permission=Public,
+    form=lambda self, request: self.form_class,
+    name='modal'
+)
+def view_form_modal(
+    self: FormDefinition,
+    request: OrgRequest,
+    form: Form,
+    layout: FormSubmissionLayout | None = None
+) -> str | Response:
+    result = get_form_modal_context(self, request, form, layout)
+    if isinstance(result, Response):
+        return result
+    return render_macro(result['layout'].macros['form-modal'], request, result)
 
 
 @OrgApp.form(
