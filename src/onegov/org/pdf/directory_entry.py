@@ -83,7 +83,7 @@ class DirectoryEntryPdf(OrgPdf):
             )
             for field in form
             if not isinstance(field, (UploadField, UploadMultipleField))
-        ))
+        ))))
 
     def add_attachments(
         self,
