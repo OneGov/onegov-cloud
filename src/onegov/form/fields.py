@@ -358,7 +358,7 @@ class UploadField(FileField):
         return getattr(self, '_data', None)
 
     @data.setter
-    def data(self, value: FileDict) -> None:
+    def data(self, value: StrictFileDict | FileDict) -> None:
         self._data = value
 
     @property
@@ -393,11 +393,9 @@ class UploadField(FileField):
                         'filename': str(valuelist[2]),
                     }
             else:
-                # mypy: total TypedDict assignable to non-total, unclear why
-                self.data = binary_to_dictionary(  # type: ignore[assignment]
+                self.data = binary_to_dictionary(
                     dictionary_to_binary({'data': raw_data}),
                     str(valuelist[2])
-
                 )
         elif len(valuelist) == 2:
             # force_simple
