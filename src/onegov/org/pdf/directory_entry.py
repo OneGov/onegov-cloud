@@ -76,23 +76,14 @@ class DirectoryEntryPdf(OrgPdf):
         self.h2(_('Publication'))
 
         form = entry.directory.form_class(data=entry.values)
-        items = []
-        for field in form._fields.values():
-            if isinstance(field, (UploadField, UploadMultipleField)):
-                continue
-            rendered: str | Markup | None = form.render_display(field)
-            if not rendered:
-                continue
-            if field.type == 'DateField':
-                rendered = escape(layout.format_date(field.data, 'date_long'))
-            elif field.type in ('DateTimeLocalField', 'TimezoneDateTimeField'):
-                rendered = escape(
-                    layout.format_date(field.data, 'datetime_long'))
-            items.append(
-                f'<li><strong>{escape(field.label.text)}</strong>: '
-                f'{rendered}</li>'
+        self.mini_html(Markup('<ul>{}</ul>'.format(Markup('').join(
+            Markup('<li><strong>{}</strong>: {}').format(
+                field.label.text,
+                form.render_display(field)
             )
-        self.mini_html(f'<ul>{"".join(items)}</ul>')
+            for field in form
+            if not isinstance(field, (UploadField, UploadMultipleField))
+        ))
 
     def add_attachments(
         self,
