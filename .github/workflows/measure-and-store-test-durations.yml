@@ -61,7 +61,10 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
-        persist-credentials: false
+        # NOTE: We currently need this for EndBug/add-and-commit, it might be
+        #       worth considering using a different action and/or setting up
+        #       a GitHub token for pushing, that's only available in that step.
+        persist-credentials: true
 
     - name: Install dependencies
       run: |
