@@ -693,6 +693,83 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         )
 
 
+@OrgApp.cronjob(hour='6', minute='56', timezone='Europe/Zurich')
+def send_daily_reservation_reminders(request: OrgRequest) -> None:
+    """
+    Send reminders for reservations in 10 days. Attached the
+    reservation confirmation.
+    """
+    today = to_timezone(utcnow(), 'Europe/Zurich')
+
+    # target the whole calendar day 10 days ahead (time of day is irrelevant)
+    day_start = align_date_to_day(
+        today + timedelta(days=10), 'Europe/Zurich', 'down'
+    )
+    day_end = day_start + timedelta(days=1)
+
+    # load all accepted reservations starting on the target day
+    all_reservations = (
+        request.session.query(Reservation)
+        .filter(Reservation.status == 'approved')
+        .filter(Reservation.data['accepted'] == True)
+        .filter(Reservation.start >= day_start)
+        .filter(Reservation.start < day_end)
+        .order_by(Reservation.resource, Reservation.start)
+        .all()
+    )
+    if not all_reservations:
+        return
+
+    # load the resources these reservations belong to
+    resources = ResourceCollection(request.app.libres_context)
+    resources_by_id = {
+        resource.id: resource
+        for resource in resources.query().filter(
+            Resource.id.in_({r.resource for r in all_reservations})
+        )
+    }
+
+    # load the linked form submissions (the reservation confirmation)
+    submissions = {
+        submission.id: submission
+        for submission in request.session.query(FormSubmission).filter(
+            FormSubmission.id.in_({r.token for r in all_reservations})
+        )
+    }
+
+    layout = DefaultMailLayout(object(), request)
+
+    for reservation in all_reservations:
+        resource = resources_by_id.get(reservation.resource)
+        if resource is None:
+            continue
+
+        submission = submissions.get(reservation.token)
+        title = request.translate(
+            _('Reminder: your reservation for ${resource}', mapping={
+                'resource': resource.title
+            })
+        )
+
+        content = render_template(
+            'mail_daily_reservation_reminder.pt', request, {
+                'layout': layout,
+                'title': title,
+                'organisation': request.app.org.title,
+                'resource': resource,
+                'resource_url': request.link(resource),
+                'reservation': reservation,
+                'form': submission.form_obj if submission else None,
+            }
+        )
+
+        request.app.send_transactional_email(
+            subject=title,
+            receivers=(reservation.email, ),
+            content=content
+        )
+
+
 @OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
 def end_chats_and_create_tickets(request: OrgRequest) -> None:
     half_hour_ago = utcnow() - timedelta(minutes=30)

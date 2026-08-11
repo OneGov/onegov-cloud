@@ -761,6 +761,79 @@ def test_daily_reservation_overview_delivery_times(
     assert len(os.listdir(client.app.maildir)) == 0
 
 
+def test_send_daily_reservation_reminders(client: Client[TestOrgApp]) -> None:
+    """Only the reservation exactly 10 days ahead gets a reminder e-mail."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
+
+    session = client.app.session()
+
+    # cronjob fires at 06:56 Europe/Zurich; freeze at a fixed "now".
+    # January Zurich = CET (UTC+1), so 06:56 Zurich = 05:56 UTC.
+    now_utc = datetime(2025, 1, 10, 5, 56)
+
+    # a reservation 8, 9, 10 and 11 days ahead (12:00 Zurich each day)
+    for days in (8, 9, 10, 11):
+        day = (now_utc + timedelta(days=days)).date()
+        add_reservation(
+            fancy,
+            session,
+            email=f'reservee-{days}@example.org',
+            start=datetime(day.year, day.month, day.day, 12, 0),
+            end=datetime(day.year, day.month, day.day, 13, 0),
+        )
+
+    # the cronjob only considers accepted reservations
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    # attach a submission to the 10-day reservation (the confirmation)
+    resource_name = fancy.name
+    ten_days = (now_utc + timedelta(days=10)).date()
+    ten_day_reservation = session.query(Reservation).filter(
+        Reservation.email == 'reservee-10@example.org'
+    ).one()
+    submissions = FormSubmissionCollection(session)
+    submissions.add_external(
+        form=fancy.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+        state='complete',
+        id=ten_day_reservation.token,
+    )
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee-10@example.org'
+    assert 'Erinnerung: Ihre Reservation für Fancy Room' in mail['Subject']
+    body = mail['TextBody']
+    assert 'Erinnerung an Ihre bevorstehende Reservation' in body
+    assert f'/resource/{resource_name}' in body
+    assert str(ten_days.weekday()) in body
+    assert str(ten_days.month) in body
+    assert str(ten_days.year) in body
+    assert '12:00' in body
+    assert '13:00' in body
+    assert 'Anzahl' in body
+    # the reservation confirmation
+    assert 'Alice Miller' in body
+
+    # TODO: extend test if multiple resources are reserved
+
 
 @pytest.mark.parametrize('secret_content_allowed', [False, True])
 def test_send_scheduled_newsletters(
