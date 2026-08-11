@@ -1667,7 +1667,6 @@ def write_choices_value(
                 # named one we need to display it as `...`
                 label = '...' if fieldset is None else fieldset
                 buffer.write(f'{indentation}        # {label}\n')
-            # FIXME: Handle nested fieldsets
             field.write_formcode(buffer, indentation + '        ')
             first_line = False
 

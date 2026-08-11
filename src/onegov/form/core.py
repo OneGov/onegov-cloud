@@ -310,6 +310,12 @@ class Form(BaseForm):
                     ),
                     If(
                         field.depends_on.unfulfilled,
+                        # NOTE: Since numeric fields tend to submit a zero
+                        #       instead of an empty string, when they're
+                        #       hidden, we don't want to trigger range
+                        #       validation errors, so we treat zeroes as
+                        #       optional and skip the other validators in
+                        #       the chain.
                         StrictOptional(zero_is_optional=True),
                         # NOTE: If someone manually submits data into a hidden
                         #       field we want to make sure it's still valid
