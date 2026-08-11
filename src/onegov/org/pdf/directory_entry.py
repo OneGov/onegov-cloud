@@ -3,6 +3,7 @@ from __future__ import annotations
 from html import escape
 from io import BytesIO
 
+from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.org import _
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.pdf.core import OrgPdf
@@ -13,7 +14,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from datetime import datetime
-    from onegov.form.parser.core import BasicParsedField
+    from markupsafe import Markup
     from onegov.org.models import ExtendedDirectoryEntry
     from onegov.org.request import OrgRequest
     from onegov.pdf.templates import Template
@@ -74,20 +75,24 @@ class DirectoryEntryPdf(OrgPdf):
 
         self.h2(_('Publication'))
 
-        def value(field: BasicParsedField) -> str:
-            data = entry.values.get(field.id)
-            if data and field.type == 'datetime':
-                data = layout.format_date(data, 'datetime_long')
-            elif data and field.type == 'date':
-                data = layout.format_date(data, 'date_long')
-            return escape(str(data or ''))
-
-        items = ''.join(
-            f'<li><strong>{escape(field.human_id)}</strong>: '
-            f'{value(field)}</li>'
-            for field in entry.directory.basic_fields
-        )
-        self.mini_html(f'<ul>{items}</ul>')
+        form = entry.directory.form_class(data=entry.values)
+        items = []
+        for field in form._fields.values():
+            if isinstance(field, (UploadField, UploadMultipleField)):
+                continue
+            rendered: str | Markup | None = form.render_display(field)
+            if not rendered:
+                continue
+            if field.type == 'DateField':
+                rendered = escape(layout.format_date(field.data, 'date_long'))
+            elif field.type in ('DateTimeLocalField', 'TimezoneDateTimeField'):
+                rendered = escape(
+                    layout.format_date(field.data, 'datetime_long'))
+            items.append(
+                f'<li><strong>{escape(field.label.text)}</strong>: '
+                f'{rendered}</li>'
+            )
+        self.mini_html(f'<ul>{"".join(items)}</ul>')
 
     def add_attachments(
         self,

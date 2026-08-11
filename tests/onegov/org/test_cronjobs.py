@@ -2795,18 +2795,6 @@ def test_admin_notification_full_workflow(client: Client[TestOrgApp],) -> None:
     """End-to-end, form-driven publication lifecycle for an entry in a
     directory with a notification_address, proving:
 
-    - editing a *scheduled* entry sends no email; the single publication
-      email (once the start is reached) carries the edited content and the
-      entry checksum, and a second cronjob run does not duplicate it;
-    - editing a *published* entry is refused until publication_start is
-      moved into the future, and the re-publication email then carries the
-      newly edited content;
-    - the expiry email is sent once publication_end passes;
-    - the entry cannot be deleted until that expiry notification has gone
-      out.
-
-    Everything is driven through the real forms, so the form's backdating
-    guard and the cronjob notification flow are exercised together.
     """
     tz = 'Europe/Zurich'
 
@@ -2923,7 +2911,7 @@ def test_admin_notification_full_workflow(client: Client[TestOrgApp],) -> None:
             'E-Mail automatisch generiert von Govikon am 1. Juli 2026 15:00',
         )
         for item in expected:
-            assert item in pdf_text, f'Error: Expected text {item} in pdf'
+            assert item in pdf_text, f'Error: Expected text \'{item}\' in pdf'
         # date/datetime fields are formatted in the pdf, not raw ISO values
         assert '2026-03-15 09:30:00' not in pdf_text
         assert '2026-08-20' not in pdf_text
