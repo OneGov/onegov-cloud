@@ -1,8 +1,54 @@
 # Changes
 
+## 2026.40
+
+`2026-08-10` | [9659e4e9ca...9d470c2cd0](https://github.com/OneGov/onegov-cloud/compare/9659e4e9ca^...9d470c2cd0)
+
+### Feriennet
+
+##### Occasion clone points to the current or upcoming period if any
+
+`Feature` | [OGC-1524](https://linear.app/onegovcloud/issue/OGC-1524) | [9d470c2cd0](https://github.com/onegov/onegov-cloud/commit/9d470c2cd008523df5b24323a94af405f8e9c29e)
+
+### Org
+
+##### Adds custom reservation pricing scheme for Stadtschulen Zug
+
+`Feature` | [OGC-3115](https://linear.app/onegovcloud/issue/OGC-3115) | [ca7bd12260](https://github.com/onegov/onegov-cloud/commit/ca7bd12260d734e9dc394bdc91c16a8a8e8fc874)
+
+##### Restore Redactor selection in Safari
+
+`Bugfix` | [OGC-3363](https://linear.app/onegovcloud/issue/OGC-3363) | [1f32ce7cea](https://github.com/onegov/onegov-cloud/commit/1f32ce7cea00dde516bbd3855334bbe9fc76e5cc)
+
+### Pdf
+
+##### Guard against emtpy html after cleaning in `mini_html`
+
+`Bugfix` | [OGC-3373](https://linear.app/onegovcloud/issue/OGC-3373) | [e894609850](https://github.com/onegov/onegov-cloud/commit/e8946098506578c739a88c7d01d8e83b16e245cd)
+
+### Ticket
+
+##### Delete referenced invoice items prior deleting the ticket
+
+`Bugfix` | [HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7644103474/](#HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7644103474/) | [1240a31b9a](https://github.com/onegov/onegov-cloud/commit/1240a31b9aea33230f0c55734284014b49b95e26)
+
+### User
+
+##### Fixes type conversion error in raw SQL query
+
+`Bugfix` | [ONEGOV-CLOUD-5XM](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5XM) | [745dcee104](https://github.com/onegov/onegov-cloud/commit/745dcee104de214fb819b9e3c4be163cee91777c)
+
+### Winterthur
+
+##### Winterthur UI
+
+New UI Elements for winterthur
+
+`Feature` | [OGC-3358](https://linear.app/onegovcloud/issue/OGC-3358) | [9659e4e9ca](https://github.com/onegov/onegov-cloud/commit/9659e4e9caf3640cdb7385103f5a56c0acba79d8)
+
 ## 2026.39
 
-`2026-07-31` | [6fb336f4d2...d31acdb58f](https://github.com/OneGov/onegov-cloud/compare/6fb336f4d2^...d31acdb58f)
+`2026-07-31` | [6fb336f4d2...7347b5857e](https://github.com/OneGov/onegov-cloud/compare/6fb336f4d2^...7347b5857e)
 
 ### Core
 
@@ -5221,8 +5267,4 @@ Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
 ##### Make db upgrade for ticket closed_on column more performant
 
 `Feature` | [NONE](#NONE) | [f59d7a9b0f](https://github.com/onegov/onegov-cloud/commit/f59d7a9b0fe658317e5dec8ba1381684d6364b09)
-
-## 2025.11
-
-`2025-03-03` | [0c2dd4a07e...c321b6c196](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...c321b6c196)
 

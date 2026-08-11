@@ -1313,10 +1313,15 @@ def test_indentation_error_for_identifier() -> None:
     with pytest.raises(errors.InvalidIndentSyntax):
         parse_formcode(text, enable_edit_checks=True)
 
-    # NOTE: Although a little weird, this is allowed, since each fieldset
-    #       opens its own dictionary in the generated YAML text, so the
-    #       indentation levels no longer need to necessarily match the
-    #       ones from the previous fieldset
+    # NOTE: We used to allow this, because we represented fieldsets
+    #       as dictionaries in the intermediary YAML representation
+    #       of the formcode. So it didn't matter if fields were over-
+    #       indented, as long as they all matched each other in any
+    #       given fieldset. But with the introduction of nested fieldsets
+    #       the fieldsets are now represented as simple strings inline
+    #       with all the field dictionaries, so now indentation needs
+    #       to match, which is more in line with what we wanted this
+    #       to behave like anyways.
     text = dedent(
         """
         Auswahl =
@@ -1330,7 +1335,8 @@ def test_indentation_error_for_identifier() -> None:
                 ( ) C
         """
     )
-    parse_formcode(text, enable_edit_checks=True)
+    with pytest.raises(errors.InvalidIndentSyntax):
+        parse_formcode(text, enable_edit_checks=True)
 
 
 def test_indentation_error_for_identifier_2() -> None:
@@ -1698,22 +1704,6 @@ def test_empty_fieldset_error() -> None:
     assert e.value.label == 'Section 2'
 
 
-def test_nested_fieldset_error() -> None:
-    with pytest.raises(errors.NestedFieldsetError) as e:
-        parse_formcode('\n'.join((
-            "# Personal information",
-            "Last name *= ___",
-            "First name *= ___",
-            "Options *=",
-            "    (x) Private",
-            "    ( ) Business",
-            "        # Nested fieldset",
-            "        Organisation = ___",
-        )), enable_edit_checks=True)
-
-    assert e.value.line == 7
-
-
 @pytest.mark.parametrize('definition,expected', [
     # NOTE: Anonymous fieldsets are re-rendered properly
     (
@@ -1924,6 +1914,21 @@ def test_nested_fieldset_error() -> None:
                 (x) No discount
                 ( ) Sports club (50%)
                 ( ) School (100%)
+
+            # Nested Fieldsets
+            Delivery Method =
+                ( ) Pickup
+                    # Timing
+                    Pickup Time * = ___
+                (x) Address
+                    Street * = ___
+                    Town * = ___
+
+                    # Addendum
+                    Instructions for delivery = ...
+
+                    # ...
+                    Something else = ___
         """),
         None
     ),
@@ -1947,3 +1952,39 @@ def test_roundtrip(
     assert json_roundtripped.fields == parsed.fields
     # without changing the generated formcode
     assert json_roundtripped.to_formcode() == expected
+
+
+def test_nested_fieldset_field_ordering() -> None:
+    form = parse_form(dedent(
+        """\
+        # A
+        Extras =
+            [ ] Option 1
+                # B
+                Sub 1a = ___
+                # C
+                Sub 1b = ___
+            [ ] Option 2
+                Sub 2a = ___
+                # B
+                Sub 2b = ___
+            [ ] Option 3
+                # C
+                Sub 3a = ___
+                # A
+                Sub 3b = ___
+                # B
+                Sub 3c = ___
+        """
+    ))()
+    assert list(form._fields) == [
+        'a_extras',
+        'a_extras_sub_2a',
+        'a_extras_b_sub_1a',
+        'a_extras_b_sub_2b',
+        'a_extras_c_sub_1b',
+        'a_extras_c_sub_3a',
+        'a_extras_sub_3b',
+        'a_extras_b_sub_3c',
+    ]
+    assert len(form.fieldsets) == 5

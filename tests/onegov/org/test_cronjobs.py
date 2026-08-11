@@ -2769,10 +2769,10 @@ def _assert_signed_pdf(attachment: Mapping[str, Any]) -> None:
 
 
 def _make_permit_directory(
-    session: 'Session',
+    session: Session,
     notification_address: str | None = 'admin@example.org',
-    extra_structure: str = '',
-) -> 'ExtendedDirectory':
+    extra_structure: str = ''
+) -> ExtendedDirectory:
     directories: DirectoryCollection[ExtendedDirectory]
     directories = DirectoryCollection(session, type='extended')
     directory = directories.add(
@@ -2791,9 +2791,7 @@ def _make_permit_directory(
     return directory
 
 
-def test_admin_notification_full_workflow(
-    client: Client['TestOrgApp'],
-) -> None:
+def test_admin_notification_full_workflow(client: Client[TestOrgApp],) -> None:
     """End-to-end, form-driven publication lifecycle for an entry in a
     directory with a notification_address, proving:
 
@@ -3006,7 +3004,7 @@ def test_admin_notification_full_workflow(
 
 
 def test_admin_notification_multiple_entries(
-    client: Client['TestOrgApp'],
+    client: Client[TestOrgApp]
 ) -> None:
     """
     Two entries crossing publication_start in the same window each get
@@ -3378,7 +3376,7 @@ def test_admin_notification_pdf_failure(
 
 
 def test_admin_notification_no_notification_address(
-    client: Client['TestOrgApp'],
+    client: Client[TestOrgApp]
 ) -> None:
     """No emails for publication when no notification address set."""
     job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
@@ -3420,8 +3418,8 @@ def test_admin_notification_no_notification_address(
 
 
 def test_admin_notification_auto_delete_no_email(
-    client: Client['TestOrgApp'],
-    handlers: 'HandlerRegistry',
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry,
 ) -> None:
     """Auto-delete at publication_end deletes the entry; no deletion email."""
     register_directory_handler(handlers)
