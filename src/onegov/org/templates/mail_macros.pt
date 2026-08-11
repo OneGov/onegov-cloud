@@ -171,14 +171,17 @@
 
 <metal:directory_entry_notification_details define-macro="directory_entry_notification_details" i18n:domain="onegov.org">
     <p><u i18n:translate="">Publication</u></p>
-    <p>
-        <tal:b tal:repeat="field directory.basic_fields">
-            <tal:b tal:define="value entry.values.get(field.id, '')">
-                - <strong>${field.human_id}:</strong>
-                <tal:b tal:condition="python: value and field.type == 'datetime'">${layout.format_date(value, 'datetime_long')}</tal:b>
-                <tal:b tal:condition="python: value and field.type == 'date'">${layout.format_date(value, 'date_long')}</tal:b>
-                <tal:b tal:condition="python: not (value and field.type in ('datetime', 'date'))">${value}</tal:b>
-                <br tal:condition="not: repeat.field.end"/>
+    <p tal:define="form python: directory.form_class(data=entry.values)">
+        <tal:b tal:repeat="field form._fields.values()">
+            <tal:b tal:condition="python: field.type not in ('UploadField', 'UploadMultipleField')"
+                   tal:define="rendered python: form.render_display(field)">
+                <tal:b tal:condition="rendered">
+                    - <strong>${field.label.text}:</strong>
+                    <tal:b tal:condition="python: field.type == 'DateField'">${layout.format_date(field.data, 'date_long')}</tal:b>
+                    <tal:b tal:condition="python: field.type in ('DateTimeLocalField', 'TimezoneDateTimeField')">${layout.format_date(field.data, 'datetime_long')}</tal:b>
+                    <tal:b tal:condition="python: field.type not in ('DateField', 'DateTimeLocalField', 'TimezoneDateTimeField')" tal:content="rendered">value</tal:b>
+                    <br/>
+                </tal:b>
             </tal:b>
         </tal:b>
     </p>

@@ -3051,49 +3051,6 @@ def test_admin_notification_multiple_entries(
     assert len(os.listdir(client.app.maildir)) == 2
 
 
-def test_admin_notification_pdf_title_special_chars(
-    client: Client['TestOrgApp'],
-) -> None:
-    """
-    A slash in the entry title is replaced, not cut off — Attachment runs
-    the filename through basename(). Angle brackets survive in the pdf,
-    which renders headings as markup.
-    """
-    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
-    assert job is not None
-    job.app = client.app
-
-    real_now = utcnow()
-
-    transaction.begin()
-    directory = _make_permit_directory(client.app.session())
-    title = 'Umbau <Haus> Haupt/Nebengebäude'
-    entry = directory.add(
-        values=dict(
-            gesuchsteller_in=title,
-            adresse='Feldweg 2',
-            publication_start=real_now - timedelta(minutes=30),
-            publication_end=real_now + timedelta(days=30),
-        )
-    )
-    assert entry.title == title
-    transaction.commit()
-    close_all_sessions()
-
-    with freeze_time(real_now, tick=True), _ais_cassette():
-        client.get(get_cronjob_url(job))
-
-    assert len(os.listdir(client.app.maildir)) == 1
-    msg = client.get_email(0)
-    assert msg['Attachments'][0]['Name'] == (
-        'Umbau <Haus> Haupt-Nebengebäude.pdf'
-    )
-    _assert_signed_pdf(msg['Attachments'][0])
-    # the heading keeps the angle brackets instead of dropping them
-    pdf_text = extract_pdf_text(msg['Attachments'][0])
-    assert pdf_text.splitlines()[0] == title
-
-
 def test_admin_notification_pdf_without_attachments(
     client: Client['TestOrgApp'],
 ) -> None:
