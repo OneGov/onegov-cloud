@@ -179,7 +179,7 @@ def handle_change_form_name(
 
 @OrgApp.form(
     model=FormDefinition,
-    template='form.pt', permission=Public,
+    template='form_modal.pt', permission=Public,
     form=lambda self, request: self.form_class
 )
 def handle_defined_form(
@@ -193,6 +193,55 @@ def handle_defined_form(
     pending submissions.
 
     """
+
+    collection = FormCollection(request.session)
+
+    if not self.current_registration_window:
+        spots = 0
+        enabled = True
+    else:
+        spots = 1
+        enabled = self.current_registration_window.accepts_submissions(spots)
+
+    if enabled and request.POST:
+        submission = collection.submissions.add(
+            self.name, form, state='pending', spots=spots)
+
+        return morepath.redirect(request.link(submission))
+
+    layout = layout or FormSubmissionLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'form': enabled and form,
+        'definition': self,
+        'form_width': 'small',
+        'lead': layout.linkify(self.meta.get('lead')),
+        'text': self.text,
+        'people': getattr(self, 'people', None),
+        'files': getattr(self, 'files', None),
+        'contact': getattr(self, 'contact_html', None),
+        'coordinates': getattr(self, 'coordinates', Coordinates()),
+        'hints': tuple(get_hints(layout, self.current_registration_window)),
+        'hints_callout': not enabled,
+        'button_text': _('Continue')
+    }
+
+
+@OrgApp.form(
+    model=FormDefinition,
+    template='form_modal.pt',
+    permission=Public,
+    form=lambda self, request: self.form_class,
+    name='modal'
+)
+def view_form_modal(
+    self: FormDefinition,
+    request: OrgRequest,
+    form: Form,
+    layout: FormSubmissionLayout | None = None
+) -> RenderData | Response:
 
     collection = FormCollection(request.session)
 

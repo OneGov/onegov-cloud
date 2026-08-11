@@ -296,6 +296,12 @@ def get_common_asset() -> Iterator[str]:
     yield 'chosen_select_hierarchy.js'
     yield 'iframe_request_parameters.js'
     yield 'ai_formcoder.js'
+    yield 'htmx.min.js'
+
+
+@TownApp.webasset('form-modal')
+def get_modal_customizations_asset() -> Iterator[str]:
+    yield 'form-modal.js'
 
 
 @TownApp.webasset('editor')

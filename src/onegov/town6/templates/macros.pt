@@ -2612,11 +2612,25 @@
     </tal:b>
 </metal:group_by_column>
 
-<metal:group_by_column define-macro="accordion_grouped_by_column" i18n:domain="onegov.town6">
+<metal:group_record define-macro="group_record" i18n:domain="onegov.town6">
+    <li tal:define="link edit_link(record)|nothing">
+        <a class="list-link" tal:attributes="href link_func(record); target link">
+                <span class="h5 list-title">${record.title}</span>
+                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+        </a>
+        <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))">
+            <p class="list-lead preview" tal:condition="lead">${lead}</p>
+            <div class="list-hint hints" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
+        </a>
+        <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+    </li>
+</metal:group_record>
+
+<metal:group_by_column_forms define-macro="accordion_grouped_by_column" i18n:domain="onegov.town6">
     <tal:b tal:condition="len(grouped) == 1" tal:repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
         <ul class="forms-list more-list">
             <tal:b tal:repeat="record grouped[group]">
-                <metal:b use-macro="layout.macros['group_record']"/>
+                <metal:b use-macro="layout.macros['group_record_form_overlay']"/>
             </tal:b>
         </ul>
     </tal:b>
@@ -2642,7 +2656,7 @@
                     <div class="accordion-body">
                         <ul class="forms-list more-list">
                             <tal:b tal:repeat="record grouped[group]">
-                                <metal:b use-macro="layout.macros['group_record']"/>
+                                <metal:b use-macro="layout.macros['group_record_form_overlay']"/>
                             </tal:b>
                         </ul>
                     </div>
@@ -2650,13 +2664,22 @@
             </div>
         </tal:b>
     </div>
-</metal:group_by_column>
+</metal:group_by_column_forms>
 
-<metal:group_record define-macro="group_record" i18n:domain="onegov.town6">
-    <li tal:define="link edit_link(record)|nothing">
-        <a class="list-link" tal:attributes="href link_func(record); target link">
-                <span class="h5 list-title">${record.title}</span>
-                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+<metal:group_record_form_overlay define-macro="group_record_form_overlay" i18n:domain="onegov.town6">
+    <li tal:define="link edit_link(record)|nothing;
+                     modal_href request.link(record, 'modal')|nothing;
+                     form_href form_url(record)">
+        <a class="list-link"
+           tal:attributes="href link_func(record);
+                            target link;
+                            hx-get modal_href;
+                            hx-target ('#form-modal-body' if modal_href else None);
+                            hx-push-url (form_href if modal_href else None);
+                            data-bs-toggle ('modal' if modal_href else None);
+                            data-bs-target ('#form-modal' if modal_href else None)">
+            <span class="h5 list-title">${record.title}</span>
+            <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
         </a>
         <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))">
             <p class="list-lead preview" tal:condition="lead">${lead}</p>
@@ -2664,7 +2687,54 @@
         </a>
         <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
     </li>
-</metal:group_record>
+</metal:group_record_form_overlay>
+
+<metal:group_record_form_overlay define-macro="form-modal" i18n:domain="onegov.town6">
+        <!--! The form is either rendered with a panel on the right (boxed), or
+    without one (normal). Since the panel takes up some space and the
+    column sizes are relative we need to adjust for that. -->
+    <?python
+        size = {
+            'small': 'small-12 medium-7 large-5 cell',
+            'normal': 'small-12 medium-8 large-6 cell',
+            'large': 'small-12 medium-9 large-7 cell',
+            'huge': 'small-12 medium-10 large-8 cell',
+            'full': 'small-12 medium-12 large-12 cell',
+        }[econtext.get('form_width', 'normal')]
+
+        boxed_size = {
+            'small': 'small-12 medium-10 large-8 cell',
+            'normal': 'small-12 medium-11 large-9 cell',
+            'large': 'small-12 medium-12 large-10 cell',
+            'huge': 'small-12 medium-12 large-11 cell',
+            'full': 'small-12 medium-12 large-12 cell',
+        }[econtext.get('form_width', 'normal')]
+    ?>
+
+    <tal:b tal:define="item definition|nothing" tal:condition="item">
+        <div class="resource-group blank-label" tal:condition="item.group|nothing">
+            ${item.group}
+        </div>
+
+        <metal:hint use-macro="layout.macros['access_hint_long']" />
+        <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
+    </tal:b>
+
+    <div class="panel callout" tal:condition="form.callout|callout|nothing">
+            <p>${form.callout|callout}</p>
+    </div>
+
+    <div class="panel" tal:condition="helptext|nothing">
+            <p>${helptext}</p>
+    </div>
+    <tal:b tal:define="steps layout.get_step_sequence()|nothing">
+        <div class="progress-wrapper" tal:condition="steps">
+            <div metal:use-macro="layout.macros['progress_indicator']" />
+            <br>
+        </div>
+    </tal:b>
+    <h1> FORM </h1>
+</metal:group_record_form_overlay>
 
 <metal:resource_groups define-macro="resource_groups" i18n:domain="onegov.town6">
     <tal:b repeat="group resources" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">

@@ -10,7 +10,23 @@
                  tal:define="lead None; text None; people None; coordinates None; contact layout.org.contact_html|None">
             <tal:b metal:fill-slot="after-text">
                 <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
+                <span>${open_form}</span>
                 <metal:b use-macro="layout.macros['accordion_grouped_by_column']" tal:condition="forms" tal:define="grouped forms; add_pagerefs request.is_logged_in" />
+                <div class="modal fade ${'onload' if open_form else ''}" id="form-modal" tabindex="-1" aria-hidden="${'false' if open_form else 'false'}" aria-labelledby="form-modal-label">
+                    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close" i18n:attributes="aria-label"></button>
+                        </div>
+                        <div class="modal-body" id="form-modal-body">
+                            <div tal:condition="open_form">
+                                <tal:b metal:use-macro="layout.macros['form-modal']" tal:define="form open_form" />
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
             </tal:b>
         </tal:b>
     </tal:b>

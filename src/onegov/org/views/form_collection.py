@@ -5,7 +5,7 @@ import collections
 from markupsafe import Markup
 from onegov.core.security import Public, Private
 from onegov.form import FormCollection, FormDefinition
-from onegov.form.collection import SurveyCollection
+from onegov.form.collection import FormDefinitionCollection, SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.org.models.document_form import FormDocument
 from onegov.org import _, OrgApp
@@ -116,6 +116,24 @@ def view_form_collection(
             lead = ''
         return lead
 
+    def modal_url(
+            model: FormDefinition | ExternalLink | FormDocument) -> str | None:
+        if isinstance(model, FormDefinition):
+            return request.link(model, 'modal')
+        return None
+
+    def form_url(
+            model: FormDefinition | ExternalLink | FormDocument,
+    ) -> str | None:
+        if isinstance(model, FormDefinition):
+            return request.link(self, query_params={'form': model.name})
+        return None
+
+    current_form = request.params.get('form', '')
+    defined_forms = FormDefinitionCollection(request.session)
+    open_form = defined_forms.by_name(
+        str(current_form)) if current_form else None
+
     # FIXME: Should the hint function be able to deal with ExternalLink?
     def hint(model: FormDefinition) -> str:
         hints = dict(get_hints(layout, model.current_registration_window))
@@ -135,6 +153,8 @@ def view_form_collection(
                     ).format(request.translate(hints['count']))
         return hint
 
+    request.include('form-modal')
+
     return {
         'layout': layout,
         'title': _('Forms'),
@@ -143,7 +163,10 @@ def view_form_collection(
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
+        'modal_url': modal_url,
+        'form_url': form_url,
         'hint': hint,
+        'open_form': open_form,
     }
 
 
