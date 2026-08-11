@@ -10,7 +10,7 @@ import vcr  # type: ignore[import-untyped]
 
 from babel import Locale as BabelLocale
 from base64 import b64decode
-from babel.dates import format_date as babel_format_date
+from babel.dates import format_datetime as babel_format_datetime
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from freezegun import freeze_time
@@ -2745,8 +2745,8 @@ def test_wil_daily_event_import(
 def _fmt_date(dt: datetime) -> str:
     """Format a datetime the way the admin notification templates do."""
     tz = ensure_timezone('Europe/Zurich')
-    return babel_format_date(
-        to_timezone(dt, tz), 'd. MMMM yyyy',
+    return babel_format_datetime(
+        to_timezone(dt, tz), 'dd.MM.yyyy HH:mm',
         locale=BabelLocale.parse('de_CH')
     )
 
@@ -2791,7 +2791,9 @@ def _make_permit_directory(
     return directory
 
 
-def test_admin_notification_full_workflow(client: Client[TestOrgApp],) -> None:
+def test_admin_notification_full_workflow(
+    client: Client[TestOrgApp]
+) -> None:
     """End-to-end, form-driven publication lifecycle for an entry in a
     directory with a notification_address, proving:
 
@@ -2865,9 +2867,9 @@ def test_admin_notification_full_workflow(client: Client[TestOrgApp],) -> None:
         assert 'Baugesuche' in msg['Subject']
         assert 'Version B' in msg['TextBody']
         assert 'Version A' not in msg['TextBody']
-        assert '15. März 2026 09:30' in msg['TextBody']
+        assert '15.03.2026 09:30' in msg['TextBody']
         assert '2026-03-15T09:30' not in msg['TextBody']
-        assert '20. August 2026' in msg['TextBody']
+        assert '20.08.2026' in msg['TextBody']
         assert '2026-08-20' not in msg['TextBody']
         assert 'Öffentlich' in msg['TextBody']
         assert 'konnte nicht signiert werden' not in msg['TextBody']
@@ -2889,26 +2891,26 @@ def test_admin_notification_full_workflow(client: Client[TestOrgApp],) -> None:
             'Beschreibung',
             'Version B',
             'Termin',
-            '15. März 2026 09:30',
+            '15.03.2026 09:30',
             'Frist',
-            '20. August 2026',
+            '20.08.2026',
             'Anhänge',
             'Baugesuch.pdf',
             'Grösse',
             'Bytes',
             'Datum',
-            '1. Juli 2026 12:00',
+            '01.07.2026 12:00',
             'Prüfsumme',
             'Publikationsdetails',
             'Publikationsstart',
-            '1. Juli 2026 14:00',
+            '01.07.2026 14:00',
             'Publikationsende',
-            '1. Juli 2026 21:00',
+            '01.07.2026 21:00',
             'Zugriff',
             'Öffentlich',
             'Prüfsumme des Verzeichniseintrages',
             entry.content_hash,
-            'E-Mail automatisch generiert von Govikon am 1. Juli 2026 15:00',
+            'E-Mail automatisch generiert von Govikon am 01.07.2026 15:00',
         )
         for item in expected:
             assert item in pdf_text, f'Error: Expected text \'{item}\' in pdf'

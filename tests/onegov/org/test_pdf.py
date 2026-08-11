@@ -344,8 +344,8 @@ def test_directory_entry_pdf(org_app: TestOrgApp) -> None:
     # dates formatted, not dumped as ISO values
     assert 'Publikation' in text
     assert 'Gesuchsteller/in: Permit One' in text
-    assert 'Termin: 15. März 2026 09:30' in text
-    assert 'Frist: 20. August 2026' in text
+    assert 'Termin: 15.03.2026 09:30' in text
+    assert 'Frist: 20.08.2026' in text
     assert '2026-03-15' not in text
     assert '2026-08-20' not in text
 
@@ -365,14 +365,14 @@ def test_directory_entry_pdf(org_app: TestOrgApp) -> None:
 
     # publication details
     assert 'Publikationsdetails' in text
-    assert 'Publikationsstart: 1. Juli 2026 14:00' in text
-    assert 'Publikationsende: 1. Juli 2026 21:00' in text
+    assert 'Publikationsstart: 01.07.2026 14:00' in text
+    assert 'Publikationsende: 01.07.2026 21:00' in text
     assert 'Zugriff: Öffentlich' in text
     assert entry.content_hash
     assert f'Prüfsumme des Verzeichniseintrages: {entry.content_hash}' in text
 
     assert (
-        'E-Mail automatisch generiert von Govikon am 1. Juli 2026 15:00'
+        'E-Mail automatisch generiert von Govikon am 01.07.2026 15:00'
     ) in text
 
 

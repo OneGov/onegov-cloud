@@ -177,9 +177,7 @@
                    tal:define="rendered python: form.render_display(field)">
                 <tal:b tal:condition="rendered">
                     - <strong>${field.label.text}:</strong>
-                    <tal:b tal:condition="python: field.type == 'DateField'">${layout.format_date(field.data, 'date_long')}</tal:b>
-                    <tal:b tal:condition="python: field.type in ('DateTimeLocalField', 'TimezoneDateTimeField')">${layout.format_date(field.data, 'datetime_long')}</tal:b>
-                    <tal:b tal:condition="python: field.type not in ('DateField', 'DateTimeLocalField', 'TimezoneDateTimeField')" tal:content="rendered">value</tal:b>
+                    <tal:b tal:content="rendered">value</tal:b>
                     <br/>
                 </tal:b>
             </tal:b>
@@ -196,7 +194,7 @@
         <p tal:repeat="file entry.files">
             <strong>${file.name}</strong><br/>
             - <span i18n:translate="">Size</span>: ${file.reference.file.content_length} Bytes<br/>
-            - <span i18n:translate="">Date</span>: ${layout.format_date(file.created, 'datetime_long')}<br/>
+            - <span i18n:translate="">Date</span>: ${layout.format_date(file.created, 'datetime')}<br/>
             - <span i18n:translate="">Hash</span>: ${file.checksum or file.id}
         </p>
     </tal:b>
@@ -204,10 +202,10 @@
     <p><u i18n:translate="">Publication details</u></p>
     <p>
         - <strong i18n:translate="">Publication start:</strong>
-        <tal:b condition="publication_start | nothing"> ${layout.format_date(publication_start, 'datetime_long')}</tal:b>
+        <tal:b condition="publication_start | nothing"> ${layout.format_date(publication_start, 'datetime')}</tal:b>
         <tal:b condition="not: publication_start | nothing"> <span i18n:translate="">Not set</span></tal:b><br/>
         - <strong i18n:translate="">Publication end:</strong>
-        <tal:b condition="publication_end | nothing"> ${layout.format_date(publication_end, 'datetime_long')}</tal:b>
+        <tal:b condition="publication_end | nothing"> ${layout.format_date(publication_end, 'datetime')}</tal:b>
         <tal:b condition="not: publication_end | nothing"> <span i18n:translate="">Not set</span></tal:b><br/>
         - <strong><span i18n:translate="">Access</span>:</strong> ${layout.access_label(entry.access)}<br/>
         - <strong><span i18n:translate="">Entry checksum</span>:</strong> ${content_hash}

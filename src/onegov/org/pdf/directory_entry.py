@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from html import escape
 from io import BytesIO
+from markupsafe import Markup
 
 from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.org import _
@@ -14,7 +15,6 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from datetime import datetime
-    from markupsafe import Markup
     from onegov.org.models import ExtendedDirectoryEntry
     from onegov.org.request import OrgRequest
     from onegov.pdf.templates import Template
@@ -76,14 +76,14 @@ class DirectoryEntryPdf(OrgPdf):
         self.h2(_('Publication'))
 
         form = entry.directory.form_class(data=entry.values)
-        self.mini_html(Markup('<ul>{}</ul>'.format(Markup('').join(
+        self.mini_html(Markup('<ul>{}</ul>').format(Markup('').join(
             Markup('<li><strong>{}</strong>: {}').format(
-                field.label.text,
+                escape(field.label.text),
                 form.render_display(field)
             )
             for field in form
             if not isinstance(field, (UploadField, UploadMultipleField))
-        ))))
+        )))
 
     def add_attachments(
         self,
@@ -112,7 +112,7 @@ class DirectoryEntryPdf(OrgPdf):
                 f'<li>{size_label}: {file.reference.file.content_length} '
                 f'{bytes_label}</li>'
                 f'<li>{date_label}: '
-                f'{layout.format_date(file.created, "datetime_long")}</li>'
+                f'{layout.format_date(file.created, "datetime")}</li>'
                 f'<li>{hash_label}: {file.checksum or file.id}</li>'
                 f'</ul>'
             )
@@ -127,11 +127,11 @@ class DirectoryEntryPdf(OrgPdf):
 
         not_set = self.translate(_('Not set'))
         start = (
-            layout.format_date(entry.publication_start, 'datetime_long')
+            layout.format_date(entry.publication_start, 'datetime')
             if entry.publication_start else not_set
         )
         end = (
-            layout.format_date(entry.publication_end, 'datetime_long')
+            layout.format_date(entry.publication_end, 'datetime')
             if entry.publication_end else not_set
         )
         details = '\n'.join([
@@ -165,7 +165,7 @@ class DirectoryEntryPdf(OrgPdf):
             mapping={
                 'org': layout.org.title,
                 'timestamp': layout.format_date(
-                    generated_at, 'datetime_long'),
+                    generated_at, 'datetime'),
             },
         )
         self.p_markup(
