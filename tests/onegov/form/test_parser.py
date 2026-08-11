@@ -1952,3 +1952,39 @@ def test_roundtrip(
     assert json_roundtripped.fields == parsed.fields
     # without changing the generated formcode
     assert json_roundtripped.to_formcode() == expected
+
+
+def test_nested_fieldset_field_ordering() -> None:
+    form = parse_form(dedent(
+        """\
+        # A
+        Extras =
+            [ ] Option 1
+                # B
+                Sub 1a = ___
+                # C
+                Sub 1b = ___
+            [ ] Option 2
+                Sub 2a = ___
+                # B
+                Sub 2b = ___
+            [ ] Option 3
+                # C
+                Sub 3a = ___
+                # A
+                Sub 3b = ___
+                # B
+                Sub 3c = ___
+        """
+    ))()
+    assert list(form._fields) == [
+        'a_extras',
+        'a_extras_sub_2a',
+        'a_extras_b_sub_1a',
+        'a_extras_b_sub_2b',
+        'a_extras_c_sub_1b',
+        'a_extras_c_sub_3a',
+        'a_extras_sub_3b',
+        'a_extras_b_sub_3c',
+    ]
+    assert len(form.fieldsets) == 5
