@@ -149,8 +149,6 @@ def view_form_collection(
                     ).format(request.translate(hints['count']))
         return hint
 
-    request.include('form-modal')
-
     return {
         'layout': layout,
         'title': _('Forms'),
