@@ -6165,7 +6165,7 @@ msgstr ""
 "Falls sie Reservationen auf über- und untergeordneten Ressourcen im Kalender "
 "sehen möchten (analog zur Belegungsansicht), dann verwenden Sie bitten "
 "diesen Link. Beachten Sie jedoch, dass dies zu duplizierten Einträgen in "
-"ihrem Kalender führen kann, wenn sie mehr als eine verwandte Ressource mit "
+"ihrem Kalender führen kann, wenn Sie mehr als eine verwandte Ressource mit "
 "diesem Link abonnieren."
 
 msgid ""
