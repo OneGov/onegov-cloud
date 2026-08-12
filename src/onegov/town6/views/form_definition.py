@@ -31,6 +31,14 @@ def town_handle_defined_form(
     request: TownRequest,
     form: Form
 ) -> RenderData | Response:
+
+    if not request.is_logged_in:
+        return request.redirect(
+            request.class_link(
+                FormCollection,
+                query_params={'form': self.name}
+            ))
+
     return handle_defined_form(
         self, request, form, FormSubmissionLayout(self, request))
 
