@@ -475,6 +475,8 @@ def handle_reservation_form(
         'title': self.title,
     })
 
+    submission_data = submission.data if submission else None
+
     return {
         'layout': layout,
         'title': title,
@@ -482,7 +484,8 @@ def handle_reservation_form(
         'blocked': blocked,
         'zipcodes': self.zipcode_block and self.zipcode_block['zipcode_list'],
         'reservation_infos': [
-            utils.ReservationInfo(self, r, request) for r in reservations
+            utils.ReservationInfo(self, r, submission_data, request)
+            for r in reservations
         ],
         'resource': self,
         'button_text': _('Continue')
@@ -612,6 +615,7 @@ def confirm_reservation(
             price.credit_card_payment
             for __, price in form.prices()
         )
+        submission_data = submission.data
         # TODO: We may want to add an option for whether or not the discount
         #       should apply to extras or not. For now the discount doesn't
         #       apply to extras.
@@ -620,6 +624,7 @@ def confirm_reservation(
         credit_card_payment = False
         extras = []
         discounts = []
+        submission_data = None
 
     layout = layout or ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_('Confirm'), '#'))
@@ -639,6 +644,7 @@ def confirm_reservation(
             reservations,
             extras,
             discounts,
+            submission_data,
             reduced_amount_label=request.translate(_('Discount')),
         ),
         rounding_base=request.app.org.price_rounding,
@@ -658,7 +664,8 @@ def confirm_reservation(
         'form': form,
         'resource': self,
         'reservation_infos': [
-            utils.ReservationInfo(self, r, request) for r in reservations
+            utils.ReservationInfo(self, r, submission_data, request)
+            for r in reservations
         ],
         'failed_reservations': failed_reservations,
         'complete_link': request.link(self, 'finish'),
@@ -731,16 +738,19 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
                 price.credit_card_payment
                 for __, price in _form_obj.prices()
             )
+            submission_data = submission.data
         else:
             credit_card_payment = False
             extras = []
             discounts = []
+            submission_data = None
 
         invoice_meta = InvoiceMeta(
             self.invoice_items_for_reservation(
                 reservations,
                 extras,
                 discounts,
+                submission_data,
                 reduced_amount_label=request.translate(_('Discount')),
             ),
             rounding_base=request.app.org.price_rounding,

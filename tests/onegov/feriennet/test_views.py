@@ -730,6 +730,58 @@ def test_occasions_form(client: Client, scenario: Scenario) -> None:
     assert "keine Durchführungen" in editor.get('/activity/play-with-legos')
 
 
+def selected_period(page: ExtendedResponse) -> str:
+    field = page.form['period_id']
+    text = next(text for value, selected, text in field.options if selected)
+    return text.split(' (')[0]
+
+
+def add_past_period(scenario: Scenario, title: str, active: bool) -> None:
+    today = date.today()
+    scenario.add_period(
+        title=title,
+        active=active,
+        prebooking_start=today - timedelta(days=60),
+        prebooking_end=today - timedelta(days=50),
+        booking_start=today - timedelta(days=50),
+        booking_end=today - timedelta(days=40),
+        execution_start=today - timedelta(days=30),
+        execution_end=today - timedelta(days=20),
+    )
+
+
+def test_clone_occasion_period_preselection(
+    client: Client, scenario: Scenario
+) -> None:
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    # the occasion to clone lives in an old, inactive period
+    add_past_period(scenario, title="Old Period", active=False)
+    scenario.add_activity(
+        title="Play with Legos", username='editor@example.org')
+    scenario.add_occasion()
+    scenario.commit()
+
+    def clone_period() -> str:
+        activity = editor.get('/activity/play-with-legos')
+        return selected_period(activity.click("Duplizieren"))
+
+    # neither active nor upcoming: keeps the occasion's own period
+    assert clone_period() == "Old Period"
+
+    # an upcoming period exists (booking_end in the future): prefers it
+    scenario.add_period(title="Upcoming Period", active=False)
+    scenario.commit()
+    assert clone_period() == "Upcoming Period"
+
+    # an active period always wins
+    scenario.add_period(title="Active Period", active=True)
+    scenario.commit()
+    assert clone_period() == "Active Period"
+
+
 def test_multiple_dates_occasion(client: Client, scenario: Scenario) -> None:
 
     editor = client.spawn()

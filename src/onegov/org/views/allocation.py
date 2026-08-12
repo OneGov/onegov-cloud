@@ -32,7 +32,7 @@ from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from purl import URL
 from sedate import utcnow
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, tuple_
 from sqlalchemy.dialects.postgresql import JSON
 from uuid import uuid4
 from webob import exc
@@ -40,9 +40,10 @@ from webob import exc
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterator
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
+    from sqlalchemy.orm import Query
     from webob import Response
 
     type AllocationForm = (
@@ -290,6 +291,7 @@ def handle_edit_allocation(
         new_start, new_end = form.dates
 
         try:
+            # FIXME: Why do we ignore form.allocation_data?
             resource.scheduler.move_allocation(
                 master_id=self.id,
                 new_start=new_start,
@@ -382,7 +384,7 @@ def warn_about_skipped_allocations(
 
 
 def count_matching_allocations(
-    allocations: Iterable[LibresAllocation],
+    allocations: Query[LibresAllocation],
     form: AllocationRuleForm,
     timezone: str,
 ) -> int:
@@ -403,12 +405,16 @@ def count_matching_allocations(
         rasterizer.rasterize_span(start, end, rasterizer.MIN_RASTER)
         for start, end in dates
     }
-    matching = {
-        (allocation._start, allocation._end)
-        for allocation in allocations
-        if allocation.is_master
-    }
-    return len(expected & matching)
+    if not expected:
+        return 0
+
+    return allocations.filter(
+        LibresAllocation.is_master,
+        tuple_(
+            LibresAllocation._start,
+            LibresAllocation._end,
+        ).in_(expected),
+    ).count()
 
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
@@ -532,7 +538,7 @@ def handle_edit_rule(
             new_data['access'] = form['access'].data
 
         matching_updated_count = count_matching_allocations(
-            updatable_candidates.all(), form, self.timezone
+            updatable_candidates, form, self.timezone
         )
 
         # NOTE: This is a little bit dodgy, but since allocations aren't

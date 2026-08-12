@@ -1082,14 +1082,14 @@ def test_registration_window_adjust_end_date(client: Client) -> None:
     # confirm first submission and change registration end date
     with freeze_time('2024-04-01', tick=True):
         # accept ticket, confirm
-        accept_submission = (client.get('/tickets/ALL/open').
-                             click("Annehmen").follow())
+        accept_submission = client.get('/tickets/ALL/open').click(
+            "Annehmen").follow()
         accept_submission.click("Anmeldung bestätigen").follow()
         assert accept_submission.status_code == 200
 
         # change end date
-        page = (client.get('/form/meet-guido-van-rossum').
-                click('01.04.2024 - 03.04.2024'))
+        page = client.get('/form/meet-guido-van-rossum').click(
+            '01.04.2024 - 03.04.2024')
         page = page.click('Bearbeiten')
         page.form['end'] = '2024-04-04'
         result = page.form.submit().follow()

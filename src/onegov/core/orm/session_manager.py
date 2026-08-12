@@ -12,6 +12,7 @@ from blinker import Signal
 from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core import log
+from psycopg.errors import FeatureNotSupported
 from psycopg.sql import SQL, Identifier
 from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -19,6 +20,7 @@ from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql import Delete, Update
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
+from zope.sqlalchemy import datamanager
 
 
 from typing import Any, Self, TYPE_CHECKING
@@ -59,6 +61,17 @@ class ForceFetchQueryClass[T](Query[T]):
 # may grow quite large - this alleviates memory fragmentation/high water mark
 # issues that we've been seeing on some servers.
 CONNECTION_LIFETIME = 60 * 60
+
+
+def _is_cached_plan_changed(error: FeatureNotSupported) -> bool:
+    return (
+        'cached plan must not change result type' in str(error)
+    )
+
+
+datamanager._retryable_errors.append(  # type: ignore[attr-defined]
+    (FeatureNotSupported, _is_cached_plan_changed)
+)
 
 
 def query_schemas(

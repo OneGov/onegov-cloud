@@ -50,7 +50,7 @@ SERVICE_DAYS_LABELS = {
     6: _('Sunday'),
 }
 
-# http://babel.pocoo.org/en/latest/numbers.html#pattern-syntax
+# http://babel.pocoo.org/en/latest\numbers.html#pattern-syntax
 FORMAT = '#,##0.00########'
 
 
@@ -768,11 +768,13 @@ class DaycareSubsidyCalculatorForm(Form):
 
     income = DecimalField(
         label=_('Definite Taxable income'),
-        validators=(InputRequired(), NumberRange(min=0)))
+        validators=(InputRequired(), NumberRange(min=0))
+    )
 
     wealth = DecimalField(
         label=_('Definite Taxable wealth'),
-        validators=(InputRequired(), NumberRange(min=0)))
+        validators=(InputRequired(), NumberRange(min=0))
+        )
 
     rebate = BooleanField(
         label=_('Rebate'),
