@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-08-06 08:19+0200\n"
+"POT-Creation-Date: 2026-08-12 08:44+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -222,8 +222,8 @@ msgstr "Newsletter giornaliera ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
 
-#.
 #. get the resource titles and ids
+#.
 msgid "General"
 msgstr "Generale"
 
@@ -391,9 +391,6 @@ msgstr "Pagamenti carta di credito"
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
 
-msgid "Inherit from resource"
-msgstr "Eredita dalla risorsa"
-
 msgid "Title"
 msgstr "Titolo"
 
@@ -439,14 +436,23 @@ msgstr "Durante le vacanze scolastiche"
 msgid "Price"
 msgstr "Prezzo"
 
+msgid "Inherit from resource"
+msgstr "Eredita dalla risorsa"
+
+msgid "Free of charge"
+msgstr "Gratuito"
+
+msgid "Per item"
+msgstr "Per elemento"
+
+msgid "Per hour"
+msgstr "Per ora"
+
 msgid "Price per item"
 msgstr "Prezzo per elemento"
 
 msgid "Price per hour"
 msgstr "Tariffa oraria"
-
-msgid "Pricing scheme"
-msgstr "Schema tariffario"
 
 msgid "Public"
 msgstr "Pubblico"
@@ -704,9 +710,6 @@ msgstr "Nuovi elementi"
 
 msgid "Guideline"
 msgstr "Linee guida"
-
-msgid "Free of charge"
-msgstr "Gratuito"
 
 msgid "Price per submission"
 msgstr "Prezzo per iscrizione"
@@ -1966,6 +1969,9 @@ msgstr ""
 "Verrà indicato nelle fatture per eventuali costi direttamente associati alle "
 "prenotazioni su questa risorsa."
 
+msgid "Pricing scheme"
+msgstr "Schema tariffario"
+
 msgid "Prices in extra fields are"
 msgstr "I prezzi nei campi extra sono"
 
@@ -1978,12 +1984,6 @@ msgstr ""
 
 msgid "One-off"
 msgstr "Una tantum"
-
-msgid "Per item"
-msgstr "Per elemento"
-
-msgid "Per hour"
-msgstr "Per ora"
 
 msgid "Discounts in extra fields apply to"
 msgstr "Gli sconti percentuali nei campi extra si applicano a"
@@ -6136,6 +6136,17 @@ msgstr ""
 "applicazioni di calendario aggiornano i calendari a cui sono iscritte (né "
 "sul fatto che si aggiornino). Pertanto, le informazioni mostrate nel "
 "calendario potrebbero essere errate o non aggiornate. Usale tuo rischio."
+
+msgid ""
+"If you want reservations from parent and/or child resources to be included, "
+"then use this link instead. Keep in mind that you may end up with duplicate "
+"events in your calendar, if you subscribe to multiple related resources with "
+"this setting."
+msgstr ""
+"Se desideri includere le prenotazioni provenienti dalle risorse superiori e "
+"subordinate, utilizza invece questo link. Tieni presente che, se ti abboni a "
+"più risorse correlate con questa impostazione, potresti ritrovarti con "
+"eventi duplicati nel tuo calendario."
 
 msgid ""
 "If you want key codes to be included in the event's description then you may "
