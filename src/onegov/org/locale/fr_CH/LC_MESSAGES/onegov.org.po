@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-08-06 16:21+0200\n"
+"POT-Creation-Date: 2026-08-12 08:44+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -220,8 +220,8 @@ msgstr "Newsletter quotidienne ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "Statut du OneGov Cloud de ${org}"
 
-#.
 #. get the resource titles and ids
+#.
 msgid "General"
 msgstr "Général"
 
@@ -6186,6 +6186,18 @@ msgstr ""
 "sont abonnées (si elles le font). Par conséquent, les informations affichées "
 "dans le calendrier peuvent être incorrectes ou obsolètes. Utilisez-le à vos "
 "risques et périls."
+
+msgid ""
+"If you want reservations from parent and/or child resources to be included, "
+"then use this link instead. Keep in mind that you may end up with duplicate "
+"events in your calendar, if you subscribe to multiple related resources with "
+"this setting."
+msgstr ""
+"Si vous souhaitez que les réservations provenant des super-ressources et des "
+"sous-ressources soient incluses, utilisez plutôt ce lien. N'oubliez pas que "
+"vous risquez de vous retrouver avec des événements en double dans votre "
+"agenda si vous vous abonnez à plusieurs ressources liées en utilisant ce "
+"paramètre."
 
 msgid ""
 "If you want key codes to be included in the event's description then you may "
