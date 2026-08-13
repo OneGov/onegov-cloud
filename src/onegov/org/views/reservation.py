@@ -1993,7 +1993,6 @@ def add_reservation(
     # if the matched allocation isn't partly available expand it to the
     # whole allocation for a better user experience, but don't ever shrink
     # it, since that's most certainly not what they want to have happen.
-    allocation = None
     for allocation in resource.scheduler.allocations_in_range(start, end):
         if not allocation.overlaps(start, end):
             continue
