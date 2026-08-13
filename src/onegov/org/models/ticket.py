@@ -836,6 +836,7 @@ class ReservationHandler(Handler):
         if not reservations:
             return
 
+        # FIXME: replace this with scheduler.remove_reservation
         # all reservations of a ticket share the token; delete their reserved
         # slots too, otherwise deleting the reservations directly (instead of
         # via the scheduler) leaves orphaned slots blocking the calendar
