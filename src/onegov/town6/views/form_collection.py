@@ -23,6 +23,7 @@ def town_view_form_collection(
 ) -> RenderData | Response:
 
     request.include('form-modal')
+    request.include('lazy-wolves')
 
     return view_form_collection(
         self, request, FormCollectionLayout(self, request))

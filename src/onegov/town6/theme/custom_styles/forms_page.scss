@@ -1,0 +1,17 @@
+#form-modal .modal-dialog{
+    width: calc(100vw - $s-xl);
+    height: calc(100vh - $s-xl);
+    margin: $s-md;
+
+    .overflow-auto {
+        height: calc(100vh - $s-3xl * 3);
+    }
+}
+
+.connector-line {
+    height: $s-xl;
+    margin-bottom: $s-md;
+    background: $white;
+    content: '';
+    width: 2px;
+}

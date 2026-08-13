@@ -5,7 +5,7 @@ from onegov.form import FormCollection, FormDefinition
 from onegov.org.forms.form_definition import FormDefinitionUrlForm
 from onegov.org.views.form_definition import (
     get_form_class, handle_new_definition, handle_edit_definition,
-    handle_defined_form, handle_change_form_name)
+    handle_defined_form, handle_change_form_name, view_form_modal)
 
 from onegov.town6 import TownApp
 from onegov.town6.layout import FormEditorLayout, FormSubmissionLayout
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 @TownApp.form(
     model=FormDefinition,
-    template='form.pt',
+    template='form_definition.pt',
     permission=Public,
     form=lambda self, request: self.form_class
 )
@@ -40,6 +40,22 @@ def town_handle_defined_form(
             ))
 
     return handle_defined_form(
+        self, request, form, FormSubmissionLayout(self, request))
+
+
+@TownApp.form(
+    model=FormDefinition,
+    permission=Public,
+    form=lambda self, request: self.form_class,
+    name='modal'
+)
+def town_view_form_modal(
+    self: FormDefinition,
+    request: TownRequest,
+    form: Form
+) -> str | Response:
+
+    return view_form_modal(
         self, request, form, FormSubmissionLayout(self, request))
 
 

@@ -215,7 +215,8 @@ def get_form_context(
         'coordinates': getattr(self, 'coordinates', Coordinates()),
         'hints': tuple(get_hints(layout, self.current_registration_window)),
         'hints_callout': not enabled,
-        'button_text': _('Continue')
+        'button_text': _('Continue'),
+        'full_page_width': True
     }
 
 

@@ -12,13 +12,9 @@
                 <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
                 <metal:b use-macro="layout.macros['accordion_grouped_by_column']" tal:condition="forms" tal:define="grouped forms; add_pagerefs request.is_logged_in" />
                 <div class="modal fade" id="form-modal" tabindex="-1" aria-hidden="true" aria-labelledby="form-modal-label">
-                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                        <div class="modal-content rounded-lg">
-                            <div class="modal-header">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close" i18n:attributes="aria-label"></button>
-                            </div>
-                            <div class="modal-body" id="form-modal-body">
+                    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+                        <div class="modal-content rounded-2">
+                            <div class="modal-body p-0" id="form-modal-body">
                             </div>
                         </div>
                     </div>
