@@ -101,6 +101,10 @@ def refresh_submission_invoice_items(
         request.session.add(invoice)
         self.ticket.invoice = invoice
 
+    # update the invoicing party
+    if self.submission is not None:
+        invoice.invoicing_party = self.submission.invoicing_party
+
     old_items = sorted(invoice.items, key=attrgetter('group'))
     new_items: list[InvoiceItem] = []
     unused: set[InvoiceItem] = set(old_items)
