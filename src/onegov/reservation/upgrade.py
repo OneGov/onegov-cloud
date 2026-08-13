@@ -441,3 +441,67 @@ def resources_switch_to_parsed_form(context: UpgradeContext) -> None:
 
     # finally remove the old column
     context.operations.drop_column('resources', 'definition')
+
+
+@upgrade_task('Store pricing settings on reservations')
+def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
+    if not context.has_table('resources'):
+        return
+
+    context.session.execute(text("""
+        WITH adata AS (
+            SELECT "group",
+                   jsonb_build_object(
+                        'pricing_method',
+                        data->'pricing_method',
+                        'price_per_hour',
+                        COALESCE(data->'price_per_hour', '0.0'::jsonb),
+                        'price_per_item',
+                        COALESCE(data->'price_per_item', '0.0'::jsonb),
+                        'currency',
+                        COALESCE(data->'currency', '"CHF"'::jsonb)
+                   ) AS pricing
+              FROM allocations
+             WHERE resource = mirror_of
+               AND data->>'pricing_method' = 'price_per_item'
+                OR data->>'pricing_method' = 'price_per_hour'
+                OR data->>'pricing_method' = 'free'
+        )
+        UPDATE reservations
+           SET data = COALESCE(data, '{}'::jsonb) ||
+              CASE
+                WHEN EXISTS (SELECT 1 FROM adata WHERE adata."group" = target)
+                THEN
+                    (
+                        SELECT pricing
+                          FROM adata
+                         WHERE adata."group" = target
+                         LIMIT 1
+                    ) || jsonb_build_object(
+                        'cost_object',
+                        resources.content->'cost_object'
+                    )
+                ELSE
+                    jsonb_build_object(
+                        'pricing_method',
+                        resources.content->'pricing_method',
+                        'price_per_hour',
+                        COALESCE(
+                            resources.content->'price_per_hour',
+                            '0.0'::jsonb
+                        ),
+                        'price_per_item',
+                        COALESCE(
+                            resources.content->'price_per_item',
+                            '0.0'::jsonb
+                        ),
+                        'currency',
+                        resources.content->'currency',
+                        'cost_object',
+                        resources.content->'cost_object'
+                    )
+               END
+           FROM resources
+          WHERE resources.id = resource
+
+    """))

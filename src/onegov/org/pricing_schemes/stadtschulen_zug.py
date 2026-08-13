@@ -24,7 +24,10 @@ CATEGORIES = ('A', 'B', 'C')
 class StadtschulenZug(
     ResourcePricingScheme,
     name='stadtschulen_zug',
-    label='Freizeitbetreuungsanlagen'
+    label='Freizeitbetreuungsanlagen',
+    content_names=(
+        'stadtschulen_zug_price_table',
+    )
 ):
 
     @classmethod
