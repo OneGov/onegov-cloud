@@ -26,6 +26,20 @@ if TYPE_CHECKING:
     from webob import Response
 
 
+def set_cancel_link(
+    layout: EditorLayout | PageLayout,
+    request: OrgRequest,
+    page: Topic | News,
+) -> None:
+    """ Points the edit mode 'Cancel' button back to the page, instead of
+    the editor itself (the default), so aborting has a visible effect. """
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.return_to_url(request.link(page)),
+        attrs={'class': 'cancel-link'}
+    )
+
+
 def get_form_class(
     editor: Editor,
     request: OrgRequest
@@ -190,11 +204,7 @@ def handle_edit_page(
     layout = layout or EditorLayout(self, request, site_title)
     layout.site_title = site_title  # type:ignore[union-attr]
     layout.edit_mode = True
-    layout.editmode_links[1] = Link(
-        text=_('Cancel'),
-        url=request.return_to_url(request.link(self.page)),
-        attrs={'class': 'cancel-link'}
-    )
+    set_cancel_link(layout, request, cast('Topic | News', self.page))
 
     if self.page.deletable and self.page.trait == 'link':
         edit_links = self.page.get_edit_links(request)
@@ -206,8 +216,9 @@ def handle_edit_page(
     if form.submitted(request):
         form.populate_obj(self.page)
         request.success(_('Your changes were saved'))
-
-        return morepath.redirect(request.link(self.page))
+        return morepath.redirect(
+            request.return_to_url(request.link(self.page))
+        )
     elif not request.POST:
         form.process(obj=self.page)
         if self.page.trait == 'news':
@@ -236,15 +247,19 @@ def handle_move_page(
 ) -> RenderData | Response:
 
     assert self.page is not None
-    layout = layout or PageLayout(self.page, request)
     site_title = self.page.trait_messages[self.trait]['move_page_title']
-    layout.site_title = site_title  # type:ignore[union-attr]
 
     if form.submitted(request):
         form.update_model(self.page)  # type:ignore[attr-defined]
         request.success(_('Your changes were saved'))
 
-        return morepath.redirect(request.link(self.page))
+        return morepath.redirect(
+            request.return_to_url(request.link(self.page))
+        )
+
+    layout = layout or EditorLayout(self, request, site_title)
+    layout.site_title = site_title  # type:ignore[union-attr]
+    set_cancel_link(layout, request, cast('Topic | News', self.page))
 
     return {
         'layout': layout,
@@ -307,7 +322,9 @@ def handle_change_page_url(
                 response.headers.add('cache-control', 'max-age=0, public')
                 response.headers['expires'] = '0'
 
-            return morepath.redirect(request.link(self.page))
+            return morepath.redirect(
+                request.return_to_url(request.link(self.page))
+            )
 
         messages.append(
             _('${count} links will be replaced by this action.',
@@ -318,8 +335,11 @@ def handle_change_page_url(
 
     site_title = _('Change URL')
 
+    layout = layout or EditorLayout(self, request, site_title)
+    set_cancel_link(layout, request, page)
+
     return {
-        'layout': layout or EditorLayout(self, request, site_title),
+        'layout': layout,
         'form': form,
         'title': site_title,
         'callout': ' '.join(request.translate(m) for m in messages)

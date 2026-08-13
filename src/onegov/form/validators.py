@@ -421,6 +421,14 @@ class StrictOptional(Optional):
 
     """
 
+    def __init__(
+        self,
+        strip_whitespace: bool = True,
+        zero_is_optional: bool = False
+    ) -> None:
+        self.zero_is_optional = zero_is_optional
+        super().__init__(strip_whitespace=strip_whitespace)
+
     def is_missing(self, value: object) -> bool:
         if isinstance(value, FieldStorage):
             return False
@@ -443,7 +451,9 @@ class StrictOptional(Optional):
         if isinstance(field, SelectField) and val == 'None':
             val = None
 
-        if self.is_missing(raw) and self.is_missing(val):
+        if self.is_missing(raw) and self.is_missing(val) or (
+            self.zero_is_optional and val == 0
+        ):
             field.errors = []
             raise StopValidation()
 

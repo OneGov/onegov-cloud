@@ -129,6 +129,11 @@ def test_pages(client: Client) -> None:
     edit_page = page.click("Bearbeiten")
     assert "Thema Bearbeiten" in edit_page
     assert "&lt;h2&gt;Living in Govikon is Really Great&lt;/h2&gt" in edit_page
+    # the cancel link must point back to the page, not the editor itself
+    cancel_href = edit_page.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None
+    assert 'edit' not in cancel_href
+    assert cancel_href == page.request.url
 
     edit_page.form['title'] = "Living in Govikon is Awful"
     edit_page.form['text'] = (
@@ -441,6 +446,11 @@ def test_move_page_to_root(client: Client) -> None:
     page = client.get('/topics/organisation/mainpage/subpage')
     move_page = page.click('Verschieben')
     assert 'move' in move_page.form.action
+    # the cancel link must point back to the page, not the editor itself
+    cancel_href = move_page.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None
+    assert 'move' not in cancel_href
+    assert cancel_href == page.request.url
     move_page.form['parent_id'].select('0')
     # ensure that news is not a valid destination
     assert not any('Aktuelles' in o[2] for o in
@@ -532,6 +542,11 @@ def test_links(client: Client) -> None:
 
     # Change the root url
     change_url = root_page.click('URL ändern')
+    # the cancel link must point back to the page, not the editor itself
+    cancel_href = change_url.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None
+    assert 'change-url' not in cancel_href
+    assert cancel_href == root_page.request.url
     change_url.form['name'] = 'org'
     change_url.form['test'] = True
 

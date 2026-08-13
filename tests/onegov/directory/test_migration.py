@@ -612,22 +612,22 @@ def test_directory_field_type_migrations(
     """
 
     structure = textwrap.dedent(
-        f"""
+    """
         # Main
         Name *= ___
         # General
-        {old}
+        {}
     """
-    )
+    ).format(textwrap.dedent(old))
 
     new_structure = textwrap.dedent(
-        f"""
+    """
         # Main
         Name *= ___
         # General
-        {new}
+        {}
     """
-    )
+    ).format(textwrap.dedent(new))
 
     directories = DirectoryCollection(session)
     zoos = directories.add(
