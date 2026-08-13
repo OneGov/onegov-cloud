@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 from onegov.core.collection import Pagination
 from onegov.core.orm import Base
 from sedate import utcnow
-from sqlalchemy import CheckConstraint, desc, event, Index, insert
+from sqlalchemy import desc, Enum, event, Index, insert
 from sqlalchemy.orm import mapped_column, Mapped, Session
 
 
@@ -90,7 +90,14 @@ class AuditEntry(Base):
     target_id: Mapped[str]
 
     #: The database operation that caused the audit event
-    operation: Mapped[str]
+    operation: Mapped[AuditOperation] = mapped_column(
+        Enum(
+            'insert',
+            'update',
+            'delete',
+            name='audit_operation',
+        )
+    )
 
     #: The state after insert/update or immediately before delete
     snapshot: Mapped[dict[str, Any]] = mapped_column(default=dict)
@@ -107,10 +114,6 @@ class AuditEntry(Base):
     __table_args__ = (
         Index('audit_entries_target', 'target_table', 'target_id'),
         Index('audit_entries_created', 'created'),
-        CheckConstraint(
-            "operation IN ('insert', 'update', 'delete')",
-            name='valid_audit_entry_operation',
-        ),
     )
 
 

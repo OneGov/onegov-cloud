@@ -260,28 +260,3 @@ def drop_remaining_gazette_and_notices_tables(context: UpgradeContext) -> None:
     ):
         if context.has_table(table):
             context.operations.drop_table(table)
-
-
-@upgrade_task('Add previous snapshot to audit entries')
-def add_previous_snapshot_to_audit_entries(
-    context: UpgradeContext,
-) -> None:
-    if not context.has_table('audit_entries') or context.has_column(
-        'audit_entries', 'previous_snapshot'
-    ):
-        return
-
-    context.operations.add_column(
-        'audit_entries',
-        Column(
-            'previous_snapshot',
-            JSON,
-            nullable=False,
-            server_default=text(r"'{}'::jsonb"),
-        ),
-    )
-    context.operations.alter_column(
-        'audit_entries',
-        'previous_snapshot',
-        server_default=None,
-    )
