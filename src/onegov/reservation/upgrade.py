@@ -496,6 +496,11 @@ def add_source_id_to_reserved_slots(context: UpgradeContext) -> None:
 
     backfill_reserved_slot_source_ids(context.session)
 
+    # every remaining slot now has an owner, so enforce it
+    context.operations.alter_column(
+        'reserved_slots', 'source_id', nullable=False
+    )
+
     context.operations.create_index(
         'ix_reserved_slots_source_id', 'reserved_slots', ['source_id']
     )
