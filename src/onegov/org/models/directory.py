@@ -409,10 +409,12 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     text = dict_markup_property('content')
     title_further_information: dict_property[str | None] = content_property()
     position: dict_property[str] = content_property(default='below')
+
+    invoicing_party: dict_property[str | None] = meta_property()
+    cost_object: dict_property[str | None] = meta_property()
     price: dict_property[Literal['free', 'paid'] | None] = content_property()
     price_per_submission: dict_property[float | None] = content_property()
     currency: dict_property[str | None] = content_property()
-
     minimum_price_total: dict_property[float | None] = meta_property()
     payment_method: dict_property[PaymentMethod | None] = meta_property()
 
