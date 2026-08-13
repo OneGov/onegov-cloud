@@ -504,6 +504,8 @@ def add_source_id_to_reserved_slots(context: UpgradeContext) -> None:
     context.operations.create_index(
         'ix_reserved_slots_source_id', 'reserved_slots', ['source_id']
     )
+
+
 @upgrade_task('Store pricing settings on reservations')
 def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
     if not context.has_table('resources'):
