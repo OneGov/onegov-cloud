@@ -237,6 +237,10 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
 
         return respond_with_error(request, err)
 
+    # store the current pricing settings on the reservation
+    data: dict[str, Any] = {}
+    resource.store_pricing_settings(data, self)
+
     # ...otherwise, try to reserve
     scheduler = resource.scheduler
     try:
@@ -245,6 +249,7 @@ def reserve_allocation(self: Allocation, request: OrgRequest) -> JSON_ro:
         scheduler.reserve(
             email='0xdeadbeef@example.org',  # will be set later
             dates=(start, end),
+            data=data,
             quota=quota,
             session_id=resource.bound_session_id(request),
             single_token_per_session=True
@@ -1988,6 +1993,7 @@ def add_reservation(
     # if the matched allocation isn't partly available expand it to the
     # whole allocation for a better user experience, but don't ever shrink
     # it, since that's most certainly not what they want to have happen.
+    allocation = None
     for allocation in resource.scheduler.allocations_in_range(start, end):
         if not allocation.overlaps(start, end):
             continue
@@ -2009,6 +2015,13 @@ def add_reservation(
         temp_token = resource.scheduler.reserve(
             self.email,
             (start, end),
+            # NOTE: Copy all of the settings apart from kaba, we will
+            #       sort out kaba further below
+            data={
+                key: value
+                for key, value in self.data.items()
+                if key != 'kaba'
+            } if self.data else None,
             quota=form.quota.data
         )
     except LibresError as e:
