@@ -17,6 +17,7 @@ from onegov.file import MultiAssociatedFiles
 from onegov.form.parser import ParsedForm
 from onegov.form.orm_types import Formcode
 from onegov.pay import InvoiceItemMeta, Price, process_payment
+from onegov.reservation.pricing_scheme import PRICING_SCHEMES
 from sedate import align_date_to_day, utcnow
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -365,6 +366,19 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         items: list[InvoiceItemMeta] = []
         extras_quantity = Decimal('0')
+        reservation_data = reservations[0].data or {}
+        extras_pricing_method = reservation_data.get(
+            'extras_pricing_method',
+            self.extras_pricing_method
+        )
+        discount_method = reservation_data.get(
+            'discount_method',
+            self.discount_method
+        )
+        cost_object = reservation_data.get(
+            'cost_object',
+            self.cost_object
+        )
         for reservation in reservations:
             # FIXME: We could speed this up by loading all of the
             #        targeted allocations ahead of time and passing
@@ -378,7 +392,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
                 items.append(item)
 
             if extras:
-                match self.extras_pricing_method:
+                match extras_pricing_method:
                     case 'one_off':
                         extras_quantity = Decimal('1')
 
@@ -411,7 +425,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         total = InvoiceItemMeta.total(items)
         extras_total = InvoiceItemMeta.total(extras)
 
-        match self.discount_method:
+        match discount_method:
             case 'resource':
                 discount_total = total
             case 'extras':
@@ -454,11 +468,41 @@ class Resource(ORMBase, ModelBase, ContentMixin,
             items.append(InvoiceItemMeta(
                 text=reduced_amount_label,
                 group='reduced_amount',
-                cost_object=self.cost_object,
+                cost_object=cost_object,
                 unit=reduced_amount-total
             ))
 
         return items
+
+    def store_pricing_settings(
+        self,
+        data: dict[str, Any],
+        allocation: Allocation | None
+    ) -> None:
+        """ Stores the resource/allocation specific pricing settings on the
+        given reservation data, so pricing on that reservation remains stable,
+        regardless of what changes later happen to the resource/allocation.
+        """
+        allocation_data = allocation and allocation.data or {}
+        pricing_method = allocation_data.get('pricing_method', 'inherit')
+        if pricing_method == 'inherit':
+            data['pricing_method'] = self.pricing_method
+            data['price_per_hour'] = self.price_per_hour
+            data['price_per_item'] = self.price_per_item
+            data['pricing_scheme'] = pricing_scheme_name = self.pricing_scheme
+            data['currency'] = self.currency
+            if pricing_scheme_name and (
+                pricing_scheme := PRICING_SCHEMES.get(pricing_scheme_name)
+            ) is not None:
+                for name in pricing_scheme.content_names:
+                    data[name] = self.content.get(name)
+        else:
+            data['pricing_method'] = pricing_method
+            data['price_per_hour'] = allocation_data.get('price_per_hour', 0.0)
+            data['price_per_item'] = allocation_data.get('price_per_item', 0.0)
+            data['pricing_scheme'] = None
+            data['currency'] = allocation_data.get('currency') or self.currency
+        data['cost_object'] = self.cost_object
 
     def process_payment(
         self,

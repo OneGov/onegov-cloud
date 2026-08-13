@@ -902,6 +902,8 @@ def handle_submit_directory_entry(
             state='pending',
             payment_method=self.directory.payment_method,
             minimum_price_total=self.directory.minimum_price_total,
+            invoicing_party=self.directory.invoicing_party,
+            cost_object=self.directory.cost_object,
             email=form.submitter.data,
             meta={
                 'handler_code': 'DIR',
@@ -910,6 +912,7 @@ def handle_submit_directory_entry(
                     'text': request.translate(_('Lump sum')),
                     'group': 'submission',
                     'unit': Decimal(amount),
+                    'cost_object': self.directory.cost_object,
                     'quantity': Decimal('1'),
                 },
                 'currency': self.directory.currency,
