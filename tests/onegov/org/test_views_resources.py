@@ -5162,6 +5162,113 @@ def test_migration_removes_reservation_when_slot_is_taken(
     assert any('irrtümlich storniert' in (n.text or '') for n in notes)
 
 
+@freeze_time('2026-08-01', tick=True)
+def test_migration_deletes_orphaned_reserved_slots(client: Client) -> None:
+    # A reserved slot whose reservation was already deleted (the OGC-3388
+    # orphan) must be removed by the migration if it lies in the future, while
+    # valid slots and harmless past orphans are left untouched.
+    from libres.db.models import ReservedSlot
+    from onegov.org.upgrade import delete_orphaned_reserved_slots
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    # a future and a past whole-only (non-partly) allocation (now = 2026-08-01)
+    future = scheduler.allocate(
+        dates=(datetime(2026, 8, 29), datetime(2026, 8, 29)),
+        whole_day=True, partly_available=False, quota=2, quota_limit=2,
+    )
+    past = scheduler.allocate(
+        dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
+        whole_day=True, partly_available=False,
+    )
+    # capture dates before commit detaches the allocation instances
+    f_start, f_end = future[0].start, future[0].end
+    p_start, p_end = past[0].start, past[0].end
+    transaction.commit()
+
+    # one future reservation we keep (valid) and one we orphan
+    keep_token = scheduler.reserve('user@example.org', (f_start, f_end))
+    orphan_token = scheduler.reserve('other@example.org', (f_start, f_end))
+    past_token = scheduler.reserve('past@example.org', (p_start, p_end))
+    scheduler.approve_reservations(keep_token)
+    scheduler.approve_reservations(orphan_token)
+    scheduler.approve_reservations(past_token)
+    transaction.commit()
+
+    # simulate the pre-fix production state: delete the reservations directly,
+    # leaving their reserved slots behind as orphans
+    session = client.app.session()
+    session.query(Reservation).filter(
+        Reservation.token.in_((orphan_token, past_token))
+    ).delete(synchronize_session=False)
+    transaction.commit()
+
+    session = client.app.session()
+    deleted_starts = delete_orphaned_reserved_slots(session)
+    transaction.commit()
+
+    # only the single future orphan slot is deleted
+    assert len(deleted_starts) == 1
+
+    session = client.app.session()
+    assert session.query(ReservedSlot).filter_by(
+        reservation_token=orphan_token).count() == 0
+    # valid future reservation untouched
+    assert session.query(ReservedSlot).filter_by(
+        reservation_token=keep_token).count() == 1
+    # past orphan left untouched (harmless, avoids a large sweep)
+    assert session.query(ReservedSlot).filter_by(
+        reservation_token=past_token).count() == 1
+
+
+@freeze_time('2026-08-01', tick=True)
+def test_delete_reservation_ticket_removes_reserved_slots(
+    client: Client,
+) -> None:
+    # Deleting a reservation ticket must also remove its reserved slots.
+    # Previously prepare_delete_ticket deleted the reservations directly
+    # (bypassing the scheduler), leaving orphaned slots behind (OGC-3388).
+    from libres.db.models import ReservedSlot
+    from onegov.ticket import Ticket
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2026, 8, 29, 10), datetime(2026, 8, 29, 18)),
+        partly_available=True,
+    )
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    assert reserve('10:00', '18:00').json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'user@example.org'
+    formular.form.submit().follow().form.submit().follow()
+
+    client.login_admin()
+    client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    session = client.app.session()
+    ticket = session.query(Ticket).one()
+    token = session.query(Reservation).one().token
+    assert session.query(ReservedSlot).filter_by(
+        reservation_token=token).count() > 0
+
+    ticket.handler.prepare_delete_ticket()
+    transaction.commit()
+
+    session = client.app.session()
+    assert session.query(Reservation).filter_by(token=token).count() == 0
+    assert session.query(ReservedSlot).filter_by(
+        reservation_token=token).count() == 0
+
+
 def _reserve_tageskarte_for_cancellation(client: Client) -> str:
     """Reserve a whole-day slot on 'tageskarte' with cancellation requests
     enabled and return the ticket status URL (ticket still open, unaccepted).
