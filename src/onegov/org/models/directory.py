@@ -397,6 +397,9 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     enable_publication: dict_property[bool | None] = meta_property()
     enable_update_notifications: dict_property[bool | None] = meta_property()
     notification_address: dict_property[str | None] = meta_property()
+    enable_notification_pdf_signing: dict_property[bool | None] = (
+        meta_property(default=True)
+    )
     required_publication: dict_property[bool | None] = meta_property()
     submitter_meta_fields: dict_property[list[str] | None] = meta_property()
 

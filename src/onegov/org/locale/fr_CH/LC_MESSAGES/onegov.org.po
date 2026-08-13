@@ -756,6 +756,13 @@ msgstr ""
 "toutes les heures). Utile p.ex. pour les répertoires de permis comme preuve "
 "de publication."
 
+msgid ""
+"Whether the PDF attached to the admin notification should be digitally "
+"signed (recommended)."
+msgstr ""
+"Si le PDF joint à la notification administrative doit être signé "
+"numériquement (recommandé)."
+
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informations complémentaires du demandeur requises à l'e-mail"
 
@@ -1286,22 +1293,22 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number of attendees ($"
-"{claimed_spots})"
+"The limit cannot be lower than the already confirmed number of attendees "
+"(${claimed_spots})"
 msgstr ""
-"La limite ne peut être inférieure au nombre de participants déjà confirmés ($"
-"{claimed_spots})"
+"La limite ne peut être inférieure au nombre de participants déjà confirmés "
+"(${claimed_spots})"
 
 #, python-format
 msgid ""
-"The limit cannot be lower than the already confirmed number attendees ($"
-"{claimed_spots}) and the number of pending requests (${pending_requests}). "
+"The limit cannot be lower than the already confirmed number attendees "
+"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
 "Either enable the waiting list, process the pending requests or increase the "
 "limit. "
 msgstr ""
 "La limite ne peut pas être inférieure au nombre de participants déjà "
-"confirmés (${claims_spots}) et au nombre de demandes en attente ($"
-"{pending_requests}). Activez la liste d'attente, traitez les demandes en "
+"confirmés (${claims_spots}) et au nombre de demandes en attente "
+"(${pending_requests}). Activez la liste d'attente, traitez les demandes en "
 "attente ou augmentez la limite."
 
 msgid "The end date must be later than the start date"
@@ -2878,8 +2885,8 @@ msgstr ""
 msgid ""
 "Invalid format. Please define subtopic(s) for '${topic}' or remove the ':'."
 msgstr ""
-"Format incorrect. Veuillez définir un ou plusieurs sous-sujets pour '$"
-"{topic}' ou supprimer le ':'."
+"Format incorrect. Veuillez définir un ou plusieurs sous-sujets pour "
+"'${topic}' ou supprimer le ':'."
 
 msgid ""
 "Invalid format. Only topics and subtopics are allowed - no deeper structures "
@@ -3125,8 +3132,8 @@ msgid ""
 "Invalid format. Please define at least one sub-organisation for '${topic}' "
 "or remove the ':'"
 msgstr ""
-"Format non valide. Veuillez définir au moins une sous-organisation pour '$"
-"{topic}' ou supprimer le ':'"
+"Format non valide. Veuillez définir au moins une sous-organisation pour "
+"'${topic}' ou supprimer le ':'"
 
 msgid ""
 "Invalid format. Only organisations and sub-organisations are allowed - no "
@@ -3217,9 +3224,9 @@ msgid ""
 "Either choose a different date range or give this window a title to "
 "differenciate it from other windows."
 msgstr ""
-"L'intervalle de dates chevauche une fenêtre de soumission existante ($"
-"{range}). Choisissez un autre intervalle de dates ou donnez un titre à cette "
-"fenêtre pour la différencier des autres fenêtres."
+"L'intervalle de dates chevauche une fenêtre de soumission existante "
+"(${range}). Choisissez un autre intervalle de dates ou donnez un titre à "
+"cette fenêtre pour la différencier des autres fenêtres."
 
 msgid "Short name to identify the text module"
 msgstr "Nom court pour identifier le module de texte"
@@ -3942,7 +3949,6 @@ msgstr "Entrées du répertoire"
 msgid "Through URL only (not listed)"
 msgstr "Via URL uniquement (non répertorié)"
 
-#. allowing mtan restricted models makes only sense if we can deliver SMS
 msgid "Only by privileged users or after submitting a mTAN"
 msgstr ""
 "Uniquement par les utilisateurs privilégiés ou après avoir soumis un mTAN"
@@ -4339,8 +4345,8 @@ msgstr "Tout refuser avec message"
 msgid "Add reservation"
 msgstr "Ajouter une réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -4517,10 +4523,49 @@ msgstr ""
 "supprimez d'abord toutes les sous-pages, ou demandez à un administrateur de "
 "le faire pour vous."
 
-#. Modification for the footer left on all pages
 #.
+#. Modification for the footer left on all pages
 msgid "Source"
 msgstr "Source"
+
+#, python-format
+msgid "The publication \"${title}\" has ended."
+msgstr "La publication « ${title} » est terminée."
+
+#, python-format
+msgid "This document certifies the publication \"${title}\" as follows."
+msgstr "Ce document atteste la publication « ${title} » comme suit."
+
+msgid "Attachments"
+msgstr "Pièces jointes"
+
+msgid "Size"
+msgstr "Taille"
+
+msgid "Hash"
+msgstr "Hash"
+
+msgid "Bytes"
+msgstr "octets"
+
+msgid "Publication details"
+msgstr "Détails de la publication"
+
+msgid "Not set"
+msgstr "Non défini"
+
+msgid "Publication start:"
+msgstr "Début de publication:"
+
+msgid "Publication end:"
+msgstr "Fin de publication:"
+
+msgid "Entry checksum"
+msgstr "Somme de contrôle de l'entrée"
+
+#, python-format
+msgid "Email automatically generated by ${org} at ${timestamp}"
+msgstr "E-mail généré automatiquement par ${org} le ${timestamp}"
 
 msgid "Appendix"
 msgstr "Annexe"
@@ -4640,9 +4685,6 @@ msgstr ""
 "Empreinte du contenu de l'entrée. Change chaque fois que les données de "
 "l'entrée sont modifiées."
 
-msgid "Hash"
-msgstr "Hash"
-
 msgid "No subscribers yet"
 msgstr "Pas encore d'abonnés"
 
@@ -4759,8 +4801,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -4821,8 +4863,8 @@ msgstr ""
 "Nous n'avons pas pu réserver certains créneaux correspondant à vos critères "
 "pour les dates${and_rooms} suivantes. Veuillez noter que certaines de ces "
 "dates peuvent encore avoir un ou plusieurs créneaux disponibles qui sont "
-"soit plus courts, soit plus longs que la durée que vous avez choisie. $"
-"{dates}"
+"soit plus courts, soit plus longs que la durée que vous avez choisie. "
+"${dates}"
 
 #. Used in sentence: "We were unable to reserve some slots matching your
 #. criteria for the following dates${and_rooms}, please note that some of those
@@ -5282,8 +5324,8 @@ msgstr "Bonjour"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
-"Votre adresse e-mail vient d'être utilisée pour créer un compte sur $"
-"{homepage}."
+"Votre adresse e-mail vient d'être utilisée pour créer un compte sur "
+"${homepage}."
 
 msgid "To activate your account, click confirm below:"
 msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous:"
@@ -5327,12 +5369,13 @@ msgid "Have a great day!"
 msgstr "Passez une bonne journée!"
 
 msgid ""
-"This is a notification for accepted cancellation requests for $"
-"{organisation}. If you no longer wish to receive these notifications, please "
-"contact an administrator so they can remove you from the recipients list."
+"This is a notification for accepted cancellation requests for "
+"${organisation}. If you no longer wish to receive these notifications, "
+"please contact an administrator so they can remove you from the recipients "
+"list."
 msgstr ""
-"Ceci est une notification pour les demandes d'annulation acceptées pour $"
-"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Ceci est une notification pour les demandes d'annulation acceptées pour "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur."
 
 msgid "Your e-mail address was just used to send a login link to ${homepage}."
@@ -5400,8 +5443,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -5410,9 +5453,9 @@ msgid "visit the request page"
 msgstr "visitez la page de la demande"
 
 msgid ""
-"This is the notification for customer messages on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for customer messages on reservations for ${request."
+"app.org.title}. If you no longer want to receive this e-mail please contact "
+"an administrator so they can remove you from the recipients list."
 msgstr ""
 "Ceci est une notification concernant les messages clients relatifs aux "
 "réservations pour ${request.app.org.title}. Si vous ne souhaitez plus "
@@ -5518,15 +5561,19 @@ msgstr ""
 msgid "An entry has been published in the \"${directory}\" directory:"
 msgstr "Une entrée a été publiée dans le répertoire \"${directory}\" :"
 
-msgid "Email automatically generated by ${org} at ${timestamp}"
-msgstr "E-mail généré automatiquement par ${org} le ${timestamp}"
+msgid ""
+"The attached PDF could not be signed, because the signature service was not "
+"available."
+msgstr ""
+"Le PDF joint n'a pas pu être signé, car le service de signature n'était pas "
+"disponible."
 
 msgid ""
 "The publication period of the entry \"${entry}\" in the \"${directory}\" "
 "directory has ended."
 msgstr ""
-"La période de publication de l'entrée \"${entry}\" dans le répertoire \"$"
-"{directory}\" est terminée."
+"La période de publication de l'entrée \"${entry}\" dans le répertoire "
+"\"${directory}\" est terminée."
 
 msgid "Your directory submission has been adopted:"
 msgstr "Votre proposition de répertoire a été adoptée :"
@@ -5550,41 +5597,17 @@ msgid "New note in Ticket ${link}"
 msgstr "Nouvelle note dans le billet ${link}"
 
 msgid ""
-"This is the notification for notes on reservations for $"
-"{request.app.org.title}. If you no longer want to receive this e-mail please "
-"contact an administrator so they can remove you from the recipients list."
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit de la notification de notes sur les réservations pour $"
-"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
-"veuillez contacter un administrateur afin qu'il puisse vous retirer de la "
-"liste des destinataires."
+"Il s'agit de la notification de notes sur les réservations pour ${request."
+"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
+"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
+"destinataires."
 
 msgid "Pending approval"
 msgstr "En attente d'approbation"
-
-msgid "Form fields"
-msgstr "Champs du formulaire"
-
-msgid "Attachments"
-msgstr "Pièces jointes"
-
-msgid "Size"
-msgstr "Taille"
-
-msgid "Publication details"
-msgstr "Détails de la publication"
-
-msgid "Publication start:"
-msgstr "Début de publication:"
-
-msgid "Not set"
-msgstr "Non défini"
-
-msgid "Publication end:"
-msgstr "Fin de publication:"
-
-msgid "Entry checksum"
-msgstr "Somme de contrôle de l'entrée"
 
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
@@ -5614,10 +5637,10 @@ msgid ""
 "you no longer want to receive this e-mail please contact an administrator so "
 "they can remove you from the recipients list."
 msgstr ""
-"Ceci est la notification pour les réservations pour $"
-"{request.app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, "
-"veuillez contacter un administrateur afin qu'il puisse vous supprimer de la "
-"liste des destinataires."
+"Ceci est la notification pour les réservations pour ${request.app.org."
+"title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez contacter un "
+"administrateur afin qu'il puisse vous supprimer de la liste des "
+"destinataires."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -5715,8 +5738,8 @@ msgid ""
 "you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Il s'agit d'une notification concernant les réservations rejetées pour $"
-"{organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"Il s'agit d'une notification concernant les réservations rejetées pour "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
 "veuillez contacter un administrateur afin qu'il vous retire de la liste des "
 "destinataires."
 
@@ -6686,8 +6709,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -6923,11 +6946,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Cannot convert field \"${field}\" from type \"${old_type}\" to \"${new_type}"
-"\"."
+"Cannot convert field \"${field}\" from type \"${old_type}\" to "
+"\"${new_type}\"."
 msgstr ""
-"Impossible de convertir le champ \"${field}\" du type \"${old_type}\" en \"$"
-"{new_type}\"."
+"Impossible de convertir le champ \"${field}\" du type \"${old_type}\" en "
+"\"${new_type}\"."
 
 msgid "The directory was deleted"
 msgstr "Le dossier a été supprimé"
@@ -6950,8 +6973,8 @@ msgstr "${org}: Entrée publiée \"${entry}\" dans \"${directory}\""
 #, python-format
 msgid "${org}: Publication Period Ended for \"${entry}\" in \"${directory}\""
 msgstr ""
-"${org}: Période de publication terminée pour \"${entry}\" dans \"${directory}"
-"\""
+"${org}: Période de publication terminée pour \"${entry}\" dans "
+"\"${directory}\""
 
 msgid "Added a new directory entry"
 msgstr "Ajout d'une nouvelle entrée dans le dossier"
@@ -7040,8 +7063,8 @@ msgstr "Nouveau destinataire"
 
 #, python-format
 msgid ""
-"Registration for notifications on new entries in the directory \"${directory}"
-"\""
+"Registration for notifications on new entries in the directory "
+"\"${directory}\""
 msgstr ""
 "Inscription pour les notifications sur les nouvelles entrées dans le dossier "
 "\"${directory}\""
@@ -7415,8 +7438,8 @@ msgid ""
 "you one already. Your subscribed categories are ${subscribed}."
 msgstr ""
 "C'est fait! Nous avons envoyé un lien de confirmation vers ${address}, si "
-"nous ne vous en avions pas déjà envoyé un. Vos catégories abonnées sont $"
-"{subscribed}."
+"nous ne vous en avions pas déjà envoyé un. Vos catégories abonnées sont "
+"${subscribed}."
 
 # python-format
 #, python-format
@@ -8375,8 +8398,8 @@ msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
 
 #, python-format
 msgid ""
-"Encountered an error while uploading to Gever. Response status code is $"
-"{status}."
+"Encountered an error while uploading to Gever. Response status code is "
+"${status}."
 msgstr ""
 "Une erreur s'est produite lors du téléchargement sur Gever. Le code d'état "
 "de la réponse est ${status}."
@@ -8447,6 +8470,9 @@ msgstr "L'utilisateur a bien été créé"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
+#~ msgid "Form fields"
+#~ msgstr "Champs du formulaire"
+
 #, python-format
 #~ msgid "Syntax Error in line ${line}"
 #~ msgstr "Erreur de syntaxe sur la ligne ${line}"
@@ -8489,11 +8515,11 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 #~ "supprimez l'adresse de notification dans les paramètres du répertoire."
 
 #~ msgid ""
-#~ "Receives an e-mail when entries are published or de-published. Useful "
-#~ "e.g. for permit directories."
+#~ "Receives an e-mail when entries are published or de-published. Useful e."
+#~ "g. for permit directories."
 #~ msgstr ""
-#~ "Reçoit un e-mail lorsque des entrées sont publiées ou dépubliées. Utile "
-#~ "p.ex. pour les répertoires de permis."
+#~ "Reçoit un e-mail lorsque des entrées sont publiées ou dépubliées. Utile p."
+#~ "ex. pour les répertoires de permis."
 
 #~ msgid ""
 #~ "Receives an e-mail when entries are published, de-published or deleted. "
