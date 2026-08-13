@@ -822,6 +822,7 @@ def test_send_daily_reservation_reminders(client: Client[TestOrgApp]) -> None:
     assert 'Erinnerung: Ihre Reservation für Fancy Room' in mail['Subject']
     body = mail['TextBody']
     assert 'Erinnerung an Ihre bevorstehende Reservation' in body
+    assert 'Erinnerung an Ihre bevorstehenden Reservationen' not in body
     assert f'/resource/{resource_name}' in body
     assert str(ten_days.weekday()) in body
     assert str(ten_days.month) in body
@@ -832,7 +833,64 @@ def test_send_daily_reservation_reminders(client: Client[TestOrgApp]) -> None:
     # the reservation confirmation
     assert 'Alice Miller' in body
 
-    # TODO: extend test if multiple resources are reserved
+
+def test_send_daily_reservation_reminders_groups_by_recipient(
+    client: Client[TestOrgApp]
+) -> None:
+    """A person reserving multiple rooms on the same day gets a single
+    email listing all reservations."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # the same person reserves two different rooms on the target day
+    add_reservation(
+        fancy,
+        session,
+        email='reservee@example.org',
+        start=datetime(day.year, day.month, day.day, 12, 0),
+        end=datetime(day.year, day.month, day.day, 13, 0),
+    )
+    add_reservation(
+        plain,
+        session,
+        email='reservee@example.org',
+        start=datetime(day.year, day.month, day.day, 14, 0),
+        end=datetime(day.year, day.month, day.day, 15, 0),
+    )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    assert 'Erinnerung: Ihre bevorstehenden Reservationen' in mail['Subject']
+    body = mail['TextBody']
+    assert 'Erinnerung an Ihre bevorstehenden Reservationen' in body
+    assert 'Erinnerung an Ihre bevorstehende Reservation' not in body
+    assert all(item in body for item in (
+        'Fancy Room', 'Plain Room', 'Anzahl', '2',
+        '12:00', '13:00', '14:00', '15:00'
+    ))
 
 
 @pytest.mark.parametrize('secret_content_allowed', [False, True])

@@ -739,33 +739,53 @@ def send_daily_reservation_reminders(request: OrgRequest) -> None:
 
     layout = DefaultMailLayout(object(), request)
 
+    reservations_by_email: dict[str, list[Reservation]] = {}
     for reservation in all_reservations:
-        resource = resources_by_id.get(reservation.resource)
-        if resource is None:
-            continue
+        if reservation.resource in resources_by_id:
+            reservations_by_email.setdefault(
+                reservation.email, []
+            ).append(reservation)
 
-        submission = submissions.get(reservation.token)
-        title = request.translate(
-            _('Reminder: your reservation for ${resource}', mapping={
-                'resource': resource.title
-            })
-        )
+    for email, reservations in reservations_by_email.items():
+        items = [
+            {
+                'resource': resources_by_id[reservation.resource],
+                'resource_url': request.link(
+                    resources_by_id[reservation.resource]
+                ),
+                'reservation': reservation,
+                'form': (
+                    submission.form_obj
+                    if (submission := submissions.get(reservation.token))
+                    else None
+                ),
+            }
+            for reservation in reservations
+        ]
+
+        if len(items) == 1:
+            title = request.translate(
+                _('Reminder: your reservation for ${resource}', mapping={
+                    'resource': items[0]['resource'].title
+                })
+            )
+        else:
+            title = request.translate(
+                _('Reminder: your upcoming reservations')
+            )
 
         content = render_template(
             'mail_daily_reservation_reminder.pt', request, {
                 'layout': layout,
                 'title': title,
                 'organisation': request.app.org.title,
-                'resource': resource,
-                'resource_url': request.link(resource),
-                'reservation': reservation,
-                'form': submission.form_obj if submission else None,
+                'reservations': items,
             }
         )
 
         request.app.send_transactional_email(
             subject=title,
-            receivers=(reservation.email, ),
+            receivers=(email, ),
             content=content
         )
 

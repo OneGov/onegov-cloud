@@ -5392,8 +5392,14 @@ msgstr ""
 " ${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
 "contatta un amministratore affinché ti rimuova dall'elenco dei destinatari."
 
-msgid "This is a friendly reminder for your upcoming reservation."
-msgstr "Questo è un cortese promemoria per la vostra prossima prenotazione."
+msgid "This is a reminder for your upcoming reservation."
+msgstr "Questo è un promemoria per la vostra prossima prenotazione."
+
+msgid "This is a reminder for your upcoming reservations."
+msgstr "Questo è un promemoria per le vostre prossime prenotazioni."
+
+msgid "Reminder: your upcoming reservations"
+msgstr "Promemoria: le vostre prossime prenotazioni"
 
 msgid "Reservation confirmation"
 msgstr "Conferma della prenotazione"

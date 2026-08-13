@@ -5420,8 +5420,14 @@ msgstr ""
 "recevoir cet e-mail, veuillez contacter un administrateur afin qu'il vous "
 "retire de la liste des destinataires."
 
-msgid "This is a friendly reminder for your upcoming reservation."
-msgstr "Ceci est un rappel amical concernant votre prochaine réservation."
+msgid "This is a reminder for your upcoming reservation."
+msgstr "Ceci est un rappel concernant votre prochaine réservation."
+
+msgid "This is a reminder for your upcoming reservations."
+msgstr "Ceci est un rappel concernant vos prochaines réservations."
+
+msgid "Reminder: your upcoming reservations"
+msgstr "Rappel : vos prochaines réservations"
 
 msgid "Reservation confirmation"
 msgstr "Confirmation de réservation"

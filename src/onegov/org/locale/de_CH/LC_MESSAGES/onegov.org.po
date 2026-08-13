@@ -5406,9 +5406,14 @@ msgstr ""
 "dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
 "Administrator damit dieser Sie von der Empfängerliste streichen kann."
 
-msgid "This is a friendly reminder for your upcoming reservation."
-msgstr ""
-"Dies ist eine freundliche Erinnerung an Ihre bevorstehende Reservation."
+msgid "This is a reminder for your upcoming reservation."
+msgstr "Dies ist eine Erinnerung an Ihre bevorstehende Reservation."
+
+msgid "This is a reminder for your upcoming reservations."
+msgstr "Dies ist eine Erinnerung an Ihre bevorstehenden Reservationen."
+
+msgid "Reminder: your upcoming reservations"
+msgstr "Erinnerung: Ihre bevorstehenden Reservationen"
 
 msgid "Reservation confirmation"
 msgstr "Reservationsbestätigung"
