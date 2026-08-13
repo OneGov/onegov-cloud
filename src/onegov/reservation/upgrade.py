@@ -12,10 +12,11 @@ from onegov.form.parser import ParsedForm
 from onegov.form.orm_types import Formcode
 from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
-from sqlalchemy import bindparam, text, Column, Enum, ForeignKey, Text, UUID
+from sqlalchemy import (
+    bindparam, text, Column, Enum, ForeignKey, Integer, Text, UUID)
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.upgrade import UpgradeContext
 
@@ -441,3 +442,60 @@ def resources_switch_to_parsed_form(context: UpgradeContext) -> None:
 
     # finally remove the old column
     context.operations.drop_column('resources', 'definition')
+
+
+def backfill_reserved_slot_source_ids(session: Any) -> None:
+    """ Sets ``source_id`` on every reserved slot to the id of its owning
+    reservation/blocker, and deletes slots that belong to no object (orphans
+    left behind when a reservation/blocker was deleted without its slots).
+
+    On partly_available allocations the slot falls within the owner's range;
+    otherwise (whole allocation, or group owners without a range) the
+    allocation group identifies the owner.
+    """
+    for source_type, table in (
+        ('reservation', 'reservations'),
+        ('blocker', 'reservation_blockers'),
+    ):
+        session.execute(text(
+            'UPDATE reserved_slots rs SET source_id = ('
+            f'  SELECT o.id FROM {table} o'
+            '   JOIN allocations a ON a.id = rs.allocation_id'
+            '  WHERE o.token = rs.reservation_token'
+            '    AND o.target = a."group"'
+            '    AND (o.start IS NULL OR a.partly_available = false'
+            '         OR (rs.start >= o.start AND rs."end" <= o."end"))'
+            '  ORDER BY o.id LIMIT 1'
+            ') '
+            f"WHERE rs.source_type = '{source_type}' "
+            'AND rs.source_id IS NULL'
+        ))
+
+    session.execute(
+        text('DELETE FROM reserved_slots WHERE source_id IS NULL')
+    )
+
+
+@upgrade_task('Add source_id to reserved slots')
+def add_source_id_to_reserved_slots(context: UpgradeContext) -> None:
+    """ Records the owning reservation/blocker id on each reserved slot so a
+    slot can be attributed to its exact object directly, instead of inferring
+    it from the allocation and time range. Slots that belong to no object are
+    orphans (their reservation/blocker was already deleted) and are removed.
+    """
+
+    if not run_upgrades(context):
+        return
+
+    if context.has_column('reserved_slots', 'source_id'):
+        return
+
+    context.operations.add_column(
+        'reserved_slots', Column('source_id', Integer, nullable=True)
+    )
+
+    backfill_reserved_slot_source_ids(context.session)
+
+    context.operations.create_index(
+        'ix_reserved_slots_source_id', 'reserved_slots', ['source_id']
+    )

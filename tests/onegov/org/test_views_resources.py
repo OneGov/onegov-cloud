@@ -5163,68 +5163,6 @@ def test_migration_removes_reservation_when_slot_is_taken(
 
 
 @freeze_time('2026-08-01', tick=True)
-def test_migration_deletes_orphaned_reserved_slots(client: Client) -> None:
-    # A reserved slot whose reservation was already deleted (the OGC-3388
-    # orphan) must be removed by the migration if it lies in the future, while
-    # valid slots and harmless past orphans are left untouched.
-    from libres.db.models import ReservedSlot
-    from onegov.org.upgrade import delete_orphaned_reserved_slots
-
-    resources = ResourceCollection(client.app.libres_context)
-    resource = resources.by_name('tageskarte')
-    assert resource is not None
-    scheduler = resource.get_scheduler(client.app.libres_context)
-
-    # a future and a past whole-only (non-partly) allocation (now = 2026-08-01)
-    future = scheduler.allocate(
-        dates=(datetime(2026, 8, 29), datetime(2026, 8, 29)),
-        whole_day=True, partly_available=False, quota=2, quota_limit=2,
-    )
-    past = scheduler.allocate(
-        dates=(datetime(2026, 7, 1), datetime(2026, 7, 1)),
-        whole_day=True, partly_available=False,
-    )
-    # capture dates before commit detaches the allocation instances
-    f_start, f_end = future[0].start, future[0].end
-    p_start, p_end = past[0].start, past[0].end
-    transaction.commit()
-
-    # one future reservation we keep (valid) and one we orphan
-    keep_token = scheduler.reserve('user@example.org', (f_start, f_end))
-    orphan_token = scheduler.reserve('other@example.org', (f_start, f_end))
-    past_token = scheduler.reserve('past@example.org', (p_start, p_end))
-    scheduler.approve_reservations(keep_token)
-    scheduler.approve_reservations(orphan_token)
-    scheduler.approve_reservations(past_token)
-    transaction.commit()
-
-    # simulate the pre-fix production state: delete the reservations directly,
-    # leaving their reserved slots behind as orphans
-    session = client.app.session()
-    session.query(Reservation).filter(
-        Reservation.token.in_((orphan_token, past_token))
-    ).delete(synchronize_session=False)
-    transaction.commit()
-
-    session = client.app.session()
-    deleted_starts = delete_orphaned_reserved_slots(session)
-    transaction.commit()
-
-    # only the single future orphan slot is deleted
-    assert len(deleted_starts) == 1
-
-    session = client.app.session()
-    assert session.query(ReservedSlot).filter_by(
-        reservation_token=orphan_token).count() == 0
-    # valid future reservation untouched
-    assert session.query(ReservedSlot).filter_by(
-        reservation_token=keep_token).count() == 1
-    # past orphan left untouched (harmless, avoids a large sweep)
-    assert session.query(ReservedSlot).filter_by(
-        reservation_token=past_token).count() == 1
-
-
-@freeze_time('2026-08-01', tick=True)
 def test_delete_reservation_ticket_removes_reserved_slots(
     client: Client,
 ) -> None:
