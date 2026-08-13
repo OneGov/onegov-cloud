@@ -830,7 +830,22 @@ class ReservationHandler(Handler):
         return self.resource.reply_to
 
     def prepare_delete_ticket(self) -> None:
-        for reservation in self.reservations or ():
+        from libres.db.models import ReservedSlot
+
+        reservations = self.reservations
+        if not reservations:
+            return
+
+        # all reservations of a ticket share the token; delete their reserved
+        # slots too, otherwise deleting the reservations directly (instead of
+        # via the scheduler) leaves orphaned slots blocking the calendar
+        token = reservations[0].token
+        self.session.query(ReservedSlot).filter(
+            ReservedSlot.reservation_token == token,
+            ReservedSlot.source_type == 'reservation',
+        ).delete(synchronize_session=False)
+
+        for reservation in reservations:
             self.session.delete(reservation)
 
     @cached_property

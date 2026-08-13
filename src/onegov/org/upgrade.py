@@ -966,6 +966,71 @@ def recreate_missing_reserved_slots(context: UpgradeContext) -> None:
         )
 
 
+def delete_orphaned_reserved_slots(session: Any) -> list[Any]:
+    """ Deletes future reservation slots whose reservation no longer exists.
+
+    A libres bug on non-partly-available allocations matched a reservation's
+    slots by time range, but such slots span the whole allocation (wider than
+    the reservation range) and were therefore not found on removal, leaving an
+    orphan that kept showing on the availability view (OGC-3388).
+
+    Returns the ``start`` datetimes of the deleted slots. Only future slots are
+    removed; past orphans are harmless and left untouched to avoid a large
+    sweep.
+    """
+    import sedate
+    from libres.db.models import Reservation, ReservedSlot
+
+    now = sedate.utcnow()
+
+    no_reservation = (
+        session.query(Reservation)
+        .filter(Reservation.token == ReservedSlot.reservation_token)
+        .correlate(ReservedSlot)
+        .exists()
+    )
+
+    orphaned = (
+        session.query(ReservedSlot)
+        .filter(
+            ReservedSlot.source_type == 'reservation',
+            ReservedSlot.end >= now,
+            ~no_reservation,
+        )
+        .all()
+    )
+
+    deleted_starts: list[Any] = []
+    for slot in orphaned:
+        deleted_starts.append(slot.start)
+        session.delete(slot)
+
+    return deleted_starts
+
+
+@upgrade_task('Delete orphaned reserved slots')
+def delete_orphaned_reserved_slots_task(context: UpgradeContext) -> None:
+    """ Removes future reserved slots whose reservation was already deleted but
+    which stayed behind due to a libres bug on non-partly-available
+    allocations, keeping a deleted reservation visible on the calendar
+    (OGC-3388).
+    """
+    if (not context.has_table('reservations') or
+            not context.has_table('reserved_slots')):
+        return
+
+    deleted_starts = delete_orphaned_reserved_slots(context.session)
+
+    for start in deleted_starts:
+        date_str = (
+            start.strftime('%d.%m.%Y %H:%M') if start is not None else '?'
+        )
+        click.secho(
+            f'{context.schema}: deleted orphaned reserved slot {date_str}',
+            fg='yellow',
+        )
+
+
 @upgrade_task('Subscribe customer-message recipients to cancellation requests')
 def subscribe_customer_message_recipients_to_cancellation_requests(
     context: UpgradeContext
