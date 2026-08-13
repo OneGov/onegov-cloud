@@ -5206,6 +5206,9 @@ def test_delete_reservation_ticket_removes_reserved_slots(
     assert session.query(ReservedSlot).filter_by(
         reservation_token=token).count() == 0
 
+    # calling it again, now that the reservations are gone, is a no-op
+    session.query(Ticket).one().handler.prepare_delete_ticket()
+
 
 def _reserve_tageskarte_for_cancellation(client: Client) -> str:
     """Reserve a whole-day slot on 'tageskarte' with cancellation requests
