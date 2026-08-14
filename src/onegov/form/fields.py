@@ -1288,7 +1288,7 @@ class FormcodeField(TextAreaField):
         #        instead
         except AttributeError as exc:
             raise ValueError(
-                self.gettext(_('The form could not be parsed.'))
+                self.gettext('The form could not be parsed.')
             ) from exc
 
     def pre_validate(self, form: BaseForm) -> None:
@@ -1301,9 +1301,9 @@ class FormcodeField(TextAreaField):
             self.require_email_field
             and not parsed_form.has_required_email_field
         ):
-            raise ValidationError(self.gettext(_(
+            raise ValidationError(self.gettext(
                 "Define at least one required e-mail field ('E-Mail * = @@@')"
-            )))
+            ))
 
         if self.require_title_fields and not parsed_form.title_fields:
             raise ValidationError(self.gettext(
@@ -1314,10 +1314,10 @@ class FormcodeField(TextAreaField):
             for formfield_id, formfield in parsed_form._fields.items():
                 if formfield_id in self.reserved_fields:
                     raise ValidationError(
-                        self.gettext(_(
+                        self.gettext(
                             "'{label}' is a reserved name. "
                             "Please use a different name."
-                        )).format(label=formfield.label.text)
+                        ).format(label=formfield.label.text)
                     )
 
         if self.validate_prices and 'payment_method' in form:
@@ -1333,11 +1333,11 @@ class FormcodeField(TextAreaField):
                 #       has a payment_provider set.
                 if form['payment_method'].data != 'free':
                     # add the error message to both affected fields
-                    error = self.gettext(_(
+                    error = self.gettext(
                         "The field '{label}' contains a price that requires a "
                         "credit card payment. This is only allowed if credit "
                         "card payments are optional."
-                    )).format(label=formfield.label.text)
+                    ).format(label=formfield.label.text)
                     # if the payment_method field is below the form
                     # definition field, then validate will not have
                     # been run yet and we can only add process_errors
@@ -1357,10 +1357,10 @@ class FormcodeField(TextAreaField):
 
             if form['minimum_price_total'].data and not has_pricing:
                 # add the error message to all affected fields
-                error = self.gettext(_(
+                error = self.gettext(
                     'A minimum price total can only be set if at least one '
                     'priced field is defined.'
-                ))
+                )
                 # if the minimum_price_total field is below the form
                 # definition field, then validate will not have
                 # been run yet and we can only add process_errors
