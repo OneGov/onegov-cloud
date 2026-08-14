@@ -888,9 +888,148 @@ def test_send_daily_reservation_reminders_groups_by_recipient(
     assert 'Erinnerung an Ihre bevorstehenden Reservationen' in body
     assert 'Erinnerung an Ihre bevorstehende Reservation' not in body
     assert all(item in body for item in (
-        'Fancy Room', 'Plain Room', 'Anzahl', '2',
+        'Fancy Room', 'Plain Room', 'Anzahl',
         '12:00', '13:00', '14:00', '15:00'
     ))
+
+
+def test_send_daily_reservation_reminders_single_request(
+    client: Client[TestOrgApp]
+) -> None:
+    """Reservations booked in one request share a ticket and a single
+    confirmation, so the confirmation is shown only once."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # two slots of the same resource, reserved in a single request (one token)
+    slots = [
+        (datetime(day.year, day.month, day.day, 12, 0),
+         datetime(day.year, day.month, day.day, 13, 0)),
+        (datetime(day.year, day.month, day.day, 14, 0),
+         datetime(day.year, day.month, day.day, 15, 0)),
+    ]
+    for start, end in slots:
+        fancy.scheduler.allocate((start, end), partly_available=True)
+
+    token = fancy.scheduler.reserve('reservee@example.org', slots)
+    fancy.scheduler.approve_reservations(token)
+    with session.no_autoflush:
+        TicketCollection(session).open_ticket(
+            handler_code='RSV', handler_id=token.hex
+        )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    submissions = FormSubmissionCollection(session)
+    submissions.add_external(
+        form=fancy.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+        state='complete',
+        id=token,
+    )
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    body = mail['TextBody']
+    # both slots are listed
+    assert any(item in body for item in (
+        'Erinnerung an Ihre bevorstehenden Reservationen',
+        'Montag, 20. Januar 2025',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+    ))
+    # ... but the confirmation appears only once
+    assert body.count('Fancy Room') == 2  # 2 slots
+    assert body.count('Reservationsbestätigung') == 1
+    assert body.count('Alice') == 1
+    assert body.count('Miller') == 1
+
+    # second test: add another reservation request. Reminder email contains
+    # two sections with date(s) and reservation confirmation
+    resources = ResourceCollection(client.app.libres_context)
+    plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
+    plain.definition = """
+        Name = ___
+    """
+    slots = [
+        (datetime(day.year, day.month, day.day, 17, 0),
+         datetime(day.year, day.month, day.day, 20, 0)),
+    ]
+    for start, end in slots:
+        plain.scheduler.allocate((start, end), partly_available=True)
+
+    token = plain.scheduler.reserve('reservee@example.org', slots)
+    plain.scheduler.approve_reservations(token)
+    with session.no_autoflush:
+        TicketCollection(session).open_ticket(
+            handler_code='RSV', handler_id=token.hex
+        )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    submissions = FormSubmissionCollection(session)
+    submissions.add_external(
+        form=plain.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+        state='complete',
+        id=token,
+    )
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 2  # a second email
+    mail = client.get_email(1)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    body = mail['TextBody']
+    assert any(item in body for item in (
+        'Erinnerung an Ihre bevorstehenden Reservationen',
+        'Montag, 20. Januar 2025',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+        '17:00',
+        '20:00',
+    ))
+    # two sections, one for each reservation
+    assert body.count('Fancy Room') == 2  # 2 slots
+    assert body.count('Plain Room') == 1  # 1 slot
+    assert body.count('Reservationsbestätigung') == 2
+    assert body.count('Alice') == 2
+    assert body.count('Miller') == 2
 
 
 @pytest.mark.parametrize('secret_content_allowed', [False, True])

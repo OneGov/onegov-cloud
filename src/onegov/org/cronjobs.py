@@ -747,26 +747,29 @@ def send_daily_reservation_reminders(request: OrgRequest) -> None:
             ).append(reservation)
 
     for email, reservations in reservations_by_email.items():
-        items = [
-            {
+        items = []
+        seen_tokens = set()
+        for reservation in reservations:
+            # reservations booked in one request share a token and thus a
+            # single confirmation
+            submission = submissions.get(reservation.token)
+            if reservation.token in seen_tokens:
+                submission = None
+            else:
+                seen_tokens.add(reservation.token)
+            items.append({
                 'resource': resources_by_id[reservation.resource],
                 'resource_url': request.link(
                     resources_by_id[reservation.resource]
                 ),
                 'reservation': reservation,
-                'form': (
-                    submission.form_obj
-                    if (submission := submissions.get(reservation.token))
-                    else None
-                ),
-            }
-            for reservation in reservations
-        ]
+                'form': submission.form_obj if submission else None,
+            })
 
         if len(items) == 1:
             title = request.translate(
                 _('Reminder: your reservation for ${resource}', mapping={
-                    'resource': items[0]['resource'].title
+                    'resource': resources_by_id[reservations[0].resource].title
                 })
             )
         else:
