@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-08-11 16:32+0200\n"
-"PO-Revision-Date: 2022-03-15 10:52+0100\n"
+"POT-Creation-Date: 2026-08-14 12:33+0200\n"
+"PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -232,6 +232,13 @@ msgstr "Panoramica della prenotazione di ${org}"
 #, python-format
 msgid "Reminder: your reservation for ${resource}"
 msgstr "Promemoria: la vostra prenotazione per ${resource}"
+
+msgid "Send a reminder email to the reservee 10 days in advance"
+msgstr ""
+"Inviare un'e-mail di promemoria alla persona che ha prenotato 10 giorni prima"
+
+msgid "Reservation reminders"
+msgstr "Promemoria di prenotazione"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "È stato creato un ticket dalla loro chat"

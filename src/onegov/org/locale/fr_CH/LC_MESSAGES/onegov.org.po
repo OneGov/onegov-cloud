@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-08-11 16:32+0200\n"
-"PO-Revision-Date: 2022-03-15 10:50+0100\n"
+"POT-Creation-Date: 2026-08-14 12:33+0200\n"
+"PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -231,6 +231,13 @@ msgstr "Aperçu de la ${org} réservation"
 #, python-format
 msgid "Reminder: your reservation for ${resource}"
 msgstr "Rappel : votre réservation pour ${resource}"
+
+msgid "Send a reminder email to the reservee 10 days in advance"
+msgstr ""
+"Envoyer un e-mail de rappel à la personne ayant réservé 10 jours à l'avance"
+
+msgid "Reservation reminders"
+msgstr "Rappels de réservation"
 
 msgid "Your Chat has been turned into a ticket"
 msgstr "Un ticket a été créé à partir de votre chat"
