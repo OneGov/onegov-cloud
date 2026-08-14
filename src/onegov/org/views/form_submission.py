@@ -383,6 +383,7 @@ def handle_complete_submission(
 
                 if invoice_meta:
                     invoice = TicketInvoice(id=uuid4())
+                    invoice.invoicing_party = self.invoicing_party
                     request.session.add(invoice)
 
                     for item_meta in invoice_meta:

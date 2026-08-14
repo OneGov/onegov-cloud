@@ -922,6 +922,7 @@ def fix_missing_reserved_slots(
                 slot.resource = allocation.resource
                 slot.reservation_token = reservation.token
                 slot.source_type = 'reservation'
+                slot.source_id = reservation.id
                 allocation.reserved_slots.append(slot)
             recreated_starts.append(reservation.start)
 
