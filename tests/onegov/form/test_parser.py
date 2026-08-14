@@ -1508,7 +1508,7 @@ def test_help_indentation_error() -> None:
             [ ] Skiing
         << Please select all your preferred sports >>
         Name *= ___
-            << Please enter your name >>
+            << badly indented >>
         """
     ).lstrip('\n')
     with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
@@ -1531,7 +1531,7 @@ def test_help_indentation_error() -> None:
             ( ) No Condiments
         << Whether or not you want condiments in your hotdog? >>
         Name *= ___
-            << Please enter your name >>
+            << badly indented >>
         """
     ).lstrip('\n')
     with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
@@ -1582,12 +1582,29 @@ def test_help_indentation_error() -> None:
             ( ) No Condiments
         << Whether or not you want condiments in your hotdog? >>
         Name *= ___
-                << Please enter your name >>
+                << badly indented >>
         """
     ).lstrip('\n')
     with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
         parse_formcode(text, enable_edit_checks=True)
     assert excinfo.value.line == 14
+
+    # option deeper indented as preceding comment
+    text = dedent(
+        """
+        Verein = ___
+        Anlass * = ___
+        Besucherzahl *= 1..500
+        Verein / gemeinnützige Institution *=
+            ( ) Ja (-600.00 CHF)
+                Statuten beilegen = *.pdf
+        << badly indented as it belongs to option >>
+            ( ) Nein
+        """
+    ).lstrip('\n')
+    with pytest.raises(errors.InvalidCommentIndentSyntax) as excinfo:
+        parse_formcode(text, enable_edit_checks=True)
+    assert excinfo.value.line == 7
 
 
 def test_help_location_error() -> None:
