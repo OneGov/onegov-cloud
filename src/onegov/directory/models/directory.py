@@ -37,10 +37,11 @@ from uuid import uuid4, UUID
 from wtforms import FieldList
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, cast, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from builtins import type as _type  # type is shadowed in model
     from collections.abc import Mapping
+    from onegov.core.types import LaxFileDict
     from onegov.form import Form
     from onegov.form.parser.core import (
         BasicParsedField, FileParsedField, ParsedField)
@@ -356,7 +357,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
                             note=field.id,
                             reference=as_fileintent(
                                 content=BytesIO(
-                                    dictionary_to_binary(data)  # type: ignore[arg-type]
+                                    dictionary_to_binary(
+                                        cast('LaxFileDict', data)
+                                    )
                                 ),
                                 filename=data['filename']
                             )
@@ -424,7 +427,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
                                 note=f'{field.id}:{new_idx}',
                                 reference=as_fileintent(
                                     content=BytesIO(
-                                        dictionary_to_binary(data)  # type: ignore[arg-type]
+                                        dictionary_to_binary(
+                                        cast('LaxFileDict', data)
+                                    )
                                     ),
                                     filename=data['filename']
                                 )
