@@ -707,7 +707,8 @@ def send_daily_reservation_reminders(request: OrgRequest) -> None:
     )
     day_end = day_start + timedelta(days=1)
 
-    # load all accepted reservations starting on the target day
+    # accepted reservations starting on the target day; group reservations
+    # (NULL start) are excluded, but onegov.org never creates them anyway
     all_reservations = (
         request.session.query(Reservation)
         .filter(Reservation.status == 'approved')
@@ -730,7 +731,7 @@ def send_daily_reservation_reminders(request: OrgRequest) -> None:
     }
 
     # load the linked form submissions (the reservation confirmation)
-    submissions = {
+    submissions_by_id = {
         submission.id: submission
         for submission in request.session.query(FormSubmission).filter(
             FormSubmission.id.in_({r.token for r in all_reservations})
@@ -752,7 +753,7 @@ def send_daily_reservation_reminders(request: OrgRequest) -> None:
         for reservation in reservations:
             # reservations booked in one request share a token and thus a
             # single confirmation
-            submission = submissions.get(reservation.token)
+            submission = submissions_by_id.get(reservation.token)
             if reservation.token in seen_tokens:
                 submission = None
             else:
