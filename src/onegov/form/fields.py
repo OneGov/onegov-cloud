@@ -61,7 +61,7 @@ from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 
 
-from typing import Any, IO, Literal, TYPE_CHECKING
+from typing import Any, cast, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from collections.abc import Collection
@@ -386,7 +386,7 @@ class UploadField(FileField):
                 original = self.object_data
                 if isinstance(original, dict) and \
                         original.get('data') == raw_data:
-                    self.data = original  # type: ignore[assignment]
+                    self.data = cast('StrictFileDict', original)
                 else:
                     self.data = {
                         'data': raw_data,
