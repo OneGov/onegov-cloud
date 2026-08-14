@@ -59,19 +59,9 @@ SANE_HTML_ATTRS = {
     'ol': ['class']
 }
 
-# lines without these plaintext characters are excluded in html_to_text
-VALID_PLAINTEXT_CHARACTERS = re.compile(r"""
-    [
-        \d  # decimals
-        \w  # words
-        \n  # new lines
-
-        # emojis
-        \U00002600-\U000027BF
-        \U0001f300-\U0001f64F
-        \U0001f680-\U0001f6FF
-    ]+
-""", re.VERBOSE)
+# lines consisting solely of these characters are excluded in html_to_text;
+# any other character (words, digits, emoji of any kind) keeps the line
+DECORATION_ONLY_CHARACTERS = re.compile(r'[^\s\-*_|=#>.]')
 
 # match empty link expressions
 EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
@@ -155,7 +145,7 @@ def html_to_text(
         lines = (EMPTY_LINK.sub('', line) for line in lines)
 
     lines = (l.strip() for l in lines)
-    lines = (l for l in lines if VALID_PLAINTEXT_CHARACTERS.search(l))
+    lines = (l for l in lines if DECORATION_ONLY_CHARACTERS.search(l))
 
     # use double newlines to get paragraphs
     plaintext = '\n\n'.join(lines)

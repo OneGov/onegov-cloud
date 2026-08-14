@@ -923,6 +923,29 @@ def test_html_to_text() -> None:
     assert plaintext == "# Date\n\n6. April 1984\n\n# Path\n\n/foo-bar"
 
 
+def test_html_to_text_preserves_emoji_only_lines() -> None:
+    # a line consisting solely of an emoji must survive the plaintext
+    # conversion, including modern emoji outside the legacy ranges
+    for emoji in ('😀', '🎉', '🥳', '🫶', '🫠', '🩷', '🇨🇭', '🔴',
+                  '⌚', '⏰', '⭐', '⬛', '™️', '🀄', '🆒', '🈁', '🟰'):
+        html = f"<p>Liebe Eltern</p>\n<p>{emoji}</p>\n<p>Anmeldung offen</p>\n"
+        assert emoji in html_to_text(html), emoji
+
+
+def test_html_to_text_filters_empty_and_decoration_lines() -> None:
+    # empty, whitespace-only and pure markdown-decoration lines must be
+    # dropped, so they don't produce stray blank paragraphs in the plaintext
+    html = (
+        "<p>Hallo</p>\n"
+        "<p>   </p>\n"        # whitespace only
+        "<hr>\n"              # -> markdown '---'
+        "<p>***</p>\n"        # decoration only
+        "<p>Welt</p>\n"
+    )
+
+    assert html_to_text(html) == "Hallo\n\nWelt"
+
+
 def test_object_by_path() -> None:
 
     class App(Framework):
