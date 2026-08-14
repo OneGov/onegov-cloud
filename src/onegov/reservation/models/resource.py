@@ -161,6 +161,11 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: reservation lead time (in days)
     lead_time: dict_property[int | None] = content_property()
 
+    #: enable reservation reminder emails
+    enable_reservation_reminders: dict_property[bool] = content_property(
+        default=False
+    )
+
     #: the pricing method to use for extras defined in formcode
     extras_pricing_method: dict_property[str] = (
         content_property(default='per_item')

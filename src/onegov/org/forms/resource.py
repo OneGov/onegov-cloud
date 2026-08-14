@@ -233,6 +233,12 @@ class ResourceBaseForm(Form):
         ]
     )
 
+    enable_reservation_reminders = BooleanField(
+        label=_('Send a reminder email to the reservee 10 days in advance'),
+        fieldset=_('Reservation reminders'),
+        default=False,
+    )
+
     zipcode_block_use = BooleanField(
         label=_('Limit reservations to certain zip-codes'),
         fieldset=_('Zip-code limit'),

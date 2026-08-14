@@ -772,6 +772,7 @@ def test_send_daily_reservation_reminders_only_ten_days_ahead(
     fancy.definition = """
         Name = ___
     """
+    fancy.enable_reservation_reminders = True
 
     session = client.app.session()
 
@@ -847,7 +848,9 @@ def test_send_daily_reservation_reminders_groups_by_recipient(
 
     resources = ResourceCollection(client.app.libres_context)
     fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.enable_reservation_reminders = True
     plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
+    plain.enable_reservation_reminders = True
 
     session = client.app.session()
 
@@ -909,6 +912,7 @@ def test_send_daily_reservation_reminders_shared_confirmation(
     fancy.definition = """
         Name = ___
     """
+    fancy.enable_reservation_reminders = True
 
     session = client.app.session()
 
@@ -985,10 +989,12 @@ def test_send_daily_reservation_reminders_multiple_requests(
     fancy.definition = """
         Name = ___
     """
+    fancy.enable_reservation_reminders = True
     plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
     plain.definition = """
         Name = ___
     """
+    plain.enable_reservation_reminders = True
 
     session = client.app.session()
 
@@ -1057,6 +1063,71 @@ def test_send_daily_reservation_reminders_multiple_requests(
     assert body.count('Reservationsbestätigung') == 2
     assert body.count('Alice') == 2
     assert body.count('Miller') == 2
+
+
+def test_send_daily_reservation_reminders_only_enabled_resources(
+    client: Client[TestOrgApp]
+) -> None:
+    """Reminders are sent only for resources with reminders enabled;
+    reservations of disabled resources are ignored."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    enabled = resources.add('Enabled Room', 'Europe/Zurich', type='room')
+    enabled.enable_reservation_reminders = True
+    disabled = resources.add('Disabled Room', 'Europe/Zurich', type='room')
+    disabled.enable_reservation_reminders = False
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # one person books both rooms; another books only the disabled room
+    add_reservation(
+        enabled,
+        session,
+        email='mixed@example.org',
+        start=datetime(day.year, day.month, day.day, 12, 0),
+        end=datetime(day.year, day.month, day.day, 13, 0),
+    )
+    add_reservation(
+        disabled,
+        session,
+        email='mixed@example.org',
+        start=datetime(day.year, day.month, day.day, 14, 0),
+        end=datetime(day.year, day.month, day.day, 15, 0),
+    )
+    add_reservation(
+        disabled,
+        session,
+        email='disabled-only@example.org',
+        start=datetime(day.year, day.month, day.day, 16, 0),
+        end=datetime(day.year, day.month, day.day, 17, 0),
+    )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    # only the person with an enabled-room reservation is reminded, and their
+    # disabled-room reservation is not listed
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'mixed@example.org'
+    body = mail['TextBody']
+    assert 'Enabled Room' in body
+    assert 'Disabled Room' not in body
 
 
 @pytest.mark.parametrize('secret_content_allowed', [False, True])

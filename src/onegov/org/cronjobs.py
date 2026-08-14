@@ -725,9 +725,9 @@ def send_daily_reservation_reminders(request: OrgRequest) -> None:
     resources = ResourceCollection(request.app.libres_context)
     resources_by_id = {
         resource.id: resource
-        for resource in resources.query().filter(
-            Resource.id.in_({r.resource for r in all_reservations})
-        )
+        for resource in resources.query()
+        .filter(Resource.id.in_({r.resource for r in all_reservations}))
+        .filter(Resource.enable_reservation_reminders)
     }
 
     # load the linked form submissions (the reservation confirmation)
