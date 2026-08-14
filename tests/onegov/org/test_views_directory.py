@@ -103,7 +103,8 @@ def create_directory(
     title: str = 'Meetings',
     lead: str | None = None,
     text: str | None = None,
-    pdf: bool = False
+    pdf: bool = False,
+    multi: bool = False
 ) -> ExtendedResponse:
 
     client.login_admin()
@@ -113,18 +114,16 @@ def create_directory(
         page.form['lead'] = lead
     if text:
         page.form['text'] = text
+    lines = ['Name *= ___', 'Pic *= *.jpg|*.png|*.gif']
+    content_fields = 'Name\nPic'
     if pdf:
-        page.form['structure'] = """
-                    Name *= ___
-                    Pic *= *.jpg|*.png|*.gif
-                    Pdf *= *.pdf
-                """
-    else:
-        page.form['structure'] = """
-                    Name *= ___
-                    Pic *= *.jpg|*.png|*.gif
-                """
-    page.form['content_fields'] = 'Name\nPic\nPdf' if pdf else 'Name\nPic'
+        lines.append('Pdf *= *.pdf')
+        content_fields += '\nPdf'
+    if multi:
+        lines.append('Docs *= *.pdf (multiple)')
+        content_fields += '\nDocs'
+    page.form['structure'] = '\n'.join(lines)
+    page.form['content_fields'] = content_fields
     page.form['content_hide_labels'] = 'Pic'
     page.form['title_format'] = '[Name]'
     page.form['enable_map'] = 'entry'
@@ -269,6 +268,76 @@ def test_attachment_preserved_on_edit_validation_error(
     # the pdf attachment must have been preserved too
     files = {f.name for f in dir_query(client).one().files}
     assert 'annual.pdf' in files
+
+
+def test_multiple_attachments_preserved_on_validation_error(
+    client: Client
+) -> None:
+    # Multiple file uploads must also survive a validation error re-render
+    # so the user doesn't have to re-select every file.
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=True, multi=True)
+
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['docs'] = [
+        Upload('one.pdf', create_pdf().read()),
+        Upload('two.pdf', create_pdf().read()),
+    ]
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = page.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the publication date, but do NOT re-upload the files
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=1))
+    entry = page.form.submit().follow()
+
+    assert get_meta(entry, 'og:image')
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'one.pdf' in files
+    assert 'two.pdf' in files
+
+
+def test_multiple_attachments_preserved_on_edit_validation_error(
+    client: Client
+) -> None:
+    # Editing an entry with multiple attachments and saving it with a
+    # publication date in the past must keep all of them.
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=True, multi=True)
+
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['docs'] = [
+        Upload('one.pdf', create_pdf().read()),
+        Upload('two.pdf', create_pdf().read()),
+    ]
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=10))
+    entry = page.form.submit().follow()
+    assert {'one.pdf', 'two.pdf'} <= {
+        f.name for f in dir_query(client).one().files
+    }
+
+    edit = client.get(entry.request.url + '/edit')
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the date without touching the attachments
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    entry = page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'one.pdf' in files
+    assert 'two.pdf' in files
 
 
 def test_required_publication(client: Client) -> None:

@@ -413,7 +413,31 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     # keep files if selected in the dialog
                     if getattr(subfield_values, 'action', None) == 'keep':
                         if len(old_values) <= old_idx:
-                            # it doesn't exist so we can't keep it
+                            # new entry: rebuild from the resent upload
+                            data = getattr(subfield_values, 'data', None) or {}
+                            if not data.get('data'):
+                                continue
+
+                            new_file = DirectoryFile(
+                                id=random_token(),
+                                name=data['filename'],
+                                note=f'{field.id}:{new_idx}',
+                                reference=as_fileintent(
+                                    content=BytesIO(
+                                        dictionary_to_binary(data)  # type: ignore[arg-type]
+                                    ),
+                                    filename=data['filename']
+                                )
+                            )
+                            entry.files.append(new_file)
+                            ref = new_file.reference.file
+                            updated[field.id].append({
+                                'data': '@' + new_file.id,
+                                'filename': data['filename'],
+                                'mimetype': ref.content_type,
+                                'size': ref.content_length
+                            })
+                            new_idx += 1
                             continue
 
                         original = old_values[old_idx]
