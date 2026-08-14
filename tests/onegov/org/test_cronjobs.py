@@ -767,6 +767,374 @@ def test_daily_reservation_overview_delivery_times(
     assert len(os.listdir(client.app.maildir)) == 0
 
 
+def test_send_daily_reservation_reminders_only_ten_days_ahead(
+    client: Client[TestOrgApp]
+) -> None:
+    """Only the reservation exactly 10 days ahead gets a reminder e-mail."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
+    fancy.enable_reservation_reminders = True
+
+    session = client.app.session()
+
+    # cronjob fires at 06:56 Europe/Zurich; freeze at a fixed "now".
+    # January Zurich = CET (UTC+1), so 06:56 Zurich = 05:56 UTC.
+    now_utc = datetime(2025, 1, 10, 5, 56)
+
+    # a reservation 8, 9, 10 and 11 days ahead (12:00 Zurich each day)
+    for days in (8, 9, 10, 11):
+        day = (now_utc + timedelta(days=days)).date()
+        add_reservation(
+            fancy,
+            session,
+            email=f'reservee-{days}@example.org',
+            start=datetime(day.year, day.month, day.day, 12, 0),
+            end=datetime(day.year, day.month, day.day, 13, 0),
+        )
+
+    # the cronjob only considers accepted reservations
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    # attach a submission to the 10-day reservation (the confirmation)
+    resource_name = fancy.name
+    ten_days = (now_utc + timedelta(days=10)).date()
+    ten_day_reservation = session.query(Reservation).filter(
+        Reservation.email == 'reservee-10@example.org'
+    ).one()
+    submissions = FormSubmissionCollection(session)
+    submissions.add_external(
+        form=fancy.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+        state='complete',
+        id=ten_day_reservation.token,
+    )
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    # only the 10-day reservation is reminded; the 8, 9 and 11-day ones
+    # fall outside the window and must not trigger any email
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee-10@example.org'
+    assert 'Erinnerung: Ihre Reservation für Fancy Room' in mail['Subject']
+    body = mail['TextBody']
+    assert 'Erinnerung an Ihre bevorstehende Reservation' in body
+    assert 'Erinnerung an Ihre bevorstehenden Reservationen' not in body
+    assert f'/resource/{resource_name}' in body
+    assert str(ten_days.weekday()) in body
+    assert str(ten_days.month) in body
+    assert str(ten_days.year) in body
+    assert '12:00' in body
+    assert '13:00' in body
+    assert 'Anzahl' in body
+    # the reservation confirmation
+    assert 'Alice Miller' in body
+
+
+def test_send_daily_reservation_reminders_groups_by_recipient(
+    client: Client[TestOrgApp]
+) -> None:
+    """A person reserving multiple rooms on the same day gets a single
+    email listing all reservations."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.enable_reservation_reminders = True
+    plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
+    plain.enable_reservation_reminders = True
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # the same person reserves two different rooms on the target day
+    add_reservation(
+        fancy,
+        session,
+        email='reservee@example.org',
+        start=datetime(day.year, day.month, day.day, 12, 0),
+        end=datetime(day.year, day.month, day.day, 13, 0),
+    )
+    add_reservation(
+        plain,
+        session,
+        email='reservee@example.org',
+        start=datetime(day.year, day.month, day.day, 14, 0),
+        end=datetime(day.year, day.month, day.day, 15, 0),
+    )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    assert 'Erinnerung: Ihre bevorstehenden Reservationen' in mail['Subject']
+    body = mail['TextBody']
+    assert 'Erinnerung an Ihre bevorstehenden Reservationen' in body
+    assert 'Erinnerung an Ihre bevorstehende Reservation' not in body
+    assert all(item in body for item in (
+        'Fancy Room', 'Plain Room', 'Anzahl',
+        '12:00', '13:00', '14:00', '15:00'
+    ))
+
+
+def test_send_daily_reservation_reminders_shared_confirmation(
+    client: Client[TestOrgApp]
+) -> None:
+    """Reservations booked in one request share a ticket and a single
+    confirmation, so the confirmation is shown only once."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
+    fancy.enable_reservation_reminders = True
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # two slots of the same resource, reserved in a single request (one token)
+    slots = [
+        (datetime(day.year, day.month, day.day, 12, 0),
+         datetime(day.year, day.month, day.day, 13, 0)),
+        (datetime(day.year, day.month, day.day, 14, 0),
+         datetime(day.year, day.month, day.day, 15, 0)),
+    ]
+    for start, end in slots:
+        fancy.scheduler.allocate((start, end), partly_available=True)
+
+    token = fancy.scheduler.reserve('reservee@example.org', slots)
+    fancy.scheduler.approve_reservations(token)
+    with session.no_autoflush:
+        TicketCollection(session).open_ticket(
+            handler_code='RSV', handler_id=token.hex
+        )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    submissions = FormSubmissionCollection(session)
+    submissions.add_external(
+        form=fancy.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+        state='complete',
+        id=token,
+    )
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    body = mail['TextBody']
+    # both slots are listed
+    assert any(item in body for item in (
+        'Erinnerung an Ihre bevorstehenden Reservationen',
+        'Montag, 20. Januar 2025',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+    ))
+    # ... but the confirmation appears only once
+    assert body.count('Fancy Room') == 2  # 2 slots
+    assert body.count('Reservationsbestätigung') == 1
+    assert body.count('Alice') == 1
+    assert body.count('Miller') == 1
+
+
+def test_send_daily_reservation_reminders_multiple_requests(
+    client: Client[TestOrgApp]
+) -> None:
+    """A person booking several separate requests gets one email with a
+    section (date(s) and confirmation) for each request."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
+    fancy.enable_reservation_reminders = True
+    plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
+    plain.definition = """
+        Name = ___
+    """
+    plain.enable_reservation_reminders = True
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # first request: two slots of Fancy Room, sharing one token
+    fancy_slots = [
+        (datetime(day.year, day.month, day.day, 12, 0),
+         datetime(day.year, day.month, day.day, 13, 0)),
+        (datetime(day.year, day.month, day.day, 14, 0),
+         datetime(day.year, day.month, day.day, 15, 0)),
+    ]
+    # second request: one slot of Plain Room, its own token
+    plain_slots = [
+        (datetime(day.year, day.month, day.day, 17, 0),
+         datetime(day.year, day.month, day.day, 20, 0)),
+    ]
+    for resource, slots in ((fancy, fancy_slots), (plain, plain_slots)):
+        for start, end in slots:
+            resource.scheduler.allocate((start, end), partly_available=True)
+        token = resource.scheduler.reserve('reservee@example.org', slots)
+        resource.scheduler.approve_reservations(token)
+        with session.no_autoflush:
+            TicketCollection(session).open_ticket(
+                handler_code='RSV', handler_id=token.hex
+            )
+        submissions = FormSubmissionCollection(session)
+        submissions.add_external(
+            form=resource.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+            state='complete',
+            id=token,
+        )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    body = mail['TextBody']
+    assert any(item in body for item in (
+        'Erinnerung an Ihre bevorstehenden Reservationen',
+        'Montag, 20. Januar 2025',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+        '17:00',
+        '20:00',
+    ))
+    # two sections, one for each request
+    assert body.count('Fancy Room') == 2  # 2 slots
+    assert body.count('Plain Room') == 1  # 1 slot
+    assert body.count('Reservationsbestätigung') == 2
+    assert body.count('Alice') == 2
+    assert body.count('Miller') == 2
+
+
+def test_send_daily_reservation_reminders_only_enabled_resources(
+    client: Client[TestOrgApp]
+) -> None:
+    """Reminders are sent only for resources with reminders enabled;
+    reservations of disabled resources are ignored."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    enabled = resources.add('Enabled Room', 'Europe/Zurich', type='room')
+    enabled.enable_reservation_reminders = True
+    disabled = resources.add('Disabled Room', 'Europe/Zurich', type='room')
+    disabled.enable_reservation_reminders = False
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # one person books both rooms; another books only the disabled room
+    add_reservation(
+        enabled,
+        session,
+        email='mixed@example.org',
+        start=datetime(day.year, day.month, day.day, 12, 0),
+        end=datetime(day.year, day.month, day.day, 13, 0),
+    )
+    add_reservation(
+        disabled,
+        session,
+        email='mixed@example.org',
+        start=datetime(day.year, day.month, day.day, 14, 0),
+        end=datetime(day.year, day.month, day.day, 15, 0),
+    )
+    add_reservation(
+        disabled,
+        session,
+        email='disabled-only@example.org',
+        start=datetime(day.year, day.month, day.day, 16, 0),
+        end=datetime(day.year, day.month, day.day, 17, 0),
+    )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    # only the person with an enabled-room reservation is reminded, and their
+    # disabled-room reservation is not listed
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'mixed@example.org'
+    body = mail['TextBody']
+    assert 'Enabled Room' in body
+    assert 'Disabled Room' not in body
+
 
 @pytest.mark.parametrize('secret_content_allowed', [False, True])
 def test_send_scheduled_newsletters(
