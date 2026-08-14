@@ -761,7 +761,9 @@ def test_daily_reservation_overview_delivery_times(
     assert len(os.listdir(client.app.maildir)) == 0
 
 
-def test_send_daily_reservation_reminders(client: Client[TestOrgApp]) -> None:
+def test_send_daily_reservation_reminders_only_ten_days_ahead(
+    client: Client[TestOrgApp]
+) -> None:
     """Only the reservation exactly 10 days ahead gets a reminder e-mail."""
     from onegov.reservation import Reservation
 
@@ -815,6 +817,8 @@ def test_send_daily_reservation_reminders(client: Client[TestOrgApp]) -> None:
     with freeze_time(now_utc, tick=True):
         client.get(url)
 
+    # only the 10-day reservation is reminded; the 8, 9 and 11-day ones
+    # fall outside the window and must not trigger any email
     assert len(os.listdir(client.app.maildir)) == 1
     mail = client.get_email(0)
     assert mail is not None
@@ -893,7 +897,7 @@ def test_send_daily_reservation_reminders_groups_by_recipient(
     ))
 
 
-def test_send_daily_reservation_reminders_single_request(
+def test_send_daily_reservation_reminders_shared_confirmation(
     client: Client[TestOrgApp]
 ) -> None:
     """Reservations booked in one request share a ticket and a single
@@ -968,36 +972,59 @@ def test_send_daily_reservation_reminders_single_request(
     assert body.count('Alice') == 1
     assert body.count('Miller') == 1
 
-    # second test: add another reservation request. Reminder email contains
-    # two sections with date(s) and reservation confirmation
+
+def test_send_daily_reservation_reminders_multiple_requests(
+    client: Client[TestOrgApp]
+) -> None:
+    """A person booking several separate requests gets one email with a
+    section (date(s) and confirmation) for each request."""
+    from onegov.reservation import Reservation
+
     resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
     plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
     plain.definition = """
         Name = ___
     """
-    slots = [
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # first request: two slots of Fancy Room, sharing one token
+    fancy_slots = [
+        (datetime(day.year, day.month, day.day, 12, 0),
+         datetime(day.year, day.month, day.day, 13, 0)),
+        (datetime(day.year, day.month, day.day, 14, 0),
+         datetime(day.year, day.month, day.day, 15, 0)),
+    ]
+    # second request: one slot of Plain Room, its own token
+    plain_slots = [
         (datetime(day.year, day.month, day.day, 17, 0),
          datetime(day.year, day.month, day.day, 20, 0)),
     ]
-    for start, end in slots:
-        plain.scheduler.allocate((start, end), partly_available=True)
-
-    token = plain.scheduler.reserve('reservee@example.org', slots)
-    plain.scheduler.approve_reservations(token)
-    with session.no_autoflush:
-        TicketCollection(session).open_ticket(
-            handler_code='RSV', handler_id=token.hex
+    for resource, slots in ((fancy, fancy_slots), (plain, plain_slots)):
+        for start, end in slots:
+            resource.scheduler.allocate((start, end), partly_available=True)
+        token = resource.scheduler.reserve('reservee@example.org', slots)
+        resource.scheduler.approve_reservations(token)
+        with session.no_autoflush:
+            TicketCollection(session).open_ticket(
+                handler_code='RSV', handler_id=token.hex
+            )
+        submissions = FormSubmissionCollection(session)
+        submissions.add_external(
+            form=resource.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+            state='complete',
+            id=token,
         )
 
     for reservation in session.query(Reservation):
         reservation.data = {'accepted': True}
-
-    submissions = FormSubmissionCollection(session)
-    submissions.add_external(
-        form=plain.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
-        state='complete',
-        id=token,
-    )
 
     transaction.commit()
 
@@ -1009,8 +1036,8 @@ def test_send_daily_reservation_reminders_single_request(
     with freeze_time(now_utc, tick=True):
         client.get(url)
 
-    assert len(os.listdir(client.app.maildir)) == 2  # a second email
-    mail = client.get_email(1)
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
     assert mail is not None
     assert mail['To'] == 'reservee@example.org'
     body = mail['TextBody']
@@ -1024,7 +1051,7 @@ def test_send_daily_reservation_reminders_single_request(
         '17:00',
         '20:00',
     ))
-    # two sections, one for each reservation
+    # two sections, one for each request
     assert body.count('Fancy Room') == 2  # 2 slots
     assert body.count('Plain Room') == 1  # 1 slot
     assert body.count('Reservationsbestätigung') == 2
