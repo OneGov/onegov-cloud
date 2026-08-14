@@ -44,7 +44,7 @@ from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob import Response
-from webob.exc import HTTPForbidden
+from webob.exc import HTTPForbidden, HTTPBadRequest
 from sedate import utcnow
 from wtforms import TextAreaField
 from wtforms.validators import InputRequired
@@ -1151,6 +1151,8 @@ def view_zip_file(
     format = request.params.get('format')
     if not isinstance(format, str):
         format = 'json'
+    if format not in ('xlsx', 'csv', 'json'):
+        raise HTTPBadRequest('Invalid export format: ' + format)
     formatter = layout.export_formatter(format)
 
     def transform(key: object, value: object) -> tuple[Any, Any]:
