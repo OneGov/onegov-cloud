@@ -2107,16 +2107,14 @@ def translate_to_yaml(
         parse_result = try_parse(ELEMENTS.boxes, line)
         if parse_result is not None:
 
-            # an option indented deeper than a preceding help comment would
-            # reopen a group the comment already closed (the comment
-            # de-indented past the still-open option group)
+            # a deeper option after a less-deep comment reopens the group the
+            # comment already closed
             if (
                 enable_edit_checks
                 and last_comment_line is not None
                 and indent_stack
                 and len_indent > indent_stack[-1]
             ):
-                print('*** tschupre raise invalid comment indent 2')
                 raise errors.InvalidCommentIndentSyntax(line=last_comment_line)
             last_comment_line = None
 
