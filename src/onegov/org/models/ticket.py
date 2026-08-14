@@ -833,25 +833,17 @@ class ReservationHandler(Handler):
         assert self.resource is not None
         return self.resource.reply_to
 
-    def prepare_delete_ticket(self) -> None:
-        from libres.db.models import ReservedSlot
-
+    def prepare_delete_ticket(
+        self,
+        request: OrgRequest  # type:ignore[override]
+    ) -> None:
         reservations = self.reservations
         if not reservations:
             return
 
-        # FIXME: replace this with scheduler.remove_reservation
-        # all reservations of a ticket share the token; delete their reserved
-        # slots too, otherwise deleting the reservations directly (instead of
-        # via the scheduler) leaves orphaned slots blocking the calendar
-        token = reservations[0].token
-        self.session.query(ReservedSlot).filter(
-            ReservedSlot.reservation_token == token,
-            ReservedSlot.source_type == 'reservation',
-        ).delete(synchronize_session=False)
-
-        for reservation in reservations:
-            self.session.delete(reservation)
+        resource = request.app.libres_resources.by_reservation(reservations[0])
+        assert resource is not None
+        resource.scheduler.remove_reservation(reservations[0].token)
 
     @cached_property
     def ticket_deletable(self) -> bool:

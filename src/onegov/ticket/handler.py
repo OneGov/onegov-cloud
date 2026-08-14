@@ -352,7 +352,7 @@ class Handler:
             return False
         return True
 
-    def prepare_delete_ticket(self) -> None:
+    def prepare_delete_ticket(self, request: CoreRequest) -> None:
         """The handler knows best what to do when a ticket is called for
         deletion. """
         assert self.ticket_deletable

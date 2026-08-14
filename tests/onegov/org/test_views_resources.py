@@ -32,6 +32,7 @@ from pathlib import Path
 from sqlalchemy import exc
 from sqlalchemy.orm.session import close_all_sessions
 from tests.onegov.org.common import ticket_message_owners
+from types import SimpleNamespace
 from tests.shared.utils import add_reservation
 from unittest.mock import patch
 from urllib.parse import quote
@@ -39,9 +40,10 @@ from uuid import UUID, uuid4
 from webtest import Upload
 
 
-from typing import TYPE_CHECKING, Any
+from typing import cast, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
     from unittest.mock import MagicMock
     from .conftest import Client
 
@@ -5198,7 +5200,8 @@ def test_delete_reservation_ticket_removes_reserved_slots(
     assert session.query(ReservedSlot).filter_by(
         reservation_token=token).count() > 0
 
-    ticket.handler.prepare_delete_ticket()
+    request = cast('OrgRequest', SimpleNamespace(app=client.app))
+    ticket.handler.prepare_delete_ticket(request)
     transaction.commit()
 
     session = client.app.session()
@@ -5207,7 +5210,7 @@ def test_delete_reservation_ticket_removes_reserved_slots(
         reservation_token=token).count() == 0
 
     # calling it again, now that the reservations are gone, is a no-op
-    session.query(Ticket).one().handler.prepare_delete_ticket()
+    session.query(Ticket).one().handler.prepare_delete_ticket(request)
 
 
 def _reserve_tageskarte_for_cancellation(client: Client) -> str:

@@ -1241,7 +1241,7 @@ def delete_time_report(
     if ticket:
         assert isinstance(ticket.handler, TimeReportHandler)
         if ticket.handler.ticket_deletable:
-            ticket.handler.prepare_delete_ticket()
+            ticket.handler.prepare_delete_ticket(request)
             request.session.delete(ticket)
 
     request.session.delete(self)

@@ -220,7 +220,7 @@ def delete_ticket(
 
         delete_messages_from_ticket(request, self.number)
 
-        self.handler.prepare_delete_ticket()
+        self.handler.prepare_delete_ticket(request)
 
         request.session.delete(self)
         request.success(_('Ticket successfully deleted'))
@@ -1889,7 +1889,7 @@ def delete_tickets_and_related_data(
             ticket.redact_data()
             continue
 
-        ticket.handler.prepare_delete_ticket()
+        ticket.handler.prepare_delete_ticket(request)
         delete_messages_from_ticket(request, ticket.number)
 
         if invoice := ticket.invoice:
