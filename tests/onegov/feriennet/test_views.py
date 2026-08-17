@@ -4176,3 +4176,11 @@ def test_notification_edit_cancel_returns_to_origin(
 
     edit = client.get(send.pyquery('a.control').attr('href'))
     assert edit.pyquery('a.cancel-link').attr('href') == origin
+
+
+def test_ticket_invoices_view_renders_in_feriennet(client: Client) -> None:
+    # feriennet's invoices.pt must not shadow the ticket invoice view
+    client.login_admin()
+
+    page = client.get('/invoices')
+    assert page.status_code == 200
