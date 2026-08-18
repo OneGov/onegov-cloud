@@ -11,17 +11,29 @@
         <tal:b condition="page.trait == 'page'">
 
             <tal:b metal:use-macro="layout.macros.page_content"
-             tal:define="lead layout.linkify(page.content.get('lead'));text page.text|None; people page.people; contact page.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links;">
-                <tal:b metal:fill-slot="after-lead"
-                       tal:define="manager request.is_manager">
+                   tal:define="
+                    lead layout.linkify(page.content.get('lead'));
+                    text page.text|None;
+                    people page.people;
+                    contact page.contact_html;
+                    coordinates page.coordinates;
+                    files page.files;
+                    sidepanel_links page.sidepanel_links;
+                    manager request.is_manager;
+                    show_side_panel python:manager and bool(page.keywords);
+                    ">
+                <tal:b metal:fill-slot="after-lead">
                     <div class="internal-notes"
                          tal:condition="manager and page.internal_notes">
                         <strong i18n:translate>Internal Comments</strong>
                         <p>${page.internal_notes}</p>
                     </div>
-                    <div class="page-keywords"
+                </tal:b>
+                <tal:b metal:fill-slot="after-panels">
+                    <div class="tag-filters borderless-side-panel
+                                page-keywords"
                          tal:condition="manager and page.keywords">
-                        <strong i18n:translate>Keywords</strong>
+                        <h2 i18n:translate>Keywords</h2>
                         <span class="blank-label"
                               tal:repeat="keyword page.keywords"
                               tal:content="keyword" />
