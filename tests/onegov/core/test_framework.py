@@ -938,8 +938,8 @@ def test_html_to_text_filters_empty_and_decoration_lines() -> None:
     html = (
         "<p>Hallo</p>\n"
         "<p>   </p>\n"        # whitespace only
-        "<hr>\n"              # -> markdown '---'
-        "<p>***</p>\n"        # decoration only
+        "<hr>\n"              # -> markdown '* * *'
+        "<p>* * *</p>\n"      # decoration only
         "<p>Welt</p>\n"
     )
 

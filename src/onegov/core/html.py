@@ -59,9 +59,37 @@ SANE_HTML_ATTRS = {
     'ol': ['class']
 }
 
-# lines consisting solely of these characters are excluded in html_to_text;
-# any other character (words, digits, emoji of any kind) keeps the line
-DECORATION_ONLY_CHARACTERS = re.compile(r'[^\s\-*_|=#>.]')
+# lines without these plaintext characters are excluded in html_to_text
+# not re.VERBOSE: its whitespace stays literal inside a character class
+VALID_PLAINTEXT_CHARACTERS = re.compile(
+    r'['
+    r'\d'  # decimals
+    r'\w'  # words
+    r'\n'  # new lines
+
+    # emojis
+    r'\U00002122'
+    r'\U00002139'
+    r'\U00002300-\U000023FF'
+    r'\U00002600-\U000027BF'
+    r'\U00002B00-\U00002BFF'
+    r'\U0001F000-\U0001F02F'
+    r'\U0001F0A0-\U0001F0FF'
+    r'\U0001F100-\U0001F1FF'
+    r'\U0001F200-\U0001F2FF'
+    r'\U0001F300-\U0001F64F'
+    r'\U0001F680-\U0001F6FF'
+    r'\U0001F700-\U0001F77F'
+    r'\U0001F780-\U0001F7FF'
+    r'\U0001F800-\U0001F8FF'
+    r'\U0001F900-\U0001F9FF'
+    r'\U0001FA00-\U0001FA6F'
+    r'\U0001FA70-\U0001FAFF'
+    r'\U0001F3FB-\U0001F3FF'
+    r'\U0000200D'
+    r'\U0000FE0F'
+    r']+'
+)
 
 # match empty link expressions
 EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
@@ -145,7 +173,7 @@ def html_to_text(
         lines = (EMPTY_LINK.sub('', line) for line in lines)
 
     lines = (l.strip() for l in lines)
-    lines = (l for l in lines if DECORATION_ONLY_CHARACTERS.search(l))
+    lines = (l for l in lines if VALID_PLAINTEXT_CHARACTERS.search(l))
 
     # use double newlines to get paragraphs
     plaintext = '\n\n'.join(lines)
