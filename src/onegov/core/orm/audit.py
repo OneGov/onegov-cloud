@@ -7,25 +7,23 @@ from onegov.core.collection import Pagination
 from onegov.core.orm import Base
 from onegov.core.orm.session_manager import CURRENT_USER_ID, CURRENT_USERNAME
 from sedate import utcnow
-from sqlalchemy import desc, Enum, event, Index, insert
-from sqlalchemy.orm import mapped_column, Mapped, Session
+from sqlalchemy import desc, Enum, Index, insert, inspect, select
+from sqlalchemy.orm import mapped_column, Mapped, object_session, Session
 
 
 from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from onegov.core.orm import SessionManager
     from sqlalchemy.orm import Query
 
 
 type AuditOperation = Literal['insert', 'update', 'delete']
 type SnapshotFactory = Callable[[Any], dict[str, Any]]
-type PreviousSnapshot = Callable[[Session, Any], dict[str, Any]]
+type PreviousSnapshot = Callable[[Session, Any], dict[str, Any] | None]
 type Changed = Callable[[Session, Any], bool]
 type DeleteSnapshot = Callable[[Session, Any], dict[str, Any] | None]
-
-
-STAGED_AUDIT_ENTRIES: str = 'staged_audit_entries'
 
 
 class AuditModelConfig(NamedTuple):
@@ -36,17 +34,6 @@ class AuditModelConfig(NamedTuple):
 
 
 AUDIT_MODELS: dict[type[Any], AuditModelConfig] = {}
-
-
-class StagedAuditEntry(NamedTuple):
-    operation: AuditOperation
-    instance: Any
-    snapshot: dict[str, Any] | None
-    previous_snapshot: dict[str, Any]
-    config: AuditModelConfig
-    user_id: str | None
-    username: str
-    created: datetime
 
 
 def register_audit_model(
@@ -121,107 +108,114 @@ class AuditEntry(Base):
     )
 
 
-@event.listens_for(Session, 'before_flush')
-def prepare_audit_entries(
+def latest_snapshot(
     session: Session,
-    flush_context: Any,
-    instances: Any,
+    instance: Any,
+) -> dict[str, Any] | None:
+    return session.execute(
+        select(AuditEntry.snapshot)
+        .where(
+            AuditEntry.target_table == instance.__tablename__,
+            AuditEntry.target_id == str(instance.id),
+        )
+        .order_by(
+            desc(AuditEntry.created),
+            desc(AuditEntry.id),
+        )
+        .limit(1)
+    ).scalar_one_or_none()
+
+
+def column_snapshot(instance: Any) -> dict[str, Any]:
+    state = inspect(instance)
+    return {
+        attribute.key: getattr(instance, attribute.key)
+        for attribute in state.mapper.column_attrs
+    }
+
+
+def write_audit_entry(
+    session: Session,
+    instance: Any,
+    operation: AuditOperation,
+    snapshot: dict[str, Any],
+    previous_snapshot: dict[str, Any] | None = None,
 ) -> None:
-    session.info.pop(STAGED_AUDIT_ENTRIES, None)
-    if CURRENT_USERNAME not in session.info:
+    username = session.info.get(CURRENT_USERNAME)
+    if not isinstance(username, str):
         return
 
-    user_id = session.info.get(CURRENT_USER_ID)
-    username = session.info[CURRENT_USERNAME]
-    created = utcnow()
-
-    staged: list[StagedAuditEntry] = [
-        StagedAuditEntry(
-            'insert',
-            instance,
-            None,
-            {},
-            config,
-            user_id,
-            username,
-            created,
-        )
-        for instance in session.new
-        if (config := audit_config(instance)) is not None
-    ]
-
-    staged.extend(
-        StagedAuditEntry(
-            'update',
-            instance,
-            None,
-            config.previous_snapshot(session, instance),
-            config,
-            user_id,
-            username,
-            created,
-        )
-        for instance in session.dirty
-        if (
-            (config := audit_config(instance)) is not None
-            and instance not in session.deleted
-            and config.changed(session, instance)
+    session.connection().execute(
+        insert(AuditEntry).values(
+            target_table=instance.__tablename__,
+            target_id=str(instance.id),
+            operation=operation,
+            snapshot=snapshot,
+            previous_snapshot=previous_snapshot or {},
+            user_id=session.info.get(CURRENT_USER_ID),
+            username=username,
+            created=utcnow(),
         )
     )
 
-    staged.extend(
-        StagedAuditEntry(
-            'delete',
-            instance,
-            snapshot,
-            {},
-            config,
-            user_id,
-            username,
-            created,
-        )
-        for instance in session.deleted
-        if (config := audit_config(instance)) is not None
-        if (
-            snapshot := (
-                config.delete_snapshot(session, instance)
-                if config.delete_snapshot is not None
-                else config.snapshot(instance)
-            )
-        )
-        is not None
-    )
 
-    if staged:
-        session.info[STAGED_AUDIT_ENTRIES] = staged
-
-
-@event.listens_for(Session, 'after_flush_postexec')
-def write_audit_entries(session: Session, flush_context: Any) -> None:
-    staged = session.info.pop(STAGED_AUDIT_ENTRIES, ())
-    if not staged:
+def audit_insert(_schema: str, obj: object) -> None:
+    config = audit_config(obj)
+    session = object_session(obj)
+    if config is None or session is None:
         return
 
-    # Audited models are expected to have a single ``id`` primary key.
-    values: list[dict[str, Any]] = [
-        {
-            'target_table': entry.instance.__tablename__,
-            'target_id': str(entry.instance.id),
-            'operation': entry.operation,
-            'snapshot': (
-                entry.snapshot
-                if entry.snapshot is not None
-                else entry.config.snapshot(entry.instance)
-            ),
-            'previous_snapshot': entry.previous_snapshot,
-            'user_id': entry.user_id,
-            'username': entry.username,
-            'created': entry.created,
-        }
-        for entry in staged
-    ]
+    write_audit_entry(session, obj, 'insert', config.snapshot(obj))
 
-    session.connection().execute(insert(AuditEntry), values)
+
+def audit_update(_schema: str, obj: object) -> None:
+    config = audit_config(obj)
+    session = object_session(obj)
+    if config is None or session is None:
+        return
+    if obj in session.dirty and not config.changed(session, obj):
+        return
+
+    previous_snapshot = latest_snapshot(session, obj)
+    if previous_snapshot is None:
+        previous_snapshot = config.previous_snapshot(session, obj)
+
+    write_audit_entry(
+        session,
+        obj,
+        'update',
+        config.snapshot(obj),
+        previous_snapshot,
+    )
+
+
+def audit_delete(
+    _schema: str,
+    session: Session,
+    obj: object,
+) -> None:
+    config = audit_config(obj)
+    if config is None:
+        return
+
+    state = inspect(obj)
+    assert state is not None
+    snapshot: dict[str, Any] | None
+    if state.detached:
+        snapshot = latest_snapshot(session, obj) or column_snapshot(obj)
+    elif config.delete_snapshot is not None:
+        snapshot = config.delete_snapshot(session, obj)
+    else:
+        snapshot = config.snapshot(obj)
+
+    if snapshot is not None:
+        write_audit_entry(session, obj, 'delete', snapshot)
+
+
+def register_audit_handlers(session_manager: SessionManager) -> None:
+    session_manager.on_insert.connect(audit_insert)
+    session_manager.on_update.connect(audit_update)
+    session_manager.on_delete.connect(audit_delete)
 
 
 class AuditEntryCollection(Pagination[AuditEntry]):

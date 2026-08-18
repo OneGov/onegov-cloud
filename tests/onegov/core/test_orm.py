@@ -611,6 +611,29 @@ def test_session_manager_i18n(postgres_dsn: str) -> None:
     mgr.dispose()
 
 
+def test_session_manager_current_user_is_thread_local(
+    session_manager: SessionManager,
+) -> None:
+    session_manager.set_current_user('user-id', 'user@example.org')
+    other_user: list[tuple[str | None, str | None]] = []
+
+    def read_current_user() -> None:
+        other_user.append(
+            (
+                session_manager.current_user_id,
+                session_manager.current_username,
+            )
+        )
+
+    thread = Thread(target=read_current_user)
+    thread.start()
+    thread.join()
+
+    assert other_user == [(None, None)]
+    assert session_manager.current_user_id == 'user-id'
+    assert session_manager.current_username == 'user@example.org'
+
+
 def test_uuid_type(postgres_dsn: str) -> None:
     class Base(DeclarativeBase, ModelBase):
         registry = registry()

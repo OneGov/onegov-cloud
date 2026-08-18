@@ -56,6 +56,7 @@ from onegov.core.datamanager import FileDataManager
 from onegov.core.mail import prepare_email
 from onegov.core.orm import (
     Base, SessionManager, debug, DB_CONNECTION_ERRORS)
+from onegov.core.orm.audit import register_audit_handlers
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.request import CoreRequest, is_logged_in
@@ -459,6 +460,7 @@ class Framework(
 
         if self.dsn:
             self.session_manager = SessionManager(self.dsn, base)
+            register_audit_handlers(self.session_manager)
             # NOTE: We used to only add the ORMBase, when we derived
             #       from LibresIntegration, however this leads to
             #       issues when we add a backref from a model derived

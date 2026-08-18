@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from onegov.core.orm.audit import AuditEntry
-from onegov.page import PageCollection
+import pytest
+
+from onegov.core.orm.audit import AuditEntry, register_audit_handlers
+from onegov.page import Page, PageCollection
 
 
 from typing import TYPE_CHECKING
@@ -13,12 +15,18 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
 
+@pytest.fixture(autouse=True)
+def audit_handlers(session_manager: SessionManager) -> None:
+    register_audit_handlers(session_manager)
+
+
 def test_page_audit_entries(
     session: Session,
     session_manager: SessionManager,
 ) -> None:
+    user_id = uuid4().hex
     session_manager.set_current_user(
-        'b5ab1f21dc96490da581c8c591b44dc7',
+        user_id,
         'editor@example.org',
     )
     pages = PageCollection(session)
@@ -39,10 +47,7 @@ def test_page_audit_entries(
     ]
     assert all(entry.target_table == 'pages' for entry in entries)
     assert all(entry.target_id == str(root_id) for entry in entries)
-    assert all(
-        entry.user_id == 'b5ab1f21dc96490da581c8c591b44dc7'
-        for entry in entries
-    )
+    assert all(entry.user_id == user_id for entry in entries)
     assert all(entry.username == 'editor@example.org' for entry in entries)
     assert all(isinstance(entry.id, UUID) for entry in entries)
     assert entries[0].snapshot['title'] == 'News'
@@ -60,8 +65,9 @@ def test_page_audit_requires_user(
     session: Session,
     session_manager: SessionManager,
 ) -> None:
+    user_id = uuid4().hex
     session_manager.set_current_user(
-        'b5ab1f21dc96490da581c8c591b44dc7',
+        user_id,
         'editor@example.org',
     )
     session_manager.set_current_user(None, None)
@@ -75,12 +81,64 @@ def test_page_audit_requires_user(
     assert session.query(AuditEntry).count() == 0
 
 
+def test_page_audit_retains_user_identity(
+    session: Session,
+    session_manager: SessionManager,
+) -> None:
+    user_id = uuid4().hex
+    session_manager.set_current_user(user_id, 'old@example.org')
+    page = PageCollection(session).add_root('News')
+    session.flush()
+
+    session_manager.set_current_user(user_id, 'new@example.org')
+    page.title = 'Latest News'
+    session.flush()
+
+    entries = session.query(AuditEntry).order_by(AuditEntry.created).all()
+    assert [entry.user_id for entry in entries] == [user_id, user_id]
+    assert [entry.username for entry in entries] == [
+        'old@example.org',
+        'new@example.org',
+    ]
+
+
+def test_page_audit_bulk_changes(
+    session: Session,
+    session_manager: SessionManager,
+) -> None:
+    user_id = uuid4().hex
+    session_manager.set_current_user(
+        user_id,
+        'editor@example.org',
+    )
+    page = PageCollection(session).add_root('News')
+    session.flush()
+    page_id = page.id
+
+    session.query(Page).filter(Page.id == page_id).update(
+        {'title': 'Bulk News'}
+    )
+    session.query(Page).filter(Page.id == page_id).delete()
+
+    entries = session.query(AuditEntry).order_by(AuditEntry.created).all()
+    assert [entry.operation for entry in entries] == [
+        'insert',
+        'update',
+        'delete',
+    ]
+    assert entries[0].snapshot['title'] == 'News'
+    assert entries[1].previous_snapshot['title'] == 'News'
+    assert entries[1].snapshot['title'] == 'Bulk News'
+    assert entries[2].snapshot['title'] == 'Bulk News'
+
+
 def test_page_audit_cascaded_delete(
     session: Session,
     session_manager: SessionManager,
 ) -> None:
+    user_id = uuid4().hex
     session_manager.set_current_user(
-        'b5ab1f21dc96490da581c8c591b44dc7',
+        user_id,
         'editor@example.org',
     )
     pages = PageCollection(session)

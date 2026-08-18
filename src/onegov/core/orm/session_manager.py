@@ -306,8 +306,7 @@ class SessionManager:
         self.bases = [base]
         self.created_schemas: set[str] = set()
         self.current_schema: str | None = None
-        self.current_user_id: str | None = None
-        self.current_username: str | None = None
+        self._current_user = threading.local()
 
         self._ignore_bulk_updates = False
         self._ignore_bulk_deletes = False
@@ -722,11 +721,19 @@ class SessionManager:
         username: str | None,
     ) -> None:
         """Sets the user responsible for changes in the current request."""
-        self.current_user_id = user_id
-        self.current_username = username
+        self._current_user.user_id = user_id
+        self._current_user.username = username
 
         if self.session_factory.registry.has():
             self._bind_current_user(self.session_factory())
+
+    @property
+    def current_user_id(self) -> str | None:
+        return getattr(self._current_user, 'user_id', None)
+
+    @property
+    def current_username(self) -> str | None:
+        return getattr(self._current_user, 'username', None)
 
     def _bind_current_user[T: Session](self, session: T) -> T:
         for key, value in (
