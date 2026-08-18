@@ -258,8 +258,8 @@ msgstr "Répertoires"
 msgid "Surveys"
 msgstr "Enquêtes"
 
-msgid "Topic chart"
-msgstr "Diagramme des thèmes"
+msgid "Information architecture"
+msgstr "Architecture de l'information"
 
 msgid "Modules"
 msgstr "Modules"

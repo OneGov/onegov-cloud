@@ -32,11 +32,11 @@ def view_topic_chart(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
-        Link(_('Topic chart'), '#')
+        Link(_('Information architecture'), '#')
     ]
 
     return {
-        'title': _('Topic chart'),
+        'title': _('Information architecture'),
         'layout': layout,
         'chart_url': request.link(self, name='topic-chart-json'),
         'image_name': f'{normalize_for_url(self.name)}-topic-chart'
