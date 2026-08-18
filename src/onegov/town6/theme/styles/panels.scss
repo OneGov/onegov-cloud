@@ -286,7 +286,8 @@ $checklist-icon: "\f0ae";
     }
 }
 
-.internal-notes {
+.internal-notes,
+.page-keywords {
     background: $gray-pastel;
     border-left: 3px solid $blue-dark;
     border-radius: 2px;
