@@ -42,7 +42,14 @@
                 <tbody>
                     <tr tal:repeat="item room_slots.items()"
                         data-date="${item[0].isoformat()}">
-                        <th><a id="row-${item[0].isoformat()}"></a>${layout.format_date(item[0], 'weekday_long')}<br/>${layout.format_date(item[0], 'date')}</th>
+                        <th>
+                            <a id="row-${item[0].isoformat()}"></a>${layout.format_date(item[0], 'weekday_long')}<br/>
+                            ${layout.format_date(item[0], 'date')}
+                            <div tal:repeat="line holidays.get(item[0], ())"
+                                class="event event-holiday">
+                                ${line}
+                            </div>
+                        </th>
                         <td valign="top" tal:repeat="room rooms">
                         <tal:b tal:define="slots item[1].get(room.id, [])">
                             <div tal:repeat="slot slots"
