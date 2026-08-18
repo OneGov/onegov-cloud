@@ -7,7 +7,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session, Query
     from typing import Self
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class ChatCollection(GenericCollection[Chat, 'UUID'], Pagination[Chat]):

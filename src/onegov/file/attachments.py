@@ -83,7 +83,7 @@ def strip_exif_and_store_image_size(
         # replace EXIF section with an empty one
         params['exif'] = Image.Exif()
 
-        content = SpooledTemporaryFile(INMEMORY_FILESIZE)  # noqa: SIM115
+        content = SpooledTemporaryFile(INMEMORY_FILESIZE)  # ruff:ignore[open-file-with-context-handler]
         try:
             # Quality is only supported by jpeg
             image.save(content, image.format, quality=IMAGE_QUALITY, **params)
@@ -129,7 +129,7 @@ def resize_image(
 
     image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
 
-    out = SpooledTemporaryFile(INMEMORY_FILESIZE)  # noqa: SIM115
+    out = SpooledTemporaryFile(INMEMORY_FILESIZE)  # ruff:ignore[open-file-with-context-handler]
     try:
         image.save(out, image.format, quality=IMAGE_QUALITY, **params)
     except ValueError:

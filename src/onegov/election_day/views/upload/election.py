@@ -80,6 +80,7 @@ def view_upload_majorz_election(
                     form.results.file,
                     form.results.data['mimetype']
                 )
+
             elif form.file_format.data == 'wabsti_c':
                 source: DataSourceItem
                 for source in self.data_sources:

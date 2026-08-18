@@ -110,7 +110,7 @@ class Transaction:
             return 'success'
 
         # NOTE: This value is never calculated we set it exactly
-        if self.confidence == 0.5:  # noqa: RUF069
+        if self.confidence == 0.5:  # ruff:ignore[float-equality-comparison]
             return 'warning'
 
         return 'unknown'

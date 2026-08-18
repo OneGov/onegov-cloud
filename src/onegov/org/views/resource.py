@@ -173,7 +173,12 @@ def get_resource_form(
     else:
         model = self
 
-    return model.with_content_extensions(ResourceForm, request)
+    form_class = ResourceForm
+
+    for pricing_scheme in request.app.resource_pricing_schemes:
+        form_class = pricing_scheme.extend_form(form_class, request)
+
+    return model.with_content_extensions(form_class, request)
 
 
 class ResourceGroup(NamedTuple):
@@ -225,7 +230,7 @@ class ResourceGroup(NamedTuple):
                         item.parent_id is not None
                         # avoid infinite loop when there is a cycle
                         and item.parent_id not in seen
-                        and (parent := rooms.get((  # noqa: B023
+                        and (parent := rooms.get((  # ruff:ignore[function-uses-loop-variable]
                             item.parent_id,
                             item.subgroup or ''
                         ))) is not None
@@ -854,7 +859,7 @@ def get_find_your_spot_reservations(
 ) -> JSON_ro:
 
     reservations = sorted(
-        (utils.ReservationInfo(resource, reservation, request).as_dict()
+        (utils.ReservationInfo(resource, reservation, None, request).as_dict()
             for resource in request.exclude_invisible(self.query())
             # FIXME: Maybe we should move bound_reservations to the base
             #        Resource class?
@@ -1313,7 +1318,7 @@ def get_reservations(self: Resource, request: OrgRequest) -> RenderData:
 
     return {
         'reservations': [
-            utils.ReservationInfo(self, reservation, request).as_dict()
+            utils.ReservationInfo(self, reservation, None, request).as_dict()
             for reservation in reservations
         ],
         'prediction': prediction
@@ -1854,6 +1859,13 @@ def view_resource_subscribe(
         url_obj = url_obj.query_param('access-token', self.access_token)
     url = url_obj.as_string()
 
+    # generate a second url which includes blocking resources
+    if self.blocking_resource_ids():
+        url_obj = url_obj.query_param('blocking-resources', '1')
+        blocking_url = url_obj.as_string()
+    else:
+        blocking_url = None
+
     layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_('Subscribe'), '#'))
 
@@ -1861,7 +1873,8 @@ def view_resource_subscribe(
         'title': self.title,
         'resource': self,
         'layout': layout,
-        'url': url
+        'url': url,
+        'blocking_url': blocking_url
     }
 
 
@@ -1871,6 +1884,8 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
 
     if request.params.get('access-token') != self.access_token:
         raise exc.HTTPForbidden()
+
+    blocking_resources = request.params.get('blocking-resources') == '1'
 
     start = utcnow() - timedelta(days=30)
     end = utcnow() + timedelta(days=730)
@@ -1888,6 +1903,18 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
     # have quite a bit of activity on busy days
     cal.add('x-published-ttl', 'PT30M')
 
+    if blocking_resources:
+        resources = self.blocking_resources()
+    else:
+        resources = {}
+    resources[self.id] = self
+
+    all_ical_fields = {
+        ical_field
+        for resource in resources.values()
+        for ical_field in resource.ical_fields
+    }
+
     # add allocations/reservations
     date = utcnow()
     query = (
@@ -1898,6 +1925,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         )
         .with_entities(
             Reservation.id.label('id'),
+            Reservation.resource.label('resource_id'),
             Reservation.token.label('token'),
             Ticket.subtitle.label('title'),
             Ticket.number.label('description'),
@@ -1907,16 +1935,19 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
             Ticket.handler_code.label('handler_code'),
             *(
                 FormSubmission.data[as_internal_id(field)].astext.label(field)
-                for field in self.ical_fields
+                for field in all_ical_fields
             )
         )
         .filter(Reservation.status == 'approved')
-        .filter(Reservation.resource == self.id)
         .filter(sa_cast(Reservation.data['accepted'], Boolean).is_(True))
         .filter(Reservation.start >= start)
         .filter(Reservation.start <= end)
     )
-    if self.ical_fields:
+    if len(resources) > 1:
+        query = query.filter(Reservation.resource.in_(resources.keys()))
+    else:
+        query = query.filter(Reservation.resource == self.id)
+    if all_ical_fields:
         query = query.outerjoin(
             FormSubmission,
             FormSubmission.id == Reservation.token
@@ -1927,6 +1958,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         start = r.start
         end = r.end + timedelta(microseconds=1)
 
+        resource = resources.get(r.resource_id, self)
         url = request.class_link(Ticket, {
             'handler_code': r.handler_code,
             'id': r.ticket_id
@@ -1935,7 +1967,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
             r.description,
             *(
                 f'{field}: {value}'
-                for field in self.ical_fields
+                for field in resource.ical_fields
                 if (value := getattr(r, field))
             ),
             f'{ticket_label}: {url}'
@@ -1943,7 +1975,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         evt = icalendar.Event()
         evt.add('uid', f'{r.token}-{r.id}')
         evt.add('summary', r.title)
-        evt.add('location', self.title)
+        evt.add('location', resource.title)
         evt.add('description', description)
         evt.add('dtstart', standardize_date(start, 'UTC'))
         evt.add('dtend', standardize_date(end, 'UTC'))

@@ -8,12 +8,15 @@ from __future__ import annotations
 from libres.db.models import Allocation, Reservation
 from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
+from onegov.form.parser import ParsedForm
+from onegov.form.orm_types import Formcode
 from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
-from sqlalchemy import text, Column, Enum, ForeignKey, Text, UUID
+from sqlalchemy import (
+    bindparam, text, Column, Enum, ForeignKey, Integer, Text, UUID)
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.upgrade import UpgradeContext
 
@@ -398,3 +401,170 @@ def add_additional_indexes_to_libres_tables(context: UpgradeContext) -> None:
         columns=['_end'],
         if_not_exists=True
     )
+
+
+@upgrade_task('Switch to JSON serialized custom resource form definitions')
+def resources_switch_to_parsed_form(context: UpgradeContext) -> None:
+    if not context.has_table('resources'):
+        return
+
+    # no migration needed, the old column is already gone
+    if not context.has_column('resources', 'definition'):
+        return
+
+    # first add the new column
+    context.operations.add_column(
+        'resources',
+        Column('parsed', Formcode, nullable=True)
+    )
+
+    # bulk update the table with the parsed definitions
+    if values := [
+        {
+            'id': directory_id,
+            'parsed': ParsedForm.from_formcode(definition),
+        }
+        for directory_id, definition in context.session.execute(text("""
+            SELECT id, definition
+              FROM resources
+             WHERE definition IS NOT NULL
+               AND definition != ''
+        """))
+    ]:
+        context.session.execute(text("""
+            UPDATE resources
+               SET parsed = :parsed
+             WHERE id = :id
+        """).bindparams(
+            bindparam('id', type_=UUID),
+            bindparam('parsed', type_=Formcode)
+        ), values)
+
+    # finally remove the old column
+    context.operations.drop_column('resources', 'definition')
+
+
+def backfill_reserved_slot_source_ids(session: Any) -> None:
+    """ Sets ``source_id`` on every reserved slot to the id of its owning
+    reservation/blocker, and deletes slots that belong to no object (orphans
+    left behind when a reservation/blocker was deleted without its slots).
+
+    On partly_available allocations the slot falls within the owner's range;
+    otherwise (whole allocation, or group owners without a range) the
+    allocation group identifies the owner.
+    """
+    for source_type, table in (
+        ('reservation', 'reservations'),
+        ('blocker', 'reservation_blockers'),
+    ):
+        session.execute(text(
+            'UPDATE reserved_slots rs SET source_id = ('
+            f'  SELECT o.id FROM {table} o'
+            '   JOIN allocations a ON a.id = rs.allocation_id'
+            '  WHERE o.token = rs.reservation_token'
+            '    AND o.target = a."group"'
+            '    AND (o.start IS NULL OR a.partly_available = false'
+            '         OR (rs.start >= o.start AND rs."end" <= o."end"))'
+            '  ORDER BY o.id LIMIT 1'
+            ') '
+            f"WHERE rs.source_type = '{source_type}' "
+            'AND rs.source_id IS NULL'
+        ))
+
+    session.execute(
+        text('DELETE FROM reserved_slots WHERE source_id IS NULL')
+    )
+
+
+@upgrade_task('Add source_id to reserved slots')
+def add_source_id_to_reserved_slots(context: UpgradeContext) -> None:
+    """ Records the owning reservation/blocker id on each reserved slot so a
+    slot can be attributed to its exact object directly, instead of inferring
+    it from the allocation and time range. Slots that belong to no object are
+    orphans (their reservation/blocker was already deleted) and are removed.
+    """
+
+    if not run_upgrades(context):
+        return
+
+    if context.has_column('reserved_slots', 'source_id'):
+        return
+
+    context.operations.add_column(
+        'reserved_slots', Column('source_id', Integer, nullable=True)
+    )
+
+    backfill_reserved_slot_source_ids(context.session)
+
+    # every remaining slot now has an owner, so enforce it
+    context.operations.alter_column(
+        'reserved_slots', 'source_id', nullable=False
+    )
+
+    context.operations.create_index(
+        'ix_reserved_slots_source_id', 'reserved_slots', ['source_id']
+    )
+
+
+@upgrade_task('Store pricing settings on reservations')
+def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
+    if not context.has_table('resources'):
+        return
+
+    context.session.execute(text("""
+        WITH adata AS (
+            SELECT "group",
+                   jsonb_build_object(
+                        'pricing_method',
+                        data->'pricing_method',
+                        'price_per_hour',
+                        COALESCE(data->'price_per_hour', '0.0'::jsonb),
+                        'price_per_item',
+                        COALESCE(data->'price_per_item', '0.0'::jsonb),
+                        'currency',
+                        COALESCE(data->'currency', '"CHF"'::jsonb)
+                   ) AS pricing
+              FROM allocations
+             WHERE resource = mirror_of
+               AND data->>'pricing_method' = 'price_per_item'
+                OR data->>'pricing_method' = 'price_per_hour'
+                OR data->>'pricing_method' = 'free'
+        )
+        UPDATE reservations
+           SET data = COALESCE(data, '{}'::jsonb) ||
+              CASE
+                WHEN EXISTS (SELECT 1 FROM adata WHERE adata."group" = target)
+                THEN
+                    (
+                        SELECT pricing
+                          FROM adata
+                         WHERE adata."group" = target
+                         LIMIT 1
+                    ) || jsonb_build_object(
+                        'cost_object',
+                        resources.content->'cost_object'
+                    )
+                ELSE
+                    jsonb_build_object(
+                        'pricing_method',
+                        resources.content->'pricing_method',
+                        'price_per_hour',
+                        COALESCE(
+                            resources.content->'price_per_hour',
+                            '0.0'::jsonb
+                        ),
+                        'price_per_item',
+                        COALESCE(
+                            resources.content->'price_per_item',
+                            '0.0'::jsonb
+                        ),
+                        'currency',
+                        resources.content->'currency',
+                        'cost_object',
+                        resources.content->'cost_object'
+                    )
+               END
+           FROM resources
+          WHERE resources.id = resource
+
+    """))

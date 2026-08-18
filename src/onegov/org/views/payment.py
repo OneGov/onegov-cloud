@@ -162,7 +162,7 @@ def view_payments(
 
 @OrgApp.form(
     model=TicketInvoiceCollection,
-    template='invoices.pt',
+    template='ticket_invoices.pt',
     form=TicketInvoiceSearchForm,
     permission=Private
 )

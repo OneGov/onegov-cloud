@@ -829,6 +829,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'filemanager.js'
     yield 'imagemanager.js'
     yield 'table.js'
+    yield 'alphalist.js'
     yield 'redactor.de.js'
     yield 'redactor.fr.js'
     yield 'redactor.it.js'
@@ -951,6 +952,11 @@ def get_scroll_to_username_asset() -> Iterator[str]:
     yield 'scroll_to_username.js'
 
 
+@OrgApp.webasset('local-login')
+def get_local_login_asset() -> Iterator[str]:
+    yield 'local_login.js'
+
+
 @OrgApp.webasset('all_blank')
 def get_all_blank_asset() -> Iterator[str]:
     yield 'all_blank.js'
@@ -980,6 +986,14 @@ def mapbox_address_autofill() -> Iterator[str]:
 @OrgApp.webasset('invoicing')
 def get_invoicing() -> Iterator[str]:
     yield 'invoicing.js'
+
+
+@OrgApp.webasset('topic-chart')
+def get_topic_chart_asset() -> Iterator[str]:
+    yield 'd3.v7.min.js'
+    yield 'd3-flextree.js'
+    yield 'd3-org-chart.js'
+    yield 'topic-chart.js'
 
 
 def wrap_with_mtan_hook(

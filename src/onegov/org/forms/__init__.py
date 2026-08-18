@@ -54,6 +54,7 @@ from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.forms.text_module import TextModuleForm
 from onegov.org.forms.ticket import (
     InternalTicketChatMessageForm, ExtendedInternalTicketChatMessageForm)
+from onegov.org.forms.ticket import RequestCancellationForm
 from onegov.org.forms.ticket import TicketAssignmentForm
 from onegov.org.forms.ticket import TicketChangeTagForm
 from onegov.org.forms.ticket import TicketChatMessageForm
@@ -115,6 +116,7 @@ __all__ = (
     'PublicRequestMTANForm',
     'ReservationAdjustmentForm',
     'ReservationForm',
+    'RequestCancellationForm',
     'ResourceChangeUrlForm',
     'ResourceCleanupForm',
     'ResourceExportForm',

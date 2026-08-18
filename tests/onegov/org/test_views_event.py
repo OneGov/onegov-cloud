@@ -203,9 +203,8 @@ def test_view_occurrences_event_filter(client: Client) -> None:
         assert client.login_admin()
         assert client.app.org.event_filter_type in ['filters',
                                                     'tags_and_filters']
-        page = client.get('/events')
-        page = page.click('Konfigurieren')
-        page.form['definition'] = """
+        page = client.get('/event-settings')
+        page.form['event_filter_definition'] = """
             My Special Filter *=
                 [ ] A Filter
                 [ ] B Filter
@@ -283,10 +282,7 @@ def test_many_filters(client: Client) -> None:
     assert client.login_admin()
     page = client.get('/event-settings')
     page.form['event_filter_type'] = 'filters'
-    page.form.submit()
-    page = client.get('/events')
-    page = page.click('Konfigurieren')
-    page.form['definition'] = """
+    page.form['event_filter_definition'] = """
         Weitere Filter =
             [ ] Gemeinde
             [ ] Schule
@@ -773,6 +769,13 @@ def test_import_export_events(client: Client) -> None:
 
     client.login_editor()
 
+    # settings are admin-only, the rest of the edit bar is not
+    events_page = client.get('/events')
+    assert not events_page.pyquery('.edit-bar a.edit-link')
+    assert events_page.pyquery('.edit-bar a.export-link')
+    assert client.get(
+        '/event-settings', expect_errors=True).status_code == 403
+
     # Export
     page = client.get('/events').click('Export')
     page.form['file_format'] = 'xlsx'
@@ -978,17 +981,30 @@ def test_export_events_json_xml_csv(client: Client) -> None:
         verify_event_fields(rows[0])
 
 
+def get_event_filter_definition(client: Client) -> str:
+    if parsed := client.app.org.event_filter_parsed_definition:
+        return parsed.formcode
+    return ''
+
+
 def test_event_filter_settings_stale_data(client: Client) -> None:
     client.login_admin()
 
-    settings = client.get('/event-settings')
+    # the edit bar link returns here after saving
+    events = client.get('/events')
+    settings_link = events.pyquery('.edit-bar a.edit-link').attr('href')
+    assert settings_link is not None
+    assert 'return-to=' in settings_link
+
+    settings = client.get(settings_link)
     settings.form['event_filter_type'] = 'filters'
-    settings.form.submit()
+    saved = settings.form.submit()
+    assert saved.headers['Location'].endswith('/events')
 
     # Set up a filter with two choices
-    page = client.get('/events').click('Konfigurieren')
+    page = client.get('/event-settings')
     assert 'force_remove' not in page.form.fields  # not shown on initial load
-    page.form['definition'] = """
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
             [ ] Choice B
@@ -1004,9 +1020,9 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form.submit()
 
     # Removing Choice A (in use) is blocked — force_remove checkbox appears
-    page = client.get('/events').click('Konfigurieren')
+    page = client.get('/event-settings')
     assert 'force_remove' not in page.form.fields
-    page.form['definition'] = """
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice B
     """
@@ -1017,21 +1033,21 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
         in response
     )
     assert 'force_remove' in response.form.fields
-    assert client.app.org.event_filter_definition is not None
-    assert 'Choice A' in client.app.org.event_filter_definition
+    assert client.app.org.event_filter_parsed_definition is not None
+    assert 'Choice A' in get_event_filter_definition(client)
 
     # Checking force_remove cleans up the filter from events and saves
     response.form['force_remove'] = True
     response.form.submit().follow()
-    assert 'Choice A' not in (client.app.org.event_filter_definition or '')
+    assert 'Choice A' not in get_event_filter_definition(client)
     page = (
         client.get('/events').click('Generalversammlung').click('Bearbeiten')
     )
     assert not page.form['my_filter'].value
 
     # Re-setup: re-add Choice A, re-apply to event
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
             [ ] Choice B
@@ -1047,8 +1063,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form.submit()
 
     # Block again — manually clearing the event also allows removing the choice
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice B
     """
@@ -1062,25 +1078,25 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form['my_filter'] = []
     page.form.submit()
 
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice B
     """
     page.form['keyword_fields'].value = 'my_filter'
     page.form.submit().follow()
-    assert 'Choice A' not in (client.app.org.event_filter_definition or '')
+    assert 'Choice A' not in get_event_filter_definition(client)
 
     # Removing an unused choice (Choice B) is allowed without blocking
-    page = client.get('/events').click('Konfigurieren')
+    page = client.get('/event-settings')
     assert 'force_remove' not in page.form.fields
-    page.form['definition'] = """
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
     page.form['keyword_fields'].value = 'my_filter'
     page.form.submit().follow()
-    assert 'Choice B' not in (client.app.org.event_filter_definition or '')
+    assert 'Choice B' not in get_event_filter_definition(client)
 
     # Re-apply a filter to test keyword-level blocking
     page = (
@@ -1091,8 +1107,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
 
     # Deselecting the whole keyword while events use it is blocked,
     # checkbox appears
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
@@ -1111,8 +1127,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     assert not client.app.org.event_filter_configuration.get('keywords')
 
     # Re-setup: re-enable keyword and re-apply filter to event
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
@@ -1125,8 +1141,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form['my_filter'] = ['Choice A']
     page.form.submit()
 
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
@@ -1141,8 +1157,8 @@ def test_event_filter_settings_stale_data(client: Client) -> None:
     page.form['my_filter'] = []
     page.form.submit()
 
-    page = client.get('/events').click('Konfigurieren')
-    page.form['definition'] = """
+    page = client.get('/event-settings')
+    page.form['event_filter_definition'] = """
         My Filter =
             [ ] Choice A
     """
@@ -1162,3 +1178,37 @@ def test_event_form_with_custom_lead(client: Client) -> None:
 
     page = client.get('/events').click("Veranstaltung erfassen")
     assert 'A completely different lead text' in page
+
+
+def test_event_settings_return_to(client: Client) -> None:
+    client.login_admin()
+
+    # opening the event settings from the events overview remembers the origin,
+    # so both the cancel link and a successful save return to the overview
+    events = client.get('/events')
+    settings = events.click('Einstellungen', href='event-settings')
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/events')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/events')
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/event-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')
+
+
+def test_event_edit_cancel_returns_to_origin(client: Client) -> None:
+    client.login_admin()
+
+    # the occurrence page links to the edit view with a return-to parameter,
+    # so cancelling the edit returns to that occurrence
+    occurrence = client.get('/events').click('Generalversammlung')
+    origin = occurrence.request.url
+
+    edit = occurrence.click('Bearbeiten')
+    cancel_href = edit.pyquery('a.cancel-link').attr('href')
+    assert cancel_href == origin

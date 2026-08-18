@@ -349,11 +349,12 @@ class VoteForm(Form):
 
         self.domain.choices = list(principal.domains_vote.items())
 
+        entities_year = date.today().year
+        if entities_year not in principal.entities and principal.entities:
+            entities_year = max(principal.entities)
         municipalities = {
-            municipality
-            for year in principal.entities.values()
-            for entity in year.values()
-            if (municipality := entity.get('name', None))
+            m for entity in principal.entities.get(entities_year, {}).values()
+            for m in (entity.get('name'),) if m
         }
         self.municipality.choices = [
             (item, item) for item in sorted(municipalities)

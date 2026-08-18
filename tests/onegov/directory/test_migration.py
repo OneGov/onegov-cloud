@@ -7,6 +7,7 @@ from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.directory.migration import StructuralChanges
 from onegov.form.errors import DuplicateLabelError
+from onegov.form.parser import ParsedForm
 from tempfile import NamedTemporaryFile
 from tests.shared.utils import create_image
 
@@ -18,13 +19,13 @@ if TYPE_CHECKING:
 
 def test_detect_added_fields() -> None:
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             First Name = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             First Name = ___
             Last Name = ___
-        """
+        """)
     )
 
     assert changes.added_fields == ['Last Name']
@@ -36,13 +37,13 @@ def test_detect_added_fields() -> None:
 
 def test_detect_removed_fields() -> None:
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             First Name = ___
             Last Name = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             First Name = ___
-        """
+        """)
     )
 
     assert changes.removed_fields == ['Last Name']
@@ -56,67 +57,67 @@ def test_duplicate_label_error() -> None:
 
     with pytest.raises(DuplicateLabelError):
         StructuralChanges(
-            'A *= ___',
-            'A *= ___\nA *= ___',
+            ParsedForm.from_formcode('A *= ___'),
+            ParsedForm.from_formcode('A *= ___\nA *= ___'),
         )
 
 
 def test_detect_renamed_fields() -> None:
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             # F
             Other = ___
             Name = ___
             Bottom = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             # F
             Other New = ___
             Name = ___
             Bottom New = ___
-        """
+        """)
     )
 
     assert changes.renamed_fields == {
         'F/Other': 'F/Other New', 'F/Bottom': 'F/Bottom New'}
 
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             # F
             Name = ___
             Bottom = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             # F
             Name New = ___
             Bottom = ___
-        """
+        """)
     )
 
     assert changes.renamed_fields == {'F/Name': 'F/Name New'}
 
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             Top = ___
             First Name = ___
             Bottom = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             Top = ___
             Name = ___
             Bottom = ___
-        """
+        """)
     )
 
     assert changes.renamed_fields == {'First Name': 'Name'}
 
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             Name = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             Comment = ...
-        """
+        """)
     )
 
     assert changes.removed_fields == ['Name']
@@ -125,16 +126,16 @@ def test_detect_renamed_fields() -> None:
 
 def test_detect_renamed_fields_changing_fieldsets() -> None:
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             # General
             First Name = ___
             Other = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             # Personal
             Name = ___
             Other = ___
-        """
+        """)
     )
     assert changes.renamed_fields == {
         'General/First Name': 'Personal/Name',
@@ -142,8 +143,8 @@ def test_detect_renamed_fields_changing_fieldsets() -> None:
     }
     assert not changes.removed_fields
     assert not changes.added_fields
-    assert changes.removed_fieldsets == ['General']
-    assert changes.added_fieldsets == ['Personal']
+    assert changes.removed_fieldsets == {'General'}
+    assert changes.added_fieldsets == {'Personal'}
 
     # there is a limit of what can be done...
     # but it should since the order persisted and a new field is only
@@ -160,7 +161,10 @@ def test_detect_renamed_fields_changing_fieldsets() -> None:
     Other too = ___
     Third Renamed = ___
     """
-    changes = StructuralChanges(old, new)
+    changes = StructuralChanges(
+        ParsedForm.from_formcode(old),
+        ParsedForm.from_formcode(new)
+    )
     assert changes.renamed_fields == {
         'General/First Name': 'Personal/Name',
         'General/Other': 'Personal/Other too',
@@ -170,8 +174,8 @@ def test_detect_renamed_fields_changing_fieldsets() -> None:
     # Testing the same with an additional type change without renaming the
     # field itself
     changes = StructuralChanges(
-        old,
-        new.replace('Other too = ___', 'Other = ...')
+        ParsedForm.from_formcode(old),
+        ParsedForm.from_formcode(new.replace('Other too = ___', 'Other = ...'))
     )
     assert changes.renamed_fields == {
         'General/First Name': 'Personal/Name',
@@ -184,12 +188,12 @@ def test_detect_renamed_fields_changing_fieldsets() -> None:
 def test_detect_changed_fields() -> None:
     # required toggle, not renamed
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             Name = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             Name *= ___
-        """
+        """)
     )
 
     assert not changes.renamed_fields
@@ -201,12 +205,12 @@ def test_detect_changed_fields() -> None:
     # renamed *and* required toggled (regression for OGC-3241): changed_fields
     # holds the new id, which does not exist in the old structure
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             First Name = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             Name *= ___
-        """
+        """)
     )
 
     assert changes.renamed_fields == {'First Name': 'Name'}
@@ -219,12 +223,12 @@ def test_detect_changed_fields() -> None:
 
     # type change, not renamed
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             Name = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             Name = ...
-        """
+        """)
     )
 
     assert not changes.renamed_fields
@@ -234,13 +238,13 @@ def test_detect_changed_fields() -> None:
 
     # renamed across a fieldset *and* required toggled
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             # Contact
             Street = ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             Strasse *= ___
-        """
+        """)
     )
 
     assert changes.renamed_fields == {'Contact/Street': 'Strasse'}
@@ -252,12 +256,12 @@ def test_detect_changed_fields() -> None:
 
     # renamed *and* required removed (required -> optional)
     changes = StructuralChanges(
-        """
+        ParsedForm.from_formcode("""
             First Name *= ___
-        """,
-        """
+        """),
+        ParsedForm.from_formcode("""
             Name = ___
-        """
+        """)
     )
 
     assert changes.renamed_fields == {'First Name': 'Name'}
@@ -289,10 +293,10 @@ def test_migration_possible_with_renamed_and_changed_field(
     entries.add(values=dict(name="Chess Club", street="Main Street 1"))
 
     migration = entries.migration(
-        """
+        ParsedForm.from_formcode("""
             Name *= ___
             Strasse *= ___
-        """,
+        """),
         new_configuration=None
     )
     assert migration.changes.renamed_fields == {'Street': 'Strasse'}
@@ -313,9 +317,12 @@ def test_add_fieldset_at_top() -> None:
     B *= ___
     C *= ___""")
 
-    changes = StructuralChanges(old, '# Main\n' + old)
+    changes = StructuralChanges(
+        ParsedForm.from_formcode(old),
+        ParsedForm.from_formcode('# Main\n' + old)
+    )
     assert not changes.removed_fieldsets
-    assert changes.added_fieldsets == ['Main']
+    assert changes.added_fieldsets == {'Main'}
     assert changes.renamed_fields == {'A': 'Main/A'}
     assert not changes.added_fields
     assert not changes.removed_fields
@@ -333,16 +340,22 @@ def test_add_fieldset_at_bottom() -> None:
     # Crazy
     C *= ___""")
 
-    changes = StructuralChanges('# Main\n' + old, '# Main\n' + new)
+    changes = StructuralChanges(
+        ParsedForm.from_formcode('# Main\n' + old),
+        ParsedForm.from_formcode('# Main\n' + new)
+    )
     assert not changes.removed_fieldsets
-    assert changes.added_fieldsets == ['Crazy']
+    assert changes.added_fieldsets == {'Crazy'}
     assert changes.renamed_fields == {'Main/C': 'Crazy/C'}
     assert not changes.added_fields
     assert not changes.removed_fields
 
-    changes = StructuralChanges(old, new)
+    changes = StructuralChanges(
+        ParsedForm.from_formcode(old),
+        ParsedForm.from_formcode(new)
+    )
     assert not changes.removed_fieldsets
-    assert changes.added_fieldsets == ['Crazy']
+    assert changes.added_fieldsets == {'Crazy'}
     assert changes.renamed_fields == {'C': 'Crazy/C'}
     assert not changes.added_fields
     assert not changes.removed_fields
@@ -359,14 +372,20 @@ def test_remove_fieldset_in_between() -> None:
         Currency *= ___"""
 
     # Test topmost fieldset deleted with fieldsets beneath
-    changes = StructuralChanges(old, old.replace('# Main', ''))
+    changes = StructuralChanges(
+        ParsedForm.from_formcode(old),
+        ParsedForm.from_formcode(old.replace('# Main', ''))
+    )
     assert not changes.added_fieldsets
     assert changes.renamed_fields == {'Main/Name': 'Name'}
     assert not changes.added_fields
     assert not changes.removed_fields
-    assert changes.removed_fieldsets == ['Main']
+    assert changes.removed_fieldsets == {'Main'}
 
-    changes = StructuralChanges(old, old.replace('# Cost (A,B;C/D)', ''))
+    changes = StructuralChanges(
+        ParsedForm.from_formcode(old),
+        ParsedForm.from_formcode(old.replace('# Cost (A,B;C/D)', ''))
+    )
     assert changes.renamed_fields == {
         'Cost (A,B;C/D)/Cost': 'Main/Cost',
         'Cost (A,B;C/D)/Currency': 'Main/Currency'
@@ -375,7 +394,7 @@ def test_remove_fieldset_in_between() -> None:
     assert not changes.added_fields
     assert not changes.removed_fields
     assert not changes.added_fieldsets
-    assert changes.removed_fieldsets == ['Cost (A,B;C/D)']
+    assert changes.removed_fieldsets == {'Cost (A,B;C/D)'}
 
     old = """
     # F
@@ -387,12 +406,12 @@ def test_remove_fieldset_in_between() -> None:
     D = ___"""
 
     changes = StructuralChanges(
-        old,
-        old.replace('# S', '')
+        ParsedForm.from_formcode(old),
+        ParsedForm.from_formcode(old.replace('# S', ''))
     )
     assert changes.renamed_fields == {'S/B': 'F/B', 'S/C': 'F/C'}
     assert not changes.added_fieldsets
-    assert changes.removed_fieldsets == ['S']
+    assert changes.removed_fieldsets == {'S'}
     assert not changes.removed_fields
     assert not changes.added_fields
     assert not changes.changed_fields
@@ -453,7 +472,10 @@ def test_directory_migration(session: Session) -> None:
 
     # Remove fieldset in between without having to change configuration
     new_structure = structure.replace('# General', '')
-    migration = zoos.migration(new_structure, new_configuration=None)
+    migration = zoos.migration(
+        ParsedForm.from_formcode(new_structure),
+        new_configuration=None
+    )
     changes = migration.changes
     assert changes.renamed_fields == {
         'General/Employees': 'Main/Employees',
@@ -467,7 +489,10 @@ def test_directory_migration(session: Session) -> None:
     migration.execute()
 
     new_structure = new_structure.replace('# Cost (A,B;C/D)', '')
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(
+        ParsedForm.from_formcode(new_structure),
+        None
+    )
     changes = migration.changes
     assert changes.renamed_fields['Cost (A,B;C/D)/Currency'] == 'Main/Currency'
     assert changes.renamed_fields['Cost (A,B;C/D)/Cost'] == 'Main/Cost'
@@ -587,22 +612,22 @@ def test_directory_field_type_migrations(
     """
 
     structure = textwrap.dedent(
-        f"""
+    """
         # Main
         Name *= ___
         # General
-        {old}
+        {}
     """
-    )
+    ).format(textwrap.dedent(old))
 
     new_structure = textwrap.dedent(
-        f"""
+    """
         # Main
         Name *= ___
         # General
-        {new}
+        {}
     """
-    )
+    ).format(textwrap.dedent(new))
 
     directories = DirectoryCollection(session)
     zoos = directories.add(
@@ -622,7 +647,7 @@ def test_directory_field_type_migrations(
 
     assert zoo.values[f'general_{label}'] == ''  # radio
 
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert migration.possible
 
     migration.execute()
@@ -672,7 +697,7 @@ def test_directory_migration_for_select(session: Session) -> None:
         Animals =
             [ ] Snakes
     """
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {
@@ -705,7 +730,7 @@ def test_directory_migration_for_select(session: Session) -> None:
             [ ] Snakes
             [ ] Gnus
     """
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert migration.changes.added_options == [
         ('General/Landscapes', 'Marine'),
         ('General/Landscapes', 'Tropical Rainforest'),
@@ -736,7 +761,7 @@ def test_directory_migration_for_select(session: Session) -> None:
             [ ] Gnus
             [ ] Snakes
     """
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {}
@@ -762,7 +787,7 @@ def test_directory_migration_for_select(session: Session) -> None:
             [ ] Gnus
             [ ] Snakes
     """
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert not migration.possible
 
     # rename
@@ -781,7 +806,7 @@ def test_directory_migration_for_select(session: Session) -> None:
             [ ] Gnus
             [ ] Snakes
     """
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {
@@ -806,7 +831,7 @@ def test_directory_migration_for_select(session: Session) -> None:
         Animals =
             [ ] Gnus
     """
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == [
         ('General/Landscapes', 'Great Desert'),
@@ -833,7 +858,7 @@ def test_directory_migration_for_select(session: Session) -> None:
         Animals =
             [ ] Gnus
     """
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {}
@@ -857,7 +882,7 @@ def test_directory_migration_for_select(session: Session) -> None:
         Animals =
             ( ) Gnus
     """
-    migration = zoos.migration(new_structure, None)
+    migration = zoos.migration(ParsedForm.from_formcode(new_structure), None)
     assert migration.changes.added_options == []
     assert migration.changes.removed_options == []
     assert migration.changes.renamed_options == {}

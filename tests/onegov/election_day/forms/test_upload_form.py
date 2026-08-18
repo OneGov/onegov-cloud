@@ -28,7 +28,8 @@ def test_upload_vote_form(session: Session) -> None:
 
     # Test if wabsti_c is added when data sources are available
     form = UploadVoteForm()
-    assert sorted(f[0] for f in form.file_format.choices) == ['internal']
+    assert sorted(
+        f[0] for f in form.file_format.choices) == ['internal']
 
     session.add(vote)
     session.add(DataSource(name='test', type='vote'))

@@ -32,6 +32,7 @@ SANE_HTML_TAGS = [
     'pre',
     'strong',
     'sup',
+    'sub',
     'span',
     'ul',
     'h1',
@@ -54,7 +55,8 @@ SANE_HTML_ATTRS = {
     'abbr': ['title', ],
     'acronym': ['title', ],
     'img': ['src', 'alt', 'title'],
-    'p': ['class']
+    'p': ['class'],
+    'ol': ['class']
 }
 
 # lines without these plaintext characters are excluded in html_to_text

@@ -350,6 +350,7 @@ $globals-height: 2.5rem;
     .ticket-archive::before { @include icon('\f1c6'); }
     .forms::before { @include icon('\f15c'); }
     .surveys::before { @include icon('\f080'); }
+    .topic-chart::before { @include icon('\f0e8'); }
     .citizen-login::before { @include icon('\f090'); }
     .citizen-tickets::before { @include icon('\f145'); }
     .citizen-reservations::before { @include icon('\f133'); }
@@ -842,6 +843,25 @@ form {
             display: inline-block;
             width: auto;
             margin-right: .25rem;
+        }
+    }
+
+    .table-widget {
+        thead th {
+            text-align: center !important;
+        }
+
+        tbody {
+            th[scope="row"] {
+                white-space: nowrap;
+            }
+            td input {
+                margin-bottom: 0 !important;
+
+                &[type="number"] {
+                    text-align: right !important;
+                }
+            }
         }
     }
 
@@ -1696,7 +1716,7 @@ $cleanup-link-icon: '\f0d0';
 $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f014';
 $disabled-icon: '\f05e';
-$edit-link-icon: '\f040';
+$edit-link-icon: '\f03a';
 $save-link-icon: '\f0c7';
 $cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
@@ -2422,11 +2442,13 @@ div#redactor-droparea {
     }
 }
 
-.form-preview-widget .holidays {
-    display: block;
-    font-size: .875rem;
-    list-style: none;
-    margin: 0 0 1rem;
+.form-preview-widget {
+    .holidays, .short-links {
+        display: block;
+        font-size: .875rem;
+        list-style: none;
+        margin: 0 0 1rem;
+    }
 }
 
 .danger-zone {
@@ -4527,7 +4549,8 @@ ul.search-results {
 /*
     Ticket summary customisations
 */
-.ticket-summary {
+.ticket-summary,
+.ticket-cancellation-request {
     margin-bottom: 1.5rem;
 
     > div {
@@ -5598,6 +5621,7 @@ h2 + div.timeline {
     }
 
     .ticket-summary h2,
+    .ticket-cancellation-request h2,
     .ticket-timeline h2 {
         font-weight: bold;
     }
@@ -5606,7 +5630,8 @@ h2 + div.timeline {
         display: none;
     }
 
-    .ticket-summary {
+    .ticket-summary,
+    .ticket-cancellation-request {
         margin-bottom: 0;
 
         * {
@@ -7472,4 +7497,120 @@ p.full-text-width {
     font-family: $font-family-monospace;
     font-size: .75rem;
     background-color: $gray-pastel;
+}
+
+
+/*
+    Topic chart (d3 org chart)
+*/
+.chart-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+
+    .button {
+        margin-bottom: 0;
+    }
+
+    .chart-message {
+        color: $alert-color;
+        margin-bottom: 0;
+    }
+}
+
+.chart-container {
+    border: 1px solid $gray;
+
+    .loading-info {
+        padding: 1rem;
+
+        .fa-spinner {
+            margin-right: 1rem;
+        }
+    }
+
+    &:has(svg) .loading-info {
+        display: none;
+    }
+
+    .d3-orgchart-node {
+        background: #fff;
+        border: 2px solid $gray !important;
+        color: $body-font-color;
+        font-weight: bold;
+        padding: .7rem 1rem;
+        position: relative;
+
+        .drilldown,
+        .drillup {
+            background: none;
+            border: 0;
+            color: inherit;
+            cursor: pointer;
+            font-size: .8rem;
+            line-height: 1;
+            opacity: .35;
+            padding: .2rem;
+            position: absolute;
+            right: .3rem;
+            top: .3rem;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        // only one of the buttons shows at a time, the text keeps clear
+        &:has(button) span {
+            padding-right: .8rem;
+        }
+
+        span {
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+            display: -webkit-box;
+            overflow: hidden;
+        }
+
+        &.hyphens {
+            hyphens: auto;
+        }
+
+        &.restricted,
+        &.unpublished {
+            border-style: dashed !important;
+            color: $gray-dark;
+        }
+
+        &:hover {
+            border-color: $primary-color !important;
+        }
+    }
+
+    .node-button-div {
+        span {
+            font-size: .8rem !important;
+        }
+
+        > div {
+            padding: .2rem .5rem !important;
+            transition: all 200ms linear;
+        }
+    }
+
+    .node-button-g:hover .node-button-div {
+        span {
+            color: $primary-color !important;
+
+            path {
+                stroke: $primary-color !important;
+            }
+        }
+
+        > div {
+            border: 2px solid $primary-color !important;
+        }
+    }
 }

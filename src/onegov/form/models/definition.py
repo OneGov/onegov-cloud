@@ -11,24 +11,25 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.models.submission import FormSubmission, SurveySubmission
 from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.models.survey_window import SurveySubmissionWindow
-from onegov.form.parser import parse_form
+from onegov.form.orm_types import Formcode
+from onegov.form.parser import ParsedForm
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, object_session, relationship, Mapped
 
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 if TYPE_CHECKING:
     # type gets shadowed in the model so we need an alias
     from builtins import type as type_t
     from uuid import UUID
     from datetime import date
+    from onegov.core.request import CoreRequest
     from onegov.form import Form
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
-    from typing import Self
-    from onegov.core.request import CoreRequest
+    from sqlalchemy.sql import ColumnElement
 else:
     PaymentMethod = str
 
@@ -52,8 +53,8 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #: the title of the form
     title: Mapped[str]
 
-    #: the form as parsable string
-    definition: Mapped[str]
+    #: the pre-parsed form
+    parsed: Mapped[ParsedForm] = mapped_column(Formcode)
 
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
@@ -144,6 +145,12 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #: be submitted
     minimum_price_total: dict_property[float | None] = meta_property()
 
+    #: the invoicing party for submissions with the form
+    invoicing_party: dict_property[str | None] = meta_property()
+
+    #: the cost center / cost unit identifier for submissions with the form
+    cost_object: dict_property[str | None] = meta_property()
+
     #: the reply_to address to supersede the global reply_to address for
     #: tickets created through this form
     reply_to: dict_property[str | None] = meta_property()
@@ -155,18 +162,35 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
         'polymorphic_identity': 'generic'
     }
 
+    @hybrid_property
+    def definition(self) -> str:
+        """ The form as a parsable string """
+        return self.parsed.formcode
+
+    @definition.inplace.setter
+    def _definition_setter(self, value: str) -> None:
+        self.parsed = ParsedForm.from_formcode(value)
+
+    @definition.inplace.expression
+    @classmethod
+    def _definition_expression(cls) -> ColumnElement[str | None]:
+        return cls.parsed['source_code'].astext
+
     @property
     def form_class(self) -> type_t[Form]:
-        """ Parses the form definition and returns a form class. """
+        """ The WTForms form class this definition represents. """
 
         return self.extend_form_class(
-            parse_form(self.definition),
+            self.parsed.form_class(),
             self.extensions or [],
         )
 
-    @observes('definition')
-    def definition_observer(self, definition: str) -> None:
-        self.checksum = hash_definition(definition)
+    @observes('parsed')
+    def parsed_observer(self, parsed: set[tuple[str, Any]]) -> None:
+        # FIXME: We might want to switch to a more stable way to hash
+        #        formcode, but we would need to ensure continuity across
+        #        the change.
+        self.checksum = hash_definition(self.parsed.formcode)
 
     @observes('title')
     def title_observer(self, title: str) -> None:
@@ -243,8 +267,8 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     #: the title of the form
     title: Mapped[str]
 
-    #: the form as parsable string
-    definition: Mapped[str]
+    #: the pre-parsed form
+    parsed: Mapped[ParsedForm] = mapped_column(Formcode)
 
     #: the group to which this resource belongs to (may be any kind of string)
     group: Mapped[str | None]
@@ -306,18 +330,35 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
 
+    @hybrid_property
+    def definition(self) -> str:
+        """ The form as a parsable string """
+        return self.parsed.formcode
+
+    @definition.inplace.setter
+    def _definition_setter(self, value: str) -> None:
+        self.parsed = ParsedForm.from_formcode(value)
+
+    @definition.inplace.expression
+    @classmethod
+    def _definition_expression(cls) -> ColumnElement[str | None]:
+        return cls.parsed['source_code'].astext
+
     @property
-    def form_class(self) -> type[Form]:
-        """ Parses the survey definition and returns a form class. """
+    def form_class(self) -> type_t[Form]:
+        """ The WTForms form class this definition represents. """
 
         return self.extend_form_class(
-            parse_form(self.definition),
+            self.parsed.form_class(),
             self.extensions or [],
         )
 
-    @observes('definition')
-    def definition_observer(self, definition: str) -> None:
-        self.checksum = hash_definition(definition)
+    @observes('parsed')
+    def parsed_observer(self, parsed: set[tuple[str, Any]]) -> None:
+        # FIXME: We might want to switch to a more stable way to hash
+        #        formcode, but we would need to ensure continuity across
+        #        the change.
+        self.checksum = hash_definition(self.parsed.formcode)
 
     @observes('title')
     def title_observer(self, title: str) -> None:

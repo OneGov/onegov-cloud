@@ -64,7 +64,7 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
-from onegov.org.models.extensions import PersonLinkExtension
+from onegov.org.models.extensions import ACCESS_LABELS, PersonLinkExtension
 from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
@@ -1002,6 +1002,10 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
         lines = (l for l in lines if l)
         return linkify(', '.join(lines))
 
+    def access_label(self, access: str) -> str:
+        """ The translated label for a model's ``access`` level. """
+        return self.request.translate(ACCESS_LABELS.get(access, access))
+
 
 class AdjacencyListMixin:
     """ Provides layouts for models inheriting from
@@ -1702,13 +1706,19 @@ class PersonCollectionLayout(DefaultLayout):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
-            return [
-                Link(
+            links: list[Link | LinkGroup] = []
+
+            if self.request.is_admin:
+                links.append(Link(
                     text=_('Settings'),
-                    url=self.request.link(
-                        self.request.app.org, 'people-settings'),
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'people-settings')
+                    ),
                     attrs={'class': 'settings-link'}
-                ),
+                ))
+
+            links.append(
                 LinkGroup(
                     title=_('Add'),
                     links=[
@@ -1721,8 +1731,9 @@ class PersonCollectionLayout(DefaultLayout):
                             attrs={'class': 'new-person'}
                         )
                     ]
-                ),
-            ]
+                )
+            )
+            return links
         return None
 
 
@@ -2279,36 +2290,49 @@ class ResourcesLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
+                    text=_('Settings'),
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'resource-settings')
+                    ),
+                    attrs={'class': 'settings-link'}
+                ),
+                Link(
                     text=_('Recipients'),
                     url=self.request.class_link(ResourceRecipientCollection),
-                    attrs={'class': 'manage-recipients'}
+                    attrs={'class': 'manage-recipients'},
+                ),
+                Link(
+                    text=_('Export All'),
+                    url=self.request.link(self.model, name='export-all'),
+                    attrs={'class': 'export-link'},
+                ),
+                IFrameLink(
+                    text=_('iFrame'),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'new-iframe'},
                 ),
                 LinkGroup(
                     title=_('Add'),
                     links=[
                         Link(
                             text=_('Room'),
-                            url=self.request.link(
-                                self.model,
-                                name='new-room'
-                            ),
-                            attrs={'class': 'new-room'}
+                            url=self.request.link(self.model, name='new-room'),
+                            attrs={'class': 'new-room'},
                         ),
                         Link(
                             text=_('Daypass'),
                             url=self.request.link(
-                                self.model,
-                                name='new-daypass'
+                                self.model, name='new-daypass'
                             ),
-                            attrs={'class': 'new-daypass'}
+                            attrs={'class': 'new-daypass'},
                         ),
                         Link(
                             text=_('Resource Item'),
                             url=self.request.link(
-                                self.model,
-                                name='new-daily-item'
+                                self.model, name='new-daily-item'
                             ),
-                            attrs={'class': 'new-daily-item'}
+                            attrs={'class': 'new-daily-item'},
                         ),
                         Link(
                             text=_('External resource link'),
@@ -2317,24 +2341,16 @@ class ResourcesLayout(DefaultLayout):
                                 query_params={
                                     'to': self.resources_url,
                                     'title': self.request.translate(
-                                        _('New external resource')),
-                                    'type': 'resource'
+                                        _('New external resource')
+                                    ),
+                                    'type': 'resource',
                                 },
-                                name='new'
+                                name='new',
                             ),
-                            attrs={'class': 'new-resource-link'}
-                        )
-                    ]
+                            attrs={'class': 'new-resource-link'},
+                        ),
+                    ],
                 ),
-                Link(
-                    text=_('Export All'),
-                    url=self.request.link(self.model, name='export-all'),
-                ),
-                IFrameLink(
-                    text=_('iFrame'),
-                    url=self.request.link(self.model),
-                    attrs={'class': 'new-iframe'}
-                )
             ]
         return None
 
@@ -2682,7 +2698,7 @@ class EventLayoutMixin:
 
         # FIXME: We define a very similar constant in our forms, we should
         #        move this to onegov.org.constants and use it for both.
-        WEEKDAYS = (  # noqa: N806
+        WEEKDAYS = (  # ruff:ignore[non-lowercase-variable-in-function]
             _('Mo'), _('Tu'), _('We'), _('Th'), _('Fr'), _('Sa'), _('Su')
         )
 
@@ -2730,21 +2746,16 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup]:
         def links() -> Iterator[Link | LinkGroup]:
-            if (self.request.is_admin and self.request.app.org.
-                    event_filter_type in ['filters', 'tags_and_filters']):
-                yield Link(
-                    text=_('Configure'),
-                    url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'filters-link'}
-                )
-
             if self.request.is_manager:
-                yield Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.request.app.org,
-                                          'event-settings'),
-                    attrs={'class': 'edit-link'}
-                )
+                if self.request.is_admin:
+                    yield Link(
+                        text=_('Settings'),
+                        url=self.request.return_here(
+                            self.request.link(self.request.app.org,
+                                              'event-settings')
+                        ),
+                        attrs={'class': 'edit-link'}
+                    )
 
                 yield Link(
                     text=_('Import'),
@@ -3050,19 +3061,24 @@ class NewsletterLayout(DefaultLayout):
             return None
 
         if self.is_collection:
-            links: list[Link | LinkGroup] = [
-                Link(
-                    text=_('Subscribers'),
-                    url=self.request.link(self.recipients),
-                    attrs={'class': 'manage-subscribers'}
-                ),
-                Link(
+            links: list[Link | LinkGroup] = []
+
+            if self.request.is_admin:
+                links.append(Link(
                     text=_('Settings'),
-                    url=self.request.link(
-                        self.request.app.org, 'newsletter-settings'),
-                    attrs={'class': 'settings-link'}
-                ),
-            ]
+                    url=self.request.return_here(
+                        self.request.link(
+                            self.request.app.org, 'newsletter-settings'
+                        )
+                    ),
+                    attrs={'class': 'settings-link'},
+                ))
+
+            links.append(Link(
+                text=_('Subscribers'),
+                url=self.request.link(self.recipients),
+                attrs={'class': 'manage-subscribers'},
+            ))
 
             if self.request.browser_session.has('clipboard_url'):
                 clipboard = Clipboard.from_session(self.request)
@@ -3101,7 +3117,12 @@ class NewsletterLayout(DefaultLayout):
 
             return [
                 Link(
-                    text=_('Send'),
+                    text=_('Edit'),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Schedule email delivery'),
                     url=self.request.link(self.model, 'send'),
                     attrs={'class': 'send-link'}
                 ),
@@ -3118,11 +3139,6 @@ class NewsletterLayout(DefaultLayout):
                         )
                     ),
                     attrs={'class': 'copy-link'},
-                ),
-                Link(
-                    text=_('Edit'),
-                    url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
                 ),
                 Link(
                     text=_('Delete'),
@@ -3243,17 +3259,17 @@ class ImageSetLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_('Choose images'),
-                    url=self.request.link(self.model, 'select'),
-                    attrs={'class': 'select'}
-                ),
-                Link(
                     text=_('Edit'),
                     url=self.request.link(
                         self.model,
                         name='edit'
                     ),
                     attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_('Choose images'),
+                    url=self.request.link(self.model, 'select'),
+                    attrs={'class': 'select'}
                 ),
                 Link(
                     text=_('Delete'),
@@ -3973,45 +3989,72 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
-            return [
+            links: list[Link | LinkGroup] = [
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 ),
-                Link(
-                    text=_('Delete'),
-                    url=self.csrf_protected_url(
-                        self.request.link(self.model)
-                    ),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _(
-                                'Do you really want to delete "${title}"?',
-                                mapping={
-                                    'title': self.model.title
-                                }
-                            ),
-                            _('This cannot be undone.'),
-                            _('Delete entry'),
-                            _('Cancel')
+            ]
+            # keep the delete button in sync with the delete_directory_entry
+            # guard
+            last_run = self.request.app.org.last_hourly_maintenance_run
+            if ((self.model.published
+                    or self.model.published_as_of(last_run))
+                    and self.model.directory.notification_address):
+                links.append(
+                    Link(
+                        text=_('Delete'),
+                        url='#',
+                        attrs={
+                            'class': 'delete-link disabled-link',
+                            'title': _(
+                                'This entry cannot be deleted while it '
+                                'is published, to ensure proof of '
+                                'publication.'
+                            )
+                        }
+                    )
+                )
+            else:
+                links.append(
+                    Link(
+                        text=_('Delete'),
+                        url=self.csrf_protected_url(
+                            self.request.link(self.model)
                         ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(
-                                ExtendedDirectoryEntryCollection(
-                                    self.directory)
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Confirm(
+                                _(
+                                    'Do you really want to delete '
+                                    '"${title}"?',
+                                    mapping={
+                                        'title': self.model.title
+                                    }
+                                ),
+                                _('This cannot be undone.'),
+                                _('Delete entry'),
+                                _('Cancel')
+                            ),
+                            Intercooler(
+                                request_method='DELETE',
+                                redirect_after=self.request.link(
+                                    ExtendedDirectoryEntryCollection(
+                                        self.directory)
+                                )
                             )
                         )
                     )
-                ),
+                )
+            links.append(
                 QrCodeLink(
                     text=_('QR'),
                     url=self.request.link(self.model),
                     attrs={'class': 'qr-code-link'}
                 )
-            ]
+            )
+            return links
         return None
 
 
@@ -4121,7 +4164,9 @@ class HomepageLayout(DefaultLayout):
             return [
                 Link(
                     _('Edit'),
-                    self.request.link(self.model, 'homepage-settings'),
+                    self.request.return_here(
+                        self.request.link(self.model, 'homepage-settings')
+                    ),
                     attrs={'class': ('edit-link')}
                 ),
                 Link(

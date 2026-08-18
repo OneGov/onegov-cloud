@@ -59,7 +59,7 @@ class InvoiceCollection[
         return InvoiceItem.get_polymorphic_class(self.item_type, InvoiceItem)  # type: ignore[arg-type, return-value]
 
     def query(self) -> Query[InvoiceT]:
-        Invoice = self.model_class  # noqa: N806
+        Invoice = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
 
         query = super().query()
 
@@ -69,8 +69,8 @@ class InvoiceCollection[
         return query
 
     def query_items(self) -> Query[ItemT]:
-        Invoice = self.model_class  # noqa: N806
-        InvoiceItem = self.item_model_class  # noqa: N806
+        Invoice = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
+        InvoiceItem = self.item_model_class  # ruff:ignore[non-lowercase-variable-in-function]
 
         query = self.session.query(self.item_model_class).filter(
             InvoiceItem.invoice_id.in_(
@@ -84,11 +84,11 @@ class InvoiceCollection[
         return query
 
     def _invoice_ids(self) -> ScalarSelect[UUID]:
-        Invoice = self.model_class  # noqa: N806
+        Invoice = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
         return self.query().with_entities(Invoice.id).scalar_subquery()
 
     def _sum(self, condition: ColumnElement[bool]) -> Decimal:
-        InvoiceItem = self.item_model_class  # noqa: N806
+        InvoiceItem = self.item_model_class  # ruff:ignore[non-lowercase-variable-in-function]
         q = self.session.query(func.sum(InvoiceItem.amount))
         q = q.filter(condition)
 
@@ -96,13 +96,13 @@ class InvoiceCollection[
 
     @property
     def total_amount(self) -> Decimal:
-        InvoiceItem = self.item_model_class  # noqa: N806
+        InvoiceItem = self.item_model_class  # ruff:ignore[non-lowercase-variable-in-function]
         return self._sum(InvoiceItem.invoice_id.in_(self._invoice_ids())
         )
 
     @property
     def outstanding_amount(self) -> Decimal:
-        InvoiceItem = self.item_model_class  # noqa: N806
+        InvoiceItem = self.item_model_class  # ruff:ignore[non-lowercase-variable-in-function]
         return self._sum(and_(
             InvoiceItem.invoice_id.in_(self._invoice_ids()),
             InvoiceItem.paid == False
@@ -110,14 +110,14 @@ class InvoiceCollection[
 
     @property
     def paid_amount(self) -> Decimal:
-        InvoiceItem = self.item_model_class  # noqa: N806
+        InvoiceItem = self.item_model_class  # ruff:ignore[non-lowercase-variable-in-function]
         return self._sum(and_(
             InvoiceItem.invoice_id.in_(self._invoice_ids()),
             InvoiceItem.paid == True
         ))
 
     def unpaid_count(self) -> int:
-        Invoice = self.model_class  # noqa: N806
+        Invoice = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
         query = self.query().with_entities(func.count(Invoice.id))
         query = query.filter(Invoice.paid == False)
         return query.scalar() or 0

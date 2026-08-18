@@ -36,10 +36,8 @@ class ExtendedAgencyCollection(AdjacencyListCollection[ExtendedAgency]):
     def __init__(
         self,
         session: Session,
-        # FIXME: These really should be float/int, we just need to add
-        #        convertes to the path configuration...
         root_pdf_modified: str | None = None,
-        browse: str | None = None
+        browse: int | None = None
     ) -> None:
         super().__init__(session)
         self.root_pdf_modified = root_pdf_modified

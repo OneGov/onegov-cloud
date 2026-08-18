@@ -14,10 +14,13 @@ from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.file import MultiAssociatedFiles
-from onegov.form import parse_form
+from onegov.form.parser import ParsedForm
+from onegov.form.orm_types import Formcode
 from onegov.pay import InvoiceItemMeta, Price, process_payment
+from onegov.reservation.pricing_scheme import PRICING_SCHEMES
 from sedate import align_date_to_day, utcnow
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
 
@@ -35,6 +38,7 @@ if TYPE_CHECKING:
         InvoiceDiscountMeta, Payment, PaymentError, PaymentProvider)
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Session
+    from sqlalchemy.sql import ColumnElement
 
     type DeadlineUnit = Literal['d', 'h']
 
@@ -101,8 +105,8 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: the timezone this resource resides in
     timezone: Mapped[str]
 
-    #: the custom form definition used when creating a reservation
-    definition: Mapped[str | None]
+    #: the pre-parsed custom form used when creating a reservation
+    parsed: Mapped[ParsedForm | None] = mapped_column(Formcode)
 
     #: the group to which this resource belongs to (may be any kind of string)
     group: Mapped[str | None]
@@ -135,6 +139,9 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         content_property('price_per_reservation')
     )
 
+    #: the custom resource pricing scheme to use
+    pricing_scheme: dict_property[str | None] = content_property()
+
     #: the invoicing party for this resource
     invoicing_party: dict_property[str | None] = content_property()
 
@@ -154,6 +161,11 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     #: reservation lead time (in days)
     lead_time: dict_property[int | None] = content_property()
+
+    #: enable reservation reminder emails
+    enable_reservation_reminders: dict_property[bool] = content_property(
+        default=False
+    )
 
     #: the pricing method to use for extras defined in formcode
     extras_pricing_method: dict_property[str] = (
@@ -187,6 +199,12 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     #: hint on how to get to the resource
     pick_up: dict_property[str | None] = content_property()
 
+    #: whether users may submit a cancellation request for
+    # accepted reservations
+    allow_cancellation_requests: dict_property[bool] = (
+        content_property(default=False)
+    )
+
     #: the reply_to address to supersede the global reply_to address for
     #: tickets created through this form
     reply_to: dict_property[str | None] = meta_property()
@@ -219,6 +237,23 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     #: the view to open in the calendar (fullCalendar view name)
     view = 'dayGridMonth'
+
+    @hybrid_property
+    def definition(self) -> str | None:
+        """ The form as a parsable string """
+        return self.parsed.formcode if self.parsed is not None else None
+
+    @definition.inplace.setter
+    def _definition_setter(self, value: str | None) -> None:
+        if not value:
+            self.parsed = None
+        else:
+            self.parsed = ParsedForm.from_formcode(value)
+
+    @definition.inplace.expression
+    @classmethod
+    def _definition_expression(cls) -> ColumnElement[str | None]:
+        return cls.parsed['source_code'].astext
 
     @deadline.inplace.setter
     def set_deadline(self, value: tuple[int, DeadlineUnit] | None) -> None:
@@ -312,16 +347,17 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     def form_class(self) -> type_t[Form] | None:
         """ Parses the form definition and returns a form class. """
 
-        if not self.definition:
+        if self.parsed is None:
             return None
 
-        return parse_form(self.definition)
+        return self.parsed.form_class()
 
     def invoice_items_for_reservation(
         self,
         reservations: Sequence[CustomReservation],
         extras: Sequence[InvoiceItemMeta] | None = None,
         discounts: Sequence[InvoiceDiscountMeta] | None = None,
+        submission_data: dict[str, Any] | None = None,
         *,
         # HACK: This isn't great, but similarly adding i18n to
         #       the reservation module for a single translation
@@ -335,17 +371,33 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         items: list[InvoiceItemMeta] = []
         extras_quantity = Decimal('0')
+        reservation_data = reservations[0].data or {}
+        extras_pricing_method = reservation_data.get(
+            'extras_pricing_method',
+            self.extras_pricing_method
+        )
+        discount_method = reservation_data.get(
+            'discount_method',
+            self.discount_method
+        )
+        cost_object = reservation_data.get(
+            'cost_object',
+            self.cost_object
+        )
         for reservation in reservations:
             # FIXME: We could speed this up by loading all of the
             #        targeted allocations ahead of time and passing
             #        the correct allocation here. Right now there's
             #        a N+1 situation for loading target allocations.
-            item = reservation.invoice_item(self)
+            item = reservation.invoice_item(
+                self,
+                submission_data=submission_data
+            )
             if item is not None:
                 items.append(item)
 
             if extras:
-                match self.extras_pricing_method:
+                match extras_pricing_method:
                     case 'one_off':
                         extras_quantity = Decimal('1')
 
@@ -378,7 +430,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         total = InvoiceItemMeta.total(items)
         extras_total = InvoiceItemMeta.total(extras)
 
-        match self.discount_method:
+        match discount_method:
             case 'resource':
                 discount_total = total
             case 'extras':
@@ -421,11 +473,41 @@ class Resource(ORMBase, ModelBase, ContentMixin,
             items.append(InvoiceItemMeta(
                 text=reduced_amount_label,
                 group='reduced_amount',
-                cost_object=self.cost_object,
+                cost_object=cost_object,
                 unit=reduced_amount-total
             ))
 
         return items
+
+    def store_pricing_settings(
+        self,
+        data: dict[str, Any],
+        allocation: Allocation | None
+    ) -> None:
+        """ Stores the resource/allocation specific pricing settings on the
+        given reservation data, so pricing on that reservation remains stable,
+        regardless of what changes later happen to the resource/allocation.
+        """
+        allocation_data = allocation and allocation.data or {}
+        pricing_method = allocation_data.get('pricing_method', 'inherit')
+        if pricing_method == 'inherit':
+            data['pricing_method'] = self.pricing_method
+            data['price_per_hour'] = self.price_per_hour
+            data['price_per_item'] = self.price_per_item
+            data['pricing_scheme'] = pricing_scheme_name = self.pricing_scheme
+            data['currency'] = self.currency
+            if pricing_scheme_name and (
+                pricing_scheme := PRICING_SCHEMES.get(pricing_scheme_name)
+            ) is not None:
+                for name in pricing_scheme.content_names:
+                    data[name] = self.content.get(name)
+        else:
+            data['pricing_method'] = pricing_method
+            data['price_per_hour'] = allocation_data.get('price_per_hour', 0.0)
+            data['price_per_item'] = allocation_data.get('price_per_item', 0.0)
+            data['pricing_scheme'] = None
+            data['currency'] = allocation_data.get('currency') or self.currency
+        data['cost_object'] = self.cost_object
 
     def process_payment(
         self,

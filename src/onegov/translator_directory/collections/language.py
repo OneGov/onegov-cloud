@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from typing import Self
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class LanguageCollection(

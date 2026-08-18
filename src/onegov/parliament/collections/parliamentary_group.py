@@ -10,7 +10,7 @@ from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class ParliamentaryGroupCollection[GroupT: ParliamentaryGroup = Any](
@@ -32,7 +32,7 @@ class ParliamentaryGroupCollection[GroupT: ParliamentaryGroup = Any](
     def query(self) -> Query[GroupT]:
         query = super().query()
 
-        ParliamentaryGroup = self.model_class  # noqa: N806
+        ParliamentaryGroup = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
         if self.active is not None:
             if self.active:
                 query = query.filter(

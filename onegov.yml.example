@@ -219,6 +219,11 @@ configuration: &global-config
     siteimprove:
     google_analytics:
 
+  # Resource pricing schemes
+  resource_pricing_schemes:
+    "onegov_town6/stadtschulen_zug":
+      - stadtschulen_zug
+
   # Alternative login providers
   # authentication_providers:
   #   msal:

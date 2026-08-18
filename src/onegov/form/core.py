@@ -310,7 +310,23 @@ class Form(BaseForm):
                     ),
                     If(
                         field.depends_on.unfulfilled,
-                        StrictOptional()
+                        # NOTE: Since numeric fields tend to submit a zero
+                        #       instead of an empty string, when they're
+                        #       hidden, we don't want to trigger range
+                        #       validation errors, so we treat zeroes as
+                        #       optional and skip the other validators in
+                        #       the chain.
+                        StrictOptional(zero_is_optional=True),
+                        # NOTE: If someone manually submits data into a hidden
+                        #       field we want to make sure it's still valid
+                        *(
+                            validator
+                            for validator in validators
+                            if not isinstance(
+                                validator,
+                                (InputRequired, DataRequired, StrictOptional)
+                            )
+                        )
                     ),
                 )
 
@@ -430,7 +446,7 @@ class Form(BaseForm):
         if not depends_on:
             return True
 
-        bound_field = getattr(self, field_id)
+        bound_field = self[field_id]
 
         if not depends_on.fulfilled(self, bound_field):
             return False

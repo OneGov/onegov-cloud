@@ -94,6 +94,7 @@ def handle_new_resource_recipient(
             customer_messages=form.customer_messages.data,
             internal_notes=form.internal_notes.data,
             rejected_reservations=form.rejected_reservations.data,
+            cancellation_requests=form.cancellation_requests.data,
             send_on=form.send_on.data,
             resources=form.resources.data,
         )

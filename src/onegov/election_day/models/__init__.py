@@ -26,6 +26,7 @@ from onegov.election_day.models.party_result import PartyPanachageResult
 from onegov.election_day.models.party_result import PartyResult
 from onegov.election_day.models.principal import Canton
 from onegov.election_day.models.principal import Municipality
+from onegov.election_day.models.principal import MunicipalityRedirect
 from onegov.election_day.models.principal import Principal
 from onegov.election_day.models.screen import Screen
 from onegov.election_day.models.subscriber import EmailSubscriber
@@ -62,6 +63,7 @@ __all__ = [
     'ListPanachageResult',
     'ListResult',
     'Municipality',
+    'MunicipalityRedirect',
     'Notification',
     'PartyPanachageResult',
     'PartyResult',

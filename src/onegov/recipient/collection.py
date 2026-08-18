@@ -6,7 +6,7 @@ from onegov.recipient.model import GenericRecipient
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class GenericRecipientCollection[T: GenericRecipient](

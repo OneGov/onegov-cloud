@@ -2,16 +2,13 @@ from __future__ import annotations
 
 from functools import cached_property
 from onegov.form import as_internal_id
-from onegov.form import flatten_fieldsets
 from onegov.form import merge_forms
-from onegov.form import parse_formcode
 from onegov.form import Form
-from onegov.form.errors import FormError
 from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import FormcodeField
 from onegov.form.fields import TreeSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
-from onegov.form.validators import ValidFormDefinition
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.org import _, log
 from onegov.org.forms.fields import HtmlField
@@ -21,7 +18,7 @@ from onegov.org.forms.generic import ExportForm
 from onegov.org.forms.generic import PaymentForm
 from onegov.org.forms.reservation import (
     RESERVED_FIELDS, ExportToExcelWorksheets)
-from onegov.org.forms.util import WEEKDAYS
+from onegov.org.forms.util import PRICING_METHODS, WEEKDAYS
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.reservation import Resource
 from sqlalchemy import func
@@ -41,6 +38,7 @@ from wtforms.validators import ValidationError
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Collection
     from markupsafe import Markup
     from onegov.form.fields import TreeSelectNode
     from onegov.org.request import OrgRequest
@@ -141,16 +139,12 @@ class ResourceBaseForm(Form):
                       'inform the user')
     )
 
-    definition = TextAreaField(
+    parsed = FormcodeField(
         label=_('Extra Fields Definition'),
-        validators=[
-            Optional(),
-            ValidFormDefinition(
-                require_email_field=False,
-                reserved_fields=RESERVED_FIELDS
-            )
-        ],
-        render_kw={'rows': 32, 'data-editor': 'form'}
+        name='definition',
+        require_email_field=False,
+        reserved_fields=RESERVED_FIELDS,
+        validators=[Optional()],
     )
 
     occupancy_fields = TextAreaField(
@@ -239,6 +233,12 @@ class ResourceBaseForm(Form):
         ]
     )
 
+    enable_reservation_reminders = BooleanField(
+        label=_('Send a reminder email to the reservee 10 days in advance'),
+        fieldset=_('Reservation reminders'),
+        default=False,
+    )
+
     zipcode_block_use = BooleanField(
         label=_('Limit reservations to certain zip-codes'),
         fieldset=_('Zip-code limit'),
@@ -301,6 +301,12 @@ class ResourceBaseForm(Form):
         description=_('Replies to automated e-mails go to this address.')
     )
 
+    allow_cancellation_requests = BooleanField(
+        label=_('Enable cancel reservation'),
+        fieldset=_('Cancellation'),
+        default=False,
+    )
+
     invoicing_party = TextAreaField(
         label=_('Invoicing party'),
         fieldset=_('Invoicing'),
@@ -322,11 +328,7 @@ class ResourceBaseForm(Form):
         fieldset=_('Payments'),
         default='free',
         validators=[InputRequired()],
-        choices=(
-            ('free', _('Free of charge')),
-            ('per_item', _('Per item')),
-            ('per_hour', _('Per hour'))
-        )
+        choices=PRICING_METHODS,
     )
 
     price_per_item = DecimalField(
@@ -343,6 +345,14 @@ class ResourceBaseForm(Form):
         fieldset=_('Payments'),
         validators=[InputRequired()],
         depends_on=('pricing_method', 'per_hour')
+    )
+
+    pricing_scheme = RadioField(
+        label=_('Pricing scheme'),
+        fieldset=_('Payments'),
+        validators=[InputRequired()],
+        depends_on=('pricing_method', 'pricing_scheme'),
+        choices=()
     )
 
     currency = StringField(
@@ -382,6 +392,18 @@ class ResourceBaseForm(Form):
     )
 
     def on_request(self) -> None:
+        scheme_choices = self.pricing_scheme.choices = [
+            (scheme.name, scheme.label)
+            for scheme in self.request.app.resource_pricing_schemes
+        ]
+        if not scheme_choices:
+            self.delete_field('pricing_scheme')
+            self.pricing_method.choices = [
+                (value, label)
+                for value, label in PRICING_METHODS
+                if value != 'pricing_scheme'
+            ]
+
         if hasattr(self.model, 'type'):
             if self.model.type != 'room':
                 self.delete_field('parent_id')
@@ -497,13 +519,9 @@ class ResourceBaseForm(Form):
     def known_field_ids(self) -> set[str] | None:
         # FIXME: We should probably define this in relation to known_fields
         #        so we don't parse the form twice if we access both properties
-        try:
-            return {
-                field.id for field in
-                flatten_fieldsets(parse_formcode(self.definition.data))
-            }
-        except FormError:
+        if self.parsed.data is None:
             return None
+        return {field.id for field in self.parsed.data.flattened_fields}
 
     def extract_field_ids(self, field: Field) -> list[str]:
         if not self.known_field_ids:
@@ -528,10 +546,14 @@ class ResourceBaseForm(Form):
             raise ValidationError(
                 _('Please select the form field that holds the zip-code'))
 
-        for fieldset in parse_formcode(self.definition.data):
-            for parsed_field in fieldset.fields:
-                if parsed_field.human_id == self.zipcode_field.data:
-                    return
+        if self.parsed.data is None:
+            return
+
+        # FIXME: What about nested fields? Can those not be selected
+        #        in these kinds of fields?
+        for parsed_field in self.parsed.data.fields:
+            if parsed_field.human_id == self.zipcode_field.data:
+                return
 
         raise ValidationError(
             _('Please select the form field that holds the zip-code'))
@@ -545,7 +567,7 @@ class ResourceBaseForm(Form):
                 _('Please enter at least one zip-code'))
 
         try:
-            self.zipcodes  # noqa: B018
+            self.zipcodes  # ruff:ignore[useless-expression]
         except ValueError as exception:
             raise ValidationError(
                 _(
@@ -637,7 +659,12 @@ class ResourceBaseForm(Form):
         self.zipcode_list.data = '\n'.join(
             str(i) for i in sorted(value['zipcode_list']))
 
-    def populate_obj(self, obj: Resource) -> None:  # type:ignore
+    def populate_obj(  # type: ignore[override]
+        self,
+        obj: Resource,  # type: ignore[override]
+        exclude: Collection[str] | None = None,
+        include: Collection[str] | None = None,
+    ) -> None:
         super().populate_obj(obj, exclude={
             'deadline',
             'deadline_unit',
@@ -653,7 +680,8 @@ class ResourceBaseForm(Form):
             'zipcode_field',
             'zipcode_days',
             'zipcode_list',
-        })
+            *(exclude or ())
+        }, include=include)
         obj.deadline = self.deadline
         obj.lead_time = self.lead_time
         obj.zipcode_block = self.zipcode_block

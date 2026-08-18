@@ -9,10 +9,10 @@ from onegov.reservation import Resource
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm.abstract import MoveDirection
-    from onegov.org.models import (  # noqa: F401
+    from onegov.org.models import (  # ruff:ignore[unused-import]
         BuiltinFormDefinition, CustomFormDefinition, News, Topic)
     from onegov.org.models.extensions import PersonLinkExtension
-    from onegov.org.models.resource import (  # noqa: F401
+    from onegov.org.models.resource import (  # ruff:ignore[unused-import]
         DaypassResource, ItemResource, RoomResource)
     from sqlalchemy.orm import Session
     from uuid import UUID

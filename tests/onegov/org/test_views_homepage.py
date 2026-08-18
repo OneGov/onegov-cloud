@@ -53,3 +53,25 @@ def test_add_new_root_topic(client: Client) -> None:
     page = client.get('/topics/super-org-thema')
     assert page.status_code == 200
     assert 'Super Org Thema' in page
+
+
+def test_homepage_settings_return_to(client: Client) -> None:
+    client.login_admin()
+
+    # opening the settings from the homepage remembers the origin, so both
+    # the cancel link and a successful save return to the homepage
+    homepage = client.get('/')
+    home_url = homepage.request.url
+    edit_href = homepage.pyquery('.edit-bar a.edit-link').attr('href')
+    settings = client.get(edit_href)
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href == home_url
+    assert settings.form.submit().location == home_url
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/homepage-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')

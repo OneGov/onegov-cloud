@@ -20,16 +20,20 @@ from onegov.form.fields import (ChosenSelectField, URLPanelField,
                                 ChosenSelectMultipleEmailField)
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
+from onegov.form.fields import FormcodeField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import URLField
+from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import If
 from onegov.form.validators import StrictOptional
+from onegov.form.validators import ValidFilterFormDefinition
 from onegov.form.validators import ValidHostname
 from onegov.gis import CoordinatesField
 from onegov.org import _, log
+from onegov.org.forms.event import EventForm
 from onegov.org.forms.fields import (
     HtmlField,
     UploadOrSelectExistingMultipleFilesField,
@@ -45,6 +49,7 @@ from onegov.user import User
 from operator import itemgetter
 from purl import URL
 from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
 from wtforms.fields import FieldList
 from wtforms.fields import FloatField
@@ -533,6 +538,16 @@ class LinksSettingsForm(Form):
             'support: https://my.support'
         ),
         render_kw={'rows': 10}
+    )
+
+    preview = PreviewField(
+        label=_('Preview'),
+        fields=('short_links',),
+        events=('change', 'type'),
+        url=lambda meta: meta.request.link(
+            meta.request.app.org,
+            name='link-settings-preview'
+        )
     )
 
     def validate_short_links(self, field: TextAreaField) -> None:
@@ -1039,16 +1054,29 @@ class HolidaySettingsForm(Form):
                 continue
 
             if line.count('-') < 1:
-                raise ValidationError(_('Format: Day.Month - Description'))
+                raise ValidationError(
+                    _(
+                        'Format: Day.Month[.Year] - Description '
+                        '(year is optional)'
+                    )
+                )
             if line.count('-') > 1:
                 raise ValidationError(_('Please enter one date per line'))
 
             date, _description = line.split('-', 1)
 
-            if date.count('.') < 1:
-                raise ValidationError(_('Format: Day.Month - Description'))
-            if date.count('.') > 1:
-                raise ValidationError(_('Please enter only day and month'))
+            if date.count('.') == 1:
+                continue
+            if date.count('.') == 2:
+                self.parse_date(date.strip())
+                continue
+
+            raise ValidationError(
+                _(
+                    'Format: Day.Month[.Year] - Description '
+                    '(year is optional)'
+                )
+            )
 
     def parse_date(self, date: str) -> datetime.date:
         day, month, year = date.split('.', 2)
@@ -1097,10 +1125,18 @@ class HolidaySettingsForm(Form):
     @property
     def holiday_settings(self) -> dict[str, Any]:
 
-        def parse_other_holidays_line(line: str) -> tuple[int, int, str]:
-            date, desc = line.strip().split('-', 1)
-            day, month = date.split('.')
+        def parse_other_holidays_line(
+            line: str,
+        ) -> tuple[int, int, str] | tuple[int, int, str, int]:
 
+            date, desc = line.strip().split('-', 1)
+            parts = date.strip().split('.')
+
+            if len(parts) == 3:
+                day, month, year = parts
+                return int(month), int(day), desc.strip(), int(year)
+
+            day, month = parts
             return int(month), int(day), desc.strip()
 
         def parse_school_holidays_line(
@@ -1134,7 +1170,11 @@ class HolidaySettingsForm(Form):
     def holiday_settings(self, data: dict[str, Any]) -> None:
         data = data or {}
 
-        def format_other(d: tuple[int, int, str]) -> str:
+        def format_other(
+            d: tuple[int, int, str] | tuple[int, int, str, int],
+        ) -> str:
+            if len(d) == 4:
+                return f'{d[1]:02d}.{d[0]:02d}.{d[3]:04d} - {d[2]}'
             return f'{d[1]:02d}.{d[0]:02d} - {d[2]}'
 
         def format_school(d: tuple[int, int, int, int, int, int]) -> str:
@@ -2056,21 +2096,6 @@ class EventSettingsForm(Form):
         default=False
     )
 
-    event_locations = TagsField(
-        label=_('Values of the location filter'),
-    )
-
-    event_filter_type = RadioField(
-        label=_("Choose the filter type for events (default is 'Tags')"),
-        choices=(
-            ('tags', _('A predefined set of tags')),
-            ('filters', _('Manually configurable filters')),
-            ('tags_and_filters', _('Both, predefined tags as well as '
-                                   'configurable filters')),
-        ),
-        default='tags'
-    )
-
     event_header_title = StringField(
         label=_('Title of text above event list'),
         description=_('General information about the event calendar'),
@@ -2093,6 +2118,59 @@ class EventSettingsForm(Form):
         fieldset=_('Information below the event list')
     )
 
+    event_locations = TagsField(
+        label=_('Values of the location filter'),
+        fieldset=_('Filters'),
+    )
+
+    event_filter_type = RadioField(
+        label=_("Choose the filter type for events (default is 'Tags')"),
+        fieldset=_('Filters'),
+        choices=(
+            ('tags', _('A predefined set of tags')),
+            ('filters', _('Manually configurable filters')),
+            ('tags_and_filters', _('Both, predefined tags as well as '
+                                   'configurable filters')),
+        ),
+        default='tags'
+    )
+
+    event_filter_parsed_definition = FormcodeField(
+        label=_('Definition'),
+        fieldset=_('Filters'),
+        name='event_filter_definition',
+        depends_on=('event_filter_type', '!tags'),
+        require_email_field=False,
+        require_title_fields=False,
+        # FIXME: This is missing other reserved fields added through
+        #        content extensions etc. We might want to optionally
+        #        allow reserved_fields to be callback, that gets invoked
+        #        with the current request, so we can get the proper
+        #        form managers will see.
+        reserved_fields={
+            name for name, _ in get_fields_from_class(EventForm)
+        } | {'syndicate', 'highlight'},
+        validators=[ValidFilterFormDefinition()],
+        render_kw={'rows': 16}
+    )
+
+    keyword_fields = TextAreaField(
+        label=_('Filters'),
+        fieldset=_('Filters'),
+        depends_on=('event_filter_type', '!tags'),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'radio,checkbox'
+        }
+    )
+
+    force_remove = BooleanField(
+        label=_('Remove these filters from all affected events'),
+        fieldset=_('Filters'),
+    )
+
+    # FIXME: keep this last; its upload widget emits a split <label> that
+    # confuses webtest's form parser for any field rendered after it
     event_files = UploadOrSelectExistingMultipleFilesField(
         label=_('Documents'),
         fieldset=_('General event documents')
@@ -2458,6 +2536,16 @@ class VATSettingsForm(Form):
         description=_('This is the VAT rate in percent. The VAT rate will '
                       'apply to all prices in the forms.'),
         validators=[InputRequired(), NumberRange(0, 100)],
+    )
+
+    price_rounding = DecimalField(
+        label=_('Rounding of invoice totals'),
+        description=_(
+            'If set, invoices include a rounding position so the total is '
+            'a multiple of this amount, for example 0.05. Leave empty to '
+            'disable rounding.'
+        ),
+        validators=[Optional(), NumberRange(min=Decimal('0.01'))],
     )
 
 
