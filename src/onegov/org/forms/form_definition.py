@@ -80,6 +80,22 @@ class FormDefinitionBaseForm(Form):
         render_kw={'rows': 4}
     )
 
+    invoicing_party = TextAreaField(
+        label=_('Invoicing party'),
+        fieldset=_('Invoicing'),
+        description=_('Will be displayed in invoices'),
+        render_kw={'rows': 3}
+    )
+
+    cost_object = StringField(
+        label=_('Cost center / cost unit'),
+        fieldset=_('Invoicing'),
+        description=_(
+            'Will be displayed in invoices for any costs directly '
+            'associated with submissions on this form.'
+        )
+    )
+
     show_vat = BooleanField(
         label=_('Show VAT'),
         description=_(

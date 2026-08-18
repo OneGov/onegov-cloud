@@ -947,6 +947,10 @@ a#results {
             background-color: $green;
         }
 
+        .event-holiday {
+            background-color: $red;
+        }
+
         .event-adjustable::before {
             float: right;
             color: white;

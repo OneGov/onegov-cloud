@@ -9,7 +9,11 @@ from datetime import UTC, datetime
 
 from collections import defaultdict
 from decimal import Decimal
+from io import BytesIO
+
+
 from onegov.core.html import html_to_text
+from onegov.core.mail import Attachment
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import render_file
@@ -25,7 +29,7 @@ from onegov.directory.errors import ValidationError
 from onegov.directory.models.directory import EntrySubscription
 from onegov.form import FormCollection, as_internal_id, move_fields
 from onegov.form.fields import UploadField
-from onegov.org import OrgApp, _
+from onegov.org import OrgApp, _, log
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.directory import DirectoryRecipientForm, DirectoryUrlForm
 from onegov.org.forms.generic import ExportForm
@@ -35,11 +39,12 @@ from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
+from onegov.org.pdf.directory_entry import DirectoryEntryPdf
 from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob import Response
-from webob.exc import HTTPForbidden
+from webob.exc import HTTPForbidden, HTTPBadRequest
 from sedate import utcnow
 from wtforms import TextAreaField
 from wtforms.validators import InputRequired
@@ -49,8 +54,10 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
 from typing import cast, Any, NamedTuple, TYPE_CHECKING
+
+
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence, Iterator
+    from collections.abc import Mapping, Sequence, Iterator, Iterable
     from onegov.core.types import JSON_ro, RenderData, EmailJsonDict
     from onegov.directory.migration import DirectoryMigration
     from onegov.directory.models.directory import DirectoryEntryForm
@@ -641,12 +648,13 @@ def send_email_notification_for_directory_entry(
     request.app.send_transactional_email_batch(email_iter())
 
 
-def _send_admin_email(
+def send_admin_email(
     directory: ExtendedDirectory,
     request: OrgRequest,
     subject: str,
     template: str,
     context: dict[str, Any],
+    attachments: Iterable[Attachment] = (),
 ) -> None:
     content = render_template(template, request, {
         'layout': DefaultMailLayout(object(), request),
@@ -661,7 +669,52 @@ def _send_admin_email(
         subject=subject,
         content=content,
         plaintext=html_to_text(content),
+        attachments=attachments,
     )
+
+
+def create_admin_notification_pdf(
+    request: OrgRequest,
+    entry: ExtendedDirectoryEntry,
+    generated_at: datetime,
+    ended: bool = False,
+) -> tuple[Attachment | None, bool]:
+    """ Renders and (optionally) signs the notification pdf for a directory
+    entry.
+
+    Returns a ``(attachment, signing_failed)`` tuple, where ``attachment``
+    is ``None`` if rendering failed and the unsigned pdf if only signing
+    failed.
+    """
+
+    try:
+        content = DirectoryEntryPdf.from_entry(
+            request, entry, generated_at, ended)
+    except Exception:
+        # a broken pdf must not hold back the notification
+        log.exception('Error while rendering directory publication')
+        return None, False
+
+    signing_failed = False
+    if entry.directory.enable_notification_pdf_signing is False:
+        pdf_bytes = content.getvalue()
+    else:
+        signed_pdf = BytesIO()
+        try:
+            request.app.signing_service.sign(
+                request.session, content, signed_pdf, None)
+            pdf_bytes = signed_pdf.getvalue()
+        except Exception:
+            # an unsigned pdf is better than no notification at all
+            log.exception('Error while signing directory publication')
+            signing_failed = True
+            pdf_bytes = content.getvalue()
+
+    return Attachment(
+        f'{entry.name}.pdf',
+        content=pdf_bytes,
+        content_type='application/pdf',
+    ), signing_failed
 
 
 def send_admin_notification_for_directory_entry(
@@ -675,8 +728,14 @@ def send_admin_notification_for_directory_entry(
                  'entry': entry.title,
                  'directory': directory.title},
     ))
+    generated_at = datetime.now(UTC)
 
-    _send_admin_email(
+    pdf, signing_failed = create_admin_notification_pdf(
+        request, entry, generated_at,
+    )
+
+    # send email anyway, independent of whether the pdf signed successfully
+    send_admin_email(
         directory, request, title,
         'mail_directory_entry_admin_notification_started.pt',
         {
@@ -687,7 +746,10 @@ def send_admin_notification_for_directory_entry(
             'publication_start': entry.publication_start,
             'publication_end': entry.publication_end,
             'content_hash': entry.content_hash,
+            'generated_at': generated_at,
+            'signing_failed': signing_failed,
         },
+        attachments=(pdf,) if pdf else (),
     )
 
 
@@ -705,7 +767,14 @@ def send_admin_expiry_notification_for_directory_entry(
                  'entry': entry.title,
                  'directory': directory.title},
     ))
-    _send_admin_email(
+    generated_at = datetime.now(UTC)
+
+    pdf, signing_failed = create_admin_notification_pdf(
+        request, entry, generated_at, ended=True,
+    )
+
+    # send email anyway, independent of whether the pdf signed successfully
+    send_admin_email(
         directory, request, title,
         'mail_directory_entry_admin_publication_ended.pt',
         {
@@ -715,7 +784,10 @@ def send_admin_expiry_notification_for_directory_entry(
             'publication_start': entry.publication_start,
             'publication_end': entry.publication_end,
             'content_hash': entry.content_hash,
+            'generated_at': generated_at,
+            'signing_failed': signing_failed,
         },
+        attachments=(pdf,) if pdf else (),
     )
 
 
@@ -830,6 +902,8 @@ def handle_submit_directory_entry(
             state='pending',
             payment_method=self.directory.payment_method,
             minimum_price_total=self.directory.minimum_price_total,
+            invoicing_party=self.directory.invoicing_party,
+            cost_object=self.directory.cost_object,
             email=form.submitter.data,
             meta={
                 'handler_code': 'DIR',
@@ -838,6 +912,7 @@ def handle_submit_directory_entry(
                     'text': request.translate(_('Lump sum')),
                     'group': 'submission',
                     'unit': Decimal(amount),
+                    'cost_object': self.directory.cost_object,
                     'quantity': Decimal('1'),
                 },
                 'currency': self.directory.currency,
@@ -1076,6 +1151,8 @@ def view_zip_file(
     format = request.params.get('format')
     if not isinstance(format, str):
         format = 'json'
+    if format not in ('xlsx', 'csv', 'json'):
+        raise HTTPBadRequest('Invalid export format: ' + format)
     formatter = layout.export_formatter(format)
 
     def transform(key: object, value: object) -> tuple[Any, Any]:

@@ -7306,6 +7306,10 @@ a#results {
             cursor: pointer;
         }
 
+        .event-holiday {
+            background-color: $red;
+        }
+
         .event-adjustable::before {
             float: right;
             color: white;

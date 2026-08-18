@@ -834,13 +834,37 @@ def view_find_your_spot(
                 if len(room_ids := reserved_dates.get(date, set())) < wanted
             } if auto_reserve != 'for_first_day' else {}
 
+    holidays: dict[date_t, list[str]] = {}
     if room_slots:
         request.include('reservationlist')
+
+        # include holiday information if either setting is enabled
+        if (
+            form.during_school_holidays
+            and form.during_school_holidays.data == 'yes'
+        ) or form.on_holidays and form.on_holidays.data == 'yes':
+            for hstart, hend in request.app.org.school_holidays:
+                if not sedate.overlaps(hstart, hend, start.date(), end.date()):
+                    continue
+
+                for date in sedate.dtrange(hstart, hend):
+                    if date in room_slots:
+                        holidays.setdefault(date, []).append(
+                            _('School holidays')
+                        )
+
+            for date, descriptions in request.app.org.holidays.between(
+                start.date(),
+                end.date()
+            ):
+                if date in room_slots:
+                    holidays.setdefault(date, []).extend(descriptions)
 
     return {
         'title': _('Find Your Spot'),
         'form': form,
         'rooms': rooms,
+        'holidays': holidays,
         'room_slots': room_slots,
         'missing_dates': missing_dates,
         'layout': layout or FindYourSpotLayout(self, request)

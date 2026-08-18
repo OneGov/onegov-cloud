@@ -1,18 +1,26 @@
 from __future__ import annotations
 
+import pytest
+
 from decimal import Decimal
 from onegov.form import Form, merge_forms, move_fields
+from onegov.form.core import FieldDependency
 from onegov.form.fields import HoneyPotField, TimeField
 from onegov.pay import Price
+from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class DummyPostData(dict[str, Any]):
@@ -286,6 +294,194 @@ def test_dependent_field_multiple() -> None:
     )
     form = TestForm(request.POST)
     assert form.validate()
+
+
+def test_dependent_field_on_text_not_empty() -> None:
+    # a field that only applies once a free-text field has been filled in,
+    # expressed with the '!' (not-equal) operator against an empty value.
+
+    class TestForm(Form):
+        address = StringField(label="Address")
+
+        optional = TimeField(
+            label="Optional",
+            validators=[InputRequired()],
+            depends_on=('address', '!')
+        )
+
+    # empty text -> dependency unfulfilled, optional not required
+    request: Any = DummyRequest({'address': ''})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    request = DummyRequest({'address': '', 'optional': ''})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    # a present but invalid value is never accepted, even when hidden
+    request = DummyRequest({'address': '', 'optional': 'asdf'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    # filled text -> dependency fulfilled, optional now required
+    request = DummyRequest({'address': 'Somewhere'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'address': 'Somewhere', 'optional': ''})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'address': 'Somewhere', 'optional': '12:00'})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+
+def test_dependent_field_on_email_not_empty() -> None:
+    # same as above but the source is an EmailField (renders type="email"),
+    # which is the case that motivated widening the dependency selectors.
+
+    class TestForm(Form):
+        notification_address = EmailField(label="Notification address")
+
+        signing = RadioField(
+            label="Sign the attachment",
+            choices=[('yes', "Yes"), ('no', "No")],
+            default='yes',
+            depends_on=('notification_address', '!')
+        )
+
+    # no address -> the dependent choice is irrelevant
+    request: Any = DummyRequest({'notification_address': ''})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    # an address is given -> the dependent choice is shown and its default
+    # is still valid
+    request = DummyRequest({
+        'notification_address': 'admin@example.org',
+        'signing': 'yes',
+    })
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    # an invalid choice is rejected even for the dependent field
+    request = DummyRequest({
+        'notification_address': 'admin@example.org',
+        'signing': 'maybe',
+    })
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+
+def _make_text_specific_form() -> type[Form]:
+    # depend on a free-text field having one exact value.
+    class TestForm(Form):
+        mode = StringField(label="Mode")
+        dependent = TimeField(
+            label="Dependent",
+            validators=[InputRequired()],
+            depends_on=('mode', 'advanced')
+        )
+    return TestForm
+
+
+def _make_boolean_form() -> type[Form]:
+    # a checkbox (BooleanField) source, using the 'y'/'n' shorthand that
+    # FieldDependency maps onto True/False.
+    class TestForm(Form):
+        enabled = BooleanField(label="Enabled")
+        dependent = TimeField(
+            label="Dependent",
+            validators=[InputRequired()],
+            depends_on=('enabled', 'y')
+        )
+    return TestForm
+
+
+def _make_boolean_inverted_form() -> type[Form]:
+    # the inverse: only relevant while a checkbox is *unchecked*.
+    class TestForm(Form):
+        enabled = BooleanField(label="Enabled")
+        dependent = TimeField(
+            label="Dependent",
+            validators=[InputRequired()],
+            depends_on=('enabled', '!y')
+        )
+    return TestForm
+
+
+def _make_select_form() -> type[Form]:
+    # a SelectField source behaves like radio buttons.
+    class TestForm(Form):
+        shipping = SelectField(
+            label="Shipping",
+            choices=[('pickup', "Pickup"), ('courier', "Courier")]
+        )
+        dependent = StringField(
+            label="Dependent",
+            validators=[InputRequired()],
+            depends_on=('shipping', 'courier')
+        )
+    return TestForm
+
+
+@pytest.mark.parametrize('make_form,unfulfilled,fulfilled', [
+    # source value that keeps the dependent field hidden / not required,
+    # followed by the source value that reveals and requires it.
+    (_make_text_specific_form, {'mode': 'simple'}, {'mode': 'advanced'}),
+    (_make_boolean_form, {}, {'enabled': 'y'}),
+    (_make_boolean_inverted_form, {'enabled': 'y'}, {}),
+    (_make_select_form, {'shipping': 'pickup'}, {'shipping': 'courier'}),
+], ids=['text-specific', 'boolean', 'boolean-inverted', 'select'])
+def test_dependent_field_required(
+    make_form: 'Callable[[], type[Form]]',
+    unfulfilled: dict[str, Any],
+    fulfilled: dict[str, Any],
+) -> None:
+    form_class = make_form()
+
+    # dependency unfulfilled -> the dependent field is not required
+    request: Any = DummyRequest(unfulfilled)
+    form = form_class(request.POST)
+    assert form.validate()
+
+    # dependency fulfilled but the dependent field is missing -> invalid
+    request = DummyRequest(fulfilled)
+    form = form_class(request.POST)
+    assert not form.validate()
+
+    # dependency fulfilled and the dependent field supplied -> valid
+    dependent_value = (
+        'Somewhere' if make_form is _make_select_form else '12:00'
+    )
+    request = DummyRequest({**fulfilled, 'dependent': dependent_value})
+    form = form_class(request.POST)
+    assert form.validate()
+
+
+def test_field_dependency_html_data() -> None:
+    # the html_data payload is what the client-side JS reads to toggle
+    # visibility; make sure each operator/combination serialises as expected.
+
+    assert FieldDependency('switch', 'on').html_data('') == {
+        'data-depends-on': 'switch/on'
+    }
+    assert FieldDependency('switch', '!off').html_data('') == {
+        'data-depends-on': 'switch/!off'
+    }
+    assert FieldDependency('address', '!').html_data('') == {
+        'data-depends-on': 'address/!'
+    }
+    assert FieldDependency(
+        'switch_1', 'on', 'switch_2', 'off'
+    ).html_data('') == {
+        'data-depends-on': 'switch_1/on;switch_2/off'
+    }
+    # a prefix is prepended to every referenced field id
+    assert FieldDependency('switch', 'on').html_data('prefix_') == {
+        'data-depends-on': 'prefix_switch/on'
+    }
 
 
 def test_merge_forms() -> None:
