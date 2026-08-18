@@ -287,6 +287,22 @@ class DirectoryBaseForm(Form):
         fieldset=_('New entries'),
         depends_on=('enable_submissions', 'y'))
 
+    invoicing_party = TextAreaField(
+        label=_('Invoicing party'),
+        fieldset=_('New entries'),
+        description=_('Will be displayed in invoices'),
+        render_kw={'rows': 3},
+        depends_on=('enable_submissions', 'y'))
+
+    cost_object = StringField(
+        label=_('Cost center / cost unit'),
+        fieldset=_('New entries'),
+        description=_(
+            'Will be displayed in invoices for any costs directly '
+            'associated with submissions in this directory.'
+        ),
+        depends_on=('enable_submissions', 'y'))
+
     price = RadioField(
         label=_('Price'),
         fieldset=_('New entries'),
@@ -356,6 +372,15 @@ class DirectoryBaseForm(Form):
             'required_publication', 'y', 'enable_change_requests', '!y'
         ),
         validators=[Optional(), Email()],
+    )
+    enable_notification_pdf_signing = BooleanField(
+        label=_('Whether the PDF attached to the admin notification '
+                'should be digitally signed (recommended).'),
+        fieldset=_('Notifications'),
+        default=True,
+        depends_on=(
+            'notification_address', '!',
+        ),
     )
 
     submitter_meta_fields = MultiCheckboxField(
