@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="medium-7 cell main-content">
+            <div class="medium-12 cell main-content">
                 <p tal:condition="not:changes" i18n:translate="">No changes yet.</p>
                 <table tal:condition="changes" class="changes">
                     <thead>
@@ -40,8 +40,6 @@
                 </div>
             </div>
 
-            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
-            </div>
         </div>
 
     </tal:b>

@@ -220,6 +220,15 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
            settings.click('Abrechnungsläufe'))
 
 
+def test_changes_use_full_content_width(client: Client[TestPasApp]) -> None:
+    client.login_admin()
+
+    page = client.get('/changes')
+
+    assert page.pyquery('.main-content.medium-12')
+    assert not page.pyquery('.sidebar')
+
+
 def test_view_upload_json(
     client: Client[TestPasApp],
     people_json: dict[str, Any],
