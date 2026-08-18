@@ -25,18 +25,18 @@ def test_page_audit_entries(
     session_manager: SessionManager,
 ) -> None:
     user_id = uuid4().hex
-    session_manager.set_current_user(
+    with session_manager.set_current_user(
         user_id,
         'editor@example.org',
-    )
-    pages = PageCollection(session)
+    ):
+        pages = PageCollection(session)
 
-    root = pages.add_root('News')
-    session.flush()
-    root.title = 'Latest News'
-    session.flush()
-    root_id = root.id
-    pages.delete(root)
+        root = pages.add_root('News')
+        session.flush()
+        root.title = 'Latest News'
+        session.flush()
+        root_id = root.id
+        pages.delete(root)
 
     entries = session.query(AuditEntry).order_by(AuditEntry.created).all()
 
@@ -66,17 +66,17 @@ def test_page_audit_requires_user(
     session_manager: SessionManager,
 ) -> None:
     user_id = uuid4().hex
-    session_manager.set_current_user(
+    with session_manager.set_current_user(
         user_id,
         'editor@example.org',
-    )
-    session_manager.set_current_user(None, None)
-    pages = PageCollection(session)
-    page = pages.add_root('News')
-    session.flush()
-    page.title = 'Latest News'
-    session.flush()
-    pages.delete(page)
+    ):
+        with session_manager.set_current_user(None, None):
+            pages = PageCollection(session)
+            page = pages.add_root('News')
+            session.flush()
+            page.title = 'Latest News'
+            session.flush()
+            pages.delete(page)
 
     assert session.query(AuditEntry).count() == 0
 
@@ -86,13 +86,13 @@ def test_page_audit_retains_user_identity(
     session_manager: SessionManager,
 ) -> None:
     user_id = uuid4().hex
-    session_manager.set_current_user(user_id, 'old@example.org')
-    page = PageCollection(session).add_root('News')
-    session.flush()
+    with session_manager.set_current_user(user_id, 'old@example.org'):
+        page = PageCollection(session).add_root('News')
+        session.flush()
 
-    session_manager.set_current_user(user_id, 'new@example.org')
-    page.title = 'Latest News'
-    session.flush()
+    with session_manager.set_current_user(user_id, 'new@example.org'):
+        page.title = 'Latest News'
+        session.flush()
 
     entries = session.query(AuditEntry).order_by(AuditEntry.created).all()
     assert [entry.user_id for entry in entries] == [user_id, user_id]
@@ -107,18 +107,18 @@ def test_page_audit_bulk_changes(
     session_manager: SessionManager,
 ) -> None:
     user_id = uuid4().hex
-    session_manager.set_current_user(
+    with session_manager.set_current_user(
         user_id,
         'editor@example.org',
-    )
-    page = PageCollection(session).add_root('News')
-    session.flush()
-    page_id = page.id
+    ):
+        page = PageCollection(session).add_root('News')
+        session.flush()
+        page_id = page.id
 
-    session.query(Page).filter(Page.id == page_id).update(
-        {'title': 'Bulk News'}
-    )
-    session.query(Page).filter(Page.id == page_id).delete()
+        session.query(Page).filter(Page.id == page_id).update(
+            {'title': 'Bulk News'}
+        )
+        session.query(Page).filter(Page.id == page_id).delete()
 
     entries = session.query(AuditEntry).order_by(AuditEntry.created).all()
     assert [entry.operation for entry in entries] == [
@@ -137,28 +137,28 @@ def test_page_audit_cascaded_delete(
     session_manager: SessionManager,
 ) -> None:
     user_id = uuid4().hex
-    session_manager.set_current_user(
+    with session_manager.set_current_user(
         user_id,
         'editor@example.org',
-    )
-    pages = PageCollection(session)
-    root = pages.add_root('Root', meta={'root': True})
-    child = pages.add(
-        parent=root,
-        title='Child',
-        content={'text': 'Child content'},
-    )
-    grandchild = pages.add(
-        parent=child,
-        title='Grandchild',
-        meta={'grandchild': True},
-    )
-    session.flush()
-    root_id = root.id
-    child_id = child.id
-    grandchild_id = grandchild.id
+    ):
+        pages = PageCollection(session)
+        root = pages.add_root('Root', meta={'root': True})
+        child = pages.add(
+            parent=root,
+            title='Child',
+            content={'text': 'Child content'},
+        )
+        grandchild = pages.add(
+            parent=child,
+            title='Grandchild',
+            meta={'grandchild': True},
+        )
+        session.flush()
+        root_id = root.id
+        child_id = child.id
+        grandchild_id = grandchild.id
 
-    pages.delete(root)
+        pages.delete(root)
 
     entries = session.query(AuditEntry).filter_by(operation='delete').all()
     assert len(entries) == 1

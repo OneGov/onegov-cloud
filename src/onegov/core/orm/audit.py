@@ -4,8 +4,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from onegov.core.collection import Pagination
-from onegov.core.orm import Base
-from onegov.core.orm.session_manager import CURRENT_USER_ID, CURRENT_USERNAME
+from onegov.core.orm import Base, SessionManager
 from sedate import utcnow
 from sqlalchemy import desc, Enum, Index, insert, inspect, select
 from sqlalchemy.orm import mapped_column, Mapped, object_session, Session
@@ -15,7 +14,6 @@ from typing import Any, Literal, NamedTuple, Self, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from onegov.core.orm import SessionManager
     from sqlalchemy.orm import Query
 
 
@@ -141,7 +139,11 @@ def write_audit_entry(
     snapshot: dict[str, Any],
     previous_snapshot: dict[str, Any] | None = None,
 ) -> None:
-    username = session.info.get(CURRENT_USERNAME)
+    session_manager = SessionManager.get_active()
+    if session_manager is None:
+        return
+
+    username = session_manager.current_username
     if not isinstance(username, str):
         return
 
@@ -152,7 +154,7 @@ def write_audit_entry(
             operation=operation,
             snapshot=snapshot,
             previous_snapshot=previous_snapshot or {},
-            user_id=session.info.get(CURRENT_USER_ID),
+            user_id=session_manager.current_user_id,
             username=username,
             created=utcnow(),
         )

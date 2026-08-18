@@ -1854,10 +1854,11 @@ def current_user_tween_factory(
             username = None
 
         if app.has_database_connection:
-            app.session_manager.set_current_user(
+            with app.session_manager.set_current_user(
                 user_id=user_id,
                 username=username,
-            )
+            ):
+                return handler(request)
 
         return handler(request)
 

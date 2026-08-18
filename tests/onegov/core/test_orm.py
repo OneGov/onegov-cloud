@@ -611,27 +611,41 @@ def test_session_manager_i18n(postgres_dsn: str) -> None:
     mgr.dispose()
 
 
-def test_session_manager_current_user_is_thread_local(
+def test_session_manager_current_user_context(
     session_manager: SessionManager,
 ) -> None:
-    session_manager.set_current_user('user-id', 'user@example.org')
-    other_user: list[tuple[str | None, str | None]] = []
+    assert (
+        session_manager.current_user_id,
+        session_manager.current_username,
+    ) == (None, None)
 
-    def read_current_user() -> None:
-        other_user.append(
-            (
+    with session_manager.set_current_user(
+        'user-id',
+        'user@example.org',
+    ):
+        assert (
+            session_manager.current_user_id,
+            session_manager.current_username,
+        ) == ('user-id', 'user@example.org')
+
+        with session_manager.set_current_user(
+            'other-user-id',
+            'other@example.org',
+        ):
+            assert (
                 session_manager.current_user_id,
                 session_manager.current_username,
-            )
-        )
+            ) == ('other-user-id', 'other@example.org')
 
-    thread = Thread(target=read_current_user)
-    thread.start()
-    thread.join()
+        assert (
+            session_manager.current_user_id,
+            session_manager.current_username,
+        ) == ('user-id', 'user@example.org')
 
-    assert other_user == [(None, None)]
-    assert session_manager.current_user_id == 'user-id'
-    assert session_manager.current_username == 'user@example.org'
+    assert (
+        session_manager.current_user_id,
+        session_manager.current_username,
+    ) == (None, None)
 
 
 def test_uuid_type(postgres_dsn: str) -> None:

@@ -61,8 +61,6 @@ class ForceFetchQueryClass[T](Query[T]):
 # may grow quite large - this alleviates memory fragmentation/high water mark
 # issues that we've been seeing on some servers.
 CONNECTION_LIFETIME = 60 * 60
-CURRENT_USER_ID = 'current_user_id'
-CURRENT_USERNAME = 'current_username'
 
 
 def _is_cached_plan_changed(error: FeatureNotSupported) -> bool:
@@ -306,7 +304,8 @@ class SessionManager:
         self.bases = [base]
         self.created_schemas: set[str] = set()
         self.current_schema: str | None = None
-        self._current_user = threading.local()
+        self.current_user_id: str | None = None
+        self.current_username: str | None = None
 
         self._ignore_bulk_updates = False
         self._ignore_bulk_deletes = False
@@ -715,36 +714,22 @@ class SessionManager:
         self.default_locale = default_locale
         self.current_locale = current_locale
 
+    @contextmanager
     def set_current_user(
         self,
         user_id: str | None,
         username: str | None,
-    ) -> None:
-        """Sets the user responsible for changes in the current request."""
-        self._current_user.user_id = user_id
-        self._current_user.username = username
-
-        if self.session_factory.registry.has():
-            self._bind_current_user(self.session_factory())
-
-    @property
-    def current_user_id(self) -> str | None:
-        return getattr(self._current_user, 'user_id', None)
-
-    @property
-    def current_username(self) -> str | None:
-        return getattr(self._current_user, 'username', None)
-
-    def _bind_current_user[T: Session](self, session: T) -> T:
-        for key, value in (
-            (CURRENT_USER_ID, self.current_user_id),
-            (CURRENT_USERNAME, self.current_username),
-        ):
-            if value is None:
-                session.info.pop(key, None)
-            else:
-                session.info[key] = value
-        return session
+    ) -> Iterator[Self]:
+        """Sets the user responsible for changes within the context."""
+        previous_user_id = self.current_user_id
+        previous_username = self.current_username
+        self.current_user_id = user_id
+        self.current_username = username
+        try:
+            yield self
+        finally:
+            self.current_user_id = previous_user_id
+            self.current_username = previous_username
 
     def _scopefunc(self) -> tuple[threading.Thread, str | None]:
         """ Returns the scope of the scoped_session used to create new
@@ -854,7 +839,7 @@ class SessionManager:
         session.info['schema'] = self.current_schema
         session.connection().info['session'] = weakref.proxy(session)
 
-        return self._bind_current_user(session)
+        return session
 
     def session(self) -> Session:
         """ Returns a new session or an existing session. Sessions with

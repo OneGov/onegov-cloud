@@ -28,13 +28,13 @@ def test_view_audit_trail(client: Client) -> None:
     persisted_page = session.get(Page, page_id)
     assert persisted_page is not None
     user_id = uuid4().hex
-    client.app.session_manager.set_current_user(
+    with client.app.session_manager.set_current_user(
         user_id,
         'editor@example.org',
-    )
-    persisted_page.title = 'Changed Audited Page'
-    session.flush()
-    transaction.commit()
+    ):
+        persisted_page.title = 'Changed Audited Page'
+        session.flush()
+        transaction.commit()
 
     client.get('/audit-trail', status=403)
     client.login_editor()
