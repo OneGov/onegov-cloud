@@ -1,16 +1,23 @@
 from __future__ import annotations
 
 from onegov.core.security import Private
+from onegov.org.forms import BatchCopyAllocationRulesForm
 from onegov.org.views.allocation import (
+    get_allocation_rule_form_class,
     get_edit_allocation_form_class,
-    get_allocation_rule_form_class, view_allocation_rules,
-    handle_edit_allocation, handle_allocation_rule,
-    handle_edit_rule)
+    handle_allocation_rule,
+    handle_copy_rules,
+    handle_edit_allocation,
+    handle_edit_rule,
+    view_allocation_rules,
+)
 from onegov.town6 import TownApp
 from onegov.reservation import Allocation
 from onegov.reservation import Resource
 from onegov.town6.layout import (
-    AllocationRulesLayout, AllocationEditFormLayout)
+    AllocationEditFormLayout,
+    AllocationRulesLayout,
+)
 
 
 from typing import TYPE_CHECKING
@@ -65,3 +72,20 @@ def town_handle_edit_rule(
 ) -> RenderData | Response:
     return handle_edit_rule(
         self, request, form, AllocationRulesLayout(self, request))
+
+
+@TownApp.form(
+    model=Resource,
+    template='form.pt',
+    name='copy-rules',
+    permission=Private,
+    form=BatchCopyAllocationRulesForm,
+)
+def town_handle_copy_rules(
+    self: Resource,
+    request: TownRequest,
+    form: BatchCopyAllocationRulesForm,
+) -> RenderData | Response:
+    return handle_copy_rules(
+        self, request, form, AllocationRulesLayout(self, request)
+    )

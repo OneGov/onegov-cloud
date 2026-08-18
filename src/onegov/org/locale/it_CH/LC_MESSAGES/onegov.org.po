@@ -401,6 +401,12 @@ msgstr "Pagamenti carta di credito"
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
 
+msgid "Availability periods"
+msgstr "Periodi di disponibilità"
+
+msgid "Target resources"
+msgstr "Risorse di destinazione"
+
 msgid "Title"
 msgstr "Titolo"
 
@@ -3726,11 +3732,11 @@ msgstr "Ripulisci"
 msgid "Subscribe"
 msgstr "Iscriviti"
 
-msgid "Availability periods"
-msgstr "Periodi di disponibilità"
-
 msgid "Availability period"
 msgstr "Periodo di disponibilità"
+
+msgid "Copy availability periods"
+msgstr "Copia periodi di disponibilità"
 
 msgid "Paste"
 msgstr "Incolla"
@@ -6778,6 +6784,14 @@ msgstr "Il periodo di disponibilità è stato fermato"
 
 msgid "The availability period was added to the clipboard"
 msgstr "Il periodo di disponibilità è stato aggiunto agli appunti"
+
+#, python-format
+msgid ""
+"${periods} availability periods copied to ${resources} resources, creating "
+"${allocations} allocations"
+msgstr ""
+"${periods} periodi di disponibilità copiati in ${resources} risorse, creando "
+"${allocations} disponibilità"
 
 msgid "Pasted availability period from to the clipboard"
 msgstr "Incollare il periodo di disponibilità negli appunti"
