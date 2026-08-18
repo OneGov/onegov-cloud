@@ -1,6 +1,6 @@
 /*
     Renders the topic hierarchy as an org chart, into the element with the
-    'topic-chart' class whose 'data-url' points to a json view returning a
+    'information-architecture' class whose 'data-url' points to a json view returning a
     flat list of nodes.
 */
 
@@ -252,7 +252,7 @@ function export_svg(chart, container, view) {
     restore_chart(chart, container, view);
 }
 
-function init_topic_chart(container) {
+function init_information_architecture(container) {
     // what the chart currently shows: all nodes, drilled down to root_id
     const view = {
         nodes: [],
@@ -272,7 +272,7 @@ function init_topic_chart(container) {
         // the level is the depth of the deepest expanded node, so 1 shows
         // two levels: the root and its children
         .initialExpandLevel(1)
-        .imageName(container.dataset.imageName || 'topic-chart')
+        .imageName(container.dataset.imageName || 'information-architecture')
         .nodeContent((node) => node_content(node, view));
 
     const reset_buttons = document.querySelectorAll(
@@ -344,9 +344,9 @@ function init_topic_chart(container) {
 
 document.addEventListener('DOMContentLoaded', () => {
     // the menu link shares the class, only the container carries the url
-    const container = document.querySelector('.topic-chart[data-url]');
+    const container = document.querySelector('.information-architecture[data-url]');
     if (container) {
-        init_topic_chart(container);
+        init_information_architecture(container);
     }
 });
 

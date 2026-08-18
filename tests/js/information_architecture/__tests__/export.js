@@ -1,5 +1,5 @@
 const path = '../../../../src/onegov/org';
-const chart = require(path + '/assets/js/topic-chart');
+const chart = require(path + '/assets/js/information-architecture');
 
 // a node is 220x90, the export adds a margin of 50 on every side
 const bounds = function(width, height) {
