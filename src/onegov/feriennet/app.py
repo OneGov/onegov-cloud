@@ -12,6 +12,7 @@ from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.sponsors import load_sponsors
 from onegov.feriennet.theme import FeriennetTheme
+from more.content_security import UNSAFE_EVAL
 from onegov.org.app import org_content_security_policy
 from onegov.town6 import TownApp
 from onegov.town6.app import get_common_asset as default_common_asset
@@ -367,6 +368,12 @@ def feriennet_content_security_policy() -> ContentSecurityPolicy:
     policy.script_src.add('https://*.google-analytics.com')
     policy.script_src.add('https://*.usercentrics.eu')
     policy.script_src.add('https://stats.g.doubleclick.net')
+    # GTM uses eval/new Function internally for its sandbox, required for
+    # custom JavaScript variables to work
+    policy.script_src.add(UNSAFE_EVAL)
 
     policy.child_src.add('https://*.usercentrics.eu')
+
+    policy.frame_src |= policy.child_src
+    policy.frame_src.add('https://web.cmp.usercentrics.eu')
     return policy
