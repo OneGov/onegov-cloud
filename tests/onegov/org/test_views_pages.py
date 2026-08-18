@@ -10,6 +10,7 @@ from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.org.models import Topic
 from onegov.page import Page, PageCollection
+from onegov.user import User
 from sedate import utcnow
 from webtest.forms import Textarea
 from tests.onegov.org.common import edit_bar_links
@@ -298,6 +299,12 @@ def test_delete_pages(client: Client) -> None:
     )
     topic_id = topic.id
     file_id = topic.files[0].id
+    admin_id = (
+        session.query(User.id)
+        .filter(User.username == 'admin@example.org')
+        .scalar()
+    )
+    assert admin_id is not None
     updates_before = (
         session.query(AuditEntry)
         .filter_by(
@@ -324,6 +331,8 @@ def test_delete_pages(client: Client) -> None:
         )
         .one()
     )
+    assert delete_entry.user_id == admin_id.hex
+    assert delete_entry.username == 'admin@example.org'
     assert delete_entry.snapshot['file_ids'] == [file_id]
     assert (
         session.query(AuditEntry)

@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 from onegov.core.collection import Pagination
 from onegov.core.orm import Base
+from onegov.core.orm.session_manager import CURRENT_USER_ID, CURRENT_USERNAME
 from sedate import utcnow
 from sqlalchemy import desc, Enum, event, Index, insert
 from sqlalchemy.orm import mapped_column, Mapped, Session
@@ -24,7 +25,6 @@ type Changed = Callable[[Session, Any], bool]
 type DeleteSnapshot = Callable[[Session, Any], dict[str, Any] | None]
 
 
-AUDIT_USERNAME: str = 'audit_username'
 STAGED_AUDIT_ENTRIES: str = 'staged_audit_entries'
 
 
@@ -44,6 +44,7 @@ class StagedAuditEntry(NamedTuple):
     snapshot: dict[str, Any] | None
     previous_snapshot: dict[str, Any]
     config: AuditModelConfig
+    user_id: str | None
     username: str
     created: datetime
 
@@ -105,6 +106,9 @@ class AuditEntry(Base):
     #: The persisted state immediately before an update
     previous_snapshot: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
+    #: The immutable user ID responsible for the operation
+    user_id: Mapped[str | None]
+
     #: The username responsible for the operation
     username: Mapped[str]
 
@@ -124,15 +128,23 @@ def prepare_audit_entries(
     instances: Any,
 ) -> None:
     session.info.pop(STAGED_AUDIT_ENTRIES, None)
-    if AUDIT_USERNAME not in session.info:
+    if CURRENT_USERNAME not in session.info:
         return
 
-    username = session.info[AUDIT_USERNAME]
+    user_id = session.info.get(CURRENT_USER_ID)
+    username = session.info[CURRENT_USERNAME]
     created = utcnow()
 
     staged: list[StagedAuditEntry] = [
         StagedAuditEntry(
-            'insert', instance, None, {}, config, username, created
+            'insert',
+            instance,
+            None,
+            {},
+            config,
+            user_id,
+            username,
+            created,
         )
         for instance in session.new
         if (config := audit_config(instance)) is not None
@@ -145,6 +157,7 @@ def prepare_audit_entries(
             None,
             config.previous_snapshot(session, instance),
             config,
+            user_id,
             username,
             created,
         )
@@ -163,6 +176,7 @@ def prepare_audit_entries(
             snapshot,
             {},
             config,
+            user_id,
             username,
             created,
         )
@@ -200,6 +214,7 @@ def write_audit_entries(session: Session, flush_context: Any) -> None:
                 else entry.config.snapshot(entry.instance)
             ),
             'previous_snapshot': entry.previous_snapshot,
+            'user_id': entry.user_id,
             'username': entry.username,
             'created': entry.created,
         }

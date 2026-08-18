@@ -61,6 +61,8 @@ class ForceFetchQueryClass[T](Query[T]):
 # may grow quite large - this alleviates memory fragmentation/high water mark
 # issues that we've been seeing on some servers.
 CONNECTION_LIFETIME = 60 * 60
+CURRENT_USER_ID = 'current_user_id'
+CURRENT_USERNAME = 'current_username'
 
 
 def _is_cached_plan_changed(error: FeatureNotSupported) -> bool:
@@ -304,6 +306,8 @@ class SessionManager:
         self.bases = [base]
         self.created_schemas: set[str] = set()
         self.current_schema: str | None = None
+        self.current_user_id: str | None = None
+        self.current_username: str | None = None
 
         self._ignore_bulk_updates = False
         self._ignore_bulk_deletes = False
@@ -712,6 +716,29 @@ class SessionManager:
         self.default_locale = default_locale
         self.current_locale = current_locale
 
+    def set_current_user(
+        self,
+        user_id: str | None,
+        username: str | None,
+    ) -> None:
+        """Sets the user responsible for changes in the current request."""
+        self.current_user_id = user_id
+        self.current_username = username
+
+        if self.session_factory.registry.has():
+            self._bind_current_user(self.session_factory())
+
+    def _bind_current_user[T: Session](self, session: T) -> T:
+        for key, value in (
+            (CURRENT_USER_ID, self.current_user_id),
+            (CURRENT_USERNAME, self.current_username),
+        ):
+            if value is None:
+                session.info.pop(key, None)
+            else:
+                session.info[key] = value
+        return session
+
     def _scopefunc(self) -> tuple[threading.Thread, str | None]:
         """ Returns the scope of the scoped_session used to create new
         sessions. Relies on self.current_schema being set before the
@@ -820,7 +847,7 @@ class SessionManager:
         session.info['schema'] = self.current_schema
         session.connection().info['session'] = weakref.proxy(session)
 
-        return session
+        return self._bind_current_user(session)
 
     def session(self) -> Session:
         """ Returns a new session or an existing session. Sessions with

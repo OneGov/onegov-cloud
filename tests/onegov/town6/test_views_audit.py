@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import transaction
 
-from onegov.core.orm.audit import AUDIT_USERNAME, AuditEntry
+from onegov.core.orm.audit import AuditEntry
 from onegov.page import Page, PageCollection
 
 
@@ -26,7 +26,10 @@ def test_view_audit_trail(client: Client) -> None:
     session = client.app.session()
     persisted_page = session.get(Page, page_id)
     assert persisted_page is not None
-    session.info[AUDIT_USERNAME] = 'editor@example.org'
+    client.app.session_manager.set_current_user(
+        'b5ab1f21dc96490da581c8c591b44dc7',
+        'editor@example.org',
+    )
     persisted_page.title = 'Changed Audited Page'
     session.flush()
     transaction.commit()
@@ -56,6 +59,7 @@ def test_view_audit_trail(client: Client) -> None:
         )
         .one()
     )
+    assert entry.user_id == 'b5ab1f21dc96490da581c8c591b44dc7'
     assert entry.username == 'editor@example.org'
     assert entry.previous_snapshot['title'] == 'Audited Page'
     assert entry.snapshot['title'] == 'Changed Audited Page'

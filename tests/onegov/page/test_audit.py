@@ -2,18 +2,25 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from onegov.core.orm.audit import AUDIT_USERNAME, AuditEntry
+from onegov.core.orm.audit import AuditEntry
 from onegov.page import PageCollection
 
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from onegov.core.orm import SessionManager
     from sqlalchemy.orm import Session
 
 
-def test_page_audit_entries(session: Session) -> None:
-    session.info[AUDIT_USERNAME] = 'editor@example.org'
+def test_page_audit_entries(
+    session: Session,
+    session_manager: SessionManager,
+) -> None:
+    session_manager.set_current_user(
+        'b5ab1f21dc96490da581c8c591b44dc7',
+        'editor@example.org',
+    )
     pages = PageCollection(session)
 
     root = pages.add_root('News')
@@ -32,6 +39,10 @@ def test_page_audit_entries(session: Session) -> None:
     ]
     assert all(entry.target_table == 'pages' for entry in entries)
     assert all(entry.target_id == str(root_id) for entry in entries)
+    assert all(
+        entry.user_id == 'b5ab1f21dc96490da581c8c591b44dc7'
+        for entry in entries
+    )
     assert all(entry.username == 'editor@example.org' for entry in entries)
     assert all(isinstance(entry.id, UUID) for entry in entries)
     assert entries[0].snapshot['title'] == 'News'
@@ -45,7 +56,15 @@ def test_page_audit_entries(session: Session) -> None:
     assert all(entry.created is not None for entry in entries)
 
 
-def test_page_audit_requires_user(session: Session) -> None:
+def test_page_audit_requires_user(
+    session: Session,
+    session_manager: SessionManager,
+) -> None:
+    session_manager.set_current_user(
+        'b5ab1f21dc96490da581c8c591b44dc7',
+        'editor@example.org',
+    )
+    session_manager.set_current_user(None, None)
     pages = PageCollection(session)
     page = pages.add_root('News')
     session.flush()
@@ -56,8 +75,14 @@ def test_page_audit_requires_user(session: Session) -> None:
     assert session.query(AuditEntry).count() == 0
 
 
-def test_page_audit_cascaded_delete(session: Session) -> None:
-    session.info[AUDIT_USERNAME] = 'editor@example.org'
+def test_page_audit_cascaded_delete(
+    session: Session,
+    session_manager: SessionManager,
+) -> None:
+    session_manager.set_current_user(
+        'b5ab1f21dc96490da581c8c591b44dc7',
+        'editor@example.org',
+    )
     pages = PageCollection(session)
     root = pages.add_root('Root', meta={'root': True})
     child = pages.add(
