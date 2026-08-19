@@ -49,7 +49,7 @@ class IllegalBackReference(ValueError):
         )
 
 
-_requires_normalization = re.compile(r'(^|/)\.\.($|/)|//').search
+_requires_normalization = re.compile(r'(^|/)\.\.?($|/)|//').search
 
 
 def normpath(path: str) -> str:
@@ -181,7 +181,18 @@ class Filestorage:
 
     def removetree(self, path: str) -> None:
         with self._lock:
-            shutil.rmtree(self.getsyspath(path))
+            sys_path = self.getsyspath(path)
+            if sys_path.rstrip('/') != self._root_path:
+                # simple case, since we don't need to preserve the root
+                shutil.rmtree(self.getsyspath(path))
+                return
+
+            with os.scandir(sys_path) as dir_iter:
+                for entry in dir_iter:
+                    if entry.is_dir(follow_symlinks=False):
+                        shutil.rmtree(entry.path)
+                    else:
+                        os.remove(entry.path)
 
     @overload
     def open(
