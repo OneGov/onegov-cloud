@@ -53,6 +53,7 @@ from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
 from onegov.core.datamanager import FileDataManager
+from onegov.core.filestorage import Filestorage
 from onegov.core.mail import prepare_email
 from onegov.core.orm import (
     Base, SessionManager, debug, DB_CONNECTION_ERRORS)
@@ -61,7 +62,6 @@ from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.request import CoreRequest
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
-from onegov.server.utils import load_class
 from operator import itemgetter
 from psycopg import OperationalError as PostgresOperationalError
 from purl import URL
@@ -76,7 +76,6 @@ if TYPE_CHECKING:
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
     from collections.abc import Callable, Iterable
     from email.headerregistry import Address
-    from fs.base import FS, SubFS
     from gettext import GNUTranslations
     from morepath.request import Request
     from morepath.settings import SettingRegistry
@@ -554,7 +553,10 @@ class Framework(
             return
 
         if 'filestorage' in cfg:
-            filestorage_class = load_class(cfg['filestorage'])
+            assert cfg['filestorage'] == 'fs.osfs.OSFS', (
+                'We currently only support OS based filesystem support'
+            )
+            filestorage_class = Filestorage
             filestorage_options = cfg.get('filestorage_options', {})
 
             # legacy support for pyfilesystem 1.x parameters
@@ -1356,11 +1358,8 @@ class Framework(
         )
 
     @property
-    def filestorage(self) -> SubFS[FS] | None:
+    def filestorage(self) -> Filestorage | None:
         """ A filestorage object bound to the current application.
-        Based on this nifty module:
-
-        `<https://docs.pyfilesystem.org/en/latest/>`_
 
         The file storage returned is guaranteed to be independent of other
         applications (the scope is the application_id, not just the class).
@@ -1371,11 +1370,6 @@ class Framework(
 
         Therefore, the urls for the file storage should always be acquired
         through :meth:`onegov.core.request.CoreRequest.filestorage_link`.
-
-        The backend is configured through :meth:`configure_application`.
-
-        For a list of methods available on the resulting object, consult this
-        list: `<https://docs.pyfilesystem.org/en/latest/interface.html>`_.
 
         If no filestorage is available, this returns None.
         See :attr:`self.has_filestorage`.
@@ -1410,7 +1404,7 @@ class Framework(
         return utils.makeopendir(self._global_file_storage, self.schema)
 
     @property
-    def themestorage(self) -> SubFS[FS] | None:
+    def themestorage(self) -> Filestorage | None:
         """ A storage object meant for themes, shared by all applications.
 
         Only use this for theming, nothing else!
