@@ -53,7 +53,6 @@ from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.crypto import stored_random_token
 from onegov.core.datamanager import FileDataManager
-from onegov.core.filestorage import Filestorage
 from onegov.core.mail import prepare_email
 from onegov.core.orm import (
     Base, SessionManager, debug, DB_CONNECTION_ERRORS)
@@ -84,6 +83,7 @@ if TYPE_CHECKING:
     from webob import Response
 
     from .analytics import AnalyticsProvider
+    from .filestorage import Filestorage
     from .layout import Layout
     from .mail import Attachment
     from .metadata import Metadata
@@ -145,6 +145,7 @@ class Framework(
     #       it makes sense to use this cache on its own
     schema_cache: dict[str, Any]
     _all_schema_caches: dict[str, Any]
+    _global_file_storage: Filestorage | None
 
     @property
     def version(self) -> str:
@@ -556,7 +557,7 @@ class Framework(
             assert cfg['filestorage'] == 'fs.osfs.OSFS', (
                 'We currently only support OS based filesystem support'
             )
-            filestorage_class = Filestorage
+            filestorage_class = self.modules.filestorage.Filestorage
             filestorage_options = cfg.get('filestorage_options', {})
 
             # legacy support for pyfilesystem 1.x parameters
