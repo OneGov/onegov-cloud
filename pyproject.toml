@@ -20,6 +20,8 @@ filterwarnings = [
     '''ignore:pathlib\.PurePath\.as_uri\(\) is deprecated:DeprecationWarning:xmlschema.*:''',
     # fixed upstream
     '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:ldap3.*:''',
+    # See: https://github.com/sarnold/pdfrw/issues/19
+    '''ignore:"[^"]+" is an invalid escape sequence:::''',
 ]
 
 [tool.coverage.run]
