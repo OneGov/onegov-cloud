@@ -687,7 +687,7 @@ class ResourceBaseForm(Form):
         obj.occupancy_fields = list(self.extract_field_ids(
             self.occupancy_fields))
         obj.ical_fields = list(self.extract_field_ids(self.ical_fields))
-        if self.parent_ids.data:
+        if self.parent_ids and self.parent_ids.data:
             obj.parents = self.request.session.query(Resource).filter(
                 Resource.id.in_(self.parent_ids.data)
             ).all()
@@ -701,7 +701,8 @@ class ResourceBaseForm(Form):
         self.zipcode_block = obj.zipcode_block
         self.occupancy_fields.data = '\n'.join(obj.occupancy_fields)
         self.ical_fields.data = '\n'.join(obj.ical_fields)
-        self.parent_ids.data = [parent.id for parent in obj.parents]
+        if self.parent_ids:
+            self.parent_ids.data = [parent.id for parent in obj.parents]
 
 
 if TYPE_CHECKING:
