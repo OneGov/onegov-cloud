@@ -299,12 +299,12 @@ def test_find_your_spot(client: Client) -> None:
     new = resources.click('Raum')
     new.form['title'] = 'Meeting 1'
     new.form['group'] = 'Meeting Rooms'
-    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.select('parent_ids', text='Grand Meeting Room')
     new.form.submit().follow()
 
     new.form['title'] = 'Meeting 2'
     new.form['group'] = 'Meeting Rooms'
-    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.select('parent_ids', text='Grand Meeting Room')
     new.form.submit().follow()
 
     find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
