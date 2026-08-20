@@ -2511,13 +2511,6 @@ msgstr "Inaktiv"
 msgid "No activities needing volunteers found."
 msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
-msgid ""
-"Thank you for offering to volunteer! We will have a look at your request and "
-"get back to you."
-msgstr ""
-"Vielen Dank dass Sie uns Ihre Hilfe angeboten haben! Wir werden Ihre Anfrage "
-"bearbeiten und uns bei Ihnen melden."
-
 msgid "No volunteers found."
 msgstr "Keine Hilfspersonen gefunden."
 
@@ -3444,9 +3437,6 @@ msgstr "Genügend Hilfspersonen"
 
 msgid "Not enough volunteers"
 msgstr "Zu wenig Hilfspersonen"
-
-#~ msgid "No activities needing volunteers found."
-#~ msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
 msgid "Subscription as a volunteer"
 msgstr "Anmeldung als Hilfsperson"

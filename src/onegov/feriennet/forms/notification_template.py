@@ -13,7 +13,8 @@ from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.models import NotificationTemplate
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, HtmlField
+from onegov.form.fields import (
+    MultiCheckboxField, HtmlField, TranslatedSelectField)
 from onegov.user import User, UserCollection
 from sqlalchemy import distinct, or_, and_, select, exists
 from uuid import uuid4
@@ -62,7 +63,7 @@ class NotificationTemplateSendForm(Form):
 
     request: FeriennetRequest
 
-    send_to = RadioField(
+    send_to = TranslatedSelectField(
         label=_('Send to'),
         choices=[
             ('myself', _(
@@ -73,6 +74,9 @@ class NotificationTemplateSendForm(Form):
             )),
             ('inactive_organisers', _(
                 'Organisers without occasions'
+            )),
+            ('volunteers', _(
+                'Volunteers'
             )),
             ('by_role', _(
                 'Users of a given role'
@@ -93,11 +97,20 @@ class NotificationTemplateSendForm(Form):
                 'Users with attenedees that have an occasion on their '
                 'wish- or booking-list'
             )),
-            (('volunteers', _(
-                'Volunteers'
-            )))
         ],
         default='by_role'
+    )
+
+    volunteer_state = RadioField(
+        label=_('State'),
+        choices=[
+            ('all', _('All')),
+            ('open', _('Open')),
+            ('contacted', _('Contacted')),
+            ('confirmed', _('Confirmed')),
+        ],
+        depends_on=('send_to', 'volunteers'),
+        default='all',
     )
 
     roles = MultiCheckboxField(
@@ -126,18 +139,6 @@ class NotificationTemplateSendForm(Form):
         depends_on=(
             'send_to', '!volunteers',
             )
-    )
-
-    volunteer_state = RadioField(
-        label=_('State'),
-        choices=[
-            ('all', _('All')),
-            ('open', _('Open')),
-            ('contacted', _('Contacted')),
-            ('confirmed', _('Confirmed')),
-        ],
-        depends_on=('send_to', 'volunteers'),
-        default='all',
     )
 
     no_spam = BooleanField(
