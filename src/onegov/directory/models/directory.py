@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from email_validator import validate_email
 from enum import Enum
-from functools import lru_cache
 from onegov.core.cache import instance_lru_cache
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, observes
@@ -16,10 +15,12 @@ from onegov.directory.types import (
     DirectoryConfiguration, DirectoryConfigurationStorage)
 from onegov.file import File, MultiAssociatedFiles
 from onegov.file.utils import as_fileintent
-from onegov.form import flatten_fieldsets, parse_formcode, parse_form
+from onegov.form.orm_types import Formcode
+from onegov.form.parser import ParsedForm
 from onegov.search import SearchableContent
 from sedate import to_timezone
 from sqlalchemy import and_, exists, func, text, Integer
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -34,7 +35,7 @@ from wtforms import FieldList
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from builtins import type as _type  # type is shadowed in model
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Mapping
     from onegov.form import Form
     from onegov.form.parser.core import (
         BasicParsedField, FileParsedField, ParsedField)
@@ -139,7 +140,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
     type: Mapped[str] = mapped_column(default=lambda: 'generic')
 
     #: The data structure of the contained entries
-    structure: Mapped[str]
+    parsed_structure: Mapped[ParsedForm] = mapped_column(Formcode)
 
     #: The configuration of the contained entries
     configuration: Mapped[DirectoryConfiguration] = mapped_column(
@@ -160,6 +161,20 @@ class Directory(Base, ContentMixin, TimestampMixin,
         order_by='DirectoryEntry.order',
         back_populates='directory'
     )
+
+    @hybrid_property
+    def structure(self) -> str:
+        """ The parsed form as a parsable string """
+        return self.parsed_structure.formcode
+
+    @structure.inplace.setter
+    def _structure_setter(self, value: str) -> None:
+        self.parsed_structure = ParsedForm.from_formcode(value)
+
+    @structure.inplace.expression
+    @classmethod
+    def _structure_expression(cls) -> ColumnElement[str | None]:
+        return cls.parsed_structure['source_code'].astext
 
     @property
     def entry_cls_name(self) -> str:
@@ -470,13 +485,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
     def title_observer(self, title: str) -> None:
         self.order = normalize_for_url(title)
 
-    @observes('structure', 'configuration')
+    @observes('parsed_structure', 'configuration')
     def structure_configuration_observer(
         self,
-        structure: str,
+        parsed_structure: set[tuple[str, Any]],
         configuration: DirectoryConfiguration
     ) -> None:
-        self.migration(structure, configuration).execute()
+        self.migration(self.parsed_structure, configuration).execute()
 
     def entry_with_name_exists(self, name: str) -> bool:
         session = object_session(self)
@@ -488,7 +503,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
     def migration(
         self,
-        new_structure: str,
+        new_structure: ParsedForm,
         new_configuration: DirectoryConfiguration | None
     ) -> DirectoryMigration:
 
@@ -499,23 +514,18 @@ class Directory(Base, ContentMixin, TimestampMixin,
         )
 
     @property
-    def fields(self) -> Sequence[ParsedField]:
-        return self.fields_from_structure(self.structure)
-
-    @staticmethod
-    @lru_cache(maxsize=1)
-    def fields_from_structure(structure: str) -> Sequence[ParsedField]:
-        return tuple(flatten_fieldsets(parse_formcode(structure)))
+    def fields(self) -> tuple[ParsedField, ...]:
+        return self.parsed_structure.flattened_fields
 
     @property
-    def basic_fields(self) -> Sequence[BasicParsedField]:
+    def basic_fields(self) -> tuple[BasicParsedField, ...]:
         return tuple(
             f for f in self.fields
             if f.type != 'fileinput' and f.type != 'multiplefileinput'
         )
 
     @property
-    def file_fields(self) -> Sequence[FileParsedField]:
+    def file_fields(self) -> tuple[FileParsedField, ...]:
         return tuple(
             f for f in self.fields
             if f.type == 'fileinput' or f.type == 'multiplefileinput'
@@ -527,25 +537,28 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
     @property
     def form_obj(self) -> DirectoryEntryForm:
-        return self.form_obj_from_structure(self.structure)
+        return self.form_obj_from_structure(self.parsed_structure)
 
     @property
     def form_class(self) -> _type[DirectoryEntryForm]:
-        return self.form_class_from_structure(self.structure)
+        return self.form_class_from_structure(self.parsed_structure)
 
     @instance_lru_cache(maxsize=1)
-    def form_obj_from_structure(self, structure: str) -> DirectoryEntryForm:
+    def form_obj_from_structure(
+        self,
+        structure: ParsedForm
+    ) -> DirectoryEntryForm:
         return self.form_class_from_structure(structure)()
 
     @instance_lru_cache(maxsize=1)
     def form_class_from_structure(
         self,
-        structure: str
+        structure: ParsedForm
     ) -> _type[DirectoryEntryForm]:
 
         directory = self
 
-        class DirectoryEntryForm(parse_form(self.structure)):  # type:ignore
+        class DirectoryEntryForm(structure.form_class()):  # type:ignore
 
             @property
             def mixed_data(self) -> dict[str, Any]:

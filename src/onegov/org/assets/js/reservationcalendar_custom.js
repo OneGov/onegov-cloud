@@ -5,6 +5,7 @@ var setupReservationCalendar = function(calendar) {
         minTime: calendar.data('min-time'),
         maxTime: calendar.data('min-time'),
         editable: calendar.data('editable'),
+        showHolidays: calendar.data('show-holidays'),
         selectUrl: calendar.data('select-url'),
         editUrl: calendar.data('edit-url'),
         view: calendar.data('view'),

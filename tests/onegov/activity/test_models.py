@@ -22,13 +22,13 @@ from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
+from onegov.activity.types import BoundedIntegerRange
 from onegov.core.utils import Bunch
 from onegov.pay.models.invoice_reference import FeriennetSchema
 from onegov.pay.models.invoice_reference import ESRSchema
 from sedate import as_datetime, replace_timezone, standardize_date
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-from psycopg2.extras import NumericRange
 from pytz import utc
 from unittest.mock import patch
 from uuid import uuid4
@@ -570,7 +570,7 @@ def test_no_orphan_occasions(session: Session, owner: User) -> None:
     need = OccasionNeed(
         id=uuid4(),
         name='Helpers',
-        number=NumericRange(1, 2),
+        number=BoundedIntegerRange(1, 2),
         occasion_id=tournament.id
     )
 
@@ -2130,6 +2130,54 @@ def test_period_phases(session: Session) -> None:
     # attribute for the phase
 
 
+def test_upcoming_period(session: Session) -> None:
+    periods = BookingPeriodCollection(session)
+
+    with freeze_time('2016-09-20'):
+        # no periods yet
+        assert periods.upcoming() is None
+
+        # a period whose booking has already ended is not upcoming
+        periods.add(
+            title="Spring 2016",
+            prebooking=(date(2016, 3, 1), date(2016, 3, 15)),
+            booking=(date(2016, 3, 15), date(2016, 3, 30)),
+            execution=(date(2016, 5, 1), date(2016, 5, 30)),
+        )
+        assert periods.upcoming() is None
+
+        # the active period must not be returned as upcoming, even though its
+        # booking has not ended yet
+        periods.add(
+            title="Autumn 2016",
+            prebooking=(date(2016, 9, 1), date(2016, 9, 15)),
+            booking=(date(2016, 9, 15), date(2016, 9, 30)),
+            execution=(date(2016, 11, 1), date(2016, 11, 30)),
+            active=True,
+        )
+        assert periods.upcoming() is None
+
+        # of two future (non-active) periods, the one with the earliest
+        # booking_start is returned
+        spring = periods.add(
+            title="Spring 2017",
+            prebooking=(date(2017, 3, 1), date(2017, 3, 15)),
+            booking=(date(2017, 3, 15), date(2017, 3, 30)),
+            execution=(date(2017, 5, 1), date(2017, 5, 30)),
+        )
+        periods.add(
+            title="Autumn 2017",
+            prebooking=(date(2017, 9, 1), date(2017, 9, 15)),
+            booking=(date(2017, 9, 15), date(2017, 9, 30)),
+            execution=(date(2017, 11, 1), date(2017, 11, 30)),
+        )
+        assert periods.upcoming() == spring
+
+    # once everything has ended, there is nothing upcoming
+    with freeze_time('2018-04-01'):
+        assert periods.upcoming() is None
+
+
 def test_invoices(
     session: Session,
     owner: User,
@@ -2573,7 +2621,7 @@ def test_date_changes(
 def test_age_barriers(prebooking_period: BookingPeriod) -> None:
     period = prebooking_period
 
-    o = Occasion(age=NumericRange(6, 9), period=period, dates=[
+    o = Occasion(age=BoundedIntegerRange(6, 9), period=period, dates=[
         OccasionDate(
             start=datetime(2017, 7, 26, 10),
             end=datetime(2017, 7, 26, 16),

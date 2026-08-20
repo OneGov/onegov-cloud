@@ -186,7 +186,7 @@ class UserCollection:
         """ All available tags. """
         records = self.session.execute(text("""
             SELECT DISTINCT tags FROM (
-                SELECT jsonb_array_elements(data->'tags') AS tags
+                SELECT jsonb_array_elements_text(data->'tags') AS tags
                 FROM users
             ) AS elements ORDER BY tags
         """))

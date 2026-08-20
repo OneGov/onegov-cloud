@@ -808,3 +808,148 @@ def test_limited_bookings_regression() -> None:
 
     # in the regression, this would be 2, even though 3 were possible
     assert len(result.accepted) == 3
+
+
+def test_number_of_wishes_does_not_favor_attendee() -> None:
+    """ PRO-1428: does the algorithm prefer children with few wishes?
+
+    The premise of the ticket - that the algorithm systematically favours
+    children with fewer wishes because it "tries to satisfy as many children
+    as possible" - does not hold. Deferred acceptance fills each occasion
+    purely by score (priority); the number of wishes an attendee submitted is
+    never taken into account.
+
+    This test documents that behaviour by pitting a single-wish child against
+    a many-wish child for the same single spot, all at equal priority. The
+    many-wish child wins the contested spot *and* keeps a second, non-competed
+    spot, leaving the single-wish child with nothing - the opposite of the
+    ticket's premise.
+
+    """
+
+    # non-overlapping occasions, one spot each
+    o1 = Occasion('O1', [(today(), today())], max_spots=1)
+    o2 = Occasion('O2', [(today() + days(1), today() + days(1))], max_spots=1)
+
+    # the single-wish child only wants O1
+    single = o1.booking("Single Wish", 'open', 0)
+
+    # the many-wish child wants both O1 and O2 (equal priority throughout)
+    many_o1 = o1.booking("Many Wishes", 'open', 0)
+    many_o2 = o2.booking("Many Wishes", 'open', 0)
+
+    result = match([single, many_o1, many_o2], (o1, o2))
+
+    # both spots always get filled, but which child wins the contested O1 spot
+    # is decided only by the (equal) score and an arbitrary tie-break - never
+    # by wish count. One of the two stable outcomes leaves the many-wish child
+    # holding both O1 and O2 while the single-wish child gets nothing, i.e. the
+    # single-wish child enjoys no protection whatsoever.
+    assert len(result.accepted) == 2
+    assert result.accepted == {single, many_o2} or (
+        result.accepted == {many_o1, many_o2} and result.open == {single})
+    assert result.blocked == set()
+
+
+def test_priority_not_wish_count_drives_matching() -> None:
+    """ PRO-1428: the actual lever is priority (starred wishes), not the
+    number of wishes.
+
+    A child who submits a single wish and stars it concentrates the maximum
+    priority on that one booking. That higher score - not the fact that they
+    have few wishes - is what wins them the contested spot. This is the real
+    explanation for the effect the organiser observed.
+
+    """
+
+    o1 = Occasion('O1', [(today(), today())], max_spots=1)
+    o2 = Occasion('O2', [(today() + days(1), today() + days(1))], max_spots=1)
+
+    # the single-wish child stars O1 -> higher priority/score
+    single = o1.booking("Single Wish", 'open', 1)
+
+    # the many-wish child did not star O1
+    many_o1 = o1.booking("Many Wishes", 'open', 0)
+    many_o2 = o2.booking("Many Wishes", 'open', 0)
+
+    result = match([single, many_o1, many_o2], (o1, o2))
+
+    # now the single-wish child wins O1 on priority, the many-wish child is
+    # bumped to its second choice O2
+    assert result.accepted == {single, many_o2}
+    assert result.open == {many_o1}
+    assert result.blocked == set()
+
+
+def test_lower_priority_wish_can_never_displace_higher_one() -> None:
+    """ PRO-1428: the reverse case - a single-wish child that did *not* star
+    its wish can never take the spot from a higher-priority booking.
+
+    An occasion only evicts a sitting booking for a newcomer with a strictly
+    higher score (``OccasionAgent.preferred``). So a single-wish child at
+    priority 0 loses the contested spot to a many-wish child who starred it,
+    deterministically - unlike the equal-priority tie there is no arbitrary
+    tie-break here. Since the single wish is the child's only wish, they end
+    up with nothing.
+
+    """
+
+    o1 = Occasion('O1', [(today(), today())], max_spots=1)
+    o2 = Occasion('O2', [(today() + days(1), today() + days(1))], max_spots=1)
+
+    # the single-wish child did not star its only wish
+    single = o1.booking("Single Wish", 'open', 0)
+
+    # the many-wish child starred O1 -> higher priority/score
+    many_o1 = o1.booking("Many Wishes", 'open', 1)
+    many_o2 = o2.booking("Many Wishes", 'open', 0)
+
+    result = match([single, many_o1, many_o2], (o1, o2))
+
+    # the higher-priority booking keeps O1, the single-wish child is shut out
+    assert result.accepted == {many_o1, many_o2}
+    assert result.open == {single}
+
+
+def test_star_cap_favours_low_wish_children() -> None:
+    """ PRO-1428: the star cap (3 per child, see Booking.star / the feriennet
+    toggle-star view) is absolute, not proportional.
+
+    A child with few wishes can star *all* of them, so every wish sits at
+    priority 1. A child with many wishes can only star 3, leaving the rest at
+    priority 0 - and a priority-0 wish always loses a contested spot to a
+    priority-1 one. The result is a structural tilt towards low-wish children
+    in oversubscribed occasions, which is a plausible driver of the effect the
+    organiser observed.
+
+    Here the many-wish child spent its 3 stars on A/B/C and competes with the
+    low-wish child for D/E/F, which the low-wish child was able to star. The
+    low-wish child wins all three contested spots, deterministically.
+
+    """
+
+    # six single-spot, non-overlapping occasions
+    occasions = {
+        name: Occasion(name, [(today() + days(i), today() + days(i))],
+                       max_spots=1)
+        for i, name in enumerate('ABCDEF')
+    }
+
+    # many-wish child: wishes all six, but the star cap only lets it star
+    # three (A/B/C -> priority 1); D/E/F stay unstarred (priority 0)
+    many = [occasions[n].booking("Many Wishes", 'open', 1) for n in 'ABC']
+    many += [occasions[n].booking("Many Wishes", 'open', 0) for n in 'DEF']
+
+    # low-wish child: only wishes D/E/F and can star all of them (priority 1)
+    low = [occasions[n].booking("Low Wishes", 'open', 1) for n in 'DEF']
+
+    result = match(many + low, tuple(occasions.values()))
+
+    accepted = {(b.occasion.name, b.attendee) for b in result.accepted}
+
+    # low-wish child wins every contested spot on its full-coverage starring
+    assert accepted == {
+        ('A', 'Many Wishes'), ('B', 'Many Wishes'), ('C', 'Many Wishes'),
+        ('D', 'Low Wishes'), ('E', 'Low Wishes'), ('F', 'Low Wishes'),
+    }
+    assert result.blocked == set()

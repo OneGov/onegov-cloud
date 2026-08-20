@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from typing import Self
 
 
-class PublicationCollection(GenericCollection[File]):
+class PublicationCollection(GenericCollection[File, str]):
 
     def __init__(self, session: Session, year: int | None = None) -> None:
         super().__init__(session)

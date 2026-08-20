@@ -6,11 +6,15 @@ from itertools import groupby
 from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
-from onegov.core.elements import Link, Confirm, Intercooler, BackLink
+from onegov.api.models import ApiKey
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
+from onegov.event.models.event import EventFilterValue
+from onegov.form import as_internal_id
 from onegov.form import Form
 from onegov.org import _
+from onegov.org.app import OrgApp
 from onegov.org.forms import AnalyticsSettingsForm
 from onegov.org.forms import FooterSettingsForm
 from onegov.org.forms import AppearanceSettingsForm
@@ -25,14 +29,13 @@ from onegov.org.forms.settings import (
     GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
     VATSettingsForm, EventSettingsForm, KabaSettingsForm,
     ResourceSettingsForm)
-from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
+from onegov.org.management import LinkHealthCheck
 from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
-from onegov.api.models import ApiKey
-from onegov.org.app import OrgApp
+from onegov.org.path import ShortLink
 from uuid import uuid4
 
 
@@ -135,16 +138,22 @@ def handle_generic_settings(
     subtitle: str | None = None
 ) -> RenderData | Response:
 
+    settings_url = request.link(self, name='settings')
+
     layout = layout or SettingsLayout(self, request, title)
     layout.edit_mode = True
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.return_to_url(settings_url),
+        attrs={'class': 'cancel-link'}
+    )
     request.include('fontpreview')
 
     if form.submitted(request):
         form.populate_obj(self)
 
         request.success(_('Your changes were saved'))
-        return request.redirect(request.link(self, name='settings'))
+        return request.redirect(settings_url)
     elif request.method == 'GET':
         form.process(obj=self)
 
@@ -244,7 +253,7 @@ def handle_footer_settings(
 
 @OrgApp.form(
     model=Organisation, name='vat-settings', template='form.pt',
-    permission=Secret, form=VATSettingsForm, setting=_('Value Added Tax'),
+    permission=Secret, form=VATSettingsForm, setting=_('Prices'),
     icon='fa-money', order=60)
 def handle_vat_settings(
         self: Organisation,
@@ -252,8 +261,8 @@ def handle_vat_settings(
         form: VATSettingsForm,
         layout: SettingsLayout | None = None
 ) -> RenderData | Response:
-    layout = layout or SettingsLayout(self, request, _('Value Added Tax'))
-    return handle_generic_settings(self, request, form, _('Value Added Tax'),
+    layout = layout or SettingsLayout(self, request, _('Prices'))
+    return handle_generic_settings(self, request, form, _('Prices'),
                                    layout)
 
 
@@ -408,7 +417,135 @@ def handle_event_settings(
     form: EventSettingsForm,
     layout: SettingsLayout | None = None
 ) -> RenderData | Response:
-    return handle_generic_settings(self, request, form, _('Events'), layout)
+
+    layout = layout or SettingsLayout(self, request, _('Events'))
+    layout.edit_mode = True
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.return_to_url(request.link(self, name='settings')),
+        attrs={'class': 'cancel-link'}
+    )
+    layout.include_code_editor()
+    request.include('fontpreview')
+
+    show_force_remove = False
+    if form.submitted(request):
+        use_filters = form.event_filter_type.data in (
+            'filters', 'tags_and_filters')
+
+        if use_filters:
+            old_keywords = {
+                as_internal_id(k)
+                for k in self.event_filter_configuration.get(
+                    'keywords', [])
+            }
+            new_keywords = {
+                as_internal_id(k)
+                for k in (form.keyword_fields.data or '').splitlines()
+            }
+            old_field_choices = {
+                f.id: {c.label for c in getattr(f, 'choices', ())}
+                for f in self.event_filter_fields
+            }
+            new_field_choices = {
+                f.id: {c.label for c in getattr(f, 'choices', ())}
+                for f in parsed.flattened_fields
+            } if (parsed := form.event_filter_parsed_definition.data) else {}
+
+            removed_keywords = old_keywords - new_keywords
+            removed_choices: dict[str, set[str]] = {
+                keyword: removed_field_choices
+                for keyword in old_keywords & new_keywords
+                if (removed_field_choices := (
+                    old_field_choices.get(keyword, set())
+                    - new_field_choices.get(keyword, set())
+                ))
+            }
+
+            if form.force_remove.data:
+                for keyword in removed_keywords:
+                    (
+                        request.session.query(EventFilterValue)
+                        .filter_by(keyword=keyword)
+                        .delete()
+                    )
+                for keyword, choices in removed_choices.items():
+                    for choice in choices:
+                        (
+                            request.session.query(EventFilterValue)
+                            .filter_by(keyword=keyword, value=choice)
+                            .delete()
+                        )
+            else:
+                blocked = False
+                for keyword in removed_keywords:
+                    count = (
+                        request.session.query(EventFilterValue)
+                        .filter_by(keyword=keyword)
+                        .count()
+                    )
+                    if count:
+                        request.alert(_(
+                            'The filter "${keyword}" is still applied to '
+                            '${count} event(s).',
+                            mapping={'keyword': keyword, 'count': count}
+                        ))
+                        blocked = True
+
+                for keyword, choices in removed_choices.items():
+                    for choice in choices:
+                        count = (
+                            request.session.query(EventFilterValue)
+                            .filter_by(keyword=keyword, value=choice)
+                            .count()
+                        )
+                        if count:
+                            request.alert(_(
+                                'The filter choice "${choice}" is still '
+                                'applied to ${count} event(s).',
+                                mapping={'choice': choice, 'count': count}
+                            ))
+                            blocked = True
+
+                if blocked:
+                    show_force_remove = True
+
+        if not show_force_remove:
+            # populate the regular settings; the filter fields are
+            # persisted explicitly below (keyword_fields maps into a dict
+            # and we must not touch the stored filters when disabled)
+            form.populate_obj(self, exclude={
+                'event_filter_parsed_definition',
+                'keyword_fields',
+                'force_remove'
+            })
+
+            if use_filters:
+                keywords = (form.keyword_fields.data or '').splitlines()
+                self.event_filter_parsed_definition = (
+                    form.event_filter_parsed_definition.data)
+                self.event_filter_configuration = {
+                    'order': [],
+                    'keywords': keywords
+                }
+
+            request.success(_('Your changes were saved'))
+            return request.redirect(request.link(self, name='settings'))
+
+    elif request.method == 'GET':
+        form.process(obj=self)
+        form.keyword_fields.data = '\r\n'.join(
+            self.event_filter_configuration.get('keywords', []))
+
+    if not show_force_remove:
+        form.delete_field('force_remove')
+
+    return {
+        'layout': layout,
+        'title': _('Events'),
+        'form': form,
+        'form_width': 'large',
+    }
 
 
 @OrgApp.form(
@@ -499,6 +636,44 @@ def preview_holiday_settings(
             'layout': layout,
             'year': layout.today().year,
         }
+    )
+
+
+@OrgApp.form(model=Organisation, name='link-settings-preview',
+             permission=Secret, form=LinksSettingsForm)
+def preview_link_settings(
+    self: Organisation,
+    request: OrgRequest,
+    form: LinksSettingsForm,
+    layout: DefaultLayout | None = None
+) -> str:
+
+    layout = layout or DefaultLayout(self, request)
+    link_names = [
+        parts[0]
+        for line in (form.short_links.data or '').splitlines()
+        if len(parts := line.split(':', 1)) == 2
+    ]
+
+    if not link_names:
+        msg = request.translate(_('No short links defined'))
+        return f'<i class="short-links">{msg}</i>'
+
+    return Markup('<ul class="short-links">{}</ul>').format(
+        Markup('').join(
+            Markup(
+                '<li><a href="{0}" target="_blank">{0}</a></li>'
+            ).format(
+                request.class_link(
+                    ShortLink,
+                    {'name': name}
+                    # NOTE: Even though @ is reserved, it's safe to use
+                    #       in the position we're using it in, browsers
+                    #       will automatically convert them.
+                ).replace('/%40', '/@'),
+            )
+            for name in link_names
+        )
     )
 
 

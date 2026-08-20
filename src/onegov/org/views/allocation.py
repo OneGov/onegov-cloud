@@ -1,17 +1,22 @@
 from __future__ import annotations
+from copy import deepcopy
 import json
 
 import morepath
+import sedate
 
 from datetime import timedelta
+from libres.db.models import Allocation as LibresAllocation
 from libres.db.models import ReservedSlot
 from libres.modules.errors import LibresError
+from libres.modules import rasterizer
 
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import is_uuid
 from onegov.form import merge_forms
 from onegov.org import OrgApp, utils, _
 from onegov.org.forms import AllocationRuleForm
+from onegov.org.forms import BatchCopyAllocationRulesForm
 from onegov.org.forms import DaypassAllocationEditForm
 from onegov.org.forms import DaypassAllocationForm
 from onegov.org.forms import RoomAllocationEditForm
@@ -27,7 +32,7 @@ from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from purl import URL
 from sedate import utcnow
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, tuple_
 from sqlalchemy.dialects.postgresql import JSON
 from uuid import uuid4
 from webob import exc
@@ -38,6 +43,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
+    from sqlalchemy.orm import Query
     from webob import Response
 
     type AllocationForm = (
@@ -56,6 +62,8 @@ if TYPE_CHECKING:
 def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     """ Returns the allocations in a fullcalendar compatible events feed.
 
+    This also includes events for national/cantonal/school holidays.
+
     See `<https://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
     more information.
 
@@ -66,10 +74,19 @@ def view_allocations_json(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         return ()
 
-    return tuple(
-        e.as_dict() for e in utils.AllocationEventInfo.from_resource_by_range(
-            request, self, start, end
-        )
+    return (
+        *(
+            event.as_dict()
+            for event in utils.HolidayEventInfo.from_request(
+                request, start.date(), end.date()
+            )
+        ),
+        *(
+            event.as_dict()
+            for event in utils.AllocationEventInfo.from_resource_by_range(
+                request, self, start, end
+            )
+        ),
     )
 
 
@@ -274,6 +291,7 @@ def handle_edit_allocation(
         new_start, new_end = form.dates
 
         try:
+            # FIXME: Why do we ignore form.allocation_data?
             resource.scheduler.move_allocation(
                 master_id=self.id,
                 new_start=new_start,
@@ -345,6 +363,60 @@ def handle_delete_allocation(self: Allocation, request: OrgRequest) -> None:
             response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
 
 
+def warn_about_skipped_allocations(
+    request: OrgRequest, form: AllocationRuleForm, created: int
+) -> None:
+    """Allocations which overlap existing ones are silently skipped by
+    the scheduler, so we point that out.
+
+    """
+
+    skipped = len(form.dates) - created
+
+    if skipped > 0:
+        request.warning(
+            _(
+                '${n} availabilities were not created, because they overlap '
+                'with existing ones.',
+                mapping={'n': skipped},
+            )
+        )
+
+
+def count_matching_allocations(
+    allocations: Query[LibresAllocation],
+    form: AllocationRuleForm,
+    timezone: str,
+) -> int:
+    dates = (
+        (
+            sedate.standardize_date(start, timezone),
+            sedate.standardize_date(end, timezone),
+        )
+        for start, end in form.dates
+    )
+    if form.whole_day:
+        dates = (
+            sedate.align_range_to_day(start, end, timezone)
+            for start, end in dates
+        )
+
+    expected = {
+        rasterizer.rasterize_span(start, end, rasterizer.MIN_RASTER)
+        for start, end in dates
+    }
+    if not expected:
+        return 0
+
+    return allocations.filter(
+        LibresAllocation.is_master,
+        tuple_(
+            LibresAllocation._start,
+            LibresAllocation._end,
+        ).in_(expected),
+    ).count()
+
+
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
              permission=Private, form=get_allocation_rule_form_class)
 def handle_allocation_rule(
@@ -367,6 +439,7 @@ def handle_allocation_rule(
             'New availability period active, ${n} allocations created',
             mapping={'n': changes}
         ))
+        warn_about_skipped_allocations(request, form, changes)
 
         return request.redirect(request.link(self, name='rules'))
 
@@ -464,6 +537,10 @@ def handle_edit_rule(
         if 'access' in form:
             new_data['access'] = form['access'].data
 
+        matching_updated_count = count_matching_allocations(
+            updatable_candidates, form, self.timezone
+        )
+
         # NOTE: This is a little bit dodgy, but since allocations aren't
         #       searchable and we don't have any other use-cases currently
         #       where we would want to know about changes to allocations
@@ -500,6 +577,11 @@ def handle_edit_rule(
                 },
             )
         )
+
+        warn_about_skipped_allocations(
+            request, form, new_allocations_count + matching_updated_count
+        )
+
         return request.redirect(request.link(self, name='rules'))
 
     # Pre-populate the form with existing rule data
@@ -655,6 +737,83 @@ def handle_copy_rule(self: Resource, request: OrgRequest) -> None:
     request.success(_('The availability period was added to the clipboard'))
 
 
+@OrgApp.form(
+    model=Resource,
+    template='form.pt',
+    name='copy-rules',
+    permission=Private,
+    form=BatchCopyAllocationRulesForm,
+)
+def handle_copy_rules(
+    self: Resource,
+    request: OrgRequest,
+    form: BatchCopyAllocationRulesForm,
+    layout: AllocationRulesLayout | None = None,
+) -> RenderData | Response:
+    layout = layout or AllocationRulesLayout(self, request)
+
+    if form.submitted(request):
+        resources = ResourceCollection(request.app.libres_context)
+        rule_ids = form.rules.data or []
+        resource_ids = form.resources.data or []
+        selected_rules = {
+            rule['id']: rule
+            for rule in self.content.get('rules', ())
+            if rule['id'] in rule_ids
+        }
+        allocation_count = 0
+
+        for resource_id in resource_ids:
+            resource = resources.by_id(resource_id)
+            if resource is None or resource.type != self.type:
+                raise exc.HTTPBadRequest()
+
+            target_rules = resource.content.get('rules', [])
+            form_class = get_allocation_rule_form_class(resource, request)
+            for rule_id in rule_ids:
+                source_rule = selected_rules.get(rule_id)
+                if source_rule is None:
+                    raise exc.HTTPBadRequest()
+
+                rule_form = request.get_form(
+                    form_class, csrf_support=False, model=resource
+                )
+                rule = deepcopy(source_rule)
+                rule['id'] = uuid4().hex
+                rule['last_run'] = None
+                rule['iteration'] = 0
+                rule_form.rule = rule
+                allocation_count += rule_form.apply(resource)
+                target_rules.append(rule_form.rule)
+
+            resource.content['rules'] = target_rules
+
+        request.success(
+            _(
+                '${periods} availability periods copied to ${resources} '
+                'resources, creating ${allocations} allocations',
+                mapping={
+                    'periods': len(selected_rules),
+                    'resources': len(resource_ids),
+                    'allocations': allocation_count,
+                },
+            )
+        )
+        return request.redirect(request.link(self, name='rules'))
+
+    layout.edit_mode = True
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.link(self, name='rules'),
+        attrs={'class': 'cancel-link'},
+    )
+    return {
+        'layout': layout,
+        'title': _('Copy availability periods'),
+        'form': form,
+    }
+
+
 @OrgApp.view(model=Resource, request_method='POST', permission=Private,
              name='paste-rule')
 def handle_paste_rule(self: Resource, request: OrgRequest) -> None:
@@ -712,8 +871,7 @@ def handle_delete_rule(self: Resource, request: OrgRequest) -> None:
         Allocation.group.notin_(reservations.scalar_subquery()))
 
     # delete the allocations
-    for count, candidate in enumerate(candidates, start=1):
-        request.session.delete(candidate)
+    count = candidates.delete('fetch')
 
     delete_rule(self, rule_id)
 

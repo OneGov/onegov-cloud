@@ -5,12 +5,15 @@ import os
 
 from AIS import AIS, PDF
 from contextlib import suppress
+from onegov.file.models import SigningRequest
 from onegov.file.sign.generic import SigningService
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead, SupportsWrite
+    from onegov.file.models import File
+    from sqlalchemy.orm import Session
 
 
 class SwisscomAIS(SigningService, service_name='swisscom_ais'):
@@ -37,9 +40,11 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
 
     def sign(
         self,
+        session: Session,
         infile: SupportsRead[bytes],
-        outfile: SupportsWrite[bytes]
-    ) -> str:
+        outfile: SupportsWrite[bytes],
+        file: File | None = None
+    ) -> SigningRequest:
 
         if hasattr(infile, 'seek'):
             with suppress(io.UnsupportedOperation):
@@ -55,4 +60,10 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         # NOTE: Same with the chunked write, the file is already in memory
         outfile.write(inout_stream.getvalue())
 
-        return f'swisscom_ais/{self.customer}/{self.client.last_request_id}'
+        request = SigningRequest(
+            service_name='swisscom_ais',
+            request_id=f'swisscom_ais/{self.customer}/{self.client.last_request_id}',
+            file=file,
+        )
+        session.add(request)
+        return request

@@ -12,13 +12,15 @@ from blinker import Signal
 from contextlib import contextmanager
 from functools import lru_cache
 from onegov.core import log
-from onegov.core.custom import json
+from psycopg.errors import FeatureNotSupported
+from psycopg.sql import SQL, Identifier
 from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql import Delete, Update
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
+from zope.sqlalchemy import datamanager
 
 
 from typing import Any, Self, TYPE_CHECKING
@@ -59,6 +61,17 @@ class ForceFetchQueryClass[T](Query[T]):
 # may grow quite large - this alleviates memory fragmentation/high water mark
 # issues that we've been seeing on some servers.
 CONNECTION_LIFETIME = 60 * 60
+
+
+def _is_cached_plan_changed(error: FeatureNotSupported) -> bool:
+    return (
+        'cached plan must not change result type' in str(error)
+    )
+
+
+datamanager._retryable_errors.append(  # type: ignore[attr-defined]
+    (FeatureNotSupported, _is_cached_plan_changed)
+)
 
 
 def query_schemas(
@@ -317,12 +330,14 @@ class SessionManager:
         # override the isolation level in any case, we cannot allow another
         engine_config['isolation_level'] = 'SERIALIZABLE'
 
-        # provide our custom serializer to the engine
+        # provide our custom no-op serializer to the engine, we handle
+        # serialization/deserialization on a per-type basis in our
+        # custom json types.
         assert 'json_serializer' not in engine_config
         assert 'json_deserializer' not in engine_config
 
-        engine_config['json_serializer'] = json.dumps
-        engine_config['json_deserializer'] = json.loads
+        engine_config['json_serializer'] = lambda value: value
+        engine_config['json_deserializer'] = lambda value: value
 
         if pool_config:
             engine_config.update(pool_config)
@@ -441,7 +456,9 @@ class SessionManager:
                     schema = None
 
             if schema is not None:
-                cursor.execute('SET search_path TO %s, extensions', (schema, ))
+                cursor.execute(SQL(
+                    'SET search_path TO {}, extensions'
+                ).format(Identifier(schema)))
 
         @event.listens_for(engine, 'before_cursor_execute')
         def limit_session_lifetime(
@@ -457,10 +474,9 @@ class SessionManager:
             if statement.startswith('ROLLBACK'):
                 return
 
-            cursor.execute(
-                'SET SESSION idle_in_transaction_session_timeout = %s',
-                (f'{CONNECTION_LIFETIME}s', )
-            )
+            cursor.execute(SQL(
+                'SET SESSION idle_in_transaction_session_timeout = {}'
+            ).format(f'{CONNECTION_LIFETIME}s'))
 
     def register_session(self, session: Session | scoped_session[Any]) -> None:
         """ Takes the given session and registers it with zope.sqlalchemy and
@@ -906,9 +922,7 @@ class SessionManager:
                             if t.name not in existing_tables
                         ]
                         if missing:
-                            base.metadata.create_all(
-                                conn, tables=missing, checkfirst=False
-                            )
+                            base.metadata.create_all(conn, tables=missing)
                             existing_tables.update(t.name for t in missing)
 
                         declared_classes.update(

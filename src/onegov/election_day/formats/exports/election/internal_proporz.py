@@ -44,7 +44,7 @@ def export_election_internal_proporz(
     ids = session.query(ElectionResult.id)
     ids = ids.filter(ElectionResult.election_id == election.id)
 
-    SubListConnection = aliased(ListConnection)  # noqa: N806
+    SubListConnection = aliased(ListConnection)  # ruff:ignore[non-lowercase-variable-in-function]
     results = session.query(
         CandidateResult.votes,
         ElectionResult.superregion,

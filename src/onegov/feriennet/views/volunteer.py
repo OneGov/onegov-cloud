@@ -32,7 +32,6 @@ if TYPE_CHECKING:
     from onegov.core.types import JSON_ro, RenderData
     from onegov.activity.collections.volunteer import ReportRow
     from onegov.feriennet.request import FeriennetRequest
-    from webob import Response
 
 
 def get_age(

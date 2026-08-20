@@ -22,7 +22,10 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
+class PaymentCollection(
+    GenericCollection[Payment, 'UUID'],
+    Pagination[Payment]
+):
     """ Manages the payment records.
 
     To render a list of payments you might want to also consider the

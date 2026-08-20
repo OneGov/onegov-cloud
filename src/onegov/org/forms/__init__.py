@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from onegov.org.forms.allocation import AllocationRuleForm
+from onegov.org.forms.allocation import BatchCopyAllocationRulesForm
 from onegov.org.forms.allocation import DaypassAllocationEditForm
 from onegov.org.forms.allocation import DaypassAllocationForm
 from onegov.org.forms.allocation import RoomAllocationEditForm
@@ -36,6 +37,7 @@ from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import KabaEditForm
 from onegov.org.forms.reservation import ReservationAdjustmentForm
 from onegov.org.forms.reservation import ReservationForm
+from onegov.org.forms.resource import ResourceChangeUrlForm
 from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
 from onegov.org.forms.resource import ResourceForm
@@ -53,6 +55,7 @@ from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.forms.text_module import TextModuleForm
 from onegov.org.forms.ticket import (
     InternalTicketChatMessageForm, ExtendedInternalTicketChatMessageForm)
+from onegov.org.forms.ticket import RequestCancellationForm
 from onegov.org.forms.ticket import TicketAssignmentForm
 from onegov.org.forms.ticket import TicketChangeTagForm
 from onegov.org.forms.ticket import TicketChatMessageForm
@@ -70,6 +73,7 @@ __all__ = (
     'AllocationRuleForm',
     'AnalyticsSettingsForm',
     'AppearanceSettingsForm',
+    'BatchCopyAllocationRulesForm',
     'ChangeUsernameForm',
     'CitizenLoginForm',
     'CommissionForm',
@@ -114,6 +118,8 @@ __all__ = (
     'PublicRequestMTANForm',
     'ReservationAdjustmentForm',
     'ReservationForm',
+    'RequestCancellationForm',
+    'ResourceChangeUrlForm',
     'ResourceCleanupForm',
     'ResourceExportForm',
     'ResourceForm',

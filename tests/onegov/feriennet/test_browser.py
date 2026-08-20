@@ -3,12 +3,11 @@ from __future__ import annotations
 import time
 import json
 import pytest
-import os
 
 from datetime import datetime
 from pathlib import Path
 from datetime import timedelta
-from psycopg2.extras import NumericRange
+from onegov.activity.types import BoundedIntegerRange
 from pytest import mark
 from sedate import as_datetime, replace_timezone
 
@@ -285,7 +284,10 @@ def test_volunteers_export(
     scenario.add_user(username='member@example.org', role='member')
     scenario.add_occasion(age=(0, 10), spots=(0, 2), cost=100)
     scenario.add_need(
-        name="Begleiter", number=NumericRange(1, 4), accept_signups=True)
+        name="Begleiter",
+        number=BoundedIntegerRange(1, 4),
+        accept_signups=True
+    )
     scenario.add_attendee(name="Dustin")
     scenario.add_booking(
         username='admin@example.org',
@@ -422,12 +424,14 @@ def test_volunteer_subscription(
     scenario.add_occasion(
         cost=100, dates=[(later, later + timedelta(hours=1))])
     scenario.add_need(
-        name="Aufichtsperson", number=NumericRange(1, 3), accept_signups=True)
+        name="Aufichtsperson", number=BoundedIntegerRange(1, 3),
+        accept_signups=True)
 
     scenario.add_activity(title="Dancing", state='accepted')
     scenario.add_occasion(cost=100)
     scenario.add_need(
-        name="Begleitung", number=NumericRange(3, 4), accept_signups=True)
+        name="Begleitung", number=BoundedIntegerRange(3, 4),
+        accept_signups=True)
 
     scenario.commit()
 
@@ -458,7 +462,9 @@ def test_volunteer_subscription(
     })
     browser.find_by_value("Absenden").click()
 
-    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
+    maildir = Path(client.app.maildir)
+    mails = sorted(maildir.iterdir(), key=lambda f: f.stat().st_mtime)
+    mail = mails[0]
     with open(mail, 'r') as file:
         mail_content = file.read()
         assert (
@@ -491,7 +497,8 @@ def test_volunteer_subscription(
     assert browser.is_text_present(
         "1 E-Mails erfolgreich gesendet")
 
-    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[1]
+    mails = sorted(maildir.iterdir(), key=lambda f: f.stat().st_mtime)
+    mail = mails[1]
     with open(mail, 'r') as file:
         mail_content = file.read()
         assert (

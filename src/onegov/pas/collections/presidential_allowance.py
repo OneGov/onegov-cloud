@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class PresidentialAllowanceCollection(
-    GenericCollection[PresidentialAllowance]
+    GenericCollection[PresidentialAllowance, 'UUID']
 ):
 
     def __init__(

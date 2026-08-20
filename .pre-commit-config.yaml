@@ -3,6 +3,8 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        # vendored libraries are kept as they are shipped
+        exclude: '^src/onegov/[^/]+/assets/js/(d3\.v7\.min|d3-org-chart|d3-flextree)\.js$'
       - id: mixed-line-ending
       - id: check-merge-conflict
       - id: check-ast
@@ -17,7 +19,7 @@ repos:
         exclude: .pre-commit-config.yaml
       - id: pt_structure
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.18
+    rev: v0.16.3
     hooks:
       - id: ruff-check
         args: [ "--fix" ]
@@ -29,7 +31,7 @@ repos:
         additional_dependencies:
         - flake8-type-checking>=3.0.0
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v17.13.0
+    rev: v17.14.1
     hooks:
     - id: stylelint
       files: '^src/.*\.scss'
@@ -37,12 +39,13 @@ repos:
         - stylelint@16.19.1
         - stylelint-config-standard-scss@15.0.0
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.5.0
+    rev: v10.8.1
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
       additional_dependencies:
-      - eslint-react
+      - eslint@8.57.0
+      - eslint-plugin-react
   - repo: https://github.com/PyCQA/bandit
     rev: 1.9.4
     hooks:
@@ -76,3 +79,7 @@ repos:
     rev: v8.30.1
     hooks:
       - id: gitleaks
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.29.0
+    hooks:
+      - id: zizmor

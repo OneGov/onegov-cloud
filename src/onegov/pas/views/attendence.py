@@ -38,6 +38,7 @@ from onegov.pas.utils import (
     get_active_kantonsrat_parliamentarians,
     is_active_kantonsrat_member,
 )
+from uuid import UUID
 
 
 from typing import TYPE_CHECKING
@@ -332,7 +333,7 @@ def add_bulk_attendence(
 ) -> RenderData | Response:
     request.include('custom')
 
-    if not request.is_admin and not request.is_commission_president:
+    if not request.is_admin and not request.has_commission_president_role:
         request.alert(_('Only admins can add bulk attendance records.'))
         return request.redirect(request.class_link(AttendenceCollection))
 
@@ -356,7 +357,12 @@ def add_bulk_attendence(
             if not request.is_admin and form.date.data:
                 blocked_parls: list[str] = []
                 for parl_id in raw_parl_ids:
-                    pid = str(parl_id)
+                    if not isinstance(parl_id, str):
+                        continue
+                    try:
+                        pid = UUID(parl_id)
+                    except ValueError:
+                        continue
                     if has_user_set_abschluss_for_settlement_run(
                         request.session, pid, form.date.data
                     ):

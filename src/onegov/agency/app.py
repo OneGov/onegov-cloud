@@ -27,9 +27,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterator
     from datetime import datetime
-    from fs.base import FS
-    from fs.base import SubFS
     from onegov.api import ApiEndpoint
+    from onegov.core.filestorage import Filestorage
     from onegov.core.types import RenderData
     from onegov.org.models import Organisation
 
@@ -40,9 +39,9 @@ class AgencyApp(TownApp):
 
     if TYPE_CHECKING:
         # FIXME: Maybe we should consider just raising an exception
-        #        if filestorage is accesed without it being configured
+        #        if filestorage is accessed without it being configured
         @property
-        def filestorage(self) -> SubFS[FS]: ...
+        def filestorage(self) -> Filestorage: ...
 
     @property
     def root_pdf_exists(self) -> bool:
@@ -55,13 +54,13 @@ class AgencyApp(TownApp):
     @property
     def root_pdf_modified(self) -> datetime | None:
         if self.root_pdf_exists:
-            return self.filestorage.getdetails('root.pdf').modified
+            return self.filestorage.getmodified('root.pdf')
         return None
 
     @property
     def people_xlsx_modified(self) -> datetime | None:
         if self.people_xlsx:
-            return self.filestorage.getdetails('people.xlsx').modified
+            return self.filestorage.getmodified('people.xlsx')
         return None
 
     @property
@@ -69,36 +68,30 @@ class AgencyApp(TownApp):
         result: bytes | None = None
         if self.filestorage.exists('root.pdf'):
             with self.filestorage.open('root.pdf', 'rb') as file:
-                # FS bug with mode=rb
-                result = file.read()  # type:ignore[assignment]
+                result = file.read()
         return result
 
-    # FIXME: asymmetric property
     @root_pdf.setter
     def root_pdf(self, value: SupportsRead[bytes] | bytes) -> None:
         with self.filestorage.open('root.pdf', 'wb') as file:
             if hasattr(value, 'read'):
                 value = value.read()
-            # FS bug with mode=wb
-            file.write(value)  # type:ignore
+            file.write(value)
 
     @property
     def people_xlsx(self) -> bytes | None:
         result: bytes | None = None
         if self.filestorage.exists('people.xlsx'):
             with self.filestorage.open('people.xlsx', 'rb') as file:
-                # FS bug with mode=rb
-                result = file.read()  # type:ignore[assignment]
+                result = file.read()
         return result
 
-    # FIXME: asymmetric property
     @people_xlsx.setter
     def people_xlsx(self, value: SupportsRead[bytes] | bytes) -> None:
         with self.filestorage.open('people.xlsx', 'wb') as file:
             if hasattr(value, 'read'):
                 value = value.read()
-            # FS bug with mode=wb
-            file.write(value)  # type:ignore
+            file.write(value)
 
     @property
     def pdf_class(self) -> type[AgencyPdfDefault]:
@@ -219,13 +212,13 @@ def get_editor_assets() -> Iterator[str]:
 
 @AgencyApp.setting(section='api', name='endpoints')
 def get_api_endpoints_handler(
-) -> Callable[[AgencyRequest], Iterator[ApiEndpoint[Any]]]:
+) -> Callable[[AgencyRequest], Iterator[ApiEndpoint[Any, Any]]]:
 
     def get_api_endpoints(
             request: AgencyRequest,
             page: int = 0,
             extra_parameters: dict[str, Any] | None = None
-    ) -> Iterator[ApiEndpoint[Any]]:
+    ) -> Iterator[ApiEndpoint[Any, Any]]:
         yield AgencyApiEndpoint(request, extra_parameters, page)
         yield PersonApiEndpoint(request, extra_parameters, page)
         yield MembershipApiEndpoint(request, extra_parameters, page)

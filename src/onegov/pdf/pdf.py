@@ -5,6 +5,7 @@ from bleach.sanitizer import Cleaner
 from copy import deepcopy
 from contextlib import contextmanager
 from functools import partial
+from html import escape
 from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from io import StringIO
 from lxml import etree
@@ -551,21 +552,19 @@ class Pdf(PDFDocument):
         prefix = ' ' if text.startswith(' ') else ''
         postfix = ' ' if text.endswith(' ') else ''
 
-        # some characters cause issues in the Reportlab and pdfdocument
-        # library, so we need to escape them
-        text = text.replace(';', '&#59;')
-
         return prefix + text.strip() + postfix
 
     @staticmethod
     def inner_html(element: etree._Element) -> str:
+        # lxml hands out text nodes decoded, while tostring() escapes the
+        # children - escape them too, or reportlab eats '<' as a tag
         return '{}{}{}'.format(
-            Pdf.strip(element.text or ''),
+            Pdf.strip(escape(element.text or '', quote=False)),
             ''.join(
                 Pdf.strip(etree.tostring(child, encoding='unicode'))
                 for child in element
             ),
-            Pdf.strip(element.tail or '')
+            Pdf.strip(escape(element.tail or '', quote=False))
         )
 
     def mini_html(self, html: str | None, linkify: bool = False) -> None:
@@ -623,6 +622,9 @@ class Pdf(PDFDocument):
         )
         html = cleaner.clean(html)
         # Todo: phone numbers with href="tel:.." are cleaned out
+
+        if not html.strip():
+            return
 
         tree = etree.parse(StringIO(html), etree.HTMLParser())
         body = tree.find('body')

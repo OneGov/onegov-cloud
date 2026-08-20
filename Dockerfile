@@ -95,7 +95,8 @@ RUN git rev-parse --short HEAD > .commit \
     && mkdir -p /var/cache/wheels \
     && mkdir -p /var/cache/pip \
     && bin/pip install --cache-dir /var/cache/pip --upgrade pip setuptools wheel --quiet \
-    && bin/pip install --find-links /var/cache/wheels --cache-dir /var/cache/pip ./src --quiet \
+    # build pycurl against the system OpenSSL libcurl so that NTLM auth (Winterthur roadwork) is available
+    && PYCURL_SSL_LIBRARY=openssl bin/pip install --find-links /var/cache/wheels --cache-dir /var/cache/pip --no-binary pycurl ./src --quiet \
     && find lib -type d -iname assets -print0 | xargs -0 chmod a+w -R \
     && find /app -regex '^.*\(__pycache__\|\.py[co]\)$' -delete \
     && rm -rf /app/src \

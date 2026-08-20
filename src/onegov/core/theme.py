@@ -54,7 +54,7 @@ from onegov.core.filestorage import FilestorageFile
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from fs.base import FS, SubFS
+    from onegov.core.filestorage import Filestorage
 
 
 class Theme:
@@ -132,7 +132,7 @@ def get_filename(theme: Theme, options: dict[str, Any] | None = None) -> str:
 
 
 def compile(
-    storage: FS | SubFS[FS],
+    storage: Filestorage,
     theme: Theme,
     options: dict[str, Any] | None = None,
     force: bool = False

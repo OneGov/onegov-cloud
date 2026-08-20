@@ -26,11 +26,11 @@ def test_news(client: Client) -> None:
     # Top page with path /news is fix, and all others are children
     links = edit_bar_links(page, 'text')
     assert 'URL ändern' not in links
-    # 5 links: Edit, Copy, iFrame, Closing link for the Iframe Modal,
+    # 5 links: Settings, Copy, iFrame, Closing link for the Iframe Modal,
     # Add News Entry
     assert len(links) == 5
 
-    edit = page.click('Bearbeiten')
+    edit = page.click('Einstellungen', href='editor/edit')
     edit.form['contact'] = 'We could show this address on the root news page'
     edit.form['access'] = 'private'
     edit.form.submit().follow()
@@ -75,6 +75,13 @@ def test_news(client: Client) -> None:
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" not in page.text
+    assert '<language>' in page.text
+
+    # RSS feed must not crash when org has no locales configured (KeyError)
+    client.app.org.meta.pop('locales', None)
+    transaction.commit()
+    page = client.get('/news?format=rss')
+    assert '<language>de_CH</language>' in page.text
 
     page = client.get('/news/we-have-a-new-homepage')
     client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))

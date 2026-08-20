@@ -169,7 +169,7 @@ Video Link
 
 An url field pointing to a video ``video-url``::
 
-    I' am a video link = video-url
+    I am a video link = video-url
 
 In case of vimeo or youtube videos the video will be embedded in the page,
 otherwise the link will be shown.
@@ -405,18 +405,23 @@ import re
 import yaml
 
 from functools import cached_property
+from datetime import date as date_t  # noqa: TC003
 from dateutil import parser as dateutil_parser
 from decimal import Decimal
 from functools import lru_cache
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
+from pydantic_extra_types.currency_code import Currency
 
 from onegov.core.utils import Bunch
 from onegov.form import errors
-from onegov.form.parser.grammar import checkbox, chip_nr, field_help_identifier
+from onegov.form.parser.grammar import checkbox
+from onegov.form.parser.grammar import chip_nr
 from onegov.form.parser.grammar import code
 from onegov.form.parser.grammar import date
 from onegov.form.parser.grammar import datetime
 from onegov.form.parser.grammar import decimal_range_field
 from onegov.form.parser.grammar import email
+from onegov.form.parser.grammar import field_help_identifier
 from onegov.form.parser.grammar import field_identifier
 from onegov.form.parser.grammar import fieldset_title
 from onegov.form.parser.grammar import fileinput
@@ -429,27 +434,18 @@ from onegov.form.parser.grammar import textfield
 from onegov.form.parser.grammar import time
 from onegov.form.parser.grammar import url
 from onegov.form.parser.grammar import video_url
+from onegov.form.parser.grammar import RelativeDate
 from onegov.form.utils import as_internal_id
 
 
-from typing import final, Any, ClassVar, Literal, Self, TYPE_CHECKING
+from typing import final, Annotated, Any, Literal, Self
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import SupportsWrite
+    from builtins import type as type_t
     from collections.abc import Callable, Iterable, Iterator, Sequence
-    from onegov.form.types import PricingRules
-    from onegov.form.utils import decimal_range
     from pyparsing import ParseResults
-    from re import Pattern
     from yaml.nodes import ScalarNode
-
-    # tagged unions so we can type narrow by type field
-    type BasicParsedField = (
-        PasswordField | EmailField | UrlField | VideoURLField | DateField
-        | DatetimeField | TimeField | StringField | TextAreaField
-        | CodeField | StdnumField | IntegerRangeField | DecimalRangeField
-        | RadioField | CheckboxField | ChipNrField
-    )
-    type FileParsedField = FileinputField | MultipleFileinputField
-    type ParsedField = BasicParsedField | FileParsedField
 
 
 # cache the parser elements
@@ -524,7 +520,7 @@ class CustomLoader(yaml.SafeLoader):
     """ Extends the default yaml loader with customized constructors. """
 
 
-class constructor:  # noqa: N801
+class constructor:  # ruff:ignore[invalid-class-name]
     """ Adds decorated functions to as constructors to the CustomLoader. """
 
     def __init__(self, tag: str):
@@ -682,22 +678,12 @@ def construct_integer_range(
     return ELEMENTS.integer_range.parse_string(node.value)
 
 
-def flatten_fieldsets(
-    fieldsets: Iterable[Fieldset]
-) -> Iterator[ParsedField]:
-    for fieldset in fieldsets:
-        yield from flatten_fields(fieldset.fields)
-
-
 def flatten_fields(
     fields: Sequence[ParsedField] | None
 ) -> Iterator[ParsedField]:
 
-    for field in fields or []:
+    for field in fields or ():
         yield field
-
-        if hasattr(field, 'fields'):
-            yield from flatten_fields(field.fields)
 
         if hasattr(field, 'choices'):
             for choice in field.choices:
@@ -705,124 +691,325 @@ def flatten_fields(
 
 
 def find_field(
-    fieldsets: Iterable[Fieldset],
+    fields: Iterable[ParsedField],
     id: str | None
-) -> Fieldset | ParsedField | None:
+) -> ParsedField | None:
 
     id = as_internal_id(id or '')
 
-    for fieldset in fieldsets:
-        if fieldset.id == id:
-            return fieldset
+    for field in fields:
+        if field.id == id:
+            return field
 
-        if not fieldset.id or id.startswith(fieldset.id):
-            for field in flatten_fields(fieldset.fields):
-                if field.id == id:
-                    return field
+        if id.startswith(field.id) and hasattr(field, 'choices'):
+            for choice in field.choices:
+                result = find_field(choice.fields, id)
+                if result is not None:
+                    return result
     return None
 
 
-class Fieldset:
-    """ Represents a parsed fieldset. """
+class _RangeValidationMixin:
+    if TYPE_CHECKING:
+        start: Any | None
+        stop: Any | None
 
-    def __init__(
-        self,
-        label: str,
-        fields: Sequence[ParsedField] | None = None
-    ):
-        self.label = label if label != '...' else None
-        self.fields = fields or []
+    @model_validator(mode='after')
+    def start_before_stop(self) -> Self:
+        start, stop = self.start, self.stop
+        if start is None or stop is None:
+            return self
 
-    @property
-    def id(self) -> str:
-        return as_internal_id(self.human_id)
+        if start < stop:
+            return self
 
-    @property
-    def human_id(self) -> str:
-        return self.label or ''
-
-    def find_field(
-        self,
-        id: str | None = None
-    ) -> Fieldset | ParsedField | None:
-        return find_field((self,), id=id)
+        raise ValueError('Invalid range. Start needs to be smaller than stop.')
 
 
-class Choice:
-    """ Represents a parsed choice.
+class Range[T](BaseModel, _RangeValidationMixin):
+    """
+    A closed bounded range, between start and stop
+    """
 
-    Note: Choices may have child-fields which are meant to be shown to the
-    user if the given choice was selected.
+    model_config = ConfigDict(frozen=True)
+
+    start: T = Field(
+        description='The start of the range.'
+    )
+    stop: T = Field(
+        description='The end of the range. Needs to be larger than the start.'
+    )
+
+
+class RangeEndOptional[T](BaseModel, _RangeValidationMixin):
+    """
+    A half-bounded range, between start and optional end
+    """
+    model_config = ConfigDict(frozen=True)
+
+    start: T = Field(
+        description='The start of the range.'
+    )
+    stop: T | None = Field(
+        default=None,
+        description='The end of the range. Needs to be larger than the start.'
+    )
+
+
+class RangeStartOptional[T](BaseModel, _RangeValidationMixin):
+    """
+    A half-bounded range, between optional start and end
+    """
+    model_config = ConfigDict(frozen=True)
+
+    start: T | None = Field(
+        default=None,
+        description='The start of the range.'
+    )
+    stop: T = Field(
+        description='The end of the range. Needs to be larger than the start. '
+            'as long as start is specified.'
+    )
+
+
+type HalfBoundedRange[T] = Annotated[
+    RangeEndOptional[T] | RangeStartOptional[T],
+    Field(union_mode='left_to_right')
+]
+type DateRange = Annotated[
+    HalfBoundedRange[date_t] | HalfBoundedRange[RelativeDate],
+    Field(union_mode='left_to_right')
+]
+
+
+class Pricing(BaseModel):
+    """
+    Pricing information for a priced form input or selection.
+    """
+    model_config = ConfigDict(frozen=True, validate_by_name=True)
+
+    amount: Decimal = Field(
+        description='The total decimal cost amount of the selection. '
+            'For numeric inputs, this is the price per item. So it will '
+            'be multiplied by the quantity input by the user.',
+        decimal_places=2
+    )
+    currency: Currency = Field(
+        default=Currency('CHF'),
+        description='An ISO 4217 currency code, excluding bonds testing '
+            'codes and precious metals. Generally this is expected to be '
+            '``CHF`` within this application.'
+    )
+    online_payment_required: bool = Field(
+        default=False,
+        exclude_if=lambda value: value is False,
+        alias='credit_card_payment',
+        description='Whether or not this selection forces the payment to be '
+            'made online, directly after form submission. This is useful '
+            'for forms, where e.g. the deliverable can optionally be '
+            'delivered via the postal service, so when the delivery option '
+            'is selected, paying in person is no longer a possibility.'
+    )
+
+    def as_tuple(self) -> tuple[Decimal, str, bool]:
+        return self.amount, self.currency, self.online_payment_required
+
+    def __str__(self) -> str:
+        return self.__format__('')
+
+    def __format__(self, format_spec: str) -> str:
+        suffix = '!' if self.online_payment_required else ''
+        return f'{self.amount:{format_spec}} {self.currency}{suffix}'
+
+
+# tagged unions so we can type narrow by type field
+type BasicParsedField = Annotated[
+    PasswordField | EmailField | UrlField | VideoURLField | DateField
+    | DatetimeField | TimeField | StringField | TextAreaField
+    | CodeField | StdnumField | IntegerRangeField | DecimalRangeField
+    | RadioField | CheckboxField | ChipNrField,
+    Field(discriminator='type')
+]
+type FileParsedField = Annotated[
+    FileinputField | MultipleFileinputField,
+    Field(discriminator='type')
+]
+type ParsedField = Annotated[
+    BasicParsedField | FileParsedField,
+    Field(discriminator='type')
+]
+
+
+class Choice(BaseModel):
+    """ Represents a single choice of a ``radio`` or ``checkbox`` field.
+
+    Generally the choices are rendered as HTML ``<input type="radio">``
+    and  ``<input type="checkbox">`` respecitvely, based on the ``kind``
+    of the containing field.
+
+    Choices may contain subfields, which are only displayed as long
+    as this choice has been selected.
 
     """
-    def __init__(
-        self,
-        key: str,
-        label: str,
-        selected: bool = False,
-        fields: Sequence[ParsedField] | None = None
-    ):
-        self.key = key
-        self.label = label
-        self.selected = selected
-        self.fields = fields
 
+    model_config = ConfigDict(frozen=True, validate_by_name=True)
 
-class Field:
-    """ Represents a parsed field. """
+    label: str = Field(
+        description='The label of this option. The label must be unique '
+            'within the containing radio or checkbox field, since it doubles '
+            'as the value, that will be stored for this selection.'
+    )
+    selected: bool = Field(
+        default=False,
+        alias='checked',
+        exclude_if=lambda value: value is False,
+        description='Whether or not this choice should be pre-selected. '
+            'For radio fields only a single choice may be pre-selected.'
+    )
+    fields: tuple[ParsedField, ...] = Field(
+        default=(),
+        exclude_if=lambda value: not value,
+        description='Any subfields that should only be displayed as long '
+            'as this choice has been selected. Subfields will inherit the '
+            'fieldset of the parent field, unless it explicitly is set '
+            'to a value other than `null` and none of the preceding fields '
+            'had an explicit fieldset value. This is mostly for convenience '
+            'so the common case of subfields sharing their parent fieldset '
+            'can be achieved by omitting the fieldset on the children.'
+    )
+    pricing: Pricing | None = Field(
+        default=None,
+        description='The pricing applied when this choice is selected. '
+            'This field is mutually exclusive with ``discount``.'
+    )
+    discount: Decimal | None = Field(
+        default=None,
+        validation_alias=AliasPath('discount', 'amount'),
+        description='The discount applied when this choice is selected '
+            'specified as a percentage. I.e. 50% means the total price '
+            'of the form submission is cut in half. Negative percentages '
+            'are allowed as procentual surcharge. I.e. -5% means an '
+            'additional fee equivalent to 5% of the total price is charged. '
+            'This field is mutually exclusive with ``pricing``. If the '
+            'applied discounts would result in a negative price, it will '
+            'truncate to zero and be treated as a free submission.'
+    )
 
-    def __init__(
-        self,
-        label: str,
-        required: bool,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
-        field_help: str | None = None,
-        human_id: str | None = None,
-        **extra_attributes: Any
-    ):
-
-        self.label = label
-        self._human_id = human_id or label
-        self.required = required
-        self.parent = parent
-        self.fieldset = fieldset
-        self.field_help = field_help
-
-        for key, value in extra_attributes.items():
-            setattr(self, key, value)
+    @model_validator(mode='after')
+    def pricing_and_discount_are_mutually_exclusive(self) -> Self:
+        if self.pricing is not None and self.discount is not None:
+            raise ValueError(
+                'You may only specify "pricing" or "discount", not both.'
+            )
+        return self
 
     @property
+    def display_label(self) -> str:
+        return self.__format__('.2f')
+
+    def __str__(self) -> str:
+        return self.__format__('')
+
+    def __format__(self, format_spec: str) -> str:
+        if self.pricing is not None:
+            return f'{self.label} ({self.pricing:{format_spec}})'
+        if self.discount is not None:
+            return f'{self.label} ({self.discount:{format_spec}}%)'
+        return self.label
+
+
+def human_id(
+    label: str,
+    fieldset: str | None,
+    parent_id: str | None = None
+) -> str:
+    if parent_id:
+        return f'{parent_id}/{label}'
+
+    if fieldset:
+        return f'{fieldset}/{label}'
+
+    return label
+
+
+class BaseField[KindT: str](BaseModel):
+    """ Represents a form field. """
+
+    model_config = ConfigDict(frozen=True)
+
+    type: KindT = Field(
+        description='The type of form field this is. This corresponds to the '
+            'HTML input type in some cases. But also includes some additional '
+            'custom fields.',
+    )
+    label: str = Field(
+        description='A human readable label for the field. Must be unique '
+            'within the same fieldset and/or choice, when it is a subfield. '
+            'Since the field identifier is generated from the parent '
+            'identifier and fieldset and normalized, it is possible for '
+            'two distinct labels to conflict, if they result in the same '
+            'identifier after normalization.'
+    )
+    required: bool = Field(
+        default=False,
+        exclude_if=lambda value: value is False,
+        description='Whether or not this field is required. Fields that '
+            'are not required, can be left empty, when submitting the form.'
+    )
+    fieldset: str | None = Field(
+        default=None,
+        description='Fields are grouped into fieldsets based on this '
+            'human readable label. Fields in the same fieldset should '
+            'appear together sequentially, they will not be reordered, '
+            'in order to fit them into the same fieldset. If the same '
+            'label occurs twice, but is interrupted by a different label, '
+            'it will result in two distinct fieldsets, similar to how '
+            '`itertools.groupby` works.'
+    )
+    field_help: str | None = Field(
+        default=None,
+        description='For short help texts this might be rendered '
+            'inline as a `placeholder` attribute on the HTML input. '
+            'Longer text, or text containing newlines will be rendered '
+            'as Markdown and rendered between the field label and the '
+            'field input.'
+    )
+
+    _parent: ParsedField | None = None
+    # whether or not this field inherits its fieldset
+    _inherits_fieldset: bool = False
+
+    @cached_property
     def id(self) -> str:
         return as_internal_id(self.human_id)
 
     @cached_property
+    def real_fieldset(self) -> str | None:
+        if self._parent is not None and self._inherits_fieldset:
+            return self._parent.real_fieldset
+        return self.fieldset
+
+    @cached_property
     def human_id(self) -> str:
-        if self.parent:
-            return f'{self.parent.human_id}/{self._human_id}'
+        if self._parent is not None:
+            if self.fieldset is not None:
+                # if we belong to a different fieldset than our parent
+                # then we need to add it to the id.
+                if self.fieldset != self._parent.real_fieldset:
+                    return (
+                        f'{self._parent.human_id}/{self.fieldset}/{self.label}'
+                    )
 
-        if self.fieldset and self.fieldset.human_id:
-            return f'{self.fieldset.human_id}/{self._human_id}'
+            return f'{self._parent.human_id}/{self.label}'
 
-        return self._human_id
+        if self.fieldset:
+            return f'{self.fieldset}/{self.label}'
 
-    @classmethod
-    def create[T: ParsedField](  # type:ignore[misc]
-        cls: type[T],
-        field: pp.ParseResults,
-        identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
-        field_help: str | None = None
-    ) -> T:
+        return self.label
 
-        return cls(  # type:ignore[return-value]
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            field_help=field_help
-        )
+    @property
+    def display_label(self) -> str:
+        return self.label
 
     # FIXME: This is used in onegov.directory.archive and is honestly
     #        pretty piggy, for now we just let anything pass and
@@ -832,347 +1019,735 @@ class Field:
     def parse(self, value: Any) -> object:
         return value
 
-
-@final
-class PasswordField(Field):
-    type: ClassVar[Literal['password']] = 'password'
-
-
-@final
-class EmailField(Field):
-    type: ClassVar[Literal['email']] = 'email'
-
-
-@final
-class UrlField(Field):
-    type: ClassVar[Literal['url']] = 'url'
-
-
-@final
-class VideoURLField(Field):
-    type: ClassVar[Literal['video_url']] = 'video_url'
-
-
-@final
-class DateField(Field):
-    type: ClassVar[Literal['date']] = 'date'
-    valid_date_range: pp.ParseResults
-
     @classmethod
-    def create(
-        cls,
+    def from_parse_results[T: ParsedField](  # type:ignore[misc]
+        cls: type_t[T],
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
+        fieldset: str | None = None,
         field_help: str | None = None
-    ) -> DateField:
+    ) -> T:
+        return cls.model_validate({  # type:ignore[return-value]
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help
+        })
 
-        return cls(
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            field_help=field_help,
-            valid_date_range=field.valid_date_range
-        )
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        raise NotImplementedError()
+
+    def write_formcode(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(indentation)
+        buffer.write(self.label)
+        buffer.write(' ')
+        if self.required:
+            buffer.write('* ')
+        buffer.write('=')
+        self.write_formcode_value(buffer, indentation)
+        if self.field_help:
+            # FIXME: Improve handling of multi-line field helps, for now
+            #        it doesn't matter, since it already gets mangled by
+            #        the YAML parser. So in almost every case it will be
+            #        a single line, even if the original was split across
+            #        multiple lines.
+            buffer.write(f'{indentation}<< {self.field_help} >>\n')
+
+    # NOTE: In order to avoid infinite recursion errors when comparing two
+    #       fields we need to get rid of our parent reference before hand
+    #       off equality checking to the base pydantic implementation
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        # NOTE: This minimal check ensures that the fields don't accidentally
+        #       compare equal if they originate from different branches
+        if self.human_id != other.human_id:
+            return False
+
+        our_parent = self.__dict__.pop('_parent', None)
+        their_parent = other.__dict__.pop('_parent', None)
+        try:
+            return super().__eq__(other)
+        finally:
+            # restore the parents
+            if our_parent is not None:
+                self.__dict__['_parent'] = our_parent
+            if their_parent is not None:
+                self.__dict__['_parent'] = their_parent
+
+
+@final
+class PasswordField(BaseField[Literal['password']]):
+    """
+    Represents an HTML ``<input type="password">``.
+    """
+
+    type: Literal['password'] = 'password'
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ***\n')
+
+
+@final
+class EmailField(BaseField[Literal['email']]):
+    """
+    Represents an HTML ``<input type="email">``.
+    """
+
+    type: Literal['email'] = 'email'
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' @@@\n')
+
+
+@final
+class UrlField(BaseField[Literal['url']]):
+    """
+    Represents an HTML ``<input type="url">``.
+    """
+
+    type: Literal['url'] = 'url'
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' https://\n')
+
+
+@final
+class VideoURLField(BaseField[Literal['video_url']]):
+    """
+    Represents an HTML ``<input type="url">`` pointing to a video.
+    """
+
+    type: Literal['video_url'] = 'video_url'
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' video-url\n')
+
+
+@final
+class DateField(BaseField[Literal['date']]):
+    """
+    Represents an HTML ``<input type="date">``.
+    """
+
+    type: Literal['date'] = 'date'
+    valid_date_range: DateRange | None = None
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' YYYY.MM.DD')
+
+        if (dr := self.valid_date_range) is not None:
+            buffer.write(' (')
+            if dr.start is not None:
+                buffer.write(f'{dr.start:%Y.%m.%d}')
+            buffer.write('..')
+            if dr.stop is not None:
+                buffer.write(f'{dr.stop:%Y.%m.%d}')
+            buffer.write(')')
+
+        buffer.write('\n')
 
     def parse(self, value: Any) -> object:
         # the first int in an ambiguous date is assumed to be a day
         # (since our software runs in europe first and foremost)
         return dateutil_parser.parse(value, dayfirst=True).date()
 
-
-@final
-class DatetimeField(Field):
-    type: ClassVar[Literal['datetime']] = 'datetime'
-    valid_date_range: pp.ParseResults
-
     @classmethod
-    def create(
+    def from_parse_results(
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
+        fieldset: str | None = None,
         field_help: str | None = None
-    ) -> DatetimeField:
-
-        return cls(
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            field_help=field_help,
-            valid_date_range=field.valid_date_range
-        )
-
-    def parse(self, value: Any) -> object:
-        # the first int in an ambiguous date is assumed to be a day
-        # (since our software runs in europe first and foremost)
-        return dateutil_parser.parse(value, dayfirst=True)
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'valid_date_range': {
+                'start': field.valid_date_range[0],
+                'stop': field.valid_date_range[1],
+            } if field.valid_date_range else None,
+        })
 
 
 @final
-class TimeField(Field):
-    type: ClassVar[Literal['time']] = 'time'
+class DatetimeField(BaseField[Literal['datetime']]):
+    """
+    Represents an HTML ``<input type="datetime-local">``.
+    """
+
+    type: Literal['datetime'] = 'datetime'
+    valid_date_range: DateRange | None = None
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' YYYY.MM.DD HH:MM')
+
+        if (dr := self.valid_date_range) is not None:
+            buffer.write(' (')
+            if dr.start is not None:
+                buffer.write(f'{dr.start:%Y.%m.%d}')
+            buffer.write('..')
+            if dr.stop is not None:
+                buffer.write(f'{dr.stop:%Y.%m.%d}')
+            buffer.write(')')
+
+        buffer.write('\n')
+
+    @classmethod
+    def from_parse_results(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        fieldset: str | None = None,
+        field_help: str | None = None
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'valid_date_range': {
+                'start': field.valid_date_range[0],
+                'stop': field.valid_date_range[1],
+            } if field.valid_date_range else None,
+        })
+
+
+@final
+class TimeField(BaseField[Literal['time']]):
+    """
+    Represents an HTML ``<input type="time">``.
+    """
+
+    type: Literal['time'] = 'time'
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' HH:MM\n')
 
     def parse(self, value: Any) -> object:
         return time(*map(int, value.split(':')))
 
 
 @final
-class StringField(Field):
-    type: ClassVar[Literal['text']] = 'text'
-    maxlength: int | None
-    regex: Pattern[str] | None
+class StringField(BaseField[Literal['text']]):
+    """
+    Represents an HTML ``<input type="text">``.
+    """
+    type: Literal['text'] = 'text'
+    maxlength: int | None = Field(
+        default=None,
+        gt=0,
+        description='Sets the `maxlength` attribute on the HTML text input'
+    )
+    regex: re.Pattern[str] | None = Field(
+        default=None,
+        description='Validates the user-submitted text input against this '
+            'regex pattern. Generally these patterns should include beginning '
+            'and end markers, e.g. `^[0-9]{0,4}$` for a 4-digit numeric code.'
+    )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ___')
+        if self.maxlength is not None:
+            buffer.write(f'[{self.maxlength}]')
+        if self.regex is not None:
+            buffer.write(f'/{self.regex.pattern}')
+        buffer.write('\n')
 
     @classmethod
-    def create(
+    def from_parse_results(
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
-        field_help: str | None = None
-    ) -> StringField:
-        regex = field.regex and re.compile(field.regex) or None
-
-        return cls(
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            maxlength=field.length or None,
-            regex=regex,
-            field_help=field_help
-        )
-
-
-@final
-class TextAreaField(Field):
-    type: ClassVar[Literal['textarea']] = 'textarea'
-    rows: int | None
-
-    @classmethod
-    def create(
-        cls,
-        field: pp.ParseResults,
-        identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
-        field_help: str | None = None
-    ) -> TextAreaField:
-        return cls(
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            rows=field.rows or None,
-            field_help=field_help
-        )
-
-
-@final
-class CodeField(Field):
-    type: ClassVar[Literal['code']] = 'code'
-    syntax: str
-
-    @classmethod
-    def create(
-        cls,
-        field: pp.ParseResults,
-        identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
-        field_help: str | None = None
-    ) -> CodeField:
-        return cls(
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            syntax=field.syntax,
-            field_help=field_help
-        )
-
-
-@final
-class StdnumField(Field):
-    type: ClassVar[Literal['stdnum']] = 'stdnum'
-    format: str
-
-    @classmethod
-    def create(
-        cls,
-        field: pp.ParseResults,
-        identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
+        fieldset: str | None = None,
         field_help: str | None = None
     ) -> Self:
-        return cls(
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            format=field.format,
-            field_help=field_help
-        )
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'regex': field.regex or None,
+            'maxlength': field.length or None,
+        })
 
 
 @final
-class ChipNrField(Field):
-    type: ClassVar[Literal['chip_nr']] = 'chip_nr'
+class TextAreaField(BaseField[Literal['textarea']]):
+    """
+    Represents an HTML ``<textarea>``.
+    """
+    type: Literal['textarea'] = 'textarea'
+    rows: int | None = Field(
+        default=None,
+        gt=0,
+        description='Sets the `rows` attribute on the HTML textarea'
+    )
 
-
-@final
-class IntegerRangeField(Field):
-    type: ClassVar[Literal['integer_range']] = 'integer_range'
-    pricing: PricingRules
-    range: range
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ...')
+        if self.rows is not None:
+            buffer.write(f'[{self.rows}]')
+        buffer.write('\n')
 
     @classmethod
-    def create(
+    def from_parse_results(
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
+        fieldset: str | None = None,
         field_help: str | None = None
-    ) -> IntegerRangeField:
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'rows': field.rows or None,
+        })
 
-        if field.pricing:
-            label = identifier.label + format_pricing(field.pricing)
-            # map one price to the whole range, the price will be
-            # multiplied by the selected value from the range
-            pricing = {field[0]: field.pricing}
-        else:
-            label = identifier.label
-            pricing = None
 
-        return cls(
-            # only modify the label visually, we don't want to
-            # affect the field id
-            human_id=identifier.label,
-            label=label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            range=field[0],
-            pricing=pricing,
-            field_help=field_help
-        )
+@final
+class CodeField(BaseField[Literal['code']]):
+    """
+    Represents an HTML ``<textarea>`` accepting code with a specified syntax.
+
+    Currently only markdown syntax is supported.
+    """
+    type: Literal['code'] = 'code'
+    syntax: Literal['markdown'] = 'markdown'
+
+    @classmethod
+    def from_parse_results(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        fieldset: str | None = None,
+        field_help: str | None = None
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'syntax': field.syntax,
+        })
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' <')
+        buffer.write(self.syntax)
+        buffer.write('>\n')
+
+
+@final
+class StdnumField(BaseField[Literal['stdnum']]):
+    """
+    Represents an HTML ``<input type="text">`` accepting a specified standard
+    number or code format. E.g. IBAN numbers.
+    """
+    type: Literal['stdnum'] = 'stdnum'
+    # FIXME: Ideally we would list all of the valid stdnum modules here
+    #        so we get a proper constraint in the JSON schema, but that
+    #        means loading and walking all the stdnum modules recursively
+    #        which would slow down startup times. So for now we don't
+    #        validate this
+    format: str = Field(
+        pattern=r'[a-z\.]+',
+        description='A valid module name in the stdnum namespace of the '
+            'python-stdnum package. E.g. for validating IBAN numbers you '
+            'would supply "iban", since the module lives at `stdnum.iban`. '
+            'For validating swiss social security numbers you would supply '
+            '"ch.ssn".'
+    )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' # ')
+        buffer.write(self.format)
+        buffer.write('\n')
+
+    @classmethod
+    def from_parse_results(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        fieldset: str | None = None,
+        field_help: str | None = None
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'format': field.format,
+        })
+
+
+@final
+class ChipNrField(BaseField[Literal['chip_nr']]):
+    """
+    Represents an HTML ``<input type="text">`` accepting 15-digit animal
+    identification numbers.
+    """
+    type: Literal['chip_nr'] = 'chip_nr'
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' chip-nr\n')
+
+
+@final
+class IntegerRangeField(BaseField[Literal['integer_range']]):
+    """
+    Represents an HTML ``<input type="number">`` accepting integer values
+    within the specified range.
+    """
+
+    type: Literal['integer_range'] = 'integer_range'
+    range: Range[int]
+    pricing_per_item: Pricing | None = Field(
+        default=None,
+        description='The pricing is multiplied by the quantity submitted '
+            'by this numeric input'
+    )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(f' {self.range.start}..{self.range.stop}')
+
+        if self.pricing_per_item is not None:
+            buffer.write(f' ({self.pricing_per_item})')
+
+        buffer.write('\n')
+
+    @property
+    def display_label(self) -> str:
+        if self.pricing_per_item is None:
+            return self.label
+
+        return f'{self.label} ({self.pricing_per_item})'
 
     def parse(self, value: Any) -> object:
         return int(float(value))  # automatically truncates dots
 
-
-@final
-class DecimalRangeField(Field):
-    type: ClassVar[Literal['decimal_range']] = 'decimal_range'
-    range: decimal_range
-
     @classmethod
-    def create(
+    def from_parse_results(
         cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
+        fieldset: str | None = None,
         field_help: str | None = None
-    ) -> DecimalRangeField:
-        return cls(
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            range=field[0],
-            field_help=field_help
+    ) -> Self:
+        pricing = field.pricing
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'range': {
+                'start': field[0].start,
+                'stop': field[0].stop,
+            },
+            'pricing_per_item': {
+                'amount': pricing.amount,
+                'currency': pricing.currency,
+                'online_payment_required': pricing.credit_card_payment
+            } if pricing else None,
+        })
 
-        )
+
+@final
+class DecimalRangeField(BaseField[Literal['decimal_range']]):
+    """
+    Represents an HTML ``<input type="number">`` accepting values
+    within the specified range.
+    """
+    type: Literal['decimal_range'] = 'decimal_range'
+    range: Range[Decimal]
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(f' {self.range.start}..{self.range.stop}\n')
 
     def parse(self, value: Any) -> object:
         return Decimal(value)
 
-
-class FileinputBase:
-    extensions: list[str]
-
     @classmethod
-    def create[T: ParsedField](  # type:ignore[misc]
-        cls: type[T],
+    def from_parse_results(
+        cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
+        fieldset: str | None = None,
         field_help: str | None = None
-    ) -> T:
-        return cls(  # type:ignore[return-value]
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            extensions=field.extensions,
-            field_help=field_help
-        )
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'range': {
+                'start': field[0].start,
+                'stop': field[0].stop,
+            },
+        })
 
 
 @final
-class FileinputField(FileinputBase, Field):
-    type: ClassVar[Literal['fileinput']] = 'fileinput'
+class FileinputField(BaseField[Literal['fileinput']]):
+    """
+    Represents an HTML ``<input type="file">`` accepting a single
+    file matching the specified file extensions.
+    """
+    type: Literal['fileinput'] = 'fileinput'
+    extensions: tuple[
+        Annotated[str, Field(pattern=r'([A-Za-z0-9]+|\*)')],
+    ...] = Field(
+        description='If arbitrary file uploads are allowed, then this '
+            'should contain a single element with the value ``*``. If '
+            'more than one element is specified, all of them are treated '
+            'like real file extensions. Generally this only works for '
+            'file extensions with a well known set of associated mimetypes.',
+        min_length=1,
+    )
+
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ')
+        buffer.write('|'.join(f'*.{ext}' for ext in self.extensions))
+        buffer.write('\n')
+
+    @classmethod
+    def from_parse_results(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        fieldset: str | None = None,
+        field_help: str | None = None
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'extensions': field.extensions,
+        })
 
 
 @final
-class MultipleFileinputField(FileinputBase, Field):
-    type: ClassVar[Literal['multiplefileinput']] = 'multiplefileinput'
+class MultipleFileinputField(BaseField[Literal['multiplefileinput']]):
+    """
+    Represents an HTML ``<input type="file" multiple>`` accepting multiple
+    files matching the specified file extensions.
+    """
+    type: Literal['multiplefileinput'] = 'multiplefileinput'
+    extensions: tuple[str, ...] = Field(
+        description='If arbitrary file uploads are allowed, then this '
+            'should contain a single element with the value ``*``. If '
+            'more than one element is specified, all of them are treated '
+            'like real file extensions. Generally this only works for '
+            'file extensions with a well known set of associated mimetypes.',
+        min_length=1,
+    )
 
-
-class OptionsField:
-    choices: list[Choice]
-    pricing: PricingRules
-    discount: dict[str, float]
+    def write_formcode_value(
+        self,
+        buffer: SupportsWrite[str],
+        indentation: str = ''
+    ) -> None:
+        buffer.write(' ')
+        buffer.write('|'.join(f'*.{ext}' for ext in self.extensions))
+        buffer.write(' (multiple)\n')
 
     @classmethod
-    def create[T: ParsedField](  # type:ignore[misc]
-        cls: type[T],
+    def from_parse_results(
+        cls,
         field: pp.ParseResults,
         identifier: pp.ParseResults,
-        parent: ParsedField | None = None,
-        fieldset: Fieldset | None = None,
+        fieldset: str | None = None,
         field_help: str | None = None
-    ) -> T:
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            'extensions': field.extensions,
+        })
 
-        choices = [
-            Choice(
-                key=c.label,
-                label=(
-                    c.label
-                    + format_pricing(c.pricing)
-                    + format_discount(c.discount)
-                ),
-                selected=c.checked
-            )
-            for c in field.choices
-        ]
 
-        pricing = {c.label: c.pricing for c in field.choices if c.pricing}
-        discount = {
-            c.label: c.discount.amount / Decimal('100')
-            for c in field.choices
-            if c.discount
-        }
+def write_choices_value(
+    self: RadioField | CheckboxField,
+    buffer: SupportsWrite[str],
+    indentation: str = ''
+) -> None:
+    buffer.write('\n')
+    fallback_fieldset = self.real_fieldset
+    for choice in self.choices:
+        check = 'x' if choice.selected else ' '
+        if self.type == 'radio':
+            buffer.write(f'{indentation}    ({check}) {choice}\n')
+        else:
+            buffer.write(f'{indentation}    [{check}] {choice}\n')
+        first_line = True
+        current_fieldset = fallback_fieldset
+        for field in choice.fields:
+            fieldset = field.real_fieldset
+            if fieldset != current_fieldset:
+                if not first_line:
+                    # insert an extra newline above the fieldset
+                    buffer.write('\n')
+                current_fieldset = fieldset
+                # if we encounter an anonymous fieldset after a
+                # named one we need to display it as `...`
+                label = '...' if fieldset is None else fieldset
+                buffer.write(f'{indentation}        # {label}\n')
+            field.write_formcode(buffer, indentation + '        ')
+            first_line = False
 
-        return cls(  # type:ignore[return-value]
-            label=identifier.label,
-            required=identifier.required,
-            parent=parent,
-            fieldset=fieldset,
-            choices=choices,
-            pricing=pricing or None,
-            discount=discount or None,
-            field_help=field_help
-        )
+
+@final
+class RadioField(BaseField[Literal['radio']]):
+    type: Literal['radio'] = 'radio'
+    choices: tuple[Choice, ...] = Field(
+        description='A sequence of choices. One of them may be pre-selected. '
+            'Each choice will be rendered as a HTML ``<input type="radio">``.',
+        # NOTE: This probably should be 2 for radio fields, but we have
+        #       never restricted this, so there's no reason to start
+        #       doing it now, especially, since it is harmless.
+        min_length=1
+    )
+
+    # NOTE: The nested fields need access to the parent field, so they
+    #       can generate their correct unique id, they also need to know
+    #       whether or not they inherit the fieldset from their parent
+    @model_validator(mode='after')
+    def insert_parent_reference(self) -> Self:
+        for choice in self.choices:
+            inherit = True
+            for child in choice.fields:
+                if child.fieldset is None and inherit:
+                    child.__dict__['_inherits_fieldset'] = inherit
+                else:
+                    inherit = False
+                child.__dict__['_parent'] = self
+        return self
+
+    def parse(self, value: Any) -> object:
+        if isinstance(value, str):
+            return next(iter(v.strip() for v in value.split('\n')), None)
+        return value and value[0] or None
+
+    write_formcode_value = write_choices_value
+
+    @classmethod
+    def from_parse_results(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        fieldset: str | None = None,
+        field_help: str | None = None
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            # NOTE: The heavy lifting of constructing the choices and the
+            #       corresponding subfields happen inside parse_field_block.
+            'choices': field.choices,
+        })
+
+
+@final
+class CheckboxField(BaseField[Literal['checkbox']]):
+    type: Literal['checkbox'] = 'checkbox'
+    choices: tuple[Choice, ...] = Field(
+        description='A sequence of choices. Any number of them may be '
+            'pre-selected. Each choice will be rendered  as a HTML '
+            '``<input type="checkbox">``.',
+        min_length=1
+    )
+
+    # NOTE: The nested fields need access to the parent field, so they
+    #       can generate their correct unique id, they also need to know
+    #       whether or not they inherit the fieldset from their parent
+    @model_validator(mode='after')
+    def insert_parent_reference(self) -> Self:
+        for choice in self.choices:
+            inherit = True
+            for child in choice.fields:
+                if child.fieldset is None and inherit:
+                    child.__dict__['_inherits_fieldset'] = inherit
+                else:
+                    inherit = False
+                child.__dict__['_parent'] = self
+        return self
 
     def parse(self, value: Any) -> Any:
         if isinstance(value, str):
@@ -1180,26 +1755,32 @@ class OptionsField:
 
         return value
 
+    write_formcode_value = write_choices_value
 
-@final
-class RadioField(OptionsField, Field):
-    type: ClassVar[Literal['radio']] = 'radio'
-
-    def parse(self, value: Any) -> object:
-        v = super().parse(value)
-        return v and v[0] or None
-
-
-@final
-class CheckboxField(OptionsField, Field):
-    type: ClassVar[Literal['checkbox']] = 'checkbox'
+    @classmethod
+    def from_parse_results(
+        cls,
+        field: pp.ParseResults,
+        identifier: pp.ParseResults,
+        fieldset: str | None = None,
+        field_help: str | None = None
+    ) -> Self:
+        return cls.model_validate({
+            'label': identifier.label,
+            'required': identifier.required,
+            'fieldset': fieldset,
+            'field_help': field_help,
+            # NOTE: The heavy lifting of constructing the choices and the
+            #       corresponding subfields happen inside parse_field_block.
+            'choices': field.choices,
+        })
 
 
 @lru_cache(maxsize=1)
 def parse_formcode(
     formcode: str,
     enable_edit_checks: bool = False
-) -> list[Fieldset]:
+) -> list[ParsedField]:
     """ Takes the given formcode and returns an intermediate representation
     that can be used to generate forms or do other things.
 
@@ -1209,34 +1790,46 @@ def parse_formcode(
     forms.validators.py
     """
     # CustomLoader is inherited from SafeLoader so no security issue here
-    parsed = yaml.load(  # nosec B506
+    parsed = yaml.load(  # nosec: B506
         '\n'.join(translate_to_yaml(formcode, enable_edit_checks)),
         CustomLoader
     )
 
-    fieldsets = []
+    fields = []
+    # FIXME: This lookup can probably go away, we can just rely
+    #        on pydantic to dispatch to the correct field in
+    #        the union based on the `type` value we give it.
     field_classes: dict[str, type[ParsedField]] = {
-        cls.type: cls  # type:ignore
-        for cls in Field.__subclasses__()
+        cls.model_fields['type'].default: cls  # type:ignore
+        for generic in BaseField.__subclasses__()
+        for cls in generic.__subclasses__()
     }
     used_ids: set[str] = set()
 
-    for fieldset in parsed:
+    current_fieldset: str | None = None
+    current_field_count = 0
+    for idx, item in enumerate(parsed):
+        if isinstance(item, str):
+            target_fieldset = None if item == '...' else item
+            if current_fieldset != target_fieldset:
+                if enable_edit_checks and idx and not current_field_count:
+                    raise errors.EmptyFieldsetError(current_fieldset or '...')
+                current_fieldset = target_fieldset
+                current_field_count = 0
+            continue
 
-        # fieldsets occur only at the top level
-        label = next(k for k in fieldset.keys())
-        fs = Fieldset(label)
+        fields.append(parse_field_block(
+            item,
+            field_classes,
+            used_ids,
+            current_fieldset
+        ))
+        current_field_count += 1
 
-        fs.fields = [
-            parse_field_block(block, field_classes, used_ids, fs)
-            for block in (fieldset[label] or ())
-        ]
-        if enable_edit_checks and not fs.fields:
-            raise errors.EmptyFieldsetError(label)
+    if enable_edit_checks and not current_field_count:
+        raise errors.EmptyFieldsetError(current_fieldset or '...')
 
-        fieldsets.append(fs)
-
-    return fieldsets
+    return fields
 
 
 def parse_field_block(
@@ -1245,8 +1838,8 @@ def parse_field_block(
     field_block: dict[str, Any],
     field_classes: dict[str, type[ParsedField]],
     used_ids: set[str],
-    fieldset: Fieldset,
-    parent: ParsedField | None = None
+    fieldset: str | None,
+    parent_id: str | None = None
 ) -> ParsedField:
     """ Takes the given parsed field block and yields the fields from it """
 
@@ -1254,55 +1847,55 @@ def parse_field_block(
     field_help = field_block.get('field_help')
 
     if field is None:
-        raise errors.FieldCompileError(field_name=key.rstrip('= '))
+        raise errors.FieldCompileError(key.rstrip('= '))
 
     identifier_src = key.rstrip('= ') + '='
     identifier = ELEMENTS.identifier.parse_string(identifier_src)
+
+    result_id = as_internal_id(
+        human_id(identifier.label, fieldset, parent_id)
+    )
+    if result_id in used_ids:
+        raise errors.DuplicateLabelError(identifier.label)
+
+    used_ids.add(result_id)
 
     # add the nested options/dependencies in case of radio/checkbox buttons
     if isinstance(field, list):
         choices = [next(i for i in f.items()) for f in field]
 
-        for choice, dependencies in choices:
-            choice['dependencies'] = dependencies
-
-        choices = [c[0] for c in choices]
-
-        field = Bunch(choices=choices, type=choices[0].type)
-
         # make sure only one type is found (either radio or checkbox)
-        types = {f.type for f in field.choices}
+        types = {c[0].type for c in choices}
         assert types <= {'radio', 'checkbox'}
 
         if not len(types) == 1:
             raise errors.MixedTypeError(key.rstrip('= '))
 
-    result: ParsedField = field_classes[field.type].create(
-        field, identifier, parent, fieldset, field_help)
-
-    if result.id in used_ids:
-        raise errors.DuplicateLabelError(label=result.label)
-
-    used_ids.add(result.id)
-
-    # go through nested blocks and recursively add them
-    if result.type == 'radio' or result.type == 'checkbox':
-        for ix, choice in enumerate(field.choices):
-            if not choice.dependencies:
+        for choice, children in choices:
+            if not children:
                 continue
 
-            result.choices[ix].fields = [
-                parse_field_block(
+            # recursively parse and add children
+            choice['fields'] = subfields = []
+            current_fieldset = fieldset
+            for child in children:
+                if isinstance(child, str):
+                    current_fieldset = None if child == '...' else child
+                    continue
+
+                subfields.append(parse_field_block(
                     field_block=child,
                     field_classes=field_classes,
                     used_ids=used_ids,
-                    fieldset=fieldset,
-                    parent=result
-                )
-                for child in choice.dependencies
-            ]
+                    fieldset=current_fieldset,
+                    parent_id=result_id
+                ))
 
-    return result
+        choices = [c[0] for c in choices]
+        field = Bunch(choices=choices, type=choices[0].type)
+
+    return field_classes[field.type].from_parse_results(
+        field, identifier, fieldset, field_help)
 
 
 def format_pricing(pricing: ParseResults | None) -> str:
@@ -1339,39 +1932,6 @@ def try_parse(expr: pp.ParserElement, text: str) -> pp.ParseResults | None:
         return None
 
 
-def prepare(text: str) -> Iterator[tuple[int, str]]:
-    """ Takes the raw form source and prepares it for the translation into
-    yaml.
-
-    """
-
-    lines = (l.rstrip() for l in text.split('\n'))
-    yield from ensure_a_fieldset((ix, l) for ix, l in enumerate(lines) if l)
-
-
-def ensure_a_fieldset(
-    lines: Iterable[tuple[int, str]]
-) -> Iterator[tuple[int, str]]:
-    """ Makes sure that the given lines all belong to a fieldset. That means
-    adding an empty fieldset before all lines, if none is found first.
-
-    """
-    found_fieldset = False
-
-    for ix, line in lines:
-        if found_fieldset:
-            yield ix, line
-            continue
-
-        if match(ELEMENTS.fieldset_title, line):
-            found_fieldset = True
-            yield ix, line
-        else:
-            found_fieldset = True
-            yield -1, '# ...'
-            yield ix, line
-
-
 def validate_indent(indent: str) -> bool:
     """
     Returns `False` if indent is other than a multiple of 4, else True
@@ -1401,6 +1961,10 @@ class IndentStack(list[int]):
         except ValueError:
             return False
 
+    @property
+    def expect_option(self) -> bool:
+        return len(self) % 2 == 1
+
     def handle_indent(
         self,
         line: int,  # for error messages
@@ -1421,8 +1985,7 @@ class IndentStack(list[int]):
         previous_indent = self[-1]
         if previous_indent < indent:
             # add new level
-            expect_option = len(self) % 2 == 1
-            if is_option is not expect_option:
+            if is_option is not self.expect_option:
                 raise errors.InvalidIndentSyntax(line=line)
             self.append(indent)
             return
@@ -1455,12 +2018,13 @@ def translate_to_yaml(
     editing a form. Should only be active originating from forms.validators.py
     """
 
-    lines = ((ix, l) for ix, l in prepare(text))
     expect_nested = False
     actual_fields = 0
-    ix = 0
+    lineno = 1
     indent_stack = IndentStack(enable_edit_checks=enable_edit_checks)
     expect_option = False
+    help_possible = False
+    last_comment_line: int | None = None
 
     def escape_single(text: str) -> str:
         return text.replace("'", "''")
@@ -1468,27 +2032,34 @@ def translate_to_yaml(
     def escape_double(text: str) -> str:
         return text.replace('"', '\\"')
 
-    for ix, line in lines:
+    for lineno, line in enumerate(text.split('\n'), start=1):
+        line = line.rstrip()
+        if not line:
+            continue
+
         len_indent = len(line) - len(line.lstrip())
-        indent = ' ' * (4 + len_indent)
+        indent = ' ' * len_indent
 
         if enable_edit_checks and not validate_indent(indent):
-            raise errors.InvalidIndentSyntax(line=ix + 1)
+            raise errors.InvalidIndentSyntax(line=lineno)
 
-        # the top level are the fieldsets
+        # fieldsets are plain strings in the nested list of dictionaries
         if match(ELEMENTS.fieldset_title, line):
-            if enable_edit_checks and len_indent > 4:
-                raise errors.NestedFieldsetError(line=ix + 1)
-            yield '- "{}":'.format(escape_double(line.lstrip('# ').rstrip()))
+            yield '{}- "{}"'.format(
+                indent,
+                escape_double(line.lstrip('# ').rstrip())
+            )
             expect_nested = False
-            indent_stack.clear()
+            help_possible = False
+            last_comment_line = None
+            indent_stack.handle_indent(lineno, len_indent)
             continue
 
         # fields are nested lists of dictionaries
         try:
             parse_result = try_parse(ELEMENTS.single_line_fields, line)
         except re.error as exception:
-            raise errors.InvalidFormSyntax(line=ix + 1) from exception
+            raise errors.InvalidFormSyntax(line=lineno) from exception
 
         if parse_result is not None:
             yield '{indent}- "{identifier}": !{type} \'{definition}\''.format(
@@ -1498,35 +2069,57 @@ def translate_to_yaml(
                 definition=escape_single(line.split('=')[1].strip())
             )
             expect_nested = len(indent) > 4
+            help_possible = True
+            last_comment_line = None
             actual_fields += 1
 
-            indent_stack.handle_indent(ix + 1, len_indent)
+            indent_stack.handle_indent(lineno, len_indent)
             continue
 
         # help descriptions following a field
         parse_result = try_parse(ELEMENTS.help_identifier, line)
         if parse_result is not None:
             if enable_edit_checks:
-                if expect_option or not indent_stack:
-                    raise errors.InvalidCommentLocationSyntax(line=ix + 1)
+                if expect_option or not help_possible:
+                    raise errors.InvalidCommentLocationSyntax(line=lineno)
 
                 if not indent_stack.is_identifier(len_indent):
-                    raise errors.InvalidCommentIndentSyntax(line=ix + 1)
+                    raise errors.InvalidCommentIndentSyntax(line=lineno)
 
+                last_comment_line = lineno
+
+            # FIXME: Currently this means we get rid of all newlines
+            #        unless there's more than one, and we get rid of
+            #        all leading spaces on every line. So use of things
+            #        like markdown code blocks or nested lists will be
+            #        broken. We should switch to a block scalar, if there
+            #        is more than one line. But we will need to be
+            #        careful about how much each line is indented.
             yield '{indent}"{identifier}": \'{message}\''.format(
                 indent=indent + 2 * ' ',
                 identifier='field_help',
                 message=escape_single(parse_result.message)
             )
-            indent_stack.handle_indent(ix + 1, len_indent)
+            indent_stack.handle_indent(lineno, len_indent)
             continue
 
         # checkboxes/radios come without identifier
         parse_result = try_parse(ELEMENTS.boxes, line)
         if parse_result is not None:
 
+            # a deeper option after a less-deep comment reopens the group the
+            # comment already closed
+            if (
+                enable_edit_checks
+                and last_comment_line is not None
+                and indent_stack
+                and len_indent > indent_stack[-1]
+            ):
+                raise errors.InvalidCommentIndentSyntax(line=last_comment_line)
+            last_comment_line = None
+
             if not expect_nested:
-                raise errors.InvalidFormSyntax(line=ix + 1)
+                raise errors.InvalidFormSyntax(line=lineno)
 
             yield "{indent}- !{type} '{definition}':".format(
                 indent=indent,
@@ -1534,8 +2127,9 @@ def translate_to_yaml(
                 definition=escape_single(line.strip())
             )
 
-            indent_stack.handle_indent(ix + 1, len_indent, is_option=True)
+            indent_stack.handle_indent(lineno, len_indent, is_option=True)
             expect_option = False
+            help_possible = True
             continue
 
         # identifiers which are alone contain nested checkboxes/radios
@@ -1543,7 +2137,7 @@ def translate_to_yaml(
 
             # this should have been matched by the single line field above
             if not line.endswith('='):
-                raise errors.InvalidFormSyntax(line=ix + 1)
+                raise errors.InvalidFormSyntax(line=lineno)
 
             yield '{indent}- "{identifier}":'.format(
                 indent=indent,
@@ -1552,12 +2146,14 @@ def translate_to_yaml(
 
             expect_nested = True
             actual_fields += 1
+            last_comment_line = None
 
-            indent_stack.handle_indent(ix + 1, len_indent)
+            indent_stack.handle_indent(lineno, len_indent)
             expect_option = True
+            help_possible = True
             continue
 
-        raise errors.InvalidFormSyntax(line=ix + 1)
+        raise errors.InvalidFormSyntax(line=lineno)
 
     if not actual_fields:
-        raise errors.InvalidFormSyntax(line=ix + 1)
+        raise errors.InvalidFormSyntax(line=lineno)

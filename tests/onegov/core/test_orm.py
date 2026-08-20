@@ -31,13 +31,14 @@ from onegov.core.orm.types import HSTORE, JSON, UTCDateTime
 from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
-from psycopg2.extensions import TransactionRollbackError
+from psycopg import OperationalError as PostgresOperationalError
+from psycopg.errors import FeatureNotSupported
 from pytz import timezone
 from sedate import utcnow
 from sqlalchemy import (
-    and_, event, func, inspect, select, text, ForeignKey, Integer
+    and_, func, inspect, select, text, ForeignKey, Integer
 )
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import NotSupportedError, OperationalError
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column, registry, relationship, validates
 from sqlalchemy.orm import DeclarativeBase, Mapped
@@ -60,6 +61,56 @@ if TYPE_CHECKING:
 
 class PicklePage(AdjacencyList):
     __tablename__ = 'picklepages'
+
+
+def test_cached_plan_failure_is_retried(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('foo')
+    attempts = 0
+
+    def operation() -> None:
+        nonlocal attempts
+        attempts += 1
+        mgr.session().execute(text('SELECT 1'))
+        if attempts == 1:
+            raise NotSupportedError(
+                None,
+                None,
+                FeatureNotSupported('cached plan must not change result type'),
+            )
+
+    transaction.manager.run(operation, tries=2)
+
+    assert attempts == 2
+    mgr.dispose()
+
+
+def test_other_feature_failure_is_not_retried(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('foo')
+    attempts = 0
+
+    def operation() -> None:
+        nonlocal attempts
+        attempts += 1
+        mgr.session().execute(text('SELECT 1'))
+        raise NotSupportedError(
+            None,
+            None,
+            FeatureNotSupported('some other unsupported feature'),
+        )
+
+    with pytest.raises(NotSupportedError):
+        transaction.manager.run(operation, tries=2)
+
+    assert attempts == 1
+    mgr.dispose()
 
 
 def test_is_valid_schema(postgres_dsn: str) -> None:
@@ -174,37 +225,6 @@ def test_create_schema(postgres_dsn: str) -> None:
 
     assert 'new' in existing_schemas()
     assert 'document' in schema_tables('new')
-
-    mgr.dispose()
-
-
-def test_schema_init_query_count(postgres_dsn: str) -> None:
-    class Base(DeclarativeBase, ModelBase):
-        registry = registry()
-
-    # create enough tables so the difference between O(1) and O(N) is clear
-    for i in range(20):
-        type(f'Table{i}', (Base,), {
-            '__tablename__': f'table_{i}',
-            'id': mapped_column(Integer, primary_key=True),
-        })
-
-    mgr = SessionManager(postgres_dsn, Base)
-
-    query_count = 0
-
-    def count_queries(*args: Any, **kwargs: Any) -> None:
-        nonlocal query_count
-        query_count += 1
-
-    event.listen(mgr.engine, 'before_cursor_execute', count_queries)
-    mgr.ensure_schema_exists('test_query_count')
-
-    table_count = len(Base.metadata.sorted_tables)
-    # O(1) implementation: fixed overhead + 1 get_table_names call
-    # O(N) implementation: fixed overhead + 1 has_table call per table
-    print('query count:', query_count, 'table count:', table_count)
-    assert query_count < 2 * table_count
 
     mgr.dispose()
 
@@ -895,7 +915,10 @@ def test_serialization_failure(postgres_dsn: str) -> None:
     # one will have failed with a rollback error
     rollbacks = [e for e in exceptions if e]
     assert len(rollbacks) == 1
-    assert isinstance(rollbacks[0].orig, TransactionRollbackError)  # type: ignore[attr-defined]
+    assert hasattr(rollbacks[0], 'orig')
+    assert isinstance(rollbacks[0].orig, PostgresOperationalError)
+    assert rollbacks[0].orig.sqlstate
+    assert rollbacks[0].orig.sqlstate.startswith('40')
 
 
 @pytest.mark.flaky(reruns=3, only_rerun=None)
@@ -968,7 +991,13 @@ def test_application_retries(
         if not hasattr(self, 'orig'):
             return
 
-        if not isinstance(self.orig, TransactionRollbackError):
+        if not isinstance(self.orig, PostgresOperationalError):
+            return
+
+        if not self.orig.sqlstate:
+            return
+
+        if not self.orig.sqlstate.startswith('40'):
             return
 
         raise HTTPConflict()

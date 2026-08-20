@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div tal:define="key_code_url key_code_url|None" class="panel limit-line-width">
+        <div tal:define="key_code_url key_code_url|None; blocking_url blocking_url|None" class="panel limit-line-width">
             <p i18n:translate>
                 The following link can be used to subscribe to the reservations
                 of this calendar. It can be used by anyone that knows the link
@@ -17,9 +17,17 @@
                 out of date. Use it at your own risk.
             </p>
 
-            <p tal:omit-tag="not:key_code_url">
+            <p tal:omit-tag="not key_code_url and not blocking_url">
                 <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${url}" style="word-break:break-all">${url}</a></b>
             </p>
+
+            <tal:b tal:condition="blocking_url">
+                <p i18n:translate>
+                    If you want reservations from parent and/or child resources to be included, then use this link instead. Keep in mind that you may end up with duplicate events in your calendar, if you subscribe to multiple related resources with this setting.
+                </p>
+
+                <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${blocking_url}" style="word-break:break-all">${blocking_url}</a></b>
+            </tal:b>
 
             <tal:b tal:condition="key_code_url">
                 <p i18n:translate>

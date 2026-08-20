@@ -1,19 +1,17 @@
 from __future__ import annotations
 
+from onegov.form.i18n import _
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from wtforms import Field
+
 
 class FormError(Exception):
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}'
-
-
-class DuplicateLabelError(FormError):
-
-    def __init__(self, label: str):
-        self.label = label
-
-    def __repr__(self) -> str:
-        return f"DuplicateLabelError(label='{self.label}')"
+        return self.__class__.__name__
 
 
 class InvalidMimeType(FormError):
@@ -24,52 +22,84 @@ class UnableToComplete(FormError):
     pass
 
 
-class InvalidFormSyntax(FormError):
+class FormParsingError(FormError):
+    message_template = _('The form could not be parsed.')
+
+    def field_message(self, field: Field) -> str:
+        return field.gettext(self.message_template)
+
+
+class _FormParsingErrorWithLineContext(FormParsingError):
+
     def __init__(self, line: int):
         self.line = line
 
+    def field_message(self, field: Field) -> str:
+        return super().field_message(field).format(line=self.line)
 
-class InvalidIndentSyntax(FormError):
-    def __init__(self, line: int):
-        self.line = line
-
-
-class InvalidCommentIndentSyntax(FormError):
-    def __init__(self, line: int):
-        self.line = line
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(line={self.line})'
 
 
-class InvalidCommentLocationSyntax(FormError):
-    def __init__(self, line: int):
-        self.line = line
+class InvalidFormSyntax(_FormParsingErrorWithLineContext):
+    message_template = _('The syntax on line {line} is not valid.')
 
 
-class NestedFieldsetError(FormError):
-    def __init__(self, line: int):
-        self.line = line
+class InvalidIndentSyntax(_FormParsingErrorWithLineContext):
+    message_template = _(
+        'The indentation on line {line} is not valid. '
+        'Please use a multiple of 4 spaces'
+    )
 
 
-class EmptyFieldsetError(FormError):
-    def __init__(self, field_name: str):
-        self.field_name = field_name
+class InvalidCommentIndentSyntax(_FormParsingErrorWithLineContext):
+    message_template = _(
+        'The indentation on line {line} is not valid. A comment must be '
+        'indented to the same level as the field (`=`) or option group it '
+        'describes.'
+    )
 
 
-class FieldCompileError(FormError):
-    def __init__(self, field_name: str):
-        self.field_name = field_name
+class InvalidCommentLocationSyntax(_FormParsingErrorWithLineContext):
+    message_template = _(
+        'Incorrect placement of the field description on '
+        'line {line}. The field description must be placed '
+        'below the field definition (`=`) and with the same '
+        'indentation.'
+    )
 
 
-class MixedTypeError(FormError):
-    def __init__(self, field_name: str):
-        self.field_name = field_name
+class _FormParsingErrorWithLabelContext(FormParsingError):
+
+    def __init__(self, label: str):
+        self.label = label
+
+    def field_message(self, field: Field) -> str:
+        return super().field_message(field).format(label=self.label)
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(label={self.label!r})'
 
 
-class RequiredFieldAddedError(FormError):
-    """
-    Directory Migration: A added field cannot be required at first one
-    directory entries exist. Make it mandatory in a separate migration step.
-    """
+class DuplicateLabelError(_FormParsingErrorWithLabelContext):
+    message_template = _("The field '{label}' exists more than once.")
 
-    def __init__(self, field_names: list[str], *args: object) -> None:
-        super().__init__(*args)
-        self.field_names = field_names
+
+class EmptyFieldsetError(_FormParsingErrorWithLabelContext):
+    message_template = _(
+        "The '{label}' group is empty and will not be visible. Either remove "
+        "the empty group or add fields to it."
+    )
+
+
+class FieldCompileError(_FormParsingErrorWithLabelContext):
+    message_template = _(
+        "The field '{label}' has no type defined. "
+        "For example use '___' for a text field."
+    )
+
+
+class MixedTypeError(_FormParsingErrorWithLabelContext):
+    message_template = _(
+        "The field '{label}' cannot mix radio buttons and checkboxes."
+    )

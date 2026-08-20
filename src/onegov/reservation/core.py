@@ -5,6 +5,7 @@ from libres.db.models import ORMBase
 from onegov.core.orm import orm_cached
 from onegov.reservation.collection import ResourceCollection
 from onegov.reservation.models import Resource
+from onegov.reservation.pricing_scheme import PRICING_SCHEMES
 from uuid import UUID
 
 
@@ -14,6 +15,14 @@ if TYPE_CHECKING:
     from libres.context.core import Context
     from libres.context.registry import Registry
     from onegov.core.orm.session_manager import SessionManager
+    from onegov.reservation.pricing_scheme import ResourcePricingScheme
+else:
+    # HACK: Monkeypatch libres' JSON type processor with ours
+    from libres.db.models.types import JSON as _LibresJSON  # ruff:ignore[constant-imported-as-non-constant]
+    from onegov.core.orm.types import JSON as _OnegGovJSON  # ruff:ignore[constant-imported-as-non-constant]
+
+    _LibresJSON.process_bind_param = _OnegGovJSON.process_bind_param
+    _LibresJSON.process_result_value = _OnegGovJSON.process_result_value
 
 
 class LibresIntegration:
@@ -35,6 +44,7 @@ class LibresIntegration:
         # necessary forward declaration
         # provided by onegov.core.framework.Framework
         session_manager: SessionManager
+        application_id: str
 
     def configure_libres(self, **cfg: Any) -> None:
         """ Configures the libres integration and leaves two properties on
@@ -63,6 +73,26 @@ class LibresIntegration:
             self.libres_registry,
             self.session_manager,
             self.get_blocking_resource_ids
+        )
+
+    def configure_resource_pricing_schemes(
+        self,
+        *,
+        resource_pricing_schemes: dict[str, list[str]] | None = None,
+        **cfg: Any
+    ) -> None:
+        self.available_resource_pricing_schemes = {
+            tenant: tuple(PRICING_SCHEMES[name] for name in names)
+            for tenant, names in resource_pricing_schemes.items()
+        } if resource_pricing_schemes else {}
+
+    @property
+    def resource_pricing_schemes(
+        self
+    ) -> tuple[type[ResourcePricingScheme], ...]:
+        return getattr(self, 'available_resource_pricing_schemes', {}).get(
+            self.application_id,
+            ()
         )
 
     @staticmethod

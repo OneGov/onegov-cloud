@@ -6,7 +6,7 @@ from functools import cached_property
 from datetime import date, datetime, time, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY
-from uuid import uuid4
+from uuid import UUID, uuid4
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
@@ -20,13 +20,14 @@ from onegov.form.fields import TimeField
 from onegov.form.filters import as_float
 from onegov.org import _
 from onegov.org.forms.util import WEEKDAYS
+from onegov.reservation import Resource, ResourceCollection
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Allocation, Resource
+    from onegov.reservation import Allocation
     from onegov.core.types import SequenceOrScalar
     from typing import Protocol
 
@@ -39,6 +40,48 @@ def choices_as_integer(choices: Iterable[str] | None) -> list[int] | None:
         return None
 
     return [int(c) for c in choices]
+
+
+class BatchCopyAllocationRulesForm(Form):
+
+    if TYPE_CHECKING:
+        model: Resource
+        request: OrgRequest
+
+    rules = MultiCheckboxField(
+        label=_('Availability periods'),
+        choices=(),
+        validators=[InputRequired()],
+    )
+
+    resources = MultiCheckboxField(
+        label=_('Target resources'),
+        choices=(),
+        coerce=lambda value: (
+            UUID(value) if isinstance(value, str) else value
+        ),
+        validators=[InputRequired()],
+    )
+
+    def on_request(self) -> None:
+        rules = self.model.content.get('rules', ())
+        self.rules.choices = [(rule['id'], rule['title']) for rule in rules]
+        if not self.request.POST:
+            self.rules.data = [rule['id'] for rule in rules]
+
+        default_group = self.request.translate(_('General'))
+        query = (
+            ResourceCollection(self.request.app.libres_context)
+            .query()
+            .with_entities(Resource.id, Resource.group, Resource.title)
+            .filter(Resource.type == self.model.type)
+            .filter(Resource.id != self.model.id)
+            .order_by(Resource.group, Resource.title)
+        )
+        self.resources.choices = [
+            (resource_id.hex, f'{group or default_group} - {title}')
+            for resource_id, group, title in query
+        ]
 
 
 class AllocationFormHelpers:
@@ -114,7 +157,7 @@ class AllocationRuleForm(Form):
     if TYPE_CHECKING:
         # forward declare required properties/methods
         @property
-        def dates(self) -> SequenceOrScalar[tuple[datetime, datetime]]: ...
+        def dates(self) -> Sequence[tuple[datetime, datetime]]: ...
         @property
         def weekdays(self) -> Iterable[int]: ...
         @property

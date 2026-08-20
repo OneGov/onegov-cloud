@@ -13,13 +13,13 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
     - [Vorbemerkungen](#vorbemerkungen)
         - [Einheiten](#einheiten)
     - [Formate](#formate)
+        - [eCH-0252](#ech-0252)
         - [OneGov](#onegov)
             - [Spalten](#spalten)
             - [Temporäre Resultate](#tempor%C3%A4re-resultate)
             - [Vorlage](#vorlage)
         - [WabstiCExport](#wabsticexport)
             - [Ermittlung des Status einer Abstimmung](#ermittlung-des-status-einer-abstimmung)
-        - [eCH-0252](#ech-0252)
 
 <!-- /TOC -->
 
@@ -32,6 +32,10 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 Eine Einheit entspricht einer Gemeinde (kantonale Instanzen, kommunale Instanzen ohne Stadtteilen) oder einem Stadtteil (kommunale Instanzen mit Stadtteilen).
 
 ## Formate
+
+### eCH-0252
+
+Siehe [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
 
 
 ### OneGov
@@ -91,6 +95,3 @@ Der Status ist `final` wenn `AnzGdePendent = 0` ist.
 Seit 2023 wird `AnzPendentGde` statt `AnzGdePendent` dazu verwendet, um den Status der Gesamtabstimmung zu setzen.
 
 
-### eCH-0252
-
-Siehe [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

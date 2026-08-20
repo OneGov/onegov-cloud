@@ -8,8 +8,8 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.layouts import DefaultLayout
-    from onegov.election_day.models import ComplexVote  # noqa: F401
-    from onegov.election_day.models import Vote  # noqa: F401
+    from onegov.election_day.models import ComplexVote  # ruff:ignore[unused-import]
+    from onegov.election_day.models import Vote  # ruff:ignore[unused-import]
 
 
 @ElectionDayApp.screen_widget(

@@ -25,7 +25,9 @@ from onegov.pay.integration import TRANSACTION_ABORTED
 from onegov.pay.utils import payments_association_table_for
 from onegov.pay.utils import InvoiceDiscountMeta
 from onegov.pay.utils import InvoiceItemMeta
+from onegov.pay.utils import InvoiceMeta
 from onegov.pay.utils import Price
+from onegov.pay.utils import round_amount
 
 
 __all__ = (
@@ -38,6 +40,7 @@ __all__ = (
     'InvoiceDiscountMeta',
     'InvoiceItem',
     'InvoiceItemMeta',
+    'InvoiceMeta',
     'InvoiceReference',
     'ManualPayment',
     'Payable',
@@ -51,5 +54,6 @@ __all__ = (
     'PaymentProviderCollection',
     'Price',
     'process_payment',
-    'payments_association_table_for'
+    'payments_association_table_for',
+    'round_amount',
 )

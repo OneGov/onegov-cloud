@@ -7,10 +7,11 @@ from onegov.core.collection import GenericCollection
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.feriennet.models import NotificationTemplate
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class NotificationTemplateCollection(
-    GenericCollection['NotificationTemplate']
+    GenericCollection['NotificationTemplate', 'UUID']
 ):
 
     @cached_property

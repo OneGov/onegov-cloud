@@ -9,7 +9,7 @@ import pytz
 
 from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from email.headerregistry import Address
 from functools import lru_cache
@@ -346,17 +346,25 @@ def complete_url(url: str | None) -> str | None:
 
 class ReservationInfo:
 
-    __slots__ = ('resource', 'reservation', 'request', 'translate')
+    __slots__ = (
+        'resource',
+        'reservation',
+        'submission_data',
+        'request',
+        'translate'
+    )
 
     def __init__(
         self,
         resource: Resource,
         reservation: Reservation,
+        submission_data: dict[str, Any] | None,
         request: OrgRequest
     ) -> None:
 
         self.resource = resource
         self.reservation = reservation
+        self.submission_data = submission_data
         self.request = request
         self.translate = request.translate
 
@@ -417,7 +425,10 @@ class ReservationInfo:
 
     @property
     def price(self) -> PriceDict | None:
-        price = self.reservation.price(self.resource)
+        price = self.reservation.price(
+            self.resource,
+            submission_data=self.submission_data
+        )
         return price.as_dict() if price else None
 
     def as_dict(self) -> dict[str, Any]:
@@ -666,10 +677,12 @@ class AllocationEventInfo:
             'id': self.allocation.id,
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'title': self.event_title,
             'classNames': list(self.event_classes),
             'display': 'block',
             # extended properties
+            'kind': 'allocation',
             'wholeDay': self.allocation.whole_day,
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
@@ -681,6 +694,84 @@ class AllocationEventInfo:
             ],
             'editurl': self.request.link(self.allocation, name='edit'),
             'reserveurl': self.request.link(self.allocation, name='reserve')
+        }
+
+
+class HolidayEventInfo:
+
+    __slots__ = (
+        'start',
+        'end',
+        'title',
+        'request'
+    )
+
+    def __init__(
+        self,
+        start: date,
+        end: date | None,
+        title: str,
+        request: OrgRequest
+    ) -> None:
+
+        self.start = start
+        self.end = end
+        self.title = request.translate(title)
+        self.request = request
+
+    @classmethod
+    def from_request(
+        cls,
+        request: OrgRequest,
+        start: date,
+        end: date
+    ) -> Iterator[Self]:
+
+        for holiday_start, holiday_end in request.app.org.school_holidays:
+            if sedate.overlaps(
+                holiday_start, holiday_end,
+                start, end
+            ):
+                yield cls(
+                    holiday_start,
+                    holiday_end,
+                    _('School holidays'),
+                    request
+                )
+
+        for holiday_date, descriptions in request.app.org.holidays.between(
+            start,
+            end
+        ):
+            yield cls(
+                holiday_date,
+                None,
+                '\n'.join(descriptions),
+                request
+            )
+
+    @property
+    def event_start(self) -> str:
+        return self.start.isoformat()
+
+    @property
+    def event_end(self) -> str:
+        end = (self.end or self.start)
+        # NOTE: FullCalendar end is exclusive, but ours is inclusive
+        #       so we need to add a day.
+        return (end + timedelta(days=1)).isoformat()
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            'start': self.event_start,
+            'end': self.event_end,
+            'allDay': True,
+            'title': self.title,
+            'editable': False,
+            'classNames': ['event-holiday'],
+            'display': 'block',
+            # extended properties
+            'kind': 'holiday',
         }
 
 
@@ -735,6 +826,7 @@ class AvailabilityEventInfo:
             'id': self.allocation.id,
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'editable': False,
             'display': 'background',
             # extended properties
@@ -836,6 +928,7 @@ class BlockerEventInfo:
             'id': f'blocker-{self.blocker.id}',
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'title': title,
             'editable': editable,
             'classNames': ['event-blocker', *self.css_classes],
@@ -1027,6 +1120,7 @@ class ReservationEventInfo:
             'id': self.reservation.id,
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'backgroundColor': self.color,
             'title': self.event_title,
             'classNames': list(self.event_classes),
@@ -1150,6 +1244,7 @@ class MyReservationEventInfo:
             'id': self.id,
             'start': self.event_start,
             'end': self.event_end,
+            'allDay': False,
             'title': self.event_title,
             'classNames': list(self.event_classes),
             'url': self.request.class_link(
@@ -1856,9 +1951,7 @@ def get_current_tickets_url(request: OrgRequest) -> str:
 
 
 def invoice_items_for_submission(
-    request: CoreRequest,
-    form: Form,
-    submission: FormSubmission
+    request: CoreRequest, form: Form, submission: FormSubmission
 ) -> list[InvoiceItemMeta]:
 
     # NOTE: Eventually we may need something more sophisticated
@@ -1868,8 +1961,16 @@ def invoice_items_for_submission(
         and org.vat_rate
     ) else None
     extra = {'submission_id': submission.id}
-    items = form.invoice_items(extra=extra, vat_rate=vat_rate)
-    discounts = form.discount_items(extra=extra, vat_rate=vat_rate)
+    items = form.invoice_items(
+        cost_object=submission.cost_object,
+        extra=extra,
+        vat_rate=vat_rate
+    )
+    discounts = form.discount_items(
+        cost_object=submission.cost_object,
+        extra=extra,
+        vat_rate=vat_rate
+    )
 
     # for backwards compatibility we still support a raw price
     # instead of a more complete invoice item
@@ -1882,6 +1983,7 @@ def invoice_items_for_submission(
             group='submission',
             unit=price.amount,
             vat_rate=vat_rate,
+            cost_object=submission.cost_object,
         ))
 
     total = InvoiceItemMeta.total(items)
@@ -1931,6 +2033,8 @@ def group_invoice_items[T: InvoiceItem | InvoiceItemMeta](
                 return 1, item.group
             case 'manual' | 'reduced_amount':
                 return 99, 'manual'
+            case 'rounding':
+                return 100, item.group
             case _:
                 return 2, item.group
 

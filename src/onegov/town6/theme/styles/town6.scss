@@ -1803,6 +1803,23 @@ a.category-anchor {
     }
 }
 
+.chart-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+
+    .button {
+        margin-bottom: 0;
+    }
+
+    .chart-message {
+        color: $alert-color;
+        margin-bottom: 0;
+    }
+}
+
 // D3 Org Chart customisations
 .chart-container {
     border: 1px solid $smoke;
@@ -1820,6 +1837,8 @@ a.category-anchor {
         display: none;
     }
 
+    // no position/transition on the node; WebKit else mispositions the
+    // foreignObject. https://github.com/bkrem/react-d3-tree/issues/284
     .d3-orgchart-node {
         padding: .7rem 1rem;
         font-weight: bold;
@@ -1828,18 +1847,43 @@ a.category-anchor {
         border-radius: .7rem !important;
         box-shadow: 0 0 17px 0 rgba(0,0,0,0.07);
         color: #444;
-        transition: all 200ms linear;
         background: white;
+        display: flex;
+        align-items: flex-start;
+        gap: .3rem;
 
-        span {
+        // glyph as text + rgba, not svg/opacity: WebKit misplaces svg and
+        // opacity layers in a foreignObject (see react-d3-tree #284 above)
+        .drilldown,
+        .drillup {
+            color: rgba(#444, .35);
+            cursor: pointer;
+            font-family: 'Font Awesome 5 Free';
+            font-size: .8rem;
+            font-weight: 900;
+            line-height: 1;
+
+            &:hover {
+                color: #444;
+            }
+        }
+
+        span:not([role]) {
             -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
             overflow: hidden;
             display: -webkit-box;
+            flex: 1;
         }
 
         &.hyphens {
             hyphens: auto;
+        }
+
+        &.restricted,
+        &.unpublished {
+            border-style: dashed !important;
+            color: $steel;
         }
 
         &:hover {
@@ -1847,14 +1891,13 @@ a.category-anchor {
         }
     }
 
-    .node-button-div {
+        .node-button-div {
         span {
             font-size: .8rem !important;
         }
 
         > div {
-            padding: .5rem !important;
-            transition: all 200ms linear;
+            padding: 0.2rem 0.5rem !important;
         }
     }
 

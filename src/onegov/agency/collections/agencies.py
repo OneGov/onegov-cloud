@@ -21,11 +21,11 @@ if TYPE_CHECKING:
 
     class FilterParams(TypedDict, total=False):
         title: str | None
-        updated_gt: datetime | str | None
-        updated_ge: datetime | str | None
-        updated_eq: datetime | str | None
-        updated_le: datetime | str | None
-        updated_lt: datetime | str | None
+        updated_gt: datetime | None
+        updated_ge: datetime | None
+        updated_eq: datetime | None
+        updated_le: datetime | None
+        updated_lt: datetime | None
 
 
 class ExtendedAgencyCollection(AdjacencyListCollection[ExtendedAgency]):
@@ -36,10 +36,8 @@ class ExtendedAgencyCollection(AdjacencyListCollection[ExtendedAgency]):
     def __init__(
         self,
         session: Session,
-        # FIXME: These really should be float/int, we just need to add
-        #        convertes to the path configuration...
         root_pdf_modified: str | None = None,
-        browse: str | None = None
+        browse: int | None = None
     ) -> None:
         super().__init__(session)
         self.root_pdf_modified = root_pdf_modified
@@ -47,7 +45,7 @@ class ExtendedAgencyCollection(AdjacencyListCollection[ExtendedAgency]):
 
 
 class PaginatedAgencyCollection(
-    GenericCollection[ExtendedAgency],
+    GenericCollection[ExtendedAgency, int],
     Pagination[ExtendedAgency]
 ):
 
@@ -55,15 +53,15 @@ class PaginatedAgencyCollection(
         self,
         session: Session,
         page: int = 0,
-        parent: str | Literal[False] | None = None,
+        parent: int | Literal[False] | None = None,
         exclude_hidden: bool = True,
         joinedload: Collection[str] | None = None,
         title: str | None = None,
-        updated_gt: datetime | str | None = None,
-        updated_ge: datetime | str | None = None,
-        updated_eq: datetime | str | None = None,
-        updated_le: datetime | str | None = None,
-        updated_lt: datetime | str | None = None,
+        updated_gt: datetime | None = None,
+        updated_ge: datetime | None = None,
+        updated_eq: datetime | None = None,
+        updated_le: datetime | None = None,
+        updated_lt: datetime | None = None,
         undefer: Collection[str] | None = None
     ) -> None:
 

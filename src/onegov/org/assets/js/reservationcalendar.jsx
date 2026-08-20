@@ -33,6 +33,11 @@ rc.defaultOptions = {
     editable: false,
 
     /*
+        True if the calendar includes holidays
+    */
+    showHolidays: false,
+
+    /*
         Url called when a new selection is made. For example:
 
             selectUrl: https://example.org/on-select
@@ -110,7 +115,9 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
     var options = {
         // the fullcalendar default options
         fc: {
-            allDaySlot: false,
+            allDaySlot: rcOptions.showHolidays,
+            allDayContent: '',
+            slotEventOverlap: false,
             height: 'auto',
             events: rcOptions.feed,
             slotMinTime: rcOptions.minTime,
@@ -287,6 +294,9 @@ $.fn.reservationCalendar = function(extendOptions) {
 
 // handles clicks on events
 rc.setupEventPopups = function(event, element) {
+    if (event.extendedProps.kind === 'holiday') {
+        return;
+    }
     $(element).click(function(e) {
         var calendar = $(element).closest('.fc');
         rc.removeAllPopups();
@@ -348,6 +358,10 @@ rc.highlightEvents = function(event, element, view) {
     var max = view.calendar.exOptions.highlights_max;
 
     if (min === null || max === null) {
+        return;
+    }
+
+    if (event.extendedProps.kind === 'holiday') {
         return;
     }
 
@@ -740,6 +754,10 @@ rc.loadPreviousReservationState = function(reservations) {
 rc.renderPartitions = function(event, element, view) {
 
     if (event.is_moving) {
+        return;
+    }
+
+    if (event.extendedProps.kind === 'holiday') {
         return;
     }
 

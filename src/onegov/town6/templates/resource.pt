@@ -27,6 +27,7 @@
             data-highlights-max="${resource.highlights_max or ''}"
             data-resources-url="${resources_url}"
             data-resource-active="${resource.name}"
+            data-show-holidays="${(request.app.org.holidays or request.app.org.has_school_holidays) and 'true' or 'false'}"
         ></div>
         <div class="calendar-footer" tal:condition="resource.deadline and not resource.lead_time">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>

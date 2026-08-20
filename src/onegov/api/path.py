@@ -33,7 +33,7 @@ def get_api_endpoint(
     app: Framework,
     endpoint: str,
     page: int = 0,
-) -> ApiEndpoint[Any] | AuthEndpoint:
+) -> ApiEndpoint[Any, Any] | AuthEndpoint:
 
     if endpoint == 'authenticate':
         return AuthEndpoint(app)
@@ -61,8 +61,8 @@ def get_api_endpoint(
 )
 def get_api_endpoint_item(
     request: CoreRequest, app: Framework, endpoint: str, id: str
-) -> ApiEndpointItem[Any]:
-    item: ApiEndpointItem[Any] = ApiEndpointItem(request, endpoint, id)
+) -> ApiEndpointItem[Any, Any]:
+    item: ApiEndpointItem[Any, Any] = ApiEndpointItem(request, endpoint, id)
     if not item.api_endpoint or not item.item:  # for ex. ExtendedAgency
         raise ApiException('Not found', status_code=404)
     return item

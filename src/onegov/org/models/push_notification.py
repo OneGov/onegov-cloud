@@ -80,7 +80,7 @@ class PushNotification(Base):
     )
 
 
-class PushNotificationCollection(GenericCollection[PushNotification]):
+class PushNotificationCollection(GenericCollection[PushNotification, UUID]):
     """Simple collection for sent notifications."""
 
     @property

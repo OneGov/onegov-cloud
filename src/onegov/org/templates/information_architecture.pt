@@ -1,0 +1,32 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <div class="chart-actions">
+            <a class="button hollow small" data-chart-action="expand" i18n:translate="">Expand all</a>
+            <a class="button hollow small" data-chart-action="collapse" i18n:translate="">Collapse all</a>
+            <a class="button hollow small" data-chart-action="fit" i18n:translate="">Fit to screen</a>
+            <a class="button hollow small" data-chart-action="reset" hidden i18n:translate="">Whole chart</a>
+            <a class="button hollow small" data-chart-action="export" i18n:translate="">Download as PNG</a>
+            <a class="button hollow small" data-chart-action="export-svg" i18n:translate="">Download as SVG</a>
+            <p class="chart-message" role="status" aria-live="polite" hidden></p>
+        </div>
+
+        <div class="chart-container information-architecture"
+             data-url="${chart_url}"
+             data-image-name="${image_name}"
+             data-drilldown-label="Show only this branch"
+             data-drillup-label="Show the level above"
+             data-error-message="The topics could not be loaded."
+             data-export-error-message="The chart is too large for an image, please use the SVG download instead."
+             i18n:attributes="data-error-message; data-export-error-message; data-drilldown-label; data-drillup-label">
+            <div class="loading-info">
+                <i class="fa fa-spinner fa-spin"></i>
+                <span i18n:translate="">Loading topics...</span>
+            </div>
+        </div>
+
+    </tal:b>
+</div>

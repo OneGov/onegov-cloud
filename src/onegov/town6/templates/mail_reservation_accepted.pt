@@ -26,6 +26,9 @@
         <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
         </p>
+        <p tal:condition="cancel_url|nothing">
+            <a href="${cancel_url}" i18n:translate>Request cancellation</a>
+        </p>
         <p tal:condition="my_reservations_url|nothing">
             <a href="${my_reservations_url}" i18n:translate>See all your reservations</a>
         </p>

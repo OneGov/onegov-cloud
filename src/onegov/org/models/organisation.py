@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from cryptography.fernet import InvalidToken
 from datetime import date, timedelta
-from functools import cached_property, lru_cache
+from functools import cached_property
 from hashlib import sha256
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
@@ -11,10 +11,11 @@ from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property, TimestampMixin)
 from onegov.core.utils import linkify, paragraphify
 from onegov.file.models.file import File
-from onegov.form import flatten_fieldsets, parse_formcode
+from onegov.form.parser import ParsedForm
 from onegov.org.theme import user_options
 from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
+from sedate import utcnow
 from sqlalchemy.orm import mapped_column, Mapped
 from uuid import uuid4, UUID
 
@@ -23,6 +24,7 @@ from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import datetime
+    from decimal import Decimal
     from markupsafe import Markup
     from onegov.core.framework import Framework
     from onegov.form.parser.core import ParsedField
@@ -121,6 +123,7 @@ class Organisation(Base, TimestampMixin):
     locales: dict_property[str | None] = meta_property()
     redirect_homepage_to: dict_property[str | None] = meta_property()
     redirect_path: dict_property[str | None] = meta_property()
+    short_links: dict_property[str | None] = meta_property()
     hidden_people_fields: dict_property[list[str]] = meta_property(
         default=lambda: ['external_user_id']
     )
@@ -136,13 +139,17 @@ class Organisation(Base, TimestampMixin):
     submit_events_visible: dict_property[bool] = meta_property(default=True)
     delete_past_events: dict_property[bool] = meta_property(default=False)
     event_filter_type: dict_property[str] = meta_property(default='tags')
-    event_filter_definition: dict_property[str | None] = meta_property()
+    event_filter_definition_json: dict_property[dict[str, Any] | None] = (
+        meta_property()
+    )
     event_filter_configuration: dict_property[dict[str, Any]] = (
         meta_property(default=dict)
     )
+    event_header_title: dict_property[str | None] = meta_property()
     event_header_html: dict_markup_property[Markup | None] = (
         dict_markup_property('meta')
     )
+    event_footer_title: dict_property[str | None] = meta_property()
     event_footer_html: dict_markup_property[Markup | None] = (
         dict_markup_property('meta')
     )
@@ -268,6 +275,8 @@ class Organisation(Base, TimestampMixin):
     newsletter_times: dict_property[list[str] | None] = meta_property()
     daily_newsletter_title: dict_property[str | None] = meta_property()
     show_only_previews: dict_property[bool] = meta_property(default=False)
+    daily_newsletter_link: dict_property[str | None] = meta_property()
+    daily_newsletter_link_text: dict_property[str | None] = meta_property()
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
@@ -320,6 +329,9 @@ class Organisation(Base, TimestampMixin):
     # vat
     vat_rate: dict_property[float | None] = meta_property(default=0.0)
 
+    # prices
+    price_rounding: dict_property[Decimal | None] = meta_property(default=None)
+
     # RIS settings
     ris_enabled: dict_property[bool] = meta_property(default=False)
     ris_main_url: dict_property[str | None] = meta_property(default=None)
@@ -343,6 +355,20 @@ class Organisation(Base, TimestampMixin):
     hourly_maintenance_tasks_last_run: dict_property[datetime | None] = (
         meta_property(default=None)
     )
+
+    @property
+    def last_hourly_maintenance_run(self) -> datetime:
+        """ The effective reference point for the hourly maintenance run.
+
+        Unlike :attr:`hourly_maintenance_tasks_last_run` this never returns
+        ``None`` - if the cronjob has never run we assume it ran an hour ago,
+        matching its cadence. Use this when deciding whether the cronjob has
+        already observed some time-dependent state (e.g. an entry's expiry).
+        """
+        return (
+            self.hourly_maintenance_tasks_last_run
+            or utcnow() - timedelta(hours=1)
+        )
 
     firebase_adminsdk_credential: dict_property[str | None] = meta_property()
     selectable_push_notification_options: dict_property[list[list[str]]] = (
@@ -419,6 +445,24 @@ class Organisation(Base, TimestampMixin):
     def opening_hours_html(self) -> Markup:
         return paragraphify(linkify(self.opening_hours))
 
+    @cached_property
+    def short_links_dict(self) -> dict[str, str]:
+        return {
+            parts[0].strip(): parts[1].strip()
+            for line in (self.short_links or '').splitlines()
+            if len(parts := line.split(':', 1)) == 2
+        }
+
+    @short_links.inplace.setter
+    def _short_links_setter(self, value: str | None) -> None:
+        self.meta['short_links'] = value
+        # update cache
+        self.__dict__['short_links_dict'] = {
+            parts[0].strip(): parts[1].strip()
+            for line in (self.short_links or '').splitlines()
+            if len(parts := line.split(':', 1)) == 2
+        }
+
     @property
     def title(self) -> str:
         return self.name.replace('|', ' ')
@@ -435,20 +479,32 @@ class Organisation(Base, TimestampMixin):
     def excluded_person_fields(self, request: OrgRequest) -> list[str]:
         return [] if request.is_logged_in else self.hidden_people_fields
 
+    # FIXME: It might be better to move some of this and use orm_cached
+    #        just like we do for pages_tree. Although this should be
+    #        reasonably inexpensive already.
+    @cached_property
+    def event_filter_parsed_definition(self) -> ParsedForm | None:
+        if definition := self.event_filter_definition_json:
+            return ParsedForm.model_validate(definition)
+        return None
+
     @property
     def event_filter_fields(self) -> tuple[ParsedField, ...]:
-        return flatten_event_filter_fields_from_definition(
-            self.event_filter_definition)
+        if parsed := self.event_filter_parsed_definition:
+            return parsed.flattened_fields
+        return ()
 
     @property
     def event_filter_names(self) -> dict[str, str]:
         return {f.id: f.label for f in self.event_filter_fields}
 
-
-@lru_cache(maxsize=64)
-def flatten_event_filter_fields_from_definition(
-    definition: str | None
-) -> tuple[ParsedField, ...]:
-    if not definition:
-        return ()
-    return tuple(flatten_fieldsets(parse_formcode(definition)))
+    def __setattr__(self, name: str, value: object) -> None:
+        if name == 'event_filter_parsed_definition':
+            if isinstance(value, ParsedForm):
+                self.event_filter_definition_json = value.model_dump(
+                    mode='json')
+            else:
+                self.event_filter_definition_json = None
+            self.__dict__['event_filter_parsed_definition'] = value
+        else:
+            super().__setattr__(name, value)

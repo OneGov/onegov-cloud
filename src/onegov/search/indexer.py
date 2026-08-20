@@ -10,10 +10,10 @@ from onegov.search.datamanager import IndexerDataManager
 from onegov.search.search_index import SearchIndex
 from onegov.search.utils import language_from_locale
 from operator import itemgetter
-from sqlalchemy import and_, bindparam, delete, func, text, String
+from sqlalchemy import and_, bindparam, delete, func, text, Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm.exc import ObjectDeletedError
-from sqlalchemy.dialects.postgresql import insert, ARRAY
+from sqlalchemy.dialects.postgresql import insert, ARRAY, REGCONFIG
 from uuid import UUID
 
 
@@ -79,9 +79,9 @@ class Indexer:
         In case of a bunch of tasks we are assuming they are all from the
         same schema and table in order to optimize the indexing process.
 
-        When a session is passed we use that session's transaction context
-        and use a savepoint instead of our own transaction to perform the
-        action.
+        The upsert is executed directly on the given session's transaction,
+        without a savepoint of its own, so the caller is responsible for
+        committing or rolling back.
 
         :param tasks: A list of tasks to index
         :param session: Supply an active session
@@ -218,10 +218,10 @@ class Indexer:
         for language in self.languages:
             title_vector_part = func.setweight(
                 func.to_tsvector(
-                    bindparam(f'_lang__{language}', type_=String),
-                    bindparam('_title_string', type_=String)
+                    bindparam(f'_lang__{language}', type_=REGCONFIG),
+                    bindparam('_title_string', type_=Text)
                 ),
-                'A'
+                text("'A'")
             )
             if title_vector is None:
                 title_vector = title_vector_part
@@ -230,17 +230,17 @@ class Indexer:
 
         data_vector: ColumnElement[str] = func.setweight(
             func.array_to_tsvector(
-                bindparam('_tags', type_=ARRAY(String))
+                bindparam('_tags', type_=ARRAY(Text))
             ),
-            'A'
+            text("'A'")
         )
         for field in tasks[0]['properties'].keys():
             for language in self.languages:
                 data_vector = data_vector.op('||')(
                     func.setweight(
                         func.to_tsvector(
-                            bindparam(f'_lang__{language}', type_=String),
-                            bindparam(f'_{field}', type_=String)
+                            bindparam(f'_lang__{language}', type_=REGCONFIG),
+                            bindparam(f'_{field}', type_=Text)
                         ),
                         bindparam(f'_weight__{field}__{language}')
                     )
@@ -260,7 +260,7 @@ class Indexer:
                 SearchIndex.access: bindparam('_access'),
                 SearchIndex.last_change: bindparam('_last_change'),
                 SearchIndex._tags:
-                    bindparam('_tags', type_=ARRAY(String)),
+                    bindparam('_tags', type_=ARRAY(Text)),
                 SearchIndex.suggestion: bindparam('_suggestion'),
                 SearchIndex.title_vector: title_vector,
                 SearchIndex.data_vector: data_vector,

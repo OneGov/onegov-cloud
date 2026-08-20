@@ -170,12 +170,13 @@
         class="ballot-entities-table results tablesaw sortable"
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-        data-tablesaw-minimap="">
+        data-tablesaw-minimap=""
+        tal:define="vote vote | python:ballot.vote">
         <thead>
             <tr>
-                <th data-tablesaw-priority="persist" i18n:translate="" class="column-entity left-aligned">${layout.principal.label('entity')}</th>
+                <th tal:condition="vote.domain != 'municipality'" data-tablesaw-priority="persist" i18n:translate="" class="column-entity left-aligned">${layout.principal.label('entity')}</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="column-district left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
-                <th data-tablesaw-priority="1" i18n:translate="" class="column-result left-aligned">Result</th>
+                <th data-tablesaw-priority="1" i18n:translate="" class="column-result right-aligned">Result</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="column-yeas right-aligned">${layout.label('Yeas')}</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">${layout.label('Nays')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">${layout.label('Yes %')}</th>
@@ -185,12 +186,12 @@
         <tbody>
             <tr tal:repeat="result results|ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
-                    <th class="column-entity">${layout.format_name(result)}</th>
+                    <th tal:condition="vote.domain != 'municipality'" class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="column-result answer" colspan="5" i18n:translate="">Not yet counted</td>
                 </tal:b>
                 <tal:b condition="result.counted">
-                    <th class="column-entity">${layout.format_name(result)}</th>
+                    <th tal:condition="vote.domain != 'municipality'" class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td tal:condition="result.accepted" class="column-result answer accepted" i18n:translate="">${layout.label('Accepted')}</td>
                     <td tal:condition="not result.accepted" class="column-result answer rejected" i18n:translate="">${layout.label('Rejected')}</td>
@@ -271,10 +272,11 @@
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
-        tal:define="expats ballot.expats">
+        tal:define="vote vote | python:ballot.vote;
+                    expats ballot.expats">
         <thead>
             <tr>
-                <th data-tablesaw-priority="persist" i18n:translate="" class="column-entity left-aligned">${layout.principal.label('entity')}</th>
+                <th tal:condition="vote.domain != 'municipality'" data-tablesaw-priority="persist" i18n:translate="" class="column-entity left-aligned">${layout.principal.label('entity')}</th>
                 <th data-tablesaw-priority="0" i18n:translate="" class="column-district left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="column-empty right-aligned">eligible_voters_vote</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="column-empty right-aligned" tal:condition="expats">Expats</th>
@@ -287,12 +289,12 @@
         <tbody>
             <tr tal:repeat="result ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
-                    <th class="column-entity">${layout.format_name(result)}</th>
+                    <th tal:condition="vote.domain != 'municipality'" class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="answer" colspan="5" i18n:translate="">Not yet counted</td>
                 </tal:b>
                 <tal:b condition="result.counted">
-                    <th class="column-entity">${layout.format_name(result)}</th>
+                    <th tal:condition="vote.domain != 'municipality'" class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="column-empty right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
                     <td class="column-empty right-aligned" data-text="${result.expats}" tal:condition="expats">${layout.format_number(result.expats or 0)}</td>
@@ -594,7 +596,7 @@
     >
         <thead>
             <tr>
-                <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
+                <th tal:condition="election.domain != 'municipality'" data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
                 <th data-tablesaw-priority="0" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.label('district')}</th>
                 <th data-tablesaw-priority="0" i18n:translate="" class="left-aligned" tal:condition="layout.has_superregions">${layout.label('superregion')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
@@ -610,12 +612,12 @@
         <tbody>
             <tr tal:repeat="result layout.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:block condition="not: result.counted">
-                    <th>${layout.format_name(result)}</th>
+                    <th tal:condition="election.domain != 'municipality'">${layout.format_name(result)}</th>
                     <td tal:condition="layout.has_districts">${result.district}</td>
                     <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
                 </tal:block>
                 <tal:block condition="result.counted">
-                    <th>${layout.format_name(result)}</th>
+                    <th tal:condition="election.domain != 'municipality'">${layout.format_name(result)}</th>
                     <td tal:condition="layout.has_districts">${result.district}</td>
                     <td tal:condition="layout.has_superregions">${result.superregion}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
@@ -875,12 +877,12 @@
     <div class="ballot-result-bar" tal:condition="layout.has_results and ballot">
         <ul class="percentages flex-container justify-between align-center">
             <li>
-                <span i18n:translate="">${layout.label('Yeas')}</span><br/>
-                <span class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</span>
+                <span i18n:translate="">${layout.label('Yeas')}</span><span>: ${layout.format_number(ballot.yeas)}</span><br/>
+                <span class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</span><br/>
             </li>
             <li>
-                <span i18n:translate="">${layout.label('Nays')}</span><br/>
-                <span class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</span>
+                <span i18n:translate="">${layout.label('Nays')}</span><span>: ${layout.format_number(ballot.nays)}</span><br/>
+                <span class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</span><br/>
             </li>
         </ul>
         <div class="percentage">
@@ -1321,6 +1323,7 @@
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
+            <li tal:condition="item.domain_segment|None"><a href="${request.link(layout.municipality_archive.for_municipality(item.domain_segment))}">${layout.principal.municipality_display_name_by_slug.get(item.domain_segment, item.domain_segment)}</a></li>
             <li tal:condition="compound"><a href="${request.link(compound)}"><span metal:use-macro="layout.macros['short-title-translation']" tal:define="item compound"/></a></li>
             <li><a href="${request.link(item)}" aria-current="page"><span metal:use-macro="layout.macros['short-title-translation']" tal:define="item item"/></a></li>
         </ul>
@@ -1328,13 +1331,15 @@
 </metal:election_day_link>
 
 <metal:election_header define-macro="election_header" i18n:domain="onegov.election_day">
-    <div metal:use-macro="layout.macros['election_day_link']" tal:define="item election"/>
-    <h1><span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/></h1>
+    <h1>
+        <small tal:condition="election.domain_segment|None">${layout.principal.municipality_display_name_by_slug.get(election.domain_segment, election.domain_segment)}</small>
+        <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/></h1>
     <hr>
 </metal:election_header>
 
 <metal:vote_header define-macro="vote_header" i18n:domain="onegov.election_day">
     <h1>
+        <small tal:condition="vote.domain_segment|None">${layout.principal.municipality_display_name_by_slug.get(vote.domain_segment, vote.domain_segment)}</small>
         <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
         <tal:b tal:condition="layout.answer">
             <br>
@@ -1403,7 +1408,7 @@
                 <span i18n:translate="">Received Ballots</span>
                 <strong>${layout.format_number(election.received_ballots)}</strong>
             </li>
-            <li>
+            <li tal:condition="election.domain!='municipality'">
                 <span i18n:translate="">Counted</span>
                 <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></strong>
             </li>
@@ -1448,9 +1453,17 @@
             <span i18n:translate="">Cast Ballots</span>
             <strong>${layout.format_number(ballot.cast_ballots)}</strong>
         </li>
-        <li>
+        <li tal:condition="vote.domain!='municipality'">
             <span i18n:translate="">Counted</span>
             <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress ballot.progress" /></strong>
+        </li>
+        <li tal:condition="vote.domain=='municipality'">
+            <span i18n:translate="">Empty votes</span>
+            <strong>${layout.format_number(ballot.empty)}</strong>
+        </li>
+        <li tal:condition="vote.domain=='municipality'">
+            <span i18n:translate="">Invalid votes</span>
+            <strong>${layout.format_number(ballot.invalid)}</strong>
         </li>
     </ul>
 </metal:vote_factoids>

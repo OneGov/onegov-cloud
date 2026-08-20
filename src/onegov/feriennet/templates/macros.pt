@@ -511,7 +511,7 @@
                                     <span i18n:translate class="show-for-sr">Cost</span>
 
                                     <span i18n:translate>
-                                        starting at <tal:b i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:b> CHF
+                                        starting at <tal:b i18n:name='price'>${layout.format_number(min_cost)}</tal:b> CHF
                                     </span>
                                 </span>
                             </tal:b>
@@ -609,7 +609,7 @@
                 </div>
 
                 <div class="bring-cash" tal:condition="period.all_inclusive and occasion.cost and period.pay_organiser_directly" >
-                    <p i18n:translate>Please bring <tal:b i18n:name="cost" replace="occasion.cost" /> CHF in cash.</p>
+                    <p i18n:translate>Please bring <tal:b i18n:name="cost" replace="layout.format_number(occasion.cost)" /> CHF in cash.</p>
                 </div>
             </div>
 
@@ -649,7 +649,7 @@
                             <span i18n:translate class="show-for-sr">Cost</span>
 
                             <tal:b i18n:translate>
-                                <tal:b i18n:name="cost" replace="occasion.cost" /> CHF
+                                <tal:b i18n:name="cost" replace="layout.format_number(occasion.cost)" /> CHF
                             </tal:b>
                         </p>
                     </div>
@@ -661,7 +661,7 @@
                             <span i18n:translate class="show-for-sr">Cost</span>
 
                             <tal:b condition="cost" i18n:translate>
-                                <tal:b i18n:name="cost" replace="cost" /> CHF
+                                <tal:b i18n:name="cost" replace="layout.format_number(cost)" /> CHF
                             </tal:b>
                             <tal:b condition="not:cost" i18n:translate>
                                 Free of charge
@@ -833,11 +833,11 @@
 
     <div tal:condition="period.all_inclusive and period.booking_cost"
          class="hint hint-costs" i18n:translate>
-            The passport costs <tal:b i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
+            The passport costs <tal:b i18n:name="amount" tal:replace="layout.format_number(period.booking_cost)" /> CHF per child. Individual activities may incur additional charges.
     </div>
     <div tal:condition="period.all_inclusive is False and period.booking_cost"
          class="hint hint-costs" i18n:translate>
-            A booking costs <tal:b i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
+            A booking costs <tal:b i18n:name="amount" tal:replace="layout.format_number(period.booking_cost)" /> CHF per child. Individual activities may incur additional charges.
     </div>
 
     <div tal:condition="period.minutes_between"

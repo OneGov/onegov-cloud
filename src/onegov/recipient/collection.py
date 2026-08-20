@@ -6,9 +6,12 @@ from onegov.recipient.model import GenericRecipient
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
-class GenericRecipientCollection[T: GenericRecipient](GenericCollection[T]):
+class GenericRecipientCollection[T: GenericRecipient](
+    GenericCollection[T, 'UUID']
+):
 
     def __init__(self, session: Session, type: str):
         super().__init__(session)

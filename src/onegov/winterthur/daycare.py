@@ -16,6 +16,7 @@ from onegov.org.models import Organisation
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import _
 from ordered_set import OrderedSet
+from uuid import UUID
 from wtforms.fields import BooleanField, DecimalField, Field, SelectField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
 
@@ -26,7 +27,6 @@ if TYPE_CHECKING:
     from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
     from sqlalchemy.orm import Session
     from typing import Self
-    from uuid import UUID
     from wtforms.form import BaseForm
 
 
@@ -50,7 +50,7 @@ SERVICE_DAYS_LABELS = {
     6: _('Sunday'),
 }
 
-# http://babel.pocoo.org/en/latest/numbers.html#pattern-syntax
+# http://babel.pocoo.org/en/latest\numbers.html#pattern-syntax
 FORMAT = '#,##0.00########'
 
 
@@ -394,7 +394,7 @@ class DaycareSubsidyCalculator:
     def directory(self) -> ExtendedDirectory:
         directory: ExtendedDirectory | None = (
             DirectoryCollection(self.session, type='extended')
-            .by_id(self.settings.directory)
+            .by_id(UUID(self.settings.directory))
         )
         assert directory is not None
         return directory
@@ -768,11 +768,13 @@ class DaycareSubsidyCalculatorForm(Form):
 
     income = DecimalField(
         label=_('Definite Taxable income'),
-        validators=(InputRequired(), NumberRange(min=0)))
+        validators=(InputRequired(), NumberRange(min=0))
+    )
 
     wealth = DecimalField(
         label=_('Definite Taxable wealth'),
-        validators=(InputRequired(), NumberRange(min=0)))
+        validators=(InputRequired(), NumberRange(min=0))
+        )
 
     rebate = BooleanField(
         label=_('Rebate'),

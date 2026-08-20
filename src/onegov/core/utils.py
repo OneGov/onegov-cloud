@@ -49,11 +49,11 @@ from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection, Iterator, Mapping
-    from fs.base import FS, SubFS
     from re import Match
     from sqlalchemy.orm import InstrumentedAttribute, Session
     from types import ModuleType
     from webob import Response
+    from .filestorage import Filestorage
     from .request import CoreRequest
     from .types import FileDict, LaxFileDict
 
@@ -237,9 +237,9 @@ def timing(name: str | None = None) -> Iterator[None]:
     finally:
         duration_ms = 1000.0 * (perf_counter() - start)
         if name:
-            print(f'{name}: {duration_ms:.0f} ms')  # noqa: T201
+            print(f'{name}: {duration_ms:.0f} ms')  # ruff:ignore[print]
         else:
-            print(f'{duration_ms:.0f} ms')  # noqa: T201
+            print(f'{duration_ms:.0f} ms')  # ruff:ignore[print]
 
 
 @lru_cache(maxsize=32)
@@ -689,7 +689,7 @@ def is_subpath(directory: str, path: str) -> bool:
     # e.g. /a/b/c/d.rst and directory is /a/b, the common prefix is /a/b
     # FIXME: This ruff error seems correct, but our tests fail with commonpath
     #        maybe module_path is broken or we need to add/remove a slash
-    return os.path.commonprefix([path, directory]) == directory  # noqa: RUF071
+    return os.path.commonprefix([path, directory]) == directory  # ruff:ignore[os-path-commonprefix]
 
 
 @overload
@@ -785,7 +785,7 @@ def get_unique_hstore_keys(
     return set(keys) if keys else set()
 
 
-def makeopendir(fs: FS, directory: str) -> SubFS[FS]:
+def makeopendir(fs: Filestorage, directory: str) -> Filestorage:
     """ Creates and opens the given directory in the given PyFilesystem. """
 
     if not fs.isdir(directory):

@@ -8,6 +8,7 @@ from __future__ import annotations
 from sqlalchemy import Column
 from sqlalchemy import JSON
 from sqlalchemy import Text
+from sqlalchemy import UUID
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
@@ -291,3 +292,21 @@ def add_meta_content_to_parliamentarian_roles(
         context.operations.add_column(table, Column('meta', JSON()))
     if not context.has_column(table, 'content'):
         context.operations.add_column(table, Column('content', JSON()))
+
+
+@upgrade_task('Add external_kub_id to roles and commission memberships')
+def add_external_kub_id_to_roles_and_memberships(
+    context: UpgradeContext,
+) -> None:
+    for table in (
+        'par_parliamentarian_roles',
+        'par_commission_memberships',
+    ):
+        if context.has_table(table):
+            if not context.has_column(table, 'external_kub_id'):
+                context.operations.add_column(
+                    table,
+                    Column(
+                        'external_kub_id', UUID, nullable=True, unique=True
+                    ),
+                )
