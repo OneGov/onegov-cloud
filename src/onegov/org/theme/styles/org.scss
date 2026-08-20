@@ -7535,42 +7535,38 @@ p.full-text-width {
         display: none;
     }
 
+    // no position/transition on the node; WebKit else mispositions the
+    // foreignObject. https://github.com/bkrem/react-d3-tree/issues/284
     .d3-orgchart-node {
         background: #fff;
         border: 2px solid $gray !important;
         color: $body-font-color;
+        display: flex;
+        align-items: flex-start;
+        gap: .3rem;
         font-weight: bold;
         padding: .7rem 1rem;
-        position: relative;
 
+        // glyph as text + rgba, not svg/opacity: WebKit misplaces svg and
+        // opacity layers in a foreignObject (see react-d3-tree #284 above)
         .drilldown,
         .drillup {
-            background: none;
-            border: 0;
-            color: inherit;
+            color: rgba($body-font-color, .35);
             cursor: pointer;
+            font-family: 'FontAwesome';
             font-size: .8rem;
             line-height: 1;
-            opacity: .35;
-            padding: .2rem;
-            position: absolute;
-            right: .3rem;
-            top: .3rem;
 
             &:hover {
-                opacity: 1;
+                color: $body-font-color;
             }
         }
 
-        // only one of the buttons shows at a time, the text keeps clear
-        &:has(button) span {
-            padding-right: .8rem;
-        }
-
-        span {
+        span:not([role]) {
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 4;
             display: -webkit-box;
+            flex: 1;
             overflow: hidden;
         }
 
@@ -7596,7 +7592,6 @@ p.full-text-width {
 
         > div {
             padding: .2rem .5rem !important;
-            transition: all 200ms linear;
         }
     }
 
