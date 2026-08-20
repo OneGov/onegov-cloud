@@ -23,7 +23,6 @@ filterwarnings = [
     # See: https://github.com/IdentityPython/pysaml2/issues/947
     '''ignore:pathlib\.PurePath\.as_uri\(\) is deprecated:DeprecationWarning:xmlschema.*:''',
     # fixed upstream
-    '''ignore:datetime\.datetime\.utcnow\(\) is deprecated:DeprecationWarning:depot.*:''',
     '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:ldap3.*:''',
 ]
 
