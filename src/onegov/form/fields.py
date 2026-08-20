@@ -897,12 +897,13 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
         self,
         choices: Iterable[TreeSelectNode]
     ) -> Iterator[tuple[str, str]]:
-        multiple = self.widget.multiple
         for choice in choices:
-            if not choice.get('disabled', False) and (
-                multiple or choice.get('isGroupSelectable', True)
-            ):
-                yield choice['value'], choice['name']
+            if not choice.get('disabled', False):
+                if choice.get('isGroupSelectable', True):
+                    yield choice['value'], choice['name']
+                elif self.widget.multiple and self.render_kw is not None:
+                    # NOTE: Make sure we don't summarize values
+                    self.render_kw['data-grouped'] = 'false'
             yield from self.flatten_choices(choice['children'])
 
     def set_choices(self, choices: Iterable[TreeSelectNode]) -> None:

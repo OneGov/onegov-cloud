@@ -568,3 +568,22 @@ def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
           WHERE resources.id = resource
 
     """))
+
+
+@upgrade_task('Migrate resources.parent_id to association table')
+def migrate_resources_parent_id_to_association_table(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('resources'):
+        return
+
+    if not context.has_column('resources', 'parent_id'):
+        return
+
+    context.session.execute(text("""
+        INSERT INTO blocking_resources (parent_id, child_id)
+        SELECT parent_id, id
+          FROM resources
+         WHERE parent_id IS NOT NULL
+    """))
+    context.operations.drop_column('resources', 'parent_id')
