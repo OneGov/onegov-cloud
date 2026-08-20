@@ -199,12 +199,10 @@ class ResourceGroup(NamedTuple):
             entries: dict[str, Any] = {}
             group_has_find_your_spot = False
             rooms: dict[tuple[UUID, str], Resource] = {}
-            all_rooms: dict[UUID, Resource] = {}
             for item in items:
                 if is_room := (
                     isinstance(item, Resource) and item.type == 'room'
                 ):
-                    all_rooms[item.id] = item
                     rooms[item.id, item.subgroup or ''] = item
                     group_has_find_your_spot = True
 
@@ -231,7 +229,9 @@ class ResourceGroup(NamedTuple):
                     for ancestor_id in request.app.get_ancestor_resource_ids(
                         item.id
                     ):
-                        ancestor = all_rooms.get(ancestor_id)  # ruff:ignore[function-uses-loop-variable]
+                        ancestor = rooms.get(  # ruff:ignore[function-uses-loop-variable]
+                            (ancestor_id, item.subgroup or '')
+                        )
                         if ancestor is None:
                             continue
 
