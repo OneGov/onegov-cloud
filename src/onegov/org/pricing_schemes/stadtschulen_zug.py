@@ -90,7 +90,10 @@ class StadtschulenZug(
                 ],
                 label='Preistabelle',
                 fieldset=_('Payments'),
-                depends_on=('pricing_scheme', cls.name)
+                depends_on=(
+                    'pricing_method', 'pricing_scheme',
+                    'pricing_scheme', cls.name
+                )
             )
 
             def process_obj(self, obj: object) -> None:

@@ -4,7 +4,7 @@ from libres.context.registry import create_default_registry
 from libres.db.models import ORMBase
 from onegov.core.orm import orm_cached
 from onegov.reservation.collection import ResourceCollection
-from onegov.reservation.models import Resource
+from onegov.reservation.models.resource import blocking_resources_table
 from onegov.reservation.pricing_scheme import PRICING_SCHEMES
 from uuid import UUID
 
@@ -134,58 +134,94 @@ class LibresIntegration:
     @orm_cached(policy='on-table-change:resources')
     def _blocking_resource_id_mapping(self) -> dict[str, frozenset[UUID]]:
         session = self.session_manager.session()
-        child_to_parent: dict[UUID, UUID] = {}
+        child_to_parents: dict[UUID, set[UUID]] = {}
         parent_to_children: dict[UUID, set[UUID]] = {}
         all_blocking_resources: dict[UUID, set[UUID]] = {}
         for child_id, parent_id in session.query(
-            Resource.id,
-            Resource.parent_id
+            blocking_resources_table.c.child_id,
+            blocking_resources_table.c.parent_id
         ):
             # NOTE: libres gives us SoftUUIDs, which are not msgpack
             #       serializable, so we convert it to the base class
             child_id = UUID(int=child_id.int)
             all_blocking_resources[child_id] = set()
-            if parent_id is None:
-                continue
             parent_id = UUID(int=parent_id.int)
-            child_to_parent[child_id] = parent_id
+            child_to_parents.setdefault(child_id, set()).add(parent_id)
             parent_to_children.setdefault(parent_id, set()).add(child_id)
 
         def walk_children(resource_id: UUID) -> None:
             for child_id in parent_to_children.get(resource_id, ()):
-                if child_id in blocking_resources:
+                if child_id in blocking_resources or child_id == target_id:
                     # NOTE: This means we have a cycle in our dependencies
                     #       so we don't need to walk this again, cycles
                     #       should be harmless, even if not ideal.
                     continue
 
-                if child_id == target_id:
-                    # NOTE: This could also happen with cycles, we don't
-                    #       need to explicitly block ourselves, we already
-                    #       do that, so we can ignore it.
-                    continue
-
                 blocking_resources.add(child_id)
                 walk_children(child_id)
 
-        def walk_parents(resource_id: UUID | None) -> None:
-            if resource_id is None:
-                return
+        def walk_parents(resource_id: UUID) -> None:
+            for parent_id in child_to_parents.get(resource_id, ()):
+                if parent_id in blocking_resources or parent_id == target_id:
+                    # NOTE: This means we have a cycle in our dependencies
+                    #       so we don't need to walk this again, cycles
+                    #       should be harmless, even if not ideal.
+                    return
 
-            if resource_id in blocking_resources or resource_id == target_id:
-                # NOTE: This means we have a cycle in our dependencies
-                #       so we don't need to walk this again, cycles
-                #       should be harmless, even if not ideal.
-                return
-
-            blocking_resources.add(resource_id)
-            walk_parents(child_to_parent.get(resource_id))
+                blocking_resources.add(parent_id)
+                walk_parents(parent_id)
 
         for target_id, blocking_resources in all_blocking_resources.items():
             walk_children(target_id)
-            walk_parents(child_to_parent.get(target_id))
+            walk_parents(target_id)
 
         return {
             resource_id.hex: frozenset(blocking)
             for resource_id, blocking in all_blocking_resources.items()
+        }
+
+    def get_ancestor_resource_ids(self, resource: UUID) -> tuple[UUID, ...]:
+        """ This returns the ancestors ids in reverse hierarchical order.
+
+        I.e. first you get the parents, then the grandparents, etc.
+
+        Resources sharing the same generation will be returned in
+        an arbitrary order.
+
+        """
+        return self._ancestor_resource_id_mapping.get(resource.hex, ())
+
+    @orm_cached(policy='on-table-change:resources')
+    def _ancestor_resource_id_mapping(self) -> dict[str, tuple[UUID, ...]]:
+        session = self.session_manager.session()
+        child_to_parents: dict[UUID, list[UUID]] = {}
+        all_ancestor_resources: dict[UUID, list[UUID]] = {}
+        for child_id, parent_id in session.query(
+            blocking_resources_table.c.child_id,
+            blocking_resources_table.c.parent_id
+        ).order_by(blocking_resources_table.c.parent_id):
+            # NOTE: libres gives us SoftUUIDs, which are not msgpack
+            #       serializable, so we convert it to the base class
+            child_id = UUID(int=child_id.int)
+            all_ancestor_resources[child_id] = []
+            parent_id = UUID(int=parent_id.int)
+            child_to_parents.setdefault(child_id, []).append(parent_id)
+
+        def walk_parents(resource_id: UUID) -> None:
+            for parent_id in child_to_parents.get(resource_id, ()):
+                if parent_id in ancestor_resources or parent_id == target_id:
+                    # NOTE: This means we have a cycle in our dependencies
+                    #       so we don't need to walk this again, cycles
+                    #       should be harmless, even if not ideal.
+                    return
+
+                ancestor_resources.append(parent_id)
+                walk_parents(parent_id)
+
+        for target_id, ancestor_resources in all_ancestor_resources.items():
+            walk_parents(target_id)
+
+        return {
+            resource_id.hex: tuple(ancestors)
+            for resource_id, ancestors in all_ancestor_resources.items()
         }

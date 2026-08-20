@@ -19,7 +19,8 @@ from onegov.form.orm_types import Formcode
 from onegov.pay import InvoiceItemMeta, Price, process_payment
 from onegov.reservation.pricing_scheme import PRICING_SCHEMES
 from sedate import align_date_to_day, utcnow
-from sqlalchemy import ForeignKey
+from sqlalchemy import column, func
+from sqlalchemy import CheckConstraint, Column, ForeignKey, Index, Table
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
@@ -62,6 +63,32 @@ def extra_scheduler_arguments() -> dict[str, Any]:
     }
 
 
+blocking_resources_table = Table(
+    'blocking_resources',
+    ORMBase.metadata,
+    Column(
+        'parent_id',
+        ForeignKey('resources.id', ondelete='CASCADE'),
+        primary_key=True,
+    ),
+    Column(
+        'child_id',
+        ForeignKey('resources.id', ondelete='CASCADE'),
+        primary_key=True,
+    ),
+    Index(
+        'uq_ensure_no_diamond_cycles',
+        func.greatest(column('parent_id'), column('child_id')),
+        func.least(column('parent_id'), column('child_id')),
+        unique=True
+    ),
+    CheckConstraint(
+        'parent_id != child_id',
+        name='ck_no_self_reference'
+    )
+)
+
+
 class Resource(ORMBase, ModelBase, ContentMixin,
                TimestampMixin, MultiAssociatedFiles):
     """ A resource holds a single calendar with allocations and reservations.
@@ -88,11 +115,6 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4
-    )
-
-    #: the id of the parent resource (optional)
-    parent_id: Mapped[UUID | None] = mapped_column(
-        ForeignKey('resources.id', ondelete='SET NULL')
     )
 
     #: a nice id for the url, readable by humans
@@ -218,6 +240,24 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         cascade='all, delete-orphan',
         primaryjoin='Resource.id == Allocation.resource',
         foreign_keys='Allocation.resource'
+    )
+
+    parents: Mapped[list[Resource]] = relationship(
+        secondary=blocking_resources_table,
+        primaryjoin=id == blocking_resources_table.c.child_id,
+        secondaryjoin=id == blocking_resources_table.c.parent_id,
+        back_populates='children',
+        join_depth=1,
+        passive_deletes=True
+    )
+
+    children: Mapped[list[Resource]] = relationship(
+        secondary=blocking_resources_table,
+        primaryjoin=id == blocking_resources_table.c.parent_id,
+        secondaryjoin=id == blocking_resources_table.c.child_id,
+        back_populates='parents',
+        join_depth=1,
+        passive_deletes=True
     )
 
     if TYPE_CHECKING:
