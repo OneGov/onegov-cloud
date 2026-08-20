@@ -1382,7 +1382,7 @@ $booking-left-margin: 1.6rem;
     border: 0;
     border-radius: .7rem;
     display: inline-block;
-    height: 2.5rem;
+    min-height: 2.5rem;
     margin-right: .2rem;
     padding: 0;
     position: relative;
@@ -1413,8 +1413,11 @@ $booking-left-margin: 1.6rem;
     }
 
     .meter {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
         border-radius: .7rem;
-        height: 100%;
         width: 100%;
     }
 
@@ -1441,12 +1444,11 @@ $booking-left-margin: 1.6rem;
 }
 
 .meter-text {
+    position: relative;
+    display: block;
     font-size: .9rem;
-    left: 0;
-    line-height: .9rem;
+    line-height: 1.2;
     padding: .75rem;
-    position: absolute;
-    top: 0;
 }
 
 /*
