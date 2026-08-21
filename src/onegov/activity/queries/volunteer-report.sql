@@ -47,7 +47,7 @@ SELECT
         YEAR FROM age(volunteers.birth_date)) as age,    -- Integer
     volunteers.email AS email,                           -- Text
     volunteers.phone AS phone,                           -- Text
-    volunteers.state AS state,                           -- Text
+    volunteers.state::text AS state,                     -- Text
     volunteers.transport as transport,                     -- Text
     volunteers.note as note,                             -- Text
     volunteers.token AS token,               -- UUID

@@ -4156,6 +4156,47 @@ def test_send_message_to_volunteer(
     assert message['To'] == 'roy@test.com'
 
 
+def test_volunteers_report_filtered_by_state(
+    client: Client,
+    scenario: Scenario
+) -> None:
+    scenario.add_period(title="2026", confirmed=True, finalized=False)
+    scenario.add_activity(title="Photography", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_need(
+        name="Begleiter",
+        number=BoundedIntegerRange(1, 3),
+        accept_signups=True
+    )
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/feriennet-settings')
+    page.form['volunteers'] = 'enabled'
+    page.form.submit()
+
+    scenario.add_volunteer(
+        first_name='Roy',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='roy@test.com',
+        phone='041 322 22 22',
+        state='confirmed'
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    period = scenario.latest_period
+    assert period is not None
+    page = client.get(
+        f'/volunteers/{period.id.hex}?volunteer_state=confirmed')
+    assert 'Roy' in page
+
+
 def test_notification_edit_cancel_returns_to_origin(
     client: Client, scenario: Scenario
 ) -> None:
