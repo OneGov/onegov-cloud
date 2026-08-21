@@ -363,6 +363,7 @@ def import_occurrences(
             return redirect(request.link(self))
 
     layout = layout or OccurrencesLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Import'), '#'))
 
     return {
         'layout': layout,
