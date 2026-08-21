@@ -78,6 +78,33 @@ class _Sentinel(Enum):
 INHERIT = _Sentinel.INHERIT
 
 
+def _rebuild_file_from_upload(
+    entry: DirectoryEntry,
+    data: LaxFileDict,
+    note: str
+) -> dict[str, Any]:
+    """ Rebuilds a ``DirectoryFile`` from a resent (dictionary-encoded)
+    upload, appends it to the entry and returns the value dict. """
+
+    new_file = DirectoryFile(
+        id=random_token(),
+        name=data['filename'],
+        note=note,
+        reference=as_fileintent(
+            content=BytesIO(dictionary_to_binary(data)),
+            filename=data['filename']
+        )
+    )
+    entry.files.append(new_file)
+    ref = new_file.reference.file
+    return {
+        'data': '@' + new_file.id,
+        'filename': data['filename'],
+        'mimetype': ref.content_type,
+        'size': ref.content_length
+    }
+
+
 class DirectoryFile(File):
     __mapper_args__ = {'polymorphic_identity': 'directory'}
 
@@ -351,26 +378,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
                             updated[field.id] = {}
                             continue
 
-                        new_file = DirectoryFile(
-                            id=random_token(),
-                            name=data['filename'],
-                            note=field.id,
-                            reference=as_fileintent(
-                                content=BytesIO(
-                                    dictionary_to_binary(
-                                        cast('LaxFileDict', data)
-                                    )
-                                ),
-                                filename=data['filename']
-                            )
+                        updated[field.id] = _rebuild_file_from_upload(
+                            entry, cast('LaxFileDict', data), field.id
                         )
-                        entry.files.append(new_file)
-                        updated[field.id] = {
-                            'data': '@' + new_file.id,
-                            'filename': data['filename'],
-                            'mimetype': new_file.reference.file.content_type,
-                            'size': new_file.reference.file.content_length
-                        }
                         continue
 
                     # delete files if selected in the dialog
@@ -421,27 +431,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
                             if not data.get('data'):
                                 continue
 
-                            new_file = DirectoryFile(
-                                id=random_token(),
-                                name=data['filename'],
-                                note=f'{field.id}:{new_idx}',
-                                reference=as_fileintent(
-                                    content=BytesIO(
-                                        dictionary_to_binary(
-                                        cast('LaxFileDict', data)
-                                    )
-                                    ),
-                                    filename=data['filename']
+                            updated[field.id].append(
+                                _rebuild_file_from_upload(
+                                    entry,
+                                    cast('LaxFileDict', data),
+                                    f'{field.id}:{new_idx}'
                                 )
                             )
-                            entry.files.append(new_file)
-                            ref = new_file.reference.file
-                            updated[field.id].append({
-                                'data': '@' + new_file.id,
-                                'filename': data['filename'],
-                                'mimetype': ref.content_type,
-                                'size': ref.content_length
-                            })
                             new_idx += 1
                             continue
 
