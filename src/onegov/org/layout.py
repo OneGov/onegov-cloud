@@ -4176,10 +4176,14 @@ class ExternalLinkLayout(DefaultLayout):
         else:
             target = ExternalLinkCollection.target(self.model)
 
-        if target is not None:
-            label = _('Resources') if target is ResourceCollection \
-                else _('Forms')
-            links.append(Link(label, self.request.class_link(target)))
+        labels = {
+            FormCollection: _('Forms'),
+            ResourceCollection: _('Resources'),
+        }
+        if target is not None and target in labels:
+            links.append(
+                Link(labels[target], self.request.class_link(target))
+            )
 
         return links
 
