@@ -4164,6 +4164,25 @@ class ExternalLinkLayout(DefaultLayout):
             )
         ]
 
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        links = [Link(_('Homepage'), self.homepage_url)]
+
+        if isinstance(self.model, ExternalLinkCollection):
+            target = (
+                self.model.supported_collections.get(self.model.type)
+                if self.model.type else None
+            )
+        else:
+            target = ExternalLinkCollection.target(self.model)
+
+        if target is not None:
+            label = _('Resources') if target is ResourceCollection \
+                else _('Forms')
+            links.append(Link(label, self.request.class_link(target)))
+
+        return links
+
 
 class HomepageLayout(DefaultLayout):
 
