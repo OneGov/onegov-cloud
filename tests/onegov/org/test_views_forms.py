@@ -506,6 +506,50 @@ def test_show_uploaded_file(client: Client) -> None:
     assert client.spawn().get(file_response.request.url, status=404)
 
 
+def test_pending_submission_file_survives_edit(client: Client) -> None:
+    # regression: editing a pending submission must not lose an already
+    # uploaded file. Once stored, the file is referenced as '@<id>' and gets
+    # resent on edit - the UploadField has to keep that reference instead of
+    # trying to decode it as inline data. This is the same mechanism used by
+    # directory entries (see form/fields.py UploadField.process_formdata).
+    collection = FormCollection(client.app.session())
+    collection.definitions.add(
+        'Text',
+        parsed=ParsedForm.from_formcode(
+            "Name * = ___\nFile * = *.txt\nE-Mail * = @@@"),
+        type='custom'
+    )
+    transaction.commit()
+
+    client.login_editor()
+
+    form_page = client.get('/form/text')
+    form_page.form['name'] = 'First'
+    form_page.form['e_mail'] = 'info@example.org'
+    form_page.form['file'] = Upload('test.txt', b'foobar')
+    preview = form_page.form.submit().follow()
+
+    # the file is now stored (referenced as '@<id>')
+    assert 'test.txt' in preview
+
+    # edit the pending submission, change a different field and keep the file
+    edit_page = preview.click(href='edit')
+    edit_page.form['name'] = 'Second'
+    preview = edit_page.form.submit()
+
+    # the uploaded file must still be there after editing
+    assert 'Second' in preview
+    assert 'test.txt' in preview
+
+    # finalize and make sure the file is still intact
+    final = preview.form.submit().follow()
+    ticket_page = client.get(
+        final.pyquery('.ticket-number a').attr('href'))
+
+    file_response = ticket_page.click('test.txt', index=0)
+    assert file_response.text == 'foobar'
+
+
 def test_hide_form(client: Client) -> None:
     client.login_editor()
 
