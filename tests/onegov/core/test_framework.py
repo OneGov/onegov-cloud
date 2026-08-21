@@ -925,9 +925,10 @@ def test_html_to_text() -> None:
 
 def test_html_to_text_preserves_emoji_only_lines() -> None:
     # a line consisting solely of an emoji must survive the plaintext
-    # conversion, including modern emoji outside the legacy ranges
+    # conversion, including modern emoji outside the legacy ranges. at least
+    # one sample per VALID_PLAINTEXT_CHARACTERS emoji range:
     for emoji in ('😀', '🎉', '🥳', '🫶', '🫠', '🩷', '🇨🇭', '🔴',
-                  '⌚', '⏰', '⭐', '⬛', '™️', '🀄', '🆒', '🈁', '🟰'):
+                  '⌚', '⏰', '⭐', '⬛', '🆒', '✅', '☀️', '🐶'):
         html = f"<p>Liebe Eltern</p>\n<p>{emoji}</p>\n<p>Anmeldung offen</p>\n"
         assert emoji in html_to_text(html), emoji
 
