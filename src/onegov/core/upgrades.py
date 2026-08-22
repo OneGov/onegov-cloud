@@ -13,8 +13,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.abstract import Associable
 from onegov.core.orm.types import JSON
-from sqlalchemy import inspect, text
-from sqlalchemy import Numeric
+from sqlalchemy import Column, inspect, Numeric, text
 from sqlalchemy.exc import NoInspectionAvailable
 
 
@@ -22,7 +21,6 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
     from onegov.core.orm.abstract.associable import RegisteredLink
-    from sqlalchemy import Column
     from sqlalchemy.engine import Connection
 
     from .upgrade import UpgradeContext

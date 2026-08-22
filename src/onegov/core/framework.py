@@ -56,9 +56,10 @@ from onegov.core.datamanager import FileDataManager
 from onegov.core.mail import prepare_email
 from onegov.core.orm import (
     Base, SessionManager, debug, DB_CONNECTION_ERRORS)
+from onegov.core.orm.audit import register_audit_handlers
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.orm.observer import ScopedPropertyObserver
-from onegov.core.request import CoreRequest
+from onegov.core.request import CoreRequest, is_logged_in
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from operator import itemgetter
@@ -459,6 +460,7 @@ class Framework(
 
         if self.dsn:
             self.session_manager = SessionManager(self.dsn, base)
+            register_audit_handlers(self.session_manager)
             # NOTE: We used to only add the ORMBase, when we derived
             #       from LibresIntegration, however this leads to
             #       issues when we add a backref from a model derived
@@ -1833,6 +1835,32 @@ def current_language_tween_factory(
 
 
 @Framework.tween_factory(under=current_language_tween_factory)
+def current_user_tween_factory(
+    app: Framework, handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
+    def current_user(request: CoreRequest) -> Response:
+        identity = request.identity
+        if is_logged_in(identity):
+            identity_user_id = getattr(identity, 'uid', None)
+            user_id = str(identity_user_id) if identity_user_id else None
+            username = identity.userid
+        else:
+            user_id = None
+            username = None
+
+        if app.has_database_connection:
+            with app.session_manager.set_current_user(
+                user_id=user_id,
+                username=username,
+            ):
+                return handler(request)
+
+        return handler(request)
+
+    return current_user
+
+
+@Framework.tween_factory(under=current_user_tween_factory)
 def spawn_cronjob_thread_tween_factory(
     app: Framework,
     handler: Callable[[CoreRequest], Response]

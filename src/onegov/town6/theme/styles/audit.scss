@@ -1,0 +1,236 @@
+.audit-trail-filters {
+    align-items: center;
+    border-bottom: 1px solid $light-gray;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+
+    .audit-trail-filter-label {
+        align-items: center;
+        display: inline-flex;
+        font-weight: bold;
+        gap: .45rem;
+    }
+
+    ul.tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        margin: 0;
+
+        li,
+        .blank-label {
+            margin: 0;
+        }
+    }
+}
+
+.audit-trail-empty {
+    align-items: center;
+    display: flex;
+    gap: .75rem;
+}
+
+.audit-trail-table-wrapper {
+    border: 1px solid $light-gray;
+    border-radius: .5rem;
+    overflow: hidden;
+}
+
+table.audit-trail {
+    margin: 0;
+    width: 100%;
+
+    thead {
+        background: $smoke;
+    }
+
+    th {
+        color: $dark-gray;
+        font-size: .75rem;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    td {
+        vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .audit-trail-date,
+    .audit-trail-user {
+        color: $dark-gray;
+        white-space: nowrap;
+
+        i {
+            color: $gray;
+            margin-right: .35rem;
+        }
+    }
+
+    .audit-trail-page-title strong {
+        display: block;
+    }
+
+    .audit-record-id {
+        color: $dark-gray;
+        display: block;
+        margin-top: .15rem;
+    }
+
+    .audit-trail-action {
+        text-align: right;
+        white-space: nowrap;
+
+        .button {
+            align-items: center;
+            display: inline-flex;
+            gap: .4rem;
+            margin: 0;
+        }
+    }
+}
+
+.audit-operation {
+    border-radius: 1rem;
+    display: inline-block;
+    font-size: .8rem;
+    font-weight: bold;
+    padding: .35rem .65rem;
+    white-space: nowrap;
+}
+
+.audit-insert {
+    background: rgba($success-color, .12);
+    color: $success-color;
+}
+
+.audit-update {
+    background: rgba($primary-color, .12);
+    color: $primary-color;
+}
+
+.audit-delete {
+    background: rgba($alert-color, .12);
+    color: $alert-color;
+}
+
+.audit-entry-summary {
+    align-items: center;
+    border-bottom: 1px solid $light-gray;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.audit-entry-heading {
+    strong,
+    small {
+        display: block;
+    }
+
+    strong {
+        font-size: 1.1rem;
+    }
+
+    small {
+        color: $dark-gray;
+        margin-top: .2rem;
+    }
+}
+
+.audit-entry-meta {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0 0 2rem;
+
+    > div {
+        background: $smoke;
+        border-radius: .4rem;
+        padding: 1rem;
+    }
+
+    dt {
+        color: $dark-gray;
+        font-size: .75rem;
+        letter-spacing: .04em;
+        margin-bottom: .35rem;
+        text-transform: uppercase;
+    }
+
+    dd {
+        margin: 0;
+    }
+
+    code {
+        background: none;
+        border: 0;
+        padding: 0;
+    }
+}
+
+.audit-snapshot-panel {
+    border: 1px solid $light-gray;
+    border-radius: .5rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+
+    h2 {
+        background: $smoke;
+        font-size: 1rem;
+        margin: 0;
+        padding: 1rem 1.25rem;
+    }
+}
+
+pre.audit-snapshot {
+    background: $white;
+    border: 0;
+    font-size: .8rem;
+    margin: 0;
+    max-height: 35rem;
+    overflow: auto;
+    padding: 1.25rem;
+}
+
+@include breakpoint(small only) {
+    .audit-trail-filters {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: .75rem;
+    }
+
+    .audit-trail-table-wrapper {
+        border: 0;
+        border-radius: 0;
+        overflow: visible;
+    }
+
+    table.audit-trail {
+        tbody tr {
+            border: 1px solid $light-gray;
+            border-radius: .5rem;
+            margin-bottom: 1rem;
+            padding: .5rem;
+        }
+
+        td {
+            border-bottom: 0;
+            padding: .45rem .75rem;
+        }
+
+        .audit-trail-action {
+            text-align: left;
+        }
+    }
+
+    .audit-entry-meta {
+        grid-template-columns: 1fr;
+    }
+}

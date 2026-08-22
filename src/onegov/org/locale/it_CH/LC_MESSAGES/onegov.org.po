@@ -292,6 +292,9 @@ msgstr "Panoramica"
 msgid "Timeline"
 msgstr "Timeline"
 
+msgid "Audit Trail"
+msgstr "Registro delle modifiche"
+
 msgid "Files"
 msgstr "File"
 
@@ -4653,6 +4656,48 @@ msgstr "Proprietario:"
 msgid "Kind:"
 msgstr "Tipo:"
 
+msgid "When"
+msgstr "Quando"
+
+msgid "Action"
+msgstr "Azione"
+
+msgid "Who"
+msgstr "Utente"
+
+msgid "Target table"
+msgstr "Tabella di destinazione"
+
+msgid "Target ID"
+msgstr "ID destinazione"
+
+msgid "Current page"
+msgstr "Pagina attuale"
+
+msgid "JSON Snapshot"
+msgstr "Snapshot JSON"
+
+msgid "Before update"
+msgstr "Prima della modifica"
+
+msgid "After update"
+msgstr "Dopo la modifica"
+
+msgid "No audit entries yet."
+msgstr "Nessuna voce nel registro delle modifiche."
+
+msgid "Page"
+msgstr "Pagina"
+
+msgid "Changed"
+msgstr "Modificato"
+
+msgid "Deleted"
+msgstr "Eliminato"
+
+msgid "Copy JSON"
+msgstr "Copia JSON"
+
 msgid "No directories defined yet."
 msgstr "Nessuna cartella ancora definita."
 
@@ -6802,6 +6847,9 @@ msgstr "La disponibilità è stata eliminata, insieme a ${n} allocazioni"
 
 msgid "Topics A-Z"
 msgstr "Argomenti A-Z"
+
+msgid "Audit Trail Entry"
+msgstr "Voce del registro delle modifiche"
 
 msgid "Your userprofile is incomplete. Please update it before you continue."
 msgstr "Il tuo profilo utente è incompleto. Aggiornalo prima di proseguire."

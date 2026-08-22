@@ -291,6 +291,9 @@ msgstr "Aperçu"
 msgid "Timeline"
 msgstr "Chronologie"
 
+msgid "Audit Trail"
+msgstr "Journal d’audit"
+
 msgid "Files"
 msgstr "Fichiers"
 
@@ -4669,6 +4672,48 @@ msgstr "Propriétaire :"
 msgid "Kind:"
 msgstr "Type :"
 
+msgid "When"
+msgstr "Date"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Who"
+msgstr "Utilisateur"
+
+msgid "Target table"
+msgstr "Table cible"
+
+msgid "Target ID"
+msgstr "ID cible"
+
+msgid "Current page"
+msgstr "Page actuelle"
+
+msgid "JSON Snapshot"
+msgstr "Instantané JSON"
+
+msgid "Before update"
+msgstr "Avant modification"
+
+msgid "After update"
+msgstr "Après modification"
+
+msgid "No audit entries yet."
+msgstr "Aucune entrée dans le journal d’audit."
+
+msgid "Page"
+msgstr "Page"
+
+msgid "Changed"
+msgstr "Modifié"
+
+msgid "Deleted"
+msgstr "Supprimé"
+
+msgid "Copy JSON"
+msgstr "Copier le JSON"
+
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
 
@@ -6836,6 +6881,9 @@ msgstr ""
 
 msgid "Topics A-Z"
 msgstr "Sujets de A à Z"
+
+msgid "Audit Trail Entry"
+msgstr "Entrée du journal d’audit"
 
 msgid "Your userprofile is incomplete. Please update it before you continue."
 msgstr ""

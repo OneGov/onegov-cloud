@@ -145,6 +145,7 @@ class TownTheme(BaseTheme):
             'chat',
             'bar-graph',
             'dashboard',
+            'audit',
         ]
 
     @property
