@@ -60,18 +60,23 @@ SANE_HTML_ATTRS = {
 }
 
 # lines without these plaintext characters are excluded in html_to_text
-VALID_PLAINTEXT_CHARACTERS = re.compile(r"""
-    [
-        \d  # decimals
-        \w  # words
-        \n  # new lines
+# not re.VERBOSE: its whitespace stays literal inside a character class
+VALID_PLAINTEXT_CHARACTERS = re.compile(
+    r'['
+    r'\d'  # decimals
+    r'\w'  # words
+    r'\n'  # new lines
 
-        # emojis
-        \U00002600-\U000027BF
-        \U0001f300-\U0001f64F
-        \U0001f680-\U0001f6FF
-    ]+
-""", re.VERBOSE)
+    # emojis
+    r'\U00002300-\U000023FF'  # misc technical (watch, hourglass, media)
+    r'\U00002600-\U000027BF'  # misc symbols + dingbats
+    r'\U00002B00-\U00002BFF'  # misc symbols and arrows (stars, arrows)
+    r'\U0001F100-\U0001F1FF'  # enclosed alphanumeric supplement (flags)
+    r'\U0001F300-\U0001F64F'  # misc symbols/pictographs + emoticons
+    r'\U0001F900-\U0001F9FF'  # supplemental symbols/pictographs
+    r'\U0001FA70-\U0001FAFF'  # symbols and pictographs extended-A
+    r']+'
+)
 
 # match empty link expressions
 EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
