@@ -61,7 +61,7 @@ from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 
 
-from typing import Any, IO, Literal, TYPE_CHECKING
+from typing import Any, cast, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from collections.abc import Collection
@@ -358,7 +358,7 @@ class UploadField(FileField):
         return getattr(self, '_data', None)
 
     @data.setter
-    def data(self, value: FileDict) -> None:
+    def data(self, value: StrictFileDict | FileDict) -> None:
         self._data = value
 
     @property
@@ -379,11 +379,8 @@ class UploadField(FileField):
             # resend_upload
             action = valuelist[0]
             fieldstorage = valuelist[1]
-            # NOTE: I'm not sure why mypy complains here, a total version
-            #       of a TypedDict should be assignable to a non-total version
-            self.data = binary_to_dictionary(  # type: ignore[assignment]
-                dictionary_to_binary({'data': str(valuelist[3])}),
-                str(valuelist[2])
+            self.data = self.process_resend(
+                str(valuelist[2]), str(valuelist[3])
             )
         elif len(valuelist) == 2:
             # force_simple
@@ -403,6 +400,18 @@ class UploadField(FileField):
             self.action = 'keep'
         else:
             raise NotImplementedError()
+
+    def process_resend(
+        self,
+        filename: str,
+        raw_data: str
+    ) -> StrictFileDict | FileDict:
+        """ Decodes a resent upload (dictionary-encoded binary) back into a
+        file dict. """
+        return binary_to_dictionary(
+            dictionary_to_binary({'data': raw_data}),
+            filename
+        )
 
     def process_fieldstorage(
         self,
@@ -624,6 +633,67 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
             if hasattr(value, 'file') or hasattr(value, 'stream'):
                 self.append_entry_from_field_storage(value)
+
+
+class FormcodeUploadField(UploadField):
+    """ The upload field the formcode parser produces.
+
+    Preserves a resent reference to an already-persisted file (``@<id>``)
+    instead of decoding it as an inline upload, which would lose the file:
+    on edit, uploads saved on a previous submit are resent as references.
+
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+        # stay transparent to display/template dispatch keyed on field.type
+        self.type = 'UploadField'
+
+    def process_resend(
+        self,
+        filename: str,
+        raw_data: str
+    ) -> StrictFileDict | FileDict:
+        if raw_data.startswith('@'):
+            # persisted file: keep loaded metadata for display/validation
+            original = self.object_data
+            if isinstance(original, dict) and \
+                    original.get('data') == raw_data:
+                return cast('StrictFileDict', original)
+            return {
+                'data': raw_data,
+                'filename': filename,
+            }
+        return super().process_resend(filename, raw_data)
+
+    def post_validate(
+        self,
+        form: BaseForm,
+        validation_stopped: bool
+    ) -> None:
+        if validation_stopped:
+            return
+        # a kept reference has no mimetype; it was validated on first upload
+        if self.data and self.mimetypes and self.data.get('mimetype'):
+            if self.data.get('mimetype') not in self.mimetypes:
+                raise ValidationError(_(
+                    'Files of this type are not supported.'))
+
+
+class FormcodeUploadMultipleField(UploadMultipleField):
+    """ The multiple upload field the formcode parser produces.
+
+    The resend handling lives on the sub-fields (:class:`FormcodeUploadField`);
+    this field only needs to spawn those and stay transparent to dispatch.
+
+    """
+
+    upload_field_class = FormcodeUploadField
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+        # stay transparent to display/template dispatch keyed on field.type
+        self.type = 'UploadMultipleField'
 
 
 class _DummyFile:

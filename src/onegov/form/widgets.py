@@ -215,7 +215,7 @@ class UploadWidget(FileInput):
                 data=field.data.get('data', ''),
             )
 
-        size = field.data['size']
+        size = field.data.get('size', -1)
         if size < 0:
             display_size = ''
         else:

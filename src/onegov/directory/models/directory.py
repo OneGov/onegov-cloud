@@ -3,12 +3,17 @@ from __future__ import annotations
 
 from email_validator import validate_email
 from enum import Enum
+from io import BytesIO
 from onegov.core.cache import instance_lru_cache
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.utils import increment_name, normalize_for_url
+from onegov.core.utils import (
+    dictionary_to_binary,
+    increment_name,
+    normalize_for_url,
+)
 from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import (
@@ -32,10 +37,11 @@ from uuid import uuid4, UUID
 from wtforms import FieldList
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, cast, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from builtins import type as _type  # type is shadowed in model
     from collections.abc import Mapping
+    from onegov.core.types import LaxFileDict
     from onegov.form import Form
     from onegov.form.parser.core import (
         BasicParsedField, FileParsedField, ParsedField)
@@ -70,6 +76,33 @@ class _Sentinel(Enum):
 
 
 INHERIT = _Sentinel.INHERIT
+
+
+def _rebuild_file_from_upload(
+    entry: DirectoryEntry,
+    data: LaxFileDict,
+    note: str
+) -> dict[str, Any]:
+    """ Rebuilds a ``DirectoryFile`` from a resent (dictionary-encoded)
+    upload, appends it to the entry and returns the value dict. """
+
+    new_file = DirectoryFile(
+        id=random_token(),
+        name=data['filename'],
+        note=note,
+        reference=as_fileintent(
+            content=BytesIO(dictionary_to_binary(data)),
+            filename=data['filename']
+        )
+    )
+    entry.files.append(new_file)
+    ref = new_file.reference.file
+    return {
+        'data': '@' + new_file.id,
+        'filename': data['filename'],
+        'mimetype': ref.content_type,
+        'size': ref.content_length
+    }
 
 
 class DirectoryFile(File):
@@ -280,7 +313,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     value_field is None
                     or value_field.data == {}
                     or value_field.data is not None
-                )
+                ) and getattr(value_field, 'action', None) != 'keep'
 
                 if delete:
                     assert session is not None
@@ -335,7 +368,19 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     # keep files if selected in the dialog
                     if getattr(field_values, 'action', None) == 'keep':
                         original = (entry.values or {}).get(field.id, {})
-                        updated[field.id] = original
+                        if original:
+                            updated[field.id] = original
+                            continue
+
+                        # new entry: rebuild from the resent upload
+                        data = getattr(field_values, 'data', None) or {}
+                        if not data.get('data'):
+                            updated[field.id] = {}
+                            continue
+
+                        updated[field.id] = _rebuild_file_from_upload(
+                            entry, cast('LaxFileDict', data), field.id
+                        )
                         continue
 
                     # delete files if selected in the dialog
@@ -381,7 +426,19 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     # keep files if selected in the dialog
                     if getattr(subfield_values, 'action', None) == 'keep':
                         if len(old_values) <= old_idx:
-                            # it doesn't exist so we can't keep it
+                            # new entry: rebuild from the resent upload
+                            data = getattr(subfield_values, 'data', None) or {}
+                            if not data.get('data'):
+                                continue
+
+                            updated[field.id].append(
+                                _rebuild_file_from_upload(
+                                    entry,
+                                    cast('LaxFileDict', data),
+                                    f'{field.id}:{new_idx}'
+                                )
+                            )
+                            new_idx += 1
                             continue
 
                         original = old_values[old_idx]
