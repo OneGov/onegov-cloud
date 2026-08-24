@@ -506,67 +506,92 @@ def add_source_id_to_reserved_slots(context: UpgradeContext) -> None:
     )
 
 
-@upgrade_task('Store pricing settings on reservations')
-def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
-    if not context.has_table('resources'):
+@upgrade_task('Backfill reservation prices from invoice lines')
+def backfill_reservation_prices_from_invoice(context: UpgradeContext) -> None:
+    """ A previous backfill (`Store pricing settings on reservations`) stored
+    ``price_per_item``/``price_per_hour`` = 0.0 on reservations whose price
+    lived on the allocation rather than on the resource content: it matched
+    allocations on the wrong ``pricing_method`` constants and fell back to the
+    (empty) resource content. Historical allocations no longer carry the price
+    either, so it cannot be recovered from them.
+
+    We recover the price from two sources, in order of trust:
+
+    1. the reservation's invoice line, which reflects what was actually
+       charged (best for old reservations whose allocation is long gone), and
+    2. the allocation the reservation targets, for reservations whose invoice
+       line was itself already zeroed by a refresh (nothing to read there) but
+       whose allocation still carries the price (typically future bookings).
+
+    We only touch reservations whose stored price is still 0, keyed by the
+    invoice item's ``reservation_id`` / the allocation ``group`` so
+    multi-reservation tickets map correctly. Genuinely free reservations (no
+    price anywhere) are left untouched.
+    """
+    if not context.has_table('reservations'):
+        return
+    if not context.has_table('invoice_items'):
+        return
+    if not context.has_table('allocations'):
         return
 
+    # per_item: the reservation invoice line's unit is the price per item
     context.session.execute(text("""
-        WITH adata AS (
-            SELECT "group",
-                   jsonb_build_object(
-                        'pricing_method',
-                        data->'pricing_method',
-                        'price_per_hour',
-                        COALESCE(data->'price_per_hour', '0.0'::jsonb),
-                        'price_per_item',
-                        COALESCE(data->'price_per_item', '0.0'::jsonb),
-                        'currency',
-                        COALESCE(data->'currency', '"CHF"'::jsonb)
-                   ) AS pricing
-              FROM allocations
-             WHERE resource = mirror_of
-               AND data->>'pricing_method' = 'price_per_item'
-                OR data->>'pricing_method' = 'price_per_hour'
-                OR data->>'pricing_method' = 'free'
-        )
-        UPDATE reservations
-           SET data = COALESCE(data, '{}'::jsonb) ||
-              CASE
-                WHEN EXISTS (SELECT 1 FROM adata WHERE adata."group" = target)
-                THEN
-                    (
-                        SELECT pricing
-                          FROM adata
-                         WHERE adata."group" = target
-                         LIMIT 1
-                    ) || jsonb_build_object(
-                        'cost_object',
-                        resources.content->'cost_object'
-                    )
-                ELSE
-                    jsonb_build_object(
-                        'pricing_method',
-                        resources.content->'pricing_method',
-                        'price_per_hour',
-                        COALESCE(
-                            resources.content->'price_per_hour',
-                            '0.0'::jsonb
-                        ),
-                        'price_per_item',
-                        COALESCE(
-                            resources.content->'price_per_item',
-                            '0.0'::jsonb
-                        ),
-                        'currency',
-                        resources.content->'currency',
-                        'cost_object',
-                        resources.content->'cost_object'
-                    )
-               END
-           FROM resources
-          WHERE resources.id = resource
+        UPDATE reservations r
+           SET data = COALESCE(r.data, '{}'::jsonb)
+                      || jsonb_build_object('price_per_item', ii.unit)
+          FROM invoice_items ii
+         WHERE ii.reservation_id = r.id
+           AND ii.group = 'reservation'
+           AND ii.unit IS NOT NULL
+           AND ii.unit <> 0
+           AND r.data->>'pricing_method' = 'per_item'
+           AND COALESCE((r.data->>'price_per_item')::numeric, 0) = 0
+    """))
 
+    # per_hour: the reservation invoice line's unit is the price per hour
+    context.session.execute(text("""
+        UPDATE reservations r
+           SET data = COALESCE(r.data, '{}'::jsonb)
+                      || jsonb_build_object('price_per_hour', ii.unit)
+          FROM invoice_items ii
+         WHERE ii.reservation_id = r.id
+           AND ii.group = 'reservation'
+           AND ii.unit IS NOT NULL
+           AND ii.unit <> 0
+           AND r.data->>'pricing_method' = 'per_hour'
+           AND COALESCE((r.data->>'price_per_hour')::numeric, 0) = 0
+    """))
+
+    # fallback for reservations whose invoice line was itself already zeroed:
+    # recover from the master allocation the reservation targets, if it still
+    # carries a non-zero price
+    context.session.execute(text("""
+        UPDATE reservations r
+           SET data = COALESCE(r.data, '{}'::jsonb)
+                      || jsonb_build_object(
+                            'price_per_item', a.data->'price_per_item')
+          FROM allocations a
+         WHERE a."group" = r.target
+           AND a.resource = a.mirror_of
+           AND a.data->>'pricing_method' = 'per_item'
+           AND COALESCE((a.data->>'price_per_item')::numeric, 0) <> 0
+           AND r.data->>'pricing_method' = 'per_item'
+           AND COALESCE((r.data->>'price_per_item')::numeric, 0) = 0
+    """))
+
+    context.session.execute(text("""
+        UPDATE reservations r
+           SET data = COALESCE(r.data, '{}'::jsonb)
+                      || jsonb_build_object(
+                            'price_per_hour', a.data->'price_per_hour')
+          FROM allocations a
+         WHERE a."group" = r.target
+           AND a.resource = a.mirror_of
+           AND a.data->>'pricing_method' = 'per_hour'
+           AND COALESCE((a.data->>'price_per_hour')::numeric, 0) <> 0
+           AND r.data->>'pricing_method' = 'per_hour'
+           AND COALESCE((r.data->>'price_per_hour')::numeric, 0) = 0
     """))
 
 
