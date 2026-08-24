@@ -90,6 +90,24 @@ class CustomReservation(Reservation, ModelBase, Payable):
                 resource.pricing_scheme
             )
             cost_object = data.get('cost_object', resource.cost_object)
+
+            # a stored price of 0 may be the result of a botched migration
+            # (see upgrade `Backfill reservation prices from invoice lines`);
+            # don't let it silently zero the invoice on refresh, fall back to
+            # the allocation and then the resource. Only load the allocation in
+            # this rare corrupted case, to keep the common path cheap.
+            if pricing_method == 'per_item' and not price_per_item:
+                allocation = allocation or self.allocation_obj
+                price_per_item = (
+                    (allocation.data or {}).get('price_per_item')
+                    if allocation is not None else None
+                ) or resource.price_per_item
+            elif pricing_method == 'per_hour' and not price_per_hour:
+                allocation = allocation or self.allocation_obj
+                price_per_hour = (
+                    (allocation.data or {}).get('price_per_hour')
+                    if allocation is not None else None
+                ) or resource.price_per_hour
         else:
             resource = resource or self.resource_obj
             allocation = allocation or self.allocation_obj
