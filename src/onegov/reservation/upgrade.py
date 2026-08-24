@@ -509,24 +509,19 @@ def add_source_id_to_reserved_slots(context: UpgradeContext) -> None:
 @upgrade_task('Backfill reservation prices from invoice lines')
 def backfill_reservation_prices_from_invoice(context: UpgradeContext) -> None:
     """ A previous backfill (`Store pricing settings on reservations`) stored
-    ``price_per_item``/``price_per_hour`` = 0.0 on reservations whose price
-    lived on the allocation rather than on the resource content: it matched
-    allocations on the wrong ``pricing_method`` constants and fell back to the
-    (empty) resource content. Historical allocations no longer carry the price
-    either, so it cannot be recovered from them.
+    price 0.0 on reservations whose price lived on the allocation, not the
+    resource content (it matched allocations on the wrong ``pricing_method``
+    constants). Recover the price from two sources, in order of trust:
 
-    We recover the price from two sources, in order of trust:
-
-    1. the reservation's invoice line, which reflects what was actually
-       charged (best for old reservations whose allocation is long gone), and
+    1. the reservation's invoice line (what was actually charged; best for old
+       reservations whose allocation is gone), then
     2. the allocation the reservation targets, for reservations whose invoice
-       line was itself already zeroed by a refresh (nothing to read there) but
-       whose allocation still carries the price (typically future bookings).
+       line was itself already zeroed but whose allocation still carries a
+       price (typically future bookings).
 
-    We only touch reservations whose stored price is still 0, keyed by the
-    invoice item's ``reservation_id`` / the allocation ``group`` so
-    multi-reservation tickets map correctly. Genuinely free reservations (no
-    price anywhere) are left untouched.
+    Only reservations with a stored price of 0 are touched, keyed by
+    ``reservation_id`` / allocation ``group`` so multi-reservation tickets map
+    correctly. Genuinely free reservations are left untouched.
     """
     if not context.has_table('reservations'):
         return
@@ -563,9 +558,8 @@ def backfill_reservation_prices_from_invoice(context: UpgradeContext) -> None:
            AND COALESCE((r.data->>'price_per_hour')::numeric, 0) = 0
     """))
 
-    # fallback for reservations whose invoice line was itself already zeroed:
-    # recover from the master allocation the reservation targets, if it still
-    # carries a non-zero price
+    # fallback: invoice line already zeroed, recover from the master allocation
+    # if it still carries a non-zero price
     context.session.execute(text("""
         UPDATE reservations r
            SET data = COALESCE(r.data, '{}'::jsonb)

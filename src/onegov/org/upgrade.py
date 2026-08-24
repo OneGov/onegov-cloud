@@ -1006,14 +1006,12 @@ def switch_to_parsed_event_filters(context: UpgradeContext) -> None:
              'Backfill reservation prices from invoice lines'
 )
 def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
-    """ The `Backfill reservation prices from invoice lines` upgrade repairs
-    the reservation *data*, but invoice lines that were already zeroed by a
-    refresh (before the data was corrected) still show 0. Recompute those
-    invoices now that both the data and the price fallback are in place.
+    """ `Backfill reservation prices from invoice lines` repairs the
+    reservation data, but invoice lines already zeroed by an earlier refresh
+    still show 0. Recompute them now that data and fallback are in place.
 
-    Scoped to reservation tickets that actually need it (a reservation line at
-    0 while the reservation now has a non-zero price) and only refreshed when
-    it is safe to do so (manual, still-open payment).
+    Scoped to tickets that need it (reservation line at 0 but reservation price
+    now non-zero) and only refreshed when safe (manual, still-open payment).
     """
     from onegov.ticket import Ticket
 
@@ -1024,8 +1022,7 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
     if not context.has_table('reservations'):
         return
 
-    # only org-based apps have reservation tickets (and an org with a
-    # rounding base); other apps sharing these tables have nothing to do here
+    # only org-based apps have reservation tickets and a rounding base
     org = getattr(context.app, 'org', None)
     if org is None:
         return

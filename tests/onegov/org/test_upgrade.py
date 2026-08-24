@@ -58,8 +58,7 @@ def test_refresh_zeroed_reservation_invoices(client: Client) -> None:
     )
     assert '200.00' in invoice
 
-    # simulate the already-zeroed state: reservation line at 0 and the payment
-    # dropped, while the reservation price data is still correct (200)
+    # already-zeroed state: line at 0, payment dropped, price data still 200
     transaction.begin()
     session = client.app.session()
     ticket = TicketCollection(session).query().filter_by(
@@ -154,10 +153,9 @@ def test_backfill_and_refresh_double_zeroed_reservation(
     client.login_editor()
     client.get('/tickets/ALL/open').click('Annehmen').follow()
 
-    # simulate the fully-collapsed state: invoice line 0, stored price 0, no
-    # payment -- the price only survives on the allocation. Everything below
-    # runs in a single session/transaction: the backfill uses raw SQL, which
-    # zope.sqlalchemy would roll back on a plain transaction.commit().
+    # fully-collapsed state: invoice line 0, stored price 0, no payment; price
+    # only survives on the allocation. Single session/transaction throughout:
+    # the backfill's raw SQL would be rolled back by zope.sqlalchemy on commit.
     transaction.begin()
     session = client.app.session()
     ticket = TicketCollection(session).query().filter_by(

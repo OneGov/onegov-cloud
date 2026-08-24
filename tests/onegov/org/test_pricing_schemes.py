@@ -139,24 +139,11 @@ def test_parktower_panorama_24_surcharge_zeroes_positions(
 ) -> None:
     """ OGC-3406: adding a Zuschlag/Abzug zeroes all reservation positions.
 
-    Real-world cause on 'Parktower Panorama 24' (Stadt Zug): the resource uses
-    ``pricing_method='per_item'`` with the price living on the allocations.
-    Reservations that were *imported* carry ``price_per_item = 0.0`` in their
-    ``reservation.data`` (and lack the ``pricing_scheme`` key that today's code
-    writes). Their invoice was created at the correct price by the import, but
-    ``custom_reservation.invoice_item`` recomputes the price from that stored
-    ``0.0``.
-
-    Any ``refresh_invoice_items`` therefore wipes the reservation lines to 0 --
-    and adding a Zuschlag/Abzug is exactly what triggers that refresh. The
-    invoice total collapses and the payment is dropped ("Rechnung
-    abgeschlossen").
-
-    To reproduce manually:
-      1. Have a per_item reservation whose ``data['price_per_item']`` is 0 but
-         whose invoice line shows the real price (as produced by the import).
-      2. Open the invoice and add a Zuschlag or Abzug.
-      -> every reservation position drops to 0.00.
+    Cause: a per_item resource with the price on the allocations. Imported
+    reservations carry ``price_per_item = 0.0`` in their data, so
+    ``custom_reservation.invoice_item`` recomputes their line from that 0.0.
+    Any ``refresh_invoice_items`` (adding a Zuschlag/Abzug triggers one) then
+    wipes the reservation lines to 0 and drops the payment.
     """
     resources = ResourceCollection(client.app.libres_context)
 
@@ -193,9 +180,7 @@ def test_parktower_panorama_24_surcharge_zeroes_positions(
     invoice = page.click('Rechnung anzeigen')
     assert '200.00' in invoice   # reservation priced correctly
 
-    # simulate the imported/legacy reservation: its stored data has
-    # ``price_per_item = 0.0`` and lacks the ``pricing_scheme`` key that
-    # today's code writes (matches the real Stadt Zug data, e.g. RSV-4872-7335)
+    # simulate the imported/legacy reservation: stored price_per_item = 0.0
     transaction.begin()
     session = client.app.session()
     for reservation in session.query(Reservation):
@@ -209,9 +194,8 @@ def test_parktower_panorama_24_surcharge_zeroes_positions(
         flag_modified(reservation, 'data')
     transaction.commit()
 
-    # adding a Zuschlag triggers refresh_invoice_items, which recomputes the
-    # reservation line -- with the stored price at 0.0 it would fall back to
-    # the allocation and then the resource price
+    # adding a Zuschlag triggers refresh_invoice_items; the 0.0 stored price
+    # falls back to the allocation then resource
     invoice = client.get(invoice.request.url)
     item = invoice.click('Abzug / Zuschlag')
     item.form['booking_text'] = 'Zuschlag'
@@ -219,8 +203,7 @@ def test_parktower_panorama_24_surcharge_zeroes_positions(
     item.form['surcharge'] = '50.00'
     invoice = item.form.submit().follow()
 
-    # the fallback keeps the real price: the reservation position must not be
-    # silently wiped to 0
+    # the fallback keeps the real price; the position must not be wiped to 0
     reservation_row = invoice.pyquery(
         'tr:contains("Parktower Panorama 24")'
     ).text()

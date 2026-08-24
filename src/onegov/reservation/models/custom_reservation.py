@@ -91,15 +91,12 @@ class CustomReservation(Reservation, ModelBase, Payable):
             )
             cost_object = data.get('cost_object', resource.cost_object)
 
-            # FIXME: Remove once we've fixed all the reservations with a
-            #  stored price of 0.0 OGC-3406.
-            # a stored price of 0 may be the result of a botched migration
-            # (see upgrade `Backfill reservation prices from invoice lines`);
-            # don't let it silently zero the invoice on refresh, fall back to
-            # the allocation and then the resource. Only load the allocation in
-            # this rare corrupted case, to keep the common path cheap. We keep
-            # the original value if nothing better is found, so we never turn
-            # a 0 into a None (which would trip the asserts below).
+            # FIXME: Remove once all reservations with a stored price of 0.0
+            #  are fixed (OGC-3406). A stored 0 may be from a botched migration
+            #  (`Backfill reservation prices from invoice lines`); fall back to
+            #  allocation then resource instead of zeroing the invoice on
+            #  refresh. Allocation loaded only in this rare case. Never turn a
+            #  0  into None (would trip the asserts below).
             if pricing_method == 'per_item' and not price_per_item:
                 allocation = allocation or self.allocation_obj
                 recovered = (
@@ -116,7 +113,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
                 ) or resource.price_per_hour
                 if recovered:
                     price_per_hour = recovered
-            # end of FIXME
+            # end FIXME OGC-3406
         else:
             resource = resource or self.resource_obj
             allocation = allocation or self.allocation_obj
