@@ -136,13 +136,13 @@ def test_store_pricing_settings_permutations(
         if alloc == 'per_hour':
             return {'method': 'per_hour', 'ppi': 0.0, 'pph': 30.0}
         if alloc == 'free':
-            return None  # free -> left untouched
+            return {'method': 'free', 'ppi': 0.0, 'pph': 0.0}
         # inherit: fall back to the resource content
         if res_method == 'per_item':
             return {'method': 'per_item', 'ppi': res_ppi, 'pph': res_pph}
         if res_method == 'per_hour':
             return {'method': 'per_hour', 'ppi': res_ppi, 'pph': res_pph}
-        return None  # free resource -> left untouched
+        return {'method': 'free', 'ppi': 0.0, 'pph': 0.0}  # free resource
 
     session = None
     tokens: dict[tuple[str, str], UUID] = {}
@@ -186,22 +186,19 @@ def test_store_pricing_settings_permutations(
         ppi, pph = resources[res_method]
         exp = expected(res_method, ppi, pph, alloc_name)
         data = session.query(Reservation).filter_by(token=token).one().data
-        if exp is None:
-            # free -> untouched: no pricing written (legacy None reads as {})
-            assert not data, (res_method, alloc_name, data)
-        else:
-            assert data is not None, (res_method, alloc_name)
-            assert data['pricing_method'] == exp['method']
-            assert data['price_per_item'] == exp['ppi']
-            assert data['price_per_hour'] == exp['pph']
+        assert exp is not None
+        assert data is not None, (res_method, alloc_name)
+        assert data['pricing_method'] == exp['method']
+        assert data['price_per_item'] == exp['ppi']
+        assert data['price_per_hour'] == exp['pph']
 
 
-def test_store_pricing_settings_leaves_free_untouched(
+def test_store_pricing_settings_stores_free(
     libres_context: Context,
 ) -> None:
-    """ Free reservations are never touched: their price is never applied
-    (invoice_item returns None for 'free'), so the migration must not churn
-    them, even when a stale non-zero price sits in the data (OGC-3406).
+    """ Free reservations must record that they are free, so a later change to
+    the resource/allocation can't make them carry a cost via the fallback: the
+    stored `free` method is the guard, regardless of any price (OGC-3406).
     """
     collection = ResourceCollection(libres_context)
     resource = collection.add('Room', 'Europe/Zurich')
@@ -222,9 +219,8 @@ def test_store_pricing_settings_leaves_free_untouched(
 
     # a free reservation carrying a stale non-zero price
     reservation = session.query(Reservation).filter_by(token=token).one()
-    stale = {'pricing_method': 'free', 'price_per_item': 45.0,
-             'price_per_hour': 0.0}
-    reservation.data = dict(stale)
+    reservation.data = {'pricing_method': 'free', 'price_per_item': 45.0,
+                        'price_per_hour': 0.0}
     flag_modified(reservation, 'data')
     session.flush()
 
@@ -233,6 +229,6 @@ def test_store_pricing_settings_leaves_free_untouched(
         cast('UpgradeContext', context))
     session.expire_all()
 
-    # left exactly as-is, not zeroed or rewritten
     reservation = session.query(Reservation).filter_by(token=token).one()
-    assert reservation.data == stale
+    assert reservation.data is not None
+    assert reservation.data['pricing_method'] == 'free'

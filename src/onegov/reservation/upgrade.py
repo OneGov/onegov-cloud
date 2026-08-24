@@ -5,8 +5,6 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 # pragma: exclude file
 from __future__ import annotations
 
-import logging
-
 from libres.db.models import Allocation, Reservation
 from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
@@ -16,10 +14,6 @@ from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
 from sqlalchemy import (
     bindparam, text, Column, Enum, ForeignKey, Integer, Text, UUID)
-
-
-log = logging.getLogger('onegov.reservation')
-
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -534,7 +528,7 @@ def store_pricing_settings_on_reservations_fixed(
     if not context.has_table('resources'):
         return
 
-    result = context.session.execute(text("""
+    context.session.execute(text("""
         WITH adata AS (
             SELECT "group",
                    jsonb_build_object(
@@ -557,7 +551,6 @@ def store_pricing_settings_on_reservations_fixed(
         ),
         computed AS (
             SELECT r.id AS id,
-                   r.data AS old_data,
                    COALESCE(r.data, '{}'::jsonb) ||
                       CASE
                         WHEN EXISTS (
@@ -600,26 +593,7 @@ def store_pricing_settings_on_reservations_fixed(
            SET data = computed.new_data
           FROM computed
          WHERE reservations.id = computed.id
-           AND computed.new_data IS DISTINCT FROM computed.old_data
-           -- leave free reservations untouched: the price is never applied
-           -- (invoice_item returns None for 'free'), so don't churn them
-           AND computed.new_data->>'pricing_method' IS DISTINCT FROM 'free'
-      RETURNING reservations.id,
-                reservations.data->>'pricing_method' AS pricing_method,
-                reservations.data->>'price_per_item' AS price_per_item,
-                reservations.data->>'price_per_hour' AS price_per_hour
     """))
-
-    count = 0
-    for row in result:
-        count += 1
-        log.info(
-            'Stored pricing on reservation %s: method=%s, per_item=%s, '
-            'per_hour=%s', row.id, row.pricing_method,
-            row.price_per_item, row.price_per_hour
-        )
-    if count:
-        log.info('Stored pricing settings on %d reservation(s)', count)
 
 
 @upgrade_task('Migrate resources.parent_id to association table')

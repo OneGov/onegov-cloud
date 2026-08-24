@@ -1036,7 +1036,7 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
            AND ii.group = 'reservation'
            AND ii.unit = 0
           JOIN reservations r
-            ON replace(r.token::text, '-', '') = t.handler_id
+            ON r.token = t.handler_id::uuid
          WHERE t.handler_code = 'RSV'
            AND (
                 COALESCE((r.data->>'price_per_item')::numeric, 0) <> 0
