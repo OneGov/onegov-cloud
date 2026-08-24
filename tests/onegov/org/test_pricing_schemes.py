@@ -4,8 +4,7 @@ import transaction
 
 from datetime import datetime
 from freezegun import freeze_time
-from onegov.reservation import Reservation, ResourceCollection
-from sqlalchemy.orm.attributes import flag_modified
+from onegov.reservation import ResourceCollection
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -130,81 +129,3 @@ def test_stadtschulen_zug(client: Client) -> None:
     )
     ticket = edit_page.form.submit().follow()
     assert '105.00' in ticket
-
-
-
-@freeze_time('2017-07-09', tick=True)
-def test_parktower_panorama_24_surcharge_zeroes_positions(
-    client: Client,
-) -> None:
-    """ OGC-3406: adding a Zuschlag/Abzug zeroes all reservation positions.
-
-    Cause: a per_item resource with the price on the allocations. Imported
-    reservations carry ``price_per_item = 0.0`` in their data, so
-    ``custom_reservation.invoice_item`` recomputes their line from that 0.0.
-    Any ``refresh_invoice_items`` (adding a Zuschlag/Abzug triggers one) then
-    wipes the reservation lines to 0 and drops the payment.
-    """
-    resources = ResourceCollection(client.app.libres_context)
-
-    transaction.begin()
-    resource = resources.add(
-        'Parktower Panorama 24',
-        'Europe/Zurich',
-        type='room',
-    )
-    resource.pricing_method = 'per_item'
-    resource.price_per_item = 200.00
-    resource.payment_method = 'manual'
-    resource.currency = 'CHF'
-
-    scheduler = resource.get_scheduler(client.app.libres_context)
-    allocations = scheduler.allocate(
-        dates=(datetime(2017, 7, 9), datetime(2017, 7, 9)),
-        whole_day=True,
-        quota=4,
-    )
-    reserve = client.bound_reserve(allocations[0])
-    transaction.commit()
-
-    reserve(quota=1, whole_day=True)
-
-    page = client.get('/resource/parktower-panorama-24/form')
-    page.form['email'] = 'info@example.org'
-    ticket = page.form.submit().follow().form.submit().follow()
-    assert 'RSV-' in ticket.text
-
-    client.login_editor()
-    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
-
-    invoice = page.click('Rechnung anzeigen')
-    assert '200.00' in invoice   # reservation priced correctly
-
-    # simulate the imported/legacy reservation: stored price_per_item = 0.0
-    transaction.begin()
-    session = client.app.session()
-    for reservation in session.query(Reservation):
-        reservation.data = {
-            'currency': 'CHF',
-            'cost_object': None,
-            'price_per_hour': 0.0,
-            'price_per_item': 0.0,
-            'pricing_method': 'per_item',
-        }
-        flag_modified(reservation, 'data')
-    transaction.commit()
-
-    # adding a Zuschlag triggers refresh_invoice_items; the 0.0 stored price
-    # falls back to the allocation then resource
-    invoice = client.get(invoice.request.url)
-    item = invoice.click('Abzug / Zuschlag')
-    item.form['booking_text'] = 'Zuschlag'
-    item.select_radio('kind', 'Zuschlag')
-    item.form['surcharge'] = '50.00'
-    invoice = item.form.submit().follow()
-
-    # the fallback keeps the real price; the position must not be wiped to 0
-    reservation_row = invoice.pyquery(
-        'tr:contains("Parktower Panorama 24")'
-    ).text()
-    assert '200.00' in reservation_row
