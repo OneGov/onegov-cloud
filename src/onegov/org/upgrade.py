@@ -1010,8 +1010,10 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
     reservation data, but invoice lines already zeroed by an earlier refresh
     still show 0. Recompute them now that the reservation prices are restored.
 
-    Scoped to tickets that need it (reservation line at 0 but reservation price
-    now non-zero) and only refreshed when safe (manual, still-open payment).
+    Scoped to reservation invoices touched since the backfill rollout that are
+    tied to a paying reservation: an allocation priced `per_item`/`per_hour`,
+    or a `per_item` resource (whose content fallback was the broken one). Only
+    refreshed when safe (manual, still-open payment).
     """
     from onegov.ticket import Ticket
 
@@ -1034,13 +1036,20 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
           JOIN invoice_items ii
             ON ii.invoice_id = t.invoice_id
            AND ii.group = 'reservation'
-           AND ii.unit = 0
+           AND COALESCE(ii.modified, ii.created) >= '2026-08-18'
           JOIN reservations r
             ON r.token = t.handler_id::uuid
+          JOIN resources res
+            ON res.id = r.resource
          WHERE t.handler_code = 'RSV'
            AND (
-                COALESCE((r.data->>'price_per_item')::numeric, 0) <> 0
-             OR COALESCE((r.data->>'price_per_hour')::numeric, 0) <> 0
+                res.content->>'pricing_method' = 'per_item'
+             OR EXISTS (
+                    SELECT 1 FROM allocations a
+                     WHERE a."group" = r.target
+                       AND a.data->>'pricing_method'
+                           IN ('per_item', 'per_hour')
+                )
            )
     """)).scalars().all()
 
@@ -1063,12 +1072,12 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
 
     if refreshed:
         log.info(
-            'Refreshed %d zeroed reservation invoice(s): %s',
+            'Refreshed %d reservation invoice(s): %s',
             len(refreshed), ', '.join(refreshed)
         )
     if skipped:
         log.warning(
-            'Skipped %d zeroed reservation invoice(s) that could not be '
-            'safely refreshed (non-manual or non-open payment): %s',
+            'Skipped %d reservation invoice(s) that could not be safely '
+            'refreshed (non-manual or non-open payment): %s',
             len(skipped), ', '.join(skipped)
         )

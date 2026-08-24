@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from tests.onegov.org.conftest import Client
 
 
-@freeze_time('2017-07-09', tick=True)
+@freeze_time('2026-08-20', tick=True)
 def test_refresh_zeroed_reservation_invoices(client: Client) -> None:
     """ A reservation invoice whose line was zeroed (before the price data was
     corrected) is recomputed by the upgrade, restoring the price and the
@@ -34,7 +34,7 @@ def test_refresh_zeroed_reservation_invoices(client: Client) -> None:
     resource.currency = 'CHF'
     scheduler = resource.get_scheduler(client.app.libres_context)
     allocations = scheduler.allocate(
-        dates=(datetime(2017, 7, 9), datetime(2017, 7, 9)),
+        dates=(datetime(2026, 8, 20), datetime(2026, 8, 20)),
         whole_day=True,
         quota=4,
     )
