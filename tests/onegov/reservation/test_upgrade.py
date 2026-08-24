@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from libres.db.models import Reservation, ReservedSlot
+from libres.db.models import Allocation, Reservation, ReservedSlot
 from onegov.core.utils import Bunch
 from onegov.reservation import ResourceCollection
 from onegov.reservation.upgrade import backfill_reserved_slot_source_ids
@@ -191,6 +191,64 @@ def test_store_pricing_settings_permutations(
         assert data['pricing_method'] == exp['method']
         assert data['price_per_item'] == exp['ppi']
         assert data['price_per_hour'] == exp['pph']
+
+
+def test_store_pricing_settings_quota_mirrors(
+    libres_context: Context,
+) -> None:
+    """ With quota > 1, reserving beyond the master persists mirror
+    allocations (resource != mirror_of) that copy the master's pricing data.
+    The migration's `resource = mirror_of` guard must read only the master, so
+    every reservation in the group still lands the allocation price (OGC-3406).
+    """
+    collection = ResourceCollection(libres_context)
+    resource = collection.add('Room', 'Europe/Zurich')
+    resource.pricing_method = 'free'  # allocation overrides to per_item
+    resource.currency = 'CHF'
+
+    scheduler = resource.get_scheduler(libres_context)
+    session = scheduler.session
+    allocation = scheduler.allocate(
+        (datetime(2015, 8, 5, 8), datetime(2015, 8, 5, 10)),
+        partly_available=False,
+        quota=2,
+    )[0]
+    allocation.data = {'pricing_method': 'per_item', 'price_per_item': 50.0,
+                       'price_per_hour': 0.0, 'currency': 'CHF'}
+    flag_modified(allocation, 'data')
+
+    # two reservations: the second consumes a mirror slot
+    tokens = []
+    for _ in range(2):
+        token = scheduler.reserve(
+            'info@example.org',
+            (datetime(2015, 8, 5, 8), datetime(2015, 8, 5, 10)),
+        )
+        scheduler.approve_reservations(token)
+        tokens.append(token)
+    session.flush()
+
+    # a mirror allocation (resource != mirror_of) now exists for the group
+    mirrors = session.query(Allocation).filter(
+        Allocation.resource != Allocation.mirror_of).count()
+    assert mirrors >= 1
+
+    # legacy state: no pricing stored yet
+    for reservation in session.query(Reservation):
+        reservation.data = None
+        flag_modified(reservation, 'data')
+    session.flush()
+
+    context = Bunch(has_table=lambda table: True, session=session)
+    store_pricing_settings_on_reservations_fixed(
+        cast('UpgradeContext', context))
+    session.expire_all()
+
+    for token in tokens:
+        data = session.query(Reservation).filter_by(token=token).one().data
+        assert data is not None
+        assert data['pricing_method'] == 'per_item'
+        assert data['price_per_item'] == 50.0
 
 
 def test_store_pricing_settings_stores_free(

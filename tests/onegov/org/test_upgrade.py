@@ -5,6 +5,7 @@ import transaction
 from datetime import datetime
 from decimal import Decimal
 from freezegun import freeze_time
+from sqlalchemy.orm.attributes import flag_modified
 from onegov.core.utils import Bunch
 from onegov.org.upgrade import refresh_zeroed_reservation_invoices
 from onegov.reservation import ResourceCollection
@@ -95,6 +96,96 @@ def test_refresh_zeroed_reservation_invoices(client: Client) -> None:
     transaction.commit()
 
     # the reservation line and the payment are restored
+    session = client.app.session()
+    ticket = TicketCollection(session).query().filter_by(id=ticket_id).one()
+    assert ticket.invoice is not None
+    reservation_items = [
+        item for item in ticket.invoice.items if item.group == 'reservation'
+    ]
+    assert reservation_items
+    assert all(item.unit == Decimal('200') for item in reservation_items)
+    assert ticket.invoice.total_amount == Decimal('200')
+    assert ticket.handler.payment is not None
+    assert ticket.handler.payment.amount == Decimal('200')
+
+
+@freeze_time('2026-08-20', tick=True)
+def test_refresh_zeroed_reservation_invoices_allocation_priced(
+    client: Client,
+) -> None:
+    """ Same recovery, but the price comes from a per_item allocation override
+    on an otherwise free resource. Exercises the allocation branch of the
+    refresh scoping (not the per_item resource branch) (OGC-3406).
+    """
+    resources = ResourceCollection(client.app.libres_context)
+
+    transaction.begin()
+    resource = resources.add(
+        'Free Room', 'Europe/Zurich', type='room')
+    resource.pricing_method = 'free'  # resource branch must not match
+    resource.payment_method = 'manual'
+    resource.currency = 'CHF'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(datetime(2026, 8, 20), datetime(2026, 8, 20)),
+        whole_day=True,
+        quota=4,
+    )
+    allocations[0].data = {
+        'pricing_method': 'per_item', 'price_per_item': 200.0,
+        'price_per_hour': 0.0, 'currency': 'CHF',
+    }
+    flag_modified(allocations[0], 'data')
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    reserve(quota=1, whole_day=True)
+    page = client.get('/resource/free-room/form')
+    page.form['email'] = 'info@example.org'
+    ticket_page = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket_page.text
+
+    client.login_editor()
+    invoice = (
+        client.get('/tickets/ALL/open')
+        .click('Annehmen').follow()
+        .click('Rechnung anzeigen')
+    )
+    assert '200.00' in invoice
+
+    # already-zeroed state: line at 0, payment dropped
+    transaction.begin()
+    session = client.app.session()
+    ticket = TicketCollection(session).query().filter_by(
+        handler_code='RSV').one()
+    handler = cast('ReservationHandler', ticket.handler)
+    payment = handler.payment
+    assert ticket.invoice is not None
+    for item in ticket.invoice.items:
+        if item.group == 'reservation':
+            item.unit = Decimal('0')
+        item.payments = []
+    if payment is not None:
+        for reservation in handler.reservations:
+            reservation.payment = None
+        ticket.payment = None
+        ticket.payment_id = None
+        session.delete(payment)
+    session.flush()
+    ticket_id = ticket.id
+    transaction.commit()
+
+    session = client.app.session()
+    context = Bunch(
+        has_table=lambda table: True,
+        session=session,
+        app=Bunch(org=Bunch(price_rounding=None)),
+        request=Bunch(session=session, translate=lambda text: text),
+    )
+    refresh_zeroed_reservation_invoices(cast('UpgradeContext', context))
+    transaction.commit()
+
+    # restored via the allocation branch
     session = client.app.session()
     ticket = TicketCollection(session).query().filter_by(id=ticket_id).one()
     assert ticket.invoice is not None
