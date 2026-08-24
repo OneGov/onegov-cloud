@@ -95,19 +95,25 @@ class CustomReservation(Reservation, ModelBase, Payable):
             # (see upgrade `Backfill reservation prices from invoice lines`);
             # don't let it silently zero the invoice on refresh, fall back to
             # the allocation and then the resource. Only load the allocation in
-            # this rare corrupted case, to keep the common path cheap.
+            # this rare corrupted case, to keep the common path cheap. We keep
+            # the original value if nothing better is found, so we never turn
+            # a 0 into a None (which would trip the asserts below).
             if pricing_method == 'per_item' and not price_per_item:
                 allocation = allocation or self.allocation_obj
-                price_per_item = (
+                recovered = (
                     (allocation.data or {}).get('price_per_item')
                     if allocation is not None else None
                 ) or resource.price_per_item
+                if recovered:
+                    price_per_item = recovered
             elif pricing_method == 'per_hour' and not price_per_hour:
                 allocation = allocation or self.allocation_obj
-                price_per_hour = (
+                recovered = (
                     (allocation.data or {}).get('price_per_hour')
                     if allocation is not None else None
                 ) or resource.price_per_hour
+                if recovered:
+                    price_per_hour = recovered
         else:
             resource = resource or self.resource_obj
             allocation = allocation or self.allocation_obj

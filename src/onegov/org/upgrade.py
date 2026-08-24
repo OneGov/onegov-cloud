@@ -1000,7 +1000,11 @@ def switch_to_parsed_event_filters(context: UpgradeContext) -> None:
     org.event_filter_parsed_definition = ParsedForm.from_formcode(definition)
 
 
-@upgrade_task('Refresh reservation invoices zeroed by the pricing backfill')
+@upgrade_task(
+    'Refresh reservation invoices zeroed by the pricing backfill',
+    requires='onegov.reservation:'
+             'Backfill reservation prices from invoice lines'
+)
 def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
     """ The `Backfill reservation prices from invoice lines` upgrade repairs
     the reservation *data*, but invoice lines that were already zeroed by a
