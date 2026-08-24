@@ -543,56 +543,44 @@ def store_pricing_settings_on_reservations_fixed(
                    ) AS pricing
               FROM allocations
              WHERE resource = mirror_of
-               AND (
-                    data->>'pricing_method' = 'per_item'
-                 OR data->>'pricing_method' = 'per_hour'
-                 OR data->>'pricing_method' = 'free'
-               )
-        ),
-        computed AS (
-            SELECT r.id AS id,
-                   COALESCE(r.data, '{}'::jsonb) ||
-                      CASE
-                        WHEN EXISTS (
-                            SELECT 1 FROM adata WHERE adata."group" = r.target
-                        )
-                        THEN
-                            (
-                                SELECT pricing
-                                  FROM adata
-                                 WHERE adata."group" = r.target
-                                 LIMIT 1
-                            ) || jsonb_build_object(
-                                'cost_object',
-                                res.content->'cost_object'
-                            )
-                        ELSE
-                            jsonb_build_object(
-                                'pricing_method',
-                                res.content->'pricing_method',
-                                'price_per_hour',
-                                COALESCE(
-                                    res.content->'price_per_hour',
-                                    '0.0'::jsonb
-                                ),
-                                'price_per_item',
-                                COALESCE(
-                                    res.content->'price_per_reservation',
-                                    '0.0'::jsonb
-                                ),
-                                'currency',
-                                res.content->'currency',
-                                'cost_object',
-                                res.content->'cost_object'
-                            )
-                       END AS new_data
-              FROM reservations r
-              JOIN resources res ON res.id = r.resource
+               AND data->>'pricing_method' IN ('per_item', 'per_hour', 'free')
         )
         UPDATE reservations
-           SET data = computed.new_data
-          FROM computed
-         WHERE reservations.id = computed.id
+           SET data = COALESCE(data, '{}'::jsonb) ||
+              CASE
+                WHEN EXISTS (SELECT 1 FROM adata WHERE adata."group" = target)
+                THEN
+                    (
+                        SELECT pricing
+                          FROM adata
+                         WHERE adata."group" = target
+                         LIMIT 1
+                    ) || jsonb_build_object(
+                        'cost_object',
+                        resources.content->'cost_object'
+                    )
+                ELSE
+                    jsonb_build_object(
+                        'pricing_method',
+                        resources.content->'pricing_method',
+                        'price_per_hour',
+                        COALESCE(
+                            resources.content->'price_per_hour',
+                            '0.0'::jsonb
+                        ),
+                        'price_per_item',
+                        COALESCE(
+                            resources.content->'price_per_reservation',
+                            '0.0'::jsonb
+                        ),
+                        'currency',
+                        resources.content->'currency',
+                        'cost_object',
+                        resources.content->'cost_object'
+                    )
+               END
+           FROM resources
+          WHERE resources.id = resource
     """))
 
 
