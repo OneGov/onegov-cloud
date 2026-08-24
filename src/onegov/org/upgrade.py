@@ -22,6 +22,7 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.form.parser import ParsedForm
 from onegov.newsletter import Newsletter
+from onegov.org import log
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
 from onegov.org.models.political_business import (
@@ -997,3 +998,76 @@ def switch_to_parsed_event_filters(context: UpgradeContext) -> None:
         return
 
     org.event_filter_parsed_definition = ParsedForm.from_formcode(definition)
+
+
+@upgrade_task('Refresh reservation invoices zeroed by the pricing backfill')
+def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
+    """ The `Backfill reservation prices from invoice lines` upgrade repairs
+    the reservation *data*, but invoice lines that were already zeroed by a
+    refresh (before the data was corrected) still show 0. Recompute those
+    invoices now that both the data and the price fallback are in place.
+
+    Scoped to reservation tickets that actually need it (a reservation line at
+    0 while the reservation now has a non-zero price) and only refreshed when
+    it is safe to do so (manual, still-open payment).
+    """
+    from onegov.ticket import Ticket
+
+    if not context.has_table('tickets'):
+        return
+    if not context.has_table('invoice_items'):
+        return
+    if not context.has_table('reservations'):
+        return
+
+    # only org-based apps have reservation tickets (and an org with a
+    # rounding base); other apps sharing these tables have nothing to do here
+    org = getattr(context.app, 'org', None)
+    if org is None:
+        return
+    rounding_base = org.price_rounding
+
+    ticket_ids = context.session.execute(text("""
+        SELECT DISTINCT t.id
+          FROM tickets t
+          JOIN invoice_items ii
+            ON ii.invoice_id = t.invoice_id
+           AND ii.group = 'reservation'
+           AND ii.unit = 0
+          JOIN reservations r
+            ON replace(r.token::text, '-', '') = t.handler_id
+         WHERE t.handler_code = 'RSV'
+           AND (
+                COALESCE((r.data->>'price_per_item')::numeric, 0) <> 0
+             OR COALESCE((r.data->>'price_per_hour')::numeric, 0) <> 0
+           )
+    """)).scalars().all()
+
+    refreshed: list[str] = []
+    skipped: list[str] = []
+    for ticket_id in ticket_ids:
+        ticket = context.session.get(Ticket, ticket_id)
+        if ticket is None:
+            continue
+
+        handler = ticket.handler
+        if not handler.refreshing_invoice_is_safe(
+            context.request, rounding_base
+        ):
+            skipped.append(ticket.number)
+            continue
+
+        handler.refresh_invoice_items(context.request, rounding_base)
+        refreshed.append(ticket.number)
+
+    if refreshed:
+        log.info(
+            'Refreshed %d zeroed reservation invoice(s): %s',
+            len(refreshed), ', '.join(refreshed)
+        )
+    if skipped:
+        log.warning(
+            'Skipped %d zeroed reservation invoice(s) that could not be '
+            'safely refreshed (non-manual or non-open payment): %s',
+            len(skipped), ', '.join(skipped)
+        )
