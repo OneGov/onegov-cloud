@@ -1003,12 +1003,12 @@ def switch_to_parsed_event_filters(context: UpgradeContext) -> None:
 @upgrade_task(
     'Refresh reservation invoices zeroed by the pricing backfill',
     requires='onegov.reservation:'
-             'Backfill reservation prices from invoice lines'
+             'Store pricing settings on reservations (fixed)'
 )
 def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
-    """ `Backfill reservation prices from invoice lines` repairs the
+    """ `Store pricing settings on reservations (fixed)` repairs the
     reservation data, but invoice lines already zeroed by an earlier refresh
-    still show 0. Recompute them now that data and fallback are in place.
+    still show 0. Recompute them now that the reservation prices are restored.
 
     Scoped to tickets that need it (reservation line at 0 but reservation price
     now non-zero) and only refreshed when safe (manual, still-open payment).

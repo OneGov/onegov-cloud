@@ -5,6 +5,8 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 # pragma: exclude file
 from __future__ import annotations
 
+import logging
+
 from libres.db.models import Allocation, Reservation
 from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task
@@ -14,6 +16,9 @@ from onegov.reservation import LibresIntegration
 from onegov.reservation import Resource
 from sqlalchemy import (
     bindparam, text, Column, Enum, ForeignKey, Integer, Text, UUID)
+
+
+log = logging.getLogger('onegov.reservation')
 
 
 from typing import Any, TYPE_CHECKING
@@ -506,87 +511,115 @@ def add_source_id_to_reserved_slots(context: UpgradeContext) -> None:
     )
 
 
-@upgrade_task('Backfill reservation prices from invoice lines')
-def backfill_reservation_prices_from_invoice(context: UpgradeContext) -> None:
-    """ A previous backfill (`Store pricing settings on reservations`) stored
-    price 0.0 on reservations whose price lived on the allocation, not the
-    resource content (it matched allocations on the wrong ``pricing_method``
-    constants). Recover the price from two sources, in order of trust:
+@upgrade_task('Store pricing settings on reservations (fixed)')
+def store_pricing_settings_on_reservations_fixed(
+    context: UpgradeContext
+) -> None:
+    """ Snapshots each reservation's pricing onto its own ``data``, from the
+    master allocation when it defines a price, otherwise from the resource
+    content.
 
-    1. the reservation's invoice line (what was actually charged; best for old
-       reservations whose allocation is gone), then
-    2. the allocation the reservation targets, for reservations whose invoice
-       line was itself already zeroed but whose allocation still carries a
-       price (typically future bookings).
+    Re-run of `Store pricing settings on reservations` under a new name so it
+    executes again on already-upgraded databases. Three bugs in the original
+    zeroed prices:
 
-    Only reservations with a stored price of 0 are touched, keyed by
-    ``reservation_id`` / allocation ``group`` so multi-reservation tickets map
-    correctly. Genuinely free reservations are left untouched.
+    - the allocation lookup matched on the wrong ``pricing_method`` constants
+      (``price_per_item``/``price_per_hour`` instead of ``per_item``/
+      ``per_hour``), so allocation-priced reservations never matched,
+    - the ``resource = mirror_of`` guard was mis-parenthesised (``AND`` bound
+      tighter than the following ``OR``s), and
+    - the resource-content fallback read ``content->'price_per_item'``, but the
+      resource stores that value under ``price_per_reservation``.
     """
-    if not context.has_table('reservations'):
-        return
-    if not context.has_table('invoice_items'):
-        return
-    if not context.has_table('allocations'):
+    if not context.has_table('resources'):
         return
 
-    # per_item: the reservation invoice line's unit is the price per item
-    context.session.execute(text("""
-        UPDATE reservations r
-           SET data = COALESCE(r.data, '{}'::jsonb)
-                      || jsonb_build_object('price_per_item', ii.unit)
-          FROM invoice_items ii
-         WHERE ii.reservation_id = r.id
-           AND ii.group = 'reservation'
-           AND ii.unit IS NOT NULL
-           AND ii.unit <> 0
-           AND r.data->>'pricing_method' = 'per_item'
-           AND COALESCE((r.data->>'price_per_item')::numeric, 0) = 0
+    result = context.session.execute(text("""
+        WITH adata AS (
+            SELECT "group",
+                   jsonb_build_object(
+                        'pricing_method',
+                        data->'pricing_method',
+                        'price_per_hour',
+                        COALESCE(data->'price_per_hour', '0.0'::jsonb),
+                        'price_per_item',
+                        COALESCE(data->'price_per_item', '0.0'::jsonb),
+                        'currency',
+                        COALESCE(data->'currency', '"CHF"'::jsonb)
+                   ) AS pricing
+              FROM allocations
+             WHERE resource = mirror_of
+               AND (
+                    data->>'pricing_method' = 'per_item'
+                 OR data->>'pricing_method' = 'per_hour'
+                 OR data->>'pricing_method' = 'free'
+               )
+        ),
+        computed AS (
+            SELECT r.id AS id,
+                   r.data AS old_data,
+                   COALESCE(r.data, '{}'::jsonb) ||
+                      CASE
+                        WHEN EXISTS (
+                            SELECT 1 FROM adata WHERE adata."group" = r.target
+                        )
+                        THEN
+                            (
+                                SELECT pricing
+                                  FROM adata
+                                 WHERE adata."group" = r.target
+                                 LIMIT 1
+                            ) || jsonb_build_object(
+                                'cost_object',
+                                res.content->'cost_object'
+                            )
+                        ELSE
+                            jsonb_build_object(
+                                'pricing_method',
+                                res.content->'pricing_method',
+                                'price_per_hour',
+                                COALESCE(
+                                    res.content->'price_per_hour',
+                                    '0.0'::jsonb
+                                ),
+                                'price_per_item',
+                                COALESCE(
+                                    res.content->'price_per_reservation',
+                                    '0.0'::jsonb
+                                ),
+                                'currency',
+                                res.content->'currency',
+                                'cost_object',
+                                res.content->'cost_object'
+                            )
+                       END AS new_data
+              FROM reservations r
+              JOIN resources res ON res.id = r.resource
+        )
+        UPDATE reservations
+           SET data = computed.new_data
+          FROM computed
+         WHERE reservations.id = computed.id
+           AND computed.new_data IS DISTINCT FROM computed.old_data
+           -- leave free reservations untouched: the price is never applied
+           -- (invoice_item returns None for 'free'), so don't churn them
+           AND computed.new_data->>'pricing_method' IS DISTINCT FROM 'free'
+      RETURNING reservations.id,
+                reservations.data->>'pricing_method' AS pricing_method,
+                reservations.data->>'price_per_item' AS price_per_item,
+                reservations.data->>'price_per_hour' AS price_per_hour
     """))
 
-    # per_hour: the reservation invoice line's unit is the price per hour
-    context.session.execute(text("""
-        UPDATE reservations r
-           SET data = COALESCE(r.data, '{}'::jsonb)
-                      || jsonb_build_object('price_per_hour', ii.unit)
-          FROM invoice_items ii
-         WHERE ii.reservation_id = r.id
-           AND ii.group = 'reservation'
-           AND ii.unit IS NOT NULL
-           AND ii.unit <> 0
-           AND r.data->>'pricing_method' = 'per_hour'
-           AND COALESCE((r.data->>'price_per_hour')::numeric, 0) = 0
-    """))
-
-    # fallback: invoice line already zeroed, recover from the master allocation
-    # if it still carries a non-zero price
-    context.session.execute(text("""
-        UPDATE reservations r
-           SET data = COALESCE(r.data, '{}'::jsonb)
-                      || jsonb_build_object(
-                            'price_per_item', a.data->'price_per_item')
-          FROM allocations a
-         WHERE a."group" = r.target
-           AND a.resource = a.mirror_of
-           AND a.data->>'pricing_method' = 'per_item'
-           AND COALESCE((a.data->>'price_per_item')::numeric, 0) <> 0
-           AND r.data->>'pricing_method' = 'per_item'
-           AND COALESCE((r.data->>'price_per_item')::numeric, 0) = 0
-    """))
-
-    context.session.execute(text("""
-        UPDATE reservations r
-           SET data = COALESCE(r.data, '{}'::jsonb)
-                      || jsonb_build_object(
-                            'price_per_hour', a.data->'price_per_hour')
-          FROM allocations a
-         WHERE a."group" = r.target
-           AND a.resource = a.mirror_of
-           AND a.data->>'pricing_method' = 'per_hour'
-           AND COALESCE((a.data->>'price_per_hour')::numeric, 0) <> 0
-           AND r.data->>'pricing_method' = 'per_hour'
-           AND COALESCE((r.data->>'price_per_hour')::numeric, 0) = 0
-    """))
+    count = 0
+    for row in result:
+        count += 1
+        log.info(
+            'Stored pricing on reservation %s: method=%s, per_item=%s, '
+            'per_hour=%s', row.id, row.pricing_method,
+            row.price_per_item, row.price_per_hour
+        )
+    if count:
+        log.info('Stored pricing settings on %d reservation(s)', count)
 
 
 @upgrade_task('Migrate resources.parent_id to association table')
