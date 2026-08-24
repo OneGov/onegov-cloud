@@ -73,6 +73,16 @@ def test_all_settings_are_reachable(client: Client) -> None:
     assert all(client.get(link).status_code == 200 for link in links)
 
 
+def test_settings_search_markup(client: Client) -> None:
+    client.login_admin()
+    page = client.get('/settings')
+
+    assert page.pyquery('[data-settings-search]').attr('type') == 'search'
+    assert page.pyquery('[data-settings-no-results]').attr('hidden')
+    assert page.pyquery('.settings-category')
+    assert page.pyquery('[data-settings-item]')
+
+
 def test_general_settings(client: Client) -> None:
     client.login_admin()
 

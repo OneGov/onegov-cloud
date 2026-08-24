@@ -947,6 +947,11 @@ def get_fontpreview_asset() -> Iterator[str]:
     yield 'fontpreview.js'
 
 
+@OrgApp.webasset('settings_search')
+def get_settings_search_asset() -> Iterator[str]:
+    yield 'settings_search.js'
+
+
 @OrgApp.webasset('scroll-to-username')
 def get_scroll_to_username_asset() -> Iterator[str]:
     yield 'scroll_to_username.js'

@@ -26,6 +26,29 @@ if TYPE_CHECKING:
     from .conftest import TestTownApp
 
 
+@pytest.mark.xdist_group(name='browser')
+def test_settings_search(browser: ExtendedBrowser) -> None:
+    browser.login_admin()
+    browser.visit('/settings')
+
+    search = browser.find_by_css('[data-settings-search]')
+    search.fill('gever api')
+
+    visible = [
+        setting.text.strip()
+        for setting in browser.find_by_css('[data-settings-item]')
+        if setting.is_visible()
+    ]
+    assert visible == ['Gever API']
+
+    search.fill('not a setting')
+    assert not any(
+        setting.is_visible()
+        for setting in browser.find_by_css('[data-settings-item]')
+    )
+    assert browser.find_by_css('[data-settings-no-results]').is_visible()
+
+
 @pytest.mark.xdist_group(name="browser")
 def test_firebase_settings_form_and_push_notification_flow(
     browser: ExtendedBrowser,

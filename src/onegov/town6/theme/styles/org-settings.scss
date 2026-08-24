@@ -7,6 +7,11 @@
     list-style: none;
     margin: 0;
 
+    .settings-search {
+        margin-bottom: 1rem;
+        max-width: 30rem;
+    }
+
     .settings-category {
         .card-section {
             display: flex;

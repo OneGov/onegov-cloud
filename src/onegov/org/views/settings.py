@@ -72,6 +72,7 @@ def view_settings(
 ) -> RenderData:
 
     layout = layout or SettingsLayout(self, request)
+    request.include('settings_search')
 
     def query_settings() -> Iterator[dict[str, Any]]:
         q = Query('view').filter(model=Organisation)
