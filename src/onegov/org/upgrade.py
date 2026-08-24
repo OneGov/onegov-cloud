@@ -1011,8 +1011,9 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
     still show 0. Recompute them now that the reservation prices are restored.
 
     Scoped to reservation invoices touched since the backfill rollout that are
-    tied to a paying reservation: an allocation priced `per_item`/`per_hour`,
-    or a `per_item` resource (whose content fallback was the broken one). Only
+    tied to an allocation the bug could have disturbed (`per_item`/`per_hour`/
+    `free` — the original broken OR only ever matched `free`), or to a
+    `per_item` resource (whose content fallback was the broken one). Only
     refreshed when safe (manual, still-open payment).
     """
     from onegov.ticket import Ticket
@@ -1048,7 +1049,7 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
                     SELECT 1 FROM allocations a
                      WHERE a."group" = r.target
                        AND a.data->>'pricing_method'
-                           IN ('per_item', 'per_hour')
+                           IN ('per_item', 'per_hour', 'free')
                 )
            )
     """)).scalars().all()
