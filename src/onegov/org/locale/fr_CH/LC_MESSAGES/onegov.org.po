@@ -258,8 +258,8 @@ msgstr "Répertoires"
 msgid "Surveys"
 msgstr "Enquêtes"
 
-msgid "Topic chart"
-msgstr "Diagramme des thèmes"
+msgid "Information architecture"
+msgstr "Architecture de l'information"
 
 msgid "Modules"
 msgstr "Modules"
@@ -399,6 +399,12 @@ msgstr "Paiements carte de crédit"
 
 msgid "Exports payments and tickets"
 msgstr "Exporte les paiements et les tickets"
+
+msgid "Availability periods"
+msgstr "Périodes de disponibilité"
+
+msgid "Target resources"
+msgstr "Ressources cibles"
 
 msgid "Title"
 msgstr "Titre"
@@ -3740,11 +3746,11 @@ msgstr "Nettoyer"
 msgid "Subscribe"
 msgstr "Souscrire"
 
-msgid "Availability periods"
-msgstr "Périodes de disponibilité"
-
 msgid "Availability period"
 msgstr "Période de disponibilité"
+
+msgid "Copy availability periods"
+msgstr "Copier des périodes de disponibilité"
 
 msgid "Paste"
 msgstr "Coller"
@@ -6811,6 +6817,14 @@ msgstr "La période de disponibilité a été arrêtée"
 
 msgid "The availability period was added to the clipboard"
 msgstr "La période de disponibilité a été ajoutée au presse-papiers"
+
+#, python-format
+msgid ""
+"${periods} availability periods copied to ${resources} resources, creating "
+"${allocations} allocations"
+msgstr ""
+"${periods} périodes de disponibilité copiées vers ${resources} ressources, "
+"créant ${allocations} disponibilités"
 
 msgid "Pasted availability period from to the clipboard"
 msgstr "Collage de la période de disponibilité dans le presse-papiers"

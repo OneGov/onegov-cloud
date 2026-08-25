@@ -200,9 +200,10 @@ class ResourceGroup(NamedTuple):
             group_has_find_your_spot = False
             rooms: dict[tuple[UUID, str], Resource] = {}
             for item in items:
-                is_room = isinstance(item, Resource) and item.type == 'room'
-                if is_room:
-                    rooms[item.id, item.subgroup or ''] = item  # type: ignore
+                if is_room := (
+                    isinstance(item, Resource) and item.type == 'room'
+                ):
+                    rooms[item.id, item.subgroup or ''] = item
                     group_has_find_your_spot = True
 
                 if subgroup_name := getattr(item, 'subgroup', None):
@@ -225,19 +226,16 @@ class ResourceGroup(NamedTuple):
             def subgroup_sort_key(item: Any) -> tuple[str, ...]:
                 key = [item.title]
                 if isinstance(item, Resource):
-                    seen = {item.id}
-                    while (
-                        item.parent_id is not None
-                        # avoid infinite loop when there is a cycle
-                        and item.parent_id not in seen
-                        and (parent := rooms.get((  # ruff:ignore[function-uses-loop-variable]
-                            item.parent_id,
-                            item.subgroup or ''
-                        ))) is not None
+                    for ancestor_id in request.app.get_ancestor_resource_ids(
+                        item.id
                     ):
-                        item = parent
-                        seen.add(item.id)
-                        key.append(item.title)
+                        ancestor = rooms.get(  # ruff:ignore[function-uses-loop-variable]
+                            (ancestor_id, item.subgroup or '')
+                        )
+                        if ancestor is None:
+                            continue
+
+                        key.append(ancestor.title)
                 return tuple(reversed(key))
 
             def group_sort_key(item: tuple[str, Any]) -> tuple[str, ...]:
@@ -385,16 +383,11 @@ def view_find_your_spot(
 
     def sort_key(item: Resource) -> tuple[str, ...]:
         key = [item.title]
-        seen = {item.id}
-        while (
-            item.parent_id is not None
-            # avoid infinite loop when there is a cycle
-            and item.parent_id not in seen
-            and (parent := rooms_dict.get(item.parent_id)) is not None
-        ):
-            item = parent
-            seen.add(item.id)
-            key.append(item.title)
+        for ancestor_id in request.app.get_ancestor_resource_ids(item.id):
+            ancestor = rooms_dict.get(ancestor_id)
+            if ancestor is None:
+                continue
+            key.append(ancestor.title)
         return tuple(reversed(key))
 
     rooms.sort(key=sort_key)
@@ -834,13 +827,37 @@ def view_find_your_spot(
                 if len(room_ids := reserved_dates.get(date, set())) < wanted
             } if auto_reserve != 'for_first_day' else {}
 
+    holidays: dict[date_t, list[str]] = {}
     if room_slots:
         request.include('reservationlist')
+
+        # include holiday information if either setting is enabled
+        if (
+            form.during_school_holidays
+            and form.during_school_holidays.data == 'yes'
+        ) or form.on_holidays and form.on_holidays.data == 'yes':
+            for hstart, hend in request.app.org.school_holidays:
+                if not sedate.overlaps(hstart, hend, start.date(), end.date()):
+                    continue
+
+                for date in sedate.dtrange(hstart, hend):
+                    if date in room_slots:
+                        holidays.setdefault(date, []).append(
+                            _('School holidays')
+                        )
+
+            for date, descriptions in request.app.org.holidays.between(
+                start.date(),
+                end.date()
+            ):
+                if date in room_slots:
+                    holidays.setdefault(date, []).extend(descriptions)
 
     return {
         'title': _('Find Your Spot'),
         'form': form,
         'rooms': rooms,
+        'holidays': holidays,
         'room_slots': room_slots,
         'missing_dates': missing_dates,
         'layout': layout or FindYourSpotLayout(self, request)

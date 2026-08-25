@@ -299,12 +299,12 @@ def test_find_your_spot(client: Client) -> None:
     new = resources.click('Raum')
     new.form['title'] = 'Meeting 1'
     new.form['group'] = 'Meeting Rooms'
-    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.select_multiple('parent_ids', texts=['Grand Meeting Room'])
     new.form.submit().follow()
 
     new.form['title'] = 'Meeting 2'
     new.form['group'] = 'Meeting Rooms'
-    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.select_multiple('parent_ids', texts=['Grand Meeting Room'])
     new.form.submit().follow()
 
     find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
@@ -4441,6 +4441,44 @@ def test_allocation_rules_copy_paste(client: Client) -> None:
     assert 'wurde eingefügt' in edit_page
     assert count_allocations(1) == 2
     assert count_allocations(2) == 2
+
+
+def test_allocation_rules_batch_copy(client: Client) -> None:
+    client.login_admin()
+
+    resources_page = client.get('/resources')
+    for title in ('Source', 'Target 1', 'Target 2'):
+        page = resources_page.click('Raum')
+        page.form['title'] = title
+        page.form.submit()
+
+    for title, start, end in (
+        ('Week one', '2019-01-01', '2019-01-02'),
+        ('Week two', '2019-01-08', '2019-01-09'),
+    ):
+        page = client.get('/resource/source/new-rule')
+        page.form['title'] = title
+        page.form['start'] = start
+        page.form['end'] = end
+        page.form['as_whole_day'] = 'yes'
+        page.form.submit()
+
+    page = client.get('/resource/source/copy-rules')
+    assert page.form.get('rules', index=0).checked
+    assert page.form.get('rules', index=1).checked
+    page.select_checkbox('resources', 'Allgemein - Target 1')
+    page.select_checkbox('resources', 'Allgemein - Target 2')
+    page = page.form.submit().follow()
+
+    assert '2 Verfügbarkeitszeiträume auf 2 Ressourcen kopiert' in page
+    for target in ('target-1', 'target-2'):
+        rules_page = client.get(f'/resource/{target}/rules')
+        assert 'Week one' in rules_page
+        assert 'Week two' in rules_page
+        slots = client.get(
+            f'/resource/{target}/slots' '?start=2019-01-01&end=2019-01-10'
+        ).json
+        assert len(slots) == 4
 
 
 def test_allocation_rules_on_daypasses(client: Client) -> None:

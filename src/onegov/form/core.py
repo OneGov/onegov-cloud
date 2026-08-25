@@ -11,6 +11,7 @@ from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
 from onegov.form.display import render_field
 from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
+from onegov.form.fields import FieldTable
 from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import If, StrictOptional
@@ -18,6 +19,7 @@ from onegov.pay import InvoiceDiscountMeta, InvoiceItemMeta, Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
 from wtforms.fields import EmailField
+from wtforms.fields import FieldList
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, DataRequired
@@ -34,6 +36,7 @@ if TYPE_CHECKING:
     from weakref import CallableProxyType
     from webob.multidict import MultiDict
     from wtforms import Field
+    from wtforms.fields.core import UnboundField
     from wtforms.meta import _MultiDictLike
 
     class DependencyDict(TypedDict):
@@ -287,6 +290,50 @@ class Form(BaseForm):
 
         """
 
+        def adjust_validators(
+            field: UnboundField[Any],
+            depends_on: FieldDependency,
+        ) -> None:
+
+            validators = field.kwargs.get('validators', None)
+            if not validators:
+                return
+
+            # mirror the field flags of the first existing validator to the
+            # field flags of the wrapper, to carry over things like the
+            # 'required' flag
+            field_flags = getattr(validators[0], 'field_flags', None)
+
+            field.kwargs['validators'] = (
+                If(
+                    depends_on.fulfilled,
+                    *validators
+                ),
+                If(
+                    depends_on.unfulfilled,
+                    # NOTE: Since numeric fields tend to submit a zero
+                    #       instead of an empty string, when they're
+                    #       hidden, we don't want to trigger range
+                    #       validation errors, so we treat zeroes as
+                    #       optional and skip the other validators in
+                    #       the chain.
+                    StrictOptional(zero_is_optional=True),
+                    # NOTE: If someone manually submits data into a hidden
+                    #       field we want to make sure it's still valid
+                    *(
+                        validator
+                        for validator in validators
+                        if not isinstance(
+                            validator,
+                            (InputRequired, DataRequired, StrictOptional)
+                        )
+                    )
+                ),
+            )
+
+            if field_flags:
+                field.kwargs['validators'][0].field_flags = field_flags
+
         for field_id, field in self._unbound_fields:
 
             depends_on = field.kwargs.pop('depends_on', None)
@@ -295,43 +342,16 @@ class Form(BaseForm):
                 continue
 
             field.depends_on = FieldDependency(*depends_on)
+            adjust_validators(field, field.depends_on)
 
-            if validators := field.kwargs.get('validators', None):
-
-                # mirror the field flags of the first existing validator to the
-                # field flags of the wrapper, to carry over things like the
-                # 'required' flag
-                field_flags = getattr(validators[0], 'field_flags', None)
-
-                field.kwargs['validators'] = (
-                    If(
-                        field.depends_on.fulfilled,
-                        *validators
-                    ),
-                    If(
-                        field.depends_on.unfulfilled,
-                        # NOTE: Since numeric fields tend to submit a zero
-                        #       instead of an empty string, when they're
-                        #       hidden, we don't want to trigger range
-                        #       validation errors, so we treat zeroes as
-                        #       optional and skip the other validators in
-                        #       the chain.
-                        StrictOptional(zero_is_optional=True),
-                        # NOTE: If someone manually submits data into a hidden
-                        #       field we want to make sure it's still valid
-                        *(
-                            validator
-                            for validator in validators
-                            if not isinstance(
-                                validator,
-                                (InputRequired, DataRequired, StrictOptional)
-                            )
-                        )
-                    ),
-                )
-
-                if field_flags:
-                    field.kwargs['validators'][0].field_flags = field_flags
+            # NOTE: For these fields we also need to adjust the validators
+            #       of their unbound subfield
+            if issubclass(field.field_class, (FieldTable, FieldList)) and (
+                subfield := field.args[0]
+                if field.args
+                else field.kwargs.get('unbound_field')
+            ) is not None:
+                adjust_validators(subfield, field.depends_on)
 
             field.kwargs.setdefault('render_kw', {}).update(
                 # NOTE: self._prefix does not exist yet, for the shared

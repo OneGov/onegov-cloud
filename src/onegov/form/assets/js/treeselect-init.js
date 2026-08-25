@@ -1,6 +1,7 @@
 $(document).ready(function() {
     $('.treeselect').each(function(_, select) {
         var container = $('<div>');
+        var grouped = select.hasAttribute('data-grouped') ? $(select).data('grouped') : select.multiple;
         $(select).hide().after(container);
         // eslint-disable-next-line no-unused-vars
         var treeselect = new Treeselect({
@@ -16,8 +17,8 @@ $(document).ready(function() {
             searchable: true,
             clearable: true,
             expandSelected: true,
-            isGroupedValue: select.multiple,
-            grouped: select.multiple,
+            isGroupedValue: grouped,
+            grouped: grouped,
             inputCallback: function(value) {
                 $(select).val(value);
             },
