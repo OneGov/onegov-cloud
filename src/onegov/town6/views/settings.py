@@ -370,7 +370,7 @@ def town_handle_event(
     form: EventSettingsForm
 ) -> RenderData | Response:
     return handle_event_settings(
-        self, request, form, SettingsLayout(self, request)
+        self, request, form, SettingsLayout(self, request, _('Events'))
     )
 
 
@@ -455,7 +455,9 @@ def town_handle_api_keys(
     request: TownRequest,
     form: OneGovApiSettingsForm
 ) -> RenderData | Response:
-    return handle_api_keys(self, request, form, SettingsLayout(self, request))
+    return handle_api_keys(
+        self, request, form, SettingsLayout(self, request, _('OneGov API'))
+    )
 
 
 @TownApp.form(

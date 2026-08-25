@@ -199,12 +199,10 @@ def handle_new_directory(
             request.link(ExtendedDirectoryEntryCollection(directory)))
 
     layout = layout or DirectoryCollectionLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_('Homepage'), layout.homepage_url),
-        Link(_('Directories'), request.link(self)),
-        Link(_('New'), request.link(self, name='new'))
-    ]
     layout.edit_mode = True
+    layout.breadcrumbs.append(
+        Link(_('New'), request.link(self, name='new'))
+    )
 
     return {
         'layout': layout,
@@ -273,12 +271,10 @@ def handle_edit_directory(
 
     layout = layout or DirectoryCollectionLayout(self, request)
     layout.edit_mode = True
-    layout.breadcrumbs = [
-        Link(_('Homepage'), layout.homepage_url),
-        Link(_('Directories'), request.link(self)),
+    layout.breadcrumbs.extend([
         Link(_(self.directory.title), request.link(self)),
-        Link(_('Edit'), '#')
-    ]
+        Link(_('Configure'), '#')
+    ])
 
     return {
         'layout': layout,
@@ -380,8 +376,17 @@ def change_directory_url(
 ) -> RenderData | Response:
 
     layout = layout or DefaultLayout(self, request)
+    layout.edit_mode = True
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_('Change URL'), '#'))
+    layout.breadcrumbs.extend([
+        Link(
+            _(self.title),
+            request.class_link(
+                ExtendedDirectoryEntryCollection, {'directory_name': self.name}
+            ),
+        ),
+        Link(_('Change URL'), '#')
+    ])
 
     form.delete_field('test')
 
