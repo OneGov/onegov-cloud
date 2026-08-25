@@ -375,13 +375,14 @@ class UploadField(FileField):
 
         fieldstorage: RawFormValue
         action: RawFormValue
+        resend: str | None = None
+        resend_filename: str = ''
         if len(valuelist) == 4:
             # resend_upload
             action = valuelist[0]
             fieldstorage = valuelist[1]
-            self.data = self.process_resend(
-                str(valuelist[2]), str(valuelist[3])
-            )
+            resend_filename = str(valuelist[2])
+            resend = str(valuelist[3])
         elif len(valuelist) == 2:
             # force_simple
             action, fieldstorage = valuelist
@@ -398,6 +399,9 @@ class UploadField(FileField):
             self.data = {}
         elif action == 'keep':
             self.action = 'keep'
+            # only keep honours a resend; replace/delete set data above
+            if resend is not None:
+                self.data = self.process_resend(resend_filename, resend)
         else:
             raise NotImplementedError()
 
@@ -646,7 +650,7 @@ class FormcodeUploadField(UploadField):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        # stay transparent to display/template dispatch keyed on field.type
+        # keep type name so display/template dispatch still matches
         self.type = 'UploadField'
 
     def process_resend(
@@ -654,30 +658,25 @@ class FormcodeUploadField(UploadField):
         filename: str,
         raw_data: str
     ) -> StrictFileDict | FileDict:
-        if raw_data.startswith('@'):
-            # persisted file: keep loaded metadata for display/validation
-            original = self.object_data
-            if isinstance(original, dict) and \
-                    original.get('data') == raw_data:
-                return cast('StrictFileDict', original)
-            return {
-                'data': raw_data,
-                'filename': filename,
-            }
-        return super().process_resend(filename, raw_data)
+        if not raw_data.startswith('@'):
+            # not yet persisted: decode the inline binary
+            return super().process_resend(filename, raw_data)
+
+        # persisted file: reuse loaded metadata if object-bound, else the ref
+        original = self.object_data
+        if isinstance(original, dict) and original.get('data') == raw_data:
+            return cast('StrictFileDict', original)
+        return {'data': raw_data, 'filename': filename}
 
     def post_validate(
         self,
         form: BaseForm,
         validation_stopped: bool
     ) -> None:
-        if validation_stopped:
+        # a kept @<id> reference has no mimetype; it was validated on upload
+        if self.data and not self.data.get('mimetype'):
             return
-        # a kept reference has no mimetype; it was validated on first upload
-        if self.data and self.mimetypes and self.data.get('mimetype'):
-            if self.data.get('mimetype') not in self.mimetypes:
-                raise ValidationError(_(
-                    'Files of this type are not supported.'))
+        super().post_validate(form, validation_stopped)
 
 
 class FormcodeUploadMultipleField(UploadMultipleField):
@@ -692,7 +691,7 @@ class FormcodeUploadMultipleField(UploadMultipleField):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        # stay transparent to display/template dispatch keyed on field.type
+        # keep type name so display/template dispatch still matches
         self.type = 'UploadMultipleField'
 
 

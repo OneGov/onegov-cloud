@@ -14,6 +14,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, TagsField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import CssField
+from onegov.form.fields import FormcodeUploadField
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import HtmlField
@@ -261,6 +262,62 @@ def test_upload_field() -> None:
     assert field2.filename == 'foobaz.txt'
     assert field2.file.read() == b'foobaz'  # type: ignore[union-attr]
     assert field.mimetypes == WhitelistedMimeType.whitelist
+
+
+def test_formcode_upload_field_resend_reference() -> None:
+    # a persisted file is resent as an '@<id>' reference: keep must preserve
+    # it (not decode as binary); delete/replace ignore it
+    def create_field() -> tuple[Form, FormcodeUploadField]:
+        form = Form()
+        field = FormcodeUploadField(allowed_mimetypes=('text/plain',))
+        field = field.bind(form, 'upload')  # type: ignore[attr-defined]
+        return form, field
+
+    reference = '@' + 'a' * 64
+    persisted = {
+        'data': reference,
+        'filename': 'report.txt',
+        'mimetype': 'text/plain',
+        'size': 6,
+    }
+
+    # keep, object-bound (form submission edit): loaded metadata is reused
+    form, field = create_field()
+    field.process(DummyPostData({'upload': [
+        'keep', '', 'report.txt', reference,
+    ]}), data=persisted)
+    assert field.validate(form)
+    assert field.action == 'keep'
+    assert field.data == persisted
+
+    # keep, no object (directory edit): bare reference kept, passes validation
+    form, field = create_field()
+    field.process(DummyPostData({'upload': [
+        'keep', '', 'report.txt', reference,
+    ]}))
+    assert field.validate(form)
+    assert field.data == {'data': reference, 'filename': 'report.txt'}
+
+    # delete: reference ignored
+    form, field = create_field()
+    field.process(DummyPostData({'upload': [
+        'delete', '', 'report.txt', reference,
+    ]}))
+    assert field.validate(form)
+    assert field.action == 'delete'
+    assert field.data == {}
+
+    # replace: new upload wins over the reference
+    form, field = create_field()
+    field.process(DummyPostData({'upload': [
+        'replace', create_file('text/plain', 'new.txt', b'newone'),
+        'report.txt', reference,
+    ]}))
+    assert field.validate(form)
+    assert field.action == 'replace'
+    assert field.data is not None
+    assert field.data['filename'] == 'new.txt'
+    assert dictionary_to_binary(field.data) == b'newone'  # type: ignore[arg-type]
 
 
 def test_upload_multiple_field() -> None:
