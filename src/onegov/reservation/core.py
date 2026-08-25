@@ -144,8 +144,9 @@ class LibresIntegration:
             # NOTE: libres gives us SoftUUIDs, which are not msgpack
             #       serializable, so we convert it to the base class
             child_id = UUID(int=child_id.int)
-            all_blocking_resources[child_id] = set()
             parent_id = UUID(int=parent_id.int)
+            all_blocking_resources.setdefault(child_id, set())
+            all_blocking_resources.setdefault(parent_id, set())
             child_to_parents.setdefault(child_id, set()).add(parent_id)
             parent_to_children.setdefault(parent_id, set()).add(child_id)
 
