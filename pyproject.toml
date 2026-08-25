@@ -11,13 +11,7 @@ python_files = ["test_*.py"]
 timeout = 300
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
-    '''ignore:pkg_resources is deprecated as an API''',
-    '''ignore:Deprecated call to `pkg_resources\.declare_namespace\('.*'\):DeprecationWarning:(fs|pkg_resources).*''',
     '''ignore:Call to deprecated setex:DeprecationWarning:dogpile.*''',
-    # potential issue for future upgrades
-    # unfortunately it's not possible to filter escape sequence warnings in
-    # specific modules, but we should be covered by Ruff for our own code
-    '''ignore:"[^"]+" is an invalid escape sequence:::''',
     # FIXME: OGC-2659
     '''ignore:'crypt':DeprecationWarning:passlib.*:''',
     # Until pysaml2 is compatible with newer versions of xmlschema
@@ -25,8 +19,9 @@ filterwarnings = [
     # See: https://github.com/IdentityPython/pysaml2/issues/947
     '''ignore:pathlib\.PurePath\.as_uri\(\) is deprecated:DeprecationWarning:xmlschema.*:''',
     # fixed upstream
-    '''ignore:datetime\.datetime\.utcnow\(\) is deprecated:DeprecationWarning:depot.*:''',
     '''ignore:(tagMap|typeMap) is deprecated:DeprecationWarning:ldap3.*:''',
+    # See: https://github.com/sarnold/pdfrw/issues/19
+    '''ignore:"[^"]+" is an invalid escape sequence:::''',
 ]
 
 [tool.coverage.run]

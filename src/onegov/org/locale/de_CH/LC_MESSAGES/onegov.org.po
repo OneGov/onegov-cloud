@@ -257,8 +257,8 @@ msgstr "Verzeichnisse"
 msgid "Surveys"
 msgstr "Umfragen"
 
-msgid "Topic chart"
-msgstr "Themendiagramm"
+msgid "Information architecture"
+msgstr "Informationsarchitektur"
 
 msgid "Modules"
 msgstr "Module"

@@ -200,9 +200,10 @@ class ResourceGroup(NamedTuple):
             group_has_find_your_spot = False
             rooms: dict[tuple[UUID, str], Resource] = {}
             for item in items:
-                is_room = isinstance(item, Resource) and item.type == 'room'
-                if is_room:
-                    rooms[item.id, item.subgroup or ''] = item  # type: ignore
+                if is_room := (
+                    isinstance(item, Resource) and item.type == 'room'
+                ):
+                    rooms[item.id, item.subgroup or ''] = item
                     group_has_find_your_spot = True
 
                 if subgroup_name := getattr(item, 'subgroup', None):
@@ -225,19 +226,16 @@ class ResourceGroup(NamedTuple):
             def subgroup_sort_key(item: Any) -> tuple[str, ...]:
                 key = [item.title]
                 if isinstance(item, Resource):
-                    seen = {item.id}
-                    while (
-                        item.parent_id is not None
-                        # avoid infinite loop when there is a cycle
-                        and item.parent_id not in seen
-                        and (parent := rooms.get((  # ruff:ignore[function-uses-loop-variable]
-                            item.parent_id,
-                            item.subgroup or ''
-                        ))) is not None
+                    for ancestor_id in request.app.get_ancestor_resource_ids(
+                        item.id
                     ):
-                        item = parent
-                        seen.add(item.id)
-                        key.append(item.title)
+                        ancestor = rooms.get(  # ruff:ignore[function-uses-loop-variable]
+                            (ancestor_id, item.subgroup or '')
+                        )
+                        if ancestor is None:
+                            continue
+
+                        key.append(ancestor.title)
                 return tuple(reversed(key))
 
             def group_sort_key(item: tuple[str, Any]) -> tuple[str, ...]:
@@ -385,16 +383,11 @@ def view_find_your_spot(
 
     def sort_key(item: Resource) -> tuple[str, ...]:
         key = [item.title]
-        seen = {item.id}
-        while (
-            item.parent_id is not None
-            # avoid infinite loop when there is a cycle
-            and item.parent_id not in seen
-            and (parent := rooms_dict.get(item.parent_id)) is not None
-        ):
-            item = parent
-            seen.add(item.id)
-            key.append(item.title)
+        for ancestor_id in request.app.get_ancestor_resource_ids(item.id):
+            ancestor = rooms_dict.get(ancestor_id)
+            if ancestor is None:
+                continue
+            key.append(ancestor.title)
         return tuple(reversed(key))
 
     rooms.sort(key=sort_key)

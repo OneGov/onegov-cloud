@@ -1837,6 +1837,8 @@ a.category-anchor {
         display: none;
     }
 
+    // no position/transition on the node; WebKit else mispositions the
+    // foreignObject. https://github.com/bkrem/react-d3-tree/issues/284
     .d3-orgchart-node {
         padding: .7rem 1rem;
         font-weight: bold;
@@ -1845,39 +1847,33 @@ a.category-anchor {
         border-radius: .7rem !important;
         box-shadow: 0 0 17px 0 rgba(0,0,0,0.07);
         color: #444;
-        transition: all 200ms linear;
         background: white;
-        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: .3rem;
 
+        // glyph as text + rgba, not svg/opacity: WebKit misplaces svg and
+        // opacity layers in a foreignObject (see react-d3-tree #284 above)
         .drilldown,
         .drillup {
-            background: none;
-            border: 0;
-            color: inherit;
+            color: rgba(#444, .35);
             cursor: pointer;
+            font-family: 'Font Awesome 5 Free';
             font-size: .8rem;
+            font-weight: 900;
             line-height: 1;
-            opacity: .35;
-            padding: .2rem;
-            position: absolute;
-            right: .3rem;
-            top: .3rem;
 
             &:hover {
-                opacity: 1;
+                color: #444;
             }
         }
 
-        // only one of the buttons shows at a time, the text keeps clear
-        &:has(button) span {
-            padding-right: .8rem;
-        }
-
-        span {
+        span:not([role]) {
             -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
             overflow: hidden;
             display: -webkit-box;
+            flex: 1;
         }
 
         &.hyphens {
@@ -1902,7 +1898,6 @@ a.category-anchor {
 
         > div {
             padding: 0.2rem 0.5rem !important;
-            transition: all 200ms linear;
         }
     }
 

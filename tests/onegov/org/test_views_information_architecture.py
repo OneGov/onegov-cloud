@@ -13,38 +13,38 @@ if TYPE_CHECKING:
     from .conftest import Client
 
 
-def test_view_topic_chart(client: Client) -> None:
+def test_view_information_architecture(client: Client) -> None:
 
     assert client.get(
-        '/topic-chart',
+        '/information-architecture',
         expect_errors=True
     ).status_code == 403
     assert client.get(
-        '/topic-chart-json',
+        '/information-architecture-json',
         expect_errors=True
     ).status_code == 403
 
     client.login_admin()
 
     # the view is linked in the modules menu
-    assert '/topic-chart' in client.get('/')
+    assert '/information-architecture' in client.get('/')
 
-    page = client.get('/topic-chart')
-    assert 'topic-chart' in page
-    assert '/topic-chart-json' in page
+    page = client.get('/information-architecture')
+    assert 'information-architecture' in page
+    assert '/information-architecture-json' in page
 
     # the menu link shares the class, the chart is found by its url
-    assert len(page.pyquery('.topic-chart[data-url]')) == 1
+    assert len(page.pyquery('.information-architecture[data-url]')) == 1
 
     scripts = [script.attrib['src'] for script in page.pyquery('script[src]')]
-    assert any('topic-chart' in script for script in scripts)
+    assert any('information-architecture' in script for script in scripts)
 
     new_page = client.get('/topics/organisation').click('Thema')
     new_page.form['title'] = 'Child Page'
     new_page.form['text'] = 'Child'
     new_page.form.submit()
 
-    nodes = client.get('/topic-chart-json').json['nodes']
+    nodes = client.get('/information-architecture-json').json['nodes']
     by_name = {node['name']: node for node in nodes}
 
     # the organisation itself is the root of the chart
@@ -66,22 +66,23 @@ def test_view_topic_chart(client: Client) -> None:
     assert 'Aktuelles' not in by_name
 
 
-def test_view_topic_chart_actions(client: Client) -> None:
+def test_view_information_architecture_actions(client: Client) -> None:
 
     client.login_admin()
-    page = client.get('/topic-chart')
+    page = client.get('/information-architecture')
 
-    assert 'Themendiagramm' in page
+    assert 'Informationsarchitektur' in page
 
     # the chart is drawn by the browser, the buttons act on it
     assert {button.attrib['data-chart-action']
             for button in page.pyquery('[data-chart-action]')} == {
         'expand', 'collapse', 'fit', 'reset', 'export', 'export-svg'}
 
-    container = page.pyquery('.topic-chart[data-url]')[0]
-    assert container.attrib['data-url'] == 'http://localhost/topic-chart-json'
-    assert container.attrib['data-image-name'] == '{}-topic-chart'.format(
-        normalize_for_url(client.app.org.name))
+    container = page.pyquery('.information-architecture[data-url]')[0]
+    assert container.attrib['data-url'] == 'http://localhost/information-architecture-json'
+    assert container.attrib['data-image-name'] == (
+        '{}-information-architecture'.format(
+            normalize_for_url(client.app.org.name)))
 
     # charts too large for a png are sent to the svg download
     assert 'SVG' in container.attrib['data-export-error-message']
@@ -95,7 +96,7 @@ def test_view_topic_chart_actions(client: Client) -> None:
     assert 'hidden' in reset.attrib
 
 
-def test_view_topic_chart_hidden_topics(client: Client) -> None:
+def test_view_information_architecture_hidden_topics(client: Client) -> None:
 
     client.login_admin()
 
@@ -105,18 +106,20 @@ def test_view_topic_chart_hidden_topics(client: Client) -> None:
     new_page.form['access'] = 'private'
     new_page.form.submit()
 
-    nodes = client.get('/topic-chart-json').json['nodes']
+    nodes = client.get('/information-architecture-json').json['nodes']
     by_name = {node['name']: node for node in nodes}
     assert by_name['Secret Page']['access'] == 'private'
 
     # editors see the private page as well, anonymous users never get here
     editor = client.spawn()
     editor.login_editor()
-    nodes = editor.get('/topic-chart-json').json['nodes']
+    nodes = editor.get('/information-architecture-json').json['nodes']
     assert 'Secret Page' in {node['name'] for node in nodes}
 
 
-def test_view_topic_chart_unpublished_topics(client: Client) -> None:
+def test_view_information_architecture_unpublished_topics(
+    client: Client
+) -> None:
 
     client.login_admin()
 
@@ -130,7 +133,7 @@ def test_view_topic_chart_unpublished_topics(client: Client) -> None:
     expired.publication_end = utcnow() - timedelta(days=1)
     transaction.commit()
 
-    nodes = client.get('/topic-chart-json').json['nodes']
+    nodes = client.get('/information-architecture-json').json['nodes']
     by_name = {node['name']: node for node in nodes}
     assert by_name['Expired Page']['published'] is False
     assert by_name['Organisation']['published'] is True

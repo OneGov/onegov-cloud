@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 from operator import itemgetter
-
 from morepath import redirect
-
-from fs.errors import ResourceNotFound
 from morepath.request import Response
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import (
@@ -367,7 +364,6 @@ def view_archive_download(
         raise HTTPNotFound()
     try:
         zip_dir = filestorage.opendir('archive/zip')
-        content = None
         with zip_dir.open('archive.zip', mode='rb') as zipfile:
             content = zipfile.read()
         if not content:
@@ -377,5 +373,5 @@ def view_archive_download(
             content_type='application/zip',
             content_disposition='inline; filename=Archive.zip'
         )
-    except (FileNotFoundError, ResourceNotFound) as exception:
+    except FileNotFoundError as exception:
         raise HTTPNotFound() from exception

@@ -259,8 +259,8 @@ msgstr "Cartelle"
 msgid "Surveys"
 msgstr "Sondaggi"
 
-msgid "Topic chart"
-msgstr "Diagramma dei temi"
+msgid "Information architecture"
+msgstr "Architettura dell'informazione"
 
 msgid "Modules"
 msgstr "Moduli"
