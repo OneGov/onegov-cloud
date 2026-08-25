@@ -7,6 +7,7 @@ import sedate
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
 from datetime import timedelta
 from enum import Enum
+from io import BytesIO
 from itertools import chain, zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
@@ -410,12 +411,19 @@ class UploadField(FileField):
         filename: str,
         raw_data: str
     ) -> StrictFileDict | FileDict:
-        """ Decodes a resent upload (dictionary-encoded binary) back into a
-        file dict. """
-        return binary_to_dictionary(
-            dictionary_to_binary({'data': raw_data}),
-            filename
-        )
+        """ Restores a file resent across a re-render. """
+        if raw_data.startswith('@'):
+            # already stored: keep the reference, reuse loaded metadata
+            original = self.object_data
+            if isinstance(original, dict) and original.get('data') == raw_data:
+                return cast('StrictFileDict', original)
+            return {'data': raw_data, 'filename': filename}
+
+        # not stored yet: decode and expose as an upload so it can be stored
+        raw = dictionary_to_binary({'data': raw_data})
+        self.file = BytesIO(raw)
+        self.filename = filename
+        return binary_to_dictionary(raw, filename)
 
     def process_fieldstorage(
         self,
@@ -442,7 +450,8 @@ class UploadField(FileField):
     ) -> None:
         if validation_stopped:
             return
-        if self.data and self.mimetypes:
+        # a kept '@<id>' reference has no mimetype; it was validated on upload
+        if self.data and self.mimetypes and self.data.get('mimetype'):
             if self.data.get('mimetype') not in self.mimetypes:
                 raise ValidationError(_(
                     'Files of this type are not supported.'))
@@ -637,62 +646,6 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
             if hasattr(value, 'file') or hasattr(value, 'stream'):
                 self.append_entry_from_field_storage(value)
-
-
-class FormcodeUploadField(UploadField):
-    """ The upload field the formcode parser produces.
-
-    Preserves a resent reference to an already-persisted file (``@<id>``)
-    instead of decoding it as an inline upload, which would lose the file:
-    on edit, uploads saved on a previous submit are resent as references.
-
-    """
-
-    def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-        # keep type name so display/template dispatch still matches
-        self.type = 'UploadField'
-
-    def process_resend(
-        self,
-        filename: str,
-        raw_data: str
-    ) -> StrictFileDict | FileDict:
-        if not raw_data.startswith('@'):
-            # not yet persisted: decode the inline binary
-            return super().process_resend(filename, raw_data)
-
-        # persisted file: reuse loaded metadata if object-bound, else the ref
-        original = self.object_data
-        if isinstance(original, dict) and original.get('data') == raw_data:
-            return cast('StrictFileDict', original)
-        return {'data': raw_data, 'filename': filename}
-
-    def post_validate(
-        self,
-        form: BaseForm,
-        validation_stopped: bool
-    ) -> None:
-        # a kept @<id> reference has no mimetype; it was validated on upload
-        if self.data and not self.data.get('mimetype'):
-            return
-        super().post_validate(form, validation_stopped)
-
-
-class FormcodeUploadMultipleField(UploadMultipleField):
-    """ The multiple upload field the formcode parser produces.
-
-    The resend handling lives on the sub-fields (:class:`FormcodeUploadField`);
-    this field only needs to spawn those and stay transparent to dispatch.
-
-    """
-
-    upload_field_class = FormcodeUploadField
-
-    def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-        # keep type name so display/template dispatch still matches
-        self.type = 'UploadMultipleField'
 
 
 class _DummyFile:

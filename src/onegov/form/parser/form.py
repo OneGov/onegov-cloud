@@ -9,7 +9,7 @@ from onegov.form.core import Form
 from onegov.form.fields import (
     MultiCheckboxField, DateTimeLocalField, URLField, VideoURLField)
 from onegov.form.fields import (
-    FormcodeUploadField, FormcodeUploadMultipleField, TimeField)
+    TimeField, UploadField, UploadMultipleField)
 from onegov.form.parser.core import flatten_fields, parse_formcode, ParsedField
 from onegov.form.validators import LaxDataRequired
 from onegov.form.validators import ExpectedExtensions
@@ -325,7 +325,7 @@ def handle_field(
         # build an accept attribute for the file input
         accept = ','.join(expected_extensions.whitelist)
         builder.add_field(
-            field_class=FormcodeUploadField,
+            field_class=UploadField,
             field_id=field.id,
             label=field.display_label,
             fieldset=field.real_fieldset,
@@ -344,7 +344,7 @@ def handle_field(
         # build an accept attribute for the file input
         accept = ','.join(expected_extensions.whitelist)
         builder.add_field(
-            field_class=FormcodeUploadMultipleField,
+            field_class=UploadMultipleField,
             field_id=field.id,
             label=field.display_label,
             fieldset=field.real_fieldset,

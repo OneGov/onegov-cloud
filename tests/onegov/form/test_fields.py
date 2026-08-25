@@ -14,7 +14,6 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, TagsField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import CssField
-from onegov.form.fields import FormcodeUploadField
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import HtmlField
@@ -264,12 +263,12 @@ def test_upload_field() -> None:
     assert field.mimetypes == WhitelistedMimeType.whitelist
 
 
-def test_formcode_upload_field_resend_reference() -> None:
+def test_upload_field_resend_reference() -> None:
     # a persisted file is resent as an '@<id>' reference: keep must preserve
     # it (not decode as binary); delete/replace ignore it
-    def create_field() -> tuple[Form, FormcodeUploadField]:
+    def create_field() -> tuple[Form, UploadField]:
         form = Form()
-        field = FormcodeUploadField(allowed_mimetypes=('text/plain',))
+        field = UploadField(allowed_mimetypes=('text/plain',))
         field = field.bind(form, 'upload')  # type: ignore[attr-defined]
         return form, field
 
