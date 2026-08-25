@@ -17,6 +17,7 @@ from onegov.file import MultiAssociatedFiles
 from onegov.form.parser import ParsedForm
 from onegov.form.orm_types import Formcode
 from onegov.pay import InvoiceItemMeta, Price, process_payment
+from onegov.reservation.observer import observes
 from onegov.reservation.pricing_scheme import PRICING_SCHEMES
 from sedate import align_date_to_day, utcnow
 from sqlalchemy import column, func
@@ -277,6 +278,10 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     #: the view to open in the calendar (fullCalendar view name)
     view = 'dayGridMonth'
+
+    @observes('parents')
+    def refresh_on_parents_updated(self, parents: list[Resource]) -> None:
+        self.force_update()
 
     @hybrid_property
     def definition(self) -> str | None:
