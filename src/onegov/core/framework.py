@@ -1839,7 +1839,10 @@ def current_language_tween_factory(
     return current_language_tween
 
 
-@Framework.tween_factory(under=current_language_tween_factory)
+@Framework.tween_factory(
+    under=current_language_tween_factory,
+    over=transaction_tween_factory,
+)
 def current_user_tween_factory(
     app: Framework, handler: Callable[[CoreRequest], Response]
 ) -> Callable[[CoreRequest], Response]:

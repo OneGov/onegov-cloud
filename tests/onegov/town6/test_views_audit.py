@@ -117,3 +117,32 @@ def test_audit_trail_shows_deleted_subpage_count(client: Client) -> None:
     assert len(facts) == 1
     assert 'Enthaltene Unterseiten' in facts[0].text_content()
     assert facts[0].text_content().strip().endswith(': 2')
+
+
+def test_audit_trail_records_page_description_update(client: Client) -> None:
+    session = client.app.session()
+    page = PageCollection(session).add_root(
+        'Audited Page',
+        type='topic',
+        meta={'trait': 'page'},
+        content={'lead': 'Original description'},
+    )
+    page_id = page.id
+    transaction.commit()
+
+    client.login_admin()
+    edit_page = client.get(f'/editor/edit/page/{page_id}')
+    edit_page.form['lead'] = 'Updated description'
+    edit_page.form.submit().follow()
+
+    session = client.app.session()
+    entry = (
+        session.query(AuditEntry)
+        .filter_by(
+            target_table='pages',
+            target_id=str(page_id),
+            operation='update',
+        )
+        .one()
+    )
+    assert entry.snapshot['content']['lead'] == 'Updated description'
