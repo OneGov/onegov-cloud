@@ -9,11 +9,69 @@ from onegov.org.layout import AuditTrailLayout
 from onegov.page import Page
 
 
-from typing import TYPE_CHECKING
+from typing import NamedTuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
+
+
+class AuditEntryFact(NamedTuple):
+    label: str
+    value: object
+
+
+def page_snapshot_subpage_count(
+    snapshot: dict[str, object],
+) -> int | None:
+    children = snapshot.get('children')
+    if not isinstance(children, list):
+        return None
+
+    count = 0
+    remaining = children.copy()
+    while remaining:
+        child = remaining.pop()
+        if not isinstance(child, dict):
+            continue
+        count += 1
+        grandchildren = child.get('children')
+        if isinstance(grandchildren, list):
+            remaining.extend(grandchildren)
+    return count
+
+
+def page_audit_entry_facts(
+    entry: AuditEntry,
+    request: OrgRequest,
+) -> tuple[AuditEntryFact, ...]:
+    count = page_snapshot_subpage_count(entry.snapshot)
+    if count is None:
+        return ()
+    return (
+        AuditEntryFact(
+            request.translate(_('Contained subpages')),
+            count,
+        ),
+    )
+
+
+AUDIT_ENTRY_FACTORIES: dict[
+    str,
+    Callable[[AuditEntry, OrgRequest], tuple[AuditEntryFact, ...]],
+] = {
+    'pages': page_audit_entry_facts,
+}
+
+
+def audit_entry_facts(
+    entry: AuditEntry,
+    request: OrgRequest,
+) -> tuple[AuditEntryFact, ...]:
+    factory = AUDIT_ENTRY_FACTORIES.get(entry.target_table)
+    return factory(entry, request) if factory else ()
 
 
 @OrgApp.html(
@@ -54,8 +112,8 @@ def view_audit_trail(
         'title': _('Audit Trail'),
         'entries': entries,
         'filters': filters,
-        'snapshots': {
-            entry.id: json.dumps(entry.snapshot, indent=2) for entry in entries
+        'entry_facts': {
+            entry.id: audit_entry_facts(entry, request) for entry in entries
         },
     }
 
@@ -82,7 +140,6 @@ def view_audit_entry(
             'delete': _('Deleted'),
         }.get(self.operation, self.operation)
     )
-
     return {
         'layout': layout,
         'title': _('Audit Trail Entry'),

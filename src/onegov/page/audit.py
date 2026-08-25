@@ -84,10 +84,11 @@ def page_delete_snapshot(
     return page_tree_snapshot(page, deleted=True)
 
 
-register_audit_model(
-    Page,
-    snapshot=page_snapshot,
-    previous_snapshot=page_previous_snapshot,
-    changed=page_changed,
-    delete_snapshot=page_delete_snapshot,
-)
+def register_page_auditing() -> None:
+    register_audit_model(
+        Page,
+        snapshot=page_snapshot,
+        previous_snapshot=page_previous_snapshot,
+        changed=page_changed,
+        delete_snapshot=page_delete_snapshot,
+    )

@@ -4,6 +4,11 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="audit-trail-page">
+            <p class="audit-trail-intro" i18n:translate>
+                The audit trail shows when and by whom records were created,
+                changed or deleted.
+            </p>
+
             <nav class="audit-trail-filters filter-panel"
                  aria-label="Action"
                  i18n:attributes="aria-label">
@@ -28,7 +33,7 @@
                         <tr>
                             <th scope="col" i18n:translate>When</th>
                             <th scope="col" i18n:translate>Action</th>
-                            <th scope="col" i18n:translate>Page</th>
+                            <th scope="col" i18n:translate>Target</th>
                             <th scope="col" i18n:translate>Who</th>
                             <th scope="col">
                                 <span class="show-for-sr"
@@ -59,12 +64,19 @@
                                           i18n:translate>Deleted</span>
                                 </span>
                             </td>
-                            <td class="audit-trail-page-title">
+                            <td class="audit-trail-target-title">
                                 <strong>
-                                    ${entry.snapshot.get('title', '-')}
+                                    ${entry.snapshot.get(
+                                        'title', entry.target_table
+                                    )}
                                 </strong>
                                 <small class="audit-record-id">
-                                    #${entry.target_id}
+                                    ${entry.target_table} #${entry.target_id}
+                                </small>
+                                <small class="audit-entry-fact"
+                                       tal:repeat="fact
+                                           entry_facts[entry.id]">
+                                    ${fact.label}: ${fact.value}
                                 </small>
                             </td>
                             <td class="audit-trail-user">
@@ -73,18 +85,6 @@
                                 ${entry.username}
                             </td>
                             <td class="audit-trail-action">
-                                <button class="button clear small audit-copy"
-                                        type="button"
-                                        data-clipboard-action="copy"
-                                        tal:attributes="
-                                            data-clipboard-text
-                                            snapshots[entry.id]"
-                                        title="Copy JSON"
-                                        i18n:attributes="title">
-                                    <i class="far fa-copy"
-                                       aria-hidden="true"></i>
-                                    <span i18n:translate>Copy JSON</span>
-                                </button>
                                 <a class="button clear small"
                                    href="${request.link(entry)}">
                                     <span i18n:translate>View</span>

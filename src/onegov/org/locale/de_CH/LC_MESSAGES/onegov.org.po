@@ -4690,8 +4690,21 @@ msgstr "Nach der Änderung"
 msgid "No audit entries yet."
 msgstr "Noch keine Einträge im Audit Trail."
 
+msgid ""
+"The audit trail shows when and by whom records were created, changed or "
+"deleted."
+msgstr ""
+"Der Audit Trail zeigt, wann und von wem Datensätze erstellt, geändert oder "
+"gelöscht wurden."
+
 msgid "Page"
 msgstr "Seite"
+
+msgid "Target"
+msgstr "Ziel"
+
+msgid "Contained subpages"
+msgstr "Enthaltene Unterseiten"
 
 msgid "Changed"
 msgstr "Geändert"

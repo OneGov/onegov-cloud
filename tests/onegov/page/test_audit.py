@@ -6,6 +6,7 @@ import pytest
 
 from onegov.core.orm.audit import AuditEntry, register_audit_handlers
 from onegov.page import Page, PageCollection
+from onegov.page.audit import register_page_auditing
 
 
 from typing import TYPE_CHECKING
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
 
 @pytest.fixture(autouse=True)
 def audit_handlers(session_manager: SessionManager) -> None:
+    register_page_auditing()
     register_audit_handlers(session_manager)
 
 

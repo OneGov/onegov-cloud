@@ -328,6 +328,19 @@ $('.side-panel .expand-people a').on('click', function(e) {
 
 var page_refs = new ClipboardJS('.pageref, .audit-copy');
 page_refs.on('success', function(e) {
+    var trigger = $(e.trigger);
+    if (trigger.hasClass('audit-copy')) {
+        var successLabel = trigger.data('copy-success-label');
+        trigger.addClass('is-copied');
+        trigger.attr('aria-label', successLabel);
+        trigger.attr('title', successLabel);
+        trigger.find('i')
+            .removeClass('far fa-copy')
+            .addClass('fa fa-check');
+        e.clearSelection();
+        return;
+    }
+
     // var success_msg = e.trigger.getAttribute('data-on-success');
     var msgContainer = $('#clipboard-copy');
     msgContainer.toggleClass('hidden');

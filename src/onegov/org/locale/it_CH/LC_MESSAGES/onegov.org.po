@@ -4686,8 +4686,21 @@ msgstr "Dopo la modifica"
 msgid "No audit entries yet."
 msgstr "Nessuna voce nel registro delle modifiche."
 
+msgid ""
+"The audit trail shows when and by whom records were created, changed or "
+"deleted."
+msgstr ""
+"Il registro delle modifiche mostra quando e da chi sono stati creati, "
+"modificati o eliminati i record."
+
 msgid "Page"
 msgstr "Pagina"
+
+msgid "Target"
+msgstr "Destinazione"
+
+msgid "Contained subpages"
+msgstr "Sottopagine contenute"
 
 msgid "Changed"
 msgstr "Modificato"

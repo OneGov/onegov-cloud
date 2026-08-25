@@ -4702,8 +4702,21 @@ msgstr "Après modification"
 msgid "No audit entries yet."
 msgstr "Aucune entrée dans le journal d’audit."
 
+msgid ""
+"The audit trail shows when and by whom records were created, changed or "
+"deleted."
+msgstr ""
+"Le journal d’audit indique quand et par qui des enregistrements ont été "
+"créés, modifiés ou supprimés."
+
 msgid "Page"
 msgstr "Page"
+
+msgid "Target"
+msgstr "Cible"
+
+msgid "Contained subpages"
+msgstr "Sous-pages contenues"
 
 msgid "Changed"
 msgstr "Modifié"

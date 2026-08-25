@@ -72,11 +72,12 @@ table.audit-trail {
         }
     }
 
-    .audit-trail-page-title strong {
+    .audit-trail-target-title strong {
         display: block;
     }
 
-    .audit-record-id {
+    .audit-record-id,
+    .audit-entry-fact {
         color: $dark-gray;
         display: block;
         margin-top: .15rem;
@@ -91,6 +92,10 @@ table.audit-trail {
             display: inline-flex;
             gap: .4rem;
             margin: 0;
+
+            &:hover {
+                padding: 1rem 1.5rem !important;
+            }
         }
     }
 }
@@ -124,7 +129,7 @@ table.audit-trail {
     border-bottom: 1px solid $light-gray;
     display: flex;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     padding-bottom: 1.5rem;
 }
 
@@ -138,40 +143,27 @@ table.audit-trail {
         font-size: 1.1rem;
     }
 
-    small {
+    small.audit-entry-details {
         color: $dark-gray;
+        display: flex;
+        flex-wrap: wrap;
+        gap: .25rem 1rem;
         margin-top: .2rem;
-    }
-}
 
-.audit-entry-meta {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin: 0 0 2rem;
+        span {
+            align-items: center;
+            display: inline-flex;
+            gap: .35rem;
+        }
 
-    > div {
-        background: $smoke;
-        border-radius: .4rem;
-        padding: 1rem;
+        i {
+            color: $gray;
+        }
     }
 
-    dt {
-        color: $dark-gray;
-        font-size: .75rem;
-        letter-spacing: .04em;
-        margin-bottom: .35rem;
-        text-transform: uppercase;
-    }
-
-    dd {
-        margin: 0;
-    }
-
-    code {
-        background: none;
-        border: 0;
-        padding: 0;
+    .fa-external-link-alt {
+        font-size: .7em;
+        margin-left: .2rem;
     }
 }
 
@@ -181,11 +173,41 @@ table.audit-trail {
     margin-bottom: 1rem;
     overflow: hidden;
 
-    h2 {
+    .audit-snapshot-heading {
+        align-items: center;
         background: $smoke;
-        font-size: 1rem;
-        margin: 0;
-        padding: 1rem 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        padding: .5rem .75rem .5rem 1.25rem;
+
+        h2 {
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .audit-copy {
+            align-items: center;
+            display: inline-flex;
+            font-size: 1.25rem;
+            height: 2.75rem;
+            justify-content: center;
+            margin: 0;
+            padding: 0 !important;
+            width: 2.75rem;
+
+            &:hover,
+            &:focus {
+                padding: 0 !important;
+            }
+
+            &.is-copied {
+                color: $success-color;
+            }
+
+            i {
+                margin: 0;
+            }
+        }
     }
 }
 
@@ -228,9 +250,5 @@ pre.audit-snapshot {
         .audit-trail-action {
             text-align: left;
         }
-    }
-
-    .audit-entry-meta {
-        grid-template-columns: 1fr;
     }
 }
