@@ -24,10 +24,17 @@
                         <a href="${setting.link}">
                             <i class="fa ${setting.icon}"
                                aria-hidden="true"></i>
-                            <span>
+                            <span data-settings-title="">
                                 ${setting.title}
                             </span>
                         </a>
+                        <ul class="settings-search-results"
+                            data-settings-fields="" hidden="hidden">
+                            <li tal:repeat="field setting.fields"
+                                data-settings-field="" hidden="hidden">
+                                <a href="${field.link}">${field.title}</a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>

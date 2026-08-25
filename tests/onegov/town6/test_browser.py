@@ -32,14 +32,24 @@ def test_settings_search(browser: ExtendedBrowser) -> None:
     browser.visit('/settings')
 
     search = browser.find_by_css('[data-settings-search]')
-    search.fill('gever api')
+    search.fill('primärfarbe')
 
-    visible = [
-        setting.text.strip()
+    visible_settings = [
+        setting
         for setting in browser.find_by_css('[data-settings-item]')
         if setting.is_visible()
     ]
-    assert visible == ['Gever API']
+    assert len(visible_settings) == 1
+
+    visible_fields = [
+        field
+        for field in browser.find_by_css('[data-settings-field]')
+        if field.is_visible()
+    ]
+    assert [field.text.strip() for field in visible_fields] == ['Primärfarbe']
+    field_link = visible_fields[0].find_by_tag('a')['href']
+    assert field_link is not None
+    assert field_link.endswith('/appearance-settings#primary_color')
 
     search.fill('not a setting')
     assert not any(

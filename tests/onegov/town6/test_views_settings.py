@@ -67,7 +67,8 @@ def test_all_settings_are_reachable(client: Client) -> None:
     client.login_admin()
     page = client.get('/settings')
     links = [
-        e.attrib.get('href') for e in page.pyquery('.org-settings a[href]')
+        e.attrib.get('href')
+        for e in page.pyquery('[data-settings-item] > a[href]')
     ]
 
     assert all(client.get(link).status_code == 200 for link in links)
@@ -81,6 +82,15 @@ def test_settings_search_markup(client: Client) -> None:
     assert page.pyquery('[data-settings-no-results]').attr('hidden')
     assert page.pyquery('.settings-category')
     assert page.pyquery('[data-settings-item]')
+
+    primary_color = page.pyquery(
+        '.appearance-settings '
+        '[data-settings-field] a[href$="#primary_color"]'
+    )
+    assert primary_color.text() == 'Primärfarbe'
+    assert primary_color.attr('href').endswith(
+        '/appearance-settings#primary_color'
+    )
 
 
 def test_general_settings(client: Client) -> None:

@@ -7,12 +7,14 @@ from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
 from onegov.api.models import ApiKey
+from onegov.core.directives import fetch_form_class
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
 from onegov.event.models.event import EventFilterValue
 from onegov.form import as_internal_id
 from onegov.form import Form
+from onegov.form.utils import get_fields_from_class
 from onegov.org import _
 from onegov.org.app import OrgApp
 from onegov.org.forms import AnalyticsSettingsForm
@@ -99,7 +101,26 @@ def view_settings(
                 ):
                     continue
                 setting['title'] = setting['setting']
-                setting['link'] = request.link(self, name=setting['name'])
+                setting_link = request.link(self, name=setting['name'])
+                setting['link'] = setting_link
+                form_class = fetch_form_class(action.form, self, request)
+                fields: list[dict[str, str]] = []
+
+                for name, field in get_fields_from_class(form_class):
+                    label = field.kwargs.get('label')
+                    if label is None and field.args:
+                        label = field.args[0]
+                    if not isinstance(label, str):
+                        continue
+
+                    fields.append(
+                        {
+                            'title': request.translate(label),
+                            'link': f'{setting_link}#{name}',
+                        }
+                    )
+
+                setting['fields'] = fields
 
                 yield setting
 

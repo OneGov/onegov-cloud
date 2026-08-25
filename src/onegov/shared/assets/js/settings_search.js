@@ -20,8 +20,30 @@
         var visibleSettings = 0;
 
         settings.forEach(function(setting) {
-            var title = setting.textContent.trim().toLocaleLowerCase();
-            var visible = title.indexOf(query) !== -1;
+            var title = setting.querySelector('[data-settings-title]');
+            var fieldList = setting.querySelector('[data-settings-fields]');
+            var fields = Array.prototype.slice.call(
+                setting.querySelectorAll('[data-settings-field]')
+            );
+            var titleMatches = title.textContent
+                .trim()
+                .toLocaleLowerCase()
+                .indexOf(query) !== -1;
+            var visibleFields = 0;
+
+            fields.forEach(function(field) {
+                var fieldMatches = query !== '' && field.textContent
+                    .trim()
+                    .toLocaleLowerCase()
+                    .indexOf(query) !== -1;
+
+                field.hidden = !fieldMatches;
+                visibleFields += fieldMatches ? 1 : 0;
+            });
+
+            fieldList.hidden = query === '' || visibleFields === 0;
+
+            var visible = query === '' || titleMatches || visibleFields > 0;
 
             setting.hidden = !visible;
             visibleSettings += visible ? 1 : 0;
@@ -36,4 +58,4 @@
 
         noResults.hidden = visibleSettings !== 0;
     });
-}());
+})();
