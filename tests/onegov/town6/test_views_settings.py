@@ -79,18 +79,61 @@ def test_settings_search_markup(client: Client) -> None:
     page = client.get('/settings')
 
     assert page.pyquery('[data-settings-search]').attr('type') == 'search'
-    assert page.pyquery('[data-settings-no-results]').attr('hidden')
+    assert page.pyquery('[data-settings-search-results]').attr('hidden')
     assert page.pyquery('.settings-category')
     assert page.pyquery('[data-settings-item]')
 
     primary_color = page.pyquery(
-        '.appearance-settings '
-        '[data-settings-field] a[href$="#primary_color"]'
+        '[data-settings-result-kind="field"]' '[href$="#primary_color"]'
     )
-    assert primary_color.text() == 'Primärfarbe'
+    assert primary_color.find('strong').text() == 'Primärfarbe'
     assert primary_color.attr('href').endswith(
         '/appearance-settings#primary_color'
     )
+    assert 'Primärfarbe' in primary_color.attr('data-settings-search-text')
+    assert 'Primary Color' in primary_color.attr('data-settings-search-text')
+
+    reply_to = page.pyquery(
+        '[data-settings-result-kind="field"][href$="#reply_to"]'
+    )
+    assert 'Antworten an automatisch generierte E-Mails' in reply_to.text()
+    assert 'Replies to automated e-mails' in reply_to.attr(
+        'data-settings-search-text'
+    )
+
+
+def test_settings_search_french_locale(client: Client) -> None:
+    client.login_admin()
+    organisation = client.get('/organisation-settings')
+    organisation.form['locales'] = 'fr_CH'
+    organisation.form.submit()
+    client.set_cookie('locale', 'fr_CH')
+    page = client.get('/settings')
+
+    primary_color = page.pyquery(
+        '[data-settings-result-kind="field"]' '[href$="#primary_color"]'
+    )
+    assert primary_color.find('strong').text() == 'Couleur primaire'
+    assert 'Couleur primaire' in primary_color.attr(
+        'data-settings-search-text'
+    )
+    assert 'Primary Color' in primary_color.attr('data-settings-search-text')
+
+    reply_to = page.pyquery(
+        '[data-settings-result-kind="field"][href$="#reply_to"]'
+    )
+    assert 'Les réponses aux e-mails automatisés' in reply_to.text()
+    assert 'Replies to automated e-mails' in reply_to.attr(
+        'data-settings-search-text'
+    )
+
+    announcement = page.pyquery(
+        '[data-settings-result-kind="fieldset"]'
+        '[href$="#fieldset-announcement"]'
+    )
+    assert announcement.find('strong').text() == 'Annonce'
+    assert 'Announcement' in announcement.attr('data-settings-search-text')
+    assert client.get('/header-settings').pyquery('#fieldset-announcement')
 
 
 def test_general_settings(client: Client) -> None:

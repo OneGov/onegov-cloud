@@ -32,31 +32,50 @@ def test_settings_search(browser: ExtendedBrowser) -> None:
     browser.visit('/settings')
 
     search = browser.find_by_css('[data-settings-search]')
-    search.fill('primärfarbe')
-
-    visible_settings = [
-        setting
-        for setting in browser.find_by_css('[data-settings-item]')
-        if setting.is_visible()
-    ]
-    assert len(visible_settings) == 1
-
-    visible_fields = [
-        field
-        for field in browser.find_by_css('[data-settings-field]')
-        if field.is_visible()
-    ]
-    assert [field.text.strip() for field in visible_fields] == ['Primärfarbe']
-    field_link = visible_fields[0].find_by_tag('a')['href']
-    assert field_link is not None
-    assert field_link.endswith('/appearance-settings#primary_color')
-
-    search.fill('not a setting')
-    assert not any(
+    dropdown = browser.find_by_css('[data-settings-search-results]')
+    visible_cards = sum(
         setting.is_visible()
         for setting in browser.find_by_css('[data-settings-item]')
     )
+    search.fill('primärfarbe')
+
+    assert dropdown.is_visible()
+    assert visible_cards == sum(
+        setting.is_visible()
+        for setting in browser.find_by_css('[data-settings-item]')
+    )
+    visible_results = [
+        result
+        for result in browser.find_by_css('[data-settings-search-result]')
+        if result.is_visible()
+    ]
+    assert len(visible_results) == 1
+    assert visible_results[0].find_by_tag('strong').text == 'Primärfarbe'
+    field_link = visible_results[0]['href']
+    assert field_link is not None
+    assert field_link.endswith('/appearance-settings#primary_color')
+
+    search.fill('replies to automated e-mails')
+    visible_results = [
+        result
+        for result in browser.find_by_css('[data-settings-search-result]')
+        if result.is_visible()
+    ]
+    assert len(visible_results) == 1
+    field_link = visible_results[0]['href']
+    assert field_link is not None
+    assert field_link.endswith('/organisation-settings#reply_to')
+
+    search.fill('not a setting')
+    assert not any(
+        result.is_visible()
+        for result in browser.find_by_css('[data-settings-search-result]')
+    )
     assert browser.find_by_css('[data-settings-no-results]').is_visible()
+    assert visible_cards == sum(
+        setting.is_visible()
+        for setting in browser.find_by_css('[data-settings-item]')
+    )
 
 
 @pytest.mark.xdist_group(name="browser")

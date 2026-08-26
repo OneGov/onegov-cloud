@@ -2,60 +2,56 @@
     'use strict';
 
     var search = document.querySelector('[data-settings-search]');
+    var dropdown = document.querySelector('[data-settings-search-results]');
     var noResults = document.querySelector('[data-settings-no-results]');
 
-    if (!search || !noResults) {
+    if (!search || !dropdown || !noResults) {
         return;
     }
 
-    var categories = Array.prototype.slice.call(
-        document.querySelectorAll('.settings-category')
-    );
-    var settings = Array.prototype.slice.call(
-        document.querySelectorAll('[data-settings-item]')
+    var results = Array.prototype.slice.call(
+        document.querySelectorAll('[data-settings-search-result]')
     );
 
-    search.addEventListener('input', function() {
+    var closeDropdown = function() {
+        dropdown.hidden = true;
+        search.setAttribute('aria-expanded', 'false');
+    };
+
+    var updateResults = function() {
         var query = search.value.trim().toLocaleLowerCase();
-        var visibleSettings = 0;
+        var visibleResults = 0;
 
-        settings.forEach(function(setting) {
-            var title = setting.querySelector('[data-settings-title]');
-            var fieldList = setting.querySelector('[data-settings-fields]');
-            var fields = Array.prototype.slice.call(
-                setting.querySelectorAll('[data-settings-field]')
-            );
-            var titleMatches = title.textContent
-                .trim()
-                .toLocaleLowerCase()
-                .indexOf(query) !== -1;
-            var visibleFields = 0;
+        if (query === '') {
+            closeDropdown();
+            return;
+        }
 
-            fields.forEach(function(field) {
-                var fieldMatches = query !== '' && field.textContent
-                    .trim()
-                    .toLocaleLowerCase()
-                    .indexOf(query) !== -1;
+        results.forEach(function(result) {
+            var searchText = result.getAttribute(
+                'data-settings-search-text'
+            ).toLocaleLowerCase();
+            var visible = searchText.indexOf(query) !== -1;
 
-                field.hidden = !fieldMatches;
-                visibleFields += fieldMatches ? 1 : 0;
-            });
-
-            fieldList.hidden = query === '' || visibleFields === 0;
-
-            var visible = query === '' || titleMatches || visibleFields > 0;
-
-            setting.hidden = !visible;
-            visibleSettings += visible ? 1 : 0;
+            result.hidden = !visible;
+            visibleResults += visible ? 1 : 0;
         });
 
-        categories.forEach(function(category) {
-            var visible = category.querySelector(
-                '[data-settings-item]:not([hidden])'
-            );
-            category.hidden = !visible;
-        });
+        noResults.hidden = visibleResults !== 0;
+        dropdown.hidden = false;
+        search.setAttribute('aria-expanded', 'true');
+    };
 
-        noResults.hidden = visibleSettings !== 0;
+    search.addEventListener('input', updateResults);
+    search.addEventListener('focus', updateResults);
+    search.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+    document.addEventListener('click', function(event) {
+        if (!search.parentElement.contains(event.target)) {
+            closeDropdown();
+        }
     });
 })();

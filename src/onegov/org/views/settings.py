@@ -14,6 +14,7 @@ from onegov.core.templates import render_macro
 from onegov.event.models.event import EventFilterValue
 from onegov.form import as_internal_id
 from onegov.form import Form
+from onegov.form.utils import extract_text_from_html
 from onegov.form.utils import get_fields_from_class
 from onegov.org import _
 from onegov.org.app import OrgApp
@@ -76,6 +77,17 @@ def view_settings(
     layout = layout or SettingsLayout(self, request)
     request.include('settings_search')
 
+    def translated_text(value: object) -> tuple[str, str]:
+        if not isinstance(value, str):
+            return '', ''
+
+        source = extract_text_from_html(str(value))
+        translated = extract_text_from_html(str(request.translate(value)))
+        return translated, source
+
+    def search_text(*values: str) -> str:
+        return ' '.join(dict.fromkeys(value for value in values if value))
+
     def query_settings() -> Iterator[dict[str, Any]]:
         q = Query('view').filter(model=Organisation)
 
@@ -100,27 +112,63 @@ def view_settings(
                     and not request.app.org.ris_enabled | False
                 ):
                     continue
-                setting['title'] = setting['setting']
+                title, source_title = translated_text(setting['setting'])
+                setting['title'] = title
+                setting['search_text'] = search_text(title, source_title)
                 setting_link = request.link(self, name=setting['name'])
                 setting['link'] = setting_link
                 form_class = fetch_form_class(action.form, self, request)
                 fields: list[dict[str, str]] = []
+                fieldsets: list[dict[str, str]] = []
+                seen_fieldsets: set[str] = set()
 
                 for name, field in get_fields_from_class(form_class):
                     label = field.kwargs.get('label')
                     if label is None and field.args:
                         label = field.args[0]
-                    if not isinstance(label, str):
+                    field_title, source_field_title = translated_text(label)
+                    if not field_title:
                         continue
+
+                    description, source_description = translated_text(
+                        field.kwargs.get('description')
+                    )
+                    fieldset, source_fieldset = translated_text(
+                        field.kwargs.get('fieldset')
+                    )
+
+                    if fieldset and source_fieldset not in seen_fieldsets:
+                        fieldset_id = source_fieldset.lower().replace(' ', '-')
+                        fieldsets.append(
+                            {
+                                'title': fieldset,
+                                'search_text': search_text(
+                                    fieldset, source_fieldset
+                                ),
+                                'link': (
+                                    f'{setting_link}#fieldset-{fieldset_id}'
+                                ),
+                            }
+                        )
+                        seen_fieldsets.add(source_fieldset)
 
                     fields.append(
                         {
-                            'title': request.translate(label),
+                            'title': field_title,
+                            'description': description,
+                            'fieldset': fieldset,
+                            'search_text': search_text(
+                                field_title,
+                                source_field_title,
+                                description,
+                                source_description,
+                            ),
                             'link': f'{setting_link}#{name}',
                         }
                     )
 
                 setting['fields'] = fields
+                setting['fieldsets'] = fieldsets
 
                 yield setting
 
@@ -147,7 +195,8 @@ def view_settings(
     return {
         'layout': layout,
         'title': _('Settings'),
-        'settings_by_category': settings_by_category
+        'settings_by_category': settings_by_category,
+        'settings_search_results': settings,
     }
 
 

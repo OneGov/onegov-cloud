@@ -9,11 +9,58 @@
                        i18n:translate="">Search</label>
                 <input id="settings-search" data-settings-search=""
                        type="search" placeholder="Search"
-                       i18n:attributes="placeholder" autocomplete="off" />
+                       i18n:attributes="placeholder" autocomplete="off"
+                       role="combobox" aria-autocomplete="list"
+                       aria-controls="settings-search-results"
+                       aria-expanded="false" />
+                <div id="settings-search-results"
+                     class="settings-search-dropdown"
+                     data-settings-search-results="" role="listbox"
+                     hidden="hidden">
+                    <tal:s tal:repeat="setting settings_search_results">
+                        <a href="${setting.link}"
+                           class="settings-search-result"
+                           data-settings-search-result=""
+                           data-settings-result-kind="section"
+                           data-settings-search-text="${setting.search_text}"
+                           role="option" hidden="hidden">
+                            <strong>${setting.title}</strong>
+                        </a>
+                        <a tal:repeat="fieldset setting.fieldsets"
+                           href="${fieldset.link}"
+                           class="settings-search-result"
+                           data-settings-search-result=""
+                           data-settings-result-kind="fieldset"
+                           data-settings-search-text="${fieldset.search_text}"
+                           role="option" hidden="hidden">
+                            <strong>${fieldset.title}</strong>
+                            <span>${setting.title}</span>
+                        </a>
+                        <a tal:repeat="field setting.fields"
+                           href="${field.link}"
+                           class="settings-search-result"
+                           data-settings-search-result=""
+                           data-settings-result-kind="field"
+                           data-settings-search-text="${field.search_text}"
+                           role="option" hidden="hidden">
+                            <strong>${field.title}</strong>
+                            <span>
+                                ${setting.title}
+                                <tal:f tal:condition="field.fieldset">
+                                    · ${field.fieldset}
+                                </tal:f>
+                            </span>
+                            <small tal:condition="field.description">
+                                ${field.description}
+                            </small>
+                        </a>
+                    </tal:s>
+                    <p data-settings-no-results="" hidden="hidden"
+                       aria-live="polite" i18n:translate="">
+                        No entries found.
+                    </p>
+                </div>
             </div>
-
-            <p data-settings-no-results="" hidden="hidden"
-               aria-live="polite" i18n:translate="">No entries found.</p>
 
             <div tal:repeat="item settings_by_category"
                  class="settings-category">
@@ -24,17 +71,10 @@
                         <a href="${setting.link}">
                             <i class="fa ${setting.icon}"
                                aria-hidden="true"></i>
-                            <span data-settings-title="">
+                            <span>
                                 ${setting.title}
                             </span>
                         </a>
-                        <ul class="settings-search-results"
-                            data-settings-fields="" hidden="hidden">
-                            <li tal:repeat="field setting.fields"
-                                data-settings-field="" hidden="hidden">
-                                <a href="${field.link}">${field.title}</a>
-                            </li>
-                        </ul>
                     </li>
                 </ul>
             </div>
