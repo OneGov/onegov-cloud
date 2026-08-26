@@ -21,8 +21,8 @@ from onegov.user import User
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any
+    from onegov.core import Identity
     from onegov.core.security.roles import Intent
-    from morepath import Identity
 
 
 """

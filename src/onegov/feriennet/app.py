@@ -22,7 +22,7 @@ from onegov.pay.models.invoice_reference import Schema
 from onegov.user import User, UserCollection
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from onegov.feriennet.sponsors import Sponsor
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 class FeriennetApp(TownApp):
 
-    request_class = FeriennetRequest
+    request_class: type[FeriennetRequest[Self]] = FeriennetRequest
 
     def fts_may_use_private_search(
         self,
