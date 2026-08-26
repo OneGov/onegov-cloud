@@ -4122,13 +4122,22 @@ def test_allocation_rules_on_rooms(client: Client) -> None:
     )
     page.form['title'] = 'Täglich'
     page.form['extend'] = 'daily'
-    page.form['start'] = '2019-01-01'
-    page.form['end'] = '2019-01-02'
+    page.form['start'] = '2019-01-02'
+    page.form['end'] = '2019-01-01'
     page.form['as_whole_day'] = 'yes'
 
     page.select_checkbox('except_for', 'Sa')
     page.select_checkbox('except_for', 'So')
 
+    page = page.form.submit()
+    assert 'Start Datum vor Ende' in page
+
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2022-01-02'
+    page = page.form.submit()
+    assert 'maximal zwei Jahre lang' in page
+
+    page.form['end'] = '2019-01-02'
     page = page.form.submit().follow()
 
     assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page
