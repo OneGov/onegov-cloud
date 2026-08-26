@@ -6,12 +6,15 @@ import niquests
 import os
 import pytest
 import transaction
+import vcr  # type: ignore[import-untyped]
 
 from babel import Locale as BabelLocale
-from babel.dates import format_date as babel_format_date
+from base64 import b64decode
+from babel.dates import format_datetime as babel_format_datetime
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from freezegun import freeze_time
+from io import BytesIO
 from markupsafe import Markup
 from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import (DirectoryEntryCollection,
@@ -21,6 +24,7 @@ from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import EventCollection, OccurrenceCollection, Event
 from onegov.event.utils import as_rdates
 from onegov.file.models import SigningRequest
+from onegov.file.sign.swisscom_ais import SwisscomAIS
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import (
     ExtendedDirectoryEntry,
@@ -43,16 +47,18 @@ from onegov.user.collections import TANCollection
 from pathlib import Path
 from sedate import ensure_timezone, to_timezone, utcnow
 from sqlalchemy.orm import close_all_sessions
+from webtest import Upload
+from onegov.core.utils import module_path
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.onegov.org.common import register_echo_handler
 from tests.onegov.org.conftest import Client
-from tests.shared.utils import add_reservation
+from tests.shared.utils import add_reservation, extract_pdf_text
 from unittest.mock import patch, Mock
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Mapping
     from onegov.org.models import ExtendedDirectory
     from onegov.ticket.handler import HandlerRegistry
     from sqlalchemy.orm import Session
@@ -760,6 +766,374 @@ def test_daily_reservation_overview_delivery_times(
         client.get(url)
     assert len(os.listdir(client.app.maildir)) == 0
 
+
+def test_send_daily_reservation_reminders_only_ten_days_ahead(
+    client: Client[TestOrgApp]
+) -> None:
+    """Only the reservation exactly 10 days ahead gets a reminder e-mail."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
+    fancy.enable_reservation_reminders = True
+
+    session = client.app.session()
+
+    # cronjob fires at 06:56 Europe/Zurich; freeze at a fixed "now".
+    # January Zurich = CET (UTC+1), so 06:56 Zurich = 05:56 UTC.
+    now_utc = datetime(2025, 1, 10, 5, 56)
+
+    # a reservation 8, 9, 10 and 11 days ahead (12:00 Zurich each day)
+    for days in (8, 9, 10, 11):
+        day = (now_utc + timedelta(days=days)).date()
+        add_reservation(
+            fancy,
+            session,
+            email=f'reservee-{days}@example.org',
+            start=datetime(day.year, day.month, day.day, 12, 0),
+            end=datetime(day.year, day.month, day.day, 13, 0),
+        )
+
+    # the cronjob only considers accepted reservations
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    # attach a submission to the 10-day reservation (the confirmation)
+    resource_name = fancy.name
+    ten_days = (now_utc + timedelta(days=10)).date()
+    ten_day_reservation = session.query(Reservation).filter(
+        Reservation.email == 'reservee-10@example.org'
+    ).one()
+    submissions = FormSubmissionCollection(session)
+    submissions.add_external(
+        form=fancy.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+        state='complete',
+        id=ten_day_reservation.token,
+    )
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    # only the 10-day reservation is reminded; the 8, 9 and 11-day ones
+    # fall outside the window and must not trigger any email
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee-10@example.org'
+    assert 'Erinnerung: Ihre Reservation für Fancy Room' in mail['Subject']
+    body = mail['TextBody']
+    assert 'Erinnerung an Ihre bevorstehende Reservation' in body
+    assert 'Erinnerung an Ihre bevorstehenden Reservationen' not in body
+    assert f'/resource/{resource_name}' in body
+    assert str(ten_days.weekday()) in body
+    assert str(ten_days.month) in body
+    assert str(ten_days.year) in body
+    assert '12:00' in body
+    assert '13:00' in body
+    assert 'Anzahl' in body
+    # the reservation confirmation
+    assert 'Alice Miller' in body
+
+
+def test_send_daily_reservation_reminders_groups_by_recipient(
+    client: Client[TestOrgApp]
+) -> None:
+    """A person reserving multiple rooms on the same day gets a single
+    email listing all reservations."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.enable_reservation_reminders = True
+    plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
+    plain.enable_reservation_reminders = True
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # the same person reserves two different rooms on the target day
+    add_reservation(
+        fancy,
+        session,
+        email='reservee@example.org',
+        start=datetime(day.year, day.month, day.day, 12, 0),
+        end=datetime(day.year, day.month, day.day, 13, 0),
+    )
+    add_reservation(
+        plain,
+        session,
+        email='reservee@example.org',
+        start=datetime(day.year, day.month, day.day, 14, 0),
+        end=datetime(day.year, day.month, day.day, 15, 0),
+    )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    assert 'Erinnerung: Ihre bevorstehenden Reservationen' in mail['Subject']
+    body = mail['TextBody']
+    assert 'Erinnerung an Ihre bevorstehenden Reservationen' in body
+    assert 'Erinnerung an Ihre bevorstehende Reservation' not in body
+    assert all(item in body for item in (
+        'Fancy Room', 'Plain Room', 'Anzahl',
+        '12:00', '13:00', '14:00', '15:00'
+    ))
+
+
+def test_send_daily_reservation_reminders_shared_confirmation(
+    client: Client[TestOrgApp]
+) -> None:
+    """Reservations booked in one request share a ticket and a single
+    confirmation, so the confirmation is shown only once."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
+    fancy.enable_reservation_reminders = True
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # two slots of the same resource, reserved in a single request (one token)
+    slots = [
+        (datetime(day.year, day.month, day.day, 12, 0),
+         datetime(day.year, day.month, day.day, 13, 0)),
+        (datetime(day.year, day.month, day.day, 14, 0),
+         datetime(day.year, day.month, day.day, 15, 0)),
+    ]
+    for start, end in slots:
+        fancy.scheduler.allocate((start, end), partly_available=True)
+
+    token = fancy.scheduler.reserve('reservee@example.org', slots)
+    fancy.scheduler.approve_reservations(token)
+    with session.no_autoflush:
+        TicketCollection(session).open_ticket(
+            handler_code='RSV', handler_id=token.hex
+        )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    submissions = FormSubmissionCollection(session)
+    submissions.add_external(
+        form=fancy.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+        state='complete',
+        id=token,
+    )
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    body = mail['TextBody']
+    # both slots are listed
+    assert any(item in body for item in (
+        'Erinnerung an Ihre bevorstehenden Reservationen',
+        'Montag, 20. Januar 2025',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+    ))
+    # ... but the confirmation appears only once
+    assert body.count('Fancy Room') == 2  # 2 slots
+    assert body.count('Reservationsbestätigung') == 1
+    assert body.count('Alice') == 1
+    assert body.count('Miller') == 1
+
+
+def test_send_daily_reservation_reminders_multiple_requests(
+    client: Client[TestOrgApp]
+) -> None:
+    """A person booking several separate requests gets one email with a
+    section (date(s) and confirmation) for each request."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    fancy = resources.add('Fancy Room', 'Europe/Zurich', type='room')
+    fancy.definition = """
+        Name = ___
+    """
+    fancy.enable_reservation_reminders = True
+    plain = resources.add('Plain Room', 'Europe/Zurich', type='room')
+    plain.definition = """
+        Name = ___
+    """
+    plain.enable_reservation_reminders = True
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # first request: two slots of Fancy Room, sharing one token
+    fancy_slots = [
+        (datetime(day.year, day.month, day.day, 12, 0),
+         datetime(day.year, day.month, day.day, 13, 0)),
+        (datetime(day.year, day.month, day.day, 14, 0),
+         datetime(day.year, day.month, day.day, 15, 0)),
+    ]
+    # second request: one slot of Plain Room, its own token
+    plain_slots = [
+        (datetime(day.year, day.month, day.day, 17, 0),
+         datetime(day.year, day.month, day.day, 20, 0)),
+    ]
+    for resource, slots in ((fancy, fancy_slots), (plain, plain_slots)):
+        for start, end in slots:
+            resource.scheduler.allocate((start, end), partly_available=True)
+        token = resource.scheduler.reserve('reservee@example.org', slots)
+        resource.scheduler.approve_reservations(token)
+        with session.no_autoflush:
+            TicketCollection(session).open_ticket(
+                handler_code='RSV', handler_id=token.hex
+            )
+        submissions = FormSubmissionCollection(session)
+        submissions.add_external(
+            form=resource.form_class(data={'name': 'Alice Miller'}),  # type: ignore[misc]
+            state='complete',
+            id=token,
+        )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'reservee@example.org'
+    body = mail['TextBody']
+    assert any(item in body for item in (
+        'Erinnerung an Ihre bevorstehenden Reservationen',
+        'Montag, 20. Januar 2025',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+        '17:00',
+        '20:00',
+    ))
+    # two sections, one for each request
+    assert body.count('Fancy Room') == 2  # 2 slots
+    assert body.count('Plain Room') == 1  # 1 slot
+    assert body.count('Reservationsbestätigung') == 2
+    assert body.count('Alice') == 2
+    assert body.count('Miller') == 2
+
+
+def test_send_daily_reservation_reminders_only_enabled_resources(
+    client: Client[TestOrgApp]
+) -> None:
+    """Reminders are sent only for resources with reminders enabled;
+    reservations of disabled resources are ignored."""
+    from onegov.reservation import Reservation
+
+    resources = ResourceCollection(client.app.libres_context)
+    enabled = resources.add('Enabled Room', 'Europe/Zurich', type='room')
+    enabled.enable_reservation_reminders = True
+    disabled = resources.add('Disabled Room', 'Europe/Zurich', type='room')
+    disabled.enable_reservation_reminders = False
+
+    session = client.app.session()
+
+    now_utc = datetime(2025, 1, 10, 5, 56)
+    day = (now_utc + timedelta(days=10)).date()
+
+    # one person books both rooms; another books only the disabled room
+    add_reservation(
+        enabled,
+        session,
+        email='mixed@example.org',
+        start=datetime(day.year, day.month, day.day, 12, 0),
+        end=datetime(day.year, day.month, day.day, 13, 0),
+    )
+    add_reservation(
+        disabled,
+        session,
+        email='mixed@example.org',
+        start=datetime(day.year, day.month, day.day, 14, 0),
+        end=datetime(day.year, day.month, day.day, 15, 0),
+    )
+    add_reservation(
+        disabled,
+        session,
+        email='disabled-only@example.org',
+        start=datetime(day.year, day.month, day.day, 16, 0),
+        end=datetime(day.year, day.month, day.day, 17, 0),
+    )
+
+    for reservation in session.query(Reservation):
+        reservation.data = {'accepted': True}
+
+    transaction.commit()
+
+    job = get_cronjob_by_name(client.app, 'send_daily_reservation_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    with freeze_time(now_utc, tick=True):
+        client.get(url)
+
+    # only the person with an enabled-room reservation is reminded, and their
+    # disabled-room reservation is not listed
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = client.get_email(0)
+    assert mail is not None
+    assert mail['To'] == 'mixed@example.org'
+    body = mail['TextBody']
+    assert 'Enabled Room' in body
+    assert 'Disabled Room' not in body
 
 
 @pytest.mark.parametrize('secret_content_allowed', [False, True])
@@ -2739,22 +3113,42 @@ def test_wil_daily_event_import(
 def _fmt_date(dt: datetime) -> str:
     """Format a datetime the way the admin notification templates do."""
     tz = ensure_timezone('Europe/Zurich')
-    return babel_format_date(
-        to_timezone(dt, tz), 'd. MMMM yyyy',
+    return babel_format_datetime(
+        to_timezone(dt, tz), 'dd.MM.yyyy HH:mm',
         locale=BabelLocale.parse('de_CH')
     )
 
 
+def _ais_cassette() -> Any:
+    """Replays a recorded Swisscom AIS response for each signing request."""
+    return vcr.use_cassette(
+        module_path('tests.onegov.org', 'cassettes/ais-success.json'),
+        record_mode='none',
+        allow_playback_repeats=True,
+    )
+
+
+def _assert_signed_pdf(attachment: Mapping[str, Any]) -> None:
+    """The attached pdf carries a digital signature."""
+    content = b64decode(attachment['Content'])
+    assert b'/SigFlags' in content
+    assert b'/ByteRange' in content
+    assert b'adbe.pkcs7.detached' in content
+
+
 def _make_permit_directory(
-    session: 'Session', notification_address: str | None = 'admin@example.org'
-) -> 'ExtendedDirectory':
+    session: Session,
+    notification_address: str | None = 'admin@example.org',
+    extra_structure: str = ''
+) -> ExtendedDirectory:
     directories: DirectoryCollection[ExtendedDirectory]
     directories = DirectoryCollection(session, type='extended')
     directory = directories.add(
         title='Baugesuche',
-        structure="""
+        structure=f"""
             Gesuchsteller/in *= ___
             Adresse *= ___
+            {extra_structure}
         """,
         configuration=DirectoryConfiguration(
             title='[Gesuchsteller/in]',
@@ -2766,23 +3160,11 @@ def _make_permit_directory(
 
 
 def test_admin_notification_full_workflow(
-    client: Client['TestOrgApp'],
+    client: Client[TestOrgApp]
 ) -> None:
     """End-to-end, form-driven publication lifecycle for an entry in a
     directory with a notification_address, proving:
 
-    - editing a *scheduled* entry sends no email; the single publication
-      email (once the start is reached) carries the edited content and the
-      entry checksum, and a second cronjob run does not duplicate it;
-    - editing a *published* entry is refused until publication_start is
-      moved into the future, and the re-publication email then carries the
-      newly edited content;
-    - the expiry email is sent once publication_end passes;
-    - the entry cannot be deleted until that expiry notification has gone
-      out.
-
-    Everything is driven through the real forms, so the form's backdating
-    guard and the cronjob notification flow are exercised together.
     """
     tz = 'Europe/Zurich'
 
@@ -2801,7 +3183,11 @@ def test_admin_notification_full_workflow(
         # a permit directory with an editable content field
         page = client.get('/directories').click('^Verzeichnis$')
         page.form['title'] = 'Baugesuche'
-        page.form['structure'] = 'Name *= ___\nBeschreibung *= ___'
+        page.form['structure'] = (
+            'Name *= ___\nBeschreibung *= ___'
+            '\nTermin *= YYYY.MM.DD HH:MM\nFrist *= YYYY.MM.DD'
+            '\nDokument = *.pdf'
+        )
         page.form['title_format'] = '[Name]'
         page.form['enable_publication'] = True
         page.form['required_publication'] = True
@@ -2814,6 +3200,13 @@ def test_admin_notification_full_workflow(
         page = page.click('Eintrag', index=0)
         page.form['name'] = 'Permit One'
         page.form['beschreibung'] = 'Version A'
+        page.form['termin'] = '2026-03-15T09:30'
+        page.form['frist'] = '2026-08-20'
+        sample_pdf = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+        with open(sample_pdf, 'rb') as pdf_file:
+            page.form['dokument'] = Upload(
+                'Baugesuch.pdf', pdf_file.read(), 'application/pdf'
+            )
         page.form['publication_start'] = dt(now_local + timedelta(hours=2))
         page.form['publication_end'] = dt(now_local + timedelta(hours=9))
         page = page.form.submit().follow()
@@ -2832,7 +3225,7 @@ def test_admin_notification_full_workflow(
         assert len(os.listdir(client.app.maildir)) == 0
 
     # cronjob after the start: one publication email carrying 'Version B'
-    with freeze_time(base + timedelta(hours=3), tick=True):
+    with freeze_time(base + timedelta(hours=3), tick=True), _ais_cassette():
         client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 1
         msg = client.get_email(0)
@@ -2842,10 +3235,56 @@ def test_admin_notification_full_workflow(
         assert 'Baugesuche' in msg['Subject']
         assert 'Version B' in msg['TextBody']
         assert 'Version A' not in msg['TextBody']
-        # the entry checksum is part of the notification (proof of content)
+        assert '15.03.2026 09:30' in msg['TextBody']
+        assert '2026-03-15T09:30' not in msg['TextBody']
+        assert '20.08.2026' in msg['TextBody']
+        assert '2026-08-20' not in msg['TextBody']
+        assert 'Öffentlich' in msg['TextBody']
+        assert 'konnte nicht signiert werden' not in msg['TextBody']
         entry = client.app.session().query(ExtendedDirectoryEntry).one()
         assert entry.content_hash
         assert entry.content_hash in msg['TextBody']
+
+        # verify attachment
+        assert msg['Attachments']
+        assert msg['Attachments'][0]['Name'].endswith('.pdf')
+        _assert_signed_pdf(msg['Attachments'][0])
+        signing_request = client.app.session().query(SigningRequest).one()
+        assert signing_request.service_name == 'swisscom_ais'
+        pdf_text = extract_pdf_text(msg['Attachments'][0])
+        expected = (
+            'Permit One',
+            'Dieses Dokument bescheinigt die Publikation "Permit One" wie',
+            'Publikation',
+            'Beschreibung',
+            'Version B',
+            'Termin',
+            '15.03.2026 09:30',
+            'Frist',
+            '20.08.2026',
+            'Anhänge',
+            'Baugesuch.pdf',
+            'Grösse',
+            'Bytes',
+            'Datum',
+            '01.07.2026 12:00',
+            'Prüfsumme',
+            'Publikationsdetails',
+            'Publikationsstart',
+            '01.07.2026 14:00',
+            'Publikationsende',
+            '01.07.2026 21:00',
+            'Zugriff',
+            'Öffentlich',
+            'Prüfsumme des Verzeichniseintrages',
+            entry.content_hash,
+            'E-Mail automatisch generiert von Govikon am 01.07.2026 15:00',
+        )
+        for item in expected:
+            assert item in pdf_text, f'Error: Expected text \'{item}\' in pdf'
+        # date/datetime fields are formatted in the pdf, not raw ISO values
+        assert '2026-03-15 09:30:00' not in pdf_text
+        assert '2026-08-20' not in pdf_text
 
         # a second run in the same window must not re-notify
         client.get(get_cronjob_url(job))
@@ -2872,12 +3311,14 @@ def test_admin_notification_full_workflow(
         assert len(os.listdir(client.app.maildir)) == 1
 
     # cronjob after the new start: re-publication email carrying 'Version C'
-    with freeze_time(base + timedelta(hours=7), tick=True):
+    with freeze_time(base + timedelta(hours=7), tick=True), _ais_cassette():
         client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 2
         msg = client.get_email(1)
         assert 'Veröffentlichter Eintrag' in msg['Subject']
         assert 'Version C' in msg['TextBody']
+        assert 'Version C' in extract_pdf_text(msg['Attachments'][0])
+        _assert_signed_pdf(msg['Attachments'][0])
 
         # published right now -> deletion is blocked
         entry_page = client.get(entry_url)
@@ -2894,7 +3335,7 @@ def test_admin_notification_full_workflow(
 
     # cronjob after publication_end: expiry email sent; only now that the
     # end notification has gone out may the entry be deleted
-    with freeze_time(base + timedelta(hours=10), tick=True):
+    with freeze_time(base + timedelta(hours=10), tick=True), _ais_cassette():
         client.get(get_cronjob_url(job))
         assert len(os.listdir(client.app.maildir)) == 3
         msg = client.get_email(2)
@@ -2902,6 +3343,14 @@ def test_admin_notification_full_workflow(
         assert 'Permit One' in msg['Subject']
         assert 'Baugesuche' in msg['Subject']
         assert 'abgelaufen' in msg['TextBody'].lower()
+        assert msg['Attachments']
+        pdf_expiry_text = extract_pdf_text(msg['Attachments'][0])
+        assert (
+            'Die Publikation "Permit One" ist abgelaufen.' in pdf_expiry_text
+        )
+        assert 'Version C' in pdf_expiry_text
+        assert 'konnte nicht signiert werden' not in msg['TextBody']
+        _assert_signed_pdf(msg['Attachments'][0])
         assert client.app.session().query(ExtendedDirectoryEntry).count() == 1
 
         # the expiry notification has now been sent -> deletion is allowed
@@ -2913,7 +3362,7 @@ def test_admin_notification_full_workflow(
 
 
 def test_admin_notification_multiple_entries(
-    client: Client['TestOrgApp'],
+    client: Client[TestOrgApp]
 ) -> None:
     """
     Two entries crossing publication_start in the same window each get
@@ -2949,7 +3398,7 @@ def test_admin_notification_multiple_entries(
     close_all_sessions()
 
     # both publication_starts crossed in the same window — one email each
-    with freeze_time(real_now, tick=True):
+    with freeze_time(real_now, tick=True), _ais_cassette():
         client.get(get_cronjob_url(job))
 
     assert len(os.listdir(client.app.maildir)) == 2
@@ -2961,6 +3410,10 @@ def test_admin_notification_multiple_entries(
         assert client.get_email(i)['To'] == 'admin@example.org'
         assert _fmt_date(pub_start) in client.get_email(i)['TextBody']
         assert _fmt_date(pub_end) in client.get_email(i)['TextBody']
+        _assert_signed_pdf(client.get_email(i)['Attachments'][0])
+
+    # one signing request per notification
+    assert client.app.session().query(SigningRequest).count() == 2
 
     # second run — no duplicates
     with freeze_time(real_now, tick=True):
@@ -2968,8 +3421,277 @@ def test_admin_notification_multiple_entries(
     assert len(os.listdir(client.app.maildir)) == 2
 
 
-def test_admin_notification_no_notification_address(
+def test_admin_notification_pdf_without_attachments(
     client: Client['TestOrgApp'],
+) -> None:
+    """
+    An entry without files says so, no dangling heading.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Frida Koch',
+            adresse='Seestrasse 11',
+            publication_start=real_now - timedelta(minutes=30),
+            publication_end=real_now + timedelta(days=30),
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    with freeze_time(real_now, tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    msg = client.get_email(0)
+    lines = [
+        line.strip()
+        for line in extract_pdf_text(msg['Attachments'][0]).splitlines()
+        if line.strip()
+    ]
+    assert lines[lines.index('Anhänge') + 1] == 'Keine'
+    assert 'Publikationsdetails' in lines
+
+
+def test_admin_notification_pdf_lists_every_attachment(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    Every file is listed with its own size, date and hash.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(
+        client.app.session(), extra_structure='Dokumente = *.txt (multiple)'
+    )
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Gustav Berger',
+            adresse='Mühleweg 5',
+            dokumente=(
+                Bunch(
+                    data=object(),
+                    file=BytesIO(b'Situationsplan'),
+                    filename='situationsplan.txt',
+                ),
+                Bunch(
+                    data=object(),
+                    file=BytesIO(b'Baubeschrieb'),
+                    filename='baubeschrieb.txt',
+                ),
+            ),
+            publication_start=real_now - timedelta(minutes=30),
+            publication_end=real_now + timedelta(days=30),
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    with freeze_time(real_now, tick=True), _ais_cassette():
+        client.get(get_cronjob_url(job))
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    msg = client.get_email(0)
+    pdf_text = extract_pdf_text(msg['Attachments'][0])
+    assert 'situationsplan.txt' in pdf_text
+    assert 'baubeschrieb.txt' in pdf_text
+    # one size/date/hash block per file
+    assert pdf_text.count('Grösse:') == 2
+    assert pdf_text.count('Datum:') == 2
+    assert pdf_text.count('Prüfsumme:') == 2
+    assert f'Grösse: {len(b"Situationsplan")} Bytes' in pdf_text
+    assert f'Grösse: {len(b"Baubeschrieb")} Bytes' in pdf_text
+    _assert_signed_pdf(msg['Attachments'][0])
+
+
+def test_admin_notification_signing_failure(
+    client: Client['TestOrgApp'],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """
+    A failing signing service does not prevent the notifications — both
+    the publication and the expiry pdf are attached unsigned, and the same
+    entry still gets its expiry mail after the first signing already failed.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Clara Meier',
+            adresse='Ringstrasse 9',
+            publication_start=real_now - timedelta(minutes=30),
+            publication_end=real_now + timedelta(hours=2),
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    with (
+        patch.object(SwisscomAIS, 'sign') as sign,
+        caplog.at_level(logging.ERROR, logger='onegov.org'),
+    ):
+        sign.side_effect = RuntimeError('signing service unavailable')
+
+        # the publication start has been crossed ...
+        with freeze_time(real_now, tick=True):
+            client.get(get_cronjob_url(job))
+        assert len(os.listdir(client.app.maildir)) == 1
+
+        # ... and later on the publication end
+        with freeze_time(real_now + timedelta(hours=3), tick=True):
+            client.get(get_cronjob_url(job))
+
+        assert sign.call_count == 2
+
+    assert len(os.listdir(client.app.maildir)) == 2
+    published, expired = client.get_email(0), client.get_email(1)
+    assert 'Veröffentlichter Eintrag' in published['Subject']
+    assert 'Publikationsfrist' in expired['Subject']
+
+    for msg in (published, expired):
+        assert msg['Attachments']
+        assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
+        assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
+        assert 'konnte nicht signiert werden' in msg['TextBody']
+
+    assert client.app.session().query(SigningRequest).count() == 0
+
+    # the signing failure is logged once per signing attempt
+    signing_errors = [
+        r for r in caplog.records
+        if 'Error while signing directory publication' in r.message
+    ]
+    assert len(signing_errors) == 2
+
+
+def test_admin_notification_signing_disabled(
+    client: Client['TestOrgApp'],
+) -> None:
+    """
+    With ``enable_notification_pdf_signing`` turned off, the signing service
+    is never invoked and the pdf is attached unsigned.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    directory.enable_notification_pdf_signing = False
+    directory.add(
+        values=dict(
+            gesuchsteller_in='Clara Meier',
+            adresse='Ringstrasse 9',
+            publication_start=real_now - timedelta(minutes=30),
+            publication_end=real_now + timedelta(hours=2),
+        )
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    with patch.object(SwisscomAIS, 'sign') as sign:
+        # the publication start has been crossed ...
+        with freeze_time(real_now, tick=True):
+            client.get(get_cronjob_url(job))
+
+        # ... and later on the publication end
+        with freeze_time(real_now + timedelta(hours=3), tick=True):
+            client.get(get_cronjob_url(job))
+
+        # signing must not be attempted at all
+        assert sign.call_count == 0
+
+    assert len(os.listdir(client.app.maildir)) == 2
+    published, expired = client.get_email(0), client.get_email(1)
+    assert 'Veröffentlichter Eintrag' in published['Subject']
+    assert 'Publikationsfrist' in expired['Subject']
+
+    for msg in (published, expired):
+        assert msg['Attachments']
+        assert b'/SigFlags' not in b64decode(msg['Attachments'][0]['Content'])
+        assert 'Clara Meier' in extract_pdf_text(msg['Attachments'][0])
+        # signing was disabled, not failed — no failure notice in the mail
+        assert 'konnte nicht signiert werden' not in msg['TextBody']
+
+    assert client.app.session().query(SigningRequest).count() == 0
+
+
+def test_admin_notification_pdf_failure(
+    client: Client['TestOrgApp'],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """
+    A failing pdf rendering does not abort the cronjob — the notification
+    is sent without an attachment.
+    """
+    job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
+    assert job is not None
+    job.app = client.app
+
+    real_now = utcnow()
+
+    transaction.begin()
+    directory = _make_permit_directory(client.app.session())
+    for name in ('Dora Vogt', 'Emil Roth'):
+        directory.add(
+            values=dict(
+                gesuchsteller_in=name,
+                adresse='Talstrasse 4',
+                publication_start=real_now - timedelta(minutes=30),
+                publication_end=real_now + timedelta(days=30),
+            )
+        )
+    transaction.commit()
+    close_all_sessions()
+
+    with patch(
+        'onegov.org.views.directory.DirectoryEntryPdf.from_entry'
+    ) as from_entry:
+        from_entry.side_effect = OSError('no such file')
+
+        with (
+            freeze_time(real_now, tick=True),
+            caplog.at_level(logging.ERROR, logger='onegov.org'),
+        ):
+            client.get(get_cronjob_url(job))
+
+    # both entries are still notified, just without a pdf
+    assert len(os.listdir(client.app.maildir)) == 2
+    for i in (0, 1):
+        msg = client.get_email(i)
+        assert 'Veröffentlichter Eintrag' in msg['Subject']
+        assert 'Attachments' not in msg
+
+    # the rendering failure is logged once per entry
+    rendering_errors = [
+        r for r in caplog.records
+        if 'Error while rendering directory publication' in r.message
+    ]
+    assert len(rendering_errors) == 2
+
+
+def test_admin_notification_no_notification_address(
+    client: Client[TestOrgApp]
 ) -> None:
     """No emails for publication when no notification address set."""
     job = get_cronjob_by_name(client.app, 'hourly_maintenance_tasks')
@@ -3011,8 +3733,8 @@ def test_admin_notification_no_notification_address(
 
 
 def test_admin_notification_auto_delete_no_email(
-    client: Client['TestOrgApp'],
-    handlers: 'HandlerRegistry',
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry,
 ) -> None:
     """Auto-delete at publication_end deletes the entry; no deletion email."""
     register_directory_handler(handlers)

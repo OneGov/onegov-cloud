@@ -142,6 +142,7 @@ def handle_generic_settings(
     settings_url = request.link(self, name='settings')
 
     layout = layout or SettingsLayout(self, request, title)
+    layout.setting = layout.setting or title
     layout.edit_mode = True
     layout.editmode_links[1] = Link(
         text=_('Cancel'),

@@ -7,7 +7,7 @@ import sedate
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
 from datetime import timedelta
 from enum import Enum
-from itertools import zip_longest
+from itertools import chain, zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
 from onegov.core.custom import json
@@ -32,6 +32,7 @@ from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import PanelWidget
 from onegov.form.widgets import PreviewWidget
+from onegov.form.widgets import TableFieldWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import TreeSelectWidget
@@ -51,6 +52,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TelField
 from wtforms.fields import TextAreaField
 from wtforms.fields import TimeField as DefaultTimeField
+from wtforms.fields.core import UnboundField
 from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -895,12 +897,13 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
         self,
         choices: Iterable[TreeSelectNode]
     ) -> Iterator[tuple[str, str]]:
-        multiple = self.widget.multiple
         for choice in choices:
-            if not choice.get('disabled', False) and (
-                multiple or choice.get('isGroupSelectable', True)
-            ):
-                yield choice['value'], choice['name']
+            if not choice.get('disabled', False):
+                if choice.get('isGroupSelectable', True):
+                    yield choice['value'], choice['name']
+                elif self.widget.multiple and self.render_kw is not None:
+                    # NOTE: Make sure we don't summarize values
+                    self.render_kw['data-grouped'] = 'false'
             yield from self.flatten_choices(choice['children'])
 
     def set_choices(self, choices: Iterable[TreeSelectNode]) -> None:
@@ -1286,7 +1289,7 @@ class FormcodeField(TextAreaField):
         #        instead
         except AttributeError as exc:
             raise ValueError(
-                self.gettext(_('The form could not be parsed.'))
+                self.gettext('The form could not be parsed.')
             ) from exc
 
     def pre_validate(self, form: BaseForm) -> None:
@@ -1299,9 +1302,9 @@ class FormcodeField(TextAreaField):
             self.require_email_field
             and not parsed_form.has_required_email_field
         ):
-            raise ValidationError(self.gettext(_(
+            raise ValidationError(self.gettext(
                 "Define at least one required e-mail field ('E-Mail * = @@@')"
-            )))
+            ))
 
         if self.require_title_fields and not parsed_form.title_fields:
             raise ValidationError(self.gettext(
@@ -1312,10 +1315,10 @@ class FormcodeField(TextAreaField):
             for formfield_id, formfield in parsed_form._fields.items():
                 if formfield_id in self.reserved_fields:
                     raise ValidationError(
-                        self.gettext(_(
+                        self.gettext(
                             "'{label}' is a reserved name. "
                             "Please use a different name."
-                        )).format(label=formfield.label.text)
+                        ).format(label=formfield.label.text)
                     )
 
         if self.validate_prices and 'payment_method' in form:
@@ -1331,11 +1334,11 @@ class FormcodeField(TextAreaField):
                 #       has a payment_provider set.
                 if form['payment_method'].data != 'free':
                     # add the error message to both affected fields
-                    error = self.gettext(_(
+                    error = self.gettext(
                         "The field '{label}' contains a price that requires a "
                         "credit card payment. This is only allowed if credit "
                         "card payments are optional."
-                    )).format(label=formfield.label.text)
+                    ).format(label=formfield.label.text)
                     # if the payment_method field is below the form
                     # definition field, then validate will not have
                     # been run yet and we can only add process_errors
@@ -1355,10 +1358,10 @@ class FormcodeField(TextAreaField):
 
             if form['minimum_price_total'].data and not has_pricing:
                 # add the error message to all affected fields
-                error = self.gettext(_(
+                error = self.gettext(
                     'A minimum price total can only be set if at least one '
                     'priced field is defined.'
-                ))
+                )
                 # if the minimum_price_total field is below the form
                 # definition field, then validate will not have
                 # been run yet and we can only add process_errors
@@ -1369,3 +1372,146 @@ class FormcodeField(TextAreaField):
 
                 errors.append(error)
                 raise ValidationError(error)
+
+
+class FieldTable[FieldT: Field](Field):
+
+    widget = TableFieldWidget()
+
+    entries: list[list[FieldT]]
+
+    def __init__(
+        self,
+        unbound_field: FieldT | UnboundField[FieldT],
+        column_labels: Sequence[str],
+        row_labels: Sequence[str],
+        label: str | None = None,
+        validators: Validators[FormT, Self] | None = None,
+        *,
+        separator: str = '-',
+        description: str = '',
+        id: str | None = None,
+        widget: Widget[Self] | None = None,
+        cell_widget: Widget[FieldT] | None = None,
+        render_kw: dict[str, Any] | None = None,
+        name: str | None = None,
+        _form: BaseForm | None = None,
+        _prefix: str = '',
+        _translations: _SupportsGettextAndNgettext | None = None,
+        _meta: DefaultMeta | None = None,
+        # onegov specific kwargs that get popped off
+        fieldset: str | None = None,
+        depends_on: Sequence[Any] | None = None,
+        pricing: PricingRules | None = None,
+        discount: dict[str, float] | None = None,
+    ) -> None:
+
+        assert isinstance(
+            unbound_field, UnboundField
+        ), 'Field must be unbound, not a field class'
+        self.unbound_field = unbound_field
+        self.column_labels = column_labels
+        self.row_labels = row_labels
+        self._separator = separator
+
+        super().__init__(
+            label=label,
+            validators=validators,
+            description=description,
+            id=id,
+            widget=widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta,
+        )
+
+    @property
+    def data(self) -> list[list[Any]]:
+        return [
+            [field.data for field in row_entries]
+            for row_entries in self.entries
+        ]
+
+    @data.setter
+    def data(self, value: list[list[Any]] | None) -> None:
+        if value is None:
+            value = []
+
+        for row, row_entries in enumerate(self.entries):
+            for col, field in enumerate(row_entries):
+                try:
+                    field.data = value[row][col]
+                except IndexError:
+                    if callable(field.default):
+                        field.data = field.default()
+                    else:
+                        field.data = field.default
+
+    def process(
+        self,
+        formdata: _MultiDictLikeWithGetlist | None,
+        data: object = unset_value,
+        extra_filters: Sequence[Filter] | None = None
+    ) -> None:
+
+        sep = self._separator
+        self.entries = [
+            [
+                self.unbound_field.bind(
+                    form=None,  # type: ignore[arg-type]
+                    name=f'{self.short_name}{sep}{row}{sep}{col}',
+                    id=f'{self.id}{sep}{row}{sep}{col}',
+                    _meta=self.meta,
+                    translations=getattr(self, '_translations', None),
+                )
+                for col in range(len(self.column_labels))
+            ]
+            for row in range(len(self.row_labels))
+        ]
+        if data is unset_value or data is None:
+            data = [
+                [
+                    field.default()
+                    if callable(field.default)
+                    else field.default
+                    for field in row
+                ]
+                for row in self.entries
+            ]
+
+        self.object_data = data
+
+        for row, row_entries in enumerate(self.entries):
+            for col, field in enumerate(row_entries):
+                # HACK: Kind of a hack but we copy the flags from the
+                #       first field
+                if not row and not col:
+                    self.flags = field.flags
+                try:
+                    field_data = data[row][col]  # type: ignore[index]
+                except IndexError:
+                    field_data = unset_value
+                field.process(formdata, field_data)
+
+    def validate[_FormT: BaseForm](  # ruff:ignore[private-type-parameter]
+        self,
+        form: BaseForm,
+        extra_validators: Validators[_FormT, Self] = ()  # type: ignore[type-var]
+    ) -> bool:
+        self.errors = []
+        for row_entries in self.entries:
+            for field in row_entries:
+                field.validate(form)
+                for error in field.errors:
+                    if error not in self.errors:
+                        self.errors.append(error)
+
+        self._run_validation_chain(  # type: ignore[attr-defined]
+            form,
+            chain(self.validators, extra_validators)
+        )
+
+        return len(self.errors) == 0

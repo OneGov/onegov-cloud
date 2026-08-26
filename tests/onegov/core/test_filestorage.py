@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import morepath
 import os.path
+import pytest
 
 from onegov.core.framework import Framework
 from onegov.core import utils
+from onegov.core.filestorage import Filestorage, IllegalBackReference
 from webtest import TestApp as Client
 
 
@@ -12,6 +14,75 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from webob import Response
+
+
+def test_validatepath(temporary_directory: str) -> None:
+    filestorage = Filestorage(temporary_directory)
+
+    with pytest.raises(ValueError, match=r'Invalid path'):
+        filestorage.validatepath('\0null_byte.txt')
+
+    with pytest.raises(IllegalBackReference):
+        filestorage.validatepath('../cannot_escape')
+
+    assert filestorage.validatepath(
+        'but/can/../../mess/../around'
+    ) == '/around'
+
+    assert filestorage.validatepath('.') == '/'
+
+
+def test_create(temporary_directory: str) -> None:
+    filestorage = Filestorage(temporary_directory)
+    assert filestorage.create('foo')
+    modified = filestorage.getmodified('foo')
+    assert not filestorage.create('foo')
+    assert filestorage.getmodified('foo') == modified
+
+
+def test_touch(temporary_directory: str) -> None:
+    filestorage = Filestorage(temporary_directory)
+    assert not filestorage.exists('foo')
+    filestorage.touch('foo')
+    assert filestorage.exists('foo')
+    modified = filestorage.getmodified('foo')
+    filestorage.touch('foo')
+    assert filestorage.getmodified('foo') > modified
+
+
+def test_repr_and_str(temporary_directory: str) -> None:
+    filestorage = Filestorage(temporary_directory)
+    assert repr(temporary_directory) in repr(filestorage)
+    assert temporary_directory in str(filestorage)
+    assert str(filestorage) != repr(filestorage)
+
+
+def test_removetree(temporary_directory: str) -> None:
+    filestorage = Filestorage(temporary_directory)
+    foo = filestorage.makedir('foo')
+    bar = filestorage.makedir('bar')
+    baz = foo.makedir('baz')
+    filestorage.writetext('root.txt', 'root')
+    foo.writetext('foo.txt', 'foo')
+    bar.writetext('bar.txt', 'bar')
+    baz.writetext('baz.txt', 'baz')
+
+    assert set(filestorage.listdir('.')) == {'root.txt', 'foo', 'bar'}
+    assert set(filestorage.listdir('foo')) == {'foo.txt', 'baz'}
+    assert set(filestorage.listdir('bar')) == {'bar.txt'}
+    assert set(filestorage.listdir('foo/baz')) == {'baz.txt'}
+
+    filestorage.removetree('bar')
+    assert not filestorage.exists('bar')
+    assert set(filestorage.listdir('.')) == {'root.txt', 'foo'}
+    assert set(filestorage.listdir('foo')) == {'foo.txt', 'baz'}
+    assert set(filestorage.listdir('foo/baz')) == {'baz.txt'}
+
+    filestorage.removetree('.')
+    assert not filestorage.listdir('.')
+    assert not filestorage.exists('foo')
+    assert not filestorage.exists('bar')
+    assert not filestorage.exists('root.txt')
 
 
 def test_independence(temporary_directory: str) -> None:
@@ -120,6 +191,14 @@ def test_filestorage(temporary_directory: str, redis_url: str) -> None:
     client = Client(app)
     assert client.get('/?file=test.txt').text == ''
     assert client.get('/?file=asdf.txt').text == ''
+
+    assert client.get('/files/test.txt', expect_errors=True).status_code == 404
+
+    # we can't access files from the other schema via backreferences
+    assert client.get(
+        '/files/../foo/test.txt',
+        expect_errors=True
+    ).status_code == 404
 
     app.set_application_id('tests/foo')
     assert client.get('/files/readme').status_code == 200

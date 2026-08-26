@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from onegov.core.elements import BackLink
+from onegov.core.elements import BackLink, Link
 from onegov.org import _
 from onegov.core.security import Private
 from onegov.org import OrgApp
 from onegov.org.forms.external_link import ExternalLinkForm
-from onegov.org.layout import ExternalLinkLayout, DefaultLayout
+from onegov.org.layout import ExternalLinkLayout
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink
 )
@@ -37,7 +37,7 @@ def handle_new_external_link(
     self: ExternalLinkCollection,
     request: OrgRequest,
     form: ExternalLinkForm,
-    layout: DefaultLayout | None = None
+    layout: ExternalLinkLayout | None = None
 ) -> RenderData | Response:
 
     if form.submitted(request):
@@ -47,9 +47,15 @@ def handle_new_external_link(
             ExternalLinkCollection.target(external_link)
         ))
 
-    layout = layout or DefaultLayout(self, request)
+    layout = layout or ExternalLinkLayout(self, request)
     layout.edit_mode = True
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    target = self.supported_collections.get(self.type) if self.type else None
+    layout.editmode_links[1] = Link(
+        _('Cancel'), request.class_link(target), attrs={'class': 'cancel-link'}
+    ) if target else BackLink(attrs={'class': 'cancel-link'})
+    layout.breadcrumbs.append(
+        Link(_('New external form'), '#'),
+    )
 
     return {
         'layout': layout,
@@ -64,7 +70,7 @@ def edit_external_link(
     self: ExternalLink,
     request: OrgRequest,
     form: ExternalLinkForm,
-    layout: DefaultLayout | None = None
+    layout: ExternalLinkLayout | None = None
 ) -> RenderData | Response:
 
     if form.submitted(request):
@@ -81,6 +87,9 @@ def edit_external_link(
     layout.edit_mode = True
     links = layout.editmode_links + layout.editbar_links  # type:ignore
     layout.editmode_links = links
+    layout.breadcrumbs.extend([
+        Link(_('Edit external form'), '#'),
+    ])
 
     return {
         'layout': layout,

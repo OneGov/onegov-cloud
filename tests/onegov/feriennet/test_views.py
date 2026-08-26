@@ -730,6 +730,58 @@ def test_occasions_form(client: Client, scenario: Scenario) -> None:
     assert "keine Durchführungen" in editor.get('/activity/play-with-legos')
 
 
+def selected_period(page: ExtendedResponse) -> str:
+    field = page.form['period_id']
+    text = next(text for value, selected, text in field.options if selected)
+    return text.split(' (')[0]
+
+
+def add_past_period(scenario: Scenario, title: str, active: bool) -> None:
+    today = date.today()
+    scenario.add_period(
+        title=title,
+        active=active,
+        prebooking_start=today - timedelta(days=60),
+        prebooking_end=today - timedelta(days=50),
+        booking_start=today - timedelta(days=50),
+        booking_end=today - timedelta(days=40),
+        execution_start=today - timedelta(days=30),
+        execution_end=today - timedelta(days=20),
+    )
+
+
+def test_clone_occasion_period_preselection(
+    client: Client, scenario: Scenario
+) -> None:
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    # the occasion to clone lives in an old, inactive period
+    add_past_period(scenario, title="Old Period", active=False)
+    scenario.add_activity(
+        title="Play with Legos", username='editor@example.org')
+    scenario.add_occasion()
+    scenario.commit()
+
+    def clone_period() -> str:
+        activity = editor.get('/activity/play-with-legos')
+        return selected_period(activity.click("Duplizieren"))
+
+    # neither active nor upcoming: keeps the occasion's own period
+    assert clone_period() == "Old Period"
+
+    # an upcoming period exists (booking_end in the future): prefers it
+    scenario.add_period(title="Upcoming Period", active=False)
+    scenario.commit()
+    assert clone_period() == "Upcoming Period"
+
+    # an active period always wins
+    scenario.add_period(title="Active Period", active=True)
+    scenario.commit()
+    assert clone_period() == "Active Period"
+
+
 def test_multiple_dates_occasion(client: Client, scenario: Scenario) -> None:
 
     editor = client.spawn()
@@ -3842,6 +3894,121 @@ def test_add_manual_booking(client: Client, scenario: Scenario) -> None:
     assert 'Discount for being nice to the admin' in page
 
 
+def test_family_removal_links_target_distinct_items(
+    client: Client,
+    scenario: Scenario
+) -> None:
+    from decimal import Decimal
+    from onegov.activity import BookingPeriodInvoiceCollection, BookingPeriod
+    from ulid import ULID
+
+    scenario.add_period(title="2020", confirmed=True, active=True)
+    scenario.add_user(username='tom@example.org', role='member',
+                      realname="Tom", phone="000 000 00 11",
+                      email="tom@example.org")
+    scenario.commit()
+
+    session = client.app.session()
+    pid = session.query(BookingPeriod).filter_by(title='2020').one().id
+    tom_id = session.query(User).filter_by(
+        username='tom@example.org').one().id
+    inv = BookingPeriodInvoiceCollection(session).add(
+        period_id=pid, user_id=tom_id)
+    for text, amount in (('Alpha discount', '-10'), ('Beta discount', '-20'),
+                         ('Gamma discount', '-30')):
+        inv.add(group='manual', text=text, unit=Decimal(amount),
+                quantity=Decimal('1'), paid=False, family=f'manual-{ULID()}')
+    transaction.commit()
+
+    client.login_admin()
+
+    # each link targets its own item/confirm (not all the last), in both views
+    urls: list[str] = []
+    for state in ('unpaid', 'paid'):
+        page = client.get(f'/billing?period_id={pid.hex}&state={state}')
+
+        targets = []
+        urls = []
+        for anchor in page.pyquery('a.remove-manual'):
+            url = anchor.attrib.get('ic-post-to', '')
+            match = re.search(r'/invoice-action/([0-9a-f-]+)/', url)
+            assert match is not None
+            text = anchor.text_content().strip()
+            confirm = anchor.attrib.get('data-confirm') or ''
+            assert text.split('"')[1] in confirm  # confirm matches the label
+
+            targets.append(match.group(1))
+            urls.append(url)
+
+        assert len(targets) == 3
+        assert len(set(targets)) == 3
+
+    # removing all three leaves no manual booking, in either view
+    for url in urls:
+        client.post(url)
+
+    for state in ('unpaid', 'paid'):
+        page = client.get(f'/billing?period_id={pid.hex}&state={state}')
+        assert not page.pyquery('a.remove-manual')
+
+
+def test_manual_booking_scoped_to_period(
+    client: Client,
+    scenario: Scenario
+) -> None:
+    from decimal import Decimal
+    from onegov.activity import BookingPeriodInvoiceCollection
+    from ulid import ULID
+
+    # an older, inactive period and the current, active one
+    scenario.add_period(title="2019", confirmed=True, active=False)
+    scenario.add_period(title="2020", confirmed=True, active=True)
+    scenario.add_user(username='tom@example.org', role='member',
+                      realname="Tom",
+                      phone="000 000 00 11", email="tom@example.org")
+
+    scenario.commit()
+
+    # one manual booking per period for the same user
+    session = client.app.session()
+    from onegov.activity import BookingPeriod
+    old_period, new_period = (
+        session.query(BookingPeriod).filter_by(title=title).one().id
+        for title in ('2019', '2020')
+    )
+    tom_id = session.query(User).filter_by(
+        username='tom@example.org').one().id
+    invoices = BookingPeriodInvoiceCollection(session)
+    for period_id, text in (
+        (old_period, 'Old period discount'),
+        (new_period, 'New period discount'),
+    ):
+        invoice = invoices.add(period_id=period_id, user_id=tom_id)
+        invoice.add(
+            group='manual',
+            text=text,
+            unit=Decimal('-20'),
+            quantity=Decimal('1'),
+            paid=False,
+            family=f'manual-{ULID()}'
+        )
+    transaction.commit()
+
+    client.login_admin()
+
+    # the dropdown lists only the period's own manual bookings, in both views
+    for state in ('unpaid', 'paid'):
+        old_billing = client.get(
+            f'/billing?period_id={old_period.hex}&state={state}')
+        assert 'Old period discount' in old_billing
+        assert 'New period discount' not in old_billing
+
+        new_billing = client.get(
+            f'/billing?period_id={new_period.hex}&state={state}')
+        assert 'New period discount' in new_billing
+        assert 'Old period discount' not in new_billing
+
+
 def test_send_message_to_different_recipients(
     client: Client,
     scenario: Scenario
@@ -4009,3 +4176,11 @@ def test_notification_edit_cancel_returns_to_origin(
 
     edit = client.get(send.pyquery('a.control').attr('href'))
     assert edit.pyquery('a.cancel-link').attr('href') == origin
+
+
+def test_ticket_invoices_view_renders_in_feriennet(client: Client) -> None:
+    # feriennet's invoices.pt must not shadow the ticket invoice view
+    client.login_admin()
+
+    page = client.get('/invoices')
+    assert page.status_code == 200

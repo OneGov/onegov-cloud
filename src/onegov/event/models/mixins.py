@@ -74,17 +74,17 @@ class OccurrenceMixin(ContentMixin):
 
     @filter_keywords.setter
     def filter_keywords(
-        self,
-        value: Mapping[str, str | list[str]] | None
+        self, value: Mapping[str, str | list[str] | None] | None
     ) -> None:
         if not value:
             self.filter_keyword_list.clear()
             return
 
         self.filter_keyword_list = [
-            (key, value)
-            for key, values in value.items()
-            for value in (values if isinstance(values, list) else [values])
+            (keyword, item)
+            for keyword, values in value.items()
+            for item in (values if isinstance(values, list) else [values])
+            if item is not None
         ]
 
     #: Timezone of the event

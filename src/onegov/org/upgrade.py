@@ -22,6 +22,7 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.form.parser import ParsedForm
 from onegov.newsletter import Newsletter
+from onegov.org import log
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
 from onegov.org.models.political_business import (
@@ -922,6 +923,7 @@ def fix_missing_reserved_slots(
                 slot.resource = allocation.resource
                 slot.reservation_token = reservation.token
                 slot.source_type = 'reservation'
+                slot.source_id = reservation.id
                 allocation.reserved_slots.append(slot)
             recreated_starts.append(reservation.start)
 
@@ -996,3 +998,87 @@ def switch_to_parsed_event_filters(context: UpgradeContext) -> None:
         return
 
     org.event_filter_parsed_definition = ParsedForm.from_formcode(definition)
+
+
+@upgrade_task(
+    'Refresh reservation invoices zeroed by the pricing backfill',
+    requires='onegov.reservation:'
+             'Store pricing settings on reservations (fixed)'
+)
+def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
+    """ `Store pricing settings on reservations (fixed)` repairs the
+    reservation data, but invoice lines already zeroed by an earlier refresh
+    still show 0. Recompute them now that the reservation prices are restored.
+
+    Scoped to reservation invoices touched since the backfill rollout that are
+    tied to an allocation the bug could have disturbed (`per_item`/`per_hour`/
+    `free` — the original broken OR only ever matched `free`), or to a
+    `per_item` resource (whose content fallback was the broken one). Only
+    refreshed when safe (manual, still-open payment).
+    """
+    from onegov.ticket import Ticket
+
+    if not context.has_table('tickets'):
+        return
+    if not context.has_table('invoice_items'):
+        return
+    if not context.has_table('reservations'):
+        return
+
+    # only org-based apps have reservation tickets and a rounding base
+    org = getattr(context.app, 'org', None)
+    if org is None:
+        return
+    rounding_base = org.price_rounding
+
+    ticket_ids = context.session.execute(text("""
+        SELECT DISTINCT t.id
+          FROM tickets t
+          JOIN invoice_items ii
+            ON ii.invoice_id = t.invoice_id
+           AND ii.group = 'reservation'
+           AND COALESCE(ii.modified, ii.created) >= '2026-08-18'
+          JOIN reservations r
+            ON r.token = t.handler_id::uuid
+          JOIN resources res
+            ON res.id = r.resource
+         WHERE t.handler_code = 'RSV'
+           AND (
+                res.content->>'pricing_method' = 'per_item'
+             OR EXISTS (
+                    SELECT 1 FROM allocations a
+                     WHERE a."group" = r.target
+                       AND a.data->>'pricing_method'
+                           IN ('per_item', 'per_hour', 'free')
+                )
+           )
+    """)).scalars().all()
+
+    refreshed: list[str] = []
+    skipped: list[str] = []
+    for ticket_id in ticket_ids:
+        ticket = context.session.get(Ticket, ticket_id)
+        if ticket is None:
+            continue
+
+        handler = ticket.handler
+        if not handler.refreshing_invoice_is_safe(
+            context.request, rounding_base
+        ):
+            skipped.append(ticket.number)
+            continue
+
+        handler.refresh_invoice_items(context.request, rounding_base)
+        refreshed.append(ticket.number)
+
+    if refreshed:
+        log.info(
+            'Refreshed %d reservation invoice(s): %s',
+            len(refreshed), ', '.join(refreshed)
+        )
+    if skipped:
+        log.warning(
+            'Skipped %d reservation invoice(s) that could not be safely '
+            'refreshed (non-manual or non-open payment): %s',
+            len(skipped), ', '.join(skipped)
+        )

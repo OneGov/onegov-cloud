@@ -54,9 +54,9 @@ class InvalidIndentSyntax(_FormParsingErrorWithLineContext):
 
 class InvalidCommentIndentSyntax(_FormParsingErrorWithLineContext):
     message_template = _(
-        'The indentation on line {line} is not valid. '
-        'Comments must be indented to the same level as '
-        'the field definition (`=`) they belong to.'
+        'The indentation on line {line} is not valid. A comment must be '
+        'indented to the same level as the field (`=`) or option group it '
+        'describes.'
     )
 
 
@@ -66,12 +66,6 @@ class InvalidCommentLocationSyntax(_FormParsingErrorWithLineContext):
         'line {line}. The field description must be placed '
         'below the field definition (`=`) and with the same '
         'indentation.'
-    )
-
-
-class NestedFieldsetError(_FormParsingErrorWithLineContext):
-    message_template = _(
-        'Nested fieldsets (`#`) are not supported, please remove line {line}.'
     )
 
 

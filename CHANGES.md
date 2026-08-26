@@ -1,8 +1,165 @@
 # Changes
 
+## 2026.41
+
+`2026-08-14` | [9d645df6d9...ba80f96163](https://github.com/OneGov/onegov-cloud/compare/9d645df6d9^...ba80f96163)
+
+### Core
+
+##### Add retry for `cached plan must not change result type`.
+
+`Bugfix` | [OGC-3383](https://linear.app/onegovcloud/issue/OGC-3383) | [0cadc0cc30](https://github.com/onegov/onegov-cloud/commit/0cadc0cc30c68aedc48a8ca11f5a23ec39bb6eb2)
+
+### Directory
+
+##### Permit email notifications with signed PDF attached
+
+`Feature` | [OGC-3098](https://linear.app/onegovcloud/issue/OGC-3098) | [16c35e942d](https://github.com/onegov/onegov-cloud/commit/16c35e942dea1d4549876020afdb127fa26c8317)
+
+##### Gracefully handle invalid export format
+
+`Bugfix` | [ONEGOV-CLOUD-5XS](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5XS) | [50eede211e](https://github.com/onegov/onegov-cloud/commit/50eede211e1e2e4e7913a0cb85376eb4a19dd177)
+
+### Feriennet
+
+##### Improve number formatting
+
+Separates groups of thousands 1´000 (locale specific separator)
+
+`Feature` | [NONE](#NONE) | [b8ab6518d1](https://github.com/onegov/onegov-cloud/commit/b8ab6518d10014d3360b83c77d52bdef8b6d9b87)
+
+##### Fix billings shows manual positions from other periods
+
+`Bugfix` | [OGC-1565](https://linear.app/onegovcloud/issue/OGC-1565) | [426942cc1d](https://github.com/onegov/onegov-cloud/commit/426942cc1d10c9006f1fafd208aeed58b21c1ca3)
+
+### Form
+
+##### Adds support for fieldsets in nested formcode fields
+
+This also makes sure that fieldsets that only contain hidden fields
+will get hidden themselves, until at least one of the fields is visible.
+
+`Feature` | [OGC-3367](https://linear.app/onegovcloud/issue/OGC-3367) | [24779c2ae5](https://github.com/onegov/onegov-cloud/commit/24779c2ae5c250095edcbd1888df750cb817fdee)
+
+##### Fix translation extraction for validation messages
+
+`Bugfix` | [NONE](#NONE) | [c678995028](https://github.com/onegov/onegov-cloud/commit/c678995028d6233320beed0a52845987c99497a5)
+
+### Formcode
+
+##### Fix invalid comment indent for options
+
+`Bugfix` | [ONEGOV-CLOUD-5XR](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5XR) | [8964088f07](https://github.com/onegov/onegov-cloud/commit/8964088f07e2a2506ab2d1483c4a048b27d80aa3)
+
+### Org
+
+##### Adds a second iCal url, which includes blocking resources
+
+By default we only include reservations on the specific resource the
+iCal subscription is made for, in order to avoid duplicate events when
+subscribing to more than one related resource. But sometimes it is more
+desirable to include the reservations on blocking resources, so we now
+provide that option via a second url.
+
+`Feature` | [OGC-3378](https://linear.app/onegovcloud/issue/OGC-3378) | [00c09808f7](https://github.com/onegov/onegov-cloud/commit/00c09808f78547dfb1e1cdda0476c3b8aeb52272)
+
+##### Adds cost object/invoicing party settings to forms/directories
+
+`Feature` | [OGC-3333](https://linear.app/onegovcloud/issue/OGC-3333) | [e4f28ee5d7](https://github.com/onegov/onegov-cloud/commit/e4f28ee5d7ff5c96ff6f4898a9221c1d3c8a7576)
+
+##### Adds proper cancel links to editor views
+
+`Bugfix` | [OGC-3361](https://linear.app/onegovcloud/issue/OGC-3361) | [9d645df6d9](https://github.com/onegov/onegov-cloud/commit/9d645df6d942b81eaf5f4f43e74acb8da1947cc5)
+
+##### Optimize ticket assignment user queries.
+
+`Bugfix` | [OGC-3381](https://linear.app/onegovcloud/issue/OGC-3381) | [ddf18693a8](https://github.com/onegov/onegov-cloud/commit/ddf18693a83000bbc3c63bb47e37f95df14cceb3)
+
+##### Stores pricing settings on reservations, so they remain stable
+
+Previously price calculations always referenced the current state of the
+pricing settings on the targeted resource/allocation, which could lead
+to issues in the transition period, when those settings change, since
+old reservations should still calculate their prices according to the
+rules when they were first made.
+
+We now store the settings on each reservation, similar to how we store
+custom form definitions along with each form submission, so old
+submissions always remain valid.
+
+`Bugfix` | [OGC-3382](https://linear.app/onegovcloud/issue/OGC-3382) | [3d96bde972](https://github.com/onegov/onegov-cloud/commit/3d96bde972e142aa095bcd78815f65ce5464bbfd)
+
+### Reservation
+
+##### Send reservation reminder email 10 days in advance
+
+`Feature` | [OGC-3224](https://linear.app/onegovcloud/issue/OGC-3224) | [ba80f96163](https://github.com/onegov/onegov-cloud/commit/ba80f96163fb4f0bb9e6816255919e36541dca03)
+
+##### Ensure ticket deletion does not leave slots behind, cleanup orphaned ReservedSlots
+
+`Bugfix` | [OGC-3388](https://linear.app/onegovcloud/issue/OGC-3388) | [4dcfc9389f](https://github.com/onegov/onegov-cloud/commit/4dcfc9389f5ddb0e352e41831100fa34ecdaa7f9)
+
+##### Adds missing test file [skip-ci]
+
+`Bugfix` | [OGC-3388](https://linear.app/onegovcloud/issue/OGC-3388) | [a0de20d114](https://github.com/onegov/onegov-cloud/commit/a0de20d114b1c08b24d07496a710de098645490c)
+
+### Tests
+
+##### Waits for async formcode renders in browser tests [skip-ci]
+
+Since the Playwright port, find_by_css(...) does no retries (compared to splinter), we wrap only the reads that depend on the async response in wait_for(...), so they poll until the render settles
+
+`Bugfix` | [NONE](#NONE) | [ca0619789a](https://github.com/onegov/onegov-cloud/commit/ca0619789a98634cdc7ba6e92cae406f5ed2f307)
+
+## 2026.40
+
+`2026-08-10` | [9659e4e9ca...0d74f9c3d6](https://github.com/OneGov/onegov-cloud/compare/9659e4e9ca^...0d74f9c3d6)
+
+### Feriennet
+
+##### Occasion clone points to the current or upcoming period if any
+
+`Feature` | [OGC-1524](https://linear.app/onegovcloud/issue/OGC-1524) | [9d470c2cd0](https://github.com/onegov/onegov-cloud/commit/9d470c2cd008523df5b24323a94af405f8e9c29e)
+
+### Org
+
+##### Adds custom reservation pricing scheme for Stadtschulen Zug
+
+`Feature` | [OGC-3115](https://linear.app/onegovcloud/issue/OGC-3115) | [ca7bd12260](https://github.com/onegov/onegov-cloud/commit/ca7bd12260d734e9dc394bdc91c16a8a8e8fc874)
+
+##### Restore Redactor selection in Safari
+
+`Bugfix` | [OGC-3363](https://linear.app/onegovcloud/issue/OGC-3363) | [1f32ce7cea](https://github.com/onegov/onegov-cloud/commit/1f32ce7cea00dde516bbd3855334bbe9fc76e5cc)
+
+### Pdf
+
+##### Guard against emtpy html after cleaning in `mini_html`
+
+`Bugfix` | [OGC-3373](https://linear.app/onegovcloud/issue/OGC-3373) | [e894609850](https://github.com/onegov/onegov-cloud/commit/e8946098506578c739a88c7d01d8e83b16e245cd)
+
+### Ticket
+
+##### Delete referenced invoice items prior deleting the ticket
+
+`Bugfix` | [HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7644103474/](#HTTPS://SEANTIS-GMBH.SENTRY.IO/ISSUES/7644103474/) | [1240a31b9a](https://github.com/onegov/onegov-cloud/commit/1240a31b9aea33230f0c55734284014b49b95e26)
+
+### User
+
+##### Fixes type conversion error in raw SQL query
+
+`Bugfix` | [ONEGOV-CLOUD-5XM](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5XM) | [745dcee104](https://github.com/onegov/onegov-cloud/commit/745dcee104de214fb819b9e3c4be163cee91777c)
+
+### Winterthur
+
+##### Winterthur UI
+
+New UI Elements for winterthur
+
+`Feature` | [OGC-3358](https://linear.app/onegovcloud/issue/OGC-3358) | [9659e4e9ca](https://github.com/onegov/onegov-cloud/commit/9659e4e9caf3640cdb7385103f5a56c0acba79d8)
+
 ## 2026.39
 
-`2026-07-31` | [6fb336f4d2...d31acdb58f](https://github.com/OneGov/onegov-cloud/compare/6fb336f4d2^...d31acdb58f)
+`2026-07-31` | [6fb336f4d2...7347b5857e](https://github.com/OneGov/onegov-cloud/compare/6fb336f4d2^...7347b5857e)
 
 ### Core
 
@@ -5211,18 +5368,4 @@ Fixes a number of issues OGC-2122, OGC-2120, OGC-2119, OGC-2109
 ##### Allows users to be part of more than one group
 
 `Feature` | [OGC-2079](https://linear.app/onegovcloud/issue/OGC-2079) | [676ffb72a0](https://github.com/onegov/onegov-cloud/commit/676ffb72a0531b5010f071641037e7e0e40d9722)
-
-## 2025.12
-
-`2025-03-04` | [aeeac42f56...1ad5188fed](https://github.com/OneGov/onegov-cloud/compare/aeeac42f56^...1ad5188fed)
-
-### Ticket
-
-##### Make db upgrade for ticket closed_on column more performant
-
-`Feature` | [NONE](#NONE) | [f59d7a9b0f](https://github.com/onegov/onegov-cloud/commit/f59d7a9b0fe658317e5dec8ba1381684d6364b09)
-
-## 2025.11
-
-`2025-03-03` | [0c2dd4a07e...c321b6c196](https://github.com/OneGov/onegov-cloud/compare/0c2dd4a07e^...c321b6c196)
 

@@ -13,11 +13,11 @@ import urllib3
 from _pytest.monkeypatch import MonkeyPatch
 from asyncio import run
 from contextlib import suppress
-from fs.tempfs import TempFS
 from functools import lru_cache
 from libres.db.models import ORMBase
 from mirakuru import TCPExecutor
 from onegov.core.crypto import hash_password
+from onegov.core.filestorage import Filestorage
 from onegov.core.orm import Base, SessionManager
 from onegov.websockets.server import main
 from pathlib import Path
@@ -331,8 +331,9 @@ def test_password() -> str:
 
 
 @pytest.fixture(scope="session")
-def long_lived_filestorage() -> TempFS:
-    return TempFS()
+def long_lived_filestorage() -> Iterator[Filestorage]:
+    with tempfile.TemporaryDirectory() as root:
+        yield Filestorage(root)
 
 
 @pytest.fixture(scope="session")

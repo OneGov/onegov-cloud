@@ -364,3 +364,21 @@ def find_link_by_href_end(
 
     """
     return response.html.find('a', href=href_ends_with(href_end))
+
+
+def extract_pdf_text(pdf: bytes | str | Mapping[str, Any]) -> str:
+    """ Returns the text of a PDF, newline-joined across pages.
+
+    Accepts raw PDF bytes, a base64-encoded string, or a Postmark attachment
+    dict (with a base64 ``Content`` key), e.g. ``msg['Attachments'][0]``.
+    """
+    from pdftotext import PDF  # type:ignore[import-not-found]
+
+    content: bytes | str
+    if isinstance(pdf, (bytes, str)):
+        content = pdf
+    else:
+        content = pdf['Content']
+    if isinstance(content, str):
+        content = b64decode(content)
+    return '\n'.join(PDF(BytesIO(content)))

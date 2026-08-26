@@ -299,12 +299,12 @@ def test_find_your_spot(client: Client) -> None:
     new = resources.click('Raum')
     new.form['title'] = 'Meeting 1'
     new.form['group'] = 'Meeting Rooms'
-    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.select_multiple('parent_ids', texts=['Grand Meeting Room'])
     new.form.submit().follow()
 
     new.form['title'] = 'Meeting 2'
     new.form['group'] = 'Meeting Rooms'
-    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.select_multiple('parent_ids', texts=['Grand Meeting Room'])
     new.form.submit().follow()
 
     find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
@@ -4443,6 +4443,44 @@ def test_allocation_rules_copy_paste(client: Client) -> None:
     assert count_allocations(2) == 2
 
 
+def test_allocation_rules_batch_copy(client: Client) -> None:
+    client.login_admin()
+
+    resources_page = client.get('/resources')
+    for title in ('Source', 'Target 1', 'Target 2'):
+        page = resources_page.click('Raum')
+        page.form['title'] = title
+        page.form.submit()
+
+    for title, start, end in (
+        ('Week one', '2019-01-01', '2019-01-02'),
+        ('Week two', '2019-01-08', '2019-01-09'),
+    ):
+        page = client.get('/resource/source/new-rule')
+        page.form['title'] = title
+        page.form['start'] = start
+        page.form['end'] = end
+        page.form['as_whole_day'] = 'yes'
+        page.form.submit()
+
+    page = client.get('/resource/source/copy-rules')
+    assert page.form.get('rules', index=0).checked
+    assert page.form.get('rules', index=1).checked
+    page.select_checkbox('resources', 'Allgemein - Target 1')
+    page.select_checkbox('resources', 'Allgemein - Target 2')
+    page = page.form.submit().follow()
+
+    assert '2 Verfügbarkeitszeiträume auf 2 Ressourcen kopiert' in page
+    for target in ('target-1', 'target-2'):
+        rules_page = client.get(f'/resource/{target}/rules')
+        assert 'Week one' in rules_page
+        assert 'Week two' in rules_page
+        slots = client.get(
+            f'/resource/{target}/slots' '?start=2019-01-01&end=2019-01-10'
+        ).json
+        assert len(slots) == 4
+
+
 def test_allocation_rules_on_daypasses(client: Client) -> None:
     client.login_admin()
 
@@ -5160,6 +5198,54 @@ def test_migration_removes_reservation_when_slot_is_taken(
         .all()
     )
     assert any('irrtümlich storniert' in (n.text or '') for n in notes)
+
+
+@freeze_time('2026-08-01', tick=True)
+def test_delete_reservation_ticket_removes_reserved_slots(
+    client: Client,
+) -> None:
+    # Deleting a reservation ticket must also remove its reserved slots.
+    # Previously prepare_delete_ticket deleted the reservations directly
+    # (bypassing the scheduler), leaving orphaned slots behind (OGC-3388).
+    from libres.db.models import ReservedSlot
+    from onegov.ticket import Ticket
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2026, 8, 29, 10), datetime(2026, 8, 29, 18)),
+        partly_available=True,
+    )
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    assert reserve('10:00', '18:00').json == {'success': True}
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'user@example.org'
+    formular.form.submit().follow().form.submit().follow()
+
+    client.login_admin()
+    client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    session = client.app.session()
+    ticket = session.query(Ticket).one()
+    token = session.query(Reservation).one().token
+    assert session.query(ReservedSlot).filter_by(
+        reservation_token=token).count() > 0
+
+    ticket.handler.prepare_delete_ticket()
+    transaction.commit()
+
+    session = client.app.session()
+    assert session.query(Reservation).filter_by(token=token).count() == 0
+    assert session.query(ReservedSlot).filter_by(
+        reservation_token=token).count() == 0
+
+    # calling it again, now that the reservations are gone, is a no-op
+    session.query(Ticket).one().handler.prepare_delete_ticket()
 
 
 def _reserve_tageskarte_for_cancellation(client: Client) -> str:

@@ -136,6 +136,20 @@ def test_topic_keywords(client: Client) -> None:
     assert keywords_meta
     assert 'Einwohnerkontrolle' in keywords_meta.attr('content')
     assert 'Einwohneramt' in keywords_meta.attr('content')
+    assert [
+        keyword.text
+        for keyword in page.pyquery('.sidebar .page-keywords .blank-label')
+    ] == ['Einwohnerkontrolle', 'Einwohneramt']
+    assert page.pyquery('.page-keywords h3').text() == 'Schlagworte'
+
+    editor = client.spawn()
+    editor.login_editor()
+    editor_page = editor.get('/topics/themen/einwohnerdienste')
+    assert editor_page.pyquery('.sidebar .page-keywords')
+
+    anonymous = client.spawn()
+    anonymous_page = anonymous.get('/topics/themen/einwohnerdienste')
+    assert not anonymous_page.pyquery('.page-keywords')
 
     # keywords field is absent when editing news
     news = client.get('/news').click('Nachricht')
