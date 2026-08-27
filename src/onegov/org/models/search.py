@@ -340,6 +340,9 @@ class Search(Pagination[Any]):
                     # NOTE: Tickets may be excluded entirely in the
                     #       future but for now we'll de-prioritize them
                     (SearchIndex.owner_tablename == 'tickets', 0.2),
+                    # de-priorize RIS meeting documents
+                    (SearchIndex.owner_tablename == 'par_meetings', 0.1),
+                    (SearchIndex.owner_tablename == 'par_meeting_items', 0.1),
                     else_=1.0
                 )
             ).desc().label('rank')
