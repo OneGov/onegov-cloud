@@ -361,7 +361,8 @@ def create_file_directory(client: Client) -> ExtendedResponse:
 
 
 def create_docs_entry(client: Client, directory: ExtendedResponse) -> str:
-    """ Entry with image + single and two multiple pdfs; returns its edit url. """
+    """ Entry with image + single and two multiple pdfs; returns its
+    edit url. """
     now = to_timezone(utcnow(), 'Europe/Zurich')
     page = directory.click('Eintrag', index=0)
     page.form['name'] = 'Annual'
