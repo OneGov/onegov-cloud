@@ -4133,9 +4133,9 @@ def test_allocation_rules_on_rooms(client: Client) -> None:
     assert 'Start Datum vor Ende' in page
 
     page.form['start'] = '2019-01-01'
-    page.form['end'] = '2022-01-02'
+    page.form['end'] = '2025-01-02'
     page = page.form.submit()
-    assert 'maximal zwei Jahre lang' in page
+    assert 'maximal fünf Jahre lang' in page
 
     page.form['end'] = '2019-01-02'
     page = page.form.submit().follow()
