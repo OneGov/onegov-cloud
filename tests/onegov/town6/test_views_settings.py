@@ -238,7 +238,7 @@ def test_firebase_settings(client: Client) -> None:
 def test_resource_settings(client: Client) -> None:
     client.login_admin()
 
-    settings = client.get('/settings').click('Reservationen', index=1)
+    settings = client.get('/resource-settings')
     settings.form['resource_header_html'] = '<h1>foo</h1>'
     settings.form['resource_footer_html'] = '<p>bar</p>'
     assert ('Ihre Änderungen wurden gespeichert' in
