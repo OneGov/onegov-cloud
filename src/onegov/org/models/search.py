@@ -11,7 +11,7 @@ from onegov.search.utils import language_from_locale
 from markupsafe import Markup
 from operator import itemgetter
 from sedate import align_date_to_day, as_datetime, replace_timezone, utcnow
-from sqlalchemy import case, func, inspect, type_coerce
+from sqlalchemy import func, inspect, type_coerce
 from sqlalchemy_utils import escape_like
 
 
@@ -329,19 +329,8 @@ class Search(Pagination[Any]):
                         math.log(1e-6)
                     )
                 )
-                # HACK: We may want to add some fts_rank_modifier property
-                #       to searchable models instead and add a column to
-                #       the index for that, that would allow us to weigh
-                #       results per type more effectively. Currently files
-                #       are he most egregious offender though, so we just
-                #       hardcode this into the query.
-                * case(
-                    (SearchIndex.owner_tablename == 'files', 0.1),
-                    # NOTE: Tickets may be excluded entirely in the
-                    #       future but for now we'll de-prioritize them
-                    (SearchIndex.owner_tablename == 'tickets', 0.2),
-                    else_=1.0
-                )
+                # per-type rank weight (Searchable::fts_rank_modifier)
+                * SearchIndex.rank_modifier
             ).desc().label('rank')
         )
         return self.apply_common_filters(query)
