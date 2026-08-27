@@ -143,9 +143,10 @@ def view_settings(
                 description, source_description = translated_text(
                     field.kwargs.get('description')
                 )
-                fieldset, source_fieldset = translated_text(
-                    field.kwargs.get('fieldset')
-                )
+                fieldset_label = field.kwargs.get('fieldset')
+                if fieldset_label is None:
+                    fieldset_label = getattr(field, 'fieldset', None)
+                fieldset, source_fieldset = translated_text(fieldset_label)
 
                 if fieldset and source_fieldset not in seen_fieldsets:
                     fieldset_id = f'fieldset-{as_internal_id(source_fieldset)}'

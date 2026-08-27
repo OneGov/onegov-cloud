@@ -119,6 +119,7 @@ def test_settings_search_french_locale(client: Client) -> None:
     organisation.form['locales'] = 'fr_CH'
     organisation.form.submit()
     client.set_cookie('locale', 'fr_CH')
+    header_settings = client.get('/header-settings')
     page = client.get('/settings')
 
     primary_color = page.pyquery(
@@ -144,7 +145,7 @@ def test_settings_search_french_locale(client: Client) -> None:
     )
     assert announcement.find('strong').text() == 'Annonce'
     assert 'Announcement' in announcement.attr('data-settings-search-text')
-    assert client.get('/header-settings').pyquery('#fieldset-announcement')
+    assert header_settings.pyquery('#fieldset-announcement')
 
 
 def test_general_settings(client: Client) -> None:
