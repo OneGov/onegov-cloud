@@ -290,6 +290,8 @@ class Search(Pagination[Any]):
         else:
             ts_query = func.websearch_to_tsquery(self.language, self.query)
 
+        # FIXME: pages/topics should have a much lower decay as other documents
+        # as this content is considered valid for a long period.
         decay = 0.99
         scale = (90 * 24 * 3600)  # 90 days to reach target decay
         offset = (7 * 24 * 3600)  # 7 days without decay
@@ -340,6 +342,9 @@ class Search(Pagination[Any]):
                     # NOTE: Tickets may be excluded entirely in the
                     #       future but for now we'll de-prioritize them
                     (SearchIndex.owner_tablename == 'tickets', 0.2),
+                    # de-priorize RIS meeting documents
+                    (SearchIndex.owner_tablename == 'par_meetings', 0.1),
+                    (SearchIndex.owner_tablename == 'par_meeting_items', 0.1),
                     else_=1.0
                 )
             ).desc().label('rank')
