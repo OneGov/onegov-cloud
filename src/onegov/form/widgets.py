@@ -209,10 +209,10 @@ class UploadWidget(FileInput):
         # only resend a fresh, not-yet-stored upload (field.raw_data); never
         # resend an already-stored '@<id>' reference
         if (
-            field.data
+            resend_upload
+            and field.data
             and field.raw_data
             and not is_stored_file_reference(field.data)
-            and resend_upload
         ):
             previous = Markup("""
                 <input type="hidden" name="{name}" value="{filename}">

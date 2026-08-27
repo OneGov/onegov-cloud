@@ -396,20 +396,18 @@ class UploadField(FileField):
             action = 'replace'
             fieldstorage = valuelist[0]
 
-        # a resend only ever carries a fresh upload (stored files are re-bound,
-        # never resent), so a resend with no new file picked is that upload
-        # coming back across a re-render: store it (a replace)
         if action == 'replace':
             self.action = 'replace'
             self.data = self.process_fieldstorage(fieldstorage)
-            if not self.file and resend is not None:
-                self.data = self.process_resend(resend_filename, resend)
         elif action == 'delete':
             self.action = 'delete'
             self.data = {}
         elif action == 'keep':
             self.action = 'keep'
-            if resend is not None:  # resend under keep: the radio just reset
+            # a resend only carries a fresh upload (stored files are re-bound,
+            # never resent); under keep the widget just reset the radio, so
+            # store the resent upload (a replace)
+            if resend is not None:
                 self.action = 'replace'
                 self.data = self.process_resend(resend_filename, resend)
         else:

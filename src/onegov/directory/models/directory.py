@@ -608,9 +608,9 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 restore = {'keep', 'delete'}
                 values = getattr(self.model, 'values', None) or {}
                 for field in directory.file_fields:
-                    form_field = getattr(self, field.id, None)
-                    if form_field is None:
+                    if field.id not in self:
                         continue
+                    form_field = self[field.id]
 
                     stored = values.get(field.id)
                     if isinstance(form_field, FieldList):
