@@ -340,6 +340,94 @@ def test_multiple_attachments_preserved_on_edit_validation_error(
     assert 'two.pdf' in files
 
 
+def create_file_directory(client: Client) -> ExtendedResponse:
+    """ Publication-enabled directory: required image + optional single and
+    multiple pdf fields (optional so they can be deleted). """
+    client.login_admin()
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Docs'
+    page.form['structure'] = (
+        'Name *= ___\n'
+        'Pic *= *.jpg|*.png|*.gif\n'
+        'Doc = *.pdf\n'
+        'Docs = *.pdf (multiple)'
+    )
+    page.form['content_fields'] = 'Name\nPic\nDoc\nDocs'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_map'] = 'no'
+    page.form['thumbnail'] = 'Pic'
+    page.form['enable_publication'] = True
+    return page.form.submit().follow()
+
+
+def create_docs_entry(client: Client, directory: ExtendedResponse) -> str:
+    """ Entry with image + single and two multiple pdfs; returns its edit url. """
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    page = directory.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['doc'] = Upload('single.pdf', create_pdf().read())
+    page.form['docs'] = [
+        Upload('one.pdf', create_pdf().read()),
+        Upload('two.pdf', create_pdf().read()),
+    ]
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=10))
+    entry = page.form.submit().follow()
+    files = {f.name for f in dir_query(client).one().files}
+    assert {'annual.jpg', 'single.pdf', 'one.pdf', 'two.pdf'} <= files
+    return entry.request.url + '/edit'
+
+
+def test_directory_entry_edit_delete_file_validation_error(
+    client: Client
+) -> None:
+    # delete + validation error: kept files survive the re-render, deleted stay
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    directory = create_file_directory(client)
+    edit_url = create_docs_entry(client, directory)
+
+    edit = client.get(edit_url)
+    edit.form.get('doc', 0).select('delete')
+    edit.form.get('docs-0', 0).select('delete')
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the date without touching the files
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'single.pdf' not in files   # single deleted
+    assert 'one.pdf' not in files      # first of the multi deleted
+    assert 'two.pdf' in files          # second of the multi kept
+    assert 'annual.jpg' in files       # untouched field kept
+
+
+def test_directory_entry_edit_replace_file(client: Client) -> None:
+    # replace a single and one multi file via the edit form; keep the rest
+    directory = create_file_directory(client)
+    edit_url = create_docs_entry(client, directory)
+
+    edit = client.get(edit_url)
+    edit.form.get('doc', 0).select('replace')
+    edit.form.get('doc', 1).value = Upload(
+        'single-new.pdf', create_pdf().read())
+    edit.form.get('docs-0', 0).select('replace')
+    edit.form.get('docs-0', 1).value = Upload(
+        'one-new.pdf', create_pdf().read())
+    edit.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'single-new.pdf' in files   # single replaced
+    assert 'single.pdf' not in files
+    assert 'one-new.pdf' in files       # first of the multi replaced
+    assert 'one.pdf' not in files
+    assert 'two.pdf' in files           # second of the multi kept
+    assert 'annual.jpg' in files        # untouched field kept
+
+
 def test_required_publication(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
