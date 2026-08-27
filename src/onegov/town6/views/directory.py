@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from onegov.core.security import Public, Private, Secret
 from onegov.directory import DirectoryCollection, Directory
-from onegov.directory import DirectoryEntry
 from onegov.org.forms.directory import DirectoryRecipientForm, DirectoryUrlForm
 from onegov.org.views.directory import (
     view_directories, get_directory_form_class, handle_new_directory,
@@ -130,21 +129,20 @@ def town_handle_new_directory_entry(
 
 
 @TownApp.form(
-    model=DirectoryEntry,
+    model=ExtendedDirectoryEntry,
     permission=Private,
     template='form.pt',
     form=get_directory_entry_form_class,
     name='edit'
 )
 def town_handle_edit_directory_entry(
-    self: DirectoryEntry,
+    self: ExtendedDirectoryEntry,
     request: TownRequest,
     form: DirectoryEntryForm
 ) -> RenderData | Response:
     return handle_edit_directory_entry(
         self, request, form,
-        # FIXME: Should we only register this view for ExtendedDirectoryEntry?
-        DirectoryEntryLayout(self, request))  # type:ignore[arg-type]
+        DirectoryEntryLayout(self, request))
 
 
 @TownApp.form(
