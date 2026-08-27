@@ -410,16 +410,16 @@ class AllocationForm(Form, AllocationFormHelpers):
         if not self.request.app.org.has_school_holidays:
             self.delete_field('during_school_holidays')
 
-    def ensure_start_before_end_and_limited_to_two_years(self) -> bool | None:
+    def ensure_start_before_end_and_limited_to_five_years(self) -> bool | None:
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
                 assert isinstance(self.start.errors, list)
                 self.start.errors.append(_('Start date before end date'))
                 return False
-            if (self.end.data - self.start.data) > timedelta(days=731):
+            if (self.end.data - self.start.data) > timedelta(days=1827):
                 assert isinstance(self.end.errors, list)
                 self.end.errors.append(_(
-                    'End may at most be two years from the start. '
+                    'End may at most be five years from the start. '
                     'Either rely on auto-extension if you want to always '
                     'cover at least a certain future date range or define '
                     'multiple availability periods to cover a larger time '
