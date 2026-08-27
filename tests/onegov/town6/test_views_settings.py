@@ -8,6 +8,7 @@ from markupsafe import Markup
 from onegov.api.models import ApiKey
 from onegov.core.utils import Bunch
 from onegov.org.models import News
+from onegov.org.models import Organisation
 from onegov.org.models import Topic
 from onegov.org.models.page import TopicCollection, NewsCollection
 
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 
 def test_gever_settings_only_https_allowed(client: Client) -> None:
     client.login_admin()
-    settings = client.get('/settings').click('Gever API')
+    settings = client.get('/gever-credentials')
     settings.form['gever_username'] = 'foo'
     settings.form['gever_password'] = 'bar'
     settings.form['gever_endpoint'] = 'http://example.org/'
@@ -32,7 +33,7 @@ def test_gever_settings_only_https_allowed(client: Client) -> None:
     settings.form['gever_password'] = 'bar'
     settings.form['gever_endpoint'] = 'https://example.org/'
 
-    res = client.get('/settings').click('Gever API')
+    res = client.get('/gever-credentials')
     assert res.status_code == 200
 
 
@@ -100,6 +101,16 @@ def test_settings_search_markup(client: Client) -> None:
     assert 'Replies to automated e-mails' in reply_to.attr(
         'data-settings-search-text'
     )
+
+
+def test_setting_view_registry(client: Client) -> None:
+    registry = client.app.config.setting_view_registry
+    appearance = registry[(Organisation, 'appearance-settings')]
+
+    assert appearance.setting == 'Appearance'
+    assert appearance.icon == 'fa-eye'
+    assert appearance.order == 30
+    assert (Organisation, 'migrate-links') not in registry
 
 
 def test_settings_search_french_locale(client: Client) -> None:
