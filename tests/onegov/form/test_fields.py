@@ -330,6 +330,35 @@ def test_upload_field_keep_stored_reference() -> None:
     assert field.file is not None
 
 
+def test_upload_field_required_delete_stays_empty() -> None:
+    # a required field can't be emptied via delete, even when its data was
+    # restored for display (e.g. on_request across a validation-error render)
+    def create_field() -> tuple[Form, UploadField]:
+        form = Form()
+        field = UploadField(
+            validators=[DataRequired()], allowed_mimetypes=('text/plain',))
+        return form, field.bind(form, 'upload')  # type: ignore[attr-defined]
+
+    stored = {
+        'data': '@' + 'a' * 64,
+        'filename': 'report.txt',
+        'mimetype': 'text/plain',
+        'size': 6,
+    }
+
+    # keep counts as present -> required satisfied
+    form, field = create_field()
+    field.process(DummyPostData({'upload': ['keep', '']}), data=stored)
+    assert field.validate(form)
+
+    # delete fails required even with the display data restored
+    form, field = create_field()
+    field.process(DummyPostData({'upload': ['delete', '']}))
+    field.data = stored  # type: ignore[assignment]  # on_request-style restore
+    assert field.action == 'delete'
+    assert not field.validate(form)
+
+
 def test_upload_multiple_field() -> None:
     def create_field(
         allowed_mimetypes: Sequence[str] | None = None,

@@ -233,8 +233,9 @@ class UploadWidget(FileInput):
         keep_label = _('Keep file')
         delete_label = _('Delete file')
         replace_label = _('Replace file')
-        # keep the selected action across a re-render (defaults to keep)
-        action = getattr(field, 'action', None)
+        # preserve a 'delete' across a re-render (else the file gets restored);
+        # everything else shows 'keep' (the resent upload is stored regardless)
+        deleting = getattr(field, 'action', None) == 'delete'
         checked = Markup(' checked=""')
         return False, {
             'wrapper_css_class': wrapper_css_class,
@@ -249,9 +250,9 @@ class UploadWidget(FileInput):
             'keep_label': field.gettext(keep_label),
             'delete_label': field.gettext(delete_label),
             'replace_label': field.gettext(replace_label),
-            'keep_checked': checked if action in (None, 'keep') else '',
-            'delete_checked': checked if action == 'delete' else '',
-            'replace_checked': checked if action == 'replace' else '',
+            'keep_checked': '' if deleting else checked,
+            'delete_checked': checked if deleting else '',
+            'replace_checked': '',
         }
 
     def __call__(

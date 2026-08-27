@@ -347,11 +347,15 @@ class UploadField(FileField):
         caller = frame.f_back.f_locals.get('self')
 
         # give the required validators the idea that the data is there
-        # when the action was to keep the current file - an evil approach
+        # when the action was to keep the current file - an evil approach.
+        # a delete counts as empty (even if data was restored for display)
         if isinstance(caller, (DataRequired, InputRequired)):
             truthy = (
-                getattr(self, '_data', None)
-                or getattr(self, 'action', None) == 'keep'
+                getattr(self, 'action', None) != 'delete'
+                and (
+                    getattr(self, '_data', None)
+                    or getattr(self, 'action', None) == 'keep'
+                )
             )
 
             return truthy  # type:ignore[return-value]
