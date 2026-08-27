@@ -14,7 +14,7 @@ from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import (
     DirectoryConfiguration, DirectoryConfigurationStorage)
 from onegov.file import File, MultiAssociatedFiles
-from onegov.file.utils import as_fileintent
+from onegov.file.utils import keep_stored_file, store_uploaded_file
 from onegov.form.orm_types import Formcode
 from onegov.form.parser import ParsedForm
 from onegov.search import SearchableContent
@@ -276,13 +276,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 if isinstance(value_field, dict):
                     continue
 
-                delete = (
-                    value_field is None
-                    or value_field.data == {}
-                    or value_field.data is not None
-                ) and getattr(value_field, 'action', None) != 'keep'
-
-                if delete:
+                keep = value_field is not None and keep_stored_file(
+                    value_field.data,
+                    getattr(value_field, 'action', None)
+                )
+                if not keep:
                     assert session is not None
                     session.delete(file)
 
@@ -352,16 +350,10 @@ class Directory(Base, ContentMixin, TimestampMixin,
                         continue
 
                     # create a new file
-                    new_file = DirectoryFile(
-                        id=random_token(),
-                        name=field_values.filename,
-                        note=field.id,
-                        reference=as_fileintent(
-                            content=field_values.file,
-                            filename=field_values.filename
-                        )
+                    new_file = store_uploaded_file(
+                        DirectoryFile, entry.files, field.id,
+                        field_values.file, field_values.filename
                     )
-                    entry.files.append(new_file)
 
                     # keep a reference to the file in the values
                     updated[field.id] = {
@@ -409,16 +401,10 @@ class Directory(Base, ContentMixin, TimestampMixin,
                         continue
 
                     # create a new file
-                    new_file = DirectoryFile(
-                        id=random_token(),
-                        name=subfield_values.filename,
-                        note=f'{field.id}:{new_idx}',
-                        reference=as_fileintent(
-                            content=subfield_values.file,
-                            filename=subfield_values.filename
-                        )
+                    new_file = store_uploaded_file(
+                        DirectoryFile, entry.files, f'{field.id}:{new_idx}',
+                        subfield_values.file, subfield_values.filename
                     )
-                    entry.files.append(new_file)
 
                     # keep a reference to the file in the values
                     updated[field.id].append({
@@ -607,6 +593,39 @@ class Directory(Base, ContentMixin, TimestampMixin,
                             form_field.append_entry(subdata)
                     else:
                         form_field.data = data
+
+            def on_request(self) -> None:
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
+
+                # POST rebuilds from formdata only; restore kept stored files
+                # before validation (new uploads carry their own resent data)
+                if not self.request.POST:
+                    return
+
+                values = getattr(self.model, 'values', None) or {}
+                for field in directory.file_fields:
+                    form_field = getattr(self, field.id, None)
+                    if form_field is None:
+                        continue
+
+                    stored = values.get(field.id)
+                    if isinstance(form_field, FieldList):
+                        # restored by position, matching Directory.update()
+                        old_values = stored or []
+                        for idx, subfield in enumerate(form_field):
+                            if (
+                                getattr(subfield, 'action', None) == 'keep'
+                                and not subfield.data
+                                and idx < len(old_values)
+                            ):
+                                subfield.data = old_values[idx]
+                    elif (
+                        getattr(form_field, 'action', None) == 'keep'
+                        and not form_field.data
+                        and stored
+                    ):
+                        form_field.data = stored
 
         return DirectoryEntryForm
 

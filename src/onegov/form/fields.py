@@ -62,7 +62,7 @@ from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ColorInput, TextInput
 
 
-from typing import Any, cast, IO, Literal, TYPE_CHECKING
+from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from collections.abc import Collection
@@ -411,15 +411,12 @@ class UploadField(FileField):
         filename: str,
         raw_data: str
     ) -> StrictFileDict | FileDict:
-        """ Restores a file resent across a re-render. """
-        if raw_data.startswith('@'):
-            # already stored: keep the reference, reuse loaded metadata
-            original = self.object_data
-            if isinstance(original, dict) and original.get('data') == raw_data:
-                return cast('StrictFileDict', original)
-            return {'data': raw_data, 'filename': filename}
+        """ Restores a file resent across a re-render.
 
-        # not stored yet: decode and expose as an upload so it can be stored
+        Only fresh, not-yet-stored uploads are ever resent (the widget gates
+        the resend on ``field.raw_data``), so the payload is always real upload
+        data we can decode and expose as a file to be stored.
+        """
         raw = dictionary_to_binary({'data': raw_data})
         self.file = BytesIO(raw)
         self.filename = filename
@@ -450,8 +447,7 @@ class UploadField(FileField):
     ) -> None:
         if validation_stopped:
             return
-        # a kept '@<id>' reference has no mimetype; it was validated on upload
-        if self.data and self.mimetypes and self.data.get('mimetype'):
+        if self.data and self.mimetypes:
             if self.data.get('mimetype') not in self.mimetypes:
                 raise ValidationError(_(
                     'Files of this type are not supported.'))

@@ -10,6 +10,7 @@ from morepath.error import LinkError
 from onegov.chat import TextModuleCollection
 from onegov.core.templates import PageTemplate
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.file.utils import is_stored_file_reference
 from onegov.form import _
 from wtforms.widgets import DateInput
 from wtforms.widgets import DateTimeLocalInput
@@ -205,7 +206,14 @@ class UploadWidget(FileInput):
             """).format(src=src)
 
         previous = ''
-        if field.data and resend_upload:
+        # only resend a fresh, not-yet-stored upload (field.raw_data); never
+        # resend an already-stored '@<id>' reference
+        if (
+            field.data
+            and field.raw_data
+            and not is_stored_file_reference(field.data)
+            and resend_upload
+        ):
             previous = Markup("""
                 <input type="hidden" name="{name}" value="{filename}">
                 <input type="hidden" name="{name}" value="{data}">

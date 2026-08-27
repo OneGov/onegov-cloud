@@ -9,6 +9,7 @@ from copy import deepcopy
 from datetime import datetime
 
 from onegov.core.utils import Bunch
+from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, TagsField
@@ -142,6 +143,15 @@ def test_upload_field() -> None:
     assert 'value="baz.txt"' not in html
     assert field.mimetypes == WhitelistedMimeType.whitelist
 
+    # a resend only happens for a fresh upload (field.raw_data); merely
+    # having data (e.g. loaded from the object) is not resent
+    html = field(resend_upload=True)
+    assert 'value="baz.txt"' not in html
+
+    # with a fresh upload the resend inputs are rendered
+    form, field = create_field()
+    field.process(DummyPostData({
+        'upload': create_file('text/plain', 'baz.txt', b'baz')}))
     html = field(resend_upload=True)
     assert 'with-data' in html
     assert 'Uploaded file: baz.txt (3 Bytes) ✓' in html
@@ -263,9 +273,9 @@ def test_upload_field() -> None:
     assert field.mimetypes == WhitelistedMimeType.whitelist
 
 
-def test_upload_field_resend_reference() -> None:
-    # a persisted file is resent as an '@<id>' reference: keep must preserve
-    # it (not decode as binary); delete/replace ignore it
+def test_upload_field_keep_stored_reference() -> None:
+    # a stored file (an '@<id>' reference) is never resent; on keep it is
+    # preserved through the bound object_data, not decoded from a resend
     def create_field() -> tuple[Form, UploadField]:
         form = Form()
         field = UploadField(allowed_mimetypes=('text/plain',))
@@ -280,43 +290,44 @@ def test_upload_field_resend_reference() -> None:
         'size': 6,
     }
 
-    # keep, object-bound (form submission edit): loaded metadata is reused
+    # keep, object-bound: no resend inputs, the loaded metadata is preserved
     form, field = create_field()
-    field.process(DummyPostData({'upload': [
-        'keep', '', 'report.txt', reference,
-    ]}), data=persisted)
+    field.process(DummyPostData({'upload': ['keep', '']}), data=persisted)
     assert field.validate(form)
     assert field.action == 'keep'
     assert field.data == persisted
 
-    # keep, no object (directory edit): bare reference kept, passes validation
+    # delete: stored file dropped
     form, field = create_field()
-    field.process(DummyPostData({'upload': [
-        'keep', '', 'report.txt', reference,
-    ]}))
-    assert field.validate(form)
-    assert field.data == {'data': reference, 'filename': 'report.txt'}
-
-    # delete: reference ignored
-    form, field = create_field()
-    field.process(DummyPostData({'upload': [
-        'delete', '', 'report.txt', reference,
-    ]}))
+    field.process(DummyPostData({'upload': ['delete', '']}), data=persisted)
     assert field.validate(form)
     assert field.action == 'delete'
     assert field.data == {}
 
-    # replace: new upload wins over the reference
+    # replace: new upload wins over the stored file
     form, field = create_field()
     field.process(DummyPostData({'upload': [
         'replace', create_file('text/plain', 'new.txt', b'newone'),
-        'report.txt', reference,
-    ]}))
+    ]}), data=persisted)
     assert field.validate(form)
     assert field.action == 'replace'
     assert field.data is not None
     assert field.data['filename'] == 'new.txt'
     assert dictionary_to_binary(field.data) == b'newone'  # type: ignore[arg-type]
+
+    # keep with a resent fresh upload (new entry, form re-rendered): the
+    # base64 payload is decoded and exposed as a file to be stored
+    form, field = create_field()
+    encoded = binary_to_dictionary(b'fresh', 'fresh.txt')
+    field.process(DummyPostData({'upload': [
+        'keep', '', 'fresh.txt', encoded['data'],
+    ]}))
+    assert field.validate(form)
+    assert field.action == 'keep'
+    assert field.data is not None
+    assert field.data['filename'] == 'fresh.txt'
+    assert dictionary_to_binary(field.data) == b'fresh'  # type: ignore[arg-type]
+    assert field.file is not None
 
 
 def test_upload_multiple_field() -> None:
