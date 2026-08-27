@@ -443,6 +443,9 @@ def test_directory_entry_replace_file_validation_error(client: Client) -> None:
     edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
     page = edit.form.submit()
     assert 'Das Publikationsende muss in der Zukunft liegen' in page
+    # the radio resets to 'keep', but the new file rides along as a resend
+    # and still wins on the next submit (asserted below)
+    assert page.form.get('doc', 0).value == 'keep'
 
     # fix the date without re-selecting the replacement
     page.form['publication_end'] = dt_for_form(now + timedelta(days=5))

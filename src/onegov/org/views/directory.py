@@ -846,7 +846,7 @@ def handle_edit_directory_entry(
 
     if request.POST:
         # bind stored values as object_data so 'keep'/'delete' upload fields
-        # keep their file across a re-render (as pending submissions do)
+        # keep their file across a re-render
         form.process(formdata=request.POST, data=self.values)
 
     if form.submitted(request):
