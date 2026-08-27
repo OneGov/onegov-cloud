@@ -192,7 +192,9 @@ class UploadWidget(FileInput):
         **kwargs: Any
     ) -> tuple[bool, dict[str, Any]]:
 
-        if force_simple or field.errors or not field.data:
+        # a delete clears 'data'; fall back to 'object_data' to still show it
+        existing = field.data or getattr(field, 'object_data', None)
+        if force_simple or field.errors or not existing:
             return True, {
                 'wrapper_css_class': wrapper_css_class,
                 'input_html': input_html,
@@ -223,7 +225,7 @@ class UploadWidget(FileInput):
                 data=field.data.get('data', ''),
             )
 
-        size = field.data.get('size', -1)
+        size = existing.get('size', -1)
         if size < 0:
             display_size = ''
         else:
@@ -244,7 +246,7 @@ class UploadWidget(FileInput):
             'preview': preview,
             'previous': previous,
             'filesize': display_size,
-            'filename': field.data['filename'],
+            'filename': existing['filename'],
             'name': field.id,
             'existing_file_label': field.gettext(existing_file_label),
             'keep_label': field.gettext(keep_label),

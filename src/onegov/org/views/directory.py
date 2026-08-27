@@ -844,6 +844,11 @@ def handle_edit_directory_entry(
     layout: DirectoryEntryLayout | None = None
 ) -> RenderData | Response:
 
+    if request.POST:
+        # bind stored values as object_data so 'keep'/'delete' upload fields
+        # keep their file across a re-render (as pending submissions do)
+        form.process(formdata=request.POST, data=self.values)
+
     if form.submitted(request):
         form.populate_obj(self)
 
