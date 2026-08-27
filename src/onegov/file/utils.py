@@ -103,10 +103,12 @@ def keep_stored_file(value: object, action: str | None = None) -> bool:
 
     A stored file is kept when the dialog action is ``keep``, when the value
     was not resubmitted (``None``, i.e. unchanged) or when the value still
-    references the stored file (``@<id>``). It is trashed on removal (``{}``)
-    or when replaced by a new upload.
+    references the stored file (``@<id>``). It is trashed on removal (``{}``,
+    or an explicit ``delete`` action) or when replaced by a new upload.
 
     """
+    if action == 'delete':
+        return False
     if action == 'keep' or value is None:
         return True
     return is_stored_file_reference(value)

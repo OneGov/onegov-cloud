@@ -429,6 +429,57 @@ def test_directory_entry_edit_replace_file(client: Client) -> None:
     assert 'annual.jpg' in files        # untouched field kept
 
 
+def test_directory_entry_replace_file_validation_error(client: Client) -> None:
+    # Replace a file and hit an unrelated validation error in the same submit;
+    # after fixing the error the replacement must win over the stored file.
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    directory = create_file_directory(client)
+    edit_url = create_docs_entry(client, directory)
+
+    edit = client.get(edit_url)
+    edit.form.get('doc', 0).select('replace')
+    edit.form.get('doc', 1).value = Upload(
+        'single-new.pdf', create_pdf().read())
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the date without re-selecting the replacement
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'single-new.pdf' in files   # replacement should have won
+    assert 'single.pdf' not in files
+
+
+def test_directory_entry_delete_file_validation_error(client: Client) -> None:
+    # Delete a file and hit an unrelated validation error in the same submit;
+    # the delete must survive the re-render (widget keeps 'delete' selected)
+    # and the file must be gone after fixing the error.
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    directory = create_file_directory(client)
+    edit_url = create_docs_entry(client, directory)
+
+    edit = client.get(edit_url)
+    edit.form.get('doc', 0).select('delete')
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+    # the widget still shows the file with 'delete' selected, not reset to keep
+    assert page.form.get('doc', 0).value == 'delete'
+
+    # fix the date without re-selecting the action
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'single.pdf' not in files   # the deleted single file is gone
+    assert 'one.pdf' in files          # multi files untouched
+    assert 'two.pdf' in files
+    assert 'annual.jpg' in files       # image untouched
+
+
 def test_required_publication(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')

@@ -598,11 +598,14 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 if hasattr(super(), 'on_request'):
                     super().on_request()
 
-                # POST rebuilds from formdata only; restore kept stored files
-                # before validation (new uploads carry their own resent data)
+                # POST rebuilds from formdata only, so stored files aren't part
+                # of it. Restore them before validation for keep/delete fields
+                # so the widget shows the file with the right action (a delete
+                # still removes it on save); new uploads carry their own resend.
                 if not self.request.POST:
                     return
 
+                restore = {'keep', 'delete'}
                 values = getattr(self.model, 'values', None) or {}
                 for field in directory.file_fields:
                     form_field = getattr(self, field.id, None)
@@ -615,13 +618,13 @@ class Directory(Base, ContentMixin, TimestampMixin,
                         old_values = stored or []
                         for idx, subfield in enumerate(form_field):
                             if (
-                                getattr(subfield, 'action', None) == 'keep'
+                                getattr(subfield, 'action', None) in restore
                                 and not subfield.data
                                 and idx < len(old_values)
                             ):
                                 subfield.data = old_values[idx]
                     elif (
-                        getattr(form_field, 'action', None) == 'keep'
+                        getattr(form_field, 'action', None) in restore
                         and not form_field.data
                         and stored
                     ):

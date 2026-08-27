@@ -129,17 +129,17 @@ class UploadWidget(FileInput):
             <ul class="upload-options">
                 <li>
                     <input type="radio" id="{name}-0" name="{name}"
-                           value="keep" checked="">
+                           value="keep"{keep_checked}>
                     <label for="{name}-0">{keep_label}</label>
                 </li>
                 <li>
                     <input type="radio" id="{name}-1" name="{name}"
-                           value="delete">
+                           value="delete"{delete_checked}>
                     <label for="{name}-1">{delete_label}</label>
                 </li>
                 <li>
                     <input type="radio" id="{name}-2" name="{name}"
-                           value="replace">
+                           value="replace"{replace_checked}>
                     <label for="{name}-2">{replace_label}</label>
                     <div>
                         <label>
@@ -233,6 +233,9 @@ class UploadWidget(FileInput):
         keep_label = _('Keep file')
         delete_label = _('Delete file')
         replace_label = _('Replace file')
+        # keep the selected action across a re-render (defaults to keep)
+        action = getattr(field, 'action', None)
+        checked = Markup(' checked=""')
         return False, {
             'wrapper_css_class': wrapper_css_class,
             'input_html': input_html,
@@ -246,6 +249,9 @@ class UploadWidget(FileInput):
             'keep_label': field.gettext(keep_label),
             'delete_label': field.gettext(delete_label),
             'replace_label': field.gettext(replace_label),
+            'keep_checked': checked if action in (None, 'keep') else '',
+            'delete_checked': checked if action == 'delete' else '',
+            'replace_checked': checked if action == 'replace' else '',
         }
 
     def __call__(

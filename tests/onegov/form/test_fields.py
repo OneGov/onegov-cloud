@@ -221,7 +221,7 @@ def test_upload_field() -> None:
     assert field.file.read() == b'foobar'  # type: ignore[union-attr]
     assert field.mimetypes == WhitelistedMimeType.whitelist
 
-    # ... with select and keep upload
+    # ... resend a fresh upload under 'keep': stored as a replace
     previous = field.data
     form, field = create_field()
     textfile = create_file('text/plain', 'foobaz.txt', b'foobaz')
@@ -232,7 +232,7 @@ def test_upload_field() -> None:
         previous['data']
     ]}))
     assert field.validate(form)
-    assert field.action == 'keep'
+    assert field.action == 'replace'
     assert field.data is not None
     assert field.data['filename'] == 'foobar.txt'
     assert field.data['mimetype'] == 'text/plain'
@@ -315,15 +315,15 @@ def test_upload_field_keep_stored_reference() -> None:
     assert field.data['filename'] == 'new.txt'
     assert dictionary_to_binary(field.data) == b'newone'  # type: ignore[arg-type]
 
-    # keep with a resent fresh upload (new entry, form re-rendered): the
-    # base64 payload is decoded and exposed as a file to be stored
+    # resend a fresh upload under 'keep' (new entry, form re-rendered): the
+    # base64 payload is decoded and stored as a replace
     form, field = create_field()
     encoded = binary_to_dictionary(b'fresh', 'fresh.txt')
     field.process(DummyPostData({'upload': [
         'keep', '', 'fresh.txt', encoded['data'],
     ]}))
     assert field.validate(form)
-    assert field.action == 'keep'
+    assert field.action == 'replace'
     assert field.data is not None
     assert field.data['filename'] == 'fresh.txt'
     assert dictionary_to_binary(field.data) == b'fresh'  # type: ignore[arg-type]
@@ -482,8 +482,8 @@ def test_upload_multiple_field() -> None:
     assert field.data[0] == {}
     assert field[1].action == 'keep'
 
-    # ... keep second file with keep upload instead of assuming
-    # it will be passed backed in via data
+    # ... resend the second file's data (a fresh, not-yet-stored upload):
+    # a resend under 'keep' is treated as a replace so the file gets stored
     previous = deepcopy(field.data)
     form, field = create_field()
     field.process(DummyPostData({
@@ -496,7 +496,7 @@ def test_upload_multiple_field() -> None:
     }))
     assert field.validate(form)
     assert len(field) == 1
-    assert field[0].action == 'keep'
+    assert field[0].action == 'replace'
     assert field[0].data is not None
     assert field[0].data['filename'] == 'baz.txt'
     assert field[0].data['mimetype'] == 'text/plain'
