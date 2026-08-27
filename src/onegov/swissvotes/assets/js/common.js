@@ -14,7 +14,7 @@ var setupRedirectAfter = function(elements) {
 // Make the extended filters of the search collapsible and store the current
 // state in the browser
 var initSearchFilters = function() {
-    var fieldsetLegend = $('#fieldset-other-filters legend');
+    var fieldsetLegend = $('#fieldset-other_filters legend');
     var key = 'fieldset-other-filters-hidden';
 
     fieldsetLegend.click(function() {

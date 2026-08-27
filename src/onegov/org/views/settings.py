@@ -148,14 +148,14 @@ def view_settings(
                 )
 
                 if fieldset and source_fieldset not in seen_fieldsets:
-                    fieldset_id = source_fieldset.lower().replace(' ', '-')
+                    fieldset_id = f'fieldset-{as_internal_id(source_fieldset)}'
                     fieldsets.append(
                         {
                             'title': fieldset,
                             'search_text': search_text(
                                 fieldset, source_fieldset
                             ),
-                            'link': (f'{setting_link}#fieldset-{fieldset_id}'),
+                            'link': f'{setting_link}#{fieldset_id}',
                         }
                     )
                     seen_fieldsets.add(source_fieldset)

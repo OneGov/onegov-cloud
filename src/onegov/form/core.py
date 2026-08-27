@@ -5,6 +5,7 @@ import weakref
 from collections import OrderedDict
 from contextlib import nullcontext
 from decimal import Decimal
+from functools import cached_property
 from itertools import chain, groupby
 from markupsafe import Markup
 from onegov.core.markdown import render_untrusted_markdown as render_md
@@ -906,8 +907,8 @@ class Fieldset:
 
     fields: dict[str, CallableProxyType[Field]]
 
-    def __init__(self, label: str | None, fields: Iterable[Field]):
-        """ Initializes the Fieldset.
+    def __init__(self, label: str | None, fields: Iterable[Field]) -> None:
+        """Initializes the Fieldset.
 
         :label: Label of the fieldset (None if it's an invisible fieldset)
         :fields: Iterator of bound fields. Fieldset creates a list of weak
@@ -917,6 +918,12 @@ class Fieldset:
         """
         self.label = label
         self.fields = OrderedDict((f.id, weakref.proxy(f)) for f in fields)
+
+    @cached_property
+    def id(self) -> str | None:
+        if self.label is None:
+            return None
+        return f'fieldset-{utils.as_internal_id(self.label)}'
 
     def __len__(self) -> int:
         return len(self.fields)
