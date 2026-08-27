@@ -1,12 +1,7 @@
 from __future__ import annotations
 
-from bleach.linkifier import LinkifyFilter
-from bleach.sanitizer import Cleaner
 from copy import deepcopy
 from contextlib import contextmanager
-from functools import partial
-from html import escape
-from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from io import StringIO
 from lxml import etree
 from onegov.core.utils import module_path
@@ -32,14 +27,15 @@ from reportlab.platypus import Paragraph
 from reportlab.platypus import Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus.tables import TableStyle
+from turbohtml import escape
+from turbohtml.clean import LinkCandidate, Linker, Linkify
+from turbohtml.clean import minify, OnDisallowed, Policy, Sanitizer
 from uuid import uuid4
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
-    from bleach.callbacks import _HTMLAttrs
-    from bleach.sanitizer import _Filter
     from collections.abc import Iterable, Iterator, Sequence
     from reportlab.lib.styles import PropertySet
     from reportlab.platypus.doctemplate import _PageCallback
@@ -584,48 +580,46 @@ class Pdf(PDFDocument):
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         attributes = {}
-        filters: list[_Filter] = [WhitespaceFilter]
+
+        if linkify:
+            tags.append('a')
+            attributes['a'] = frozenset({'href'})
+
+        sanitizer = Sanitizer(Policy(
+            tags=frozenset(tags),
+            attributes=attributes,
+            on_disallowed_tag=OnDisallowed.STRIP,
+        ))
+        html = sanitizer.sanitize(html)
+        if not html.strip():
+            return
 
         if linkify:
             link_color = self.link_color
             underline_links = self.underline_links
             underline_width = self.underline_width
 
-            def colorize(
-                attrs: _HTMLAttrs,
-                new: bool = False
-            ) -> _HTMLAttrs:
-                # phone numbers appear here but are escaped, skip...
-                if not attrs.get((None, 'href')):
-                    # FIXME: bleach stubs seem to be incorrect here
-                    #        but we may be able to just return attrs
-                    return None  # type:ignore[return-value]
-                attrs[(None, 'color')] = link_color
+            def colorize(link: LinkCandidate) -> LinkCandidate | None:
+                link.attrs['color'] = link_color
                 if underline_links:
-                    attrs[(None, 'underline')] = '1'
-                    attrs[('a', 'underlineColor')] = link_color
-                    attrs[('a', 'underlineWidth')] = underline_width
-                return attrs
+                    link.attrs['underline'] = '1'
+                    link.attrs['underlineColor'] = link_color
+                    link.attrs['underlineWidth'] = underline_width
+                return link
 
-            tags.append('a')
-            attributes['a'] = ['href']
-            filters.append(
-                partial(
-                    LinkifyFilter, parse_email=True, callbacks=[colorize])
-            )
+            linker = Linker(Linkify(
+                callbacks=(colorize,),
+                parse_email=True,
+                process_existing=True,
+                schemes=('http', 'https', 'email', 'tel')
+            ))
+            html = linker.linkify(html)
 
-        cleaner = Cleaner(
-            tags=tags,
-            attributes=attributes,
-            strip=True,
-            filters=filters
-        )
-        html = cleaner.clean(html)
-        # Todo: phone numbers with href="tel:.." are cleaned out
+        # NOTE: This has the same result as the html5lib whitespace
+        #       filter we used to use. It collapses all whitespace.
+        html = minify(html)
 
-        if not html.strip():
-            return
-
+        # TODO: Switch to turbohtml.parse
         tree = etree.parse(StringIO(html), etree.HTMLParser())
         body = tree.find('body')
         if body is None:

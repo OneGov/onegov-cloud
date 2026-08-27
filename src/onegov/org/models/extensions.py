@@ -33,7 +33,7 @@ from onegov.reservation import Resource
 from sqlalchemy import desc, inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
-from urlextract import URLExtract
+from turbohtml.clean import LinkDetector
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import FieldList
@@ -877,12 +877,12 @@ def _content_file_link_observer(
     if not changed:
         return
 
-    extractor = URLExtract()
+    extractor = LinkDetector(emails=False)
     file_ids = [
         match.group(1)
         for changed_name in changed
         if (text := self.content.get(changed_name))
-        for url in extractor.find_urls(text, only_unique=True)
+        for url in {span.text for span in extractor.find(text)}
         if (match := FILE_URL_RE.search(url))
     ]
     if not file_ids:

@@ -4,10 +4,11 @@ import re
 
 from collections import OrderedDict
 from datetime import timedelta
-from onegov.core.utils import linkify, _email_regex
+from onegov.core.utils import linkify
 from onegov.form import Form
 from onegov.form.fields import HtmlField
 from onegov.fsi import _
+from turbohtml.clean import LinkDetector
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import StringField
@@ -204,4 +205,13 @@ class InviteCourseForm(Form):
         exclude: Collection[str] | None = None
     ) -> tuple[str, ...]:
         string = self.attendees.data or ''
-        return tuple(t[0] for t in _email_regex.findall(string))
+        detector = LinkDetector(emails=True)
+        return tuple(
+            # NOTE: Since detector will match mailto: links as a full span
+            #       we have to ensure it's not included in the match if
+            #       someone was feeling silly and pasted a mailto: link
+            #       instead of a plain e-mail
+            span.text.removeprefix('mailto:')
+            for span in detector.find(string)
+            if span.is_email
+        )

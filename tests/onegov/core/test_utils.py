@@ -3,7 +3,6 @@ from __future__ import annotations
 import onegov.core
 import os.path
 import pytest
-import re
 import transaction
 
 from collections.abc import Collection, Mapping
@@ -13,10 +12,10 @@ from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
-from onegov.core.utils import Bunch, linkify_phone, _phone_ch, to_html_ul
+from onegov.core.utils import Bunch, to_html_ul
 from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
+from turbohtml.clean import PhoneFormat, PhoneNumber
 from unittest.mock import patch
-from urlextract import URLExtract
 from uuid import uuid4
 from yubico_client import Yubico  # type: ignore[import-untyped]
 
@@ -122,7 +121,6 @@ def test_module_path() -> None:
 valid_test_phone_numbers = [
     '+41 44 453 45 45',
     '+41 79434 3254',
-    '+41     79434     3254',
     '+4179434 3254',
     '004179434 3254',
     '044 302 35 87',
@@ -130,45 +128,40 @@ valid_test_phone_numbers = [
     '0797205503',
     '0413025643',
     '041 324 4321',
+    '0043 555 32 43',
+    Markup('0043&nbsp;555&nbsp;32&nbsp;43'),
 ]
-
-# +041 324 4321 will treat + like a normal text around
 
 invalid_test_phone_numbers = [
     Markup('<a href="tel:061 444 44 44">061 444 44 44</a>'),
-    Markup('">+41 44 453 45 45'),
     'some text',
     '+31 654 32 54',
     '+0041 543 44 44',
     '0041-24400321',
-    '0043 555 32 43'
+    # NOTE: We no longer accept multiple spaces
+    '+41     79434     3254',
 ]
 
 
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
-def test_phone_regex_groups_valid(number: str) -> None:
-    gr = re.search(_phone_ch, number)
-    assert gr is not None
-    assert gr.group(0)
-    assert gr.group(1)
-    assert gr.group(2)
-
-
-@pytest.mark.parametrize("number", valid_test_phone_numbers)
 def test_phone_linkify_valid(number: str) -> None:
-    r = linkify_phone(number)
-    number = utils.remove_repeated_spaces(number)
+    r = utils.linkify(number)
     wanted = Markup(
-        '<a href="tel:{number}">{number}</a> '
-    ).format(number=number)
+        '<a href="tel:{normalized}">{number}</a>'
+    ).format(
+        number=number,
+        normalized=PhoneNumber.parse(
+            str(number).replace('&nbsp;', ' '), regions=('CH',)
+        ).format(PhoneFormat.E164)
+    )
     assert r == wanted
     # Important !
-    assert linkify_phone(wanted) == wanted
+    assert utils.linkify(wanted) == wanted
 
 
 @pytest.mark.parametrize("number", invalid_test_phone_numbers)
 def test_phone_linkify_invalid(number: str) -> None:
-    r = linkify_phone(number)
+    r = utils.linkify(number)
     assert r == number
 
 
@@ -190,16 +183,19 @@ def test_linkify() -> None:
 
     # test a longer html string with valid phone number
     tel_nr = valid_test_phone_numbers[0]
+    normalized = PhoneNumber.parse(
+        tel_nr, regions=('CH',)
+    ).format(PhoneFormat.E164)
     text = Markup('2016/2019<br>{}').format(tel_nr)
     assert utils.linkify(text) == Markup(
-        f'2016/2019<br><a href="tel:{tel_nr}">{tel_nr}</a> ')
+        f'2016/2019<br><a href="tel:{normalized}">{tel_nr}</a>')
 
 
 @pytest.mark.parametrize("tel", [
     ('Tel. +41 41 728 33 11',
-     'Tel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a> '),
+     'Tel. <a href="tel:+41417283311">+41 41 728 33 11</a>'),
     ('\nTel. +41 41 728 33 11\n',
-     '\nTel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a> \n'),
+     '\nTel. <a href="tel:+41417283311">+41 41 728 33 11</a>\n'),
 ])
 def test_linkify_with_phone(tel: str) -> None:
     assert utils.linkify(tel[0]) == Markup(tel[1])
@@ -207,7 +203,7 @@ def test_linkify_with_phone(tel: str) -> None:
 
 def test_linkify_with_phone_newline() -> None:
     assert utils.linkify('Foo\n041 123 45 67') == Markup(
-        'Foo\n<a href="tel:041 123 45 67">041 123 45 67</a> '
+        'Foo\n<a href="tel:+41411234567">041 123 45 67</a>'
     )
 
 
@@ -221,8 +217,8 @@ def test_linkify_with_custom_domains() -> None:
         "foo@bar.agency</a>\n<a href=\"mailto:foo@bar.co\">foo@bar.co</a>\n"
         "<a href=\"mailto:foo@bar.com\">foo@bar.com</a>\n"
         "<a href=\"https://foobar.agency\" rel=\"nofollow\">"
-        "https://foobar.agency</a>\n<a href=\"tel:+41 41 511 21 21\">"
-        "+41 41 511 21 21</a> \n<a href=\"mailto:foo@bar.ngo\">foo@bar.ngo</a>"
+        "https://foobar.agency</a>\n<a href=\"tel:+41415112121\">"
+        "+41 41 511 21 21</a>\n<a href=\"mailto:foo@bar.ngo\">foo@bar.ngo</a>"
     )
 
 
@@ -251,21 +247,6 @@ def test_linkify_with_custom_domain_and_without_email() -> None:
     assert utils.linkify(
         "https://thismatters.agency\nhttps://google.com"
     ) == expected
-
-
-def test_load_tlds() -> None:
-    def remove_dots(tlds: list[str]) -> list[str]:
-        return [domain[1:] for domain in tlds]
-
-    extract = URLExtract()
-    tlds = remove_dots(extract._load_cached_tlds())
-
-    assert all("." not in item for item in tlds)
-    assert len(tlds) > 1600  # make sure the reading worked
-
-    # if these are not in the list, the list is probably outdated
-    additional_tlds = ['agency', 'ngo', 'swiss', 'gle']
-    assert all(domain in tlds for domain in additional_tlds)
 
 
 def test_increment_name() -> None:

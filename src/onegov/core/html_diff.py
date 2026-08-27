@@ -29,10 +29,9 @@ from contextlib import contextmanager
 from difflib import SequenceMatcher
 from itertools import chain, zip_longest
 
-import html5lib
 from genshi.core import Stream, QName, Attrs, START, END, TEXT  # type:ignore
-from genshi.input import ET  # type:ignore[import-untyped]
 from markupsafe import Markup
+from turbohtml import parse_fragment, Element, Text as TextNode
 
 
 from typing import Any, TYPE_CHECKING
@@ -67,21 +66,32 @@ def render_html_diff(
     return Markup(rv.render('html', encoding=None))  # nosec: B704
 
 
+def to_genshi_stream(element: Element) -> Iterator[StreamEvent]:
+    tag_name = QName(element.tag.lstrip('{'))
+    attrs = Attrs([(QName(attr.lstrip('{')), value)
+                   for attr, value in element.attrs.items()])
+    yield START, (tag_name, attrs), (None, -1, -1)
+    for node in element.children:
+        if isinstance(node, Element):
+            yield from to_genshi_stream(element)
+        elif isinstance(node, TextNode):
+            yield TEXT, node.data, (None, -1, -1)
+    yield END, tag_name, (None, -1, -1)
+
+
 def parse_html(
     html: str,
     wrapper_element: str = 'div',
     wrapper_class: str = 'diff'
-) -> ET:
+) -> Iterator[StreamEvent]:
     """Parse an HTML fragment into a Genshi stream."""
-    builder = html5lib.getTreeBuilder('etree')
-    parser = html5lib.HTMLParser(tree=builder)
-    tree = parser.parseFragment(html)
-    tree.tag = wrapper_element
+    element = parse_fragment(html, wrapper_element)
     if wrapper_class is not None:
-        tree.set('class', wrapper_class)
-    return ET(tree)
+        element.add_class('wrapper_class')
+    return to_genshi_stream(element)
 
 
+# FIXME: Can we easily implement StreamDiffer without genshi?
 class StreamDiffer:
     """A class that can diff a stream of Genshi events. It will inject
     ``<ins>`` and ``<del>`` tags into the stream. It probably breaks
@@ -97,7 +107,11 @@ class StreamDiffer:
     _stack: list[str]
     _context: str | None
 
-    def __init__(self, old_stream: ET, new_stream: ET):
+    def __init__(
+        self,
+        old_stream: Iterator[StreamEvent],
+        new_stream: Iterator[StreamEvent]
+    ) -> None:
         self._old = list(old_stream)
         self._new = list(new_stream)
         # FIXME: We should probably switch to a hasattr check

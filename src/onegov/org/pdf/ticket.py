@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import date
-from functools import partial
 from io import BytesIO, StringIO
 from math import isclose
 
-from bleach import Cleaner
-from bleach.linkifier import LinkifyFilter
 from lxml import etree
 from markupsafe import Markup
 from onegov.chat import MessageCollection
@@ -20,20 +17,19 @@ from onegov.org.pdf.core import OrgPdf
 from onegov.org.utils import group_invoice_items
 from onegov.org.views.message import view_messages_feed
 from onegov.qrcode import QrCode
-from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from pdfdocument.document import MarkupParagraph
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import PageBreak, Paragraph
+from turbohtml.clean import LinkCandidate, Linker, Linkify
+from turbohtml.clean import minify, OnDisallowed, Policy, Sanitizer
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from collections.abc import Collection
-    from bleach.callbacks import _HTMLAttrs
-    from bleach.sanitizer import _Filter
     from onegov.org.forms import TicketInvoiceSearchForm
     from onegov.org.request import OrgRequest
     from onegov.pdf.templates import Template
@@ -67,56 +63,52 @@ class TicketBasePdf(OrgPdf):
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         ticket_summary_tags = ['dl', 'dt', 'dd', 'h2']
         tags += ticket_summary_tags
+        attributes: dict[str, frozenset[str]] = {}
 
-        attributes: dict[str, list[str]] = {}
-        filters: list[_Filter] = [WhitespaceFilter]
+        if linkify:
+            tags.append('a')
+            attributes['a'] = frozenset({'href'})
+
+        sanitizer = Sanitizer(Policy(
+            tags=frozenset(tags),
+            attributes=attributes,
+            on_disallowed_tag=OnDisallowed.STRIP,
+        ))
+        html = sanitizer.sanitize(html)
+        if not html.strip():
+            return
 
         if linkify:
             link_color = self.link_color
             underline_links = self.underline_links
             underline_width = self.underline_width
 
-            def colorize(
-                attrs: _HTMLAttrs,
-                new: bool = False
-            ) -> _HTMLAttrs:
-
-                # phone numbers appear here but are escaped, skip...
-                if not attrs.get((None, 'href')):
-                    # FIXME: The bleach stubs appear to be incorrect
-                    #        since this definitely works at runtime
-                    #        but we may be able to return an empty
-                    #        dictionary or attrs instead of None
-                    return None  # type:ignore[return-value]
-                attrs[(None, 'color')] = link_color
+            def colorize(link: LinkCandidate) -> LinkCandidate | None:
+                link.attrs['color'] = link_color
                 if underline_links:
-                    attrs[(None, 'underline')] = '1'
-                    attrs[('a', 'underlineColor')] = link_color
-                    attrs[('a', 'underlineWidth')] = underline_width
-                return attrs
+                    link.attrs['underline'] = '1'
+                    link.attrs['underlineColor'] = link_color
+                    link.attrs['underlineWidth'] = underline_width
+                return link
 
-            tags.append('a')
-            attributes['a'] = ['href']
-            filters.append(
-                partial(
-                    LinkifyFilter, parse_email=True, callbacks=[colorize])
-            )
+            linker = Linker(Linkify(
+                callbacks=(colorize,),
+                parse_email=True,
+                process_existing=True,
+                schemes=('http', 'https', 'email', 'tel')
+            ))
+            html = linker.linkify(html)
 
-        cleaner = Cleaner(
-            tags=tags,
-            attributes=attributes,
-            strip=True,
-            filters=filters
-        )
-        html = cleaner.clean(html)
-        # Todo: phone numbers with href="tel:.." are cleaned out
-        if not html.strip():
+        # NOTE: This has the same result as the html5lib whitespace
+        #       filter we used to use. It collapses all whitespace.
+        html = minify(html)
+
+        # TODO: Switch to turbohtml.parse
+        tree = etree.parse(StringIO(html), etree.HTMLParser())
+        body_element = tree.find('body')
+        if body_element is None:
             return
 
-        tree = etree.parse(StringIO(html), etree.HTMLParser())
-
-        body_element = tree.find('body')
-        assert body_element is not None
         for element in body_element:
             if element.tag == 'dl':
                 data: list[list[Paragraph | str]] = []
@@ -425,16 +417,15 @@ class TicketPdf(TicketBasePdf):
         tags += ticket_summary_tags
 
         attributes = {}
-        filters = [WhitespaceFilter]
-        attributes['div'] = ['class']
+        attributes['div'] = frozenset({'class'})
 
-        cleaner = Cleaner(
-            tags=tags,
+        sanitizer = Sanitizer(Policy(
+            tags=frozenset(tags),
             attributes=attributes,
-            strip=True,
-            filters=filters
-        )
-        html = cleaner.clean(html)
+            on_disallowed_tag=OnDisallowed.STRIP,
+        ))
+        html = minify(sanitizer.sanitize(html))
+        # TODO: switch to turbohtml.parse
         tree = etree.parse(StringIO(html), etree.HTMLParser())
         data = []
 

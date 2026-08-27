@@ -82,8 +82,8 @@ def test_link_health_check(org_app: TestOrgApp) -> None:
     # check external
     check = LinkHealthCheck(request, 'external')
 
-    found_urls = check.extractor.find_urls(text, only_unique=True)
-    assert found_urls == valid + not_found + invalid_domain
+    found_urls = {span.text for span in check.extractor.find(text)}
+    assert found_urls == set(valid + not_found + invalid_domain)
 
     urls = tuple(check.find_urls())
     assert urls == (

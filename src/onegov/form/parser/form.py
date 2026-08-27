@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from html import escape
 from functools import cached_property
 from io import StringIO
 from onegov.form import errors, log
@@ -19,6 +18,7 @@ from onegov.form.validators import ValidDateRange
 from onegov.form.widgets import DateRangeInput
 from onegov.form.widgets import DateTimeLocalRangeInput
 from pydantic import BaseModel, ConfigDict, Field
+from turbohtml import escape
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import EmailField

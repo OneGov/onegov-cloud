@@ -7,7 +7,7 @@ from collections import defaultdict
 import transaction
 from markupsafe import Markup
 from sqlalchemy.orm import object_session
-from urlextract import URLExtract
+from turbohtml.clean import LinkDetector
 
 from onegov.async_http.fetch import async_niquests_get_all
 from onegov.core.utils import normalize_for_url
@@ -295,7 +295,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
 
         self.link_type = link_type or None
         self.domain = self.request.domain
-        self.extractor = URLExtract()
+        self.extractor = LinkDetector(emails=False)
         self.timeout = timeout
 
     @property
@@ -319,15 +319,15 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     def find_urls(self) -> Iterator[tuple[str, str, Sequence[str]]]:
         for entries in self.site_collection.get().values():
             for entry in entries:
-                urls = []
+                urls: list[str] = []
                 for field in self.fields_with_urls:
                     text = getattr(entry, field, None)
                     if not text:
                         continue
-                    found = self.extractor.find_urls(text, only_unique=True)
+                    found = {span.text for span in self.extractor.find(text)}
                     if not found:
                         continue
-                    urls += found
+                    urls.extend(found)
                 if urls:
                     yield (
                         entry.__class__.__name__,
@@ -337,12 +337,15 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         for agency in AgencyCollection(self.request.session).query():
             if not agency.portrait:
                 continue
-            urls = self.extractor.find_urls(agency.portrait, only_unique=True)
-            if urls:
+            found = {
+                span.text
+                for span in self.extractor.find(agency.portrait)
+            }
+            if found:
                 yield (
                     'Agency',
                     self.request.link(agency),
-                    self.filter_urls(urls)
+                    self.filter_urls(list(found))
                 )
 
     def url_list_generator(self) -> Iterator[LinkCheck]:
