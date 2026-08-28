@@ -5018,7 +5018,8 @@ def test_my_reservations_view(client: Client) -> None:
     ).json
     assert len(events) == 1
     # key codes are hidden and ticket deep-links removed in reduced mode
-    assert events[0]['url'] is None
+    # empty url keeps the calendar entry but renders no link
+    assert events[0]['url'] == ''
 
     # the pdf is reachable via the same token and shows the confirmed
     # reservation without a session

@@ -1251,7 +1251,7 @@ class MyReservationEventInfo:
             'allDay': False,
             'title': self.event_title,
             'classNames': list(self.event_classes),
-            'url': None if self.reduced else self.request.class_link(
+            'url': '' if self.reduced else self.request.class_link(
                 Ticket,
                 {
                     'handler_code': self.handler_code,
