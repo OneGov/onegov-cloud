@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import isodate
 import morepath
+import secrets
 import pytz
 import sedate
 import transaction
@@ -988,6 +989,26 @@ def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
     )
 
 
+def get_reservations_subscribe_url(
+    request: OrgRequest,
+    email: str
+) -> str | None:
+    """ Durable magic link (no login / mail verification) to the recipient's
+    reservations calendar feed.
+    """
+    if not request.app.org.citizen_login_enabled:
+        return None
+
+    salt = secrets.token_urlsafe(16)
+    url_obj = URL(request.class_link(
+        ResourceCollection, name='my-reservations-ical'
+    ))
+    token = request.new_url_safe_token(email, salt)
+    url_obj = url_obj.query_param('token', token)
+    url_obj = url_obj.query_param('salt', salt)
+    return url_obj.as_string()
+
+
 @OrgApp.view(model=Reservation, name='accept', permission=Private)
 def accept_reservation(
     self: Reservation,
@@ -1137,6 +1158,9 @@ def accept_reservation(
                 'form': form,
                 'message': message,
                 'my_reservations_url': get_my_reservations_url(
+                    request, self.email
+                ),
+                'subscribe_url': get_reservations_subscribe_url(
                     request, self.email
                 ),
                 'cancel_url': _cancel_url,
@@ -1899,6 +1923,9 @@ def send_reservation_summary(
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
                 'my_reservations_url': get_my_reservations_url(
+                    request, recipient
+                ),
+                'subscribe_url': get_reservations_subscribe_url(
                     request, recipient
                 ),
             }

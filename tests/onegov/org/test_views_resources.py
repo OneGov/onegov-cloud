@@ -13,6 +13,7 @@ from base64 import b64decode
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 from freezegun import freeze_time
+from html import unescape
 from io import BytesIO
 from libres.db.models import Reservation
 from onegov.core.utils import module_path, normalize_for_url
@@ -4986,6 +4987,17 @@ def test_my_reservations_view(client: Client) -> None:
     ticket.click('Alle Reservationen annehmen')
 
     assert client.get(ical_url).status_code == 200
+
+    # the acceptance email contains a durable magic link to subscribe to
+    # the reservations calendar without login / mail verification
+    accepted_mail = client.get_email(-1)['HtmlBody']
+    assert 'Reservationskalender abonnieren' in accepted_mail
+    mail_ical_url = unescape(re.search(  # type: ignore[union-attr]
+        r'https?://localhost(/resources/my-reservations-ical[^"]+)',
+        accepted_mail
+    ).group(1))
+    # anyone with the link can reach the feed, no authentication needed
+    assert client2.get(mail_ical_url).status_code == 200
 
     # someone else can open the same ical link without authentication
     assert client2.get(ical_url).status_code == 200
