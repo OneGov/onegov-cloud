@@ -1843,6 +1843,15 @@ msgstr "Richiedere la cancellazione"
 msgid "See all your reservations"
 msgstr "Vedere tutte le prenotazioni"
 
+msgid "Subscribe to your reservations calendar"
+msgstr "Abbonarsi al calendario delle prenotazioni"
+
+msgid "You are viewing a read-only summary of your confirmed reservations."
+msgstr "State visualizzando un riepilogo in sola lettura delle prenotazioni confermate."
+
+msgid "Log in for full details"
+msgstr "Accedere per tutti i dettagli"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 

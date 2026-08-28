@@ -1849,6 +1849,15 @@ msgstr "Stornierung beantragen"
 msgid "See all your reservations"
 msgstr "Alle Ihre Reservationen einsehen"
 
+msgid "Subscribe to your reservations calendar"
+msgstr "Reservationskalender abonnieren"
+
+msgid "You are viewing a read-only summary of your confirmed reservations."
+msgstr "Dies ist eine limitierte Übersicht Ihrer bestätigten Reservationen."
+
+msgid "Log in for full details"
+msgstr "Für alle Details anmelden"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 

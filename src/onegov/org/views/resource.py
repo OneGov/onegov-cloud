@@ -39,6 +39,7 @@ from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.org.views.utils import assert_citizen_logged_in
+from onegov.user import Auth
 from onegov.reservation import Allocation, Reservation
 from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketInvoice
@@ -1536,6 +1537,19 @@ def view_occupancy(
     }
 
 
+def resolved_reservations_email(
+    request: OrgRequest
+) -> tuple[str | None, bool]:
+    """ (email, reduced): the session citizen (full) or a magic-link token
+    (reduced, read-only). """
+    if request.authenticated_email:
+        return request.authenticated_email, False
+    email = request.load_url_safe_token(
+        request.GET.get('token'), request.GET.get('salt'), None
+    )
+    return (email, True) if isinstance(email, str) else (None, False)
+
+
 @OrgApp.json(
     model=ResourceCollection,
     name='my-reservations-json',
@@ -1555,7 +1569,8 @@ def view_my_reservations_json(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    if not request.authenticated_email:
+    email, reduced = resolved_reservations_email(request)
+    if email is None:
         raise exc.HTTPForbidden()
 
     start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
@@ -1566,14 +1581,20 @@ def view_my_reservations_json(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(*stmt.c).where(and_(
-        func.lower(stmt.c.email) == request.authenticated_email.lower(),
+    conditions = [
+        func.lower(stmt.c.email) == email.lower(),
         start <= stmt.c.start,
-        stmt.c.start <= end
-    )))
+        stmt.c.start <= end,
+    ]
+    if reduced:
+        # magic-link visitors: confirmed reservations only
+        conditions.append(stmt.c.accepted.is_(True))
 
-    return [
-        utils.MyReservationEventInfo(
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
+
+    events = []
+    for r in records:
+        event = utils.MyReservationEventInfo(
             id=r.id,
             token=r.token,
             start=r.start,
@@ -1585,10 +1606,14 @@ def view_my_reservations_json(
             ticket_id=r.ticket_id,
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
-            key_code=r.key_code,
+            # reduced: no key codes, no ticket deep-links (see below)
+            key_code=None if reduced else r.key_code,
             request=request
-        ).as_dict() for r in records
-    ]
+        ).as_dict()
+        if reduced:
+            event['url'] = None
+        events.append(event)
+    return events
 
 
 @OrgApp.html(
@@ -1604,7 +1629,8 @@ def view_my_reservations_pdf(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    if not request.authenticated_email:
+    email, reduced = resolved_reservations_email(request)
+    if email is None:
         raise exc.HTTPForbidden()
 
     start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
@@ -1616,12 +1642,12 @@ def view_my_reservations_pdf(
     stmt = as_selectable_from_path(path)
 
     conditions = [
-        func.lower(stmt.c.email) == request.authenticated_email.lower(),
+        func.lower(stmt.c.email) == email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end,
     ]
 
-    if request.GET.get('accepted') == '1':
+    if reduced or request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
 
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
@@ -1639,7 +1665,7 @@ def view_my_reservations_pdf(
             ticket_id=r.ticket_id,
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
-            key_code=r.key_code,
+            key_code=None if reduced else r.key_code,
             request=request
         ) for r in records
     ], start, end)
@@ -1649,7 +1675,7 @@ def view_my_reservations_pdf(
         content_type='application/pdf',
         content_disposition='attachment; filename='
         'my-reservations-{}-{}-{}.pdf'.format(
-            request.authenticated_email,
+            email,
             start.strftime('%Y%m%d'),
             end.strftime('%Y%m%d')
         )
@@ -1668,7 +1694,13 @@ def view_my_reservations(
     layout: DefaultLayout | None = None
 ) -> RenderData:
 
-    assert_citizen_logged_in(request)
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    email, reduced = resolved_reservations_email(request)
+    if email is None:
+        # no session, no valid token: redirect to login
+        assert_citizen_logged_in(request)
 
     # NOTE: For some reason we need to manually include common
     #       and fullcalendar in addition to occupancycalendar
@@ -1677,6 +1709,12 @@ def view_my_reservations(
     request.include('fullcalendar')
     request.include('occupancycalendar')
 
+    # reduced visitors carry their token into the feeds
+    feed_params = {
+        'token': request.GET.get('token') or '',
+        'salt': request.GET.get('salt') or '',
+    } if reduced else {}
+
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
@@ -1684,7 +1722,7 @@ def view_my_reservations(
         Link(_('My Reservations'), '#')
     ]
 
-    layout.editbar_links = [
+    layout.editbar_links = [] if reduced else [
         Link(
             _('Subscribe'),
             request.link(self, 'my-reservations-subscribe'),
@@ -1709,8 +1747,16 @@ def view_my_reservations(
             default_view='timeGridWeek'
         ),
         'layout': layout,
-        'feed': request.link(self, name='my-reservations-json'),
-        'pdf_url': request.link(self, name='my-reservations-pdf'),
+        'feed': request.link(
+            self, name='my-reservations-json', query_params=feed_params
+        ),
+        'pdf_url': request.link(
+            self, name='my-reservations-pdf', query_params=feed_params
+        ),
+        'reduced': reduced,
+        'login_url': request.link(
+            Auth.from_request_path(request), name='citizen-login'
+        ),
     }
 
 

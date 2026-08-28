@@ -5820,6 +5820,15 @@ msgstr "Demander l'annulation"
 msgid "See all your reservations"
 msgstr "Voir toutes vos réservations"
 
+msgid "Subscribe to your reservations calendar"
+msgstr "S'abonner à votre calendrier de réservations"
+
+msgid "You are viewing a read-only summary of your confirmed reservations."
+msgstr "Vous consultez un résumé en lecture seule de vos réservations confirmées."
+
+msgid "Log in for full details"
+msgstr "Se connecter pour tous les détails"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
 

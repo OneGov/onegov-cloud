@@ -4999,6 +4999,72 @@ def test_my_reservations_view(client: Client) -> None:
     # anyone with the link can reach the feed, no authentication needed
     assert client2.get(mail_ical_url).status_code == 200
 
+    # the acceptance email also contains a durable magic link to a read-only
+    # web summary (no login), with the option to log in for full details
+    web_url = unescape(re.search(  # type: ignore[union-attr]
+        r'https?://localhost(/resources/my-reservations\?token=[^"]+)',
+        accepted_mail
+    ).group(1))
+    client3 = client.spawn()
+    summary = client3.get(web_url)
+    assert 'Für alle Details anmelden' in summary
+    # the feed carries the token so the calendar loads without a session
+    feed_url = unescape(re.search(  # type: ignore[union-attr]
+        r'data-feed="([^"]+)"', summary.text
+    ).group(1))
+    assert 'token=' in feed_url
+    events = client3.get(
+        f'{feed_url}&start=2015-08-28&end=2015-08-29'
+    ).json
+    assert len(events) == 1
+    # key codes are hidden and ticket deep-links removed in reduced mode
+    assert events[0]['url'] is None
+
+    # the pdf is reachable via the same token and shows the confirmed
+    # reservation without a session
+    pdf_feed_url = unescape(re.search(  # type: ignore[union-attr]
+        r'data-pdf-url="([^"]+)"', summary.text
+    ).group(1))
+    assert 'token=' in pdf_feed_url
+    pdf = client3.get(f'{pdf_feed_url}&start=2015-08-28&end=2015-08-29')
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert '28. August 2015' in pdf_content
+    assert 'Noch nicht akzeptiert' not in pdf_content
+    # without a token or session the pdf is forbidden
+    client.spawn().get(
+        '/resources/my-reservations-pdf?start=2015-08-28&end=2015-08-29',
+        status=403
+    )
+
+    # a tampered token does not leak anything: html falls back to login,
+    # the feeds return 403
+    assert client.spawn().get(
+        web_url[:-1] + ('x' if web_url[-1] != 'x' else 'y')
+    ).follow().request.path == '/auth/citizen-login'
+    client.spawn().get(
+        feed_url[:-1] + ('x' if feed_url[-1] != 'x' else 'y')
+        + '&start=2015-08-28&end=2015-08-29',
+        status=403
+    )
+
+    # logging in "for details" with a *different* email must not escalate:
+    # the visitor becomes that other email and sees its (empty) reservations,
+    # never the magic-link email's data
+    login = summary.click('Für alle Details anmelden')
+    login.form['email'] = 'someone.else@example.org'
+    confirm = login.form.submit().follow()
+    tan = re.search(  # type: ignore[union-attr]
+        r'&token=([^)\s]+)', client3.get_email(-1)['TextBody']
+    ).group(1)
+    confirm.form['token'] = tan
+    confirm.form.submit().follow()
+
+    # now authenticated as the other email: no reservations, no key code
+    other_events = client3.get(
+        '/resources/my-reservations-json?start=2015-08-28&end=2015-08-29'
+    ).json
+    assert other_events == []
+
     # someone else can open the same ical link without authentication
     assert client2.get(ical_url).status_code == 200
     # but not the other views

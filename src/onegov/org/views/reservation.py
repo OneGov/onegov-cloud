@@ -37,8 +37,6 @@ from onegov.pay import InvoiceMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.reservation.collection import ResourceCollection
 from onegov.ticket import TicketCollection, TicketInvoice
-from onegov.user import Auth
-from onegov.user.collections import TANCollection
 from purl import URL
 from sqlalchemy import and_, or_
 from uuid import uuid4
@@ -966,26 +964,19 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
 
 def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
+    """ Durable magic link to a read-only summary of the recipient's
+    confirmed reservations, with an option to log in for full details. """
     if not request.app.org.citizen_login_enabled:
         return None
 
-    auth = Auth.from_request(
-        request,
-        to=request.class_link(
-            ResourceCollection,
-            name='my-reservations'
-        )
-    )
-    tans = TANCollection(request.session, scope='citizen-login')
-    tan_obj = tans.add(
-        client='unknown',
-        email=email,
-        redirect_to=auth.to,
-    )
-    return request.link(
-        auth,
-        name='confirm-citizen-login',
-        query_params={'token': tan_obj.tan}
+    salt = secrets.token_urlsafe(16)
+    return request.class_link(
+        ResourceCollection,
+        name='my-reservations',
+        query_params={
+            'token': request.new_url_safe_token(email, salt),
+            'salt': salt,
+        }
     )
 
 
@@ -993,9 +984,7 @@ def get_reservations_subscribe_url(
     request: OrgRequest,
     email: str
 ) -> str | None:
-    """ Durable magic link (no login / mail verification) to the recipient's
-    reservations calendar feed.
-    """
+    """ Durable magic link to the recipient's reservations calendar feed. """
     if not request.app.org.citizen_login_enabled:
         return None
 
