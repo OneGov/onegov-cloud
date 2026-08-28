@@ -550,67 +550,6 @@ def fix_tags(
     return fixes_german_tags_in_db
 
 
-@cli.command('translate-tags', context_settings={'default_selector': '*'})
-@click.option('--dry-run', default=False, is_flag=True,
-              help='Do not write any changes into the database.')
-@pass_group_context
-def translate_tags(
-    group_context: GroupContext,
-    dry_run: bool
-) -> Callable[[OrgRequest, OrgApp], None]:
-    """ Translates existing English tag keys stored on events/occurrences to
-    the German custom tag labels, for orgs that switched to custom event tags
-    (eventsettings.yml). The inverse of `fix-tags`.
-
-    Example:
-
-        onegov-org --select /onegov_town6/abc translate-tags --dry-run
-
-    """
-
-    def translates_to_custom_tags(request: OrgRequest, app: OrgApp) -> None:
-        custom_tags = app.custom_event_tags
-        if not custom_tags:
-            abort(
-                'No custom event tags configured (eventsettings.yml missing)'
-            )
-
-        de_transl = app.translations.get('de_CH')
-        assert de_transl is not None
-
-        def translate(text: TranslationString) -> str:
-            return text.interpolate(de_transl.gettext(text))
-
-        # English key -> German label, but only where the German label is
-        # actually one of the configured custom tags
-        custom = set(custom_tags)
-        en_to_de = {
-            str(tag): translate(tag)
-            for tag in TAGS
-            if translate(tag) in custom
-        }
-
-        msg_log = set()
-
-        def handle_occurrence_tags(occurrence: Event | Occurrence) -> None:
-            new_tags = [en_to_de.get(t, t) for t in occurrence.tags]
-            if new_tags != occurrence.tags:
-                for old, new in zip(occurrence.tags, new_tags):
-                    if old != new:
-                        msg_log.add(f'{old} -> {new}')
-                if not dry_run:
-                    occurrence.tags = new_tags
-
-        for event_ in request.session.query(Event):
-            handle_occurrence_tags(event_)
-        for occurrence in request.session.query(Occurrence):
-            handle_occurrence_tags(occurrence)
-
-        click.echo('\n'.join(sorted(msg_log)) or 'No tags to translate')
-
-    return translates_to_custom_tags
-
-
 def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
     # attribute to the logged-in user if any, else the passed acting user
     owner = request.current_username or user.username
