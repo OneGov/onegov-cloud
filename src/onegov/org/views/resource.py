@@ -1592,9 +1592,8 @@ def view_my_reservations_json(
 
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
-    events = []
-    for r in records:
-        event = utils.MyReservationEventInfo(
+    return [
+        utils.MyReservationEventInfo(
             id=r.id,
             token=r.token,
             start=r.start,
@@ -1606,14 +1605,11 @@ def view_my_reservations_json(
             ticket_id=r.ticket_id,
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
-            # reduced: no key codes, no ticket deep-links (see below)
-            key_code=None if reduced else r.key_code,
-            request=request
-        ).as_dict()
-        if reduced:
-            event['url'] = None
-        events.append(event)
-    return events
+            key_code=r.key_code,
+            request=request,
+            reduced=reduced
+        ).as_dict() for r in records
+    ]
 
 
 @OrgApp.html(
@@ -1665,8 +1661,9 @@ def view_my_reservations_pdf(
             ticket_id=r.ticket_id,
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
-            key_code=None if reduced else r.key_code,
-            request=request
+            key_code=r.key_code,
+            request=request,
+            reduced=reduced
         ) for r in records
     ], start, end)
 
