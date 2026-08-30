@@ -199,12 +199,10 @@ def handle_new_directory(
             request.link(ExtendedDirectoryEntryCollection(directory)))
 
     layout = layout or DirectoryCollectionLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_('Homepage'), layout.homepage_url),
-        Link(_('Directories'), request.link(self)),
-        Link(_('New'), request.link(self, name='new'))
-    ]
     layout.edit_mode = True
+    layout.breadcrumbs.append(
+        Link(_('New'), request.link(self, name='new'))
+    )
 
     return {
         'layout': layout,
@@ -273,12 +271,10 @@ def handle_edit_directory(
 
     layout = layout or DirectoryCollectionLayout(self, request)
     layout.edit_mode = True
-    layout.breadcrumbs = [
-        Link(_('Homepage'), layout.homepage_url),
-        Link(_('Directories'), request.link(self)),
+    layout.breadcrumbs.extend([
         Link(_(self.directory.title), request.link(self)),
-        Link(_('Edit'), '#')
-    ]
+        Link(_('Configure'), '#')
+    ])
 
     return {
         'layout': layout,
@@ -380,8 +376,17 @@ def change_directory_url(
 ) -> RenderData | Response:
 
     layout = layout or DefaultLayout(self, request)
+    layout.edit_mode = True
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_('Change URL'), '#'))
+    layout.breadcrumbs.extend([
+        Link(
+            _(self.title),
+            request.class_link(
+                ExtendedDirectoryEntryCollection, {'directory_name': self.name}
+            ),
+        ),
+        Link(_('Change URL'), '#')
+    ])
 
     form.delete_field('test')
 
@@ -837,13 +842,13 @@ def handle_new_directory_entry(
 
 
 @OrgApp.form(
-    model=DirectoryEntry,
+    model=ExtendedDirectoryEntry,
     permission=Private,
     template='form.pt',
     form=get_directory_entry_form_class,
     name='edit')
 def handle_edit_directory_entry(
-    self: DirectoryEntry,
+    self: ExtendedDirectoryEntry,
     request: OrgRequest,
     form: DirectoryEntryForm,
     layout: DirectoryEntryLayout | None = None
@@ -857,8 +862,7 @@ def handle_edit_directory_entry(
     elif not request.POST:
         form.process(obj=self)
 
-    # FIXME: Should we only register this view for ExtendedDirectoryEntry?
-    layout = layout or DirectoryEntryLayout(self, request)  # type:ignore
+    layout = layout or DirectoryEntryLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []

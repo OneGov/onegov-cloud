@@ -316,6 +316,34 @@ def test_many_filters(client: Client) -> None:
     assert "Mehr anzeigen" in events
 
 
+def test_empty_event_filter_value(client: Client) -> None:
+    client.login_admin()
+    page = client.get('/event-settings')
+    page.form['event_filter_type'] = 'tags_and_filters'
+    definition = """
+        Size =
+            ( ) Small
+            ( ) Large
+    """
+    page.form['event_filter_definition'] = definition
+    page.form['keyword_fields'].value = 'size'
+    page.form.submit()
+
+    page = (
+        client.get('/events').click('Generalversammlung').click('Bearbeiten')
+    )
+    assert page.form['size'].value is None
+    page.form.submit()
+
+    event = (
+        client.app.session()
+        .query(Event)
+        .filter_by(title='Generalversammlung')
+        .one()
+    )
+    assert event.filter_keywords_ordered() == {}
+
+
 def test_view_occurrence(client: Client) -> None:
     events = client.get('/events')
 

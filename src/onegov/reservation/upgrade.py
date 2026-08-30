@@ -15,7 +15,6 @@ from onegov.reservation import Resource
 from sqlalchemy import (
     bindparam, text, Column, Enum, ForeignKey, Integer, Text, UUID)
 
-
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.upgrade import UpgradeContext
@@ -506,8 +505,26 @@ def add_source_id_to_reserved_slots(context: UpgradeContext) -> None:
     )
 
 
-@upgrade_task('Store pricing settings on reservations')
-def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
+@upgrade_task('Store pricing settings on reservations (fixed)')
+def store_pricing_settings_on_reservations_fixed(
+    context: UpgradeContext
+) -> None:
+    """ Snapshots each reservation's pricing onto its own ``data``, from the
+    master allocation when it defines a price, otherwise from the resource
+    content.
+
+    Re-run of `Store pricing settings on reservations` under a new name so it
+    executes again on already-upgraded databases. Three bugs in the original
+    zeroed prices:
+
+    - the allocation lookup matched on the wrong ``pricing_method`` constants
+      (``price_per_item``/``price_per_hour`` instead of ``per_item``/
+      ``per_hour``), so allocation-priced reservations never matched,
+    - the ``resource = mirror_of`` guard was mis-parenthesised (``AND`` bound
+      tighter than the following ``OR``s), and
+    - the resource-content fallback read ``content->'price_per_item'``, but the
+      resource stores that value under ``price_per_reservation``.
+    """
     if not context.has_table('resources'):
         return
 
@@ -526,9 +543,7 @@ def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
                    ) AS pricing
               FROM allocations
              WHERE resource = mirror_of
-               AND data->>'pricing_method' = 'price_per_item'
-                OR data->>'pricing_method' = 'price_per_hour'
-                OR data->>'pricing_method' = 'free'
+               AND data->>'pricing_method' IN ('per_item', 'per_hour', 'free')
         )
         UPDATE reservations
            SET data = COALESCE(data, '{}'::jsonb) ||
@@ -555,7 +570,7 @@ def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
                         ),
                         'price_per_item',
                         COALESCE(
-                            resources.content->'price_per_item',
+                            resources.content->'price_per_reservation',
                             '0.0'::jsonb
                         ),
                         'currency',
@@ -566,5 +581,23 @@ def store_pricing_settings_on_reservations(context: UpgradeContext) -> None:
                END
            FROM resources
           WHERE resources.id = resource
-
     """))
+
+
+@upgrade_task('Migrate resources.parent_id to association table')
+def migrate_resources_parent_id_to_association_table(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('resources'):
+        return
+
+    if not context.has_column('resources', 'parent_id'):
+        return
+
+    context.session.execute(text("""
+        INSERT INTO blocking_resources (parent_id, child_id)
+        SELECT parent_id, id
+          FROM resources
+         WHERE parent_id IS NOT NULL
+    """))
+    context.operations.drop_column('resources', 'parent_id')

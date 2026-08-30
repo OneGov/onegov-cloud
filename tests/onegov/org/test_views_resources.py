@@ -299,12 +299,12 @@ def test_find_your_spot(client: Client) -> None:
     new = resources.click('Raum')
     new.form['title'] = 'Meeting 1'
     new.form['group'] = 'Meeting Rooms'
-    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.select_multiple('parent_ids', texts=['Grand Meeting Room'])
     new.form.submit().follow()
 
     new.form['title'] = 'Meeting 2'
     new.form['group'] = 'Meeting Rooms'
-    new.form.select('parent_id', text='Grand Meeting Room')
+    new.form.select_multiple('parent_ids', texts=['Grand Meeting Room'])
     new.form.submit().follow()
 
     find_your_spot = client.get('/find-your-spot?group=Meeting+Rooms')
@@ -4122,13 +4122,22 @@ def test_allocation_rules_on_rooms(client: Client) -> None:
     )
     page.form['title'] = 'Täglich'
     page.form['extend'] = 'daily'
-    page.form['start'] = '2019-01-01'
-    page.form['end'] = '2019-01-02'
+    page.form['start'] = '2019-01-02'
+    page.form['end'] = '2019-01-01'
     page.form['as_whole_day'] = 'yes'
 
     page.select_checkbox('except_for', 'Sa')
     page.select_checkbox('except_for', 'So')
 
+    page = page.form.submit()
+    assert 'Start Datum vor Ende' in page
+
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2025-01-02'
+    page = page.form.submit()
+    assert 'maximal fünf Jahre lang' in page
+
+    page.form['end'] = '2019-01-02'
     page = page.form.submit().follow()
 
     assert 'Verfügbarkeitszeitraum aktiv, 2 Verfügbarkeiten erstellt' in page

@@ -13,8 +13,8 @@ from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.models import NotificationTemplate
 from onegov.form import Form
-from onegov.form.fields import (
-    MultiCheckboxField, HtmlField, TranslatedSelectField)
+from onegov.form.fields import (MultiCheckboxField, HtmlField,
+                                TranslatedSelectField)
 from onegov.user import User, UserCollection
 from sqlalchemy import distinct, or_, and_, select, exists
 from uuid import uuid4
@@ -96,7 +96,7 @@ class NotificationTemplateSendForm(Form):
             ('by_occasion', _(
                 'Users with attenedees that have an occasion on their '
                 'wish- or booking-list'
-            )),
+            ))
         ],
         default='by_role'
     )

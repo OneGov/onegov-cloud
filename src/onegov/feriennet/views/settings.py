@@ -358,7 +358,7 @@ class FeriennetSettingsForm(Form):
             obj.meta[attr] = value
 
 
-@FeriennetApp.form(model=Organisation, name='feriennet-settings',
+@FeriennetApp.setting_form(model=Organisation, name='feriennet-settings',
                    template='form.pt', permission=Secret,
                    form=FeriennetSettingsForm, setting=_('Feriennet'),
                    icon='fa-child')

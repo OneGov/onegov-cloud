@@ -1037,3 +1037,17 @@ def add_transport_and_note_to_volunteer(context: UpgradeContext) -> None:
         'volunteers',
         Column('note', Text, nullable=True)
     )
+
+
+@upgrade_task('Reset stale cancelled volunteer states')
+def reset_stale_cancelled_volunteer_states(context: UpgradeContext) -> None:
+    # The reverted "Volunteer Ticket" feature left behind volunteers with a
+    # 'canceled' state that is no longer part of the volunteer_state enum,
+    # causing a LookupError when loading them on the demo instance. Reset
+    # them to 'open'. Compare on ::text since most schemas never gained the
+    # 'canceled' enum label.
+    if context.has_table('volunteers'):
+        context.session.execute(text(
+            "UPDATE volunteers SET state = 'open' "
+            "WHERE state::text = 'cancelled'"
+        ))
