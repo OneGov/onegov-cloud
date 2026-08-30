@@ -418,7 +418,7 @@ def test_volunteer_subscription(
     scenario.add_activity(title="Photography", state='accepted')
 
     now = datetime.now()
-    later = scenario.date_offset(10)  # ein date-Objekt
+    later = scenario.date_offset(10)
 
     later = datetime.combine(later, now.time())
     scenario.add_occasion(
