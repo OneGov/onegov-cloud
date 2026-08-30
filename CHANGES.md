@@ -1,8 +1,20 @@
 # Changes
 
+## 2026.43
+
+`2026-08-30` | [ff591f5e87...1e6bb4537d](https://github.com/OneGov/onegov-cloud/compare/ff591f5e87^...1e6bb4537d)
+
+### Feriennet
+
+##### Volunteers
+
+Volunteer submissions are now tickets
+
+`Feature` | [1e6bb4537d](https://github.com/onegov/onegov-cloud/commit/1e6bb4537dad459d68688deb54a1db08d81d37a6)
+
 ## 2026.42
 
-`2026-08-28` | [82c3f9e52f...593b3b9458](https://github.com/OneGov/onegov-cloud/compare/82c3f9e52f^...593b3b9458)
+`2026-08-28` | [82c3f9e52f...2bd89f0ffc](https://github.com/OneGov/onegov-cloud/compare/82c3f9e52f^...2bd89f0ffc)
 
 ### Activity
 
@@ -5439,20 +5451,4 @@ is the default and can safely be ignored.
 ##### Avoids N+1 query for page slides
 
 `Performance` | [c88b3b5493](https://github.com/onegov/onegov-cloud/commit/c88b3b5493bf2fee8e0d73d2c9df8734f6ee7e23)
-
-## 2025.14
-
-`2025-03-14` | [65267dc3b5...d92404c116](https://github.com/OneGov/onegov-cloud/compare/65267dc3b5^...d92404c116)
-
-### Org
-
-##### Adds a button to show a modal with file links in the file details
-
-`Feature` | [OGC-2077](https://linear.app/onegovcloud/issue/OGC-2077) | [65267dc3b5](https://github.com/onegov/onegov-cloud/commit/65267dc3b5c03a5ee84e79e25e8e8eed68496ca5)
-
-##### Display phone numbers in international format
-
-The international format prefixes the country code e.g. +41 for Switzerland
-
-`Feature` | [OGC-2113](https://linear.app/onegovcloud/issue/OGC-2113) | [d54f9470e7](https://github.com/onegov/onegov-cloud/commit/d54f9470e7636d9140199e75a3ab827322115856)
 
