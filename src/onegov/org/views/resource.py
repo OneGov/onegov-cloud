@@ -1540,8 +1540,9 @@ def view_occupancy(
 def resolved_reservations_email(
     request: OrgRequest
 ) -> tuple[str | None, bool]:
-    """ (email, reduced): the session citizen (full) or a magic-link token
-    (reduced, read-only). """
+    """ Returns (email, limited). A logged-in citizen sees the full view
+    (limited=False); a magic-link token grants only the limited view
+    (limited=True): confirmed reservations, no key codes, no ticket links. """
     if request.authenticated_email:
         return request.authenticated_email, False
     email = request.load_url_safe_token(
@@ -1569,7 +1570,7 @@ def view_my_reservations_json(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    email, reduced = resolved_reservations_email(request)
+    email, limited = resolved_reservations_email(request)
     if email is None:
         raise exc.HTTPForbidden()
 
@@ -1586,7 +1587,7 @@ def view_my_reservations_json(
         start <= stmt.c.start,
         stmt.c.start <= end,
     ]
-    if reduced:
+    if limited:
         # magic-link visitors: confirmed reservations only
         conditions.append(stmt.c.accepted.is_(True))
 
@@ -1607,7 +1608,7 @@ def view_my_reservations_json(
             ticket_number=r.ticket_number,
             key_code=r.key_code,
             request=request,
-            reduced=reduced
+            limited=limited
         ).as_dict() for r in records
     ]
 
@@ -1625,7 +1626,7 @@ def view_my_reservations_pdf(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    email, reduced = resolved_reservations_email(request)
+    email, limited = resolved_reservations_email(request)
     if email is None:
         raise exc.HTTPForbidden()
 
@@ -1643,7 +1644,7 @@ def view_my_reservations_pdf(
         stmt.c.start <= end,
     ]
 
-    if reduced or request.GET.get('accepted') == '1':
+    if limited or request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
 
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
@@ -1663,16 +1664,16 @@ def view_my_reservations_pdf(
             ticket_number=r.ticket_number,
             key_code=r.key_code,
             request=request,
-            reduced=reduced
+            limited=limited
         ) for r in records
     ], start, end)
 
     return Response(
         content.read(),
         content_type='application/pdf',
-        content_disposition='attachment; filename='
-        'my-reservations-{}-{}-{}.pdf'.format(
-            email,
+        # limited: no email in the filename
+        content_disposition='attachment; filename={}-{}-{}.pdf'.format(
+            'my-reservations' if limited else f'my-reservations-{email}',
             start.strftime('%Y%m%d'),
             end.strftime('%Y%m%d')
         )
@@ -1694,7 +1695,7 @@ def view_my_reservations(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    email, reduced = resolved_reservations_email(request)
+    email, limited = resolved_reservations_email(request)
     if email is None:
         # no session, no valid token: redirect to login
         assert_citizen_logged_in(request)
@@ -1706,11 +1707,11 @@ def view_my_reservations(
     request.include('fullcalendar')
     request.include('occupancycalendar')
 
-    # reduced visitors carry their token into the feeds
+    # limited visitors carry their token into the feeds
     feed_params = {
         'token': request.GET.get('token') or '',
         'salt': request.GET.get('salt') or '',
-    } if reduced else {}
+    } if limited else {}
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
@@ -1719,7 +1720,7 @@ def view_my_reservations(
         Link(_('My Reservations'), '#')
     ]
 
-    layout.editbar_links = [] if reduced else [
+    layout.editbar_links = [] if limited else [
         Link(
             _('Subscribe'),
             request.link(self, 'my-reservations-subscribe'),
@@ -1750,7 +1751,7 @@ def view_my_reservations(
         'pdf_url': request.link(
             self, name='my-reservations-pdf', query_params=feed_params
         ),
-        'reduced': reduced,
+        'limited': limited,
         'login_url': request.link(
             Auth.from_request_path(request), name='citizen-login'
         ),
@@ -1888,8 +1889,9 @@ def view_my_reservations_ical(
 
         cal.add_component(evt)
 
+    # durable magic-link feed: no email in the filename
     suffix = '-with-key-codes' if include_key_code else ''
-    filename = f'inline; filename=my-reservations-{email}{suffix}.ics'
+    filename = f'inline; filename=my-reservations{suffix}.ics'
     return Response(
         cal.to_ical(),
         content_type='text/calendar',

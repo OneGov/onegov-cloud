@@ -964,7 +964,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
 
 def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
-    """ Durable magic link to a read-only summary of the recipient's
+    """ Durable magic link to a limited summary of the recipient's
     confirmed reservations, with an option to log in for full details. """
     if not request.app.org.citizen_login_enabled:
         return None
