@@ -5051,16 +5051,51 @@ def test_my_reservations_view(client: Client) -> None:
     assert KABA not in feed.text
     assert EMAIL not in feed.text
 
+    # add a second reservation request for the same email that never gets
+    # accepted; the limited (accepted-only) view must not list it
+    client4 = client.spawn()
+    tageskarte = resources.by_name('tageskarte')
+    assert tageskarte is not None
+    scheduler = tageskarte.get_scheduler(client.app.libres_context)
+    pending = scheduler.allocate(
+        dates=(datetime(2015, 9, 4), datetime(2015, 9, 4)), whole_day=True
+    )
+    reserve = client4.bound_reserve(pending[0])
+    transaction.commit()
+    assert reserve().json == {'success': True}
+    formular = client4.get('/resource/tageskarte/form')
+    formular.form['email'] = EMAIL
+    formular.form.submit().follow().form.submit()
+
+    # both reservations now exist: one accepted, the new one still pending
+    assert sorted(
+        bool((r.data or {}).get('accepted'))
+        for r in client.app.session().query(Reservation)
+    ) == [False, True]
+
+    # the limited JSON feed lists only the accepted 08-28 reservation; the
+    # pending 09-04 request is excluded even though the window spans it
+    wide = 'start=2015-08-28&end=2015-09-30'
+    limited = client3.get(f'{feed_url}&{wide}').json
+    assert len(limited) == 1
+    assert '2015-08-28' in limited[0]['start']
+    # the authenticated citizen sees both (accepted + pending)
+    full = client.get(f'/resources/my-reservations-json?{wide}').json
+    assert len(full) == 2
+
     # the pdf is reachable via the same token and shows the confirmed
     # reservation without a session
     pdf_feed_url = unescape(re.search(  # type: ignore[union-attr]
         r'data-pdf-url="([^"]+)"', summary.text
     ).group(1))
     assert 'token=' in pdf_feed_url
-    pdf = client3.get(f'{pdf_feed_url}&start=2015-08-28&end=2015-08-29')
+    pdf = client3.get(f'{pdf_feed_url}&{wide}')
     _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
     assert '28. August 2015' in pdf_content
+    # limited PDF: accepted only, no pending 09-04 entry ("4. September",
+    # distinct from the header range's "30. September")
     assert 'Noch nicht akzeptiert' not in pdf_content
+    assert '4. September 2015' not in pdf_content
     # the limited PDF exposes neither the code nor the email (body or filename)
     assert KABA not in pdf_content
     assert EMAIL not in pdf_content
@@ -5118,6 +5153,9 @@ def test_my_reservations_view(client: Client) -> None:
     # but not the other views
     client2.get('/resources/my-reservations-json', status=403)
     client2.get('/resources/my-reservations-pdf', status=403)
+    login_page = client2.get('/resources/my-reservations')
+    assert login_page.status_code == 302
+    assert 'citizen-login' in (login_page.location or '')
 
 
 @pytest.mark.parametrize(
