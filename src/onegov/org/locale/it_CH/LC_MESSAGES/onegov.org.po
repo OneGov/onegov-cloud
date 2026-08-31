@@ -6301,9 +6301,9 @@ msgstr ""
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
 
-msgid "You are viewing a read-only summary of your confirmed reservations."
+msgid "You are viewing a limited summary of your confirmed reservations."
 msgstr ""
-"State visualizzando un riepilogo in sola lettura delle prenotazioni "
+"State visualizzando un riepilogo limitato delle prenotazioni "
 "confermate."
 
 msgid "Log in for full details"

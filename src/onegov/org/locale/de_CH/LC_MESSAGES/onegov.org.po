@@ -6319,7 +6319,7 @@ msgstr ""
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
 
-msgid "You are viewing a read-only summary of your confirmed reservations."
+msgid "You are viewing a limited summary of your confirmed reservations."
 msgstr "Dies ist eine limitierte Übersicht Ihrer bestätigten Reservationen."
 
 msgid "Log in for full details"

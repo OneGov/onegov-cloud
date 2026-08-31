@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
 
         <div class="callout" tal:condition="limited|nothing">
-            <p i18n:translate>You are viewing a read-only summary of your
+            <p i18n:translate>You are viewing a limited summary of your
                confirmed reservations.</p>
             <a href="${login_url}" class="button" i18n:translate>
                Log in for full details</a>
