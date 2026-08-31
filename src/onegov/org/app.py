@@ -72,6 +72,8 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
     event_search_widget = directive(directives.EventSearchWidgetAction)
     boardlet = directive(directives.Boardlet)
+    _setting_view_meta = directive(directives.SettingViewMetaAction)
+    setting_form = directive(directives.SettingViewAction)
 
     #: cronjob settings
     send_ticket_statistics = True
@@ -947,6 +949,11 @@ def get_common_asset() -> Iterator[str]:
 @OrgApp.webasset('fontpreview')
 def get_fontpreview_asset() -> Iterator[str]:
     yield 'fontpreview.js'
+
+
+@OrgApp.webasset('settings_search')
+def get_settings_search_asset() -> Iterator[str]:
+    yield 'settings_search.js'
 
 
 @OrgApp.webasset('scroll-to-username')

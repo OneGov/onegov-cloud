@@ -13,6 +13,7 @@ from uuid import uuid4, UUID
 
 
 from typing import Literal, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.activity.models import OccasionNeed
 
@@ -20,6 +21,7 @@ type VolunteerState = Literal[
     'open',
     'contacted',
     'confirmed',
+    'cancelled'
 ]
 
 
@@ -43,6 +45,7 @@ class Volunteer(Base, StripWhitespaceMixin, ContentMixin, TimestampMixin):
             'open',
             'contacted',
             'confirmed',
+            'cancelled',
             name='volunteer_state'
         ),
         default='open'
@@ -82,3 +85,7 @@ class Volunteer(Base, StripWhitespaceMixin, ContentMixin, TimestampMixin):
 
     #: The phone number of the volunteer
     phone: Mapped[str]
+
+    transport: Mapped[str | None]
+
+    note: Mapped[str | None]

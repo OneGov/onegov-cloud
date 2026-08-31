@@ -5,10 +5,11 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x volunteers-list occasion-list">
             <div class="cell small-12 medium-8">
-                <div class="panel" i18n:translate tal:condition="not:has_needs">
-                    No activities needing volunteers found.
-                </div>
-
+                <tal:b tal:condition="not:has_needs" tal:define="view_name view_name|None">
+                    <div class="panel" i18n:translate>
+                        No volunteers found.
+                    </div>
+                </tal:b>
 
                 <tal:b repeat="activity_group grouped(records, 'activity_id')">
                     <div class="occasion">
@@ -86,7 +87,15 @@
                                                         </tal:b>
                                                     </tal:b>
                                                 </td>
-                                                <td>
+                                                <td tal:condition="record.ticket_id" class="ticket-cell">
+                                                    <a href="${request.link(tickets[record.ticket_id])}">
+                                                        <i class="fa fa-ticket-alt" aria-hidden="true"></i>
+                                                        <span i18n:translate class="show-for-sr">
+                                                            View ticket
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td tal:condition="not record.ticket_id">
                                                     <button type="button" data-toggle="dropdown-${record.volunteer_id.hex}" aria-controls="dropdown-${record.volunteer_id.hex}" aria-expanded="false" class="button tiny actions-button">
                                                         <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
                                                         <span i18n:translate class="show-for-sr">
@@ -190,6 +199,22 @@
                                                                 <a href="tel:${record.phone}">${record.phone}</a>
                                                             </dd>
                                                         </div>
+                                                        <div>
+                                                            <dt tal:condition="record.transport" i18n:translate>Transport</dt>
+                                                            <dd tal:condition="record.transport">
+                                                                <tal:b switch="record.transport">
+                                                                    <tal:b case="'no_pass'" i18n:translate>No pass</tal:b>
+                                                                    <tal:b case="'ga'" i18n:translate>GA</tal:b>
+                                                                    <tal:b case="'half_fare'" i18n:translate>Half Fare Travelcard</tal:b>
+                                                                    <tal:b case="'other_pass'" i18n:translate>Other pass (e.g. zones)</tal:b>
+                                                                    <tal:b case="'own_vehicle'" i18n:translate>Own Vehicle</tal:b>
+                                                                </tal:b>
+                                                            </dd>
+                                                        </div>
+                                                        <div>
+                                                            <dt tal:condition="record.note" i18n:translate>Note</dt>
+                                                            <dd tal:condition="record.note">${record.note}</dd>
+                                                        </div>
                                                     </dl>
                                                 </td>
                                             </tr>
@@ -203,7 +228,25 @@
             </div>
             <div class="cell small-12 medium-4 sidebar">
                 <div class="sidebar-wrapper">
-                    <tal:b metal:use-macro="layout.macros.periods" />
+                    <tal:b metal:use-macro="layout.macros.periods"/>
+                    <tal:b tal:define="view_name view_name|None; period model.period">
+                        <div class="filter-panel side-panel">
+                            <h3 class="filter-title" i18n:translate tal:condition="not hide_title|True">Volunteer State</h3>
+                            <select data-auto-redirect>
+                                <option tal:repeat="s state_options" value="${request.link(model.for_status(period, s[0], need_state), name=view_name)}" tal:attributes="selected volunteer_state == s[0]">
+                                    ${s[1]}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="filter-panel side-panel">
+                            <h3 class="filter-title" i18n:translate tal:condition="not hide_title|True">Need Status</h3>
+                            <select data-auto-redirect>
+                                <option tal:repeat="s need_status_options" value="${request.link(model.for_status(period, volunteer_state, s[0]), name=view_name)}" tal:attributes="selected need_state == s[0]">
+                                    ${s[1]}
+                                </option>
+                            </select>
+                        </div>
+                    </tal:b>
                 </div>
             </div>
         </div>
