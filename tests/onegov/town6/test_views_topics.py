@@ -31,6 +31,25 @@ def test_sort_topics(client: Client) -> None:
     assert "Zurück zur Seite" in page
 
 
+def test_sort_root_topics(client: Client) -> None:
+    client.login_admin().follow()
+
+    page = client.get('/')
+    page = page.click('Sortieren')
+    url = page.pyquery('ul[data-sortable]').attr('data-sortable-url')
+    items = {
+        item.text_content().strip(): item.attrib['data-sortable-id']
+        for item in page.pyquery('ul[data-sortable] li')
+    }
+    url = url.replace('%7Bsubject_id%7D', items['Kontakt'])
+    url = url.replace('%7Bdirection%7D', 'above')
+    url = url.replace('%7Btarget_id%7D', items['Organisation'])
+    client.put(url)
+
+    links = client.get('/').pyquery('.side-navigation > li > a span')
+    assert links.text() == 'Kontakt Organisation Themen Aktuelles'
+
+
 def get_select_option_id_by_text(
     select_form: Select,
     search_text: str
