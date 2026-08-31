@@ -436,3 +436,60 @@ def match_fairness(
                        f'no place {gunplaced}/{gn} ({pct(gunplaced, gn)})')
 
     return match_fairness
+
+
+@cli.command(name='which-ferienpass-is-currently',
+             context_settings={'default_selector': '*'})
+@click.argument('phase', required=True)
+def which_ferienpass(
+    phase: str,
+) -> Callable[[FeriennetRequest, FeriennetApp], None]:
+    """ Displays all ferienpass instances where the option applies.
+
+    Example::
+    onegov-feriennet --select /foo/bar which-ferienpass-is-currently 'phase'
+
+    phases: inactive, wishlist, booking, execution, payment
+
+    """
+    def search_ferienpass(
+        request: FeriennetRequest,
+        app: FeriennetApp
+    ) -> None:
+
+        if not hasattr(app, 'active_period'):
+            return
+
+        if phase == 'inactive':
+            if (
+                not app.active_period or (
+                    app.active_period.phase == 'inactive'
+                )
+            ):
+                click.echo(f'{app.schema} - {app.org.title}')
+        if not app.active_period:
+            return
+        else:
+            period = app.active_period
+            if phase == 'wishlist' and period.is_currently_prebooking:
+                click.echo(f'{app.schema} - {app.org.title}')
+                click.secho(
+                    f'{period.prebooking_start} - {period.prebooking_end}',
+                    fg='cyan'
+                )
+            if phase == 'booking' and period.is_currently_booking:
+                click.echo(f'{app.schema} - {app.org.title}')
+                click.secho(
+                    f'{period.booking_start} - {period.booking_end}',
+                    fg='cyan'
+                )
+            if phase == 'execution' and period.execution_phase:
+                click.echo(f'{app.schema} - {app.org.title}')
+                click.secho(
+                    f'{period.execution_start} - {period.execution_end}',
+                    fg='cyan'
+                )
+            if phase == 'payment' and period.payment_phase:
+                click.echo(f'{app.schema} - {app.org.title}')
+
+    return search_ferienpass
