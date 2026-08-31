@@ -4896,7 +4896,8 @@ def test_reserve_fractions_of_hours_total_correct_in_price(
 
 @freeze_time('2015-08-28', tick=True)
 def test_my_reservations_view(client: Client) -> None:
-    # prepate the required data
+    # prepare the required data
+    EMAIL = 'info@example.org'
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     assert resource is not None
@@ -4912,7 +4913,7 @@ def test_my_reservations_view(client: Client) -> None:
     # create a reservation
     assert reserve().json == {'success': True}
     formular = client.get('/resource/tageskarte/form')
-    formular.form['email'] = 'info@example.org'
+    formular.form['email'] = EMAIL
     formular.form.submit().follow().form.submit()
 
     client2 = client.spawn()
@@ -4935,7 +4936,7 @@ def test_my_reservations_view(client: Client) -> None:
     client.get('/resources/my-reservations-json', status=403)
     client.get('/resources/my-reservations-pdf', status=403)
     login = client.get('/resources/my-reservations?date=20150828').follow()
-    login.form['email'] = 'info@example.org'
+    login.form['email'] = EMAIL
     confirm = login.form.submit().follow()
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)['TextBody']
@@ -4960,6 +4961,8 @@ def test_my_reservations_view(client: Client) -> None:
     assert '28. August 2015 - 29. August 2015' in pdf_content
     assert 'Ganztägig' in pdf_content
     assert 'Noch nicht akzeptiert' in pdf_content
+    # the authenticated citizen's own download filename may carry their email
+    assert EMAIL in pdf.headers['Content-Disposition']
 
     # if we only include accepted reservations the PDF is empty
     pdf = client.get(
@@ -4986,7 +4989,24 @@ def test_my_reservations_view(client: Client) -> None:
     ticket = admin.get('/tickets/ALL/open').click('Annehmen').follow()
     ticket.click('Alle Reservationen annehmen')
 
+    # a Kaba code on the accepted reservation must never leak in a limited view
+    KABA = 'KABA-SECRET-9999'
+    session = client.app.session()
+    reservation = session.query(Reservation).one()
+    reservation.data = {**(reservation.data or {}), 'kaba': {'code': KABA}}
+    org = client.app.org
+    org.meta = {**org.meta, 'kaba_configurations': [{
+        'site_id': 'site', 'api_key': 'key', 'api_secret': 'secret',
+    }]}
+    transaction.commit()
+
+    # iCal folds long DESCRIPTION lines with '\r\n '; unfold before searching
+    def ics_body(response: Any) -> str:
+        return response.text.replace('\r\n ', '')
+
     assert client.get(ical_url).status_code == 200
+    # the emailed ICS magic link (unauthenticated bare token) omits the code
+    assert KABA not in ics_body(client.get(ical_url))
 
     # the acceptance email contains a durable magic link to subscribe to
     # the reservations calendar without login / mail verification
@@ -4998,8 +5018,13 @@ def test_my_reservations_view(client: Client) -> None:
     ).group(1))
     # anyone with the link can reach the feed, no authentication needed
     assert client2.get(mail_ical_url).status_code == 200
+    # ...and exposes neither the code nor the email (body or filename)
+    ics_response = client2.get(mail_ical_url)
+    assert KABA not in ics_body(ics_response)
+    assert EMAIL not in ics_response.text
+    assert EMAIL not in ics_response.headers['Content-Disposition']
 
-    # the acceptance email also contains a durable magic link to a read-only
+    # the acceptance email also contains a durable magic link to a limited
     # web summary (no login), with the option to log in for full details
     web_url = unescape(re.search(  # type: ignore[union-attr]
         r'https?://localhost(/resources/my-reservations\?token=[^"]+)',
@@ -5008,18 +5033,23 @@ def test_my_reservations_view(client: Client) -> None:
     client3 = client.spawn()
     summary = client3.get(web_url)
     assert 'Für alle Details anmelden' in summary
+    # the limited web summary never renders the Kaba door code or email address
+    assert KABA not in summary.text
+    assert EMAIL not in summary.text
     # the feed carries the token so the calendar loads without a session
     feed_url = unescape(re.search(  # type: ignore[union-attr]
         r'data-feed="([^"]+)"', summary.text
     ).group(1))
     assert 'token=' in feed_url
-    events = client3.get(
-        f'{feed_url}&start=2015-08-28&end=2015-08-29'
-    ).json
+    feed = client3.get(f'{feed_url}&start=2015-08-28&end=2015-08-29')
+    events = feed.json
     assert len(events) == 1
-    # key codes are hidden and ticket deep-links removed in reduced mode
+    # key codes are hidden and ticket deep-links removed in limited mode
     # empty url keeps the calendar entry but renders no link
     assert events[0]['url'] == ''
+    # the limited JSON feed never exposes the Kaba door code or email address
+    assert KABA not in feed.text
+    assert EMAIL not in feed.text
 
     # the pdf is reachable via the same token and shows the confirmed
     # reservation without a session
@@ -5031,6 +5061,23 @@ def test_my_reservations_view(client: Client) -> None:
     _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
     assert '28. August 2015' in pdf_content
     assert 'Noch nicht akzeptiert' not in pdf_content
+    # the limited PDF exposes neither the code nor the email (body or filename)
+    assert KABA not in pdf_content
+    assert EMAIL not in pdf_content
+    assert EMAIL not in pdf.headers['Content-Disposition']
+
+    # POSITIVE CONTROL: the code is real and *does* surface for a logged-in
+    # citizen via the explicit "with key codes" subscribe link
+    subscribe = client.get('/resources/my-reservations-subscribe')
+    ical_paths = re.findall(
+        r'href="webcal://localhost(/resources/my-reservations-ical[^"]+)"',
+        subscribe.text
+    )
+    assert len(ical_paths) == 2  # plain feed + with-key-codes feed
+    plain_path, key_code_path = (unescape(p) for p in ical_paths)
+    assert KABA not in ics_body(client.get(plain_path))
+    assert KABA in ics_body(client.get(key_code_path))
+
     # without a token or session the pdf is forbidden
     client.spawn().get(
         '/resources/my-reservations-pdf?start=2015-08-28&end=2015-08-29',
