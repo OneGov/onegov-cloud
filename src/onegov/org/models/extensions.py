@@ -882,7 +882,11 @@ def _content_file_link_observer(
         match.group(1)
         for changed_name in changed
         if (text := self.content.get(changed_name))
-        for url in {span.text for span in extractor.find(text)}
+        for url in {span.text for span in extractor.find(
+            # HACK: turbohtml does currently not detect localhost links
+            #       so we use the loopback IP instead, which is detected
+            text.replace('localhost', '127.0.0.1')
+        )}
         if (match := FILE_URL_RE.search(url))
     ]
     if not file_ids:

@@ -68,8 +68,13 @@ def render_html_diff(
 
 def to_genshi_stream(element: Element) -> Iterator[StreamEvent]:
     tag_name = QName(element.tag.lstrip('{'))
-    attrs = Attrs([(QName(attr.lstrip('{')), value)
-                   for attr, value in element.attrs.items()])
+    attrs = Attrs([
+        (
+            QName(attr.lstrip('{')),
+            ' '.join(value) if isinstance(value, list) else value
+        )
+        for attr, value in element.attrs.items()
+    ])
     yield START, (tag_name, attrs), (None, -1, -1)
     for node in element.children:
         if isinstance(node, Element):

@@ -120,7 +120,6 @@ def sanitize_svg[T: str](svg: T) -> T:
 def html_to_text(
     html: str,
     *,
-    unicode_snob: bool = False,
     body_width: int = 0,
     ignore_images: bool = True,
     single_line_break: bool = True,
@@ -137,8 +136,17 @@ def html_to_text(
 
     config = turbohtml.Markdown(
         document=turbohtml.Markdown.Document(
-            transliterate=unicode_snob,
-            block_spacing='single' if single_line_break else 'double',
+            # NOTE: While we used to have unicode_snob set to True
+            #       it only made sure html entities are converted
+            #       to their unicode representation, it didn't actually
+            #       replace unicode characters with ASCII, and we don't
+            #       really want that to happen anyways. turbohtml
+            #       always replaces html entities, so transliteration
+            #       is not what we want, since it would replace
+            #       things like umlauts and accents with their
+            #       unaccented counterparts.
+            transliterate=False,
+            block_spacing='double',
         ),
         wrapping=turbohtml.Markdown.Wrapping(width=body_width),
         inline=turbohtml.Markdown.Inline(
@@ -146,9 +154,31 @@ def html_to_text(
             emphasis=emphasis_mark,
             ignore_emphasis=ignore_emphasis
         ),
+        # NOTE: We don't care about producing valid markdown as much
+        #       as producing something human-readable, the escaped
+        #       markdown would be a nuisance. This minimizes the
+        #       amount of escaping that will happen, although it would
+        #       be nice to have a `mode='none' that will attemp no
+        #       escaping whatsoever.
+        escaping=turbohtml.Markdown.Escaping(
+            mode='minimal',
+            asterisks=False,
+            underscores=False,
+        ),
         lists=turbohtml.Markdown.Lists(bullets=ul_item_mark),
         images=turbohtml.Markdown.Images(
             mode='ignore' if ignore_images else 'markdown'
+        ),
+        # NOTE: Using a padded whitespace only table produces more sane
+        #       output, since markdown mode tries to preserve the
+        #       table working correctly. But markdown doesn't support
+        #       multiple lines per table cell or nested tables, both
+        #       are very common input, so we will get something very
+        #       messy and unreadable, unless we switch to this mode.
+        tables=turbohtml.Markdown.Tables(
+            mode='strip',
+            header='detect',
+            pad=True
         ),
     )
 

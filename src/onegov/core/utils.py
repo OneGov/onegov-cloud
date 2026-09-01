@@ -1198,7 +1198,11 @@ def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
             continue
 
         try:
-            parsed = PhoneNumber.parse(number, regions=('CH',))
+            parsed = PhoneNumber.parse(
+                number,
+                regions=('CH',),
+                require_valid=False
+            )
         except ValueError:
             # allow invalid phone number
             result.append(number.replace(' ', ''))

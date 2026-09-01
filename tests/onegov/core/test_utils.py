@@ -143,6 +143,10 @@ invalid_test_phone_numbers = [
 ]
 
 
+def normalize_phone_number(number: str) -> str:
+    return PhoneNumber.parse(number, regions=('CH',)).format(PhoneFormat.E164)
+
+
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
 def test_phone_linkify_valid(number: str) -> None:
     r = utils.linkify(number)
@@ -150,9 +154,9 @@ def test_phone_linkify_valid(number: str) -> None:
         '<a href="tel:{normalized}">{number}</a>'
     ).format(
         number=number,
-        normalized=PhoneNumber.parse(
-            str(number).replace('&nbsp;', ' '), regions=('CH',)
-        ).format(PhoneFormat.E164)
+        normalized=normalize_phone_number(
+            str(number).replace('&nbsp;', ' ')
+        )
     )
     assert r == wanted
     # Important !
@@ -183,9 +187,7 @@ def test_linkify() -> None:
 
     # test a longer html string with valid phone number
     tel_nr = valid_test_phone_numbers[0]
-    normalized = PhoneNumber.parse(
-        tel_nr, regions=('CH',)
-    ).format(PhoneFormat.E164)
+    normalized = normalize_phone_number(tel_nr)
     text = Markup('2016/2019<br>{}').format(tel_nr)
     assert utils.linkify(text) == Markup(
         f'2016/2019<br><a href="tel:{normalized}">{tel_nr}</a>')
