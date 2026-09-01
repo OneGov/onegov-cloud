@@ -977,7 +977,7 @@ def get_my_reservations_url(
         return None
 
     salt = secrets.token_urlsafe(16)
-    payload: object = email if reservation_token is None else {
+    payload = {
         'email': email,
         'token': reservation_token,
     }
