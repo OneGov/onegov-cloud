@@ -1550,10 +1550,8 @@ def resolve_reservations_access(
     payload = request.load_url_safe_token(
         request.GET.get('token'), request.GET.get('salt'), None
     )
-    if isinstance(payload, str):
-        return payload, True, None
-    if isinstance(payload, dict) and isinstance(payload.get('email'), str):
-        return payload['email'], True, payload.get('token')
+    assert isinstance(payload, dict)
+    return payload['email'], True, payload.get('token')
     return None, False, None
 
 
