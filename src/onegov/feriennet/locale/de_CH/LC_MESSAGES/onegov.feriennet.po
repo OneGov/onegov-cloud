@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-05-18 16:39+0200\n"
+"POT-Creation-Date: 2026-09-01 08:50+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -912,6 +912,9 @@ msgstr ""
 "Benutzer mit Teilnehmenden, die eine Durchführung gewünscht oder gebucht "
 "haben"
 
+msgid "State"
+msgstr "Status"
+
 msgid "Role"
 msgstr "Rolle"
 
@@ -935,9 +938,6 @@ msgstr "Aktive Benutzer"
 
 msgid "Inactive users"
 msgstr "Inaktive Benutzer"
-
-msgid "State"
-msgstr "Status"
 
 msgid ""
 "I hereby confirm that this message is relevant to the recipients and is not "
@@ -2323,6 +2323,9 @@ msgid "Your subscription states have been updated, this is the final list:"
 msgstr ""
 "Der Status ihrer Anmeldungen wurde aktualisiert, dies ist die finale Liste:"
 
+msgid "No more Volunteers needed."
+msgstr "Kein Helferbedarf mehr nötig."
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET wird unterstützt von:"
 
@@ -2507,9 +2510,6 @@ msgstr "Aktiv"
 
 msgid "Inactive"
 msgstr "Inaktiv"
-
-msgid "No activities needing volunteers found."
-msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
 msgid "No volunteers found."
 msgstr "Keine Hilfspersonen gefunden."
@@ -3464,6 +3464,9 @@ msgstr "${count} E-Mails erfolgreich gesendet"
 
 msgid "The submitter email is not available"
 msgstr "Die E-Mail-Adresse des Absenders ist nicht verfügbar"
+
+#~ msgid "No activities needing volunteers found."
+#~ msgstr "Keine Angebote gefunden welche Hilfspersonen benötigen."
 
 #~ msgid ""
 #~ "You have You have signed up to volunteer for the following activities:"
