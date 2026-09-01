@@ -7272,6 +7272,12 @@ a#results {
     visibility: hidden;
 }
 
+.reservation-exceptions del {
+    background-color: transparentize($red, .85);
+    color: $red;
+    text-decoration-color: $red;
+}
+
 .reservation-list {
 
     /* HACK: Overflow clipping is broken in Chromium when scrolling
