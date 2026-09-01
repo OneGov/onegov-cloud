@@ -120,7 +120,7 @@ def sanitize_svg[T: str](svg: T) -> T:
 def html_to_text(
     html: str,
     *,
-    unicode_snob: bool = True,
+    unicode_snob: bool = False,
     body_width: int = 0,
     ignore_images: bool = True,
     single_line_break: bool = True,
