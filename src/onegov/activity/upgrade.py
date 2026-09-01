@@ -999,6 +999,46 @@ def add_indexes_to_speed_up_activity_filters(context: UpgradeContext) -> None:
         )
 
 
+@upgrade_task('Add cancelled state to volunteer_state enum')
+def add_cancelled_state_to_volunteer_state(context: UpgradeContext) -> None:
+    if not context.has_enum('volunteer_state'):
+        return
+
+    new_type = Enum(
+        'open',
+        'contacted',
+        'confirmed',
+        'cancelled',
+        name='volunteer_state'
+    )
+
+    op = context.operations
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state TYPE Text;
+        DROP TYPE volunteer_state;
+    """))
+
+    new_type.create(op.get_bind())
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state
+        TYPE volunteer_state USING state::text::volunteer_state;
+    """))
+
+
+@upgrade_task('Add transport and note to volunteer')
+def add_transport_and_note_to_volunteer(context: UpgradeContext) -> None:
+    context.operations.add_column(
+        'volunteers',
+        Column('transport', Text, nullable=True)
+    )
+    context.operations.add_column(
+        'volunteers',
+        Column('note', Text, nullable=True)
+    )
+
+
 @upgrade_task('Reset stale cancelled volunteer states')
 def reset_stale_cancelled_volunteer_states(context: UpgradeContext) -> None:
     # The reverted "Volunteer Ticket" feature left behind volunteers with a

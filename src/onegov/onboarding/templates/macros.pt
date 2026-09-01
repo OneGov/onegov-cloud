@@ -8,7 +8,7 @@
 <metal:form define-macro="form" i18n:domain="onegov.onboarding">
     <form tal:attributes="action form.action" method="POST" enctype="multipart/form-data">
         <tal:block repeat="fieldset form.fieldsets">
-            <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
+            <fieldset tal:condition="fieldset.is_visible" id="${fieldset.id}">
                 <legend>${fieldset.label}</legend>
                 <div class="formfields">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />

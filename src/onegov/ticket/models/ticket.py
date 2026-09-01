@@ -182,6 +182,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #       so we just manually specify it for now.
     fts_type_title = TranslationString('Tickets', domain='onegov.org')
     fts_public = False
+    fts_rank_modifier = 0.2
     fts_title_property = 'number'
     fts_properties = {
         'number': {'type': 'text', 'weight': 'A'},

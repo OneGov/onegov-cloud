@@ -97,7 +97,9 @@ function configure-sentry() {
 }
 
 function current-version() {
-    git tag --sort=version:refname --merged master | tail -n 1
+    git tag --sort=version:refname --merged master \
+        | grep -E '^release-[0-9]{4}\.[0-9]+$' \
+        | tail -n 1
 }
 
 function announce-release-on-sentry-io() {
@@ -127,12 +129,10 @@ function new-version() {
     local year
     year="$(date +"%Y")"
 
-    local build
+    local build=0
 
-    if echo "${version}" | grep "release-${year}" -q; then
-        build="$(echo "${version}" | awk -F '.' '{print $NF}')"
-    else
-        build="0"
+    if [[ "${version}" =~ ^release-${year}\.([0-9]+)$ ]]; then
+        build="${BASH_REMATCH[1]}"
     fi
 
     echo "release-$year.$((build + 1))"
@@ -156,6 +156,13 @@ function release() {
     short="${new/release-/}"
 
     echo "Releasing $new (previous: $current)"
+
+    if [[ "${DRY_RUN}" == "1" ]]; then
+        echo "[dry-run] would generate CHANGES.md, bump version to ${short},"
+        echo "[dry-run] commit, tag ${new}, push, and announce on sentry.io"
+        return
+    fi
+
     "$SELF"/changes "$new" > "$REPO/CHANGES.md"
     sed -i.bak "s/__version__.*/__version__ = '${short}'/g" src/onegov/core/__init__.py
     rm src/onegov/core/__init__.py.bak
@@ -178,5 +185,33 @@ function release() {
     announce-release-on-sentry-io "onegov-cloud:${new}" "$current_commit" "$previous_commit"
 }
 
-configure-sentry
+function usage() {
+    cat <<'EOF'
+Usage: do/release [OPTIONS]
+
+Creates a new OGC release: computes the next version, updates CHANGES.md and the
+version in the source, commits, tags, pushes, and announces it on sentry.io.
+Must be run on a clean master branch.
+
+Options:
+  --dry-run   Run the checks and print the version that would be released,
+              without writing files, committing, tagging, pushing, or
+              announcing on sentry.io.
+  --help, -h  Show this help and exit.
+EOF
+}
+
+DRY_RUN=0
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) DRY_RUN=1 ;;
+        --help|-h) usage; exit 0 ;;
+        *) echo "Unknown option: $arg" >&2; echo >&2; usage >&2; exit 1 ;;
+    esac
+done
+
+if [[ "${DRY_RUN}" != "1" ]]; then
+    configure-sentry
+fi
+
 release

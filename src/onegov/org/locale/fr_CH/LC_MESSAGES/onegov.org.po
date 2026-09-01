@@ -4453,6 +4453,24 @@ msgstr "Souhaitez-vous vraiment rejeter cette entrée ?"
 msgid "Chats"
 msgstr "Chats"
 
+msgid "Volunteer"
+msgstr "Bénévole"
+
+msgid "Status mail"
+msgstr "Courriel de statut"
+
+msgid "Do you really want to send the current status?"
+msgstr "Voulez-vous vraiment envoyer le statut actuel ?"
+
+msgid ""
+"A mail will be sent to the volunteer containing the status of his "
+"subscriptions. Only send this if these are the final states ofthe "
+"subscriptions."
+msgstr ""
+"Un courriel sera envoyé au bénévole contenant le statut de ses "
+"abonnements. N'envoyez ceci que si ce sont les états finaux des "
+"abonnements."
+
 msgid "New Link"
 msgstr "Nouveau lien"
 

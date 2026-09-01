@@ -95,16 +95,18 @@ def delete_user(self: User, request: FeriennetRequest) -> None:
                 session.delete(booking)
             session.flush()
 
-        # Delete attendees
-        for attendee in attendees:
-            session.delete(attendee)
-
-        # Delete invoices
+        # Delete invoice_items and invoices
         invoices = session.query(BookingPeriodInvoice).filter(
             BookingPeriodInvoice.user_id == self.id
         ).all()
         for invoice in invoices:
+            for item in invoice.items:
+                session.delete(item)
             session.delete(invoice)
+
+        # Delete attendees
+        for attendee in attendees:
+            session.delete(attendee)
 
         # Delete the user
         session.delete(self)

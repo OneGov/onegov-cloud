@@ -167,7 +167,7 @@ class AgencySettingsForm(Form):
         obj.pdf_link_color = self.link_color.data
 
 
-@AgencyApp.form(
+@AgencyApp.setting_form(
     model=Organisation,
     name='agency-settings',
     template='form.pt',
