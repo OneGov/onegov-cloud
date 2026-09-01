@@ -42,16 +42,16 @@ input[type="text"], input[type="password"], input[type="date"], input[type="date
     border-radius: 4px !important;
     background-color: $white !important;
     box-shadow: none;
-    color: $black;
+    color: $body-font-color;
 }
 
 button.secondary.dropdown {
     padding: 1rem;
-    color: $black !important;
+    color: $body-font-color !important;
 
     &:hover {
         background-color: $white !important;
-        color: $black !important;
+        color: $body-font-color !important;
     }
 }
 
@@ -290,7 +290,7 @@ ul#pubnav {
         margin-bottom: .3rem;
         background: rgba($beige-ultra-light, 0.6);
         border: 0 !important;
-        
+
         &:hover {
             background: $beige-ultra-light !important;
         }
@@ -298,46 +298,63 @@ ul#pubnav {
         a {
             width: 100%;
             display: block;
-            color: black;
+            color: $body-font-color;
             position: relative;
 
-            &::after {
-                content: "";
-                display: block;
-                width: 16px;
-                height: 20px;
-                flex-shrink: 0;
-                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23E2001A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg>');
-                background-repeat: no-repeat;
-                background-size: contain;
-                position: absolute;
-                top: 50%;
-                right: 1rem;
-                transform: translateY(-50%);
-            }
         }
     }
 }
 
 .streetlist a {
     padding: 1rem;
+
+    &::after {
+            content: "";
+            display: block;
+            width: 16px;
+            height: 20px;
+            flex-shrink: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23E2001A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg>');
+            background-repeat: no-repeat;
+            background-size: contain;
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+    }
 }
 
 .directory-list {
     margin-top: 2rem;
 
+    .box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .text {
+        padding: 1rem;
+    }
+
+    .arrow {
+            margin-right: 1rem;
+            content: "";
+            display: block;
+            width: 16px;
+            height: 20px;
+            flex-shrink: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23E2001A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="20" y2="12"/><polyline points="14 6 20 12 14 18"/></svg>');
+            background-repeat: no-repeat;
+            background-size: contain;
+    }
+
+
     li {
         padding: 0 !important;
-    
-        a {
-            padding: 1rem;
-            padding-bottom: 0;
-        }
-    
+
         .list-lead {
             margin: 0;
-            padding: 1rem;
-            padding-top: 0;
         }
     }
 }
@@ -559,7 +576,7 @@ ul#pubnav {
          padding: 2rem 0;
 
          a {
-            color: $black;
+            color: $body-font-color;
             font-weight: bold;
             font-size: 1rem;
          }
@@ -570,7 +587,7 @@ ul#pubnav {
     }
 
     .title-roadwork-sections {
-        color: $black;
+        color: $body-font-color;
         display: block;
         margin-top: 2rem;
         margin-bottom: .5rem;
@@ -1236,7 +1253,7 @@ table.responsive {
     color: $primary-color;
     padding: .5rem;
     &:hover {
-        color: $black;
+        color: $body-font-color;
         border: 1px solid $black;
     }
 }
@@ -1247,7 +1264,7 @@ a.mission-nature-title,
     font-weight: bold;
     position: relative;
     text-decoration: none;
-    color: $black;
+    color: $body-font-color;
     display: inline-block;
 
     &::before {
