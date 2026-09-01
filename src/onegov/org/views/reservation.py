@@ -963,18 +963,29 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     return morepath.redirect(url)
 
 
-def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
+def get_my_reservations_url(
+    request: OrgRequest,
+    email: str,
+    reservation_token: object = None
+) -> str | None:
     """ Durable magic link to a limited summary of the recipient's
-    confirmed reservations, with an option to log in for full details. """
+    reservations, with an option to log in for full details.
+
+    When ``reservation_token`` is given, the limited view is restricted to
+    the reservations of that single ticket. """
     if not request.app.org.citizen_login_enabled:
         return None
 
     salt = secrets.token_urlsafe(16)
+    payload: object = email if reservation_token is None else {
+        'email': email,
+        'token': str(reservation_token),
+    }
     return request.class_link(
         ResourceCollection,
         name='my-reservations',
         query_params={
-            'token': request.new_url_safe_token(email, salt),
+            'token': request.new_url_safe_token(payload, salt),
             'salt': salt,
         }
     )
@@ -1147,7 +1158,7 @@ def accept_reservation(
                 'form': form,
                 'message': message,
                 'my_reservations_url': get_my_reservations_url(
-                    request, self.email
+                    request, self.email, ticket.handler_id
                 ),
                 'subscribe_url': get_reservations_subscribe_url(
                     request, self.email
@@ -1912,7 +1923,7 @@ def send_reservation_summary(
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
                 'my_reservations_url': get_my_reservations_url(
-                    request, recipient
+                    request, recipient, self.handler_id
                 ),
                 'subscribe_url': get_reservations_subscribe_url(
                     request, recipient

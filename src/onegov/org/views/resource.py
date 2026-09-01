@@ -1537,18 +1537,24 @@ def view_occupancy(
     }
 
 
-def resolved_reservations_email(
+def resolve_reservations_access(
     request: OrgRequest
-) -> tuple[str | None, bool]:
-    """ Returns (email, limited). A logged-in citizen sees the full view
-    (limited=False); a magic-link token grants only the limited view
-    (limited=True): confirmed reservations, no key codes, no ticket links. """
+) -> tuple[str | None, bool, str | None]:
+    """Returns (email, limited, reservation_token). A logged-in citizen sees
+    the full view (limited=False); a magic-link token grants only the limited
+    view (limited=True): reservations linked to token, no key codes, no ticket
+    links. When the magic link carries a reservation_token, the limited view is
+    restricted to that single ticket/token."""
     if request.authenticated_email:
-        return request.authenticated_email, False
-    email = request.load_url_safe_token(
+        return request.authenticated_email, False, None
+    payload = request.load_url_safe_token(
         request.GET.get('token'), request.GET.get('salt'), None
     )
-    return (email, True) if isinstance(email, str) else (None, False)
+    if isinstance(payload, str):
+        return payload, True, None
+    if isinstance(payload, dict) and isinstance(payload.get('email'), str):
+        return payload['email'], True, payload.get('token')
+    return None, False, None
 
 
 @OrgApp.json(
@@ -1570,7 +1576,7 @@ def view_my_reservations_json(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    email, limited = resolved_reservations_email(request)
+    email, limited, reservation_token = resolve_reservations_access(request)
     if email is None:
         raise exc.HTTPForbidden()
 
@@ -1587,6 +1593,9 @@ def view_my_reservations_json(
         start <= stmt.c.start,
         stmt.c.start <= end,
     ]
+
+    if reservation_token:
+        conditions.append(stmt.c.token == reservation_token)
 
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
@@ -1623,7 +1632,7 @@ def view_my_reservations_pdf(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    email, limited = resolved_reservations_email(request)
+    email, limited, reservation_token = resolve_reservations_access(request)
     if email is None:
         raise exc.HTTPForbidden()
 
@@ -1640,6 +1649,9 @@ def view_my_reservations_pdf(
         start <= stmt.c.start,
         stmt.c.start <= end,
     ]
+
+    if reservation_token:
+        conditions.append(stmt.c.token == reservation_token)
 
     if limited or request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
@@ -1692,7 +1704,7 @@ def view_my_reservations(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    email, limited = resolved_reservations_email(request)
+    email, limited, _reservation_token = resolve_reservations_access(request)
     if email is None:
         # no session, no valid token: redirect to login
         assert_citizen_logged_in(request)
