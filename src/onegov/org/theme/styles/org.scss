@@ -7272,6 +7272,11 @@ a#results {
     visibility: hidden;
 }
 
+@keyframes reservation-row-glow {
+    0% { background-color: transparentize($yellow-pastel, .25); }
+    100% { background-color: transparent; }
+}
+
 .reservation-list {
 
     /* HACK: Overflow clipping is broken in Chromium when scrolling
@@ -7293,6 +7298,15 @@ a#results {
         tr {
             scroll-margin-top: 7rem;  // sass-lint:disable-line no-misspelled-properties
             scroll-snap-margin-top: 7rem;
+        }
+
+        tr:target th,
+        tr:target td {
+            animation: reservation-row-glow 2s ease-out;
+
+            @media (prefers-reduced-motion: reduce) {
+                animation: none;
+            }
         }
 
         th:first-child {
