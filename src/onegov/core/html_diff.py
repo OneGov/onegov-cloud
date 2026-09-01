@@ -87,7 +87,7 @@ def parse_html(
     """Parse an HTML fragment into a Genshi stream."""
     element = parse_fragment(html, wrapper_element)
     if wrapper_class is not None:
-        element.add_class('wrapper_class')
+        element.add_class(wrapper_class)
     return to_genshi_stream(element)
 
 
