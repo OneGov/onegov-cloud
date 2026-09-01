@@ -501,6 +501,17 @@ def test_find_your_spot(client: Client) -> None:
     find_your_spot.form['auto_reserve_available_slots'] = 'for_every_room'
     result = find_your_spot.form.submit()
 
+    # missing dates listed as struck-through overview with time and room
+    assert 'Übersicht Ihrer Serie' in result
+    overview = result.pyquery('.reservation-exceptions')[0].text_content()
+    assert '<del>' in result
+    assert '07:00 - 08:00' in overview
+    assert 'Meeting 1' in overview
+    # something unavailable -> "some" hint, entries link to rows below
+    assert 'Für einige Tage und Räume' in result
+    assert 'href="#row-' in result
+    assert 'Für alle Tage und Räume' not in result
+
     result = client.get(
         '/find-your-spot/reservations?group=Meeting+Rooms'
     ).json
@@ -555,6 +566,168 @@ def test_find_your_spot(client: Client) -> None:
     assert reservation['resource'] == 'meeting-2'
     assert reservation['date'].startswith('2020-01-05')
     assert reservation['time'] == '07:00 - 08:00'
+
+
+@freeze_time('2020-01-01', tick=True)
+def test_find_your_spot_series_all_available(client: Client) -> None:
+    client.login_admin()
+
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'Solo Room'
+    new.form['group'] = 'Solo Rooms'
+    new.form.submit().follow()
+
+    # two adjacent weekdays, both fully available
+    transaction.begin()
+    scheduler = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('solo-room')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler.allocate(
+        dates=(
+            (datetime(2020, 1, 6), datetime(2020, 1, 6)),
+            (datetime(2020, 1, 7), datetime(2020, 1, 7)),
+        ),
+        whole_day=True,
+        partly_available=True,
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    find_your_spot = client.get('/find-your-spot?group=Solo+Rooms')
+    find_your_spot.form['start'] = '2020-01-06'
+    find_your_spot.form['end'] = '2020-01-07'
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_day'
+    result = find_your_spot.form.submit()
+
+    # both requested days are booked -> full-success message, no exceptions
+    assert 'Übersicht Ihrer Serie' in result
+    assert 'Für alle Tage und Räume' in result
+    assert 'Für einige Tage und Räume' not in result
+    assert '<del>' not in result
+    assert 'href="#row-2020-01-06"' in result
+    assert 'href="#row-2020-01-07"' in result
+
+
+@freeze_time('2020-01-01', tick=True)
+def test_find_your_spot_series_date_fully_unavailable(client: Client) -> None:
+    client.login_admin()
+
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'Solo Room'
+    new.form['group'] = 'Solo Rooms'
+    new.form.submit().follow()
+
+    # only the first day is allocated, the second has no slot at all
+    transaction.begin()
+    scheduler = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('solo-room')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler.allocate(
+        dates=((datetime(2020, 1, 6), datetime(2020, 1, 6)),),
+        whole_day=True,
+        partly_available=True,
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    find_your_spot = client.get('/find-your-spot?group=Solo+Rooms')
+    find_your_spot.form['start'] = '2020-01-06'
+    find_your_spot.form['end'] = '2020-01-07'
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_day'
+    result = find_your_spot.form.submit()
+
+    # first day booked, second day struck through with no room label
+    assert 'Übersicht Ihrer Serie' in result
+    assert 'Für einige Tage und Räume' in result
+    assert '<del>' in result
+    overview = result.pyquery('.reservation-exceptions')[0].text_content()
+    assert '07:00 - 08:00' in overview
+    assert 'href="#row-2020-01-06"' in result
+    assert 'href="#row-2020-01-07"' in result
+
+
+@freeze_time('2020-01-01', tick=True)
+def test_find_your_spot_first_day_has_no_overview(client: Client) -> None:
+    client.login_admin()
+
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'Solo Room'
+    new.form['group'] = 'Solo Rooms'
+    new.form.submit().follow()
+
+    transaction.begin()
+    scheduler = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('solo-room')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler.allocate(
+        dates=(
+            (datetime(2020, 1, 6), datetime(2020, 1, 6)),
+            (datetime(2020, 1, 7), datetime(2020, 1, 7)),
+        ),
+        whole_day=True,
+        partly_available=True,
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    find_your_spot = client.get('/find-your-spot?group=Solo+Rooms')
+    find_your_spot.form['start'] = '2020-01-06'
+    find_your_spot.form['end'] = '2020-01-07'
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_first_day'
+    result = find_your_spot.form.submit()
+
+    # a single-day booking is not a series, so no overview is shown
+    assert 'Übersicht Ihrer Serie' not in result
+
+
+@freeze_time('2020-01-01', tick=True)
+def test_find_your_spot_series_mixed_day(client: Client) -> None:
+    client.login_admin()
+
+    for title in ('Mixed A', 'Mixed B'):
+        resources = client.get('/resources')
+        new = resources.click('Raum')
+        new.form['title'] = title
+        new.form['group'] = 'Mixed Rooms'
+        new.form.submit().follow()
+
+    # on the same day, one room is available and the other is not
+    transaction.begin()
+    scheduler_a = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('mixed-a')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler_a.allocate(
+        dates=((datetime(2020, 1, 6), datetime(2020, 1, 6)),),
+        whole_day=True,
+        partly_available=True,
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    find_your_spot = client.get('/find-your-spot?group=Mixed+Rooms')
+    find_your_spot.form['start'] = '2020-01-06'
+    find_your_spot.form['end'] = '2020-01-06'
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_room'
+    result = find_your_spot.form.submit()
+
+    # the same day carries both a booked room and a struck-through one
+    assert 'Für einige Tage und Räume' in result
+    assert '<del>' in result
+    overview = result.pyquery('.reservation-exceptions')[0].text_content()
+    assert 'Mixed A' in overview
+    assert 'Mixed B' in overview
+    assert '07:00 - 08:00' in overview
 
 
 def test_resource_room_deletion(client: Client) -> None:
