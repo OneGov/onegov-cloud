@@ -1587,9 +1587,6 @@ def view_my_reservations_json(
         start <= stmt.c.start,
         stmt.c.start <= end,
     ]
-    if limited:
-        # magic-link visitors: confirmed reservations only
-        conditions.append(stmt.c.accepted.is_(True))
 
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
