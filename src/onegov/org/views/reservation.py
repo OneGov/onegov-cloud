@@ -966,7 +966,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 def get_my_reservations_url(
     request: OrgRequest,
     email: str,
-    reservation_token: object = None
+    reservation_token: str | None = None
 ) -> str | None:
     """ Durable magic link to a limited summary of the recipient's
     reservations, with an option to log in for full details.
@@ -979,7 +979,7 @@ def get_my_reservations_url(
     salt = secrets.token_urlsafe(16)
     payload: object = email if reservation_token is None else {
         'email': email,
-        'token': str(reservation_token),
+        'token': reservation_token,
     }
     return request.class_link(
         ResourceCollection,
