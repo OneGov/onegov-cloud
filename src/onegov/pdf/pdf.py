@@ -636,18 +636,12 @@ class Pdf(PDFDocument):
         if body is None or not body.children:
             return
 
-        # FIXME: Currently we test against exclusion of intermediary
-        #        non-paragraph nodes in the body, I'm not sure if this
-        #        was intentional, but for now we'll leave it like that
-        #        for backwards compatibility. As a result we only process
-        #        the very first text child node and ignore the rest
-        if (
-            isinstance(text := body.children[0], turbohtml.Text)
-            and text.data.strip()
-        ):
-            self.p(text.data, self.style.paragraph)
-
         for element in body:
+            if isinstance(element, turbohtml.Text):
+                if element.data.strip():
+                    self.p(element.data, self.style.paragraph)
+                continue
+
             if not isinstance(element, turbohtml.Element):
                 continue
 
@@ -662,6 +656,8 @@ class Pdf(PDFDocument):
                 items = [
                     MarkupParagraph(self.strip(item.inner_xml), style)
                     for item in element
+                    if isinstance(item, turbohtml.Element)
+                    if item.tag == 'li'
                 ]
                 self.story.append(
                     ListFlowable(
@@ -681,6 +677,8 @@ class Pdf(PDFDocument):
                 items = [
                     MarkupParagraph(self.strip(item.inner_xml), style)
                     for item in element
+                    if isinstance(item, turbohtml.Element)
+                    if item.tag == 'li'
                 ]
                 self.story.append(
                     ListFlowable(
