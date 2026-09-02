@@ -41,9 +41,9 @@
                 </thead>
                 <tbody>
                     <tr tal:repeat="item room_slots.items()"
+                        id="row-${item[0].isoformat()}"
                         data-date="${item[0].isoformat()}">
                         <th>
-                            <a id="row-${item[0].isoformat()}"></a>
                             ${layout.format_date(item[0], 'weekday_long')}<br/>
                             ${layout.format_date(item[0], 'date')}
                             <div tal:repeat="line holidays.get(item[0], ())"

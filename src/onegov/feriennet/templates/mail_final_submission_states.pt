@@ -10,15 +10,17 @@
         </tal:b>
         <ul class="normal">
             <tal:needs repeat="subscription subscriptions">
-                <li class="${subscription.state}">
-                    <b>${subscription.need.name}</b> - <a href="${request.link(subscription.need.occasion.activity)}">
-                        ${subscription.need.occasion.activity.title}
-                    </a>
-                    <br/>
-                    <tal:b tal:repeat="date subscription.need.occasion.dates">${layout.format_datetime_range(date.localized_start, date.localized_end)}</tal:b>
-                    <br/>
-                    <span class="bg-color" tal:condition="subscription.state == 'confirmed'" i18n:translate>Confirmed</span>
-                    <span class="bg-color" tal:condition="subscription.state == 'cancelled'" i18n:translate>Denied</span>
+                <li>
+                    <span class="${subscription.state}">
+                        <b>${subscription.need.name}</b> - <a href="${request.link(subscription.need.occasion.activity)}">
+                            ${subscription.need.occasion.activity.title}
+                        </a>
+                        <br/>
+                        <tal:b tal:repeat="date subscription.need.occasion.dates">${layout.format_datetime_range(date.localized_start, date.localized_end)}</tal:b>
+                        <br/>
+                    </span>
+                    <span class="bg-color ${subscription.state}" tal:condition="subscription.state == 'confirmed'" i18n:translate>Confirmed</span>
+                    <span class="bg-color ${subscription.state}" tal:condition="subscription.state == 'cancelled'" i18n:translate>No more Volunteers needed.</span>
                 </li>
             </tal:needs>
         </ul>

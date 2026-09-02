@@ -507,5 +507,5 @@ def test_volunteer_subscription(
         )
         assert ("Photography" in mail_content)
         assert ("Dancing" in mail_content)
-        assert ("Abgelehnt" in mail_content)
+        assert ("Kein Helferbedarf" in mail_content)
         assert ("Best\\u00e4tigt" in mail_content)

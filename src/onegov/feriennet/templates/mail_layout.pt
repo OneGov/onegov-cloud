@@ -290,18 +290,20 @@
         border-radius: .3rem;
     }
 
-    .confirmed .bg-color {
+    .confirmed.bg-color {
         background: #d4ecd8;
     }
 
-    .cancelled .bg-color {
-        background: #f8d5d8;
-    }
-
-    li.cancelled {
+    span.cancelled {
         text-decoration: line-through;
     }
-    </style>
+
+    span.cancelled.bg-color {
+        background: #fff4d3;
+        text-decoration: none;
+    }
+
+</style>
 </head>
 <body bgcolor="#f6f6f6">
 
