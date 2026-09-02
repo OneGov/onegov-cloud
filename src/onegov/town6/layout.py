@@ -171,33 +171,38 @@ class Layout(OrgLayout):
 
     @property
     def new_features(self) -> list[dict[str, Any]]:
-        repo_root: Path | None = None
-        for parent in Path(__file__).resolve().parents:
-            if (parent / 'changes').is_dir():
-                repo_root = parent
-                break
-
         features: list[dict[str, Any]] = []
-        if not repo_root:
-            return features
 
-        next_release_path = repo_root / 'changes' / 'next release'
-        if not next_release_path.exists():
-            return features
+        if self.request.is_manager:
+            repo_root: Path | None = None
+            for parent in Path(__file__).resolve().parents:
+                if (parent / 'changes').is_dir():
+                    repo_root = parent
+                    break
 
-        for yaml_file in sorted(next_release_path.glob('*.yaml')):
-            with yaml_file.open('r', encoding='utf-8') as fh:
-                payload = yaml.safe_load(fh) or {}
+            if not repo_root:
+                return features
 
-            if isinstance(payload, dict):
-                features.append(payload)
+            next_release_path = repo_root / 'changes' / 'next release'
+            if not next_release_path.exists():
+                return features
 
-            for feature in features:
-                for value in feature:
-                    if type(feature[value]) is dict:
-                        feature[value] = feature[value].get(
-                            str(self.request.locale).split('_')[0], None
-                        )
+            for yaml_file in sorted(next_release_path.glob('*.yaml')):
+                with yaml_file.open('r', encoding='utf-8') as fh:
+                    payload = yaml.safe_load(fh) or {}
+
+                namespace = self.app.namespace
+                applications = payload['applications']
+                if isinstance(payload, dict):
+                    if namespace in applications or 'all' in applications:
+                        features.append(payload)
+
+                for feature in features:
+                    for value in feature:
+                        if type(feature[value]) is dict:
+                            feature[value] = feature[value].get(
+                                str(self.request.locale).split('_')[0], None
+                            )
 
         return features
 

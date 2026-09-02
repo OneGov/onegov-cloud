@@ -470,5 +470,8 @@ $('body').each(function() {
 });
 
 $(document).ready(function() {
-  $('#newFeaturesModal').foundation('open');
+  var $modal = $('#newFeaturesModal');
+  if ($modal.length) {
+    $modal.foundation('open');
+  }
 });

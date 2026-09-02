@@ -3510,8 +3510,8 @@
 
 <metal:features define-macro="features">
     <tal:b tal:define="features layout.new_features|nothing">
-        <div class="reveal" id="newFeaturesModal" data-reveal>
-            <h1 class="h2">Neue Features verfügbar</h1>
+        <div tal:condition="features" class="reveal" id="newFeaturesModal" data-reveal>
+            <h1 class="h2" i18n:translate="">New features available</h1>
             <tal:b repeat="feature features">
                 <div class="card">
                     <div class="card-section">

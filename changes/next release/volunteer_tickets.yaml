@@ -17,11 +17,11 @@ description:
     finale.
 applications:
   # - all
-  - feriennet
-  # - town6
-  # - agency
-  # - pas
-  # - events
-  # - fsi
-  # - intranet
-  # - landsgemeinde
+  - onegov_feriennet
+  # - onegov_town6
+  # - onegov_agency
+  # - onegov_pas
+  # - onegov_events
+  # - onegov_fsi
+  # - onegov_intranet
+  # - onegov_landsgemeinde
