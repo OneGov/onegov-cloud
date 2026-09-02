@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+import turbohtml
+
 from copy import deepcopy
 from datetime import date
-from io import BytesIO, StringIO
+from io import BytesIO
 from math import isclose
-
-from lxml import etree
 from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.org import _
@@ -64,31 +64,36 @@ class TicketBasePdf(OrgPdf):
         if html is None:
             return
 
-        # TODO: Switch to turbohtml.parse
-        tree = etree.parse(StringIO(html), etree.HTMLParser())
-        body_element = tree.find('body')
+        document = turbohtml.parse(html)
+        body_element = document.find('body')
         if body_element is None:
             return
 
         for element in body_element:
+            if not isinstance(element, turbohtml.Element):
+                continue
+
             if element.tag == 'dl':
                 data: list[list[Paragraph | str]] = []
                 for item in element:
+                    if not isinstance(item, turbohtml.Element):
+                        continue
                     if item.tag == 'dt':
                         p = MarkupParagraph(
-                            self.inner_html(item), self.style.bold)
+                            self.strip(item.inner_html), self.style.bold)
                         data.append([p, ''])
                     if item.tag == 'dd':
-                        data[-1][1] = MarkupParagraph(self.inner_html(item))
+                        data[-1][1] = MarkupParagraph(
+                            self.strip(item.inner_html))
                 if data:
                     self.table(data, 'even')
             elif element.tag == 'h2':
                 # Fieldset titles
-                self.h2(self.inner_html(element))
+                self.h2(self.strip(element.inner_html))
 
             elif element.tag == 'ul':
                 items = [
-                    [MarkupParagraph(self.inner_html(item))]
+                    [MarkupParagraph(self.strip(item.inner_html))]
                     for item in element
                 ]
                 self.table(items, 'even')
@@ -377,20 +382,32 @@ class TicketPdf(TicketBasePdf):
         if html is None:
             return None
 
-        # TODO: switch to turbohtml.parse
-        tree = etree.parse(StringIO(html), etree.HTMLParser())
-        data = []
+        document = turbohtml.parse(html)
 
-        body_element = tree.find('body')
-        assert body_element is not None
-        for el in body_element:
-            if el.tag == 'div':
-                class_ = el.attrib['class']
-                if class_ == 'timestamp':
-                    data = [TicketPdf.inner_html(el), None]
-                if class_ == 'text':
-                    data[1] = TicketPdf.inner_html(el)
-        return data
+        body = document.find('body')
+        if body is None or not body.children:
+            return None
+
+        timestamp_el = body.find(
+            'div',
+            axis=turbohtml.Axis.CHILDREN,
+            class_='timestamp'
+        )
+        text_el = body.find(
+            'div',
+            axis=turbohtml.Axis.CHILDREN,
+            class_='text'
+        )
+        if timestamp_el is None:
+            if text_el is None:
+                return None
+            timestamp_html = None
+        else:
+            timestamp_html = self.strip(timestamp_el.inner_html)
+
+        if text_el is None:
+            return [timestamp_html, None]
+        return [timestamp_html, self.strip(text_el.inner_html)]
 
     def add_ticket(self, ticket: Ticket, request: OrgRequest) -> None:
         """ Adds a ticket to the story. """

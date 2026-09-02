@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import turbohtml
+
 from copy import deepcopy
 from contextlib import contextmanager
-from io import StringIO
-from lxml import etree
 from onegov.core.utils import module_path
 from onegov.pdf.flowables import InlinePDF
 from onegov.pdf.page_functions import empty_page_fn
@@ -27,7 +27,6 @@ from reportlab.platypus import Paragraph
 from reportlab.platypus import Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus.tables import TableStyle
-from turbohtml import escape
 from turbohtml.clean import minify
 from turbohtml.clean import LinkCandidate
 from turbohtml.clean import Linker
@@ -548,26 +547,12 @@ class Pdf(PDFDocument):
         self.p_markup(text, style=style or self.style.figcaption)
 
     @staticmethod
-    # Walk the tree and convert the elements
     def strip(text: str) -> str:
         text = text.strip('\r\n')
         prefix = ' ' if text.startswith(' ') else ''
         postfix = ' ' if text.endswith(' ') else ''
 
         return prefix + text.strip() + postfix
-
-    @staticmethod
-    def inner_html(element: etree._Element) -> str:
-        # lxml hands out text nodes decoded, while tostring() escapes the
-        # children - escape them too, or reportlab eats '<' as a tag
-        return '{}{}{}'.format(
-            Pdf.strip(escape(element.text or '', quote=False)),
-            ''.join(
-                Pdf.strip(etree.tostring(child, encoding='unicode'))
-                for child in element
-            ),
-            Pdf.strip(escape(element.tail or '', quote=False))
-        )
 
     def prepare_html(
         self,
@@ -646,23 +631,36 @@ class Pdf(PDFDocument):
         if html is None:
             return
 
-        # TODO: Switch to turbohtml.parse
-        tree = etree.parse(StringIO(html), etree.HTMLParser())
-        body = tree.find('body')
-        if body is None:
+        document = turbohtml.parse(html)
+        body = document.find('body')
+        if body is None or not body.children:
             return
 
-        if body.text and body.text.strip():
-            self.p(body.text, self.style.paragraph)
+        # FIXME: Currently we test against exclusion of intermediary
+        #        non-paragraph nodes in the body, I'm not sure if this
+        #        was intentional, but for now we'll leave it like that
+        #        for backwards compatibility. As a result we only process
+        #        the very first text child node and ignore the rest
+        if (
+            isinstance(text := body.children[0], turbohtml.Text)
+            and text.data.strip()
+        ):
+            self.p(text.data, self.style.paragraph)
 
         for element in body:
+            if not isinstance(element, turbohtml.Element):
+                continue
+
             if element.tag == 'p':
-                self.p_markup(self.inner_html(element), self.style.paragraph)
+                self.p_markup(
+                    self.strip(element.inner_html),
+                    self.style.paragraph
+                )
             elif element.tag == 'ol':
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ol.leftIndent
                 items = [
-                    MarkupParagraph(self.inner_html(item), style)
+                    MarkupParagraph(self.strip(item.inner_html), style)
                     for item in element
                 ]
                 self.story.append(
@@ -681,7 +679,7 @@ class Pdf(PDFDocument):
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ul.leftIndent
                 items = [
-                    MarkupParagraph(self.inner_html(item), style)
+                    MarkupParagraph(self.strip(item.inner_html), style)
                     for item in element
                 ]
                 self.story.append(
@@ -697,10 +695,3 @@ class Pdf(PDFDocument):
                         )
                     )
                 )
-
-            # FIXME: Currently we test against exclusion of intermediary
-            #        non-paragraph nodes in the body, I'm not sure if this
-            #        was intentional, but for now we'll leave it like that
-            #        for backwards compatibility
-            # if element.tail and element.tail.strip():
-            #     self.p(element.tail, self.style.paragraph)
