@@ -80,20 +80,20 @@ class TicketBasePdf(OrgPdf):
                         continue
                     if item.tag == 'dt':
                         p = MarkupParagraph(
-                            self.strip(item.inner_html), self.style.bold)
+                            self.strip(item.inner_xml), self.style.bold)
                         data.append([p, ''])
                     if item.tag == 'dd':
                         data[-1][1] = MarkupParagraph(
-                            self.strip(item.inner_html))
+                            self.strip(item.inner_xml))
                 if data:
                     self.table(data, 'even')
             elif element.tag == 'h2':
                 # Fieldset titles
-                self.h2(self.strip(element.inner_html))
+                self.h2(self.strip(element.inner_xml))
 
             elif element.tag == 'ul':
                 items = [
-                    [MarkupParagraph(self.strip(item.inner_html))]
+                    [MarkupParagraph(self.strip(item.inner_xml))]
                     for item in element
                 ]
                 self.table(items, 'even')
@@ -403,11 +403,11 @@ class TicketPdf(TicketBasePdf):
                 return None
             timestamp_html = None
         else:
-            timestamp_html = self.strip(timestamp_el.inner_html)
+            timestamp_html = self.strip(timestamp_el.inner_xml)
 
         if text_el is None:
             return [timestamp_html, None]
-        return [timestamp_html, self.strip(text_el.inner_html)]
+        return [timestamp_html, self.strip(text_el.inner_xml)]
 
     def add_ticket(self, ticket: Ticket, request: OrgRequest) -> None:
         """ Adds a ticket to the story. """

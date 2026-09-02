@@ -653,14 +653,14 @@ class Pdf(PDFDocument):
 
             if element.tag == 'p':
                 self.p_markup(
-                    self.strip(element.inner_html),
+                    self.strip(element.inner_xml),
                     self.style.paragraph
                 )
             elif element.tag == 'ol':
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ol.leftIndent
                 items = [
-                    MarkupParagraph(self.strip(item.inner_html), style)
+                    MarkupParagraph(self.strip(item.inner_xml), style)
                     for item in element
                 ]
                 self.story.append(
@@ -679,7 +679,7 @@ class Pdf(PDFDocument):
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ul.leftIndent
                 items = [
-                    MarkupParagraph(self.strip(item.inner_html), style)
+                    MarkupParagraph(self.strip(item.inner_xml), style)
                     for item in element
                 ]
                 self.story.append(
