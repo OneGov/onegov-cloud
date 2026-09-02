@@ -28,8 +28,14 @@ from reportlab.platypus import Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus.tables import TableStyle
 from turbohtml import escape
-from turbohtml.clean import LinkCandidate, Linker, Linkify
-from turbohtml.clean import minify, OnDisallowed, Policy, Sanitizer
+from turbohtml.clean import minify
+from turbohtml.clean import LinkCandidate
+from turbohtml.clean import Linker
+from turbohtml.clean import Linkify
+from turbohtml.clean import OnDisallowed
+from turbohtml.clean import PhoneNumbers
+from turbohtml.clean import Policy
+from turbohtml.clean import Sanitizer
 from uuid import uuid4
 
 
@@ -611,7 +617,8 @@ class Pdf(PDFDocument):
                 callbacks=(colorize,),
                 parse_email=True,
                 process_existing=True,
-                schemes=('http', 'https', 'email', 'tel')
+                schemes=('http', 'https', 'email', 'tel'),
+                phones=PhoneNumbers(regions=('CH',))
             ))
             html = linker.linkify(html)
 
