@@ -22,8 +22,6 @@ from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import PageBreak, Paragraph
-from turbohtml.clean import LinkCandidate, Linker, Linkify
-from turbohtml.clean import minify, OnDisallowed, Policy, Sanitizer
 
 
 from typing import Any, TYPE_CHECKING
@@ -56,52 +54,15 @@ class TicketBasePdf(OrgPdf):
         - reservations
 
         """
-        if not html or html == '<p></p>':
-            return
-
-        # Remove unwanted markup
-        tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         ticket_summary_tags = ['dl', 'dt', 'dd', 'h2']
-        tags += ticket_summary_tags
-        attributes: dict[str, frozenset[str]] = {}
 
-        if linkify:
-            tags.append('a')
-            attributes['a'] = frozenset({'href'})
-
-        sanitizer = Sanitizer(Policy(
-            tags=frozenset(tags),
-            attributes=attributes,
-            on_disallowed_tag=OnDisallowed.STRIP,
-        ))
-        html = sanitizer.sanitize(html)
-        if not html.strip():
+        html = self.prepare_html(
+            html,
+            linkify=linkify,
+            extra_tags=ticket_summary_tags
+        )
+        if html is None:
             return
-
-        if linkify:
-            link_color = self.link_color
-            underline_links = self.underline_links
-            underline_width = self.underline_width
-
-            def colorize(link: LinkCandidate) -> LinkCandidate | None:
-                link.attrs['color'] = link_color
-                if underline_links:
-                    link.attrs['underline'] = '1'
-                    link.attrs['underlineColor'] = link_color
-                    link.attrs['underlineWidth'] = underline_width
-                return link
-
-            linker = Linker(Linkify(
-                callbacks=(colorize,),
-                parse_email=True,
-                process_existing=True,
-                schemes=('http', 'https', 'email', 'tel')
-            ))
-            html = linker.linkify(html)
-
-        # NOTE: This has the same result as the html5lib whitespace
-        #       filter we used to use. It collapses all whitespace.
-        html = minify(html)
 
         # TODO: Switch to turbohtml.parse
         tree = etree.parse(StringIO(html), etree.HTMLParser())
@@ -403,28 +364,19 @@ class TicketPdf(TicketBasePdf):
             #        something different?
             self.table(data, 'even', first_bold=False)  # type:ignore
 
-    @staticmethod
-    def extract_feed_info(html: str) -> list[str | None] | None:
+    def extract_feed_info(self, html: str | None) -> list[str | None] | None:
         """ Must be able to parse templates message_{message.type}.pt and
         return the useful data in cleaned form.
         """
-        if not html or html == '<p></p>':
+        message_tags = ['dl', 'dt', 'dd', 'h2', 'div']
+        html = self.prepare_html(
+            html,
+            extra_tags=message_tags,
+            extra_attributes={'div': frozenset({'class'})}
+        )
+        if html is None:
             return None
 
-        # Remove unwanted markup
-        tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
-        ticket_summary_tags = ['dl', 'dt', 'dd', 'h2', 'div']
-        tags += ticket_summary_tags
-
-        attributes = {}
-        attributes['div'] = frozenset({'class'})
-
-        sanitizer = Sanitizer(Policy(
-            tags=frozenset(tags),
-            attributes=attributes,
-            on_disallowed_tag=OnDisallowed.STRIP,
-        ))
-        html = minify(sanitizer.sanitize(html))
         # TODO: switch to turbohtml.parse
         tree = etree.parse(StringIO(html), etree.HTMLParser())
         data = []

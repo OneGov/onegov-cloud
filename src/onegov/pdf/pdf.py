@@ -36,7 +36,7 @@ from uuid import uuid4
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Iterable, Iterator, Mapping, Sequence
     from reportlab.lib.styles import PropertySet
     from reportlab.platypus.doctemplate import _PageCallback
     from reportlab.platypus.tables import _TableCommand
@@ -563,23 +563,23 @@ class Pdf(PDFDocument):
             Pdf.strip(escape(element.tail or '', quote=False))
         )
 
-    def mini_html(self, html: str | None, linkify: bool = False) -> None:
-        """ Convert a small subset of HTML into ReportLab paragraphs.
-
-        This is very limited and currently supports only links, paragraphs and
-        non-nested ordered/unordered lists.
-
-        If linkifing is enabled, a-tags are cleaned and kept and the html is
-        linkified automatically.
-
-        """
+    def prepare_html(
+        self,
+        html: str | None,
+        linkify: bool = False,
+        extra_tags: Iterable[str] = (),
+        extra_attributes: Mapping[str, frozenset[str]] | None = None,
+    ) -> str | None:
 
         if not html or html == '<p></p>':
-            return
+            return None
 
         # Remove unwanted markup
-        tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
-        attributes = {}
+        tags = [
+            'p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li',
+            *extra_tags
+        ]
+        attributes = dict(extra_attributes) if extra_attributes else {}
 
         if linkify:
             tags.append('a')
@@ -592,7 +592,7 @@ class Pdf(PDFDocument):
         ))
         html = sanitizer.sanitize(html)
         if not html.strip():
-            return
+            return None
 
         if linkify:
             link_color = self.link_color
@@ -617,7 +617,27 @@ class Pdf(PDFDocument):
 
         # NOTE: This has the same result as the html5lib whitespace
         #       filter we used to use. It collapses all whitespace.
+        #       It also goes a little beyond that, but all the other
+        #       things it does also help us.
         html = minify(html)
+        if not html.strip():
+            return None
+        return html
+
+    def mini_html(self, html: str | None, linkify: bool = False) -> None:
+        """ Convert a small subset of HTML into ReportLab paragraphs.
+
+        This is very limited and currently supports only links, paragraphs and
+        non-nested ordered/unordered lists.
+
+        If linkifing is enabled, a-tags are cleaned and kept and the html is
+        linkified automatically.
+
+        """
+
+        html = self.prepare_html(html, linkify=linkify)
+        if html is None:
+            return
 
         # TODO: Switch to turbohtml.parse
         tree = etree.parse(StringIO(html), etree.HTMLParser())
