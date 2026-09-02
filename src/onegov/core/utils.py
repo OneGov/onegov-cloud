@@ -388,12 +388,7 @@ def linkify_linker() -> Linker:
     return Linker(Linkify(
         parse_email=True,
         schemes=frozenset({'http', 'https', 'mailto', 'tel'}),
-        phones=PhoneNumbers(
-            regions=('CH',),
-            require_valid=True,
-            require_separators=False,
-            require_national_prefix=True,
-        )
+        phones=PhoneNumbers(regions=('CH',))
     ))
 
 

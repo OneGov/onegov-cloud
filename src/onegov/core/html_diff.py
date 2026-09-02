@@ -78,7 +78,7 @@ def to_genshi_stream(element: Element) -> Iterator[StreamEvent]:
     yield START, (tag_name, attrs), (None, -1, -1)
     for node in element.children:
         if isinstance(node, Element):
-            yield from to_genshi_stream(element)
+            yield from to_genshi_stream(node)
         elif isinstance(node, TextNode):
             yield TEXT, node.data, (None, -1, -1)
     yield END, tag_name, (None, -1, -1)
@@ -96,7 +96,14 @@ def parse_html(
     return to_genshi_stream(element)
 
 
-# FIXME: Can we easily implement StreamDiffer without genshi?
+# FIXME: Can we easily implement StreamDiffer without genshi? We might
+#        get better results if we implement a custom streaming format
+#        that operates purely on tagged string chunks, that map back
+#        to the tree, so we can detect modifications like enclosing
+#        some text in a `<b>` tag, without changing the enclosed text.
+#        So this gets rendered as `tagdiff_added`/`tagdiff_removed`
+#        classified ranges, instead of repeating the same text as
+#        an insertion and deletion with an enclosing tag on one of them.
 class StreamDiffer:
     """A class that can diff a stream of Genshi events. It will inject
     ``<ins>`` and ``<del>`` tags into the stream. It probably breaks
@@ -161,27 +168,30 @@ class StreamDiffer:
         tag = QName(tag)
         if ws:
             self.append(TEXT, ws, pos)
-        self.append(START, (tag, Attrs()), pos)
-        self.append(TEXT, text, pos)
-        self.append(END, tag, pos)
+        if text:
+            self.append(START, (tag, Attrs()), pos)
+            self.append(TEXT, text, pos)
+            self.append(END, tag, pos)
 
     def diff_text(self, pos: Position, old_text: str, new_text: str) -> None:
         old = self.text_split(old_text)
         new = self.text_split(new_text)
         matcher = SequenceMatcher(None, old, new)
 
-        # FIXME: This function is too simple to be worth it, get rid of it
-        def wrap(tag: str, words: list[str]) -> None:
-            self.mark_text(pos, ''.join(words), tag)
-
         for tag, i1, i2, j1, j2 in matcher.get_opcodes():
             if tag == 'replace':
-                wrap('del', old[i1:i2])
-                wrap('ins', new[j1:j2])
+                # NOTE: We set the leading whitespace to the new fragment
+                #       we ignore the leading whitespace of the old fragment
+                _, deleted = self.cut_leading_space(''.join(old[i1:i2]))
+                ws, added = self.cut_leading_space(''.join(new[j1:j2]))
+                if ws:
+                    self.append(TEXT, ws, pos)
+                self.mark_text(pos, deleted, 'del')
+                self.mark_text(pos, added, 'ins')
             elif tag == 'delete':
-                wrap('del', old[i1:i2])
+                self.mark_text(pos, ''.join(old[i1:i2]), 'del')
             elif tag == 'insert':
-                wrap('ins', new[j1:j2])
+                self.mark_text(pos, ''.join(new[j1:j2]), 'ins')
             else:
                 self.append(TEXT, ''.join(old[i1:i2]), pos)
 
