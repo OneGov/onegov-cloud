@@ -324,7 +324,11 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                     text = getattr(entry, field, None)
                     if not text:
                         continue
-                    found = {span.text for span in self.extractor.find(text)}
+                    # FIXME: Switch to unique=True
+                    found = {
+                        span.text: None
+                        for span in self.extractor.find(text)
+                    }
                     if not found:
                         continue
                     urls.extend(found)
@@ -337,8 +341,9 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         for agency in AgencyCollection(self.request.session).query():
             if not agency.portrait:
                 continue
+            # FIXME: Switch to unique=True
             found = {
-                span.text
+                span.text: None
                 for span in self.extractor.find(agency.portrait)
             }
             if found:

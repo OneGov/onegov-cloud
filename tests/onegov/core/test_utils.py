@@ -121,6 +121,7 @@ def test_module_path() -> None:
 valid_test_phone_numbers = [
     '+41 44 453 45 45',
     '+41 79434 3254',
+    '+41    79434    3254',
     '+4179434 3254',
     '004179434 3254',
     '044 302 35 87',
@@ -138,8 +139,6 @@ invalid_test_phone_numbers = [
     '+31 654 32 54',
     '+0041 543 44 44',
     '0041-24400321',
-    # NOTE: We no longer accept multiple spaces
-    '+41     79434     3254',
 ]
 
 

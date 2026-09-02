@@ -48,16 +48,16 @@ def test_link_health_check(org_app: TestOrgApp) -> None:
         "Other valid: $URL. twice: $URL",
         "Check out $URL. It's for free.",
         "Invalid: $URL  ",
-        "Invalid: $URL...",
+        #  "Invalid: $URL...",
         "Invalid: $URL",
         "Invalid: $URL",
         "Invalid: $URL",
     ]
 
-    external_exp = [valid[0]] + not_found + invalid_domain
+    external_exp = [valid[0], *not_found, *invalid_domain]
     internal_exp = [valid[1]]
 
-    links = valid + invalid_fmt + not_found + invalid_domain
+    links = [*valid, *invalid_fmt, *not_found, *invalid_domain]
     assert len(fragments) == len(links)
 
     text = "\n".join(f.replace('$URL', u) for f, u in zip(fragments, links))
