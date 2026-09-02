@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import secrets
+import yaml
+
 from functools import cached_property
+from pathlib import Path
 
 from onegov.core import Framework
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
@@ -165,6 +168,38 @@ class Layout(OrgLayout):
             '<li class="js-drilldown-back">'
             f'<a tabindex="0">{back}</a></li>'
         )
+
+    @property
+    def new_features(self) -> list[dict[str, Any]]:
+        repo_root: Path | None = None
+        for parent in Path(__file__).resolve().parents:
+            if (parent / 'changes').is_dir():
+                repo_root = parent
+                break
+
+        features: list[dict[str, Any]] = []
+        if not repo_root:
+            return features
+
+        next_release_path = repo_root / 'changes' / 'next release'
+        if not next_release_path.exists():
+            return features
+
+        for yaml_file in sorted(next_release_path.glob('*.yaml')):
+            with yaml_file.open('r', encoding='utf-8') as fh:
+                payload = yaml.safe_load(fh) or {}
+
+            if isinstance(payload, dict):
+                features.append(payload)
+
+            for feature in features:
+                for value in feature:
+                    if type(feature[value]) is dict:
+                        feature[value] = feature[value].get(
+                            str(self.request.locale).split('_')[0], None
+                        )
+
+        return features
 
     @property
     def on_homepage(self) -> bool:

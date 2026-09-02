@@ -1,0 +1,27 @@
+title:
+  de: Helferanmeldungen sind neu Tickets
+  fr: Les inscriptions de bénévoles sont désormais des tickets
+  it: Le iscrizioni dei volontari sono ora gestite come ticket
+description:
+  de:
+    Die Helferanmeldungen werden neu als Tickets verwaltet. Dort kann der
+    Status der Anmeldungen bearbeitet und abschliessend ein Statusmail
+    versendet werden.
+  fr:
+    Les inscriptions de bénévoles sont désormais gérées comme des tickets.
+    Le statut des inscriptions peut être modifié et un e-mail de statut final
+    peut être envoyé.
+  it:
+    Le iscrizioni dei volontari sono ora gestite come ticket. Lo stato delle
+    iscrizioni può essere modificato e può essere inviato un e-mail di stato
+    finale.
+applications:
+  # - all
+  - feriennet
+  # - town6
+  # - agency
+  # - pas
+  # - events
+  # - fsi
+  # - intranet
+  # - landsgemeinde
