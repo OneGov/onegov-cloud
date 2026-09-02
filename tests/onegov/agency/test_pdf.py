@@ -369,7 +369,9 @@ def test_agency_pdf_lu(session: Session) -> None:
     aeschi = people.add(
         last_name="Sutter",
         first_name="Thomas",
-        political_party="SVP"
+        political_party="SVP",
+        academic_title='Dr. iur.',
+        phone='+41 41 228 59 22',
     )
     eder = people.add(
         last_name="Wyss",
@@ -385,8 +387,10 @@ def test_agency_pdf_lu(session: Session) -> None:
         portrait="Portrait NR",
         export_fields=[
             'membership.title',
-            'person.title'
-        ]
+            'person.academic_title',
+            'person.title',
+            'person.phone',
+        ],
     )
     sr = agencies.add(
         parent=bund,
@@ -420,7 +424,8 @@ def test_agency_pdf_lu(session: Session) -> None:
     assert 'Nationalrat' in pdf
     assert 'Portrait NR' in pdf
     assert 'Mitglied von Luzern' in pdf
-    assert 'Sutter Thomas' in pdf
+    assert 'Dr. iur. Sutter Thomas, +41 41 228 59 22' in pdf
+    assert 'Dr. iur., Sutter Thomas' not in pdf
     assert 'Ständerat' in pdf
     assert 'Patrick' in pdf
     assert 'Wyss, FDP' in pdf

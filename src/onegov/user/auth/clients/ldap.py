@@ -97,7 +97,7 @@ class LDAPClient:
 
         # disconnect if necessary
         with suppress(LDAPCommunicationError, socket.error):
-            self.connection.unbind()
+            self.connection.unbind()  # type: ignore[no-untyped-call]
 
         # clear cache
         del self.__dict__['connection']
