@@ -468,3 +468,7 @@ $('body').each(function() {
         this.className += " framed";
     }
 });
+
+$(document).ready(function() {
+  $('#newFeaturesModal').foundation('open');
+});

@@ -3507,3 +3507,22 @@
         </li>
     </ul>
 </metal:globals-left>
+
+<metal:features define-macro="features">
+    <tal:b tal:define="features layout.new_features|nothing">
+        <div class="reveal" id="newFeaturesModal" data-reveal>
+            <h1 class="h2">Neue Features verfügbar</h1>
+            <tal:b repeat="feature features">
+                <div class="card">
+                    <div class="card-section">
+                        <b tal:content="feature['title']"></b><br/>
+                        <span tal:content="feature['description']"></span>
+                    </div>
+                </div>
+            </tal:b>
+            <button class="close-button" data-close aria-label="Close modal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </tal:b>
+</metal:features>
