@@ -7,6 +7,8 @@ import morepath
 import secrets
 import sedate
 
+from uuid import UUID
+
 from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
@@ -63,7 +65,6 @@ if TYPE_CHECKING:
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
     from typing import TypedDict
-    from uuid import UUID
     from webob import Response as BaseResponse
 
     type RoomSlots = dict[UUID, list[utils.FindYourSpotEventInfo]]
@@ -1593,7 +1594,7 @@ def view_my_reservations_json(
     ]
 
     if reservation_token:
-        conditions.append(stmt.c.token == reservation_token)
+        conditions.append(stmt.c.token == UUID(reservation_token))
 
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
@@ -1649,7 +1650,7 @@ def view_my_reservations_pdf(
     ]
 
     if reservation_token:
-        conditions.append(stmt.c.token == reservation_token)
+        conditions.append(stmt.c.token == UUID(reservation_token))
 
     if limited or request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
@@ -1862,12 +1863,15 @@ def view_my_reservations_ical(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(*stmt.c).where(and_(
+    conditions = [
         func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file
         stmt.c.accepted.is_(True)
-    )))
+    ]
+    if reservation_token:
+        conditions.append(stmt.c.token == UUID(reservation_token))
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     ticket_label = request.translate(_('Check request status'))
     key_code_label = request.translate(_('Key Code'))
