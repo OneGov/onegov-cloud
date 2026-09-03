@@ -1,0 +1,13 @@
+title: Erinnerungsmail für Reservationen
+description:
+  Für Reservationen wird nun automatisch 10 Tage im Voraus eine Erinnerungsmail versendet.
+applications:
+  - onegov_town6
+# - all
+# - onegov_feriennet
+# - onegov_agency
+# - onegov_pas
+# - onegov_events
+# - onegov_fsi
+# - onegov_intranet
+# - onegov_landsgemeinde

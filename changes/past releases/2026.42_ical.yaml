@@ -1,0 +1,13 @@
+title: Zweite iCal-URL für Reservationen
+description:
+  Zusätzlich zur bestehenden iCal-URL steht eine zweite Variante zur Verfügung, welche auch Reservationen auf blockierenden Ressourcen einschliesst.
+applications:
+  - onegov_town6
+  - all
+# - onegov_feriennet
+# - onegov_agency
+# - onegov_pas
+# - onegov_events
+# - onegov_fsi
+# - onegov_intranet
+# - onegov_landsgemeinde

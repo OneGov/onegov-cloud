@@ -1,0 +1,13 @@
+title: Feiertage in der Platzsuche sichtbar
+description:
+  Bei der Suche nach freien Plätzen werden Feiertage neu direkt in den Ergebnissen angezeigt.
+applications:
+  - onegov_feriennet
+# - all
+# - onegov_town6
+# - onegov_agency
+# - onegov_pas
+# - onegov_events
+# - onegov_fsi
+# - onegov_intranet
+# - onegov_landsgemeinde

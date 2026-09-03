@@ -3520,7 +3520,8 @@
                     </div>
                 </div>
             </tal:b>
-            <button class="close-button" data-close aria-label="Close modal" type="button">
+
+            <button ic-post-to="${layout.csrf_protected_url(request.link(request.current_user, 'release-features'))}" class="close-button" data-close aria-label="Close modal" type="button">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>

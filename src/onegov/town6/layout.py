@@ -173,7 +173,11 @@ class Layout(OrgLayout):
     def new_features(self) -> list[dict[str, Any]]:
         features: list[dict[str, Any]] = []
 
-        if self.request.is_manager:
+        if user := self.request.current_user:
+            user_release = user.release_features
+            if user_release == self.app.version:
+                return features
+
             repo_root: Path | None = None
             for parent in Path(__file__).resolve().parents:
                 if (parent / 'changes').is_dir():
@@ -183,14 +187,9 @@ class Layout(OrgLayout):
             if not repo_root:
                 return features
 
-            current_release_path = repo_root / 'changes' / 'current release'
-            if not current_release_path.exists():
-                return features
-
-            for yaml_file in sorted(current_release_path.glob('*.yaml')):
-                with yaml_file.open('r', encoding='utf-8') as fh:
-                    payload = yaml.safe_load(fh) or {}
-
+            def add_payload(
+                    payload: dict[str, Any],
+            ) -> None:
                 required_keys = {'title', 'description', 'applications'}
 
                 if isinstance(payload, dict) and required_keys.issubset(
@@ -200,12 +199,54 @@ class Layout(OrgLayout):
                     if namespace in applications or 'all' in applications:
                         features.append(payload)
 
-                for feature in features:
-                    for value in feature:
-                        if type(feature[value]) is dict:
-                            feature[value] = feature[value].get(
-                                str(self.request.locale).split('_')[0], None
-                            )
+            def parse_release(value: str) -> tuple[int, int]:
+                year, number = value.split('.', 1)
+                return int(year), int(number)
+
+            current_release_path = repo_root / 'changes' / 'current release'
+            if not current_release_path.exists():
+                return features
+
+            for yaml_file in sorted(current_release_path.glob('*.yaml')):
+                with yaml_file.open('r', encoding='utf-8') as fh:
+                    add_payload(yaml.safe_load(fh) or {})
+
+            if len(features) < 5:
+                past_release_path = repo_root / 'changes' / 'past releases'
+                if past_release_path.exists():
+                    if user_release is None:
+                        user_release_tuple = (0, 0)
+                    else:
+                        user_release_tuple = parse_release(user_release)
+
+                    def release_key(yaml_file: Path) -> tuple[int, int]:
+                        release_str = yaml_file.name.split('_', 1)[0]
+                        try:
+                            return parse_release(release_str)
+                        except ValueError:
+                            return (0, 0)
+
+                    sorted_files = sorted(
+                        past_release_path.glob('*.yaml'),
+                        key=release_key,
+                        reverse=True,
+                    )
+
+                    for yaml_file in sorted_files:
+                        if len(features) >= 5:
+                            break
+                        if release_key(yaml_file) <= user_release_tuple:
+                            break
+                        with yaml_file.open('r', encoding='utf-8') as fh:
+                            add_payload(yaml.safe_load(fh) or {})
+
+            # Translations if there are locales
+            for feature in features:
+                for value in feature:
+                    if type(feature[value]) is dict:
+                        feature[value] = feature[value].get(
+                            str(self.request.locale).split('_')[0], None
+                        )
 
         return features
 

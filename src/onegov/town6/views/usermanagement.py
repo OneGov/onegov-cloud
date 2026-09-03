@@ -110,3 +110,21 @@ def town_handle_new_user(
     layout.edit_mode = True
     return handle_new_user(
         self, request, form, layout)
+
+
+@TownApp.view(
+        model=User,
+        permission=Secret,
+        request_method='POST',
+        name='release-features'
+)
+def add_release_number(
+    self: User,
+    request: TownRequest,
+) -> None:
+
+    request.assert_valid_csrf_token()
+
+    self.release_features = request.app.version
+
+    request.success('The release features have been confirmed')
