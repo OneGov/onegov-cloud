@@ -11,7 +11,11 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TextAreaFieldWithTextModules
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.filters import strip_whitespace
-from onegov.form.validators import FileSizeLimit, StrictOptional
+from onegov.form.validators import (
+    FileSizeLimit,
+    MIME_TYPES_PDF,
+    StrictOptional,
+)
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.org import _
 from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
@@ -67,6 +71,13 @@ class TicketChatMessageForm(Form):
         filters=(strip_whitespace, ),
         render_kw={'rows': 5, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
+    file = UploadFileWithORMSupport(
+        label=_('PDF'),
+        file_class=MessageFile,
+        validators=[Optional(), FileSizeLimit(10 * 1000 * 1000)],
+        allowed_mimetypes=MIME_TYPES_PDF,
+    )
+
     def validate_text(self, field: TextAreaField) -> None:
         if not self.text.data or not self.text.data.strip():
             raise ValidationError(_('The message is empty'))
@@ -94,6 +105,7 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
     )
 
     def on_request(self) -> None:
+        self.delete_field('file')
         self.text.widget = TextAreaWithTextModules()
         if self.request.app.org.ticket_always_notify:
             self.delete_field('notify')
