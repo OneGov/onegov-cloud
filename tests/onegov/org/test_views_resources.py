@@ -5157,6 +5157,30 @@ def test_my_reservations_view(client: Client) -> None:
     assert login_page.status_code == 302
     assert 'citizen-login' in (login_page.location or '')
 
+    # with two accepted tickets, each email's ical link is scoped to its
+    # ticket while the durable subscribe feed lists both
+    ticket = admin.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+    second_mail = client4.get_email(-1)['HtmlBody']
+    second_ical_url = unescape(re.search(  # type: ignore[union-attr]
+        r'https?://localhost(/resources/my-reservations-ical[^"]+)',
+        second_mail
+    ).group(1))
+
+    def event_uids(response: Any) -> set[str]:
+        return set(re.findall(r'UID:(\S+)', response.text))
+
+    # each ticket's magic link is scoped to its own single reservation
+    first_uids = event_uids(client.spawn().get(mail_ical_url))
+    second_uids = event_uids(client.spawn().get(second_ical_url))
+    assert len(first_uids) == 1
+    assert len(second_uids) == 1
+    assert first_uids.isdisjoint(second_uids)
+
+    # the durable subscribe feed (no ticket token) lists both accepted events
+    both_uids = event_uids(client.spawn().get(ical_url))
+    assert both_uids == first_uids | second_uids
+
 
 @pytest.mark.parametrize(
     'frozen_at,expected_status',
