@@ -1,0 +1,90 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="audit-entry">
+            <div class="audit-entry-summary">
+                <span class="audit-operation audit-${entry.operation}">
+                    ${operation}
+                </span>
+                <div class="audit-entry-heading">
+                    <strong>
+                        <a tal:condition="current_page"
+                           href="${request.link(current_page)}">
+                            ${entry.snapshot.get(
+                                'title', entry.target_table
+                            )}
+                            <i class="fa fa-external-link-alt"
+                               aria-hidden="true"></i>
+                        </a>
+                        <tal:b tal:condition="not:current_page">
+                            ${entry.snapshot.get(
+                                'title', entry.target_table
+                            )}
+                        </tal:b>
+                    </strong>
+                    <small class="audit-entry-details">
+                        <span>
+                            <i class="far fa-clock"
+                               aria-hidden="true"></i>
+                            ${layout.format_date(entry.created, 'datetime')}
+                        </span>
+                        <span class="audit-entry-user">
+                            <i class="far fa-user"
+                               aria-hidden="true"></i>
+                            ${entry.username}
+                        </span>
+                    </small>
+                </div>
+            </div>
+
+            <section class="audit-snapshot-panel"
+                     tal:condition="previous_snapshot">
+                <div class="audit-snapshot-heading">
+                    <h2 i18n:translate>Before update</h2>
+                    <button class="button clear audit-copy"
+                            type="button"
+                            data-clipboard-action="copy"
+                            data-clipboard-target=
+                                "#audit-previous-snapshot"
+                            title="Copy JSON"
+                            aria-label="Copy JSON"
+                            data-copy-success-label=
+                                "Copied to Clipboard!"
+                            i18n:attributes=
+                                "title;aria-label;
+                                 data-copy-success-label">
+                        <i class="far fa-copy" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <pre id="audit-previous-snapshot"
+                     class="audit-snapshot">${previous_snapshot}</pre>
+            </section>
+
+            <section class="audit-snapshot-panel">
+                <div class="audit-snapshot-heading">
+                    <h2 tal:condition="previous_snapshot"
+                        i18n:translate>After update</h2>
+                    <h2 tal:condition="not:previous_snapshot"
+                        i18n:translate>JSON Snapshot</h2>
+                    <button class="button clear audit-copy"
+                            type="button"
+                            data-clipboard-action="copy"
+                            data-clipboard-target="#audit-snapshot"
+                            title="Copy JSON"
+                            aria-label="Copy JSON"
+                            data-copy-success-label=
+                                "Copied to Clipboard!"
+                            i18n:attributes=
+                                "title;aria-label;
+                                 data-copy-success-label">
+                        <i class="far fa-copy" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <pre id="audit-snapshot"
+                     class="audit-snapshot">${snapshot}</pre>
+            </section>
+        </div>
+    </tal:b>
+</div>

@@ -15,6 +15,7 @@ from onegov.core.converters import datetime_year_converter
 from onegov.core.converters import json_converter
 from onegov.core.converters import LiteralConverter
 from onegov.core.orm.abstract import MoveDirection
+from onegov.core.orm.audit import AuditEntry, AuditEntryCollection
 from onegov.core.security import Public
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
@@ -200,6 +201,32 @@ def get_users(
         app.session(),
         active=active, role=role, tag=tag, provider=provider, source=source
     )
+
+
+@OrgApp.path(
+    model=AuditEntryCollection,
+    path='/audit-trail',
+    converters={'page': int, 'operation': str},
+)
+def get_audit_entries(
+    app: OrgApp,
+    page: int = 0,
+    operation: str | None = None,
+) -> AuditEntryCollection:
+    if operation not in {None, 'insert', 'update', 'delete'}:
+        operation = None
+    return AuditEntryCollection(
+        app.session(), page, operation  # type: ignore[arg-type]
+    )
+
+
+@OrgApp.path(
+    model=AuditEntry,
+    path='/audit-trail/{id}',
+    converters={'id': UUID},
+)
+def get_audit_entry(app: OrgApp, id: UUID) -> AuditEntry | None:
+    return AuditEntryCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(
