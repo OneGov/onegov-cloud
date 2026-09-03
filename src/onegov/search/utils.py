@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import html
 import re
+import turbohtml
 
 from lingua import IsoCode639_1, LanguageDetectorBuilder
 from onegov.core.orm import find_models
@@ -101,7 +101,7 @@ def apply_searchable_polymorphic_filter[T](
 
 
 def extract_hashtags(text: str) -> list[str]:
-    return HASHTAG.findall(html.unescape(text))
+    return HASHTAG.findall(turbohtml.unescape(text))
 
 
 class classproperty[T_co]:  # ruff:ignore[invalid-class-name]

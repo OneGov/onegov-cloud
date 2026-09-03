@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 import base64
-import bleach
-from urlextract import URLExtract, CacheFileError
-from bleach.linkifier import TLDS
 import errno
 import fcntl
 import gzip
@@ -23,7 +20,7 @@ import urllib.request
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
-from functools import lru_cache, reduce, cache
+from functools import lru_cache, reduce
 from importlib import import_module
 from io import BytesIO, StringIO
 from itertools import groupby, islice
@@ -32,11 +29,11 @@ from markupsafe import Markup
 from onegov.core import log
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
-from phonenumbers import (PhoneNumberFormat, format_number,
-                          NumberParseException, parse)
 from purl import URL
 from threading import Thread
 from time import perf_counter
+from turbohtml.clean import Linker, Linkify, PhoneNumbers, Policy, sanitize
+from turbohtml.clean import PhoneFormat, PhoneNumber
 from unidecode import unidecode
 from uuid import UUID, uuid4
 from webob import static
@@ -49,7 +46,6 @@ from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection, Iterator, Mapping
-    from re import Match
     from sqlalchemy.orm import InstrumentedAttribute, Session
     from types import ModuleType
     from webob import Response
@@ -67,27 +63,8 @@ _repeated_dots = re.compile(r'\.\.+')
 _uuid = re.compile(
     r'^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$')
 
-# only temporary until bleach has a release > 1.4.1 -
-_email_regex = re.compile(
-    r"([a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`"
-    r"{|}~-]+)*(@|\sat\s)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(\.|"
-    r"\sdot\s))+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)"
-)
-
 # detects multiple successive newlines
 _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
-
-# detect starting strings of phone inside a link
-_phone_inside_a_tags = r'(\">|href=\"tel:)?'
-
-# regex pattern for swiss phone numbers
-_phone_ch_country_code = r'(\+41|0041|0[0-9]{2})'
-_phone_ch = re.compile(_phone_ch_country_code + r'([ \r\f\t\d]+)')
-
-# Adds a regex group to capture if a leading a tag is present or if the
-# number is part of the href attributes
-_phone_ch_html_safe = re.compile(
-    _phone_inside_a_tags + _phone_ch_country_code + r'([ \r\f\t\d]+)')
 
 # for yubikeys
 ALPHABET = 'cbdefghijklnrtuv'
@@ -406,55 +383,20 @@ def groupbylist[T](
     return [(k, list(g)) for k, g in groupby(iterable, key=key)]
 
 
-def linkify_phone(text: str) -> Markup:
-    """ Takes a string and replaces valid phone numbers with html links. If a
-    phone number is matched, it will be replaced by the result of a callback
-    function, that does further checks on the regex match. If these checks do
-    not pass, the matched number will remain unchanged.
-
-    """
-
-    def strip_whitespace(number: str) -> str:
-        return re.sub(r'\s', '', number)
-
-    def is_valid_length(number: str) -> bool:
-        if number.startswith('+00'):
-            return False
-        if number.startswith('00'):
-            return len(number) == 13
-        elif number.startswith('0'):
-            return len(number) == 10
-        elif number.startswith('+'):
-            return len(number) == 12
-        return False
-
-    def handle_match(match: Match[str]) -> str:
-        inside_html = match.group(1)
-        number = f'{match.group(2)}{match.group(3)}'
-        assert not number.endswith('\n')
-        if inside_html:
-            return match.group(0)
-        if is_valid_length(strip_whitespace(number)):
-            number = remove_repeated_spaces(number).strip()
-            return Markup(
-                '<a href="tel:{number}">{number}</a> '
-            ).format(number=number)
-
-        return match.group(0)
-
-    # NOTE: re.sub isn't Markup aware, so we need to re-wrap
-    return Markup(  # nosec: B704
-        _phone_ch_html_safe.sub(handle_match, escape(text)))
+@lru_cache(maxsize=1)
+def linkify_linker() -> Linker:
+    return Linker(Linkify(
+        parse_email=True,
+        schemes=frozenset({'http', 'https', 'mailto', 'tel'}),
+        phones=PhoneNumbers(regions=('CH',))
+    ))
 
 
-@cache
-def top_level_domains() -> set[str]:
-    try:
-        return URLExtract()._load_cached_tlds()
-    except CacheFileError:
-        pass
-    # fallback
-    return {'agency', 'ngo', 'swiss', 'gle'}
+linkify_policy = Policy(
+    tags=frozenset({'a'}),
+    attributes={'a': frozenset({'href', 'rel'})},
+    url_schemes=frozenset({'http', 'https', 'mailto', 'tel'}),
+)
 
 
 def linkify(text: str | None) -> Markup:
@@ -475,46 +417,18 @@ def linkify(text: str | None) -> Markup:
     if not text:
         return Markup('')
 
-    def remove_dots(tlds: set[str]) -> list[str]:
-        return [domain[1:] for domain in tlds]
+    linker = linkify_linker()
 
-    # bleach.linkify supports only a fairly limited amount of tlds
-    additional_tlds = top_level_domains()
-    if any(domain in text for domain in additional_tlds):
-
-        all_tlds = list(set(TLDS + remove_dots(additional_tlds)))
-
-        # Longest first, to prevent eager matching, if for example
-        # .co is matched before .com
-        all_tlds.sort(key=len, reverse=True)
-
-        bleach_linker = bleach.Linker(
-            url_re=bleach.linkifier.build_url_re(tlds=all_tlds),
-            email_re=bleach.linkifier.build_email_re(tlds=all_tlds),
-            parse_email=True if '@' in text else False
-        )
-        # NOTE: bleach's linkify always returns a plain string
-        #       so we need to re-wrap
-        linkified = linkify_phone(Markup(  # nosec: B704
-            bleach_linker.linkify(escape(text)))
-        )
-
-    else:
-        # NOTE: bleach's linkify always returns a plain string
-        #       so we need to re-wrap
-        linkified = linkify_phone(Markup(  # nosec: B704
-            bleach.linkify(escape(text), parse_email=True))
-        )
+    # NOTE: linkify always returns a plain string so we need to re-wrap
+    linkified = Markup(linker.linkify(escape(text)))  # nosec: B704
 
     # NOTE: this is already vetted markup, don't clean it
     if isinstance(text, Markup):
         return linkified
 
-    return Markup(bleach.clean(  # nosec: B704
+    return Markup(sanitize(  # nosec: B704
         linkified,
-        tags=['a'],
-        attributes={'a': ['href', 'rel']},
-        protocols=['http', 'https', 'mailto', 'tel']
+        linkify_policy
     ))
 
 
@@ -1279,17 +1193,19 @@ def generate_fts_phonenumbers(numbers: Iterable[str | None]) -> list[str]:
             continue
 
         try:
-            parsed = parse(number, 'CH')
-        except NumberParseException:
+            parsed = PhoneNumber.parse(
+                number,
+                regions=('CH',),
+                require_valid=False
+            )
+        except ValueError:
             # allow invalid phone number
             result.append(number.replace(' ', ''))
             continue
 
-        result.append(format_number(
-            parsed, PhoneNumberFormat.E164))
+        result.append(parsed.format(PhoneFormat.E164))
 
-        national = format_number(
-            parsed, PhoneNumberFormat.NATIONAL)
+        national = parsed.format(PhoneFormat.NATIONAL)
         groups = national.split()
         for idx in range(len(groups)):
             partial = ''.join(groups[idx:])

@@ -2149,8 +2149,8 @@ def test_send_reservation_summary(client: Client) -> None:
 
     message = client.get_email(2)['TextBody']
     assert 'Tageskarte' in message
-    assert '10:00 - 12:00  | → |' not in message
-    assert '10:30 - 12:00  | → | Abgelehnt' in message
+    assert '10:00 - 12:00  →' not in message
+    assert '10:30 - 12:00  → Abgelehnt' in message
 
 
 @freeze_time('2015-08-28', tick=True)

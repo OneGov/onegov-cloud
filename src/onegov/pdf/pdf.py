@@ -1,14 +1,9 @@
 from __future__ import annotations
 
-from bleach.linkifier import LinkifyFilter
-from bleach.sanitizer import Cleaner
+import turbohtml
+
 from copy import deepcopy
 from contextlib import contextmanager
-from functools import partial
-from html import escape
-from html5lib.filters.whitespace import Filter as WhitespaceFilter
-from io import StringIO
-from lxml import etree
 from onegov.core.utils import module_path
 from onegov.pdf.flowables import InlinePDF
 from onegov.pdf.page_functions import empty_page_fn
@@ -32,15 +27,21 @@ from reportlab.platypus import Paragraph
 from reportlab.platypus import Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus.tables import TableStyle
+from turbohtml.clean import minify
+from turbohtml.clean import LinkCandidate
+from turbohtml.clean import Linker
+from turbohtml.clean import Linkify
+from turbohtml.clean import OnDisallowed
+from turbohtml.clean import PhoneNumbers
+from turbohtml.clean import Policy
+from turbohtml.clean import Sanitizer
 from uuid import uuid4
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
-    from bleach.callbacks import _HTMLAttrs
-    from bleach.sanitizer import _Filter
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Iterable, Iterator, Mapping, Sequence
     from reportlab.lib.styles import PropertySet
     from reportlab.platypus.doctemplate import _PageCallback
     from reportlab.platypus.tables import _TableCommand
@@ -546,7 +547,6 @@ class Pdf(PDFDocument):
         self.p_markup(text, style=style or self.style.figcaption)
 
     @staticmethod
-    # Walk the tree and convert the elements
     def strip(text: str) -> str:
         text = text.strip('\r\n')
         prefix = ' ' if text.startswith(' ') else ''
@@ -554,18 +554,67 @@ class Pdf(PDFDocument):
 
         return prefix + text.strip() + postfix
 
-    @staticmethod
-    def inner_html(element: etree._Element) -> str:
-        # lxml hands out text nodes decoded, while tostring() escapes the
-        # children - escape them too, or reportlab eats '<' as a tag
-        return '{}{}{}'.format(
-            Pdf.strip(escape(element.text or '', quote=False)),
-            ''.join(
-                Pdf.strip(etree.tostring(child, encoding='unicode'))
-                for child in element
-            ),
-            Pdf.strip(escape(element.tail or '', quote=False))
-        )
+    def prepare_html(
+        self,
+        html: str | None,
+        linkify: bool = False,
+        extra_tags: Iterable[str] = (),
+        extra_attributes: Mapping[str, frozenset[str]] | None = None,
+    ) -> str | None:
+
+        if not html or html == '<p></p>':
+            return None
+
+        # Remove unwanted markup
+        tags = [
+            'p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li',
+            *extra_tags
+        ]
+        attributes = dict(extra_attributes) if extra_attributes else {}
+
+        if linkify:
+            tags.append('a')
+            attributes['a'] = frozenset({'href'})
+
+        sanitizer = Sanitizer(Policy(
+            tags=frozenset(tags),
+            attributes=attributes,
+            on_disallowed_tag=OnDisallowed.STRIP,
+        ))
+        html = sanitizer.sanitize(html)
+        if not html.strip():
+            return None
+
+        if linkify:
+            link_color = self.link_color
+            underline_links = self.underline_links
+            underline_width = self.underline_width
+
+            def colorize(link: LinkCandidate) -> LinkCandidate | None:
+                link.attrs['color'] = link_color
+                if underline_links:
+                    link.attrs['underline'] = '1'
+                    link.attrs['underlineColor'] = link_color
+                    link.attrs['underlineWidth'] = underline_width
+                return link
+
+            linker = Linker(Linkify(
+                callbacks=(colorize,),
+                parse_email=True,
+                process_existing=True,
+                schemes=('http', 'https', 'email', 'tel'),
+                phones=PhoneNumbers(regions=('CH',))
+            ))
+            html = linker.linkify(html)
+
+        # NOTE: This has the same result as the html5lib whitespace
+        #       filter we used to use. It collapses all whitespace.
+        #       It also goes a little beyond that, but all the other
+        #       things it does also help us.
+        html = minify(html)
+        if not html.strip():
+            return None
+        return html
 
     def mini_html(self, html: str | None, linkify: bool = False) -> None:
         """ Convert a small subset of HTML into ReportLab paragraphs.
@@ -578,71 +627,37 @@ class Pdf(PDFDocument):
 
         """
 
-        if not html or html == '<p></p>':
+        html = self.prepare_html(html, linkify=linkify)
+        if html is None:
             return
 
-        # Remove unwanted markup
-        tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
-        attributes = {}
-        filters: list[_Filter] = [WhitespaceFilter]
-
-        if linkify:
-            link_color = self.link_color
-            underline_links = self.underline_links
-            underline_width = self.underline_width
-
-            def colorize(
-                attrs: _HTMLAttrs,
-                new: bool = False
-            ) -> _HTMLAttrs:
-                # phone numbers appear here but are escaped, skip...
-                if not attrs.get((None, 'href')):
-                    # FIXME: bleach stubs seem to be incorrect here
-                    #        but we may be able to just return attrs
-                    return None  # type:ignore[return-value]
-                attrs[(None, 'color')] = link_color
-                if underline_links:
-                    attrs[(None, 'underline')] = '1'
-                    attrs[('a', 'underlineColor')] = link_color
-                    attrs[('a', 'underlineWidth')] = underline_width
-                return attrs
-
-            tags.append('a')
-            attributes['a'] = ['href']
-            filters.append(
-                partial(
-                    LinkifyFilter, parse_email=True, callbacks=[colorize])
-            )
-
-        cleaner = Cleaner(
-            tags=tags,
-            attributes=attributes,
-            strip=True,
-            filters=filters
-        )
-        html = cleaner.clean(html)
-        # Todo: phone numbers with href="tel:.." are cleaned out
-
-        if not html.strip():
+        document = turbohtml.parse(html)
+        body = document.find('body')
+        if body is None or not body.children:
             return
-
-        tree = etree.parse(StringIO(html), etree.HTMLParser())
-        body = tree.find('body')
-        if body is None:
-            return
-
-        if body.text and body.text.strip():
-            self.p(body.text, self.style.paragraph)
 
         for element in body:
+            if isinstance(element, turbohtml.Text):
+                if element.data.strip():
+                    self.p(element.data, self.style.paragraph)
+                continue
+
+            if not isinstance(element, turbohtml.Element):
+                continue
+
             if element.tag == 'p':
-                self.p_markup(self.inner_html(element), self.style.paragraph)
+                self.p_markup(
+                    self.strip(element.inner_xml),
+                    self.style.paragraph
+                )
             elif element.tag == 'ol':
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ol.leftIndent
                 items = [
-                    MarkupParagraph(self.inner_html(item), style)
+                    MarkupParagraph(self.strip(item.inner_xml), style)
                     for item in element
+                    if isinstance(item, turbohtml.Element)
+                    if item.tag == 'li'
                 ]
                 self.story.append(
                     ListFlowable(
@@ -660,8 +675,10 @@ class Pdf(PDFDocument):
                 style = deepcopy(self.style.li)
                 style.leftIndent += self.style.ul.leftIndent
                 items = [
-                    MarkupParagraph(self.inner_html(item), style)
+                    MarkupParagraph(self.strip(item.inner_xml), style)
                     for item in element
+                    if isinstance(item, turbohtml.Element)
+                    if item.tag == 'li'
                 ]
                 self.story.append(
                     ListFlowable(
@@ -676,10 +693,3 @@ class Pdf(PDFDocument):
                         )
                     )
                 )
-
-            # FIXME: Currently we test against exclusion of intermediary
-            #        non-paragraph nodes in the body, I'm not sure if this
-            #        was intentional, but for now we'll leave it like that
-            #        for backwards compatibility
-            # if element.tail and element.tail.strip():
-            #     self.p(element.tail, self.style.paragraph)

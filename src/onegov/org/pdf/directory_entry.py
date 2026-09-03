@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from html import escape
 from io import BytesIO
 from markupsafe import Markup
+from turbohtml import escape
 
 from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.org import _

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from bleach.sanitizer import Cleaner
 from markupsafe import Markup
 from onegov.quill.widgets import QuillInput
 from onegov.quill.widgets import TAGS
+from turbohtml.clean import OnDisallowed, Policy, Sanitizer
 from wtforms.fields import TextAreaField
 
 
@@ -45,9 +45,13 @@ class QuillField(TextAreaField):
 
         attributes = {}
         if 'a' in tags:
-            attributes['a'] = ['href']
+            attributes['a'] = frozenset({'href'})
 
-        self.cleaner = Cleaner(tags=tags, attributes=attributes, strip=True)
+        self.sanitizer = Sanitizer(Policy(
+            tags=frozenset(tags),
+            attributes=attributes,
+            on_disallowed_tag=OnDisallowed.STRIP,
+        ))
 
     def pre_validate(self, form: BaseForm) -> None:
-        self.data = Markup(self.cleaner.clean(self.data or ''))  # nosec: B704
+        self.data = Markup(self.sanitizer.sanitize(self.data or ''))  # nosec: B704

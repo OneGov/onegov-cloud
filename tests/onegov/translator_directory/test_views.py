@@ -32,6 +32,7 @@ from onegov.translator_directory.models.time_report import TranslatorTimeReport
 from onegov.user import UserCollection, UserGroup, UserGroupCollection
 from openpyxl import load_workbook
 from pdftotext import PDF  # type: ignore[import-not-found]
+from tests.onegov.core.test_utils import normalize_phone_number
 from tests.onegov.translator_directory.shared import (
     translator_data, create_languages, create_certificates)
 from tests.shared.utils import decode_map_value, encode_map_value
@@ -391,10 +392,11 @@ def test_view_translator(client: Client) -> None:
     ):
         page = page.form.submit().follow()
 
+    normalized = normalize_phone_number(tel_mobile)
     assert 'Ihre Änderungen wurden gespeichert' in page
     assert 'Aunt' in page
     assert 'MAGGIE' in page
-    assert f'<a href="tel:{tel_mobile}">{tel_mobile}</a>' in page
+    assert f'<a href="tel:{normalized}">{tel_mobile}</a>' in page
     values = {
         dl.find('dt').text_content().strip():
         dl.find('dd').text_content().strip()
