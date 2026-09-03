@@ -993,9 +993,13 @@ def get_my_reservations_url(
 
 def get_reservations_subscribe_url(
     request: OrgRequest,
-    email: str
+    email: str,
+    reservation_token: str | None = None
 ) -> str | None:
-    """ Durable magic link to the recipient's reservations calendar feed. """
+    """ Durable magic link to the recipient's reservations calendar feed.
+
+    When ``reservation_token`` is given, the feed is restricted to the
+    reservations of that single ticket. """
     if not request.app.org.citizen_login_enabled:
         return None
 
@@ -1003,7 +1007,11 @@ def get_reservations_subscribe_url(
     url_obj = URL(request.class_link(
         ResourceCollection, name='my-reservations-ical'
     ))
-    token = request.new_url_safe_token(email, salt)
+    payload = {
+        'email': email,
+        'token': reservation_token,
+    }
+    token = request.new_url_safe_token(payload, salt)
     url_obj = url_obj.query_param('token', token)
     url_obj = url_obj.query_param('salt', salt)
     return url_obj.as_string()
@@ -1161,7 +1169,7 @@ def accept_reservation(
                     request, self.email, ticket.handler_id
                 ),
                 'subscribe_url': get_reservations_subscribe_url(
-                    request, self.email
+                    request, self.email, ticket.handler_id
                 ),
                 'cancel_url': _cancel_url,
             },
@@ -1926,7 +1934,7 @@ def send_reservation_summary(
                     request, recipient, self.handler_id
                 ),
                 'subscribe_url': get_reservations_subscribe_url(
-                    request, recipient
+                    request, recipient, self.handler_id
                 ),
             }
         )

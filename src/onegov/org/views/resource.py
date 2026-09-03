@@ -1551,9 +1551,9 @@ def resolve_reservations_access(
     payload = request.load_url_safe_token(
         request.GET.get('token'), request.GET.get('salt'), None
     )
-    assert isinstance(payload, dict)
+    if not isinstance(payload, dict):
+        return None, False, None
     return payload['email'], True, payload.get('token')
-    return None, False, None
 
 
 @OrgApp.json(
@@ -1830,14 +1830,20 @@ def view_my_reservations_ical(
     request: OrgRequest
 ) -> Response:
 
-    token = request.GET.get('token')
     salt = request.GET.get('salt')
-    email = request.load_url_safe_token(token, salt, None)
+    token = request.GET.get('token')
+    payload = request.load_url_safe_token(token, salt, None)
     include_key_code = False
-    if email is None:
+    reservation_token = None
+    if isinstance(payload, list):  # existing handed-out key-code links
+        email, include_key_code = payload
+    elif isinstance(payload, dict):  # per-ticket magic links
+        email = payload.get('email')
+        reservation_token = payload.get('token')
+    else:  # plain-string tokens / durable feed links
+        email = payload
+    if not isinstance(email, str):
         raise exc.HTTPForbidden()
-    elif isinstance(email, list):
-        email, include_key_code = email
 
     s = utcnow() - timedelta(days=30)
     e = utcnow() + timedelta(days=365)
