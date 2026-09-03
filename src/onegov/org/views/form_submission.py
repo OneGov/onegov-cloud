@@ -44,7 +44,7 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.types import RenderData
-    from onegov.form import FormSubmission
+    from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from onegov.ticket import Ticket
     from webob import Response
@@ -280,6 +280,167 @@ def handle_edit_submission_from_ticket(
     )
 
 
+def do_complete_submission(
+    self: FormSubmission,
+    form: Form,
+    request: OrgRequest,
+    raises: bool = False,
+    no_messages: bool = False,
+) -> Response:
+
+    provider = request.app.default_payment_provider
+    token = provider.get_token(request) if provider else None
+    invoice_meta = InvoiceMeta(
+        invoice_items_for_submission(request, form, self),
+        rounding_base=request.app.org.price_rounding,
+        rounding_text=request.translate(_('Rounding difference')),
+    )
+    amount = invoice_meta.total
+    price = request.app.adjust_price(Price(
+        amount=amount,
+        currency=currency_for_submission(form, self),
+        credit_card_payment=any(
+            price.credit_card_payment
+            for __, price in form.prices()
+        )
+    )) if amount > 0.0 else None
+    payment = self.process_payment(price, provider, token)
+
+    # FIXME: Custom error message for PaymentError?
+    if not payment or isinstance(payment, PaymentError):
+        if raises:
+            raise ValueError('Payment processing failed')
+        if not no_messages:
+            request.alert(_('Your payment could not be processed'))
+        return morepath.redirect(request.link(self))
+
+    if payment is not True:
+        request.session.add(payment)
+        request.session.flush()
+        request.session.refresh(payment)
+        self.payment = payment
+
+    window = self.registration_window
+    if window and not window.accepts_submissions(self.spots):
+        if raises:
+            raise ValueError('Registrations are no longer possible')
+        if not no_messages:
+            request.alert(_('Registrations are no longer possible'))
+        return morepath.redirect(request.link(self))
+
+    show_submission = request.params.get('send_by_email') == 'yes'
+
+    self.meta['show_submission'] = show_submission
+    self.meta.changed()  # type:ignore[attr-defined]
+
+    collection = FormCollection(request.session)
+    submission_id = self.id
+
+    # Expunges the submission from the session
+    collection.submissions.complete_submission(self)
+
+    # make sure accessing the submission doesn't flush it, because
+    # it uses sqlalchemy utils observe, which doesn't like premature
+    # flushing at all
+    with collection.session.no_autoflush:
+        ticket = TicketCollection(request.session).open_ticket(
+            handler_code=self.meta.get('handler_code', 'FRM'),
+            handler_id=self.id.hex
+        )
+        TicketMessage.create(ticket, request, 'opened', 'external')
+
+        if invoice_meta:
+            invoice = TicketInvoice(id=uuid4())
+            invoice.invoicing_party = self.invoicing_party
+            request.session.add(invoice)
+
+            for item_meta in invoice_meta:
+                item = item_meta.add_to_invoice(invoice)
+                if payment is not True:
+                    if provider and payment.source == provider.type:
+                        item.payment_date = date.today()
+                    item.payments.append(payment)
+                    item.paid = payment.state == 'paid'
+
+            ticket.invoice = invoice
+
+    assert self.email is not None
+    submission = collection.submissions.by_id(
+        submission_id, current_only=True
+    )
+    custom_above_footer = (
+        self.form.custom_above_footer if self.form else None)
+    send_ticket_mail(
+        request=request,
+        template='mail_ticket_opened.pt',
+        subject=_('Your request has been registered'),
+        ticket=ticket,
+        receivers=(self.email, ),
+        content={
+            'model': ticket,
+            'form': form,
+            'show_submission': self.meta['show_submission'],
+            'custom_above_footer': custom_above_footer
+        }
+    )
+    for email in emails_for_new_ticket(request, ticket):
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened_info.pt',
+            subject=_('New ticket'),
+            ticket=ticket,
+            receivers=(email, ),
+            content={'model': ticket},
+        )
+
+    request.app.send_websocket(
+        channel=request.app.websockets_private_channel,
+        message={
+            'event': 'browser-notification',
+            'title': request.translate(_('New ticket')),
+            'created': ticket.created.isoformat()
+        },
+        groupids=request.app.groupids_for_ticket(ticket),
+    )
+
+    if request.auto_accept(ticket):
+        try:
+            # FIXME: Was the auto_accept_user being None the only
+            #        way this could raise ValueError previously?
+            #        If so refactor this to a simple if/else
+            if request.auto_accept_user is None:
+                raise ValueError()
+
+            ticket.accept_ticket(request.auto_accept_user)
+            # We need to reload the object with the correct polymorphic
+            # type
+            submission = collection.submissions.by_id(
+                submission_id, state='complete', current_only=True
+            )
+            assert isinstance(submission, CompleteFormSubmission)
+            handle_submission_action(
+                submission, request, 'confirmed',
+                ignore_csrf=True,
+                raises=True,
+                no_messages=no_messages,
+                owner=request.auto_accept_owner()
+            )
+
+        except ValueError:
+            if not no_messages and request.is_manager:
+                request.warning(_('Your request could not be '
+                                  'accepted automatically!'))
+        else:
+            close_ticket(
+                ticket, request.auto_accept_user, request
+            )
+
+    if not no_messages:
+        request.success(_('Thank you for your submission!'))
+
+    return morepath.redirect(request.link(ticket, 'status'))
+
+
 @OrgApp.view(model=PendingFormSubmission, name='complete',
              permission=Public, request_method='GET')
 @OrgApp.view(model=PendingFormSubmission, name='complete',
@@ -315,158 +476,18 @@ def handle_complete_submission(
 
     if form.errors:
         return morepath.redirect(request.link(self))
-    else:
-        if self.state == 'complete':
-            self.data.changed()  # type:ignore[attr-defined]  # trigger updates
-            request.success(_('Your changes were saved'))
 
-            assert self.name is not None
-            return morepath.redirect(request.link(
-                FormCollection(request.session).scoped_submissions(
-                    self.name, ensure_existance=False)
-            ))
-        else:
-            provider = request.app.default_payment_provider
-            token = provider.get_token(request) if provider else None
-            invoice_meta = InvoiceMeta(
-                invoice_items_for_submission(request, form, self),
-                rounding_base=request.app.org.price_rounding,
-                rounding_text=request.translate(_('Rounding difference')),
-            )
-            amount = invoice_meta.total
-            price = request.app.adjust_price(Price(
-                amount=amount,
-                currency=currency_for_submission(form, self),
-                credit_card_payment=any(
-                    price.credit_card_payment
-                    for __, price in form.prices()
-                )
-            )) if amount > 0.0 else None
-            payment = self.process_payment(price, provider, token)
+    if self.state == 'complete':
+        self.data.changed()  # type:ignore[attr-defined]  # trigger updates
+        request.success(_('Your changes were saved'))
 
-            # FIXME: Custom error message for PaymentError?
-            if not payment or isinstance(payment, PaymentError):
-                request.alert(_('Your payment could not be processed'))
-                return morepath.redirect(request.link(self))
+        assert self.name is not None
+        return morepath.redirect(request.link(
+            FormCollection(request.session).scoped_submissions(
+                self.name, ensure_existance=False)
+        ))
 
-            if payment is not True:
-                request.session.add(payment)
-                request.session.flush()
-                request.session.refresh(payment)
-                self.payment = payment
-
-            window = self.registration_window
-            if window and not window.accepts_submissions(self.spots):
-                request.alert(_('Registrations are no longer possible'))
-                return morepath.redirect(request.link(self))
-
-            show_submission = request.params.get('send_by_email') == 'yes'
-
-            self.meta['show_submission'] = show_submission
-            self.meta.changed()  # type:ignore[attr-defined]
-
-            collection = FormCollection(request.session)
-            submission_id = self.id
-
-            # Expunges the submission from the session
-            collection.submissions.complete_submission(self)
-
-            # make sure accessing the submission doesn't flush it, because
-            # it uses sqlalchemy utils observe, which doesn't like premature
-            # flushing at all
-            with collection.session.no_autoflush:
-                ticket = TicketCollection(request.session).open_ticket(
-                    handler_code=self.meta.get('handler_code', 'FRM'),
-                    handler_id=self.id.hex
-                )
-                TicketMessage.create(ticket, request, 'opened', 'external')
-
-                if invoice_meta:
-                    invoice = TicketInvoice(id=uuid4())
-                    invoice.invoicing_party = self.invoicing_party
-                    request.session.add(invoice)
-
-                    for item_meta in invoice_meta:
-                        item = item_meta.add_to_invoice(invoice)
-                        if payment is not True:
-                            if provider and payment.source == provider.type:
-                                item.payment_date = date.today()
-                            item.payments.append(payment)
-                            item.paid = payment.state == 'paid'
-
-                    ticket.invoice = invoice
-
-            assert self.email is not None
-            submission = collection.submissions.by_id(
-                submission_id, current_only=True
-            )
-            custom_above_footer = (
-                self.form.custom_above_footer if self.form else None)
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_opened.pt',
-                subject=_('Your request has been registered'),
-                ticket=ticket,
-                receivers=(self.email, ),
-                content={
-                    'model': ticket,
-                    'form': form,
-                    'show_submission': self.meta['show_submission'],
-                    'custom_above_footer': custom_above_footer
-                }
-            )
-            for email in emails_for_new_ticket(request, ticket):
-                send_ticket_mail(
-                    request=request,
-                    template='mail_ticket_opened_info.pt',
-                    subject=_('New ticket'),
-                    ticket=ticket,
-                    receivers=(email, ),
-                    content={'model': ticket},
-                )
-
-            request.app.send_websocket(
-                channel=request.app.websockets_private_channel,
-                message={
-                    'event': 'browser-notification',
-                    'title': request.translate(_('New ticket')),
-                    'created': ticket.created.isoformat()
-                },
-                groupids=request.app.groupids_for_ticket(ticket),
-            )
-
-            if request.auto_accept(ticket):
-                try:
-                    # FIXME: Was the auto_accept_user being None the only
-                    #        way this could raise ValueError previously?
-                    #        If so refactor this to a simple if/else
-                    if request.auto_accept_user is None:
-                        raise ValueError()
-
-                    ticket.accept_ticket(request.auto_accept_user)
-                    # We need to reload the object with the correct polymorphic
-                    # type
-                    submission = collection.submissions.by_id(
-                        submission_id, state='complete', current_only=True
-                    )
-                    assert isinstance(submission, CompleteFormSubmission)
-                    handle_submission_action(
-                        submission, request, 'confirmed', True, raises=True,
-                        owner=request.auto_accept_owner()
-                    )
-
-                except ValueError:
-                    if request.is_manager:
-                        request.warning(_('Your request could not be '
-                                          'accepted automatically!'))
-                else:
-                    close_ticket(
-                        ticket, request.auto_accept_user, request
-                    )
-
-            request.success(_('Thank you for your submission!'))
-
-            return morepath.redirect(request.link(ticket, 'status'))
+    return do_complete_submission(self, form, request)
 
 
 @OrgApp.view(model=CompleteFormSubmission, name='ticket', permission=Private)

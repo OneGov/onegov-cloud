@@ -6,10 +6,10 @@ from functools import cached_property
 from json import JSONDecodeError
 from logging import getLogger
 from logging import NullHandler
+from onegov.api.form import model_from_form
 from onegov.core.orm import Base
-from onegov.form.fields import HoneyPotField
-from onegov.form.utils import get_fields_from_class
 from onegov.user import User
+from pydantic import ValidationError
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -17,7 +17,6 @@ from sqlalchemy.orm import Mapped
 from uuid import uuid4, UUID
 from webob.exc import HTTPException
 from webob.multidict import MultiDict
-from wtforms import HiddenField
 
 
 from typing import TYPE_CHECKING, Any, ClassVar, NoReturn, Self, overload
@@ -29,7 +28,6 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from sqlalchemy.orm import DeclarativeBase, Query, Session
     from typing import Protocol
-    from webob.request import _FieldStorageWithFile
 
     class PaginationWithById[
         M: DeclarativeBase,
@@ -359,6 +357,18 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
 
         raise NotImplementedError()
 
+    def item_form_class(self, item: M) -> type[Form] | None:
+        """ Return the form class specific to this endpoint item.
+
+        Cannot be combined with ApiEndpoint.form_class, if that attribute
+        is set to something other than `None`, then this method will never
+        be called.
+
+        Set the attribute when all items share the same form_class and
+        override this method when each item has its own form_class
+        """
+        return None
+
     def item_links(self, item: M) -> dict[str, Any]:
         """ Return the link properties of the collection item as a dictionary.
         Links can either be string or a linkable object.
@@ -383,35 +393,47 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
         """ Return a form for editing items of this collection. """
 
         if self.form_class is None:
-            return None
+            if item is None:
+                return None
 
-        def malformed_payload() -> NoReturn:
-            raise ApiException(
-                'Malformed collection+json payload',
-                status_code=400
-            )
+            form_class = self.item_form_class(item)
+            if form_class is None:
+                return None
+        else:
+            form_class = self.form_class
+
+        form = request.get_form(
+            form_class,
+            csrf_support=False,
+            model=item
+        )
 
         # NOTE: In addition to form encoded data we also allow a JSON
-        #       payload, although the support for this is currenty
-        #       very limited
-        formdata: MultiDict[str, str | _FieldStorageWithFile] | None
+        #       payload, as long as we can generate a valid pydantic
+        #       model for it.
         if request.method in ('POST', 'PUT') and not request.POST:
-            settable_fields = {
-                name
-                for name, field in get_fields_from_class(self.form_class)
-                if not issubclass(
-                    field.field_class,
-                    (HiddenField, HoneyPotField)
-                )
-            }
+            try:
+                model_class = model_from_form(form)
+            except Exception as exc:
+                raise ApiException(
+                    'This endpoint only supports multipart/form-data or '
+                    'application/x-www-form-urlencoded form submissions',
+                    status_code=400
+                ) from exc
 
-            formdata = MultiDict()
+            data: dict[str, Any] = {}
             with ApiException.capture_exceptions(
                 exception_type=JSONDecodeError,
                 default_message='Malformed payload',
                 default_status_code=400,
             ):
                 json_data = request.json
+
+            def malformed_payload() -> NoReturn:
+                raise ApiException(
+                    'Malformed collection+json payload',
+                    status_code=400
+                )
 
             if not isinstance(json_data, dict):
                 malformed_payload()
@@ -428,34 +450,40 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
                 if not isinstance(name, str):
                     malformed_payload()
 
-                if name not in settable_fields:
+                if name in data:
+                    raise ApiException(
+                        f'Field "{name}" was supplied more than once',
+                        status_code=400
+                    )
+
+                if name not in model_class.model_fields:
                     raise ApiException(
                         f'Invalid field "{name}" supplied', status_code=400
                     )
 
-                # TOOD: It would be more robust to use something like pydantic
-                #       for parsing/validating the JSON payload, rather than
-                #       try to convert the JSON to formdata. For now the only
-                #       form we support only has text data, so keep it simple.
-                value = field.get('value')
-                if value is None:
-                    continue
-                elif isinstance(value, (str, int, float)):
-                    formdata[name] = str(value)
-                else:
-                    raise ApiException(
-                        f'{name}: Unsupported value format', status_code=400
-                    )
+                data[name] = field.get('value')
 
-        else:
-            formdata = None
+            try:
+                model = model_class.model_validate(data)
+            except ValidationError as exc:
+                raise ApiException(
+                    ', '.join(
+                        f'{'.'.join(str(l) for l in err['loc'])}: {err['msg']}'
+                        for err in exc.errors(
+                            include_url=False,
+                            include_input=False,
+                        )
+                    ),
+                    status_code=400
+                ) from exc
 
-        return request.get_form(
-            self.form_class,
-            csrf_support=False,
-            formdata=formdata,
-            model=item
-        )
+            form.process(obj=model)
+            # NOTE: We already validated the data using pydantic, so we
+            #       bypass the validation on the form itself. This way
+            #       we don't have to construct valid formdata.
+            form.validate = lambda *a, **kw: True  # type: ignore[method-assign]
+
+        return form
 
     def apply_changes(self, item: M, form: Any) -> None:
         """ Apply the changes to the item based on the given form data. """
