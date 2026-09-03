@@ -183,17 +183,20 @@ class Layout(OrgLayout):
             if not repo_root:
                 return features
 
-            next_release_path = repo_root / 'changes' / 'next release'
-            if not next_release_path.exists():
+            current_release_path = repo_root / 'changes' / 'current release'
+            if not current_release_path.exists():
                 return features
 
-            for yaml_file in sorted(next_release_path.glob('*.yaml')):
+            for yaml_file in sorted(current_release_path.glob('*.yaml')):
                 with yaml_file.open('r', encoding='utf-8') as fh:
                     payload = yaml.safe_load(fh) or {}
 
-                namespace = self.app.namespace
-                applications = payload['applications']
-                if isinstance(payload, dict):
+                required_keys = {'title', 'description', 'applications'}
+
+                if isinstance(payload, dict) and required_keys.issubset(
+                    payload.keys()):
+                    namespace = self.app.namespace
+                    applications = payload['applications']
                     if namespace in applications or 'all' in applications:
                         features.append(payload)
 

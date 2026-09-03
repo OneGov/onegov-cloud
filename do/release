@@ -138,6 +138,29 @@ function new-version() {
     echo "release-$year.$((build + 1))"
 }
 
+function archive-current-release() {
+    local version="$1"
+    local current_release_dir="$REPO/changes/current release"
+    local past_release_dir="$REPO/changes/past releases"
+
+    mkdir -p "$past_release_dir"
+
+    shopt -s nullglob
+    local files=("$current_release_dir"/*)
+    shopt -u nullglob
+
+    for file in "${files[@]}"; do
+        if [[ ! -f "$file" ]]; then
+            continue
+        fi
+
+        local basename
+        basename="${file##*/}"
+
+        mv -- "$file" "$past_release_dir/${version}_${basename}"
+    done
+}
+
 function release() {
     git fetch --quiet
 
@@ -160,8 +183,11 @@ function release() {
     if [[ "${DRY_RUN}" == "1" ]]; then
         echo "[dry-run] would generate CHANGES.md, bump version to ${short},"
         echo "[dry-run] commit, tag ${new}, push, and announce on sentry.io"
+        echo "[dry-run] archived files from changes/current release to changes/past releases"
         return
     fi
+
+    archive-current-release "${short}"
 
     "$SELF"/changes "$new" > "$REPO/CHANGES.md"
     sed -i.bak "s/__version__.*/__version__ = '${short}'/g" src/onegov/core/__init__.py
