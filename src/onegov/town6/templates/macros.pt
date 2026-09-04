@@ -3507,3 +3507,16 @@
         </li>
     </ul>
 </metal:globals-left>
+
+<metal:inline_search define-macro="inline_search">
+    <form class="searchbox" action="${action}" method="GET">
+        <div class="input-group">
+            <input name="term" class="input-group-field" type="text" autocomplete="off" autocorrect="off" value="${term or ''}" placeholder="Name or email" i18n:attributes="placeholder">
+            <div class="input-group-button">
+                <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</metal:inline_search>

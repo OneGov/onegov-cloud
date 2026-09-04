@@ -2584,3 +2584,18 @@
         </tal:b>
     </tal:b>
 </metal:display_results>
+
+<metal:inline_search define-macro="inline_search">
+    <form class="searchbox" action="${action}" method="GET">
+        <div class="input-group">
+            <div class="input">
+                <input name="term" type="text" autocomplete="off" autocorrect="off" value="${term or ''}" placeholder="Name or email" i18n:attributes="placeholder">
+            </div>
+            <div class="search-button">
+                <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</metal:inline_search>

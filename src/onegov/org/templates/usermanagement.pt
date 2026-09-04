@@ -65,6 +65,10 @@
                 </table>
             </div>
             <div class="columns medium-3 filter-panel">
+                <div class="filter-search" tal:condition="search_widget">
+                    <h2 class="filter-title" i18n:translate>Search</h2>
+                    <tal:b replace="search_widget.html(layout)"/>
+                </div>
                 <div tal:condition="filters['active']|nothing" class="filter-active">
                     <h2 class="filter-title" i18n:translate>State</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
