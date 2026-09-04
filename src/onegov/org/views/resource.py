@@ -819,19 +819,9 @@ def view_find_your_spot(
             # series overview from actual reservations; skipped for
             # 'for_first_day' which books a single day, not a series
             if auto_reserve != 'for_first_day':
-                wanted = (
-                    len(rooms) if auto_reserve == 'for_every_room' else 1
-                )
-                missing_dates = {
-                    date: [
-                        room
-                        for room in rooms
-                        if room.id not in room_ids
-                    ] if wanted > 1 else None
-                    for date in room_slots.keys()
-                    if len(room_ids := reserved_dates.get(date, set()))
-                    < wanted
-                }
+                every_room = auto_reserve == 'for_every_room'
+                wanted = len(rooms) if every_room else 1
+
                 booked_by_date: dict[date_t, list[tuple[str, str]]] = {}
                 for room in rooms:
                     for reservation in room.bound_reservations(request):  # type: ignore[attr-defined]
@@ -859,16 +849,26 @@ def view_find_your_spot(
                             }
                         )
 
-                    # unavailable rooms (None in single-room mode)
-                    if date in missing_dates:
-                        for room in missing_dates[date] or ():
-                            series_overview.append({
-                                'date': date, 'time': None, 'room': room.title
-                            })
-                        if not booked and not missing_dates[date]:
-                            series_overview.append({
-                                'date': date, 'time': None, 'room': None
-                            })
+                    reserved_rooms = reserved_dates.get(date, set())
+                    if len(reserved_rooms) >= wanted:
+                        continue
+
+                    if every_room:
+                        # list each room we couldn't reserve
+                        for room in rooms:
+                            if room.id not in reserved_rooms:
+                                series_overview.append(
+                                    {
+                                        'date': date,
+                                        'time': None,
+                                        'room': room.title,
+                                    }
+                                )
+                    elif not booked:
+                        # single-room mode: nothing available at all
+                        series_overview.append({
+                            'date': date, 'time': None, 'room': None
+                        })
 
     holidays: dict[date_t, list[str]] = {}
     if room_slots:
