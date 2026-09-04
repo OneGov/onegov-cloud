@@ -359,3 +359,59 @@ def test_filters(client: Client) -> None:
     assert 'doris' in users
     assert 'emilia' not in users
     assert 'frank' not in users
+
+
+def test_user_search_widget(client: Client) -> None:
+    client.login_admin()
+
+    def add_user(username: str) -> None:
+        new = client.get('/usermanagement').click('Benutzer', href='new')
+        new.form['username'] = username
+        new.form['role'] = 'member'
+        new.form.submit()
+
+    add_user('glauser@example.org')
+    add_user('brunner@example.org')
+
+    # give a user a realname (the family name admins actually search by)
+    session = client.app.session()
+    user = UserCollection(session).by_username('brunner@example.org')
+    assert user is not None
+    user.realname = 'Marine Berger'
+    transaction.commit()
+
+    # the search widget is always enabled, with a real term field
+    users = client.get('/usermanagement')
+    assert users.pyquery('.filter-search form input[name="term"]')
+
+    # matches the realname (family name), not just the username
+    users = client.get('/usermanagement?term=berger')
+    assert 'brunner' in users
+    assert 'glauser' not in users
+
+    # partial (non-word) terms match username/realname substrings
+    users = client.get('/usermanagement?term=gla')
+    assert 'glauser' in users
+    assert 'brunner' not in users
+
+    # an empty term resets the search (shows everyone)
+    users = client.get('/usermanagement?term=')
+    assert 'glauser' in users
+    assert 'brunner' in users
+
+    # search is case-insensitive
+    users = client.get(
+        '/usermanagement?search=inline&search_query={"term":"GLA"}')
+    assert 'glauser' in users
+
+    # common substrings match multiple users
+    users = client.get(
+        '/usermanagement?search=inline&search_query={"term":"example.org"}')
+    assert 'glauser' in users
+    assert 'brunner' in users
+
+    # no match yields none of them
+    users = client.get(
+        '/usermanagement?search=inline&search_query={"term":"zzz"}')
+    assert 'glauser' not in users
+    assert 'brunner' not in users
