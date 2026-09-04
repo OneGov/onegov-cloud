@@ -5,11 +5,11 @@ import transaction
 from datetime import date
 from functools import cached_property
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
-from onegov.api.models import ApiInvalidParamException
+from onegov.api.models import ApiException, ApiInvalidParamException
 from onegov.core.collection import Pagination
 from onegov.core.converters import extended_date_decode
 from onegov.event.collections import OccurrenceCollection
-from onegov.form import FormCollection
+from onegov.form import Form, FormCollection
 from onegov.form.models import FormDefinition
 from onegov.gis import Coordinates
 from onegov.org import _
@@ -19,6 +19,7 @@ from onegov.org.models.directory import (
 from onegov.org.models.external_link import (
     ExternalFormLink, ExternalLinkCollection, ExternalResourceLink)
 from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
+from onegov.org.views.form_submission import do_complete_submission
 from onegov.people import Person
 from onegov.people.collections import PersonCollection
 from onegov.reservation.collection import ResourceCollection
@@ -806,6 +807,53 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink, UUID | str]):
         if isinstance(item, ExternalFormLink):
             return {'html': item.url}
         return {'html': item}
+
+    def item_form_class(self, item: FormOrExternalLink) -> type[Form] | None:
+        if isinstance(item, ExternalFormLink):
+            return None
+
+        # Check whether the form still accepts submissions
+        window = item.current_registration_window
+        if window and not window.accepts_submissions(1):
+            return None
+
+        # Forms that require online payments may not be submitted via API
+        if item.payment_method == 'cc':
+            return None
+        # NOTE: If there are any options in the form that require credit
+        #       card payment we will emit an ApiError in apply_changes
+        #       instead of disallowing submissions altogether
+        return item.form_class
+
+    def apply_changes(self, item: FormOrExternalLink, form: Form) -> None:
+        assert not isinstance(item, ExternalFormLink)
+
+        for name, price in form.prices():
+            if price.credit_card_payment:
+                raise ApiException(
+                    f'Based on the submitted value for "{name}", '
+                    f'online payment is required for this submission, '
+                    f'which is not supported through the API.',
+                    status_code=400
+                )
+
+        # Add the submission first so we can re-use the finalize
+        # submission logic
+        submission = FormCollection(self.session).submissions.add(
+            item.name,
+            form,
+            state='pending',
+            spots=1 if item.current_registration_window else 0,
+        )
+        form.model = submission
+        try:
+            do_complete_submission(
+                submission, form, self.request,
+                raises=True,
+                no_messages=True,
+            )
+        except ValueError as exc:
+            raise ApiException(str(exc), status_code=400) from exc
 
 
 class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink, UUID]):
