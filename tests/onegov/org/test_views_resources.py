@@ -510,7 +510,7 @@ def test_find_your_spot(client: Client) -> None:
     # something unavailable -> "some" hint, entries link to rows below
     assert 'Für einige Tage und Räume' in result
     assert 'href="#row-' in result
-    assert 'Für alle Tage und Räume' not in result
+    assert 'Wir haben Termine gefunden' not in result
 
     result = client.get(
         '/find-your-spot/reservations?group=Meeting+Rooms'
@@ -604,7 +604,7 @@ def test_find_your_spot_series_all_available(client: Client) -> None:
 
     # both requested days are booked -> full-success message, no exceptions
     assert 'Übersicht Ihrer Serie' in result
-    assert 'Für alle Tage und Räume' in result
+    assert 'Wir haben Termine gefunden' in result
     assert 'Für einige Tage und Räume' not in result
     assert '<del>' not in result
     assert 'href="#row-2020-01-06"' in result
@@ -653,7 +653,7 @@ def test_find_your_spot_series_date_fully_unavailable(client: Client) -> None:
 
 
 @freeze_time('2020-01-01', tick=True)
-def test_find_your_spot_first_day_has_no_overview(client: Client) -> None:
+def test_find_your_spot_first_day_overview(client: Client) -> None:
     client.login_admin()
 
     resources = client.get('/resources')
@@ -668,6 +668,7 @@ def test_find_your_spot_first_day_has_no_overview(client: Client) -> None:
         .by_name('solo-room')
         .get_scheduler(client.app.libres_context)
     )
+    # 06+07 are available, 08 has no allocation at all
     scheduler.allocate(
         dates=(
             (datetime(2020, 1, 6), datetime(2020, 1, 6)),
@@ -681,12 +682,14 @@ def test_find_your_spot_first_day_has_no_overview(client: Client) -> None:
 
     find_your_spot = client.get('/find-your-spot?group=Solo+Rooms')
     find_your_spot.form['start'] = '2020-01-06'
-    find_your_spot.form['end'] = '2020-01-07'
+    find_your_spot.form['end'] = '2020-01-08'
     find_your_spot.form['auto_reserve_available_slots'] = 'for_first_day'
     result = find_your_spot.form.submit()
 
-    # a single-day booking is not a series, so no overview is shown
-    assert 'Übersicht Ihrer Serie' not in result
+    # for_first_day books a single slot but still lists every date: the
+    # booked day plus dates where nothing matching was available (08)
+    assert 'Übersicht Ihrer Serie' in result
+    assert 'konnten wir leider keinen Termin finden' in result
 
 
 @freeze_time('2020-01-01', tick=True)

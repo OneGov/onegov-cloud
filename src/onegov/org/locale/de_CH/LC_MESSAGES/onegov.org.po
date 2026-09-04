@@ -4922,11 +4922,8 @@ msgstr ""
 "möglicherweise ein Termin verfügbar ist, der kürzer oder länger als die von "
 "Ihnen gewählte Dauer ist."
 
-msgid ""
-"For all dates and rooms we were able to find a slot matching your criteria."
-msgstr ""
-"Für alle Tage und Räume konnten wir einen Ihren Kriterien entsprechenden "
-"Termin finden."
+msgid "We were able to find slots matching your criteria."
+msgstr "Wir haben Termine gefunden, die Ihren Kriterien entsprechen."
 
 msgid "Unavailable"
 msgstr "Besetzt"

@@ -25,7 +25,7 @@
                     For some dates and rooms we were unable to find a slot matching your criteria. Please check those dates in the list below, as a shorter or longer slot than your selected duration may still be available.
                 </p>
                 <p tal:condition="not has_unavailable" i18n:translate>
-                    For all dates and rooms we were able to find a slot matching your criteria.
+                    We were able to find slots matching your criteria.
                 </p>
                 <ul class="reservations reservation-exceptions">
                     <li tal:repeat="entry series_overview">

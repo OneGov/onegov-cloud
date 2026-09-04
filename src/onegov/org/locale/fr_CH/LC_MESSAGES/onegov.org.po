@@ -4929,11 +4929,8 @@ msgstr ""
 "dessous, car un créneau plus court ou plus long que la durée que vous avez "
 "sélectionnée pourrait être disponible."
 
-msgid ""
-"For all dates and rooms we were able to find a slot matching your criteria."
-msgstr ""
-"Pour toutes les dates et salles, nous avons trouvé un créneau correspondant "
-"à vos critères."
+msgid "We were able to find slots matching your criteria."
+msgstr "Nous avons trouvé des créneaux correspondant à vos critères."
 
 msgid "Unavailable"
 msgstr "Indisponible"

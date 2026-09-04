@@ -4914,11 +4914,8 @@ msgstr ""
 "poiché potrebbe essere disponibile un appuntamento di durata inferiore o "
 "superiore a quella da lei selezionata."
 
-msgid ""
-"For all dates and rooms we were able to find a slot matching your criteria."
-msgstr ""
-"Per tutte le date e le sale è stato possibile trovare un appuntamento "
-"corrispondente ai suoi criteri."
+msgid "We were able to find slots matching your criteria."
+msgstr "È stato possibile trovare appuntamenti corrispondenti ai suoi criteri."
 
 msgid "Unavailable"
 msgstr "Non disponibile"
