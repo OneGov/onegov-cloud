@@ -402,3 +402,198 @@ def test_fetch(
     ])
     assert result.exit_code == 0
     assert "1 added, 0 updated, 0 deleted" in result.output
+
+
+def test_fetch_multi_namespace(
+    cfg_path_multi_namespace: str,
+    session_manager: SessionManager,
+    test_password: str
+) -> None:
+
+    runner = CliRunner()
+
+    session_manager.ensure_schema_exists('space1-bar')
+    session_manager.ensure_schema_exists('space2-baz')
+
+    def get_session(namespace: str, entity: str) -> Session:
+        session_manager.set_current_schema(f'{namespace}-{entity}')
+        return session_manager.session()
+
+    for namespace, entity, title, source, tags, location in (
+        ('space1', 'bar', '1', None, [], ''),
+        ('space1', 'bar', '2', None, ['A'], None),
+        ('space1', 'bar', '3', None, ['A', 'B'], 'bar'),
+        ('space1', 'bar', '4', None, ['A', 'C'], '1234 Bar'),
+        ('space1', 'bar', '5', None, ['C'], 'there in 4321 baz!'),
+        ('space1', 'bar', '6', 'xxx', [], 'bar'),
+        ('space1', 'bar', '7', 'yyy', ['A', 'B'], None),
+        ('space1', 'baz', 'a', None, [], 'BAZ'),
+        ('space1', 'baz', 'b', None, ['A', 'C'], '4321 Baz'),
+        ('space1', 'baz', 'c', 'zzz', ['B', 'C'], 'bar'),
+    ):
+        EventCollection(get_session(namespace, entity)).add(
+            title=title,
+            start=datetime(2015, 6, 16, 9, 30),
+            end=datetime(2015, 6, 16, 18, 00),
+            timezone='Europe/Zurich',
+            tags=tags,
+            location=location,
+            source=source
+        )
+    commit()
+    for namespace, entity in zip(('space1', 'bar'), ('space2', 'baz')):
+        get_session(namespace, entity).add(User(
+            username='admin@example.org',
+            password_hash=test_password,
+            role='admin'
+        ))
+    commit()
+
+    assert get_session('space1', 'bar').query(Event).count() == 7
+    assert get_session('space1', 'baz').query(Event).count() == 3
+    event = get_session('space1', 'bar').query(Event).first()
+    assert event is not None and event.state == 'initiated'
+    assert get_session('space2', 'bar').query(Event).count() == 0
+    assert get_session('space2', 'baz').query(Event).count() == 0
+
+    # space1-bar[*] -> space2-bar missing namespace option
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/bar',
+        'fetch',
+        '--source', 'space1-bar'
+    ])
+    assert result.exit_code == 1
+    assert 'Cross-namespace fetches are not allowed' in result.output
+
+    # space1-bar[*] -> space2-bar
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/bar',
+        'fetch',
+        '--source', 'space1-bar',
+        '--cross-namespace'
+    ])
+    assert result.exit_code == 0
+    assert "5 added, 0 updated, 0 deleted" in result.output
+
+    assert get_session('space2', 'bar').query(Event).count() == 5
+    assert get_session('space2', 'baz').query(Event).count() == 0  # not yet
+    assert get_session('space2', 'qux').query(Event).count() == 0
+    event = get_session('space2', 'bar').query(Event).first()
+    assert event is not None and event.state == 'published'
+
+    # space1-bar[*] -> space2-bar, now including the imported events
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/bar',
+        'fetch',
+        '--source', 'space1-bar',
+        '--cross-namespace',
+        '--include-imported'
+    ])
+    assert result.exit_code == 0
+    assert "2 added, 0 updated, 0 deleted" in result.output
+    assert get_session('space2', 'bar').query(Event).count() == 7
+
+    # space1-baz[*] -> space2-baz (separate namespace/entity target)
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/baz',
+        'fetch',
+        '--source', 'space1-baz',
+        '--cross-namespace'
+    ])
+    assert result.exit_code == 0
+    # baz has 3 events, 'c' is imported -> 2 fetched
+    assert "2 added, 0 updated, 0 deleted" in result.output
+    assert get_session('space2', 'baz').query(Event).count() == 2
+    assert get_session('space2', 'bar').query(Event).count() == 7  # untouched
+
+    # cross-namespace source without a namespace prefix still resolves via the
+    # selected app's namespace: space2-bar[*] -> space2-baz
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/baz',
+        'fetch',
+        '--source', 'bar',
+        '--include-imported'
+    ])
+    assert result.exit_code == 0
+    # a different source key doesn't purge the 2 events fetched from space1-baz
+    assert "7 added, 0 updated, 0 deleted" in result.output
+    assert get_session('space2', 'baz').query(Event).count() == 9
+
+    # tag filter across namespaces: space1-bar[A] -> space2-bar
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/bar',
+        'fetch',
+        '--source', 'space1-bar',
+        '--cross-namespace',
+        '--tag', 'A'
+    ])
+    assert result.exit_code == 0
+    # non-imported events with tag A: 2, 3, 4 -> keep 3, delete the other 4
+    assert "0 added, 0 updated, 4 deleted" in result.output
+    assert get_session('space2', 'bar').query(Event).count() == 3
+
+    # location filter across namespaces: space1-bar['baz'] -> space2-qux
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/qux',
+        'fetch',
+        '--source', 'space1-bar',
+        '--cross-namespace',
+        '--location', 'baz'
+    ])
+    assert result.exit_code == 0
+    # only event 5 has 'baz' in its location among non-imported events
+    assert "1 added, 0 updated, 0 deleted" in result.output
+    assert get_session('space2', 'qux').query(Event).count() == 1
+
+
+def test_fetch_entity_with_dash(
+    cfg_path_multi_namespace: str,
+    session_manager: SessionManager,
+    test_password: str
+) -> None:
+    # an entity name may itself contain a dash: 'space1-my-town' is the schema
+    # for namespace 'space1' and entity 'my-town'. --source my-town must
+    # resolve via the app's namespace prefix, not be mistaken for a namespaced
+    # source.
+    runner = CliRunner()
+
+    session_manager.ensure_schema_exists('space1-my-town')
+    session_manager.ensure_schema_exists('space1-target')
+
+    def get_session(entity: str) -> Session:
+        session_manager.set_current_schema(f'space1-{entity}')
+        return session_manager.session()
+
+    EventCollection(get_session('my-town')).add(
+        title='1',
+        start=datetime(2015, 6, 16, 9, 30),
+        end=datetime(2015, 6, 16, 18, 00),
+        timezone='Europe/Zurich',
+        tags=[],
+        location='',
+        source=None
+    )
+    commit()
+    get_session('target').add(User(
+        username='admin@example.org',
+        password_hash=test_password,
+        role='admin'
+    ))
+    commit()
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space1/target',
+        'fetch',
+        '--source', 'my-town'
+    ])
+    assert result.exit_code == 0
+    assert "1 added, 0 updated, 0 deleted" in result.output
+    assert get_session('target').query(Event).count() == 1
