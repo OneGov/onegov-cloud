@@ -868,13 +868,16 @@ def test_tags_field() -> None:
     assert field._value() == 'Psychologie,Exorzismus'
 
     field.process_formdata(['single'])
+    assert field.data == ['single']
     assert field._value() == 'single'
 
     field.process_formdata([])
     assert field._value() == ''
 
     field.process_data(['from', 'model'])
+    assert field.data == ['from', 'model']
     assert field._value() == 'from,model'
 
     field.process_data(None)
+    assert field.data == []
     assert field._value() == ''
