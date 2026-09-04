@@ -528,6 +528,42 @@ def test_cli(
         assert user.realname == 'Jane Doe'
         assert user.phone_number == '0411234567'
 
+    # Give the user some tags, then remove one
+    session = session_manager.session()
+    user = session.query(User).filter_by(username='admin@example.org').one()
+    user.tags = ['Sport', 'Musik']
+    commit()
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'remove-tag', 'admin@example.org', 'Sport'
+    ])
+    assert result.exit_code == 0
+    assert 'Removed tag "Sport" from admin@example.org' in result.output
+
+    session = session_manager.session()
+    user = session.query(User).filter_by(username='admin@example.org').one()
+    assert user.tags == ['Musik']
+
+    # Removing a tag the user does not have fails
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'remove-tag', 'admin@example.org', 'Sport'
+    ])
+    assert result.exit_code == 1
+    assert 'does not have the tag "Sport"' in result.output
+
+    # Removing a tag from an unknown user fails
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'remove-tag', 'ghost@example.org', 'Musik'
+    ])
+    assert result.exit_code == 1
+    assert 'ghost@example.org does not exist' in result.output
+
 
 def test_cli_exists_recursive(
     postgres_dsn: str,

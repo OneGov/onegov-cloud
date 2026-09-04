@@ -6,9 +6,10 @@ import phonenumbers
 import pyotp
 
 from getpass import getpass
-from onegov.user import User, UserCollection
+from onegov.user import log, User, UserCollection
 from onegov.core.cli import command_group, abort
 from onegov.core.crypto import random_password
+from sqlalchemy.orm.attributes import flag_modified
 
 
 from typing import TYPE_CHECKING
@@ -534,6 +535,40 @@ def change_role(
         click.secho("{}'s role was changed".format(username), fg='green')
 
     return change
+
+
+@cli.command(name='remove-tag', context_settings={
+    'singular': True,
+    'skip_search_indexing': True
+})
+@click.argument('username')
+@click.argument('tag')
+def remove_tag(
+    username: str,
+    tag: str
+) -> Callable[[CoreRequest, Framework], None]:
+    """ Removes the given tag from the given username. """
+
+    def remove(request: CoreRequest, app: Framework) -> None:
+        users = UserCollection(app.session())
+
+        user = users.by_username(username)
+        if user is None:
+            abort('{} does not exist'.format(username))
+
+        tags = user.tags or []
+        if tag not in tags:
+            abort(f'{username} does not have the tag "{tag}"')
+
+        user.tags = [t for t in tags if t != tag]
+        flag_modified(user, 'data')
+
+        log.info(
+            'Removed tag "%s" from %s (%s)', tag, username, app.application_id
+        )
+        click.secho(f'Removed tag "{tag}" from {username}', fg='green')
+
+    return remove
 
 
 @cli.command(name='list-sessions', context_settings={

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import phonenumbers
+import re
 import sedate
 
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
@@ -746,16 +747,14 @@ class TagsField(StringField):
     """
 
     widget = TagsWidget()
-    # FIXME: Why does data have a different shape depending on if it's
-    #        passed in by the form or the object?! This seems like a bug
-    data: str | list[str]  # type:ignore[assignment]
+    # mirrors the client-side sanitation of tags-input.js: keep alphanumerics
+    # and latin-1 accented characters, everything else becomes whitespace
+    _sanitize = re.compile(r'[^A-Za-z0-9À-ÿ]')
+    data: list[str]  # type:ignore[assignment]
 
     def _value(self) -> str:
-        # Without this override, we had the underlying data corrupted
-        # containing strings like ["['[]']"]
-        if isinstance(self.data, list):
-            return ','.join(self.data)
-        return self.data or ''
+        # data is always a list; join for the comma-separated widget value
+        return ','.join(self.data) if self.data else ''
 
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
@@ -764,13 +763,16 @@ class TagsField(StringField):
 
         values_str = valuelist[0]
         if isinstance(values_str, str) and values_str != '':
-            values = (v.strip() for v in values_str.split(','))
+            values = (
+                ' '.join(self._sanitize.sub(' ', v).split())
+                for v in values_str.split(',')
+            )
             self.data = [v for v in values if v]
         else:
             self.data = []
 
     def process_data(self, value: list[str] | None) -> None:
-        self.data = ','.join(value) if value else ''
+        self.data = list(value) if value else []
 
 
 class IconField(StringField):
