@@ -7,6 +7,8 @@ import morepath
 import secrets
 import sedate
 
+from uuid import UUID
+
 from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
@@ -39,6 +41,7 @@ from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.org.views.utils import assert_citizen_logged_in
+from onegov.user import Auth
 from onegov.reservation import Allocation, Reservation
 from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketInvoice
@@ -62,7 +65,6 @@ if TYPE_CHECKING:
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
     from typing import TypedDict
-    from uuid import UUID
     from webob import Response as BaseResponse
 
     type RoomSlots = dict[UUID, list[utils.FindYourSpotEventInfo]]
@@ -1536,6 +1538,24 @@ def view_occupancy(
     }
 
 
+def resolve_reservations_access(
+    request: OrgRequest
+) -> tuple[str | None, bool, str | None]:
+    """Returns (email, limited, reservation_token). A logged-in citizen sees
+    the full view (limited=False); a magic-link token grants only the limited
+    view (limited=True): reservations linked to token, no key codes, no ticket
+    links. When the magic link carries a reservation_token, the limited view is
+    restricted to that single ticket/token."""
+    if request.authenticated_email:
+        return request.authenticated_email, False, None
+    payload = request.load_url_safe_token(
+        request.GET.get('token'), request.GET.get('salt'), None
+    )
+    if not isinstance(payload, dict):
+        return None, False, None
+    return payload['email'], True, payload.get('token')
+
+
 @OrgApp.json(
     model=ResourceCollection,
     name='my-reservations-json',
@@ -1555,7 +1575,8 @@ def view_my_reservations_json(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    if not request.authenticated_email:
+    email, limited, reservation_token = resolve_reservations_access(request)
+    if email is None:
         raise exc.HTTPForbidden()
 
     start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
@@ -1566,11 +1587,16 @@ def view_my_reservations_json(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(*stmt.c).where(and_(
-        func.lower(stmt.c.email) == request.authenticated_email.lower(),
+    conditions = [
+        func.lower(stmt.c.email) == email.lower(),
         start <= stmt.c.start,
-        stmt.c.start <= end
-    )))
+        stmt.c.start <= end,
+    ]
+
+    if reservation_token:
+        conditions.append(stmt.c.token == UUID(reservation_token))
+
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     return [
         utils.MyReservationEventInfo(
@@ -1586,7 +1612,8 @@ def view_my_reservations_json(
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
             key_code=r.key_code,
-            request=request
+            request=request,
+            limited=limited
         ).as_dict() for r in records
     ]
 
@@ -1604,7 +1631,8 @@ def view_my_reservations_pdf(
     if not request.app.org.citizen_login_enabled:
         raise exc.HTTPNotFound()
 
-    if not request.authenticated_email:
+    email, limited, reservation_token = resolve_reservations_access(request)
+    if email is None:
         raise exc.HTTPForbidden()
 
     start, end = utils.parse_fullcalendar_request(request, 'Europe/Zurich')
@@ -1616,12 +1644,15 @@ def view_my_reservations_pdf(
     stmt = as_selectable_from_path(path)
 
     conditions = [
-        func.lower(stmt.c.email) == request.authenticated_email.lower(),
+        func.lower(stmt.c.email) == email.lower(),
         start <= stmt.c.start,
         stmt.c.start <= end,
     ]
 
-    if request.GET.get('accepted') == '1':
+    if reservation_token:
+        conditions.append(stmt.c.token == UUID(reservation_token))
+
+    if limited or request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
 
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
@@ -1640,16 +1671,17 @@ def view_my_reservations_pdf(
             handler_code=r.handler_code,
             ticket_number=r.ticket_number,
             key_code=r.key_code,
-            request=request
+            request=request,
+            limited=limited
         ) for r in records
     ], start, end)
 
     return Response(
         content.read(),
         content_type='application/pdf',
-        content_disposition='attachment; filename='
-        'my-reservations-{}-{}-{}.pdf'.format(
-            request.authenticated_email,
+        # limited: no email in the filename
+        content_disposition='attachment; filename={}-{}-{}.pdf'.format(
+            'my-reservations' if limited else f'my-reservations-{email}',
             start.strftime('%Y%m%d'),
             end.strftime('%Y%m%d')
         )
@@ -1668,7 +1700,13 @@ def view_my_reservations(
     layout: DefaultLayout | None = None
 ) -> RenderData:
 
-    assert_citizen_logged_in(request)
+    if not request.app.org.citizen_login_enabled:
+        raise exc.HTTPNotFound()
+
+    email, limited, _reservation_token = resolve_reservations_access(request)
+    if email is None:
+        # no session, no valid token: redirect to login
+        assert_citizen_logged_in(request)
 
     # NOTE: For some reason we need to manually include common
     #       and fullcalendar in addition to occupancycalendar
@@ -1677,6 +1715,12 @@ def view_my_reservations(
     request.include('fullcalendar')
     request.include('occupancycalendar')
 
+    # limited visitors carry their token into the feeds
+    feed_params = {
+        'token': request.GET.get('token') or '',
+        'salt': request.GET.get('salt') or '',
+    } if limited else {}
+
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
@@ -1684,7 +1728,7 @@ def view_my_reservations(
         Link(_('My Reservations'), '#')
     ]
 
-    layout.editbar_links = [
+    layout.editbar_links = [] if limited else [
         Link(
             _('Subscribe'),
             request.link(self, 'my-reservations-subscribe'),
@@ -1709,8 +1753,16 @@ def view_my_reservations(
             default_view='timeGridWeek'
         ),
         'layout': layout,
-        'feed': request.link(self, name='my-reservations-json'),
-        'pdf_url': request.link(self, name='my-reservations-pdf'),
+        'feed': request.link(
+            self, name='my-reservations-json', query_params=feed_params
+        ),
+        'pdf_url': request.link(
+            self, name='my-reservations-pdf', query_params=feed_params
+        ),
+        'limited': limited,
+        'login_url': request.link(
+            Auth.from_request_path(request), name='citizen-login'
+        ),
     }
 
 
@@ -1778,14 +1830,20 @@ def view_my_reservations_ical(
     request: OrgRequest
 ) -> Response:
 
-    token = request.GET.get('token')
     salt = request.GET.get('salt')
-    email = request.load_url_safe_token(token, salt, None)
+    token = request.GET.get('token')
+    payload = request.load_url_safe_token(token, salt, None)
     include_key_code = False
-    if email is None:
+    reservation_token = None
+    if isinstance(payload, list):  # existing handed-out key-code links
+        email, include_key_code = payload
+    elif isinstance(payload, dict):  # per-ticket magic links
+        email = payload.get('email')
+        reservation_token = payload.get('token')
+    else:  # plain-string tokens / durable feed links
+        email = payload
+    if not isinstance(email, str):
         raise exc.HTTPForbidden()
-    elif isinstance(email, list):
-        email, include_key_code = email
 
     s = utcnow() - timedelta(days=30)
     e = utcnow() + timedelta(days=365)
@@ -1811,12 +1869,15 @@ def view_my_reservations_ical(
     path = module_path('onegov.org', 'queries/my-reservations.sql')
     stmt = as_selectable_from_path(path)
 
-    records = request.session.execute(select(*stmt.c).where(and_(
+    conditions = [
         func.lower(stmt.c.email) == email.lower(),
         s <= stmt.c.start, stmt.c.start <= e,
         # only include accepted reservations in ICS file
         stmt.c.accepted.is_(True)
-    )))
+    ]
+    if reservation_token:
+        conditions.append(stmt.c.token == UUID(reservation_token))
+    records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     ticket_label = request.translate(_('Check request status'))
     key_code_label = request.translate(_('Key Code'))
@@ -1845,8 +1906,9 @@ def view_my_reservations_ical(
 
         cal.add_component(evt)
 
+    # durable magic-link feed: no email in the filename
     suffix = '-with-key-codes' if include_key_code else ''
-    filename = f'inline; filename=my-reservations-{email}{suffix}.ics'
+    filename = f'inline; filename=my-reservations{suffix}.ics'
     return Response(
         cal.to_ical(),
         content_type='text/calendar',

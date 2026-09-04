@@ -13,6 +13,7 @@ from base64 import b64decode
 from datetime import datetime, date, timedelta
 from decimal import Decimal
 from freezegun import freeze_time
+from html import unescape
 from io import BytesIO
 from libres.db.models import Reservation
 from onegov.core.utils import module_path, normalize_for_url
@@ -4895,7 +4896,8 @@ def test_reserve_fractions_of_hours_total_correct_in_price(
 
 @freeze_time('2015-08-28', tick=True)
 def test_my_reservations_view(client: Client) -> None:
-    # prepate the required data
+    # prepare the required data
+    EMAIL = 'info@example.org'
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     assert resource is not None
@@ -4911,7 +4913,7 @@ def test_my_reservations_view(client: Client) -> None:
     # create a reservation
     assert reserve().json == {'success': True}
     formular = client.get('/resource/tageskarte/form')
-    formular.form['email'] = 'info@example.org'
+    formular.form['email'] = EMAIL
     formular.form.submit().follow().form.submit()
 
     client2 = client.spawn()
@@ -4934,7 +4936,7 @@ def test_my_reservations_view(client: Client) -> None:
     client.get('/resources/my-reservations-json', status=403)
     client.get('/resources/my-reservations-pdf', status=403)
     login = client.get('/resources/my-reservations?date=20150828').follow()
-    login.form['email'] = 'info@example.org'
+    login.form['email'] = EMAIL
     confirm = login.form.submit().follow()
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)['TextBody']
@@ -4959,6 +4961,8 @@ def test_my_reservations_view(client: Client) -> None:
     assert '28. August 2015 - 29. August 2015' in pdf_content
     assert 'Ganztägig' in pdf_content
     assert 'Noch nicht akzeptiert' in pdf_content
+    # the authenticated citizen's own download filename may carry their email
+    assert EMAIL in pdf.headers['Content-Disposition']
 
     # if we only include accepted reservations the PDF is empty
     pdf = client.get(
@@ -4985,13 +4989,197 @@ def test_my_reservations_view(client: Client) -> None:
     ticket = admin.get('/tickets/ALL/open').click('Annehmen').follow()
     ticket.click('Alle Reservationen annehmen')
 
+    # a Kaba code on the accepted reservation must never leak in a limited view
+    KABA = 'KABA-SECRET-9999'
+    session = client.app.session()
+    reservation = session.query(Reservation).one()
+    reservation.data = {**(reservation.data or {}), 'kaba': {'code': KABA}}
+    org = client.app.org
+    org.meta = {**org.meta, 'kaba_configurations': [{
+        'site_id': 'site', 'api_key': 'key', 'api_secret': 'secret',
+    }]}
+    transaction.commit()
+
+    # iCal folds long DESCRIPTION lines with '\r\n '; unfold before searching
+    def ics_body(response: Any) -> str:
+        return response.text.replace('\r\n ', '')
+
     assert client.get(ical_url).status_code == 200
+    # the emailed ICS magic link (unauthenticated bare token) omits the code
+    assert KABA not in ics_body(client.get(ical_url))
+
+    # the acceptance email contains a durable magic link to subscribe to
+    # the reservations calendar without login / mail verification
+    accepted_mail = client.get_email(-1)['HtmlBody']
+    assert 'Reservationskalender abonnieren' in accepted_mail
+    mail_ical_url = unescape(re.search(  # type: ignore[union-attr]
+        r'https?://localhost(/resources/my-reservations-ical[^"]+)',
+        accepted_mail
+    ).group(1))
+    # anyone with the link can reach the feed, no authentication needed
+    assert client2.get(mail_ical_url).status_code == 200
+    # ...and exposes neither the code nor the email (body or filename)
+    ics_response = client2.get(mail_ical_url)
+    assert KABA not in ics_body(ics_response)
+    assert EMAIL not in ics_response.text
+    assert EMAIL not in ics_response.headers['Content-Disposition']
+
+    # the acceptance email also contains a durable magic link to a limited
+    # web summary (no login), with the option to log in for full details
+    web_url = unescape(re.search(  # type: ignore[union-attr]
+        r'https?://localhost(/resources/my-reservations\?token=[^"]+)',
+        accepted_mail
+    ).group(1))
+    client3 = client.spawn()
+    summary = client3.get(web_url)
+    assert 'Für alle Details anmelden' in summary
+    # the limited web summary never renders the Kaba door code or email address
+    assert KABA not in summary.text
+    assert EMAIL not in summary.text
+    # the feed carries the token so the calendar loads without a session
+    feed_url = unescape(re.search(  # type: ignore[union-attr]
+        r'data-feed="([^"]+)"', summary.text
+    ).group(1))
+    assert 'token=' in feed_url
+    feed = client3.get(f'{feed_url}&start=2015-08-28&end=2015-08-29')
+    events = feed.json
+    assert len(events) == 1
+    # key codes are hidden and ticket deep-links removed in limited mode
+    # empty url keeps the calendar entry but renders no link
+    assert events[0]['url'] == ''
+    # the limited JSON feed never exposes the Kaba door code or email address
+    assert KABA not in feed.text
+    assert EMAIL not in feed.text
+
+    # add a second reservation request for the same email that never gets
+    # accepted; the limited (accepted-only) view must not list it
+    client4 = client.spawn()
+    tageskarte = resources.by_name('tageskarte')
+    assert tageskarte is not None
+    scheduler = tageskarte.get_scheduler(client.app.libres_context)
+    pending = scheduler.allocate(
+        dates=(datetime(2015, 9, 4), datetime(2015, 9, 4)), whole_day=True
+    )
+    reserve = client4.bound_reserve(pending[0])
+    transaction.commit()
+    assert reserve().json == {'success': True}
+    formular = client4.get('/resource/tageskarte/form')
+    formular.form['email'] = EMAIL
+    formular.form.submit().follow().form.submit()
+
+    # both reservations now exist: one accepted, the new one still pending
+    assert sorted(
+        bool((r.data or {}).get('accepted'))
+        for r in client.app.session().query(Reservation)
+    ) == [False, True]
+
+    # the limited JSON feed lists only the accepted 08-28 reservation; the
+    # pending 09-04 request is excluded even though the window spans it
+    wide = 'start=2015-08-28&end=2015-09-30'
+    limited = client3.get(f'{feed_url}&{wide}').json
+    assert len(limited) == 1
+    assert '2015-08-28' in limited[0]['start']
+    # the authenticated citizen sees both (accepted + pending)
+    full = client.get(f'/resources/my-reservations-json?{wide}').json
+    assert len(full) == 2
+
+    # the pdf is reachable via the same token and shows the confirmed
+    # reservation without a session
+    pdf_feed_url = unescape(re.search(  # type: ignore[union-attr]
+        r'data-pdf-url="([^"]+)"', summary.text
+    ).group(1))
+    assert 'token=' in pdf_feed_url
+    pdf = client3.get(f'{pdf_feed_url}&{wide}')
+    _, pdf_content = extract_pdf_info(BytesIO(pdf.body))
+    assert '28. August 2015' in pdf_content
+    # limited PDF: accepted only, no pending 09-04 entry ("4. September",
+    # distinct from the header range's "30. September")
+    assert 'Noch nicht akzeptiert' not in pdf_content
+    assert '4. September 2015' not in pdf_content
+    # the limited PDF exposes neither the code nor the email (body or filename)
+    assert KABA not in pdf_content
+    assert EMAIL not in pdf_content
+    assert EMAIL not in pdf.headers['Content-Disposition']
+
+    # POSITIVE CONTROL: the code is real and *does* surface for a logged-in
+    # citizen via the explicit "with key codes" subscribe link
+    subscribe = client.get('/resources/my-reservations-subscribe')
+    ical_paths = re.findall(
+        r'href="webcal://localhost(/resources/my-reservations-ical[^"]+)"',
+        subscribe.text
+    )
+    assert len(ical_paths) == 2  # plain feed + with-key-codes feed
+    plain_path, key_code_path = (unescape(p) for p in ical_paths)
+    assert KABA not in ics_body(client.get(plain_path))
+    assert KABA in ics_body(client.get(key_code_path))
+
+    # without a token or session the pdf is forbidden
+    client.spawn().get(
+        '/resources/my-reservations-pdf?start=2015-08-28&end=2015-08-29',
+        status=403
+    )
+
+    # a tampered token does not leak anything: html falls back to login,
+    # the feeds return 403
+    assert client.spawn().get(
+        web_url[:-1] + ('x' if web_url[-1] != 'x' else 'y')
+    ).follow().request.path == '/auth/citizen-login'
+    client.spawn().get(
+        feed_url[:-1] + ('x' if feed_url[-1] != 'x' else 'y')
+        + '&start=2015-08-28&end=2015-08-29',
+        status=403
+    )
+
+    # logging in "for details" with a *different* email must not escalate:
+    # the visitor becomes that other email and sees its (empty) reservations,
+    # never the magic-link email's data
+    login = summary.click('Für alle Details anmelden')
+    login.form['email'] = 'someone.else@example.org'
+    confirm = login.form.submit().follow()
+    tan = re.search(  # type: ignore[union-attr]
+        r'&token=([^)\s]+)', client3.get_email(-1)['TextBody']
+    ).group(1)
+    confirm.form['token'] = tan
+    confirm.form.submit().follow()
+
+    # now authenticated as the other email: no reservations, no key code
+    other_events = client3.get(
+        '/resources/my-reservations-json?start=2015-08-28&end=2015-08-29'
+    ).json
+    assert other_events == []
 
     # someone else can open the same ical link without authentication
     assert client2.get(ical_url).status_code == 200
     # but not the other views
     client2.get('/resources/my-reservations-json', status=403)
     client2.get('/resources/my-reservations-pdf', status=403)
+    login_page = client2.get('/resources/my-reservations')
+    assert login_page.status_code == 302
+    assert 'citizen-login' in (login_page.location or '')
+
+    # with two accepted tickets, each email's ical link is scoped to its
+    # ticket while the durable subscribe feed lists both
+    ticket = admin.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+    second_mail = client4.get_email(-1)['HtmlBody']
+    second_ical_url = unescape(re.search(  # type: ignore[union-attr]
+        r'https?://localhost(/resources/my-reservations-ical[^"]+)',
+        second_mail
+    ).group(1))
+
+    def event_uids(response: Any) -> set[str]:
+        return set(re.findall(r'UID:(\S+)', response.text))
+
+    # each ticket's magic link is scoped to its own single reservation
+    first_uids = event_uids(client.spawn().get(mail_ical_url))
+    second_uids = event_uids(client.spawn().get(second_ical_url))
+    assert len(first_uids) == 1
+    assert len(second_uids) == 1
+    assert first_uids.isdisjoint(second_uids)
+
+    # the durable subscribe feed (no ticket token) lists both accepted events
+    both_uids = event_uids(client.spawn().get(ical_url))
+    assert both_uids == first_uids | second_uids
 
 
 @pytest.mark.parametrize(

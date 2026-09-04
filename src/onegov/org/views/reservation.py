@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import isodate
 import morepath
+import secrets
 import pytz
 import sedate
 import transaction
@@ -36,8 +37,6 @@ from onegov.pay import InvoiceMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.reservation.collection import ResourceCollection
 from onegov.ticket import TicketCollection, TicketInvoice
-from onegov.user import Auth
-from onegov.user.collections import TANCollection
 from purl import URL
 from sqlalchemy import and_, or_
 from uuid import uuid4
@@ -964,28 +963,58 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     return morepath.redirect(url)
 
 
-def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
+def get_my_reservations_url(
+    request: OrgRequest,
+    email: str,
+    reservation_token: str | None = None
+) -> str | None:
+    """ Durable magic link to a limited summary of the recipient's
+    reservations, with an option to log in for full details.
+
+    When ``reservation_token`` is given, the limited view is restricted to
+    the reservations of that single ticket. """
     if not request.app.org.citizen_login_enabled:
         return None
 
-    auth = Auth.from_request(
-        request,
-        to=request.class_link(
-            ResourceCollection,
-            name='my-reservations'
-        )
+    salt = secrets.token_urlsafe(16)
+    payload = {
+        'email': email,
+        'token': reservation_token,
+    }
+    return request.class_link(
+        ResourceCollection,
+        name='my-reservations',
+        query_params={
+            'token': request.new_url_safe_token(payload, salt),
+            'salt': salt,
+        }
     )
-    tans = TANCollection(request.session, scope='citizen-login')
-    tan_obj = tans.add(
-        client='unknown',
-        email=email,
-        redirect_to=auth.to,
-    )
-    return request.link(
-        auth,
-        name='confirm-citizen-login',
-        query_params={'token': tan_obj.tan}
-    )
+
+
+def get_reservations_subscribe_url(
+    request: OrgRequest,
+    email: str,
+    reservation_token: str | None = None
+) -> str | None:
+    """ Durable magic link to the recipient's reservations calendar feed.
+
+    When ``reservation_token`` is given, the feed is restricted to the
+    reservations of that single ticket. """
+    if not request.app.org.citizen_login_enabled:
+        return None
+
+    salt = secrets.token_urlsafe(16)
+    url_obj = URL(request.class_link(
+        ResourceCollection, name='my-reservations-ical'
+    ))
+    payload = {
+        'email': email,
+        'token': reservation_token,
+    }
+    token = request.new_url_safe_token(payload, salt)
+    url_obj = url_obj.query_param('token', token)
+    url_obj = url_obj.query_param('salt', salt)
+    return url_obj.as_string()
 
 
 @OrgApp.view(model=Reservation, name='accept', permission=Private)
@@ -1137,7 +1166,10 @@ def accept_reservation(
                 'form': form,
                 'message': message,
                 'my_reservations_url': get_my_reservations_url(
-                    request, self.email
+                    request, self.email, ticket.handler_id
+                ),
+                'subscribe_url': get_reservations_subscribe_url(
+                    request, self.email, ticket.handler_id
                 ),
                 'cancel_url': _cancel_url,
             },
@@ -1899,7 +1931,10 @@ def send_reservation_summary(
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
                 'my_reservations_url': get_my_reservations_url(
-                    request, recipient
+                    request, recipient, self.handler_id
+                ),
+                'subscribe_url': get_reservations_subscribe_url(
+                    request, recipient, self.handler_id
                 ),
             }
         )
