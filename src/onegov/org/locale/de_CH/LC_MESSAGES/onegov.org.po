@@ -4447,6 +4447,24 @@ msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 msgid "Chats"
 msgstr "Chats"
 
+msgid "Volunteer"
+msgstr "Hilfsperson"
+
+msgid "Status mail"
+msgstr "Statusmail"
+
+msgid "Do you really want to send the current status?"
+msgstr "Möchten Sie den aktuellen Status wirklich senden?"
+
+msgid ""
+"A mail will be sent to the volunteer containing the status of his "
+"subscriptions. Only send this if these are the final states ofthe "
+"subscriptions."
+msgstr ""
+"Eine Email wird an die Hilfsperson gesendet, welche den Status seiner "
+"Anmeldungen enthält. Senden Sie dies nur, wenn dies die endgültigen Zustände "
+"der Anmeldungen sind."
+
 msgid "New Link"
 msgstr "Neue Verknüpfung"
 
