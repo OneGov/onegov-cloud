@@ -21,7 +21,15 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query, Session
+    from typing import Protocol
     from uuid import UUID
+
+    class UserSearchWidget(Protocol):
+        @property
+        def name(self) -> str: ...
+        @property
+        def search_query(self) -> dict[str, str] | None: ...
+        def adapt(self, query: Query[User]) -> Query[User]: ...
 
 
 MIN_PASSWORD_LENGTH = 10
@@ -71,9 +79,23 @@ class UserCollection:
 
     """
 
-    def __init__(self, session: Session, **filters: Any):
+    def __init__(
+        self,
+        session: Session,
+        search_widget: UserSearchWidget | None = None,
+        **filters: Any
+    ):
         self.session = session
+        self.search_widget = search_widget
         self.filters = as_dictionary_of_sets(filters)
+
+    @property
+    def search(self) -> str | None:
+        return self.search_widget.name if self.search_widget else None
+
+    @property
+    def search_query(self) -> dict[str, str] | None:
+        return self.search_widget.search_query if self.search_widget else None
 
     def __getattr__(self, name: str) -> set[Any] | None:
         if name not in self.filters:
@@ -91,7 +113,8 @@ class UserCollection:
             if key not in toggled:
                 toggled[key] = self.filters[key]
 
-        return self.__class__(self.session, **toggled)
+        return self.__class__(
+            self.session, search_widget=self.search_widget, **toggled)
 
     def query(self) -> Query[User]:
         """ Returns a query using :class:`onegov.user.models.User`. With
@@ -104,6 +127,9 @@ class UserCollection:
             if values:
                 apply = getattr(self, f'apply_{key}_filter', self.apply_filter)
                 query = apply(query, key, values)
+
+        if self.search_widget:
+            query = self.search_widget.adapt(query)
 
         return query
 

@@ -68,6 +68,10 @@
             </div>
             <div class="medium-4 cell medium-offset-1 sidebar filter-panel small-order-1 medium-order-2 large-order-2" id="right-sidebar">
                 <div class="sidebar-wrapper">
+                    <div class="side-panel filter-search" tal:condition="search_widget">
+                        <h2 class="filter-title h3" i18n:translate>Search</h2>
+                        <tal:b replace="search_widget.html(layout)"/>
+                    </div>
                     <div tal:condition="filters['active']|nothing" class="side-panel filter-active">
                         <h2 class="filter-title h3" i18n:translate>State</h2>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
