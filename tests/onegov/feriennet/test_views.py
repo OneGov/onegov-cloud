@@ -3877,10 +3877,20 @@ def test_add_manual_booking(client: Client, scenario: Scenario) -> None:
 
     page = client.get('/billing')
 
+    # add a discount (negative amount)
     form = page.click('Manuelle Buchung hinzufügen')
     form.form['username'] = 'tom@example.org'
     form.form['booking_text'] = 'Discount for being nice to the admin'
+    form.form['kind'] = 'discount'
     form.form['discount'] = '20'
+    form.form.submit()
+
+    # add a surcharge (positive amount)
+    form = client.get('/billing').click('Manuelle Buchung hinzufügen')
+    form.form['username'] = 'tom@example.org'
+    form.form['booking_text'] = 'Surcharge for late payment'
+    form.form['kind'] = 'surcharge'
+    form.form['surcharge'] = '15'
     form.form.submit()
 
     page_url = (
@@ -3891,7 +3901,38 @@ def test_add_manual_booking(client: Client, scenario: Scenario) -> None:
 
     page = client.get(page_url)
     assert 'Tom' in page
+
+    # both the discount and the surcharge are shown, grouped under the
+    # 'Discounts / Surcharges' label with their respective amounts
+    assert 'Abzüge / Zuschläge' in page
     assert 'Discount for being nice to the admin' in page
+    assert '-20.00' in page
+    assert 'Surcharge for late payment' in page
+    assert '15.00' in page
+
+    # mark the regular booking as paid, leaving the manual positions unpaid,
+    # so the bill counts as paid overall (outstanding <= 0) while still
+    # carrying unpaid discount/surcharge items
+    for item in scenario.session.query(ActivityInvoiceItem):
+        if item.group != 'manual':
+            item.paid = True
+    transaction.commit()
+
+    # the unpaid discount/surcharge must stay grouped with their (paid) bill
+    # under the 'paid' filter, instead of being split off into 'unpaid'
+    page_url = (
+        client.get('/billing?state=paid')
+        .pyquery('.item-header + div')
+        .attr('ic-get-from')
+    )
+    page = client.get(page_url)
+    assert 'Discount for being nice to the admin' in page
+    assert '-20.00' in page
+    assert 'Surcharge for late payment' in page
+    assert '15.00' in page
+
+    # and the paid bill does not show up under the 'unpaid' filter
+    assert 'Tom' not in client.get('/billing?state=unpaid')
 
 
 def test_family_removal_links_target_distinct_items(
