@@ -820,11 +820,20 @@ def test_tags_field() -> None:
     assert field.validate(form)
 
     field.process_formdata(['[]'])
-    assert field.data == ['[]']
+    assert field.data == []
     assert field.validate(form)
 
     field.process_formdata(['()'])
-    assert field.data == ['()']
+    assert field.data == []
+    assert field.validate(form)
+
+    field.process_formdata(["''"])
+    assert field.data == []
+    assert field.validate(form)
+
+    # stringified list reprs collapse to their real content
+    field.process_formdata(["['Sport']"])
+    assert field.data == ['Sport']
     assert field.validate(form)
 
     field.process_formdata(['labels, keywords, markers'])
