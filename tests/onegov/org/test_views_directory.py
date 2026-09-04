@@ -22,7 +22,7 @@ from pytz import UTC
 from textwrap import dedent
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from tests.shared.utils import (
-    create_image, get_meta, extract_filename_from_response)
+    create_image, create_pdf, get_meta, extract_filename_from_response)
 from webtest import Upload
 
 from typing import TYPE_CHECKING
@@ -102,7 +102,9 @@ def create_directory(
     extended_submitter: bool = False,
     title: str = 'Meetings',
     lead: str | None = None,
-    text: str | None = None
+    text: str | None = None,
+    pdf: bool = False,
+    multi: bool = False
 ) -> ExtendedResponse:
 
     client.login_admin()
@@ -112,11 +114,16 @@ def create_directory(
         page.form['lead'] = lead
     if text:
         page.form['text'] = text
-    page.form['structure'] = """
-                    Name *= ___
-                    Pic *= *.jpg|*.png|*.gif
-                """
-    page.form['content_fields'] = 'Name\nPic'
+    lines = ['Name *= ___', 'Pic *= *.jpg|*.png|*.gif']
+    content_fields = 'Name\nPic'
+    if pdf:
+        lines.append('Pdf *= *.pdf')
+        content_fields += '\nPdf'
+    if multi:
+        lines.append('Docs *= *.pdf (multiple)')
+        content_fields += '\nDocs'
+    page.form['structure'] = '\n'.join(lines)
+    page.form['content_fields'] = content_fields
     page.form['content_hide_labels'] = 'Pic'
     page.form['title_format'] = '[Name]'
     page.form['enable_map'] = 'entry'
@@ -164,8 +171,7 @@ def test_publication_added_by_admin(client: Client) -> None:
     page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
     page = page.form.submit()
     assert 'Das Publikationsende muss in der Zukunft liegen' in page
-    # we have to submit the file again, can't evade that
-    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    # the uploaded file survives the validation error, no need to resend it
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     entry = page.form.submit().follow()
@@ -197,6 +203,286 @@ def test_publication_added_by_admin(client: Client) -> None:
     assert 'publication_start' not in page.form.fields
 
 
+def test_attachment_preserved_on_validation_error(client: Client) -> None:
+    # Uploading a file and submitting an entry with a publication date in
+    # the past triggers a validation error. The already uploaded file must
+    # survive the re-render so the user doesn't lose the attachment.
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=True, pdf=True)
+
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['pdf'] = Upload('annual.pdf', create_pdf().read())
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = page.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the publication date, but do NOT re-upload the files
+    annual_end = now + timedelta(days=1)
+    page.form['publication_end'] = dt_for_form(annual_end)
+    entry = page.form.submit().follow()
+
+    # the image attachment must have been preserved
+    assert get_meta(entry, 'og:image')
+    assert get_meta(entry, 'og:image:alt') == 'annual.jpg'
+
+    # the pdf attachment must have been preserved too
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'annual.pdf' in files
+
+
+def test_attachment_preserved_on_edit_validation_error(
+    client: Client
+) -> None:
+    # Editing an existing entry with an attachment and saving it with a
+    # publication date in the past must not lose the attachment.
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=True, pdf=True)
+
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['pdf'] = Upload('annual.pdf', create_pdf().read())
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=10))
+    entry = page.form.submit().follow()
+    assert get_meta(entry, 'og:image')
+
+    edit = client.get(entry.request.url + '/edit')
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the date without touching the attachments
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    entry = page.form.submit().follow()
+    assert get_meta(entry, 'og:image')
+    assert get_meta(entry, 'og:image:alt') == 'annual.jpg'
+
+    # the pdf attachment must have been preserved too
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'annual.pdf' in files
+
+
+def test_multiple_attachments_preserved_on_validation_error(
+    client: Client
+) -> None:
+    # Multiple file uploads must also survive a validation error re-render
+    # so the user doesn't have to re-select every file.
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=True, multi=True)
+
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['docs'] = [
+        Upload('one.pdf', create_pdf().read()),
+        Upload('two.pdf', create_pdf().read()),
+    ]
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = page.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the publication date, but do NOT re-upload the files
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=1))
+    entry = page.form.submit().follow()
+
+    assert get_meta(entry, 'og:image')
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'one.pdf' in files
+    assert 'two.pdf' in files
+
+
+def test_multiple_attachments_preserved_on_edit_validation_error(
+    client: Client
+) -> None:
+    # Editing an entry with multiple attachments and saving it with a
+    # publication date in the past must keep all of them.
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, publication=True, multi=True)
+
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['docs'] = [
+        Upload('one.pdf', create_pdf().read()),
+        Upload('two.pdf', create_pdf().read()),
+    ]
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=10))
+    entry = page.form.submit().follow()
+    assert {'one.pdf', 'two.pdf'} <= {
+        f.name for f in dir_query(client).one().files
+    }
+
+    edit = client.get(entry.request.url + '/edit')
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the date without touching the attachments
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    entry = page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'one.pdf' in files
+    assert 'two.pdf' in files
+
+
+def create_file_directory(client: Client) -> ExtendedResponse:
+    """ Publication-enabled directory: required image + optional single and
+    multiple pdf fields (optional so they can be deleted). """
+    client.login_admin()
+    page = client.get('/directories').click('^Verzeichnis$')
+    page.form['title'] = 'Docs'
+    page.form['structure'] = (
+        'Name *= ___\n'
+        'Pic *= *.jpg|*.png|*.gif\n'
+        'Doc = *.pdf\n'
+        'Docs = *.pdf (multiple)'
+    )
+    page.form['content_fields'] = 'Name\nPic\nDoc\nDocs'
+    page.form['title_format'] = '[Name]'
+    page.form['enable_map'] = 'no'
+    page.form['thumbnail'] = 'Pic'
+    page.form['enable_publication'] = True
+    return page.form.submit().follow()
+
+
+def create_docs_entry(client: Client, directory: ExtendedResponse) -> str:
+    """ Entry with image + single and two multiple pdfs; returns its
+    edit url. """
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    page = directory.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['doc'] = Upload('single.pdf', create_pdf().read())
+    page.form['docs'] = [
+        Upload('one.pdf', create_pdf().read()),
+        Upload('two.pdf', create_pdf().read()),
+    ]
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=10))
+    entry = page.form.submit().follow()
+    files = {f.name for f in dir_query(client).one().files}
+    assert {'annual.jpg', 'single.pdf', 'one.pdf', 'two.pdf'} <= files
+    return entry.request.url + '/edit'
+
+
+def test_directory_entry_edit_delete_file_validation_error(
+    client: Client
+) -> None:
+    # delete + validation error: kept files survive the re-render, deleted stay
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    directory = create_file_directory(client)
+    edit_url = create_docs_entry(client, directory)
+
+    edit = client.get(edit_url)
+    edit.form.get('doc', 0).select('delete')
+    edit.form.get('docs-0', 0).select('delete')
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the date without touching the files
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'single.pdf' not in files   # single deleted
+    assert 'one.pdf' not in files      # first of the multi deleted
+    assert 'two.pdf' in files          # second of the multi kept
+    assert 'annual.jpg' in files       # untouched field kept
+
+
+def test_directory_entry_edit_replace_file(client: Client) -> None:
+    # replace a single and one multi file via the edit form; keep the rest
+    directory = create_file_directory(client)
+    edit_url = create_docs_entry(client, directory)
+
+    edit = client.get(edit_url)
+    edit.form.get('doc', 0).select('replace')
+    edit.form.get('doc', 1).value = Upload(
+        'single-new.pdf', create_pdf().read())
+    edit.form.get('docs-0', 0).select('replace')
+    edit.form.get('docs-0', 1).value = Upload(
+        'one-new.pdf', create_pdf().read())
+    edit.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'single-new.pdf' in files   # single replaced
+    assert 'single.pdf' not in files
+    assert 'one-new.pdf' in files       # first of the multi replaced
+    assert 'one.pdf' not in files
+    assert 'two.pdf' in files           # second of the multi kept
+    assert 'annual.jpg' in files        # untouched field kept
+
+
+def test_directory_entry_replace_file_validation_error(client: Client) -> None:
+    # Replace a file and hit an unrelated validation error in the same submit;
+    # after fixing the error the replacement must win over the stored file.
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    directory = create_file_directory(client)
+    edit_url = create_docs_entry(client, directory)
+
+    edit = client.get(edit_url)
+    edit.form.get('doc', 0).select('replace')
+    edit.form.get('doc', 1).value = Upload(
+        'single-new.pdf', create_pdf().read())
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+    # the radio resets to 'keep', but the new file rides along as a resend
+    # and still wins on the next submit (asserted below)
+    assert page.form.get('doc', 0).value == 'keep'
+
+    # fix the date without re-selecting the replacement
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'single-new.pdf' in files   # replacement should have won
+    assert 'single.pdf' not in files
+
+
+def test_directory_entry_delete_file_validation_error(client: Client) -> None:
+    # Delete a file and hit an unrelated validation error in the same submit;
+    # the delete must survive the re-render (widget keeps 'delete' selected)
+    # and the file must be gone after fixing the error.
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    directory = create_file_directory(client)
+    edit_url = create_docs_entry(client, directory)
+
+    edit = client.get(edit_url)
+    edit.form.get('doc', 0).select('delete')
+    edit.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = edit.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+    # the widget still shows the file with 'delete' selected, not reset to keep
+    assert page.form.get('doc', 0).value == 'delete'
+
+    # fix the date without re-selecting the action
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert 'single.pdf' not in files   # the deleted single file is gone
+    assert 'one.pdf' in files          # multi files untouched
+    assert 'two.pdf' in files
+    assert 'annual.jpg' in files       # image untouched
+
+
 def test_required_publication(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')
@@ -213,8 +499,7 @@ def test_required_publication(client: Client) -> None:
     page.form['publication_start'] = dt_for_form(now)
     page = page.form.submit()
     assert 'Dieses Feld wird benötigt' in page
-    # we have to submit the file again, can't evade that
-    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    # the uploaded file survives the validation error, no need to resend it
     annual_end = now + timedelta(days=1)
     page.form['publication_end'] = dt_for_form(annual_end)
     page.form.submit().follow()

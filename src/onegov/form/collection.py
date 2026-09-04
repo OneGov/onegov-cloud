@@ -3,10 +3,10 @@ from __future__ import annotations
 import warnings
 
 from datetime import datetime, timedelta
-from onegov.core.crypto import random_token
 from onegov.core.utils import normalize_for_url
 from onegov.core.collection import GenericCollection
-from onegov.file.utils import as_fileintent
+from onegov.file.utils import (
+    is_stored_file_reference, keep_stored_file, store_uploaded_file)
 from onegov.form.errors import UnableToComplete
 from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.form.models import (
@@ -434,7 +434,7 @@ class FormSubmissionCollection:
         files_to_add = {
             id for id in files
             if (file_meta := submission.data.get(id))
-            and not file_meta['data'].startswith('@')
+            and not is_stored_file_reference(file_meta)
         }
 
         files_to_keep = files - files_to_add
@@ -455,14 +455,8 @@ class FormSubmissionCollection:
             for id, indeces in multi_files.items()
             if (file_metas := submission.data.get(id))
             for idx in indeces
-            # if a file is set to 'keep' it will be None unless
-            # the data has been resubmitted or the original data
-            # was passed in, it might be a bit cleaner to look
-            # at the field.action to determine which files to
-            # keep and which ones to delete/replace...
-            if file_metas[idx] is None
-            or file_metas[idx]['data'].startswith('@')
-
+            # a kept file is None (unchanged) or resent as an '@<id>' ref
+            if keep_stored_file(file_metas[idx])
         }
         files_to_keep |= multi_files_to_keep
 
@@ -481,17 +475,10 @@ class FormSubmissionCollection:
         for field_id in files_to_add:
             field = getattr(form, field_id)
 
-            f = FormFile(
-                id=random_token(),
-                name=field.filename,
-                note=field_id,
-                reference=as_fileintent(
-                    content=field.file,
-                    filename=field.filename
-                )
+            f = store_uploaded_file(
+                FormFile, submission.files, field_id,
+                field.file, field.filename
             )
-
-            submission.files.append(f)
             self.session.flush()
 
             # replace the data in the submission with a reference and
@@ -526,17 +513,10 @@ class FormSubmissionCollection:
                         # skip this subfield
                         continue
 
-                    f = FormFile(
-                        id=random_token(),
-                        name=field.filename,
-                        note=new_key,
-                        reference=as_fileintent(
-                            content=field.file,
-                            filename=field.filename
-                        )
+                    f = store_uploaded_file(
+                        FormFile, submission.files, new_key,
+                        field.file, field.filename
                     )
-
-                    submission.files.append(f)
                     self.session.flush()
 
                     # replace the data in the submission with a reference and

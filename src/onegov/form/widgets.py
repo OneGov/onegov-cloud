@@ -10,6 +10,7 @@ from morepath.error import LinkError
 from onegov.chat import TextModuleCollection
 from onegov.core.templates import PageTemplate
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.file.utils import is_stored_file_reference
 from onegov.form import _
 from wtforms.widgets import DateInput
 from wtforms.widgets import DateTimeLocalInput
@@ -128,17 +129,17 @@ class UploadWidget(FileInput):
             <ul class="upload-options">
                 <li>
                     <input type="radio" id="{name}-0" name="{name}"
-                           value="keep" checked="">
+                           value="keep"{keep_checked}>
                     <label for="{name}-0">{keep_label}</label>
                 </li>
                 <li>
                     <input type="radio" id="{name}-1" name="{name}"
-                           value="delete">
+                           value="delete"{delete_checked}>
                     <label for="{name}-1">{delete_label}</label>
                 </li>
                 <li>
                     <input type="radio" id="{name}-2" name="{name}"
-                           value="replace">
+                           value="replace"{replace_checked}>
                     <label for="{name}-2">{replace_label}</label>
                     <div>
                         <label>
@@ -191,7 +192,9 @@ class UploadWidget(FileInput):
         **kwargs: Any
     ) -> tuple[bool, dict[str, Any]]:
 
-        if force_simple or field.errors or not field.data:
+        # a delete clears 'data'; fall back to 'object_data' to still show it
+        existing = field.data or getattr(field, 'object_data', None)
+        if force_simple or field.errors or not existing:
             return True, {
                 'wrapper_css_class': wrapper_css_class,
                 'input_html': input_html,
@@ -205,7 +208,14 @@ class UploadWidget(FileInput):
             """).format(src=src)
 
         previous = ''
-        if field.data and resend_upload:
+        # only resend a fresh, not-yet-stored upload (field.raw_data); never
+        # resend an already-stored '@<id>' reference
+        if (
+            resend_upload
+            and field.data
+            and field.raw_data
+            and not is_stored_file_reference(field.data)
+        ):
             previous = Markup("""
                 <input type="hidden" name="{name}" value="{filename}">
                 <input type="hidden" name="{name}" value="{data}">
@@ -215,7 +225,7 @@ class UploadWidget(FileInput):
                 data=field.data.get('data', ''),
             )
 
-        size = field.data['size']
+        size = existing.get('size', -1)
         if size < 0:
             display_size = ''
         else:
@@ -225,6 +235,10 @@ class UploadWidget(FileInput):
         keep_label = _('Keep file')
         delete_label = _('Delete file')
         replace_label = _('Replace file')
+        # preserve a 'delete' across a re-render (else the file gets restored);
+        # everything else shows 'keep' (the resent upload is stored regardless)
+        deleting = getattr(field, 'action', None) == 'delete'
+        checked = Markup(' checked=""')
         return False, {
             'wrapper_css_class': wrapper_css_class,
             'input_html': input_html,
@@ -232,12 +246,15 @@ class UploadWidget(FileInput):
             'preview': preview,
             'previous': previous,
             'filesize': display_size,
-            'filename': field.data['filename'],
+            'filename': existing['filename'],
             'name': field.id,
             'existing_file_label': field.gettext(existing_file_label),
             'keep_label': field.gettext(keep_label),
             'delete_label': field.gettext(delete_label),
             'replace_label': field.gettext(replace_label),
+            'keep_checked': '' if deleting else checked,
+            'delete_checked': checked if deleting else '',
+            'replace_checked': '',
         }
 
     def __call__(

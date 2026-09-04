@@ -14,7 +14,7 @@ from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import (
     DirectoryConfiguration, DirectoryConfigurationStorage)
 from onegov.file import File, MultiAssociatedFiles
-from onegov.file.utils import as_fileintent
+from onegov.file.utils import keep_stored_file, store_uploaded_file
 from onegov.form.orm_types import Formcode
 from onegov.form.parser import ParsedForm
 from onegov.search import SearchableContent
@@ -276,13 +276,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 if isinstance(value_field, dict):
                     continue
 
-                delete = (
-                    value_field is None
-                    or value_field.data == {}
-                    or value_field.data is not None
+                keep = value_field is not None and keep_stored_file(
+                    value_field.data,
+                    getattr(value_field, 'action', None)
                 )
-
-                if delete:
+                if not keep:
                     assert session is not None
                     session.delete(file)
 
@@ -335,8 +333,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     # keep files if selected in the dialog
                     if getattr(field_values, 'action', None) == 'keep':
                         original = (entry.values or {}).get(field.id, {})
-                        updated[field.id] = original
-                        continue
+                        if original:
+                            updated[field.id] = original
+                            continue
+                        # new entry: no stored file yet, fall through to
+                        # create it from the resent upload below
 
                     # delete files if selected in the dialog
                     if getattr(field_values, 'action', None) == 'delete':
@@ -349,16 +350,10 @@ class Directory(Base, ContentMixin, TimestampMixin,
                         continue
 
                     # create a new file
-                    new_file = DirectoryFile(
-                        id=random_token(),
-                        name=field_values.filename,
-                        note=field.id,
-                        reference=as_fileintent(
-                            content=field_values.file,
-                            filename=field_values.filename
-                        )
+                    new_file = store_uploaded_file(
+                        DirectoryFile, entry.files, field.id,
+                        field_values.file, field_values.filename
                     )
-                    entry.files.append(new_file)
 
                     # keep a reference to the file in the values
                     updated[field.id] = {
@@ -380,23 +375,22 @@ class Directory(Base, ContentMixin, TimestampMixin,
 
                     # keep files if selected in the dialog
                     if getattr(subfield_values, 'action', None) == 'keep':
-                        if len(old_values) <= old_idx:
-                            # it doesn't exist so we can't keep it
+                        if len(old_values) > old_idx:
+                            original = old_values[old_idx]
+                            updated[field.id].append(original)
+                            # update the file.note so it points to the correct
+                            # index in the list if necessary
+                            file_id = original['data'].lstrip('@')
+                            for file in entry.files:
+                                if file.id == file_id:
+                                    new_key = f'{field.id}:{new_idx}'
+                                    if file.note != new_key:
+                                        file.note = new_key
+                                    break
+                            new_idx += 1
                             continue
-
-                        original = old_values[old_idx]
-                        updated[field.id].append(original)
-                        # update the file.note so it points to the correct
-                        # index in the list if necessary
-                        file_id = original['data'].lstrip('@')
-                        for file in entry.files:
-                            if file.id == file_id:
-                                new_key = f'{field.id}:{new_idx}'
-                                if file.note != new_key:
-                                    file.note = new_key
-                                break
-                        new_idx += 1
-                        continue
+                        # new entry / added file: no stored file yet, fall
+                        # through to create it from the resent upload below
 
                     # delete files if selected in the dialog
                     if getattr(subfield_values, 'action', None) == 'delete':
@@ -407,16 +401,10 @@ class Directory(Base, ContentMixin, TimestampMixin,
                         continue
 
                     # create a new file
-                    new_file = DirectoryFile(
-                        id=random_token(),
-                        name=subfield_values.filename,
-                        note=f'{field.id}:{new_idx}',
-                        reference=as_fileintent(
-                            content=subfield_values.file,
-                            filename=subfield_values.filename
-                        )
+                    new_file = store_uploaded_file(
+                        DirectoryFile, entry.files, f'{field.id}:{new_idx}',
+                        subfield_values.file, subfield_values.filename
                     )
-                    entry.files.append(new_file)
 
                     # keep a reference to the file in the values
                     updated[field.id].append({
