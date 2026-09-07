@@ -77,6 +77,12 @@ def test_resource_recipient_delivery_times(client: Client) -> None:
     page: ExtendedResponse = client.get('/resource-recipients/new-recipient')
     assert '06:00' in page
 
+    # the tags-input field must opt into keeping ':' (data-allow-chars),
+    field = page.pyquery('input[name="daily_reservations_times"]')
+    assert ':' in (field.attr('data-allow-chars') or '')
+    # and the tags-input asset must be loaded so it renders as chips
+    assert 'tags-input' in page
+
     # create with two delivery times
     page.form['name'] = 'User A'
     page.form['address'] = 'user@example.org'

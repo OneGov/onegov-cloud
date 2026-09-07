@@ -398,6 +398,14 @@ class TagsWidget(TextInput):
     input_type = 'tags'
 
 
+class DeliveryTimesWidget(TagsWidget):
+    # tags widget that opts into keeping ':' so HH:MM times survive the
+    # client-side sanitation of tags-input.js (see data-allow-chars there)
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        kwargs.setdefault('data-allow-chars', ':')
+        return super().__call__(field, **kwargs)
+
+
 class IconWidget(TextInput):
 
     iconfont = 'FontAwesome'
