@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from functools import cached_property
 from sqlalchemy import func, or_, cast, String
-from sqlalchemy.orm import QueryableAttribute
 
 from onegov.core.templates import render_macro
 from onegov.user import User, UserCollection
@@ -51,10 +50,8 @@ class InlineUserSearch:
 
         for word in self.term.split():
             query = query.filter(or_(*(
-                func.lower(cast(getattr(User, prop), String)).contains(
-                    word.lower())
-                for prop in User.fts_properties
-                if isinstance(getattr(User, prop, None), QueryableAttribute)
+                func.lower(cast(column, String)).contains(word.lower())
+                for column in (User.username, User.realname)
             )))
 
         return query
