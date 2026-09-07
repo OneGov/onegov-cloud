@@ -205,12 +205,12 @@ class BaseAdapter(ABC):
         yield list[t]  # type: ignore[valid-type]
 
         is_dependent = hasattr(field, 'depends_on')
-        min_length = getattr(field, 'min_entries', 0)
-        if not is_dependent and (min_length > 0 or any(
+        upload_required = getattr(field, 'upload_required', False)
+        if not is_dependent and (upload_required or any(
             isinstance(validator, (InputRequired, DataRequired))
             for validator in field.validators
         )):
-            yield Field(min_length=min_length or 1)
+            yield Field(min_length=1)
             return
 
         if default := field.data:
@@ -218,9 +218,8 @@ class BaseAdapter(ABC):
         else:
             yield Field(default_factory=list)
 
-        if (
-            is_dependent
-            and ((validators := field.validators) or (
+        if is_dependent and (upload_required or (
+            ((validators := field.validators) or (
                 hasattr(field, 'unbound_field')
                 and (validators := field.unbound_field.kwargs.get(
                     'validators'
@@ -231,13 +230,10 @@ class BaseAdapter(ABC):
                 isinstance(validator, (InputRequired, DataRequired))
                 for validator in validators[0].validators
             )
-        ):
+        )):
             # we use this marker in the model validator to detect
             # fields that become dependent when their dependency
             # is fulfilled
-            # TODO: Should we validate min_lengths > 1? Currently
-            #       there's no use-case for this, required always
-            #       means at least 1 entry, never more
             yield REQUIRED_DEPENDENT
 
     def adapt_validators(
