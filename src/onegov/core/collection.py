@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from abc import abstractmethod
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
+    from sqlalchemy.sql.base import ExecutableOption
     from sqlalchemy.orm import DeclarativeBase, Query, Session
     from typing import Protocol
     from typing import Self
@@ -321,6 +322,25 @@ class Pagination[M: DeclarativeBase]:
         if self.page + 1 < self.pages_count:
             return self.page_by_index(self.page + 1)
         return None
+
+
+class ApiBatchEagerLoad[M: DeclarativeBase](Pagination[M]):
+    """ Pagination mixin that eager-loads per-item data on the batch only.
+
+    Subclasses declare the loader options in ``batch_eager_options``; they
+    apply to the rendered page, not to the count/facet queries, which avoids
+    N+1 queries when every item is serialized (e.g. the API).
+
+    """
+
+    def batch_eager_options(self) -> tuple[ExecutableOption, ...]:
+        return ()
+
+    def transform_batch_query(self, query: Query[M]) -> Query[M]:
+        query = super().transform_batch_query(query)
+        if options := self.batch_eager_options():
+            query = query.options(*options)
+        return query
 
 
 class RangedPagination[M: DeclarativeBase]:
