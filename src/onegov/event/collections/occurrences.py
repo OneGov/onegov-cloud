@@ -663,9 +663,9 @@ class OccurrenceCollection(Pagination[Occurrence]):
             .join(Event)
             .options(
                 event.joinedload(Event.image),
-                event.undefer(Event.content)
+                event.undefer(Event.content),
+                undefer(Occurrence.content),
             )
-            .options(undefer(Occurrence.content))
         )
 
         if self.term:
