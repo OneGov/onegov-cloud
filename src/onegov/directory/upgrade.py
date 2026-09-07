@@ -9,7 +9,9 @@ from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.directory import Directory
 from onegov.directory.models import DirectoryEntry
-from sqlalchemy import Column, Integer, Text, text
+from onegov.form.parser import ParsedForm
+from onegov.form.orm_types import Formcode
+from sqlalchemy import Column, Integer, Text, UUID, bindparam, text
 from sqlalchemy.orm import joinedload
 
 
@@ -121,3 +123,43 @@ def calc_content_hash_for_directory_entries(context: UpgradeContext) -> None:
             {'hash': entry.content_hash, 'id': entry.id}
         )
         context.session.expire(entry)
+
+
+@upgrade_task('Switch to JSON serialized form structure')
+def directories_switch_to_parsed_form(context: UpgradeContext) -> None:
+    if not context.has_table('directories'):
+        return
+
+    # no migration needed, the old column is already gone
+    if not context.has_column('directories', 'structure'):
+        return
+
+    # first add the new column, but make it nullable
+    context.operations.add_column(
+        'directories',
+        Column('parsed_structure', Formcode, nullable=True)
+    )
+
+    # bulk update the table with the parsed definitions
+    if values := [
+        {
+            'id': directory_id,
+            'parsed': ParsedForm.from_formcode(definition),
+        }
+        for directory_id, definition in context.session.execute(text(
+            'SELECT id, structure FROM directories'
+        ))
+    ]:
+        context.session.execute(text("""
+            UPDATE directories
+               SET parsed_structure = :parsed
+             WHERE id = :id
+        """).bindparams(
+            bindparam('id', type_=UUID),
+            bindparam('parsed', type_=Formcode)
+        ), values)
+
+    # finally make the column not nullable and remove the old column
+    context.operations.alter_column(
+        'directories', 'parsed_structure', nullable=False)
+    context.operations.drop_column('directories', 'structure')

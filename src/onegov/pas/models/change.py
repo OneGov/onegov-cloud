@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
@@ -104,7 +105,7 @@ class Change(Base, ContentMixin, TimestampMixin):
         return None
 
     #: The changes
-    changes: dict_property[dict[str, str | int | None] | None] = (
+    changes: dict_property[dict[str, Decimal | str | int | None] | None] = (
         content_property()
     )
 

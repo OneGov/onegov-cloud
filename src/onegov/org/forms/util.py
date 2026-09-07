@@ -25,3 +25,10 @@ TIMESPANS = (
 )
 
 KABA_CODE_RE = re.compile(r'^[0-9]{4,6}$')
+
+PRICING_METHODS = (
+    ('free', _('Free of charge')),
+    ('per_item', _('Per item')),
+    ('per_hour', _('Per hour')),
+    ('pricing_scheme', _('Custom pricing scheme'))
+)

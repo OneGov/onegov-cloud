@@ -346,17 +346,25 @@ def complete_url(url: str | None) -> str | None:
 
 class ReservationInfo:
 
-    __slots__ = ('resource', 'reservation', 'request', 'translate')
+    __slots__ = (
+        'resource',
+        'reservation',
+        'submission_data',
+        'request',
+        'translate'
+    )
 
     def __init__(
         self,
         resource: Resource,
         reservation: Reservation,
+        submission_data: dict[str, Any] | None,
         request: OrgRequest
     ) -> None:
 
         self.resource = resource
         self.reservation = reservation
+        self.submission_data = submission_data
         self.request = request
         self.translate = request.translate
 
@@ -417,7 +425,10 @@ class ReservationInfo:
 
     @property
     def price(self) -> PriceDict | None:
-        price = self.reservation.price(self.resource)
+        price = self.reservation.price(
+            self.resource,
+            submission_data=self.submission_data
+        )
         return price.as_dict() if price else None
 
     def as_dict(self) -> dict[str, Any]:
@@ -1940,9 +1951,7 @@ def get_current_tickets_url(request: OrgRequest) -> str:
 
 
 def invoice_items_for_submission(
-    request: CoreRequest,
-    form: Form,
-    submission: FormSubmission
+    request: CoreRequest, form: Form, submission: FormSubmission
 ) -> list[InvoiceItemMeta]:
 
     # NOTE: Eventually we may need something more sophisticated
@@ -1952,8 +1961,16 @@ def invoice_items_for_submission(
         and org.vat_rate
     ) else None
     extra = {'submission_id': submission.id}
-    items = form.invoice_items(extra=extra, vat_rate=vat_rate)
-    discounts = form.discount_items(extra=extra, vat_rate=vat_rate)
+    items = form.invoice_items(
+        cost_object=submission.cost_object,
+        extra=extra,
+        vat_rate=vat_rate
+    )
+    discounts = form.discount_items(
+        cost_object=submission.cost_object,
+        extra=extra,
+        vat_rate=vat_rate
+    )
 
     # for backwards compatibility we still support a raw price
     # instead of a more complete invoice item
@@ -1966,6 +1983,7 @@ def invoice_items_for_submission(
             group='submission',
             unit=price.amount,
             vat_rate=vat_rate,
+            cost_object=submission.cost_object,
         ))
 
     total = InvoiceItemMeta.total(items)
@@ -2015,6 +2033,8 @@ def group_invoice_items[T: InvoiceItem | InvoiceItemMeta](
                 return 1, item.group
             case 'manual' | 'reduced_amount':
                 return 99, 'manual'
+            case 'rounding':
+                return 100, item.group
             case _:
                 return 2, item.group
 

@@ -16,7 +16,14 @@ if TYPE_CHECKING:
 
 def test_people_view(client: Client) -> None:
     client.login_admin()
-    settings = client.get('/people-settings')
+
+    # the edit bar link returns here after saving
+    people = client.get('/people')
+    settings_link = people.pyquery('.edit-bar a.settings-link').attr('href')
+    assert settings_link is not None
+    assert 'return-to=' in settings_link
+
+    settings = client.get(settings_link)
     settings.form['hidden_people_fields'] = ['academic_title', 'profession']
     settings.form['organisation_hierarchy'] = """
     - Organisation 1:
@@ -36,13 +43,19 @@ def test_people_view(client: Client) -> None:
       - Sub-Organisation 2.1
       - Sub-Organisation 2.2
     """
-    settings.form.submit()
+    saved = settings.form.submit()
+    assert saved.headers['Location'].endswith('/people')
     client.logout()
 
     client.login_editor()
 
     people = client.get('/people')
     assert people.status_int == 200
+
+    # settings are admin-only, so editors get no link
+    assert not people.pyquery('a.settings-link')
+    assert client.get(
+        '/people-settings', expect_errors=True).status_code == 403
 
     new_person = people.click('Person', index=1)
     new_person.form['academic_title'] = 'Dr.'
@@ -92,6 +105,27 @@ def test_people_view(client: Client) -> None:
 
     people = client.get('/people')
     assert 'Noch keine Personen erfasst' in people
+
+
+def test_people_settings_return_to(client: Client) -> None:
+    client.login_admin()
+
+    # opening the settings from the people overview remembers the origin,
+    # so both the cancel link and a successful save return to the overview
+    people = client.get('/people')
+    settings = client.get(people.pyquery('a.settings-link').attr('href'))
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/people')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/people')
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/people-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')
 
 
 def test_with_people(client: Client) -> None:

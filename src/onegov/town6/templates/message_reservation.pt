@@ -29,6 +29,19 @@
                         <tal:b i18n:name="count">${count}</tal:b> reservations added.
                     </tal:b>
                 </tal:b>
+                <tal:b tal:case="'cancellation_requested'">
+                    <tal:b tal:condition="count == 1" i18n:translate>
+                        Cancellation requested for 1 reservation.
+                    </tal:b>
+                    <tal:b tal:condition="count > 1" i18n:translate>
+                        Cancellation requested for <tal:b i18n:name="count">${count}</tal:b> reservations.
+                    </tal:b>
+                </tal:b>
+                <tal:b tal:case="'cancellation_accepted'">
+                    <tal:b i18n:translate>
+                        Cancellation accepted.
+                    </tal:b>
+                </tal:b>
             </tal:b>
         </metal:b>
     </metal:b>

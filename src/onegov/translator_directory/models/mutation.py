@@ -115,15 +115,15 @@ class TranslatorMutation:
 
     @cached_property
     def translations(self) -> dict[str, Mapping[Any, str]]:
-        LANGUAGES = {  # noqa: N806
+        LANGUAGES = {  # ruff:ignore[non-lowercase-variable-in-function]
             str(language.id): language.name
             for language in self.language_collection.query()
         }
-        CERTIFICATES = {  # noqa: N806
+        CERTIFICATES = {  # ruff:ignore[non-lowercase-variable-in-function]
             str(cert.id): cert.name
             for cert in self.certificate_collection.query()
         }
-        BOOLS = {True: _('Yes'), False: _('No')}  # noqa: N806
+        BOOLS = {True: _('Yes'), False: _('No')}  # ruff:ignore[non-lowercase-variable-in-function]
 
         return {
             'admission': ADMISSIONS,

@@ -5,7 +5,7 @@ from onegov.translator_directory.models.certificate import LanguageCertificate
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class LanguageCertificateCollection(

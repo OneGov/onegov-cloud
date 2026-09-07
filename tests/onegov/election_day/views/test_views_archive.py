@@ -3,7 +3,9 @@ from __future__ import annotations
 import transaction
 import pytest
 
+from datetime import date
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from tests.onegov.election_day.common import login, upload_complex_vote
 from webtest import TestApp as Client
@@ -60,6 +62,13 @@ def test_view_archive_no_results(election_day_app_zg: TestApp) -> None:
     assert "Abstimmung 1. Januar 2013" in archive
     assert "Noch keine Resultate" in archive
     assert "Wahl 1. Januar 2013" in archive
+
+    # no municipal results exist, so the municipal archive link is hidden
+    assert "Alle kommunalen Wahlen und Abstimmungen" not in archive
+
+    municipal = client.get('/archive/municipal')
+    assert "Es sind noch keine kommunalen Wahlen und Abstimmungen verfügbar." \
+        in municipal
 
     archive = client.get('/archive/2013-02-02')
     assert "noch keine Wahlen oder Abstimmungen" in archive
@@ -219,3 +228,149 @@ def test_download_archive(election_day_app_zg: TestApp) -> None:
     archive = client.get('/').click('Gesamtes Archiv herunterladen')
     assert archive.headers['Content-Type'] == 'application/zip'
     assert len(archive.body)
+
+
+def _add_municipal_results(app: TestApp) -> None:
+    """Add two municipalities (Au, Wil) with results across two years."""
+    session = app.session()
+    for domain_segment, title, result_date, result_type in (
+        ('au', 'Au Abstimmung 2025', date(2025, 5, 18), 'vote'),
+        ('au', 'Au Wahl 2024', date(2024, 3, 3), 'election'),
+        ('wil', 'Wil Abstimmung 2025', date(2025, 5, 18), 'vote'),
+    ):
+        session.add(ArchivedResult(
+            date=result_date,
+            type=result_type,
+            domain='municipality',
+            name=domain_segment,
+            url=f'https://example.com/{result_type}/{domain_segment}',
+            title_translations={'de_CH': title},
+            meta={'domain_segment': domain_segment},
+            schema='other-instance',
+        ))
+    transaction.commit()
+
+
+def test_view_archive_all_municipal(election_day_app_sg: TestApp) -> None:
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    # link to communal results does not exist
+    main = client.get('/')
+    assert 'Alle kommunalen Wahlen und Abstimmungen' not in main
+
+    _add_municipal_results(election_day_app_sg)
+
+    page = client.get('/archive/municipal')
+    assert 'Kommunale Wahlen und Abstimmungen nach Gemeinde' in page
+
+    # year-specific URL when results exist; au has 2024 + 2025 so latest
+    # is 2025
+    assert '/municipality/au/2025' in page
+    assert '/municipality/wil/2025' in page
+
+    # slug resolved to proper display name
+    assert 'Au (SG)' in page
+    assert 'Wil (SG)' in page
+
+    # municipality with no results is not listed at all
+    assert '/municipality/rorschach' not in page
+
+    # only links shown, no inline result titles
+    assert 'Au Abstimmung 2025' not in page
+    assert 'Au Wahl 2024' not in page
+
+    # link to communal results exists
+    main = client.get('/')
+    assert 'Alle kommunalen Wahlen und Abstimmungen' in main
+
+
+def test_view_archive_all_municipal_link_hidden_for_cantonal_vote(
+    election_day_app_sg: TestApp
+) -> None:
+    # a cantonal/national vote is not a communal vote, so it must not surface
+    # the all-municipal link even though its results are in the archive
+    session = election_day_app_sg.session()
+    session.add(ArchivedResult(
+        date=date(2025, 5, 18),
+        type='vote',
+        domain='canton',
+        name='kantonal',
+        url='https://example.com/vote/kantonal',
+        title_translations={'de_CH': 'Kantonale Abstimmung'},
+        meta={'id': 'kantonal'},
+        schema=election_day_app_sg.schema,
+    ))
+    transaction.commit()
+
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    # the cantonal vote is shown, but there is no all-municipal link ...
+    archive = client.get('/archive/2025-05-18')
+    assert 'Kantonale Abstimmung' in archive
+    assert 'Alle kommunalen Wahlen und Abstimmungen' not in archive
+
+    # ... and the all-municipal page shows the empty state
+    page = client.get('/archive/municipal')
+    assert 'Es sind noch keine kommunalen Wahlen und Abstimmungen verfügbar.' \
+        in page
+
+
+def test_view_archive_municipal_by_date(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/archive/2025-05-18/municipal')
+    assert 'Au' in page
+    assert 'Wil' in page
+    assert '/municipality/au/2025' in page
+    assert '/municipality/wil/2025' in page
+    assert '/municipality/au"' not in page
+    assert '/municipality/wil"' not in page
+    assert 'Au Wahl 2024' not in page
+
+
+def test_view_archive_municipality(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/municipality/au')
+    assert 'Au Abstimmung 2025' in page
+    assert 'Au Wahl 2024' in page
+    # Wil's item isn't shown
+    assert 'Wil Abstimmung 2025' not in page
+    # Year archive footer: both years present as links
+    assert '/municipality/au/2025' in page
+    assert '/municipality/au/2024' in page
+    # "All" shown as plain text (no year filter active)
+    assert 'href="/municipality/au"' not in page
+
+
+def test_view_archive_municipality_year(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/municipality/au/2025')
+    assert 'Au Abstimmung 2025' in page
+    # 2024 item filtered out
+    assert 'Au Wahl 2024' not in page
+    # "All" shown as a link back to /municipality/au
+    assert '/municipality/au"' in page
+    # 2024 year link present; 2025 shown as plain text (current)
+    assert '/municipality/au/2024' in page
+    assert 'href="/municipality/au/2025"' not in page
+
+
+def test_view_municipality_redirect(election_day_app_sg: TestApp) -> None:
+    _add_municipal_results(election_day_app_sg)
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    response = client.get('/gemeinde/au')
+    assert response.status_int == 302
+    assert response.location is not None
+    assert response.location.endswith('/municipality/au')

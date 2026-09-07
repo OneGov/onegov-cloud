@@ -1,20 +1,33 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from dectate import Action
+from dectate import Composite
 from itertools import count
+from onegov.core.directives import HtmlHandleFormAction
 
 from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from _typeshed import StrOrBytesPath
     from collections.abc import Callable
+    from collections.abc import Iterator
     from onegov.core.elements import LinkGroup
     from onegov.directory.models import DirectoryEntry
     from onegov.event.models import Occurrence
+    from onegov.form import Form
     from onegov.org.models import Boardlet as _Boardlet
     from onegov.org.request import OrgRequest
     from onegov.user import User
     from sqlalchemy.orm import Query
     from typing import Protocol, TypedDict
+    from webob import Response
+
+    type FormFactory = type[Form] | Callable[..., type[Form]]
+    type SettingViewRegistry = dict[
+        tuple[type, str],
+        SettingViewMeta,
+    ]
 
     type DirectorySearchWidgetRegistry = dict[
         str,
@@ -72,6 +85,140 @@ if TYPE_CHECKING:
         cls: type[_Boardlet]
         order: tuple[int, int]
         icon: str
+
+
+@dataclass(frozen=True)
+class SettingViewMeta:
+    model: type
+    name: str
+    form: FormFactory
+    setting: str
+    icon: str
+    order: int
+    category: str | None
+
+
+class SettingViewMetaAction(Action):
+    config = {
+        'setting_view_registry': dict,
+    }
+
+    def __init__(
+        self,
+        model: type,
+        name: str,
+        form: FormFactory,
+        setting: str | None,
+        icon: str | None,
+        order: int,
+        category: str | None,
+    ) -> None:
+        self.model = model
+        self.name = name
+        self.form = form
+        self.setting = setting
+        self.icon = icon
+        self.order = order
+        self.category = category
+
+    def identifier(  # type:ignore[override]
+        self,
+        setting_view_registry: SettingViewRegistry,
+    ) -> tuple[type, str]:
+        return self.model, self.name
+
+    def perform(  # type:ignore[override]
+        self,
+        obj: Callable[..., Any],
+        setting_view_registry: SettingViewRegistry,
+    ) -> None:
+        key = self.model, self.name
+        if self.setting is None or self.icon is None:
+            setting_view_registry.pop(key, None)
+            return
+
+        setting_view_registry[key] = SettingViewMeta(
+            model=self.model,
+            name=self.name,
+            form=self.form,
+            setting=self.setting,
+            icon=self.icon,
+            order=self.order,
+            category=self.category,
+        )
+
+
+class SettingViewAction(Composite):
+    query_classes = [HtmlHandleFormAction, SettingViewMetaAction]
+
+    def __init__(
+        self,
+        model: type,
+        name: str,
+        form: FormFactory,
+        setting: str | None = None,
+        icon: str | None = None,
+        order: int = 0,
+        category: str | None = None,
+        listed: bool = True,
+        render: Callable[..., Response] | str | None = None,
+        template: StrOrBytesPath | None = None,
+        load: Callable[..., Any] | str | None = None,
+        permission: object | str | None = None,
+        internal: bool = False,
+        pass_model: bool = False,
+        **predicates: Any,
+    ) -> None:
+        if listed and (setting is None or icon is None):
+            raise TypeError(
+                'Listed setting views require setting and icon metadata'
+            )
+        if not listed and (setting is not None or icon is not None):
+            raise TypeError(
+                'Unlisted setting views cannot define setting or icon'
+            )
+
+        self.model = model
+        self.name = name
+        self.form = form
+        self.setting = setting
+        self.icon = icon
+        self.order = order
+        self.category = category
+        self.listed = listed
+        self.render = render
+        self.template = template
+        self.load = load
+        self.permission = permission
+        self.internal = internal
+        self.pass_model = pass_model
+        self.predicates = predicates
+
+    def actions(
+        self,
+        obj: Callable[..., Any],
+    ) -> Iterator[tuple[Action, Callable[..., Any]]]:
+        yield HtmlHandleFormAction(
+            model=self.model,
+            form=self.form,
+            render=self.render,
+            template=self.template,
+            load=self.load,
+            permission=self.permission,
+            internal=self.internal,
+            pass_model=self.pass_model,
+            name=self.name,
+            **self.predicates,
+        ), obj
+        yield SettingViewMetaAction(
+            model=self.model,
+            name=self.name,
+            form=self.form,
+            setting=self.setting if self.listed else None,
+            icon=self.icon if self.listed else None,
+            order=self.order,
+            category=self.category,
+        ), obj
 
 
 class HomepageWidgetAction(Action):

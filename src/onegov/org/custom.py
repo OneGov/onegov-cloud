@@ -135,6 +135,15 @@ def get_modules(request: OrgRequest) -> LinkGroup:
             )
         )
 
+        links.append(
+            Link(
+                _('Information architecture'),
+                request.class_link(
+                    Organisation, name='information-architecture'),
+                attrs={'class': 'information-architecture'}
+            )
+        )
+
     return LinkGroup(_('Modules'), classes=('modules', ), links=links)
 
 

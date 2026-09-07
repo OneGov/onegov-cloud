@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
     from typing import Self
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 order_cols = (

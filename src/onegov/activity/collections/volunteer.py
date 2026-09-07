@@ -38,10 +38,12 @@ if TYPE_CHECKING:
         zip_code: str
         place: str
         organisation: str | None
-        birth_date: date
+        birth_date: date | None
         age: int
         email: str
         phone: str
+        transport: str
+        note: str
         state: VolunteerState
         dates: Sequence[datetime]
 
@@ -68,6 +70,8 @@ if TYPE_CHECKING:
         age: None
         email: None
         phone: None
+        transport: None
+        note: None
         state: None
         dates: Sequence[datetime]
 
@@ -79,10 +83,14 @@ class VolunteerCollection(GenericCollection[Volunteer, 'UUID']):
     def __init__(
         self,
         session: Session,
-        period: BookingPeriod | BookingPeriodMeta | None
+        period: BookingPeriod | BookingPeriodMeta | None,
+        volunteer_state: VolunteerState | None = None,
+        need_state: str | None = None
     ) -> None:
         super().__init__(session)
         self.period = period
+        self.volunteer_state = volunteer_state
+        self.need_state = need_state
 
     @property
     def model_class(self) -> type[Volunteer]:
@@ -98,6 +106,12 @@ class VolunteerCollection(GenericCollection[Volunteer, 'UUID']):
 
         query = select(*stmt.c).where(stmt.c.period_id == self.period_id)
 
+        if self.volunteer_state is not None:
+            query = query.where(stmt.c.state == self.volunteer_state)
+
+        if self.need_state is not None:
+            query = query.where(stmt.c.need_state == self.need_state)
+
         return self.session.execute(query)
 
     def for_period(
@@ -105,3 +119,16 @@ class VolunteerCollection(GenericCollection[Volunteer, 'UUID']):
         period: BookingPeriod | BookingPeriodMeta | None
     ) -> Self:
         return self.__class__(self.session, period)
+
+    def for_status(
+        self,
+        period: BookingPeriod | BookingPeriodMeta | None,
+        volunteer_state: VolunteerState | None,
+        need_state: str | None
+    ) -> Self:
+        return self.__class__(
+            self.session,
+            period,
+            volunteer_state=volunteer_state,
+            need_state=need_state
+        )

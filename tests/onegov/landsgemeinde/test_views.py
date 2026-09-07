@@ -406,3 +406,39 @@ def test_views_assembly_ticker_sorted_vota(client: Client[TestApp]) -> None:
     assert text.index('Bob') < text.index('Alice')
     # within item 2: Dave (votum 2) before Charlie (votum 1)
     assert text.index('Dave') < text.index('Charlie')
+
+
+def test_votum_edit_cancel_returns_to_origin(
+    client: Client[TestApp], assembly: Assembly
+) -> None:
+    session = client.app.session()
+    session.add(assembly)
+    commit()
+
+    client.login_admin()
+
+    # the states page links to the votum edit with a return-to back to itself,
+    # so cancelling the edit returns to the states page (not history.back)
+    states = client.get('/assembly/2023-05-07/states')
+    origin = states.request.url
+
+    votum_edit = states.pyquery('li.votum a[href]')[0].attrib['href']
+    edit = client.get(votum_edit)
+    assert edit.pyquery('a.cancel-link').attr('href') == origin
+
+
+def test_agenda_item_edit_cancel_returns_to_origin(
+    client: Client[TestApp], assembly: Assembly
+) -> None:
+    session = client.app.session()
+    session.add(assembly)
+    commit()
+
+    client.login_admin()
+
+    states = client.get('/assembly/2023-05-07/states')
+    origin = states.request.url
+
+    agenda_edit = states.pyquery('li.agenda-item a[href]')[0].attrib['href']
+    edit = client.get(agenda_edit)
+    assert edit.pyquery('a.cancel-link').attr('href') == origin

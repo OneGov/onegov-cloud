@@ -178,6 +178,11 @@ def edit_agenda_item(
     layout = AgendaItemLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.edit_mode = True
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.return_to_url(request.link(self)),
+        attrs={'class': 'cancel-link'}
+    )
 
     return {
         'layout': layout,

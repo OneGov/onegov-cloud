@@ -6,6 +6,7 @@ import transaction
 
 from orjson import loads
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.models.payment_providers import StripeConnect
 from purl import URL
@@ -109,13 +110,18 @@ def test_setup_stripe(client: Client) -> None:
 
 def test_stripe_form_payment(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Donate', definition=textwrap.dedent("""
-        E-Mail *= @@@
+    collection.definitions.add(
+        'Donate',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
 
-        Donation *=
-            (x) Small (10 CHF)
-            ( ) Medium (100 CHF)
-    """), type='custom', payment_method='free')
+            Donation *=
+                (x) Small (10 CHF)
+                ( ) Medium (100 CHF)
+        """)),
+        type='custom',
+        payment_method='free'
+    )
 
     providers = PaymentProviderCollection(client.app.session())
     providers.add(type='stripe_connect', default=True, meta={
@@ -180,13 +186,18 @@ def test_stripe_form_payment(client: Client) -> None:
 
 def test_stripe_charge_fee_to_customer(client: Client) -> None:
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Donate', definition=textwrap.dedent("""
-        E-Mail *= @@@
+    collection.definitions.add(
+        'Donate',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-Mail *= @@@
 
-        Donation *=
-            (x) Small (10 CHF)
-            ( ) Medium (100 CHF)
-    """), type='custom', payment_method='free')
+            Donation *=
+                (x) Small (10 CHF)
+                ( ) Medium (100 CHF)
+        """)),
+        type='custom',
+        payment_method='free'
+    )
 
     providers = PaymentProviderCollection(client.app.session())
     providers.add(type='stripe_connect', default=True, meta={

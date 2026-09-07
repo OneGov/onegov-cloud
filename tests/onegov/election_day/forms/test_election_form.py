@@ -45,8 +45,8 @@ def test_election_form_on_request(session: Session) -> None:
         'federation', 'canton', 'district', 'none', 'municipality'
     ]
     assert form.region.choices == []
-    assert len(form.district.choices) == 18
-    assert len(form.municipality.choices) == 95
+    assert len(form.district.choices) == 8
+    assert len(form.municipality.choices) == 75
     assert form.title_de.validators == []
     assert isinstance(form.title_fr.validators[0], InputRequired)
     assert form.title_it.validators == []
@@ -61,8 +61,8 @@ def test_election_form_on_request(session: Session) -> None:
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
     ]
     assert len(form.region.choices) == 39
-    assert len(form.district.choices) == 15
-    assert len(form.municipality.choices) == 232
+    assert len(form.district.choices) == 11
+    assert len(form.municipality.choices) == 100
     assert form.title_de.validators == []
     assert form.title_fr.validators == []
     assert isinstance(form.title_it.validators[0], InputRequired)

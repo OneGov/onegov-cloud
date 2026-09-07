@@ -9,11 +9,11 @@
                 <tal:b metal:use-macro="layout.macros.period_hints" />
 
                 <div class="hint hint-costs" i18n:translate tal:condition="bills">
-                    The total amount is <strong tal:content="'{:.2f}'.format(model.total)" i18n:name="amount" /> CHF.
+                    The total amount is <strong tal:content="layout.format_number(model.total)" i18n:name="amount" /> CHF.
                 </div>
 
                 <div class="hint hint-outstanding" i18n:translate tal:condition="bills">
-                    The outstanding amount is <strong tal:content="'{:.2f}'.format(model.outstanding)" i18n:name="amount" /> CHF.
+                    The outstanding amount is <strong tal:content="layout.format_number(model.outstanding)" i18n:name="amount" /> CHF.
                 </div>
             </div>
         </div>
@@ -38,10 +38,10 @@
                                 <span class="outstanding">
                                     <tal:b condition="details.outstanding == 0" i18n:translate>Paid</tal:b>
                                     <tal:b condition="details.outstanding > 0" i18n:translate>
-                                        <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
+                                        <tal:b i18n:name="amount" tal:replace="layout.format_number(details.outstanding)" /> unpaid
                                     </tal:b>
                                     <tal:b condition="details.outstanding < 0" i18n:translate>
-                                        <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding * -1)" /> overpaid
+                                        <tal:b i18n:name="amount" tal:replace="layout.format_number(details.outstanding * -1)" /> overpaid
                                     </tal:b>
 
                                     <tal:b tal:define="actions tuple(invoice_links(details))" tal:condition="actions">
@@ -110,7 +110,7 @@
                                                         </i>
                                                     </tal:b>
                                                 </td>
-                                                <td class="amount">${'{:.2f}'.format(item.amount)}</td>
+                                                <td class="amount">${layout.format_number(item.amount)}</td>
                                                 <td class="payment-status" tal:condition="not item.paid">
                                                     <span i18n:translate class="show-for-sr">Unpaid</span>
                                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -137,7 +137,7 @@
                                             <td class="amount">
                                                 <tal:b tal:condition="not details.paid" i18n:translate >amount unpaid</tal:b>
                                                 <tal:b tal:condition="details.paid" i18n:translate >paid</tal:b>
-                                                ${'{:.2f}'.format(details.total)}
+                                                ${layout.format_number(details.total)}
                                             </td>
                                             <td></td>
                                         </tr>

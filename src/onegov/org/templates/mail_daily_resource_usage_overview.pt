@@ -37,7 +37,7 @@
                         </p>
 
                         <tal:b condition="reservation.submission">
-                            <tal:b define="form parse_form(reservation.submission.definition)(data=reservation.submission.data)">
+                            <tal:b define="form reservation.submission.form_obj">
                                 <div tal:repeat="fieldset form.fieldsets" class="fieldset">
                                     <tal:b define="fields fieldset.non_empty_fields" condition="fields">
                                         <p>

@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Self
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class RateSetCollection(GenericCollection[RateSet, 'UUID']):

@@ -11,10 +11,13 @@ from sqlalchemy.orm import backref, relationship, Mapped
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
+    from onegov.parliament.models.commission_membership import MembershipRole
     from onegov.pas.models import Attendence
+    from onegov.pas.models import PASCommissionMembership
     from onegov.pas.models import Party
     from onegov.user import User
     from sqlalchemy.orm import Session
+    from uuid import UUID
 
 
 class PASParliamentarian(Parliamentarian, ORMSearchable):
@@ -57,7 +60,39 @@ class PASParliamentarian(Parliamentarian, ORMSearchable):
     zg_username: Mapped[str | None]
 
     if TYPE_CHECKING:
+        commission_memberships: Mapped[
+            list[PASCommissionMembership]
+        ]  # type: ignore[assignment]
         roles: Mapped[list[PASParliamentarianRole]]  # type: ignore[assignment]
+
+    def commission_memberships_on(
+        self,
+        on_date: date,
+        role: MembershipRole | None = None,
+    ) -> list[PASCommissionMembership]:
+        return [
+            membership
+            for membership in self.commission_memberships
+            if membership.is_active_on(on_date)
+            and (role is None or membership.role == role)
+        ]
+
+    def has_commission_presidency(
+        self,
+        on_date: date,
+        commission_id: UUID | None = None,
+    ) -> bool:
+        """Whether a commission presidency is active on the given date."""
+        return any(
+            (
+                commission_id is None
+                or membership.commission_id == commission_id
+            )
+            for membership in self.commission_memberships_on(
+                on_date=on_date,
+                role='president',
+            )
+        )
 
     def get_party_during_period(
         self, start_date: date, end_date: date, session: Session

@@ -65,6 +65,9 @@ class SearchIndex(Base, UTCPublicationMixin):
     #: Suggestions for search functionality (Searchable::fts_suggestion)
     suggestion: Mapped[list[str] | None] = mapped_column(ARRAY(String))
 
+    #: Rank multiplier for this entry (Searchable::fts_rank_modifier)
+    rank_modifier: Mapped[float] = mapped_column(default=1.0)
+
     #: Postgres full-text search (fts) index (title)
     title_vector: Mapped[str] = mapped_column(TSVECTOR)
 

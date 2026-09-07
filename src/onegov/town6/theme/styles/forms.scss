@@ -110,6 +110,25 @@ form {
         }
     }
 
+    .table-widget {
+        thead th {
+            text-align: center !important;
+        }
+
+        tbody {
+            th[scope="row"] {
+                white-space: nowrap;
+            }
+            td input {
+                margin-bottom: 0 !important;
+
+                &[type="number"] {
+                    text-align: right !important;
+                }
+            }
+        }
+    }
+
     .label-text,
     label > ul label {
         max-width: 90%;

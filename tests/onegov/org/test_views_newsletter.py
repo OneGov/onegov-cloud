@@ -345,6 +345,12 @@ def test_newsletter_subscribers_and_edit_bar(client: Client) -> None:
         assert page.pyquery('a.manage-subscribers')
         assert page.pyquery('a.new-newsletter')
 
+    # settings are admin-only, so editors get no link
+    assert admin.get('/newsletters').pyquery('a.settings-link')
+    assert not editor.get('/newsletters').pyquery('a.settings-link')
+    assert editor.get(
+        '/newsletter-settings', expect_errors=True).status_code == 403
+
     member = client.spawn()
     member.login_member()
     anom = client.spawn()
@@ -356,6 +362,39 @@ def test_newsletter_subscribers_and_edit_bar(client: Client) -> None:
         assert 'Abonnenten' not in page
         assert not page.pyquery('a.manage-subscribers')
         assert not page.pyquery('a.new-newsletter')
+        assert not page.pyquery('a.settings-link')
+
+    # the edit bar link returns here after saving
+    page = admin.get('/newsletters')
+    settings_link = page.pyquery('a.settings-link').attr('href')
+    assert 'return-to=' in settings_link
+
+    saved = admin.get(settings_link).form.submit()
+    assert saved.headers['Location'].endswith('/newsletters')
+
+
+def test_newsletter_settings_return_to(client: Client) -> None:
+    client.login_admin()
+    page = client.get('/module-activation-settings')
+    page.form['show_newsletter'] = True
+    page.form.submit().follow()
+
+    # opening the settings from the newsletter overview remembers the origin,
+    # so both the cancel link and a successful save return to the overview
+    newsletters = client.get('/newsletters')
+    settings = client.get(newsletters.pyquery('a.settings-link').attr('href'))
+
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/newsletters')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/newsletters')
+
+    # opening it directly (no origin) falls back to the settings index
+    settings = client.get('/newsletter-settings')
+    cancel_href = settings.pyquery('a.cancel-link').attr('href')
+    assert cancel_href is not None and cancel_href.endswith('/settings')
+    location = settings.form.submit().location
+    assert location is not None and location.endswith('/settings')
 
 
 def test_newsletter_subscribers_management(client: Client) -> None:
@@ -500,7 +539,7 @@ def test_newsletter_send(client: Client) -> None:
             client.get('/newsletters'))
 
     # send the newsletter
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" not in send
     assert "two@example.org" not in send
@@ -513,7 +552,7 @@ def test_newsletter_send(client: Client) -> None:
     assert "gerade eben" in page
 
     # the send form should now look different
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
     assert "Dieser Newsletter wurde an 2 Abonnenten gesendet." in send
@@ -619,7 +658,7 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     assert "3 Abonnenten registriert" in client.get('/newsletters')
 
     # send the newsletter
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" not in send
     assert "two@example.org" not in send
@@ -634,7 +673,7 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     assert "gerade eben" in page
 
     # the send form should now look different
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
     assert "Dieser Newsletter wurde an 2 Abonnenten gesendet." in send
@@ -660,7 +699,7 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     newsletter = new.form.submit().follow()
 
     # send the newsletter
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" not in send
     assert "two@example.org" not in send
@@ -675,7 +714,7 @@ def test_newsletter_send_with_categories(client: Client) -> None:
     assert "gerade eben" in page
 
     # the send form should now look different
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
     assert "Dieser Newsletter wurde an 3 Abonnenten gesendet." in send
@@ -712,7 +751,7 @@ def test_newsletter_schedule(client: Client) -> None:
 
     transaction.commit()
 
-    send = newsletter.click('Senden')
+    send = newsletter.click('E-Mail Versand planen')
     send.form['send'] = 'specify'
 
     # schedule the newsletter too close to execute

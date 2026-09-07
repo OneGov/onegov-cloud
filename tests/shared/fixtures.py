@@ -13,11 +13,11 @@ import urllib3
 from _pytest.monkeypatch import MonkeyPatch
 from asyncio import run
 from contextlib import suppress
-from fs.tempfs import TempFS
 from functools import lru_cache
 from libres.db.models import ORMBase
 from mirakuru import TCPExecutor
 from onegov.core.crypto import hash_password
+from onegov.core.filestorage import Filestorage
 from onegov.core.orm import Base, SessionManager
 from onegov.websockets.server import main
 from pathlib import Path
@@ -331,8 +331,9 @@ def test_password() -> str:
 
 
 @pytest.fixture(scope="session")
-def long_lived_filestorage() -> TempFS:
-    return TempFS()
+def long_lived_filestorage() -> Iterator[Filestorage]:
+    with tempfile.TemporaryDirectory() as root:
+        yield Filestorage(root)
 
 
 @pytest.fixture(scope="session")
@@ -406,10 +407,15 @@ def browser(playwright_browser: Browser) -> Iterator[ExtendedBrowser]:
 
 @pytest.fixture(scope="function")
 def redis_url(redis_server: RedisExecutor) -> Iterator[str]:
+    import onegov.core.cache.redis as redis_cache
     url = f'redis://{redis_server.host}:{redis_server.port}/0'
     yield url
+    with Redis.from_url(url) as client:
+        client.flushall()
 
-    Redis.from_url(url).flushall()
+    # clear the cached connection pools, so they can be gc'd
+    redis_cache.get_pool.cache_clear()
+    redis_cache.get.cache_clear()
 
 
 @pytest.fixture(scope="session")

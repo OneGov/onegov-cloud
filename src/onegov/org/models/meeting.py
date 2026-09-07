@@ -38,6 +38,7 @@ class Meeting(
 
     fts_type_title = _('Meetings')
     fts_public = True
+    fts_rank_modifier = 0.1
     fts_title_property = 'display_name'
     fts_properties = {
         'title_text': {'type': 'text', 'weight': 'A'},
@@ -139,7 +140,7 @@ class MeetingCollection(GenericCollection[Meeting, UUID]):
     def query(self) -> Query[Meeting]:
         query = super().query()
 
-        Meeting = self.model_class  # noqa: N806
+        Meeting = self.model_class  # ruff:ignore[non-lowercase-variable-in-function]
         if self.past is not None:
             if self.past:
                 query = query.filter(Meeting.start_datetime < utcnow())

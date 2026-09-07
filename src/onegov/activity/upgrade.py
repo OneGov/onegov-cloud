@@ -394,7 +394,7 @@ def add_invoice_references(context: UpgradeContext) -> None:
         return
 
     # legacy functions obsolete after this migration
-    CODE_TO_ESR_MAPPING = {  # noqa: N806
+    CODE_TO_ESR_MAPPING = {  # ruff:ignore[non-lowercase-variable-in-function]
         character: '{:02d}'.format(value) for value, character in chain(
             enumerate(string.digits, start=1),
             enumerate(string.ascii_lowercase, start=11)
@@ -997,3 +997,57 @@ def add_indexes_to_speed_up_activity_filters(context: UpgradeContext) -> None:
             ['occasion_id'],
             if_not_exists=True
         )
+
+
+@upgrade_task('Add cancelled state to volunteer_state enum')
+def add_cancelled_state_to_volunteer_state(context: UpgradeContext) -> None:
+    if not context.has_enum('volunteer_state'):
+        return
+
+    new_type = Enum(
+        'open',
+        'contacted',
+        'confirmed',
+        'cancelled',
+        name='volunteer_state'
+    )
+
+    op = context.operations
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state TYPE Text;
+        DROP TYPE volunteer_state;
+    """))
+
+    new_type.create(op.get_bind())
+
+    op.execute(text("""
+        ALTER TABLE volunteers ALTER COLUMN state
+        TYPE volunteer_state USING state::text::volunteer_state;
+    """))
+
+
+@upgrade_task('Add transport and note to volunteer')
+def add_transport_and_note_to_volunteer(context: UpgradeContext) -> None:
+    context.operations.add_column(
+        'volunteers',
+        Column('transport', Text, nullable=True)
+    )
+    context.operations.add_column(
+        'volunteers',
+        Column('note', Text, nullable=True)
+    )
+
+
+@upgrade_task('Reset stale cancelled volunteer states')
+def reset_stale_cancelled_volunteer_states(context: UpgradeContext) -> None:
+    # The reverted "Volunteer Ticket" feature left behind volunteers with a
+    # 'canceled' state that is no longer part of the volunteer_state enum,
+    # causing a LookupError when loading them on the demo instance. Reset
+    # them to 'open'. Compare on ::text since most schemas never gained the
+    # 'canceled' enum label.
+    if context.has_table('volunteers'):
+        context.session.execute(text(
+            "UPDATE volunteers SET state = 'open' "
+            "WHERE state::text = 'cancelled'"
+        ))

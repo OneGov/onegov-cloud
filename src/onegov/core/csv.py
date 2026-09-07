@@ -167,7 +167,7 @@ class CSVFile[RowT = DefaultRow]:
             rownumber can't be used as a header
         """
 
-        self.rowtype = rowtype or namedtuple(  # type:ignore  # noqa: PYI024
+        self.rowtype = rowtype or namedtuple(  # type:ignore  # ruff:ignore[collections-named-tuple]
             'CSVFileRow', ['rownumber', *(
                 self.as_valid_identifier(k)
                 for k in self.headers.keys()

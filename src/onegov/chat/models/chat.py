@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import JSONArray
 from onegov.user import User
 from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from uuid import uuid4, UUID
 
@@ -42,6 +41,6 @@ class Chat(Base, TimestampMixin):
     topic: Mapped[str]
     active: Mapped[bool] = mapped_column(default=True)
     chat_history: Mapped[list[dict[str, Any]]] = mapped_column(
-        MutableList.as_mutable(JSONB),
+        JSONArray,
         default=list
     )

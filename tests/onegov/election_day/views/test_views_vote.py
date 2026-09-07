@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from freezegun import freeze_time
+from onegov.core.utils import module_path
+from tests.onegov.election_day.common import import_ech_from_file
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_complex_vote
 from tests.onegov.election_day.common import upload_vote
 from webtest import TestApp as Client
+from webtest import Upload
 
 
 from typing import TYPE_CHECKING
@@ -233,3 +236,86 @@ def test_views_vote_embedded_widgets(election_day_app_zg: TestApp) -> None:
         'vote-header-widget',
     ):
         client.get(f'/vote/complex-vote/{url}').maybe_follow()
+
+
+def test_views_vote_municipal_and_municipality(
+    election_day_app_sg: TestApp
+) -> None:
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+    import_ech_from_file(
+        client,
+        module_path(
+            'tests.onegov.election_day',
+            'fixtures/multiple/sg/vote-result-delivery_20250518.xml'
+        )
+    )
+
+    page = client.get('/')
+
+    assert 'Urnengang vom 18. Mai 2025' in page
+    assert 'Kantonale Abstimmungen' in page
+    assert 'Finanzausgleichsgesetz' in page
+    assert 'Kommunale Wahlen und Abstimmungen' in page
+    assert 'Zu den kommunalen Wahl- und Abstimmungsergebnissen' in page
+    assert '/archive/2025-05-18/municipal' in page
+
+    # verify municipal results
+    municipal_page = page.click(
+        'Zu den kommunalen Wahl- und Abstimmungsergebnissen')
+    assert 'Urnengang vom 18. Mai 2025' in page
+    assert 'Kommunale Wahlen und Abstimmungen' in page
+    for municipality in (
+        'Au', 'Balgach', 'Gaiserwald', 'Gossau', 'Mosnang',
+        'Niederhelfenschwil', 'Rheineck', 'St. Gallen',
+        'St. Margrethen', 'Wattwil'
+    ):
+        assert municipality in municipal_page
+
+    # verify municipality detail page
+    balgach_page = municipal_page.click('Balgach', index=0)
+    assert 'Urnengang vom 18. Mai 2025' in balgach_page
+    assert 'Kommunale Wahlen und Abstimmungen' in balgach_page
+    assert 'Balgach' in balgach_page
+    assert 'Abstimmung' in balgach_page
+    t1 = 'betreffend die Hochwasserschutzprojekte «Wolfsbach und'
+    assert t1 in balgach_page
+    assert 'angenommen' in balgach_page
+    assert '74.15' in balgach_page
+    t2 = 'Urnenabstimmung betreffend das Hochwasserschutzprojekt «Dorfbach»'
+    assert t2 in balgach_page
+    assert '75.15' in balgach_page
+    # municipality name must be capitalized in the vote header
+    vote_page = balgach_page.click('Dorfbach').maybe_follow()
+    assert vote_page.status_code == 200
+    assert 'Balgach' in vote_page
+
+
+def test_view_vote_shows_long_title(election_day_app_zg: TestApp) -> None:
+    client = Client(election_day_app_zg)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['title_de'] = 'The Long Title of the Vote'
+    new.form['short_title_de'] = 'Short Title'
+    new.form['date'] = '2022-01-01'
+    new.form['domain'] = 'federation'
+    new.form['type'] = 'simple'
+    new.form.submit().follow()
+
+    csv = (
+        'entity_id,yeas,nays,eligible_voters,empty,invalid,status,type,counted\n'
+        '1701,3049,5111,13828,54,3,final,proposal,true\n'
+    )
+    upload = client.get('/vote/short-title/upload')
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain')
+    upload.form.submit()
+
+    archive = client.get('/archive/2022-01-01')
+    assert 'The Long Title of the Vote' in archive
+    assert 'Short Title' not in archive

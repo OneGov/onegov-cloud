@@ -167,3 +167,57 @@ def test_transaction_integration(postgres_dsn: str, redis_url: str) -> None:
 
     collection = ResourceCollection(app.libres_context)
     assert collection.query().count() == 0
+
+
+def test_orm_cached_flushing(postgres_dsn: str, redis_url: str) -> None:
+    class Base(DeclarativeBase):
+        registry = registry()
+
+    class App(Framework, LibresIntegration):
+        request_cache = {}
+
+    app = App()
+    app.namespace = 'libres'
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=CoreBase,
+        redis_url=redis_url
+    )
+    app.session_manager.bases.append(Base)
+    app.set_application_id('libres/foo')
+
+    session = app.session()
+    collection = ResourceCollection(app.libres_context)
+    resource_1 = collection.add('Test 1', 'Europe/Zurich')
+    resource_2 = collection.add('Test 2', 'Europe/Zurich')
+    resource_3 = collection.add('Test 3', 'Europe/Zurich')
+    session.flush()
+
+    assert app._blocking_resource_id_mapping == {}
+    assert app._ancestor_resource_id_mapping == {}
+
+    resource_3.parents = [resource_1, resource_2]
+    session.flush()
+
+    assert app._blocking_resource_id_mapping == {
+        resource_1.id.hex: frozenset({resource_3.id}),
+        resource_2.id.hex: frozenset({resource_3.id}),
+        resource_3.id.hex: frozenset({resource_1.id, resource_2.id}),
+    }
+    assert app._ancestor_resource_id_mapping == {
+        resource_3.id.hex: tuple(sorted((resource_1.id, resource_2.id)))
+    }
+
+    resource_2.parents = [resource_1]
+    resource_3.parents = [resource_2]
+    session.flush()
+
+    assert app._blocking_resource_id_mapping == {
+        resource_1.id.hex: frozenset({resource_2.id, resource_3.id}),
+        resource_2.id.hex: frozenset({resource_1.id, resource_3.id}),
+        resource_3.id.hex: frozenset({resource_1.id, resource_2.id}),
+    }
+    assert app._ancestor_resource_id_mapping == {
+        resource_2.id.hex: (resource_1.id,),
+        resource_3.id.hex: (resource_2.id, resource_1.id)
+    }

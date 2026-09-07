@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from onegov.core.custom import json
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.pas import _
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql.json import JSONB
 from sqlalchemy.orm import mapped_column, relationship, Mapped
+from sqlalchemy.types import TypeDecorator
 from uuid import uuid4, UUID
 
 
@@ -13,6 +15,33 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.user import User
+    from sqlalchemy.engine.interfaces import Dialect
+
+
+# NOTE: Since we replaced the default serializer/deserializer with
+#       a no-op one, so we can use different serializer/deserializers
+#       per custom json type, we can't use JSONB directly, we need
+#       a type decorator that handles serialization/deserialization
+class JSON(TypeDecorator[Any]):
+
+    impl = JSONB
+    cache_ok = True
+
+    def process_bind_param(
+        self,
+        value: Any | None,
+        dialect: Dialect
+    ) -> str | None:
+
+        return json.dumps(value) if value is not None else None
+
+    def process_result_value(
+        self,
+        value: str | bytes | None,
+        dialect: Dialect
+    ) -> Any | None:
+
+        return None if value is None else json.loads(value)
 
 
 class ImportLog(Base, TimestampMixin):
@@ -55,14 +84,14 @@ class ImportLog(Base, TimestampMixin):
     # several MBs of text and the sync cronjob runs regularly.
     # These are deferred by default to avoid loading large JSON data
     people_source: Mapped[Any | None] = mapped_column(
-        JSONB,
+        JSON,
         deferred=True
     )
     organizations_source: Mapped[Any | None] = mapped_column(
-        JSONB,
+        JSON,
         deferred=True
     )
     memberships_source: Mapped[Any | None] = mapped_column(
-        JSONB,
+        JSON,
         deferred=True
     )

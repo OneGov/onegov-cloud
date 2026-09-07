@@ -224,6 +224,6 @@ class Server:
                 self.exception_hook(environ)
 
             if self.post_mortem:
-                import pdb; pdb.post_mortem()  # noqa: E702, T100
+                import pdb; pdb.post_mortem()  # ruff:ignore[multiple-statements-on-one-line-semicolon, debugger]
 
             raise

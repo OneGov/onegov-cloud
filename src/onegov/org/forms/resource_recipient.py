@@ -87,6 +87,13 @@ class ResourceRecipientForm(Form):
                       'be sent to the above recipient.'),
     )
 
+    cancellation_requests = BooleanField(
+        label=_('Cancellation Requests'),
+        fieldset=_('Notifications *'),
+        description=_('When a customer requests to cancel a reservation, a '
+                      'notification will be sent to the above recipient.'),
+    )
+
     send_on = MultiCheckboxField(
         label=_('Send on'),
         fieldset='Tage und Ressourcen',
@@ -145,6 +152,7 @@ class ResourceRecipientForm(Form):
             or self.customer_messages.data
             or self.internal_notes.data
             or self.rejected_reservations.data
+            or self.cancellation_requests.data
         ):
             self.request.alert(_('Please add at least one notification.'))
             return False

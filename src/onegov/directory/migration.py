@@ -2,22 +2,19 @@ from __future__ import annotations
 
 from onegov.directory.models.directory_entry import DirectoryEntry
 from onegov.form import as_internal_id
-from onegov.form import flatten_fieldsets
-from onegov.form import parse_form
-from onegov.form import parse_formcode
-from onegov.form.parser.core import OptionsField
 from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
 from wtforms import ValidationError
 
-from typing import Any, TYPE_CHECKING
 
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from datetime import date, datetime, time
     from onegov.directory.models import Directory
     from onegov.directory.types import DirectoryConfiguration
     from onegov.form.parser.core import ParsedField
+    from onegov.form.parser.form import ParsedForm
 
 
 class DirectoryMigration:
@@ -31,18 +28,18 @@ class DirectoryMigration:
     def __init__(
         self,
         directory: Directory,
-        new_structure: str | None = None,
+        new_structure: ParsedForm | None = None,
         new_configuration: DirectoryConfiguration | None = None,
-        old_structure: str | None = None
+        old_structure: ParsedForm | None = None
     ):
 
         self.directory = directory
         self.old_structure = old_structure or self.old_directory_structure
 
-        self.new_structure = new_structure or directory.structure
+        self.new_structure = new_structure or directory.parsed_structure
         self.new_configuration = new_configuration or directory.configuration
 
-        self.new_form_class = parse_form(self.new_structure)
+        self.new_form_class = self.new_structure.form_class()
         self.fieldtype_migrations = FieldTypeMigrations()
 
         self.changes = StructuralChanges(
@@ -51,13 +48,13 @@ class DirectoryMigration:
         )
 
     @property
-    def old_directory_structure(self) -> str:
-        history = get_history(self.directory, 'structure')
+    def old_directory_structure(self) -> ParsedForm:
+        history = get_history(self.directory, 'parsed_structure')
 
         if history.deleted:
             return history.deleted[0]
         else:
-            return self.directory.structure
+            return self.directory.parsed_structure
 
     @property
     def possible(self) -> bool:
@@ -134,7 +131,7 @@ class DirectoryMigration:
             self.migrate_entry(entry)
 
     def migrate_directory(self) -> None:
-        self.directory.structure = self.new_structure
+        self.directory.parsed_structure = self.new_structure
         self.directory.configuration = self.new_configuration
 
     def migrate_entry(self, entry: DirectoryEntry) -> None:
@@ -312,17 +309,14 @@ class StructuralChanges:
 
     """
 
-    def __init__(self, old_structure: str, new_structure: str) -> None:
-        old_fieldsets = parse_formcode(old_structure)
-        new_fieldsets = parse_formcode(new_structure)
-        self.old = {
-            f.human_id: f for f in flatten_fieldsets(old_fieldsets)
-        }
-        self.new = {
-            f.human_id: f for f in flatten_fieldsets(new_fieldsets)
-        }
-        self.old_fieldsets = old_fieldsets
-        self.new_fieldsets = new_fieldsets
+    def __init__(
+        self,
+        old_structure: ParsedForm,
+        new_structure: ParsedForm
+    ) -> None:
+
+        self.old = {f.human_id: f for f in old_structure.flattened_fields}
+        self.new = {f.human_id: f for f in new_structure.flattened_fields}
 
         self.detect_added_fieldsets()
         self.detect_removed_fieldsets()
@@ -346,18 +340,18 @@ class StructuralChanges:
         )
 
     def detect_removed_fieldsets(self) -> None:
-        new_ids = tuple(f.human_id for f in self.new_fieldsets if f.human_id)
-        self.removed_fieldsets = [
-            f.human_id for f in self.old_fieldsets
-            if f.human_id and f.human_id not in new_ids
-        ]
+        new_ids = {f.fieldset for f in self.new.values() if f.fieldset}
+        self.removed_fieldsets = {
+            f.fieldset for f in self.old.values()
+            if f.fieldset and f.fieldset not in new_ids
+        }
 
     def detect_added_fieldsets(self) -> None:
-        old_ids = tuple(f.human_id for f in self.old_fieldsets if f.human_id)
-        self.added_fieldsets = [
-            f.human_id for f in self.new_fieldsets
-            if f.human_id and f.human_id not in old_ids
-        ]
+        old_ids = {f.fieldset for f in self.old.values() if f.fieldset}
+        self.added_fieldsets = {
+            f.fieldset for f in self.new.values()
+            if f.fieldset and f.fieldset not in old_ids
+        }
 
     def detect_added_fields(self) -> None:
         self.added_fields = [
@@ -478,9 +472,9 @@ class StructuralChanges:
         self.added_options = []
 
         for old_id, old_field in self.old.items():
-            if isinstance(old_field, OptionsField) and old_id in self.new:
+            if hasattr(old_field, 'choices') and old_id in self.new:
                 new_field = self.new[old_id]
-                if isinstance(new_field, OptionsField):
+                if hasattr(new_field, 'choices'):
                     new_labels = [r.label for r in new_field.choices]
                     old_labels = [r.label for r in old_field.choices]
 
@@ -492,9 +486,9 @@ class StructuralChanges:
         self.removed_options = []
 
         for old_id, old_field in self.old.items():
-            if isinstance(old_field, OptionsField) and old_id in self.new:
+            if hasattr(old_field, 'choices') and old_id in self.new:
                 new_field = self.new[old_id]
-                if isinstance(new_field, OptionsField):
+                if hasattr(new_field, 'choices'):
                     new_labels = [r.label for r in new_field.choices]
                     old_labels = [r.label for r in old_field.choices]
 
@@ -506,9 +500,9 @@ class StructuralChanges:
         self.renamed_options = {}
 
         for old_id, old_field in self.old.items():
-            if isinstance(old_field, OptionsField) and old_id in self.new:
+            if hasattr(old_field, 'choices') and old_id in self.new:
                 new_field = self.new[old_id]
-                if isinstance(new_field, OptionsField):
+                if hasattr(new_field, 'choices'):
                     old_labels = [r.label for r in old_field.choices]
                     new_labels = [r.label for r in new_field.choices]
 

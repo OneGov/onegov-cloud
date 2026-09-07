@@ -19,6 +19,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
+    from pathlib import Path
     from sqlalchemy.orm import Session
 
 
@@ -166,7 +167,11 @@ def test_page_layout_breadcrumbs(session: Session) -> None:
     assert links[2].attrs['href'] == 'grandma/ma'
 
 
-def test_template_layout(postgres_dsn: str, redis_url: str) -> None:
+def test_template_layout(
+    postgres_dsn: str,
+    redis_url: str,
+    tmp_path: Path
+) -> None:
 
     class Mock:
         homepage_structure = ''
@@ -219,7 +224,8 @@ def test_template_layout(postgres_dsn: str, redis_url: str) -> None:
     app.namespace = 'tests'
     app.configure_application(
         dsn=postgres_dsn,
-        filestorage='fs.memoryfs.MemoryFS',
+        filestorage='fs.osfs.OSFS',
+        filestorage_options={'root_path': tmp_path},
         enable_elasticsearch=False,
         depot_backend='depot.io.memory.MemoryFileStorage',
         redis_url=redis_url,

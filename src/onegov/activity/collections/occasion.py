@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import datetime
     from onegov.activity.models import Activity, BookingPeriod
-    from uuid import UUID  # noqa: F401
+    from uuid import UUID  # ruff:ignore[unused-import]
 
 
 class OccasionCollection(GenericCollection[Occasion, 'UUID']):

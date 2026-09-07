@@ -45,6 +45,11 @@ En cas d'elecziuns regiunalas vegnan spetgads mo ils resultats da l'elecziun da 
 
 ## Formats
 
+### eCH-0252
+
+Vesair [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
+
+
 ### Onegov
 
 Il format che vegn duvrà da l'applicaziun web per l'export sa cumpona d'ina singula datoteca per elecziun. Per mintga vischnanca e candidata u candidat datti ina lingia.

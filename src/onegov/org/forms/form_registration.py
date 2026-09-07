@@ -203,7 +203,7 @@ class FormRegistrationWindowForm(Form):
             return
 
         # nor do unlimited registration windows
-        if not self.limit_attendees.data:
+        if self.limit_attendees.data != 'yes':
             return
 
         assert self.limit.data is not None  # but may be 0 / limit inactive

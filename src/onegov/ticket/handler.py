@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from decimal import Decimal
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
+from translationstring import TranslationString
 
 
 from typing import Any, TypeVar, TYPE_CHECKING
@@ -10,8 +10,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from markupsafe import Markup
     from onegov.core.request import CoreRequest
-    from onegov.pay import InvoiceItemMeta, Payment
+    from onegov.pay import InvoiceItemMeta, InvoiceMeta, Payment
     from onegov.ticket.models import Ticket
+    from decimal import Decimal
     from sqlalchemy.orm import Query, Session
 
     type _LinkOrCallback = tuple[str, str] | Callable[[CoreRequest], str]
@@ -89,18 +90,48 @@ class Handler:
         if self.ticket.payment_id != payment_id:
             self.ticket.payment_id = payment_id
 
-    def invoice_items(self, request: CoreRequest) -> list[InvoiceItemMeta]:
-        """ Returns the generated invoice items based on the current state
-        of the ticket.
+    # HACK: We don't want to set up translations in this module for this
+    #       single string, we know we already have a translation in a
+    #       different domain so we just manually specify it for now.
+    rounding_text = TranslationString(
+        'Rounding difference', domain='onegov.org'
+    )
+
+    def base_invoice_items(
+        self, request: CoreRequest
+    ) -> list[InvoiceItemMeta]:
+        """Returns the generated invoice items based on the current state
+        of the ticket, excluding any rounding of the total.
         """
         raise NotImplementedError
 
-    def refresh_invoice_items(self, request: CoreRequest) -> None:
+    def invoice_items(
+        self, request: CoreRequest, rounding_base: Decimal | None
+    ) -> InvoiceMeta:
+        """Returns the generated invoice metadata based on the current
+        state of the ticket, which takes care of rounding the total to a
+        multiple of the given rounding base.
+        """
+        # FIXME: circular import
+        from onegov.pay import InvoiceMeta
+
+        return InvoiceMeta(
+            items=self.base_invoice_items(request),
+            rounding_base=rounding_base,
+            invoice=self.ticket.invoice,
+            rounding_text=request.translate(self.rounding_text),
+        )
+
+    def refresh_invoice_items(
+        self, request: CoreRequest, rounding_base: Decimal | None
+    ) -> None:
         """ Updates the invoice items with the latest data from the handler.
         """
         raise NotImplementedError
 
-    def refreshing_invoice_is_safe(self, request: CoreRequest) -> bool:
+    def refreshing_invoice_is_safe(
+        self, request: CoreRequest, rounding_base: Decimal | None
+    ) -> bool:
         """ Whether or not is safe to refresh the invoice.
 
         Currently we disallow changing the total amount for a
@@ -114,22 +145,16 @@ class Handler:
             return True
 
         invoice = self.ticket.invoice
-        if invoice is None:
-            expected = Decimal('0')
-        elif invoice.invoiced:
+        if invoice is not None and invoice.invoiced:
             # If it has already been invoiced no changes should be made
             return False
-        else:
-            expected = invoice.total_excluding_manual_entries
 
         # if the total doesn't change, we're fine
         # TODO: What if we have a manual discount that results in a negative
         #       total and we end up with a new non-positive total? Either way
         #       we don't get a change in payment, so it should be fine. But
         #       it also seems a little bit fragile to allow this.
-        # FIXME: circular import
-        from onegov.pay import InvoiceItemMeta
-        return InvoiceItemMeta.total(self.invoice_items(request)) == expected
+        return not self.invoice_items(request, rounding_base).total_changed()
 
     @property
     def email(self) -> str | None:

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import logging
 import math
 import morepath
 import sedate
+import threading
 import transaction
 
 from datetime import timedelta
@@ -12,7 +14,8 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
 from onegov.search import ORMSearchable, SearchApp, SearchIndex
 from onegov.search.datamanager import IndexerDataManager
-from sqlalchemy import func
+from onegov.search.integration import REINDEX_MAX_ATTEMPTS
+from sqlalchemy import func, text
 from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 from webtest import TestApp as Client
 
@@ -311,6 +314,207 @@ def test_reindex(postgres_dsn: str) -> None:
     session = app.session()
     search = session.query(func.count(SearchIndex.id))
     assert search.scalar() == 2
+
+
+def _reindex_conflict_app(postgres_dsn: str) -> tuple[Any, Any]:
+    """ Builds a search app with two already-indexed Documents, ready to
+    exercise the reindex conflict handling. Returns the app and the
+    ``Document`` model. """
+
+    class Base(DeclarativeBase):
+        registry = registry()
+
+    class App(Framework, SearchApp):
+        pass
+
+    @App.setting(section='i18n', name='locales')
+    def locales() -> set[str]:
+        return {'en', 'de'}
+
+    @App.setting(section='i18n', name='default_locale')
+    def default_locale() -> str:
+        return 'en'
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
+
+        fts_public = True
+        fts_title_property = 'title'
+        fts_properties = {
+            'title': {'type': 'localized', 'weight': 'A'}
+        }
+
+        @property
+        def fts_suggestion(self) -> str:
+            return self.title
+
+    scan_morepath_modules(App)
+    morepath.commit(App)
+
+    app = App()
+    app.namespace = 'documents'
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        enable_search=True
+    )
+    app.session_manager.bases[1] = RealBase
+
+    app.set_application_id('documents/home')
+    assert app.fts_search_enabled
+
+    session = app.session()
+    session.add(Document(id=1, title='1'))
+    session.add(Document(id=2, title='2'))
+    transaction.commit()
+
+    return app, Document
+
+
+def _upsert_document_concurrently(
+    app: Any,
+    index: Any,
+    schema: str,
+    document_cls: Any,
+    doc_id: int,
+) -> None:
+    """ Upserts a single document into ``search_index`` from an independent
+    transaction and commits it.
+
+    Our sessions run under ``SERIALIZABLE`` isolation, so doing this while a
+    reindex transaction is already open (its snapshot taken) makes that
+    reindex's own upsert of the same row fail with a genuine serialization
+    error -- the exact transient conflict the retry mechanism must survive.
+
+    This runs on its own thread so it gets a session and connection that are
+    independent from the reindex transaction, since our sessions are scoped
+    per thread.
+    """
+    box: dict[str, BaseException] = {}
+
+    def run() -> None:
+        try:
+            session = app.session()
+            document = session.query(document_cls).filter_by(id=doc_id).one()
+            task = app.fts_orm_events.index_task(schema, document)
+            # bypass the patched indexer and perform a real upsert + commit
+            index([task], session)
+            session.execute(text('COMMIT'))
+            session.invalidate()
+        except BaseException as exception:  # noqa: BLE001
+            box['error'] = exception
+
+    thread = threading.Thread(target=run)
+    thread.start()
+    thread.join()
+    if 'error' in box:
+        raise box['error']
+
+
+def test_reindex_recovers_from_real_conflict(
+    postgres_dsn: str,
+    caplog: Any
+) -> None:
+    """ Triggers a genuine serialization failure (SQLSTATE 40001) during the
+    reindex and asserts that the retry actually recovers -- i.e. that the
+    aborted transaction is rolled back so the retry runs in a fresh one on the
+    same connection. """
+
+    app, Document = _reindex_conflict_app(postgres_dsn)
+    schema = app.schema
+    original_index = app.fts_indexer.index
+    attempts = {'n': 0}
+
+    def conflicting_index(tasks: Any, session: Any) -> bool:
+        attempts['n'] += 1
+        if attempts['n'] == 1:
+            # the reindex transaction's snapshot has already been taken by the
+            # query that produced these tasks; committing a concurrent upsert
+            # of the same row now makes the upsert below raise a real 40001
+            _upsert_document_concurrently(
+                app, original_index, schema, Document, 1
+            )
+        return original_index(tasks, session)
+
+    app.fts_indexer.index = conflicting_index
+
+    with caplog.at_level(logging.INFO, logger='onegov.search.index'):
+        app.perform_reindex()
+
+    # the first attempt hit a real conflict, the retry ran and succeeded
+    assert attempts['n'] == 2
+
+    session = app.session()
+    assert session.query(func.count(SearchIndex.id)).scalar() == 2
+    owner_ids = {
+        r.owner_id_int for r in session.query(SearchIndex.owner_id_int)
+    }
+    assert owner_ids == {1, 2}
+
+    # exactly one retry was logged at INFO and, since the retry succeeded,
+    # nothing was logged at ERROR
+    retry_logs = [
+        r for r in caplog.records
+        if (
+            r.levelno == logging.INFO
+            and "Conflict while indexing model 'Document' in schema "
+                "documents-home, retrying"
+            in r.getMessage()
+        )
+    ]
+    assert len(retry_logs) == 1
+    error_logs = [r for r in caplog.records if r.levelno >= logging.ERROR]
+    assert error_logs == []
+
+
+def test_reindex_gives_up_on_persistent_conflict(
+    postgres_dsn: str,
+    caplog: Any
+) -> None:
+    """ When the serialization failure keeps happening on every attempt, the
+    reindex must give up after ``REINDEX_MAX_ATTEMPTS`` and surface an ERROR
+    instead of retrying forever. """
+
+    app, Document = _reindex_conflict_app(postgres_dsn)
+    schema = app.schema
+    original_index = app.fts_indexer.index
+    attempts = {'n': 0}
+
+    def conflicting_index(tasks: Any, session: Any) -> bool:
+        attempts['n'] += 1
+        # force a genuine conflict on every attempt, including the last one
+        _upsert_document_concurrently(
+            app, original_index, schema, Document, 1
+        )
+        return original_index(tasks, session)
+
+    app.fts_indexer.index = conflicting_index
+
+    with caplog.at_level(logging.INFO, logger='onegov.search.index'):
+        app.perform_reindex()
+
+    # every attempt was made and then the model was given up on
+    assert attempts['n'] == REINDEX_MAX_ATTEMPTS
+
+    # the reindex never managed to commit its own upsert, so the document that
+    # only it writes (id=2) is missing from the index
+    session = app.session()
+    indexed = session.query(SearchIndex).filter_by(owner_id_int=2).count()
+    assert indexed == 0
+
+    # giving up must surface as an ERROR, not be swallowed silently
+    error_logs = [
+        r for r in caplog.records
+        if (
+            r.levelno == logging.ERROR
+            and "Error indexing model 'Document' in schema documents-home"
+            in r.getMessage()
+        )
+    ]
+    assert len(error_logs) == 1
 
 
 def test_orm_integration(

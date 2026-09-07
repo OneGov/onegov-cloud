@@ -72,6 +72,7 @@ def test_models(session: Session) -> None:
     )
     commission_membership = PASCommissionMembership(
         role='president',
+        start=date(2022, 1, 1),
         commission_id=commission.id,
         parliamentarian_id=parliamentarian.id
     )
@@ -117,6 +118,13 @@ def test_models(session: Session) -> None:
     assert parliamentarian.roles == [parliamentarian_role]
     assert parliamentarian.commission_memberships == [commission_membership]
     assert parliamentarian.attendences == [attendence]
+    assert parliamentarian.has_commission_presidency(
+        on_date=date(2022, 6, 6),
+        commission_id=commission.id,
+    )
+    assert not parliamentarian.has_commission_presidency(
+        on_date=date(2021, 12, 31),
+    )
     assert parliamentary_group.roles == [parliamentarian_role]
     assert party.roles == [parliamentarian_role]
     assert change.attendence == attendence
@@ -134,6 +142,9 @@ def test_models(session: Session) -> None:
     commission_membership.end = date(2022, 5, 5)
     parliamentarian = parliamentarian  # undo mypy narrowing
     assert parliamentarian.active is False
+    assert not parliamentarian.has_commission_presidency(
+        on_date=date(2022, 6, 6),
+    )
     parliamentarian.roles = []
     parliamentarian.commission_memberships = []
     parliamentarian = parliamentarian  # undo mypy narrowing
@@ -204,7 +215,7 @@ def test_attendence_calculate_value_precision(session: Session) -> None:
     session.flush()
     assert str(att_3.calculate_value()) == '3.50'
 
-    # plenary is returned verbatim
+    # plenary keeps the actual hours, but not more than two places
     att_4 = Attendence(
         date=date(2022, 1, 3),
         duration=h(3.25),
@@ -214,6 +225,16 @@ def test_attendence_calculate_value_precision(session: Session) -> None:
     session.add(att_4)
     session.flush()
     assert str(att_4.calculate_value()) == '3.25'
+
+    att_plenary = Attendence(
+        date=date(2022, 1, 3),
+        duration=205,
+        type='plenary',
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.add(att_plenary)
+    session.flush()
+    assert str(att_plenary.calculate_value()) == '3.42'
 
     att_5 = Attendence(
         date=date(2022, 1, 4),

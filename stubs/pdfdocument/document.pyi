@@ -20,7 +20,7 @@ def register_fonts_from_paths(
 
 # NOTE: This is sometimes used as an empty Stylesheet, but also sometimes
 #       as a PropertySet, so we treat it like Any
-Empty = Any  # noqa: PYI026
+Empty = Any  # ruff:ignore[type-alias-without-annotation]
 
 def sanitize(text: str) -> str: ...
 def normalize(text: str | bytes) -> str: ...

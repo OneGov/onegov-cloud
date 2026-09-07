@@ -2130,6 +2130,54 @@ def test_period_phases(session: Session) -> None:
     # attribute for the phase
 
 
+def test_upcoming_period(session: Session) -> None:
+    periods = BookingPeriodCollection(session)
+
+    with freeze_time('2016-09-20'):
+        # no periods yet
+        assert periods.upcoming() is None
+
+        # a period whose booking has already ended is not upcoming
+        periods.add(
+            title="Spring 2016",
+            prebooking=(date(2016, 3, 1), date(2016, 3, 15)),
+            booking=(date(2016, 3, 15), date(2016, 3, 30)),
+            execution=(date(2016, 5, 1), date(2016, 5, 30)),
+        )
+        assert periods.upcoming() is None
+
+        # the active period must not be returned as upcoming, even though its
+        # booking has not ended yet
+        periods.add(
+            title="Autumn 2016",
+            prebooking=(date(2016, 9, 1), date(2016, 9, 15)),
+            booking=(date(2016, 9, 15), date(2016, 9, 30)),
+            execution=(date(2016, 11, 1), date(2016, 11, 30)),
+            active=True,
+        )
+        assert periods.upcoming() is None
+
+        # of two future (non-active) periods, the one with the earliest
+        # booking_start is returned
+        spring = periods.add(
+            title="Spring 2017",
+            prebooking=(date(2017, 3, 1), date(2017, 3, 15)),
+            booking=(date(2017, 3, 15), date(2017, 3, 30)),
+            execution=(date(2017, 5, 1), date(2017, 5, 30)),
+        )
+        periods.add(
+            title="Autumn 2017",
+            prebooking=(date(2017, 9, 1), date(2017, 9, 15)),
+            booking=(date(2017, 9, 15), date(2017, 9, 30)),
+            execution=(date(2017, 11, 1), date(2017, 11, 30)),
+        )
+        assert periods.upcoming() == spring
+
+    # once everything has ended, there is nothing upcoming
+    with freeze_time('2018-04-01'):
+        assert periods.upcoming() is None
+
+
 def test_invoices(
     session: Session,
     owner: User,

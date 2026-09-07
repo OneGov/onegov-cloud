@@ -58,6 +58,7 @@ def view_upload(
                     form.proposal.file,
                     form.proposal.data['mimetype']
                 )
+
             elif form.file_format.data == 'wabsti_c':
                 assert form.sg_geschaefte.data is not None
                 assert form.sg_geschaefte.file is not None

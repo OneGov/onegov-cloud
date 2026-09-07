@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from onegov.core.custom import json
+from datetime import date
 from functools import cached_property
 from markupsafe import Markup
+from onegov.activity import Occasion, Volunteer
 from onegov.chat import Message, MessageCollection
 from onegov.chat.collections import ChatCollection
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
@@ -14,7 +17,7 @@ from onegov.org.layout import DefaultLayout, EventLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.org.utils import (
     currency_for_submission,
-    invoice_items_for_submission
+    invoice_items_for_submission,
 )
 from onegov.pay import ManualPayment
 from onegov.reservation import Allocation, Resource, Reservation
@@ -35,6 +38,7 @@ from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import datetime
+    from decimal import Decimal
     from onegov.chat.models import Chat
     from onegov.core.request import CoreRequest
     from onegov.event import Event
@@ -56,25 +60,28 @@ def ticket_submitter(ticket: Ticket) -> str | None:
     return mail
 
 
-def submission_invoice_items(
+def submission_base_invoice_items(
     self: FormSubmissionHandler | DirectoryEntryHandler,
     request: CoreRequest
 ) -> list[InvoiceItemMeta]:
-    return invoice_items_for_submission(
-        request,
-        self.form,  # type: ignore[arg-type]
-        self.submission
-    ) if self.submission else []
+    return (
+        invoice_items_for_submission(
+            request, self.form, self.submission  # type: ignore[arg-type]
+        )
+        if self.submission
+        else []
+    )
 
 
 def refresh_submission_invoice_items(
     self: FormSubmissionHandler | DirectoryEntryHandler,
-    request: CoreRequest
+    request: CoreRequest,
+    rounding_base: Decimal | None,
 ) -> None:
     payment = self.payment
     invoice = self.ticket.invoice
-    new_item_metas = self.invoice_items(request)
-    if not new_item_metas:
+    invoice_meta = self.invoice_items(request, rounding_base)
+    if not invoice_meta:
         # delete the invoice and payment (if it exists)
         if invoice is not None:
             for item in invoice.items:
@@ -96,10 +103,14 @@ def refresh_submission_invoice_items(
         request.session.add(invoice)
         self.ticket.invoice = invoice
 
+    # update the invoicing party
+    if self.submission is not None:
+        invoice.invoicing_party = self.submission.invoicing_party
+
     old_items = sorted(invoice.items, key=attrgetter('group'))
     new_items: list[InvoiceItem] = []
     unused: set[InvoiceItem] = set(old_items)
-    for meta in new_item_metas:
+    for meta in invoice_meta:
         existing: InvoiceItem | None = None
         for item in old_items:
             if item.group != meta.group:
@@ -115,6 +126,9 @@ def refresh_submission_invoice_items(
                 if item.group == 'submission':
                     existing = item
                     break
+            elif meta.group == 'rounding':
+                existing = item
+                break
             else:
                 raise AssertionError('unreachable')
 
@@ -318,7 +332,7 @@ class FormSubmissionHandler(Handler):
 
     handler_title = _('Form Submissions')
     code_title = _('Forms')
-    invoice_items = submission_invoice_items
+    base_invoice_items = submission_base_invoice_items
     refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property
@@ -611,7 +625,9 @@ class ReservationHandler(Handler):
     def deleted(self) -> bool:
         return not self.reservations
 
-    def invoice_items(self, request: CoreRequest) -> list[InvoiceItemMeta]:
+    def base_invoice_items(
+        self, request: CoreRequest
+    ) -> list[InvoiceItemMeta]:
         if self.submission:
             form = request.get_form(
                 self.submission.form_class,
@@ -627,22 +643,30 @@ class ReservationHandler(Handler):
                 cost_object=cost_object,
                 extra=item_extra
             )
+            submission_data = self.submission.data
         else:
             extras = []
             discounts = []
+            submission_data = None
+
+        if not self.resource:
+            return []
 
         return self.resource.invoice_items_for_reservation(
             self.reservations,
             extras,
             discounts,
-            reduced_amount_label=request.translate(_('Discount'))
-        ) if self.resource else []
+            submission_data,
+            reduced_amount_label=request.translate(_('Discount')),
+        )
 
-    def refresh_invoice_items(self, request: CoreRequest) -> None:
+    def refresh_invoice_items(
+        self, request: CoreRequest, rounding_base: Decimal | None
+    ) -> None:
         payment = self.payment
         invoice = self.ticket.invoice
-        new_item_metas = self.invoice_items(request)
-        if not new_item_metas:
+        invoice_meta = self.invoice_items(request, rounding_base)
+        if not invoice_meta:
             # delete the invoice and payment (if it exists)
             if invoice is not None:
                 for item in invoice.items:
@@ -671,7 +695,7 @@ class ReservationHandler(Handler):
         old_items = sorted(invoice.items, key=attrgetter('group'))
         new_items: list[InvoiceItem] = []
         unused: set[InvoiceItem] = set(old_items)
-        for meta in new_item_metas:
+        for meta in invoice_meta:
             existing: InvoiceItem | None = None
             for item in old_items:
                 if item.group != meta.group:
@@ -689,7 +713,7 @@ class ReservationHandler(Handler):
                     if meta.family == item.family:
                         existing = item
                         break
-                elif meta.group == 'reduced_amount':
+                elif meta.group in ('reduced_amount', 'rounding'):
                     existing = item
                     break
                 else:
@@ -812,7 +836,23 @@ class ReservationHandler(Handler):
         return self.resource.reply_to
 
     def prepare_delete_ticket(self) -> None:
-        for reservation in self.reservations or ():
+        from libres.db.models import ReservedSlot
+
+        reservations = self.reservations
+        if not reservations:
+            return
+
+        # FIXME: replace this with scheduler.remove_reservation
+        # all reservations of a ticket share the token; delete their reserved
+        # slots too, otherwise deleting the reservations directly (instead of
+        # via the scheduler) leaves orphaned slots blocking the calendar
+        token = reservations[0].token
+        self.session.query(ReservedSlot).filter(
+            ReservedSlot.reservation_token == token,
+            ReservedSlot.source_type == 'reservation',
+        ).delete(synchronize_session=False)
+
+        for reservation in reservations:
             self.session.delete(reservation)
 
     @cached_property
@@ -1033,6 +1073,42 @@ class ReservationHandler(Handler):
 
         return links
 
+    def get_cancellation_links(
+        self,
+        reservation: Reservation,
+        request: OrgRequest
+    ) -> list[Link]:
+        id_set = set(self.data.get('cancellation_reservation_ids') or ())
+        if id_set:
+            targeted = [r for r in self.reservations if r.id in id_set]
+        else:
+            targeted = list(self.reservations)
+        if self.ticket.state != 'pending':
+            return []
+        confirm_items = json.dumps([
+            {'title': self.get_reservation_title(r)} for r in targeted
+        ])
+        return [Link(
+            text=_('Accept cancellation'),
+            url=request.link(self.ticket, 'accept-cancellation'),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _('Do you really want to accept the cancellation?'),
+                    _(
+                        'This will cancel the reservation and cannot '
+                        'be undone.'
+                    ),
+                    _('Accept cancellation'),
+                    _('Cancel'),
+                    items=confirm_items,
+                ),
+                Intercooler(
+                    request_method='GET', redirect_after=request.url
+                ),
+            ),
+        )]
+
     def get_occupancy_url(
         self,
         reservation: Reservation,
@@ -1071,7 +1147,14 @@ class ReservationHandler(Handler):
             for r in self.reservations
         )
 
-        if not all(accepted):
+        cancellation_requested = self.data.get('cancellation_requested', False)
+
+        if cancellation_requested:
+            links.extend(
+                self.get_cancellation_links(self.reservations[0], request)
+            )
+
+        if not all(accepted) and not cancellation_requested:
             links.append(
                 Link(
                     text=_('Accept all reservations'),
@@ -1371,7 +1454,7 @@ class DirectoryEntryHandler(Handler):
 
     handler_title = _('Directory Entry Submissions')
     code_title = _('Directory Entry Submissions')
-    invoice_items = submission_invoice_items
+    base_invoice_items = submission_base_invoice_items
     refresh_invoice_items = refresh_submission_invoice_items
 
     @cached_property
@@ -1762,6 +1845,170 @@ class ChatHandler(Handler):
         request: OrgRequest  # type: ignore[override]
     ) -> list[Link | LinkGroup]:
         return []
+
+
+class VolunteerTicket(OrgTicketMixin, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'VOL'}
+
+    if TYPE_CHECKING:
+        handler: VolunteerHandler
+
+
+@handlers.registered_handler('VOL')
+class VolunteerHandler(Handler):
+
+    handler_title = _('Volunteer')
+    code_title = _('Volunteer')
+
+    @cached_property
+    def volunteer_cart(self) -> list[Volunteer]:
+        query = self.session.query(Volunteer).filter(
+            Volunteer.token == UUID(self.id)
+        ).order_by(Volunteer.need_id)
+
+        return query.all()
+
+    @property
+    def volunteer(self) -> Volunteer | None:
+        if self.volunteer_cart:
+            return self.volunteer_cart[0]
+        return None
+
+    @property
+    def deleted(self) -> bool:
+        return self.volunteer_cart == []
+
+    @property
+    def email(self) -> str:
+        if self.deleted:
+            return self.ticket.snapshot.get('email', '')
+        if self.volunteer is None:
+            return ''
+        return self.volunteer.email
+
+    @property
+    def email_changeable(self) -> bool:
+        return True
+
+    def change_email(self, email: str) -> None:
+        if self.deleted:
+            self.ticket.snapshot['email'] = email
+        else:
+            for item in self.volunteer_cart:
+                item.email = email
+        self.ticket.ticket_email = email
+
+    @cached_property
+    def ticket_deletable(self) -> bool:
+        volunteer = self.volunteer
+        need_id = volunteer.need_id if volunteer else None
+
+        occasion = self.session.query(Occasion).filter_by(
+            need_id=need_id).first()
+        if not occasion:
+            return True
+
+        return not occasion.period.active
+
+    @property
+    def title(self) -> str:
+        if self.volunteer:
+            return f'{self.volunteer.first_name} {self.volunteer.last_name}'
+        else:
+            return _('Volunteer')
+
+    @property
+    def subtitle(self) -> None:
+        return None
+
+    @property
+    def group(self) -> str:
+        return _('Volunteer')
+
+    def get_summary(
+        self,
+        request: OrgRequest  # type:ignore[override]
+    ) -> Markup:
+
+        layout = DefaultLayout(self.volunteer_cart, request)
+
+        def get_confirmed(
+                request: OrgRequest,
+                need_id: str,
+        ) -> int:
+            return request.session.query(Volunteer).filter(
+                Volunteer.need_id == need_id,
+                Volunteer.state == 'confirmed'
+            ).count()
+
+        def state_change(request: OrgRequest,
+                        volunteer: Volunteer,
+                        state: str,
+                        layout: DefaultLayout) -> str:
+            assert volunteer.id is not None
+            url = request.class_link(
+                Volunteer, name=state, variables={'id': volunteer.id.hex})
+            return layout.csrf_protected_url(url)
+
+        def get_age(
+            birth_date: date
+        ) -> int:
+            today = date.today()
+            age = today.year - birth_date.year
+            if (today.month, today.day) < (birth_date.month, birth_date.day):
+                age -= 1
+            return age
+
+        parts = []
+        parts.append(
+            render_macro(layout.macros['volunteer_submissions'], request, {
+                'self': self,
+                'volunteer': self.volunteer,
+                'get_age': get_age,
+                'state_change': state_change,
+                'subscriptions': self.volunteer_cart,
+                'get_confirmed': get_confirmed,
+                'layout': layout,
+                'ticket_state': self.ticket.state,
+            })
+        )
+
+        return Markup('').join(parts)
+
+    def get_links(  # type:ignore[override]
+        self,
+        request: OrgRequest  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
+
+        if self.deleted:
+            return []
+
+        links: list[Link | LinkGroup] = []
+
+        links.append(Link(
+                text=_('Status mail'),
+                url=request.link(self.ticket, 'send-status-mail'),
+                attrs={'class': ('envelope')},
+                traits=(
+                    Confirm(
+                        _('Do you really want to send the current status?'),
+                        _(
+                            'A mail will be sent to the volunteer '
+                            'containing the status of his '
+                            'subscriptions. Only send this if these are the '
+                            'final states ofthe subscriptions.'
+                        ),
+                        _('Send'),
+                        _('Cancel')
+                    ),
+                    Intercooler(
+                        request_method='GET',
+                        redirect_after=request.url
+                    )
+                )
+            ))
+
+        return links
 
 
 def apply_ticket_permissions[T: Query[Any]](

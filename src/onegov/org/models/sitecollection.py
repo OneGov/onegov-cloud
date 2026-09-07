@@ -39,7 +39,7 @@ class SiteCollection:
     @staticmethod
     def get_forms(session: Session) -> Query[FormDefinition]:
         forms = session.query(FormDefinition)
-        forms = forms.options(defer(FormDefinition.definition))
+        forms = forms.options(defer(FormDefinition.parsed))
         forms = forms.options(defer(FormDefinition.checksum))
         forms = forms.order_by(FormDefinition.title)
         return forms
@@ -47,6 +47,7 @@ class SiteCollection:
     @staticmethod
     def get_resources(session: Session) -> Query[Resource]:
         resources = session.query(Resource)
+        resources = resources.options(defer(Resource.parsed))
         resources = resources.options(defer(Resource.timezone))
         resources = resources.order_by(Resource.title)
         return resources
@@ -57,7 +58,7 @@ class SiteCollection:
         directories = directories.options(defer(Directory.meta))
         directories = directories.options(defer(Directory.content))
         directories = directories.options(defer(Directory.lead))
-        directories = directories.options(defer(Directory.structure))
+        directories = directories.options(defer(Directory.parsed_structure))
         directories = directories.options(defer(Directory.configuration))
         directories = directories.order_by(Directory.order)
         return directories

@@ -24,7 +24,7 @@ __all__ = [
 
 def parse(
     fp: IO[Any] | None = None,
-    environ: SupportsItemAccess[str, str] = os.environ,  # noqa: PYI011
+    environ: SupportsItemAccess[str, str] = os.environ,  # ruff:ignore[typed-argument-default-in-stub]
     keep_blank_values: bool = ...,
     strict_parsing: bool = ...,
     separator: str = "&",
@@ -38,8 +38,8 @@ class _Environ(Protocol):
     def keys(self) -> Iterable[str]: ...
 
 def parse_header(line: str) -> tuple[str, dict[str, str]]: ...
-def test(environ: _Environ = os.environ) -> None: ...  # noqa: PYI011
-def print_environ(environ: _Environ = os.environ) -> None: ...  # noqa: PYI011
+def test(environ: _Environ = os.environ) -> None: ...  # ruff:ignore[typed-argument-default-in-stub]
+def print_environ(environ: _Environ = os.environ) -> None: ...  # ruff:ignore[typed-argument-default-in-stub]
 def print_form(form: dict[str, Any]) -> None: ...
 def print_directory() -> None: ...
 def print_environ_usage() -> None: ...
@@ -86,7 +86,7 @@ class FieldStorage:
         fp: IO[Any] | None = None,
         headers: Mapping[str, str] | Message | None = None,
         outerboundary: bytes = b"",
-        environ: SupportsContainsAndGetItem[str, str] = os.environ,  # noqa: PYI011
+        environ: SupportsContainsAndGetItem[str, str] = os.environ,  # ruff:ignore[typed-argument-default-in-stub]
         keep_blank_values: int = 0,
         strict_parsing: int = 0,
         limit: int | None = None,

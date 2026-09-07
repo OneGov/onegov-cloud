@@ -117,21 +117,6 @@ def view_pas_settings(
             'icon': 'fa-plus-circle'
         })
 
-        # For parliamentarians, show their specific commissions
-        # Currently unclear is this is a requirement to add a
-        # shortcut for these. Leaving it here for future reference.
-        # user = request.current_user
-        # active_memberships = get_active_commission_memberships(user)
-        # Will update in future, leaving it here for now
-        # for membership in active_memberships:
-        #     commission = membership.commission
-        #     shortcuts.append({
-        #         'name': f'commission-{commission.id}',
-        #         'title': commission.name,
-        #         'link': request.link(commission),
-        #         'icon': 'fa-user-friends'
-        #     })
-
     return {
         'layout': layout,
         'title': _('PAS settings'),

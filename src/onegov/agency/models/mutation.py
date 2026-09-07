@@ -16,9 +16,9 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from uuid import UUID
 
-    from .agency import ExtendedAgency  # noqa: F401
+    from .agency import ExtendedAgency  # ruff:ignore[unused-import]
     from .move import SupportsById
-    from .person import ExtendedPerson  # noqa: F401
+    from .person import ExtendedPerson  # ruff:ignore[unused-import]
 
 
 _NOT_FOUND = object()

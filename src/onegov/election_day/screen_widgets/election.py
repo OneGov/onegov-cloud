@@ -14,8 +14,8 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.layouts import DefaultLayout
-    from onegov.election_day.models import Election  # noqa: F401
-    from onegov.election_day.models import ProporzElection  # noqa: F401
+    from onegov.election_day.models import Election  # ruff:ignore[unused-import]
+    from onegov.election_day.models import ProporzElection  # ruff:ignore[unused-import]
 
 
 @ElectionDayApp.screen_widget(

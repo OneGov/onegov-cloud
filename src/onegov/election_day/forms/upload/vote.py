@@ -22,7 +22,9 @@ class UploadVoteForm(Form):
 
     file_format = RadioField(
         _('File format'),
-        choices=[('internal', 'OneGov Cloud')],
+        choices=[
+            ('internal', 'OneGov Cloud'),
+        ],
         validators=[
             InputRequired()
         ],

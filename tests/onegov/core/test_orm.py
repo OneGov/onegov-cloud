@@ -32,12 +32,13 @@ from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg import OperationalError as PostgresOperationalError
+from psycopg.errors import FeatureNotSupported
 from pytz import timezone
 from sedate import utcnow
 from sqlalchemy import (
     and_, func, inspect, select, text, ForeignKey, Integer
 )
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import NotSupportedError, OperationalError
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column, registry, relationship, validates
 from sqlalchemy.orm import DeclarativeBase, Mapped
@@ -60,6 +61,56 @@ if TYPE_CHECKING:
 
 class PicklePage(AdjacencyList):
     __tablename__ = 'picklepages'
+
+
+def test_cached_plan_failure_is_retried(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('foo')
+    attempts = 0
+
+    def operation() -> None:
+        nonlocal attempts
+        attempts += 1
+        mgr.session().execute(text('SELECT 1'))
+        if attempts == 1:
+            raise NotSupportedError(
+                None,
+                None,
+                FeatureNotSupported('cached plan must not change result type'),
+            )
+
+    transaction.manager.run(operation, tries=2)
+
+    assert attempts == 2
+    mgr.dispose()
+
+
+def test_other_feature_failure_is_not_retried(postgres_dsn: str) -> None:
+    class Base(DeclarativeBase, ModelBase):
+        registry = registry()
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('foo')
+    attempts = 0
+
+    def operation() -> None:
+        nonlocal attempts
+        attempts += 1
+        mgr.session().execute(text('SELECT 1'))
+        raise NotSupportedError(
+            None,
+            None,
+            FeatureNotSupported('some other unsupported feature'),
+        )
+
+    with pytest.raises(NotSupportedError):
+        transaction.manager.run(operation, tries=2)
+
+    assert attempts == 1
+    mgr.dispose()
 
 
 def test_is_valid_schema(postgres_dsn: str) -> None:

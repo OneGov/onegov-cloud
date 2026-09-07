@@ -411,6 +411,10 @@ def handle_new_user(
 
             request.info(_('The user was created successfully'))
 
+            # the confirmation page has no form, so neither the editbar
+            # links nor the editmode links (save/cancel) apply to it
+            layout.edit_mode = False
+
             return {
                 'layout': layout,
                 'title': _('New User'),

@@ -32,6 +32,7 @@ from onegov.pas.importer.types import (  # noqa: TC002
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import logging
+    from onegov.parliament.models.commission_membership import MembershipRole
     from onegov.parliament.models.parliamentarian_role import (
         ParliamentaryGroupRole, PartyRole, Role)
     from collections.abc import Sequence
@@ -43,13 +44,29 @@ if TYPE_CHECKING:
         updated: list[Any]
         processed: int
 
-    type RoleKey = tuple[
-        UUID,
-        UUID | None,
-        UUID | None,
-        str,
-        str | None
-    ]
+    #: Groups the roles of a parliamentarian by the organization they
+    #: belong to: (parliamentarian, party, group, additional information)
+    type RoleBucket = tuple[UUID, UUID | None, UUID | None, str | None]
+
+    #: Groups the memberships of a parliamentarian by commission
+    type MembershipBucket = tuple[UUID, UUID]
+
+    type Match = Literal['kub', 'adopt', 'duplicate', 'create']
+
+
+def periods_overlap(
+    start_a: date | None,
+    end_a: date | None,
+    start_b: date | None,
+    end_b: date | None,
+) -> bool:
+    """Whether two possibly open ended date ranges have any day in common."""
+
+    if start_a and end_b and start_a > end_b:
+        return False
+    if start_b and end_a and start_b > end_a:
+        return False
+    return True
 
 
 class DataImporter:
@@ -559,6 +576,16 @@ class MembershipImporter(DataImporter):
 
     Total unique combinations: 22
 
+    Roles and commission memberships are identified by the id of the KUB
+    membership they originate from (``external_kub_id``). A person may hold
+    the same role in the same organization more than once (leaving and
+    returning), so anything derived from person, organization and role is not
+    unique and would collapse those periods into a single row.
+
+    Rows which still lack an ``external_kub_id`` are matched by person,
+    organization and start date, and adopt the id of the membership they were
+    imported from. Rows that keep an empty id were entered by hand and are
+    left alone.
     """
 
     def __init__(
@@ -571,6 +598,23 @@ class MembershipImporter(DataImporter):
         # party_map now keyed by external_kub_id for consistency
         self.party_map: dict[str, Party] = {}
         self.other_organization_map: dict[str, Any] = {}
+
+        # the ids of all memberships in the payload currently being imported
+        self.payload_ids: set[UUID] = set()
+
+        # the ids of the rows this import has claimed, everything else may
+        # be deleted
+        self.seen_membership_ids: set[UUID] = set()
+        self.seen_role_ids: set[UUID] = set()
+
+        self.memberships_by_kub_id: dict[UUID, PASCommissionMembership] = {}
+        self.memberships_by_bucket: dict[
+            MembershipBucket, list[PASCommissionMembership]
+        ] = {}
+        self.roles_by_kub_id: dict[UUID, PASParliamentarianRole] = {}
+        self.roles_by_bucket: dict[
+            RoleBucket, list[PASParliamentarianRole]
+        ] = {}
 
     def init(
         self,
@@ -860,6 +904,7 @@ class MembershipImporter(DataImporter):
             'parliamentarian_roles': 0,  # Covers Fraktion, Kantonsrat,
             # Sonstige
             'skipped': 0,  # Count memberships we couldn't process
+            'deleted': 0,  # Rows which vanished from KUB
         }
 
         # Process parliamentarians found only in memberships first
@@ -875,96 +920,10 @@ class MembershipImporter(DataImporter):
             'updated'
         ]
 
-        # --- Pre-fetch existing memberships and roles ---
         parliamentarian_ids = [
             p.id for p in self.parliamentarian_map.values() if p.id
         ]
-        commission_ids = [c.id for c in self.commission_map.values() if c.id]
-        [p.id for p in self.party_map.values() if p.id]
-        [g.id for g in self.parliamentary_group_map.values() if g.id]
-
-        existing_commission_memberships_map: dict[
-            tuple[UUID | None, UUID | None, date | None],
-            PASCommissionMembership,
-        ] = {}
-        if parliamentarian_ids and commission_ids:
-            existing_cms = (
-                self.session.query(PASCommissionMembership)
-                .filter(
-                    PASCommissionMembership.parliamentarian_id.in_(
-                        parliamentarian_ids
-                    ),
-                    PASCommissionMembership.commission_id.in_(commission_ids),
-                )
-                .all()
-            )
-            existing_commission_memberships_map = {
-                (cm.parliamentarian_id, cm.commission_id, cm.start): cm
-                for cm in existing_cms
-            }
-            self.logger.debug(
-                f'Pre-fetched {len(existing_commission_memberships_map)} '
-                f'existing commission memberships.'
-            )
-
-        # Define the precise structure for the role key tuple
-        existing_roles_map: dict[RoleKey, PASParliamentarianRole] = {}
-        current_role_key: RoleKey
-        if parliamentarian_ids:
-            # Fetch all roles for the relevant parliamentarians
-            # We'll filter/map them client-side
-            existing_roles = (
-                self.session.query(PASParliamentarianRole)
-                .filter(
-                    PASParliamentarianRole.parliamentarian_id.in_(
-                        parliamentarian_ids
-                    )
-                )
-                .options(
-                    # Eager load related objects to prevent N+1 queries
-                    # during updates.
-                    selectinload(PASParliamentarianRole.party),
-                    selectinload(PASParliamentarianRole.parliamentary_group),
-                )
-                .all()
-            )
-            for role_obj_ in existing_roles:
-                # Create a unique key based on the role type and relevant IDs
-                # Use the defined role_key_type hint for clarity
-                if role_obj_.party_id or role_obj_.parliamentary_group_id:
-                    # Fraktion/Party Role (assuming role='member')
-                    current_role_key = (
-                        role_obj_.parliamentarian_id,
-                        role_obj_.party_id,
-                        role_obj_.parliamentary_group_id,
-                        'member',  # Explicitly add role type for uniqueness
-                        None,  # Placeholder for additional_information
-                    )
-                elif role_obj_.additional_information:
-                    # Sonstige Role (assuming role='member')
-                    current_role_key = (
-                        role_obj_.parliamentarian_id,
-                        None,  # party_id
-                        None,  # group_id
-                        'member',  # Explicitly add role type
-                        role_obj_.additional_information,
-                    )
-                else:
-                    # Kantonsrat Role (or potentially others without
-                    # party/group/add.info)
-                    current_role_key = (
-                        role_obj_.parliamentarian_id,
-                        None,  # party_id
-                        None,  # group_id
-                        role_obj_.role,  # Use the actual role
-                        None,  # Placeholder for additional_information
-                    )
-                existing_roles_map[current_role_key] = role_obj_
-            self.logger.debug(
-                f'Pre-fetched {len(existing_roles_map)} existing '
-                f'parliamentarian roles.'
-            )
-        # --- End Pre-fetching ---
+        self._prefetch(parliamentarian_ids, memberships_data)
 
         for membership in memberships_data:
             person_id = None
@@ -1009,10 +968,15 @@ class MembershipImporter(DataImporter):
                 org_type_title = org_data.get('organizationTypeTitle')
                 role_text = membership.get('role', '')
                 org_name = org_data.get('name', '')
+                kub_id = self._parse_kub_id(membership)
+                start_date, end_date = self._membership_dates(membership)
 
                 if org_type_title == 'Kommission':
                     processed_counts['commission_memberships'] += 1
                     processed_membership_type = True
+                    if kub_id is not None:
+                        self.seen_membership_ids.add(kub_id)
+
                     commission = self.commission_map.get(org_id)
                     if not commission:
                         self.logger.warning(
@@ -1021,65 +985,32 @@ class MembershipImporter(DataImporter):
                         )
                         continue
 
-                    start_val = membership.get('start')
-                    start_date = self.parse_date(
-                        str(start_val)
-                        if start_val and not isinstance(start_val, bool)
-                        else None
-                    )
-                    membership_key = (
-                        parliamentarian.id,
-                        commission.id,
-                        start_date,
-                    )
-                    existing_membership = (
-                        existing_commission_memberships_map.get(membership_key)
-                    )
-
-                    if existing_membership:
-                        # Update existing membership (changes tracked by
-                        # session)
-                        updated = self._update_commission_membership(
-                            existing_membership, membership
+                    membership_obj, is_new = (
+                        self._import_commission_membership(
+                            parliamentarian=parliamentarian,
+                            commission=commission,
+                            kub_id=kub_id,
+                            role=self._map_to_commission_role(role_text),
+                            start=start_date,
+                            end=end_date,
                         )
-                        if updated:
-                            commission_memberships_to_update.append(
-                                existing_membership
-                            )
-                            self.logger.debug(
-                                f'Updating commission membership for '
-                                f'{parliamentarian.id} in {commission.id}'
-                            )
-                        # No need to append, session flush handles updates.
-                    else:
-                        # Create new membership
-                        membership_obj = self._create_commission_membership(
-                            parliamentarian, commission, membership
-                        )
-                        if membership_obj:
+                    )
+                    if membership_obj is not None:
+                        if is_new:
                             commission_memberships_to_create.append(
                                 membership_obj
                             )
-                            # Add the new membership to the map to prevent
-                            # duplicates within the same import run if data is
-                            # redundant
-                            if parliamentarian.id and commission.id:
-                                new_key = (
-                                    parliamentarian.id,
-                                    commission.id,
-                                    membership_obj.start,
-                                )
-                                existing_commission_memberships_map[
-                                    new_key
-                                ] = membership_obj
-                            self.logger.debug(
-                                f'Creating commission membership for '
-                                f'{parliamentarian.id} in {commission.id}'
+                        else:
+                            commission_memberships_to_update.append(
+                                membership_obj
                             )
 
                 elif org_type_title == 'Fraktion':
                     processed_counts['parliamentarian_roles'] += 1
                     processed_membership_type = True
+                    if kub_id is not None:
+                        self.seen_role_ids.add(kub_id)
+
                     party = self.party_map.get(org_id)
                     if not party:
                         self.logger.warning(
@@ -1089,231 +1020,66 @@ class MembershipImporter(DataImporter):
                         continue
                     group = self.parliamentary_group_map.get(org_id)
 
-                    # Use role_key_type hint for the variable
-                    current_role_key = (
-                        parliamentarian.id,
-                        party.id if party else None,
-                        group.id if group else None,
-                        'member',  # Role type
-                        None,  # additional_information
+                    role_obj, is_new = self._import_parliamentarian_role(
+                        parliamentarian=parliamentarian,
+                        kub_id=kub_id,
+                        role='member',
+                        parliamentary_group=group,
+                        parliamentary_group_role=(
+                            self._map_to_parliamentary_group_role(role_text)
+                        ),
+                        party=party,
+                        party_role='member',
+                        start=start_date,
+                        end=end_date,
+                        org_type=org_type_title,
                     )
-                    existing_role = existing_roles_map.get(current_role_key)
-
-                    start_val = membership.get('start')
-                    start_date_str = (
-                        str(start_val)
-                        if start_val and not isinstance(start_val, bool)
-                        else None
-                    )
-                    end_val = membership.get('end')
-                    end_date_str = (
-                        str(end_val)
-                        if end_val and not isinstance(end_val, bool)
-                        else None
-                    )
-
-                    if existing_role:
-                        # Update existing role
-                        updated = self._update_parliamentarian_role(
-                            existing_role,
-                            role='member',
-                            parliamentary_group=group,
-                            parliamentary_group_role=self._map_to_parliamentary_group_role(
-                                role_text
-                            ),
-                            party=party,
-                            party_role=('member' if party else 'none'),
-                            start_date=start_date_str,
-                            end_date=end_date_str,
-                            org_type=org_type_title,
-                        )
-                        if updated:
-                            parliamentarian_roles_to_update.append(
-                                existing_role
-                            )
-                            self.logger.debug(
-                                f'Updating Fraktion/Party role for '
-                                f'{parliamentarian.id}'
-                            )
-                        # No need to append, session flush handles updates.
-                    else:
-                        # Create new role
-                        role_obj = self._create_parliamentarian_role(
-                            parliamentarian=parliamentarian,
-                            role='member',
-                            parliamentary_group=group,
-                            parliamentary_group_role=self._map_to_parliamentary_group_role(
-                                role_text
-                            ),
-                            party=party,
-                            party_role=('member' if party else 'none'),
-                            start_date=start_date_str,
-                            end_date=end_date_str,
-                            org_type=org_type_title,
-                        )
-                        if role_obj:
+                    if role_obj is not None:
+                        if is_new:
                             parliamentarian_roles_to_create.append(role_obj)
-                            # Add the new role to the map
-                            # Ensure the key matches RoleKey type
-                            if parliamentarian.id:
-                                current_role_key_after_create: RoleKey = (
-                                    parliamentarian.id,
-                                    role_obj.party_id,
-                                    role_obj.parliamentary_group_id,
-                                    role_obj.role,
-                                    role_obj.additional_information,
-                                )
-                                existing_roles_map[
-                                    current_role_key_after_create
-                                ] = role_obj
-                            self.logger.debug(
-                                f'Creating Fraktion/Party role for '
-                                f'{parliamentarian.id}'
-                            )
+                        else:
+                            parliamentarian_roles_to_update.append(role_obj)
 
                 elif org_type_title == 'Kantonsrat':
                     processed_counts['parliamentarian_roles'] += 1
                     processed_membership_type = True
-                    role = self._map_to_parliamentarian_role(role_text)
-                    start_val = membership.get('start')
-                    start_date_str = (
-                        str(start_val)
-                        if start_val and not isinstance(start_val, bool)
-                        else None
-                    )
-                    end_val = membership.get('end')
-                    end_date_str = (
-                        str(end_val)
-                        if end_val and not isinstance(end_val, bool)
-                        else None
-                    )
+                    if kub_id is not None:
+                        self.seen_role_ids.add(kub_id)
 
-                    current_role_key = (
-                        parliamentarian.id,
-                        None,  # party_id
-                        None,  # group_id
-                        role,  # Actual role from _map_to_parliamentarian_role
-                        None,  # additional_information
+                    role_obj, is_new = self._import_parliamentarian_role(
+                        parliamentarian=parliamentarian,
+                        kub_id=kub_id,
+                        role=self._map_to_parliamentarian_role(role_text),
+                        start=start_date,
+                        end=end_date,
+                        org_type=org_type_title,
                     )
-                    existing_role = existing_roles_map.get(current_role_key)
-
-                    if existing_role:
-                        updated = self._update_parliamentarian_role(
-                            existing_role,
-                            role=role,
-                            start_date=start_date_str,
-                            end_date=end_date_str,
-                            org_type=org_type_title,
-                        )
-                        if updated:
-                            parliamentarian_roles_to_update.append(
-                                existing_role
-                            )
-                            self.logger.debug(
-                                f'Updating Kantonsrat role ({role}) for '
-                                f'{parliamentarian.id}'
-                            )
-                        # No need to append, session flush handles updates.
-                    else:
-                        role_obj = self._create_parliamentarian_role(
-                            parliamentarian=parliamentarian,
-                            role=role,
-                            start_date=start_date_str,
-                            end_date=end_date_str,
-                            org_type=org_type_title,
-                        )
-                        if role_obj:
+                    if role_obj is not None:
+                        if is_new:
                             parliamentarian_roles_to_create.append(role_obj)
-                            # Add the new role to the map
-                            # Ensure the key matches RoleKey type
-                            if parliamentarian.id:
-                                current_role_key_after_create = (
-                                    parliamentarian.id,
-                                    role_obj.party_id,
-                                    role_obj.parliamentary_group_id,
-                                    role_obj.role,
-                                    role_obj.additional_information,
-                                )
-                                existing_roles_map[
-                                    current_role_key_after_create
-                                ] = role_obj
-                            self.logger.debug(
-                                f'Creating Kantonsrat role ({role}) for '
-                                f'{parliamentarian.id}'
-                            )
+                        else:
+                            parliamentarian_roles_to_update.append(role_obj)
 
                 elif org_type_title == 'Sonstige':
                     processed_counts['parliamentarian_roles'] += 1
                     processed_membership_type = True
-                    additional_info = f'{role_text} - {org_name}'
-                    start_val = membership.get('start')
-                    start_date_str = (
-                        str(start_val)
-                        if start_val and not isinstance(start_val, bool)
-                        else None
-                    )
-                    end_val = membership.get('end')
-                    end_date_str = (
-                        str(end_val)
-                        if end_val and not isinstance(end_val, bool)
-                        else None
-                    )
+                    if kub_id is not None:
+                        self.seen_role_ids.add(kub_id)
 
-                    current_role_key = (
-                        parliamentarian.id,
-                        None,  # party_id
-                        None,  # group_id
-                        'member',  # Role type
-                        additional_info,  # additional_information
+                    role_obj, is_new = self._import_parliamentarian_role(
+                        parliamentarian=parliamentarian,
+                        kub_id=kub_id,
+                        role='member',
+                        additional_information=f'{role_text} - {org_name}',
+                        start=start_date,
+                        end=end_date,
+                        org_type=org_type_title,
                     )
-                    existing_role = existing_roles_map.get(current_role_key)
-
-                    if existing_role:
-                        updated = self._update_parliamentarian_role(
-                            existing_role,
-                            role='member',
-                            additional_information=additional_info,
-                            start_date=start_date_str,
-                            end_date=end_date_str,
-                            org_type=org_type_title,
-                        )
-                        if updated:
-                            parliamentarian_roles_to_update.append(
-                                existing_role
-                            )
-                            self.logger.debug(
-                                f'Updating Sonstige role for '
-                                f'{parliamentarian.id}: {additional_info}'
-                            )
-                        # No need to append, session flush handles updates.
-                    else:
-                        role_obj = self._create_parliamentarian_role(
-                            parliamentarian=parliamentarian,
-                            role='member',
-                            additional_information=additional_info,
-                            start_date=start_date_str,
-                            end_date=end_date_str,
-                            org_type=org_type_title,
-                        )
-                        if role_obj:
+                    if role_obj is not None:
+                        if is_new:
                             parliamentarian_roles_to_create.append(role_obj)
-                            # Add the new role to the map
-                            # Ensure the key matches RoleKey type
-                            if parliamentarian.id:
-                                current_role_key_after_create = (
-                                    parliamentarian.id,
-                                    role_obj.party_id,
-                                    role_obj.parliamentary_group_id,
-                                    role_obj.role,
-                                    role_obj.additional_information,
-                                )
-                                existing_roles_map[
-                                    current_role_key_after_create
-                                ] = role_obj
-                            self.logger.debug(
-                                f'Creating Sonstige role for '
-                                f'{parliamentarian.id}: {additional_info}'
-                            )
+                        else:
+                            parliamentarian_roles_to_update.append(role_obj)
                 else:
                     # Count skipped/unknown types
                     if not processed_membership_type:
@@ -1343,6 +1109,11 @@ class MembershipImporter(DataImporter):
         if parliamentarian_roles_to_create:
             self._bulk_save(
                 parliamentarian_roles_to_create, 'new parliamentarian roles'
+            )
+
+        if memberships_data:
+            processed_counts['deleted'] = self._delete_vanished(
+                parliamentarian_ids
             )
 
         # Flush is removed, commit at the end of import_zug_kub_data
@@ -1395,138 +1166,321 @@ class MembershipImporter(DataImporter):
             f'Roles(C:{len(details["parliamentarian_roles"]["created"])}, '
             f'U:{len(details["parliamentarian_roles"]["updated"])}, '
             f'P:{details["parliamentarian_roles"]["processed"]}), '
+            f'Deleted: {processed_counts["deleted"]}, '
             f'Skipped: {processed_counts["skipped"]}'
         )
         return details, processed_counts
 
-    def _create_commission_membership(
+    def _parse_kub_id(self, membership_data: MembershipData) -> UUID | None:
+        """The id of the membership in KUB, if it is a valid UUID."""
+        raw_id = membership_data.get('id')
+        if not raw_id:
+            return None
+        try:
+            return UUID(str(raw_id))
+        except ValueError:
+            self.logger.warning(f'Invalid UUID for membership: {raw_id}')
+            return None
+
+    def _membership_dates(
+        self, membership_data: MembershipData
+    ) -> tuple[date | None, date | None]:
+        start = membership_data.get('start')
+        end = membership_data.get('end')
+        return (
+            self.parse_date(
+                str(start) if start and not isinstance(start, bool) else None
+            ),
+            self.parse_date(
+                str(end) if end and not isinstance(end, bool) else None
+            ),
+        )
+
+    def _prefetch(
+        self,
+        parliamentarian_ids: list[UUID],
+        memberships_data: Sequence[MembershipData],
+    ) -> None:
+        """Loads the roles and memberships of the parliamentarians we are
+        about to import, indexed by KUB id and by organization."""
+
+        self.payload_ids = {
+            kub_id
+            for kub_id in (
+                self._parse_kub_id(membership)
+                for membership in memberships_data
+            )
+            if kub_id is not None
+        }
+        self.seen_membership_ids = set()
+        self.seen_role_ids = set()
+        self.memberships_by_kub_id = {}
+        self.memberships_by_bucket = {}
+        self.roles_by_kub_id = {}
+        self.roles_by_bucket = {}
+
+        if not parliamentarian_ids:
+            return
+
+        memberships = (
+            self.session.query(PASCommissionMembership)
+            .filter(
+                PASCommissionMembership.parliamentarian_id.in_(
+                    parliamentarian_ids
+                )
+            )
+            .all()
+        )
+        for membership in memberships:
+            self._register_membership(membership)
+
+        roles = (
+            self.session.query(PASParliamentarianRole)
+            .filter(
+                PASParliamentarianRole.parliamentarian_id.in_(
+                    parliamentarian_ids
+                )
+            )
+            .options(
+                selectinload(PASParliamentarianRole.party),
+                selectinload(PASParliamentarianRole.parliamentary_group),
+            )
+            .all()
+        )
+        for role in roles:
+            self._register_role(
+                role,
+                (
+                    role.parliamentarian_id,
+                    role.party_id,
+                    role.parliamentary_group_id,
+                    role.additional_information,
+                ),
+            )
+
+        self.logger.debug(
+            f'Pre-fetched {len(memberships)} commission memberships and '
+            f'{len(roles)} parliamentarian roles.'
+        )
+
+    def _register_membership(
+        self, membership: PASCommissionMembership
+    ) -> None:
+        if membership.external_kub_id:
+            self.memberships_by_kub_id[membership.external_kub_id] = membership
+        bucket = (membership.parliamentarian_id, membership.commission_id)
+        rows = self.memberships_by_bucket.setdefault(bucket, [])
+        if membership not in rows:
+            rows.append(membership)
+
+    def _register_role(
+        self, role: PASParliamentarianRole, bucket: RoleBucket
+    ) -> None:
+        if role.external_kub_id:
+            self.roles_by_kub_id[role.external_kub_id] = role
+        rows = self.roles_by_bucket.setdefault(bucket, [])
+        if role not in rows:
+            rows.append(role)
+
+    def _match[
+        T: (PASCommissionMembership, PASParliamentarianRole)
+    ](
+        self,
+        candidates: Sequence[T],
+        role: str,
+        start: date | None,
+        end: date | None,
+    ) -> tuple[Match, T | None]:
+        """Decides what to do with a membership from KUB, given the rows we
+        already have for the same person and organization.
+
+        - ``duplicate``: KUB holds two memberships for the same period, we
+          only keep one row
+        - ``adopt``: the row predates ``external_kub_id`` (or its membership
+          is gone from KUB), it takes over the id of this membership
+        - ``create``: a period we haven't seen before
+        """
+        stale = []
+        for candidate in candidates:
+            if (
+                candidate.external_kub_id
+                and candidate.external_kub_id in self.payload_ids
+            ):
+                if candidate.role == role and periods_overlap(
+                    candidate.start, candidate.end, start, end
+                ):
+                    return 'duplicate', candidate
+            else:
+                stale.append(candidate)
+
+        for candidate in stale:
+            if candidate.start == start:
+                return 'adopt', candidate
+        for candidate in stale:
+            if candidate.role == role and periods_overlap(
+                candidate.start, candidate.end, start, end
+            ):
+                return 'adopt', candidate
+        return 'create', None
+
+    def _import_commission_membership(
         self,
         parliamentarian: PASParliamentarian,
         commission: PASCommission,
-        membership_data: MembershipData,
-    ) -> PASCommissionMembership | None:
-        """Create a CommissionMembership object."""
-        try:
-            if not parliamentarian.id or not commission.id:
-                self.logger.warning(
-                    f'Missing ID: Parliamentarian={parliamentarian.id}, '
-                    f'Commission={commission.id}'
-                )
-                return None
+        kub_id: UUID | None,
+        role: MembershipRole,
+        start: date | None,
+        end: date | None,
+    ) -> tuple[PASCommissionMembership | None, bool]:
+        """Creates, updates or merges a single commission membership.
 
-            role_text = membership_data.get('role', '')
-            role = self._map_to_commission_role(role_text)
-
-            start = membership_data.get('start')
-            end = membership_data.get('end')
-
-            start_date = self.parse_date(
-                str(start) if start and not isinstance(start, bool) else None
-            )
-            end_date = self.parse_date(
-                str(end) if end and not isinstance(end, bool) else None
-            )
-
-            assert parliamentarian.id is not None
-            assert commission.id is not None
-            return PASCommissionMembership(
-                parliamentarian=parliamentarian,
-                parliamentarian_id=parliamentarian.id,
-                commission=commission,
-                commission_id=commission.id,
-                role=role,
-                start=start_date,
-                end=end_date,
-            )
-        except Exception:
-            self.logger.exception(
-                'Error creating commission membership'
-            )
-            return None
-
-    def _update_commission_membership(
-        self,
-        membership: PASCommissionMembership,
-        membership_data: MembershipData
-    ) -> bool:
+        Returns the membership that was created or changed (if any) and
+        whether it is a new one.
         """
-        Updates an existing CommissionMembership object.
-        Returns True if changed.
-        """
-        changed = False
-        new_role = self._map_to_commission_role(
-            membership_data.get('role', '')
-        )
-        start_val = membership_data.get('start')
-        new_start = self.parse_date(
-            str(start_val)
-            if start_val and not isinstance(start_val, bool)
-            else None
-        )
-        end_val = membership_data.get('end')
-        new_end = self.parse_date(
-            str(end_val) if end_val and not isinstance(end_val, bool) else None
-        )
+        if not parliamentarian.id or not commission.id:
+            self.logger.warning(
+                f'Missing ID: Parliamentarian={parliamentarian.id}, '
+                f'Commission={commission.id}'
+            )
+            return None, False
 
-        if membership.role != new_role:
-            membership.role = new_role
-            changed = True
-        if membership.start != new_start:
-            membership.start = new_start
-            changed = True
-        if membership.end != new_end:
-            membership.end = new_end
-            changed = True
+        match: Match = 'kub'
+        existing = self.memberships_by_kub_id.get(kub_id) if kub_id else None
+        if existing is None:
+            match, existing = self._match(
+                self.memberships_by_bucket.get(
+                    (parliamentarian.id, commission.id), []
+                ),
+                role,
+                start,
+                end,
+            )
 
-        return changed
+        if match == 'duplicate':
+            self.logger.info(
+                f'Merging duplicate KUB membership {kub_id} of '
+                f'{parliamentarian.id} in commission {commission.id}'
+            )
+            return None, False
 
-    def _create_parliamentarian_role(
+        if existing is not None:
+            changed = False
+            if match == 'adopt' and kub_id:
+                existing.external_kub_id = kub_id
+                self._register_membership(existing)
+                changed = True
+            if existing.role != role:
+                existing.role = role
+                changed = True
+            if existing.start != start:
+                existing.start = start
+                changed = True
+            if existing.end != end:
+                existing.end = end
+                changed = True
+            return (existing, False) if changed else (None, False)
+
+        membership = PASCommissionMembership(
+            parliamentarian=parliamentarian,
+            parliamentarian_id=parliamentarian.id,
+            commission=commission,
+            commission_id=commission.id,
+            external_kub_id=kub_id,
+            role=role,
+            start=start,
+            end=end,
+        )
+        self._register_membership(membership)
+        self.logger.debug(
+            f'Creating commission membership for {parliamentarian.id} in '
+            f'{commission.id}'
+        )
+        return membership, True
+
+    def _import_parliamentarian_role(
         self,
         parliamentarian: PASParliamentarian,
+        kub_id: UUID | None,
         role: Role,
         parliamentary_group: PASParliamentaryGroup | None = None,
         parliamentary_group_role: ParliamentaryGroupRole | None = None,
         party: Party | None = None,
         party_role: PartyRole | None = None,
         additional_information: str | None = None,
-        start_date: str | None = None,
-        end_date: str | None = None,
+        start: date | None = None,
+        end: date | None = None,
         org_type: str | None = None,
-    ) -> PASParliamentarianRole | None:
-        try:
-            # Ensure parliamentarian has an ID
-            if not parliamentarian.id:
-                self.logger.warning(
-                    'Skipping parliamentarian role: '
-                    'PASParliamentarian missing '
-                    f'ID: {parliamentarian.first_name} '
-                    f'{parliamentarian.last_name}'
-                )
-                return None
+    ) -> tuple[PASParliamentarianRole | None, bool]:
+        """Creates, updates or merges a single parliamentarian role.
 
-            meta: dict[str, str] = {}
-            if org_type:
-                meta['org_type'] = org_type
+        Returns the role that was created or changed (if any) and whether it
+        is a new one.
+        """
+        if not parliamentarian.id:
+            self.logger.warning(
+                'Skipping parliamentarian role: PASParliamentarian missing '
+                f'ID: {parliamentarian.first_name} {parliamentarian.last_name}'
+            )
+            return None, False
 
-            assert parliamentarian.id is not None
-            return PASParliamentarianRole(
-                parliamentarian=parliamentarian,
-                parliamentarian_id=parliamentarian.id,
+        bucket: RoleBucket = (
+            parliamentarian.id,
+            party.id if party else None,
+            parliamentary_group.id if parliamentary_group else None,
+            additional_information,
+        )
+        match: Match = 'kub'
+        existing = self.roles_by_kub_id.get(kub_id) if kub_id else None
+        if existing is None:
+            match, existing = self._match(
+                self.roles_by_bucket.get(bucket, []), role, start, end
+            )
+
+        if match == 'duplicate':
+            self.logger.info(
+                f'Merging duplicate KUB membership {kub_id} of '
+                f'{parliamentarian.id}'
+            )
+            return None, False
+
+        if existing is not None:
+            changed = self._update_parliamentarian_role(
+                existing,
                 role=role,
                 parliamentary_group=parliamentary_group,
-                parliamentary_group_role=parliamentary_group_role or 'none',
+                parliamentary_group_role=parliamentary_group_role,
                 party=party,
-                party_role=party_role or 'none',
+                party_role=party_role,
                 additional_information=additional_information,
-                start=self.parse_date(start_date),
-                end=self.parse_date(end_date),
-                meta=meta,
+                start=start,
+                end=end,
+                org_type=org_type,
             )
-        except Exception:
-            self.logger.exception(
-                'Error creating parliamentarian role'
-            )
-            return None
+            if match == 'adopt' and kub_id:
+                existing.external_kub_id = kub_id
+                self._register_role(existing, bucket)
+                changed = True
+            return (existing, False) if changed else (None, False)
+
+        role_obj = PASParliamentarianRole(
+            parliamentarian=parliamentarian,
+            parliamentarian_id=parliamentarian.id,
+            external_kub_id=kub_id,
+            role=role,
+            parliamentary_group=parliamentary_group,
+            parliamentary_group_role=parliamentary_group_role or 'none',
+            party=party,
+            party_role=party_role or 'none',
+            additional_information=additional_information,
+            start=start,
+            end=end,
+            meta={'org_type': org_type} if org_type else {},
+        )
+        self._register_role(role_obj, bucket)
+        self.logger.debug(
+            f'Creating {org_type} role ({role}) for {parliamentarian.id}'
+        )
+        return role_obj, True
 
     def _update_parliamentarian_role(
         self,
@@ -1537,8 +1491,8 @@ class MembershipImporter(DataImporter):
         party: Party | None = None,
         party_role: PartyRole | None = None,
         additional_information: str | None = None,
-        start_date: str | None = None,
-        end_date: str | None = None,
+        start: date | None = None,
+        end: date | None = None,
         org_type: str | None = None,
     ) -> bool:
         """
@@ -1546,8 +1500,6 @@ class MembershipImporter(DataImporter):
         Returns True if changed.
         """
         changed = False
-        new_start = self.parse_date(start_date)
-        new_end = self.parse_date(end_date)
 
         # Update fields only if they are provided for the specific role type
         if role_obj.role != role:
@@ -1577,17 +1529,72 @@ class MembershipImporter(DataImporter):
         ):
             role_obj.additional_information = additional_information
             changed = True
-        if role_obj.start != new_start:
-            role_obj.start = new_start
+        if role_obj.start != start:
+            role_obj.start = start
             changed = True
-        if role_obj.end != new_end:
-            role_obj.end = new_end
+        if role_obj.end != end:
+            role_obj.end = end
             changed = True
         if org_type and role_obj.meta.get('org_type') != org_type:
             role_obj.meta['org_type'] = org_type
             changed = True
 
         return changed
+
+    def _delete_vanished(self, parliamentarian_ids: list[UUID]) -> int:
+        """Deletes the roles and memberships whose KUB membership is gone.
+
+        Rows without an ``external_kub_id`` were entered by hand and are
+        never touched.
+        """
+        if not parliamentarian_ids:
+            return 0
+
+        deleted = 0
+        memberships = (
+            self.session.query(PASCommissionMembership)
+            .filter(
+                PASCommissionMembership.parliamentarian_id.in_(
+                    parliamentarian_ids
+                ),
+                PASCommissionMembership.external_kub_id.isnot(None),
+                PASCommissionMembership.external_kub_id.notin_(
+                    self.seen_membership_ids
+                ),
+            )
+            .all()
+        )
+        for membership in memberships:
+            self.logger.info(
+                f'Deleting commission membership {membership.external_kub_id} '
+                f'of {membership.parliamentarian_id}, it no longer exists '
+                f'in KUB'
+            )
+            self.session.delete(membership)
+            deleted += 1
+
+        roles = (
+            self.session.query(PASParliamentarianRole)
+            .filter(
+                PASParliamentarianRole.parliamentarian_id.in_(
+                    parliamentarian_ids
+                ),
+                PASParliamentarianRole.external_kub_id.isnot(None),
+                PASParliamentarianRole.external_kub_id.notin_(
+                    self.seen_role_ids
+                ),
+            )
+            .all()
+        )
+        for role_obj in roles:
+            self.logger.info(
+                f'Deleting role {role_obj.external_kub_id} of '
+                f'{role_obj.parliamentarian_id}, it no longer exists in KUB'
+            )
+            self.session.delete(role_obj)
+            deleted += 1
+
+        return deleted
 
     def _map_to_commission_role(
         self, role_text: str

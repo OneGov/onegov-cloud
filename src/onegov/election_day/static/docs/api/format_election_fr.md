@@ -46,6 +46,11 @@ Lors du téléchargement des résultats d'une élection régionale, seules les e
 
 ## Formats
 
+### eCH-0252
+
+Voir [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
+
+
 ### Onegov
 
 Le format, qui sera utilisé par l'application web pour l'exportation, se compose d'un seul fichier par élection. Une ligne est présente pour chaque municipalité et candidat.

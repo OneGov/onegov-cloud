@@ -11,7 +11,7 @@ var FormHighlightRules = function() {
         start: [
             {
                 token: 'comment',
-                regex: '^#.*'
+                regex: /^\s*#.*/
             },
             {
                 token: 'support.function',

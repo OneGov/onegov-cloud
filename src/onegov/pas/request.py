@@ -17,7 +17,7 @@ class PasRequest(TownRequest):
         return is_parliamentarian(self.current_user)
 
     @cached_property
-    def is_commission_president(self) -> bool:
+    def has_commission_president_role(self) -> bool:
         user = self.current_user
         if not user:
             return False

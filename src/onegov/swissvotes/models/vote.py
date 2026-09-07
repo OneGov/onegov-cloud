@@ -55,7 +55,7 @@ class Poster(NamedTuple):
     label: str
 
 
-class encoded_property:  # noqa: N801
+class encoded_property:  # ruff:ignore[invalid-class-name]
     """ A shorthand property to return the label of an encoded value. Requires
     the instance the have a `codes`-lookup function. Creates the SqlAlchemy
     Column (with a prefixed underline).
@@ -86,7 +86,7 @@ class encoded_property:  # noqa: N801
         return instance.codes(self.name).get(value)
 
 
-class localized_property[StrT: str | None = str | None]:  # noqa: N801
+class localized_property[StrT: str | None = str | None]:  # ruff:ignore[invalid-class-name]
     """ A shorthand property to return a localized attribute. Requires at least
     a `xxx_de` attribute and falls back to this.
 
@@ -1065,19 +1065,19 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     )
 
     # searchable attachment texts
-    searchable_text_de_CH: Mapped[str | None] = mapped_column(  # noqa: N815
+    searchable_text_de_CH: Mapped[str | None] = mapped_column(  # ruff:ignore[mixed-case-variable-in-class-scope]
         TSVECTOR,
         deferred=True
     )
-    searchable_text_fr_CH: Mapped[str | None] = mapped_column(  # noqa: N815
+    searchable_text_fr_CH: Mapped[str | None] = mapped_column(  # ruff:ignore[mixed-case-variable-in-class-scope]
         TSVECTOR,
         deferred=True
     )
-    searchable_text_it_CH: Mapped[str | None] = mapped_column(  # noqa: N815
+    searchable_text_it_CH: Mapped[str | None] = mapped_column(  # ruff:ignore[mixed-case-variable-in-class-scope]
         TSVECTOR,
         deferred=True
     )
-    searchable_text_en_US: Mapped[str | None] = mapped_column(  # noqa: N815
+    searchable_text_en_US: Mapped[str | None] = mapped_column(  # ruff:ignore[mixed-case-variable-in-class-scope]
         TSVECTOR,
         deferred=True
     )

@@ -69,7 +69,7 @@ var PreviewWidgetHandler = function(el) {
             field.addEventListener('click', submit, false);
         },
         'type': function(field) {
-            field.addEventListener('keypress', debounce(function() {
+            field.addEventListener('keyup', debounce(function() {
                 submit();
             }, 250));
         },

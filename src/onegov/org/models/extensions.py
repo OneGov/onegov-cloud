@@ -49,7 +49,7 @@ from typing import cast, Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
-    from onegov.org.models import GeneralFile  # noqa: F401
+    from onegov.org.models import GeneralFile  # ruff:ignore[unused-import]
     from onegov.org.request import OrgRequest
     from onegov.org.models import ImageSet
     from sqlalchemy.orm import Mapped
@@ -135,6 +135,17 @@ class ContentExtension:
         raise NotImplementedError
 
 
+#: Labels for the ``access`` levels of :class:`AccessExtension`.
+ACCESS_LABELS = {
+    'public': _('Public'),
+    'secret': _('Through URL only (not listed)'),
+    'private': _('Only by privileged users'),
+    'member': _('Only by privileged users and members'),
+    'mtan': _('Only by privileged users or after submitting a mTAN'),
+    'secret_mtan': _('Through URL only after submitting a mTAN (not listed)'),
+}
+
+
 class AccessExtension(ContentExtension):
     """ Extends any class that has a meta dictionary field with the ability to
     set one of the following access levels:
@@ -163,21 +174,17 @@ class AccessExtension(ContentExtension):
     ) -> type[T]:
 
         access_choices = [
-            ('public', _('Public')),
-            ('secret', _('Through URL only (not listed)')),
-            ('private', _('Only by privileged users')),
-            ('member', _('Only by privileged users and members')),
+            (value, ACCESS_LABELS[value])
+            for value in ('public', 'secret', 'private', 'member')
         ]
 
         if request.app.can_deliver_sms:
             # allowing mtan restricted models makes only sense
             # if we can deliver SMS
-            access_choices.append(('mtan', _(
-                'Only by privileged users or after submitting a mTAN'
-            )))
-            access_choices.append(('secret_mtan', _(
-                'Through URL only after submitting a mTAN (not listed)'
-            )))
+            access_choices.append(('mtan', ACCESS_LABELS['mtan']))
+            access_choices.append(
+                ('secret_mtan', ACCESS_LABELS['secret_mtan'])
+            )
 
         fields: dict[str, Field] = {
             'access': RadioField(
@@ -601,9 +608,9 @@ class PersonLinkExtension(ContentExtension):
         PersonForm.Meta = meta
 
         if TYPE_CHECKING:
-            FieldBase = FieldList[FormField[PersonForm]]  # noqa: N806
+            FieldBase = FieldList[FormField[PersonForm]]  # ruff:ignore[non-lowercase-variable-in-function]
         else:
-            FieldBase = FieldList  # noqa: N806
+            FieldBase = FieldList  # ruff:ignore[non-lowercase-variable-in-function]
 
         class PeopleField(FieldBase):
             def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:

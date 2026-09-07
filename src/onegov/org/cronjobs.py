@@ -7,7 +7,6 @@ import logging
 from babel.dates import get_month_names
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from functools import lru_cache
 from inspect import isabstract
 from itertools import groupby, chain
 from markupsafe import Markup
@@ -18,11 +17,12 @@ from onegov.core.orm import find_models
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.directory import DirectoryEntry
 from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.event import Occurrence, Event, EventCollection
 from onegov.file import FileCollection
 from onegov.file.models import SigningRequest
-from onegov.form import FormSubmission, parse_form, Form
+from onegov.form import FormSubmission
 from onegov.newsletter.models import Recipient
 from onegov.newsletter import (Newsletter, NewsletterCollection,
                                RecipientCollection)
@@ -40,13 +40,16 @@ from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from cryptography.fernet import InvalidToken
-from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
+from onegov.org.models import (
+    ExtendedDirectoryEntry, TicketMessage)
 from onegov.org.notification_service import (
     get_notification_service,
 )
 from onegov.org.utils import emails_for_new_ticket
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.directory import (
+    send_admin_expiry_notification_for_directory_entry,
+    send_admin_notification_for_directory_entry,
     send_email_notification_for_directory_entry)
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
@@ -61,7 +64,7 @@ from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import undefer
+from sqlalchemy.orm import undefer, joinedload
 from urllib3.util import Retry
 from uuid import UUID
 
@@ -231,6 +234,8 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
                 )
             )
         )
+        if issubclass(model, DirectoryEntry):
+            query = query.options(joinedload(model.directory))
         objects.update(query)
 
     for obj in objects:
@@ -250,6 +255,15 @@ def handle_publication_models(request: OrgRequest, now: datetime) -> None:
         ):
             send_email_notification_for_directory_entry(
                 obj.directory, obj, request)
+
+        if (isinstance(obj, ExtendedDirectoryEntry) and
+                obj.directory.notification_address):
+            if obj.publication_end is None or obj.publication_end > now:
+                send_admin_notification_for_directory_entry(
+                    obj.directory, obj, request)
+            else:
+                send_admin_expiry_notification_for_directory_entry(
+                    obj.directory, obj, request)
 
 
 def delete_old_tans(request: OrgRequest) -> None:
@@ -602,8 +616,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         .with_entities(
             Resource.id,
             Resource.group,
-            Resource.title,
-            Resource.definition
+            Resource.title
         )
         .order_by(Resource.group, Resource.name, Resource.id)
     )
@@ -612,10 +625,6 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         (r.id.hex, f'{r.group or default_group} - {r.title}')
         for r in all_resources
     )
-
-    @lru_cache(maxsize=128)
-    def form(definition: str) -> type[Form]:
-        return parse_form(definition)
 
     # get the reservations of this day
     start = align_date_to_day(today, 'Europe/Zurich', 'down')
@@ -650,7 +659,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
             #        temporary attribute
             reservation.submission = submission  # type:ignore
 
-    # group th reservations by resource
+    # group the reservations by resource
     reservations = {
         resid.hex: tuple(reservations) for resid, reservations in groupby(
             all_reservations, key=lambda r: r.resource
@@ -667,7 +676,6 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         ),
         'organisation': request.app.org.title,
         'resources': resources,
-        'parse_form': form
     }
 
     for address, included_resources in recipients:
@@ -681,6 +689,107 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         request.app.send_transactional_email(
             subject=args['title'],
             receivers=(address, ),
+            content=content
+        )
+
+
+@OrgApp.cronjob(hour='6', minute='56', timezone='Europe/Zurich')
+def send_daily_reservation_reminders(request: OrgRequest) -> None:
+    """
+    Send reminders for reservations in 10 days. Attached the
+    reservation confirmation.
+    """
+    today = to_timezone(utcnow(), 'Europe/Zurich')
+
+    # target the whole calendar day 10 days ahead (time of day is irrelevant)
+    day_start = align_date_to_day(
+        today + timedelta(days=10), 'Europe/Zurich', 'down'
+    )
+    day_end = day_start + timedelta(days=1)
+
+    # accepted reservations starting on the target day; group reservations
+    # (NULL start) are excluded, but onegov.org never creates them anyway
+    all_reservations = (
+        request.session.query(Reservation)
+        .filter(Reservation.status == 'approved')
+        .filter(Reservation.data['accepted'] == True)
+        .filter(Reservation.start >= day_start)
+        .filter(Reservation.start < day_end)
+        .order_by(Reservation.resource, Reservation.start)
+        .all()
+    )
+    if not all_reservations:
+        return
+
+    # load the resources these reservations belong to
+    resources = ResourceCollection(request.app.libres_context)
+    resources_by_id = {
+        resource.id: resource
+        for resource in resources.query()
+        .filter(Resource.id.in_({r.resource for r in all_reservations}))
+        .filter(Resource.enable_reservation_reminders)
+    }
+
+    # load the linked form submissions (the reservation confirmation)
+    submissions_by_id = {
+        submission.id: submission
+        for submission in request.session.query(FormSubmission).filter(
+            FormSubmission.id.in_({r.token for r in all_reservations})
+        )
+    }
+
+    layout = DefaultMailLayout(object(), request)
+
+    reservations_by_email: dict[str, list[Reservation]] = {}
+    for reservation in all_reservations:
+        if reservation.resource in resources_by_id:
+            reservations_by_email.setdefault(
+                reservation.email, []
+            ).append(reservation)
+
+    for email, reservations in reservations_by_email.items():
+        items = []
+        seen_tokens = set()
+        for reservation in reservations:
+            # reservations booked in one request share a token and thus a
+            # single confirmation
+            submission = submissions_by_id.get(reservation.token)
+            if reservation.token in seen_tokens:
+                submission = None
+            else:
+                seen_tokens.add(reservation.token)
+            items.append({
+                'resource': resources_by_id[reservation.resource],
+                'resource_url': request.link(
+                    resources_by_id[reservation.resource]
+                ),
+                'reservation': reservation,
+                'form': submission.form_obj if submission else None,
+            })
+
+        if len(items) == 1:
+            title = request.translate(
+                _('Reminder: your reservation for ${resource}', mapping={
+                    'resource': resources_by_id[reservations[0].resource].title
+                })
+            )
+        else:
+            title = request.translate(
+                _('Reminder: your upcoming reservations')
+            )
+
+        content = render_template(
+            'mail_daily_reservation_reminder.pt', request, {
+                'layout': layout,
+                'title': title,
+                'organisation': request.app.org.title,
+                'reservations': items,
+            }
+        )
+
+        request.app.send_transactional_email(
+            subject=title,
+            receivers=(email, ),
             content=content
         )
 

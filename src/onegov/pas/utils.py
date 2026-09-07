@@ -4,7 +4,7 @@ import niquests
 
 from babel.numbers import format_decimal
 from datetime import date
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from lxml import html
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import PASCommission
@@ -17,7 +17,6 @@ from onegov.pas.models.presidential_allowance import (
 )
 from onegov.pas.collections import PASParliamentarianCollection
 from sqlalchemy.orm import selectinload
-from uuid import UUID
 
 
 from typing import TYPE_CHECKING
@@ -27,10 +26,10 @@ if TYPE_CHECKING:
     from onegov.parliament.models.parliamentarian_role import (
         ParliamentarianRole,
     )
-    from onegov.pas.models import SettlementRun
 
     from onegov.user import User
     from sqlalchemy.orm import Session
+    from uuid import UUID
 
 
 def _is_kantonsrat_role(
@@ -129,52 +128,41 @@ def format_swiss_number(value: Decimal | int) -> str:
     return format_decimal(value, format='#,##0.00', locale='de_CH')
 
 
-def round_to_five_rappen(value: Decimal | int) -> Decimal:
-    """Round a decimal value to the nearest 5 Rappen (0.05 CHF)."""
-    if isinstance(value, int):
-        value = Decimal(value)
-
-    return (value / Decimal('0.05')).quantize(
-        Decimal('1'), rounding=ROUND_HALF_UP
-    ) * Decimal('0.05')
-
-
-def is_commission_president(
+def is_kantonsrat_president(
     parliamentarian: PASParliamentarian,
-    attendance_or_commission_id: Attendence | UUID,
-    settlement_run: SettlementRun
+    on_date: date,
 ) -> bool:
+    """The Kantonsratspräsidium is a role on the parliamentarian and not a
+    commission membership.
+
     """
-    Check if a parliamentarian is president of the commission for the given
-    attendance or commission_id during the settlement run period.
+    return any(
+        role.role == 'president'
+        and _is_kantonsrat_role(role)
+        and (role.start is None or role.start <= on_date)
+        and (role.end is None or role.end >= on_date)
+        for role in parliamentarian.roles
+    )
+
+
+def is_president_for_attendance(
+    parliamentarian: PASParliamentarian,
+    attendance: Attendence,
+) -> bool:
+    """Whether the president rate applies. A plenary session has no
+    commission, there the Kantonsratspräsidium decides.
+
     """
-    if isinstance(attendance_or_commission_id, UUID):
-        commission_id = attendance_or_commission_id
-        return any(
-            cm.role == 'president'
-            for cm in parliamentarian.commission_memberships
-            if (
-                cm.commission_id == commission_id and (
-                    cm.end is None or cm.end >= settlement_run.start
-                ) and (
-                    cm.start is None or cm.start <= settlement_run.end
-                )
-            )
-        )
-    else:
-        attendance = attendance_or_commission_id
-        return any(
-            cm.role == 'president'
-            for cm in parliamentarian.commission_memberships
-            if (
-                attendance.commission and
-                cm.commission_id == attendance.commission.id and (
-                    cm.end is None or cm.end >= settlement_run.start
-                ) and (
-                    cm.start is None or cm.start <= settlement_run.end
-                )
-            )
-        )
+    if attendance.type == 'plenary':
+        return is_kantonsrat_president(parliamentarian, attendance.date)
+
+    if attendance.commission_id is None:
+        return False
+
+    return parliamentarian.has_commission_presidency(
+        on_date=attendance.date,
+        commission_id=attendance.commission_id,
+    )
 
 
 def get_parliamentarians_with_settlements(
@@ -289,21 +277,6 @@ def is_parliamentarian_role(role: str | None) -> bool:
     """Check if a role is a parliamentarian role."""
     parls = {'parliamentarian', 'commission_president'}
     return role in parls if role else False
-
-
-def get_active_commission_memberships(
-    user: User | None
-) -> list[PASCommissionMembership]:
-    """Get active commission memberships for a parliamentarian user."""
-    if (not user or not hasattr(user, 'parliamentarian')
-            or not user.parliamentarian):
-        return []
-
-    parliamentarian = user.parliamentarian
-    return [
-        m for m in parliamentarian.commission_memberships
-        if not m.end or m.end >= date.today()
-    ]
 
 
 def get_commissions_with_memberships(

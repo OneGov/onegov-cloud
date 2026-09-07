@@ -47,6 +47,11 @@ When uploading results of a regional election, only entities of one district are
 
 ## Formats
 
+### eCH-0252
+
+See [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
+
+
 ### Onegov
 
 The format, which will be used by the web application for the export, consists of a single file per election. There is a row for each municipality and candidate.

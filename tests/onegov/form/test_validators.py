@@ -5,6 +5,8 @@ from onegov.core.orm import SessionManager
 from onegov.file.attachments import IMAGE_QUALITY
 from onegov.form import Form
 from onegov.form import parse_form
+from phonenumbers import PhoneNumberType
+
 from onegov.form.fields import UploadField
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import ImageSizeLimit
@@ -82,37 +84,80 @@ def test_phone_number_validator() -> None:
     validator(request, Field(None))
     validator(request, Field(''))
 
+    # non-swiss numbers are allowed by default
+    validator(request, Field('+12398051122'))  # US
+    validator(request, Field('+4909562181751'))  # DE
+    validator(request, Field('+4319876543'))  # A
+    validator(request, Field('+43695621817'))  # A
+    validator(request, Field('+330956218175'))  # FR
+    validator(request, Field('+390612345678'))  # IT
+
     validator(request, Field('+41791112233'))
     validator(request, Field('0041791112233'))
     validator(request, Field('0791112233'))
 
-    # non-swiss numbers are allowed by default
-    validator(request, Field('+4909562181751'))
+    def error(data: int | str | None) -> str:
+        with raises(ValidationError) as exception:
+            validator(request, Field(data))
+        return exception.value.args[0].interpolate()
 
-    with raises(ValidationError):
-        validator(request, Field(1234))
-    with raises(ValidationError):
-        validator(request, Field('1234'))
+    # numbers that cannot be parsed at all
+    assert error(1234) == 'Not a valid phone number.'
+    assert error('not a number') == 'Not a valid phone number.'
 
-    with raises(ValidationError):
-        validator(request, Field('+417911122333'))
-    with raises(ValidationError):
-        validator(request, Field('041791112233'))
-    with raises(ValidationError):
-        validator(request, Field('041791112233'))
-    with raises(ValidationError):
-        validator(request, Field('00791112233'))
+    # the parser rejects an unknown country code
+    assert error('+9991234567') == 'Not a valid country code.'
+    assert error('+99912345') == 'Not a valid country code.'
 
+    # swiss numbers are 9 or 12 digits long, everything else is invalid
+    invalid_length = 'This phone number has an invalid length.'
+    assert error('1234') == invalid_length
+    assert error('00791112233') == invalid_length
+    assert error('+417911122334455') == invalid_length
+    assert error('079111223344556677') == invalid_length
+    assert error('+417911122333') == invalid_length
+    assert error('+4179111223344') == invalid_length
 
-def test_phone_number_validator_whitelist() -> None:
+    # plausible length, but no such number exists
+    assert error('041791112233') == 'This phone number does not exist.'
 
-    class Field(BaseField):
-        def __init__(self, data: str | None) -> None:
-            self.data = data
+    validator = ValidPhoneNumber(country='US')
+    assert error('2345678') == 'Please include the area code.'
+
+    validator = ValidPhoneNumber(number_type=None)
+    validator(request, Field('+41791112233'))
+    validator(request, Field('0041791112233'))
+    validator(request, Field('41791112233'))
+    validator(request, Field('41791112233'))
+    validator(request, Field('41781112233'))
+    validator(request, Field('41771112233'))
+    validator(request, Field('41761112233'))
+    validator(request, Field('41411112233'))
+
+    validator = ValidPhoneNumber(number_type=PhoneNumberType.MOBILE)
+    validator(request, Field('+41791112233'))
+    validator(request, Field('0041791112233'))
+    validator(request, Field('41791112233'))
+    validator(request, Field('41791112233'))
+    validator(request, Field('41781112233'))
+    validator(request, Field('41771112233'))
+    validator(request, Field('41761112233'))
+    assert error('41411112233') == 'Please enter a mobile phone number.'
+
+    validator = ValidPhoneNumber(number_type=PhoneNumberType.FIXED_LINE)
+    landline = 'Please enter a landline phone number.'
+    assert error('+41791112233') == landline
+    assert error('0041791112233') == landline
+    assert error('41791112233') == landline
+    assert error('41781112233') == landline
+    assert error('41771112233') == landline
+    assert error('41761112233') == landline
+    validator(request, Field('41411112233'))
+
+    # the number type is only checked once the number itself is valid
+    assert error('041791112233') == 'This phone number does not exist.'
 
     validator = ValidPhoneNumber(country_whitelist={'CH'})
-
-    request: Any = None
     validator(request, Field(None))
     validator(request, Field(''))
 
@@ -120,9 +165,71 @@ def test_phone_number_validator_whitelist() -> None:
     validator(request, Field('0041791112233'))
     validator(request, Field('0791112233'))
 
-    with raises(ValidationError):
-        # not a swiss number
-        validator(request, Field('+4909562181751'))
+    # not a swiss number
+    unsupported = 'Phone numbers from this country are not supported.'
+    assert error('+4909562181751') == (  # DE
+        f'{unsupported} Allowed countries: CH'
+    )
+
+    # the whitelist is listed in a stable order
+    validator = ValidPhoneNumber(country_whitelist={'LI', 'CH', 'AT'})
+    assert error('+4909562181751') == (  # DE
+        f'{unsupported} Allowed countries: AT, CH, LI'
+    )
+
+    # every whitelisted country is accepted
+    validator(request, Field('+41791112233'))  # CH
+    validator(request, Field('+4319876543'))  # AT
+    validator(request, Field('+4232371234'))  # LI
+
+    # numbers from anywhere else are not, no matter how far away
+    assert error('+390612345678').startswith(unsupported)  # IT
+    assert error('+12025550123').startswith(unsupported)  # US
+
+    # an invalid number is reported as such, not as a country problem
+    assert error('+417911122333') == invalid_length
+    assert error('+42366012345') == invalid_length
+
+    # the whitelist is combined with the other checks
+    validator = ValidPhoneNumber(
+        country_whitelist={'CH', 'AT'},
+        number_type=PhoneNumberType.MOBILE
+    )
+    validator(request, Field('+41791112233'))
+    assert error('+41411112233') == 'Please enter a mobile phone number.'
+    assert error('+390612345678').startswith(unsupported)  # IT
+
+    # the US can't distinguish fixed line from mobile (numbers resolve to
+    # FIXED_LINE_OR_MOBILE), so the aggregate is accepted for either
+    mobile = ValidPhoneNumber(number_type=PhoneNumberType.MOBILE)
+    fixed_line = ValidPhoneNumber(number_type=PhoneNumberType.FIXED_LINE)
+    mobile(request, Field('+12015550123'))  # US
+    fixed_line(request, Field('+12015550123'))  # US
+
+    # swiss numbers can be distinguished, so the type is enforced
+    mobile(request, Field('+41791112233'))  # CH mobile
+    fixed_line(request, Field('+41411112233'))  # CH landline
+
+    # unsupported type in the region (international numbers) -> check skipped
+    mobile(request, Field('+80012345678'))  # UIFN, region '001'
+    fixed_line(request, Field('+870773111632'))  # Inmarsat, region '001'
+
+    # a non mobile/fixed type: matching passes, mismatching gets generic error
+    toll_free = ValidPhoneNumber(number_type=PhoneNumberType.TOLL_FREE)
+    toll_free(request, Field('+18002223333'))  # US toll free
+    with raises(ValidationError) as exception:
+        toll_free(request, Field('0791112233'))  # CH mobile
+    assert exception.value.args[0].interpolate() == 'Not a valid phone number.'
+
+    # the default country has to be part of the whitelist
+    with raises(AssertionError) as ex:
+        ValidPhoneNumber(country='DE', country_whitelist={'CH'})
+    assert "Invalid country code: DE. Allowed are: ['CH']" in str(ex.value)
+
+    # the same goes for an unknown number type
+    with raises(AssertionError) as ex:
+        ValidPhoneNumber(number_type=999)
+    assert "Invalid number type: 999" in str(ex.value)
 
 
 def test_input_required_if_validator() -> None:

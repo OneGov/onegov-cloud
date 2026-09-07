@@ -9,6 +9,9 @@ from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.sms_processor import SmsQueueProcessor
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import ElectionCollection
+from onegov.election_day.collections import ElectionCompoundCollection
+from onegov.election_day.collections import VoteCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Subscriber
 from onegov.election_day.utils import add_local_results
@@ -185,9 +188,8 @@ def generate_archive() -> Processor:
         if not archive_zip:
             abort('generate_archive returned None.')
 
-        archive_filesize = archive_generator.archive_dir.getinfo(
-            archive_zip, namespaces=['details']).size
-
+        archive_stat = os.stat(archive_generator.archive_system_path)
+        archive_filesize = archive_stat.st_size
         if archive_filesize == 0:
             click.secho('Generated archive is empty', fg='red')
         else:
@@ -250,3 +252,41 @@ def migrate_subscribers() -> Processor:
         click.echo(f'Migrated {count} subscribers')
 
     return migrate
+
+
+@cli.command('delete-elections-and-votes')
+@click.option('--confirm', is_flag=True, default=False,
+              help='Required to actually delete.')
+def delete_elections_and_votes(confirm: bool) -> Processor:
+    r""" Deletes all elections, election compounds, votes and archived results.
+
+    .. code-block:: bash
+
+        onegov-election-day --select '/onegov_election_day/sg' \
+            delete-elections-and-votes --confirm
+
+    """
+
+    def delete(request: ElectionDayRequest, app: ElectionDayApp) -> None:
+        if not confirm:
+            click.secho(
+                'Dry run — pass --confirm to actually delete.', fg='yellow'
+            )
+            return
+
+        session = request.app.session()
+        click.secho(f'Deleting elections/votes for {app.schema}', fg='yellow')
+
+        for election in ElectionCollection(session).query():
+            session.delete(election)
+        for compound in ElectionCompoundCollection(session).query():
+            session.delete(compound)
+        for vote in VoteCollection(session).query():
+            session.delete(vote)
+        session.query(ArchivedResult).filter_by(
+            schema=session.info['schema']
+        ).delete()
+
+        click.secho('Done.', fg='green')
+
+    return delete

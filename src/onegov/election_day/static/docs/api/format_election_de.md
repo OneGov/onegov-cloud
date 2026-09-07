@@ -47,6 +47,11 @@ Bei regionalen Wahlen werden nur Wahlresultate der Einheiten eines Wahlkreises e
 
 ## Formate
 
+### eCH-0252
+
+Siehe [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
+
+
 ### OneGov
 
 Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Wahl. Es gibt für jede Einheit und Kandidat eine Zeile.

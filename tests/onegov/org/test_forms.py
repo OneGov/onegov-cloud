@@ -24,6 +24,7 @@ from onegov.reservation import LibresIntegration
 from onegov.ticket import Ticket, TicketPermission
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
+from sqlalchemy import event
 from unittest.mock import MagicMock
 from uuid import UUID
 from webob.multidict import MultiDict
@@ -739,7 +740,7 @@ def test_user_group_form(
     formdefinition = FormDefinition(
         title='A-1',
         name='a',
-        definition='# A',
+        definition='# A\nE-Mail = @@@',
         order='0',
         checksum='x'
     )
@@ -950,9 +951,13 @@ def test_settings_ticket_permissions(session: Session) -> None:
 
 def test_ticket_assignment_form(session: Session) -> None:
     users = UserCollection(session)
-    user_a = users.add(username='a', password='pwd', role='admin')
+    group = UserGroupCollection(session).add(name='A')
+    user_a = users.add(
+        username='a', password='pwd', role='admin', groups=[group]
+    )
     users.add(username='e', password='pwd', role='editor')
     users.add(username='m', password='pwd', role='member')
+    users.add(username='i', password='pwd', role='admin', active=False)
 
     request: Any = Bunch(
         session=session,
@@ -961,9 +966,27 @@ def test_ticket_assignment_form(session: Session) -> None:
     form = TicketAssignmentForm(data={'user': user_a.id})
     form.model = None
     form.request = request
-    form.on_request()
 
-    assert sorted(name for id_, name in form.user.choices) == ['a', 'e']  # type: ignore
+    statements: list[str] = []
+
+    def count_query(*args: Any) -> None:
+        statements.append(args[2])
+
+    session.expire_all()
+    connection = session.connection()
+    event.listen(connection, 'before_cursor_execute', count_query)
+    try:
+        form.on_request()
+        assert form.username == 'a'
+        assert form.username == 'a'
+    finally:
+        event.remove(connection, 'before_cursor_execute', count_query)
+
+    assert len(statements) == 1
+    names = sorted(  # type: ignore[misc, str-unpack]
+        name for id_, name in form.user.choices
+    )
+    assert names == ['a (A)', 'e']
     assert form.username == 'a'
 
 

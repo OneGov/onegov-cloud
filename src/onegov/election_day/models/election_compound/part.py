@@ -15,12 +15,12 @@ if TYPE_CHECKING:
     from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import ElectionCompoundRelationship
     from onegov.election_day.models import PartyResult
-    from onegov.election_day.types import DomainOfInfluence  # noqa: F401
-    from onegov.core.orm import SessionManager  # noqa: F401
+    from onegov.election_day.types import DomainOfInfluence  # ruff:ignore[unused-import]
+    from onegov.core.orm import SessionManager  # ruff:ignore[unused-import]
     from sqlalchemy.orm import Query
 
 
-class inherited_attribute[T]:  # noqa: N801
+class inherited_attribute[T]:  # ruff:ignore[invalid-class-name]
 
     def __set_name__(
         self,

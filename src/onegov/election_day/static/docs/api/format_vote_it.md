@@ -13,12 +13,12 @@ I formati di file accettabili sono file generati manualmente, dal software elett
     - [Prefazione](#prefazione)
         - [Enti](#enti)
     - [Formati](#formati)
+        - [eCH-0252](#ech-0252)
         - [OneGov](#onegov)
             - [Colonne](#colonne)
             - [Risultati temporanei](#risultati-temporanei)
             - [Modello](#modello)
         - [WabstiCExport](#wabsticexport)
-        - [eCH-0252](#ech-0252)
 
 <!-- /TOC -->
 
@@ -29,6 +29,10 @@ I formati di file accettabili sono file generati manualmente, dal software elett
 Un ente può essere un comune (esempi cantonali, esempi comunali senza quartieri) o un quartiere (esempi comunali con quartieri)
 
 ## Formati
+
+### eCH-0252
+
+Vedi [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
 
 
 ### OneGov
@@ -73,8 +77,3 @@ Se lo stato è
 ### WabstiCExport
 
 La versione `>= 2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
-
-
-### eCH-0252
-
-Vedi [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

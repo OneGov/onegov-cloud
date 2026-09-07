@@ -11,6 +11,7 @@ from onegov.form import FormCollection
 from onegov.form import parse_form
 from onegov.form import PendingFormSubmission
 from onegov.form.errors import UnableToComplete
+from onegov.form.parser import ParsedForm
 from onegov.form.utils import hash_definition
 from PIL import Image
 from sedate import utcnow
@@ -34,10 +35,13 @@ def test_form_checksum() -> None:
 def test_add_form(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('Tax Form', definition=dedent("""
-        First Name * = ___
-        Last Name * = ___
-    """))
+    form = collection.definitions.add(
+        'Tax Form',
+        parsed=ParsedForm.from_formcode(dedent("""
+            First Name * = ___
+            Last Name * = ___
+        """))
+    )
 
     assert form.name == 'tax-form'
     assert hasattr(form.form_class, '_source')
@@ -50,10 +54,13 @@ def test_add_form(session: Session) -> None:
     assert form.form_class._source == form.definition
 
     with pytest.raises(IntegrityError):
-        form = collection.definitions.add('Tax Form', definition=dedent("""
-            First Name * = ___
-            Last Name * = ___
-        """))
+        form = collection.definitions.add(
+            'Tax Form',
+            parsed=ParsedForm.from_formcode(dedent("""
+                First Name * = ___
+                Last Name * = ___
+            """))
+        )
 
     assert form.checksum and form.checksum == hash_definition(form.definition)
 
@@ -61,11 +68,14 @@ def test_add_form(session: Session) -> None:
 def test_submit_form(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('TPS Report', definition=dedent("""
-        First Name * = ___
-        Last Name * = ___
-        Date = YYYY.MM.DD
-    """))
+    form = collection.definitions.add(
+        'TPS Report',
+        parsed=ParsedForm.from_formcode(dedent("""
+            First Name * = ___
+            Last Name * = ___
+            Date = YYYY.MM.DD
+        """))
+    )
 
     data = MultiDict([
         ('first_name', 'Bill'),
@@ -90,12 +100,15 @@ def test_submit_form(session: Session) -> None:
 def test_submission_extra_data(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('TPS Report', definition=dedent("""
-        First Name * = ___
-        Last Name * = ___
-        E-Mail = @@@
-        Date = YYYY.MM.DD
-    """))
+    form = collection.definitions.add(
+        'TPS Report',
+        parsed=ParsedForm.from_formcode(dedent("""
+            First Name * = ___
+            Last Name * = ___
+            E-Mail = @@@
+            Date = YYYY.MM.DD
+        """))
+    )
 
     data = MultiDict([
         ('first_name', 'Bill'),
@@ -115,12 +128,15 @@ def test_submission_extra_data(session: Session) -> None:
 def test_submission_update(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('Whatever', definition=dedent("""
-        First Name * = ___
-        Last Name * = ___
-        E-Mail = @@@
-        Date = YYYY.MM.DD
-    """))
+    form = collection.definitions.add(
+        'Whatever',
+        parsed=ParsedForm.from_formcode(dedent("""
+            First Name * = ___
+            Last Name * = ___
+            E-Mail = @@@
+            Date = YYYY.MM.DD
+        """))
+    )
 
     data = MultiDict([
         ('first_name', 'Bill'),
@@ -143,7 +159,10 @@ def test_submission_update(session: Session) -> None:
 def test_definitions_with_submissions_count(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('Newsletter', definition="E-Mail = @@@")
+    form = collection.definitions.add(
+        'Newsletter',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     data = MultiDict([
         ('e_mail', 'test@example.org'),
@@ -175,10 +194,13 @@ def test_definitions_with_submissions_count(session: Session) -> None:
 def test_submit_pending(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('tweet', definition=dedent("""
-        handle * = ___
-        tweet * = ___[140]
-    """))
+    form = collection.definitions.add(
+        'tweet',
+    parsed=ParsedForm.from_formcode(dedent("""
+            handle * = ___
+            tweet * = ___[140]
+        """))
+    )
 
     data = MultiDict([
         ('handle', '@href'),
@@ -214,7 +236,10 @@ def test_submit_pending(session: Session) -> None:
 def test_remove_old_pending_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
-    signup = collection.definitions.add('Signup', definition="E-Mail = @@@")
+    signup = collection.definitions.add(
+        'Signup',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     data = MultiDict([('e_mail', 'info@example.org')])
     form = signup.form_class(data)
@@ -243,7 +268,10 @@ def test_no_store_csrf_token(session: Session) -> None:
         def generate_csrf_token(self, csrf_token_field: object) -> str:
             return '0xdeadbeef'
 
-    signup = collection.definitions.add('Signup', definition="E-Mail = @@@")
+    signup = collection.definitions.add(
+        'Signup',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     data = MultiDict([
         ('e_mail', 'info@example.org'),
@@ -260,7 +288,10 @@ def test_no_store_csrf_token(session: Session) -> None:
 def test_delete_without_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
+    form = collection.definitions.add(
+        'Newsletter',
+        parsed=ParsedForm.from_formcode("E-Mail *= @@@")
+    )
     data = MultiDict([('e_mail', 'billg@microsoft.com')])
 
     collection.submissions.add(
@@ -273,7 +304,10 @@ def test_delete_without_submissions(session: Session) -> None:
 def test_delete_with_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
+    form = collection.definitions.add(
+        'Newsletter',
+        parsed=ParsedForm.from_formcode("E-Mail *= @@@")
+    )
     data = MultiDict([('e_mail', 'billg@microsoft.com')])
 
     collection.submissions.add(
@@ -287,7 +321,10 @@ def test_delete_with_submissions(session: Session) -> None:
 def test_delete_with_pending_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
+    form = collection.definitions.add(
+        'Newsletter',
+        parsed=ParsedForm.from_formcode("E-Mail *= @@@")
+    )
     data = MultiDict([('e_mail', 'billg@microsoft.com')])
 
     collection.submissions.add(
@@ -301,7 +338,10 @@ def test_delete_with_pending_submissions(session: Session) -> None:
 def test_delete_fail_with_submissions(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
+    form = collection.definitions.add(
+        'Newsletter',
+        parsed=ParsedForm.from_formcode("E-Mail *= @@@")
+    )
     data = MultiDict([('e_mail', 'billg@microsoft.com')])
 
     collection.submissions.add(
@@ -315,7 +355,10 @@ def test_file_submissions_update(session: Session) -> None:
     collection = FormCollection(session)
 
     # upload a new file
-    definition = collection.definitions.add('File', definition="File = *.txt")
+    definition = collection.definitions.add(
+        'File',
+        parsed=ParsedForm.from_formcode("File = *.txt")
+    )
 
     data: Any = FileMultiDict()
     data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
@@ -374,7 +417,8 @@ def test_multiple_file_submissions_update(session: Session) -> None:
 
     # upload a new file
     definition = collection.definitions.add(
-        'File', definition="File = *.txt (multiple)"
+        'File',
+        parsed=ParsedForm.from_formcode("File = *.txt (multiple)")
     )
 
     data: Any = FileMultiDict()
@@ -437,7 +481,10 @@ def test_file_submissions_cascade(session: Session) -> None:
     collection = FormCollection(session)
 
     # upload a new file
-    definition = collection.definitions.add('File', definition="File = *.txt")
+    definition = collection.definitions.add(
+        'File',
+        parsed=ParsedForm.from_formcode("File = *.txt")
+    )
 
     data: Any = FileMultiDict()
     data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
@@ -459,7 +506,10 @@ def test_file_submissions_cascade(session: Session) -> None:
 def test_get_current(session: Session) -> None:
     collection = FormCollection(session)
 
-    form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
+    form = collection.definitions.add(
+        'Newsletter',
+        parsed=ParsedForm.from_formcode("E-Mail *= @@@")
+    )
     data = MultiDict([('e_mail', 'billg@microsoft.com')])
 
     submission = collection.submissions.add(
@@ -504,7 +554,7 @@ def test_upload_image_size_stored_as_actual_size(session: Session) -> None:
     collection = FormCollection(session)
 
     definition = collection.definitions.add(
-        'Photo', definition="Photo = *.jpg|*.png"
+        'Photo', parsed=ParsedForm.from_formcode("Photo = *.jpg|*.png")
     )
 
     img = Image.new('RGB', (200, 200), color=(255, 0, 0))

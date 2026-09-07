@@ -7,6 +7,7 @@ from datetime import timedelta
 from collection_json import Collection  # type: ignore[import-untyped]
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.form import FormCollection
+from onegov.form.parser import ParsedForm
 from onegov.org.models.external_link import (
     ExternalFormLink, ExternalResourceLink)
 from onegov.people import Person
@@ -90,12 +91,8 @@ def test_view_api(
     # Configure event filters
     settings = client.get('/event-settings')
     settings.form['event_filter_type'] = 'filters'
-    settings.form.submit().follow()
-
-    events_page = client.get('/events')
-    filter_settings = events_page.click('Konfigurieren')
-    filter_settings.form[
-        'definition'
+    settings.form[
+        'event_filter_definition'
     ] = """
         Altersgruppe =
             [ ] Kind
@@ -106,8 +103,8 @@ def test_view_api(
         Empfehlung =
             [ ] Ja
     """
-    filter_settings.form['keyword_fields'].value = 'Altersgruppe\nEmpfehlung'
-    filter_settings.form.submit().follow()
+    settings.form['keyword_fields'].value = 'Altersgruppe\nEmpfehlung'
+    settings.form.submit().follow()
 
     endpoints = collection('/api')
     event_fiters = filters(endpoints.queries[0])
@@ -551,14 +548,14 @@ def test_api_forms_paginates_external_links_and_hides_invisible_items(
     for ix in range(100):
         form = forms.definitions.add(
             f'API Form {ix:02d}',
-            'E-Mail *= @@@',
+            parsed=ParsedForm.from_formcode('E-Mail *= @@@'),
             type='custom',
         )
         form.access = 'public'  # type:ignore[attr-defined]
 
     hidden_form = forms.definitions.add(
         'API Form Hidden',
-        'E-Mail *= @@@',
+        parsed=ParsedForm.from_formcode('E-Mail *= @@@'),
         name='hidden',
         type='custom',
     )

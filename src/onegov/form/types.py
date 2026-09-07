@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Literal, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
+    from decimal import Decimal
     from onegov.form import Form
-    from typing import Any, Protocol
     from webob.request import _FieldStorageWithFile
     from wtforms.fields.core import _Filter, _Validator, _Widget, Field
     from wtforms.form import BaseForm
@@ -23,7 +23,10 @@ if TYPE_CHECKING:
         FormT: Form,
         FieldT: Field
     ] = tuple[_Validator[FormT, FieldT], ...] | list[Any]
-    type RawPricing = tuple[float, str] | tuple[float, str, bool]
+    type RawPricing = (
+        tuple[Decimal | float, str]
+        | tuple[Decimal | float, str, bool]
+    )
     type PricingRules = dict[str | range, RawPricing]
     # this matches what webob.request.POST returns as value type
     type RawFormValue = str | _FieldStorageWithFile

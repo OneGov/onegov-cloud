@@ -187,12 +187,10 @@ class WinterthurApp(OrgApp):
                     (path / 'preview.png').open('rb') as input,
                     fs.open(filename, 'wb') as output
                 ):
-                    # NOTE: Bug in type hints of FS
-                    output.write(input.read())  # type:ignore
+                    output.write(input.read())
 
         with fs.open(filename, 'rb') as input:
-            # NOTE: Bug in type hints of FS
-            return BytesIO(input.read())  # type:ignore
+            return BytesIO(input.read())
 
 
 @WinterthurApp.tween_factory()

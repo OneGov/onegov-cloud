@@ -6,7 +6,7 @@ from datetime import date
 from io import StringIO
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
-from onegov.form import FieldDependency, WTFormsClassBuilder, move_fields
+from onegov.form import WTFormsClassBuilder, move_fields
 from onegov.org.views.files import view_get_image_collection
 from onegov.winterthur import WinterthurApp, _
 from onegov.winterthur.collections import MissionReportCollection
@@ -79,7 +79,6 @@ def mission_report_form(
                 self[f'{field_id}_count'].data = used.count
 
     builder = WTFormsClassBuilder(MissionReportVehicleUseForm)
-    builder.set_current_fieldset(_('Vehicles'))
 
     vehicles_q = MissionReportVehicleCollection(request.session).query()
     vehicles = {v.id: v for v in vehicles_q if v.access == 'public'}
@@ -99,6 +98,7 @@ def mission_report_form(
             field_class=BooleanField,
             field_id=field_id,
             label=vehicle.title,
+            fieldset=_('Vehicles'),
             required=False,
             id=vehicle.id
         )
@@ -108,8 +108,9 @@ def mission_report_form(
             field_class=IntegerField,
             field_id=vehicle_field_id,
             label=request.translate(_('Count')),
+            fieldset=_('Vehicles'),
             required=True,
-            dependency=FieldDependency(field_id, 'y'),
+            depends_on=(field_id, 'y'),
             default=1
         )
 

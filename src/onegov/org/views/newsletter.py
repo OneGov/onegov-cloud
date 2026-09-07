@@ -615,6 +615,12 @@ def send_newsletter(
     if daily and request.app.org.daily_newsletter_title:
         title = request.app.org.daily_newsletter_title
 
+    daily_link = ''
+    daily_link_text = ''
+    if daily:
+        daily_link = request.app.org.daily_newsletter_link or ''
+        daily_link_text = request.app.org.daily_newsletter_link_text or ''
+
     _html = render_template(
         'mail_newsletter.pt', request, {
             'layout': layout,
@@ -627,7 +633,9 @@ def send_newsletter(
             'publications': publications_by_newsletter(newsletter, request),
             'name_without_extension': name_without_extension,
             'closing_remark': newsletter.closing_remark,
-            'daily': daily
+            'daily': daily,
+            'daily_link': daily_link,
+            'daily_link_text': daily_link_text,
         }
     )
     html = Template(_html)
@@ -802,7 +810,9 @@ def handle_preview_newsletter(
         'publications': publications_by_newsletter(self, request),
         'name_without_extension': name_without_extension,
         'closing_remark': self.closing_remark,
-        'daily': False
+        'daily': False,
+        'daily_link': '',
+        'daily_link_text': '',
     }
 
 

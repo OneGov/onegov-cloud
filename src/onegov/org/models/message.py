@@ -168,12 +168,15 @@ class TicketChatMessage(Message, TicketMessageMixin):
         owner: str,
         origin: str,
         notify: bool = False,
-        recipient: str | None = None
+        recipient: str | None = None,
+        file: File | None = None,
     ) -> Self:
 
-        return super().create(
+        message = super().create(
             ticket, request, text=text, owner=owner, origin=origin,
             notify=notify, recipient=recipient)
+        message.file = file
+        return message
 
     def formatted_text(self, layout: DefaultLayout) -> str:
         return self.text and hashtag_elements(
@@ -216,13 +219,15 @@ class ReservationMessage(Message, TicketMessageMixin):
         ticket: Ticket,
         request: OrgRequest,
         change: str,
-        origin: str = 'internal'
+        origin: str = 'internal',
+        owner: str | None = None
     ) -> Self:
         return super().create(
             ticket,
             request,
             change=change,
             origin=origin,
+            owner=owner,
             reservations=[
                 # NOTE: we record more than just the id, since if the
                 #       change is, that we deleted the reservations,
@@ -273,9 +278,10 @@ class SubmissionMessage(Message, TicketMessageMixin):
         cls,
         ticket: Ticket,
         request: OrgRequest,
-        change: str
+        change: str,
+        owner: str | None = None
     ) -> Self:
-        return super().create(ticket, request, change=change)
+        return super().create(ticket, request, change=change, owner=owner)
 
 
 class EventMessage(Message, TicketMessageMixin):

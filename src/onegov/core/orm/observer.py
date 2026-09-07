@@ -33,7 +33,7 @@ class ScopedPropertyObserver(sqlalchemy_utils.observer.PropertyObserver):
     _global_observer: ClassVar[ScopedPropertyObserver]
     _scoped_observers: ClassVar[dict[str, ScopedPropertyObserver]] = {}
 
-    def __new__(cls, dotted_name: str | None) -> ScopedPropertyObserver:  # noqa: PYI034
+    def __new__(cls, dotted_name: str | None) -> ScopedPropertyObserver:  # ruff:ignore[non-self-return-type]
 
         # special case global scope
         if dotted_name is None:

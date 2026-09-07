@@ -12,6 +12,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory.errors import ValidationError
 from onegov.file import File
+from onegov.form.parser import ParsedForm
 from wtforms.validators import ValidationError as WtfValidationError
 
 
@@ -120,25 +121,25 @@ def test_directory_configuration_missing_fields() -> None:
         keywords=['Category']
     )
 
-    assert not cfg.missing_fields("""
+    assert not cfg.missing_fields(ParsedForm.from_formcode("""
         First Name *= ___
         Last Name *= ___
         Category *=
             [ ] Consultant
             [ ] Employee
-    """)
+    """))
 
-    assert cfg.missing_fields("""
+    assert cfg.missing_fields(ParsedForm.from_formcode("""
         First Name *= ___
         Last Name *= ___
-    """) == {'keywords': ['Category']}
+    """)) == {'keywords': ['Category']}
 
-    assert cfg.missing_fields("""
+    assert cfg.missing_fields(ParsedForm.from_formcode("""
         First Name *= ___
         Category *=
             [ ] Consultant
             [ ] Employee
-    """) == {'title': ['Last Name']}
+    """)) == {'title': ['Last Name']}
 
 
 def test_directory_form(session: Session) -> None:

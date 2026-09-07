@@ -189,7 +189,7 @@ class NotificationTemplateLayout(DefaultLayout):
         if view_name != 'send' and self.model.type == 'info':
             links.append(
                 Link(
-                    _('Send'),
+                    _('Mailing'),
                     self.request.link(self.model, name='send'),
                     attrs={'class': 'email-link'},
                 )
@@ -223,5 +223,5 @@ class SendNotificationTemplateLayout(NotificationTemplateLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         breadcrumbs = super().breadcrumbs
-        breadcrumbs.append(Link(_('Send')))
+        breadcrumbs.append(Link(_('Mailing')))
         return breadcrumbs

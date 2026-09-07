@@ -88,9 +88,10 @@ def clone_occasion(
     form: OccasionForm
 ) -> RenderData | Response:
 
+    periods = BookingPeriodCollection(request.session)
+
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
-        periods = BookingPeriodCollection(request.session)
         period = periods.by_id(form.period_id.data)
         assert period is not None
 
@@ -105,8 +106,15 @@ def clone_occasion(
         request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.activity))
     elif not request.POST:
+        active_period = periods.active()
+        upcoming_period = periods.upcoming()
+
         form.process(obj=self)
         form.dates.data = form.dates_to_json(dates=None)
+        if active_period is not None:
+            form.period_id.data = str(active_period.id)
+        elif upcoming_period is not None:
+            form.period_id.data = str(upcoming_period.id)
 
     layout = OccasionFormLayout(self.activity, request, _('Clone Occasion'))
     layout.edit_mode = True

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import pytest
 
+from datetime import date
+from uuid import UUID
+
 from onegov.pas.importer.json_import import (
     MembershipImporter,
     PeopleImporter,
@@ -13,10 +16,12 @@ from onegov.pas.models import (
     PASParliamentarian,
     Party,
 )
+from onegov.pas.utils import is_active_kantonsrat_member
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, cast, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.pas.importer.types import MembershipData
     from sqlalchemy.orm import Session
 
 
@@ -321,6 +326,256 @@ def test_membership_importer_role_transition(
     assert president_cm.role == 'president'
     assert str(president_cm.start) == '2024-07-03'
     assert president_cm.end is None
+
+
+PERSON_ID = 'c3b0e5f8-2d3b-4a1c-9c3f-2f2a7b3d5e11'
+COMMISSION_ID = 'e1f2a3b4-c5d6-47e8-9a0b-1c2d3e4f5a6b'
+KANTONSRAT_ID = 'f0e1d2c3-b4a5-4968-8778-6a5b4c3d2e1f'
+
+
+def membership_data(
+    kub_id: str,
+    organization: dict[str, str],
+    role: str,
+    start: str | None,
+    end: str | None,
+) -> MembershipData:
+    return cast(
+        'MembershipData',
+        {
+            'id': kub_id,
+            'organization': organization,
+            'person': {
+                'id': PERSON_ID,
+                'firstName': 'Karl',
+                'officialName': 'Nussbaumer',
+                'fullName': 'Nussbaumer Karl',
+            },
+            'role': role,
+            'start': start,
+            'end': end,
+        },
+    )
+
+
+COMMISSION = {
+    'id': COMMISSION_ID,
+    'name': 'ad-hoc Kommission Polizeigesetz',
+    'organizationTypeTitle': 'Kommission',
+}
+
+KANTONSRAT = {
+    'id': KANTONSRAT_ID,
+    'name': 'Kantonsrat',
+    'organizationTypeTitle': 'Kantonsrat',
+}
+
+
+@pytest.fixture
+def nussbaumer(
+    session: Session,
+) -> tuple[MembershipImporter, PASParliamentarian, PASCommission]:
+    """A parliamentarian who returned to the Kantonsrat after a break, with
+    the importer wired up for him and one commission."""
+    from uuid import UUID
+
+    parliamentarian = PASParliamentarian(
+        first_name='Karl',
+        last_name='Nussbaumer',
+        external_kub_id=UUID(PERSON_ID),
+    )
+    commission = PASCommission(
+        name='ad-hoc Kommission Polizeigesetz',
+        external_kub_id=UUID(COMMISSION_ID),
+    )
+    session.add_all([parliamentarian, commission])
+    session.flush()
+
+    importer = MembershipImporter(session)
+    importer.init(
+        session=session,
+        parliamentarian_map={PERSON_ID: parliamentarian},
+        commission_map={COMMISSION_ID: commission},
+        parliamentary_group_map={},
+        party_map={},
+        other_organization_map={},
+    )
+    return importer, parliamentarian, commission
+
+
+def test_membership_importer_keeps_open_kantonsrat_role(
+    session: Session,
+    nussbaumer: tuple[MembershipImporter, PASParliamentarian, PASCommission],
+) -> None:
+    """A parliamentarian who left and returned holds the same role twice.
+    Both periods must survive, otherwise the closed one wins and he counts
+    as inactive (OGC-3263)."""
+
+    importer, parliamentarian, _ = nussbaumer
+
+    importer.bulk_import(
+        [
+            membership_data(
+                '5b008748-7c0f-4c1f-9e4b-6a1e2d3c4b5a',
+                KANTONSRAT,
+                'Mitglied des Kantonsrates',
+                '2003-01-01',
+                '2020-12-17',
+            ),
+            membership_data(
+                'ab2f351b-8d4e-4f2a-8b3c-9d0e1f2a3b4c',
+                KANTONSRAT,
+                'Mitglied des Kantonsrates',
+                '2024-12-20',
+                None,
+            ),
+        ]
+    )
+    session.flush()
+
+    roles = sorted(parliamentarian.roles, key=lambda r: r.start or date.min)
+    assert len(roles) == 2
+    assert str(roles[0].start) == '2003-01-01'
+    assert str(roles[0].end) == '2020-12-17'
+    assert str(roles[1].start) == '2024-12-20'
+    assert roles[1].end is None
+    assert is_active_kantonsrat_member(parliamentarian)
+
+
+def test_membership_importer_merges_duplicate_kub_memberships(
+    session: Session,
+    nussbaumer: tuple[MembershipImporter, PASParliamentarian, PASCommission],
+) -> None:
+    """KUB holds the same membership twice, under two ids. We only want one
+    row for it."""
+
+    importer, parliamentarian, _ = nussbaumer
+
+    importer.bulk_import(
+        [
+            membership_data(
+                '024247e5-1a2b-4c3d-8e4f-5a6b7c8d9e0f',
+                COMMISSION,
+                'Mitglied',
+                '2026-04-30',
+                None,
+            ),
+            membership_data(
+                '46cad2bc-0f1e-4d2c-9b3a-8c7d6e5f4a3b',
+                COMMISSION,
+                'Mitglied',
+                '2026-04-30',
+                None,
+            ),
+        ]
+    )
+    session.flush()
+
+    memberships = (
+        session.query(PASCommissionMembership)
+        .filter_by(parliamentarian_id=parliamentarian.id)
+        .all()
+    )
+    assert len(memberships) == 1
+
+
+def test_membership_importer_deletes_vanished_membership(
+    session: Session,
+    nussbaumer: tuple[MembershipImporter, PASParliamentarian, PASCommission],
+) -> None:
+    """A membership which is gone from KUB is removed from PAS."""
+
+    importer, parliamentarian, commission = nussbaumer
+
+    importer.bulk_import(
+        [
+            membership_data(
+                '024247e5-1a2b-4c3d-8e4f-5a6b7c8d9e0f',
+                COMMISSION,
+                'Mitglied',
+                '2026-04-30',
+                None,
+            ),
+            membership_data(
+                '5b008748-7c0f-4c1f-9e4b-6a1e2d3c4b5a',
+                KANTONSRAT,
+                'Mitglied des Kantonsrates',
+                '2024-12-20',
+                None,
+            ),
+        ]
+    )
+    session.flush()
+    assert len(parliamentarian.commission_memberships) == 1
+    assert len(parliamentarian.roles) == 1
+
+    importer.bulk_import(
+        [
+            membership_data(
+                '5b008748-7c0f-4c1f-9e4b-6a1e2d3c4b5a',
+                KANTONSRAT,
+                'Mitglied des Kantonsrates',
+                '2024-12-20',
+                None,
+            ),
+        ]
+    )
+    session.flush()
+    session.expire_all()
+
+    assert parliamentarian.commission_memberships == []
+    assert len(parliamentarian.roles) == 1
+
+
+def test_membership_importer_adopts_and_keeps_manual_rows(
+    session: Session,
+    nussbaumer: tuple[MembershipImporter, PASParliamentarian, PASCommission],
+) -> None:
+    """Rows imported before we stored the KUB id take over the id of their
+    membership. Rows entered by hand keep an empty id and are never
+    deleted."""
+
+    importer, parliamentarian, commission = nussbaumer
+
+    own_commission = PASCommission(name='Kommission ohne KUB')
+    session.add(own_commission)
+    session.flush()
+
+    imported_before = PASCommissionMembership(
+        parliamentarian_id=parliamentarian.id,
+        commission_id=commission.id,
+        role='member',
+        start=date(2026, 4, 30),
+    )
+    manual = PASCommissionMembership(
+        parliamentarian_id=parliamentarian.id,
+        commission_id=own_commission.id,
+        role='guest',
+        start=date(2020, 1, 1),
+    )
+    session.add_all([imported_before, manual])
+    session.flush()
+
+    importer.bulk_import(
+        [
+            membership_data(
+                '024247e5-1a2b-4c3d-8e4f-5a6b7c8d9e0f',
+                COMMISSION,
+                'Präsident/-in',
+                '2026-04-30',
+                None,
+            ),
+        ]
+    )
+    session.flush()
+    session.expire_all()
+
+    assert imported_before.external_kub_id == UUID(
+        '024247e5-1a2b-4c3d-8e4f-5a6b7c8d9e0f'
+    )
+    assert imported_before.role == 'president'
+    assert manual.external_kub_id is None
+    assert len(parliamentarian.commission_memberships) == 2
 
 
 @pytest.fixture

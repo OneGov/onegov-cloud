@@ -313,6 +313,55 @@ def test_inplace_values_mutation_does_not_update_hash(
     assert conference.content_hash != original_hash
 
 
+# --- Publication dates ---
+
+
+def test_content_hash_stable_with_publication_dates(session: Session) -> None:
+    # Publication dates are not part of the hash — changing them must not
+    # update it.
+    rooms = DirectoryCollection(session).add(
+        title='Rooms',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+
+    entry = rooms.add(values=dict(name='Conference Room'))
+    original_hash = entry.content_hash
+    assert original_hash is not None
+
+    entry.publication_start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    session.flush()
+    assert entry.content_hash == original_hash
+
+    entry.publication_end = datetime(2026, 12, 31, tzinfo=timezone.utc)
+    session.flush()
+    assert entry.content_hash == original_hash
+
+
+# --- Keywords / categories ---
+
+
+def test_content_hash_stable_with_keywords(session: Session) -> None:
+    # Keywords are not part of the hash — changing them must not update it.
+    rooms = DirectoryCollection(session).add(
+        title='Rooms',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+
+    entry = rooms.add(values=dict(name='Conference Room'))
+    original_hash = entry.content_hash
+    assert original_hash is not None
+
+    entry.keywords = {'Sport', 'Kultur'}
+    session.flush()
+    assert entry.content_hash == original_hash
+
+    entry.keywords = {'Sport'}
+    session.flush()
+    assert entry.content_hash == original_hash
+
+
 # --- Structure migration ---
 
 

@@ -31,6 +31,25 @@ def test_sort_topics(client: Client) -> None:
     assert "Zurück zur Seite" in page
 
 
+def test_sort_root_topics(client: Client) -> None:
+    client.login_admin().follow()
+
+    page = client.get('/')
+    page = page.click('Sortieren')
+    url = page.pyquery('ul[data-sortable]').attr('data-sortable-url')
+    items = {
+        item.text_content().strip(): item.attrib['data-sortable-id']
+        for item in page.pyquery('ul[data-sortable] li')
+    }
+    url = url.replace('%7Bsubject_id%7D', items['Kontakt'])
+    url = url.replace('%7Bdirection%7D', 'above')
+    url = url.replace('%7Btarget_id%7D', items['Organisation'])
+    client.put(url)
+
+    links = client.get('/').pyquery('.side-navigation > li > a span')
+    assert links.text() == 'Kontakt Organisation Themen Aktuelles'
+
+
 def get_select_option_id_by_text(
     select_form: Select,
     search_text: str
@@ -136,6 +155,20 @@ def test_topic_keywords(client: Client) -> None:
     assert keywords_meta
     assert 'Einwohnerkontrolle' in keywords_meta.attr('content')
     assert 'Einwohneramt' in keywords_meta.attr('content')
+    assert [
+        keyword.text
+        for keyword in page.pyquery('.sidebar .page-keywords .blank-label')
+    ] == ['Einwohnerkontrolle', 'Einwohneramt']
+    assert page.pyquery('.page-keywords h3').text() == 'Schlagworte'
+
+    editor = client.spawn()
+    editor.login_editor()
+    editor_page = editor.get('/topics/themen/einwohnerdienste')
+    assert editor_page.pyquery('.sidebar .page-keywords')
+
+    anonymous = client.spawn()
+    anonymous_page = anonymous.get('/topics/themen/einwohnerdienste')
+    assert not anonymous_page.pyquery('.page-keywords')
 
     # keywords field is absent when editing news
     news = client.get('/news').click('Nachricht')

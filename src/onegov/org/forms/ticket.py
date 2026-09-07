@@ -1,22 +1,31 @@
 from __future__ import annotations
 
+import sedate
+
 from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form
 from onegov.form.fields import (ChosenSelectField,
                                 ChosenSelectMultipleEmailField, PanelField)
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TextAreaFieldWithTextModules
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.filters import strip_whitespace
-from onegov.form.validators import FileSizeLimit, StrictOptional
+from onegov.form.validators import (
+    FileSizeLimit,
+    MIME_TYPES_PDF,
+    StrictOptional,
+)
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.org import _
 from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
 from onegov.user import User
 from onegov.user import UserCollection
+from sqlalchemy.orm import joinedload
 from wtforms.fields import BooleanField
 from wtforms.fields import TextAreaField
 from functools import cached_property
+from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
 from wtforms.validators import Optional
@@ -25,6 +34,7 @@ from wtforms.validators import ValidationError
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.org.models.ticket import ReservationTicket
     from onegov.org.request import OrgRequest
 
 
@@ -61,6 +71,13 @@ class TicketChatMessageForm(Form):
         filters=(strip_whitespace, ),
         render_kw={'rows': 5, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
+    file = UploadFileWithORMSupport(
+        label=_('PDF'),
+        file_class=MessageFile,
+        validators=[Optional(), FileSizeLimit(10 * 1000 * 1000)],
+        allowed_mimetypes=MIME_TYPES_PDF,
+    )
+
     def validate_text(self, field: TextAreaField) -> None:
         if not self.text.data or not self.text.data.strip():
             raise ValidationError(_('The message is empty'))
@@ -88,6 +105,7 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
     )
 
     def on_request(self) -> None:
+        self.delete_field('file')
         self.text.widget = TextAreaWithTextModules()
         if self.request.app.org.ticket_always_notify:
             self.delete_field('notify')
@@ -132,6 +150,8 @@ class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
 
 class TicketAssignmentForm(Form):
 
+    usernames: dict[str, str]
+
     user = ChosenSelectField(
         _('User'),
         choices=[],
@@ -142,12 +162,19 @@ class TicketAssignmentForm(Form):
 
     @property
     def username(self) -> str | None:
-        if self.user.data in (choice[0] for choice in self.user.choices):
-            query = self.request.session.query(User.username)
-            return query.filter_by(id=self.user.data).scalar()
-        return None
+        return self.usernames.get(str(self.user.data))
 
     def on_request(self) -> None:
+        query = UserCollection(self.request.session).query()
+        query = query.filter(User.active.is_(True))
+        query = query.options(joinedload(User.groups))
+
+        users = [
+            user
+            for user in query
+            if self.request.has_permission(self.model, Private, user)
+        ]
+        self.usernames = {str(user.id): user.username for user in users}
         self.user.choices = [
             (
                 str(user.id),
@@ -155,11 +182,7 @@ class TicketAssignmentForm(Form):
                 if user.groups
                 else user.title
             )
-            for user in UserCollection(self.request.session).query()
-            if (
-                self.request.has_permission(self.model, Private, user)
-                and user.active == True
-            )
+            for user in users
         ]
 
 
@@ -180,3 +203,40 @@ class TicketChangeTagForm(Form):
             for tag in (item.keys() if isinstance(item, dict) else (item,))
         ]
         choices.insert(0, ('', ''))
+
+
+class RequestCancellationForm(Form):
+    """Cancellation request form for reservation tickets.
+
+    Shows reservation checkboxes when there are multiple reservations,
+    allowing the user to select which ones to cancel. For a single
+    reservation the checkbox field is removed and the form acts as a
+    plain confirmation.
+    """
+
+    if TYPE_CHECKING:
+        model: ReservationTicket
+
+    reservation_ids = MultiCheckboxField(
+        label=_('Select reservations to cancel'),
+        coerce=int,
+        validators=[DataRequired()],
+    )
+
+    def on_request(self) -> None:
+        now = sedate.utcnow()
+        reservations = [
+            r for r in self.model.handler.reservations
+            if r.start is not None and r.start > now
+        ]
+
+        if len(reservations) <= 1:
+            self.delete_field('reservation_ids')
+            return
+
+        self.reservation_ids.choices = [
+            (r.id, self.model.handler.get_reservation_title(r))
+            for r in reservations
+        ]
+        if not self.request.POST:
+            self.reservation_ids.data = [r.id for r in reservations]

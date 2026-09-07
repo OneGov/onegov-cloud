@@ -350,6 +350,7 @@ $globals-height: 2.5rem;
     .ticket-archive::before { @include icon('\f1c6'); }
     .forms::before { @include icon('\f15c'); }
     .surveys::before { @include icon('\f080'); }
+    .information-architecture::before { @include icon('\f0e8'); }
     .citizen-login::before { @include icon('\f090'); }
     .citizen-tickets::before { @include icon('\f145'); }
     .citizen-reservations::before { @include icon('\f133'); }
@@ -842,6 +843,25 @@ form {
             display: inline-block;
             width: auto;
             margin-right: .25rem;
+        }
+    }
+
+    .table-widget {
+        thead th {
+            text-align: center !important;
+        }
+
+        tbody {
+            th[scope="row"] {
+                white-space: nowrap;
+            }
+            td input {
+                margin-bottom: 0 !important;
+
+                &[type="number"] {
+                    text-align: right !important;
+                }
+            }
         }
     }
 
@@ -1696,7 +1716,7 @@ $cleanup-link-icon: '\f0d0';
 $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f014';
 $disabled-icon: '\f05e';
-$edit-link-icon: '\f040';
+$edit-link-icon: '\f03a';
 $save-link-icon: '\f0c7';
 $cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
@@ -2422,11 +2442,69 @@ div#redactor-droparea {
     }
 }
 
-.form-preview-widget .holidays {
+.settings-search {
+    margin-bottom: 1rem;
+    max-width: 30rem;
+    position: relative;
+
+    input {
+        margin-bottom: 0;
+    }
+}
+
+.settings-search-dropdown {
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .15);
+    left: 0;
+    max-height: 28rem;
+    overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 20;
+
+    p {
+        margin: 0;
+        padding: .75rem 1rem;
+    }
+}
+
+.settings-search-result {
+    border-bottom: 1px solid #eee;
     display: block;
-    font-size: .875rem;
-    list-style: none;
-    margin: 0 0 1rem;
+    padding: .65rem 1rem;
+
+    &[hidden] {
+        display: none;
+    }
+
+    &:focus,
+    &:hover {
+        background: #f5f5f5;
+    }
+
+    span,
+    small {
+        display: block;
+    }
+
+    span {
+        opacity: .75;
+    }
+
+    small {
+        margin-top: .2rem;
+    }
+}
+
+.form-preview-widget {
+    .holidays, .short-links {
+        display: block;
+        font-size: .875rem;
+        list-style: none;
+        margin: 0 0 1rem;
+    }
 }
 
 .danger-zone {
@@ -4527,7 +4605,8 @@ ul.search-results {
 /*
     Ticket summary customisations
 */
-.ticket-summary {
+.ticket-summary,
+.ticket-cancellation-request {
     margin-bottom: 1.5rem;
 
     > div {
@@ -5598,6 +5677,7 @@ h2 + div.timeline {
     }
 
     .ticket-summary h2,
+    .ticket-cancellation-request h2,
     .ticket-timeline h2 {
         font-weight: bold;
     }
@@ -5606,7 +5686,8 @@ h2 + div.timeline {
         display: none;
     }
 
-    .ticket-summary {
+    .ticket-summary,
+    .ticket-cancellation-request {
         margin-bottom: 0;
 
         * {
@@ -7191,6 +7272,11 @@ a#results {
     visibility: hidden;
 }
 
+@keyframes reservation-row-glow {
+    0% { background-color: transparentize($yellow-pastel, .25); }
+    100% { background-color: transparent; }
+}
+
 .reservation-list {
 
     /* HACK: Overflow clipping is broken in Chromium when scrolling
@@ -7212,6 +7298,15 @@ a#results {
         tr {
             scroll-margin-top: 7rem;  // sass-lint:disable-line no-misspelled-properties
             scroll-snap-margin-top: 7rem;
+        }
+
+        tr:target th,
+        tr:target td {
+            animation: reservation-row-glow 2s ease-out;
+
+            @media (prefers-reduced-motion: reduce) {
+                animation: none;
+            }
         }
 
         th:first-child {
@@ -7280,6 +7375,10 @@ a#results {
             cursor: pointer;
         }
 
+        .event-holiday {
+            background-color: $red;
+        }
+
         .event-adjustable::before {
             float: right;
             color: white;
@@ -7309,7 +7408,7 @@ a#results {
     }
 }
 
-#fieldset-header-fixation {
+#fieldset-header_fixation {
     display: none;
 }
 
@@ -7472,4 +7571,115 @@ p.full-text-width {
     font-family: $font-family-monospace;
     font-size: .75rem;
     background-color: $gray-pastel;
+}
+
+
+/*
+    Topic chart (d3 org chart)
+*/
+.chart-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+
+    .button {
+        margin-bottom: 0;
+    }
+
+    .chart-message {
+        color: $alert-color;
+        margin-bottom: 0;
+    }
+}
+
+.chart-container {
+    border: 1px solid $gray;
+
+    .loading-info {
+        padding: 1rem;
+
+        .fa-spinner {
+            margin-right: 1rem;
+        }
+    }
+
+    &:has(svg) .loading-info {
+        display: none;
+    }
+
+    // no position/transition on the node; WebKit else mispositions the
+    // foreignObject. https://github.com/bkrem/react-d3-tree/issues/284
+    .d3-orgchart-node {
+        background: #fff;
+        border: 2px solid $gray !important;
+        color: $body-font-color;
+        display: flex;
+        align-items: flex-start;
+        gap: .3rem;
+        font-weight: bold;
+        padding: .7rem 1rem;
+
+        // glyph as text + rgba, not svg/opacity: WebKit misplaces svg and
+        // opacity layers in a foreignObject (see react-d3-tree #284 above)
+        .drilldown,
+        .drillup {
+            color: rgba($body-font-color, .35);
+            cursor: pointer;
+            font-family: 'FontAwesome';
+            font-size: .8rem;
+            line-height: 1;
+
+            &:hover {
+                color: $body-font-color;
+            }
+        }
+
+        span:not([role]) {
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+            display: -webkit-box;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        &.hyphens {
+            hyphens: auto;
+        }
+
+        &.restricted,
+        &.unpublished {
+            border-style: dashed !important;
+            color: $gray-dark;
+        }
+
+        &:hover {
+            border-color: $primary-color !important;
+        }
+    }
+
+    .node-button-div {
+        span {
+            font-size: .8rem !important;
+        }
+
+        > div {
+            padding: .2rem .5rem !important;
+        }
+    }
+
+    .node-button-g:hover .node-button-div {
+        span {
+            color: $primary-color !important;
+
+            path {
+                stroke: $primary-color !important;
+            }
+        }
+
+        > div {
+            border: 2px solid $primary-color !important;
+        }
+    }
 }

@@ -9,6 +9,7 @@ from onegov.form import FormCollection
 from onegov.form import FormExtension
 from onegov.form import FormRegistrationWindow
 from onegov.form import FormSubmission
+from onegov.form.parser import ParsedForm
 from sqlalchemy.exc import IntegrityError
 from webob.multidict import MultiDict
 from wtforms.validators import ValidationError
@@ -26,7 +27,10 @@ def days(d: int) -> timedelta:
 
 def test_has_submissions(session: Session) -> None:
     collection = FormCollection(session)
-    form = collection.definitions.add('Newsletter', definition="E-Mail = @@@")
+    form = collection.definitions.add(
+        'Newsletter',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     assert not form.has_submissions()
 
@@ -45,7 +49,10 @@ def test_has_submissions(session: Session) -> None:
 def test_form_extensions(session: Session) -> None:
     collection = FormCollection(session)
 
-    members = collection.definitions.add('Members', definition="E-Mail = @@@")
+    members = collection.definitions.add(
+        'Members',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     class CorporateOnly:
 
@@ -104,8 +111,14 @@ def test_form_extensions(session: Session) -> None:
 def test_registration_window_adjacent(session: Session) -> None:
     forms = FormCollection(session)
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
-    winter = forms.definitions.add('Witnercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
+    winter = forms.definitions.add(
+        'Witnercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     summer.add_registration_window(date(2018, 4, 1), date(2018, 6, 30))
     summer.add_registration_window(date(2017, 4, 1), date(2017, 6, 30))
@@ -136,7 +149,10 @@ def test_registration_window_adjacent(session: Session) -> None:
 def test_registration_window_overlaps(session: Session) -> None:
     forms = FormCollection(session)
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
     summer.add_registration_window(date(2017, 4, 1), date(2017, 6, 30))
 
     assert len(summer.registration_windows) == 1
@@ -155,7 +171,9 @@ def test_registration_window_overlaps(session: Session) -> None:
 
 def test_registration_window_end_before_start(session: Session) -> None:
     camp = FormCollection(session).definitions.add(
-        'Camp', definition="E-Mail = @@@")
+        'Camp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     camp.add_registration_window(date(2018, 1, 1), date(2017, 1, 1))
 
@@ -169,10 +187,16 @@ def test_current_registration_window_bound_to_form(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    winter = forms.definitions.add('Witnercamp', definition="E-Mail = @@@")
+    winter = forms.definitions.add(
+        'Witnercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
     winter.add_registration_window(today - days(1), today + days(1))
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
     summer.add_registration_window(today - days(100), today - days(10))
 
     assert winter.current_registration_window is not None
@@ -185,7 +209,10 @@ def test_current_registration_window_end_date(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     # the first window is closer, though the start is further away
     summer.add_registration_window(today - days(10), today - days(1))
@@ -200,7 +227,10 @@ def test_registration_window_spots(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
     window = summer.add_registration_window(today - days(5), today + days(5))
 
     session.flush()
@@ -281,7 +311,10 @@ def test_registration_claims_with_no_limit(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     window = summer.add_registration_window(today - days(5), today + days(5))
     window.limit = None
@@ -356,7 +389,10 @@ def test_registration_claims_with_a_limit(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     window = summer.add_registration_window(today - days(5), today + days(5))
     window.limit = 10
@@ -394,7 +430,10 @@ def test_register_more_than_allowed(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     window = summer.add_registration_window(today - days(5), today + days(5))
     window.limit = 1
@@ -428,7 +467,10 @@ def test_undo_registration(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
 
     window = summer.add_registration_window(today - days(5), today + days(5))
     window.limit = 1
@@ -463,7 +505,10 @@ def test_registration_window_queue(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
     window = summer.add_registration_window(today - days(5), today + days(5))
 
     session.flush()
@@ -508,7 +553,10 @@ def test_require_spots_if_registration_window(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
     summer.add_registration_window(today - days(5), today + days(5))
 
     session.flush()
@@ -534,7 +582,10 @@ def test_registration_submission_state(session: Session) -> None:
     forms = FormCollection(session)
     today = date.today()
 
-    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer = forms.definitions.add(
+        'Summercamp',
+        parsed=ParsedForm.from_formcode("E-Mail = @@@")
+    )
     session.flush()
 
     submission = forms.submissions.add(

@@ -71,6 +71,8 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
     event_search_widget = directive(directives.EventSearchWidgetAction)
     boardlet = directive(directives.Boardlet)
+    _setting_view_meta = directive(directives.SettingViewMetaAction)
+    setting_form = directive(directives.SettingViewAction)
 
     #: cronjob settings
     send_ticket_statistics = True
@@ -829,6 +831,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'filemanager.js'
     yield 'imagemanager.js'
     yield 'table.js'
+    yield 'alphalist.js'
     yield 'redactor.de.js'
     yield 'redactor.fr.js'
     yield 'redactor.it.js'
@@ -946,9 +949,19 @@ def get_fontpreview_asset() -> Iterator[str]:
     yield 'fontpreview.js'
 
 
+@OrgApp.webasset('settings_search')
+def get_settings_search_asset() -> Iterator[str]:
+    yield 'settings_search.js'
+
+
 @OrgApp.webasset('scroll-to-username')
 def get_scroll_to_username_asset() -> Iterator[str]:
     yield 'scroll_to_username.js'
+
+
+@OrgApp.webasset('local-login')
+def get_local_login_asset() -> Iterator[str]:
+    yield 'local_login.js'
 
 
 @OrgApp.webasset('all_blank')
@@ -980,6 +993,14 @@ def mapbox_address_autofill() -> Iterator[str]:
 @OrgApp.webasset('invoicing')
 def get_invoicing() -> Iterator[str]:
     yield 'invoicing.js'
+
+
+@OrgApp.webasset('information-architecture')
+def get_information_architecture_asset() -> Iterator[str]:
+    yield 'd3.v7.min.js'
+    yield 'd3-flextree.js'
+    yield 'd3-org-chart.js'
+    yield 'information-architecture.js'
 
 
 def wrap_with_mtan_hook(

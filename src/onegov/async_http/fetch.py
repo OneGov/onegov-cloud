@@ -121,7 +121,7 @@ async def fetch_many(
     fetch_func: FetchFunc = fetch,
     callback: FetchCallback = default_callback,
     handle_exceptions: HandleExceptionType = raise_by_default,
-    timeout: TimeoutType | None = None  # noqa: ASYNC109
+    timeout: TimeoutType | None = None  # ruff:ignore[async-function-with-timeout]
 ) -> list[UrlAndResult]: ...
 
 
@@ -132,7 +132,7 @@ async def fetch_many[T, UrlTypeT: UrlType = UrlType](
     fetch_func: FetchFunc[UrlTypeT, T],
     callback: FetchCallback[UrlTypeT, T],
     handle_exceptions: HandleExceptionType[UrlTypeT, T] = raise_by_default,
-    timeout: TimeoutType | None = None  # noqa: ASYNC109
+    timeout: TimeoutType | None = None  # ruff:ignore[async-function-with-timeout]
 ) -> list[T]: ...
 
 
@@ -144,7 +144,7 @@ async def fetch_many[T, UrlTypeT: UrlType = UrlType](
     *,
     callback: FetchCallback[UrlTypeT, T],
     handle_exceptions: HandleExceptionType[UrlTypeT, T] = raise_by_default,
-    timeout: TimeoutType | None = None  # noqa: ASYNC109
+    timeout: TimeoutType | None = None  # ruff:ignore[async-function-with-timeout]
 ) -> list[T]: ...
 
 
@@ -154,7 +154,7 @@ async def fetch_many(
     fetch_func: FetchFunc[Any, Any] = fetch,
     callback: FetchCallback[Any, Any] = default_callback,
     handle_exceptions: HandleExceptionType[Any, Any] = raise_by_default,
-    timeout: TimeoutType | None = None  # noqa: ASYNC109
+    timeout: TimeoutType | None = None  # ruff:ignore[async-function-with-timeout]
 ) -> list[Any]:
     """ Registers a task per url using the coroutine fetch_func with correct
     signature. """
