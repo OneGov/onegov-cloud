@@ -660,6 +660,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         query = self.apply_common_filters(
             self.session.query(Occurrence).join(Event)
             .options(contains_eager(Occurrence.event).joinedload(Event.image))
+            .options(undefer(Occurrence.content))
         )
 
         if self.term:
