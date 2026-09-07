@@ -88,7 +88,7 @@
 </metal:navigation>
 
 <metal:navigation define-macro="main-navigation">
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="offCanvasMainMenu">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offCanvasMainMenu">
         <div class="offcanvas-header p-lg">
             <button type="button" class="btn-close primary-color" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
@@ -3827,6 +3827,9 @@
 
 <metal:globals-left define-macro="globals-left">
     <ul tal:condition="modules and modules.links|nothing" class="navbar-nav global-tools-menu">
+        <li class="nav-item">
+            <a class="docs nav-link" href="https://docs.admin.digital/" i18n:translate>User manual</a>
+        </li>
         <li class="nav-item dropdown">
             <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="nav-link dropdown-toggle" i18n:translate>Modules</a>
             <ul id="modules-dropdown" class="dropdown-menu">
@@ -3834,9 +3837,6 @@
                     <tal:b replace="link(layout, ('nav-link', ))" />
                 </li>
             </ul>
-        </li>
-        <li class="nav-item">
-            <a class="docs nav-link" href="https://docs.admin.digital/" i18n:translate>User manual</a>
         </li>
     </ul>
 </metal:globals-left>

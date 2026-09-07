@@ -159,147 +159,6 @@ def get_global_tools(
 
     citizen_login_enabled = request.app.org.citizen_login_enabled
 
-    # Authentication / Userprofile
-    if request.is_logged_in:
-        yield LinkGroup(_('Account'), classes=('user', ), links=(
-            Link(
-                _('User Profile'), request.link(
-                    request.app.org, name='userprofile'
-                ), attrs={'class': 'profile'}
-            ),
-            Link(
-                _('Logout'), request.link(
-                    Auth.from_request(
-                        request, to=logout_path(request)), name='logout'
-                ), attrs={'class': 'logout'}
-            ),
-        ))
-
-    else:
-        yield Link(
-            _('Login'), request.link(
-                Auth.from_request_path(request), name='login'
-            ), attrs={'class': 'login'}
-        )
-
-        if citizen_login_enabled and not request.authenticated_email:
-            dashboard = CitizenDashboard(request)
-            if dashboard.is_available:
-                auth = Auth.from_request(
-                    request,
-                    request.link(dashboard)
-                )
-            else:
-                auth = Auth.from_request_path(request)
-            yield Link(
-                _('Citizen Login'), request.link(
-                    auth, name='citizen-login'
-                ), attrs={
-                    'class': 'citizen-login',
-                    'title': _('No registration necessary')
-                }
-            )
-
-        if request.app.enable_user_registration:
-            yield Link(
-                _('Register'), request.link(
-                    Auth.from_request_path(request), name='register'
-                ), attrs={'class': 'register'})
-
-    # Management dropdown
-    if request.is_manager:
-        links = []
-
-        links.append(
-            Link(
-                _('Overview'), request.class_link(Dashboard),
-                attrs={'class': 'dashboard'}
-            )
-        )
-
-        links.append(
-            Link(
-                _('Timeline'), request.class_link(MessageCollection),
-                attrs={'class': 'timeline'}
-            )
-        )
-
-        links.append(
-            Link(
-                _('Files'), request.class_link(GeneralFileCollection),
-                attrs={'class': 'files'}
-            )
-        )
-
-        links.append(
-            Link(
-                _('Images'), request.class_link(ImageFileCollection),
-                attrs={'class': 'images'}
-            )
-        )
-
-        links.append(
-            Link(
-                _('Payments'),
-                request.class_link(PaymentCollection),
-                attrs={'class': 'payment'}
-            )
-        )
-
-        if invoicing:
-            links.append(
-                Link(
-                    _('Invoices'),
-                    request.class_link(TicketInvoiceCollection),
-                    attrs={'class': 'invoice'}
-                )
-            )
-
-        if request.is_admin:
-            links.append(
-                Link(
-                    _('Users'), request.class_link(
-                        UserCollection,
-                        variables={'active': '1'}
-                    ),
-                    attrs={'class': 'user'}
-                )
-            )
-
-            links.append(
-                Link(
-                    _('User groups'), request.class_link(UserGroupCollection),
-                    attrs={'class': 'users'}
-                )
-            )
-
-        if request.is_admin:
-            links.append(
-                Link(
-                    _('Settings'), request.link(
-                        request.app.org, 'settings'
-                    ), attrs={'class': 'settings'}
-                )
-            )
-
-            links.append(
-                Link(
-                    _('Link Check'),
-                    request.class_link(Organisation, name='link-check'),
-                    attrs={'class': 'link-check'}
-                )
-            )
-
-            # Currently hidden, it doesn't work as it should
-            # links.append(
-            #     Link(
-            #         _('Link Migration'),
-            #         request.class_link(Organisation, name='link-check'),
-            #         attrs={'class': 'migrate-links'}
-            #     )
-            # )
-
-        yield LinkGroup(_('Management'), classes=('management', ), links=links)
 
     # Tickets
     if request.is_manager or request.is_supporter:
@@ -430,6 +289,148 @@ def get_global_tools(
                 'class': ('citizen-tickets'),
             }
         )
+
+    # Management dropdown
+    if request.is_manager:
+        links = []
+
+        links.append(
+            Link(
+                _('Overview'), request.class_link(Dashboard),
+                attrs={'class': 'dashboard'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Timeline'), request.class_link(MessageCollection),
+                attrs={'class': 'timeline'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Files'), request.class_link(GeneralFileCollection),
+                attrs={'class': 'files'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Images'), request.class_link(ImageFileCollection),
+                attrs={'class': 'images'}
+            )
+        )
+
+        links.append(
+            Link(
+                _('Payments'),
+                request.class_link(PaymentCollection),
+                attrs={'class': 'payment'}
+            )
+        )
+
+        if invoicing:
+            links.append(
+                Link(
+                    _('Invoices'),
+                    request.class_link(TicketInvoiceCollection),
+                    attrs={'class': 'invoice'}
+                )
+            )
+
+        if request.is_admin:
+            links.append(
+                Link(
+                    _('Users'), request.class_link(
+                        UserCollection,
+                        variables={'active': '1'}
+                    ),
+                    attrs={'class': 'user'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _('User groups'), request.class_link(UserGroupCollection),
+                    attrs={'class': 'users'}
+                )
+            )
+
+        if request.is_admin:
+            links.append(
+                Link(
+                    _('Settings'), request.link(
+                        request.app.org, 'settings'
+                    ), attrs={'class': 'settings'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _('Link Check'),
+                    request.class_link(Organisation, name='link-check'),
+                    attrs={'class': 'link-check'}
+                )
+            )
+
+            # Currently hidden, it doesn't work as it should
+            # links.append(
+            #     Link(
+            #         _('Link Migration'),
+            #         request.class_link(Organisation, name='link-check'),
+            #         attrs={'class': 'migrate-links'}
+            #     )
+            # )
+
+        yield LinkGroup(_('Management'), classes=('management', ), links=links)
+
+    # Authentication / Userprofile
+    if request.is_logged_in:
+        yield LinkGroup(_('Account'), classes=('user', ), links=(
+            Link(
+                _('User Profile'), request.link(
+                    request.app.org, name='userprofile'
+                ), attrs={'class': 'profile'}
+            ),
+            Link(
+                _('Logout'), request.link(
+                    Auth.from_request(
+                        request, to=logout_path(request)), name='logout'
+                ), attrs={'class': 'logout'}
+            ),
+        ))
+
+    else:
+        yield Link(
+            _('Login'), request.link(
+                Auth.from_request_path(request), name='login'
+            ), attrs={'class': 'login'}
+        )
+
+        if citizen_login_enabled and not request.authenticated_email:
+            dashboard = CitizenDashboard(request)
+            if dashboard.is_available:
+                auth = Auth.from_request(
+                    request,
+                    request.link(dashboard)
+                )
+            else:
+                auth = Auth.from_request_path(request)
+            yield Link(
+                _('Citizen Login'), request.link(
+                    auth, name='citizen-login'
+                ), attrs={
+                    'class': 'citizen-login',
+                    'title': _('No registration necessary')
+                }
+            )
+
+        if request.app.enable_user_registration:
+            yield Link(
+                _('Register'), request.link(
+                    Auth.from_request_path(request), name='register'
+                ), attrs={'class': 'register'})
 
 
 def get_api_endpoints(request: OrgRequest) -> Iterator[ApiEndpoint[Any, Any]]:
