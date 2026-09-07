@@ -26,7 +26,7 @@ from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
 from sqlalchemy import and_, or_, func, text
-from sqlalchemy.orm import object_session
+from sqlalchemy.orm import object_session, undefer, selectinload
 from sqlalchemy.orm.attributes import set_committed_value
 
 
@@ -633,6 +633,8 @@ class ExtendedDirectoryEntryCollection(
         #        than filtering access after the fact, for now we'll only
         #        use it in the API.
         request: OrgRequest | None = None,
+        # eager-load deferred content to avoid N+1 when iterating (e.g. API)
+        undefer_content: bool = False,
     ) -> None:
 
         self.request = request
@@ -640,6 +642,7 @@ class ExtendedDirectoryEntryCollection(
         self.published_only = published_only
         self.past_only = past_only
         self.upcoming_only = upcoming_only
+        self.undefer_content = undefer_content
 
     if TYPE_CHECKING:
         directory: ExtendedDirectory
@@ -701,4 +704,10 @@ class ExtendedDirectoryEntryCollection(
         return query
 
     def query(self) -> Query[ExtendedDirectoryEntry]:
-        return self.apply_common_filters(super().query())
+        query = self.apply_common_filters(super().query())
+        if self.undefer_content:
+            query = query.options(
+                undefer(ExtendedDirectoryEntry.content),
+                selectinload(ExtendedDirectoryEntry.files),
+            )
+        return query

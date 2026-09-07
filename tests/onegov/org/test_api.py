@@ -708,3 +708,48 @@ def test_api_directory_content_hash(client: Client) -> None:
     items = api_items(client, '/api/clubs')
     item_data = api_item_data(items[0])
     assert item_data['content_hash'] != first_hash
+
+
+def test_api_directory_no_n_plus_one_content(client: Client) -> None:
+    from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+    from sqlalchemy import event
+
+    session = client.app.session()
+    directory: ExtendedDirectory = DirectoryCollection(
+        session, type='extended'
+    ).add(
+        title='Clubs',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+    for i in range(5):
+        directory.add(values={'name': f'Club {i}'})
+    transaction.commit()
+
+    session = client.app.session()
+    directory = DirectoryCollection(
+        session, type='extended'
+    ).by_name('clubs')  # type: ignore[assignment]
+
+    collection = ExtendedDirectoryEntryCollection(
+        directory, published_only=True, undefer_content=True
+    )
+    entries = collection.batch  # eager-loads content
+    assert len(entries) == 5
+
+    statements: list[str] = []
+
+    def count_query(*args: Any) -> None:
+        statements.append(args[2])
+
+    connection = session.connection()
+    event.listen(connection, 'before_cursor_execute', count_query)
+    try:
+        for entry in entries:
+            entry.content  # must not emit a query
+            entry.files
+    finally:
+        event.remove(connection, 'before_cursor_execute', count_query)
+
+    content_loads = [s for s in statements if 'directory_entries.content' in s]
+    assert content_loads == [], f'N+1 on content: {len(content_loads)} queries'

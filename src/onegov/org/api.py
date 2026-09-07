@@ -646,7 +646,8 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
             self.directory,
             request=self.request,
             page=self.page or 0,
-            published_only=True
+            published_only=True,
+            undefer_content=True
         )
         for key, values in self.extra_parameters.items():
             self.assert_valid_filter(key)
