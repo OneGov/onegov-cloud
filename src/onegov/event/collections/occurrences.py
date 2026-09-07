@@ -657,15 +657,9 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         """
 
-        event = contains_eager(Occurrence.event)
+        # Event join needed for filters/ordering and the batch contains_eager
         query = self.apply_common_filters(
-            self.session.query(Occurrence)
-            .join(Event)
-            .options(
-                event.joinedload(Event.image),
-                event.undefer(Event.content)
-            )
-            .options(undefer(Occurrence.content))
+            self.session.query(Occurrence).join(Event)
         )
 
         if self.term:
@@ -741,6 +735,18 @@ class OccurrenceCollection(Pagination[Occurrence]):
             query = self.search_widget.adapt(query)
 
         return query
+
+    def transform_batch_query(
+        self,
+        query: Query[Occurrence]
+    ) -> Query[Occurrence]:
+        # eager-load per-occurrence data (e.g. API) to avoid N+1 on the batch
+        event = contains_eager(Occurrence.event)
+        return query.options(
+            event.joinedload(Event.image),
+            event.undefer(Event.content),
+            undefer(Occurrence.content),
+        )
 
     def by_name(self, name: str) -> Occurrence | None:
         """ Returns an occurrence by its URL-friendly name.
