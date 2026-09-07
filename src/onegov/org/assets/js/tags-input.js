@@ -24,8 +24,8 @@
     var SEPERATOR = ',';
     var COPY_PROPS = 'placeholder pattern spellcheck autocomplete autocapitalize autofocus accessKey accept lang minLength maxLength required'.split(' ');
     function tagsInput(input) {
-        // fields may opt into keeping extra characters (e.g. ':' for HH:MM
-        // times) via data-allow-chars; everything else is stripped as before
+        // data-allow-chars: chars to keep beyond alnum (e.g. ':'); escaped
+        // before use in the char class to avoid regex injection
         var allowChars = (input.getAttribute('data-allow-chars') || '')
             .replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
         var sanitizeRe = new RegExp(

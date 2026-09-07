@@ -776,12 +776,7 @@ class TagsField(StringField):
 
 
 class DeliveryTimesField(TagsField):
-    """ TagsField for HH:MM times; keeps digits and colons.
-
-    Keeps the tags-input chip UI but opts into ':' both client-side (via
-    DeliveryTimesWidget's data-allow-chars) and server-side (_sanitize),
-    so HH:MM times are not mangled to "HH MM".
-    """
+    """ TagsField for HH:MM times; keeps ':' client- and server-side. """
 
     widget = DeliveryTimesWidget()
     _sanitize = re.compile(r'[^0-9:]')

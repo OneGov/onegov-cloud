@@ -399,8 +399,7 @@ class TagsWidget(TextInput):
 
 
 class DeliveryTimesWidget(TagsWidget):
-    # tags widget that opts into keeping ':' so HH:MM times survive the
-    # client-side sanitation of tags-input.js (see data-allow-chars there)
+    # tags widget that keeps ':' client-side so HH:MM survives
     def __call__(self, field: Field, **kwargs: Any) -> Markup:
         kwargs.setdefault('data-allow-chars', ':')
         return super().__call__(field, **kwargs)
