@@ -732,9 +732,9 @@ def test_api_directory_no_n_plus_one_content(client: Client) -> None:
     ).by_name('clubs')  # type: ignore[assignment]
 
     collection = ExtendedDirectoryEntryCollection(
-        directory, published_only=True, undefer_content=True
+        directory, published_only=True
     )
-    entries = collection.batch  # eager-loads content
+    entries = collection.batch  # eager-loads content + files
     assert len(entries) == 5
 
     statements: list[str] = []
@@ -753,3 +753,5 @@ def test_api_directory_no_n_plus_one_content(client: Client) -> None:
 
     content_loads = [s for s in statements if 'directory_entries.content' in s]
     assert content_loads == [], f'N+1 on content: {len(content_loads)} queries'
+    file_loads = [s for s in statements if 'files_for_directory_entries' in s]
+    assert len(file_loads) <= 1, f'N+1 on files: {len(file_loads)} queries'

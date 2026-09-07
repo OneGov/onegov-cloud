@@ -633,8 +633,6 @@ class ExtendedDirectoryEntryCollection(
         #        than filtering access after the fact, for now we'll only
         #        use it in the API.
         request: OrgRequest | None = None,
-        # eager-load deferred content to avoid N+1 when iterating (e.g. API)
-        undefer_content: bool = False,
     ) -> None:
 
         self.request = request
@@ -642,7 +640,6 @@ class ExtendedDirectoryEntryCollection(
         self.published_only = published_only
         self.past_only = past_only
         self.upcoming_only = upcoming_only
-        self.undefer_content = undefer_content
 
     if TYPE_CHECKING:
         directory: ExtendedDirectory
@@ -704,10 +701,14 @@ class ExtendedDirectoryEntryCollection(
         return query
 
     def query(self) -> Query[ExtendedDirectoryEntry]:
-        query = self.apply_common_filters(super().query())
-        if self.undefer_content:
-            query = query.options(
-                undefer(ExtendedDirectoryEntry.content),
-                selectinload(ExtendedDirectoryEntry.files),
-            )
-        return query
+        return self.apply_common_filters(super().query())
+
+    def transform_batch_query(
+        self,
+        query: Query[ExtendedDirectoryEntry]
+    ) -> Query[ExtendedDirectoryEntry]:
+        # eager-load per-entry data (e.g. API) to avoid N+1 on the batch
+        return query.options(
+            undefer(ExtendedDirectoryEntry.content),
+            selectinload(ExtendedDirectoryEntry.files),
+        )
