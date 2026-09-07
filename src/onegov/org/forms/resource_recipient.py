@@ -19,6 +19,13 @@ if TYPE_CHECKING:
 
 _TIME_RE = re.compile(r'^([01]\d|2[0-3]):([0-5]\d)$')
 
+
+class DeliveryTimesField(TagsField):
+    """ TagsField for HH:MM times; keeps digits and colons. """
+
+    _sanitize = re.compile(r'[^0-9:]')
+
+
 WEEKDAYS = (
     ('MO', _('Mo')),
     ('TU', _('Tu')),
@@ -104,7 +111,7 @@ class ResourceRecipientForm(Form):
         render_kw={'prefix_label': False, 'class_': 'oneline-checkboxes'}
     )
 
-    daily_reservations_times = TagsField(
+    daily_reservations_times = DeliveryTimesField(
         label=_('Delivery Times'),
         fieldset='Tage und Ressourcen',
         description=_('e.g. 07:05'),
