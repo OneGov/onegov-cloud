@@ -107,7 +107,7 @@ class ResourceRecipientForm(Form):
     daily_reservations_times = TagsField(
         label=_('Delivery Times'),
         fieldset='Tage und Ressourcen',
-        description=_('e.g. 07:05'),
+        description=_('e.g. 07:05, 09:00'),
         depends_on=('daily_reservations', 'y'),
     )
 

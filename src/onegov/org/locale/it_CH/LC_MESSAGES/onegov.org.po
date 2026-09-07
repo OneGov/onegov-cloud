@@ -2135,8 +2135,8 @@ msgstr "Invia il"
 msgid "Delivery Times"
 msgstr "Orari di invio"
 
-msgid "e.g. 07:05"
-msgstr "es. 07:05"
+msgid "e.g. 07:05, 09:00"
+msgstr "es. 07:05, 09:00"
 
 #. type: ignore[attr-defined]
 msgid "Please enter at least one delivery time."
