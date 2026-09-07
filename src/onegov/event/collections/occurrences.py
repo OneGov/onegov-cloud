@@ -657,9 +657,14 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         """
 
+        event = contains_eager(Occurrence.event)
         query = self.apply_common_filters(
-            self.session.query(Occurrence).join(Event)
-            .options(contains_eager(Occurrence.event).joinedload(Event.image))
+            self.session.query(Occurrence)
+            .join(Event)
+            .options(
+                event.joinedload(Event.image),
+                event.undefer(Event.content)
+            )
             .options(undefer(Occurrence.content))
         )
 
