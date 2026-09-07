@@ -753,7 +753,6 @@ class TagsField(StringField):
     data: list[str]  # type:ignore[assignment]
 
     def _value(self) -> str:
-        # data is always a list; join for the comma-separated widget value
         return ','.join(self.data) if self.data else ''
 
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
@@ -773,6 +772,12 @@ class TagsField(StringField):
 
     def process_data(self, value: list[str] | None) -> None:
         self.data = list(value) if value else []
+
+
+class DeliveryTimesField(TagsField):
+    """ TagsField for HH:MM times; keeps digits and colons. """
+
+    _sanitize = re.compile(r'[^0-9:]')
 
 
 class IconField(StringField):

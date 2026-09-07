@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, TagsField
+from onegov.form.fields import DeliveryTimesField, MultiCheckboxField
 from onegov.org import _
 from onegov.reservation import Resource, ResourceCollection
 from wtforms.fields import EmailField
@@ -18,13 +18,6 @@ if TYPE_CHECKING:
 
 
 _TIME_RE = re.compile(r'^([01]\d|2[0-3]):([0-5]\d)$')
-
-
-class DeliveryTimesField(TagsField):
-    """ TagsField for HH:MM times; keeps digits and colons. """
-
-    _sanitize = re.compile(r'[^0-9:]')
-
 
 WEEKDAYS = (
     ('MO', _('Mo')),
