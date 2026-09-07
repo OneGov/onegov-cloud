@@ -297,3 +297,5 @@ class FeriennetExport(Export):
         yield _('E-Mail'), volunteer.email
         yield _('Phone'), volunteer.phone
         yield _('Address'), volunteer.address
+        yield _('Transport'), volunteer.transport
+        yield _('Note'), volunteer.note or ''

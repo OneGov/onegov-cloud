@@ -172,7 +172,7 @@ class WinterthurDaycareSettingsForm(Form):
         self.directory.choices = list(self.directory_choices())
 
 
-@WinterthurApp.form(
+@WinterthurApp.setting_form(
     model=Organisation, name='daycare-settings',
     template='form.pt', permission=Secret,
     form=WinterthurDaycareSettingsForm,
@@ -224,7 +224,7 @@ class WinterthurMissionReportSettingsForm(Form):
             d.get('legend', DEFAULT_LEGEND))
 
 
-@WinterthurApp.form(
+@WinterthurApp.setting_form(
     model=Organisation, name='mission-report-settings',
     template='form.pt', permission=Secret,
     form=WinterthurMissionReportSettingsForm,

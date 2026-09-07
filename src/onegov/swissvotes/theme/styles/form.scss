@@ -176,7 +176,7 @@ form {
     /*
         Make the search filters toggable
     */
-    #fieldset-other-filters {
+    #fieldset-other_filters {
         cursor: pointer;
 
         legend::before,
@@ -199,7 +199,7 @@ form {
     /*
         Center "More Filters" in Firefox and Chrome
     */
-    #fieldset-other-filters legend {
+    #fieldset-other_filters legend {
         margin: 0 auto;
     }
 }

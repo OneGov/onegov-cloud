@@ -1,20 +1,22 @@
 from __future__ import annotations
+from copy import deepcopy
 import json
 
 import morepath
 import sedate
 
 from datetime import timedelta
+from itertools import batched
 from libres.db.models import Allocation as LibresAllocation
 from libres.db.models import ReservedSlot
 from libres.modules.errors import LibresError
 from libres.modules import rasterizer
-
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import is_uuid
 from onegov.form import merge_forms
 from onegov.org import OrgApp, utils, _
 from onegov.org.forms import AllocationRuleForm
+from onegov.org.forms import BatchCopyAllocationRulesForm
 from onegov.org.forms import DaypassAllocationEditForm
 from onegov.org.forms import DaypassAllocationForm
 from onegov.org.forms import RoomAllocationEditForm
@@ -406,13 +408,21 @@ def count_matching_allocations(
     if not expected:
         return 0
 
-    return allocations.filter(
-        LibresAllocation.is_master,
-        tuple_(
-            LibresAllocation._start,
-            LibresAllocation._end,
-        ).in_(expected),
-    ).count()
+    return sum(
+        allocations.filter(
+            LibresAllocation.is_master,
+            tuple_(
+                LibresAllocation._start,
+                LibresAllocation._end,
+            ).in_(batch),
+        ).count()
+        # NOTE: Since each date is rendered either as a bind parameter or
+        #       an inline value in the compiled statement, the statement
+        #       quickly becomes huge and exceeds Postgres' default stack
+        #       size limit for compiling/analyzing queries. By splitting
+        #       this into smaller batches we can avoid crashes.
+        for batch in batched(expected, 250)
+    )
 
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
@@ -733,6 +743,83 @@ def handle_copy_rule(self: Resource, request: OrgRequest) -> None:
         raise exc.HTTPNotFound()
 
     request.success(_('The availability period was added to the clipboard'))
+
+
+@OrgApp.form(
+    model=Resource,
+    template='form.pt',
+    name='copy-rules',
+    permission=Private,
+    form=BatchCopyAllocationRulesForm,
+)
+def handle_copy_rules(
+    self: Resource,
+    request: OrgRequest,
+    form: BatchCopyAllocationRulesForm,
+    layout: AllocationRulesLayout | None = None,
+) -> RenderData | Response:
+    layout = layout or AllocationRulesLayout(self, request)
+
+    if form.submitted(request):
+        resources = ResourceCollection(request.app.libres_context)
+        rule_ids = form.rules.data or []
+        resource_ids = form.resources.data or []
+        selected_rules = {
+            rule['id']: rule
+            for rule in self.content.get('rules', ())
+            if rule['id'] in rule_ids
+        }
+        allocation_count = 0
+
+        for resource_id in resource_ids:
+            resource = resources.by_id(resource_id)
+            if resource is None or resource.type != self.type:
+                raise exc.HTTPBadRequest()
+
+            target_rules = resource.content.get('rules', [])
+            form_class = get_allocation_rule_form_class(resource, request)
+            for rule_id in rule_ids:
+                source_rule = selected_rules.get(rule_id)
+                if source_rule is None:
+                    raise exc.HTTPBadRequest()
+
+                rule_form = request.get_form(
+                    form_class, csrf_support=False, model=resource
+                )
+                rule = deepcopy(source_rule)
+                rule['id'] = uuid4().hex
+                rule['last_run'] = None
+                rule['iteration'] = 0
+                rule_form.rule = rule
+                allocation_count += rule_form.apply(resource)
+                target_rules.append(rule_form.rule)
+
+            resource.content['rules'] = target_rules
+
+        request.success(
+            _(
+                '${periods} availability periods copied to ${resources} '
+                'resources, creating ${allocations} allocations',
+                mapping={
+                    'periods': len(selected_rules),
+                    'resources': len(resource_ids),
+                    'allocations': allocation_count,
+                },
+            )
+        )
+        return request.redirect(request.link(self, name='rules'))
+
+    layout.edit_mode = True
+    layout.editmode_links[1] = Link(
+        text=_('Cancel'),
+        url=request.link(self, name='rules'),
+        attrs={'class': 'cancel-link'},
+    )
+    return {
+        'layout': layout,
+        'title': _('Copy availability periods'),
+        'form': form,
+    }
 
 
 @OrgApp.view(model=Resource, request_method='POST', permission=Private,

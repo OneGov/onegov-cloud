@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import inspect
 import importlib
-import pkg_resources
 import transaction
 
 from contextlib import contextmanager
+from importlib.metadata import entry_points
 from inspect import getmembers, isfunction, ismethod
 from itertools import chain
 from onegov.core import LEVELS
@@ -23,8 +23,6 @@ if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
-    # FIXME: Switch to importlib.resources
-    from pkg_resources import Distribution, EntryPoint
     from sqlalchemy import Column
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
@@ -85,33 +83,9 @@ class UpgradeState(Base, TimestampMixin):
         self.state.changed()  # type:ignore[attr-defined]
 
 
-def get_distributions_with_entry_map(
-    key: str
-) -> Iterator[tuple[Distribution, dict[str, EntryPoint]]]:
-    """ Iterates through all distributions with entry_maps and yields
-    each distribution along side the entry map with the given key.
-
-    """
-    for distribution in pkg_resources.working_set:
-        if hasattr(distribution, 'get_entry_map'):
-            entry_map = distribution.get_entry_map(key)
-
-            if entry_map:
-                yield distribution, entry_map
-
-
 def get_upgrade_modules() -> Iterator[tuple[str, ModuleType]]:
     """ Returns all modules that registered themselves for onegov.core
     upgrades like this::
-
-        entry_points={
-            'onegov': [
-                'upgrade = onegov.mypackage.upgrade'
-            ]
-        }
-
-    To add multiple upgrades in a single setup.py file, the following syntax
-    may be used. This will become the default in the future::
 
         entry_points= {
             'onegov_upgrades': [
@@ -125,20 +99,8 @@ def get_upgrade_modules() -> Iterator[tuple[str, ModuleType]]:
     """
     yield 'onegov.core', importlib.import_module('onegov.core.upgrades')
 
-    distributions = get_distributions_with_entry_map('onegov')
-
-    for distribution, entry_map in distributions:
-        if 'upgrade' in entry_map:
-            yield (
-                '.'.join(entry_map['upgrade'].module_name.split('.')[:2]),
-                importlib.import_module(entry_map['upgrade'].module_name)
-            )
-
-    distributions = get_distributions_with_entry_map('onegov_upgrades')
-
-    for distribution, entry_map in distributions:
-        for entry in entry_map.values():
-            yield entry.name, importlib.import_module(entry.module_name)
+    for entry in entry_points(group='onegov_upgrades'):
+        yield entry.name, entry.load()
 
 
 class upgrade_task:  # ruff:ignore[invalid-class-name]

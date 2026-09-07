@@ -164,6 +164,12 @@ class Searchable:
         """ A list of tags associated with this content. """
         return None
 
+    @property
+    def fts_rank_modifier(self) -> float:
+        """ Multiplies this entry's search rank. 1.0 is neutral; a lower
+        value de-prioritizes this type in mixed search results. """
+        return 1.0
+
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults

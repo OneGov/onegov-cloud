@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-08-06 08:19+0200\n"
-"PO-Revision-Date: 2022-03-15 10:52+0100\n"
+"POT-Creation-Date: 2026-08-27 07:25+0200\n"
+"PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -231,6 +231,13 @@ msgstr "Generale"
 msgid "${org} Reservation Overview"
 msgstr "Panoramica della prenotazione di ${org}"
 
+#, python-format
+msgid "Reminder: your reservation for ${resource}"
+msgstr "Promemoria: la vostra prenotazione per ${resource}"
+
+msgid "Reminder: your upcoming reservations"
+msgstr "Promemoria: le vostre prossime prenotazioni"
+
 msgid "Your Chat has been turned into a ticket"
 msgstr "È stato creato un ticket dalla loro chat"
 
@@ -249,8 +256,8 @@ msgstr "Cartelle"
 msgid "Surveys"
 msgstr "Sondaggi"
 
-msgid "Topic chart"
-msgstr "Diagramma dei temi"
+msgid "Information architecture"
+msgstr "Architettura dell'informazione"
 
 msgid "Modules"
 msgstr "Moduli"
@@ -391,8 +398,11 @@ msgstr "Pagamenti carta di credito"
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
 
-msgid "Inherit from resource"
-msgstr "Eredita dalla risorsa"
+msgid "Availability periods"
+msgstr "Periodi di disponibilità"
+
+msgid "Target resources"
+msgstr "Risorse di destinazione"
 
 msgid "Title"
 msgstr "Titolo"
@@ -439,14 +449,23 @@ msgstr "Durante le vacanze scolastiche"
 msgid "Price"
 msgstr "Prezzo"
 
+msgid "Inherit from resource"
+msgstr "Eredita dalla risorsa"
+
+msgid "Free of charge"
+msgstr "Gratuito"
+
+msgid "Per item"
+msgstr "Per elemento"
+
+msgid "Per hour"
+msgstr "Per ora"
+
 msgid "Price per item"
 msgstr "Prezzo per elemento"
 
 msgid "Price per hour"
 msgstr "Tariffa oraria"
-
-msgid "Pricing scheme"
-msgstr "Schema tariffario"
 
 msgid "Public"
 msgstr "Pubblico"
@@ -462,6 +481,16 @@ msgstr "Sicurezza"
 
 msgid "Start date before end date"
 msgstr "Data di inizio precedente la data di fine"
+
+msgid ""
+"End may at most be five years from the start. Either rely on auto-extension "
+"if you want to always cover at least a certain future date range or define "
+"multiple availability periods to cover a larger time range."
+msgstr ""
+"La data di scadenza non può essere superiore a cinque anni dalla data di "
+"inizio. È possibile avvalersi del rinnovo automatico se si desidera coprire "
+"sempre almeno un determinato intervallo di date future oppure definire più "
+"periodi di disponibilità per coprire un arco temporale più ampio."
 
 msgid "Daypasses"
 msgstr "Biglietti giornalieri"
@@ -705,8 +734,21 @@ msgstr "Nuovi elementi"
 msgid "Guideline"
 msgstr "Linee guida"
 
-msgid "Free of charge"
-msgstr "Gratuito"
+msgid "Invoicing party"
+msgstr "Soggetto emittente la fattura"
+
+msgid "Will be displayed in invoices"
+msgstr "Verrà visualizzato nelle fatture"
+
+msgid "Cost center / cost unit"
+msgstr "Unità di costo"
+
+msgid ""
+"Will be displayed in invoices for any costs directly associated with "
+"submissions in this directory."
+msgstr ""
+"Verrà indicato nelle fatture per tutti i costi direttamente connessi alle "
+"inserzioni presenti in questa directory."
 
 msgid "Price per submission"
 msgstr "Prezzo per iscrizione"
@@ -753,6 +795,13 @@ msgstr ""
 "Riceve un'e-mail quando le voci vengono pubblicate o depubblicate (invio "
 "orario). Utile ad esempio per i registri dei permessi come prova di "
 "pubblicazione."
+
+msgid ""
+"Whether the PDF attached to the admin notification should be digitally "
+"signed (recommended)."
+msgstr ""
+"Se il PDF allegato alla notifica amministrativa debba essere firmato "
+"digitalmente (consigliato)."
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informazioni da fornire in aggiunta all'e-mail"
@@ -1202,6 +1251,16 @@ msgstr ""
 "Questo testo viene visualizzato sopra il piè di pagina nell'e-mail di "
 "notifica di apertura del biglietto."
 
+msgid "Invoicing"
+msgstr "Fatturazione"
+
+msgid ""
+"Will be displayed in invoices for any costs directly associated with "
+"submissions on this form."
+msgstr ""
+"Verrà indicato nelle fatture per eventuali costi direttamente connessi alle "
+"richieste inviate tramite questo modulo."
+
 msgid "Show VAT"
 msgstr "Visualizza l'IVA"
 
@@ -1374,9 +1433,6 @@ msgstr "Per data dell'ultima modifica"
 
 msgid "Booking Text"
 msgstr "Testo prenotazione"
-
-msgid "Cost center / cost unit"
-msgstr "Unità di costo"
 
 msgid "Kind"
 msgstr "Tipo"
@@ -1917,6 +1973,13 @@ msgstr "Nessuna data di apertura"
 msgid "Start accepting reservations days before the allocation"
 msgstr "Inizia ad accettare prenotazioni giorni prima dell'assegnazione"
 
+msgid "Send a reminder email to the reservee 10 days in advance"
+msgstr ""
+"Inviare un'e-mail di promemoria alla persona che ha prenotato 10 giorni prima"
+
+msgid "Reservation reminders"
+msgstr "Promemoria di prenotazione"
+
 msgid "Limit reservations to certain zip-codes"
 msgstr "Limita le prenotazioni a specifici codici postali"
 
@@ -1950,21 +2013,15 @@ msgstr "Consentire la cancellazione delle prenotazioni"
 msgid "Cancellation"
 msgstr "Cancellazione"
 
-msgid "Invoicing party"
-msgstr "Soggetto emittente la fattura"
-
-msgid "Invoicing"
-msgstr "Fatturazione"
-
-msgid "Will be displayed in invoices"
-msgstr "Verrà visualizzato nelle fatture"
-
 msgid ""
 "Will be displayed in invoices for any costs directly associated with "
 "reservations on this resource."
 msgstr ""
 "Verrà indicato nelle fatture per eventuali costi direttamente associati alle "
 "prenotazioni su questa risorsa."
+
+msgid "Pricing scheme"
+msgstr "Schema tariffario"
 
 msgid "Prices in extra fields are"
 msgstr "I prezzi nei campi extra sono"
@@ -1978,12 +2035,6 @@ msgstr ""
 
 msgid "One-off"
 msgstr "Una tantum"
-
-msgid "Per item"
-msgstr "Per elemento"
-
-msgid "Per hour"
-msgstr "Per ora"
 
 msgid "Discounts in extra fields apply to"
 msgstr "Gli sconti percentuali nei campi extra si applicano a"
@@ -3706,11 +3757,11 @@ msgstr "Ripulisci"
 msgid "Subscribe"
 msgstr "Iscriviti"
 
-msgid "Availability periods"
-msgstr "Periodi di disponibilità"
-
 msgid "Availability period"
 msgstr "Periodo di disponibilità"
+
+msgid "Copy availability periods"
+msgstr "Copia periodi di disponibilità"
 
 msgid "Paste"
 msgstr "Incolla"
@@ -3934,7 +3985,6 @@ msgstr "Elementi della cartella"
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
 
-#. allowing mtan restricted models makes only sense if we can deliver SMS
 msgid "Only by privileged users or after submitting a mTAN"
 msgstr "Solo da utenti autorizzati o dopo l'invio di un mTAN."
 
@@ -4393,6 +4443,23 @@ msgstr "Vuoi davvero rifiutare questo elemento?"
 msgid "Chats"
 msgstr "Chat"
 
+msgid "Volunteer"
+msgstr "Aiutante"
+
+msgid "Status mail"
+msgstr "E-mail di stato"
+
+msgid "Do you really want to send the current status?"
+msgstr "Vuoi davvero inviare lo stato attuale?"
+
+msgid ""
+"A mail will be sent to the volunteer containing the status of his "
+"subscriptions. Only send this if these are the final states ofthe "
+"subscriptions."
+msgstr ""
+"Una mail sarà inviata al volontario contenente lo stato delle sue "
+"iscrizioni. Inviare solo se questi sono gli stati finali delle iscrizioni."
+
 msgid "New Link"
 msgstr "Nuovo collegamento"
 
@@ -4511,6 +4578,45 @@ msgstr ""
 msgid "Source"
 msgstr "Fonte"
 
+#, python-format
+msgid "The publication \"${title}\" has ended."
+msgstr "La pubblicazione \"${title}\" è terminata."
+
+#, python-format
+msgid "This document certifies the publication \"${title}\" as follows."
+msgstr "Questo documento attesta la pubblicazione \"${title}\" come segue."
+
+msgid "Attachments"
+msgstr "Allegati"
+
+msgid "Size"
+msgstr "Dimensione"
+
+msgid "Hash"
+msgstr "Hash"
+
+msgid "Bytes"
+msgstr "byte"
+
+msgid "Publication details"
+msgstr "Dettagli della pubblicazione"
+
+msgid "Not set"
+msgstr "Non impostato"
+
+msgid "Publication start:"
+msgstr "Inizio pubblicazione:"
+
+msgid "Publication end:"
+msgstr "Fine pubblicazione:"
+
+msgid "Entry checksum"
+msgstr "Checksum della voce"
+
+#, python-format
+msgid "Email automatically generated by ${org} at ${timestamp}"
+msgstr "E-mail generata automaticamente da ${org} il ${timestamp}"
+
 msgid "Appendix"
 msgstr "Appendice"
 
@@ -4626,9 +4732,6 @@ msgid ""
 msgstr ""
 "Impronta del contenuto della voce. Cambia ogni volta che i dati della voce "
 "vengono modificati."
-
-msgid "Hash"
-msgstr "Hash"
 
 msgid "No subscribers yet"
 msgstr "Non ci sono ancora abbonati"
@@ -4851,26 +4954,41 @@ msgstr "Questo album non contiene ancora nessuna immagine."
 msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
-msgid "No invoices yet."
-msgstr "Nessuna fattura ancora."
+msgid "Expand all"
+msgstr "Espandi tutto"
 
-msgid "Batch Action"
-msgstr "Azione di gruppo"
+msgid "Collapse all"
+msgstr "Comprimi tutto"
 
-msgid "Mark as Invoiced"
-msgstr "Contrassegna come fatturato"
+msgid "Fit to screen"
+msgstr "Adatta allo schermo"
 
-msgid "Mark as Uninvoiced"
-msgstr "Contrassegna come non fatturato"
+msgid "Whole chart"
+msgstr "Diagramma intero"
 
-msgid "Mark as Paid"
-msgstr "Contrassegna come pagato"
+msgid "Download as PNG"
+msgstr "Scarica come PNG"
 
-msgid "Mark as Unpaid"
-msgstr "Contrassegna come non pagato"
+msgid "Download as SVG"
+msgstr "Scarica come SVG"
 
-msgid "Apply to selected"
-msgstr "Applica ai selezionati"
+msgid "Show only this branch"
+msgstr "Mostra solo questo ramo"
+
+msgid "Show the level above"
+msgstr "Mostra il livello superiore"
+
+msgid "The topics could not be loaded."
+msgstr "Non è stato possibile caricare gli argomenti."
+
+msgid ""
+"The chart is too large for an image, please use the SVG download instead."
+msgstr ""
+"Il diagramma è troppo grande per un'immagine, si prega di utilizzare il "
+"download SVG."
+
+msgid "Loading topics..."
+msgstr "Caricamento degli argomenti..."
 
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
@@ -5396,6 +5514,18 @@ msgstr ""
 "${request.app.org.title}. Se non desideri più ricevere questa e-mail, "
 "contatta un amministratore affinché ti rimuova dall'elenco dei destinatari."
 
+msgid "This is a reminder for your upcoming reservation."
+msgstr "Questo è un promemoria per la vostra prossima prenotazione."
+
+msgid "This is a reminder for your upcoming reservations."
+msgstr "Questo è un promemoria per le vostre prossime prenotazioni."
+
+msgid "Reservation confirmation"
+msgstr "Conferma della prenotazione"
+
+msgid "This is a reservation reminder for ${organisation}."
+msgstr "Questo è un promemoria di prenotazione per ${organisation}."
+
 msgid "Good morning,"
 msgstr "Buongiorno,"
 
@@ -5496,8 +5626,12 @@ msgstr ""
 msgid "An entry has been published in the \"${directory}\" directory:"
 msgstr "Una voce è stata pubblicata nella directory \"${directory}\"："
 
-msgid "Email automatically generated by ${org} at ${timestamp}"
-msgstr "E-mail generata automaticamente da ${org} il ${timestamp}"
+msgid ""
+"The attached PDF could not be signed, because the signature service was not "
+"available."
+msgstr ""
+"Il PDF allegato non ha potuto essere firmato perché il servizio di firma non "
+"era disponibile."
 
 msgid ""
 "The publication period of the entry \"${entry}\" in the \"${directory}\" "
@@ -5540,30 +5674,6 @@ msgstr ""
 
 msgid "Pending approval"
 msgstr "In attesa di approvazione"
-
-msgid "Form fields"
-msgstr "Campi del modulo"
-
-msgid "Attachments"
-msgstr "Allegati"
-
-msgid "Size"
-msgstr "Dimensione"
-
-msgid "Publication details"
-msgstr "Dettagli della pubblicazione"
-
-msgid "Publication start:"
-msgstr "Inizio pubblicazione:"
-
-msgid "Not set"
-msgstr "Non impostato"
-
-msgid "Publication end:"
-msgstr "Fine pubblicazione:"
-
-msgid "Entry checksum"
-msgstr "Checksum della voce"
 
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
@@ -6138,6 +6248,17 @@ msgstr ""
 "calendario potrebbero essere errate o non aggiornate. Usale tuo rischio."
 
 msgid ""
+"If you want reservations from parent and/or child resources to be included, "
+"then use this link instead. Keep in mind that you may end up with duplicate "
+"events in your calendar, if you subscribe to multiple related resources with "
+"this setting."
+msgstr ""
+"Se desideri includere le prenotazioni provenienti dalle risorse superiori e "
+"subordinate, utilizza invece questo link. Tieni presente che, se ti abboni a "
+"più risorse correlate con questa impostazione, potresti ritrovarti con "
+"eventi duplicati nel tuo calendario."
+
+msgid ""
 "If you want key codes to be included in the event's description then you may "
 "use the following link instead. Please note however that anyone you share "
 "this link with will have permanent access to this information."
@@ -6373,6 +6494,27 @@ msgstr "Disabilita i messaggi e-mail per tutti i biglietti correlati"
 msgid "Enable E-Mails for all related tickets"
 msgstr "Abilita i messaggi e-mail per tutti i biglietti correlati"
 
+msgid "No invoices yet."
+msgstr "Nessuna fattura ancora."
+
+msgid "Batch Action"
+msgstr "Azione di gruppo"
+
+msgid "Mark as Invoiced"
+msgstr "Contrassegna come fatturato"
+
+msgid "Mark as Uninvoiced"
+msgstr "Contrassegna come non fatturato"
+
+msgid "Mark as Paid"
+msgstr "Contrassegna come pagato"
+
+msgid "Mark as Unpaid"
+msgstr "Contrassegna come non pagato"
+
+msgid "Apply to selected"
+msgstr "Applica ai selezionati"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -6433,42 +6575,6 @@ msgid ""
 msgstr ""
 "Non vieni reindirizzato automaticamente, quindi hai la possibilità di "
 "modificare o eliminare questo collegamento."
-
-msgid "Expand all"
-msgstr "Espandi tutto"
-
-msgid "Collapse all"
-msgstr "Comprimi tutto"
-
-msgid "Fit to screen"
-msgstr "Adatta allo schermo"
-
-msgid "Whole chart"
-msgstr "Diagramma intero"
-
-msgid "Download as PNG"
-msgstr "Scarica come PNG"
-
-msgid "Download as SVG"
-msgstr "Scarica come SVG"
-
-msgid "Show only this branch"
-msgstr "Mostra solo questo ramo"
-
-msgid "Show the level above"
-msgstr "Mostra il livello superiore"
-
-msgid "The topics could not be loaded."
-msgstr "Non è stato possibile caricare gli argomenti."
-
-msgid ""
-"The chart is too large for an image, please use the SVG download instead."
-msgstr ""
-"Il diagramma è troppo grande per un'immagine, si prega di utilizzare il "
-"download SVG."
-
-msgid "Loading topics..."
-msgstr "Caricamento degli argomenti..."
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr ""
@@ -6648,8 +6754,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -6708,6 +6814,14 @@ msgstr "Il periodo di disponibilità è stato fermato"
 
 msgid "The availability period was added to the clipboard"
 msgstr "Il periodo di disponibilità è stato aggiunto agli appunti"
+
+#, python-format
+msgid ""
+"${periods} availability periods copied to ${resources} resources, creating $"
+"{allocations} allocations"
+msgstr ""
+"${periods} periodi di disponibilità copiati in ${resources} risorse, creando "
+"${allocations} disponibilità"
 
 msgid "Pasted availability period from to the clipboard"
 msgstr "Incollare il periodo di disponibilità negli appunti"
@@ -7132,6 +7246,9 @@ msgstr "Aggiunto un nuovo link esterno"
 msgid "New external link"
 msgstr "Nuovo collegamento esterno"
 
+msgid "Edit external form"
+msgstr "Modifica il modulo esterno"
+
 msgid "Edit external link"
 msgstr "Modifica il collegamento esterno"
 
@@ -7161,9 +7278,6 @@ msgstr "Questo file include già un sigillo digitale"
 
 msgid "Your Yubikey could not be validated"
 msgstr "Non è stato possibile convalidare la tua Yubikey"
-
-msgid "Edit external form"
-msgstr "Modifica il modulo esterno"
 
 msgid "The registration has ended"
 msgstr "La registrazione è terminata"
@@ -8392,6 +8506,9 @@ msgstr "Utente creato correttamente"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Inserisci il tuo indirizzo e-mail per continuare"
+
+#~ msgid "Form fields"
+#~ msgstr "Campi del modulo"
 
 #, python-format
 #~ msgid "Syntax Error in line ${line}"

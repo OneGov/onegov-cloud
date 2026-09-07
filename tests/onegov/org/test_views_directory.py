@@ -830,6 +830,18 @@ def test_directory_export(client: Client) -> None:
     assert count == 1
     assert directory.meta == events.meta
 
+    # an invalid format is rejected with a 400 instead of crashing
+    resp = client.get(
+        '/directories/events/+zip?format=xml', expect_errors=True
+    )
+    assert resp.status_code == 400
+    assert 'Invalid export format: xml' in resp
+    resp = client.get(
+        '/directories/events/+zip?format=abc', expect_errors=True
+    )
+    assert resp.status_code == 400
+    assert 'Invalid export format: abc' in resp
+
 
 def test_add_directory_entries_with_duplicate_names(client: Client) -> None:
     client.login_admin()

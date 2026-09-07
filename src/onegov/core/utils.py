@@ -49,11 +49,11 @@ from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection, Iterator, Mapping
-    from fs.base import FS, SubFS
     from re import Match
     from sqlalchemy.orm import InstrumentedAttribute, Session
     from types import ModuleType
     from webob import Response
+    from .filestorage import Filestorage
     from .request import CoreRequest
     from .types import FileDict, LaxFileDict
 
@@ -785,7 +785,7 @@ def get_unique_hstore_keys(
     return set(keys) if keys else set()
 
 
-def makeopendir(fs: FS, directory: str) -> SubFS[FS]:
+def makeopendir(fs: Filestorage, directory: str) -> Filestorage:
     """ Creates and opens the given directory in the given PyFilesystem. """
 
     if not fs.isdir(directory):

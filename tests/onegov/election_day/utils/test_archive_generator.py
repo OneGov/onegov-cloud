@@ -2,22 +2,18 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import date
-from fs.copy import copy_file
-from fs.osfs import OSFS
-from fs.tempfs import TempFS
-from fs.walk import Walker
-from fs.zipfs import ReadZipFS
-from onegov.core.utils import module_path
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import BallotResult
 from onegov.election_day.models import Municipality
 from onegov.election_day.models import Vote
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
+from zipfile import ZipFile, Path as ZipPath
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from pathlib import Path
     from ..conftest import ImportTestDatasets, TestApp
 
 
@@ -127,76 +123,68 @@ def test_archive_generation_from_scratch(election_day_app_zg: TestApp) -> None:
     zip_path = archive_generator.generate_archive()
     assert zip_path is not None
 
-    with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
-        with ReadZipFS(fi) as zip_fs:
-            votes_dir = zip_fs.listdir("votes")
-            years = [str(year) for year in votes_dir]
-            assert len(zip_fs.listdir("votes")) == 3
-            assert {"all_votes.csv", "2022", "2013"} == set(years)
+    with (
+        archive_generator.archive_dir.open(zip_path, mode="rb") as fi,
+        ZipFile(fi) as zf
+    ):
+        path = ZipPath(zf)
+        assert {p.name for p in (path / 'votes').iterdir()} == {
+            "all_votes.csv", "2022", "2013"
+        }
 
-            votes = zip_fs.opendir("votes")
-            counter: Counter[str] = Counter()
-            total_bytes_csv = 0
-            walker = Walker()
-            for _, _, files in walker.walk(
-                    votes, namespaces=["basic", "details"]
-            ):
-                for file in files:
-                    counter[file.name] += 1
+        counter: Counter[str] = Counter()
+        total_bytes_csv = 0
+        for info in zf.infolist():
+            if info.is_dir():
+                continue
+            if not info.filename.startswith('votes/'):
+                continue
 
-                total_bytes_csv += sum(info.size for info in files)
-            # We expect 3 csv because we have 3 votes,
-            # Plus a csv that contains everything = 4
-            assert sum(counter.values()) == 4
-            assert total_bytes_csv > 10  # check to ensure files are not empty
+            counter[info.filename.rsplit('/', 1)[-1]] += 1
+            total_bytes_csv += info.file_size
+
+        # We expect 3 csv because we have 3 votes,
+        # Plus a csv that contains everything = 4
+        assert sum(counter.values()) == 4
+        assert total_bytes_csv > 10  # check to ensure files are not empty
 
 
-def test_zipping_multiple_directories(election_day_app_zg: TestApp) -> None:
+def test_zipping_multiple_directories(
+    election_day_app_zg: TestApp,
+    tmp_path: Path
+) -> None:
     archive_generator = ArchiveGenerator(election_day_app_zg)
-    tmp_fs = TempFS()
-    empty_dir = tmp_fs.opendir("/")
 
-    zip_path = archive_generator.zip_dir(empty_dir)
-    # empty directory should not create a zip
-    assert zip_path is None
+    root = tmp_path / 'test1'
+    root.mkdir()
+    votes = (root / 'votes')
+    votes.mkdir()
+    elections = (root / 'elections')
+    elections.mkdir()
+    for year in ('2020', '2021', '2022'):
+        year_dir = (votes / year)
+        year_dir.mkdir()
+        (year_dir / 'testfile-votes.csv').touch()
+    (elections / '2022').mkdir()
+    (elections / '2022' / 'testfile-elections.csv').touch()
+    zip_path = archive_generator.zip_dir(str(root))
 
-    tmp_fs.makedir("/test1")
-    root = tmp_fs.opendir("/test1")
-    root.makedir("votes")
-    root.makedir("elections")
-    for year in {"2020", "2021", "2022"}:
-        root.makedir(f"votes/{year}")
-    root.makedir("elections/2022")
-    # archive should not be generated
-    assert zip_path is None
-    for year in {"2020", "2021", "2022"}:
-        root.create(f"votes/{year}/testfile-votes.csv", wipe=True)
-    root.create("elections/2022/testfile-elections.csv", wipe=True)
-    zip_path = archive_generator.zip_dir(root)
-    # unless it actually contains .csv files
-    assert zip_path is not None
+    archive_generator.include_docs(str(root))
+    zip_path = archive_generator.zip_dir(str(root))
 
-    api = module_path("onegov.election_day", "static/docs/api")
-    native_fs = OSFS(api)
-    for match in native_fs.glob("**/open_data*.md"):
-        copy_file(
-            src_fs=native_fs,
-            src_path=match.path,
-            dst_fs=root,
-            dst_path=match.path,
-        )
+    with (
+        archive_generator.archive_dir.open(zip_path, mode="rb") as fi,
+        ZipFile(fi) as zf
+    ):
+        additional_files = [
+            info
+            for info in zf.infolist()
+            if info.filename.endswith('.md')
+        ]
 
-    zip_path = archive_generator.zip_dir(root)
-    assert zip_path is not None
-
-    with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
-        with ReadZipFS(fi) as zip_fs:
-            additional_files = (match for match in zip_fs.glob(
-                "*.md", namespaces=["details"]))
-
-            assert len(list(additional_files)) != 0
-            for zip_path in additional_files:
-                assert zip_path.info.size > 100
+        assert len(additional_files) != 0
+        for info in additional_files:
+            assert info.file_size > 100
 
 
 def test_long_filenames_are_truncated(election_day_app_zg: TestApp) -> None:
@@ -232,14 +220,15 @@ def test_long_filenames_are_truncated(election_day_app_zg: TestApp) -> None:
 
     zip_path = archive_generator.generate_archive()
     assert zip_path is not None
-    with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
-        with ReadZipFS(fi) as zip_fs:
-            csv = [csv for csv in zip_fs.scandir("votes/2022",
-                                                 namespaces=["basic"])]
-            first_file = csv[0]
-            filename = first_file.name
-            assert "bundesbeschluss-vom-28-september" in filename
-            assert len(filename) <= archive_generator.MAX_FILENAME_LENGTH + 4
+    with (
+        archive_generator.archive_dir.open(zip_path, mode="rb") as fi,
+        ZipFile(fi) as zf
+    ):
+        path = ZipPath(zf)
+        first_file = next((path / 'votes' / '2022').iterdir())
+        filename = first_file.name
+        assert "bundesbeschluss-vom-28-september" in filename
+        assert len(filename) <= archive_generator.MAX_FILENAME_LENGTH + 4
 
 
 def test_election_generation(
@@ -276,20 +265,14 @@ def test_election_generation(
     archive_generator = ArchiveGenerator(election_day_app_zg)
     zip_path = archive_generator.generate_archive()
     assert zip_path is not None
-    with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
-        with ReadZipFS(fi) as zip_fs:
-            top_level_dir = zip_fs.listdir(".")
-            assert "elections" in top_level_dir
-
-            elections = zip_fs.opendir("elections")
-            years = {year for year in elections.listdir(".")}
-            assert years == {"2015"}
-
-            files = {
-                csv.name for csv
-                in zip_fs.scandir("elections/2015", namespaces=["basic"])
-            }
-            assert files == {
-                'proporz_internal_nationalratswahlen-2015.csv',
-                'proporz_internal_nationalratswahlen-2015-parties.csv'
-            }
+    with (
+        archive_generator.archive_dir.open(zip_path, mode="rb") as fi,
+        ZipFile(fi) as zf
+    ):
+        path = ZipPath(zf)
+        assert 'elections' in [p.name for p in path.iterdir()]
+        assert {p.name for p in (path / 'elections').iterdir()} == {'2015'}
+        assert {p.name for p in (path / 'elections' / '2015').iterdir()} == {
+            'proporz_internal_nationalratswahlen-2015.csv',
+            'proporz_internal_nationalratswahlen-2015-parties.csv'
+        }

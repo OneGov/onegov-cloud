@@ -241,6 +241,8 @@ class FormSubmissionCollection:
         id: UUID | None = None,
         payment_method: PaymentMethod | None = None,
         minimum_price_total: float | None = None,
+        invoicing_party: str | None = None,
+        cost_object: str | None = None,
         meta: dict[str, Any] | None = None,
         email: str | None = None,
         spots: int | None = None
@@ -305,6 +307,16 @@ class FormSubmissionCollection:
             or definition and definition.minimum_price_total
             or 0.0
         )
+        submission.invoicing_party = (
+            invoicing_party
+            or definition and definition.invoicing_party
+            or None
+        )
+        submission.cost_object = (
+            cost_object
+            or definition and definition.cost_object
+            or None
+        )
 
         # extensions are inherited from definitions
         if definition:
@@ -335,6 +347,8 @@ class FormSubmissionCollection:
         id: UUID | None = None,
         payment_method: PaymentMethod | None = None,
         minimum_price_total: float | None = None,
+        invoicing_party: str | None = None,
+        cost_object: str | None = None,
         meta: dict[str, Any] | None = None,
         email: str | None = None
     ) -> FormSubmission:
@@ -355,6 +369,8 @@ class FormSubmissionCollection:
             id=id,
             payment_method=payment_method,
             minimum_price_total=minimum_price_total,
+            invoicing_party=invoicing_party,
+            cost_object=cost_object,
             meta=meta,
             email=email,
         )

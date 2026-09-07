@@ -412,8 +412,8 @@ def test_generate_archive_total_package(
 
     assert run_command(
         cfg_path, 'govikon', ['generate-archive']).exit_code == 1
-    assert os.path.exists(archive_path)
-    assert "archive.zip" in os.listdir(archive_path)
+    # NOTE: We no longer create empty archives
+    assert not os.path.exists(archive_path)
 
     add_vote(1, session_manager)
 

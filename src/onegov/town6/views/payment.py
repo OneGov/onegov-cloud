@@ -38,7 +38,7 @@ def town_view_payments(
 
 @TownApp.form(
     model=TicketInvoiceCollection,
-    template='invoices.pt',
+    template='ticket_invoices.pt',
     form=TicketInvoiceSearchForm,
     permission=Private
 )

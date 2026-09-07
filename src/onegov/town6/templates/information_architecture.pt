@@ -14,7 +14,7 @@
             <p class="chart-message" role="status" aria-live="polite" hidden></p>
         </div>
 
-        <div class="chart-container topic-chart"
+        <div class="chart-container information-architecture"
              data-url="${chart_url}"
              data-image-name="${image_name}"
              data-drilldown-label="Show only this branch"

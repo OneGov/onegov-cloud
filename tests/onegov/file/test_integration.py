@@ -453,6 +453,7 @@ def test_sign_file(app: TestApp) -> None:
             assert pdf.signature_metadata['signee'] == 'admin@example.org'
             assert pdf.signature_metadata['old_digest'] == old_digest
             assert pdf.signature_metadata['new_digest']
+            assert pdf.signature_metadata['new_digest'] != old_digest
             assert pdf.signature_metadata['token'] == token
             assert pdf.signature_metadata['token_type'] == 'yubikey'
             assert pdf.signature_metadata['request_id'].startswith(

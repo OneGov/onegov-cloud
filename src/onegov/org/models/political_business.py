@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy import and_, case, func, or_
 from sqlalchemy import Column, Enum, ForeignKey, UUID as UUIDType
 from sqlalchemy import Table
@@ -18,7 +18,7 @@ from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.search import ORMSearchable, SearchIndex
 from onegov.search.utils import language_from_locale
-
+from sedate import as_datetime, replace_timezone
 
 from typing import Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -155,6 +155,12 @@ class PoliticalBusiness(
             f'{self.title} {self.number}',
             f'{self.number} {self.title}'
         ]
+
+    @property
+    def fts_last_change(self) -> datetime | None:
+        if self.entry_date is None:
+            return None
+        return replace_timezone(as_datetime(self.entry_date), 'UTC')
 
     #: Internal ID
     id: Mapped[UUID] = mapped_column(

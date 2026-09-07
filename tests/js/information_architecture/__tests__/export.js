@@ -1,5 +1,5 @@
 const path = '../../../../src/onegov/org';
-const chart = require(path + '/assets/js/topic-chart');
+const chart = require(path + '/assets/js/information-architecture');
 
 // a node is 220x90, the export adds a margin of 50 on every side
 const bounds = function(width, height) {
@@ -140,10 +140,10 @@ describe('Node content', () => {
         expect(html).toContain('href="/a?b=1&amp;c=2"');
     });
 
-    it('draws the icons inline, the icon fonts differ per theme', () => {
+    it('draws the icon as a font glyph, WebKit misplaces svg in foreignObject', () => {
         const html = chart.node_content(node({_directSubordinates: 2}), view);
-        expect(html).toContain('<svg');
-        expect(html).not.toContain('<i class');
+        expect(html).toContain('\uf0e8'); // sitemap glyph
+        expect(html).not.toContain('<svg');
     });
 
     it('offers the drill down to nodes with children only', () => {

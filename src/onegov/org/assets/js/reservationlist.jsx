@@ -78,8 +78,8 @@ $.fn.reservationList = function(options) {
                 rl.reserve(
                     list,
                     event.reserveurl,
-                    event.start.format('hh:mm'),
-                    event.end.format('hh:mm'),
+                    event.start.format('HH:mm'),
+                    event.end.format('HH:mm'),
                     1,
                     event.wholeDay,
                     !singleSelect

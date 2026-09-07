@@ -24,7 +24,7 @@
                 </div>
                 <form id="chat-actions" style="display:none;" method="POST">
                     <tal:b repeat="fieldset form.fieldsets">
-                        <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
+                        <fieldset tal:condition="fieldset.is_visible" id="${fieldset.id}">
                             <legend>${fieldset.label}</legend>
                             <div class="formfields" tal:define="form_two_columns form_two_columns|False">
                                 <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />

@@ -66,20 +66,9 @@ class CustomReservation(Reservation, ModelBase, Payable):
     ) -> InvoiceItemMeta | None:
         """ Returns an invoice item for this reservation. """
 
-        allocation = allocation or self.allocation_obj
-        data = allocation and allocation.data or {}
-        pricing_method = data.get('pricing_method', 'inherit')
-        if pricing_method not in (
-            'inherit',
-            'per_hour',
-            'per_item'
-        ):
-            return None
-
-        resource = resource or self.resource_obj
-        if pricing_method == 'inherit':
-            pricing_method = resource.pricing_method
-
+        data = self.data
+        if data and 'pricing_method' in data:
+            pricing_method = data['pricing_method']
             if pricing_method not in (
                 'per_hour',
                 'per_item',
@@ -87,13 +76,50 @@ class CustomReservation(Reservation, ModelBase, Payable):
             ):
                 return None
 
-            price_per_hour = resource.price_per_hour
-            price_per_item = resource.price_per_item
-            pricing_scheme_name = resource.pricing_scheme
+            resource = resource or self.resource_obj
+            price_per_hour = data.get(
+                'price_per_hour',
+                resource.price_per_hour
+            )
+            price_per_item = data.get(
+                'price_per_item',
+                resource.price_per_item
+            )
+            pricing_scheme_name = data.get(
+                'pricing_scheme',
+                resource.pricing_scheme
+            )
+            cost_object = data.get('cost_object', resource.cost_object)
         else:
-            price_per_hour = data.get('price_per_hour', 0.0)
-            price_per_item = data.get('price_per_item', 0.0)
-            pricing_scheme_name = None
+            resource = resource or self.resource_obj
+            allocation = allocation or self.allocation_obj
+            allocation_data = allocation and allocation.data or {}
+            pricing_method = allocation_data.get('pricing_method', 'inherit')
+            if pricing_method not in (
+                'inherit',
+                'per_hour',
+                'per_item'
+            ):
+                return None
+
+            if pricing_method == 'inherit':
+                pricing_method = resource.pricing_method
+
+                if pricing_method not in (
+                    'per_hour',
+                    'per_item',
+                    'pricing_scheme'
+                ):
+                    return None
+
+                price_per_hour = resource.price_per_hour
+                price_per_item = resource.price_per_item
+                pricing_scheme_name = resource.pricing_scheme
+            else:
+                price_per_hour = allocation_data.get('price_per_hour', 0.0)
+                price_per_item = allocation_data.get('price_per_item', 0.0)
+                pricing_scheme_name = None
+            cost_object = resource.cost_object
 
         # technically we could have multiple allocations per reservation
         # but in practice we don't use that feature. Each reservation
@@ -112,7 +138,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
             return InvoiceItemMeta(
                 text=resource.title,
                 group='reservation',
-                cost_object=resource.cost_object,
+                cost_object=cost_object,
                 extra={'reservation_id': self.id},
                 unit=Decimal(price_per_hour),
                 quantity=hours,
@@ -125,7 +151,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
             return InvoiceItemMeta(
                 text=resource.title,
                 group='reservation',
-                cost_object=resource.cost_object,
+                cost_object=cost_object,
                 extra={'reservation_id': self.id},
                 unit=Decimal(price_per_item),
                 quantity=Decimal(count),
@@ -150,7 +176,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
             return InvoiceItemMeta(
                 text=resource.title,
                 group='reservation',
-                cost_object=resource.cost_object,
+                cost_object=cost_object,
                 extra={'reservation_id': self.id},
                 unit=amount,
             )
@@ -171,16 +197,20 @@ class CustomReservation(Reservation, ModelBase, Payable):
         The price per token is calculcated by combining all the prices.
 
         """
+        data = self.data
         resource = resource or self.resource_obj
-        allocation = allocation or self.allocation_obj
+        if data and 'currency' in data:
+            currency = data['currency'] or resource.currency
+        else:
+            allocation = allocation or self.allocation_obj
+            allocation_data = allocation and allocation.data or {}
+            if allocation_data.get('pricing_method', 'inherit') == 'inherit':
+                currency = resource.currency
+            else:
+                currency = allocation_data.get('currency') or resource.currency
 
         item = self.invoice_item(resource, allocation, submission_data)
         if item is None:
             return None
 
-        data = allocation and allocation.data or {}
-        if data.get('pricing_method', 'inherit') == 'inherit':
-            currency = resource.currency
-        else:
-            currency = data.get('currency') or resource.currency
         return Price(item.amount, currency)

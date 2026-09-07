@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import transaction
 
-from datetime import datetime, date
+from datetime import datetime, date, UTC
 from io import BytesIO
 from onegov.core.utils import Bunch
+from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.form import FormCollection
 from onegov.form.parser import ParsedForm
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.models import TicketMessage, TicketChatMessage
+from onegov.org.pdf.directory_entry import DirectoryEntryPdf
 from onegov.org.pdf.ticket import TicketBasePdf, TicketPdf
 from onegov.pdf.utils import extract_pdf_info
 from onegov.reservation import ResourceCollection
@@ -21,6 +23,7 @@ from webob.multidict import MultiDict
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.form import Form, FormSubmission
+    from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
     from onegov.ticket import Ticket
@@ -248,6 +251,184 @@ def test_ticket_pdf_long_message(client: Client) -> None:
     assert pdf.content_type == 'application/pdf'
     _, page_text = extract_pdf_info(BytesIO(pdf.body))
     assert 'John' in page_text
+
+
+ENTRY_URL = 'https://example.org/directories/baugesuche/permit-one'
+
+
+def directory_entry_request(org_app: TestOrgApp) -> Any:
+    """ The minimum DirectoryEntryPdf and DefaultMailLayout need. """
+
+    translator = org_app.translations.get('de_CH')
+
+    def translate(text: Any) -> str:
+        if not hasattr(text, 'interpolate'):
+            return text
+        return text.interpolate(
+            translator.gettext(text) if translator else text)
+
+    return Bunch(
+        app=org_app,
+        locale='de_CH',
+        translate=translate,
+        link=lambda *args, **kwargs: ENTRY_URL,
+    )
+
+
+def add_permit_entry(
+    org_app: TestOrgApp,
+    with_files: bool = False,
+    name: str = 'Permit One'
+) -> ExtendedDirectoryEntry:
+
+    session = org_app.session()
+    directories: DirectoryCollection[ExtendedDirectory]
+    directories = DirectoryCollection(session, type='extended')
+    directory = directories.add(
+        title='Baugesuche',
+        structure="""
+            Gesuchsteller/in *= ___
+            Termin *= YYYY.MM.DD HH:MM
+            Frist *= YYYY.MM.DD
+            Dokumente = *.txt (multiple)
+        """,
+        configuration=DirectoryConfiguration(
+            title='[Gesuchsteller/in]',
+            order=['Gesuchsteller/in'],
+        ),
+    )
+
+    values: dict[str, Any] = dict(
+        gesuchsteller_in=name,
+        termin=datetime(2026, 3, 15, 9, 30),
+        frist=date(2026, 8, 20),
+        publication_start=datetime(2026, 7, 1, 12, 0, tzinfo=UTC),
+        publication_end=datetime(2026, 7, 1, 19, 0, tzinfo=UTC),
+    )
+    values['dokumente'] = (
+        Bunch(
+            data=object(),
+            file=BytesIO(b'Situationsplan'),
+            filename='situationsplan.txt',
+        ),
+        Bunch(
+            data=object(),
+            file=BytesIO(b'Baubeschrieb'),
+            filename='baubeschrieb.txt',
+        ),
+    ) if with_files else ()
+
+    entry = directory.add(values=values)
+    session.flush()
+    return entry
+
+
+def test_directory_entry_pdf(org_app: TestOrgApp) -> None:
+    """ The certificate renders every section. """
+
+    request = directory_entry_request(org_app)
+    entry = add_permit_entry(org_app, with_files=True)
+    generated_at = datetime(2026, 7, 1, 13, 0, tzinfo=UTC)
+
+    result = DirectoryEntryPdf.from_entry(request, entry, generated_at)
+
+    # rewound, ready to be attached
+    assert result.tell() == 0
+
+    pages, text = extract_pdf_info(result)
+    assert pages == 1
+    assert text.startswith('Permit One')
+    assert 'Dieses Dokument bescheinigt die Publikation "Permit One"' in text
+    assert 'ist abgelaufen' not in text
+
+    # dates formatted, not dumped as ISO values
+    assert 'Publikation' in text
+    assert 'Gesuchsteller/in: Permit One' in text
+    assert 'Termin: 15.03.2026 09:30' in text
+    assert 'Frist: 20.08.2026' in text
+    assert '2026-03-15' not in text
+    assert '2026-08-20' not in text
+
+    # file fields are not repeated as basic fields
+    assert 'Dokumente:' not in text
+
+    # one size/date/hash block per file
+    assert 'Anhänge' in text
+    for name, content in (
+        ('situationsplan.txt', b'Situationsplan'),
+        ('baubeschrieb.txt', b'Baubeschrieb'),
+    ):
+        assert name in text
+        assert f'Grösse: {len(content)} Bytes' in text
+    assert text.count('Datum:') == 2
+    assert text.count('Prüfsumme:') == 2
+
+    # publication details
+    assert 'Publikationsdetails' in text
+    assert 'Publikationsstart: 01.07.2026 14:00' in text
+    assert 'Publikationsende: 01.07.2026 21:00' in text
+    assert 'Zugriff: Öffentlich' in text
+    assert entry.content_hash
+    assert f'Prüfsumme des Verzeichniseintrages: {entry.content_hash}' in text
+
+    assert (
+        'E-Mail automatisch generiert von Govikon am 01.07.2026 15:00'
+    ) in text
+
+
+def test_directory_entry_pdf_ended(org_app: TestOrgApp) -> None:
+    """ The expiry variant swaps the intro; everything else stays. """
+
+    request = directory_entry_request(org_app)
+    entry = add_permit_entry(org_app)
+    generated_at = datetime(2026, 7, 1, 13, 0, tzinfo=UTC)
+
+    result = DirectoryEntryPdf.from_entry(
+        request, entry, generated_at, ended=True)
+
+    _, text = extract_pdf_info(result)
+    assert 'Die Publikation "Permit One" ist abgelaufen.' in text
+    assert 'bescheinigt' not in text
+    assert 'Publikationsdetails' in text
+
+
+def test_directory_entry_pdf_without_attachments(
+    org_app: TestOrgApp
+) -> None:
+    """ An entry without files says so, no empty section. """
+
+    request = directory_entry_request(org_app)
+    entry = add_permit_entry(org_app)
+
+    result = DirectoryEntryPdf.from_entry(
+        request, entry, datetime(2026, 7, 1, 13, 0, tzinfo=UTC))
+
+    _, text = extract_pdf_info(result)
+    assert 'Anhänge Keine' in text
+    assert 'Grösse:' not in text
+    assert 'Datum:' not in text
+    assert 'Prüfsumme:' not in text
+
+
+def test_directory_entry_pdf_escapes_markup(org_app: TestOrgApp) -> None:
+    """ Titles and field values end up in reportlab markup - unescaped,
+    reportlab eats them as tags and silently drops the content. """
+
+    request = directory_entry_request(org_app)
+    name = 'Umbau <b>Haus</b> & Garten'
+    entry = add_permit_entry(org_app, name=name)
+    assert entry.title == name
+
+    result = DirectoryEntryPdf.from_entry(
+        request, entry, datetime(2026, 7, 1, 13, 0, tzinfo=UTC))
+
+    _, text = extract_pdf_info(result)
+    # heading and intro link keep the markup verbatim, not bold
+    assert text.startswith(name)
+    assert f'Publikation "{name}"' in text
+
+    # ... and so does the field value, via mini_html
+    assert f'Gesuchsteller/in: {name}' in text
 
 
 def test_ticket_summary_empty_after_cleaning() -> None:

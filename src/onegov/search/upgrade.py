@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.search.utils import searchable_sqlalchemy_models
-from sqlalchemy import inspect, text, Column, String
+from sqlalchemy import inspect, text, Column, Float, String
 from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 
 
@@ -98,3 +98,18 @@ def split_title_and_data_tsvector_columns(context: UpgradeContext) -> None:
             columns=['data_vector'],
             postgresql_using='gin'
         )
+
+
+@upgrade_task('Add rank_modifier to search_index')
+def add_search_index_rank_modifier(context: UpgradeContext) -> None:
+    if not context.has_table('search_index'):
+        return
+    if context.has_column('search_index', 'rank_modifier'):
+        return
+    context.operations.add_column(
+        'search_index',
+        Column(
+            'rank_modifier', Float, nullable=False, server_default='1.0'
+        )
+    )
+    # existing files/tickets rows correct themselves on next reindex

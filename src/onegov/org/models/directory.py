@@ -397,6 +397,9 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     enable_publication: dict_property[bool | None] = meta_property()
     enable_update_notifications: dict_property[bool | None] = meta_property()
     notification_address: dict_property[str | None] = meta_property()
+    enable_notification_pdf_signing: dict_property[bool | None] = (
+        meta_property(default=True)
+    )
     required_publication: dict_property[bool | None] = meta_property()
     submitter_meta_fields: dict_property[list[str] | None] = meta_property()
 
@@ -406,10 +409,12 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     text = dict_markup_property('content')
     title_further_information: dict_property[str | None] = content_property()
     position: dict_property[str] = content_property(default='below')
+
+    invoicing_party: dict_property[str | None] = meta_property()
+    cost_object: dict_property[str | None] = meta_property()
     price: dict_property[Literal['free', 'paid'] | None] = content_property()
     price_per_submission: dict_property[float | None] = content_property()
     currency: dict_property[str | None] = content_property()
-
     minimum_price_total: dict_property[float | None] = meta_property()
     payment_method: dict_property[PaymentMethod | None] = meta_property()
 

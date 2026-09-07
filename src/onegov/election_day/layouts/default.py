@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from babel import Locale
-from fs.errors import ResourceNotFound
 from functools import cached_property
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
@@ -283,13 +282,8 @@ class DefaultLayout(ChameleonLayout):
 
     @property
     def last_archive_modification(self) -> datetime | None:
-        try:
-            filestorage = self.request.app.filestorage
-            assert filestorage is not None
-            filestorage_info = filestorage.getinfo(
-                'archive/zip/archive.zip', namespaces='details'
-            )
-            return filestorage_info.modified
-        except ResourceNotFound:
-            pass
-        return None
+        filestorage = self.request.app.filestorage
+        assert filestorage is not None
+        if not filestorage.isfile('archive/zip/archive.zip'):
+            return None
+        return filestorage.getmodified('archive/zip/archive.zip')

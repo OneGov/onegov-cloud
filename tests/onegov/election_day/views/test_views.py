@@ -403,7 +403,7 @@ def test_view_pdf(election_day_app_zg: TestApp) -> None:
     assert election_day_app_zg.filestorage is not None
     election_day_app_zg.filestorage.makedir('pdf')
     with election_day_app_zg.filestorage.open('pdf/test.pdf', 'wb') as f:
-        f.write(pdf)  # type: ignore[arg-type]
+        f.write(pdf)
 
     filenames = []
     with patch('onegov.election_day.layouts.vote.pdf_filename',
@@ -499,7 +499,7 @@ def test_view_svg(election_day_app_zg: TestApp) -> None:
     assert election_day_app_zg.filestorage is not None
     election_day_app_zg.filestorage.makedir('svg')
     with election_day_app_zg.filestorage.open('svg/test.svg', 'wb') as f:
-        f.write(svg)  # type: ignore[arg-type]
+        f.write(svg)
 
     filenames = []
     with patch('onegov.election_day.layouts.vote.svg_filename',

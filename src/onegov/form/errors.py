@@ -54,9 +54,9 @@ class InvalidIndentSyntax(_FormParsingErrorWithLineContext):
 
 class InvalidCommentIndentSyntax(_FormParsingErrorWithLineContext):
     message_template = _(
-        'The indentation on line {line} is not valid. '
-        'Comments must be indented to the same level as '
-        'the field definition (`=`) they belong to.'
+        'The indentation on line {line} is not valid. A comment must be '
+        'indented to the same level as the field (`=`) or option group it '
+        'describes.'
     )
 
 

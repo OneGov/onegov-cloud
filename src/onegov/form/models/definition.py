@@ -145,6 +145,12 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #: be submitted
     minimum_price_total: dict_property[float | None] = meta_property()
 
+    #: the invoicing party for submissions with the form
+    invoicing_party: dict_property[str | None] = meta_property()
+
+    #: the cost center / cost unit identifier for submissions with the form
+    cost_object: dict_property[str | None] = meta_property()
+
     #: the reply_to address to supersede the global reply_to address for
     #: tickets created through this form
     reply_to: dict_property[str | None] = meta_property()

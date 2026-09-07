@@ -118,7 +118,7 @@ def view_town_settings(
     return view_settings(self, request, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='organisation-settings', template='form.pt',
     permission=Secret, form=OrganisationProfileSettingsForm,
     setting=_('Organisation Profile'),
@@ -132,7 +132,7 @@ def town_handle_organisation_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='ticket-settings', template='form.pt',
     permission=Secret, form=OrgTicketSettingsForm,
     setting=_('Tickets'), order=10, icon='fa-ticket-alt'
@@ -146,9 +146,10 @@ def town_handle_ticket_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(model=Organisation, name='homepage-settings', template='form.pt',
-              permission=Secret, form=get_custom_settings_form,
-              setting=_('Homepage'), icon='fa-home', order=20)
+@TownApp.setting_form(
+    model=Organisation, name='homepage-settings', template='form.pt',
+    permission=Secret, form=get_custom_settings_form,
+    setting=_('Homepage'), icon='fa-home', order=20)
 def custom_handle_settings(
     self: Organisation,
     request: TownRequest,
@@ -160,7 +161,7 @@ def custom_handle_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='appearance-settings', template='form.pt',
     permission=Secret, form=AppearanceSettingsForm, setting=_('Appearance'),
     icon='fa-eye', order=30)
@@ -173,7 +174,7 @@ def town_handle_appearance_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='header-settings', template='form.pt',
     permission=Secret, form=HeaderSettingsForm, setting=_('Header'),
     icon='fa-window-maximize', order=40)
@@ -186,7 +187,7 @@ def town_handle_header_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='footer-settings', template='form.pt',
     permission=Secret, form=custom_footer_settings_form, setting=_('Footer'),
     icon='fa-window-minimize', order=50)
@@ -199,7 +200,7 @@ def town_handle_footer_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='data-retention-settings',
     template='form.pt',
     permission=Secret, form=DataRetentionPolicyForm,
@@ -218,7 +219,7 @@ def town_handle_ticket_data_deletion_settings(
     )
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='vat-settings', template='form.pt',
     permission=Secret, form=VATSettingsForm, setting=_('Prices'),
     icon='fa-file-invoice-dollar', order=70
@@ -235,7 +236,7 @@ def handle_vat_settings(
     )
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='access-settings', template='form.pt',
     permission=Secret, form=AccessSettingsForm, setting=_('Access (mTAN)'),
     icon='fa-lock', order=80)
@@ -248,7 +249,7 @@ def town_handle_access_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='link-settings', template='form.pt',
     permission=Secret, form=LinksSettingsForm, setting=_('Links'),
     icon='fa-link', order=90)
@@ -261,7 +262,7 @@ def town_handle_links_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='holiday-settings', template='form.pt',
     permission=Secret, form=HolidaySettingsForm, setting=_('Holidays'),
     icon='fa-calendar', order=500)
@@ -274,7 +275,7 @@ def town_handle_holiday_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='map-settings', template='form.pt',
     permission=Secret, form=MapSettingsForm, setting=_('Map'),
     icon='fa-map-marker-alt', order=100)
@@ -287,7 +288,7 @@ def town_handle_map_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='analytics-settings', template='form.pt',
     permission=Secret, form=AnalyticsSettingsForm, setting=_('Analytics'),
     icon='fa-chart-bar ', order=110)
@@ -301,7 +302,7 @@ def town_handle_analytics_settings(
 
 
 # Module Settings
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='module-activation-settings', template='form.pt',
     permission=Secret, form=ModuleActivationSettingsForm,
     setting=_('Optional modules'), order=0, icon='far fa-th-large',
@@ -317,7 +318,7 @@ def town_handle_module_activation_settings(
     )
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='newsletter-settings', template='form.pt',
     permission=Secret, form=NewsletterSettingsForm,
     setting=_('Newsletter'), order=10, icon='far fa-paper-plane',
@@ -333,7 +334,7 @@ def town_handle_newsletter_settings(
     )
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='resource-settings', template='form.pt',
     permission=Secret, form=ResourceSettingsForm, setting=_('Resources'),
     icon='fa-building', order=20, category=_('Modules'))
@@ -347,7 +348,7 @@ def town_handle_resource(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='people-settings', template='form.pt',
     permission=Secret, form=PeopleSettingsForm, setting=_('People directory'),
     icon='fa-users', order=30, category=_('Modules')
@@ -360,7 +361,7 @@ def town_handle_people_settings(
     )
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='event-settings', template='form.pt',
     permission=Secret, form=EventSettingsForm, setting=_('Events'),
     icon='fa-calendar-alt', order=40, category=_('Modules'))
@@ -370,14 +371,15 @@ def town_handle_event(
     form: EventSettingsForm
 ) -> RenderData | Response:
     return handle_event_settings(
-        self, request, form, SettingsLayout(self, request)
+        self, request, form, SettingsLayout(self, request, _('Events'))
     )
 
 
-@TownApp.form(model=Organisation, name='chat-settings', template='form.pt',
-              permission=Secret, form=ChatSettingsForm,
-              setting=_('Chat'), icon='far fa-comments', order=50,
-              category=_('Modules'))
+@TownApp.setting_form(
+    model=Organisation, name='chat-settings', template='form.pt',
+    permission=Secret, form=ChatSettingsForm,
+    setting=_('Chat'), icon='far fa-comments', order=50,
+    category=_('Modules'))
 def town_handle_chat_settings(
     self: Organisation,
     request: TownRequest,
@@ -387,7 +389,7 @@ def town_handle_chat_settings(
         self, request, form, SettingsLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='ris-settings', template='form.pt',
     permission=Secret, form=RISSettingsForm,
     setting=_('Ratsinformationssystem'), icon='fa-landmark', order=500,
@@ -405,10 +407,11 @@ def town_handle_ris_enable(
 
 
 # Advanced Settings
-@TownApp.form(model=Organisation, name='gever-credentials', template='form.pt',
-              permission=Secret, form=GeverSettingsForm,
-              setting='Gever API', icon='fa-key', order=30,
-              category=_('Advanced Settings'))
+@TownApp.setting_form(
+    model=Organisation, name='gever-credentials', template='form.pt',
+    permission=Secret, form=GeverSettingsForm,
+    setting='Gever API', icon='fa-key', order=30,
+    category=_('Advanced Settings'))
 def town_handle_gever_settings(
     self: Organisation,
     request: TownRequest,
@@ -418,10 +421,11 @@ def town_handle_gever_settings(
                                    SettingsLayout(self, request))
 
 
-@TownApp.form(model=Organisation, name='kaba-settings', template='form.pt',
-              permission=Secret, form=KabaSettingsForm,
-              setting='dormakaba API', icon='fa-key', order=20,
-              category=_('Advanced Settings'))
+@TownApp.setting_form(
+    model=Organisation, name='kaba-settings', template='form.pt',
+    permission=Secret, form=KabaSettingsForm,
+    setting='dormakaba API', icon='fa-key', order=20,
+    category=_('Advanced Settings'))
 def town_handle_kaba_settings(
     self: Organisation,
     request: TownRequest,
@@ -446,7 +450,7 @@ def town_preview_holiday_settings(
         self, request, form, DefaultLayout(self, request))
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='api-keys', template='api_keys.pt',
     permission=Secret, form=OneGovApiSettingsForm, icon='fa-key',
     setting=_('OneGov API'), order=10, category=_('Advanced Settings'))
@@ -455,10 +459,12 @@ def town_handle_api_keys(
     request: TownRequest,
     form: OneGovApiSettingsForm
 ) -> RenderData | Response:
-    return handle_api_keys(self, request, form, SettingsLayout(self, request))
+    return handle_api_keys(
+        self, request, form, SettingsLayout(self, request, _('OneGov API'))
+    )
 
 
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='firebase', template='form.pt',
     permission=Secret, form=FirebaseSettingsForm, setting=_('Firebase (App)'),
     icon='fa-bell', order=40, category=_('Advanced Settings')
@@ -475,9 +481,9 @@ def town_handle_firebase_settings(
 
 
 # Settings in Management, not Settings View
-@TownApp.form(
+@TownApp.setting_form(
     model=Organisation, name='migrate-links', template='form.pt',
-    permission=Secret, form=LinkMigrationForm)
+    permission=Secret, form=LinkMigrationForm, listed=False)
 def town_handle_migrate_links(
     self: Organisation,
     request: TownRequest,

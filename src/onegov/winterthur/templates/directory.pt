@@ -110,17 +110,20 @@
                             </tal:b>
                         </div>
 
-                        <div>
-                            <a class="list-title" tal:attributes="href request.link(entry)">
-                                <span tal:condition="entry.number" class="entry-number">${entry.number}. </span>${entry.title}
-                            </a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
+                        <div class="box">
+                            <div class="text">
+                                <a class="list-title" tal:attributes="href request.link(entry)">
+                                    <span tal:condition="entry.number" class="entry-number">${entry.number}. </span>${entry.title}
+                                </a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
-                            <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
-                                <div class="list-lead">
-                                    <tal:b condition="custom_lead" replace="custom_lead" />
-                                    <tal:b condition="not:custom_lead" replace="escape(entry.lead).replace('\\n', Markup('<br>'))" />
-                                </div>
-                            </tal:b>
+                                <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
+                                    <div class="list-lead">
+                                        <tal:b condition="custom_lead" replace="custom_lead" />
+                                        <tal:b condition="not:custom_lead" replace="escape(entry.lead).replace('\\n', Markup('<br>'))" />
+                                    </div>
+                                </tal:b>
+                            </div>
+                            <div class="arrow"></div>
                         </div>
                     </li>
                 </ul>

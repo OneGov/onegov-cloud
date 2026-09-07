@@ -254,7 +254,6 @@ def export_occurrences(
 
     layout = layout or OccurrencesLayout(self, request)
     layout.breadcrumbs.append(Link(_('Export'), '#'))
-    layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
         import_form = EventImportForm()
@@ -363,6 +362,7 @@ def import_occurrences(
             return redirect(request.link(self))
 
     layout = layout or OccurrencesLayout(self, request)
+    layout.breadcrumbs.append(Link(_('Import'), '#'))
 
     return {
         'layout': layout,

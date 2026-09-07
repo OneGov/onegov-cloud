@@ -100,7 +100,7 @@ class Occasion(Base, TimestampMixin):
     accepted: Mapped[list[Booking]] = relationship(
         primaryjoin=("""and_(
             Booking.occasion_id == Occasion.id,
-            Booking.state == 'accepted'
+            Booking.state == text("'accepted'::booking_state")
         )"""),
         viewonly=True
     )

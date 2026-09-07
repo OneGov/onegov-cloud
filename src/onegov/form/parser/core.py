@@ -2024,6 +2024,7 @@ def translate_to_yaml(
     indent_stack = IndentStack(enable_edit_checks=enable_edit_checks)
     expect_option = False
     help_possible = False
+    last_comment_line: int | None = None
 
     def escape_single(text: str) -> str:
         return text.replace("'", "''")
@@ -2050,6 +2051,7 @@ def translate_to_yaml(
             )
             expect_nested = False
             help_possible = False
+            last_comment_line = None
             indent_stack.handle_indent(lineno, len_indent)
             continue
 
@@ -2068,6 +2070,7 @@ def translate_to_yaml(
             )
             expect_nested = len(indent) > 4
             help_possible = True
+            last_comment_line = None
             actual_fields += 1
 
             indent_stack.handle_indent(lineno, len_indent)
@@ -2082,6 +2085,8 @@ def translate_to_yaml(
 
                 if not indent_stack.is_identifier(len_indent):
                     raise errors.InvalidCommentIndentSyntax(line=lineno)
+
+                last_comment_line = lineno
 
             # FIXME: Currently this means we get rid of all newlines
             #        unless there's more than one, and we get rid of
@@ -2101,6 +2106,17 @@ def translate_to_yaml(
         # checkboxes/radios come without identifier
         parse_result = try_parse(ELEMENTS.boxes, line)
         if parse_result is not None:
+
+            # a deeper option after a less-deep comment reopens the group the
+            # comment already closed
+            if (
+                enable_edit_checks
+                and last_comment_line is not None
+                and indent_stack
+                and len_indent > indent_stack[-1]
+            ):
+                raise errors.InvalidCommentIndentSyntax(line=last_comment_line)
+            last_comment_line = None
 
             if not expect_nested:
                 raise errors.InvalidFormSyntax(line=lineno)
@@ -2130,6 +2146,7 @@ def translate_to_yaml(
 
             expect_nested = True
             actual_fields += 1
+            last_comment_line = None
 
             indent_stack.handle_indent(lineno, len_indent)
             expect_option = True

@@ -37,6 +37,7 @@ if TYPE_CHECKING:
         public: bool
         suggestion: list[str]
         tags: list[str]
+        rank_modifier: float
         last_change: datetime | None
         publication_start: datetime | None
         publication_end: datetime | None
@@ -175,6 +176,7 @@ class Indexer:
                 '_public': task['public'],
                 '_access': task.get('access', 'public'),
                 '_last_change': task['last_change'],
+                '_rank_modifier': task['rank_modifier'],
                 '_tags': _tags,
                 '_suggestion': task['suggestion'],
                 '_publication_start':
@@ -259,6 +261,7 @@ class Indexer:
                 SearchIndex.public: bindparam('_public'),
                 SearchIndex.access: bindparam('_access'),
                 SearchIndex.last_change: bindparam('_last_change'),
+                SearchIndex.rank_modifier: bindparam('_rank_modifier'),
                 SearchIndex._tags:
                     bindparam('_tags', type_=ARRAY(Text)),
                 SearchIndex.suggestion: bindparam('_suggestion'),
@@ -281,6 +284,7 @@ class Indexer:
                 'public': stmt.excluded.public,
                 'access': stmt.excluded.access,
                 'last_change': stmt.excluded.last_change,
+                'rank_modifier': stmt.excluded.rank_modifier,
                 'tags': stmt.excluded.tags,
                 'suggestion': stmt.excluded.suggestion,
                 'title_vector': stmt.excluded.title_vector,
@@ -631,6 +635,7 @@ class ORMEventTranslator:
                 'public': obj.fts_public,
                 'suggestion': [],
                 'tags': obj.fts_tags or [],
+                'rank_modifier': obj.fts_rank_modifier,
                 'last_change': obj.fts_last_change,
                 'publication_start': obj.fts_publication_start,
                 'publication_end': obj.fts_publication_end,

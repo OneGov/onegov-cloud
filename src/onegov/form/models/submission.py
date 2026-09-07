@@ -115,6 +115,8 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: form setting may change later.
     payment_method: Mapped[PaymentMethod] = mapped_column(default='manual')
     minimum_price_total: dict_property[float | None] = meta_property()
+    invoicing_party: dict_property[str | None] = meta_property()
+    cost_object: dict_property[str | None] = meta_property()
 
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)

@@ -1961,8 +1961,16 @@ def invoice_items_for_submission(
         and org.vat_rate
     ) else None
     extra = {'submission_id': submission.id}
-    items = form.invoice_items(extra=extra, vat_rate=vat_rate)
-    discounts = form.discount_items(extra=extra, vat_rate=vat_rate)
+    items = form.invoice_items(
+        cost_object=submission.cost_object,
+        extra=extra,
+        vat_rate=vat_rate
+    )
+    discounts = form.discount_items(
+        cost_object=submission.cost_object,
+        extra=extra,
+        vat_rate=vat_rate
+    )
 
     # for backwards compatibility we still support a raw price
     # instead of a more complete invoice item
@@ -1975,6 +1983,7 @@ def invoice_items_for_submission(
             group='submission',
             unit=price.amount,
             vat_rate=vat_rate,
+            cost_object=submission.cost_object,
         ))
 
     total = InvoiceItemMeta.total(items)

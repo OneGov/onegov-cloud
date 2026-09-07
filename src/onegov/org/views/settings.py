@@ -1,18 +1,19 @@
 """ The settings view, defining things like the logo or color of the org. """
 from __future__ import annotations
 
-from copy import copy
 from itertools import groupby
-from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
 from onegov.api.models import ApiKey
+from onegov.core.directives import fetch_form_class
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
 from onegov.event.models.event import EventFilterValue
 from onegov.form import as_internal_id
 from onegov.form import Form
+from onegov.form.utils import extract_text_from_html
+from onegov.form.utils import get_fields_from_class
 from onegov.org import _
 from onegov.org.app import OrgApp
 from onegov.org.forms import AnalyticsSettingsForm
@@ -43,6 +44,7 @@ from typing import cast, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
+    from onegov.org.directives import SettingViewMeta
     from onegov.org.request import OrgRequest
     from typing import type_check_only
     from webob import Response
@@ -72,35 +74,112 @@ def view_settings(
 ) -> RenderData:
 
     layout = layout or SettingsLayout(self, request)
+    request.include('settings_search')
+
+    def translated_text(value: object) -> tuple[str, str]:
+        if not isinstance(value, str):
+            return '', ''
+
+        source = extract_text_from_html(str(value))
+        translated = extract_text_from_html(str(request.translate(value)))
+        return translated, source
+
+    def search_text(*values: str) -> str:
+        return ' '.join(dict.fromkeys(value for value in values if value))
 
     def query_settings() -> Iterator[dict[str, Any]]:
-        q = Query('view').filter(model=Organisation)
+        registry: dict[tuple[type, str], SettingViewMeta]
+        registry = request.app.config.setting_view_registry
 
-        for action, fn in q(request.app):
-            if 'setting' in action.predicates:
-                setting = copy(action.predicates)
-                # exclude this setting view if it's disabled for the app
-                if (
-                    setting['name'] == 'citizen-login-settings'
-                    and not request.app.settings.org.citizen_login_enabled
-                ):
+        for metadata in registry.values():
+            if not issubclass(Organisation, metadata.model):
+                continue
+
+            setting: dict[str, Any] = {
+                'name': metadata.name,
+                'setting': metadata.setting,
+                'icon': metadata.icon,
+                'order': metadata.order,
+            }
+            if metadata.category is not None:
+                setting['category'] = metadata.category
+
+            if (
+                metadata.name == 'citizen-login-settings'
+                and not request.app.settings.org.citizen_login_enabled
+            ):
+                continue
+
+            if (
+                metadata.name == 'newsletter-settings'
+                and not request.app.org.show_newsletter
+            ):
+                continue
+
+            if (
+                metadata.name == 'ris-settings'
+                and not request.app.org.ris_enabled | False
+            ):
+                continue
+
+            title, source_title = translated_text(metadata.setting)
+            setting['title'] = title
+            setting['search_text'] = search_text(title, source_title)
+            setting_link = request.link(self, name=metadata.name)
+            setting['link'] = setting_link
+            form_class = fetch_form_class(metadata.form, self, request)
+            fields: list[dict[str, str]] = []
+            fieldsets: list[dict[str, str]] = []
+            seen_fieldsets: set[str] = set()
+
+            for name, field in get_fields_from_class(form_class):
+                label = field.kwargs.get('label')
+                if label is None and field.args:
+                    label = field.args[0]
+                field_title, source_field_title = translated_text(label)
+                if not field_title:
                     continue
 
-                if (
-                    setting['name'] == 'newsletter-settings'
-                    and not request.app.org.show_newsletter
-                ):
-                    continue
+                description, source_description = translated_text(
+                    field.kwargs.get('description')
+                )
+                fieldset_label = field.kwargs.get('fieldset')
+                if fieldset_label is None:
+                    fieldset_label = getattr(field, 'fieldset', None)
+                fieldset, source_fieldset = translated_text(fieldset_label)
 
-                if (
-                    setting['name'] == 'ris-settings'
-                    and not request.app.org.ris_enabled | False
-                ):
-                    continue
-                setting['title'] = setting['setting']
-                setting['link'] = request.link(self, name=setting['name'])
+                if fieldset and source_fieldset not in seen_fieldsets:
+                    fieldset_id = f'fieldset-{as_internal_id(source_fieldset)}'
+                    fieldsets.append(
+                        {
+                            'title': fieldset,
+                            'search_text': search_text(
+                                fieldset, source_fieldset
+                            ),
+                            'link': f'{setting_link}#{fieldset_id}',
+                        }
+                    )
+                    seen_fieldsets.add(source_fieldset)
 
-                yield setting
+                fields.append(
+                    {
+                        'title': field_title,
+                        'description': description,
+                        'fieldset': fieldset,
+                        'search_text': search_text(
+                            field_title,
+                            source_field_title,
+                            description,
+                            source_description,
+                        ),
+                        'link': f'{setting_link}#{name}',
+                    }
+                )
+
+            setting['fields'] = fields
+            setting['fieldsets'] = fieldsets
+
+            yield setting
 
     settings = list(query_settings())
     settings.sort(key=lambda s: s.get('order', 0))
@@ -125,7 +204,8 @@ def view_settings(
     return {
         'layout': layout,
         'title': _('Settings'),
-        'settings_by_category': settings_by_category
+        'settings_by_category': settings_by_category,
+        'settings_search_results': settings,
     }
 
 
@@ -141,6 +221,7 @@ def handle_generic_settings(
     settings_url = request.link(self, name='settings')
 
     layout = layout or SettingsLayout(self, request, title)
+    layout.setting = layout.setting or title
     layout.edit_mode = True
     layout.editmode_links[1] = Link(
         text=_('Cancel'),
@@ -166,7 +247,7 @@ def handle_generic_settings(
 
 
 # General Settings
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='organisation-settings', template='form.pt',
     permission=Secret, form=OrganisationProfileSettingsForm,
     setting=_('Organisation Profile'),
@@ -181,7 +262,7 @@ def handle_organisation_settings(
                                    _('Organisation Profile'), layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='ticket-settings', template='form.pt',
     permission=Secret, form=OrgTicketSettingsForm,
     setting=_('Tickets'), order=10, icon='fa-ticket'
@@ -197,7 +278,7 @@ def handle_ticket_settings(
     return resp
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='homepage-settings', template='form.pt',
     permission=Secret, form=HomepageSettingsForm, setting=_('Homepage'),
     icon='fa-home', order=20)
@@ -210,7 +291,7 @@ def handle_homepage_settings(
     return handle_generic_settings(self, request, form, _('Homepage'), layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='appearance-settings', template='form.pt',
     permission=Secret, form=AppearanceSettingsForm, setting=_('Appearance'),
     icon='fa-eye', order=30)
@@ -224,7 +305,7 @@ def handle_appearance_settings(
                                    layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='header-settings', template='form.pt',
     permission=Secret, form=HeaderSettingsForm, setting=_('Header'),
     icon='fa-window-maximize', order=40)
@@ -238,7 +319,7 @@ def handle_header_settings(
     return handle_generic_settings(self, request, form, _('Header'), layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='footer-settings', template='form.pt',
     permission=Secret, form=FooterSettingsForm, setting=_('Footer'),
     icon='fa-window-minimize', order=50)
@@ -251,7 +332,7 @@ def handle_footer_settings(
     return handle_generic_settings(self, request, form, _('Footer'), layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='vat-settings', template='form.pt',
     permission=Secret, form=VATSettingsForm, setting=_('Prices'),
     icon='fa-money', order=60)
@@ -266,7 +347,7 @@ def handle_vat_settings(
                                    layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='data-retention-settings',
     template='form.pt', permission=Secret,
     form=DataRetentionPolicyForm, setting=_('Data Retention Policy'),
@@ -285,7 +366,7 @@ def handle_ticket_data_deletion_settings(
     )
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='access-settings', template='form.pt',
     permission=Secret, form=AccessSettingsForm, setting=_('Access (mTAN)'),
     icon='fa-lock', order=80)
@@ -299,7 +380,7 @@ def handle_access_settings(
         self, request, form, _('Access (mTAN)'), layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='link-settings', template='form.pt',
     permission=Secret, form=LinksSettingsForm, setting=_('Links'),
     icon=' fa-link', order=90)
@@ -312,7 +393,7 @@ def handle_links_settings(
     return handle_generic_settings(self, request, form, _('Links'), layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='map-settings', template='form.pt',
     permission=Secret, form=MapSettingsForm, setting=_('Map'),
     icon='fa-map-marker', order=100)
@@ -325,7 +406,7 @@ def handle_map_settings(
     return handle_generic_settings(self, request, form, _('Map'), layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='analytics-settings', template='form.pt',
     permission=Secret, form=AnalyticsSettingsForm, setting=_('Analytics'),
     icon='fa-line-chart ', order=110)
@@ -341,7 +422,7 @@ def handle_analytics_settings(
 # Module Settings
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='module-activation-settings', template='form.pt',
     permission=Secret, form=ModuleActivationSettingsForm,
     setting=_('Optional modules'), order=0,
@@ -359,7 +440,7 @@ def handle_module_activation_settings(
     )
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='newsletter-settings', template='form.pt',
     permission=Secret, form=NewsletterSettingsForm,
     setting=_('Newsletter'), order=10, icon='far fa-paper-plane',
@@ -376,7 +457,7 @@ def handle_newsletter_settings(
     )
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='resource-settings', template='form.pt',
     permission=Secret, form=ResourceSettingsForm, setting=_('Resources'),
     icon='fa-building', order=20, category=_('Modules')
@@ -390,7 +471,7 @@ def handle_resource_settings(
     return handle_generic_settings(self, request, form, _('Resources'), layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='people-settings', template='form.pt',
     permission=Secret, form=PeopleSettingsForm, setting=_('People directory'),
     icon='fa-users', order=30,
@@ -407,7 +488,7 @@ def handle_people_settings(
     )
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='event-settings', template='form.pt',
     permission=Secret, form=EventSettingsForm, setting=_('Events'),
     icon='fa-calendar', order=40)
@@ -548,7 +629,7 @@ def handle_event_settings(
     }
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='chat-settings', template='form.pt',
     permission=Secret, form=Form, setting=_('Chat'),
     icon='fa-window-maximize', order=50)
@@ -563,7 +644,7 @@ def handle_chat_settings(
 
 
 # Advanced Settings
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='gever-credentials', template='form.pt',
     permission=Secret, form=GeverSettingsForm, setting='Gever API',
     icon='fa-key', order=30, category=_('Advanced Settings'))
@@ -576,7 +657,7 @@ def handle_gever_settings(
     return handle_generic_settings(self, request, form, 'Gever API', layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='kaba-settings', template='form.pt',
     permission=Secret, form=KabaSettingsForm, setting='dormakaba API',
     icon='fa-key', order=40, category=_('Advanced Settings'))
@@ -590,7 +671,7 @@ def handle_kaba_settings(
         self, request, form, 'dormakaba API', layout)
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='holiday-settings', template='form.pt',
     permission=Secret, form=HolidaySettingsForm, setting=_('Holidays'),
     icon='fa-calendar-o', order=-500)
@@ -677,7 +758,7 @@ def preview_link_settings(
     )
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='migrate-links', template='form.pt',
     permission=Secret, form=LinkMigrationForm, setting=_('Link Migration'),
     icon='fa fa-random', order=-400)
@@ -761,7 +842,7 @@ def handle_link_health_check(
     }
 
 
-@OrgApp.form(
+@OrgApp.setting_form(
     model=Organisation, name='api-keys', template='api_keys.pt',
     permission=Secret, form=OneGovApiSettingsForm, setting=_('OneGov API'),
     icon='fa-key', order=10, category=_('Advanced Settings'))

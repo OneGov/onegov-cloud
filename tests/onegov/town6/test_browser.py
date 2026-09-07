@@ -26,6 +26,58 @@ if TYPE_CHECKING:
     from .conftest import TestTownApp
 
 
+@pytest.mark.xdist_group(name='browser')
+def test_settings_search(browser: ExtendedBrowser) -> None:
+    browser.login_admin()
+    browser.visit('/settings')
+
+    search = browser.find_by_css('[data-settings-search]')
+    dropdown = browser.find_by_css('[data-settings-search-results]')
+    visible_cards = sum(
+        setting.is_visible()
+        for setting in browser.find_by_css('[data-settings-item]')
+    )
+    search.fill('primärfarbe')
+
+    assert dropdown.is_visible()
+    assert visible_cards == sum(
+        setting.is_visible()
+        for setting in browser.find_by_css('[data-settings-item]')
+    )
+    visible_results = [
+        result
+        for result in browser.find_by_css('[data-settings-search-result]')
+        if result.is_visible()
+    ]
+    assert len(visible_results) == 1
+    assert visible_results[0].find_by_tag('strong').text == 'Primärfarbe'
+    field_link = visible_results[0]['href']
+    assert field_link is not None
+    assert field_link.endswith('/appearance-settings#primary_color')
+
+    search.fill('replies to automated e-mails')
+    visible_results = [
+        result
+        for result in browser.find_by_css('[data-settings-search-result]')
+        if result.is_visible()
+    ]
+    assert len(visible_results) == 1
+    field_link = visible_results[0]['href']
+    assert field_link is not None
+    assert field_link.endswith('/organisation-settings#reply_to')
+
+    search.fill('not a setting')
+    assert not any(
+        result.is_visible()
+        for result in browser.find_by_css('[data-settings-search-result]')
+    )
+    assert browser.find_by_css('[data-settings-no-results]').is_visible()
+    assert visible_cards == sum(
+        setting.is_visible()
+        for setting in browser.find_by_css('[data-settings-item]')
+    )
+
+
 @pytest.mark.xdist_group(name="browser")
 def test_firebase_settings_form_and_push_notification_flow(
     browser: ExtendedBrowser,

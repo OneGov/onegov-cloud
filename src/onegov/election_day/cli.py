@@ -188,9 +188,8 @@ def generate_archive() -> Processor:
         if not archive_zip:
             abort('generate_archive returned None.')
 
-        archive_filesize = archive_generator.archive_dir.getinfo(
-            archive_zip, namespaces=['details']).size
-
+        archive_stat = os.stat(archive_generator.archive_system_path)
+        archive_filesize = archive_stat.st_size
         if archive_filesize == 0:
             click.secho('Generated archive is empty', fg='red')
         else:

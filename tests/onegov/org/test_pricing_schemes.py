@@ -77,9 +77,9 @@ def test_stadtschulen_zug(client: Client) -> None:
     transaction.begin()
 
     scheduler = (
-        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        ResourceCollection(client.app.libres_context)
         .by_name('tageskarte')
-        .get_scheduler(client.app.libres_context)
+        .get_scheduler(client.app.libres_context)  # type: ignore[union-attr]
     )
 
     allocations = scheduler.allocate(

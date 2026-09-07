@@ -64,7 +64,7 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
-from onegov.org.models.extensions import PersonLinkExtension
+from onegov.org.models.extensions import ACCESS_LABELS, PersonLinkExtension
 from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.open_graph import OpenGraphMixin
@@ -1001,6 +1001,10 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
         lines = (l.strip() for l in self.org.meta['contact'].splitlines())
         lines = (l for l in lines if l)
         return linkify(', '.join(lines))
+
+    def access_label(self, access: str) -> str:
+        """ The translated label for a model's ``access`` level. """
+        return self.request.translate(ACCESS_LABELS.get(access, access))
 
 
 class AdjacencyListMixin:
@@ -2599,11 +2603,20 @@ class AllocationRulesLayout(ResourceLayout):
             ]
         )
 
+        links: list[Link | LinkGroup] = [add_link]
+        if self.model.content.get('rules'):
+            links.append(
+                Link(
+                    text=_('Copy availability periods'),
+                    url=self.request.link(self.model, 'copy-rules'),
+                    attrs={'class': 'copy-link'},
+                )
+            )
+
         if self.request.browser_session.get(  # type: ignore[call-overload]
             'copied_allocation_rules', {}
         ).get(self.model.type):
-            return [
-                add_link,
+            links.append(
                 Link(
                     text=_('Paste'),
                     url=self.request.csrf_protected_url(
@@ -2615,12 +2628,12 @@ class AllocationRulesLayout(ResourceLayout):
                             request_method='POST',
                             redirect_after=self.request.link(
                                 self.model, 'rules'
-                            )
+                            ),
                         ),
-                    )
+                    ),
                 )
-            ]
-        return [add_link]
+            )
+        return links
 
 
 class AllocationEditFormLayout(DefaultLayout):
@@ -4150,6 +4163,29 @@ class ExternalLinkLayout(DefaultLayout):
                 attrs={'class': ('ticket-delete',)}
             )
         ]
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        links = [Link(_('Homepage'), self.homepage_url)]
+
+        if isinstance(self.model, ExternalLinkCollection):
+            target = (
+                self.model.supported_collections.get(self.model.type)
+                if self.model.type else None
+            )
+        else:
+            target = ExternalLinkCollection.target(self.model)
+
+        labels = {
+            FormCollection: _('Forms'),
+            ResourceCollection: _('Resources'),
+        }
+        if target is not None and target in labels:
+            links.append(
+                Link(labels[target], self.request.class_link(target))
+            )
+
+        return links
 
 
 class HomepageLayout(DefaultLayout):

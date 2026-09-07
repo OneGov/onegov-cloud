@@ -16,40 +16,42 @@ if TYPE_CHECKING:
 
 @OrgApp.html(
     model=Organisation,
-    name='topic-chart',
-    template='topic_chart.pt',
+    name='information-architecture',
+    template='information_architecture.pt',
     permission=Private
 )
-def view_topic_chart(
+def view_information_architecture(
     self: Organisation,
     request: OrgRequest,
     layout: DefaultLayout | None = None
 ) -> RenderData:
     """ Shows the topic hierarchy of the site as an interactive chart. """
 
-    request.include('topic-chart')
+    request.include('information-architecture')
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_('Homepage'), layout.homepage_url),
-        Link(_('Topic chart'), '#')
+        Link(_('Information architecture'), '#')
     ]
 
     return {
-        'title': _('Topic chart'),
+        'title': _('Information architecture'),
         'layout': layout,
-        'chart_url': request.link(self, name='topic-chart-json'),
-        'image_name': f'{normalize_for_url(self.name)}-topic-chart'
+        'chart_url': request.link(self, name='information-architecture-json'),
+        'image_name': (
+            f'{normalize_for_url(self.name)}-information-architecture'
+        )
     }
 
 
 @OrgApp.json(
     model=Organisation,
-    name='topic-chart-json',
+    name='information-architecture-json',
     permission=Private,
     open_data=False
 )
-def view_topic_chart_json(
+def view_information_architecture_json(
     self: Organisation,
     request: OrgRequest
 ) -> JSON_ro:

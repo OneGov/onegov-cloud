@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from onegov.core.security import Private
 from onegov.org.models import Organisation
-from onegov.org.views.topic_chart import view_topic_chart
+from onegov.org.views.information_architecture import (
+    view_information_architecture)
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
 
@@ -15,15 +16,15 @@ if TYPE_CHECKING:
 
 @TownApp.html(
     model=Organisation,
-    name='topic-chart',
-    template='topic_chart.pt',
+    name='information-architecture',
+    template='information_architecture.pt',
     permission=Private
 )
-def town_view_topic_chart(
+def town_view_information_architecture(
     self: Organisation,
     request: TownRequest,
     layout: DefaultLayout | None = None
 ) -> RenderData:
-    return view_topic_chart(
+    return view_information_architecture(
         self, request, layout or DefaultLayout(self, request)
     )

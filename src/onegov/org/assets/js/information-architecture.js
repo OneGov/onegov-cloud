@@ -1,6 +1,6 @@
 /*
     Renders the topic hierarchy as an org chart, into the element with the
-    'topic-chart' class whose 'data-url' points to a json view returning a
+    'information-architecture' class whose 'data-url' points to a json view returning a
     flat list of nodes.
 */
 
@@ -35,22 +35,10 @@ function branch(nodes, root_id) {
     return result;
 }
 
-// drawn inline, the themes do not share an icon font
-const ARROW_UP_ICON = `
-    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-        <path fill="currentColor" d="M8 1.5 13 7h-3v7.5H6V7H3z"/>
-    </svg>
-`;
-
-const SITEMAP_ICON = `
-    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-        <path fill="none" stroke="currentColor" stroke-width="1.2"
-              d="M8 4v3.5M3.5 12V7.5h9V12"/>
-        <rect fill="currentColor" x="6" y="1" width="4" height="3"/>
-        <rect fill="currentColor" x="1.5" y="12" width="4" height="3"/>
-        <rect fill="currentColor" x="10.5" y="12" width="4" height="3"/>
-    </svg>
-`;
+// icon glyphs as text; WebKit misplaces svg/backgrounds in a foreignObject
+// https://github.com/bkrem/react-d3-tree/issues/284
+const DRILLUP_ICON = '\uf062'; // arrow-up
+const DRILLDOWN_ICON = '\uf0e8'; // sitemap
 
 // the buttons are a screen affordance, they have no place in an export
 function node_buttons(node, view) {
@@ -66,22 +54,18 @@ function node_buttons(node, view) {
         node.data.id === view.root_id
     ) {
         buttons += `
-            <button class="drillup"
-                    data-drillup="${escape_html(view.parent_id)}"
-                    title="${escape_html(view.drillup_label)}">
-                ${ARROW_UP_ICON}
-            </button>
+            <span class="drillup" role="button" tabindex="0"
+                  data-drillup="${escape_html(view.parent_id)}"
+                  title="${escape_html(view.drillup_label)}">${DRILLUP_ICON}</span>
         `;
     }
 
     // the root is the branch already, drilling into it changes nothing
     if (node.data._directSubordinates && node.depth > 0) {
         buttons += `
-            <button class="drilldown"
-                    data-drilldown="${escape_html(node.data.id)}"
-                    title="${escape_html(view.drilldown_label)}">
-                ${SITEMAP_ICON}
-            </button>
+            <span class="drilldown" role="button" tabindex="0"
+                  data-drilldown="${escape_html(node.data.id)}"
+                  title="${escape_html(view.drilldown_label)}">${DRILLDOWN_ICON}</span>
         `;
     }
 
@@ -252,7 +236,7 @@ function export_svg(chart, container, view) {
     restore_chart(chart, container, view);
 }
 
-function init_topic_chart(container) {
+function init_information_architecture(container) {
     // what the chart currently shows: all nodes, drilled down to root_id
     const view = {
         nodes: [],
@@ -272,7 +256,7 @@ function init_topic_chart(container) {
         // the level is the depth of the deepest expanded node, so 1 shows
         // two levels: the root and its children
         .initialExpandLevel(1)
-        .imageName(container.dataset.imageName || 'topic-chart')
+        .imageName(container.dataset.imageName || 'information-architecture')
         .nodeContent((node) => node_content(node, view));
 
     const reset_buttons = document.querySelectorAll(
@@ -327,6 +311,18 @@ function init_topic_chart(container) {
         }
     });
 
+    // the drill affordances are spans, so they need explicit keyboard support
+    container.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') {
+            return;
+        }
+        const target = event.target.closest('[data-drilldown], [data-drillup]');
+        if (target) {
+            event.preventDefault();
+            target.click();
+        }
+    });
+
     fetch(container.dataset.url)
         .then((response) => response.json())
         .then((data) => {
@@ -344,9 +340,9 @@ function init_topic_chart(container) {
 
 document.addEventListener('DOMContentLoaded', () => {
     // the menu link shares the class, only the container carries the url
-    const container = document.querySelector('.topic-chart[data-url]');
+    const container = document.querySelector('.information-architecture[data-url]');
     if (container) {
-        init_topic_chart(container);
+        init_information_architecture(container);
     }
 });
 

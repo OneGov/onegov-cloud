@@ -14,6 +14,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.form import Form
+    from onegov.form.parser.core import ParsedField
     from onegov.org.request import OrgRequest
     from onegov.reservation import Reservation
 
@@ -24,7 +25,11 @@ CATEGORIES = ('A', 'B', 'C')
 class StadtschulenZug(
     ResourcePricingScheme,
     name='stadtschulen_zug',
-    label='Freizeitbetreuungsanlagen'
+    label='Freizeitbetreuungsanlagen',
+    content_names=(
+        'stadtschulen_zug_price_table',
+        'stadtschulen_zug_kategorie_field',
+    )
 ):
 
     @classmethod
@@ -37,7 +42,11 @@ class StadtschulenZug(
         if submission_data is None:
             return None
 
-        category = submission_data.get('kategorie')
+        data = (reservation.data or {})
+        category = submission_data.get(data.get(
+            'stadtschulen_zug_kategorie_field',
+            'kategorie'
+        ))
         if category:
             category = category[0]
         if category not in CATEGORIES:
@@ -50,7 +59,7 @@ class StadtschulenZug(
             category = 'C'
 
         col = CATEGORIES.index(category)
-        table = (reservation.data or {}).get('stadtschulen_zug_price_table')
+        table = data.get('stadtschulen_zug_price_table')
         if table is None:
             table = resource.content.get('stadtschulen_zug_price_table')
         if table is None:
@@ -87,7 +96,10 @@ class StadtschulenZug(
                 ],
                 label='Preistabelle',
                 fieldset=_('Payments'),
-                depends_on=('pricing_scheme', cls.name)
+                depends_on=(
+                    'pricing_method', 'pricing_scheme',
+                    'pricing_scheme', cls.name
+                )
             )
 
             def process_obj(self, obj: object) -> None:
@@ -106,6 +118,20 @@ class StadtschulenZug(
                 super().populate_obj(obj, exclude, include)
                 obj.content['stadtschulen_zug_price_table'] = (
                     self.stadtschulen_zug_price_table.data)
+                if field := self.get_kategorie_field():
+                    obj.content['stadtschulen_zug_kategorie_field'] = field.id
+                elif 'stadtschulen_zug_kategorie_field' in obj.content:
+                    del obj.content['stadtschulen_zug_kategorie_field']
+
+            def get_kategorie_field(self) -> ParsedField | None:
+                parsed = self['parsed'].data
+                if parsed is None:
+                    return None
+
+                for field in parsed.fields:
+                    if field.label.lower() == 'kategorie':
+                        return field
+                return None
 
             def ensure_valid_form_definition(self) -> bool | None:
                 if 'pricing_scheme' not in self:
@@ -121,11 +147,7 @@ class StadtschulenZug(
                     # if we failed to parse, don't pile on more errors
                     return None
 
-                parsed = self['parsed'].data
-                field = {
-                    field.id: field
-                    for field in (parsed.fields if parsed else ())
-                }.get('kategorie')
+                field = self.get_kategorie_field()
                 if (
                     field is None
                     or field.type != 'radio'

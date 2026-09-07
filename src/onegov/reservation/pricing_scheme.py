@@ -27,21 +27,31 @@ class ResourcePricingScheme:
 
     __slots__ = ()
 
+    #: The internal name/identifier of the pricing scheme
     name: ClassVar[str]
+
+    #: The human readable label of the pricing scheme
     label: ClassVar[str]
+
+    #: A sequence of names stored in `resource.content`, that will be
+    #: accessed by this pricing scheme
+    content_names: ClassVar[tuple[str, ...]]
 
     def __init_subclass__(
         cls,
         name: str | None = None,
         label: str | None = None,
+        content_names: tuple[str, ...] | None = None,
         **kwargs: Any,
     ) -> None:
 
         if name is not None:
             assert name not in PRICING_SCHEMES
             assert label is not None
+            assert content_names is not None
             cls.name = name
             cls.label = label
+            cls.content_names = content_names
             PRICING_SCHEMES[name] = cls
 
         super().__init_subclass__(**kwargs)
