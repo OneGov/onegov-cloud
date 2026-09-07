@@ -19,7 +19,6 @@ from onegov.org.models.directory import (
 from onegov.org.models.external_link import (
     ExternalFormLink, ExternalLinkCollection, ExternalResourceLink)
 from onegov.org.models.page import News, NewsCollection, Topic, TopicCollection
-from onegov.org.views.form_submission import do_complete_submission
 from onegov.people import Person
 from onegov.people.collections import PersonCollection
 from onegov.reservation.collection import ResourceCollection
@@ -846,6 +845,8 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink, UUID | str]):
             spots=1 if item.current_registration_window else 0,
         )
         form.model = submission
+        # FIXME: circular import
+        from onegov.org.views.form_submission import do_complete_submission
         try:
             do_complete_submission(
                 submission, form, self.request,
