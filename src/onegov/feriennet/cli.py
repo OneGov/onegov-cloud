@@ -438,9 +438,12 @@ def match_fairness(
     return match_fairness
 
 
+VALID_PHASES = ('inactive', 'wishlist', 'booking', 'execution', 'payment')
+
+
 @cli.command(name='which-ferienpass-is-currently',
              context_settings={'default_selector': '*'})
-@click.argument('phase', required=True)
+@click.argument('phase', required=True, type=click.Choice(VALID_PHASES))
 def which_ferienpass(
     phase: str,
 ) -> Callable[[FeriennetRequest, FeriennetApp], None]:

@@ -100,27 +100,45 @@ class AgencyPdfDefault(Pdf):
             ):
                 continue
 
-            description = []
+            description: list[tuple[str, str | None]] = []
             first_attribute: str | None = None
             if membership.person:
-                for field in agency.export_fields or []:
-                    if field.startswith('membership.'):
-                        field = field.split('membership.')[1]
+                for export_field in agency.export_fields or []:
+                    if export_field.startswith('membership.'):
+                        field = export_field.split('membership.')[1]
                         if not first_attribute:
                             first_attribute = getattr(membership, field)
                         else:
-                            description.append(getattr(membership, field))
-                    if field.startswith('person.'):
-                        field = field.split('person.')[1]
+                            description.append(
+                                (export_field, getattr(membership, field))
+                            )
+                    if export_field.startswith('person.'):
+                        field = export_field.split('person.')[1]
                         if field in exclude:
                             continue
                         if not first_attribute:
                             first_attribute = getattr(membership.person, field)
                         else:
                             description.append(
-                                getattr(membership.person, field)
+                                (
+                                    export_field,
+                                    getattr(membership.person, field),
+                                )
                             )
-            description_str = ', '.join(part for part in description if part)
+            description_parts: list[str] = []
+            previous_field: str | None = None
+            for field, part in description:
+                if not part:
+                    continue
+                if (
+                    field == 'person.title'
+                    and previous_field == 'person.academic_title'
+                ):
+                    description_parts[-1] = f'{description_parts[-1]} {part}'
+                else:
+                    description_parts.append(part)
+                previous_field = field
+            description_str = ', '.join(description_parts)
 
             prefix = membership.meta.get('prefix', '') or ''
             data.append(

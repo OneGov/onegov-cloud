@@ -77,6 +77,7 @@ from onegov.org.models import ResourceRecipient
 from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models import Search
 from onegov.org.models import SiteCollection
+from onegov.org.models import TicketChatMessage
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
 from onegov.org.models import TraitInfo
@@ -383,7 +384,13 @@ def get_file_for_org(
     if not obj:
         return None
 
-    if obj.type in protected_filetypes:
+    public_ticket_attachment = obj.type == 'messagefile' and any(
+        isinstance(message, TicketChatMessage)
+        and message.meta.get('origin') == 'external'
+        for message in obj.links
+    )
+
+    if obj.type in protected_filetypes and not public_ticket_attachment:
         if not request.has_role('editor', 'admin'):
             obj = None
         else:
