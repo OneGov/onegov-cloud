@@ -18,7 +18,8 @@ from pydantic import AfterValidator, BaseModel, Field
 from pydantic import AwareDatetime, Base64Bytes, EmailStr, HttpUrl
 from wtforms import HiddenField
 from wtforms.validators import DataRequired, InputRequired, Optional
-from wtforms.validators import Email, Length, NumberRange, Regexp
+from wtforms.validators import Email, Length, NumberRange, Regexp, URL
+from wtforms.validators import HostnameValidation
 
 
 from typing import Annotated, Any, Literal, TypeVar, TYPE_CHECKING
@@ -148,6 +149,9 @@ def adapt_file_size_limit(validator: FileSizeLimit) -> Any:
     return AfterValidator(validate_file_size)
 
 
+REQUIRED_DEPENDENT = object()
+
+
 class BaseAdapter(ABC):
     """ Provides utility functions for all adapters. """
 
@@ -155,24 +159,42 @@ class BaseAdapter(ABC):
         self,
         t: TypeForm[Any],
         field: WTField
-    ) -> tuple[Any, ...]:
-        if not hasattr(field, 'depends_on') and any(
+    ) -> Generator[Any]:
+        is_dependent = hasattr(field, 'depends_on')
+        if not is_dependent and any(
             isinstance(validator, (InputRequired, DataRequired))
             for validator in field.validators
         ):
+            yield t
             # NOTE: This is a bit of a hack to avoid emitting an
             #       Annotated without metadata
-            return t, Field()
+            yield object()
+            return
 
-        default = field.default
-        if callable(default):
-            default = default()
-
+        default = field.data
         if default is None:
-            return t | None, Field(default=None)
-        if callable(field.default):
-            return t, Field(default_factory=field.default)
-        return t, Field(default=default)
+            yield t | None
+            yield Field(default=None)
+        else:
+            yield t
+            if isinstance(default, (list, dict)):
+                yield Field(default_factory=lambda: default.copy())
+            else:
+                yield Field(default=default)
+
+        if (
+            is_dependent
+            and field.validators
+            and isinstance(field.validators[0], If)
+            and any(
+                isinstance(validator, (InputRequired, DataRequired))
+                for validator in field.validators[0].validators
+            )
+        ):
+            # we use this marker in the model validator to detect
+            # fields that become dependent when their dependency
+            # is fulfilled
+            yield REQUIRED_DEPENDENT
 
     def handle_sequence_field_type(
         self,
@@ -182,17 +204,41 @@ class BaseAdapter(ABC):
 
         yield list[t]  # type: ignore[valid-type]
 
-        if not hasattr(field, 'depends_on') and any(
+        is_dependent = hasattr(field, 'depends_on')
+        min_length = getattr(field, 'min_entries', 0)
+        if not is_dependent and (min_length > 0 or any(
             isinstance(validator, (InputRequired, DataRequired))
             for validator in field.validators
-        ):
-            yield Field(min_length=1)
+        )):
+            yield Field(min_length=min_length or 1)
             return
 
-        if callable(default := field.default):
-            yield Field(default_factory=default)
+        if default := field.data:
+            yield Field(default_factory=lambda: default.copy())
         else:
-            yield Field(default=default)
+            yield Field(default_factory=list)
+
+        if (
+            is_dependent
+            and ((validators := field.validators) or (
+                hasattr(field, 'unbound_field')
+                and (validators := field.unbound_field.kwargs.get(
+                    'validators'
+                ))
+            ))
+            and isinstance(validators[0], If)
+            and any(
+                isinstance(validator, (InputRequired, DataRequired))
+                for validator in validators[0].validators
+            )
+        ):
+            # we use this marker in the model validator to detect
+            # fields that become dependent when their dependency
+            # is fulfilled
+            # TODO: Should we validate min_lengths > 1? Currently
+            #       there's no use-case for this, required always
+            #       means at least 1 entry, never more
+            yield REQUIRED_DEPENDENT
 
     def adapt_validators(
         self,
@@ -210,6 +256,8 @@ class BaseAdapter(ABC):
                 Optional, InputRequired, DataRequired,
                 # already special-cased in Email field adapter
                 Email,
+                # already special-cased in URL field adapter
+                URL,
                 # already special-cased in upload field adapter
                 WhitelistedMimeType,
             )):
@@ -240,15 +288,38 @@ class EmailFieldAdapter(BaseAdapter):
         yield from self.adapt_validators(field.validators)
 
 
+validate_hostname = HostnameValidation(require_tld=True, allow_ip=True)
+
+
+def validate_and_coerce_url(value: HttpUrl | None) -> str | None:
+    if value is None:
+        return None
+
+    if value.host is None:  # pragma: no cover
+        # NOTE: I don't think it's possible for this to happen with HttpUrl
+        #       since the scheme is required, so relative urls don't work
+        #       despite the validation error claiming it does...
+        raise ValueError('hostname is required')
+
+    if not validate_hostname(value.host):
+        raise ValueError('hostname is not valid')
+
+    # NOTE: Coerce from HttpUrl back to str, since that's what we will
+    #       store in our database
+    return str(value)
+
+
 @registry.register_for(
     'URLField',
     'VideoURLField'
 )
 class URLFieldAdapter(BaseAdapter):
     def __call__(self, field: WTField) -> Generator[Any]:
+        # NOTE: HttpUrl normalizes the URL to some degree, which doesn't
+        #       happen in the actual form, maybe we should use `str`
+        #       type and rely on the wtforms URL validator instead?
         yield from self.handle_scalar_field_type(HttpUrl, field)
-        # NOTE: Coerce from HttpUrl | None back to str | None
-        yield AfterValidator(lambda v: None if v is None else str(v))
+        yield AfterValidator(validate_and_coerce_url)
         yield from self.adapt_validators(field.validators)
 
 
@@ -373,26 +444,30 @@ def dependency_fulfilled(self: FieldDependency, obj: object) -> bool:
         if isinstance(data, bool) and choice in ('y', 'n'):
             choice = choice == 'y' and True or False
 
-        result = result and ((data == choice) ^ invert)
+        if isinstance(data, list):
+            value = choice in data
+        else:
+            value = data == choice
+
+        result = result and (value ^ invert)
     return result
 
 
 def model_from_form(form: Form) -> type[BaseModel]:
     validators: dict[str, Any] = {}
-    maybe_required_dependent_fields = {
+    dependent_fields = {
         name: field.depends_on
         for name, field in form._fields.items()
         if hasattr(field, 'depends_on')
-        if isinstance(field.validators[0], If)
-        if any(
-            isinstance(v, (InputRequired, DataRequired))
-            for v in field.validators[0].validators
-        )
     }
-    if maybe_required_dependent_fields:
+    if dependent_fields:
         @model_validator(mode='after')
         def validate_required_dependent_fields(self: Any) -> Any:
-            for name, depends_on in maybe_required_dependent_fields.items():
+            model_fields = type(self).model_fields
+            for name, depends_on in dependent_fields.items():
+                if REQUIRED_DEPENDENT not in model_fields[name].metadata:
+                    continue
+
                 # if the value is something that will satisfy LaxDataRequired
                 # then we accept it regardless of whether the dependency is
                 # fulfilled

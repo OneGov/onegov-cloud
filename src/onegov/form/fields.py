@@ -559,7 +559,10 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         super().__init__(
             unbound_field,
             label,
-            min_entries=0,
+            min_entries=1 if any(
+                isinstance(validator, (InputRequired, DataRequired))
+                for validator in validators or ()
+            ) else 0,
             max_entries=None,
             id=id,
             default=default,
