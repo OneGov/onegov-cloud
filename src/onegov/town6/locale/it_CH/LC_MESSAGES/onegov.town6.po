@@ -2795,9 +2795,6 @@ msgstr "Archivio selezionato"
 msgid "Internal Comments"
 msgstr "Commenti interni"
 
-msgid "Keywords"
-msgstr "Parole chiave"
-
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"

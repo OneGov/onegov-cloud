@@ -2807,9 +2807,6 @@ msgstr "Archiver la sélection"
 msgid "Internal Comments"
 msgstr "Commentaires internes"
 
-msgid "Keywords"
-msgstr "Mots-clés"
-
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
