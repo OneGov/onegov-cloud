@@ -1,8 +1,6 @@
 
 from __future__ import annotations
 
-import sedate
-
 from collections import defaultdict
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Block
 from onegov.core.security import Private
@@ -199,14 +197,13 @@ def view_registration_window(
     )
     deletable = True
 
-    if self.end > sedate.utcnow().date():
-        for submission in q:
-            if not submission.registration_state:
-                continue
+    for submission in q:
+        if not submission.registration_state:
+            continue
 
-            registrations[submission.registration_state].append(submission)
-            if submission.registration_state != 'cancelled':
-                deletable = False
+        registrations[submission.registration_state].append(submission)
+        if submission.registration_state == 'open':
+            deletable = False
 
     if request.is_manager:
         edit_url = request.link(self, 'edit')
@@ -283,10 +280,8 @@ def view_registration_window(
                 ) if deletable else (
                     Block(
                         _("This registration window can't be deleted."),
-                        _('There are confirmed or open submissions associated '
-                          'with it and the registration window is still '
-                          'active. Cancel the registration window first or '
-                          'set the end date to a past date.'),
+                        _('There are open submissions associated with it. '
+                          'Cancel the registration window first.'),
                         _('Cancel')
                     )
                 )
