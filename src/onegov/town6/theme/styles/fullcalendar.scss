@@ -857,6 +857,12 @@ a#results {
     visibility: hidden;
 }
 
+.reservation-exceptions del {
+    background-color: transparentize($red, .85);
+    color: $red;
+    text-decoration-color: $red;
+}
+
 @keyframes reservation-row-glow {
     0% { background-color: transparentize($yellow-pastel, .25); }
     100% { background-color: transparent; }

@@ -18,12 +18,21 @@
                 any one of your Shift, Alt or Ctrl keys while clicking the
                 time slots you want to reserve.
             </div>
-            <div class="callout alert-box alert" tal:condition="missing_dates" i18n:translate>
-                We were unable to reserve some slots matching your criteria for the following dates<tal:b i18n:name="and_rooms" i18n:translate tal:condition="any(missing_dates.values())"> and rooms</tal:b>, please note that some of those dates may still have one or more available slots that are either shorter or longer than your selected duration.
-                <ul i18n:name="dates">
-                    <li tal:repeat="item missing_dates.items()">
-                        <a href="#row-${item[0].isoformat()}">
-                            ${layout.format_date(item[0], 'date')}<tal:b tal:condition="item[1]">: ${', '.join(room.title for room in item[1])}</tal:b>
+            <div class="callout" tal:condition="series_overview"
+                tal:define="has_unavailable any(not entry['time'] for entry in series_overview or ())">
+                <p><strong i18n:translate>Overview of your series</strong></p>
+                <p tal:condition="has_unavailable" i18n:translate>
+                    For some dates and rooms we were unable to find a slot matching your criteria. Please check those dates in the list below, as a shorter or longer slot than your selected duration may still be available.
+                </p>
+                <p tal:condition="not has_unavailable" i18n:translate>
+                    We were able to find slots matching your criteria.
+                </p>
+                <ul class="reservations reservation-exceptions">
+                    <li tal:repeat="entry series_overview">
+                        <a href="#row-${entry['date'].isoformat()}"
+                            tal:define="label '%s, %s%s%s' % (layout.format_date(entry['date'], 'weekday_long'), layout.format_date(entry['date'], 'date_long'), (', ' + entry['time']) if entry['time'] else '', (', ' + entry['room']) if entry['room'] else '')">
+                            <tal:b tal:condition="entry['time']">${label}</tal:b>
+                            <del tal:condition="not entry['time']">${label}</del>
                         </a>
                     </li>
                 </ul>

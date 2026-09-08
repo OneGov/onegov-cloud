@@ -371,7 +371,7 @@ def view_find_your_spot(
     # HACK: Focus results
     form.action += '#results'
     room_slots: dict[date_t, RoomSlots] | None = None
-    missing_dates: dict[date_t, list[Resource] | None] | None = None
+    series_overview: list[dict[str, Any]] | None = None
     rooms = request.exclude_invisible(self.query())
     if not rooms:
         # we'll treat categories without rooms as non-existant
@@ -727,6 +727,8 @@ def view_find_your_spot(
             }
 
             reserved_dates: dict[date_t, set[UUID]] = {}
+            # what we actually reserved: date -> [(time label, room title)]
+            reserved_slots: dict[date_t, list[tuple[str, str]]] = {}
             for date, date_room_slots in (
                 # skip iteration if we have existing reservations
                 # that match our criteria and we're only supposed
@@ -772,15 +774,16 @@ def view_find_your_spot(
 
                     for slot in slots:
                         if isclose(slot.availability, 100.0, abs_tol=.005):
+                            slot_dates = slot.slot_time or (
+                                slot.allocation.display_start(),
+                                slot.allocation.display_end()
+                            )
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
                                 room.scheduler.reserve(
                                     email='0xdeadbeef@example.org',
-                                    dates=slot.slot_time or (
-                                        slot.allocation.display_start(),
-                                        slot.allocation.display_end()
-                                    ),
+                                    dates=slot_dates,
                                     quota=1,
                                     session_id=room.bound_session_id(request),
                                     single_token_per_session=True
@@ -791,7 +794,11 @@ def view_find_your_spot(
                                 # this as a missing reserved slot
                                 continue
                             else:
-                                # we managed to reserve a slot
+                                # record the slot we just reserved
+                                reserved_slots.setdefault(date, []).append((
+                                    utils.render_time_range(*slot_dates),
+                                    room.title
+                                ))
                                 break
                     else:
                         # no slot reserved, move on to the next room
@@ -816,16 +823,37 @@ def view_find_your_spot(
                 if auto_reserve == 'for_first_day':
                     break
 
-            wanted = len(rooms) if auto_reserve == 'for_every_room' else 1
-            missing_dates = {
-                date: [
-                    room
-                    for room in rooms
-                    if room.id not in room_ids
-                ] if wanted > 1 else None
-                for date in room_slots.keys()
-                if len(room_ids := reserved_dates.get(date, set())) < wanted
-            } if auto_reserve != 'for_first_day' else {}
+            # overview from recorded slots: booked plus what we couldn't get
+            every_room = auto_reserve == 'for_every_room'
+            first_day = auto_reserve == 'for_first_day'
+            series_overview = []
+            for date in room_slots:
+                booked = sorted(reserved_slots.get(date, ()))
+                series_overview.extend(
+                    {'date': date, 'time': time_label, 'room': room_title}
+                    for time_label, room_title in booked
+                )
+
+                if every_room:
+                    # flag each room we couldn't reserve on this date
+                    reserved_rooms = reserved_dates.get(date, set())
+                    series_overview.extend(
+                        {'date': date, 'time': None, 'room': room.title}
+                        for room in rooms
+                        if room.id not in reserved_rooms
+                    )
+                elif not booked:
+                    # for_first_day stops after one booking; flag only dates
+                    # with nothing available
+                    if first_day and any(
+                        isclose(slot.availability, 100.0, abs_tol=.005)
+                        for slots in room_slots[date].values()
+                        for slot in slots
+                    ):
+                        continue
+                    series_overview.append({
+                        'date': date, 'time': None, 'room': None
+                    })
 
     holidays: dict[date_t, list[str]] = {}
     if room_slots:
@@ -859,7 +887,7 @@ def view_find_your_spot(
         'rooms': rooms,
         'holidays': holidays,
         'room_slots': room_slots,
-        'missing_dates': missing_dates,
+        'series_overview': series_overview,
         'layout': layout or FindYourSpotLayout(self, request)
     }
 
