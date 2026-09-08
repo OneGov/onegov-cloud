@@ -34,7 +34,6 @@ from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import PanelWidget
 from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TableFieldWidget
-from onegov.form.widgets import DeliveryTimesWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import TreeSelectWidget
@@ -750,7 +749,7 @@ class TagsField(StringField):
     widget = TagsWidget()
     # mirrors the client-side sanitation of tags-input.js: keep alphanumerics
     # and latin-1 accented characters, everything else becomes whitespace
-    _sanitize = re.compile(r'[^A-Za-z0-9À-ÿ]')
+    _sanitize = re.compile(r'[^A-Za-z0-9À-ÿ]+')
     data: list[str]  # type:ignore[assignment]
 
     def _value(self) -> str:
@@ -764,7 +763,7 @@ class TagsField(StringField):
         values_str = valuelist[0]
         if isinstance(values_str, str) and values_str != '':
             values = (
-                ' '.join(self._sanitize.sub(' ', v).split())
+                self._sanitize.sub(' ', v).strip()
                 for v in values_str.split(',')
             )
             self.data = [v for v in values if v]
@@ -775,11 +774,28 @@ class TagsField(StringField):
         self.data = list(value) if value else []
 
 
-class DeliveryTimesField(TagsField):
-    """ TagsField for HH:MM times; keeps ':' client- and server-side. """
+class DeliveryTimesField(StringField):
+    """ Comma-separated HH:MM times rendered as a plain text field.
 
-    widget = DeliveryTimesWidget()
-    _sanitize = re.compile(r'[^0-9:]')
+    Stores its data as ``list[str]``; the HH:MM validation is done by the
+    form. Unlike a tags field it does not sanitize input, so ``:`` survives.
+    """
+
+    data: list[str]  # type:ignore[assignment]
+
+    def _value(self) -> str:
+        return ', '.join(self.data) if self.data else ''
+
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
+        if valuelist and isinstance(valuelist[0], str) and valuelist[0]:
+            self.data = [
+                v.strip() for v in valuelist[0].split(',') if v.strip()
+            ]
+        else:
+            self.data = []
+
+    def process_data(self, value: list[str] | None) -> None:
+        self.data = list(value) if value else []
 
 
 class IconField(StringField):

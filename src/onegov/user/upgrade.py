@@ -12,11 +12,10 @@ from onegov.core.upgrade import upgrade_task
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.user import User, UserCollection
 from sqlalchemy import Boolean, Column, Text, UUID
-from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql import text
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import datetime
@@ -360,7 +359,7 @@ def add_on_update_cascade_to_username_fk(context: UpgradeContext) -> None:
         )
 
 
-def _unwrap_tags(tags: list[str]) -> list[str]:
+def _unwrap_tags(tags: list[Any]) -> list[str]:
     """ Unwraps tag elements that are Python list reprs stored as strings.
 
     A repr like "['Sport']" is unwrapped to its contents ("Sport"), while
@@ -368,7 +367,9 @@ def _unwrap_tags(tags: list[str]) -> list[str]:
     """
     result = []
     for tag in tags:
-        if isinstance(tag, str) and tag.startswith('[') and tag.endswith(']'):
+        if not isinstance(tag, str):
+            continue
+        if tag.startswith('[') and tag.endswith(']'):
             try:
                 parsed = ast.literal_eval(tag)
             except (ValueError, SyntaxError):
@@ -376,8 +377,8 @@ def _unwrap_tags(tags: list[str]) -> list[str]:
             if isinstance(parsed, list):
                 result.extend(_unwrap_tags(parsed))
                 continue
-        if isinstance(tag, str) and tag.strip():
-            result.append(tag.strip())
+        if stripped := tag.strip():
+            result.append(stripped)
     return result
 
 
@@ -396,12 +397,10 @@ def fix_stringified_user_tags(context: UpgradeContext) -> None:
     if not context.has_table('users'):
         return
 
-    for user in context.session.query(User):
+    for user in context.session.query(User).filter(User.tags.isnot(None)):
         tags = user.tags
         if not tags:
             continue
-
         fixed = _unwrap_tags(tags)
         if fixed != tags:
             user.tags = fixed
-            flag_modified(user, 'data')

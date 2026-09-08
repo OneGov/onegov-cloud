@@ -27,14 +27,29 @@ def test_fix_stringified_user_tags(session: Session) -> None:
     users = UserCollection(session)
     user = users.add('user-a@example.org', 'hunter2', 'member')
     user.tags = ["['Sport']", "['[]']", '[]', 'Kultur']
+    # single-element repr (array length 1) must be caught too
+    single = users.add('user-b@example.org', 'hunter2', 'member')
+    single.tags = ["['Musik']"]
+    # a clean user must be left untouched
+    clean = users.add('user-c@example.org', 'hunter2', 'member')
+    clean.tags = ['Sport', 'Kultur']
+    # tags that are pure empty-list reprs unwrap to nothing
+    empty = users.add('user-d@example.org', 'hunter2', 'member')
+    empty.tags = ['[]', "['[]']"]
     session.flush()
 
     fix_stringified_user_tags(_context(session, FeriennetApp()))
     session.flush()
 
-    fixed = users.by_username('user-a@example.org')
-    assert fixed is not None
-    assert fixed.tags == ['Sport', 'Kultur']
+    def tags_of(username: str) -> list[str] | None:
+        user = users.by_username(username)
+        assert user is not None
+        return user.tags
+
+    assert tags_of('user-a@example.org') == ['Sport', 'Kultur']
+    assert tags_of('user-b@example.org') == ['Musik']
+    assert tags_of('user-c@example.org') == ['Sport', 'Kultur']
+    assert tags_of('user-d@example.org') == []
 
 
 def test_fix_stringified_user_tags_skips_non_feriennet(

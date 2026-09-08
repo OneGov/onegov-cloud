@@ -24,12 +24,6 @@
     var SEPERATOR = ',';
     var COPY_PROPS = 'placeholder pattern spellcheck autocomplete autocapitalize autofocus accessKey accept lang minLength maxLength required'.split(' ');
     function tagsInput(input) {
-        // data-allow-chars: chars to keep beyond alnum (e.g. ':'); escaped
-        // before use in the char class to avoid regex injection
-        var allowChars = (input.getAttribute('data-allow-chars') || '')
-            .replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
-        var sanitizeRe = new RegExp(
-            '[^A-Za-z0-9\\u00C0-\\u00FF' + allowChars + ']', 'g');
         function createElement(type, name, text, attributes) {
             var el = document.createElement(type);
             if (name)
@@ -64,7 +58,7 @@
                 text = text.split(SEPERATOR);
             if (Array.isArray(text))
                 return text.forEach(addTag);
-            var tag = text && text.replace(sanitizeRe, ' ').replace(/\s+/g, ' ').trim();
+            var tag = text && text.replace(/[^A-Za-z0-9\u00C0-\u00FF]/g, ' ').replace(/\s+/g, ' ').trim();
             if (!tag)
                 return false;
             if (!input.getAttribute('duplicates')) {

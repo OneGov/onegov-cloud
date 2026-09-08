@@ -2414,7 +2414,6 @@ class ResourceRecipientsFormLayout(DefaultLayout):
     def __init__(self, model: Any, request: OrgRequest, title: str) -> None:
         super().__init__(model, request)
         self.title = title
-        self.request.include('tags-input')  # delivery-times chip UI
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
