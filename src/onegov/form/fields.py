@@ -750,7 +750,7 @@ class TagsField(StringField):
     widget = TagsWidget()
     # mirrors the client-side sanitation of tags-input.js: keep alphanumerics
     # and latin-1 accented characters, everything else becomes whitespace
-    _sanitize = re.compile(r'[^A-Za-z0-9À-ÿ]')
+    _sanitize = re.compile(r'[^A-Za-z0-9À-ÿ]+')
     data: list[str]  # type:ignore[assignment]
 
     def _value(self) -> str:
