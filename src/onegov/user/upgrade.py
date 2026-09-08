@@ -399,7 +399,10 @@ def fix_stringified_user_tags(context: UpgradeContext) -> None:
     for user in context.session.query(User):
         tags = user.tags
         if not tags:
-            continue
+    for user in (
+        context.session.query(User)
+        .filter(func.jsonb_array_length(User.tags) > 1)
+    ):
 
         fixed = _unwrap_tags(tags)
         if fixed != tags:
