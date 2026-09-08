@@ -386,7 +386,6 @@ def get_file_for_org(
 
     public_ticket_attachment = obj.type == 'messagefile' and any(
         isinstance(message, TicketChatMessage)
-        and message.meta.get('origin') == 'external'
         for message in obj.links
     )
 
