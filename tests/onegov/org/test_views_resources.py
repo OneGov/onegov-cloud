@@ -735,8 +735,7 @@ def test_find_your_spot_series_mixed_day(client: Client) -> None:
 
 @freeze_time('2020-01-01', tick=True)
 def test_find_your_spot_series_no_leak_between_submits(client: Client) -> None:
-    # the overview must reflect only the current submission, not reservations
-    # left over from a previous submission in the same session
+    # overview must reflect only this submission, not earlier ones this session
     client.login_admin()
 
     resources = client.get('/resources')
@@ -768,8 +767,7 @@ def test_find_your_spot_series_no_leak_between_submits(client: Client) -> None:
     first = find_your_spot.form.submit()
     assert '07:00 - 08:00' in first
 
-    # a second submission reserves nothing new (already booked); its overview
-    # must not inherit the first submission's slot
+    # second submission books nothing new; must not inherit the first's slot
     second = find_your_spot.form.submit()
     overview = second.pyquery('.reservation-exceptions')
     text = overview[0].text_content() if overview else ''
