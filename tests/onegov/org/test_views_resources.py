@@ -733,6 +733,49 @@ def test_find_your_spot_series_mixed_day(client: Client) -> None:
     assert '07:00 - 08:00' in overview
 
 
+@freeze_time('2020-01-01', tick=True)
+def test_find_your_spot_series_no_leak_between_submits(client: Client) -> None:
+    # the overview must reflect only the current submission, not reservations
+    # left over from a previous submission in the same session
+    client.login_admin()
+
+    resources = client.get('/resources')
+    new = resources.click('Raum')
+    new.form['title'] = 'Solo Room'
+    new.form['group'] = 'Solo Rooms'
+    new.form.submit().follow()
+
+    transaction.begin()
+    scheduler = (
+        ResourceCollection(client.app.libres_context)  # type: ignore[union-attr]
+        .by_name('solo-room')
+        .get_scheduler(client.app.libres_context)
+    )
+    scheduler.allocate(
+        dates=((datetime(2020, 1, 6), datetime(2020, 1, 6)),),
+        whole_day=True,
+        partly_available=True,
+    )
+    transaction.commit()
+    close_all_sessions()
+
+    find_your_spot = client.get('/find-your-spot?group=Solo+Rooms')
+    find_your_spot.form['start'] = '2020-01-06'
+    find_your_spot.form['end'] = '2020-01-06'
+    find_your_spot.form['auto_reserve_available_slots'] = 'for_every_day'
+
+    # first submission books 2020-01-06
+    first = find_your_spot.form.submit()
+    assert '07:00 - 08:00' in first
+
+    # a second submission reserves nothing new (already booked); its overview
+    # must not inherit the first submission's slot
+    second = find_your_spot.form.submit()
+    overview = second.pyquery('.reservation-exceptions')
+    text = overview[0].text_content() if overview else ''
+    assert '07:00 - 08:00' not in text
+
+
 def test_resource_room_deletion(client: Client) -> None:
     # TicketMessage.create(ticket, request, 'opened')
     resources = ResourceCollection(client.app.libres_context)
