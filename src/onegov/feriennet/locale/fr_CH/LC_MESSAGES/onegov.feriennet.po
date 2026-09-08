@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-09-01 08:50+0200\n"
+"POT-Creation-Date: 2026-09-08 07:39+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -443,8 +443,8 @@ msgstr "Aperçu (pas soumis)"
 msgid "Proposed"
 msgstr "Soumis"
 
-#.
 #. users like the term 'Published' better
+#.
 msgid "Published"
 msgstr "Publié"
 
@@ -717,8 +717,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "Conditions de participation"
 
@@ -3456,6 +3456,9 @@ msgstr "Assez de bénévoles"
 
 msgid "Not enough volunteers"
 msgstr "Pas assez de bénévoles"
+
+msgid "Please add at least one activity to your list."
+msgstr "Veuillez ajouter au moins une activité à votre liste."
 
 msgid "Subscription as a volunteer"
 msgstr "Inscription en tant que bénévole"
