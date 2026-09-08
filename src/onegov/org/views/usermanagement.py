@@ -111,7 +111,7 @@ def view_usermanagement(
         'title': _('User Management'),
         'roles': roles.keys(),
         'users': users,
-        'filters': filters,
+        'filters': filters
     }
 
 

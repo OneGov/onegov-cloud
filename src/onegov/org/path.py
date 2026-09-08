@@ -197,7 +197,7 @@ def get_users(
     role: list[str] | None = None,
     tag: list[str] | None = None,
     provider: list[str] | None = None,
-    source: list[str] | None = None,
+    source: list[str] | None = None
 ) -> UserCollection:
     return UserCollection(
         app.session(),
