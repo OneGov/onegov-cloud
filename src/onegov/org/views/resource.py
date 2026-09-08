@@ -727,6 +727,8 @@ def view_find_your_spot(
             }
 
             reserved_dates: dict[date_t, set[UUID]] = {}
+            # what we actually reserved: date -> [(time label, room title)]
+            reserved_slots: dict[date_t, list[tuple[str, str]]] = {}
             for date, date_room_slots in (
                 # skip iteration if we have existing reservations
                 # that match our criteria and we're only supposed
@@ -772,15 +774,16 @@ def view_find_your_spot(
 
                     for slot in slots:
                         if isclose(slot.availability, 100.0, abs_tol=.005):
+                            slot_dates = slot.slot_time or (
+                                slot.allocation.display_start(),
+                                slot.allocation.display_end()
+                            )
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
                                 room.scheduler.reserve(
                                     email='0xdeadbeef@example.org',
-                                    dates=slot.slot_time or (
-                                        slot.allocation.display_start(),
-                                        slot.allocation.display_end()
-                                    ),
+                                    dates=slot_dates,
                                     quota=1,
                                     session_id=room.bound_session_id(request),
                                     single_token_per_session=True
@@ -791,7 +794,11 @@ def view_find_your_spot(
                                 # this as a missing reserved slot
                                 continue
                             else:
-                                # we managed to reserve a slot
+                                # record the slot we just reserved
+                                reserved_slots.setdefault(date, []).append((
+                                    utils.render_time_range(*slot_dates),
+                                    room.title
+                                ))
                                 break
                     else:
                         # no slot reserved, move on to the next room
@@ -816,105 +823,37 @@ def view_find_your_spot(
                 if auto_reserve == 'for_first_day':
                     break
 
-            # series overview from actual reservations
-            if auto_reserve != 'for_first_day':
-                every_room = auto_reserve == 'for_every_room'
-                wanted = len(rooms) if every_room else 1
+            # overview from recorded slots: booked plus what we couldn't get
+            every_room = auto_reserve == 'for_every_room'
+            first_day = auto_reserve == 'for_first_day'
+            series_overview = []
+            for date in room_slots:
+                booked = sorted(reserved_slots.get(date, ()))
+                series_overview.extend(
+                    {'date': date, 'time': time_label, 'room': room_title}
+                    for time_label, room_title in booked
+                )
 
-                # re-query for the just-reserved slots; keep only rooms
-                # counted in reserved_dates so display matches the count
-                booked_by_date: dict[date_t, list[tuple[str, str]]] = {}
-                for room in rooms:
-                    for reservation in room.bound_reservations(request):  # type: ignore[attr-defined]
-                        date = reservation.display_start().date()
-                        if room.id not in reserved_dates.get(date, set()):
-                            continue
-                        booked_by_date.setdefault(date, []).append((
-                            utils.render_time_range(
-                                reservation.display_start(),
-                                reservation.display_end()
-                            ),
-                            room.title,
-                        ))
-
-                # each entry is booked (has a time) or unavailable (time None)
-                series_overview = []
-                for date in room_slots:
-                    booked = sorted(booked_by_date.get(date, ()))
-                    for time_label, room_title in booked:
-                        series_overview.append(
-                            {
-                                'date': date,
-                                'time': time_label,
-                                'room': room_title,
-                            }
-                        )
-
+                if every_room:
+                    # flag each room we couldn't reserve on this date
                     reserved_rooms = reserved_dates.get(date, set())
-                    if len(reserved_rooms) >= wanted:
-                        continue
-
-                    if every_room:
-                        # list each room we couldn't reserve
-                        for room in rooms:
-                            if room.id not in reserved_rooms:
-                                series_overview.append(
-                                    {
-                                        'date': date,
-                                        'time': None,
-                                        'room': room.title,
-                                    }
-                                )
-                    elif not booked:
-                        # single-room mode: nothing available at all
-                        series_overview.append({
-                            'date': date, 'time': None, 'room': None
-                        })
-            else:
-                # for_first_day books one slot; overview still lists every
-                # date, flagging those where nothing matching was available
-                booked_by_date = {}
-                for room in rooms:
-                    for reservation in room.bound_reservations(request):  # type: ignore[attr-defined]
-                        date = reservation.display_start().date()
-                        if date not in room_slots:
-                            continue
-                        # keep only reservations in the search window
-                        if not (
-                            reservation.display_start().time() < end_time
-                            and reservation.display_end().time() > start_time
-                        ):
-                            continue
-                        booked_by_date.setdefault(date, []).append((
-                            utils.render_time_range(
-                                reservation.display_start(),
-                                reservation.display_end()
-                            ),
-                            room.title,
-                        ))
-
-                series_overview = []
-                for date in room_slots:
-                    booked = sorted(booked_by_date.get(date, ()))
-                    for time_label, room_title in booked:
-                        series_overview.append(
-                            {
-                                'date': date,
-                                'time': time_label,
-                                'room': room_title,
-                            }
-                        )
-                    if booked:
-                        continue
-                    # flag dates with no bookable slot in any room
-                    if not any(
+                    series_overview.extend(
+                        {'date': date, 'time': None, 'room': room.title}
+                        for room in rooms
+                        if room.id not in reserved_rooms
+                    )
+                elif not booked:
+                    # for_first_day stops after one booking; flag only dates
+                    # with nothing available
+                    if first_day and any(
                         isclose(slot.availability, 100.0, abs_tol=.005)
                         for slots in room_slots[date].values()
                         for slot in slots
                     ):
-                        series_overview.append({
-                            'date': date, 'time': None, 'room': None
-                        })
+                        continue
+                    series_overview.append({
+                        'date': date, 'time': None, 'room': None
+                    })
 
     holidays: dict[date_t, list[str]] = {}
     if room_slots:
