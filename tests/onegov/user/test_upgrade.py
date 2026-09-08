@@ -36,6 +36,14 @@ def test_fix_stringified_user_tags(session: Session) -> None:
     # tags that are pure empty-list reprs unwrap to nothing
     empty = users.add('user-d@example.org', 'hunter2', 'member')
     empty.tags = ['[]', "['[]']"]
+    # doubly-wrapped reprs must unwrap through every layer (recursion);
+    # a single literal_eval would leave "['Sport']" still wrapped
+    nested = users.add('user-e@example.org', 'hunter2', 'member')
+    nested.tags = ["[\"[' Jodeln ']\"]", "[\"['[]']\"]"]
+    # a real, multiply-wrapped value straight from the production dump
+    # (onegov_feriennet/am_alten_rhein), all layers empty
+    real = users.add('user-f@example.org', 'hunter2', 'member')
+    real.tags = ["['[\"[\\'[]\\']\"]']"]
     session.flush()
 
     fix_stringified_user_tags(_context(session, FeriennetApp()))
@@ -50,6 +58,8 @@ def test_fix_stringified_user_tags(session: Session) -> None:
     assert tags_of('user-b@example.org') == ['Musik']
     assert tags_of('user-c@example.org') == ['Sport', 'Kultur']
     assert tags_of('user-d@example.org') == []
+    assert tags_of('user-e@example.org') == [' Jodeln ']
+    assert tags_of('user-f@example.org') == []
 
 
 def test_fix_stringified_user_tags_skips_non_feriennet(

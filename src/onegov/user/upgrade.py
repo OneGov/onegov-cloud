@@ -377,8 +377,8 @@ def _unwrap_tags(tags: list[Any]) -> list[str]:
             if isinstance(parsed, list):
                 result.extend(_unwrap_tags(parsed))
                 continue
-        if stripped := tag.strip():
-            result.append(stripped)
+        if tag:
+            result.append(tag)
     return result
 
 
