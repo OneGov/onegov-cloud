@@ -51,7 +51,6 @@ from onegov.org.models import AtoZPages, PushNotificationCollection
 from onegov.org.models import RISCommissionMembershipCollection
 from onegov.org.models import RISCommissionMembership
 from onegov.org.models import CitizenDashboard, Dashboard
-from onegov.org.models.user_search_widget import InlineUserSearch
 from onegov.org.models import Clipboard
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import Editor
@@ -187,24 +186,27 @@ def get_user(app: OrgApp, id: UUID) -> User | None:
         'role': [str],
         'tag': [str],
         'provider': [str],
-        'source': [str],
-        'search_query': json_converter,
+        'source': [str]
     }
 )
 def get_users(
     app: OrgApp,
     request: OrgRequest,
+    q: str | None = None,
     active: list[bool] | None = None,
     role: list[str] | None = None,
     tag: list[str] | None = None,
     provider: list[str] | None = None,
     source: list[str] | None = None,
-    search_query: dict[str, Any] | None = None
 ) -> UserCollection:
-    search_widget = InlineUserSearch(request, search_query)
     return UserCollection(
-        app.session(), search_widget=search_widget,
-        active=active, role=role, tag=tag, provider=provider, source=source
+        app.session(),
+        term=q,
+        active=active,
+        role=role,
+        tag=tag,
+        provider=provider,
+        source=source,
     )
 
 

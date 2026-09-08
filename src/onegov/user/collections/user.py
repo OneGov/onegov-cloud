@@ -21,16 +21,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol
     from uuid import UUID
-
-    class UserSearchWidget(Protocol):
-        @property
-        def name(self) -> str: ...
-        @property
-        def search_query(self) -> dict[str, str] | None: ...
-        def adapt(self, query: Query[User]) -> Query[User]: ...
-
 
 MIN_PASSWORD_LENGTH = 10
 
@@ -82,20 +73,16 @@ class UserCollection:
     def __init__(
         self,
         session: Session,
-        search_widget: UserSearchWidget | None = None,
+        term: str | None = None,
         **filters: Any
     ):
         self.session = session
-        self.search_widget = search_widget
+        self.term = term
         self.filters = as_dictionary_of_sets(filters)
 
     @property
-    def search(self) -> str | None:
-        return self.search_widget.name if self.search_widget else None
-
-    @property
-    def search_query(self) -> dict[str, str] | None:
-        return self.search_widget.search_query if self.search_widget else None
+    def q(self) -> str | None:
+        return self.term
 
     def __getattr__(self, name: str) -> set[Any] | None:
         if name not in self.filters:
@@ -114,7 +101,7 @@ class UserCollection:
                 toggled[key] = self.filters[key]
 
         return self.__class__(
-            self.session, search_widget=self.search_widget, **toggled)
+            self.session, self.term, **toggled)
 
     def query(self) -> Query[User]:
         """ Returns a query using :class:`onegov.user.models.User`. With
@@ -123,13 +110,16 @@ class UserCollection:
         """
         query = self.session.query(User)
 
+        if self.term:
+            query = query.filter(or_(
+                User.username.ilike(f'%{self.term}%'),
+                User.realname.ilike(f'%{self.term}%')
+            ))
+
         for key, values in self.filters.items():
             if values:
                 apply = getattr(self, f'apply_{key}_filter', self.apply_filter)
                 query = apply(query, key, values)
-
-        if self.search_widget:
-            query = self.search_widget.adapt(query)
 
         return query
 

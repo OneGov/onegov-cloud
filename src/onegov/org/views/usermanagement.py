@@ -112,7 +112,6 @@ def view_usermanagement(
         'roles': roles.keys(),
         'users': users,
         'filters': filters,
-        'search_widget': self.search_widget
     }
 
 
