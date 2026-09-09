@@ -34,10 +34,7 @@ def test_link_health_check(org_app: TestOrgApp) -> None:
 
     invalid_fmt = [
         'www.disco.',
-        # NOTE: turbohtml will still detect the nonsense.com portion
-        #       of this url. It's debatable which behavior is better
-        #       for now it seems fine to switch to turbohtml's behavior
-        # 'https:/nonsense.com',
+        'https:/nonsense.com',
         'www.wrong-domain.comm',
     ]
 
@@ -48,7 +45,7 @@ def test_link_health_check(org_app: TestOrgApp) -> None:
         "Other valid: $URL. twice: $URL",
         "Check out $URL. It's for free.",
         "Invalid: $URL  ",
-        #  "Invalid: $URL...",
+        "Invalid: $URL...",
         "Invalid: $URL",
         "Invalid: $URL",
         "Invalid: $URL",

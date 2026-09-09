@@ -327,7 +327,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                     found = self.extractor.find(text, unique=True)
                     if not found:
                         continue
-                    urls.extend(span.url for span in found)
+                    urls.extend(span.text for span in found)
                 if urls:
                     yield (
                         entry.__class__.__name__,
@@ -342,7 +342,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                 yield (
                     'Agency',
                     self.request.link(agency),
-                    self.filter_urls([span.url for span in found])
+                    self.filter_urls([span.text for span in found])
                 )
 
     def url_list_generator(self) -> Iterator[LinkCheck]:
