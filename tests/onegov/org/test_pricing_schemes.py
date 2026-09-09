@@ -71,7 +71,6 @@ def test_stadtschulen_zug(client: Client) -> None:
         '    ( ) B - Andere Organisationen / Personen (Sitz in der Stadt Zug)',
         '    ( ) C - Auswärtige Organisationen / Personen',
     ))
-    page.form['stadtschulen_zug_price_table-2-2'] = 300
     page.form.submit().follow()
 
     transaction.begin()
@@ -129,3 +128,205 @@ def test_stadtschulen_zug(client: Client) -> None:
     )
     ticket = edit_page.form.submit().follow()
     assert '105.00' in ticket
+
+
+
+@freeze_time('2026-09-04', tick=True)
+def test_horw_horwerhalle(client: Client) -> None:
+    client.app.configure_resource_pricing_schemes(resource_pricing_schemes={
+        client.app.application_id: ['horw_horwerhalle']
+    })
+    assert len(client.app.resource_pricing_schemes) == 1
+    assert client.app.resource_pricing_schemes[0].name == 'horw_horwerhalle'
+    client.login_admin()
+
+    page = client.get('/resource/tageskarte/edit')
+    page.select_radio('payment_method', 'Keine Kreditkarten-Zahlungen')
+    page.select_radio('pricing_method', 'Vordefiniertes Preisschema')
+    page.select_radio('pricing_scheme', 'Horwerhalle')
+    page.select_radio('extras_pricing_method', 'Pro Eintrag')
+    page.select_radio('discount_method', 'Nur den Preis pro Eintrag/Stunde')
+    page.form['currency'] = 'CHF'
+    # missing definition and empty table are errors
+    page = page.form.submit()
+    assert 'Mit Preisschema "Horwerhalle" braucht' in page
+    assert 'Dieses Feld wird benötigt' in page
+
+    # a partially complete table is still missing, correct field
+    # but missing required option is an error as well
+    page.form['definition'] = '\n'.join((
+        'Horwer Non-Profit Organisation =',
+        '    ( ) Ya',
+        '    (x) Nein',
+        'Mit Wirtschaft =',
+        '    ( ) Ya',
+        '    (x) Nein',
+    ))
+    page.form['horw_horwerhalle_price_table-0-0'] = 50
+    page.form['horw_horwerhalle_price_table-0-1'] = 120
+    page.form['horw_horwerhalle_price_table-0-2'] = 200
+    page.form['horw_horwerhalle_price_table-1-0'] = 600
+    page.form['horw_horwerhalle_price_table-1-1'] = 600
+    page.form['horw_horwerhalle_price_table-1-2'] = 1200
+    page.form['horw_horwerhalle_price_table-2-0'] = 200
+    page.form['horw_horwerhalle_price_table-2-1'] = 400
+    page.form['horw_horwerhalle_price_table-2-2'] = 800
+    page.form['horw_horwerhalle_price_table-3-0'] = 800
+    page.form['horw_horwerhalle_price_table-3-1'] = 800
+    page = page.form.submit()
+    assert 'Mit Preisschema "Horwerhalle" braucht' in page
+    assert 'Dieses Feld wird benötigt' in page
+
+    # a correct definition that is non-required is also invalid
+    page.form['definition'] = '\n'.join((
+        'Horwer Non-Profit Organisation =',
+        '    ( ) Ja',
+        '    (x) Nein',
+        'Mit Wirtschaft =',
+        '    ( ) Ja',
+        '    (x) Nein',
+    ))
+    page.form['horw_horwerhalle_price_table-3-2'] = 1600
+    page = page.form.submit()
+    assert 'nicht optional sein' in page
+    assert 'Dieses Feld wird benötigt' not in page
+
+    page.form['definition'] = '\n'.join((
+        'Horwer Non-Profit Organisation * =',
+        '    ( ) Ja',
+        '    (x) Nein',
+        'Mit Wirtschaft =',
+        '    ( ) Ja',
+        '    (x) Nein',
+    ))
+    page.form.submit().follow()
+
+    transaction.begin()
+
+    scheduler = (
+        ResourceCollection(client.app.libres_context)
+        .by_name('tageskarte')
+        .get_scheduler(client.app.libres_context)  # type: ignore[union-attr]
+    )
+
+    allocations = scheduler.allocate(
+        dates=[
+            # friday
+            (datetime(2026, 9, 4, 8), datetime(2026, 9, 4, 20)),
+            # satuday
+            (datetime(2026, 9, 5, 8), datetime(2026, 9, 5, 20)),
+        ],
+        whole_day=False,
+        partly_available=True,
+    )
+    reserve1 = client.bound_reserve(allocations[0])
+    reserve2 = client.bound_reserve(allocations[1])
+
+    transaction.commit()
+
+    # create a reservation
+    assert reserve1('8:00', '12:30').json == {'success': True}
+
+    # initially there should be no price
+    page = client.get('/resource/tageskarte/form')
+    assert '.00 CHF' not in page
+
+    # with this selection we still get no price on a friday
+    page.form['email'] = 'john.doe@example.com'
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Ja'
+    )
+    page.select_radio(
+        'mit_wirtschaft',
+        'Nein'
+    )
+    assert '.00 CHF' not in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Ja'
+    )
+    page.select_radio(
+        'mit_wirtschaft',
+        'Ja'
+    )
+    assert '600.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Nein'
+    )
+    page.select_radio(
+        'mit_wirtschaft',
+        'Nein'
+    )
+    assert '400.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Nein'
+    )
+    page.select_radio(
+        'mit_wirtschaft',
+        'Ja'
+    )
+    assert '800.00 CHF' in page.form.submit().follow()
+    page.form.submit().follow().form.submit()
+
+    # open ticket
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert '800.00' in ticket
+
+    # changing the submission details updates the price as expected
+    edit_page = ticket.click('Details bearbeiten')
+    edit_page.select_radio(
+        'mit_wirtschaft',
+        'Nein'
+    )
+    ticket = edit_page.form.submit().follow()
+    assert '400.00' in ticket
+
+    # create a reservation
+    assert reserve2('8:00', '9:30').json == {'success': True}
+
+    # initially there should be no price
+    page = client.get('/resource/tageskarte/form')
+    assert '.00 CHF' not in page
+
+    # on a saturday we do get a price with this selection
+    page.form['email'] = 'john.doe@example.com'
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Ja'
+    )
+    page.select_radio(
+        'mit_wirtschaft',
+        'Nein'
+    )
+    assert '50.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Ja'
+    )
+    page.select_radio(
+        'mit_wirtschaft',
+        'Ja'
+    )
+    assert '600.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Nein'
+    )
+    page.select_radio(
+        'mit_wirtschaft',
+        'Nein'
+    )
+    assert '200.00 CHF' in page.form.submit().follow()
+    page.select_radio(
+        'horwer_non_profit_organisation',
+        'Nein'
+    )
+    page.select_radio(
+        'mit_wirtschaft',
+        'Ja'
+    )
+    assert '800.00 CHF' in page.form.submit().follow()
+    page.form.submit().follow().form.submit()
