@@ -1919,3 +1919,23 @@ a.category-anchor {
 ol li a:not(.button) {
   display: inline !important;
 }
+
+#newFeaturesModal {
+    padding: 1.5rem;
+    padding-bottom: .5rem;
+
+    .h2 {
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        border: 1px solid $white-smoke;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.11);
+    }
+
+    .footer {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 1rem;
+    }
+}

@@ -116,7 +116,7 @@ def town_handle_new_user(
         model=User,
         permission=Secret,
         request_method='POST',
-        name='release-features'
+        name='read-features'
 )
 def add_release_number(
     self: User,
@@ -127,4 +127,16 @@ def add_release_number(
 
     self.release_features = request.app.version
 
-    request.success('The release features have been confirmed')
+
+@TownApp.view(
+        model=User,
+        permission=Secret,
+        request_method='POST',
+        name='close-features'
+)
+def close_features(
+    self: User,
+    request: TownRequest,
+) -> None:
+
+    request.browser_session.dismissed_new_features = True
