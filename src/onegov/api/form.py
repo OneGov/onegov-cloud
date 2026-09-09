@@ -192,7 +192,7 @@ class BaseAdapter(ABC):
             )
         ):
             # we use this marker in the model validator to detect
-            # fields that become dependent when their dependency
+            # fields that become required when their dependency
             # is fulfilled
             yield REQUIRED_DEPENDENT
 
@@ -232,7 +232,7 @@ class BaseAdapter(ABC):
             )
         )):
             # we use this marker in the model validator to detect
-            # fields that become dependent when their dependency
+            # fields that become required when their dependency
             # is fulfilled
             yield REQUIRED_DEPENDENT
 
