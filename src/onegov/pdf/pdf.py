@@ -27,10 +27,10 @@ from reportlab.platypus import Paragraph
 from reportlab.platypus import Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus.tables import TableStyle
-from turbohtml.clean import minify
 from turbohtml.clean import LinkCandidate
 from turbohtml.clean import Linker
 from turbohtml.clean import Linkify
+from turbohtml.clean import Minify
 from turbohtml.clean import OnDisallowed
 from turbohtml.clean import PhoneNumbers
 from turbohtml.clean import Policy
@@ -565,6 +565,11 @@ class Pdf(PDFDocument):
         if not html or html == '<p></p>':
             return None
 
+        document = turbohtml.parse(html)
+        body = document.find('body')
+        if body is None:
+            return None
+
         # Remove unwanted markup
         tags = [
             'p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li',
@@ -581,7 +586,7 @@ class Pdf(PDFDocument):
             attributes=attributes,
             on_disallowed_tag=OnDisallowed.STRIP,
         ))
-        html = sanitizer.sanitize(html)
+        sanitized = sanitizer.sanitize_node(body)
         if not html.strip():
             return None
 
@@ -605,13 +610,17 @@ class Pdf(PDFDocument):
                 schemes=('http', 'https', 'email', 'tel'),
                 phones=PhoneNumbers(regions=('CH',))
             ))
-            html = linker.linkify(html)
+            sanitized = linker.linkify_node(sanitized)
 
-        # NOTE: This has the same result as the html5lib whitespace
-        #       filter we used to use. It collapses all whitespace.
-        #       It also goes a little beyond that, but all the other
-        #       things it does also help us.
-        html = minify(html)
+        html = sanitized.serialize(
+            turbohtml.Html(
+                # NOTE: This has the same result as the html5lib whitespace
+                #       filter we used to use.
+                layout=Minify(collapse_whitespace=True),
+            )
+        # FIXME: There should be a inner_serialize, so we don't have to
+        #        remove this wrapper.
+        ).removeprefix('<body>').removesuffix('</body>')
         if not html.strip():
             return None
         return html

@@ -324,14 +324,10 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                     text = getattr(entry, field, None)
                     if not text:
                         continue
-                    # FIXME: Switch to unique=True
-                    found = {
-                        span.text: None
-                        for span in self.extractor.find(text)
-                    }
+                    found = self.extractor.find(text, unique=True)
                     if not found:
                         continue
-                    urls.extend(found)
+                    urls.extend(span.url for span in found)
                 if urls:
                     yield (
                         entry.__class__.__name__,
@@ -341,16 +337,12 @@ class LinkHealthCheck(ModelsWithLinksMixin):
         for agency in AgencyCollection(self.request.session).query():
             if not agency.portrait:
                 continue
-            # FIXME: Switch to unique=True
-            found = {
-                span.text: None
-                for span in self.extractor.find(agency.portrait)
-            }
+            found = self.extractor.find(agency.portrait, unique=True)
             if found:
                 yield (
                     'Agency',
                     self.request.link(agency),
-                    self.filter_urls(list(found))
+                    self.filter_urls([span.url for span in found])
                 )
 
     def url_list_generator(self) -> Iterator[LinkCheck]:
