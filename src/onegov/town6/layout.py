@@ -169,7 +169,7 @@ class Layout(OrgLayout):
             f'<a tabindex="0">{back}</a></li>'
         )
 
-    @property
+    @cached_property
     def new_features(self) -> list[dict[str, Any]]:
         features: list[dict[str, Any]] = []
 
@@ -203,7 +203,7 @@ class Layout(OrgLayout):
                 year, number = value.split('.', 1)
                 return int(year), int(number)
 
-            current_release_path = repo_root / 'changes' / 'current release'
+            current_release_path = repo_root / 'changes' / 'current'
             if not current_release_path.exists():
                 return features
 
@@ -212,7 +212,7 @@ class Layout(OrgLayout):
                     add_payload(yaml.safe_load(fh) or {})
 
             if len(features) < 5:
-                past_release_path = repo_root / 'changes' / 'past releases'
+                past_release_path = repo_root / 'changes' / 'past'
                 if past_release_path.exists():
                     if user_release is None:
                         user_release_tuple = (0, 0)

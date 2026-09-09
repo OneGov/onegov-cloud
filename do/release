@@ -140,8 +140,8 @@ function new-version() {
 
 function archive-current-release() {
     local version="$1"
-    local current_release_dir="$REPO/changes/current release"
-    local past_release_dir="$REPO/changes/past releases"
+    local current_release_dir="$REPO/changes/current"
+    local past_release_dir="$REPO/changes/past"
 
     mkdir -p "$past_release_dir"
 
@@ -183,7 +183,7 @@ function release() {
     if [[ "${DRY_RUN}" == "1" ]]; then
         echo "[dry-run] would generate CHANGES.md, bump version to ${short},"
         echo "[dry-run] commit, tag ${new}, push, and announce on sentry.io"
-        echo "[dry-run] archived files from changes/current release to changes/past releases"
+        echo "[dry-run] archived files from changes/current to changes/past"
         return
     fi
 
