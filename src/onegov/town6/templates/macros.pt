@@ -3515,7 +3515,7 @@
                 <span aria-hidden="true">&times;</span>
             </button>
 
-            <h1 class="h2" i18n:translate="">New features available</h1>
+            <h1 class="h3" i18n:translate="">New features available</h1>
             <tal:b repeat="feature features">
                 <div class="card">
                     <div class="card-section">
