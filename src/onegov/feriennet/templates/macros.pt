@@ -1237,48 +1237,56 @@
         </div>
 
         </p>
-        <ul tal:condition="ticket_state == 'pending'">
-            <li class="state-transitions" tal:condition="subscription.state != 'open'">
-                <a class="mark-open" ic-post-to="${state_change(request, subscription, 'ticket_open', layout)}"
-                ic-target="#${subscription.need.id.hex}"
-                ic-select-from-response="#${subscription.need.id.hex}">
-                    <i class="far fa-fw fa-circle" aria-hidden="true"></i>
-                    <tal:b i18n:translate>
-                        Mark as open
-                    </tal:b>
-                </a>
-            </li>
-            <li class="state-transitions" tal:condition="subscription.state != 'contacted'">
-                <a class="mark-contacted" ic-post-to="${state_change(request, subscription, 'ticket_contacted', layout)}"
-                ic-target="#${subscription.need.id.hex}"
-                ic-select-from-response="#${subscription.need.id.hex}">
-                    <i class="fa fa-fw fa-circle" aria-hidden="true"></i>
-                    <tal:b i18n:translate>
-                        Mark as contacted
-                    </tal:b>
-                </a>
-            </li>
-            <li class="state-transitions" tal:condition="subscription.state != 'confirmed'">
-                <a class="mark-confirmed" ic-post-to="${state_change(request, subscription, 'ticket_confirmed', layout)}"
-                ic-target="#${subscription.need.id.hex}"
-                ic-select-from-response="#${subscription.need.id.hex}">
-                    <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i>
-                    <tal:b i18n:translate>
-                        Mark as confirmed
-                    </tal:b>
-                </a>
-            </li>
-            <li class="state-transitions" tal:condition="subscription.state != 'cancelled'">
-                <a class="mark-cancelled" ic-post-to="${state_change(request, subscription, 'ticket_cancelled', layout)}"
-                ic-target="#${subscription.need.id.hex}"
-                ic-select-from-response="#${subscription.need.id.hex}">
-                    <i class="fa fa-fw fa-times-circle" aria-hidden="true"></i>
-                    <tal:b i18n:translate>
-                        Mark as denied
-                    </tal:b>
-                </a>
-            </li>
-        </ul>
+
+        <dl>
+            <dt i18n:translate>
+                Actions
+            </dt>
+            <dd>
+                <ul tal:condition="ticket_state == 'pending'">
+                    <li class="state-transitions" tal:condition="subscription.state != 'open'">
+                        <a class="mark-open" ic-post-to="${state_change(request, subscription, 'ticket_open', layout)}"
+                        ic-target="#${subscription.need.id.hex}"
+                        ic-select-from-response="#${subscription.need.id.hex}">
+                            <i class="far fa-fw fa-circle" aria-hidden="true"></i>
+                            <tal:b i18n:translate>
+                                Mark as open
+                            </tal:b>
+                        </a>
+                    </li>
+                    <li class="state-transitions" tal:condition="subscription.state != 'contacted'">
+                        <a class="mark-contacted" ic-post-to="${state_change(request, subscription, 'ticket_contacted', layout)}"
+                        ic-target="#${subscription.need.id.hex}"
+                        ic-select-from-response="#${subscription.need.id.hex}">
+                            <i class="fa fa-fw fa-circle" aria-hidden="true"></i>
+                            <tal:b i18n:translate>
+                                Mark as contacted
+                            </tal:b>
+                        </a>
+                    </li>
+                    <li class="state-transitions" tal:condition="subscription.state != 'confirmed'">
+                        <a class="mark-confirmed" ic-post-to="${state_change(request, subscription, 'ticket_confirmed', layout)}"
+                        ic-target="#${subscription.need.id.hex}"
+                        ic-select-from-response="#${subscription.need.id.hex}">
+                            <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i>
+                            <tal:b i18n:translate>
+                                Mark as confirmed
+                            </tal:b>
+                        </a>
+                    </li>
+                    <li class="state-transitions" tal:condition="subscription.state != 'cancelled'">
+                        <a class="mark-cancelled" ic-post-to="${state_change(request, subscription, 'ticket_cancelled', layout)}"
+                        ic-target="#${subscription.need.id.hex}"
+                        ic-select-from-response="#${subscription.need.id.hex}">
+                            <i class="fa fa-fw fa-times-circle" aria-hidden="true"></i>
+                            <tal:b i18n:translate>
+                                Mark as denied
+                            </tal:b>
+                        </a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
     </div>
 </div>
 </metal:volunteer_submission>

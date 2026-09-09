@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-05-18 16:39+0200\n"
+"POT-Creation-Date: 2026-09-08 07:39+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -443,8 +443,8 @@ msgstr "Aperçu (pas soumis)"
 msgid "Proposed"
 msgstr "Soumis"
 
-#.
 #. users like the term 'Published' better
+#.
 msgid "Published"
 msgstr "Publié"
 
@@ -717,8 +717,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "Conditions de participation"
 
@@ -921,6 +921,9 @@ msgstr ""
 "Utilisateurs·trices avec enfants inscrits pour des souhaits ou des "
 "réservations"
 
+msgid "State"
+msgstr "État"
+
 msgid "Role"
 msgstr "Fonction"
 
@@ -944,9 +947,6 @@ msgstr "Utilisateurs·trices actifs"
 
 msgid "Inactive users"
 msgstr "Utilisateurs·trices inactifs"
-
-msgid "State"
-msgstr "État"
 
 msgid ""
 "I hereby confirm that this message is relevant to the recipients and is not "
@@ -2341,6 +2341,9 @@ msgstr "Nous avons reçu votre annulation pour ${name}."
 msgid "Your subscription states have been updated, this is the final list:"
 msgstr "Vos états d'inscription ont été mis à jour, voici la liste finale:"
 
+msgid "No more Volunteers needed."
+msgstr "Vous n'avez plus besoin d'aide."
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Réseau vacances de Pro Juventute est soutenu par :"
 
@@ -2528,9 +2531,6 @@ msgstr "Actif"
 
 msgid "Inactive"
 msgstr "Inactif"
-
-msgid "No activities needing volunteers found."
-msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."
 
 msgid "No volunteers found."
 msgstr "Aucun·e bénévole trouvé·e."
@@ -3457,6 +3457,9 @@ msgstr "Assez de bénévoles"
 msgid "Not enough volunteers"
 msgstr "Pas assez de bénévoles"
 
+msgid "Please add at least one activity to your list."
+msgstr "Veuillez ajouter au moins une activité à votre liste."
+
 msgid "Subscription as a volunteer"
 msgstr "Inscription en tant que bénévole"
 
@@ -3483,6 +3486,9 @@ msgstr "${count} e-mails envoyés avec succès"
 
 msgid "The submitter email is not available"
 msgstr "L'e-mail de l'expéditeur n'est pas disponible"
+
+#~ msgid "No activities needing volunteers found."
+#~ msgstr "Aucune activité nécessitant des bénévoles n'a été trouvée."
 
 #~ msgid ""
 #~ "You have You have signed up to volunteer for the following activities:"

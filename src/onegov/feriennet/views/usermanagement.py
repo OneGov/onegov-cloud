@@ -6,9 +6,10 @@ from onegov.activity.models.invoice import BookingPeriodInvoice
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import UserLayout
-from onegov.user import User
-from sqlalchemy.orm import joinedload
+from onegov.pay.models import InvoiceItem
 from onegov.town6.views.usermanagement import town_view_user
+from onegov.user import User
+from sqlalchemy.orm import joinedload, selectinload
 
 
 from typing import TYPE_CHECKING
@@ -98,9 +99,17 @@ def delete_user(self: User, request: FeriennetRequest) -> None:
         # Delete invoice_items and invoices
         invoices = session.query(BookingPeriodInvoice).filter(
             BookingPeriodInvoice.user_id == self.id
-        ).all()
+        ).options(
+            selectinload(BookingPeriodInvoice.items).selectinload(
+                InvoiceItem.payments
+            )
+        )
         for invoice in invoices:
             for item in invoice.items:
+                # unlink payments from invoice items
+                if item.payments:
+                    item.payments = []
+                    session.flush()
                 session.delete(item)
             session.delete(invoice)
 
