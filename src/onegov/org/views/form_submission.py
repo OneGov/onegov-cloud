@@ -40,7 +40,7 @@ from uuid import uuid4
 from webob.exc import HTTPMethodNotAllowed, HTTPNotFound
 
 
-from typing import Literal, TYPE_CHECKING
+from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.types import RenderData
@@ -280,13 +280,47 @@ def handle_edit_submission_from_ticket(
     )
 
 
+@overload
 def do_complete_submission(
     self: FormSubmission,
     form: Form,
     request: OrgRequest,
+    *,
     raises: bool = False,
     no_messages: bool = False,
-) -> Response:
+    return_ticket: Literal[False] = False,
+) -> Response: ...
+@overload
+def do_complete_submission(
+    self: FormSubmission,
+    form: Form,
+    request: OrgRequest,
+    *,
+    raises: Literal[True],
+    no_messages: bool = False,
+    return_ticket: Literal[True],
+) -> Ticket: ...
+@overload
+def do_complete_submission(
+    self: FormSubmission,
+    form: Form,
+    request: OrgRequest,
+    *,
+    raises: Literal[False] = False,
+    no_messages: bool = False,
+    return_ticket: Literal[True],
+) -> Ticket | None: ...
+
+
+def do_complete_submission(
+    self: FormSubmission,
+    form: Form,
+    request: OrgRequest,
+    *,
+    raises: bool = False,
+    no_messages: bool = False,
+    return_ticket: bool = False,
+) -> Response | Ticket | None:
 
     provider = request.app.default_payment_provider
     token = provider.get_token(request) if provider else None
@@ -312,6 +346,8 @@ def do_complete_submission(
             raise ValueError('Payment processing failed')
         if not no_messages:
             request.alert(_('Your payment could not be processed'))
+        if return_ticket:
+            return None
         return morepath.redirect(request.link(self))
 
     if payment is not True:
@@ -326,6 +362,8 @@ def do_complete_submission(
             raise ValueError('Registrations are no longer possible')
         if not no_messages:
             request.alert(_('Registrations are no longer possible'))
+        if return_ticket:
+            return None
         return morepath.redirect(request.link(self))
 
     show_submission = request.params.get('send_by_email') == 'yes'
@@ -438,6 +476,8 @@ def do_complete_submission(
     if not no_messages:
         request.success(_('Thank you for your submission!'))
 
+    if return_ticket:
+        return ticket
     return morepath.redirect(request.link(ticket, 'status'))
 
 

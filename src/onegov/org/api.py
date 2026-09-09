@@ -824,7 +824,11 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink, UUID | str]):
         #       instead of disallowing submissions altogether
         return item.form_class
 
-    def apply_changes(self, item: FormOrExternalLink, form: Form) -> None:
+    def apply_changes(
+        self,
+        item: FormOrExternalLink,
+        form: Form
+    ) -> dict[str, Any]:
         assert not isinstance(item, ExternalFormLink)
 
         for name, price in form.prices():
@@ -848,13 +852,33 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink, UUID | str]):
         # FIXME: circular import
         from onegov.org.views.form_submission import do_complete_submission
         try:
-            do_complete_submission(
+            ticket = do_complete_submission(
                 submission, form, self.request,
                 raises=True,
                 no_messages=True,
+                return_ticket=True
             )
         except ValueError as exc:
             raise ApiException(str(exc), status_code=400) from exc
+
+        return {
+            'collection': {
+                'version': '1.0',
+                'href': self.request.link(self),
+                'links': [
+                    {
+                        'rel': 'ticket',
+                        'href': self.request.link(ticket),
+                        'prompt': 'View Ticket (for supporters)',
+                    },
+                    {
+                        'rel': 'ticket_status',
+                        'href': self.request.link(ticket, 'status'),
+                        'prompt': 'View Ticket (for customers)',
+                    },
+                ],
+            }
+        }
 
 
 class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink, UUID]):

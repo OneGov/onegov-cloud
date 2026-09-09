@@ -485,8 +485,13 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
 
         return form
 
-    def apply_changes(self, item: M, form: Any) -> None:
-        """ Apply the changes to the item based on the given form data. """
+    def apply_changes(self, item: M, form: Any) -> dict[str, Any] | None:
+        """ Apply the changes to the item based on the given form data.
+
+        May optionally return a valid Collection+JSON payload which will
+        be included in the response.
+
+        """
 
         raise NotImplementedError()
 
