@@ -56,6 +56,7 @@ from wtforms.fields.core import UnboundField
 from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import StopValidation
 from wtforms.validators import URL
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ColorInput, TextInput
@@ -556,6 +557,10 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             validators=validators,  # type: ignore[arg-type]
             **extra_arguments
         )
+        self.upload_required = any(
+            isinstance(validator, (InputRequired, DataRequired))
+            for validator in validators or ()
+        )
         super().__init__(
             unbound_field,
             label,
@@ -624,6 +629,14 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
             if hasattr(value, 'file') or hasattr(value, 'stream'):
                 self.append_entry_from_field_storage(value)
+
+    def pre_validate(self, form: BaseForm) -> None:
+        if self.upload_required and not any(
+            field.action != 'delete'
+            for field in self
+            if hasattr(field, 'action')
+        ):
+            raise StopValidation(self.gettext('This field is required.'))
 
 
 class _DummyFile:
