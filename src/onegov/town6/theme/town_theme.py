@@ -105,7 +105,8 @@ class TownBootstrapTheme(BootstrapBaseTheme):
             'homepage',
             'header',
             'navigation',
-            'forms_page'
+            'forms_page',
+            'search'
         ]
 
     @property

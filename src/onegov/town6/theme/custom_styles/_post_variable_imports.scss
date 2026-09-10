@@ -65,3 +65,7 @@ $btn-font-size-lg: map-get($font-sizes, "sm");
 
 // OffCanvas
 $offcanvas-horizontal-width: 100vw;
+
+// List group
+$list-group-item-padding-y: map-get($spacers, "md");
+$list-group-item-padding-x: 0;

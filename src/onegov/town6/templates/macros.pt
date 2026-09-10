@@ -2085,7 +2085,7 @@
 <metal:search_results define-macro="search_results" i18n:domain="onegov.town6">
     <ul class="list-group list-group-flush search-results">
         <tal:b repeat="result model.load_batch_results">
-            <li class="search-result-${result.__tablename__} list-group-item px-0" tal:condition="result">
+            <li class="search-result-${result.__tablename__} list-group-item" tal:condition="result">
                 <tal:b
                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
@@ -2097,7 +2097,7 @@
 
 <metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
     <div tal:condition="result_layout and len(result_layout.breadcrumbs) > 1" tal:define="links result_layout.breadcrumbs">
-        <ul class="search-breadcrumbs breadcrumb fs-2xs">
+        <ul class="search-breadcrumbs breadcrumb fs-2xs mb-0 mt-sm">
             <tal:b repeat="link links">
                 <li class="breadcrumb-item link-underline-opacity-0">
                     ${link(result_layout, ('link-secondary', )).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
@@ -2108,8 +2108,9 @@
 </metal:search_breadcrumbs>
 
 <metal:search_result_template define-macro="search_result_template">
-    <a href="${link}" class="list-link">
-        <h5 class="list-title"><metal:b define-slot="list-title" /></h5>
+    <a href="${link}" class="text-reset text-decoration-none">
+        <h3 class="fs-md mb-sm"><metal:b define-slot="list-title" /></h3>
+        <p class="search-preview mb-0"><metal:b define-slot="search-preview" /></p>
     </a>
     <metal:b define-slot="content" />
     <metal:b use-macro="layout.macros['search_breadcrumbs']" />
@@ -2121,10 +2122,8 @@
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
         </tal:b>
-        <tal:b metal:fill-slot="content">
-            <div class="search-preview">
-                ${translate(result.role.capitalize())}
-            </div>
+        <tal:b metal:fill-slot="search-preview">
+            ${translate(result.role.capitalize())}
         </tal:b>
     </metal:b>
 </metal:search_result_users>
@@ -2135,23 +2134,19 @@
         <tal:b metal:fill-slot="list-title">
             ${result.name} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
         </tal:b>
-        <tal:b metal:fill-slot="content">
-            <a href="${link}">
-                <div class="search-preview">
-                    <tal:b condition="result.signed">
-                        <span i18n:translate>Has a digital seal</span>,
-                    </tal:b>
-                    <span>
-                        <tal:b i18n:translate tal:condition="result.stats.get('pages', 0) == 1">
-                            <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> page
-                        </tal:b>
+        <tal:b metal:fill-slot="search-preview">
+            <tal:b condition="result.signed">
+                <span i18n:translate>Has a digital seal</span>,
+            </tal:b>
+            <span>
+                <tal:b i18n:translate tal:condition="result.stats.get('pages', 0) == 1">
+                    <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> page
+                </tal:b>
 
-                        <tal:b i18n:translate tal:condition="result.stats.get('pages', 0) > 1">
-                            <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
-                        </tal:b>
-                    </span>
-                </div>
-            </a>
+                <tal:b i18n:translate tal:condition="result.stats.get('pages', 0) > 1">
+                    <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
+                </tal:b>
+            </span>
         </tal:b>
     </metal:b>
 </metal:search_result_files>
@@ -2162,14 +2157,10 @@
             ${result.number}
             <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
         </tal:b>
-        <tal:b metal:fill-slot="content">
-            <a href="${link}">
-                <p class="search-preview">
-                    <tal:b>${translate(result.group)}</tal:b><br/>
-                    <tal:b tal:content="result.title"></tal:b><br/>
-                    <tal:b tal:content="result.subtitle"></tal:b>
-                </p>
-            </a>
+        <tal:b metal:fill-slot="search-preview">
+            <tal:b>${translate(result.group)}</tal:b><br/>
+            <tal:b tal:content="result.title"></tal:b><br/>
+            <tal:b tal:content="result.subtitle"></tal:b>
         </tal:b>
     </metal:b>
 </metal:search_result_tickets>
@@ -2179,8 +2170,8 @@
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
         </tal:b>
-        <tal:b metal:fill-slot="content">
-            <p tal:define="latest result.latest_occurrence" class="search-preview">
+        <tal:b metal:fill-slot="search-preview">
+            <tal:b tal:define="latest result.latest_occurrence">
         <tal:b tal:condition="latest">
             ${
             '{}, {} - {}'.format(
@@ -2192,7 +2183,9 @@
         </tal:b>
         <tal:b tal:condition="result.location">
         ${result.location}</tal:b>
-            </p>
+            </tal:b>
+        </tal:b>
+        <tal:b metal:fill-slot="content">
             <tal:b tal:condition="future_occ" tal:define="future_occ result.future_occurrences(offset=1).all()">
         <ul>
             <li><span i18n:translate="">Further occurrences:</span>
@@ -2225,11 +2218,11 @@
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
         </tal:b>
-        <tal:b metal:fill-slot="content">
-            <div class="search-preview" tal:condition="result.function|nothing"><i>${result.function}</i></div>
-            <div class="search-preview" tal:condition="result_layout.organisation_texts|nothing" tal:repeat="org result_layout.organisation_texts">
-                <span i18n:attributes="title" title="Organisation">${org}</span>
-            </div>
+        <tal:b metal:fill-slot="search-preview">
+            <span tal:condition="result.function|nothing"><i>${result.function}</i></span>
+            <span tal:condition="result_layout.organisation_texts|nothing" tal:repeat="org result_layout.organisation_texts">
+                <span i18n:attributes="title" title="Organisation">${org}</span><br>
+            </span>
         </tal:b>
     </metal:b>
 </metal:search_result_people>
@@ -2240,22 +2233,22 @@
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
         </tal:b>
-        <tal:b metal:fill-slot="content">
-            <div class="search-preview" tal:condition="result.function|nothing">${result.function}</div>
-            <div class="search-preview" tal:condition="not:result.active|nothing" i18n:translate>Former member or parliament</div>
-            <div class="search-preview" tal:condition="result.roles|nothing" tal:repeat="role result.roles">
-                <div class="search-preview" tal:condition="role.role_label">
+        <tal:b metal:fill-slot="search-preview">
+            <span tal:condition="result.function|nothing">${result.function}</span>
+            <span tal:condition="not:result.active|nothing" i18n:translate>Former member or parliament</span>
+            <span tal:condition="result.roles|nothing" tal:repeat="role result.roles">
+                <span tal:condition="role.role_label">
                     <span>${role.role_label}</span> <span i18n:translate>Parliament</span>
-                </div>
-                <div tal:condition="role.parliamentary_group">
+                </span>
+                <span tal:condition="role.parliamentary_group">
                     ${role.parliamentary_group_role_label}
                     <span i18n:translate>Parliamentary Group</span>
                     ${role.parliamentary_group.title}
-                </div>
-            </div>
-            <div class="search-preview" tal:condition="result.commission_memberships|nothing" tal:repeat="role result.commission_memberships">
+                </span><br>
+            </span>
+            <span tal:condition="result.commission_memberships|nothing" tal:repeat="role result.commission_memberships">
                 <span>${role.role_label}</span> <span>${role.commission.title}
-            </div>
+            </span><br>
         </tal:b>
     </metal:b>
 </metal:search_result_par_parliamentarians>
@@ -2266,19 +2259,19 @@
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
         </tal:b>
-        <tal:b metal:fill-slot="content">
-            <div class="search-preview" tal:condition="result.number|nothing">
+        <tal:b metal:fill-slot="search-preview">
+            <span tal:condition="result.number|nothing">
                 <span><tal:b i18n:translate>Number</tal:b>:</span>
                 <span>${result.number}</span>
-            </div>
-            <div class="search-preview" tal:condition="result.entry_date|nothing">
+            </span><br tal:condition="result.number|nothing">
+            <span tal:condition="result.entry_date|nothing">
                 <span><tal:b i18n:translate>Date</tal:b>:</span>
                 <span>${layout.format_date(result.entry_date, 'date')}</span>
-            </div>
-            <div class="search-preview" tal:condition="result.status|nothing">
+            </span><br tal:condition="result.entry_date|nothing">
+            <span tal:condition="result.status|nothing">
                 <span><tal:b i18n:translate>Status</tal:b>:</span>
                 <span>${result.status.capitalize()}</span>
-            </div>
+            </span>
         </tal:b>
     </metal:b>
 </metal:search_result_par_political_businesses>
@@ -2289,12 +2282,10 @@
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
         </tal:b>
+        <tal:b metal:fill-slot="search-preview">
+            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+        </tal:b>
         <tal:b metal:fill-slot="content">
-            <a tal:condition="result.lead" href="${link}">
-                <p class="search-preview">
-                    ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-                </p>
-            </a>
             <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="far fa-edit"></i></a>
         </tal:b>
     </metal:b>
@@ -2306,12 +2297,8 @@
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
         </tal:b>
-        <tal:b metal:fill-slot="content">
-            <a tal:condition="result.lead|None" href="${link}">
-                <div class="search-preview">
-                    ${result.lead[:260]}<tal:b condition="len(result.lead) > 260">…</tal:b>
-                </div>
-            </a>
+        <tal:b metal:fill-slot="search-preview" tal:condition="result.lead|None">
+            ${result.lead[:260]}<tal:b condition="len(result.lead) > 260">…</tal:b>
         </tal:b>
     </metal:b>
 </metal:search_result_default>
