@@ -25,14 +25,6 @@ $spacers: map-merge($spacers, (
 
 $gutters: $spacers;
 
-// For squares
-@each $key, $value in $spacers {
-  .square-#{$key} {
-    width: $value !important;
-    height: $value !important;
-  }
-}
-
 // Cards
 $card-spacer-y: map-get($spacers, "lg"); // 1.5rem / 24px
 $card-spacer-x: map-get($spacers, "lg"); // 1.5rem / 24px
@@ -69,3 +61,4 @@ $offcanvas-horizontal-width: 100vw;
 // List group
 $list-group-item-padding-y: map-get($spacers, "md");
 $list-group-item-padding-x: 0;
+

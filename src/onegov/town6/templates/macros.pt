@@ -193,7 +193,7 @@
 </metal:panel-links>
 
 <metal:footer define-macro="footer">
-    <footer id="footer" class="bg-tertiary bg-dark-subtle py-5xl">
+    <footer id="footer" class="bg-tertiary-subtle py-5xl">
         <div class="container-fluid">
                 <metal:b use-macro="layout.macros['footer_columns']" />
                 <metal:b use-macro="layout.macros['footer_links']" />
@@ -1184,7 +1184,7 @@
                             src="${url}"
                             alt="Person image">
                         <div tal:condition="not url"
-                            class="rounded-1 bg-dark-subtle bg-tertiary d-flex align-items-center justify-content-center">
+                            class="rounded-1 bg-tertiary-subtle d-flex align-items-center justify-content-center">
                             <span class="fs-xl" tal:content="initials"></span>
                         </div>
                     </div>

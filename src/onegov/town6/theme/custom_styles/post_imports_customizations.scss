@@ -1,4 +1,7 @@
-// OffCanvas
+/*
+  Customizations for bootstrap components and non-bootstrap utilities
+*/
+
 @include media-breakpoint-up(md) {
   .offcanvas {
     --bs-offcanvas-width: 600px;
@@ -10,4 +13,72 @@
     &:hover {
         border-color: $primary;
     }
+}
+
+@each $key, $value in $spacers {
+  .square-#{$key} {
+    width: $value !important;
+    height: $value !important;
+  }
+}
+
+// Tertiary color utilities
+.text-tertiary {
+  color: $tertiary !important;
+}
+.text-tertiary-subtle {
+  color: $tertiary-subtle !important;
+}
+
+.bg-tertiary {
+  background-color: $tertiary !important;
+}
+.bg-tertiary-subtle {
+  background-color: $tertiary-subtle !important;
+}
+
+.border-tertiary {
+  border-color: $tertiary !important;
+}
+.border-tertiary-subtle {
+  border-color: $tertiary-subtle !important;
+}
+
+.btn-tertiary {
+  color: color-contrast($tertiary);
+  background-color: $tertiary;
+  border-color: $tertiary;
+
+  &:hover {
+    color: color-contrast(shade-color($tertiary, 10%));
+    background-color: shade-color($tertiary, 10%);
+    border-color: shade-color($tertiary, 10%);
+  }
+}
+
+.text-bg-tertiary {
+  color: color-contrast($tertiary) !important;
+  background-color: $tertiary !important;
+}
+
+.btn-outline-tertiary {
+  color: $tertiary;
+  border-color: $tertiary;
+
+  &:hover {
+    color: color-contrast($tertiary);
+    background-color: $tertiary;
+    border-color: $tertiary;
+  }
+}
+
+.link-tertiary {
+  color: $tertiary;
+  text-decoration-color: rgba($tertiary, .5);
+
+  &:hover,
+  &:focus {
+    color: shade-color($tertiary, 20%);
+    text-decoration-color: rgba(shade-color($tertiary, 20%), .75);
+  }
 }
