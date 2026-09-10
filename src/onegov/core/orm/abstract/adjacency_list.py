@@ -349,9 +349,7 @@ def calculuate_midpoint_order[L: AdjacencyList](
         )  # Increment from left
     elif right:
         # Before first item (based on key)
-        new_item.order = (
-            Decimal(str(right.order)) / 2
-        )  # Half of the first item's order
+        new_item.order = Decimal(str(right.order)) - Decimal('1')
     else:
         # Only item in the list (or all others filtered out)
         new_item.order = Decimal('65536')  # Default middle value
@@ -678,7 +676,7 @@ class AdjacencyListCollection[L: AdjacencyList]:
             subject.order = Decimal(str(left.order)) + Decimal('1')
         elif right:
             # Place before right (target was right, or target was first)
-            subject.order = Decimal(str(right.order)) / 2
+            subject.order = Decimal(str(right.order)) - Decimal('1')
         else:
             # This case (no left and no right) should only happen if the target
             # is the only sibling (excluding subject). Place subject with

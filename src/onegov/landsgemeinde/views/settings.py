@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-@LandsgemeindeApp.form(
+@LandsgemeindeApp.setting_form(
     model=Organisation, name='open-data-settings', permission=Secret,
     template='form.pt', form=OpenDataSettingsForm,
     setting=_('Open Data'), icon='far fa-file-export', order=500
@@ -31,7 +31,7 @@ def handle_open_data_settings(
     return handle_generic_settings(self, request, form, _('Open Data'), layout)
 
 
-@LandsgemeindeApp.form(
+@LandsgemeindeApp.setting_form(
     model=Organisation, name='assembly-settings', permission=Secret,
     template='form.pt', form=AssemblySettingsForm,
     setting=_('General Assemblies'), icon='far fa-vote-yea', order=500

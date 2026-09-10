@@ -168,12 +168,15 @@ class TicketChatMessage(Message, TicketMessageMixin):
         owner: str,
         origin: str,
         notify: bool = False,
-        recipient: str | None = None
+        recipient: str | None = None,
+        file: File | None = None,
     ) -> Self:
 
-        return super().create(
+        message = super().create(
             ticket, request, text=text, owner=owner, origin=origin,
             notify=notify, recipient=recipient)
+        message.file = file
+        return message
 
     def formatted_text(self, layout: DefaultLayout) -> str:
         return self.text and hashtag_elements(

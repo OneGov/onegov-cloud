@@ -72,6 +72,14 @@ def test_useful_data() -> None:
     ) == {'c': 'C'}
 
 
+def test_fieldset_id() -> None:
+
+    class TestForm(Form):
+        field = StringField('Field', fieldset='Crème brûlée & More')
+
+    assert TestForm().fieldsets[0].id == 'fieldset-creme_brulee_more'
+
+
 def test_match_fields() -> None:
 
     class TestForm(Form):

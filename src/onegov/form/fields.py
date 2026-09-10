@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import phonenumbers
+import re
 import sedate
 
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
@@ -57,6 +58,7 @@ from wtforms.fields.core import UnboundField
 from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import StopValidation
 from wtforms.validators import URL
 from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput, ColorInput, TextInput
@@ -581,6 +583,10 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             validators=validators,  # type: ignore[arg-type]
             **extra_arguments
         )
+        self.upload_required = any(
+            isinstance(validator, (InputRequired, DataRequired))
+            for validator in validators or ()
+        )
         super().__init__(
             unbound_field,
             label,
@@ -649,6 +655,14 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
             if hasattr(value, 'file') or hasattr(value, 'stream'):
                 self.append_entry_from_field_storage(value)
+
+    def pre_validate(self, form: BaseForm) -> None:
+        if self.upload_required and not any(
+            field.action != 'delete'
+            for field in self
+            if hasattr(field, 'action')
+        ):
+            raise StopValidation(self.gettext('This field is required.'))
 
 
 class _DummyFile:
@@ -771,16 +785,13 @@ class TagsField(StringField):
     """
 
     widget = TagsWidget()
-    # FIXME: Why does data have a different shape depending on if it's
-    #        passed in by the form or the object?! This seems like a bug
-    data: str | list[str]  # type:ignore[assignment]
+    # mirrors the client-side sanitation of tags-input.js: keep alphanumerics
+    # and latin-1 accented characters, everything else becomes whitespace
+    _sanitize = re.compile(r'[^A-Za-z0-9À-ÿ]+')
+    data: list[str]  # type:ignore[assignment]
 
     def _value(self) -> str:
-        # Without this override, we had the underlying data corrupted
-        # containing strings like ["['[]']"]
-        if isinstance(self.data, list):
-            return ','.join(self.data)
-        return self.data or ''
+        return ','.join(self.data) if self.data else ''
 
     def process_formdata(self, valuelist: list[RawFormValue]) -> None:
         if not valuelist:
@@ -789,13 +800,40 @@ class TagsField(StringField):
 
         values_str = valuelist[0]
         if isinstance(values_str, str) and values_str != '':
-            values = (v.strip() for v in values_str.split(','))
+            values = (
+                self._sanitize.sub(' ', v).strip()
+                for v in values_str.split(',')
+            )
             self.data = [v for v in values if v]
         else:
             self.data = []
 
     def process_data(self, value: list[str] | None) -> None:
-        self.data = ','.join(value) if value else ''
+        self.data = list(value) if value else []
+
+
+class DeliveryTimesField(StringField):
+    """ Comma-separated HH:MM times rendered as a plain text field.
+
+    Stores its data as ``list[str]``; the HH:MM validation is done by the
+    form. Unlike a tags field it does not sanitize input, so ``:`` survives.
+    """
+
+    data: list[str]  # type:ignore[assignment]
+
+    def _value(self) -> str:
+        return ', '.join(self.data) if self.data else ''
+
+    def process_formdata(self, valuelist: list[RawFormValue]) -> None:
+        if valuelist and isinstance(valuelist[0], str) and valuelist[0]:
+            self.data = [
+                v.strip() for v in valuelist[0].split(',') if v.strip()
+            ]
+        else:
+            self.data = []
+
+    def process_data(self, value: list[str] | None) -> None:
+        self.data = list(value) if value else []
 
 
 class IconField(StringField):

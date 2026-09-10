@@ -3531,6 +3531,30 @@ def test_view_dashboard(client: Client, scenario: Scenario) -> None:
     assert len(page.pyquery('.boardlet')) == 6
 
 
+def test_submit_volunteer_with_empty_cart(client: Client) -> None:
+    # regression for ONEGOV-CLOUD-5YN: submitting the volunteer form with an
+    # empty cart (e.g. all activities removed before submit)
+    from onegov.ticket import TicketCollection
+
+    page = client.get('/volunteer-cart/submit')
+    page.form['first_name'] = 'User'
+    page.form['last_name'] = 'A'
+    page.form['birth_date'] = '2000-01-01'
+    page.form['address'] = 'Example Street 1'
+    page.form['zip_code'] = '1234'
+    page.form['place'] = 'Govikon'
+    page.form['email'] = 'user@example.org'
+    page.form['phone'] = '0123456789'
+    page = page.form.submit().follow()
+
+    # shows an alert linking back to the activities instead of 500-ing
+    assert page.status_code == 200
+    assert 'Helfen</a>' in page
+    assert '/activities/volunteer"' in page
+    # no ticket was created
+    assert TicketCollection(client.app.session()).by_handler_code('VOL') == []
+
+
 def test_view_volunteer_activities(
     client: Client,
     scenario: Scenario
@@ -4154,6 +4178,47 @@ def test_send_message_to_volunteer(
     assert len(os.listdir(client.app.maildir)) == 1
     message = client.get_email(0)
     assert message['To'] == 'roy@test.com'
+
+
+def test_volunteers_report_filtered_by_state(
+    client: Client,
+    scenario: Scenario
+) -> None:
+    scenario.add_period(title="2026", confirmed=True, finalized=False)
+    scenario.add_activity(title="Photography", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_need(
+        name="Begleiter",
+        number=BoundedIntegerRange(1, 3),
+        accept_signups=True
+    )
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/feriennet-settings')
+    page.form['volunteers'] = 'enabled'
+    page.form.submit()
+
+    scenario.add_volunteer(
+        first_name='Roy',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='roy@test.com',
+        phone='041 322 22 22',
+        state='confirmed'
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    period = scenario.latest_period
+    assert period is not None
+    page = client.get(
+        f'/volunteers/{period.id.hex}?volunteer_state=confirmed')
+    assert 'Roy' in page
 
 
 def test_notification_edit_cancel_returns_to_origin(

@@ -10,6 +10,7 @@ import transaction
 from datetime import date, timedelta, datetime
 from freezegun import freeze_time
 from onegov.chat import MessageCollection
+from onegov.core.utils import module_path
 from onegov.form import FormCollection
 from onegov.form.parser import ParsedForm
 from onegov.reservation import ResourceCollection
@@ -108,6 +109,8 @@ def test_tickets(client: Client) -> None:
     send_msg = ticket_page.request.url + '/message-to-submitter'
     send_msg_page = client.get(send_msg)
     assert send_msg_page.pyquery('#notify') == []
+    assert 'file' not in send_msg_page.form.fields
+    assert 'email_attachment' in send_msg_page.form.fields
     hint = send_msg_page.pyquery('.field-notify_hint')
     assert "Die Einstellung" in hint.text()
 
@@ -116,12 +119,40 @@ def test_tickets(client: Client) -> None:
     anon = client.spawn()
     ticket_status = ticket_page.request.url + '/status'
     status = anon.get(ticket_status)
+
+    status.form['text'] = 'Invalid attachment'
+    status.form['file'] = Upload('not-a-pdf.txt', b'Invalid', 'text/plain')
+    invalid = status.form.submit()
+    assert 'Dateien dieses Typs werden nicht unterstützt.' in invalid
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    status = anon.get(ticket_status)
     status.form['text'] = 'Testmessage'
-    status.form.submit().follow()
+    pdf_path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(pdf_path, 'rb') as pdf:
+        pdf_content = pdf.read()
+    status.form['file'] = Upload(
+        'customer.pdf', pdf_content, 'application/pdf'
+    )
+    status = status.form.submit().follow()
+
+    timeline_messages = get_data_feed_messages(status)
+    message_html = timeline_messages[-1]['html']
+    assert 'customer.pdf' in message_html
+    file_url_match = re.search(r'href="([^"]+)">customer.pdf', message_html)
+    assert file_url_match is not None
+    file_response = anon.get(file_url_match.group(1))
+    assert file_response.status_code == 200
+    assert file_response.body == pdf_content
 
     message = client.get_email(1)
+    attachment = message['Attachments'][0]
+    assert attachment['Name'] == 'customer.pdf'
+    assert base64.b64decode(attachment['Content']) == pdf_content
 
     ticket_url = ticket_page.request.path
+    ticket_page = client.get(ticket_url)
+    assert 'customer.pdf' in get_data_feed_messages(ticket_page)[2]['html']
     ticket_page = ticket_page.click('Ticket abschliessen').follow()
 
     page = client.get('/')
