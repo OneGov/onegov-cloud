@@ -289,29 +289,18 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 if not field_values:
                     updated[field.id] = field_values
                     continue
-                # migrate files during an entry migration
-                if isinstance(field_values, dict):
+                # migrate files during an entry migration: a single file is
+                # treated as a list of one slot
+                if isinstance(field_values, (dict, list)):
                     updated[field.id] = field_values
-                    file_id = field_values['data'].lstrip('@')
+                    slots = (
+                        [field_values]
+                        if isinstance(field_values, dict)
+                        else field_values
+                    )
                     assert session is not None
-                    with session.no_autoflush:
-                        f = session.query(File).filter_by(id=file_id).first()
-                        if f and f.type != 'directory':
-                            new = DirectoryFile(
-                                id=random_token(),
-                                name=f.name,
-                                note=f.note,
-                                reference=f.reference
-                            )
-                            entry.files.append(new)
-                            updated[field.id].update({'data': f'@{new.id}'})
-
-                    continue
-                elif isinstance(field_values, list):
-                    updated[field.id] = field_values
-                    for idx, field_value in enumerate(field_values):
-                        file_id = field_value['data'].lstrip('@')
-                        assert session is not None
+                    for slot in slots:
+                        file_id = slot['data'].lstrip('@')
                         with session.no_autoflush:
                             f = session.query(File).filter_by(
                                 id=file_id
@@ -324,9 +313,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                                     reference=f.reference
                                 )
                                 entry.files.append(new)
-                                updated[field.id][idx].update(
-                                    {'data': f'@{new.id}'}
-                                )
+                                slot.update({'data': f'@{new.id}'})
 
                     continue
                 # single and multiple fields share one code path: a single
