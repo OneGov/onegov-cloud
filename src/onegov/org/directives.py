@@ -9,7 +9,6 @@ from onegov.core.directives import HtmlHandleFormAction
 from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from _typeshed import StrOrBytesPath
     from collections.abc import Callable
     from collections.abc import Iterator
     from onegov.core.elements import LinkGroup
@@ -23,7 +22,9 @@ if TYPE_CHECKING:
     from typing import Protocol, TypedDict
     from webob import Response
 
-    type FormFactory = type[Form] | Callable[..., type[Form]]
+    type FormFactory[RequestT: OrgRequest] = (
+        type[Form] | Callable[[Any, RequestT], type[Form]]
+    )
     type SettingViewRegistry = dict[
         tuple[type, str],
         SettingViewMeta,
@@ -91,7 +92,7 @@ if TYPE_CHECKING:
 class SettingViewMeta:
     model: type
     name: str
-    form: FormFactory
+    form: FormFactory[Any]
     setting: str
     icon: str
     order: int
@@ -107,7 +108,7 @@ class SettingViewMetaAction(Action):
         self,
         model: type,
         name: str,
-        form: FormFactory,
+        form: FormFactory[Any],
         setting: str | None,
         icon: str | None,
         order: int,
@@ -121,13 +122,13 @@ class SettingViewMetaAction(Action):
         self.order = order
         self.category = category
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         setting_view_registry: SettingViewRegistry,
     ) -> tuple[type, str]:
         return self.model, self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         obj: Callable[..., Any],
         setting_view_registry: SettingViewRegistry,
@@ -151,20 +152,20 @@ class SettingViewMetaAction(Action):
 class SettingViewAction(Composite):
     query_classes = [HtmlHandleFormAction, SettingViewMetaAction]
 
-    def __init__(
+    def __init__[RequestT: OrgRequest](
         self,
         model: type,
         name: str,
-        form: FormFactory,
+        form: FormFactory[RequestT],
         setting: str | None = None,
         icon: str | None = None,
         order: int = 0,
         category: str | None = None,
         listed: bool = True,
-        render: Callable[..., Response] | str | None = None,
-        template: StrOrBytesPath | None = None,
-        load: Callable[..., Any] | str | None = None,
-        permission: object | str | None = None,
+        render: Callable[[Any, RequestT], Response] | None = None,
+        template: str | None = None,
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object | None = None,
         internal: bool = False,
         pass_model: bool = False,
         **predicates: Any,
@@ -194,10 +195,10 @@ class SettingViewAction(Composite):
         self.pass_model = pass_model
         self.predicates = predicates
 
-    def actions(
+    def actions[RequestT: OrgRequest](
         self,
-        obj: Callable[..., Any],
-    ) -> Iterator[tuple[Action, Callable[..., Any]]]:
+        obj: Callable[[Any, RequestT, Any], Any],
+    ) -> Iterator[tuple[Action, Callable[[Any, RequestT, Any], Any]]]:
         yield HtmlHandleFormAction(
             model=self.model,
             form=self.form,
