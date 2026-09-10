@@ -160,17 +160,13 @@ def create_pdf(
 
     from reportlab.pdfgen import canvas
 
-    if filename is None:
-        buffer = BytesIO()
-        c = canvas.Canvas(buffer)
-        c.drawString(100, 750, content)
-        c.save()
-        buffer.seek(0)
-        return buffer
-
-    c = canvas.Canvas(filename)
+    c = canvas.Canvas((buffer := BytesIO()) if filename is None else filename)
     c.drawString(100, 750, content)
     c.save()
+
+    if filename is None:
+        buffer.seek(0)
+        return buffer
     return c
 
 
