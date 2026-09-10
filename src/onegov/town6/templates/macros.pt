@@ -2625,14 +2625,14 @@
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.town6">
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
-        <a class="category-anchor" id="${group}"></a>
+        <a id="${group}"></a>
         <div class="group-title align-justify">
             <h2 tal:condition="len(grouped) > 1">
                 ${group}
                 <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
             </h2>
         </div>
-        <ul class="forms-list more-list">
+        <ul class="forms-list list-group list-group-flush">
             <tal:b tal:repeat="record grouped[group]">
                 <metal:b use-macro="layout.macros['group_record']"/>
             </tal:b>
@@ -2656,7 +2656,7 @@
 
 <metal:group_by_column_forms define-macro="accordion_grouped_by_column" i18n:domain="onegov.town6">
     <tal:b tal:condition="len(grouped) == 1" tal:repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
-        <ul class="forms-list more-list">
+        <ul class="forms-list list-group list-group-flush">
             <tal:b tal:repeat="record grouped[group]">
                 <metal:b use-macro="layout.macros['group_record_form_overlay']"/>
             </tal:b>
@@ -2682,7 +2682,7 @@
                     aria-labelledby="heading-${repeat.group.index}"
                     data-bs-parent="#forms-accordion">
                     <div class="accordion-body">
-                        <ul class="forms-list more-list">
+                        <ul class="forms-list list-group list-group-flush">
                             <tal:b tal:repeat="record grouped[group]">
                                 <metal:b use-macro="layout.macros['group_record_form_link']"/>
                             </tal:b>
@@ -2697,7 +2697,8 @@
 <metal:group_record_form_link define-macro="group_record_form_link" i18n:domain="onegov.town6">
     <li tal:define="link edit_link(record)|nothing;
                      modal_href request.link(record, 'modal')|nothing;
-                     form_href form_url(record)">
+                     form_href form_url(record)"
+        class="list-group-item">
         <a class="list-link"
            tal:attributes="href link_func(record);
                             hx-get modal_href;
@@ -2724,7 +2725,6 @@
         <tal:b tal:define="steps layout.get_step_sequence()|nothing">
             <div tal:condition="steps" class="col-12 col-lg-3 text-white p-xl p-lg-2xl d-flex flex-column">
                 <ul class="list-unstyled d-flex flex-column">
-
 
                     <tal:b tal:repeat="step steps">
                     <tal:b tal:define="index list(steps).index(step) + 1;">
@@ -2767,55 +2767,78 @@
             </div>
         </tal:b>
 
-
         <!-- Main content -->
         <div class="col-12 col-lg-9 bg-white h-100 overflow-hidden rounded-start-3">
-
+            <div metal:use-macro="layout.macros['editbar']"></div>
             <div class="d-flex justify-content-end p-md">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" i18n:attributes="aria-label"></button>
             </div>
             <div class="overflow-auto">
-                <div class="col-md-6 offset-md-3">
-                    <tal:b tal:define="item definition|nothing" tal:condition="item">
-
-                        <metal:hint use-macro="layout.macros['access_hint_long']" />
-                        <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
-                    </tal:b>
-
-                    <div class="panel callout" tal:condition="form.callout|callout|nothing">
-                        <p>${form.callout|callout}</p>
-                    </div>
-
-                    <div class="panel" tal:condition="helptext|nothing">
-                        <p>${helptext}</p>
-                    </div>
-
-                    <tal:b tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing; files files|nothing;">
-                        <tal:b tal:condition="hints|nothing">
-                            <div class="cell small-12 panel ${hints_callout and 'callout' or ''}">
-                                <div class="hints" tal:condition="hints|nothing">
-                                    <div tal:repeat="(name, hint) hints" class="hint hint-${name}">${hint}</div>
-                                </div>
-                            </div>
-                        </tal:b>
-                        <div tal:define="form_id 'main-form'">
-                            <div metal:use-macro="layout.macros['form-definition']" tal:condition="form" />
+                    <div class="col-md-6 offset-md-3">
+                        <div tal:condition="form.errors|nothing" class="alert alert-warning alert-dismissible fade show mt-md" role="alert">
+                            <tal:b i18n:translate>The form contains errors. Please check the fields marked in red.</tal:b>
                         </div>
-                    </tal:b>
+
+                        <tal:b metal:use-macro="layout.macros['consume_messages']" />
+                        <div class="alert alert-warning" role="alert" tal:condition="form.callout|callout|nothing">
+                                <p>${form.callout|callout}</p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        <div class="alert alert-secondary" role="alert" tal:condition="helptext|nothing">
+                                <p>${helptext}</p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <tal:b tal:define="item definition|nothing" tal:condition="item">
+
+                            <metal:hint use-macro="layout.macros['access_hint_long']" />
+                            <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
+                        </tal:b>
+
+                        <tal:b tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing; files files|nothing;">
+                            <tal:b tal:condition="hints|nothing">
+                                <div class="cell small-12 panel ${hints_callout and 'callout' or ''}">
+                                    <div class="hints" tal:condition="hints|nothing">
+                                        <div tal:repeat="(name, hint) hints" class="hint hint-${name}">${hint}</div>
+                                    </div>
+                                </div>
+                            </tal:b>
+                            <metal:b define-slot="modal-main-content" />
+                        </tal:b>
                 </div>
             </div>
         </div>
     </div>
 </metal:group_record_form_link>
 
+<metal:group_record_form_link define-macro="form-modal-definition" i18n:domain="onegov.town6">
+    <tal:b metal:use-macro="layout.macros['form-modal']">
+        <tal:b metal:fill-slot="modal-main-content">
+            <div tal:define="form_id 'main-form'">
+                <div metal:use-macro="layout.macros['form-definition']" tal:condition="form" />
+            </div>
+        </tal:b>
+    </tal:b>
+</metal:group_record_form_link>
 
 <metal:form define-macro="form-definition">
 
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''"
-        class="${form.css_class|''}"
-        method="${form.method|'POST'}"
-        enctype="multipart/form-data"
-        tal:define="form_two_columns form_two_columns|False">
+<form tal:attributes="action form.action|'.';
+                       data-image-upload-url layout.image_upload_json_url;
+                       data-image-list-url layout.image_list_url;
+                       data-file-upload-url layout.file_upload_json_url;
+                       data-file-list-url layout.file_list_url;
+                       data-sitecollection-url layout.sitecollection_url;
+                       id form_id|''"
+      class="${form.css_class|''}"
+      method="${form.method|'POST'}"
+      enctype="multipart/form-data"
+      hx-post="${form.action}"
+      hx-target="#form-modal-body"
+      hx-select="#content > *"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data"
+      tal:define="form_two_columns form_two_columns|False">
 
         <tal:b repeat="fieldset form.fieldsets" tal:define="visible_fieldsets [f for f in form.fieldsets if f.is_visible]">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}" class="border-0 mb-md p-0">
