@@ -219,9 +219,17 @@ class Pagination[M: DeclarativeBase]:
 
     batch_size = 10
 
+    query_options: tuple[ExecutableOption, ...] = ()
+
     def __init__(self, page: int = 0):
         assert page is not None
         self.page = max(page, 0)
+
+    def set_query_options(self, *options: ExecutableOption) -> Self:
+        """ Loader options applied to the batch query only, not to
+        subset_count/facet queries. Chainable. """
+        self.query_options = options
+        return self
 
     def __eq__(self, other: object) -> bool:
         """ Returns True if the current and the other Pagination instance
@@ -267,6 +275,8 @@ class Pagination[M: DeclarativeBase]:
         values to the batch which are then not loaded by the whole query).
 
         """
+        if self.query_options:
+            query = query.options(*self.query_options)
         return query
 
     @cached_property
@@ -322,25 +332,6 @@ class Pagination[M: DeclarativeBase]:
         if self.page + 1 < self.pages_count:
             return self.page_by_index(self.page + 1)
         return None
-
-
-class ApiBatchEagerLoad[M: DeclarativeBase](Pagination[M]):
-    """ Pagination mixin that eager-loads per-item data on the batch only.
-
-    Subclasses declare the loader options in ``batch_eager_options``; they
-    apply to the rendered page, not to the count/facet queries, which avoids
-    N+1 queries when every item is serialized (e.g. the API).
-
-    """
-
-    def batch_eager_options(self) -> tuple[ExecutableOption, ...]:
-        return ()
-
-    def transform_batch_query(self, query: Query[M]) -> Query[M]:
-        query = super().transform_batch_query(query)
-        if options := self.batch_eager_options():
-            query = query.options(*options)
-        return query
 
 
 class RangedPagination[M: DeclarativeBase]:

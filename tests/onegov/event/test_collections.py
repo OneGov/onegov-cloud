@@ -268,7 +268,7 @@ def test_occurrence_collection_query_no_n_plus_one(session: Session) -> None:
     transaction.commit()
     session.expire_all()
 
-    occurrences = OccurrenceCollection(session).batch
+    occurrences = OccurrenceCollection(session).eager_load_batch().batch
     assert len(occurrences) > 1
 
     statements: list[str] = []

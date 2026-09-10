@@ -22,7 +22,7 @@ from sqlalchemy.orm import raiseload
 from sqlalchemy.orm import undefer
 from webob.multidict import MultiDict
 
-from onegov.core.collection import ApiBatchEagerLoad
+from onegov.core.collection import Pagination
 from onegov.core.orm import SessionManager
 from onegov.core.utils import toggle
 from onegov.event.models import Event
@@ -50,7 +50,6 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import ParsedField
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from sqlalchemy.sql.base import ExecutableOption
     from typing import Protocol
 
     class OccurenceSearchWidget(Protocol):
@@ -88,7 +87,7 @@ _clean_search_term = str.maketrans(dict.fromkeys(
 ))
 
 
-class OccurrenceCollection(ApiBatchEagerLoad[Occurrence]):
+class OccurrenceCollection(Pagination[Occurrence]):
     """ Manages a list of occurrences.
 
     Occurrences are read only (no ``add`` method here), they are generated
@@ -737,10 +736,13 @@ class OccurrenceCollection(ApiBatchEagerLoad[Occurrence]):
 
         return query
 
-    def batch_eager_options(self) -> tuple[ExecutableOption, ...]:
+    def eager_load_batch(self) -> Self:
+        """
+        Eager-loads the event data serialized per occurrence, batch only.
+        """
         # relies on the Event join added in query()
         event = contains_eager(Occurrence.event)
-        return (
+        return self.set_query_options(
             event.joinedload(Event.image),
             event.undefer(Event.content),
             undefer(Occurrence.content),

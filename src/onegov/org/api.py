@@ -401,7 +401,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
 
         result.page = self.page or 0
         result.batch_size = self.batch_size
-        return result
+        return result.eager_load_batch()
 
     def item_data(self, item: Occurrence) -> dict[str, Any]:
         source = item.event.source
