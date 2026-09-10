@@ -422,8 +422,7 @@ class FormSubmissionCollection:
         }
         submission.update_title(form)
 
-        # move uploaded files to a separate table, reconciling them against
-        # the already-stored files
+        # reconcile the uploaded files against the already-stored ones
         upload_fields = {
             field_id: field
             for field_id, field in form._fields.items()

@@ -260,11 +260,10 @@ def reconcile_uploaded_files[FileT: File](
             has_upload = bool(getattr(slot, 'file', None)) and bool(
                 getattr(slot, 'filename', None))
 
-            # an explicit delete always drops the slot
             if action == 'delete':
                 continue
 
-            # a fresh upload replaces whatever was stored at this slot
+            # a fresh upload replaces the slot's stored file
             if has_upload and not is_stored_file_reference(value):
                 new_file = store_uploaded_file(
                     file_cls, files, note_key, slot.file, slot.filename)
@@ -274,7 +273,7 @@ def reconcile_uploaded_files[FileT: File](
                 new_idx += 1
                 continue
 
-            # keep the stored file (unchanged, kept or resent as an '@<id>')
+            # keep the stored file (unchanged, kept, or an '@<id>' resend)
             if keep_stored_file(value, action):
                 existing = files_by_note.get(old_note)
                 if existing is None:

@@ -248,13 +248,11 @@ class Directory(Base, ContentMixin, TimestampMixin,
         if self.file_fields:
 
             def delete_file(file: File) -> None:
-                # session may be absent on a detached import; only a removal
-                # (reached here) actually needs it
+                # detached imports have no session; only deletes need it
                 assert session is not None
                 session.delete(file)
 
-            # field objects to reconcile; migration values (plain dict/list)
-            # are cloned here and excluded from the reconcile
+            # field objects to reconcile; migration values are cloned below
             upload_fields: dict[str, Any] = {}
             multiple = {
                 f.id for f in self.file_fields if f.type != 'fileinput'
@@ -265,8 +263,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 if not field_values:
                     updated[field.id] = field_values
                     continue
-                # migrate files during an entry migration: a single file is
-                # treated as a list of one slot
+                # migrate files during a migration (single = one-slot list)
                 if isinstance(field_values, (dict, list)):
                     updated[field.id] = field_values
                     slots = (

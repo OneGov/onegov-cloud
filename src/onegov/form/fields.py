@@ -406,9 +406,8 @@ class UploadField(FileField):
             self.data = {}
         elif action == 'keep':
             self.action = 'keep'
-            # a resend only carries a fresh upload (stored files are re-bound,
-            # never resent); under keep the widget just reset the radio, so
-            # store the resent upload (a replace)
+            # a resend only carries a fresh upload; the widget reset the
+            # radio to keep, so store it (a replace)
             if resend is not None:
                 self.action = 'replace'
                 self.data = self.process_resend(resend_filename, resend)
