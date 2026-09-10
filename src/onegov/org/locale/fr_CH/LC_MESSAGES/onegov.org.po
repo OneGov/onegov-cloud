@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-08-31 11:00+0200\n"
+"POT-Creation-Date: 2026-09-07 14:57+0200\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3285,6 +3285,9 @@ msgstr "Pièce jointe"
 msgid "Message"
 msgstr "Message"
 
+msgid "PDF"
+msgstr "PDF"
+
 msgid "The message is empty"
 msgstr "Le message est vide"
 
@@ -3668,9 +3671,6 @@ msgstr "Attribuer le ticket"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
-
-msgid "PDF"
-msgstr "PDF"
 
 msgid "Only this ticket"
 msgstr "Seulement ce billet"
@@ -4453,6 +4453,23 @@ msgstr "Souhaitez-vous vraiment rejeter cette entrée ?"
 msgid "Chats"
 msgstr "Chats"
 
+msgid "Volunteer"
+msgstr "Bénévole"
+
+msgid "Status mail"
+msgstr "Courriel de statut"
+
+msgid "Do you really want to send the current status?"
+msgstr "Voulez-vous vraiment envoyer le statut actuel ?"
+
+msgid ""
+"A mail will be sent to the volunteer containing the status of his "
+"subscriptions. Only send this if these are the final states ofthe "
+"subscriptions."
+msgstr ""
+"Un courriel sera envoyé au bénévole contenant le statut de ses abonnements. "
+"N'envoyez ceci que si ce sont les états finaux des abonnements."
+
 msgid "New Link"
 msgstr "Nouveau lien"
 
@@ -4627,8 +4644,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Paiement"
 
@@ -6776,8 +6793,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -7408,11 +7425,11 @@ msgid "This registration window can't be deleted."
 msgstr "Ce fenêtre d'inscription ne peut être supprimé."
 
 msgid ""
-"There are confirmed or open submissions associated with it. Cancel the "
-"registration window first."
+"There are open submissions associated with it. Cancel the registration "
+"window first."
 msgstr ""
-"Il y a des inscriptions confirmées ou ouvertes pour ce fenêtre "
-"d'inscription. Annulez-le d'abord."
+"Il y a des soumissions ouvertes qui y sont associées. Annulez d'abord la "
+"fenêtre d'inscription."
 
 msgid "Edit Registration Window"
 msgstr "Modifier la fenêtre d'inscription"
@@ -7972,8 +7989,8 @@ msgstr ""
 "Votre demande d'annulation a été soumise. Vous serez informé(e) une fois "
 "qu'elle aura été traitée."
 
-#. We adjust the wording for users that do not know what a ticket is
 #.
+#. We adjust the wording for users that do not know what a ticket is
 msgid "Request Status"
 msgstr "Status Demand"
 
@@ -8545,49 +8562,24 @@ msgstr "L'utilisateur a bien été créé"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 
-#~ msgid "Form fields"
-#~ msgstr "Champs du formulaire"
-
-#, python-format
-#~ msgid "Syntax Error in line ${line}"
-#~ msgstr "Erreur de syntaxe sur la ligne ${line}"
-
-#~ msgid "Syntax error in form"
-#~ msgstr "Erreur de syntaxe dans le formulaire"
-
-#, python-format
-#~ msgid "Syntax error in field ${field_name}"
-#~ msgstr "Erreur de syntaxe dans le champ ${field_name}"
-
-#, python-format
-#~ msgid "Error: Duplicate label ${label}"
-#~ msgstr "Erreur: Duplication de l'étiquette ${label}"
-
-#~ msgid "Format: Day.Month - Description or Day.Month.Year - Description"
-#~ msgstr "Format : Jour.Mois - Description ou Jour.Mois.Année - Description"
-
-#~ msgid "Format: Day.Month - Description"
-#~ msgstr "Format : Jour.Mois - Description"
-
-#~ msgid "Please enter only day and month"
-#~ msgstr "Veuillez ne renseigner que des jours et des mois"
-
 #~ msgid "Confirmation"
 #~ msgstr "Confirmation"
 
-#~ msgid "Edit Event Filter Configuration"
-#~ msgstr "Modifier la configuration du filtre d'événements"
+#~ msgid ""
+#~ "There are confirmed or open submissions associated with it and the "
+#~ "registration window is still active. Cancel the registration window first "
+#~ "or set the end date to a past date."
+#~ msgstr ""
+#~ "Il existe des soumissions confirmées ou ouvertes qui y sont associées et "
+#~ "la fenêtre d'inscription est toujours active. Annulez d'abord la fenêtre "
+#~ "d'inscription ou définissez la date de fin à une date passée."
 
 #~ msgid ""
-#~ "This entry is published and this directory has an admin notification "
-#~ "address set, so it cannot be deleted. To delete it, wait until its "
-#~ "publication period ends, or remove the notification address in the "
-#~ "directory settings."
+#~ "There are confirmed or open submissions associated with it. Cancel the "
+#~ "registration window first."
 #~ msgstr ""
-#~ "Cette entrée est publiée et ce répertoire dispose d'une adresse de "
-#~ "notification de l'administrateur, elle ne peut donc pas être supprimée. "
-#~ "Pour la supprimer, attendez la fin de sa période de publication ou "
-#~ "supprimez l'adresse de notification dans les paramètres du répertoire."
+#~ "Il y a des inscriptions confirmées ou ouvertes pour ce fenêtre "
+#~ "d'inscription. Annulez-le d'abord."
 
 #~ msgid ""
 #~ "Receives an e-mail when entries are published or de-published. Useful e."

@@ -404,95 +404,196 @@ def test_fetch(
     assert "1 added, 0 updated, 0 deleted" in result.output
 
 
-def test_translate_tags(
-    postgres_dsn: str,
+def test_fetch_multi_namespace(
+    cfg_path_multi_namespace: str,
     session_manager: SessionManager,
-    temporary_directory: str,
-    redis_url: str
+    test_password: str
 ) -> None:
 
-    cfg = {
-        'applications': [
-            {
-                'path': '/onegov_org/*',
-                'application': 'onegov.org.OrgApp',
-                'namespace': 'onegov_org',
-                'configuration': {
-                    'dsn': postgres_dsn,
-                    'depot_backend': 'depot.io.memory.MemoryFileStorage',
-                    'filestorage': 'fs.osfs.OSFS',
-                    'filestorage_options': {
-                        'root_path': '{}/file-storage'.format(
-                            temporary_directory
-                        ),
-                        'create': 'true'
-                    },
-                    'redis_url': redis_url,
-                    'websockets': {
-                        'client_url': 'ws://localhost:8766',
-                        'manage_url': 'ws://localhost:8766',
-                        'manage_token': 'super-super-secret-token'
-                    }
-                }
-            }
-        ]
-    }
-
-    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    with open(cfg_path, 'w') as f:
-        f.write(yaml.dump(cfg))
-
     runner = CliRunner()
+
+    session_manager.ensure_schema_exists('space1-bar')
+    session_manager.ensure_schema_exists('space2-baz')
+
+    def get_session(namespace: str, entity: str) -> Session:
+        session_manager.set_current_schema(f'{namespace}-{entity}')
+        return session_manager.session()
+
+    for namespace, entity, title, source, tags, location in (
+        ('space1', 'bar', '1', None, [], ''),
+        ('space1', 'bar', '2', None, ['A'], None),
+        ('space1', 'bar', '3', None, ['A', 'B'], 'bar'),
+        ('space1', 'bar', '4', None, ['A', 'C'], '1234 Bar'),
+        ('space1', 'bar', '5', None, ['C'], 'there in 4321 baz!'),
+        ('space1', 'bar', '6', 'xxx', [], 'bar'),
+        ('space1', 'bar', '7', 'yyy', ['A', 'B'], None),
+        ('space1', 'baz', 'a', None, [], 'BAZ'),
+        ('space1', 'baz', 'b', None, ['A', 'C'], '4321 Baz'),
+        ('space1', 'baz', 'c', 'zzz', ['B', 'C'], 'bar'),
+    ):
+        EventCollection(get_session(namespace, entity)).add(
+            title=title,
+            start=datetime(2015, 6, 16, 9, 30),
+            end=datetime(2015, 6, 16, 18, 00),
+            timezone='Europe/Zurich',
+            tags=tags,
+            location=location,
+            source=source
+        )
+    commit()
+    for namespace, entity in zip(('space1', 'bar'), ('space2', 'baz')):
+        get_session(namespace, entity).add(User(
+            username='admin@example.org',
+            password_hash=test_password,
+            role='admin'
+        ))
+    commit()
+
+    assert get_session('space1', 'bar').query(Event).count() == 7
+    assert get_session('space1', 'baz').query(Event).count() == 3
+    event = get_session('space1', 'bar').query(Event).first()
+    assert event is not None and event.state == 'initiated'
+    assert get_session('space2', 'bar').query(Event).count() == 0
+    assert get_session('space2', 'baz').query(Event).count() == 0
+
+    # space1-bar[*] -> space2-bar missing namespace option
     result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_org/newyork',
-        'add', 'New York'
-    ], catch_exceptions=False)
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/bar',
+        'fetch',
+        '--source', 'space1-bar'
+    ])
+    assert result.exit_code == 1
+    assert 'Cross-namespace fetches are not allowed' in result.output
+
+    # space1-bar[*] -> space2-bar
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/bar',
+        'fetch',
+        '--source', 'space1-bar',
+        '--cross-namespace'
+    ])
     assert result.exit_code == 0
+    assert "5 added, 0 updated, 0 deleted" in result.output
 
-    # custom event tags for this org
-    fs_dir = os.path.join(
-        temporary_directory, 'file-storage', 'onegov_org-newyork'
-    )
-    os.makedirs(fs_dir, exist_ok=True)
-    with open(os.path.join(fs_dir, 'eventsettings.yml'), 'w') as f:
-        yaml.dump({'event_tags': ['Konzert', 'Kultur']}, f)
+    assert get_session('space2', 'bar').query(Event).count() == 5
+    assert get_session('space2', 'baz').query(Event).count() == 0  # not yet
+    assert get_session('space2', 'qux').query(Event).count() == 0
+    event = get_session('space2', 'bar').query(Event).first()
+    assert event is not None and event.state == 'published'
 
-    session_manager.set_current_schema('onegov_org-newyork')
-    session = session_manager.session()
-    event = EventCollection(session).add(
-        title='Event',
+    # space1-bar[*] -> space2-bar, now including the imported events
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/bar',
+        'fetch',
+        '--source', 'space1-bar',
+        '--cross-namespace',
+        '--include-imported'
+    ])
+    assert result.exit_code == 0
+    assert "2 added, 0 updated, 0 deleted" in result.output
+    assert get_session('space2', 'bar').query(Event).count() == 7
+
+    # space1-baz[*] -> space2-baz (separate namespace/entity target)
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/baz',
+        'fetch',
+        '--source', 'space1-baz',
+        '--cross-namespace'
+    ])
+    assert result.exit_code == 0
+    # baz has 3 events, 'c' is imported -> 2 fetched
+    assert "2 added, 0 updated, 0 deleted" in result.output
+    assert get_session('space2', 'baz').query(Event).count() == 2
+    assert get_session('space2', 'bar').query(Event).count() == 7  # untouched
+
+    # cross-namespace source without a namespace prefix still resolves via the
+    # selected app's namespace: space2-bar[*] -> space2-baz
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/baz',
+        'fetch',
+        '--source', 'bar',
+        '--include-imported'
+    ])
+    assert result.exit_code == 0
+    # a different source key doesn't purge the 2 events fetched from space1-baz
+    assert "7 added, 0 updated, 0 deleted" in result.output
+    assert get_session('space2', 'baz').query(Event).count() == 9
+
+    # tag filter across namespaces: space1-bar[A] -> space2-bar
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/bar',
+        'fetch',
+        '--source', 'space1-bar',
+        '--cross-namespace',
+        '--tag', 'A'
+    ])
+    assert result.exit_code == 0
+    # non-imported events with tag A: 2, 3, 4 -> keep 3, delete the other 4
+    assert "0 added, 0 updated, 4 deleted" in result.output
+    assert get_session('space2', 'bar').query(Event).count() == 3
+
+    # location filter across namespaces: space1-bar['baz'] -> space2-qux
+    result = runner.invoke(cli, [
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space2/qux',
+        'fetch',
+        '--source', 'space1-bar',
+        '--cross-namespace',
+        '--location', 'baz'
+    ])
+    assert result.exit_code == 0
+    # only event 5 has 'baz' in its location among non-imported events
+    assert "1 added, 0 updated, 0 deleted" in result.output
+    assert get_session('space2', 'qux').query(Event).count() == 1
+
+
+def test_fetch_entity_with_dash(
+    cfg_path_multi_namespace: str,
+    session_manager: SessionManager,
+    test_password: str
+) -> None:
+    # an entity name may itself contain a dash: 'space1-my-town' is the schema
+    # for namespace 'space1' and entity 'my-town'. --source my-town must
+    # resolve via the app's namespace prefix, not be mistaken for a namespaced
+    # source.
+    runner = CliRunner()
+
+    session_manager.ensure_schema_exists('space1-my-town')
+    session_manager.ensure_schema_exists('space1-target')
+
+    def get_session(entity: str) -> Session:
+        session_manager.set_current_schema(f'space1-{entity}')
+        return session_manager.session()
+
+    EventCollection(get_session('my-town')).add(
+        title='1',
         start=datetime(2015, 6, 16, 9, 30),
         end=datetime(2015, 6, 16, 18, 00),
         timezone='Europe/Zurich',
-        tags=['Concert', 'Culture', 'Sports'],
+        tags=[],
+        location='',
+        source=None
     )
-    event_id = event.id
+    commit()
+    get_session('target').add(User(
+        username='admin@example.org',
+        password_hash=test_password,
+        role='admin'
+    ))
     commit()
 
-    # dry run leaves tags untouched but reports the mapping
     result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_org/newyork',
-        'translate-tags', '--dry-run'
-    ], catch_exceptions=False)
+        '--config', cfg_path_multi_namespace,
+        '--select', '/space1/target',
+        'fetch',
+        '--source', 'my-town'
+    ])
     assert result.exit_code == 0
-    assert 'Concert -> Konzert' in result.output
-    assert 'Culture -> Kultur' in result.output
-
-    session_manager.set_current_schema('onegov_org-newyork')
-    session = session_manager.session()
-    fetched = session.get(Event, event_id)
-    assert fetched is not None
-    assert set(fetched.tags) == {'Concert', 'Culture', 'Sports'}
-
-    # actual run translates the mapped tags, leaves unmapped ones
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_org/newyork',
-        'translate-tags'
-    ], catch_exceptions=False)
-    assert result.exit_code == 0
-
-    session_manager.set_current_schema('onegov_org-newyork')
-    session = session_manager.session()
-    fetched = session.get(Event, event_id)
-    assert fetched is not None
-    assert set(fetched.tags) == {'Konzert', 'Kultur', 'Sports'}
+    assert "1 added, 0 updated, 0 deleted" in result.output
+    assert get_session('target').query(Event).count() == 1

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-08-31 11:00+0200\n"
+"POT-Creation-Date: 2026-09-07 14:57+0200\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3270,6 +3270,9 @@ msgstr "Anhang"
 msgid "Message"
 msgstr "Nachricht"
 
+msgid "PDF"
+msgstr "PDF"
+
 msgid "The message is empty"
 msgstr "Die Nachricht ist leer"
 
@@ -3655,9 +3658,6 @@ msgstr "Ticket zuweisen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
-
-msgid "PDF"
-msgstr "PDF"
 
 msgid "Only this ticket"
 msgstr "Nur dieses Ticket"
@@ -4447,6 +4447,24 @@ msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 msgid "Chats"
 msgstr "Chats"
 
+msgid "Volunteer"
+msgstr "Hilfsperson"
+
+msgid "Status mail"
+msgstr "Statusmail"
+
+msgid "Do you really want to send the current status?"
+msgstr "Möchten Sie den aktuellen Status wirklich senden?"
+
+msgid ""
+"A mail will be sent to the volunteer containing the status of his "
+"subscriptions. Only send this if these are the final states ofthe "
+"subscriptions."
+msgstr ""
+"Eine Email wird an die Hilfsperson gesendet, welche den Status seiner "
+"Anmeldungen enthält. Senden Sie dies nur, wenn dies die endgültigen Zustände "
+"der Anmeldungen sind."
+
 msgid "New Link"
 msgstr "Neue Verknüpfung"
 
@@ -4621,8 +4639,8 @@ msgstr "Anzahl"
 msgid "VAT"
 msgstr "MwSt"
 
-#. credit card
 #.
+#. credit card
 msgid "Payment"
 msgstr "Zahlung"
 
@@ -6761,8 +6779,8 @@ msgid "Delete availability period"
 msgstr "Verfügbarkeitszeitraum löschen"
 
 #.
-#. type:ignore[attr-defined]
 #. type:ignore[attr-defined]  # trigger updates
+#. type:ignore[attr-defined]
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -7392,11 +7410,11 @@ msgid "This registration window can't be deleted."
 msgstr "Dieser Anmeldezeitraum kann nicht gelöscht werden."
 
 msgid ""
-"There are confirmed or open submissions associated with it. Cancel the "
-"registration window first."
+"There are open submissions associated with it. Cancel the registration "
+"window first."
 msgstr ""
-"Bereits bestätigte oder offene Anmeldungen wären betroffen. Sagen Sie den "
-"Zeitraum zuerst ab."
+"Es gibt offene Anmeldungen die mit diesem Anmeldezeitraum verbunden sind. "
+"Bitte stornieren Sie zuerst den Anmeldezeitraum."
 
 msgid "Edit Registration Window"
 msgstr "Anmeldezeitraum bearbeiten"
@@ -7958,8 +7976,8 @@ msgstr ""
 "Ihre Stornierungsanfrage wurde eingereicht. Sie werden benachrichtigt, "
 "sobald sie bearbeitet wurde."
 
-#. We adjust the wording for users that do not know what a ticket is
 #.
+#. We adjust the wording for users that do not know what a ticket is
 msgid "Request Status"
 msgstr "Status Anfrage"
 
@@ -8534,50 +8552,25 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
-#~ msgid "Form fields"
-#~ msgstr "Formularfelder"
-
-#, python-format
-#~ msgid "Syntax Error in line ${line}"
-#~ msgstr "Syntaxfehler auf Zeile ${line}"
-
-#~ msgid "Syntax error in form"
-#~ msgstr "Syntaxfehler im Formular"
-
-#, python-format
-#~ msgid "Syntax error in field ${field_name}"
-#~ msgstr "Syntaxfehler im Feld ${field_name}"
-
-#, python-format
-#~ msgid "Error: Duplicate label ${label}"
-#~ msgstr "Fehler: ${label} zweifach erfasst"
-
-#~ msgid "Format: Day.Month - Description or Day.Month.Year - Description"
-#~ msgstr "Format: Tag.Monat - Beschreibung oder Tag.Monat.Jahr - Beschreibung"
-
-#~ msgid "Format: Day.Month - Description"
-#~ msgstr "Format: Tag.Monat - Beschreibung"
-
-#~ msgid "Please enter only day and month"
-#~ msgstr "Bitte geben Sie nur Tag und Monat ein"
-
 #~ msgid "Confirmation"
 #~ msgstr "Bestätigung"
 
-#~ msgid "Edit Event Filter Configuration"
-#~ msgstr "Filterkonfiguration für Veranstaltungen bearbeiten"
+#~ msgid ""
+#~ "There are confirmed or open submissions associated with it and the "
+#~ "registration window is still active. Cancel the registration window first "
+#~ "or set the end date to a past date."
+#~ msgstr ""
+#~ "Es gibt bestätigte oder offene Anmeldungen die mit diesem Anmeldezeitraum "
+#~ "verbunden sind und der Anmeldezeitraum ist noch aktiv. Bitte stornieren "
+#~ "Sie zuerst den Anmeldezeitraum oder setzen Sie das Enddatum auf ein "
+#~ "Vergangenes Datum."
 
 #~ msgid ""
-#~ "This entry is published and this directory has an admin notification "
-#~ "address set, so it cannot be deleted. To delete it, wait until its "
-#~ "publication period ends, or remove the notification address in the "
-#~ "directory settings."
+#~ "There are confirmed or open submissions associated with it. Cancel the "
+#~ "registration window first."
 #~ msgstr ""
-#~ "Dieser Eintrag ist veröffentlicht und für dieses Verzeichnis ist eine "
-#~ "Admin-Benachrichtigungsadresse hinterlegt, deshalb kann er nicht gelöscht "
-#~ "werden. Warten Sie, bis die Veröffentlichungsdauer abgelaufen ist, oder "
-#~ "entfernen Sie die Benachrichtigungsadresse in den "
-#~ "Verzeichniseinstellungen, um ihn zu löschen."
+#~ "Bereits bestätigte oder offene Anmeldungen wären betroffen. Sagen Sie den "
+#~ "Zeitraum zuerst ab."
 
 #~ msgid ""
 #~ "Receives an e-mail when entries are published or de-published. Useful e."

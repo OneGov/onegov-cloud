@@ -1,8 +1,104 @@
 # Changes
 
+## 2026.44
+
+`2026-09-07` | [45425254cf...3d287ac838](https://github.com/OneGov/onegov-cloud/compare/45425254cf^...3d287ac838)
+
+### Agency
+
+##### Fixes academic name rendering.
+
+`Bugfix` | [OGC-3416](https://linear.app/onegovcloud/issue/OGC-3416) | [b1b383d89c](https://github.com/onegov/onegov-cloud/commit/b1b383d89c18843d2b0220faaa84498b2c5218d3)
+
+### Core
+
+##### Fix moving pages above the first item.
+
+Root pages start with order 0. Moving a page above the first one used
+0 / 2, leaving both pages at order 0. Use `first_order - 1` instead.
+
+`Bugfix` | [OGC-3419](https://linear.app/onegovcloud/issue/OGC-3419) | [473b6b8df7](https://github.com/onegov/onegov-cloud/commit/473b6b8df75169aa3d4492abb606153036563887)
+
+### Feriennet
+
+##### Add CLI for searching ferienpass instances
+
+Lists ferienpass instances that are in the specified state
+
+`Feature` | [2b58e238b7](https://github.com/onegov/onegov-cloud/commit/2b58e238b79f260e1fbeae3db70f71628cb741af)
+
+##### Restore tracking blocked by CSP
+
+- Add web.cmp.usercentrics.eu to frame-src; mirror inherited child-src frame sources so video embeds keep working
+- Add 'unsafe-eval' to script-src for GTM custom JavaScript variables
+
+`Feature` | [PRO-1570](https://linear.app/projuventute/issue/PRO-1570) | [3d287ac838](https://github.com/onegov/onegov-cloud/commit/3d287ac838afb05105f2341a1328fec741bbd895)
+
+##### User deletion bug
+
+User with attendees connected to invoice items couldn't be deleted.
+
+`Bugfix` | [OGC-1594](https://linear.app/onegovcloud/issue/OGC-1594) | [c57ac32820](https://github.com/onegov/onegov-cloud/commit/c57ac3282065127e73b0154e86d9042854c09b2d)
+
+### Ferienpass
+
+##### Add CLI for searching ferienpass instances with specific phase
+
+`Feature` | [51c75b8551](https://github.com/onegov/onegov-cloud/commit/51c75b8551c6705a486b13df26c08564b753f80b)
+
+### Org
+
+##### Add pdf attachement to customer message.
+
+`Feature` | [OGC-3424](https://linear.app/onegovcloud/issue/OGC-3424) | [237230d57e](https://github.com/onegov/onegov-cloud/commit/237230d57e62d76418829a2271d5887d3338ef84)
+
+### Pas
+
+##### Don't auto-expand files dropdown; breaks Intercooler
+
+`Bugfix` | [OGC-3429](https://linear.app/onegovcloud/issue/OGC-3429) | [207709148d](https://github.com/onegov/onegov-cloud/commit/207709148d8bdf66e075b258ab8e4d5836baf8ee)
+
+### Reservation
+
+##### Add row-glow for anchor links in find a spot
+
+`Feature` | [NONE](#NONE) | [3b8a908168](https://github.com/onegov/onegov-cloud/commit/3b8a90816842ecb9db3d86319ca109acfaf49ea9)
+
+### Reservations
+
+##### Fix wrong time when selecting slot in second half of day
+
+Use 24h format for slot times
+
+`Bugfix` | [OGC-3425](https://linear.app/onegovcloud/issue/OGC-3425) | [071b230c00](https://github.com/onegov/onegov-cloud/commit/071b230c005b6cb4bcf80371d8b42906164f88fb)
+
+### Resource
+
+##### Calendar subscription shows access hint (same as resource)
+
+`Feature` | [OGC-3415](https://linear.app/onegovcloud/issue/OGC-3415) | [c490bca857](https://github.com/onegov/onegov-cloud/commit/c490bca857fd8f6162ab6febc280878448a161f9)
+
+### Winterthur
+
+##### Design adjusments
+
+`Feature` | [OGC-3404](https://linear.app/onegovcloud/issue/OGC-3404) | [fb8248915c](https://github.com/onegov/onegov-cloud/commit/fb8248915c01502c59a3c5799f98c2a9ca6d9729)
+
+## 2026.43
+
+`2026-08-30` | [ff591f5e87...771dc57c3f](https://github.com/OneGov/onegov-cloud/compare/ff591f5e87^...771dc57c3f)
+
+### Feriennet
+
+##### Volunteers
+
+Volunteer submissions are now tickets
+
+`Feature` | [1e6bb4537d](https://github.com/onegov/onegov-cloud/commit/1e6bb4537dad459d68688deb54a1db08d81d37a6)
+
 ## 2026.42
 
-`2026-08-28` | [82c3f9e52f...593b3b9458](https://github.com/OneGov/onegov-cloud/compare/82c3f9e52f^...593b3b9458)
+`2026-08-28` | [82c3f9e52f...2bd89f0ffc](https://github.com/OneGov/onegov-cloud/compare/82c3f9e52f^...2bd89f0ffc)
 
 ### Activity
 
@@ -5374,85 +5470,4 @@ Fix bug where editing an event with reoccurring dates lost the dates.
 ##### Extend cli list command to run over all instances
 
 `Feature` | [NONE](#NONE) | [f770378d11](https://github.com/onegov/onegov-cloud/commit/f770378d1191fa3a7ac7cada483f24ccf763da02)
-
-## 2025.15
-
-`2025-03-21` | [3b0cdefbe6...97478cf310](https://github.com/OneGov/onegov-cloud/compare/3b0cdefbe6^...97478cf310)
-
-### Agency
-
-##### Fixes N+1 query in the people endpoint for the API
-
-`Performance` | [9b1a46148f](https://github.com/onegov/onegov-cloud/commit/9b1a46148fe881bed0ac73a1f12ea8b871ad0f09)
-
-##### Fixes N+1 queries in the agency/membership endpoints for the API
-
-`Performance` | [affcdc40a7](https://github.com/onegov/onegov-cloud/commit/affcdc40a797c5e456564488cb6f78eb3a051dfc)
-
-##### Fixes N+1 query in the agency view
-
-`Performance` | [8aa5b95507](https://github.com/onegov/onegov-cloud/commit/8aa5b95507fc3a0dd59613d0036fecf075d97336)
-
-### Api
-
-##### Avoids logging `None` when no exception is set
-
-`Bugfix` | [5ac460a417](https://github.com/onegov/onegov-cloud/commit/5ac460a41733624f6b7879d0029da11d90c3f22f)
-
-### Auth
-
-##### Extends test coverage for LDAPProvider
-
-`Feature` | [OGC-2137](https://linear.app/onegovcloud/issue/OGC-2137) | [b279e33037](https://github.com/onegov/onegov-cloud/commit/b279e330376bbd4be35b654ef5eaab348d81a3b9)
-
-### Newsletter
-
-##### Remove org_name from Newsletter Category Definition
-
-`Feature` | [OGC-2128](https://linear.app/onegovcloud/issue/OGC-2128) | [604e3c2ea3](https://github.com/onegov/onegov-cloud/commit/604e3c2ea36625bca09a970310f6a02daea88852)
-
-### Org
-
-##### Renders a custom error page for exceeding the mTAN access limit
-
-`Feature` | [OGC-2139](https://linear.app/onegovcloud/issue/OGC-2139) | [4a3cc04258](https://github.com/onegov/onegov-cloud/commit/4a3cc0425888951b41b4c5d116fa62f887c8ee21)
-
-##### Removes unnecessary `print()` statements.
-
-Prevent spamming `/var/log/syslog`. No credentials configured
-is the default and can safely be ignored.
-
-`Bugfix` | [NONE](#NONE) | [750dfecc8f](https://github.com/onegov/onegov-cloud/commit/750dfecc8f10dcaf18bdb18f4c5b72b179adbb9f)
-
-##### Fixes regression in `RolesMapping.match`
-
-`Bugfix` | [OGC-2137](https://linear.app/onegovcloud/issue/OGC-2137) | [007b2c904e](https://github.com/onegov/onegov-cloud/commit/007b2c904e937949cf5edd69f9af33e629e3d865)
-
-### Search
-
-##### Reduce log level for ObjectDeletedError
-
-`Feature` | [OGC-1999](https://linear.app/onegovcloud/issue/OGC-1999) | [92d5f89676](https://github.com/onegov/onegov-cloud/commit/92d5f89676efcb0ff1863fb25ea57cbab17fa036)
-
-### Swissvotes
-
-##### Avoids N+1 query for page slides
-
-`Performance` | [c88b3b5493](https://github.com/onegov/onegov-cloud/commit/c88b3b5493bf2fee8e0d73d2c9df8734f6ee7e23)
-
-## 2025.14
-
-`2025-03-14` | [65267dc3b5...d92404c116](https://github.com/OneGov/onegov-cloud/compare/65267dc3b5^...d92404c116)
-
-### Org
-
-##### Adds a button to show a modal with file links in the file details
-
-`Feature` | [OGC-2077](https://linear.app/onegovcloud/issue/OGC-2077) | [65267dc3b5](https://github.com/onegov/onegov-cloud/commit/65267dc3b5c03a5ee84e79e25e8e8eed68496ca5)
-
-##### Display phone numbers in international format
-
-The international format prefixes the country code e.g. +41 for Switzerland
-
-`Feature` | [OGC-2113](https://linear.app/onegovcloud/issue/OGC-2113) | [d54f9470e7](https://github.com/onegov/onegov-cloud/commit/d54f9470e7636d9140199e75a3ab827322115856)
 

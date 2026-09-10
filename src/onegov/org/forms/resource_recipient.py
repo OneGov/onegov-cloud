@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, TagsField
+from onegov.form.fields import DeliveryTimesField, MultiCheckboxField
 from onegov.org import _
 from onegov.reservation import Resource, ResourceCollection
 from wtforms.fields import EmailField
@@ -104,7 +104,7 @@ class ResourceRecipientForm(Form):
         render_kw={'prefix_label': False, 'class_': 'oneline-checkboxes'}
     )
 
-    daily_reservations_times = TagsField(
+    daily_reservations_times = DeliveryTimesField(
         label=_('Delivery Times'),
         fieldset='Tage und Ressourcen',
         description=_('e.g. 07:05'),

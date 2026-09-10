@@ -143,10 +143,12 @@ def handle_edit_resource_recipient(
             form.daily_reservations_times.data = ['06:00']
 
     title = _('Edit Recipient')
+    layout = layout or ResourceRecipientsFormLayout(self, request, title)
+    layout.edit_mode = True
 
     return {
         'title': title,
-        'layout': layout or ResourceRecipientsFormLayout(self, request, title),
+        'layout': layout,
         'form': form
     }
 
