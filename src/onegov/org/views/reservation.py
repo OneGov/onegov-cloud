@@ -50,6 +50,7 @@ if TYPE_CHECKING:
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
+    from uuid import UUID
 
 
 def reservation_subject(
@@ -966,7 +967,7 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 def get_my_reservations_url(
     request: OrgRequest,
     email: str,
-    reservation_token: str | None = None
+    reservation_token: UUID | None = None
 ) -> str | None:
     """ Durable magic link to a limited summary of the recipient's
     reservations, with an option to log in for full details.
@@ -979,7 +980,7 @@ def get_my_reservations_url(
     salt = secrets.token_urlsafe(16)
     payload = {
         'email': email,
-        'token': reservation_token,
+        'token': reservation_token.hex if reservation_token else None,
     }
     return request.class_link(
         ResourceCollection,
@@ -994,7 +995,7 @@ def get_my_reservations_url(
 def get_reservations_subscribe_url(
     request: OrgRequest,
     email: str,
-    reservation_token: str | None = None
+    reservation_token: UUID | None = None
 ) -> str | None:
     """ Durable magic link to the recipient's reservations calendar feed.
 
@@ -1009,7 +1010,7 @@ def get_reservations_subscribe_url(
     ))
     payload = {
         'email': email,
-        'token': reservation_token,
+        'token': reservation_token.hex if reservation_token else None,
     }
     token = request.new_url_safe_token(payload, salt)
     url_obj = url_obj.query_param('token', token)
@@ -1166,10 +1167,10 @@ def accept_reservation(
                 'form': form,
                 'message': message,
                 'my_reservations_url': get_my_reservations_url(
-                    request, self.email, ticket.handler_id
+                    request, self.email, self.token
                 ),
                 'subscribe_url': get_reservations_subscribe_url(
-                    request, self.email, ticket.handler_id
+                    request, self.email, self.token
                 ),
                 'cancel_url': _cancel_url,
             },
@@ -1931,10 +1932,10 @@ def send_reservation_summary(
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
                 'my_reservations_url': get_my_reservations_url(
-                    request, recipient, self.handler_id
+                    request, recipient, self.handler.reservations[0].token
                 ),
                 'subscribe_url': get_reservations_subscribe_url(
-                    request, recipient, self.handler_id
+                    request, recipient, self.handler.reservations[0].token
                 ),
             }
         )
