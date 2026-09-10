@@ -14,9 +14,9 @@ from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import (
     DirectoryConfiguration, DirectoryConfigurationStorage)
 from onegov.file import File, MultiAssociatedFiles
-from onegov.file.utils import keep_stored_file, store_uploaded_file
 from onegov.form.orm_types import Formcode
 from onegov.form.parser import ParsedForm
+from onegov.form.utils import reconcile_uploaded_files
 from onegov.search import SearchableContent
 from sedate import to_timezone
 from sqlalchemy import and_, exists, func, text, Integer
@@ -245,44 +245,20 @@ class Directory(Base, ContentMixin, TimestampMixin,
         updated = {f.id: values[f.id] for f in self.basic_fields}
 
         # treat file fields differently
-        known_file_ids = {
-            f.id if idx is None else f'{f.id}:{idx}'
-            for f in self.file_fields
-            # add an id for each file in a multiple upload field
-            for idx in (
-                range(len(values[f.id]))
-                if hasattr(values[f.id], '__len__')
-                else [None]
-            )
-        }
-
         if self.file_fields:
 
-            def get_value_field_from_note(file_id: str) -> Any:
-                id, __, idx = file_id.rpartition(':')
-                if idx is None or not idx.isdigit():
-                    return values[file_id]
-                return values[id][int(idx)]
+            def delete_file(file: File) -> None:
+                # session may be absent on a detached import; only a removal
+                # (reached here) actually needs it
+                assert session is not None
+                session.delete(file)
 
-            # files which are not given or whose value is {} are removed
-            # (this is in line with onegov.form's file upload field+widget)
-            for file in entry.files:
-
-                # this indicates that the file has been renamed
-                if file.note is None or file.note not in known_file_ids:
-                    continue
-
-                value_field = get_value_field_from_note(file.note)
-                if isinstance(value_field, dict):
-                    continue
-
-                keep = value_field is not None and keep_stored_file(
-                    value_field.data,
-                    getattr(value_field, 'action', None)
-                )
-                if not keep:
-                    assert session is not None
-                    session.delete(file)
+            # field objects to reconcile; migration values (plain dict/list)
+            # are cloned here and excluded from the reconcile
+            upload_fields: dict[str, Any] = {}
+            multiple = {
+                f.id for f in self.file_fields if f.type != 'fileinput'
+            }
 
             for field in self.file_fields:
                 field_values = values[field.id]
@@ -316,69 +292,16 @@ class Directory(Base, ContentMixin, TimestampMixin,
                                 slot.update({'data': f'@{new.id}'})
 
                     continue
-                # single and multiple fields share one code path: a single
-                # file is treated as a list of one slot
-                is_single = field.type == 'fileinput'
-                subfields = [field_values] if is_single else list(field_values)
 
-                old_stored = (entry.values or {}).get(field.id)
-                if is_single:
-                    old_values = (
-                        [old_stored]
-                        if isinstance(old_stored, dict) and old_stored
-                        else []
-                    )
-                else:
-                    old_values = old_stored or []
+                upload_fields[field.id] = field_values
 
-                new_idx = 0
-                result: list[Any] = []
-                for old_idx, subfield_values in enumerate(subfields):
-                    note_key = (
-                        field.id if is_single else f'{field.id}:{new_idx}'
-                    )
-
-                    # keep files if selected in the dialog
-                    if getattr(subfield_values, 'action', None) == 'keep':
-                        if len(old_values) > old_idx:
-                            original = old_values[old_idx]
-                            result.append(original)
-                            # point file.note at the (possibly new) index
-                            file_id = original['data'].lstrip('@')
-                            for file in entry.files:
-                                if file.id == file_id:
-                                    if file.note != note_key:
-                                        file.note = note_key
-                                    break
-                            new_idx += 1
-                            continue
-                        # new entry / added file: no stored file yet, fall
-                        # through to create it from the resent upload below
-
-                    # delete files if selected in the dialog
-                    if getattr(subfield_values, 'action', None) == 'delete':
-                        continue
-
-                    # stale formdata guard: need both file and filename
-                    if not getattr(subfield_values, 'file', None) or \
-                            not getattr(subfield_values, 'filename', None):
-                        continue
-
-                    new_file = store_uploaded_file(
-                        DirectoryFile, entry.files, note_key,
-                        subfield_values.file, subfield_values.filename
-                    )
-                    result.append({
-                        'data': '@' + new_file.id,
-                        'filename': subfield_values.filename,
-                        'mimetype': new_file.reference.file.content_type,
-                        'size': new_file.reference.file.content_length
-                    })
-                    new_idx += 1
-
-                updated[field.id] = (
-                    (result[0] if result else {}) if is_single else result
-                )
+            updated.update(reconcile_uploaded_files(
+                file_cls=DirectoryFile,
+                fields=upload_fields,
+                multiple=multiple,
+                files=entry.files,
+                delete=delete_file,
+            ))
 
         # update the values
         if force_update or entry.values != updated:
@@ -547,10 +470,10 @@ class Directory(Base, ContentMixin, TimestampMixin,
                 super().process_obj(obj)
 
                 for field in directory.fields:
-                    form_field = getattr(self, field.id)
-
-                    if form_field is None:
+                    # item access avoids picking up non-field attributes
+                    if field.id not in self:
                         continue
+                    form_field = self[field.id]
 
                     data = obj.values.get(field.id)
                     if isinstance(form_field, FieldList):

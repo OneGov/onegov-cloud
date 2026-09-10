@@ -483,6 +483,31 @@ def test_directory_entry_delete_file_validation_error(client: Client) -> None:
     assert 'annual.jpg' in files       # image untouched
 
 
+def test_directory_entry_new_file_survives_validation_error(
+    client: Client
+) -> None:
+    # fresh uploads on a NEW entry must survive an unrelated validation error
+    now = to_timezone(utcnow(), 'Europe/Zurich')
+    directory = create_file_directory(client)
+
+    page = directory.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['doc'] = Upload('single.pdf', create_pdf().read())
+    page.form['docs'] = [Upload('one.pdf', create_pdf().read())]
+    page.form['publication_start'] = dt_for_form(now)
+    page.form['publication_end'] = dt_for_form(now - timedelta(days=1))
+    page = page.form.submit()
+    assert 'Das Publikationsende muss in der Zukunft liegen' in page
+
+    # fix the date without re-uploading the files
+    page.form['publication_end'] = dt_for_form(now + timedelta(days=5))
+    page.form.submit().follow()
+
+    files = {f.name for f in dir_query(client).one().files}
+    assert {'annual.jpg', 'single.pdf', 'one.pdf'} <= files
+
+
 def test_required_publication(client: Client) -> None:
     utc_now = utcnow()
     now = to_timezone(utc_now, 'Europe/Zurich')

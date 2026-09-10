@@ -507,6 +507,55 @@ def test_multi_files(session: Session) -> None:
     assert session.query(File).count() == 0
 
 
+def test_multi_files_middle_delete(session: Session) -> None:
+    # deleting a file in the middle compacts the notes of the survivors
+    press_releases = DirectoryCollection(session).add(
+        title="Press Releases",
+        structure="""
+            Title *= ___
+            Files = *.txt (multiple)
+        """,
+        configuration=DirectoryConfiguration(title='Title', order=['Title'])
+    )
+
+    def txt(content: bytes, name: str) -> Bunch:
+        return Bunch(data=object(), file=BytesIO(content), filename=name)
+
+    entry = press_releases.add(values=dict(
+        title="Entry",
+        files=(
+            txt(b'one', 'a.txt'),
+            txt(b'two', 'b.txt'),
+            txt(b'three', 'c.txt'),
+        )
+    ))
+    transaction.commit()
+    entry = session.query(DirectoryEntry).one()
+    press_releases = session.query(Directory).one()
+
+    files = session.query(File).order_by(File.note).all()
+    first_id, last_id = files[0].id, files[2].id
+
+    # keep the first and last, delete the middle one
+    press_releases.update(entry, dict(
+        title="Entry",
+        files=(
+            Bunch(data=None, action='keep'),
+            Bunch(data={}, action='delete'),
+            Bunch(data=None, action='keep'),
+        )
+    ))
+    transaction.commit()
+    entry = session.query(DirectoryEntry).one()
+
+    assert session.query(File).count() == 2
+    files = session.query(File).order_by(File.note).all()
+    assert [f.note for f in files] == ['files:0', 'files:1']
+    assert files[0].id == first_id
+    assert files[1].id == last_id
+    assert [v['filename'] for v in entry.values['files']] == ['a.txt', 'c.txt']
+
+
 def test_files_outdated_formdata_guard(session: Session) -> None:
     # outdated formdata may carry a subfield without a proper file/filename;
     # it must not be stored as a broken file

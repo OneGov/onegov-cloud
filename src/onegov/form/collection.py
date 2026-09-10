@@ -5,10 +5,9 @@ import warnings
 from datetime import datetime, timedelta
 from onegov.core.utils import normalize_for_url
 from onegov.core.collection import GenericCollection
-from onegov.file.utils import (
-    is_stored_file_reference, keep_stored_file, store_uploaded_file)
 from onegov.form.errors import UnableToComplete
 from onegov.form.fields import UploadField, UploadMultipleField
+from onegov.form.utils import reconcile_uploaded_files
 from onegov.form.models import (
     FormDefinition,
     FormSubmission,
@@ -26,6 +25,7 @@ from uuid import uuid4, UUID
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator
+    from onegov.file.models import File
     from onegov.form import Form
     from onegov.form.parser import ParsedForm
     from onegov.form.types import SubmissionState
@@ -422,117 +422,43 @@ class FormSubmissionCollection:
         }
         submission.update_title(form)
 
-        # move uploaded files to a separate table
-        files = {
-            field_id
+        # move uploaded files to a separate table, reconciling them against
+        # the already-stored files
+        upload_fields = {
+            field_id: field
             for field_id, field in form._fields.items()
-            if isinstance(field, UploadField) and field_id not in exclude
-            # we exclude files that should be removed
-            and submission.data.get(field_id) != {}
-        }
-
-        files_to_add = {
-            id for id in files
-            if (file_meta := submission.data.get(id))
-            and not is_stored_file_reference(file_meta)
-        }
-
-        files_to_keep = files - files_to_add
-
-        multi_files = {
-            field_id: [
-                index
-                for index, data in enumerate(submission.data.get(field_id, []))
-                # we exclude files that should be removed but we also
-                if data != {}
-            ]
-            for field_id, field in form._fields.items()
-            if isinstance(field, UploadMultipleField)
+            if isinstance(field, (UploadField, UploadMultipleField))
             and field_id not in exclude
         }
-        multi_files_to_keep = {
-            f'{id}:{idx}'
-            for id, indeces in multi_files.items()
-            if (file_metas := submission.data.get(id))
-            for idx in indeces
-            # a kept file is None (unchanged) or resent as an '@<id>' ref
-            if keep_stored_file(file_metas[idx])
-        }
-        files_to_keep |= multi_files_to_keep
 
-        # delete all files which are not part of the updated form
-        # if no files are given, delete all files belonging to the submission
-        trash = [f for f in submission.files if f.note not in files_to_keep]
+        trashed: list[File] = []
 
-        for f in trash:
-            self.session.delete(f)
+        def trash(file: File) -> None:
+            trashed.append(file)
+            self.session.delete(file)
 
-        if trash and inspect(submission).persistent:
-            self.session.refresh(submission)
+        new_values = reconcile_uploaded_files(
+            file_cls=FormFile,
+            fields=upload_fields,
+            multiple={
+                field_id for field_id, field in upload_fields.items()
+                if isinstance(field, UploadMultipleField)
+            },
+            files=submission.files,
+            delete=trash,
+            flush=self.session.flush,
+        )
 
-        # store the new files in the separate table
+        if trashed and inspect(submission).persistent:
+            # drop deleted files from the collection; reconcile's renames/new
+            # files flush on the next (auto)flush
+            self.session.expire(submission, ['files'])
 
-        for field_id in files_to_add:
-            field = getattr(form, field_id)
-
-            f = store_uploaded_file(
-                FormFile, submission.files, field_id,
-                field.file, field.filename
-            )
-            self.session.flush()
-
-            # replace the data in the submission with a reference and
-            # update the size to reflect the actual stored size after
-            # any resizing/compression applied by the depot
-            submission.data[field_id]['data'] = '@{}'.format(f.id)
-            submission.data[field_id]['size'] = f.reference.file.content_length
-
+        if new_values:
+            submission.data.update(new_values)
             # we need to mark these changes as only top-level json changes
             # are automatically propagated
             submission.data.changed()  # type:ignore[attr-defined]
-
-        for field_id, indeces in multi_files.items():
-            datalist = []
-            # we can't use enumerate because we need to guard against
-            # old_keys t
-            new_idx = 0
-            for old_idx in indeces:
-                data = submission.data[field_id][old_idx]
-                old_key = f'{field_id}:{old_idx}'
-                new_key = f'{field_id}:{new_idx}'
-                if old_key in multi_files_to_keep:
-                    # update the key in the note field if the index changed
-                    if old_idx != new_idx:
-                        for f in submission.files:
-                            if f.note == old_key:
-                                f.note = new_key
-                                break
-                else:
-                    field = getattr(form, field_id)[old_idx]
-                    if getattr(field, 'file', None) is None:
-                        # skip this subfield
-                        continue
-
-                    f = store_uploaded_file(
-                        FormFile, submission.files, new_key,
-                        field.file, field.filename
-                    )
-                    self.session.flush()
-
-                    # replace the data in the submission with a reference and
-                    # update the size to reflect the actual stored size
-                    data['data'] = '@{}'.format(f.id)
-                    data['size'] = f.reference.file.content_length
-
-                datalist.append(data)
-                new_idx += 1
-
-            if submission.data[field_id] != datalist:
-                submission.data[field_id] = datalist
-
-                # we need to mark these changes as only top-level json changes
-                # are automatically propagated
-                submission.data.changed()  # type:ignore[attr-defined]
 
     def remove_old_pending_submissions(
         self,

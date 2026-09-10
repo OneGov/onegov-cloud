@@ -12,6 +12,9 @@ from unidecode import unidecode
 from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from bs4 import NavigableString, Tag
+    from collections.abc import (
+        Callable, Collection, Mapping, MutableSequence)
+    from onegov.file.models import File
     from onegov.form import Form
     from typing import Self
     from wtforms.fields.core import UnboundField
@@ -188,3 +191,111 @@ def remove_empty_links(
                 link.decompose()
 
     return str(soup)
+
+
+def _file_meta(file: File) -> dict[str, Any]:
+    """ The serialized ``@<id>`` reference for an already-stored file. """
+    try:
+        size = file.reference.file.content_length
+    except OSError:
+        size = -1
+    return {
+        'data': f'@{file.id}',
+        'filename': file.name,
+        'mimetype': file.reference.content_type,
+        'size': size,
+    }
+
+
+def reconcile_uploaded_files[FileT: File](
+    *,
+    file_cls: type[FileT],
+    fields: Mapping[str, Any],
+    multiple: Collection[str],
+    files: MutableSequence[FileT],
+    delete: Callable[[FileT], None],
+    flush: Callable[[], None] = lambda: None,  # noop
+) -> dict[str, Any]:
+    """ Reconciles the submitted upload fields against the already-stored
+    files, shared by form submissions and directory entries so both decide
+    which files to delete/insert/keep the exact same way.
+
+    ``multiple`` holds the ids of the fields that accept more than one file
+    (the caller knows this unambiguously); every other field is a single one,
+    handled as a list of one slot.
+
+    Stored files are matched by their ``note`` (``<field id>`` for a single
+    field, ``<field id>:<index>`` for a multiple one). For each field, per
+    slot, the file is kept (note renumbered to the new, compacted index),
+    trashed, or replaced by a fresh upload.
+
+    ``files`` is mutated in place (new files appended, removed ones passed to
+    ``delete``); the new serialized values are returned keyed by field id.
+
+    ``flush`` is called right after storing a new file, for callers that need
+    it flushed before reading back its stored size (form submissions pass
+    ``session.flush``); it defaults to a no-op since directory entries read the
+    size without a flush.
+
+    """
+    from onegov.file.utils import (
+        is_stored_file_reference, keep_stored_file, store_uploaded_file)
+
+    files_by_note = {f.note: f for f in files}
+    kept: set[int] = set()
+    updated: dict[str, Any] = {}
+
+    for field_id, field in fields.items():
+        is_multiple = field_id in multiple
+        subfields = list(field) if is_multiple else [field]
+
+        new_idx = 0
+        result: list[Any] = []
+        for old_idx, slot in enumerate(subfields):
+            note_key = f'{field_id}:{new_idx}' if is_multiple else field_id
+            old_note = f'{field_id}:{old_idx}' if is_multiple else field_id
+
+            action = getattr(slot, 'action', None)
+            value = getattr(slot, 'data', None)
+            has_upload = bool(getattr(slot, 'file', None)) and bool(
+                getattr(slot, 'filename', None))
+
+            # an explicit delete always drops the slot
+            if action == 'delete':
+                continue
+
+            # a fresh upload replaces whatever was stored at this slot
+            if has_upload and not is_stored_file_reference(value):
+                new_file = store_uploaded_file(
+                    file_cls, files, note_key, slot.file, slot.filename)
+                flush()
+                kept.add(id(new_file))
+                result.append(_file_meta(new_file))
+                new_idx += 1
+                continue
+
+            # keep the stored file (unchanged, kept or resent as an '@<id>')
+            if keep_stored_file(value, action):
+                existing = files_by_note.get(old_note)
+                if existing is None:
+                    continue  # nothing stored to keep (e.g. a new slot)
+                if existing.note != note_key:
+                    existing.note = note_key
+                kept.add(id(existing))
+                result.append(_file_meta(existing))
+                new_idx += 1
+
+        updated[field_id] = (
+            result if is_multiple else (result[0] if result else {})
+        )
+
+    # trash files owned by a processed field that are no longer kept
+    for file in list(files):
+        if id(file) in kept or file.note is None:
+            continue
+        base, sep, idx = file.note.rpartition(':')
+        owner = base if sep and idx.isdigit() else file.note
+        if owner in fields:
+            delete(file)
+
+    return updated
