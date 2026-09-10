@@ -369,6 +369,7 @@ class Auth:
 
         user.last_login = utcnow()
         user.save_current_session(request)
+        del request.browser_session['dismissed_new_features']
 
         response.completed_login = True  # type:ignore[attr-defined]
 

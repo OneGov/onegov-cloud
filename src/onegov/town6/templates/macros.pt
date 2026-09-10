@@ -3507,3 +3507,27 @@
         </li>
     </ul>
 </metal:globals-left>
+
+<metal:features define-macro="features" i18n:domain="onegov.town6">
+    <tal:b tal:define="features layout.new_features|nothing">
+        <div tal:condition="features and not request.browser_session.get('dismissed_new_features')" class="reveal" id="newFeaturesModal" data-reveal data-close-on-click="false">
+            <button class="close-button" ic-post-to="${layout.csrf_protected_url(request.link(request.current_user, 'close-features'))}" data-close aria-label="Close modal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+
+            <h1 class="h3" i18n:translate="">New features available</h1>
+            <tal:b repeat="feature features">
+                <div class="card">
+                    <div class="card-section">
+                        <b tal:content="feature['title']"></b><br/>
+                        <span tal:content="feature['description']"></span>
+                    </div>
+                </div>
+            </tal:b>
+            <div class="footer">
+                <button class="button hollow" ic-post-to="${layout.csrf_protected_url(request.link(request.current_user, 'close-features'))}" data-close i18n:translate="">Close</button>
+                <button class="button" ic-post-to="${layout.csrf_protected_url(request.link(request.current_user, 'read-features'))}" data-close i18n:translate="">Read</button>
+            </div>
+        </div>
+    </tal:b>
+</metal:features>
