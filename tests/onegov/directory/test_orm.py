@@ -507,6 +507,59 @@ def test_multi_files(session: Session) -> None:
     assert session.query(File).count() == 0
 
 
+def test_files_outdated_formdata_guard(session: Session) -> None:
+    # outdated formdata may carry a subfield without a proper file/filename;
+    # it must not be stored as a broken file
+    directory = DirectoryCollection(session).add(
+        title="Press Releases",
+        structure="""
+            Title *= ___
+            File = *.txt
+            Files = *.txt (multiple)
+        """,
+        configuration=DirectoryConfiguration(
+            title='Title',
+            order=['Title'],
+        )
+    )
+
+    entry = directory.add(values=dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        file=Bunch(
+            data=object(),
+            file=BytesIO(b'just kidding'),
+            filename='press-release.txt'
+        ),
+        files=(
+            Bunch(
+                data=object(),
+                file=BytesIO(b'just kidding'),
+                filename='press-release.txt'
+            ),
+        )
+    ))
+    transaction.commit()
+    entry = session.query(DirectoryEntry).one()
+    directory = session.query(Directory).one()
+
+    assert session.query(File).count() == 2
+
+    # a file with no filename must be skipped
+    directory.update(entry, dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        file=Bunch(data=object(), file=BytesIO(b'x'), filename=None),
+        files=(
+            Bunch(data=object(), file=BytesIO(b'x'), filename=None),
+        )
+    ))
+    transaction.commit()
+    entry = session.query(DirectoryEntry).one()
+
+    assert entry.values['file'] == {}
+    assert entry.values['files'] == []
+    assert session.query(File).count() == 0
+
+
 def test_migrate_text_field(session: Session) -> None:
     rooms = DirectoryCollection(session).add(
         title="Rooms",
