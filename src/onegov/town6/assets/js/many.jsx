@@ -132,14 +132,14 @@ var ManyDates = React.createClass({
                                         index === (values.length - 1) &&
                                             <a href="#" className="button round field-button" onClick={onAdd}>
                                                 <i className="fa fa-plus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.add}</span>
+                                                <span className="visually-hidden">{data.labels.add}</span>
                                             </a>
                                     }
                                     {
                                         values.length > 1 &&
                                             <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                                 <i className="fa fa-minus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                                <span className="visually-hidden">{data.labels.remove}</span>
                                             </a>
                                     }
                                 </div>
@@ -245,14 +245,14 @@ var ManyDateTimeRanges = React.createClass({
                                         index === (values.length - 1) &&
                                             <a href="#" className="button round field-button" onClick={onAdd}>
                                                 <i className="fa fa-plus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.add}</span>
+                                                <span className="visually-hidden">{data.labels.add}</span>
                                             </a>
                                     }
                                     {
                                         index > 0 && index === (values.length - 1) &&
                                             <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                                 <i className="fa fa-minus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                                <span className="visually-hidden">{data.labels.remove}</span>
                                             </a>
                                     }
                                 </div>
@@ -410,14 +410,14 @@ var ManyLinks = React.createClass({
                                         index > 0 && index === (values.length - 1) &&
                                             <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                                 <i className="fa fa-minus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                                <span className="visually-hidden">{data.labels.remove}</span>
                                             </a>
                                     }
                                     {
                                         index === (values.length - 1) &&
                                             <a href="#" className="button round field-button" onClick={onAdd}>
                                                 <i className="fa fa-plus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.add}</span>
+                                                <span className="visually-hidden">{data.labels.add}</span>
                                             </a>
                                     }
                                 </div>
@@ -557,14 +557,14 @@ var ManyFirebasetopics = React.createClass({
                                             index > 0 && index === (values.length - 1) &&
                                             <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                                 <i className="fa fa-minus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                                <span className="visually-hidden">{data.labels.remove}</span>
                                             </a>
                                         }
                                         {
                                             index === (values.length - 1) &&
                                             <a href="#" className="button round field-button" onClick={onAdd}>
                                                 <i className="fa fa-plus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.add}</span>
+                                                <span className="visually-hidden">{data.labels.add}</span>
                                             </a>
                                         }
                                     </div>
@@ -691,14 +691,14 @@ var ManyOpeningHours = React.createClass({
                                         index > 0 && index === (values.length - 1) &&
                                             <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                                 <i className="fa fa-minus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                                <span className="visually-hidden">{data.labels.remove}</span>
                                             </a>
                                     }
                                     {
                                         index === (values.length - 1) &&
                                             <a href="#" className="button round field-button" onClick={onAdd}>
                                                 <i className="fa fa-plus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.add}</span>
+                                                <span className="visually-hidden">{data.labels.add}</span>
                                             </a>
                                     }
                                 </div>
@@ -833,14 +833,14 @@ var ManyMeetingItems = React.createClass({
                                         index >= 0 && index === (values.length - 1) &&
                                         <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                             <i className="fa fa-minus" aria-hidden="true" />
-                                            <span className="show-for-sr">{data.labels.remove}</span>
+                                            <span className="visually-hidden">{data.labels.remove}</span>
                                         </a>
                                     }
                                     {
                                         index === (values.length - 1) &&
                                         <a href="#" className="button round field-button" onClick={onAdd}>
                                             <i className="fa fa-plus" aria-hidden="true" />
-                                            <span className="show-for-sr">{data.labels.add}</span>
+                                            <span className="visually-hidden">{data.labels.add}</span>
                                         </a>
                                     }
                                 </div>
@@ -959,14 +959,14 @@ var ManyInterestTies = React.createClass({
                                         index > 0 && index === (values.length - 1) &&
                                         <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                             <i className="fa fa-minus" aria-hidden="true" />
-                                            <span className="show-for-sr">{data.labels.remove}</span>
+                                            <span className="visually-hidden">{data.labels.remove}</span>
                                         </a>
                                     }
                                     {
                                         index === (values.length - 1) &&
                                         <a href="#" className="button round field-button" onClick={onAdd}>
                                             <i className="fa fa-plus" aria-hidden="true" />
-                                            <span className="show-for-sr">{data.labels.add}</span>
+                                            <span className="visually-hidden">{data.labels.add}</span>
                                         </a>
                                     }
                                 </div>

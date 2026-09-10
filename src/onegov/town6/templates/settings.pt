@@ -13,7 +13,7 @@
                         role="combobox" aria-autocomplete="list"
                         aria-controls="settings-search-results"
                         aria-expanded="false" />
-                        <label class="show-for-sr label-text" for="settings-search"
+                        <label class="visually-hidden label-text" for="settings-search"
                             i18n:translate="">Search</label>
                     </div>
                 </div>

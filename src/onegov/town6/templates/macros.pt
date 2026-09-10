@@ -374,7 +374,7 @@
         <a tal:attributes="href item.url">
             <img src="${item.image_url}" alt="${item.lead or ''}">
         </a>
-        <div tal:condition="item.lead" class="card-section show-for-sr">${item.lead}</div>
+        <div tal:condition="item.lead" class="card-section visually-hidden">${item.lead}</div>
     </div>
 </metal:partners>
 
@@ -1420,7 +1420,7 @@
                     </tal:b>
 
                     <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
-                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span><span>${page.page + 1}</span></a>
+                        <a href="${request.link(page, name)}"><span class="visually-hidden" i18n:translate>You're on page </span><span>${page.page + 1}</span></a>
                     </li>
 
                     <tal:b condition="repeat.page.end and next">
@@ -2063,8 +2063,8 @@
                 </li>
             </ul>
             <div class="orbit-controls" tal:condition="image_2 and image_2 and quote_2">
-                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
-                <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
+                <button class="orbit-previous"><span class="visually-hidden">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
+                <button class="orbit-next"><span class="visually-hidden">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
         </div>
     </div>
@@ -2075,8 +2075,8 @@
     <div class="orbit-bullet-wrapper show-for-medium">
         <nav class="orbit-bullets">
             <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
-                <span class="show-for-sr" tal:condition="image.note">${image.note}</span>
-                <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Image</span>
+                <span class="visually-hidden" tal:condition="image.note">${image.note}</span>
+                <span tal:condition="repeat.image.start" class="visually-hidden" data-slide-active-label i18n:translate>Current Image</span>
             </button>
         </nav>
     </div>
@@ -2577,21 +2577,21 @@
                 <td class="invoiced-state">
                     <tal:b tal:condition="invoice.invoiced">
                         <i class="fa fa-check-circle" aria-hidden="true" title="Invoiced" i18n:attributes="title"></i>
-                        <span i18n:translate class="show-for-sr">Invoiced</span>
+                        <span i18n:translate class="visually-hidden">Invoiced</span>
                     </tal:b>
                     <tal:b tal:condition="not:invoice.invoiced">
                         <i class="fa fa-times-circle" aria-hidden="true" title="Uninvoiced" i18n:attributes="title"></i>
-                        <span i18n:translate class="show-for-sr">Uninvoiced</span>
+                        <span i18n:translate class="visually-hidden">Uninvoiced</span>
                     </tal:b>
                 </td>
                 <td class="paid-state">
                     <tal:b tal:condition="invoice.paid">
                         <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
-                        <span i18n:translate class="show-for-sr">Paid</span>
+                        <span i18n:translate class="visually-hidden">Paid</span>
                     </tal:b>
                     <tal:b tal:condition="not:invoice.paid">
                         <i class="fa fa-times-circle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
-                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                        <span i18n:translate class="visually-hidden">Unpaid</span>
                     </tal:b>
                 </td>
                 <td>
@@ -2986,7 +2986,7 @@
 
                                     <a ic-post-to="${post_url}&clear_start_date=1" ic-target="#button-${file.id}" ic-success-action="change">
                                         <i class="far fa-times-circle"></i>
-                                        <span class="show-for-sr" i18n:translate>Reset</span>
+                                        <span class="visually-hidden" i18n:translate>Reset</span>
                                     </a>
                                 </div>
                             </fieldset>
@@ -3006,7 +3006,7 @@
 
                                 <a ic-post-to="${post_url}&clear_end_date=1" ic-target="#button-${file.id}" ic-success-action="change">
                                     <i class="far fa-times-circle"></i>
-                                    <span class="show-for-sr" i18n:translate>Reset</span>
+                                    <span class="visually-hidden" i18n:translate>Reset</span>
                                 </a>
                             </div>
                         </fieldset>
@@ -3753,7 +3753,7 @@
                 <th tal:condition="show_vat" class="centered" i18n:translate>VAT</th>
                 <th class="centered" i18n:translate>Amount</th>
                 <th tal:condition="item_actions">
-                    <span i18n:translate class="show-for-sr">Actions</span>
+                    <span i18n:translate class="visually-hidden">Actions</span>
                 </th>
             </tr>
         </thead>
@@ -3798,11 +3798,11 @@
                             ${'{:.2f}'.format(item.amount)}
                             <tal:b tal:condition="show_payment_state and paid">
                                 <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
-                                <span i18n:translate class="show-for-sr">Paid</span>
+                                <span i18n:translate class="visually-hidden">Paid</span>
                             </tal:b>
                             <tal:b tal:condition="show_payment_state and not paid">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
-                                <span i18n:translate class="show-for-sr">Unpaid</span>
+                                <span i18n:translate class="visually-hidden">Unpaid</span>
                             </tal:b>
                         </td>
                         <td class="actions" tal:condition="item_actions">
@@ -3828,11 +3828,11 @@
                     ${'{:.2f}'.format(total_amount)}
                     <tal:b tal:condition="show_payment_state and total_paid">
                         <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
-                        <span i18n:translate class="show-for-sr">Paid</span>
+                        <span i18n:translate class="visually-hidden">Paid</span>
                     </tal:b>
                     <tal:b tal:condition="show_payment_state and not total_paid">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
-                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                        <span i18n:translate class="visually-hidden">Unpaid</span>
                     </tal:b>
                 </td>
                 <td tal:condition="item_actions"></td>
