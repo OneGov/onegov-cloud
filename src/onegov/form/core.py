@@ -5,6 +5,7 @@ import weakref
 from collections import OrderedDict
 from contextlib import nullcontext
 from decimal import Decimal
+from functools import cached_property
 from itertools import chain, groupby
 from markupsafe import Markup
 from onegov.core.markdown import render_untrusted_markdown as render_md
@@ -361,13 +362,6 @@ class Form(BaseForm):
 
         yield
 
-        # NOTE: We currently assume that the only time we have different
-        #       prefixes for the same form is in a FieldList, technically
-        #       we would need to always do this step below to be fully
-        #       robust
-        if not self._prefix:
-            return
-
         for field_id, field in self._unbound_fields:
             if not hasattr(field, 'depends_on'):
                 continue
@@ -378,6 +372,9 @@ class Form(BaseForm):
             f.render_kw.update(
                 field.depends_on.html_data(self._prefix)
             )
+            # NOTE: For introspection we copy the dependency object
+            #       to the bound field
+            f.depends_on = field.depends_on  # type: ignore[attr-defined]
 
     def process_pricing(self) -> Iterator[None]:
         """ Processes the pricing parameter on the fields, which adds the
@@ -926,8 +923,8 @@ class Fieldset:
 
     fields: dict[str, CallableProxyType[Field]]
 
-    def __init__(self, label: str | None, fields: Iterable[Field]):
-        """ Initializes the Fieldset.
+    def __init__(self, label: str | None, fields: Iterable[Field]) -> None:
+        """Initializes the Fieldset.
 
         :label: Label of the fieldset (None if it's an invisible fieldset)
         :fields: Iterator of bound fields. Fieldset creates a list of weak
@@ -937,6 +934,12 @@ class Fieldset:
         """
         self.label = label
         self.fields = OrderedDict((f.id, weakref.proxy(f)) for f in fields)
+
+    @cached_property
+    def id(self) -> str | None:
+        if self.label is None:
+            return None
+        return f'fieldset-{utils.as_internal_id(self.label)}'
 
     def __len__(self) -> int:
         return len(self.fields)
@@ -1011,7 +1014,12 @@ class FieldDependency:
             if isinstance(data, bool) and choice in ('y', 'n'):
                 choice = choice == 'y' and True or False
 
-            result = result and ((data == choice) ^ invert)
+            if isinstance(data, list):
+                value = choice in data
+            else:
+                value = data == choice
+
+            result = result and (value ^ invert)
         return result
 
     def unfulfilled(self, form: Form, field: Field) -> bool:

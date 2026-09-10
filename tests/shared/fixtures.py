@@ -156,6 +156,8 @@ def postgres(
         "-c logging_collector=off",
         "-c fsync=off",
         "-c full_page_writes=off",
+        # schema-heavy tests drop many schemas CASCADE in one teardown tx
+        "-c max_locks_per_transaction=1024",
     ))
 
     postgres = Postgresql(  # type: ignore[no-untyped-call]

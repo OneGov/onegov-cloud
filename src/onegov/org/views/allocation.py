@@ -6,11 +6,11 @@ import morepath
 import sedate
 
 from datetime import timedelta
+from itertools import batched
 from libres.db.models import Allocation as LibresAllocation
 from libres.db.models import ReservedSlot
 from libres.modules.errors import LibresError
 from libres.modules import rasterizer
-
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import is_uuid
 from onegov.form import merge_forms
@@ -408,13 +408,21 @@ def count_matching_allocations(
     if not expected:
         return 0
 
-    return allocations.filter(
-        LibresAllocation.is_master,
-        tuple_(
-            LibresAllocation._start,
-            LibresAllocation._end,
-        ).in_(expected),
-    ).count()
+    return sum(
+        allocations.filter(
+            LibresAllocation.is_master,
+            tuple_(
+                LibresAllocation._start,
+                LibresAllocation._end,
+            ).in_(batch),
+        ).count()
+        # NOTE: Since each date is rendered either as a bind parameter or
+        #       an inline value in the compiled statement, the statement
+        #       quickly becomes huge and exceeds Postgres' default stack
+        #       size limit for compiling/analyzing queries. By splitting
+        #       this into smaller batches we can avoid crashes.
+        for batch in batched(expected, 250)
+    )
 
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',

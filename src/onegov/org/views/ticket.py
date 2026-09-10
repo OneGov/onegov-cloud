@@ -68,6 +68,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.core.types import (
         EmailJsonDict, JSON_ro, RenderData, SequenceOrScalar)
+    from onegov.file import File
     from onegov.form.fields import UploadFileWithORMSupport
     from onegov.org.layout import Layout
     from onegov.org.request import OrgRequest
@@ -387,6 +388,7 @@ def send_chat_message_email_if_enabled(
 ) -> None:
 
     assert origin in ('internal', 'external')
+    attachments = tuple(attachments)
     messages = MessageCollection[TicketChatMessage](
         request.session,
         channel_id=ticket.number,
@@ -512,7 +514,7 @@ def send_chat_message_email_if_enabled(
                 content=content,
                 plaintext=plaintext,
                 category='transactional',
-                attachments=(),
+                attachments=attachments,
             )
 
     request.app.send_transactional_email_batch(email_iter())
@@ -1465,14 +1467,22 @@ def view_ticket_status(
             else:
                 owner = self.handler.email
 
+            file = form.file.create()
             message = TicketChatMessage.create(
                 self, request,
                 text=form.text.data,
                 owner=owner or '',
-                origin='external')
+                origin='external',
+                file=file,
+            )
 
             send_chat_message_email_if_enabled(
-                self, request, message, origin='external')
+                self,
+                request,
+                message,
+                origin='external',
+                attachments=create_attachment_from_file(file),
+            )
 
             request.success(_('Your message has been received'))
             return morepath.redirect(request.link(self, 'status'))
@@ -1505,6 +1515,16 @@ def view_ticket_status(
         'pick_up_hint': pick_up_hint,
         'extra_information': extra_information,
     }
+
+
+def create_attachment_from_file(file: File | None) -> tuple[Attachment, ...]:
+    if file is None:
+        return ()
+
+    attachment = Attachment(
+        file.name, file.reference.file, file.reference['content_type']
+    )
+    return (attachment,)
 
 
 @OrgApp.view(model=Ticket, name='send-to-gever', permission=Private)

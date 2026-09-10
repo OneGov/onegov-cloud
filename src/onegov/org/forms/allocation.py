@@ -256,6 +256,15 @@ class AllocationRuleForm(Form):
                 case _:
                     raise AssertionError('unreachable')
 
+            # FIXME: This gets more expensive with every iteration
+            #        we may want to rethink this and adjust the rules'
+            #        stored start and end dates, instead of relying
+            #        on an iteration count. That also leads to less
+            #        surprising results when editing an auto-extended
+            #        rule. Since you will need to adjust the range if
+            #        you want the rule to extend the same way it did
+            #        before editing it, unless the iteration count
+            #        was already at 0 before editing it...
             start = self['end'].data + timedelta(days=1)
             end = self['end'].data + end_offset
 
@@ -401,11 +410,21 @@ class AllocationForm(Form, AllocationFormHelpers):
         if not self.request.app.org.has_school_holidays:
             self.delete_field('during_school_holidays')
 
-    def ensure_start_before_end(self) -> bool | None:
+    def ensure_start_before_end_and_limited_to_five_years(self) -> bool | None:
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
                 assert isinstance(self.start.errors, list)
                 self.start.errors.append(_('Start date before end date'))
+                return False
+            if (self.end.data - self.start.data) > timedelta(days=1827):
+                assert isinstance(self.end.errors, list)
+                self.end.errors.append(_(
+                    'End may at most be five years from the start. '
+                    'Either rely on auto-extension if you want to always '
+                    'cover at least a certain future date range or define '
+                    'multiple availability periods to cover a larger time '
+                    'range.'
+                ))
                 return False
         return None
 

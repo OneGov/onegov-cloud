@@ -842,13 +842,13 @@ def handle_new_directory_entry(
 
 
 @OrgApp.form(
-    model=DirectoryEntry,
+    model=ExtendedDirectoryEntry,
     permission=Private,
     template='form.pt',
     form=get_directory_entry_form_class,
     name='edit')
 def handle_edit_directory_entry(
-    self: DirectoryEntry,
+    self: ExtendedDirectoryEntry,
     request: OrgRequest,
     form: DirectoryEntryForm,
     layout: DirectoryEntryLayout | None = None
@@ -862,8 +862,7 @@ def handle_edit_directory_entry(
     elif not request.POST:
         form.process(obj=self)
 
-    # FIXME: Should we only register this view for ExtendedDirectoryEntry?
-    layout = layout or DirectoryEntryLayout(self, request)  # type:ignore
+    layout = layout or DirectoryEntryLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []

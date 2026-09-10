@@ -27,6 +27,11 @@ SELECT
     lower(occasion_needs.number) AS min_required,        -- Integer
     upper(occasion_needs.number) - 1 AS max_required,    -- Integer
     coalesce(needs_fulfilled.fulfilled, 0) AS confirmed, -- Integer
+    CASE
+        WHEN lower(occasion_needs.number) > coalesce(needs_fulfilled.fulfilled, 0)
+        THEN 'unfulfilled'
+        ELSE 'fulfilled'
+    END AS need_state,                                   -- Text
     occasions.id AS occasion_id,                         -- UUID
     occasions.period_id AS period_id,                    -- UUID
     occasion_numbers.number AS occasion_number,          -- Integer
@@ -42,7 +47,11 @@ SELECT
         YEAR FROM age(volunteers.birth_date)) as age,    -- Integer
     volunteers.email AS email,                           -- Text
     volunteers.phone AS phone,                           -- Text
-    volunteers.state AS state,                           -- Text
+    volunteers.state::text AS state,                     -- Text
+    volunteers.transport as transport,                     -- Text
+    volunteers.note as note,                             -- Text
+    volunteers.token AS token,               -- UUID
+    tickets.id AS ticket_id,                             -- UUID
     array_agg(
         ARRAY[
             occasion_dates.start
@@ -62,6 +71,7 @@ FROM
     JOIN activities ON occasions.activity_id = activities.id
     JOIN occasion_dates ON occasions.id = occasion_dates.occasion_id
     JOIN occasion_numbers ON occasions.id = occasion_numbers.occasion_id
+    LEFT JOIN tickets ON tickets.handler_id::uuid = volunteers.token
 GROUP BY
     activities.id,
     activities.title,
@@ -84,7 +94,10 @@ GROUP BY
     volunteers.birth_date,
     volunteers.email,
     volunteers.phone,
-    needs_fulfilled.fulfilled
+    volunteers.transport,
+    volunteers.note,
+    needs_fulfilled.fulfilled,
+    tickets.id
 ORDER BY
     activity_title,
     activity_id,

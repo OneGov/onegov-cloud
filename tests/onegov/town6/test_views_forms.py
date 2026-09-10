@@ -378,7 +378,7 @@ def test_navbar_links_visibility(client: Client) -> None:
     # the Gever upload button should not be shown ...
     assert "Hochladen auf Gever" not in page
 
-    settings = client.get('/settings').click('Gever API')
+    settings = client.get('/gever-credentials')
     settings.form['gever_username'] = 'foo'
     settings.form['gever_password'] = 'bar'
     settings.form['gever_endpoint'] = 'https://example.org/'

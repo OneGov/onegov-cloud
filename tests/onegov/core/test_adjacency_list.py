@@ -200,6 +200,17 @@ def test_move_root(session: Session) -> None:
     assert family.query(ordered=True).all() == [a, b]
 
 
+def test_move_above_zero_order(session: Session) -> None:
+    family = FamilyMemberCollection(session)
+    a = family.add_root('a', order=Decimal('0'))
+    b = family.add_root('b', order=Decimal('1'))
+
+    family.move_above(target=a, subject=b)
+
+    assert family.query(ordered=True).all() == [b, a]
+    assert b.order == Decimal('-1')
+
+
 def test_move(session: Session) -> None:
 
     family = FamilyMemberCollection(session)
@@ -386,7 +397,7 @@ def test_add_uses_binary_gap(session: Session) -> None:
     order_b2 = b.order
     assert order_a1 < order_b2  # 'a' got order less than 'b'
     assert order_b2 == order_b1  # 'b's order didn't change
-    assert order_a1 == order_b1 / 2  # Specifically, half of 'b's original
+    assert order_a1 == order_b1 - Decimal('1')
 
     c = family.add(parent=root, title='c')  # Should go after 'b'
     order_a2 = a.order

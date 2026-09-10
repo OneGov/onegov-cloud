@@ -101,6 +101,18 @@ class NotificationTemplateSendForm(Form):
         default='by_role'
     )
 
+    volunteer_state = RadioField(
+        label=_('State'),
+        choices=[
+            ('all', _('All')),
+            ('open', _('Open')),
+            ('contacted', _('Contacted')),
+            ('confirmed', _('Confirmed')),
+        ],
+        depends_on=('send_to', 'volunteers'),
+        default='all',
+    )
+
     roles = MultiCheckboxField(
         label=_('Role'),
         choices=[
@@ -127,18 +139,6 @@ class NotificationTemplateSendForm(Form):
         depends_on=(
             'send_to', '!volunteers',
             )
-    )
-
-    volunteer_state = RadioField(
-        label=_('State'),
-        choices=[
-            ('all', _('All')),
-            ('open', _('Open')),
-            ('contacted', _('Contacted')),
-            ('confirmed', _('Confirmed')),
-        ],
-        depends_on=('send_to', 'volunteers'),
-        default='all',
     )
 
     no_spam = BooleanField(

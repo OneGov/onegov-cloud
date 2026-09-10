@@ -8,6 +8,7 @@ from markupsafe import Markup
 from onegov.api.models import ApiKey
 from onegov.core.utils import Bunch
 from onegov.org.models import News
+from onegov.org.models import Organisation
 from onegov.org.models import Topic
 from onegov.org.models.page import TopicCollection, NewsCollection
 
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 
 def test_gever_settings_only_https_allowed(client: Client) -> None:
     client.login_admin()
-    settings = client.get('/settings').click('Gever API')
+    settings = client.get('/gever-credentials')
     settings.form['gever_username'] = 'foo'
     settings.form['gever_password'] = 'bar'
     settings.form['gever_endpoint'] = 'http://example.org/'
@@ -32,7 +33,7 @@ def test_gever_settings_only_https_allowed(client: Client) -> None:
     settings.form['gever_password'] = 'bar'
     settings.form['gever_endpoint'] = 'https://example.org/'
 
-    res = client.get('/settings').click('Gever API')
+    res = client.get('/gever-credentials')
     assert res.status_code == 200
 
 
@@ -67,10 +68,84 @@ def test_all_settings_are_reachable(client: Client) -> None:
     client.login_admin()
     page = client.get('/settings')
     links = [
-        e.attrib.get('href') for e in page.pyquery('.org-settings a[href]')
+        e.attrib.get('href')
+        for e in page.pyquery('[data-settings-item] > a[href]')
     ]
 
     assert all(client.get(link).status_code == 200 for link in links)
+
+
+def test_settings_search_markup(client: Client) -> None:
+    client.login_admin()
+    page = client.get('/settings')
+
+    assert page.pyquery('[data-settings-search]').attr('type') == 'search'
+    assert page.pyquery('[data-settings-search-results]').attr('hidden')
+    assert page.pyquery('.settings-category')
+    assert page.pyquery('[data-settings-item]')
+
+    primary_color = page.pyquery(
+        '[data-settings-result-kind="field"]' '[href$="#primary_color"]'
+    )
+    assert primary_color.find('strong').text() == 'Primärfarbe'
+    assert primary_color.attr('href').endswith(
+        '/appearance-settings#primary_color'
+    )
+    assert 'Primärfarbe' in primary_color.attr('data-settings-search-text')
+    assert 'Primary Color' in primary_color.attr('data-settings-search-text')
+
+    reply_to = page.pyquery(
+        '[data-settings-result-kind="field"][href$="#reply_to"]'
+    )
+    assert 'Antworten an automatisch generierte E-Mails' in reply_to.text()
+    assert 'Replies to automated e-mails' in reply_to.attr(
+        'data-settings-search-text'
+    )
+
+
+def test_setting_view_registry(client: Client) -> None:
+    registry = client.app.config.setting_view_registry
+    appearance = registry[(Organisation, 'appearance-settings')]
+
+    assert appearance.setting == 'Appearance'
+    assert appearance.icon == 'fa-eye'
+    assert appearance.order == 30
+    assert (Organisation, 'migrate-links') not in registry
+
+
+def test_settings_search_french_locale(client: Client) -> None:
+    client.login_admin()
+    organisation = client.get('/organisation-settings')
+    organisation.form['locales'] = 'fr_CH'
+    organisation.form.submit()
+    client.set_cookie('locale', 'fr_CH')
+    header_settings = client.get('/header-settings')
+    page = client.get('/settings')
+
+    primary_color = page.pyquery(
+        '[data-settings-result-kind="field"]' '[href$="#primary_color"]'
+    )
+    assert primary_color.find('strong').text() == 'Couleur primaire'
+    assert 'Couleur primaire' in primary_color.attr(
+        'data-settings-search-text'
+    )
+    assert 'Primary Color' in primary_color.attr('data-settings-search-text')
+
+    reply_to = page.pyquery(
+        '[data-settings-result-kind="field"][href$="#reply_to"]'
+    )
+    assert 'Les réponses aux e-mails automatisés' in reply_to.text()
+    assert 'Replies to automated e-mails' in reply_to.attr(
+        'data-settings-search-text'
+    )
+
+    announcement = page.pyquery(
+        '[data-settings-result-kind="fieldset"]'
+        '[href$="#fieldset-announcement"]'
+    )
+    assert announcement.find('strong').text() == 'Annonce'
+    assert 'Announcement' in announcement.attr('data-settings-search-text')
+    assert header_settings.pyquery('#fieldset-announcement')
 
 
 def test_general_settings(client: Client) -> None:
@@ -164,7 +239,7 @@ def test_firebase_settings(client: Client) -> None:
 def test_resource_settings(client: Client) -> None:
     client.login_admin()
 
-    settings = client.get('/settings').click('Reservationen', index=1)
+    settings = client.get('/resource-settings')
     settings.form['resource_header_html'] = '<h1>foo</h1>'
     settings.form['resource_footer_html'] = '<p>bar</p>'
     assert ('Ihre Änderungen wurden gespeichert' in
