@@ -13,9 +13,9 @@
         </button>
     </div>
 
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offCanvasFilter" aria-labelledby="offcanvasFilterLabel">
+    <div class="offcanvas offcanvas-end bg-light" tabindex="-1" id="offCanvasFilter" aria-labelledby="offcanvasFilterLabel">
         <div class="offcanvas-header">
-            <h5 class="visually-hidden" id="offCanvasFilter" i18n:translate="">Filters</h5>
+            <h5 class="visually-hidden" i18n:translate="">Filters</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">

@@ -4,3 +4,10 @@
     --bs-offcanvas-width: 600px;
   }
 }
+
+.card.hover {
+    transition: all 0.2s ease-in-out;
+    &:hover {
+        border-color: $primary;
+    }
+}

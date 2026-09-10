@@ -42,7 +42,6 @@
                                         <tal:b condition="link.model|nothing">
                                             <metal:identicon use-macro="layout.macros.identicon" tal:define="initials link.model.initials; username link.model.username" />
                                         </tal:b>
-
                                         ${link.text}
                                     </a>
                                 </li>

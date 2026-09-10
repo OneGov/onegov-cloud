@@ -2,7 +2,13 @@
     display: none !important;
 }
 
-.main-content {
+.content {
+    img {
+         border-radius: $border-radius-lg;
+         max-width: 100%;
+         height: auto;
+    }
+
     .anchor-link {
         color: $tertiary-subtle;
         display: inline !important;
