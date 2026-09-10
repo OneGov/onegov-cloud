@@ -329,63 +329,39 @@ class Directory(Base, ContentMixin, TimestampMixin,
                                 )
 
                     continue
-                elif field.type == 'fileinput':
-                    # keep files if selected in the dialog
-                    if getattr(field_values, 'action', None) == 'keep':
-                        original = (entry.values or {}).get(field.id, {})
-                        if original:
-                            updated[field.id] = original
-                            continue
-                        # new entry: no stored file yet, fall through to
-                        # create it from the resent upload below
+                # single and multiple fields share one code path: a single
+                # file is treated as a list of one slot
+                is_single = field.type == 'fileinput'
+                subfields = [field_values] if is_single else list(field_values)
 
-                    # delete files if selected in the dialog
-                    if getattr(field_values, 'action', None) == 'delete':
-                        updated[field.id] = {}
-                        continue
-
-                    # if there was no file supplied, we can't add it
-                    if not getattr(field_values, 'file', None):
-                        updated[field.id] = {}
-                        continue
-
-                    # create a new file
-                    new_file = store_uploaded_file(
-                        DirectoryFile, entry.files, field.id,
-                        field_values.file, field_values.filename
+                old_stored = (entry.values or {}).get(field.id)
+                if is_single:
+                    old_values = (
+                        [old_stored]
+                        if isinstance(old_stored, dict) and old_stored
+                        else []
                     )
+                else:
+                    old_values = old_stored or []
 
-                    # keep a reference to the file in the values
-                    updated[field.id] = {
-                        'data': '@' + new_file.id,
-                        'filename': field_values.filename,
-                        'mimetype': new_file.reference.file.content_type,
-                        'size': new_file.reference.file.content_length
-                    }
-                    continue
-
-                # FIXME: there's quite a bit of copy pasta between the
-                #        filefield and multiplefilefield case, we should
-                #        try to refactor this so we can handle both more
-                #        easily
                 new_idx = 0
-                updated[field.id] = []
-                for old_idx, subfield_values in enumerate(field_values):
-                    old_values = (entry.values or {}).get(field.id) or []
+                result: list[Any] = []
+                for old_idx, subfield_values in enumerate(subfields):
+                    note_key = (
+                        field.id if is_single else f'{field.id}:{new_idx}'
+                    )
 
                     # keep files if selected in the dialog
                     if getattr(subfield_values, 'action', None) == 'keep':
                         if len(old_values) > old_idx:
                             original = old_values[old_idx]
-                            updated[field.id].append(original)
-                            # update the file.note so it points to the correct
-                            # index in the list if necessary
+                            result.append(original)
+                            # point file.note at the (possibly new) index
                             file_id = original['data'].lstrip('@')
                             for file in entry.files:
                                 if file.id == file_id:
-                                    new_key = f'{field.id}:{new_idx}'
-                                    if file.note != new_key:
-                                        file.note = new_key
+                                    if file.note != note_key:
+                                        file.note = note_key
                                     break
                             new_idx += 1
                             continue
@@ -396,24 +372,26 @@ class Directory(Base, ContentMixin, TimestampMixin,
                     if getattr(subfield_values, 'action', None) == 'delete':
                         continue
 
-                    # if there was no file supplied, we can't add it
-                    if not getattr(subfield_values, 'file', None):
+                    # stale formdata guard: need both file and filename
+                    if not getattr(subfield_values, 'file', None) or \
+                            not getattr(subfield_values, 'filename', None):
                         continue
 
-                    # create a new file
                     new_file = store_uploaded_file(
-                        DirectoryFile, entry.files, f'{field.id}:{new_idx}',
+                        DirectoryFile, entry.files, note_key,
                         subfield_values.file, subfield_values.filename
                     )
-
-                    # keep a reference to the file in the values
-                    updated[field.id].append({
+                    result.append({
                         'data': '@' + new_file.id,
                         'filename': subfield_values.filename,
                         'mimetype': new_file.reference.file.content_type,
                         'size': new_file.reference.file.content_length
                     })
                     new_idx += 1
+
+                updated[field.id] = (
+                    (result[0] if result else {}) if is_single else result
+                )
 
         # update the values
         if force_update or entry.values != updated:
