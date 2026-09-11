@@ -377,16 +377,27 @@ def test_user_search(client: Client) -> None:
     session = client.app.session()
     user = UserCollection(session).by_username('brunner@example.org')
     assert user is not None
-    user.realname = 'Marine Berger'
+    user.realname = 'Mariane Bérger'
     transaction.commit()
 
     # the search field is always rendered
     users = client.get('/usermanagement')
     assert users.pyquery('.filter-search-term form input[name="q"]')
 
-    # matches the realname (family name), not just the username
+    # matches realname, and accents are normalized (unaccented term)
     users = client.get('/usermanagement?q=berger')
     assert 'brunner' in users
+    assert 'glauser' not in users
+
+    # accented term matches too
+    users = client.get('/usermanagement?q=b%C3%A9rger')
+    assert 'brunner' in users
+
+    # LIKE wildcards are escaped, matching literally
+    users = client.get('/usermanagement?q=%25')
+    assert 'glauser' not in users
+    assert 'brunner' not in users
+    users = client.get('/usermanagement?q=gl_user')
     assert 'glauser' not in users
 
     # partial (non-word) terms match username/realname substrings

@@ -12,8 +12,8 @@ from onegov.user.errors import (
     InvalidActivationTokenError,
     UnknownUserError,
 )
-from onegov.search import SearchIndex
 from sqlalchemy import func, or_, exists, text
+from sqlalchemy_utils import escape_like
 
 
 from typing import overload, Any, Self, TYPE_CHECKING
@@ -112,12 +112,10 @@ class UserCollection:
         query = self.session.query(User)
 
         if self.term:
-            query = query.join(
-                SearchIndex,
-                SearchIndex.owner_id_uuid == User.id
-            )
-            query = query.filter(SearchIndex.data_vector.op('@@')(
-                func.websearch_to_tsquery('simple', self.term)
+            term = func.unaccent(f'%{escape_like(self.term)}%')
+            query = query.filter(or_(
+                func.unaccent(User.username).ilike(term),
+                func.unaccent(User.realname).ilike(term)
             ))
 
         for key, values in self.filters.items():
