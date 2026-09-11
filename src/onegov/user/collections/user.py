@@ -12,7 +12,8 @@ from onegov.user.errors import (
     InvalidActivationTokenError,
     UnknownUserError,
 )
-from sqlalchemy import or_, exists, text
+from sqlalchemy import func, or_, exists, text
+from sqlalchemy_utils import escape_like
 
 
 from typing import overload, Any, Self, TYPE_CHECKING
@@ -22,7 +23,6 @@ if TYPE_CHECKING:
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
-
 
 MIN_PASSWORD_LENGTH = 10
 
@@ -71,9 +71,19 @@ class UserCollection:
 
     """
 
-    def __init__(self, session: Session, **filters: Any):
+    def __init__(
+        self,
+        session: Session,
+        term: str | None = None,
+        **filters: Any
+    ):
         self.session = session
+        self.term = term
         self.filters = as_dictionary_of_sets(filters)
+
+    @property
+    def q(self) -> str | None:
+        return self.term
 
     def __getattr__(self, name: str) -> set[Any] | None:
         if name not in self.filters:
@@ -91,7 +101,8 @@ class UserCollection:
             if key not in toggled:
                 toggled[key] = self.filters[key]
 
-        return self.__class__(self.session, **toggled)
+        return self.__class__(
+            self.session, self.term, **toggled)
 
     def query(self) -> Query[User]:
         """ Returns a query using :class:`onegov.user.models.User`. With
@@ -99,6 +110,13 @@ class UserCollection:
 
         """
         query = self.session.query(User)
+
+        if self.term:
+            term = func.unaccent(f'%{escape_like(self.term)}%')
+            query = query.filter(or_(
+                func.unaccent(User.username).ilike(term),
+                func.unaccent(User.realname).ilike(term)
+            ))
 
         for key, values in self.filters.items():
             if values:

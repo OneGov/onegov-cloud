@@ -191,6 +191,8 @@ def get_user(app: OrgApp, id: UUID) -> User | None:
 )
 def get_users(
     app: OrgApp,
+    request: OrgRequest,
+    q: str | None = None,
     active: list[bool] | None = None,
     role: list[str] | None = None,
     tag: list[str] | None = None,
@@ -199,7 +201,12 @@ def get_users(
 ) -> UserCollection:
     return UserCollection(
         app.session(),
-        active=active, role=role, tag=tag, provider=provider, source=source
+        term=q,
+        active=active,
+        role=role,
+        tag=tag,
+        provider=provider,
+        source=source,
     )
 
 
