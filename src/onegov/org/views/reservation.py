@@ -39,7 +39,7 @@ from onegov.reservation.collection import ResourceCollection
 from onegov.ticket import TicketCollection, TicketInvoice
 from purl import URL
 from sqlalchemy import and_, or_
-from uuid import uuid4
+from uuid import UUID, uuid4
 from webob import exc, Response
 from wtforms import HiddenField
 
@@ -50,7 +50,6 @@ if TYPE_CHECKING:
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
-    from uuid import UUID
 
 
 def reservation_subject(
@@ -978,9 +977,15 @@ def get_my_reservations_url(
         return None
 
     salt = secrets.token_urlsafe(16)
+    # FIXME: URLSafeTimedSerializer uses JSON, which can't encode a UUID, so
+    # we round-trip through int here. Passing it a SoftUUID serializer would
+    # let us pass reservation_token directly (same in
+    # get_reservations_subscribe_url below).
     payload = {
         'email': email,
-        'token': reservation_token.hex if reservation_token else None,
+        'token': UUID(int=reservation_token.int)
+        if reservation_token
+        else None,
     }
     return request.class_link(
         ResourceCollection,
@@ -1008,9 +1013,15 @@ def get_reservations_subscribe_url(
     url_obj = URL(request.class_link(
         ResourceCollection, name='my-reservations-ical'
     ))
+    # FIXME: URLSafeTimedSerializer uses JSON, which can't encode a UUID, so
+    # we round-trip through int here. Passing it a SoftUUID serializer would
+    # let us pass reservation_token directly (same in
+    # get_my_reservations_url above).
     payload = {
         'email': email,
-        'token': reservation_token.hex if reservation_token else None,
+        'token': UUID(int=reservation_token.int)
+        if reservation_token
+        else None,
     }
     token = request.new_url_safe_token(payload, salt)
     url_obj = url_obj.query_param('token', token)
