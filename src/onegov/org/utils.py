@@ -1156,6 +1156,7 @@ class MyReservationEventInfo:
         'handler_code',
         'ticket_number',
         'key_code',
+        'limited',
         'request',
         'translate',
     )
@@ -1175,6 +1176,7 @@ class MyReservationEventInfo:
         ticket_number: str,
         key_code: str | None,
         request: OrgRequest,
+        limited: bool = False,
     ) -> None:
 
         self.id = id
@@ -1191,6 +1193,8 @@ class MyReservationEventInfo:
         self.ticket_id = ticket_id
         self.handler_code = handler_code
         self.key_code = key_code
+        # limited magic-link view: no key codes, no ticket links
+        self.limited = limited
         self.request = request
         self.translate = request.translate
 
@@ -1222,7 +1226,7 @@ class MyReservationEventInfo:
             self.resource,
             self.event_time,
             f'{self.translate(_("Key Code"))}: {self.key_code}'
-            if self.key_code else '',
+            if self.key_code and not self.limited else '',
             self.translate(_('Pending approval')) if not self.accepted else '',
         ) if part)
 
@@ -1247,7 +1251,7 @@ class MyReservationEventInfo:
             'allDay': False,
             'title': self.event_title,
             'classNames': list(self.event_classes),
-            'url': self.request.class_link(
+            'url': '' if self.limited else self.request.class_link(
                 Ticket,
                 {
                     'handler_code': self.handler_code,

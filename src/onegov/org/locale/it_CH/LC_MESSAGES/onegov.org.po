@@ -5497,8 +5497,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -5806,6 +5806,9 @@ msgstr "Richiedere la cancellazione"
 
 msgid "See all your reservations"
 msgstr "Vedere tutte le prenotazioni"
+
+msgid "Subscribe to your reservations calendar"
+msgstr "Abbonarsi al calendario delle prenotazioni"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
@@ -6314,6 +6317,14 @@ msgstr ""
 "fine. Ciò include le allocazioni create utilizzando un periodo di "
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
+
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr ""
+"State visualizzando un riepilogo limitato delle prenotazioni "
+"confermate."
+
+msgid "Log in for full details"
+msgstr "Accedere per tutti i dettagli"
 
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
@@ -8526,6 +8537,52 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Ad essa sono associate iscrizioni confermate o aperte. Annulla prima la "
 #~ "finestra di registrazione."
+
+#~ msgid ""
+#~ "Receives an e-mail when entries are published or de-published. Useful e."
+#~ "g. for permit directories."
+#~ msgstr ""
+#~ "Riceve un'e-mail quando le voci vengono pubblicate o depubblicate. Utile "
+#~ "ad esempio per i registri dei permessi."
+
+#~ msgid ""
+#~ "Receives an e-mail when entries are published, de-published or deleted. "
+#~ "Useful e.g. for permit directories."
+#~ msgstr ""
+#~ "Riceve un'e-mail quando le voci vengono pubblicate, depubblicate o "
+#~ "eliminate. Utile ad es. per i registri delle autorizzazioni."
+
+#~ msgid "A new entry has been published in the \"${directory}\" directory:"
+#~ msgstr "Una nuova voce è stata pubblicata nel registro \"${directory}\":"
+
+#~ msgid "An entry in the \"${directory}\" directory has been updated:"
+#~ msgstr "Una voce nel registro \"${directory}\" è stata aggiornata:"
+
+#, python-format
+#~ msgid "${org}: Updated Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Voce aggiornata \"${entry}\" in \"${directory}\""
+
+#, python-format
+#~ msgid "${org}: New Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Nuova voce \"${entry}\" in \"${directory}\""
+
+#~ msgid ""
+#~ "The entry \"${entry}\" in the \"${directory}\" directory has been deleted."
+#~ msgstr ""
+#~ "La voce \"${entry}\" nel registro \"${directory}\" è stata eliminata."
+
+#~ msgid "Automatically deleted as configured."
+#~ msgstr "Eliminato automaticamente come configurato."
+
+#, python-format
+#~ msgid "${org}: Deleted Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Voce eliminata \"${entry}\" in \"${directory}\""
+
+#~ msgid "General information above the event list"
+#~ msgstr "Informazioni generali sopra l'elenco degli eventi"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Informazioni generali sotto l'elenco degli eventi"
 
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "es. 07:00 o 07:00, 14:30"

@@ -5514,8 +5514,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Neue Kunden Nachricht in Ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -5830,6 +5830,9 @@ msgstr "Stornierung beantragen"
 
 msgid "See all your reservations"
 msgstr "Alle Ihre Reservationen einsehen"
+
+msgid "Subscribe to your reservations calendar"
+msgstr "Reservationskalender abonnieren"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
@@ -6333,6 +6336,12 @@ msgstr ""
 "Verfügbarkeitszeitraum erstellt wurden. Um diese Verfügbarkeiten wieder zu "
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
+
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr "Dies ist eine limitierte Übersicht Ihrer bestätigten Reservationen."
+
+msgid "Log in for full details"
+msgstr "Für alle Details anmelden"
 
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
@@ -8562,6 +8571,78 @@ msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 #~ msgstr ""
 #~ "Bereits bestätigte oder offene Anmeldungen wären betroffen. Sagen Sie den "
 #~ "Zeitraum zuerst ab."
+
+#~ msgid ""
+#~ "Receives an e-mail when entries are published or de-published. Useful e."
+#~ "g. for permit directories."
+#~ msgstr ""
+#~ "Erhält eine E-Mail, wenn Einträge veröffentlicht oder depubliziert "
+#~ "werden. Nützlich z.B. für Baugesuchsverzeichnisse."
+
+#~ msgid ""
+#~ "Receives an e-mail when entries are published, de-published or deleted. "
+#~ "Useful e.g. for permit directories."
+#~ msgstr ""
+#~ "Erhält eine E-Mail, wenn Einträge veröffentlicht, depubliziert oder "
+#~ "gelöscht werden. Nützlich z.B. für Baugesuchsverzeichnisse."
+
+#~ msgid "A new entry has been published in the \"${directory}\" directory:"
+#~ msgstr ""
+#~ "Ein neuer Eintrag wurde im Verzeichnis \"${directory}\" veröffentlicht:"
+
+#~ msgid "An entry in the \"${directory}\" directory has been updated:"
+#~ msgstr "Ein Eintrag im Verzeichnis \"${directory}\" wurde aktualisiert:"
+
+#, python-format
+#~ msgid "${org}: Updated Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Aktualisierter Eintrag \"${entry}\" in \"${directory}\""
+
+#, python-format
+#~ msgid "${org}: New Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Neuer Eintrag \"${entry}\" in \"${directory}\""
+
+#~ msgid ""
+#~ "The entry \"${entry}\" in the \"${directory}\" directory has been deleted."
+#~ msgstr ""
+#~ "Der Eintrag \"${entry}\" im Verzeichnis \"${directory}\" wurde gelöscht."
+
+#~ msgid "Automatically deleted as configured."
+#~ msgstr "Automatisch gelöscht wie konfiguriert."
+
+#, python-format
+#~ msgid "${org}: Deleted Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Gelöschter Eintrag \"${entry}\" in \"${directory}\""
+
+#~ msgid "Publication start: ${date}"
+#~ msgstr "Publikationsstart: ${date}"
+
+#~ msgid "Publication start: Not set"
+#~ msgstr "Publikationsstart: Nicht gesetzt"
+
+#~ msgid "Publication end: ${date}"
+#~ msgstr "Publikationsende: ${date}"
+
+#~ msgid "Publication end: Not set"
+#~ msgstr "Publikationsende: Nicht gesetzt"
+
+#~ msgid "Publication start"
+#~ msgstr "Publikationsstart"
+
+#~ msgid "Publication end"
+#~ msgstr "Publikationsende"
+
+#~ msgid ""
+#~ "The publication period of an entry in the \"${directory}\" directory has "
+#~ "expired and the entry has been deleted:"
+#~ msgstr ""
+#~ "Die Publikationsfrist eines Eintrags im Verzeichnis \"${directory}\" ist "
+#~ "abgelaufen und der Eintrag wurde gelöscht:"
+
+#~ msgid "General information above the event list"
+#~ msgstr "Allgemeine Informationen über der Veranstaltungs-Liste"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Allgemeine Informationen unterhalb der Veranstaltungs-Liste"
 
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "z.B. 07:00 oder 07:00, 14:30"

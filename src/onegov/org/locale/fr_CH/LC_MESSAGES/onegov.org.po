@@ -5520,8 +5520,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -5837,6 +5837,9 @@ msgstr "Demander l'annulation"
 
 msgid "See all your reservations"
 msgstr "Voir toutes vos réservations"
+
+msgid "Subscribe to your reservations calendar"
+msgstr "S'abonner à votre calendrier de réservations"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
@@ -6345,6 +6348,13 @@ msgstr ""
 "période de disponibilité. Pour recréer ces allocations, cliquez sur "
 "\"éditer\" dans la période de disponibilité, puis \"enregistrer\" sans rien "
 "changer."
+
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr ""
+"Vous consultez un résumé limité de vos réservations confirmées."
+
+msgid "Log in for full details"
+msgstr "Se connecter pour tous les détails"
 
 msgid "No recipients defined yet."
 msgstr "Aucun destinataire défini pour le moment."
@@ -8570,6 +8580,53 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 #~ msgstr ""
 #~ "Il y a des inscriptions confirmées ou ouvertes pour ce fenêtre "
 #~ "d'inscription. Annulez-le d'abord."
+
+#~ msgid ""
+#~ "Receives an e-mail when entries are published or de-published. Useful e."
+#~ "g. for permit directories."
+#~ msgstr ""
+#~ "Reçoit un e-mail lorsque des entrées sont publiées ou dépubliées. Utile p."
+#~ "ex. pour les répertoires de permis."
+
+#~ msgid ""
+#~ "Receives an e-mail when entries are published, de-published or deleted. "
+#~ "Useful e.g. for permit directories."
+#~ msgstr ""
+#~ "Reçoit un e-mail lorsque des entrées sont publiées, dépubliées ou "
+#~ "supprimées. Utile p.ex. pour les répertoires de permis."
+
+#~ msgid "A new entry has been published in the \"${directory}\" directory:"
+#~ msgstr ""
+#~ "Une nouvelle entrée a été publiée dans le répertoire \"${directory}\" :"
+
+#~ msgid "An entry in the \"${directory}\" directory has been updated:"
+#~ msgstr "Une entrée dans le répertoire \"${directory}\" a été mise à jour :"
+
+#, python-format
+#~ msgid "${org}: Updated Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Entrée mise à jour \"${entry}\" dans \"${directory}\""
+
+#, python-format
+#~ msgid "${org}: New Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Nouvelle entrée \"${entry}\" dans \"${directory}\""
+
+#~ msgid ""
+#~ "The entry \"${entry}\" in the \"${directory}\" directory has been deleted."
+#~ msgstr ""
+#~ "L'entrée \"${entry}\" dans le répertoire \"${directory}\" a été supprimée."
+
+#~ msgid "Automatically deleted as configured."
+#~ msgstr "Supprimé automatiquement comme configuré."
+
+#, python-format
+#~ msgid "${org}: Deleted Entry \"${entry}\" in \"${directory}\""
+#~ msgstr "${org}: Entrée supprimée \"${entry}\" dans \"${directory}\""
+
+#~ msgid "General information above the event list"
+#~ msgstr "Informations générales au-dessus de la liste des événements"
+
+#~ msgid "General information below the event list"
+#~ msgstr "Informations générales en dessous de la liste des événements"
 
 #~ msgid "e.g. 07:00 or 07:00, 14:30"
 #~ msgstr "p.ex. 07:00 ou 07:00, 14:30"
