@@ -663,7 +663,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         """
 
-        # Event join: filters/ordering and the batch eager-load
         query = self.apply_common_filters(
             self.session.query(Occurrence).join(Event)
         )
