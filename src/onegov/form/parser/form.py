@@ -8,7 +8,8 @@ from onegov.form import errors, log
 from onegov.form.core import Form
 from onegov.form.fields import (
     MultiCheckboxField, DateTimeLocalField, URLField, VideoURLField)
-from onegov.form.fields import TimeField, UploadField, UploadMultipleField
+from onegov.form.fields import (
+    TimeField, UploadField, UploadMultipleField)
 from onegov.form.parser.core import flatten_fields, parse_formcode, ParsedField
 from onegov.form.validators import LaxDataRequired
 from onegov.form.validators import ExpectedExtensions
@@ -334,7 +335,7 @@ def handle_field(
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
             allowed_mimetypes=expected_extensions.whitelist,
-            render_kw={'accept': accept},
+            render_kw={'accept': accept, 'resend_upload': True},
             description=field.field_help
         )
 
@@ -353,7 +354,7 @@ def handle_field(
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
             allowed_mimetypes=expected_extensions.whitelist,
-            render_kw={'accept': accept},
+            render_kw={'accept': accept, 'resend_upload': True},
             description=field.field_help
         )
 

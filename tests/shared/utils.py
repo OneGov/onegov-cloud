@@ -139,16 +139,34 @@ def create_image(
     return im
 
 
+@overload
 def create_pdf(
-    filename: str = 'simple.pdf',
+    filename: None = None,
+    content: str = ...
+) -> BytesIO: ...
+
+
+@overload
+def create_pdf(
+    filename: str,
+    content: str = ...
+) -> Canvas: ...
+
+
+def create_pdf(
+    filename: str | None = None,
     content: str = "Hello, I am a PDF document created with Python!"
-) -> Canvas:
+) -> Canvas | BytesIO:
 
     from reportlab.pdfgen import canvas
 
-    c = canvas.Canvas(filename)
+    c = canvas.Canvas((buffer := BytesIO()) if filename is None else filename)
     c.drawString(100, 750, content)
     c.save()
+
+    if filename is None:
+        buffer.seek(0)
+        return buffer
     return c
 
 
