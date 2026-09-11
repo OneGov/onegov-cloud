@@ -1465,6 +1465,72 @@ def test_reserve_allocation(
 
 
 @freeze_time('2015-08-28', tick=True)
+def test_accept_reservation_with_pdf(client: Client) -> None:
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocation = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=1,
+        quota_limit=1,
+    )[0]
+    reserve = client.bound_reserve(allocation)
+    transaction.commit()
+
+    assert reserve(quota=1, whole_day=True).json == {'success': True}
+    form = client.get('/resource/tageskarte/form').form
+    form['email'] = 'info@example.org'
+    ticket_status = form.submit().follow().form.submit().follow()
+    status_url = ticket_status.request.url
+
+    client.login_admin()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    accept = ticket.click('Alle annehmen mit Kommentar')
+    assert 'file' in accept.form.fields
+
+    pdf_path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(pdf_path, 'rb') as pdf:
+        pdf_content = pdf.read()
+    accept.form['text'] = 'Ihre Bewilligung ist im Anhang.'
+    accept.form['file'] = Upload(
+        'bewilligung.pdf', pdf_content, 'application/pdf'
+    )
+    ticket = accept.form.submit().follow()
+
+    email = client.get_email(1)
+    attachments = {
+        attachment['Name']: b64decode(attachment['Content'])
+        for attachment in email['Attachments']
+    }
+    assert len(attachments) == 2
+    assert any(
+        name.endswith('-reservations-summary.pdf') for name in attachments
+    )
+    assert 'bewilligung.pdf' in attachments
+    assert attachments['bewilligung.pdf'] == pdf_content
+
+    messages = json.loads(
+        ticket.pyquery('div.timeline').attr('data-feed-data')
+    )['messages']
+    message_html = next(
+        message['html']
+        for message in messages
+        if 'bewilligung.pdf' in message['html']
+    )
+    file_url = re.search(r'href="([^"]+)">bewilligung.pdf', message_html)
+    assert file_url is not None
+
+    anonymous = client.spawn()
+    status = anonymous.get(status_url)
+    assert 'bewilligung.pdf' in status
+    response = anonymous.get(file_url.group(1))
+    assert response.body == pdf_content
+
+
+@freeze_time('2015-08-28', tick=True)
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')

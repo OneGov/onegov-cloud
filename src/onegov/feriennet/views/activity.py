@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+from uuid import UUID
+
 import sedate
 import random
 
@@ -723,25 +725,33 @@ def view_activities_for_volunteers(
     adjust_filter_path(filters, suffix='volunteer')
     adjust_filter_path(mobile_filters, suffix='volunteer')
 
+    # batch-load occasions for all activities
+    occasions_by_activity: dict[UUID, list[Occasion]] = {}
+    if show_activities:
+        activity_ids = [a.id for a in self.batch]
+        if activity_ids:
+            query = OccasionCollection(request.session).query()
+            query = query.filter(Occasion.activity_id.in_(activity_ids))
+
+            query = query.join(Occasion.period)
+            query = query.options(contains_eager(Occasion.period))
+
+            query = query.filter(BookingPeriod.active == True)
+            query = query.filter(BookingPeriod.archived == False)
+
+            query = query.order_by(
+                desc(BookingPeriod.active),
+                BookingPeriod.execution_start,
+                Occasion.order)
+
+            for occasion in query:
+                occasions_by_activity.setdefault(
+                    occasion.activity_id, []).append(occasion)
+
     def occasions_for_volunteer(
         activity: Activity,
     ) -> list[Occasion]:
-
-        query = OccasionCollection(request.session).query()
-        query = query.filter(Occasion.activity_id == activity.id)
-
-        query = query.join(Occasion.period)
-        query = query.options(contains_eager(Occasion.period))
-
-        query = query.filter(BookingPeriod.active == True)
-        query = query.filter(BookingPeriod.archived == False)
-
-        query = query.order_by(
-            desc(BookingPeriod.active),
-            BookingPeriod.execution_start,
-            Occasion.order)
-
-        return query.all()
+        return occasions_by_activity.get(activity.id, [])
 
     def wants_more_volunteers(need: OccasionNeed) -> bool:
         needed = need.number.upper - 1

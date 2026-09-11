@@ -204,19 +204,23 @@ def validate_attendance_date(
     return None
 
 
-def has_user_set_abschluss_for_settlement_run(
-    session: Session, parliamentarian_id: UUID, attendance_date: date
+def has_user_set_abschluss_for_commission(
+    session: Session,
+    parliamentarian_id: UUID,
+    commission_id: UUID,
+    attendance_date: date,
 ) -> bool:
-    """Check if parliamentarian has set abschluss in settlement run.
+    """Check if parliamentarian has closed a commission in a settlement run.
 
     Args:
         session: Database session
         parliamentarian_id: UUID of the parliamentarian
+        commission_id: UUID of the commission
         attendance_date: Date to check which settlement run it belongs to
 
     Returns:
-        True if parliamentarian has any attendance with abschluss=True
-        in the settlement run containing the given date.
+        True if parliamentarian has an attendance with abschluss=True for the
+        commission in the settlement run containing the given date.
     """
     settlement_run = (
         session.query(SettlementRun)
@@ -233,6 +237,7 @@ def has_user_set_abschluss_for_settlement_run(
     has_abschluss = session.query(
         exists().where(
             (Attendence.parliamentarian_id == parliamentarian_id)
+            & (Attendence.commission_id == commission_id)
             & (Attendence.date >= settlement_run.start)
             & (Attendence.date <= settlement_run.end)
             & (Attendence.abschluss == True)
