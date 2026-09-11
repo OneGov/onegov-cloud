@@ -181,3 +181,8 @@ def test_exports(client: Client, scenario: Scenario) -> None:
     assert data['Attendee Political Municipality'] == 'Someotherplace'
     assert data['Attendee SwissPass ID'] == '123-456-789-0'
     assert data['Invoice Item Payment date'] == date(2020, 3, 5)
+
+
+def test_volunteer_states_are_all_exportable() -> None:
+    # STATES must cover every volunteer_state, else export raises KeyError
+    assert set(STATES) == set(get_args(VolunteerState.__value__))
