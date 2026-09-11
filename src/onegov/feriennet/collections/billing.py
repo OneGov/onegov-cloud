@@ -125,7 +125,10 @@ class BillingCollection:
             query = query.where(invoices.username == self.username)
 
         if self.state in ('paid', 'unpaid'):
-            query = query.where(invoices.paid == (self.state == 'paid'))
+            # filter by invoice-level paid status so items (e.g. discounts)
+            # stay grouped with their bill
+            query = query.where(
+                invoices.invoice_paid == (self.state == 'paid'))
 
         return self.session.execute(query)
 
