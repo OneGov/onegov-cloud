@@ -161,6 +161,12 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.event_filter_configuration = event_filter_configuration or {}
         self.event_filter_fields = event_filter_fields or ()
 
+        # batch-default eager-load; set here, not as class attr, to defer
+        # mapper configuration past import
+        self.set_query_options(
+            contains_eager(Occurrence.event).joinedload(Event.image)
+        )
+
     @property
     def q(self) -> str | None:
         return self.term
@@ -659,7 +665,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         query = self.apply_common_filters(
             self.session.query(Occurrence).join(Event)
-            .options(contains_eager(Occurrence.event).joinedload(Event.image))
         )
 
         if self.term:
