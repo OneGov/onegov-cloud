@@ -13,6 +13,7 @@ from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
+from onegov.pas.models import Attendence
 from onegov.pas.models import PASCommissionMembership
 from onegov.pas.models import PASParliamentarianRole
 from onegov.pas.models import SettlementRun
@@ -1027,11 +1028,9 @@ def test_commission_president_bulk_add(
     assert page.status_code == 200
 
 
-def test_abschluss_blocks_second_bulk_add(
+def test_abschluss_blocks_bulk_add_only_for_same_commission(
     client: Client[TestPasApp],
 ) -> None:
-    from onegov.pas.models import Attendence
-
     session = client.app.session()
     session.add(
         SettlementRun(
@@ -1068,23 +1067,26 @@ def test_abschluss_blocks_second_bulk_add(
 
     commissions = PASCommissionCollection(session)
     commission = commissions.add(name='Finanzkommission')
+    other_commission = commissions.add(name='Bildungskommission')
 
-    session.add(
-        PASCommissionMembership(
-            parliamentarian_id=bob.id,
-            commission_id=commission.id,
-            role='member',
+    for target_commission in (commission, other_commission):
+        session.add(
+            PASCommissionMembership(
+                parliamentarian_id=bob.id,
+                commission_id=target_commission.id,
+                role='member',
+            )
         )
-    )
-    session.add(
-        PASCommissionMembership(
-            parliamentarian_id=alice.id,
-            commission_id=commission.id,
-            role='president',
+        session.add(
+            PASCommissionMembership(
+                parliamentarian_id=alice.id,
+                commission_id=target_commission.id,
+                role='president',
+            )
         )
-    )
 
     commission_id = str(commission.id)
+    other_commission_id = str(other_commission.id)
     bob_id = str(bob.id)
     alice_id = str(alice.id)
 
@@ -1118,6 +1120,20 @@ def test_abschluss_blocks_second_bulk_add(
     page.form['date'] = '2024-07-15'
     page.form['type'] = 'commission'
     page.form['duration'] = '3'
+    page.form['commission_id'] = other_commission_id
+    page.form['abschluss'] = False
+    page.form['parliamentarian_id'] = [bob_id, alice_id]
+    page = page.form.submit().maybe_follow()
+
+    assert page.status_code == 200
+    session = client.app.session()
+    assert session.query(Attendence).count() == 4
+
+    page = client.get('/attendences/new-commission-bulk')
+    assert page.status_code == 200
+    page.form['date'] = '2024-07-15'
+    page.form['type'] = 'commission'
+    page.form['duration'] = '3'
     page.form['commission_id'] = commission_id
     page.form['abschluss'] = False
     page.form['parliamentarian_id'] = [bob_id, alice_id]
@@ -1127,7 +1143,7 @@ def test_abschluss_blocks_second_bulk_add(
 
     session = client.app.session()
     count_after_second = session.query(Attendence).count()
-    assert count_after_second == 2
+    assert count_after_second == 4
 
 
 def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
