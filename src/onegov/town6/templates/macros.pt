@@ -980,8 +980,6 @@
 
 <metal:display_form define-macro="display_form" i18n:domain="onegov.town6">
 
-    <div metal:use-macro="layout.macros['progress_indicator']" tal:define="steps layout.get_step_sequence()|nothing"/>
-
     <div tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:b define="fields fieldset.non_empty_fields" condition="fields">
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
@@ -2379,13 +2377,13 @@
                 <metal:b define-slot="after-submit" />
             </div>
             <div data-depends-on="payment_method/manual">
-                <input type="submit" value="Complete" class="button" i18n:attributes="value">
+                <input type="submit" value="Complete" class="btn btn-primary me-lg" i18n:attributes="value">
                 <metal:b define-slot="after-submit" />
             </div>
         </tal:b>
 
         <tal:b condition="not price">
-            <input type="submit" value="Complete" class="button" i18n:attributes="value">
+            <input type="submit" value="Complete" class="btn btn-primary me-lg" i18n:attributes="value">
             <metal:b define-slot="after-submit" />
         </tal:b>
     </form>
