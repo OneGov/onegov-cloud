@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import html
+import turbohtml
 
 from datetime import datetime
 from onegov.core.orm import Base, observes
@@ -206,7 +206,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             #       safe to unescape before extracting text, this will
             #       avoid escaped html entities in the title
             self.title = extract_text_from_html(', '.join(
-                html.unescape(render_field(form._fields[id]))
+                turbohtml.unescape(render_field(form._fields[id]))
                 for id in title_fields
             ))
 
@@ -407,7 +407,7 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
         if title_fields:
             # FIXME: Reconsider using unescape when consistently using Markup.
             self.title = extract_text_from_html(', '.join(
-                html.unescape(render_field(survey._fields[id]))
+                turbohtml.unescape(render_field(survey._fields[id]))
                 for id in title_fields
             ))
 

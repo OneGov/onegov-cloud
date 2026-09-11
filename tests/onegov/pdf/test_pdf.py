@@ -443,10 +443,24 @@ def test_pdf_mini_html() -> None:
         'ultricies mi vitae est</em>. Mauris commodo vitae.'
     )
     assert paragraphs[3] == (
-        'Donec non enim in turpis pulvinar facilisis. Ut felis. Aliquam'
+        'Donec non enim in turpis pulvinar facilisis. Ut felis.'
     )
-    assert paragraphs[4] == (
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean'
+    assert paragraphs[4] == 'Aliquam'
+    assert paragraphs[5] == (
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+    )
+    assert paragraphs[6] == 'Aenean'
+    # NOTE: The only reason this previously wasn't included is because
+    #       it happened to occur at the end and got thus transformed
+    #       into the element.tail of the ul element, which was not
+    #       being displayed, which was incorrect anyways. Our new
+    #       transformer is more correct and more robust, so it makes
+    #       sense that this text is included. If we want to remove
+    #       certain tags entirely we would need to pre-process the
+    #       the html to first remove all those tags at the root-level
+    #       before we sanitize it and strip the tags
+    assert paragraphs[7] == (
+        '#header h1 a { display: block; width: 300px; height: 80px; }'
     )
 
     lists = [
@@ -478,7 +492,8 @@ def test_pdf_mini_html() -> None:
         '2 Aliquam tincidunt mauris eu risus. '
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean '
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
-        'Aliquam tincidunt mauris eu risus.'
+        'Aliquam tincidunt mauris eu risus. '
+        '#header h1 a { display: block; width: 300px; height: 80px; }'
     )
 
 

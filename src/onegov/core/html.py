@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 import re
+import turbohtml
 
-from bleach.sanitizer import Cleaner
-from html2text import HTML2Text
 from markupsafe import Markup
+from turbohtml.clean import Policy, sanitize
 
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
-# html tags allowed by bleach
-SANE_HTML_TAGS = [
+# html tags allowed by our default sanitize policy
+SANE_HTML_TAGS = frozenset({
     'a',
     'abbr',
     'b',
@@ -47,16 +47,16 @@ SANE_HTML_TAGS = [
     'tr',
     'th',
     'td',
-]
+})
 
-# html attributes allowed by bleach
+# html attributes allowed by our default sanitize policy
 SANE_HTML_ATTRS = {
-    'a': ['href', 'title'],
-    'abbr': ['title', ],
-    'acronym': ['title', ],
-    'img': ['src', 'alt', 'title'],
-    'p': ['class'],
-    'ol': ['class']
+    'a': frozenset({'href', 'title'}),
+    'abbr': frozenset({'title', }),
+    'acronym': frozenset({'title', }),
+    'img': frozenset({'src', 'alt', 'title'}),
+    'p': frozenset({'class'}),
+    'ol': frozenset({'class'}),
 }
 
 # lines without these plaintext characters are excluded in html_to_text
@@ -82,7 +82,7 @@ VALID_PLAINTEXT_CHARACTERS = re.compile(
 EMPTY_LINK = re.compile(r'\[\]\([^)]+\)')
 
 
-cleaner = Cleaner(
+sanitize_policy = Policy(
     tags=SANE_HTML_TAGS,
     attributes=SANE_HTML_ATTRS
 )
@@ -94,7 +94,7 @@ def sanitize_html(html: str | None) -> Markup:
 
     """
 
-    return Markup(cleaner.clean(html or ''))  # nosec: B704
+    return Markup(sanitize(html or '', sanitize_policy))  # nosec: B704
 
 
 def sanitize_svg[T: str](svg: T) -> T:
@@ -120,40 +120,70 @@ def sanitize_svg[T: str](svg: T) -> T:
 def html_to_text(
     html: str,
     *,
-    unicode_snob: bool = True,
     body_width: int = 0,
     ignore_images: bool = True,
     single_line_break: bool = True,
-    # FIXME: We may want to specify the other valid options
-    **config: Any
+    ignore_emphasis: bool = False,
+    ul_item_mark: str = '*',
+    strong_mark: str = '**',
+    emphasis_mark: str = '_',
 ) -> str:
     """ Takes the given HTML text and extracts the text from it.
 
-    The result is markdown. The driver behind it is html2text. Have a look
-    at https://github.com/Alir3z4/html2text/blob/master/html2text/__init__.py
-    to see all options.
+    The result is markdown. The driver behind it is turbohtml.
 
     """
 
-    # filter out duplicated lines and lines without any text
-    html2text = HTML2Text()
+    config = turbohtml.Markdown(
+        document=turbohtml.Markdown.Document(
+            # NOTE: While we used to have unicode_snob set to True
+            #       it only made sure html entities are converted
+            #       to their unicode representation, it didn't actually
+            #       replace unicode characters with ASCII, and we don't
+            #       really want that to happen anyways. turbohtml
+            #       always replaces html entities, so transliteration
+            #       is not what we want, since it would replace
+            #       things like umlauts and accents with their
+            #       unaccented counterparts.
+            transliterate=False,
+            block_spacing='double',
+        ),
+        wrapping=turbohtml.Markdown.Wrapping(width=body_width),
+        inline=turbohtml.Markdown.Inline(
+            strong=strong_mark,
+            emphasis=emphasis_mark,
+            ignore_emphasis=ignore_emphasis
+        ),
+        # NOTE: We don't care about producing valid markdown as much
+        #       as producing something human-readable, the escaped
+        #       markdown would be a nuisance. This minimizes the
+        #       amount of escaping that will happen, although it would
+        #       be nice to have a `mode='none' that will attemp no
+        #       escaping whatsoever.
+        escaping=turbohtml.Markdown.Escaping(
+            mode='minimal',
+            asterisks=False,
+            underscores=False,
+        ),
+        lists=turbohtml.Markdown.Lists(bullets=ul_item_mark),
+        images=turbohtml.Markdown.Images(
+            mode='ignore' if ignore_images else 'markdown'
+        ),
+        # NOTE: Using a padded whitespace only table produces more sane
+        #       output, since markdown mode tries to preserve the
+        #       table working correctly. But markdown doesn't support
+        #       multiple lines per table cell or nested tables, both
+        #       are very common input, so we will get something very
+        #       messy and unreadable, unless we switch to this mode.
+        tables=turbohtml.Markdown.Tables(
+            mode='strip',
+            header='detect',
+            pad=True
+        ),
+    )
 
-    # output unicode directly, instead of approximating it to ASCII
-    html2text.unicode_snob = unicode_snob
-
-    # do not wrap lines after a certain length
-    html2text.body_width = body_width
-
-    # images are just converted into somewhat useless links, so disable
-    html2text.ignore_images = ignore_images
-
-    # we do our own paragraph handling
-    html2text.single_line_break = single_line_break
-
-    for key, value in config.items():
-        setattr(html2text, key, value)
-
-    lines: Iterable[str] = html2text.handle(html).splitlines()
+    lines: Iterable[str]
+    lines = turbohtml.parse(html).to_markdown(config).splitlines()
 
     # ignore images doesn't catch all images:
     if ignore_images:

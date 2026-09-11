@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from bleach.sanitizer import Cleaner
 from functools import cached_property
 from datetime import timedelta
 from dateutil.parser import parse
 from onegov.gis import Coordinates
 from sedate import replace_timezone
+from turbohtml.clean import OnDisallowed, Policy, Sanitizer
 
 
 from typing import overload
@@ -27,12 +27,11 @@ class GuidleBase:
             root = root.getroot()
         self.root = root
         self.nsmap = {'guidle': 'http://www.guidle.com'}
-        self.cleaner = Cleaner(
-            tags=[],
+        self.sanitizer = Sanitizer(Policy(
+            tags=frozenset(),
             attributes={},
-            strip=True,
-            filters=[]
-        )
+            on_disallowed_tag=OnDisallowed.STRIP,
+        ))
 
     def find(
         self,
@@ -85,7 +84,7 @@ class GuidleBase:
         if parser:
             return parser(result) if result else None
         else:
-            return self.cleaner.clean(result) if result else ''
+            return self.sanitizer.sanitize(result) if result else ''
 
     def join(self, texts: Sequence[str], joiner: str = ', ') -> str:
         """ Joins a set of text, skips duplicate and empty texts while
