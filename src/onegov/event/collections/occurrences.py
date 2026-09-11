@@ -161,6 +161,12 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.event_filter_configuration = event_filter_configuration or {}
         self.event_filter_fields = event_filter_fields or ()
 
+        # batch-default eager-load; set here, not as class attr, to defer
+        # mapper configuration past import
+        self.set_query_options(
+            contains_eager(Occurrence.event).joinedload(Event.image)
+        )
+
     @property
     def q(self) -> str | None:
         return self.term
@@ -657,7 +663,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         """
 
-        # Event join needed for filters/ordering and the batch eager-load
+        # Event join: filters/ordering and the batch eager-load
         query = self.apply_common_filters(
             self.session.query(Occurrence).join(Event)
         )
@@ -735,18 +741,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
             query = self.search_widget.adapt(query)
 
         return query
-
-    def eager_load_batch(self) -> Self:
-        """
-        Eager-loads the event data serialized per occurrence, batch only.
-        """
-        # relies on the Event join added in query()
-        event = contains_eager(Occurrence.event)
-        return self.set_query_options(
-            event.joinedload(Event.image),
-            event.undefer(Event.content),
-            undefer(Occurrence.content),
-        )
 
     def by_name(self, name: str) -> Occurrence | None:
         """ Returns an occurrence by its URL-friendly name.
