@@ -304,6 +304,8 @@ class SessionManager:
         self.bases = [base]
         self.created_schemas: set[str] = set()
         self.current_schema: str | None = None
+        self.current_user_id: str | None = None
+        self.current_username: str | None = None
 
         self._ignore_bulk_updates = False
         self._ignore_bulk_deletes = False
@@ -711,6 +713,23 @@ class SessionManager:
 
         self.default_locale = default_locale
         self.current_locale = current_locale
+
+    @contextmanager
+    def set_current_user(
+        self,
+        user_id: str | None,
+        username: str | None,
+    ) -> Iterator[Self]:
+        """Sets the user responsible for changes within the context."""
+        previous_user_id = self.current_user_id
+        previous_username = self.current_username
+        self.current_user_id = user_id
+        self.current_username = username
+        try:
+            yield self
+        finally:
+            self.current_user_id = previous_user_id
+            self.current_username = previous_username
 
     def _scopefunc(self) -> tuple[threading.Thread, str | None]:
         """ Returns the scope of the scoped_session used to create new

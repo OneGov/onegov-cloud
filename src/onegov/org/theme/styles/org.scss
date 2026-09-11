@@ -345,6 +345,7 @@ $globals-height: 2.5rem;
     .text-modules::before { @include icon('\f249'); }
     .settings::before { @include icon('\f1de'); }
     .timeline::before { @include icon('\f017'); }
+    .audit-trail::before { @include icon('\f1da'); }
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon('\f0fa'); }
     .ticket-archive::before { @include icon('\f1c6'); }
