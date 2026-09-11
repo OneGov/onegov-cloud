@@ -830,3 +830,47 @@ def test_api_directory_content_hash(client: Client) -> None:
     items = api_items(client, '/api/clubs')
     item_data = api_item_data(items[0])
     assert item_data['content_hash'] != first_hash
+
+
+def test_api_directory_no_n_plus_one_content(client: Client) -> None:
+    from sqlalchemy import event as sa_event
+    from onegov.core.utils import Bunch
+    from onegov.org.api import DirectoryEntryApiEndpoint
+
+    session = client.app.session()
+    directory: ExtendedDirectory = DirectoryCollection(
+        session, type='extended'
+    ).add(
+        title='Clubs',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+    for i in range(5):
+        directory.add(values={'name': f'Club {i}'})
+    transaction.commit()
+
+    request: Any = Bunch(
+        app=client.app, session=client.app.session(), identity=None
+    )
+    entries = DirectoryEntryApiEndpoint(request, 'clubs').collection.batch
+    assert len(entries) == 5
+
+    statements: list[str] = []
+    engine = client.app.session().get_bind()
+
+    def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
+        statements.append(statement)
+
+    sa_event.listen(engine, 'before_cursor_execute', count)
+    try:
+        # what the API serializer touches per row
+        for entry in entries:
+            entry.content
+            entry.files
+    finally:
+        sa_event.remove(engine, 'before_cursor_execute', count)
+
+    content_loads = [s for s in statements if 'directory_entries.content' in s]
+    assert content_loads == [], f'N+1 on content: {len(content_loads)} queries'
+    file_loads = [s for s in statements if 'files_for_directory_entries' in s]
+    assert len(file_loads) <= 1, f'N+1 on files: {len(file_loads)} queries'
