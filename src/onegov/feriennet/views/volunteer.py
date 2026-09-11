@@ -12,6 +12,7 @@ from onegov.feriennet.forms import VolunteerForm
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.layout import VolunteerFormLayout
 from onegov.feriennet.layout import VolunteerLayout
+from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.mail import send_ticket_mail
 from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.models import VolunteerCart
@@ -334,15 +335,30 @@ def submit_volunteer(
     self: VolunteerCart,
     request: FeriennetRequest,
     form: VolunteerForm
-) -> RenderData:
+) -> RenderData | Response:
 
     layout = VolunteerFormLayout(self, request)
     request.include('volunteer-cart')
     complete = False
 
     if form.submitted(request):
-        volunteers = VolunteerCollection(request.session, period=None)
         cart = VolunteerCart.from_request(request)
+
+        if not cart.ids():
+            # empty cart: alert with a link back to the activities
+            link = Markup('<a href="{}">{}</a>').format(
+                request.class_link(
+                    VacationActivityCollection, name='volunteer'),
+                request.translate(_('Help us'))
+            )
+            request.alert(Markup('{} {}').format(
+                request.translate(
+                    _('Please add at least one activity to your list.')),
+                link
+            ))
+            return request.redirect(request.link(self, name='submit'))
+
+        volunteers = VolunteerCollection(request.session, period=None)
         token = uuid4()
         subscriptions = []
 
