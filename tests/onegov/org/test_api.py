@@ -319,6 +319,35 @@ def test_api_syndicate_filter(
     assert not collection('/api/events?syndicate=true&highlight=true').items
 
 
+def test_api_events_no_n_plus_one(client: Client) -> None:
+    from sqlalchemy import event as sa_event
+    from onegov.core.utils import Bunch
+    from onegov.org.api import EventApiEndpoint
+
+    request: Any = Bunch(app=client.app, identity=None)
+    occurrences = EventApiEndpoint(request).collection.batch
+    assert len(occurrences) > 1
+
+    statements: list[str] = []
+    engine = client.app.session().get_bind()
+
+    def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
+        statements.append(statement)
+
+    sa_event.listen(engine, 'before_cursor_execute', count)
+    try:
+        # what the API serializer touches per row
+        for occurrence in occurrences:
+            occurrence.content
+            occurrence.event.content
+            occurrence.event.image
+    finally:
+        sa_event.remove(engine, 'before_cursor_execute', count)
+
+    # all eager-loaded: no per-row lazy queries
+    assert statements == [], f'unexpected lazy queries: {statements}'
+
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')

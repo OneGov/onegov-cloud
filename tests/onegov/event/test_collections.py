@@ -250,47 +250,6 @@ def test_occurrence_collection(session: Session) -> None:
     assert OccurrenceCollection(session, range='today').end == date.today()
 
 
-def test_occurrence_collection_query_no_n_plus_one(session: Session) -> None:
-    from sqlalchemy import event as sa_event
-
-    for i in range(5):
-        event = EventCollection(session).add(
-            title=f'Event {i}',
-            start=datetime(next_year, 6, 16 + i, 9, 30),
-            end=datetime(next_year, 6, 16 + i, 18, 00),
-            timezone='Europe/Zurich',
-            location='Somewhere',
-            tags=['fun'],
-        )
-        event.submit()
-        event.publish()
-
-    transaction.commit()
-    session.expire_all()
-
-    occurrences = OccurrenceCollection(session).eager_load_batch().batch
-    assert len(occurrences) > 1
-
-    statements: list[str] = []
-    engine = session.get_bind()
-
-    def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
-        statements.append(statement)
-
-    sa_event.listen(engine, 'before_cursor_execute', count)
-    try:
-        # access exactly what the API serializer touches per row
-        for occurrence in occurrences:
-            occurrence.content
-            occurrence.event.content
-            occurrence.event.image
-    finally:
-        sa_event.remove(engine, 'before_cursor_execute', count)
-
-    # everything was eager-loaded: no per-row lazy queries
-    assert statements == [], f'unexpected lazy queries: {statements}'
-
-
 def test_occurrence_collection_query(session: Session) -> None:
     config = {'keywords': ['Filter 1', 'Filter 2'], 'order': []}
     definition = """
