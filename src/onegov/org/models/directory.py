@@ -26,7 +26,7 @@ from onegov.org.utils import narrowest_access
 from onegov.pay import Price
 from onegov.ticket import Ticket
 from sqlalchemy import and_, or_, func, text
-from sqlalchemy.orm import object_session, undefer, selectinload
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm.attributes import set_committed_value
 
 
@@ -702,13 +702,3 @@ class ExtendedDirectoryEntryCollection(
 
     def query(self) -> Query[ExtendedDirectoryEntry]:
         return self.apply_common_filters(super().query())
-
-    def transform_batch_query(
-        self,
-        query: Query[ExtendedDirectoryEntry]
-    ) -> Query[ExtendedDirectoryEntry]:
-        # eager-load per-entry data (e.g. API) to avoid N+1 on the batch
-        return query.options(
-            undefer(ExtendedDirectoryEntry.content),
-            selectinload(ExtendedDirectoryEntry.files),
-        )

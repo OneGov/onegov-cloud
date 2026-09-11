@@ -833,8 +833,9 @@ def test_api_directory_content_hash(client: Client) -> None:
 
 
 def test_api_directory_no_n_plus_one_content(client: Client) -> None:
-    from onegov.org.models.directory import ExtendedDirectoryEntryCollection
-    from sqlalchemy import event
+    from sqlalchemy import event as sa_event
+    from onegov.core.utils import Bunch
+    from onegov.org.api import DirectoryEntryApiEndpoint
 
     session = client.app.session()
     directory: ExtendedDirectory = DirectoryCollection(
@@ -848,30 +849,26 @@ def test_api_directory_no_n_plus_one_content(client: Client) -> None:
         directory.add(values={'name': f'Club {i}'})
     transaction.commit()
 
-    session = client.app.session()
-    directory = DirectoryCollection(
-        session, type='extended'
-    ).by_name('clubs')  # type: ignore[assignment]
-
-    collection = ExtendedDirectoryEntryCollection(
-        directory, published_only=True
+    request: Any = Bunch(
+        app=client.app, session=client.app.session(), identity=None
     )
-    entries = collection.batch  # eager-loads content + files
+    entries = DirectoryEntryApiEndpoint(request, 'clubs').collection.batch
     assert len(entries) == 5
 
     statements: list[str] = []
+    engine = client.app.session().get_bind()
 
-    def count_query(*args: Any) -> None:
-        statements.append(args[2])
+    def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
+        statements.append(statement)
 
-    connection = session.connection()
-    event.listen(connection, 'before_cursor_execute', count_query)
+    sa_event.listen(engine, 'before_cursor_execute', count)
     try:
+        # what the API serializer touches per row
         for entry in entries:
-            entry.content  # must not emit a query
+            entry.content
             entry.files
     finally:
-        event.remove(connection, 'before_cursor_execute', count_query)
+        sa_event.remove(engine, 'before_cursor_execute', count)
 
     content_loads = [s for s in statements if 'directory_entries.content' in s]
     assert content_loads == [], f'N+1 on content: {len(content_loads)} queries'

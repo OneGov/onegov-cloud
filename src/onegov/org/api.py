@@ -28,7 +28,7 @@ from onegov.search import SearchIndex
 from onegov.search.utils import language_from_locale
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import contains_eager, undefer
+from sqlalchemy.orm import contains_eager, selectinload, undefer
 from uuid import UUID
 
 
@@ -665,7 +665,12 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
                     term
                 )
         result.batch_size = 25
-        return result
+
+        # eager-load the serialized entry data, batch only
+        return result.set_query_options(
+            undefer(ExtendedDirectoryEntry.content),
+            selectinload(ExtendedDirectoryEntry.files),
+        )
 
     def for_page(self, page: int | None) -> DirectoryEntryApiEndpoint:
         """ Return a new endpoint instance with the given page while keeping
