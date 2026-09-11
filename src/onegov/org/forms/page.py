@@ -144,14 +144,18 @@ class IframeForm(PageBaseForm):
             return
 
         domain = '/'.join(field.data.split('/', 3)[:3])
-        allowed_domains = {
-            d.rstrip('/')
-            for d in self.allowed_domains
-        }
-        if domain not in allowed_domains:
-            raise ValidationError(
-                _('The domain of the URL is not allowed for iFrames.')
-            )
+        for allowed in self.allowed_domains:
+            allowed = allowed.rstrip('/')
+            # CSP child_src entries may use a wildcard host (*.vimeo.com)
+            if '*' in allowed:
+                prefix, _sep, suffix = allowed.partition('*')
+                if domain.startswith(prefix) and domain.endswith(suffix):
+                    return
+            elif domain == allowed:
+                return
+        raise ValidationError(
+            _('The domain of the URL is not allowed for iFrames.')
+        )
 
 
 class PageUrlForm(ChangeAdjacencyListUrlForm):
