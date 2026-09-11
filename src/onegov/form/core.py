@@ -362,13 +362,6 @@ class Form(BaseForm):
 
         yield
 
-        # NOTE: We currently assume that the only time we have different
-        #       prefixes for the same form is in a FieldList, technically
-        #       we would need to always do this step below to be fully
-        #       robust
-        if not self._prefix:
-            return
-
         for field_id, field in self._unbound_fields:
             if not hasattr(field, 'depends_on'):
                 continue
@@ -379,6 +372,9 @@ class Form(BaseForm):
             f.render_kw.update(
                 field.depends_on.html_data(self._prefix)
             )
+            # NOTE: For introspection we copy the dependency object
+            #       to the bound field
+            f.depends_on = field.depends_on  # type: ignore[attr-defined]
 
     def process_pricing(self) -> Iterator[None]:
         """ Processes the pricing parameter on the fields, which adds the
@@ -1018,7 +1014,12 @@ class FieldDependency:
             if isinstance(data, bool) and choice in ('y', 'n'):
                 choice = choice == 'y' and True or False
 
-            result = result and ((data == choice) ^ invert)
+            if isinstance(data, list):
+                value = choice in data
+            else:
+                value = data == choice
+
+            result = result and (value ^ invert)
         return result
 
     def unfulfilled(self, form: Form, field: Field) -> bool:

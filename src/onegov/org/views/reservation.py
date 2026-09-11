@@ -19,8 +19,14 @@ from onegov.org import utils
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import (
-    AddReservationForm, KabaEditForm, ReservationAdjustmentForm,
-    ReservationForm, InternalTicketChatMessageForm, RequestCancellationForm)
+    AddReservationForm,
+    KabaEditForm,
+    ReservationAdjustmentForm,
+    ReservationForm,
+    InternalTicketChatMessageForm,
+    RequestCancellationForm,
+    ReservationTicketChatMessageForm,
+)
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
 from onegov.org.layout import DefaultLayout, DefaultMailLayout, TicketLayout
@@ -32,6 +38,7 @@ from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import emails_for_new_ticket, group_invoice_items
+from onegov.org.views.ticket import create_attachment_from_file
 from onegov.pay import InvoiceMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.reservation.collection import ResourceCollection
@@ -50,6 +57,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
+    from onegov.file import File
     from onegov.org.request import OrgRequest
 
 
@@ -995,6 +1003,7 @@ def accept_reservation(
     text: str | None = None,
     notify: bool = False,
     view_ticket: ReservationTicket | None = None,
+    file: File | None = None,
 ) -> Response:
 
     resource = request.app.libres_resources.by_reservation(self)
@@ -1114,6 +1123,7 @@ def accept_reservation(
                 recipient=self.email,
                 notify=notify,
                 origin='internal',
+                file=file,
             )
 
         _cancel_url = (
@@ -1147,6 +1157,7 @@ def accept_reservation(
                     MyReservationsPdf.from_ticket(request, ticket),
                     'application/pdf'
                 ),
+                *create_attachment_from_file(file),
             )
         )
 
@@ -1240,13 +1251,13 @@ def accept_reservation_from_ticket(
     model=Reservation,
     name='accept-with-message',
     permission=Private,
-    form=InternalTicketChatMessageForm,
+    form=ReservationTicketChatMessageForm,
     template='form.pt'
 )
 def accept_reservation_with_message(
     self: Reservation,
     request: OrgRequest,
-    form: InternalTicketChatMessageForm,
+    form: ReservationTicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None,
     view_ticket: ReservationTicket | None = None,
 ) -> RenderData | Response:
@@ -1264,7 +1275,8 @@ def accept_reservation_with_message(
             request,
             text=form.text.data,
             notify=form.notify.data if form.notify is not None else True,
-            view_ticket=view_ticket
+            view_ticket=view_ticket,
+            file=form.file.create(),
         )
 
     layout = layout or TicketChatMessageLayout(self, request)  # type:ignore
@@ -1285,13 +1297,13 @@ def accept_reservation_with_message(
     model=ReservationTicket,
     name='accept-reservation-with-message',
     permission=Private,
-    form=InternalTicketChatMessageForm,
+    form=ReservationTicketChatMessageForm,
     template='form.pt'
 )
 def accept_reservation_with_message_from_ticket(
     self: ReservationTicket,
     request: OrgRequest,
-    form: InternalTicketChatMessageForm,
+    form: ReservationTicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None
 ) -> RenderData | Response:
 

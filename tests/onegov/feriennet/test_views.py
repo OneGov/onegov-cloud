@@ -3531,6 +3531,30 @@ def test_view_dashboard(client: Client, scenario: Scenario) -> None:
     assert len(page.pyquery('.boardlet')) == 6
 
 
+def test_submit_volunteer_with_empty_cart(client: Client) -> None:
+    # regression for ONEGOV-CLOUD-5YN: submitting the volunteer form with an
+    # empty cart (e.g. all activities removed before submit)
+    from onegov.ticket import TicketCollection
+
+    page = client.get('/volunteer-cart/submit')
+    page.form['first_name'] = 'User'
+    page.form['last_name'] = 'A'
+    page.form['birth_date'] = '2000-01-01'
+    page.form['address'] = 'Example Street 1'
+    page.form['zip_code'] = '1234'
+    page.form['place'] = 'Govikon'
+    page.form['email'] = 'user@example.org'
+    page.form['phone'] = '0123456789'
+    page = page.form.submit().follow()
+
+    # shows an alert linking back to the activities instead of 500-ing
+    assert page.status_code == 200
+    assert 'Helfen</a>' in page
+    assert '/activities/volunteer"' in page
+    # no ticket was created
+    assert TicketCollection(client.app.session()).by_handler_code('VOL') == []
+
+
 def test_view_volunteer_activities(
     client: Client,
     scenario: Scenario
@@ -3572,6 +3596,50 @@ def test_view_volunteer_activities(
 
     page = client.get('/activities/volunteer')
     assert "Pet Zoo" not in page
+
+
+def test_view_volunteer_activities_no_n_plus_one(
+    client: Client,
+    scenario: Scenario
+) -> None:
+    from sqlalchemy import event
+
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    for i in range(5):
+        scenario.add_activity(title=f"Activity {i}", state='accepted')
+        scenario.add_occasion(cost=200)
+        scenario.add_need(
+            name="Begleiter",
+            number=BoundedIntegerRange(1, 2),
+            accept_signups=True
+        )
+
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/feriennet-settings')
+    page.form['volunteers'] = 'enabled'
+    page.form.submit()
+
+    statements: list[str] = []
+
+    def count_query(conn, cursor, statement, *args):  # type: ignore
+        if 'FROM occasions' in statement and 'periods_archived' in statement:
+            statements.append(statement)
+
+    engine = scenario.session.get_bind()
+    event.listen(engine, 'before_cursor_execute', count_query)
+    try:
+        page = client.get('/activities/volunteer')
+    finally:
+        event.remove(engine, 'before_cursor_execute', count_query)
+
+    assert "Activity 0" in page
+    # a single batched query, not one per activity
+    assert len(statements) == 1, (
+        f"expected 1 occasion query, got {len(statements)}"
+    )
 
 
 def test_analytics_settings(client: Client) -> None:

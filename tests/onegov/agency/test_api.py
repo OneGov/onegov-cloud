@@ -472,7 +472,7 @@ def test_view_api(
     )
     assert response.status_code == 400
     parsed = Collection.from_json(response.text)
-    assert 'submitter_email: Das ist ein Pflichtfeld' in parsed.error.message
+    assert 'submitter_email: Field required' in parsed.error.message
 
     # test submitting a valid change
     payload = Template(data=[

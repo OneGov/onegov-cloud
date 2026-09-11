@@ -5,11 +5,12 @@ import transaction
 from datetime import date
 from functools import cached_property
 from onegov.api.models import ApiEndpoint, ApiEndpointItem
-from onegov.api.models import ApiInvalidParamException
+from onegov.api.models import ApiException, ApiInvalidParamException
 from onegov.core.collection import Pagination
 from onegov.core.converters import extended_date_decode
 from onegov.event.collections import OccurrenceCollection
-from onegov.form import FormCollection
+from onegov.event.models import Event, Occurrence
+from onegov.form import Form, FormCollection
 from onegov.form.models import FormDefinition
 from onegov.gis import Coordinates
 from onegov.org import _
@@ -27,6 +28,7 @@ from onegov.search import SearchIndex
 from onegov.search.utils import language_from_locale
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import contains_eager, undefer
 from uuid import UUID
 
 
@@ -36,7 +38,6 @@ if TYPE_CHECKING:
     from onegov.core.collection import PKType
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from onegov.event.models import Occurrence
     from onegov.org.app import OrgApp
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import DeclarativeBase, Query
@@ -401,7 +402,14 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
 
         result.page = self.page or 0
         result.batch_size = self.batch_size
-        return result
+
+        # eager-load the serialized event data, batch only
+        event = contains_eager(Occurrence.event)
+        return result.set_query_options(
+            event.joinedload(Event.image),
+            event.undefer(Event.content),
+            undefer(Occurrence.content),
+        )
 
     def item_data(self, item: Occurrence) -> dict[str, Any]:
         source = item.event.source
@@ -806,6 +814,79 @@ class FormApiEndpoint(ApiEndpoint[FormOrExternalLink, UUID | str]):
         if isinstance(item, ExternalFormLink):
             return {'html': item.url}
         return {'html': item}
+
+    def item_form_class(self, item: FormOrExternalLink) -> type[Form] | None:
+        if isinstance(item, ExternalFormLink):
+            return None
+
+        # Check whether the form still accepts submissions
+        window = item.current_registration_window
+        if window and not window.accepts_submissions(1):
+            return None
+
+        # Forms that require online payments may not be submitted via API
+        if item.payment_method == 'cc':
+            return None
+        # NOTE: If there are any options in the form that require credit
+        #       card payment we will emit an ApiError in apply_changes
+        #       instead of disallowing submissions altogether
+        return item.form_class
+
+    def apply_changes(
+        self,
+        item: FormOrExternalLink,
+        form: Form
+    ) -> dict[str, Any]:
+        assert not isinstance(item, ExternalFormLink)
+
+        for name, price in form.prices():
+            if price.credit_card_payment:
+                raise ApiException(
+                    f'Based on the submitted value for "{name}", '
+                    f'online payment is required for this submission, '
+                    f'which is not supported through the API.',
+                    status_code=400
+                )
+
+        # Add the submission first so we can re-use the finalize
+        # submission logic
+        submission = FormCollection(self.session).submissions.add(
+            item.name,
+            form,
+            state='pending',
+            spots=1 if item.current_registration_window else 0,
+        )
+        form.model = submission
+        # FIXME: circular import
+        from onegov.org.views.form_submission import do_complete_submission
+        try:
+            ticket = do_complete_submission(
+                submission, form, self.request,
+                raises=True,
+                no_messages=True,
+                return_ticket=True
+            )
+        except ValueError as exc:
+            raise ApiException(str(exc), status_code=400) from exc
+
+        return {
+            'collection': {
+                'version': '1.0',
+                'href': self.request.link(self),
+                'links': [
+                    {
+                        'rel': 'ticket',
+                        'href': self.request.link(ticket),
+                        'prompt': 'View Ticket (for supporters)',
+                    },
+                    {
+                        'rel': 'ticket_status',
+                        'href': self.request.link(ticket, 'status'),
+                        'prompt': 'View Ticket (for customers)',
+                    },
+                ],
+            }
+        }
 
 
 class ResourceApiEndpoint(ApiEndpoint[ResourceOrExternalLink, UUID]):

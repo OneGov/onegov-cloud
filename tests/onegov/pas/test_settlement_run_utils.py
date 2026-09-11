@@ -9,6 +9,8 @@ from onegov.pas.collections.commission_membership import (
     PASCommissionMembershipCollection
 )
 from onegov.pas.collections import SettlementRunCollection
+from onegov.pas.custom import check_attendance_outside_any_settlement_run
+from onegov.pas.custom import has_user_set_abschluss_for_commission
 from onegov.pas.views.settlement_run import get_commission_closure_status
 from onegov.pas.models import Attendence
 
@@ -264,12 +266,62 @@ def test_get_commission_closure_status(pas_app: TestPasApp) -> None:
             assert member['has_attendance'] is False
 
 
+def test_abschluss_is_scoped_to_person_commission_and_settlement_run(
+    pas_app: TestPasApp,
+) -> None:
+    session = pas_app.session()
+    settlement_runs = SettlementRunCollection(session)
+    settlement_runs.add(
+        name='2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 12, 31),
+        active=True,
+    )
+    settlement_runs.add(
+        name='2025',
+        start=date(2025, 1, 1),
+        end=date(2025, 12, 31),
+        active=False,
+    )
+
+    parliamentarians = PASParliamentarianCollection(pas_app)
+    alice = parliamentarians.add(first_name='Alice', last_name='Member')
+    bob = parliamentarians.add(first_name='Bob', last_name='Member')
+
+    commissions = PASCommissionCollection(session)
+    finance = commissions.add(name='Finance')
+    education = commissions.add(name='Education')
+
+    session.add(
+        Attendence(
+            date=date(2024, 6, 15),
+            duration=120,
+            type='commission',
+            parliamentarian_id=alice.id,
+            commission_id=finance.id,
+            abschluss=True,
+        )
+    )
+    session.flush()
+
+    assert has_user_set_abschluss_for_commission(
+        session, alice.id, finance.id, date(2024, 8, 1)
+    )
+    assert not has_user_set_abschluss_for_commission(
+        session, alice.id, education.id, date(2024, 8, 1)
+    )
+    assert not has_user_set_abschluss_for_commission(
+        session, bob.id, finance.id, date(2024, 8, 1)
+    )
+    assert not has_user_set_abschluss_for_commission(
+        session, alice.id, finance.id, date(2025, 8, 1)
+    )
+
+
 def test_attendance_outside_any_settlement_run(
     pas_app: TestPasApp,
 ) -> None:
     """Test that attendance cannot be created outside any settlement run."""
-    from onegov.pas.custom import check_attendance_outside_any_settlement_run
-
     session = pas_app.session()
 
     # Create TWO settlement runs with a gap between them

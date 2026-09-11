@@ -4,7 +4,7 @@ import json
 import transaction
 from base64 import b64encode
 from datetime import timedelta
-from collection_json import Collection  # type: ignore[import-untyped]
+from collection_json import Collection, Template  # type: ignore[import-untyped]
 from onegov.directory import DirectoryCollection, DirectoryConfiguration
 from onegov.form import FormCollection
 from onegov.form.parser import ParsedForm
@@ -216,6 +216,99 @@ def test_view_api(
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')
+def test_api_submitting_forms(
+    authenticate: MagicMock,
+    broadcast: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
+    client.login_admin()  # allow access to PUT endpoint
+
+    def collection(url: str) -> Collection:
+        return Collection.from_json(client.get(url).body)
+
+    def data(item: Any) -> dict[str, Any]:
+        return {x.name: x.value for x in item.data}
+
+    def filters(item: Any) -> dict[str, Any]:
+        return {x.name: x.values or x.prompt for x in item.data}
+
+    def links(item: Any) -> dict[str, str]:
+        return {x.rel: x.href for x in item.links}
+
+    def template(item: Any) -> set[str]:
+        return {x.name for x in item.template.data}
+
+    forms_collection = collection('/api/forms')
+    forms = {
+        data(item)['title']: item.href
+        for item in forms_collection.items
+    }
+    assert set(forms) == {'Anmeldung'}
+    # Forms are different for every item so there is no shared template
+    assert forms_collection.template is None
+    anmeldung_collection = collection(forms['Anmeldung'])
+    assert template(anmeldung_collection) == {
+        'personalien_vorname',
+        'personalien_name',
+        'personalien_e_mail',
+        'personalien_geburtsdatum',
+        'personalien_ahv_nummer',
+        'adresse_strasse_inkl_hausnummer_',
+        'adresse_plz_ort',
+        'personliches_ernahrung',
+        'personliches_musikstile',
+        'sonstiges_bemerkungen',
+    }
+
+    # test submitting an invalid change (missing fields)
+    payload = Template(data=[
+        {'name': 'personalien_vorname', 'value': 'Nick'}
+    ]).to_dict()
+    response = client.put_json(
+        forms['Anmeldung'],
+        payload,
+        expect_errors=True
+    )
+    assert response.status_code == 400
+    parsed = Collection.from_json(response.text)
+    message = parsed.error.message
+    assert 'personalien_e_mail: Field required' in message
+    assert 'personalien_name: Field required' in message
+    assert 'personalien_geburtsdatum: Field required' in message
+    assert 'adresse_strasse_inkl_hausnummer_: Field required' in message
+    assert 'adresse_plz_ort: Field required' in message
+
+    # test submitting a valid change
+    payload = Template(data=[
+        {'name': 'personalien_vorname', 'value': 'Nick'},
+        {'name': 'personalien_name', 'value': 'Riviera'},
+        {'name': 'personalien_e_mail', 'value': 'nick.riviera@example.org'},
+        {'name': 'personalien_geburtsdatum', 'value': '1987-10-10'},
+        {'name': 'adresse_strasse_inkl_hausnummer_', 'value': 'Strasse 15'},
+        {'name': 'adresse_plz_ort', 'value': '6003 Luzern'},
+    ]).to_dict()
+    response = client.put_json(forms['Anmeldung'], payload)
+    assert response.status_code == 200
+    parsed = Collection.from_json(response.text)
+    assert links(parsed).keys() == {'ticket', 'ticket_status'}
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
+
+    # the ticket links are both valid
+    assert 'Riviera' in client.get(links(parsed)['ticket'])
+    assert 'Offen' in client.get(links(parsed)['ticket_status'])
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.broadcast')
+@patch('onegov.websockets.integration.authenticate')
 def test_api_syndicate_filter(
     authenticate: MagicMock,
     broadcast: MagicMock,
@@ -317,6 +410,35 @@ def test_api_syndicate_filter(
 
     # both filters can be combined
     assert not collection('/api/events?syndicate=true&highlight=true').items
+
+
+def test_api_events_no_n_plus_one(client: Client) -> None:
+    from sqlalchemy import event as sa_event
+    from onegov.core.utils import Bunch
+    from onegov.org.api import EventApiEndpoint
+
+    request: Any = Bunch(app=client.app, identity=None)
+    occurrences = EventApiEndpoint(request).collection.batch
+    assert len(occurrences) > 1
+
+    statements: list[str] = []
+    engine = client.app.session().get_bind()
+
+    def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
+        statements.append(statement)
+
+    sa_event.listen(engine, 'before_cursor_execute', count)
+    try:
+        # what the API serializer touches per row
+        for occurrence in occurrences:
+            occurrence.content
+            occurrence.event.content
+            occurrence.event.image
+    finally:
+        sa_event.remove(engine, 'before_cursor_execute', count)
+
+    # all eager-loaded: no per-row lazy queries
+    assert statements == [], f'unexpected lazy queries: {statements}'
 
 
 @patch('onegov.websockets.integration.connect')
