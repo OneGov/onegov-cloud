@@ -9,7 +9,6 @@ from onegov.core.directives import HtmlHandleFormAction
 from typing import cast, Any, ClassVar, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from _typeshed import StrOrBytesPath
     from collections.abc import Callable
     from collections.abc import Iterator
     from onegov.core.elements import LinkGroup
@@ -23,7 +22,9 @@ if TYPE_CHECKING:
     from typing import Protocol, TypedDict
     from webob import Response
 
-    type FormFactory = type[Form] | Callable[..., type[Form]]
+    type FormFactory[RequestT: OrgRequest] = (
+        type[Form] | Callable[[Any, RequestT], type[Form]]
+    )
     type SettingViewRegistry = dict[
         tuple[type, str],
         SettingViewMeta,
@@ -91,7 +92,7 @@ if TYPE_CHECKING:
 class SettingViewMeta:
     model: type
     name: str
-    form: FormFactory
+    form: FormFactory[Any]
     setting: str
     icon: str
     order: int
@@ -107,7 +108,7 @@ class SettingViewMetaAction(Action):
         self,
         model: type,
         name: str,
-        form: FormFactory,
+        form: FormFactory[Any],
         setting: str | None,
         icon: str | None,
         order: int,
@@ -121,13 +122,13 @@ class SettingViewMetaAction(Action):
         self.order = order
         self.category = category
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         setting_view_registry: SettingViewRegistry,
     ) -> tuple[type, str]:
         return self.model, self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         obj: Callable[..., Any],
         setting_view_registry: SettingViewRegistry,
@@ -151,20 +152,20 @@ class SettingViewMetaAction(Action):
 class SettingViewAction(Composite):
     query_classes = [HtmlHandleFormAction, SettingViewMetaAction]
 
-    def __init__(
+    def __init__[RequestT: OrgRequest](
         self,
         model: type,
         name: str,
-        form: FormFactory,
+        form: FormFactory[RequestT],
         setting: str | None = None,
         icon: str | None = None,
         order: int = 0,
         category: str | None = None,
         listed: bool = True,
-        render: Callable[..., Response] | str | None = None,
-        template: StrOrBytesPath | None = None,
-        load: Callable[..., Any] | str | None = None,
-        permission: object | str | None = None,
+        render: Callable[[Any, RequestT], Response] | None = None,
+        template: str | None = None,
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object | None = None,
         internal: bool = False,
         pass_model: bool = False,
         **predicates: Any,
@@ -194,10 +195,10 @@ class SettingViewAction(Composite):
         self.pass_model = pass_model
         self.predicates = predicates
 
-    def actions(
+    def actions[RequestT: OrgRequest](
         self,
-        obj: Callable[..., Any],
-    ) -> Iterator[tuple[Action, Callable[..., Any]]]:
+        obj: Callable[[Any, RequestT, Any], Any],
+    ) -> Iterator[tuple[Action, Callable[[Any, RequestT, Any], Any]]]:
         yield HtmlHandleFormAction(
             model=self.model,
             form=self.form,
@@ -231,13 +232,13 @@ class HomepageWidgetAction(Action):
     def __init__(self, tag: str) -> None:
         self.tag = tag
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         homepage_widget_registry: dict[str, RegisteredHomepageWidget]
     ) -> str:
         return self.tag
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: Callable[[], HomepageWidget],
         homepage_widget_registry: dict[str, RegisteredHomepageWidget]
@@ -260,13 +261,13 @@ class ExportAction(Action):
         self.kwargs = kwargs
         self.kwargs['id'] = id
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         export_registry: dict[str, Any]
     ) -> str:
         return self.id
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         cls: Callable[..., Any],
         export_registry: dict[str, Any]
@@ -286,13 +287,13 @@ class UserlinkAction(Action):
     def __init__(self) -> None:
         self.name = next(self.counter)
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         linkgroup_registry: list[LinkGroupFactory]
     ) -> int:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: LinkGroupFactory,
         linkgroup_registry: list[LinkGroupFactory]
@@ -310,13 +311,13 @@ class DirectorySearchWidgetAction(Action):
     def __init__(self, name: str) -> None:
         self.name = name
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         directory_search_widget_registry: DirectorySearchWidgetRegistry
     ) -> str:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         cls: type[DirectorySearchWidget[Any]],
         directory_search_widget_registry: DirectorySearchWidgetRegistry
@@ -341,13 +342,13 @@ class EventSearchWidgetAction(Action):
     def __init__(self, name: str) -> None:
         self.name = name
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         event_search_widget_registry: EventSearchWidgetRegistry
     ) -> str:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         cls: type[EventSearchWidget],
         event_search_widget_registry: EventSearchWidgetRegistry
@@ -383,23 +384,23 @@ class Boardlet(Action):
         """
 
         self.name = name
-        self.order = order
+        self.boardlet_order = order
         self.icon = icon
         self.kind = kind
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         boardlets_registry: dict[BoardletKind, dict[str, BoardletConfig]]
     ) -> str:
         return f'{self.kind}-{self.name}'
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: type[_Boardlet],
         boardlets_registry: dict[BoardletKind, dict[str, BoardletConfig]]
     ) -> None:
         boardlets_registry[self.kind][self.name] = {
             'cls': func,
-            'order': self.order,
+            'order': self.boardlet_order,
             'icon': self.icon,
         }

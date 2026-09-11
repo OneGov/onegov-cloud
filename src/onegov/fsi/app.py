@@ -10,7 +10,7 @@ from onegov.town6.app import get_common_asset as default_common_asset
 from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from onegov.core.request import CoreRequest
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 class FsiApp(TownApp):
 
-    request_class = FsiRequest
+    request_class: type[FsiRequest[Self]] = FsiRequest
 
     # FSI doesn't really deal with tickets much, so no reason to send the
     # ticket statistics.

@@ -28,6 +28,7 @@ from webob import Response
 
 
 from typing import Any
+from typing import Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -44,7 +45,7 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     """
 
     serve_static_files = True
-    request_class = ElectionDayRequest
+    request_class: type[ElectionDayRequest[Self]] = ElectionDayRequest
 
     csv_file = directive(CsvFileAction)
     json_file = directive(JsonFileAction)

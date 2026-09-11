@@ -64,7 +64,7 @@ def monkeysession(request: pytest.FixtureRequest) -> Iterator[MonkeyPatch]:
 
 @pytest.fixture(scope='session', autouse=True)
 def scan_onegov() -> None:
-    import importscan  # type: ignore[import-untyped]
+    import importscan
     import onegov
     importscan.scan(onegov, ignore=['.test', '.tests'])
 

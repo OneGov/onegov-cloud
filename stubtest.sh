@@ -16,37 +16,11 @@ stubtest cgi \
          --mypy-config-file pyproject.toml \
          --allowlist tests/stubtest/cgi_allowlist.txt
 
-echo "Running stubtest on dectate"
-stubtest dectate \
-         --mypy-config-file pyproject.toml \
-         --allowlist tests/stubtest/dectate_allowlist.txt \
-         --ignore-missing-stub
-
 echo "Running stubtest on depot"
 stubtest depot \
          --mypy-config-file pyproject.toml \
          --allowlist tests/stubtest/depot_allowlist.txt \
          --ignore-missing-stub
-
-echo "Running stubtest on morepath"
-stubtest morepath \
-         --mypy-config-file pyproject.toml \
-         --allowlist tests/stubtest/morepath_allowlist.txt \
-         --ignore-missing-stub
-
-echo "Running stubtest on more.content_security"
-stubtest more.content_security \
-         --mypy-config-file pyproject.toml
-
-echo "Running stubtest on more.transaction"
-stubtest more.transaction \
-         --mypy-config-file pyproject.toml \
-         --allowlist tests/stubtest/more.transaction_allowlist.txt
-
-echo "Running stubtest on more.webassets"
-stubtest more.webassets \
-         --mypy-config-file pyproject.toml \
-         --allowlist tests/stubtest/more.webassets_allowlist.txt
 
 echo "Running stubtest on pdfdocument"
 stubtest pdfdocument \
@@ -56,11 +30,6 @@ stubtest pdfdocument \
 echo "Running stubtest on purl"
 stubtest purl \
          --mypy-config-file pyproject.toml
-
-echo "Running stubtest on reg"
-stubtest reg \
-         --mypy-config-file pyproject.toml \
-         --allowlist tests/stubtest/reg_allowlist.txt
 
 echo "Running stubtest on sqlalchemy_utils"
 stubtest sqlalchemy_utils \

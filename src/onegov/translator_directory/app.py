@@ -17,17 +17,18 @@ from purl import URL
 from sqlalchemy import and_
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
-    from morepath.authentication import Identity, NoIdentity
+    from morepath.authentication import NoIdentity
+    from onegov.core import Identity
     from onegov.gis.models.coordinates import AnyCoordinates
 
 
 class TranslatorDirectoryApp(TownApp):
 
     send_ticket_statistics = False
-    request_class = TranslatorAppRequest
+    request_class: type[TranslatorAppRequest[Self]] = TranslatorAppRequest
 
     def fts_may_use_private_search(
         self,

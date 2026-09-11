@@ -6,7 +6,7 @@ from onegov.org.converters import keywords_converter
 def test_keywords_converter() -> None:
     converter = keywords_converter
 
-    assert converter.encode(None) == ['']
+    assert converter.encode(None) == ['']  # type: ignore[arg-type]
     assert converter.encode('') == ['']  # type: ignore[arg-type]
     assert converter.encode({}) == ['']
     assert converter.encode({'k': ['v']}) == ['k:v']

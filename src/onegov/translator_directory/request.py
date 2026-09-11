@@ -5,14 +5,21 @@ from onegov.town6.request import TownRequest
 from onegov.user import UserGroup
 
 
+from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.translator_directory.app import TranslatorDirectoryApp
 
 
-class TranslatorAppRequest(TownRequest):
+AppT = TypeVar(
+    'AppT',
+    bound='TranslatorDirectoryApp',
+    default='TranslatorDirectoryApp',
+    covariant=True
+)
 
-    app: TranslatorDirectoryApp
+
+class TranslatorAppRequest(TownRequest[AppT]):
 
     @cached_property
     def is_member(self) -> bool:
