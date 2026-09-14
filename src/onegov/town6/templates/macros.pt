@@ -1940,41 +1940,78 @@
             </a>
         </div>
 </metal:icon_links>
-
 <metal:slider define-macro="slider" i18n:domain="onegov.town6" tal:define="searchbox searchbox|'true';">
-    <div tal:condition="images" id="homepageCarousel" class="carousel slide homepage-image-slider" data-bs-ride="carousel" data-bs-interval="7200" role="region" aria-label="Homepage Image Slider" tal:define="height height|None;">
-        <div tal:condition="images and len(images) > 1" class="carousel-indicators">
-            <button tal:repeat="image images"
-                    type="button"
-                    data-bs-target="#homepageCarousel"
-                    data-bs-slide-to="${repeat.image.index}"
-                    class="${'active' if repeat.image.index == 0 else ''}"
-                    aria-current="${'true' if repeat.image.index == 0 else 'false'}"
-                    aria-label="Slide ${repeat.image.index + 1}">
+
+    <div class="position-relative">
+
+        <div tal:condition="images" id="homepageCarousel" class="carousel slide homepage-image-slider" data-bs-ride="carousel" data-bs-interval="7200" role="region" aria-label="Homepage Image Slider" tal:define="height height|None;">
+            <div tal:condition="images and len(images) > 1" class="carousel-indicators">
+                <button tal:repeat="image images"
+                        type="button"
+                        data-bs-target="#homepageCarousel"
+                        data-bs-slide-to="${repeat.image.index}"
+                        class="${'active' if repeat.image.index == 0 else ''}"
+                        aria-current="${'true' if repeat.image.index == 0 else 'false'}"
+                        aria-label="Slide ${repeat.image.index + 1}">
+                </button>
+            </div>
+
+            <div class="carousel-inner" data-height-m="${height_m}" data-height-d="${height_d}">
+                <div tal:repeat="image images"
+                    class="carousel-item ${'active' if repeat.image.index == 0 else ''}">
+                    <div class="carousel-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
+                    <div class="carousel-caption-overlay" tal:condition="image.note"></div>
+                    <div class="carousel-caption d-md-block text-container" tal:condition="image.note">
+                        <div class="text">
+                            <span>${image.note}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button tal:condition="images and len(images) > 1" class="carousel-control-prev d-none d-md-flex" type="button" data-bs-target="#homepageCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous Slide</span>
+            </button>
+            <button tal:condition="images and len(images) > 1" class="carousel-control-next d-none d-md-flex" type="button" data-bs-target="#homepageCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next Slide</span>
             </button>
         </div>
 
-        <div class="carousel-inner" data-height-m="${height_m}" data-height-d="${height_d}">
-            <div tal:repeat="image images"
-                class="carousel-item ${'active' if repeat.image.index == 0 else ''}">
-                <div class="carousel-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
-                <div class="carousel-caption-overlay" tal:condition="image.note"></div>
-                <div class="carousel-caption d-md-block text-container" tal:condition="image.note">
-                    <div class="text">
-                        <span>${image.note}</span>
+        <div class="homepage-searchbox-wrapper position-absolute bottom-0 start-0 end-0 mb-4xl z-2"
+             tal:condition="len(images) and not searchbox == 'false'|True">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-md-6 col-lg-7">
+                        <form class="searchbox" action="${layout.search_url}" method="GET"
+                            data-typeahead="on"
+                            data-typeahead-source="${layout.suggestions_url}"
+                            data-typeahead-target="${layout.search_url}">
+
+                            <div class="position-relative">
+
+                                <input class="form-control rounded-pill py-lg pe-lg" type="search" id="search"
+                                    data-typeahead-subject name="q" autocomplete="off" autocorrect="off"
+                                    required maxlength="200" placeholder="What are you searching for?"
+                                    i18n:attributes="placeholder">
+
+                                <button class="square-4xl btn btn-primary rounded-circle position-absolute top-50 end-0 translate-middle-y me-xs p-0 d-flex align-items-center justify-content-center"
+                                        type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+
+                                <div class="typeahead position-absolute top-100 start-0 mt-2 z-3 bg-white rounded-3 shadow-sm overflow-hidden">
+                                    <div class="cell col-12" data-typeahead-container></div>
+                                </div>
+
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <button tal:condition="images and len(images) > 1" class="carousel-control-prev d-none d-md-flex" type="button" data-bs-target="#homepageCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous Slide</span>
-        </button>
-        <button tal:condition="images and len(images) > 1" class="carousel-control-next d-none d-md-flex" type="button" data-bs-target="#homepageCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next Slide</span>
-        </button>
     </div>
 
     <div class="slider no-images" tal:condition="not images and request.is_manager">
@@ -1986,28 +2023,7 @@
         </div>
     </div>
 
-    <div class="homepage-searchbox-wrapper" tal:condition="len(images) and not searchbox == 'false'|True">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 col-md-6 col-lg-7">
-                    <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                        <div class="input-group">
-                            <input class="form-control" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            <div class="typeahead">
-                                <div class="cell col-12" data-typeahead-container>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 </metal:slider>
-
 
 <metal:testimonial_slider define-macro="testimonial_slider" i18n:domain="onegov.town6">
 <tal:b tal:condition="description_1 and image_1 and quote_1">
