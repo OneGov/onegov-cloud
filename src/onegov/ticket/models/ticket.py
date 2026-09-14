@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.search import ORMSearchable
@@ -131,6 +131,9 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         default=dict,
         deferred=True
     )
+
+    #: an optional due date by which the ticket should be handled
+    due_date: Mapped[date | None]
 
     #: the time the ticket was closed
     closed_on: Mapped[datetime | None]
