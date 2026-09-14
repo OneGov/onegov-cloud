@@ -735,6 +735,7 @@ def test_add_iframe_csp_wildcard_domain(client: Client) -> None:
 
     for url in (
         'https://player.vimeo.com/video/76979871',
+        'https://a.b.vimeo.com/video/76979871',
         'https://www.youtube.com/embed/dQw4w9WgXcQ',
     ):
         page = client.get('/topics/organisation').click('iFrame')

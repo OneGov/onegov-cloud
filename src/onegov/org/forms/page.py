@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from fnmatch import fnmatch
+from urllib.parse import urlparse
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TagsField
@@ -143,15 +146,16 @@ class IframeForm(PageBaseForm):
         if not field.data:
             return
 
-        domain = '/'.join(field.data.split('/', 3)[:3])
+        url = urlparse(field.data)
         for allowed in self.allowed_domains:
-            allowed = allowed.rstrip('/')
+            allowed_url = urlparse(allowed.rstrip('/'))
             # CSP child_src entries may use a wildcard host (*.vimeo.com)
-            if '*' in allowed:
-                prefix, _sep, suffix = allowed.partition('*')
-                if domain.startswith(prefix) and domain.endswith(suffix):
-                    return
-            elif domain == allowed:
+            if (
+                url.scheme == allowed_url.scheme
+                and url.hostname is not None
+                and allowed_url.hostname is not None
+                and fnmatch(url.hostname, allowed_url.hostname)
+            ):
                 return
         raise ValidationError(
             _('The domain of the URL is not allowed for iFrames.')
