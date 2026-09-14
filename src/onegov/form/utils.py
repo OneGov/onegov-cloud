@@ -265,6 +265,7 @@ def reconcile_uploaded_files[FileT: File](
             if value != {}
         ]
         for field_id in multiple
+        if field_id in fields
     }
     # a kept file is None (unchanged) or an '@<id>' resend
     multi_files_to_keep = {
