@@ -69,14 +69,9 @@ def store_uploaded_file[FileT: File](
     filename: str,
 ) -> FileT:
     """ Creates a file of the given type from an uploaded file, appends it to
-    the given files collection under the given note and returns it.
-
-    Shared by :meth:`onegov.form.collection.FormSubmissionCollection.update`
-    and :meth:`onegov.directory.models.directory.Directory.update` so both
-    persist uploads the same way.
-
-    """
-    # imported lazily to avoid a runtime dependency on onegov.core
+    the collection under the given note and returns it. Shared by form
+    submissions and directory entries so both persist uploads the same way. """
+    # lazy import to avoid a runtime dependency on onegov.core
     from onegov.core.crypto import random_token
 
     stored = file_cls(
@@ -96,22 +91,6 @@ def is_stored_file_reference(value: object) -> bool:
         isinstance(value, dict)
         and str(value.get('data', '')).startswith('@')
     )
-
-
-def keep_stored_file(value: object, action: str | None = None) -> bool:
-    """ Whether an already-stored file should survive a form/directory update.
-
-    A stored file is kept when the dialog action is ``keep``, when the value
-    was not resubmitted (``None``, i.e. unchanged) or when the value still
-    references the stored file (``@<id>``). It is trashed on removal (``{}``,
-    or an explicit ``delete`` action) or when replaced by a new upload.
-
-    """
-    if action == 'delete':
-        return False
-    if action == 'keep' or value is None:
-        return True
-    return is_stored_file_reference(value)
 
 
 @lru_cache(maxsize=1)
