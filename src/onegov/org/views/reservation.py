@@ -985,12 +985,9 @@ def get_my_reservations_url(
         return None
 
     salt = secrets.token_urlsafe(16)
-    # FIXME: URLSafeTimedSerializer uses JSON, which can't encode a UUID, so
-    # we round-trip through int here. Passing it a SoftUUID serializer would
-    # let us pass reservation_token directly (same in
-    # get_reservations_subscribe_url below).
     payload = {
         'email': email,
+        # libres SoftUUIDs aren't json serializable; convert to the base class
         'token': UUID(int=reservation_token.int)
         if reservation_token
         else None,
@@ -1021,12 +1018,9 @@ def get_reservations_subscribe_url(
     url_obj = URL(request.class_link(
         ResourceCollection, name='my-reservations-ical'
     ))
-    # FIXME: URLSafeTimedSerializer uses JSON, which can't encode a UUID, so
-    # we round-trip through int here. Passing it a SoftUUID serializer would
-    # let us pass reservation_token directly (same in
-    # get_my_reservations_url above).
     payload = {
         'email': email,
+        # libres SoftUUIDs aren't json serializable; convert to the base class
         'token': UUID(int=reservation_token.int)
         if reservation_token
         else None,
