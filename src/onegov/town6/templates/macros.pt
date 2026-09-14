@@ -2304,18 +2304,20 @@
 
 <metal:ticket_status_page_message define-macro="ticket_status_page_message" i18n:domain="onegov.town6" tal:define="mute_all request.app.org.mute_all_tickets; skip request.app.org.tickets_skip_opening_email or []">
     <tal:b tal:condition="ticket.state == 'open'">
-        <tal:b tal:switch="not mute_all and ticket.handler_code in skip">
-            <p tal:case="False" i18n:translate>
-                Your request will be processed shortly. To see the state of
-                your process your may return to this page at any time.
+        <p class="fs-md" >
+            <tal:b tal:switch="not mute_all and ticket.handler_code in skip">
+                <tal:b tal:case="False" i18n:translate>
+                    Your request will be processed shortly. To see the state of
+                    your process your may return to this page at any time.
 
-                All information on this page has been sent to your e-mail address.
-            </p>
-            <p tal:case="True" i18n:translate>
-                Your request will be processed shortly. To see the state of
-                your process your may return to this page at any time.
-            </p>
-        </tal:b>
+                    All information on this page has been sent to your e-mail address.
+                </tal:b>
+                <tal:b tal:case="True"  i18n:translate>
+                    Your request will be processed shortly. To see the state of
+                    your process your may return to this page at any time.
+                </tal:b>
+            </tal:b>
+        </p>
     </tal:b>
 
     <p i18n:translate tal:condition="ticket.state == 'closed'">

@@ -179,31 +179,51 @@
                 </div>
             </div>
 
-            <div class="container">
+            <div id="breadcrumbs" class="container">
                 <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
             </div>
 
-            <div tal:condition="not: on_homepage" class="content my-5xl">
-                <div id="intro" class="container mb-3xl">
-                    <div class="row">
-                        <div class="col-12 col-md-4 col-lg-3">
-                            <h1 class="main-title fs-xs fw-bold text-primary">
-                                <tal:b metal:define-slot="title"></tal:b>
-                            </h1>
+            <tal:b tal:define="fullpage fullpage|False" tal:condition="not on_homepage">
+                <div id="withSidebar" tal:condition="not fullpage" class="content my-5xl">
+                    <div id="intro" class="container mb-3xl">
+                        <div class="row">
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <h1 class="main-title fs-xs fw-bold text-primary">
+                                    <tal:b metal:define-slot="title"></tal:b>
+                                </h1>
+                            </div>
+                            <div class="col-12 col-md-8 col-lg-9">
+                                <p class="lead-text h1 text-primary mb-0">
+                                    <div metal:define-slot="lead"></div>
+                                </p>
+                            </div>
                         </div>
-                        <div class="col-12 col-md-8 col-lg-9">
-                            <p class="lead-text h1 text-primary mb-0">
-                                <div metal:define-slot="lead"></div>
-                            </p>
+                    </div>
+
+                    <div class="container" role="main" id="content" data-reinit-foundation>
+                        <div metal:define-slot="before-content"></div>
+                        <div metal:define-slot="content"></div>
+                    </div>
+                </div>
+
+                <div id="fullPage" tal:condition="fullpage" class="content my-5xl container">
+                    <div class="row justify-content-center">
+                        <div class="col-md-9">
+                            <div id="intro">
+                                <h1 class="main-title text-primary mb-md">
+                                    <tal:b metal:define-slot="title"></tal:b>
+                                </h1>
+                            </div>
+
+                            <div id="content" role="main" data-reinit-foundation>
+                                <div metal:define-slot="before-content"></div>
+                                <div metal:define-slot="content"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="container" role="main" id="content" data-reinit-foundation>
-                    <div metal:define-slot="before-content"></div>
-                    <div metal:define-slot="content"></div>
-                </div>
-            </div>
+            </tal:b>
         </tal:b>
 
         <div tal:condition="layout.show_partners" id="partners-everywhere" class="partners-everywhere">

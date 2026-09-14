@@ -2,6 +2,9 @@
   Customizations for bootstrap components and non-bootstrap utilities
 */
 
+$tertiary: #aac0ce;
+$tertiary-subtle: #e4eaee;
+
 @include media-breakpoint-up(md) {
   .offcanvas {
     --bs-offcanvas-width: 600px;
@@ -81,4 +84,9 @@
     color: shade-color($tertiary, 20%);
     text-decoration-color: rgba(shade-color($tertiary, 20%), .75);
   }
+}
+
+//Alerts
+.alert-secondary {
+  --bs-alert-bg: #{$tertiary-subtle};
 }
