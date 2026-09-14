@@ -5369,7 +5369,7 @@ h2 + div.timeline {
         display: inline-block;
         padding: 1px 6px;
 
-        ::before {
+        a::before {
             @include icon('\f0c6');
             margin-right: .5ex;
         }
