@@ -578,23 +578,11 @@ class Pdf(PDFDocument):
             *extra_tags
         ]
         attributes = dict(extra_attributes) if extra_attributes else {}
+        optional_transforms = []
 
         if linkify:
             tags.append('a')
             attributes['a'] = frozenset({'href'})
-
-        sanitizer = Sanitizer(Policy(
-            tags=frozenset(tags),
-            attributes=attributes,
-            on_disallowed_tag=OnDisallowed.STRIP,
-        ))
-        transforms = [
-            sanitizer.sanitize_node,
-            collapse_whitespace_node,
-            strip_comments_node,
-        ]
-
-        if linkify:
             link_color = self.link_color
             underline_links = self.underline_links
             underline_width = self.underline_width
@@ -617,9 +605,20 @@ class Pdf(PDFDocument):
                     collapse_whitespace=True
                 )
             ))
-            transforms.insert(1, linker.linkify_node)
+            optional_transforms.append(linker.linkify_node)
 
-        body = transform_node(body, *transforms)
+        sanitizer = Sanitizer(Policy(
+            tags=frozenset(tags),
+            attributes=attributes,
+            on_disallowed_tag=OnDisallowed.STRIP,
+        ))
+        body = transform_node(
+            body,
+            sanitizer.sanitize_node,
+            strip_comments_node,
+            *optional_transforms,
+            collapse_whitespace_node,
+        )
         if not body.children:
             return None
         return body
