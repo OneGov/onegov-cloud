@@ -165,6 +165,16 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             return 'due-date-tomorrow'
         return ''
 
+    def due_date_icon(self, due_date: date | None) -> str:
+        if not due_date:
+            return ''
+        today = self.today()
+        if due_date <= today:
+            return 'fa-hourglass-end'
+        if due_date == today + timedelta(days=1):
+            return 'fa-hourglass-half'
+        return 'fa-hourglass-start'
+
     @property
     def name(self) -> str:
         """ Takes the class name of the layout and generates a name which

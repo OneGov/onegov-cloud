@@ -185,6 +185,8 @@ $all-ticket-icon: '\f055';
 
     td {
         vertical-align: top;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
 
         .button { margin-bottom: 0; }
 
@@ -213,19 +215,24 @@ $all-ticket-icon: '\f055';
             font-weight: bold;
         }
 
-        &.due-date-overdue {
-            color: darken($alert-color, 20%);
-            font-weight: bold;
+        .due-date-batch {
+            @include status-batch($light-gray);
+            border-radius: 0.4em;
+            margin-top: -0.25rem;
+
+            .fa { margin-right: 0.4em; }
         }
 
-        &.due-date-today {
-            color: $alert-color;
-            font-weight: bold;
-        }
+        $due-date-colors: (
+            overdue: darken($alert-color, 10%),
+            today: lighten($alert-color, 20%),
+            tomorrow: $warning-color,
+        );
 
-        &.due-date-tomorrow {
-            color: $warning-color;
-            font-weight: bold;
+        @each $state, $color in $due-date-colors {
+            &.due-date-#{$state} .due-date-batch {
+                background: rgba($color, 0.3);
+            }
         }
     }
 
@@ -1004,7 +1011,7 @@ button {
         padding: .5rem;
         background: #fff;
         border: 1px solid #ccc;
-        border-radius: 3px;
+        border-radius: 10px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
 
         button {
@@ -1015,11 +1022,11 @@ button {
             text-align: left;
             background: none;
             border: 0;
+            border-radius: 6px;
             padding: .5rem .625rem;
             font-size: .875rem;
             cursor: pointer;
 
-            //&:hover { background: #f0f0f0; }
             &:hover {
                 background: $primary-color;
                 color: #fff;

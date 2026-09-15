@@ -2408,7 +2408,10 @@
               </tal:b>
           </td>
           <td class="ticket-due-date ${layout.due_date_class(ticket.due_date)}">
-              ${layout.format_date(ticket.due_date, 'date') if ticket.due_date else ''}
+              <span tal:condition="ticket.due_date" class="due-date-batch">
+                  <i class="fa ${layout.due_date_icon(ticket.due_date)}" aria-hidden="true"></i>
+                  ${layout.format_date(ticket.due_date, 'date')}
+              </span>
           </td>
           <td class="ticket-date">
               ${layout.format_date(ticket.created, 'relative')}

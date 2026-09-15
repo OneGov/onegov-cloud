@@ -1618,32 +1618,26 @@ def get_filters(
         active=self.state == 'unfinished',
         attrs={'class': 'ticket-filter-my'}
     )
-    for state, text in TICKET_STATES.items():
-        if state != 'archived':
-            coll = self.for_state(state)
-            if self.state == 'unfinished':
-                # FIXME: This is another case where we pass invalid
-                #        state just so the generated URL is shorter
-                #        we should make morepath aware of defaults
-                #        so it can ellide parameters that have been
-                #        set to their default value automatically
-                coll = coll.for_owner(None)  # type: ignore[arg-type]
-            yield Link(
-                text=text,
-                url=request.link(coll),
-                active=self.state == state,
-                attrs={'class': 'ticket-filter-' + state}
-            )
+    # build the filter order, placing the due-date filter right after 'open'
+    states = [(s, t) for s, t in TICKET_STATES.items() if s != 'archived']
+    after_open = next(i for i, (s, _t) in enumerate(states) if s == 'open') + 1
+    states.insert(after_open, ('due_dated', _('Due dated')))
 
-    due_dated = self.for_state('due_dated')
-    if self.state == 'unfinished':
-        due_dated = due_dated.for_owner(None)  # type: ignore[arg-type]
-    yield Link(
-        text=_('Due dated'),
-        url=request.link(due_dated),
-        active=self.state == 'due_dated',
-        attrs={'class': 'ticket-filter-due_dated'}
-    )
+    for state, text in states:
+        coll = self.for_state(state)
+        if self.state == 'unfinished':
+            # FIXME: This is another case where we pass invalid
+            #        state just so the generated URL is shorter
+            #        we should make morepath aware of defaults
+            #        so it can ellide parameters that have been
+            #        set to their default value automatically
+            coll = coll.for_owner(None)  # type: ignore[arg-type]
+        yield Link(
+            text=text,
+            url=request.link(coll),
+            active=self.state == state,
+            attrs={'class': 'ticket-filter-' + state}
+        )
 
 
 def get_groups(

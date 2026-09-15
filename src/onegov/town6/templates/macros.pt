@@ -3012,14 +3012,6 @@
 </metal:holidays>
 
 <metal:tickets_table_row define-macro="tickets_table_row" i18n:domain="onegov.town6">
-    <tr tal:condition="show_header|None">
-        <th i18n:translate="">Number</th>
-        <th colspan="2" i18n:translate="">Group</th>
-        <th class="ticket-due-date" i18n:translate="">Due Date</th>
-        <th class="ticket-date" i18n:translate="">Date</th>
-        <th class="ticket-state" i18n:translate="">State</th>
-        <th class="ticket-user" i18n:translate="">User</th>
-    </tr>
     <tr tal:define="ticket_url request.link(ticket); has_access request.is_manager_for_model(ticket)"
             class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}" tal:attributes="data-url action_link(ticket) if has_access else nothing">
         <tal:block tal:condition="has_access">
@@ -3039,7 +3031,10 @@
               </tal:b>
           </td>
           <td class="ticket-due-date ${layout.due_date_class(ticket.due_date)}">
-              ${layout.format_date(ticket.due_date, 'date') if ticket.due_date else ''}
+              <span tal:condition="ticket.due_date" class="due-date-batch">
+                  <i class="fa ${layout.due_date_icon(ticket.due_date)}" aria-hidden="true"></i>
+                  ${layout.format_date(ticket.due_date, 'date')}
+              </span>
           </td>
           <td class="ticket-date">
               ${layout.format_date(ticket.created, 'datetime')}

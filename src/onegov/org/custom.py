@@ -340,6 +340,19 @@ def get_global_tools(
 
         links.append(
             Link(
+                _('Due Dated Tickets'),
+                request.class_link(
+                    TicketCollection, {'handler': 'ALL', 'state': 'due_dated'}
+                ),
+                attrs={
+                    'class': ('with-count', 'warning', 'due-dated-tickets'),
+                    'data-count': str(ticket_count.due_dated),
+                }
+            )
+        )
+
+        links.append(
+            Link(
                 _('Pending Tickets'),
                 request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'pending'}
@@ -360,19 +373,6 @@ def get_global_tools(
                 attrs={
                     'class': ('with-count', 'secondary', 'closed-tickets'),
                     'data-count': str(ticket_count.closed),
-                }
-            )
-        )
-
-        links.append(
-            Link(
-                _('Due Dated Tickets'),
-                request.class_link(
-                    TicketCollection, {'handler': 'ALL', 'state': 'due_dated'}
-                ),
-                attrs={
-                    'class': ('with-count', 'warning', 'due-dated-tickets'),
-                    'data-count': str(ticket_count.due_dated),
                 }
             )
         )

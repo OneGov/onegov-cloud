@@ -2848,7 +2848,7 @@ $ticket-number-bg: $yellow-light;
         padding: .5rem;
         background: #fff;
         border: 1px solid #ccc;
-        border-radius: 3px;
+        border-radius: 10px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
 
         button {
@@ -2859,11 +2859,15 @@ $ticket-number-bg: $yellow-light;
             text-align: left;
             background: none;
             border: 0;
+            border-radius: 6px;
             padding: .5rem .625rem;
             font-size: .9375rem;
             cursor: pointer;
 
-            &:hover { background: #f0f0f0; }
+            &:hover {
+                background: $primary-color;
+                color: #fff;
+            }
         }
 
         .due-date-custom {
@@ -3009,6 +3013,8 @@ $archive-ticket-icon: '\f1c6';
 
     td {
         vertical-align: top;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
 
         &.ticket-date,
         &.ticket-state,
@@ -3032,19 +3038,27 @@ $archive-ticket-icon: '\f1c6';
             font-weight: bold;
         }
 
-        &.due-date-overdue {
-            color: darken($alert-color, 20%);
-            font-weight: bold;
+        .due-date-batch {
+            background: $gray;
+            border-radius: 0.4em;
+            display: inline-block;
+            margin-top: -0.25rem;
+            padding: .25rem .5rem;
+            white-space: nowrap;
+
+            .fa { margin-right: 0.4em; }
         }
 
-        &.due-date-today {
-            color: $alert-color;
-            font-weight: bold;
-        }
+        $due-date-colors: (
+            overdue: darken($alert-color, 10%),
+            today: lighten($alert-color, 20%),
+            tomorrow: $warning-color,
+        );
 
-        &.due-date-tomorrow {
-            color: $warning-color;
-            font-weight: bold;
+        @each $state, $color in $due-date-colors {
+            &.due-date-#{$state} .due-date-batch {
+                background: rgba($color, 0.3);
+            }
         }
     }
 
