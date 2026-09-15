@@ -90,8 +90,9 @@ class TicketBasePdf(OrgPdf):
 
             elif element.tag == 'ul':
                 items = [
-                    [MarkupParagraph(self.strip(item.inner_xml))]
+                    [MarkupParagraph(content)]
                     for item in element
+                    if (content := self.strip(item.inner_xml))
                 ]
                 self.table(items, 'even')
 

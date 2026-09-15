@@ -574,7 +574,7 @@ class Pdf(PDFDocument):
 
         # Remove unwanted markup
         tags = [
-            'p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li',
+            'p', 'br', 'strong', 'b', 'em', 'ol', 'ul', 'li',
             *extra_tags
         ]
         attributes = dict(extra_attributes) if extra_attributes else {}
