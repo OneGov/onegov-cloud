@@ -3038,7 +3038,7 @@
                   </div>
               </tal:b>
           </td>
-          <td class="ticket-due-date">
+          <td class="ticket-due-date ${layout.due_date_class(ticket.due_date)}">
               ${layout.format_date(ticket.due_date, 'date') if ticket.due_date else ''}
           </td>
           <td class="ticket-date">

@@ -151,6 +151,20 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def has_model_permission(self, permission: type[Intent] | None) -> bool:
         return self.request.has_permission(self.model, permission)
 
+    def due_date_class(self, due_date: date | None) -> str:
+        # colour a due date by urgency: overdue dark red, today red,
+        # tomorrow yellow
+        if not due_date:
+            return ''
+        today = self.today()
+        if due_date < today:
+            return 'due-date-overdue'
+        if due_date == today:
+            return 'due-date-today'
+        if due_date == today + timedelta(days=1):
+            return 'due-date-tomorrow'
+        return ''
+
     @property
     def name(self) -> str:
         """ Takes the class name of the layout and generates a name which

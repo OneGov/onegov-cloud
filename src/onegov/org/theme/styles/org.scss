@@ -3031,6 +3031,21 @@ $archive-ticket-icon: '\f1c6';
         &.ticket-group div:first-child {
             font-weight: bold;
         }
+
+        &.due-date-overdue {
+            color: darken($alert-color, 20%);
+            font-weight: bold;
+        }
+
+        &.due-date-today {
+            color: $alert-color;
+            font-weight: bold;
+        }
+
+        &.due-date-tomorrow {
+            color: $warning-color;
+            font-weight: bold;
+        }
     }
 
     th {

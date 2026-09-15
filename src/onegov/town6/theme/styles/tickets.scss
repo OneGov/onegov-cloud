@@ -212,6 +212,21 @@ $all-ticket-icon: '\f055';
         &.ticket-group div:first-child {
             font-weight: bold;
         }
+
+        &.due-date-overdue {
+            color: darken($alert-color, 20%);
+            font-weight: bold;
+        }
+
+        &.due-date-today {
+            color: $alert-color;
+            font-weight: bold;
+        }
+
+        &.due-date-tomorrow {
+            color: $warning-color;
+            font-weight: bold;
+        }
     }
 
 }
