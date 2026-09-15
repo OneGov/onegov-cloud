@@ -2,11 +2,17 @@
     display: none !important;
 }
 
+.page-content-main {
+        img {
+            height: auto;
+        }
+}
+
 .content {
+
     img {
          border-radius: $border-radius-lg;
          max-width: 100%;
-         height: auto;
     }
 
     .anchor-link {
@@ -31,4 +37,13 @@
 .typeahead {
     width: 100%;
     max-width: 400px;
+}
+
+// Homepage
+#homepage {
+    &> .container,
+    &> .container-fluid {
+        margin-top: $s-5xl;
+        margin-bottom: $s-5xl;
+    }
 }

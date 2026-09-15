@@ -66,7 +66,7 @@ XSLT_BASE = """<?xml version="1.0" encoding="UTF-8"?>
     </xsl:template>
 
     <xsl:template match="page">
-      <div class="homepage">
+      <div id="homepage" class="homepage">
         <xsl:apply-templates select="@*|node()"/>
       </div>
     </xsl:template>

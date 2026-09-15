@@ -161,7 +161,7 @@
 
         <tal:b tal:define="on_homepage layout.on_homepage; sidebar_links layout.sidebar_links">
 
-            <div tal:condition="on_homepage" class="content without-sidebar-links">
+            <div tal:condition="on_homepage" id="homepage" class="content without-sidebar-links">
                 <div role="main" id="content" data-reinit-foundation>
                     <div metal:define-slot="content"></div>
                 </div>
