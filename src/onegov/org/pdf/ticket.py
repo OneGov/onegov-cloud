@@ -90,9 +90,10 @@ class TicketBasePdf(OrgPdf):
 
             elif element.tag == 'ul':
                 items = [
-                    [MarkupParagraph(content)]
+                    [MarkupParagraph(self.strip(item.inner_xml))]
                     for item in element
-                    if (content := self.strip(item.inner_xml))
+                    if isinstance(item, turbohtml.Element)
+                    if item.tag == 'li'
                 ]
                 self.table(items, 'even')
 
