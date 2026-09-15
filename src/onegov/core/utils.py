@@ -32,8 +32,8 @@ from onegov.core.errors import AlreadyLockedError
 from purl import URL
 from threading import Thread
 from time import perf_counter
-from turbohtml.clean import Linker, Linkify, PhoneNumbers, Policy, sanitize
-from turbohtml.clean import PhoneFormat, PhoneNumber
+from turbohtml.clean import Linker, Linkify, Policy, sanitize
+from turbohtml.clean import PhoneFormat, PhoneNumber, PhoneNumbers
 from unidecode import unidecode
 from uuid import UUID, uuid4
 from webob import static
@@ -388,7 +388,7 @@ def linkify_linker() -> Linker:
     return Linker(Linkify(
         parse_email=True,
         schemes=frozenset({'http', 'https', 'mailto', 'tel'}),
-        phones=PhoneNumbers(regions=('CH',))
+        phones=PhoneNumbers(regions=('CH',), collapse_whitespace=True)
     ))
 
 

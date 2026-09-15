@@ -56,20 +56,15 @@ class TicketBasePdf(OrgPdf):
         """
         ticket_summary_tags = ['dl', 'dt', 'dd', 'h2']
 
-        html = self.prepare_html(
+        body = self.prepare_html(
             html,
             linkify=linkify,
             extra_tags=ticket_summary_tags
         )
-        if html is None:
+        if body is None:
             return
 
-        document = turbohtml.parse(html)
-        body_element = document.find('body')
-        if body_element is None:
-            return
-
-        for element in body_element:
+        for element in body:
             if not isinstance(element, turbohtml.Element):
                 continue
 
@@ -374,18 +369,12 @@ class TicketPdf(TicketBasePdf):
         return the useful data in cleaned form.
         """
         message_tags = ['dl', 'dt', 'dd', 'h2', 'div']
-        html = self.prepare_html(
+        body = self.prepare_html(
             html,
             extra_tags=message_tags,
             extra_attributes={'div': frozenset({'class'})}
         )
-        if html is None:
-            return None
-
-        document = turbohtml.parse(html)
-
-        body = document.find('body')
-        if body is None or not body.children:
+        if body is None:
             return None
 
         timestamp_el = body.find(

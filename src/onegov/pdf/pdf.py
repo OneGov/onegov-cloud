@@ -27,10 +27,12 @@ from reportlab.platypus import Paragraph
 from reportlab.platypus import Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus.tables import TableStyle
+from turbohtml.clean import collapse_whitespace_node
+from turbohtml.clean import strip_comments_node
+from turbohtml.clean import transform_node
 from turbohtml.clean import LinkCandidate
 from turbohtml.clean import Linker
 from turbohtml.clean import Linkify
-from turbohtml.clean import Minify
 from turbohtml.clean import OnDisallowed
 from turbohtml.clean import PhoneNumbers
 from turbohtml.clean import Policy
@@ -560,7 +562,7 @@ class Pdf(PDFDocument):
         linkify: bool = False,
         extra_tags: Iterable[str] = (),
         extra_attributes: Mapping[str, frozenset[str]] | None = None,
-    ) -> str | None:
+    ) -> turbohtml.Element | None:
 
         if not html or html == '<p></p>':
             return None
@@ -586,9 +588,11 @@ class Pdf(PDFDocument):
             attributes=attributes,
             on_disallowed_tag=OnDisallowed.STRIP,
         ))
-        sanitized = sanitizer.sanitize_node(body)
-        if not html.strip():
-            return None
+        transforms = [
+            sanitizer.sanitize_node,
+            collapse_whitespace_node,
+            strip_comments_node,
+        ]
 
         if linkify:
             link_color = self.link_color
@@ -608,22 +612,17 @@ class Pdf(PDFDocument):
                 parse_email=True,
                 process_existing=True,
                 schemes=('http', 'https', 'email', 'tel'),
-                phones=PhoneNumbers(regions=('CH',))
+                phones=PhoneNumbers(
+                    regions=('CH',),
+                    collapse_whitespace=True
+                )
             ))
-            sanitized = linker.linkify_node(sanitized)
+            transforms.insert(1, linker.linkify_node)
 
-        html = sanitized.serialize(
-            turbohtml.Html(
-                # NOTE: This has the same result as the html5lib whitespace
-                #       filter we used to use.
-                layout=Minify(collapse_whitespace=True),
-            )
-        # FIXME: There should be a inner_serialize, so we don't have to
-        #        remove this wrapper.
-        ).removeprefix('<body>').removesuffix('</body>')
-        if not html.strip():
+        body = transform_node(body, *transforms)
+        if not body.children:
             return None
-        return html
+        return body
 
     def mini_html(self, html: str | None, linkify: bool = False) -> None:
         """ Convert a small subset of HTML into ReportLab paragraphs.
@@ -636,13 +635,8 @@ class Pdf(PDFDocument):
 
         """
 
-        html = self.prepare_html(html, linkify=linkify)
-        if html is None:
-            return
-
-        document = turbohtml.parse(html)
-        body = document.find('body')
-        if body is None or not body.children:
+        body = self.prepare_html(html, linkify=linkify)
+        if body is None:
             return
 
         for element in body:
