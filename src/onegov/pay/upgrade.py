@@ -5,6 +5,8 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 # pragma: exclude file
 from __future__ import annotations
 
+import click
+
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import false
 from sqlalchemy import text
@@ -173,3 +175,36 @@ def add_payment_and_invoice_indexes(context: UpgradeContext) -> None:
             [text('(unit * quantity)')],
             if_not_exists=True
         )
+
+
+@upgrade_task('Make invoice_id not nullable, delete orphaned items')
+def make_invoice_id_not_nullable_and_delete_orphaned_items(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('invoice_items'):
+        return
+
+    if not context.is_nullable('invoice_items', 'invoice_id'):
+        return
+
+    # delete orphaned invoice items and their payment links
+    context.session.execute(text("""
+         DELETE FROM payments_for_invoice_items
+          WHERE invoice_items_id IN (
+            SELECT id
+              FROM invoice_items
+             WHERE invoice_id IS NULL
+        )
+    """))
+    result = context.session.execute(text("""
+         DELETE FROM invoice_items
+          WHERE invoice_id IS NULL
+    """))
+    if rowcount := getattr(result, 'rowcount', 0):
+        click.secho(f'Deleted {rowcount} orphaned invoice items.', fg='yellow')
+
+    context.operations.alter_column(
+        'invoice_items',
+        'invoice_id',
+        nullable=False
+    )
