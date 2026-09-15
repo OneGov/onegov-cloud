@@ -189,7 +189,7 @@ def make_invoice_id_not_nullable_and_delete_orphaned_items(
 
     # delete orphaned invoice items and their payment links
     context.session.execute(text("""
-         DELETE FROM payments_for_invoice_items
+         DELETE FROM payments_for_invoice_items_payments
           WHERE invoice_items_id IN (
             SELECT id
               FROM invoice_items
