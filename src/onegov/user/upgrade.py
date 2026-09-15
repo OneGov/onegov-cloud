@@ -5,6 +5,8 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 # pragma: exclude file
 from __future__ import annotations
 
+import ast
+
 from collections import defaultdict
 from onegov.core.upgrade import upgrade_task
 from onegov.core.orm.types import JSON, UTCDateTime
@@ -13,7 +15,7 @@ from sqlalchemy import Boolean, Column, Text, UUID
 from sqlalchemy.sql import text
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import datetime
@@ -355,3 +357,50 @@ def add_on_update_cascade_to_username_fk(context: UpgradeContext) -> None:
             ['username'],
             onupdate='CASCADE'
         )
+
+
+def _unwrap_tags(tags: list[Any]) -> list[str]:
+    """ Unwraps tag elements that are Python list reprs stored as strings.
+
+    A repr like "['Sport']" is unwrapped to its contents ("Sport"), while
+    "[]" and "['[]']" unwrap to nothing. Regular tags are kept as-is.
+    """
+    result = []
+    for tag in tags:
+        if not isinstance(tag, str):
+            continue
+        if tag.startswith('[') and tag.endswith(']'):
+            try:
+                parsed = ast.literal_eval(tag)
+            except (ValueError, SyntaxError):
+                parsed = None
+            if isinstance(parsed, list):
+                result.extend(_unwrap_tags(parsed))
+                continue
+        if tag:
+            result.append(tag)
+    return result
+
+
+@upgrade_task('Fix stringified list reprs in user tags')
+def fix_stringified_user_tags(context: UpgradeContext) -> None:
+    """ Some user tags were stored as the Python repr of a list instead of
+    the list's contents, e.g. "['Sport']", "[]" or "['[]']" as a single tag
+    string. Found in feriennet instances only.
+    """
+    if not any(
+        cls.__name__ == 'FeriennetApp'
+        for cls in type(context.app).__mro__
+    ):
+        return
+
+    if not context.has_table('users'):
+        return
+
+    for user in context.session.query(User).filter(User.tags.isnot(None)):
+        tags = user.tags
+        if not tags:
+            continue
+        fixed = _unwrap_tags(tags)
+        if fixed != tags:
+            user.tags = fixed

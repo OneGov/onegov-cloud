@@ -4,12 +4,11 @@ import time
 import json
 import pytest
 
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from datetime import timedelta
 from onegov.activity.types import BoundedIntegerRange
 from pytest import mark
-from sedate import as_datetime, replace_timezone
 
 
 from typing import TYPE_CHECKING
@@ -264,148 +263,64 @@ def test_browse_billing(
     assert not browser.is_element_present_by_css('.remove-manual')
 
 
-# The parametrization is used to ensure all the volunteer states can
-# be reached by clicking in the browser and verify that the states
-# can be exported properly
-@mark.skip('Causes too many requests, skip for now')
-@pytest.mark.parametrize('to_volunteer_state', [
-    ('Kontaktiert'),
-    ('Bestätigt'),
-    ('Offen'),
+# A volunteer can hold any of these states; the 'helfer' export must render
+# each label. A missing 'cancelled' label previously raised KeyError (OGC-5YR).
+@pytest.mark.parametrize('state,label', [
+    ('open', 'Offen'),
+    ('contacted', 'Kontaktiert'),
+    ('confirmed', 'Bestätigt'),
+    ('cancelled', 'Abgelehnt'),
 ])
 def test_volunteers_export(
     browser: ExtendedBrowser,
     scenario: Scenario,
-    to_volunteer_state: str
+    state: str,
+    label: str
 ) -> None:
 
     scenario.add_period(title="Ferienpass 2019", active=True, confirmed=True)
     scenario.add_activity(title="Zoo", state='accepted')
-    scenario.add_user(username='member@example.org', role='member')
     scenario.add_occasion(age=(0, 10), spots=(0, 2), cost=100)
     scenario.add_need(
         name="Begleiter",
         number=BoundedIntegerRange(1, 4),
         accept_signups=True
     )
-    scenario.add_attendee(name="Dustin")
-    scenario.add_booking(
-        username='admin@example.org',
-        occasion=scenario.occasions[0],
-        state='accepted',
-        cost=100
+    scenario.add_volunteer(
+        state=state,
+        first_name="Foo",
+        last_name="Bar",
+        birth_date=date(1984, 6, 4),
+        organisation="",
+        address="Foostreet 1",
+        zip_code="1234",
+        place="Bartown",
+        email="foo@bar.org",
+        phone="1234"
     )
     scenario.commit()
     scenario.refresh()
 
-    # initially, the volunteer feature is disabled
-    browser.visit('/')
-    assert not browser.is_text_present('Helfen')
-
-    # once activated, it is public
+    page = browser.page
     browser.login_admin()
-    browser.visit('/feriennet-settings')
-    browser.fill_form({
-        'volunteers': 'enabled',
-        'tos_url': 'https://example.org/tos'
-    })
-    browser.find_by_value("Absenden").click()
 
-    browser.visit('/')
-    assert browser.is_text_present('Helfen')
-
-    # users can sign up as volunteers
-    browser.links.find_by_text("Helfen").click()
-    assert browser.is_text_present("Begleiter")
-    assert not browser.is_element_present_by_css('.volunteer-cart-item')
-
-    browser.links.find_by_partial_text("Zu meiner Liste").click()
-    assert browser.is_element_present_by_css('.volunteer-cart-item')
-
-    browser.links.find_by_text("Als Hilfsperson registrieren").click()
-    browser.fill_form({
-        'first_name': "Foo",
-        'last_name': "Bar",
-        'birth_date': '06.04.1984',
-        'address': 'Foostreet 1',
-        'zip_code': '1234',
-        'place': 'Bartown',
-        'email': 'foo@bar.org',
-        'phone': '1234'
-    })
-    browser.find_by_value("Absenden").click()
-
-    # the volunteer is not in the helpers list yet
-    browser.visit('/attendees/zoo')
-    assert not browser.is_text_present("Foo")
-
-    # the admin can see the signed-up users
-    assert scenario.latest_period is not None
-    browser.visit(f'/volunteers/{scenario.latest_period.id.hex}')
-    assert browser.is_text_present("Foo")
-
-    # verify initial volunteer state
-    assert browser.is_text_present("Offen")
-
-    browser.find_by_css('.actions-button').first.click()
-    # move volunteer through different volunteer states
-    if to_volunteer_state == 'Offen':
-        pass
-    elif to_volunteer_state == 'Kontaktiert':
-        assert not browser.is_text_present("Bestätigt")
-        browser.links.find_by_partial_text("Als kontaktiert markieren").click()
-        assert browser.is_text_present("Kontaktiert")
-    elif to_volunteer_state == 'Bestätigt':
-        assert not browser.is_text_present("Bestätigt")
-        browser.links.find_by_partial_text("Als bestätigt markieren").click()
-        assert browser.is_text_present("Bestätigt")
-        # now the volunteer is in the list
-        browser.visit('/attendees/zoo')
-        assert browser.is_text_present("Foo")
-    else:
-        # invalid case
-        raise AssertionError()
-
+    # the 'helfer' export is admin-only and independent of the feature flag
     browser.visit('/export/helfer')
-    browser.fill_form({
-        'period': scenario.periods[0].id.hex,
-        'file_format': "json",
-    })
-    browser.find_by_value("Absenden").click()
+    page.locator('select[name="period"]').select_option(
+        scenario.periods[0].id.hex)
+    # the radio input is visually hidden, so check it with force
+    page.locator('input[name="file_format"][value="json"]').check(force=True)
 
-    volunteer_export = json.loads(browser.find_by_tag('pre').text)[0]
+    # the json export is served as a file download
+    with page.expect_download() as download_info:
+        page.locator('input[value="Absenden"]').click()
+    export_path = download_info.value.path()
 
-    occasion_date = as_datetime(scenario.date_offset(10))
-    occasion_date = replace_timezone(occasion_date, 'Europe/Zurich')
-    start_time = occasion_date.isoformat()
-    end_time = (occasion_date + timedelta(hours=1)).isoformat()
-
-    def get_number_of_confirmed_volunteers(state: str) -> int:
-        if state == 'Bestätigt':
-            return 1
-        return 0
-
-    volunteer_json = {
-        'Angebot Titel': 'Zoo',
-        'Durchführung Daten': [
-            [start_time, end_time]
-        ],
-        'Durchführung Abgesagt': False,
-        'Bedarf Name': 'Begleiter',
-        'Bedarf Anzahl': '1 - 3',
-        'Bestätigte Helfer': get_number_of_confirmed_volunteers(
-            to_volunteer_state),
-        'Helfer Status': to_volunteer_state,
-        'Vorname': 'Foo',
-        'Nachname': 'Bar',
-        'Geburtsdatum': '1984-06-04',
-        'Organisation': '',
-        'Ort': 'Bartown',
-        'E-Mail': 'foo@bar.org',
-        'Telefon': '1234',
-        'Adresse': 'Foostreet 1'
-    }
-    assert volunteer_export == volunteer_json
+    volunteer = json.loads(Path(export_path).read_text())[0]
+    assert volunteer['Angebot Titel'] == 'Zoo'
+    assert volunteer['Vorname'] == 'Foo'
+    assert volunteer['Helfer Status'] == label
+    assert volunteer['Bestätigte Helfer'] == (1 if state == 'confirmed' else 0)
 
 
 def test_volunteer_subscription(

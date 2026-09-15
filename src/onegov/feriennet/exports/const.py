@@ -46,5 +46,6 @@ ROLES = {
 STATES = {
     'open': _('Open'),
     'contacted': _('Contacted'),
-    'confirmed': _('Confirmed')
+    'confirmed': _('Confirmed'),
+    'cancelled': _('Denied')
 }

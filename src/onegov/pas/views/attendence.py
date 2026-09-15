@@ -17,7 +17,7 @@ from onegov.pas.collections import (
     SettlementRunCollection,
 )
 from onegov.pas.custom import (
-    has_user_set_abschluss_for_settlement_run,
+    has_user_set_abschluss_for_commission,
     validate_attendance_date,
     notify_admins_finalized,
 )
@@ -281,10 +281,12 @@ def add_attendence(
         if not request.is_admin:
             if (
                 form.parliamentarian_id.data
+                and form.commission_id.data
                 and form.date.data
-                and has_user_set_abschluss_for_settlement_run(
+                and has_user_set_abschluss_for_commission(
                     request.session,
-                    form.parliamentarian_id.data,
+                    UUID(form.parliamentarian_id.data),
+                    UUID(form.commission_id.data),
                     form.date.data,
                 )
             ):
@@ -354,8 +356,13 @@ def add_bulk_attendence(
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-            if not request.is_admin and form.date.data:
+            if (
+                not request.is_admin
+                and form.commission_id.data
+                and form.date.data
+            ):
                 blocked_parls: list[str] = []
+                commission_id = UUID(form.commission_id.data)
                 for parl_id in raw_parl_ids:
                     if not isinstance(parl_id, str):
                         continue
@@ -363,8 +370,11 @@ def add_bulk_attendence(
                         pid = UUID(parl_id)
                     except ValueError:
                         continue
-                    if has_user_set_abschluss_for_settlement_run(
-                        request.session, pid, form.date.data
+                    if has_user_set_abschluss_for_commission(
+                        request.session,
+                        pid,
+                        commission_id,
+                        form.date.data,
                     ):
                         parl = PASParliamentarianCollection(request.app).by_id(
                             pid

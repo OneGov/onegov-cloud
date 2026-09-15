@@ -1258,7 +1258,7 @@ table.responsive {
     }
 }
 
-.page-content-main a,
+.page-content-main a:not(.re-icon),
 a.mission-nature-title,
 .side-panel.highlighted.without-title > ul:first-of-type:not(.bulleted) a {
     font-weight: bold;
