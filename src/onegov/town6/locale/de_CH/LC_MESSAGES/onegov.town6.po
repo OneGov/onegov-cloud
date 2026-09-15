@@ -3194,3 +3194,39 @@ msgstr "Neue Notiz"
 
 #~ msgid "Party"
 #~ msgstr "Party"
+
+msgid "Due Date"
+msgstr "Fälligkeitsdatum"
+
+msgid "No due date"
+msgstr "Kein Fälligkeitsdatum"
+
+msgid "Set due date"
+msgstr "Fälligkeit setzen"
+
+msgid "End of this week"
+msgstr "Ende dieser Woche"
+
+msgid "In one week"
+msgstr "In einer Woche"
+
+msgid "Invalid date"
+msgstr "Ungültiges Datum"
+
+msgid "Due Dated Tickets"
+msgstr "Fällige Tickets"
+
+msgid "Today"
+msgstr "Heute"
+
+msgid "Tomorrow"
+msgstr "Morgen"
+
+msgid "Custom"
+msgstr "Eigene"
+
+msgid "Clear"
+msgstr "Löschen"
+
+msgid "User"
+msgstr "Benutzer"

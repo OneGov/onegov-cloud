@@ -364,6 +364,19 @@ def get_global_tools(
             )
         )
 
+        links.append(
+            Link(
+                _('Due Dated Tickets'),
+                request.class_link(
+                    TicketCollection, {'handler': 'ALL', 'state': 'due_dated'}
+                ),
+                attrs={
+                    'class': ('with-count', 'warning', 'due-dated-tickets'),
+                    'data-count': str(ticket_count.due_dated),
+                }
+            )
+        )
+
         if screen_count:
             css = ticket_count.open and 'alert' or 'info'
         else:

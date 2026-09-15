@@ -166,6 +166,9 @@ msgstr "In attesa"
 msgid "Closed"
 msgstr "Chiuso"
 
+msgid "Due dated"
+msgstr "Con scadenza"
+
 msgid "Archived"
 msgstr "Fare Archivio"
 
@@ -8704,3 +8707,24 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla "
 #~ "regola verranno rimosse."
+
+msgid "Due Date"
+msgstr "Data di scadenza"
+
+msgid "No due date"
+msgstr "Nessuna scadenza"
+
+msgid "Set due date"
+msgstr "Imposta scadenza"
+
+msgid "End of this week"
+msgstr "Fine di questa settimana"
+
+msgid "In one week"
+msgstr "Tra una settimana"
+
+msgid "Invalid date"
+msgstr "Data non valida"
+
+msgid "Due Dated Tickets"
+msgstr "Tickets con scadenza"

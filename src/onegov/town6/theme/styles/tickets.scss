@@ -155,6 +155,11 @@ $all-ticket-icon: '\f055';
     width: 2 * $default-icon-width;
 }
 
+.ticket-filter-due_dated::before {
+    @include icon('\f073');
+    width: 2 * $default-icon-width;
+}
+
 .no-tickets {
     border: 0;
     height: 400px;
@@ -165,12 +170,26 @@ $all-ticket-icon: '\f055';
 .tickets-table {
     width: 100%;
 
+    th {
+        font-weight: normal;
+        color: $body-font-color;
+        &.ticket-date,
+        &.ticket-due-date,
+        &.ticket-state,
+        &.ticket-user {
+            @include breakpoint(medium up) {
+                text-align: right !important;
+            }
+        }
+    }
+
     td {
         vertical-align: top;
 
         .button { margin-bottom: 0; }
 
         &.ticket-date,
+        &.ticket-due-date,
         &.ticket-state,
         &.ticket-user {
             color: $monsoon;
@@ -947,5 +966,58 @@ button {
 
     &.granted {
         &::before { @include icon-bold($ticket-notification-enabled-icon); }
+    }
+}
+
+.due-date-dropdown {
+    position: relative;
+    display: inline-block;
+
+    summary {
+        cursor: pointer;
+        list-style: none;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    .due-date-menu {
+        position: absolute;
+        z-index: 10;
+        left: 0;
+        min-width: 12rem;
+        margin-top: .25rem;
+        padding: .5rem;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
+
+        button {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0 0 .25rem;
+            text-align: left;
+            background: none;
+            border: 0;
+            padding: .5rem .625rem;
+            font-size: .875rem;
+            cursor: pointer;
+
+            //&:hover { background: #f0f0f0; }
+            &:hover {
+                background: $primary-color;
+                color: #fff;
+            }
+        }
+
+        .due-date-custom {
+            display: block;
+            padding: .35rem .5rem;
+
+            input { margin: .25rem 0 0; }
+        }
+
+        .due-date-clear { color: #cc4b37; }
     }
 }

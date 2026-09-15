@@ -164,6 +164,9 @@ msgstr "En traitement"
 msgid "Closed"
 msgstr "Fermé"
 
+msgid "Due dated"
+msgstr "Avec échéance"
+
 msgid "Archived"
 msgstr "Archivé"
 
@@ -8734,3 +8737,24 @@ msgstr "Veuillez saisir votre adresse e-mail pour continuer"
 #~ msgstr ""
 #~ "Toutes les allocations créées par la règle seront supprimées si elles "
 #~ "n'ont pas encore été réservées."
+
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+msgid "No due date"
+msgstr "Sans échéance"
+
+msgid "Set due date"
+msgstr "Définir l'échéance"
+
+msgid "End of this week"
+msgstr "Fin de cette semaine"
+
+msgid "In one week"
+msgstr "Dans une semaine"
+
+msgid "Invalid date"
+msgstr "Date invalide"
+
+msgid "Due Dated Tickets"
+msgstr "Tickets avec échéance"

@@ -4,7 +4,7 @@ import morepath
 import os
 import zipfile
 
-from datetime import date
+from datetime import date, timedelta
 from email_validator import validate_email, EmailNotValidError
 from io import BytesIO
 from markupsafe import Markup
@@ -897,6 +897,37 @@ def archive_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     return morepath.redirect(request.link(self))
 
 
+@OrgApp.view(model=Ticket, name='set-due-date', permission=Private,
+             request_method='POST')
+def set_ticket_due_date(self: Ticket, request: OrgRequest) -> BaseResponse:
+    request.assert_valid_csrf_token()
+
+    today = TicketLayout(self, request).today()
+    preset = request.params.get('preset')
+
+    if request.params.get('clear'):
+        self.due_date = None
+    elif preset == 'today':
+        self.due_date = today
+    elif preset == 'tomorrow':
+        self.due_date = today + timedelta(days=1)
+    elif preset == 'end_of_week':
+        # coming Friday
+        self.due_date = today + timedelta(days=(4 - today.weekday()) % 7)
+    elif preset == 'in_one_week':
+        self.due_date = today + timedelta(days=7)
+    else:
+        raw = request.params.get('date')
+        try:
+            self.due_date = date.fromisoformat(raw) if isinstance(
+                raw, str) and raw else None
+        except ValueError:
+            request.alert(_('Invalid date'))
+            return request.redirect(request.link(self))
+
+    return request.redirect(request.link(self))
+
+
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
 def unarchive_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     user = request.current_user
@@ -1603,6 +1634,16 @@ def get_filters(
                 active=self.state == state,
                 attrs={'class': 'ticket-filter-' + state}
             )
+
+    due_dated = self.for_state('due_dated')
+    if self.state == 'unfinished':
+        due_dated = due_dated.for_owner(None)  # type: ignore[arg-type]
+    yield Link(
+        text=_('Due dated'),
+        url=request.link(due_dated),
+        active=self.state == 'due_dated',
+        attrs={'class': 'ticket-filter-due_dated'}
+    )
 
 
 def get_groups(

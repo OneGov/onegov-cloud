@@ -1259,6 +1259,36 @@
     </div>
 </metal:ticket_status>
 
+<metal:due_date define-macro="due_date" i18n:domain="onegov.town6">
+    <tal:b tal:define="
+        editable is_manager and ticket.state in ('open', 'pending');
+        action layout.csrf_protected_url(request.link(ticket, name='set-due-date'));
+        current ticket.due_date and layout.format_date(ticket.due_date, 'date');">
+        <tal:b tal:condition="not:editable">
+            <span tal:condition="current">${current}</span>
+            <span tal:condition="not:current" i18n:translate>No due date</span>
+        </tal:b>
+        <details tal:condition="editable" class="due-date-dropdown">
+            <summary class="button small secondary due-date-button">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+                <span tal:condition="current">${current}</span>
+                <span tal:condition="not:current" i18n:translate>Set due date</span>
+            </summary>
+            <form method="POST" action="${action}" class="due-date-menu" tal:define="presets layout.due_date_presets">
+                <button type="submit" name="preset" value="today" title="${presets['today']}" i18n:translate>Today</button>
+                <button type="submit" name="preset" value="tomorrow" title="${presets['tomorrow']}" i18n:translate>Tomorrow</button>
+                <button type="submit" name="preset" value="end_of_week" title="${presets['end_of_week']}" i18n:translate>End of this week</button>
+                <button type="submit" name="preset" value="in_one_week" title="${presets['in_one_week']}" i18n:translate>In one week</button>
+                <label class="due-date-custom">
+                    <span i18n:translate>Custom</span>
+                    <input type="date" name="date" data-auto-submit="true" value="${ticket.due_date and ticket.due_date.isoformat() or ''}">
+                </label>
+                <button tal:condition="current" type="submit" name="clear" value="1" class="due-date-clear" i18n:translate>Clear</button>
+            </form>
+        </details>
+    </tal:b>
+</metal:due_date>
+
 <metal:payment_status define-macro="payment_status" i18n:domain="onegov.town6">
     <div i18n:translate tal:condition="payment.state == 'open'" class="payment-state payment-state-open">
         Open
@@ -2982,6 +3012,14 @@
 </metal:holidays>
 
 <metal:tickets_table_row define-macro="tickets_table_row" i18n:domain="onegov.town6">
+    <tr tal:condition="show_header|None">
+        <th i18n:translate="">Number</th>
+        <th colspan="2" i18n:translate="">Group</th>
+        <th class="ticket-due-date" i18n:translate="">Due Date</th>
+        <th class="ticket-date" i18n:translate="">Date</th>
+        <th class="ticket-state" i18n:translate="">State</th>
+        <th class="ticket-user" i18n:translate="">User</th>
+    </tr>
     <tr tal:define="ticket_url request.link(ticket); has_access request.is_manager_for_model(ticket)"
             class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}" tal:attributes="data-url action_link(ticket) if has_access else nothing">
         <tal:block tal:condition="has_access">
@@ -2999,6 +3037,9 @@
                       ${layout.format_number(payment.amount)} ${payment.currency}
                   </div>
               </tal:b>
+          </td>
+          <td class="ticket-due-date">
+              ${layout.format_date(ticket.due_date, 'date') if ticket.due_date else ''}
           </td>
           <td class="ticket-date">
               ${layout.format_date(ticket.created, 'datetime')}
@@ -3021,7 +3062,7 @@
           </td>
         </tal:block>
         <tal:block tal:condition="not has_access">
-          <td class="ticket-number-plain" colspan="6">
+          <td class="ticket-number-plain" colspan="7">
               ${ticket.number}
           </td>
         </tal:block>

@@ -165,6 +165,9 @@ msgstr "In Bearbeitung"
 msgid "Closed"
 msgstr "Abgeschlossen"
 
+msgid "Due dated"
+msgstr "Fällig"
+
 msgid "Archived"
 msgstr "Archiviert"
 
@@ -8759,3 +8762,24 @@ msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 #~ "reserved yet."
 #~ msgstr ""
 #~ "Alle Einteilungen der Regel werden entfernt, sofern nicht reserviert."
+
+msgid "Due Date"
+msgstr "Fälligkeitsdatum"
+
+msgid "No due date"
+msgstr "Kein Fälligkeitsdatum"
+
+msgid "Set due date"
+msgstr "Fälligkeit setzen"
+
+msgid "End of this week"
+msgstr "Ende dieser Woche"
+
+msgid "In one week"
+msgstr "In einer Woche"
+
+msgid "Invalid date"
+msgstr "Ungültiges Datum"
+
+msgid "Due Dated Tickets"
+msgstr "Fällige Tickets"

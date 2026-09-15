@@ -55,8 +55,8 @@ var processCommonNodes = function(elements, out_of_band) {
         return false;
     });
 
-    // auto-submitting select dropdowns
-    targets.find('select[data-auto-submit]').on('change', function() {
+    // auto-submitting select dropdowns and inputs
+    targets.find('select[data-auto-submit], input[data-auto-submit]').on('change', function() {
         this.form.submit();
     });
 

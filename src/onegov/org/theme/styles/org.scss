@@ -398,6 +398,11 @@ $globals-height: 2.5rem;
         background-color: $secondary-color;
         color: $body-font-color;
     }
+
+    .warning.with-count::before {
+        background-color: $warning-color;
+        color: $body-font-color;
+    }
 }
 
 .header {
@@ -2823,6 +2828,55 @@ $ticket-number-bg: $yellow-light;
     padding: 0;
 }
 
+.due-date-dropdown {
+    position: relative;
+    display: inline-block;
+
+    summary {
+        cursor: pointer;
+        list-style: none;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    .due-date-menu {
+        position: absolute;
+        z-index: 10;
+        left: 0;
+        min-width: 12rem;
+        margin-top: .25rem;
+        padding: .5rem;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
+
+        button {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0 0 .25rem;
+            text-align: left;
+            background: none;
+            border: 0;
+            padding: .5rem .625rem;
+            font-size: .9375rem;
+            cursor: pointer;
+
+            &:hover { background: #f0f0f0; }
+        }
+
+        .due-date-custom {
+            display: block;
+            padding: .35rem .5rem;
+
+            input { margin: .25rem 0 0; }
+        }
+
+        .due-date-clear { color: #cc4b37; }
+    }
+}
+
 .ticket-timeline .timeline-no-messages {
     margin-top: 1.25rem;
 }
@@ -2902,6 +2956,11 @@ $archive-ticket-icon: '\f1c6';
 
 .ticket-filter-all::before {
     @include icon($all-ticket-icon);
+    margin-right: $ticket-filter-icon-mr;
+}
+
+.ticket-filter-due_dated::before {
+    @include icon('\f073');
     margin-right: $ticket-filter-icon-mr;
 }
 

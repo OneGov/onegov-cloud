@@ -26,7 +26,9 @@ if TYPE_CHECKING:
     from sqlalchemy.sql.elements import SQLColumnExpression
     from typing import TypedDict
 
-    type ExtendedTicketState = TicketState | Literal['all', 'unfinished']
+    type ExtendedTicketState = TicketState | Literal[
+        'all', 'unfinished', 'due_dated'
+    ]
 
     class StateCountDict(TypedDict, total=False):
         open: int
@@ -93,7 +95,13 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
     def subset(self) -> Query[Ticket]:
         query = self.query()
-        query = query.order_by(desc(Ticket.created))
+        if self.state in ('due_dated', 'unfinished', 'pending'):
+            # soonest due date first
+            query = query.order_by(
+                Ticket.due_date.asc().nullslast(), desc(Ticket.created)
+            )
+        else:
+            query = query.order_by(desc(Ticket.created))
         query = query.options(joinedload(Ticket.user))
         query = query.options(undefer(Ticket.created))
 
@@ -104,6 +112,12 @@ class TicketCollectionPagination(Pagination[Ticket]):
             )
         elif self.state == 'all':
             query = query.filter(Ticket.state != 'archived')
+        elif self.state == 'due_dated':
+            query = query.filter(
+                Ticket.state != 'archived',
+                Ticket.state != 'closed',
+                Ticket.due_date.isnot(None),
+            )
         else:
             query = query.filter(Ticket.state == self.state)
 
@@ -183,6 +197,7 @@ class TicketCount(NamedTuple):
     pending: int = 0
     closed: int = 0
     archived: int = 0
+    due_dated: int = 0
 
 
 class TicketCollection(TicketCollectionPagination):
@@ -295,7 +310,12 @@ class TicketCollection(TicketCollectionPagination):
 
         query = query.group_by(Ticket.state)
 
-        return TicketCount(**dict(query.tuples()))
+        due_dated = self.query().with_entities(func.count()).filter(
+            Ticket.due_date.isnot(None),
+            Ticket.state.notin_(('closed', 'archived'))
+        ).scalar()
+
+        return TicketCount(due_dated=due_dated, **dict(query.tuples()))
 
     def by_handler_data_id(
         self,

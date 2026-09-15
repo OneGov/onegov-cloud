@@ -141,6 +141,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     request: OrgRequest
 
     date_long_without_year_format = 'E d. MMMM'
+    date_long_with_weekday_format = 'EE, d. MMM y'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
     datetime_short_format = 'E d.MM.Y HH:mm'
     event_format = 'EEEE, d. MMMM YYYY'
@@ -1894,6 +1895,24 @@ class TicketLayout(DefaultLayout):
     @cached_property
     def collection(self) -> TicketCollection:
         return TicketCollection(self.request.session)
+
+    @property
+    def due_date_presets(self) -> dict[str, str]:
+        # long-date label per preset
+        today = self.today()
+        fmt = 'date_long_with_weekday'
+        return {
+            'today': self.format_date(today, fmt),
+            'tomorrow': self.format_date(
+                today + timedelta(days=1), fmt
+            ),
+            'end_of_week': self.format_date(
+                today + timedelta(days=(4 - today.weekday()) % 7), fmt
+            ),
+            'in_one_week': self.format_date(
+                today + timedelta(days=7), fmt
+            ),
+        }
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

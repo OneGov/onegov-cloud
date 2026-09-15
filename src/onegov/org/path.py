@@ -482,7 +482,8 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
         'closed',
         'archived',
         'all',
-        'unfinished'
+        'unfinished',
+        'due_dated'
     )}
 )
 def get_tickets(

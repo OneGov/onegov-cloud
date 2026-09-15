@@ -257,6 +257,11 @@ $settings-icon: '\f1de';
         color: $body-font-color;
     }
 
+    .warning.with-count::before {
+        background-color: get-color(warning);
+        color: $body-font-color;
+    }
+
     .docs .fa-external-link-alt {
         display: none;
     }

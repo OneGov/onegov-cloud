@@ -3170,3 +3170,39 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "Parties"
 #~ msgstr "Partis"
+
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+msgid "No due date"
+msgstr "Sans échéance"
+
+msgid "Set due date"
+msgstr "Définir l'échéance"
+
+msgid "End of this week"
+msgstr "Fin de cette semaine"
+
+msgid "In one week"
+msgstr "Dans une semaine"
+
+msgid "Invalid date"
+msgstr "Date invalide"
+
+msgid "Due Dated Tickets"
+msgstr "Tickets avec échéance"
+
+msgid "Today"
+msgstr "Aujourd'hui"
+
+msgid "Tomorrow"
+msgstr "Demain"
+
+msgid "Custom"
+msgstr "Personnalisé"
+
+msgid "Clear"
+msgstr "Supprimer"
+
+msgid "User"
+msgstr "Utilisateur"

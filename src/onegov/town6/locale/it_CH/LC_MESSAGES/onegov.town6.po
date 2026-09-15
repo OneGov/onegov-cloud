@@ -3162,3 +3162,39 @@ msgstr "Nuova nota"
 
 #~ msgid "Parties"
 #~ msgstr "Partiti"
+
+msgid "Due Date"
+msgstr "Data di scadenza"
+
+msgid "No due date"
+msgstr "Nessuna scadenza"
+
+msgid "Set due date"
+msgstr "Imposta scadenza"
+
+msgid "End of this week"
+msgstr "Fine di questa settimana"
+
+msgid "In one week"
+msgstr "Tra una settimana"
+
+msgid "Invalid date"
+msgstr "Data non valida"
+
+msgid "Due Dated Tickets"
+msgstr "Tickets con scadenza"
+
+msgid "Today"
+msgstr "Oggi"
+
+msgid "Tomorrow"
+msgstr "Domani"
+
+msgid "Custom"
+msgstr "Personalizzato"
+
+msgid "Clear"
+msgstr "Cancella"
+
+msgid "User"
+msgstr "Utente"
