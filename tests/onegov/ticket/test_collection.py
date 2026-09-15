@@ -311,6 +311,57 @@ def test_filtering(session: Session) -> None:
         ).for_owner(user_b.id).subset().count() == 2
 
 
+def test_due_dated_filter_and_count(session: Session) -> None:
+    from datetime import date, timedelta
+
+    today = date.today()
+    tickets: tuple[tuple[TicketState, date | None], ...] = (
+        ('open', today),
+        ('pending', today + timedelta(days=3)),
+        ('open', None),
+        ('closed', today),        # closed -> excluded
+        ('archived', today),      # archived -> excluded
+    )
+
+    for i, (state, due) in enumerate(tickets):
+        session.add(Ticket(
+            number=f'ABC-1000-{i:04d}',
+            title='test', group='test',
+            handler_code='ABC', handler_id=str(i),
+            state=state, due_date=due
+        ))
+
+    coll = TicketCollection(session, state='due_dated')
+    assert coll.subset().count() == 2
+    assert all(t.due_date is not None for t in coll.subset())
+    assert all(t.state not in ('closed', 'archived') for t in coll.subset())
+
+    assert TicketCollection(session).get_count().due_dated == 2
+
+
+def test_due_dated_ordering(session: Session) -> None:
+    from datetime import date, timedelta
+
+    today = date.today()
+    # inserted out of order; expect ascending due date, undated last
+    rows: tuple[tuple[str, date | None], ...] = (
+        ('later', today + timedelta(days=5)),
+        ('undated', None),
+        ('soonest', today + timedelta(days=1)),
+    )
+    for i, (title, due) in enumerate(rows):
+        session.add(Ticket(
+            number=f'ABC-1000-{i:04d}',
+            title=title, group='test',
+            handler_code='ABC', handler_id=str(i),
+            state='pending', due_date=due
+        ))
+
+    titles = [t.title for t in
+              TicketCollection(session, state='unfinished').subset()]
+    assert titles == ['soonest', 'later', 'undated']
+
+
 def test_ticket_pagination_negative_page_index(session: Session) -> None:
     ticket_collections = [TicketCollection, ArchivedTicketCollection]
 
