@@ -22,6 +22,8 @@ from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import PageBreak, Paragraph
+from sqlalchemy.orm.attributes import (
+    flag_modified, get_history, set_committed_value)
 
 
 from typing import Any, TYPE_CHECKING
@@ -414,7 +416,16 @@ class TicketPdf(TicketBasePdf):
                                 'The following information is a snapshot '
                                 'kept for future reference.')
         else:
+            # HACK: Set the ticket state to closed so we don't render
+            #       any links in the summary, but without causing a
+            #       database change, while preserving unflushed changes.
+            orginal_state = ticket.state
+            history = get_history(ticket, 'state')
+            set_committed_value(ticket, 'state', 'closed')
             summary = handler.get_summary(request)
+            set_committed_value(ticket, 'state', orginal_state)
+            if not history.empty():
+                flag_modified(ticket, 'state')
 
         self.ticket_metadata(ticket, layout)
 
