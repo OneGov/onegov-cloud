@@ -1,4 +1,4 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6" tal:define="fullpage True if page.parent else False">
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
@@ -53,7 +53,7 @@
         </div>
 
         <tal:b metal:use-macro="layout.macros.page_content" tal:condition="page.parent"
-            tal:define="lead page.content.get('lead');text page.text|None; people page.people; contact None if children else layout.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False; imageset page.photo_album|False; sidepanel_contact page.sidepanel_contact|None; " />
+            tal:define="lead page.content.get('lead');text page.text|None; imageset page.photo_album|False; full_page_width True" />
 
 
         <div metal:use-macro="layout.macros['pagination']" tal:condition="pagination" tal:define="
