@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2026-09-07 14:57+0200\n"
+"POT-Creation-Date: 2026-09-15 11:37+0200\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -166,9 +166,6 @@ msgstr "In attesa"
 msgid "Closed"
 msgstr "Chiuso"
 
-msgid "Due dated"
-msgstr "Con scadenza"
-
 msgid "Archived"
 msgstr "Fare Archivio"
 
@@ -224,6 +221,10 @@ msgstr "Newsletter giornaliera ${time}"
 #, python-format
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
+
+#, python-format
+msgid "${org}: Tickets due today"
+msgstr "${org}: Ticket in scadenza oggi"
 
 #.
 #. get the resource titles and ids
@@ -321,6 +322,9 @@ msgstr "Gestione"
 
 msgid "My Tickets"
 msgstr "I miei biglietti"
+
+msgid "Due Dated Tickets"
+msgstr "Tickets con scadenza"
 
 msgid "Ticket"
 msgstr "Biglietto"
@@ -4635,8 +4639,8 @@ msgstr "Quantità"
 msgid "VAT"
 msgstr "IVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Pagamento"
 
@@ -5122,6 +5126,24 @@ msgstr "Fattura"
 msgid "Online Payment"
 msgstr "Pagamento online"
 
+msgid "No due date"
+msgstr "Nessuna scadenza"
+
+msgid "Set due date"
+msgstr "Imposta scadenza"
+
+msgid "Today"
+msgstr "Oggi"
+
+msgid "Tomorrow"
+msgstr "Domani"
+
+msgid "End of this week"
+msgstr "Fine di questa settimana"
+
+msgid "In one week"
+msgstr "Tra una settimana"
+
 msgid "Previous Page"
 msgstr "Pagina precedente"
 
@@ -5500,8 +5522,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -5850,6 +5872,15 @@ msgstr "Cronologia delle richieste"
 
 msgid "Thank you for your request."
 msgstr "Ti ringraziamo per la tua richiesta."
+
+msgid "The following tickets assigned to you are overdue:"
+msgstr "I seguenti ticket a lei assegnati sono in ritardo:"
+
+msgid "due"
+msgstr "scadenza"
+
+msgid "The following tickets assigned to you are due today:"
+msgstr "I seguenti ticket a lei assegnati scadono oggi:"
 
 msgid "Your request has been registered with the following reference:"
 msgstr "La tua richiesta è stata registrata con il seguente riferimento:"
@@ -6486,6 +6517,9 @@ msgstr "${count} note"
 msgid "View Invoice"
 msgstr "Visualizza fattura"
 
+msgid "Due Date"
+msgstr "Data di scadenza"
+
 msgid "Change tag"
 msgstr "Modificare il tag"
 
@@ -6758,8 +6792,8 @@ msgid "Delete availability period"
 msgstr "Elimina il periodo di disponibilità"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
@@ -7572,12 +7606,6 @@ msgstr ""
 "Lo stesso formato dell'esportazione (XLSX) può essere usato per "
 "l'importazione."
 
-msgid "Today"
-msgstr "Oggi"
-
-msgid "Tomorrow"
-msgstr "Domani"
-
 msgid "This weekend"
 msgstr "Questo fine settimana"
 
@@ -7941,8 +7969,8 @@ msgstr ""
 "La tua richiesta di cancellazione è stata inviata. Sarai informato/a quando "
 "sarà elaborata."
 
-#.
 #. We adjust the wording for users that do not know what a ticket is
+#.
 msgid "Request Status"
 msgstr "Stato della richiesta"
 
@@ -8367,6 +8395,9 @@ msgstr "Il biglietto non può essere archiviato perché non è chiuso"
 msgid "You archived ticket ${number}"
 msgstr "Hai archiviato il biglietto ${number}"
 
+msgid "Invalid date"
+msgstr "Data non valida"
+
 msgid ""
 "The ticket cannot be recovered from the archive because it's not archived"
 msgstr ""
@@ -8450,6 +8481,9 @@ msgstr "Il PDF di questo biglietto è stato caricato con successo su Gever."
 
 msgid "My"
 msgstr "Il mio"
+
+msgid "Due dated"
+msgstr "Con scadenza"
 
 msgid "All Tickets"
 msgstr "Tutti i biglietti"
@@ -8707,24 +8741,3 @@ msgstr "Inserisci il tuo indirizzo e-mail per continuare"
 #~ msgstr ""
 #~ "Se non sono state ancora prenotate, tutte le allocazioni create dalla "
 #~ "regola verranno rimosse."
-
-msgid "Due Date"
-msgstr "Data di scadenza"
-
-msgid "No due date"
-msgstr "Nessuna scadenza"
-
-msgid "Set due date"
-msgstr "Imposta scadenza"
-
-msgid "End of this week"
-msgstr "Fine di questa settimana"
-
-msgid "In one week"
-msgstr "Tra una settimana"
-
-msgid "Invalid date"
-msgstr "Data non valida"
-
-msgid "Due Dated Tickets"
-msgstr "Tickets con scadenza"
