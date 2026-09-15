@@ -3355,11 +3355,11 @@ def test_mails_on_registration_and_cancellation(
 
     mails = [client.get_email(i) for i in range(2)]
     confirmation = mails[0]
-    text = "Vielen Dank!\n\nWir haben Ihre Buchung für Susan Golding erhalten."
+    text = "Vielen Dank!\n\nWir haben Ihre Buchung für Susan\xa0Golding"
     assert text in confirmation['TextBody']
 
     cancelation = mails[1]
-    text = "Wir haben Ihre Abmeldung für Susan Golding erhalten."
+    text = "Wir haben Ihre Abmeldung für Susan\xa0Golding erhalten."
     assert text in cancelation['TextBody']
 
 

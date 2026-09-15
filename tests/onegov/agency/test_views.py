@@ -12,6 +12,7 @@ from onegov.core.utils import linkify
 from onegov.org.models import Organisation
 from onegov.pdf.utils import extract_pdf_info
 from sedate import utcnow
+from tests.onegov.core.test_utils import normalize_phone_number
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 from tests.shared.utils import encode_map_value
 from transaction import commit
@@ -117,7 +118,8 @@ def test_views_general(client: Client[AgencyApp]) -> None:
     nr = new_agency.form.submit().follow()
 
     assert 'Nationalrat' in nr
-    assert f'2016/2019<br><a href="tel:{tel_nr}">{tel_nr}</a>' in nr
+    normalized = normalize_phone_number(tel_nr)
+    assert f'2016/2019<br><a href="tel:{normalized}">{tel_nr}</a>' in nr
 
     new_agency = bund.click('Organisation', href='new')
     new_agency.form['title'] = 'Standerat'
@@ -627,7 +629,7 @@ def test_view_mutations(
     manage = client.get(person_ticket_number)
     assert "Mutationsmeldung" in manage
     assert "Rivera Nick" in manage
-    assert "Rivera&#39;s got some troubles" in manage
+    assert "Rivera's got some troubles" in manage
     assert "info@hospital-springfield.com" in manage
     assert "Funktion: Janitor" in manage
     manage = manage.click("Ticket annehmen").follow()
@@ -675,7 +677,7 @@ def test_view_mutations(
     assert "Der hinterlegte Datensatz wurde entfernt." in manage
     assert "Mutationsmeldung" in manage
     assert "Rivera Nick" in manage
-    assert "Rivera&#39;s got some troubles" in manage
+    assert "Rivera's got some troubles" in manage
     assert "info@hospital-springfield.com" in manage
     assert "Funktion: Janitor" in manage
 

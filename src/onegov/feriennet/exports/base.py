@@ -4,8 +4,7 @@ import re
 import sedate
 
 from itertools import chain
-from html import unescape
-from onegov.core import mail
+from onegov.core import html
 from onegov.feriennet import _
 from onegov.feriennet.exports.const import ACTIVITY_STATES
 from onegov.feriennet.exports.const import BOOKING_STATES
@@ -16,6 +15,7 @@ from onegov.feriennet.exports.const import SALUTATIONS
 from onegov.feriennet.exports.const import STATES
 from onegov.feriennet.utils import decode_name
 from onegov.org.models import Export
+from turbohtml import unescape
 
 
 from typing import Any, TYPE_CHECKING
@@ -84,12 +84,12 @@ def remove_duplicate_spaces(text: str) -> str:
     return SPACES.sub(' ', text)
 
 
-def html_to_text(html: str | None) -> str:
-    if not html:
+def html_to_text(html_text: str | None) -> str:
+    if not html_text:
         return ''
 
-    return remove_duplicate_spaces(mail.html_to_text(
-        unescape(html),
+    return remove_duplicate_spaces(html.html_to_text(
+        unescape(html_text),
         ul_item_mark='•',
         strong_mark='',
         emphasis_mark=''
