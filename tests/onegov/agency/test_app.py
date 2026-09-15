@@ -100,7 +100,7 @@ def test_app_custom(agency_app: AgencyApp) -> None:
         {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
                         'Invoices', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
-                     'Closed Tickets']}
+                     'Closed Tickets', 'Due Dated Tickets']}
     ]
     assert as_text([get_modules(request)]) == [{'Modules': [
         'Agencies', 'People', 'Forms']}]
@@ -113,7 +113,7 @@ def test_app_custom(agency_app: AgencyApp) -> None:
                         'Invoices', 'Users', 'User groups', 'Settings',
                         'Link Check', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
-                     'Closed Tickets']}
+                     'Closed Tickets', 'Due Dated Tickets']}
     ]
     assert as_text([get_modules(request)]) == [{'Modules': [
         'Agencies', 'People', 'Forms']}]
