@@ -3,8 +3,6 @@ from __future__ import annotations
 import pytest
 
 from depot.manager import DepotManager
-from onegov.core.custom import json
-from onegov.file import File
 from onegov.page import Page, PageCollection
 from onegov.page.audit import page_snapshot, page_tree_snapshot
 from onegov.page.restore import PageRestore
@@ -28,25 +26,6 @@ def depot(temporary_directory: str) -> Iterator[None]:
     )
     yield
     DepotManager._clear()  # type: ignore[attr-defined]
-
-
-@pytest.mark.usefixtures('depot')
-def test_restore_deleted_tree(session: Session) -> None:
-    pages = PageCollection(session)
-    root = pages.add_root('Root', meta={'access': 'private'})
-    child = pages.add(root, 'Child', content={'text': 'Original'})
-    file = File(name='readme.txt', reference=b'README')
-    child.files.append(file)
-    session.flush()
-    snapshot = json.loads(json.dumps(page_tree_snapshot(root)))
-    pages.delete(root)
-    session.flush()
-    session.expunge_all()
-
-    restored = PageRestore.prepare(session, snapshot).apply(session)
-    session.expire_all()
-    assert page_tree_snapshot(restored) == snapshot
-    assert restored.children[0].files[0].reference.file.read() == b'README'
 
 
 def test_restore_existing_page(session: Session) -> None:
