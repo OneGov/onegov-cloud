@@ -5,10 +5,12 @@ import yaml
 
 from datetime import timedelta
 from freezegun import freeze_time
+from onegov.core.orm.audit import AuditEntry
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
 from onegov.org.models import Topic
 from onegov.page import Page, PageCollection
+from onegov.user import User
 from sedate import utcnow
 from webtest.forms import Textarea
 from tests.onegov.org.common import edit_bar_links
@@ -289,6 +291,29 @@ def test_delete_pages(client: Client) -> None:
         Upload('test.txt', b'foo', 'text/plain')
     ], -1)
     page = new_page.form.submit().follow()
+    session = client.app.session()
+    topic = (
+        session.query(Topic)
+        .filter_by(title='Living in Govikon is Swell')
+        .one()
+    )
+    topic_id = topic.id
+    file_id = topic.files[0].id
+    admin_id = (
+        session.query(User.id)
+        .filter(User.username == 'admin@example.org')
+        .scalar()
+    )
+    assert admin_id is not None
+    updates_before = (
+        session.query(AuditEntry)
+        .filter_by(
+            target_table='pages',
+            target_id=str(topic_id),
+            operation='update',
+        )
+        .count()
+    )
     delete_link = page.pyquery('a[ic-delete-from]')[0].attrib['ic-delete-from']
 
     result = client.delete(delete_link.split('?')[0], expect_errors=True)
@@ -296,6 +321,29 @@ def test_delete_pages(client: Client) -> None:
 
     assert client.delete(delete_link).status_code == 200
     assert client.delete(delete_link, expect_errors=True).status_code == 404
+
+    delete_entry = (
+        session.query(AuditEntry)
+        .filter_by(
+            target_table='pages',
+            target_id=str(topic_id),
+            operation='delete',
+        )
+        .one()
+    )
+    assert delete_entry.user_id == admin_id.hex
+    assert delete_entry.username == 'admin@example.org'
+    assert delete_entry.snapshot['file_ids'] == [file_id]
+    assert (
+        session.query(AuditEntry)
+        .filter_by(
+            target_table='pages',
+            target_id=str(topic_id),
+            operation='update',
+        )
+        .count()
+        == updates_before
+    )
 
 
 def test_delete_root_page_with_nested_pages(client: Client) -> None:
