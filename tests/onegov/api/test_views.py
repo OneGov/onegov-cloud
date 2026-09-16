@@ -138,7 +138,16 @@ def test_view_api(client: Client, app: App) -> None:
             ],
             'template': {
                 'data': [
-                    {'name': 'title', 'prompt': 'Title'},
+                    {
+                        'name': 'title',
+                        'prompt': 'Title',
+                        'required': True,
+                        'fieldset': None,
+                        'json_schema': {
+                            'title': 'Title',
+                            'type': 'string',
+                        },
+                    },
                 ],
             }
         }
@@ -172,7 +181,16 @@ def test_view_api(client: Client, app: App) -> None:
             ],
             'template': {
                 'data': [
-                    {'name': 'title', 'prompt': 'Title'},
+                    {
+                        'name': 'title',
+                        'prompt': 'Title',
+                        'required': True,
+                        'fieldset': None,
+                        'json_schema': {
+                            'title': 'Title',
+                            'type': 'string',
+                        },
+                    },
                 ],
             }
         }
