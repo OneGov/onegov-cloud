@@ -170,7 +170,7 @@ class Layout(OrgLayout):
             f'<a tabindex="0">{back}</a></li>'
         )
 
-    @cached_property
+    @property
     def new_features(self) -> list[dict[str, Any]]:
         features: list[dict[str, Any]] = []
 
@@ -191,63 +191,50 @@ class Layout(OrgLayout):
             def add_payload(
                     payload: dict[str, Any],
             ) -> None:
-                required_keys = {'title', 'description', 'applications'}
+                required_keys = {'title', 'description'}
 
                 if isinstance(payload, dict) and required_keys.issubset(
                     payload.keys()):
-                    namespace = self.app.namespace
-                    applications = payload['applications']
-                    if namespace in applications or 'all' in applications:
-                        features.append(payload)
+                    features.append(payload)
 
-            def parse_release(value: str) -> tuple[int, int]:
-                year, number = value.split('.', 1)
-                return int(year), int(number)
-
-            current_release_path = repo_root / 'changes' / 'current'
-            if not current_release_path.exists():
+            changes_path = repo_root / 'changes'
+            if not changes_path.exists():
                 return features
 
-            for yaml_file in sorted(current_release_path.glob('*.yaml')):
-                with yaml_file.open('r', encoding='utf-8') as fh:
-                    add_payload(yaml.safe_load(fh) or {})
+            release_names = self.app.cache.get_or_create(
+                'new_features_releases',
+                creator=lambda: sorted(
+                    (path.name for path in changes_path.iterdir()
+                     if path.is_dir()),
+                    reverse=True
+                )
+            )
 
-            if len(features) < 5:
-                past_release_path = repo_root / 'changes' / 'past'
-                if past_release_path.exists():
-                    if user_release is None:
-                        user_release_tuple = (0, 0)
-                    else:
-                        user_release_tuple = parse_release(user_release)
+            for index, release_name in enumerate(release_names):
+                if user_release is not None and release_name <= user_release:
+                    break
 
-                    def release_key(yaml_file: Path) -> tuple[int, int]:
-                        release_str = yaml_file.name.split('_', 1)[0]
-                        try:
-                            return parse_release(release_str)
-                        except ValueError:
-                            return (0, 0)
-
-                    sorted_files = sorted(
-                        past_release_path.glob('*.yaml'),
-                        key=release_key,
-                        reverse=True,
-                    )
-
-                    for yaml_file in sorted_files:
-                        if len(features) >= 5:
-                            break
-                        if release_key(yaml_file) <= user_release_tuple:
-                            break
-                        with yaml_file.open('r', encoding='utf-8') as fh:
-                            add_payload(yaml.safe_load(fh) or {})
-
-            # Translations if there are locales
-            for feature in features:
-                for value in feature:
-                    if type(feature[value]) is dict:
-                        feature[value] = feature[value].get(
-                            str(self.request.locale).split('_')[0], None
+                release_features = self.app.cache.get_or_create(
+                    f'new_features_release_{release_name}',
+                    creator=lambda release_name=release_name: [
+                        yaml.safe_load(
+                            yaml_file.read_text(encoding='utf-8')) or {}
+                        for yaml_file in sorted(
+                            (path for path in
+                             (changes_path / release_name).glob('*.yaml')
+                             if path.is_file()),
+                            key=lambda path: path.name
                         )
+                    ]
+                )
+
+                for payload in release_features:
+                    if index > 0 and len(features) >= 5:
+                        break
+                    add_payload(payload)
+
+                if index > 0 and len(features) >= 5:
+                    break
 
         return features
 

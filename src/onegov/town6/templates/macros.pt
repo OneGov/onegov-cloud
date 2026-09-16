@@ -3519,8 +3519,12 @@
             <tal:b repeat="feature features">
                 <div class="card">
                     <div class="card-section">
-                        <b tal:content="feature['title']"></b><br/>
-                        <span tal:content="feature['description']"></span>
+                        <h5 tal:content="feature['title']"></h5>
+                        <p>
+                            <span tal:content="feature['description']"></span>
+                        </p>
+                        <i tal:condition="feature.get('idea_by')"><tal:b i18n:translate>Suggested by</tal:b> ${feature['idea_by']}</i>
+
                     </div>
                 </div>
             </tal:b>

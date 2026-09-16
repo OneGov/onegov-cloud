@@ -41,13 +41,11 @@ def test_new_feature_close_and_read(
     client.login_admin()
 
     changes_root = tmp_path / 'changes'
-    current_changes = changes_root / 'current'
-    current_changes.mkdir(parents=True)
-    (current_changes / 'new-feature.yaml').write_text(
+    release_changes = changes_root / '2026.47'
+    release_changes.mkdir(parents=True)
+    (release_changes / 'new-feature.yaml').write_text(
         'title: A new feature\n'
-        'description: A useful new feature\n'
-        'applications:\n'
-        '  - all\n',
+        'description: A useful new feature\n',
         encoding='utf-8'
     )
 
