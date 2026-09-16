@@ -6,7 +6,6 @@ from abc import abstractmethod, ABC
 from datetime import date, time
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-from functools import lru_cache
 from onegov.core.utils import binary_to_dictionary
 from onegov.form.fields import HoneyPotField
 from onegov.form.validators import FileSizeLimit
@@ -447,7 +446,6 @@ def dependency_fulfilled(self: FieldDependency, obj: object) -> bool:
     return result
 
 
-@lru_cache(maxsize=16)
 def model_from_form(form: Form) -> type[BaseModel] | None:
     validators: dict[str, Any] = {}
     dependent_fields = {

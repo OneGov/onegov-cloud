@@ -148,6 +148,38 @@ def test_view_api(client: Client, app: App) -> None:
                             'type': 'string',
                         },
                     },
+                    {
+                        'name': 'file',
+                        'prompt': 'File',
+                        'required': False,
+                        'fieldset': None,
+                        'json_schema': {
+                            'anyOf': [
+                                {
+                                    'properties': {
+                                        'filename': {
+                                          'title': 'Filename',
+                                          'type': 'string'
+                                        },
+                                        'data': {
+                                          'format': 'base64',
+                                          'title': 'Data',
+                                          'type': 'string'
+                                        }
+                                    },
+                                    'required': [
+                                        'filename',
+                                        'data'
+                                    ],
+                                    'title': 'FileUpload',
+                                    'type': 'object',
+                                },
+                                {'type': 'null'}
+                            ],
+                            'default': None,
+                            'title': 'File',
+                        },
+                    },
                 ],
             }
         }
@@ -189,6 +221,38 @@ def test_view_api(client: Client, app: App) -> None:
                         'json_schema': {
                             'title': 'Title',
                             'type': 'string',
+                        },
+                    },
+                    {
+                        'name': 'file',
+                        'prompt': 'File',
+                        'required': False,
+                        'fieldset': None,
+                        'json_schema': {
+                            'anyOf': [
+                                {
+                                    'properties': {
+                                        'filename': {
+                                          'title': 'Filename',
+                                          'type': 'string'
+                                        },
+                                        'data': {
+                                          'format': 'base64',
+                                          'title': 'Data',
+                                          'type': 'string'
+                                        }
+                                    },
+                                    'required': [
+                                        'filename',
+                                        'data'
+                                    ],
+                                    'title': 'FileUpload',
+                                    'type': 'object',
+                                },
+                                {'type': 'null'}
+                            ],
+                            'default': None,
+                            'title': 'File',
                         },
                     },
                 ],

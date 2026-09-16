@@ -124,10 +124,7 @@ def replace_json_schema_refs[T](
 
 def template_from_form(form: Form) -> dict[str, Any]:
     model_class = model_from_form(form)
-    if model_class is not None:
-        json_schema = model_class.model_json_schema()
-    else:
-        json_schema = {}
+    json_schema = model_class.model_json_schema() if model_class else {}
     properties = json_schema.get('properties', {})
     required_names = json_schema.get('required', ())
     return {
