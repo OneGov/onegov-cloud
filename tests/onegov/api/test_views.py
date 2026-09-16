@@ -143,7 +143,7 @@ def test_view_api(client: Client, app: App) -> None:
                         'prompt': 'Title',
                         'required': True,
                         'fieldset': None,
-                        'json_schema': {
+                        'value_json_schema': {
                             'title': 'Title',
                             'type': 'string',
                         },
@@ -153,7 +153,7 @@ def test_view_api(client: Client, app: App) -> None:
                         'prompt': 'File',
                         'required': False,
                         'fieldset': None,
-                        'json_schema': {
+                        'value_json_schema': {
                             'anyOf': [
                                 {
                                     'properties': {
@@ -218,7 +218,7 @@ def test_view_api(client: Client, app: App) -> None:
                         'prompt': 'Title',
                         'required': True,
                         'fieldset': None,
-                        'json_schema': {
+                        'value_json_schema': {
                             'title': 'Title',
                             'type': 'string',
                         },
@@ -228,7 +228,7 @@ def test_view_api(client: Client, app: App) -> None:
                         'prompt': 'File',
                         'required': False,
                         'fieldset': None,
-                        'json_schema': {
+                        'value_json_schema': {
                             'anyOf': [
                                 {
                                     'properties': {

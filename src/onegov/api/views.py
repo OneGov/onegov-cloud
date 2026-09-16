@@ -144,7 +144,7 @@ def template_from_form(form: Form) -> dict[str, Any]:
                     ]
                 } if hasattr(field, 'depends_on') else {}),
                 **({
-                    'json_schema': replace_json_schema_refs(
+                    'value_json_schema': replace_json_schema_refs(
                         properties[field.name],
                         json_schema
                     )
