@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
     from onegov.core.request import CoreRequest
     from onegov.core.types import JSONObject
+    from onegov.form import Form
     from morepath.request import Response
     from wtforms.form import _FormErrors
 
@@ -88,6 +89,77 @@ def view_api_endpoints(
     }
 
 
+def resolve_json_schema_ref(root: dict[str, Any], ref: str) -> dict[str, Any]:
+    assert ref.startswith('#/')
+    resolved = root
+    for key in ref[2:].split('/'):
+        resolved = resolved[key]
+    return resolved
+
+
+def replace_json_schema_refs[T](
+    data: T,
+    json_schema: dict[str, Any]
+) -> T:
+    if isinstance(data, list):
+        return [  # type: ignore[return-value]
+            replace_json_schema_refs(value, json_schema)
+            for value in data
+        ]
+
+    if not isinstance(data, dict):
+        return data
+
+    if '$ref' in data:
+        return replace_json_schema_refs(  # type: ignore[return-value]
+            resolve_json_schema_ref(json_schema, data['$ref']),
+            json_schema
+        )
+
+    return {  # type: ignore[return-value]
+        key: replace_json_schema_refs(value, json_schema)
+        for key, value in data.items()
+    }
+
+
+def template_from_form(form: Form) -> dict[str, Any]:
+    model_class = model_from_form(form)
+    if model_class is not None:
+        json_schema = model_class.model_json_schema()
+    else:
+        json_schema = {}
+    properties = json_schema.get('properties', {})
+    required_names = json_schema.get('required', ())
+    return {
+        'data': [
+            {
+                'name': field.name,
+                'prompt': field.gettext(field.label.text),
+                'required': field.name in required_names,
+                'fieldset': fieldset.label,
+                **({
+                    'depends_on': [
+                        {
+                            'name': form[dependency['field_id']].name,
+                            'value': dependency['raw_choice']
+                        }
+                        for dependency in field.depends_on.dependencies
+                    ]
+                } if hasattr(field, 'depends_on') else {}),
+                **({
+                    'json_schema': replace_json_schema_refs(
+                        properties[field.name],
+                        json_schema
+                    )
+                } if field.name in properties else {})
+            }
+            for fieldset in form.fieldsets
+            for field in fieldset.fields.values()
+            if not isinstance(field, (HiddenField, HoneyPotField))
+        ]
+    }
+
+
 @ApiApp.json(
     model=ApiEndpoint,
     permission=Public,
@@ -143,50 +215,8 @@ def view_api_endpoint(
             }
         }
         if form := self.form(None, request):
-            payload['collection']['template'] = {
-                'data': [
-                    {
-                        'name': field.name,
-                        'prompt': field.gettext(field.label.text)
-                    }
-                    for field in form
-                    if not isinstance(field, (HiddenField, HoneyPotField))
-                ]
-            }
+            payload['collection']['template'] = template_from_form(form)
         return payload
-
-
-def resolve_json_schema_ref(root: dict[str, Any], ref: str) -> dict[str, Any]:
-    assert ref.startswith('#/')
-    resolved = root
-    for key in ref[2:].split('/'):
-        resolved = resolved[key]
-    return resolved
-
-
-def replace_json_schema_refs[T](
-    data: T,
-    json_schema: dict[str, Any]
-) -> T:
-    if isinstance(data, list):
-        return [  # type: ignore[return-value]
-            replace_json_schema_refs(value, json_schema)
-            for value in data
-        ]
-
-    if not isinstance(data, dict):
-        return data
-
-    if '$ref' in data:
-        return replace_json_schema_refs(  # type: ignore[return-value]
-            resolve_json_schema_ref(json_schema, data['$ref']),
-            json_schema
-        )
-
-    return {  # type: ignore[return-value]
-        key: replace_json_schema_refs(value, json_schema)
-        for key, value in data.items()
-    }
 
 
 @ApiApp.json(
@@ -243,41 +273,7 @@ def view_api_endpoint_item(
             }
         }
         if form := self.form(request):
-            model_class = model_from_form(form)
-            if model_class is not None:
-                json_schema = model_class.model_json_schema()
-            else:
-                json_schema = {}
-            properties = json_schema.get('properties', {})
-            required_names = json_schema.get('required', ())
-            payload['collection']['template'] = {
-                'data': [
-                    {
-                        'name': field.name,
-                        'prompt': field.gettext(field.label.text),
-                        'required': field.name in required_names,
-                        'fieldset': fieldset.label,
-                        **({
-                            'depends_on': [
-                                {
-                                    'name': form[dependency['field_id']].name,
-                                    'value': dependency['raw_choice']
-                                }
-                                for dependency in field.depends_on.dependencies
-                            ]
-                        } if hasattr(field, 'depends_on') else {}),
-                        **({
-                            'json_schema': replace_json_schema_refs(
-                                properties[field.name],
-                                json_schema
-                            )
-                        } if field.name in properties else {})
-                    }
-                    for fieldset in form.fieldsets
-                    for field in fieldset.fields.values()
-                    if not isinstance(field, (HiddenField, HoneyPotField))
-                ]
-            }
+            payload['collection']['template'] = template_from_form(form)
         return payload
 
 
