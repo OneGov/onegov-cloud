@@ -6,6 +6,7 @@ from abc import abstractmethod, ABC
 from datetime import date, time
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+from functools import lru_cache
 from onegov.core.utils import binary_to_dictionary
 from onegov.form.fields import HoneyPotField
 from onegov.form.validators import FileSizeLimit
@@ -166,9 +167,6 @@ class BaseAdapter(ABC):
             for validator in field.validators
         ):
             yield t
-            # NOTE: This is a bit of a hack to avoid emitting an
-            #       Annotated without metadata
-            yield object()
             return
 
         default = field.data
@@ -449,7 +447,8 @@ def dependency_fulfilled(self: FieldDependency, obj: object) -> bool:
     return result
 
 
-def model_from_form(form: Form) -> type[BaseModel]:
+@lru_cache(maxsize=16)
+def model_from_form(form: Form) -> type[BaseModel] | None:
     validators: dict[str, Any] = {}
     dependent_fields = {
         name: field.depends_on
@@ -488,6 +487,21 @@ def model_from_form(form: Form) -> type[BaseModel]:
             'validate_required_dependent_fields'
         ] = validate_required_dependent_fields
 
+    try:
+        fields = {
+            field.name: Annotated[
+                *registry.adapt(field),
+                Field(
+                    title=field.label.text,
+                    description=field.description or None,
+                )
+            ]
+            for field in form
+            if not isinstance(field, (HiddenField, HoneyPotField))
+        }
+    except Exception:
+        return None
+
     return create_model(
         f'{form.__class__.__name__}Model',
         __base__=None,
@@ -497,9 +511,5 @@ def model_from_form(form: Form) -> type[BaseModel]:
         __config__={'frozen': True},
         __validators__=validators,
         __cls_kwargs__=None,
-        **{
-            name: Annotated[*registry.adapt(field)]
-            for name, field in form._fields.items()
-            if not isinstance(field, (HiddenField, HoneyPotField))
-        }
+        **fields
     )
