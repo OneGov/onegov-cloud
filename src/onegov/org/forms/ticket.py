@@ -88,6 +88,8 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
     if TYPE_CHECKING:
         request: OrgRequest
 
+    allow_file: bool = False
+
     notify_hint = PanelField(
         label=_('Notify about replies hint'),
         kind='callout',
@@ -105,12 +107,18 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
     )
 
     def on_request(self) -> None:
-        self.delete_field('file')
+        if not self.allow_file:
+            self.delete_field('file')
         self.text.widget = TextAreaWithTextModules()
         if self.request.app.org.ticket_always_notify:
             self.delete_field('notify')
         else:
             self.delete_field('notify_hint')
+
+
+class ReservationTicketChatMessageForm(InternalTicketChatMessageForm):
+
+    allow_file: bool = True
 
 
 class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):

@@ -301,7 +301,6 @@ class UploadMultipleWidget(FileInput):
 
         force_simple = kwargs.pop('force_simple', False)
         resend_upload = kwargs.pop('resend_upload', False)
-        input_html = self.render_input(field, **kwargs)
         simple_template = Markup("""
             <div class="upload-widget without-data">
                 {}
@@ -309,11 +308,15 @@ class UploadMultipleWidget(FileInput):
         """)
 
         if force_simple or len(field) == 0:
+            if getattr(field, 'upload_required', False):
+                kwargs.setdefault('required', True)
+            input_html = self.render_input(field, **kwargs)
             return simple_template.format(input_html) + Markup('\n').join(
                 Markup('<small class="error">{}</small>').format(error)
                 for error in field.errors
             )
         else:
+            input_html = self.render_input(field, **kwargs)
             existing_html = Markup('').join(
                 subfield(
                     force_simple=force_simple,

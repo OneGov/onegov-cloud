@@ -118,6 +118,11 @@ Find out how to use the public API.
 
     api/election_day/README.md
 
+.. toctree::
+    :maxdepth: 1
+
+    api/org/README.md
+
 
 Source
 ^^^^^^

@@ -11,7 +11,6 @@ import logging
 import niquests
 
 from dateutil.parser import parse
-from html import unescape
 
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
@@ -33,6 +32,7 @@ from sedate import to_timezone
 from sedate import utcnow
 from sqlalchemy import and_
 from sqlalchemy import or_
+from turbohtml import unescape
 from uuid import uuid4
 
 
@@ -497,7 +497,6 @@ class EventCollection(Pagination[Event]):
         items = []
         items_to_purge = []
         source_ids = []
-        h2t_config = {'ignore_emphasis': True}
 
         root = etree.fromstring(xml_stream)
         ns = {'ns': 'https://minasa.ch/schema/v1'}
@@ -582,8 +581,10 @@ class EventCollection(Pagination[Event]):
             title = find_element_text(event, 'title')
             abstract = find_element_text(event, 'abstract')
             description = find_element_text(event, 'description')
-            description = (
-                html_to_text(description, **h2t_config)) if description else ''
+            description = html_to_text(
+                description,
+                ignore_emphasis=True
+            ) if description else ''
             if abstract:
                 description = f'{abstract}\n\n{description}'
 

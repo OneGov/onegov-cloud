@@ -83,7 +83,8 @@ class OrgTheme(BaseTheme):
         return [
             'org',
             'chosen',
-            'bar-graph'
+            'bar-graph',
+            'redactor',
         ]
 
     @property

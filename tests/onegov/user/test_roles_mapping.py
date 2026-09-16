@@ -98,3 +98,16 @@ def test_match(roles_mapping: RolesMapping) -> None:
     roles = roles_mapping.roles['onegov_town6/casetown']
     groups = ['CASEtown_Admins', 'CaseTown_Editors']
     assert roles_mapping.match(roles, groups) == 'admin'
+
+
+def test_match_multiple_groups() -> None:
+    roles: dict[str, str | list[str]] = {
+        'admins': ['primary_admins', 'secondary_admins'],
+        'editors': 'editors',
+    }
+    roles_mapping = RolesMapping({'__default__': roles})
+
+    assert roles_mapping.match(roles, ['primary_admins']) == 'admin'
+    assert roles_mapping.match(roles, ['SECONDARY_ADMINS']) == 'admin'
+    assert roles_mapping.match(roles, ['editors']) == 'editor'
+    assert roles_mapping.match(roles, ['unknown_group']) is None

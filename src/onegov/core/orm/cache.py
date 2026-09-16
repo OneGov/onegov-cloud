@@ -435,7 +435,9 @@ def request_cached[AppT: Framework, T](
             session.flush()
 
         if cache_key in self.request_cache:
-            return maybe_merge(self.session(), self.request_cache[cache_key])
+            value = maybe_merge(session, self.request_cache[cache_key])
+            self.request_cache[cache_key] = value
+            return value
 
         self.request_cache[cache_key] = value = appmethod(self)
         return value

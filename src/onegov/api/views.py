@@ -230,7 +230,7 @@ def view_api_endpoint_item(
 )
 def edit_api_endpoint_item(
     self: ApiEndpointItem[Any, Any], request: CoreRequest
-) -> None:
+) -> dict[str, Any] | None:
 
     with ApiException.capture_exceptions():
         endpoint = self.api_endpoint
@@ -274,7 +274,7 @@ def edit_api_endpoint_item(
                 status_code=400
             )
 
-        endpoint.apply_changes(self.item, form)
+        return endpoint.apply_changes(self.item, form)
 
 
 @ApiApp.json(model=AuthEndpoint, permission=Public, open_data=False)
