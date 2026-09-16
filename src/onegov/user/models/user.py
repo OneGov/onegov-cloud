@@ -186,6 +186,11 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the tickets assigned to this user
     tickets: Mapped[list[Ticket]] = relationship(back_populates='user')
 
+    #: gets set when the user confirms to have seen the release feaures
+    # and is used to determine if the user should be shown the release features
+    # again
+    release_features: Mapped[str | None]
+
     @hybrid_property
     def title(self) -> str:
         """ Returns the realname or the username of the user, depending on

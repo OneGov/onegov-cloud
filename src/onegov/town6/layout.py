@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import secrets
+import yaml
+
 from functools import cached_property
+from pathlib import Path
 
 from onegov.core import Framework
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
@@ -166,6 +169,74 @@ class Layout(OrgLayout):
             '<li class="js-drilldown-back">'
             f'<a tabindex="0">{back}</a></li>'
         )
+
+    @property
+    def new_features(self) -> list[dict[str, Any]]:
+        features: list[dict[str, Any]] = []
+
+        if user := self.request.current_user:
+            user_release = user.release_features
+            if user_release == self.app.version:
+                return features
+
+            repo_root: Path | None = None
+            for parent in Path(__file__).resolve().parents:
+                if (parent / 'changes').is_dir():
+                    repo_root = parent
+                    break
+
+            if not repo_root:
+                return features
+
+            def add_payload(
+                    payload: dict[str, Any],
+            ) -> None:
+                required_keys = {'title', 'description'}
+
+                if isinstance(payload, dict) and required_keys.issubset(
+                    payload.keys()):
+                    features.append(payload)
+
+            changes_path = repo_root / 'changes'
+            if not changes_path.exists():
+                return features
+
+            release_names = self.app.cache.get_or_create(
+                'new_features_releases',
+                creator=lambda: sorted(
+                    (path.name for path in changes_path.iterdir()
+                     if path.is_dir()),
+                    reverse=True
+                )
+            )
+
+            for index, release_name in enumerate(release_names):
+                if user_release is not None and release_name <= user_release:
+                    break
+
+                release_features = self.app.cache.get_or_create(
+                    f'new_features_release_{release_name}',
+                    creator=lambda release_name=release_name: [
+                        yaml.safe_load(
+                            yaml_file.read_text(encoding='utf-8')) or {}
+                        for yaml_file in sorted(
+                            (path for path in
+                             (changes_path / release_name).glob('*.yaml')
+                             if path.is_file()),
+                            key=lambda path: path.name
+                        )
+                    ]
+                )
+
+                for payload in release_features:
+                    if index > 0 and len(features) >= 5:
+                        break
+                    add_payload(payload)
+
+                if index > 0 and len(features) >= 5:
+                    break
+
+        return features
 
     @property
     def on_homepage(self) -> bool:

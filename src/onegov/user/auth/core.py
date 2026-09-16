@@ -355,6 +355,7 @@ class Auth:
         to = to or self.to
 
         response = self.redirect(request, to)
+        request.browser_session.pop('dismissed_new_features', None)
 
         # Rotate the session ID
         if 'session_id' in request.cookies:
