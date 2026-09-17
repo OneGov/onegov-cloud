@@ -745,7 +745,11 @@ def test_add_iframe(client: Client) -> None:
     fs = client.app.filestorage
     assert fs is not None
     data = {  # with and without trailing slash
-        'allowed_domains': ['https://www.seantis.ch/', 'https://www.myorg.org']
+        'allowed_domains': [
+            'https://www.seantis.ch/',
+            'https://www.myorg.org',
+            'http://www.upgrade.ch',  # http source also allows https
+        ]
     }
     with fs.open('allowed_iframe_domains.yml', 'w') as f:
         yaml.dump(data, f)
@@ -775,6 +779,51 @@ def test_add_iframe(client: Client) -> None:
     page.form['url'] = "https://www.organisation.org/success-stories/"
     page = page.form.submit()
     assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page
+
+    # an http allow-entry also permits the https upgrade
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Upgrade"
+    page.form['url'] = "https://www.upgrade.ch/embed"
+    page = page.form.submit().follow()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' not in page
+    assert 'iFrame wurde hinzugefügt' in page
+
+    # but not the other way around: https allow-entry rejects http
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Downgrade"
+    page.form['url'] = "http://www.seantis.ch/embed"
+    page = page.form.submit()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page
+
+
+def test_add_iframe_csp_wildcard_domain(client: Client) -> None:
+    # wildcard CSP domains (https://*.vimeo.com) must match concrete hosts
+    client.login_admin()
+
+    for url in (
+        'https://player.vimeo.com/video/76979871',
+        'https://a.b.vimeo.com/video/76979871',
+        'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    ):
+        page = client.get('/topics/organisation').click('iFrame')
+        page.form['title'] = "Wildcard"
+        page.form['url'] = url
+        page = page.form.submit().follow()
+        assert 'Die Domäne der URL ist für iFrames nicht zulässig.' not in page
+        assert 'iFrame wurde hinzugefügt' in page
+
+    # the wildcard must not match spoofed hosts, bare apex or wrong scheme
+    for url in (
+        'https://vimeo.com.evil.org/video/1',
+        'https://evilvimeo.com/video/1',
+        'https://vimeo.com/76979871',
+        'http://player.vimeo.com/video/1',
+    ):
+        page = client.get('/topics/organisation').click('iFrame')
+        page.form['title'] = "Spoof"
+        page.form['url'] = url
+        page = page.form.submit()
+        assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page
 
 
 def test_open_graph_description_fallback(client: 'Client') -> None:
