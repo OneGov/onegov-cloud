@@ -1854,13 +1854,13 @@ class KabaConfigurationForm(Form):
         label=_('Site ID'),
     )
 
-    api_key = StringField(
-        label='API_KEY',
+    client_id = StringField(
+        label='Client ID (M2M)',
         depends_on=('site_id', '!'),
     )
 
-    api_secret = PasswordField(
-        label='API_SECRET',
+    client_secret = PasswordField(
+        label='Client Secret (M2M)',
         depends_on=('site_id', '!'),
     )
 
@@ -1895,18 +1895,18 @@ class KabaConfigurationsField(FieldBase):
         assert hasattr(obj, 'meta')
 
         previous_secrets = {
-            config['site_id']: config['api_secret']
+            config['site_id']: config['client_secret']
             for config in obj.meta.get('kaba_configurations', [])
         }
         obj.meta['kaba_configurations'] = [
             {
                 'site_id': site_id,
-                'api_key': item['api_key'],
+                'client_id': item['client_id'],
                 # if we already submitted this then just use the existing
                 # key, unless we specified a new one
-                'api_secret':
-                    self.meta.request.app.encrypt(item['api_secret']).hex()
-                    if item['api_secret'] else previous_secrets[site_id]
+                'client_secret':
+                    self.meta.request.app.encrypt(item['client_secret']).hex()
+                    if item['client_secret'] else previous_secrets[site_id]
             }
             for item in self.data
             # skip de-selected entries
@@ -2003,12 +2003,12 @@ class KabaSettingsForm(Form):
 
             seen.add(site_id)
 
-            if not field.form.api_key.data:
+            if not field.form.client_id.data:
                 assert isinstance(self.kaba_configurations.errors, list)
                 msg = _(
                     '${field} for site ID ${site_id} is required',
                     mapping={
-                        'field': 'API_KEY',
+                        'field': field.form.client_id.label.text,
                         'site_id': field.form.site_id.data
                     }
                 )
@@ -2017,14 +2017,14 @@ class KabaSettingsForm(Form):
                 )
                 return False
 
-            if field.form.api_secret.data:
-                api_secret = field.form.api_secret.data
+            if field.form.client_secret.data:
+                client_secret = field.form.client_secret.data
             elif (cfg := self.model.get_kaba_configuration(site_id)) is None:
                 assert isinstance(self.kaba_configurations.errors, list)
                 msg = _(
                     '${field} for site ID ${site_id} is required',
                     mapping={
-                        'field': 'API_SECRET',
+                        'field': field.form.client_secret.label.text,
                         'site_id': field.form.site_id.data
                     }
                 )
@@ -2032,19 +2032,19 @@ class KabaSettingsForm(Form):
                     self.kaba_configurations.gettext(msg)
                 )
                 return False
-            elif cfg.api_key == field.form.api_key.data:
+            elif cfg.client_id == field.form.client_id.data:
                 # no need to re-validate
                 return None
             else:
                 # decrypt existing API secret
-                api_secret = self.request.app.decrypt(
-                    bytes.fromhex(cfg.api_secret)
+                client_secret = self.request.app.decrypt(
+                    bytes.fromhex(cfg.client_secret)
                 )
 
-            api_key = field.form.api_key.data
-            assert site_id is not None and api_key is not None
+            client_id = field.form.client_id.data
+            assert site_id is not None and client_id is not None
 
-            client = KabaClient(site_id, api_key, api_secret)
+            client = KabaClient(site_id, client_id, client_secret)
             try:
                 client.site_name()
             except KabaApiError:

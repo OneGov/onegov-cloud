@@ -33,25 +33,25 @@ if TYPE_CHECKING:
 
 class KabaConfiguration(NamedTuple):
     site_id: str
-    api_key: str
-    api_secret: str
+    client_id: str
+    client_secret: str
 
 
 class RawKabaConfiguration(NamedTuple):
     site_id: str
-    api_key: str
-    api_secret: str
+    client_id: str
+    client_secret: str
 
     def decrypt(self, app: Framework) -> KabaConfiguration | None:
         try:
-            api_secret = app.decrypt(bytes.fromhex(self.api_secret))
+            client_secret = app.decrypt(bytes.fromhex(self.client_secret))
         except InvalidToken:
             return None
 
         return KabaConfiguration(
             site_id=self.site_id,
-            api_key=self.api_key,
-            api_secret=api_secret
+            client_id=self.client_id,
+            client_secret=client_secret
         )
 
 

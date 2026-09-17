@@ -55,6 +55,7 @@ from wtforms import HiddenField
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator, Sequence
+    from libres.db.models import Reservation as BaseReservation
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
     from onegov.file import File
@@ -592,6 +593,23 @@ def blocked_by_zipcode(
     return blocked
 
 
+def format_reservation_date(
+    reservation: BaseReservation,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> str:
+    if layout is None:
+        layout = DefaultLayout(reservation, request)
+
+    start = reservation.display_start()
+    end = reservation.display_end()
+    return (
+        f'{layout.format_date(start, 'weekday_long')}, '
+        f'{layout.format_date(start, 'date_long')}, '
+        f'{layout.format_time_range(start, end)}'
+    )
+
+
 @OrgApp.html(
     model=Resource,
     name='confirmation',
@@ -1067,14 +1085,16 @@ def accept_reservation(
             # NOTE: We can only create future visits
             start = reservation.display_start() - lead_delta
             if clients and start > now:
-                visit_ids = {}
+                auth_ids = {}
                 end = reservation.display_end() + lag_delta
+                formatted = format_reservation_date(reservation, request)
+                name = f'{ticket.number} ({resource.title}, {formatted})'
                 for site_id, group in components.items():
                     assert code is not None
                     try:
-                        visit_id = clients[site_id].create_visit(
+                        auth_id = clients[site_id].create_pin_access(
                             code=code,
-                            name=ticket.number,
+                            name=name,
                             message='Managed through OneGov Cloud',
                             start=start,
                             end=end,
@@ -1097,11 +1117,11 @@ def accept_reservation(
 
                         return request.redirect(request.link(self))
                     else:
-                        visit_ids[site_id] = visit_id
+                        auth_ids[site_id] = auth_id
 
                 data['kaba'] = {
                     'code': code,
-                    'visit_ids': visit_ids,
+                    'auth_ids': auth_ids,
                 }
 
         ReservationMessage.create(
@@ -1514,7 +1534,7 @@ def _remove_reservation(
         ticket.create_snapshot(request)
         ticket.state = orginal_state
 
-    kaba_visits_to_revoke: list[tuple[str, str]] = []
+    kaba_auths_to_revoke: list[tuple[str, str]] = []
     for reservation in targeted:
         if payment:
             # remove the link to the payment
@@ -1525,7 +1545,7 @@ def _remove_reservation(
         if (
             clients
             and (kaba := (reservation.data or {}).get('kaba'))
-            and (visit_ids := kaba.get('visit_ids'))
+            and (auth_ids := kaba.get('auth_ids'))
         ):
             lead_delta = timedelta(minutes=ticket.handler.data.get(
                 'key_code_lead_time',
@@ -1534,7 +1554,7 @@ def _remove_reservation(
             start = reservation.display_start() - lead_delta
             # we can only revoke future visits
             if start > sedate.utcnow():
-                kaba_visits_to_revoke.extend(visit_ids.items())
+                kaba_auths_to_revoke.extend(auth_ids.items())
         resource.scheduler.remove_reservation(token, reservation.id)
 
     if len(excluded) == 0 and submission:
@@ -1552,9 +1572,9 @@ def _remove_reservation(
         # the kaba visits until now, since we didn't hook this change
         # into the transaction system
         failed_to_revoke = False
-        for site_id, visit_id in kaba_visits_to_revoke:
+        for site_id, auth_id in kaba_auths_to_revoke:
             try:
-                clients[site_id].revoke_visit(visit_id)
+                clients[site_id].revoke_pin_access(auth_id)
             except (KeyError, KabaApiError) as kaba_exc:
                 if isinstance(kaba_exc, KabaApiError):
                     log.info('Kaba API error', exc_info=True)
@@ -1955,10 +1975,13 @@ def add_reservation(
     if view_ticket is not None and view_ticket != ticket:
         raise exc.HTTPNotFound()
 
+    if layout is None:
+        layout = ReservationLayout(resource, request)
+
     def show_form() -> RenderData:
         return {
             'title': _('Add reservation'),
-            'layout': layout or ReservationLayout(resource, request),
+            'layout': layout,
             'form': form,
         }
 
@@ -2094,12 +2117,14 @@ def add_reservation(
                 request.app.org.default_key_code_lag_time
             ))
             end = reservation.display_end() + lag_delta
-            visit_ids = {}
+            formatted = format_reservation_date(reservation, request, layout)
+            name = f'{ticket.number} ({resource.title}, {formatted})'
+            auth_ids = {}
             for site_id, group in components.items():
                 try:
-                    visit_ids[site_id] = clients[site_id].create_visit(
+                    auth_ids[site_id] = clients[site_id].create_pin_access(
                         code=code,
-                        name=ticket.number,
+                        name=name,
                         message='Managed through OneGov Cloud',
                         start=start,
                         end=end,
@@ -2122,7 +2147,7 @@ def add_reservation(
 
                 data['kaba'] = {
                     'code': code,
-                    'visit_ids': visit_ids,
+                    'auth_ids': auth_ids,
                 }
 
     ReservationMessage.create(
@@ -2235,6 +2260,9 @@ def adjust_reservation(
     if view_ticket is not None and view_ticket != ticket:
         raise exc.HTTPNotFound()
 
+    if layout is None:
+        layout = ReservationLayout(resource, request)
+
     def show_form() -> RenderData:
         if not request.POST:
             form.start_time.data = reservation.display_start().time()
@@ -2248,7 +2276,7 @@ def adjust_reservation(
             ))
         return {
             'title': _('Adjust reservation'),
-            'layout': layout or ReservationLayout(resource, request),
+            'layout': layout,
             'form': form,
         }
 
@@ -2339,9 +2367,9 @@ def adjust_reservation(
     if new_reservation is not None:
         failed_to_revoke = False
         clients = KabaClient.from_resource(resource, request.app)
-        data = reservation.data
+        data = new_reservation.data
         if data is None:
-            data = reservation.data = {}
+            data = new_reservation.data = {}
         if clients and (kaba := data.get('kaba')):
             # adjust visit
             components: dict[str, list[str]] = {}
@@ -2359,26 +2387,28 @@ def adjust_reservation(
             old_start = reservation.display_start() - lead_delta
             start = new_reservation.display_start() - lead_delta
             end = new_reservation.display_end() + lag_delta
-            old_visit_ids = kaba.get('visit_ids')
+            old_auth_ids = kaba.get('auth_ids')
             now = sedate.utcnow()
-            visit_ids = {}
+            formatted = format_reservation_date(reservation, request, layout)
+            name = f'{ticket.number} ({resource.title}, {formatted})'
+            auth_ids = {}
             for site_id, group in components.items():
                 try:
                     code = kaba['code']
                     # NOTE: We can only revoke existing future visits
-                    old_visit_id = old_visit_ids.get(site_id)
-                    if old_visit_id and old_start > now:
+                    old_auth_id = old_auth_ids.get(site_id)
+                    if old_auth_id and old_start > now:
                         try:
-                            clients[site_id].revoke_visit(old_visit_id)
+                            clients[site_id].revoke_pin_access(old_auth_id)
                         except (KeyError, KabaApiError) as e:
                             if isinstance(e, KabaApiError):
                                 log.info('Kaba API error', exc_info=True)
                             failed_to_revoke = True
                     # NOTE: We can only create future visits
                     if start > now:
-                        visit_ids[site_id] = clients[site_id].create_visit(
+                        auth_ids[site_id] = clients[site_id].create_pin_access(
                             code=code,
-                            name=ticket.number,
+                            name=name,
                             message='Managed through OneGov Cloud',
                             start=start,
                             end=end,
@@ -2400,7 +2430,7 @@ def adjust_reservation(
 
                 data['kaba'] = {
                     'code': code,
-                    'visit_ids': visit_ids,
+                    'auth_ids': auth_ids,
                 }
 
         ReservationAdjustedMessage.create(
@@ -2521,6 +2551,9 @@ def edit_kaba(
 
         return request.redirect(request.link(self))
 
+    if layout is None:
+        layout = ReservationLayout(resource, request)
+
     field_names = (
         'key_code',
         'key_code_lead_time',
@@ -2533,7 +2566,7 @@ def edit_kaba(
                 form[name].data = ticket.handler_data.get(name)
         return {
             'title': _('Edit key code'),
-            'layout': layout or ReservationLayout(resource, request),
+            'layout': layout,
             'form': form,
         }
 
@@ -2570,25 +2603,27 @@ def edit_kaba(
             old_start = reservation.display_start() - old_lead_delta
             start = reservation.display_start() - lead_delta
             end = reservation.display_end() + lag_delta
+            formatted = format_reservation_date(reservation, request, layout)
+            name = f'{ticket.number} ({resource.title}, {formatted})'
             kaba = data.get('kaba') or {}
-            old_visit_ids = kaba.get('visit_ids', {})
-            visit_ids = {}
+            old_auth_ids = kaba.get('auth_ids', {})
+            auth_ids = {}
             for site_id, group in components.items():
                 try:
                     # if there is an old visit, revoke it
-                    old_visit_id = old_visit_ids.get(site_id)
-                    if old_visit_id and old_start > now:
+                    old_auth_id = old_auth_ids.get(site_id)
+                    if old_auth_id and old_start > now:
                         try:
-                            clients[site_id].revoke_visit(old_visit_id)
+                            clients[site_id].revoke_pin_access(old_auth_id)
                         except (KeyError, KabaApiError) as e:
                             if isinstance(e, KabaApiError):
                                 log.info('Kaba API error', exc_info=True)
                             failed_to_revoke = True
 
                     if start > now:
-                        visit_ids[site_id] = clients[site_id].create_visit(
+                        auth_ids[site_id] = clients[site_id].create_pin_access(
                             code=code,
-                            name=ticket.number,
+                            name=name,
                             message='Managed through OneGov Cloud',
                             start=start,
                             end=end,
@@ -2610,7 +2645,7 @@ def edit_kaba(
 
                 data['kaba'] = {
                     'code': code,
-                    'visit_ids': visit_ids,
+                    'auth_ids': auth_ids,
                 }
 
     if failed_to_revoke:

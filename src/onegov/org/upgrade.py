@@ -1082,3 +1082,22 @@ def refresh_zeroed_reservation_invoices(context: UpgradeContext) -> None:
             'refreshed (non-manual or non-open payment): %s',
             len(skipped), ', '.join(skipped)
         )
+
+
+@upgrade_task('Clear deprecated exivo credentials and kaba components')
+def clear_exivo_credentials_and_kaba_components(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('resources'):
+        return
+
+    org = context.session.query(Organisation).first()
+    if not org or 'kaba_configurations' not in org.meta:
+        return
+
+    del org.meta['kaba_configurations']
+    context.session.execute(text("""
+        UPDATE resources
+           SET meta = meta - 'kaba_components'
+         wHERE meta ? 'kaba_components'
+    """))
