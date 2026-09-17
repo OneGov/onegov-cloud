@@ -91,7 +91,7 @@ from openpyxl import load_workbook
 from operator import add as add_op
 from pathlib import Path
 from sedate import utcnow
-from sqlalchemy import and_, func, or_, type_coerce, Text
+from sqlalchemy import and_, func, or_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.exc import StatementError
 from uuid import uuid4
@@ -3722,22 +3722,38 @@ def recreate_future_kaba_authorizations(
                 start=utcnow(),
                 exclude_pending=True,
                 only_managed=True
-            ).filter(
-                Ticket.handler_data.has_key(type_coerce('key_code', Text))
             ).with_entities(Reservation, Ticket)
             created = 0
             failed_revocations = 0
             failed_creations = 0
+            key_codes_for_ticket: dict[UUID, str] = {}
             for reservation, ticket in query:
                 data = reservation.data
                 if data is None:
                     data = reservation.data = {}
-                code = ticket.handler_data['key_code']
+                if 'key_code' in ticket.handler_data:
+                    code = key_codes_for_ticket[
+                        ticket.id
+                    ] = ticket.handler_data['key_code']
+                elif ticket.id in key_codes_for_ticket:
+                    code = key_codes_for_ticket[ticket.id]
+                else:
+                    code = ticket.handler_data[
+                        'key_code'
+                    ] = key_codes_for_ticket[
+                        ticket.id
+                    ] = KabaClient.random_code()
                 lead_delta = timedelta(
-                    minutes=ticket.handler_data['key_code_lead_time']
+                    minutes=ticket.handler_data.setdefault(
+                        'key_code_lead_time',
+                        request.app.org.default_key_code_lead_time
+                    )
                 )
                 lag_delta = timedelta(
-                    minutes=ticket.handler_data['key_code_lag_time']
+                    minutes=ticket.handler_data.setdefault(
+                        'key_code_lag_time',
+                        request.app.org.default_key_code_lag_time
+                    )
                 )
                 start = reservation.display_start() - lead_delta
                 end = reservation.display_end() + lag_delta
