@@ -147,6 +147,25 @@ def test_analyze_cache_queries_report(
     assert ('rep:set k' in out) == (report == 'all')
 
 
+def test_analyze_cache_queries_set_multi(
+    redis_url: str,
+    capsys: pytest.CaptureFixture[str]
+) -> None:
+    region = cache.get(
+        namespace='rep', expiration_time=60, redis_url=redis_url
+    )
+
+    with analyze_cache_queries('all'):
+        region.set_multi({'a': 1, 'b': 2, 'c': 3})
+
+    out = capsys.readouterr().out
+    # set_multi's mapping is counted per key, not as one stringified dict
+    assert 'executed 3 cache round-trips' in out
+    assert 'rep:set_multi a' in out
+    assert 'rep:set_multi b' in out
+    assert 'rep:set_multi c' in out
+
+
 def test_analyze_cache_queries_total_colors(
     redis_url: str,
     monkeypatch: pytest.MonkeyPatch

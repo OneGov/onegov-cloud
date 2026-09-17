@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
 
-# the region methods that result in a redis round-trip
 WRAPPED_METHODS = (
     'get', 'get_multi', 'get_or_create', 'get_or_create_multi',
     'set', 'set_multi', 'delete', 'delete_multi',
@@ -39,12 +38,17 @@ def analyze_cache_queries(
 
     assert report in {'summary', 'redundant', 'all'}
 
-    # keyed by (method, namespaced-key) -> count
     queries: dict[tuple[str, str], int] = {}
     originals: dict[str, Callable[..., Any]] = {}
 
     def record(method: str, key: Any) -> None:
-        keys = key if isinstance(key, (list, tuple, set)) else (key,)
+        # set_multi takes a mapping, the other *_multi methods a key list
+        if isinstance(key, dict):
+            keys: Any = key.keys()
+        elif isinstance(key, (list, tuple, set)):
+            keys = key
+        else:
+            keys = (key,)
         for k in keys:
             entry = (method, str(k))
             if report == 'all':
