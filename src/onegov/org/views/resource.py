@@ -1540,7 +1540,7 @@ def view_occupancy(
 
 def resolve_reservations_access(
     request: OrgRequest
-) -> tuple[str | None, bool, str | None]:
+) -> tuple[str | None, bool, UUID | None]:
     """Returns (email, limited, reservation_token). A logged-in citizen sees
     the full view (limited=False); a magic-link token grants only the limited
     view (limited=True): reservations linked to token, no key codes, no ticket
