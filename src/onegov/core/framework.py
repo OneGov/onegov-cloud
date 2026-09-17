@@ -443,7 +443,7 @@ class Framework(
             Do not use in production!
 
         :cache_query_report:
-            Prints out a report of redis cache round-trips for each request,
+            Prints out a report of the redis commands sent for each request,
             unless False. Same values as ``sql_query_report`` ('summary',
             'redundant', 'all'). Useful for spotting cache N+1s that don't
             show up in the sql report.
