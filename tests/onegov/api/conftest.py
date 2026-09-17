@@ -10,6 +10,7 @@ from onegov.agency.api import PersonApiEndpoint
 from onegov.agency.models import ExtendedPerson
 from onegov.core.utils import Bunch
 from onegov.form import Form
+from onegov.form.fields import UploadField
 from tests.shared.client import Client
 from tests.shared.utils import create_app
 from uuid import UUID
@@ -30,6 +31,7 @@ class App(Framework, ApiApp):
 
 class ItemForm(Form):
     title = StringField(validators=[InputRequired()])
+    file = UploadField()
 
 
 class Collection:

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-05-28 01:42+0200\n"
+"POT-Creation-Date: 2026-09-17 11:49+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -704,9 +704,6 @@ msgstr ""
 "${user_name} hat für die Kommission «${commission_name}» im Abrechnungslauf "
 "«${settlement_run_name}» die Erfassung abgeschlossen."
 
-msgid "Parliamentarian:"
-msgstr "Parlamentarier:in:"
-
 msgid "Commission:"
 msgstr "Kommission:"
 
@@ -851,11 +848,15 @@ msgstr "Nur Administratoren können Massenanwesenheiten erfassen."
 msgid "New commission session (bulk)"
 msgstr "Neue Massenbuchung Kommissionssitzung"
 
-#, python-format
-msgid "Cannot book attendance - abschluss already set for: ${names}"
-msgstr ""
-"Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
-"${names}"
+msgid "a selected parliamentarian"
+msgstr "ein:e ausgewählte:r Parlamentarier:in"
+
+msgid "the selected commission"
+msgstr "die ausgewählte Kommission"
+
+msgid "Cannot book attendance for the selected commission or parliamentarian."
+msgstr "Anwesenheit kann für die ausgewählte Kommission oder "
+"Parlamentarier:in nicht gebucht werden."
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
@@ -1030,6 +1031,15 @@ msgid "Cannot delete closed settlement run. Please reopen it first."
 msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
+
+#~ msgid "Parliamentarian:"
+#~ msgstr "Parlamentarier:in:"
+
+#, python-format
+#~ msgid "Cannot book attendance - abschluss already set for: ${names}"
+#~ msgstr ""
+#~ "Anwesenheit kann nicht gebucht werden - Abschluss bereits gesetzt für: "
+#~ "${names}"
 
 #~ msgid "Do you really want to delete this commission?"
 #~ msgstr "Möchten Sie die Kommission wirklich löschen?"

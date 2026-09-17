@@ -82,7 +82,7 @@
                                                         <tal:b case="'confirmed'" i18n:translate>
                                                             Confirmed
                                                         </tal:b>
-                                                        <tal:b case="'denied'" i18n:translate>
+                                                        <tal:b case="'cancelled'" i18n:translate>
                                                             Denied
                                                         </tal:b>
                                                     </tal:b>

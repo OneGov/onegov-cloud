@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from abc import abstractmethod
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from sqlalchemy.sql.elements import ColumnElement, SQLCoreOperations
+    from sqlalchemy.sql.base import ExecutableOption
     from sqlalchemy.orm import DeclarativeBase, Query, Session
     from typing import Protocol
     from typing import Self
@@ -218,9 +219,17 @@ class Pagination[M: DeclarativeBase]:
 
     batch_size = 10
 
+    query_options: tuple[ExecutableOption, ...] = ()
+
     def __init__(self, page: int = 0):
         assert page is not None
         self.page = max(page, 0)
+
+    def set_query_options(self, *options: ExecutableOption) -> Self:
+        """ Loader options applied to the batch query only, not to
+        subset_count/facet queries. Chainable. """
+        self.query_options = options
+        return self
 
     def __eq__(self, other: object) -> bool:
         """ Returns True if the current and the other Pagination instance
@@ -266,6 +275,8 @@ class Pagination[M: DeclarativeBase]:
         values to the batch which are then not loaded by the whole query).
 
         """
+        if self.query_options:
+            query = query.options(*self.query_options)
         return query
 
     @cached_property

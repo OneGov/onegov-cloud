@@ -7,7 +7,6 @@ from onegov.pas.collections.parliamentarian import (
     PASParliamentarianCollection,
 )
 from onegov.pas.importer.orchestrator import KubImporter
-from onegov.pas.log import CompositeOutputHandler, LogOutputHandler
 from onegov.pas.importer.output_handlers import DatabaseOutputHandler
 from onegov.pas.models import ImportLog
 from sqlalchemy.orm.attributes import flag_modified
@@ -59,11 +58,9 @@ def trigger_kub_data_import(
     cert = _resolve_cert(cert_dir)
 
     db_handler = DatabaseOutputHandler()
-    log_handler = LogOutputHandler()
-    output_handler = CompositeOutputHandler(db_handler, log_handler)
 
     with KubImporter(
-        kub_token, kub_base_url, output_handler, cert=cert
+        kub_token, kub_base_url, db_handler, cert=cert
     ) as importer:
         combined_results, import_log_id = importer.run_full_sync(
             request, cast('PasAppType', app), import_type

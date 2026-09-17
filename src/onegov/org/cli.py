@@ -26,6 +26,7 @@ from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
+from onegov.core.custom import json as custom_json
 from onegov.core.orm.utils import QueryChain
 from onegov.core.utils import Bunch
 from onegov.directory import (
@@ -78,6 +79,7 @@ from onegov.org.models import (
     RISParliamentaryGroupCollection,
 )
 from onegov.page.collection import PageCollection
+from onegov.page.restore import PageRestore
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -89,6 +91,7 @@ from operator import add as add_op
 from pathlib import Path
 from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
+from sqlalchemy.exc import StatementError
 from uuid import uuid4
 
 
@@ -113,6 +116,60 @@ if TYPE_CHECKING:
     )
 
 cli = command_group()
+
+
+@cli.command(context_settings={'singular': True})
+@click.argument('snapshot', type=click.File('r', encoding='utf-8'))
+@click.option('--dry-run', is_flag=True, help='Validate without saving.')
+@click.option(
+    '--skip-missing-files',
+    is_flag=True,
+    help='Restore even if some referenced files no longer exist.',
+)
+def restore_page(
+    snapshot: IO[str],
+    dry_run: bool,
+    skip_missing_files: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """Restore a page and included descendants from audit snapshot JSON.
+
+    Existing pages are overwritten by ID. Children absent from the snapshot
+    are retained. File IDs reconnect existing files; binaries are not restored.
+    """
+    try:
+        data = custom_json.load(snapshot)
+    except (ValueError, TypeError) as error:
+        raise click.ClickException(
+            f'Invalid snapshot JSON: {error}'
+        ) from error
+
+    def restore(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        try:
+            plan = PageRestore.prepare(session, data, skip_missing_files)
+            for item in plan.snapshots:
+                action = (
+                    'Update' if session.get(Page, item['id']) else 'Create'
+                )
+                click.echo(f"{action} page {item['id']}: {item['title']}")
+            if plan.missing_files:
+                click.echo(
+                    f"Skipping missing files: {', '.join(plan.missing_files)}"
+                )
+            with app.session_manager.set_current_user(
+                None, 'cli:restore-page'
+            ):
+                plan.apply(session)
+            if dry_run:
+                transaction.abort()
+                click.echo('Dry run complete. No changes saved.')
+            else:
+                click.echo(f'Restored {len(plan.snapshots)} page(s).')
+        except (ValueError, TypeError, StatementError) as error:
+            transaction.abort()
+            raise click.ClickException(str(error)) from error
+
+    return restore
 
 
 @cli.command(context_settings={'creates_path': True})
@@ -584,6 +641,7 @@ def close_ticket(ticket: Ticket, user: User, request: OrgRequest) -> None:
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
 @click.option('--include-imported', is_flag=True, default=False)
+@click.option('--cross-namespace', is_flag=True, default=False)
 def fetch(
     group_context: GroupContext,
     source: Sequence[str],
@@ -593,20 +651,31 @@ def fetch(
     state_transfers: Sequence[str],
     published_only: bool,
     delete_orphaned_tickets: bool,
-    include_imported: bool
+    include_imported: bool,
+    cross_namespace: bool
 ) -> Callable[[OrgRequest, OrgApp], None]:
     r""" Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
     themselves.
 
-    Example
+    Examples
     .. code-block:: bash
 
         onegov-org --select '/veranstaltungen/zug' fetch \
             --source menzingen --source steinhausen \
             --tag Sport --tag Konzert \
             --location Zug
+
+    To fetch from an entity in another namespace, pass the full
+    ``<namespace>-<entity>`` source schema together with ``--cross-namespace``:
+
+    .. code-block:: bash
+
+        onegov-org --select '/onegov_town6/tools_zg' fetch \
+            --source onegov_town6_without_yubikey-huenenberg \
+            --published-only \
+            --cross-namespace
 
     Additional parameters:
 
@@ -631,6 +700,13 @@ def fetch(
         By default skip events that have a source attribute, which means they
         have been imported. If the flag is set, imported events will be
         included in the fetch transfer.
+
+    - ``--cross-namespace``
+
+        By default a source refers to an entity within the selected app's own
+        namespace (``<app namespace>-<source>``). If the flag is set, a source
+        that already contains a namespace (e.g. ``namespace1-bar``) is used as
+        the remote schema as-is, allowing fetches across namespaces.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
@@ -674,11 +750,25 @@ def fetch(
         try:
             result = [0, 0, 0]
 
+            schemas = app.session_manager.list_schemas()
+
             for key in source:
-                remote_schema = f'{app.namespace}-{key}'
+                prefixed = f'{app.namespace}-{key}'
+                if prefixed in schemas:
+                    # source refers to an entity in the app's own namespace
+                    remote_schema = prefixed
+                elif key in schemas:
+                    # source is already a full <namespace>-<entity> schema
+                    if not cross_namespace:
+                        abort(
+                            'Cross-namespace fetches are not allowed; pass '
+                            '--cross-namespace to fetch from another namespace'
+                        )
+                    remote_schema = key
+                else:
+                    abort(f'No schema found for source {key!r}')
                 local_schema = app.session_manager.current_schema
                 assert local_schema is not None
-                assert remote_schema in app.session_manager.list_schemas()
 
                 app.session_manager.set_current_schema(remote_schema)
                 remote_session = app.session_manager.session()

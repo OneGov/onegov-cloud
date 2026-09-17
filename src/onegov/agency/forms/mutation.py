@@ -15,7 +15,7 @@ from wtforms.validators import InputRequired
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from weakref import CallableProxyType
+    from collections.abc import Mapping
     from wtforms import Field
 
 
@@ -43,7 +43,7 @@ class MutationForm(Form):
     )
 
     @property
-    def proposal_fields(self) -> dict[str, CallableProxyType[Field]]:
+    def proposal_fields(self) -> Mapping[str, Field]:
         for fieldset in self.fieldsets:
             if fieldset.label == 'Proposed changes':
                 return fieldset.fields
@@ -77,7 +77,7 @@ class MutationForm(Form):
             return
 
         for name, field in self.proposal_fields.items():
-            field.description = getattr(self.model, name)  # type:ignore
+            field.description = getattr(self.model, name)
 
 
 class AgencyMutationForm(MutationForm):
