@@ -3507,3 +3507,19 @@
         </li>
     </ul>
 </metal:globals-left>
+
+<metal:inline_search define-macro="inline_search">
+    <form action="${request.path_url}" method="GET">
+        <tal:b tal:condition="request.GET" tal:repeat="item request.GET.items()">
+            <input type="hidden" name="${item[0]}" value="${item[1]}" tal:condition="item[0] not in ('page', 'q')" />
+        </tal:b>
+        <div class="input-group">
+            <input class="input-group-field" id="search" data-typeahead-subject type="search" name="q" value="${layout.model.q}" autocomplete="off" autocorrect="off" autofocus />
+            <div class="input-group-button">
+                <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">
+                    <i class="fa fa-fw fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</metal:inline_search>
