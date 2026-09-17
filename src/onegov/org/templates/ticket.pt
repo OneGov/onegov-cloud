@@ -191,7 +191,7 @@
 
                     <tal:b tal:condition="payment_button" tal:replace="payment_button(layout)" />
 
-                    <a tal:condition="is_manager and invoice" href="${request.link(ticket, 'invoice')}" class="button small primary view-invoice" i18n:translate>View Invoice</a>
+                    <a tal:condition="is_manager and invoice" href="${request.link(ticket, 'invoice')}" class="button primary view-invoice" i18n:translate>View Invoice</a>
                 </div>
 
                 <div class="ticket-panel">

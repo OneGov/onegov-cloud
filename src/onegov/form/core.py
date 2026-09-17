@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import weakref
 
-from collections import OrderedDict
 from contextlib import nullcontext
 from decimal import Decimal
 from functools import cached_property
@@ -34,7 +33,6 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
     from typing import TypedDict, Self
-    from weakref import CallableProxyType
     from webob.multidict import MultiDict
     from wtforms import Field
     from wtforms.fields.core import UnboundField
@@ -921,7 +919,7 @@ class Form(BaseForm):
 class Fieldset:
     """ Defines a fieldset with a list of fields. """
 
-    fields: dict[str, CallableProxyType[Field]]
+    fields: weakref.WeakValueDictionary[str, Field]
 
     def __init__(self, label: str | None, fields: Iterable[Field]) -> None:
         """Initializes the Fieldset.
@@ -933,7 +931,7 @@ class Fieldset:
 
         """
         self.label = label
-        self.fields = OrderedDict((f.id, weakref.proxy(f)) for f in fields)
+        self.fields = weakref.WeakValueDictionary((f.id, f) for f in fields)
 
     @cached_property
     def id(self) -> str | None:
@@ -944,7 +942,7 @@ class Fieldset:
     def __len__(self) -> int:
         return len(self.fields)
 
-    def __getitem__(self, key: str) -> CallableProxyType[Field]:
+    def __getitem__(self, key: str) -> Field:
         return self.fields[key]
 
     @property
@@ -952,10 +950,13 @@ class Fieldset:
         return self.label is not None
 
     @property
-    def non_empty_fields(self) -> dict[str, CallableProxyType[Field]]:
+    def non_empty_fields(self) -> weakref.WeakValueDictionary[str, Field]:
         """ Only the fields which are not empty. """
-        return OrderedDict(
-            (id, field) for id, field in self.fields.items() if field.data)
+        return weakref.WeakValueDictionary(
+            (id, field)
+            for id, field in self.fields.items()
+            if field.data
+        )
 
 
 class FieldDependency:

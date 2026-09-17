@@ -1,14 +1,11 @@
 from __future__ import annotations
 
+import turbohtml
+
 from copy import deepcopy
 from datetime import date
-from functools import partial
-from io import BytesIO, StringIO
+from io import BytesIO
 from math import isclose
-
-from bleach import Cleaner
-from bleach.linkifier import LinkifyFilter
-from lxml import etree
 from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.org import _
@@ -20,20 +17,19 @@ from onegov.org.pdf.core import OrgPdf
 from onegov.org.utils import group_invoice_items
 from onegov.org.views.message import view_messages_feed
 from onegov.qrcode import QrCode
-from html5lib.filters.whitespace import Filter as WhitespaceFilter
 from pdfdocument.document import MarkupParagraph
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import PageBreak, Paragraph
+from sqlalchemy.orm.attributes import (
+    flag_modified, get_history, set_committed_value)
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
     from collections.abc import Collection
-    from bleach.callbacks import _HTMLAttrs
-    from bleach.sanitizer import _Filter
     from onegov.org.forms import TicketInvoiceSearchForm
     from onegov.org.request import OrgRequest
     from onegov.pdf.templates import Template
@@ -60,83 +56,44 @@ class TicketBasePdf(OrgPdf):
         - reservations
 
         """
-        if not html or html == '<p></p>':
-            return
-
-        # Remove unwanted markup
-        tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         ticket_summary_tags = ['dl', 'dt', 'dd', 'h2']
-        tags += ticket_summary_tags
 
-        attributes: dict[str, list[str]] = {}
-        filters: list[_Filter] = [WhitespaceFilter]
-
-        if linkify:
-            link_color = self.link_color
-            underline_links = self.underline_links
-            underline_width = self.underline_width
-
-            def colorize(
-                attrs: _HTMLAttrs,
-                new: bool = False
-            ) -> _HTMLAttrs:
-
-                # phone numbers appear here but are escaped, skip...
-                if not attrs.get((None, 'href')):
-                    # FIXME: The bleach stubs appear to be incorrect
-                    #        since this definitely works at runtime
-                    #        but we may be able to return an empty
-                    #        dictionary or attrs instead of None
-                    return None  # type:ignore[return-value]
-                attrs[(None, 'color')] = link_color
-                if underline_links:
-                    attrs[(None, 'underline')] = '1'
-                    attrs[('a', 'underlineColor')] = link_color
-                    attrs[('a', 'underlineWidth')] = underline_width
-                return attrs
-
-            tags.append('a')
-            attributes['a'] = ['href']
-            filters.append(
-                partial(
-                    LinkifyFilter, parse_email=True, callbacks=[colorize])
-            )
-
-        cleaner = Cleaner(
-            tags=tags,
-            attributes=attributes,
-            strip=True,
-            filters=filters
+        body = self.prepare_html(
+            html,
+            linkify=linkify,
+            extra_tags=ticket_summary_tags
         )
-        html = cleaner.clean(html)
-        # Todo: phone numbers with href="tel:.." are cleaned out
-        if not html.strip():
+        if body is None:
             return
 
-        tree = etree.parse(StringIO(html), etree.HTMLParser())
+        for element in body:
+            if not isinstance(element, turbohtml.Element):
+                continue
 
-        body_element = tree.find('body')
-        assert body_element is not None
-        for element in body_element:
             if element.tag == 'dl':
                 data: list[list[Paragraph | str]] = []
                 for item in element:
+                    if not isinstance(item, turbohtml.Element):
+                        continue
                     if item.tag == 'dt':
                         p = MarkupParagraph(
-                            self.inner_html(item), self.style.bold)
+                            self.strip(item.inner_xml), self.style.bold)
                         data.append([p, ''])
                     if item.tag == 'dd':
-                        data[-1][1] = MarkupParagraph(self.inner_html(item))
+                        data[-1][1] = MarkupParagraph(
+                            self.strip(item.inner_xml))
                 if data:
                     self.table(data, 'even')
             elif element.tag == 'h2':
                 # Fieldset titles
-                self.h2(self.inner_html(element))
+                self.h2(self.strip(element.inner_xml))
 
             elif element.tag == 'ul':
                 items = [
-                    [MarkupParagraph(self.inner_html(item))]
+                    [MarkupParagraph(self.strip(item.inner_xml))]
                     for item in element
+                    if isinstance(item, turbohtml.Element)
+                    if item.tag == 'li'
                 ]
                 self.table(items, 'even')
 
@@ -411,43 +368,39 @@ class TicketPdf(TicketBasePdf):
             #        something different?
             self.table(data, 'even', first_bold=False)  # type:ignore
 
-    @staticmethod
-    def extract_feed_info(html: str) -> list[str | None] | None:
+    def extract_feed_info(self, html: str | None) -> list[str | None] | None:
         """ Must be able to parse templates message_{message.type}.pt and
         return the useful data in cleaned form.
         """
-        if not html or html == '<p></p>':
+        message_tags = ['dl', 'dt', 'dd', 'h2', 'div']
+        body = self.prepare_html(
+            html,
+            extra_tags=message_tags,
+            extra_attributes={'div': frozenset({'class'})}
+        )
+        if body is None:
             return None
 
-        # Remove unwanted markup
-        tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
-        ticket_summary_tags = ['dl', 'dt', 'dd', 'h2', 'div']
-        tags += ticket_summary_tags
-
-        attributes = {}
-        filters = [WhitespaceFilter]
-        attributes['div'] = ['class']
-
-        cleaner = Cleaner(
-            tags=tags,
-            attributes=attributes,
-            strip=True,
-            filters=filters
+        timestamp_el = body.find(
+            'div',
+            axis=turbohtml.Axis.CHILDREN,
+            class_='timestamp'
         )
-        html = cleaner.clean(html)
-        tree = etree.parse(StringIO(html), etree.HTMLParser())
-        data = []
+        text_el = body.find(
+            'div',
+            axis=turbohtml.Axis.CHILDREN,
+            class_='text'
+        )
+        if timestamp_el is None:
+            if text_el is None:
+                return None
+            timestamp_html = None
+        else:
+            timestamp_html = self.strip(timestamp_el.inner_xml)
 
-        body_element = tree.find('body')
-        assert body_element is not None
-        for el in body_element:
-            if el.tag == 'div':
-                class_ = el.attrib['class']
-                if class_ == 'timestamp':
-                    data = [TicketPdf.inner_html(el), None]
-                if class_ == 'text':
-                    data[1] = TicketPdf.inner_html(el)
-        return data
+        if text_el is None:
+            return [timestamp_html, None]
+        return [timestamp_html, self.strip(text_el.inner_xml)]
 
     def add_ticket(self, ticket: Ticket, request: OrgRequest) -> None:
         """ Adds a ticket to the story. """
@@ -465,7 +418,16 @@ class TicketPdf(TicketBasePdf):
                                 'The following information is a snapshot '
                                 'kept for future reference.')
         else:
+            # HACK: Set the ticket state to closed so we don't render
+            #       any links in the summary, but without causing a
+            #       database change, while preserving unflushed changes.
+            orginal_state = ticket.state
+            history = get_history(ticket, 'state')
+            set_committed_value(ticket, 'state', 'closed')
             summary = handler.get_summary(request)
+            set_committed_value(ticket, 'state', orginal_state)
+            if not history.empty():
+                flag_modified(ticket, 'state')
 
         self.ticket_metadata(ticket, layout)
 
