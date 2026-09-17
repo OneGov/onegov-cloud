@@ -3,6 +3,8 @@ from __future__ import annotations
 import gc
 import pytest
 
+from typing import Any, Literal
+
 from onegov.core import cache
 from onegov.core.cache.debug import analyze_cache_queries
 from onegov.core.cache.redis import RedisCacheRegion
@@ -120,7 +122,9 @@ def test_cache_flush(redis_url: str) -> None:
     assert baz.cache.keys() == []
 
 
-def test_analyze_cache_queries_summary(
+@pytest.mark.parametrize('report', ['summary', 'redundant', 'all'])
+def test_analyze_cache_queries_report(
+    report: Literal['summary', 'redundant', 'all'],
     redis_url: str,
     capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -128,52 +132,75 @@ def test_analyze_cache_queries_summary(
         namespace='rep', expiration_time=60, redis_url=redis_url
     )
 
-    with analyze_cache_queries('summary'):
-        region.set('a', 1)
-        region.get('a')
-        region.get('a')
-
-    out = capsys.readouterr().out
-    assert 'executed 3 cache round-trips, 1 of which were redundant' in out
-    # summary does not list the individual keys
-    assert 'rep:get' not in out
-
-
-def test_analyze_cache_queries_redundant(
-    redis_url: str,
-    capsys: pytest.CaptureFixture[str]
-) -> None:
-    region = cache.get(
-        namespace='rep', expiration_time=60, redis_url=redis_url
-    )
-
-    with analyze_cache_queries('redundant'):
-        region.get_or_create('tags', lambda: [1, 2])
-        region.get_or_create('tags', lambda: [1, 2])
-        region.get_or_create('tags', lambda: [1, 2])
-
-    out = capsys.readouterr().out
-    assert 'redundant' in out
-    # the offending key is reported with its hit count
-    assert 'rep:get_or_create tags (3x)' in out
-
-
-def test_analyze_cache_queries_all(
-    redis_url: str,
-    capsys: pytest.CaptureFixture[str]
-) -> None:
-    region = cache.get(
-        namespace='rep', expiration_time=60, redis_url=redis_url
-    )
-
-    with analyze_cache_queries('all'):
+    with analyze_cache_queries(report):
         region.set('k', 1)
-        region.get('k')
+        region.get_or_create('tags', lambda: [1])
+        region.get_or_create('tags', lambda: [1])
 
     out = capsys.readouterr().out
-    # 'all' echoes every round-trip as it happens
-    assert 'rep:set k' in out
-    assert 'rep:get k' in out
+
+    # every mode prints the totals line
+    assert 'executed 3 cache round-trips, 1 of which were redundant' in out
+    # only 'redundant' lists the offending keys
+    assert ('rep:get_or_create tags (2x)' in out) == (report == 'redundant')
+    # only 'all' echoes each round-trip as it happens
+    assert ('rep:set k' in out) == (report == 'all')
+
+
+def test_analyze_cache_queries_total_colors(
+    redis_url: str,
+    monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from onegov.core.cache import debug
+
+    region = cache.get(
+        namespace='rep', expiration_time=60, redis_url=redis_url
+    )
+
+    styled: list[tuple[str, str | None]] = []
+    orig_style = debug.click.style
+
+    def spy(text: str, fg: str | None = None, *a: Any, **k: Any) -> str:
+        styled.append((text, fg))
+        return orig_style(text, fg, *a, **k)
+
+    def total_color(round_trips: int) -> str | None:
+        styled.clear()
+        monkeypatch.setattr(debug.click, 'style', spy)
+        with analyze_cache_queries('summary'):
+            for i in range(round_trips):
+                region.set(str(i), i)
+        monkeypatch.undo()
+        # the total count is the entry styled with its own number as text
+        return next(fg for text, fg in styled if text == str(round_trips))
+
+    assert total_color(3) == 'green'
+    assert total_color(7) == 'yellow'  # > 5
+    assert total_color(12) == 'red'    # > 10
+
+
+def test_with_cache_query_report(
+    redis_url: str,
+    capsys: pytest.CaptureFixture[str]
+) -> None:
+    app = Framework()
+    app.configure_debug(cache_query_report='redundant')
+    region = cache.get(
+        namespace='wrap', expiration_time=60, redis_url=redis_url
+    )
+
+    def view() -> str:
+        region.get_or_create('tags', lambda: [1])
+        region.get_or_create('tags', lambda: [1])
+        return 'ok'
+
+    wrapped = app.with_cache_query_report(view)
+
+    # the wrapper runs the view inside analyze_cache_queries and reports
+    assert wrapped() == 'ok'
+    out = capsys.readouterr().out
+    assert 'cache round-trips' in out
+    assert 'wrap:get_or_create tags (2x)' in out
 
 
 def test_analyze_cache_queries_restores_methods(redis_url: str) -> None:
