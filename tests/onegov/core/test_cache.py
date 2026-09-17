@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import gc
+import pytest
 
 from onegov.core import cache
+from onegov.core.cache.debug import analyze_cache_queries
+from onegov.core.cache.redis import RedisCacheRegion
 from onegov.core.framework import Framework
 
 
@@ -115,3 +118,69 @@ def test_cache_flush(redis_url: str) -> None:
     assert baz.cache.flush() == 10000
     assert bar.cache.keys() == [b'foo/bar:short-term:moo']
     assert baz.cache.keys() == []
+
+
+def test_analyze_cache_queries_summary(
+    redis_url: str,
+    capsys: pytest.CaptureFixture[str]
+) -> None:
+    region = cache.get(
+        namespace='rep', expiration_time=60, redis_url=redis_url
+    )
+
+    with analyze_cache_queries('summary'):
+        region.set('a', 1)
+        region.get('a')
+        region.get('a')
+
+    out = capsys.readouterr().out
+    assert 'executed 3 cache round-trips, 1 of which were redundant' in out
+    # summary does not list the individual keys
+    assert 'rep:get' not in out
+
+
+def test_analyze_cache_queries_redundant(
+    redis_url: str,
+    capsys: pytest.CaptureFixture[str]
+) -> None:
+    region = cache.get(
+        namespace='rep', expiration_time=60, redis_url=redis_url
+    )
+
+    with analyze_cache_queries('redundant'):
+        region.get_or_create('tags', lambda: [1, 2])
+        region.get_or_create('tags', lambda: [1, 2])
+        region.get_or_create('tags', lambda: [1, 2])
+
+    out = capsys.readouterr().out
+    assert 'redundant' in out
+    # the offending key is reported with its hit count
+    assert 'rep:get_or_create tags (3x)' in out
+
+
+def test_analyze_cache_queries_all(
+    redis_url: str,
+    capsys: pytest.CaptureFixture[str]
+) -> None:
+    region = cache.get(
+        namespace='rep', expiration_time=60, redis_url=redis_url
+    )
+
+    with analyze_cache_queries('all'):
+        region.set('k', 1)
+        region.get('k')
+
+    out = capsys.readouterr().out
+    # 'all' echoes every round-trip as it happens
+    assert 'rep:set k' in out
+    assert 'rep:get k' in out
+
+
+def test_analyze_cache_queries_restores_methods(redis_url: str) -> None:
+    before = {m: getattr(RedisCacheRegion, m) for m in (
+        'get', 'get_or_create', 'set', 'delete'
+    )}
+    with analyze_cache_queries('summary'):
+        assert RedisCacheRegion.get is not before['get']
+    after = {m: getattr(RedisCacheRegion, m) for m in before}
+    assert before == after
