@@ -172,6 +172,9 @@ class Framework(
         if getattr(self, 'sql_query_report', False):
             fn = self.with_query_report(fn)
 
+        if getattr(self, 'cache_query_report', False):
+            fn = self.with_cache_query_report(fn)
+
         if getattr(self, 'profile', False):
             fn = self.with_profiler(fn)
 
@@ -194,6 +197,25 @@ class Framework(
                 return fn(*args, **kwargs)
 
         return with_query_report_wrapper
+
+    def with_cache_query_report[**P, T](
+        self,
+        fn: Callable[P, T]
+    ) -> Callable[P, T]:
+
+        from onegov.core.cache import debug as cache_debug
+
+        @wraps(fn)
+        def with_cache_query_report_wrapper(
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
+
+            assert isinstance(self.cache_query_report, str)
+            with cache_debug.analyze_cache_queries(self.cache_query_report):
+                return fn(*args, **kwargs)
+
+        return with_cache_query_report_wrapper
 
     def with_profiler[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
@@ -420,6 +442,14 @@ class Framework(
 
             Do not use in production!
 
+        :cache_query_report:
+            Prints out a report of the redis commands sent for each request,
+            unless False. Same values as ``sql_query_report`` ('summary',
+            'redundant', 'all'). Useful for spotting cache N+1s that don't
+            show up in the sql report.
+
+            Do not use in production!
+
         :profile:
             If true, profiles the request and stores the result in the profiles
             folder with the following format: ``YYYY-MM-DD hh:mm:ss.profile``
@@ -582,6 +612,8 @@ class Framework(
         allow_shift_f5_compile: bool = False,
         sql_query_report: Literal[
             False, 'summary', 'redundant', 'all'] = False,
+        cache_query_report: Literal[
+            False, 'summary', 'redundant', 'all'] = False,
         profile: bool = False,
         print_exceptions: bool = False,
         **cfg: Any
@@ -590,6 +622,7 @@ class Framework(
         self.always_compile_theme = always_compile_theme
         self.allow_shift_f5_compile = allow_shift_f5_compile
         self.sql_query_report = sql_query_report
+        self.cache_query_report = cache_query_report
         self.profile = profile
         self.print_exceptions = print_exceptions
 
