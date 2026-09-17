@@ -48,6 +48,7 @@ from wtforms import HiddenField
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator, Sequence
+    from libres.db.models import Reservation as BaseReservation
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
@@ -584,6 +585,23 @@ def blocked_by_zipcode(
     return blocked
 
 
+def format_reservation_date(
+    reservation: BaseReservation,
+    request: OrgRequest,
+    layout: DefaultLayout | None = None
+) -> str:
+    if layout is None:
+        layout = DefaultLayout(reservation, request)
+
+    start = reservation.display_start()
+    end = reservation.display_end()
+    return (
+        f'{layout.format_date(start, 'weekday_long')}, '
+        f'{layout.format_date(start, 'date_long')}, '
+        f'{layout.format_time_range(start, end)}'
+    )
+
+
 @OrgApp.html(
     model=Resource,
     name='confirmation',
@@ -1060,12 +1078,14 @@ def accept_reservation(
             if clients and start > now:
                 auth_ids = {}
                 end = reservation.display_end() + lag_delta
+                formatted = format_reservation_date(reservation, request)
+                name = f'{ticket.number} ({resource.title}, {formatted})'
                 for site_id, group in components.items():
                     assert code is not None
                     try:
                         auth_id = clients[site_id].create_pin_access(
                             code=code,
-                            name=ticket.number,
+                            name=name,
                             message='Managed through OneGov Cloud',
                             start=start,
                             end=end,
@@ -1943,10 +1963,13 @@ def add_reservation(
     if view_ticket is not None and view_ticket != ticket:
         raise exc.HTTPNotFound()
 
+    if layout is None:
+        layout = ReservationLayout(resource, request)
+
     def show_form() -> RenderData:
         return {
             'title': _('Add reservation'),
-            'layout': layout or ReservationLayout(resource, request),
+            'layout': layout,
             'form': form,
         }
 
@@ -2082,12 +2105,14 @@ def add_reservation(
                 request.app.org.default_key_code_lag_time
             ))
             end = reservation.display_end() + lag_delta
+            formatted = format_reservation_date(reservation, request, layout)
+            name = f'{ticket.number} ({resource.title}, {formatted})'
             auth_ids = {}
             for site_id, group in components.items():
                 try:
                     auth_ids[site_id] = clients[site_id].create_pin_access(
                         code=code,
-                        name=ticket.number,
+                        name=name,
                         message='Managed through OneGov Cloud',
                         start=start,
                         end=end,
@@ -2223,6 +2248,9 @@ def adjust_reservation(
     if view_ticket is not None and view_ticket != ticket:
         raise exc.HTTPNotFound()
 
+    if layout is None:
+        layout = ReservationLayout(resource, request)
+
     def show_form() -> RenderData:
         if not request.POST:
             form.start_time.data = reservation.display_start().time()
@@ -2236,7 +2264,7 @@ def adjust_reservation(
             ))
         return {
             'title': _('Adjust reservation'),
-            'layout': layout or ReservationLayout(resource, request),
+            'layout': layout,
             'form': form,
         }
 
@@ -2327,9 +2355,9 @@ def adjust_reservation(
     if new_reservation is not None:
         failed_to_revoke = False
         clients = KabaClient.from_resource(resource, request.app)
-        data = reservation.data
+        data = new_reservation.data
         if data is None:
-            data = reservation.data = {}
+            data = new_reservation.data = {}
         if clients and (kaba := data.get('kaba')):
             # adjust visit
             components: dict[str, list[str]] = {}
@@ -2349,6 +2377,8 @@ def adjust_reservation(
             end = new_reservation.display_end() + lag_delta
             old_auth_ids = kaba.get('auth_ids')
             now = sedate.utcnow()
+            formatted = format_reservation_date(reservation, request, layout)
+            name = f'{ticket.number} ({resource.title}, {formatted})'
             auth_ids = {}
             for site_id, group in components.items():
                 try:
@@ -2366,7 +2396,7 @@ def adjust_reservation(
                     if start > now:
                         auth_ids[site_id] = clients[site_id].create_pin_access(
                             code=code,
-                            name=ticket.number,
+                            name=name,
                             message='Managed through OneGov Cloud',
                             start=start,
                             end=end,
@@ -2509,6 +2539,9 @@ def edit_kaba(
 
         return request.redirect(request.link(self))
 
+    if layout is None:
+        layout = ReservationLayout(resource, request)
+
     field_names = (
         'key_code',
         'key_code_lead_time',
@@ -2521,7 +2554,7 @@ def edit_kaba(
                 form[name].data = ticket.handler_data.get(name)
         return {
             'title': _('Edit key code'),
-            'layout': layout or ReservationLayout(resource, request),
+            'layout': layout,
             'form': form,
         }
 
@@ -2558,6 +2591,8 @@ def edit_kaba(
             old_start = reservation.display_start() - old_lead_delta
             start = reservation.display_start() - lead_delta
             end = reservation.display_end() + lag_delta
+            formatted = format_reservation_date(reservation, request, layout)
+            name = f'{ticket.number} ({resource.title}, {formatted})'
             kaba = data.get('kaba') or {}
             old_auth_ids = kaba.get('auth_ids', {})
             auth_ids = {}
@@ -2576,7 +2611,7 @@ def edit_kaba(
                     if start > now:
                         auth_ids[site_id] = clients[site_id].create_pin_access(
                             code=code,
-                            name=ticket.number,
+                            name=name,
                             message='Managed through OneGov Cloud',
                             start=start,
                             end=end,

@@ -35,6 +35,8 @@ class KabaClient:
         self.site_id = site_id
         self.client_id = client_id
         self.client_secret = client_secret
+        self.base_url = 'https://api.resivo.io/'
+        self.api_version = 'v8'
         self.session = niquests.Session(
             retries=Retry(
                 total=3,
@@ -48,10 +50,9 @@ class KabaClient:
                 respect_retry_after_header=True,
                 retry_after_max=30,
             ),
+            base_url=self.base_url,
             timeout=(5, 10)
         )
-        self.base_url = 'https://api.resivo.io'
-        self.api_version = 'v8'
         self.access_token: str
         self.access_token_expires = datetime.now(UTC)
 
@@ -88,7 +89,7 @@ class KabaClient:
     def maybe_refresh_access_token(self) -> None:
         if self.access_token_expires <= (now := datetime.now(UTC)):
             res = self.session.post(
-                f'{self.base_url}/oauth2/token',
+                'oauth2/token',
                 data={
                     'grant_type': 'client_credentials',
                     'client_id': self.client_id,
@@ -117,7 +118,7 @@ class KabaClient:
     def site_name(self) -> str:
         self.maybe_refresh_access_token()
         res = self.session.get(
-            f'{self.base_url}/{self.api_version}/sites/{self.site_id}',
+            f'{self.api_version}/sites/{self.site_id}',
             auth=self.access_token,
             timeout=(5, 10)
         )
@@ -126,8 +127,9 @@ class KabaClient:
 
     def component_choices(self) -> list[_Choice]:
         self.maybe_refresh_access_token()
-        res = self.session.get(
-            f'{self.base_url}/{self.site_id}/components?scope=all',
+        res = self.session.post(
+            f'{self.api_version}/sites/{self.site_id}/devices/query',
+            json={'isComponent': True, 'deviceTypes': ['sdu']},
             auth=self.access_token,
             timeout=(5, 10)
         )
@@ -152,9 +154,10 @@ class KabaClient:
     ) -> str:
         self.maybe_refresh_access_token()
         res = self.session.post(
-            f'{self.base_url}/{self.site_id}/authorizations/pin-access',
+            f'{self.api_version}/sites/{self.site_id}/authorizations/pin-access',
             json={
                 'displayName': name,
+                'remarks': message,
                 'pinCodes': [{'pinCode': code, 'displayName': f'{name} PIN'}],
                 'componentIds': components,
                 'restrictions': {
@@ -180,7 +183,7 @@ class KabaClient:
     def revoke_pin_access(self, auth_id: str) -> None:
         self.maybe_refresh_access_token()
         res = self.session.get(
-            f'{self.base_url}/{self.site_id}/authorizations/{auth_id}',
+            f'{self.api_version}/authorizations/{auth_id}',
             auth=self.access_token,
             timeout=(5, 10)
         )
@@ -196,7 +199,27 @@ class KabaClient:
         # NOTE: Just in case the previous request was slow
         self.maybe_refresh_access_token()
         res = self.session.delete(
-            f'{self.base_url}/{self.site_id}/authorizations/{auth_id}/revoke',
+            f'{self.api_version}/authorizations/{auth_id}/revoke',
+            json={},
+            auth=self.access_token,
+            timeout=(5, 10)
+        )
+        self.raise_for_status(res)
+
+        # NOTE: We can't delete in one step, we need to revoke first
+        #       but we definitely want to delete to not leave too
+        #       big of a mess. If we want to keep revoked authorizations
+        #       around we would need to try to edit existing authorizations
+        #       whenever possible, instead of doing revoke + create,
+        #       although it is a little bit more error-prone, since creation
+        #       will generally always succeed, alteration/revocation may
+        #       fail, a failed revocation is pretty harmless, but a failed
+        #       alteration is pretty bad, so we would need to special-case
+        #       failed alterations based on whether the authorization still
+        #       exists or not.
+        self.maybe_refresh_access_token()
+        res = self.session.delete(
+            f'{self.api_version}/authorizations/{auth_id}/delete',
             json={},
             auth=self.access_token,
             timeout=(5, 10)
