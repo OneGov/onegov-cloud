@@ -55,6 +55,7 @@ from onegov.newsletter.collection import RecipientCollection
 from onegov.org import log, _
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
+from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.management import LinkMigration
 from onegov.org.models.file import ImageFileCollection
 from onegov.org.models.page import Page
@@ -80,8 +81,8 @@ from onegov.org.models import (
 )
 from onegov.page.collection import PageCollection
 from onegov.page.restore import PageRestore
-from onegov.reservation import ResourceCollection
-from onegov.ticket import TicketCollection
+from onegov.reservation import Reservation, ResourceCollection
+from onegov.ticket import Ticket, TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
 from onegov.user.models import TAN
@@ -89,7 +90,8 @@ from onegov.user import UserCollection, User
 from openpyxl import load_workbook
 from operator import add as add_op
 from pathlib import Path
-from sqlalchemy import func, and_, or_
+from sedate import utcnow
+from sqlalchemy import and_, func, or_, type_coerce, Text
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.exc import StatementError
 from uuid import uuid4
@@ -105,7 +107,6 @@ if TYPE_CHECKING:
     from onegov.core.upgrade import UpgradeContext
     from onegov.org.app import OrgApp
     from onegov.org.request import OrgRequest
-    from onegov.ticket import Ticket
     from sqlalchemy.orm import Query, Session
 
     from translationstring import TranslationString
@@ -3522,11 +3523,16 @@ def list_resources(
 
     onegov-org --select '/foo/bar' list-resources
     """
+    first_header = True
 
     def list_all_resources(request: OrgRequest, app: OrgApp) -> None:
+        nonlocal first_header
         resources = ResourceCollection(app.libres_context)
 
-        click.echo('\n----------------------------------------')
+        if first_header:
+            first_header = False
+        else:
+            click.echo('\n----------------------------------------')
         click.secho(f'Resources of {request.app.org.name}', fg='blue')
         type = None
         for res in resources.ordered_by_type():
@@ -3676,3 +3682,127 @@ def migrate_agency(
         """)
 
     return migrate_to_new_agency
+
+
+@cli.command(name='recreate-future-kaba-authorizations')
+def recreate_future_kaba_authorizations(
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """
+    Recreates future dormakaba authorizations for each resource
+
+    onegov-org --select '/foo/bar' recreate-future-kaba-authorizations
+    """
+    from onegov.org.views.reservation import format_reservation_date
+
+    first_header = True
+
+    def recreate_kaba_authorizations(
+        request: OrgRequest,
+        app: OrgApp
+    ) -> None:
+        nonlocal first_header
+        printed_header = False
+        resources = ResourceCollection(app.libres_context)
+        for resource in resources.ordered_by_type():
+            resource.bind_to_libres_context(app.libres_context)
+            clients = KabaClient.from_resource(resource, request.app)
+            if not clients:
+                continue
+
+            components: dict[str, list[str]] = {}
+            for site_id, component in resource.kaba_components:  # type: ignore[attr-defined]
+                components.setdefault(site_id, []).append(component)
+
+            if not components:
+                continue
+
+            # get all future reservations and tickets
+            query: Query[tuple[Reservation, Ticket]]
+            query = resource.reservations_with_tickets_query(  # type:ignore[attr-defined]
+                start=utcnow(),
+                exclude_pending=True,
+                only_managed=True
+            ).filter(
+                Ticket.handler_data.has_key(type_coerce('key_code', Text))
+            ).with_entities(Reservation, Ticket)
+            created = 0
+            failed_revocations = 0
+            failed_creations = 0
+            for reservation, ticket in query:
+                data = reservation.data
+                if data is None:
+                    data = reservation.data = {}
+                code = ticket.handler_data['key_code']
+                lead_delta = timedelta(
+                    minutes=ticket.handler_data['key_code_lead_time']
+                )
+                lag_delta = timedelta(
+                    minutes=ticket.handler_data['key_code_lag_time']
+                )
+                start = reservation.display_start() - lead_delta
+                end = reservation.display_end() + lag_delta
+                formatted = format_reservation_date(reservation, request)
+                name = f'{ticket.number} ({resource.title}, {formatted})'
+                kaba = data.get('kaba') or {}
+                old_auth_ids = kaba.get('auth_ids', {})
+                auth_ids = {}
+                for site_id, group in components.items():
+                    try:
+                        # if there is an old visit, revoke it
+                        old_auth_id = old_auth_ids.get(site_id)
+                        if old_auth_id and start > utcnow():
+                            try:
+                                clients[site_id].revoke_pin_access(old_auth_id)
+                            except (KeyError, KabaApiError):
+                                failed_revocations += 1
+
+                        if start > utcnow():
+                            auth_ids[site_id] = clients[
+                                site_id
+                            ].create_pin_access(
+                                code=code,
+                                name=name,
+                                message='Managed through OneGov Cloud',
+                                start=start,
+                                end=end,
+                                components=group,
+                            )
+                    except (KeyError, KabaApiError):
+                        failed_creations += 1
+                    else:
+                        created += 1
+                        data['kaba'] = {
+                            'code': code,
+                            'auth_ids': auth_ids,
+                        }
+
+            if not printed_header and (created or failed_creations):
+                printed_header = True
+                if first_header:
+                    first_header = False
+                else:
+                    click.echo('\n----------------------------------------')
+                click.secho(
+                    f'Recreating visits of {request.app.org.name}',
+                    fg='blue'
+                )
+            if created:
+                click.secho(
+                    f'Successfully recreated {created} authorizations '
+                    f'for {resource.title}.',
+                    fg='green'
+                )
+            if failed_creations:
+                click.secho(
+                    f'Failed to recreate {failed_creations} authorizations '
+                    f'for {resource.title}.',
+                    fg='yellow' if created > failed_creations else 'red'
+                )
+            if failed_revocations:
+                click.secho(
+                    f'Failed to revoke {failed_revocations} old '
+                    f'authorizations for {resource.title}.',
+                    fg='yellow'
+                )
+
+    return recreate_kaba_authorizations
