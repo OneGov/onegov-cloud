@@ -94,6 +94,7 @@ from sedate import utcnow
 from sqlalchemy import and_, func, or_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.exc import StatementError
+from sqlalchemy.orm import undefer
 from uuid import uuid4
 
 
@@ -3722,7 +3723,10 @@ def recreate_future_kaba_authorizations(
                 start=utcnow(),
                 exclude_pending=True,
                 only_managed=True
-            ).with_entities(Reservation, Ticket)
+            ).with_entities(Reservation, Ticket).options(
+                undefer(Reservation.data),
+                undefer(Ticket.handler_data)
+            )
             created = 0
             failed_revocations = 0
             failed_creations = 0
@@ -3731,18 +3735,18 @@ def recreate_future_kaba_authorizations(
                 data = reservation.data
                 if data is None:
                     data = reservation.data = {}
+
                 if 'key_code' in ticket.handler_data:
-                    code = key_codes_for_ticket[
-                        ticket.id
-                    ] = ticket.handler_data['key_code']
+                    code = ticket.handler_data['key_code']
+                    key_codes_for_ticket[ticket.id] = code
                 elif ticket.id in key_codes_for_ticket:
                     code = key_codes_for_ticket[ticket.id]
                 else:
-                    code = ticket.handler_data[
-                        'key_code'
-                    ] = key_codes_for_ticket[
-                        ticket.id
-                    ] = KabaClient.random_code()
+                    tag_meta = data.get('ticket_tag_meta', {})
+                    code = tag_meta.get('Kaba Code', KabaClient.random_code())
+                    ticket.handler_data['key_code'] = code
+                    key_codes_for_ticket[ticket.id] = code
+
                 lead_delta = timedelta(
                     minutes=ticket.handler_data.setdefault(
                         'key_code_lead_time',
