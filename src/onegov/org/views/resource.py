@@ -1834,7 +1834,7 @@ def view_my_reservations_ical(
     token = request.GET.get('token')
     payload = request.load_url_safe_token(token, salt, None)
     include_key_code = False
-    reservation_token = None
+    reservation_token: UUID | None = None
     if isinstance(payload, list):  # existing handed-out key-code links
         email, include_key_code = payload
     elif isinstance(payload, dict):  # per-ticket magic links
