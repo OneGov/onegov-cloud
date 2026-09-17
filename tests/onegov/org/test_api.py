@@ -441,6 +441,27 @@ def test_api_events_no_n_plus_one(client: Client) -> None:
     assert statements == [], f'unexpected lazy queries: {statements}'
 
 
+def test_api_events_no_n_plus_one_cache(client: Client) -> None:
+    from onegov.core.cache.redis import RedisCacheRegion
+
+    client.login_admin()  # prevent rate limit
+
+    calls: list[str] = []
+    orig = RedisCacheRegion.get_or_create
+
+    def count(self: Any, key: str, *args: Any, **kwargs: Any) -> Any:
+        if key == 'custom_event_tags':
+            calls.append(key)
+        return orig(self, key, *args, **kwargs)
+
+    with patch.object(RedisCacheRegion, 'get_or_create', count):
+        response = client.get('/api/events')
+
+    # more than one item, but the custom_event_tags cache is only hit once
+    assert response.body.count(b'"start"') > 1
+    assert len(calls) <= 1, f'N+1 on cache: {len(calls)} redis round-trips'
+
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')
