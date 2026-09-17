@@ -1876,7 +1876,7 @@ def view_my_reservations_ical(
         stmt.c.accepted.is_(True)
     ]
     if reservation_token:
-        conditions.append(stmt.c.token == UUID(reservation_token))
+        conditions.append(stmt.c.token == reservation_token)
     records = request.session.execute(select(*stmt.c).where(and_(*conditions)))
 
     ticket_label = request.translate(_('Check request status'))
