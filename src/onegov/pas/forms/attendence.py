@@ -19,7 +19,8 @@ from onegov.pas.utils import (
     is_active_kantonsrat_member,
 )
 from onegov.pas.custom import AttendenceCollection
-from onegov.pas.models import PASCommissionMembership, SettlementRun
+from onegov.pas.models import PASCommission, PASCommissionMembership
+from onegov.pas.models import SettlementRun
 from onegov.pas.models.attendence import TYPES
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
@@ -496,14 +497,56 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
 
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
+        commissions = PASCommissionCollection(self.request.session).query()
+        parliamentarians = get_active_kantonsrat_parliamentarians(
+            self.request.app
+        )
+
+        if (
+            hasattr(self.request.identity, 'role')
+            and self.request.identity.role == 'commission_president'
+        ):
+            user = (
+                self.request.session.query(User)
+                .filter_by(username=self.request.identity.userid)
+                .first()
+            )
+            if user and user.parliamentarian:  # type: ignore[attr-defined]
+                today = date.today()
+                led_commission_ids = {
+                    membership.commission_id
+                    for membership in (
+                        user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
+                            on_date=today,
+                            role='president',
+                        )
+                    )
+                }
+                commissions = commissions.filter(
+                    PASCommission.id.in_(led_commission_ids)
+                )
+                member_ids = {
+                    membership.parliamentarian_id
+                    for membership in self.request.session.query(
+                        PASCommissionMembership
+                    )
+                    if membership.commission_id in led_commission_ids
+                    and membership.is_active_on(today)
+                }
+                parliamentarians = [
+                    parliamentarian
+                    for parliamentarian in parliamentarians
+                    if parliamentarian.id in member_ids
+                ]
+            else:
+                commissions = commissions.filter(PASCommission.id.in_([]))
+                parliamentarians = []
+
         self.commission_id.choices = [
-            (commission.id, commission.title)
-            for commission
-            in PASCommissionCollection(self.request.session).query()
+            (commission.id, commission.title) for commission in commissions
         ]
         self.parliamentarian_id.choices = [
-            (str(p.id), p.title)
-            for p in get_active_kantonsrat_parliamentarians(self.request.app)
+            (str(p.id), p.title) for p in parliamentarians
         ]
         self.parliamentarian_id.data = []
 
