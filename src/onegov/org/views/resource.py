@@ -1650,7 +1650,7 @@ def view_my_reservations_pdf(
     ]
 
     if reservation_token:
-        conditions.append(stmt.c.token == UUID(reservation_token))
+        conditions.append(stmt.c.token == reservation_token)
 
     if limited or request.GET.get('accepted') == '1':
         conditions.append(stmt.c.accepted.is_(True))
