@@ -60,12 +60,13 @@ def analyze_cache_queries(
             click.echo(f'> {entry}')
         queries[entry] = queries.get(entry, 0) + 1
 
-    # StrictRedis is an alias for Redis, so this covers both
-    orig_execute_command = redis.Redis.execute_command
-    orig_pipeline_execute = Pipeline.execute
+    # StrictRedis is an alias for Redis, so this covers both; typed as Any
+    # since redis-py's generic-ness varies across versions
+    orig_execute_command: Any = redis.Redis.execute_command
+    orig_pipeline_execute: Any = Pipeline.execute
 
     def execute_command(
-        self: redis.Redis[Any],
+        self: Any,
         *args: Any,
         **options: Any
     ) -> Any:
@@ -73,7 +74,7 @@ def analyze_cache_queries(
         return orig_execute_command(self, *args, **options)
 
     def pipeline_execute(
-        self: Pipeline[Any],
+        self: Any,
         *args: Any,
         **kwargs: Any
     ) -> Any:
