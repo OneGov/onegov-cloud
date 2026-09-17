@@ -263,6 +263,11 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
     pk_type = UUID
 
     @cached_property
+    def custom_event_tags(self) -> list[str] | None:
+        # memoize per request to avoid a cache round-trip per item
+        return self.app.custom_event_tags
+
+    @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
         collection = self._base_collection
         filters: dict[str, Collection[str] | str | None] = {
@@ -281,7 +286,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         filter_type = self.app.org.event_filter_type
         if filter_type in ('tags', 'tags_and_filters'):
             used_tags = collection.used_tags
-            if not self.app.custom_event_tags:
+            if not self.custom_event_tags:
                 # built-in tags need to be translated
                 used_tags = {
                     self.request.translate(_(tag))
@@ -362,7 +367,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
                 value = self.get_date_filter(key, values)
                 result = result.for_filter(end=value)
             elif key == 'tags':
-                if not self.app.custom_event_tags:
+                if not self.custom_event_tags:
                     # FIXME: circular import
                     from onegov.org.forms.event import TAGS
                     # built-in tags are translated and need to be
@@ -435,7 +440,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         filter_type = self.app.org.event_filter_type
         if filter_type in ('tags', 'tags_and_filters'):
             tags = item.event.tags
-            if not self.app.custom_event_tags:
+            if not self.custom_event_tags:
                 # built-in tags need to be translated
                 tags = [self.request.translate(_(tag)) for tag in tags]
             data['tags'] = tags
