@@ -36,7 +36,7 @@ from tests.onegov.org.common import ticket_message_owners
 from tests.shared.utils import add_reservation
 from unittest.mock import patch
 from urllib.parse import quote
-from uuid import UUID, uuid4
+from uuid import uuid4
 from webtest import Upload
 
 
@@ -44,6 +44,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from unittest.mock import MagicMock
+    from uuid import UUID
     from .conftest import Client
 
 
