@@ -16,6 +16,7 @@ from onegov.core.html import html_to_text
 from onegov.core.mail import Attachment
 from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Personal, Private, Secret
+from onegov.core.templates import render_macro
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
@@ -902,7 +903,8 @@ def archive_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
 def set_ticket_due_date(self: Ticket, request: OrgRequest) -> BaseResponse:
     request.assert_valid_csrf_token()
 
-    today = TicketLayout(self, request).today()
+    layout = TicketLayout(self, request)
+    today = layout.today()
     preset = request.params.get('preset')
 
     if request.params.get('clear'):
@@ -924,6 +926,13 @@ def set_ticket_due_date(self: Ticket, request: OrgRequest) -> BaseResponse:
         except ValueError:
             request.alert(_('Invalid date'))
             return request.redirect(request.link(self))
+
+    if request.headers.get('X-IC-Request'):
+        return Response(render_macro(layout.macros['due_date'], request, {
+            'ticket': self,
+            'layout': layout,
+            'is_manager': request.is_manager_for_model(self),
+        }))
 
     return request.redirect(request.link(self))
 

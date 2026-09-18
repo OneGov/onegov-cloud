@@ -957,17 +957,17 @@
                 <span tal:condition="current">${current}</span>
                 <span tal:condition="not:current" i18n:translate>Set due date</span>
             </summary>
-            <form method="POST" action="${action}" class="due-date-menu" tal:define="presets layout.due_date_presets">
-                <button type="submit" name="preset" value="today" title="${presets['today']}" i18n:translate>Today</button>
-                <button type="submit" name="preset" value="tomorrow" title="${presets['tomorrow']}" i18n:translate>Tomorrow</button>
-                <button type="submit" name="preset" value="end_of_week" title="${presets['end_of_week']}" i18n:translate>End of this week</button>
-                <button type="submit" name="preset" value="in_one_week" title="${presets['in_one_week']}" i18n:translate>In one week</button>
+            <div class="due-date-menu" tal:define="presets layout.due_date_presets">
+                <button type="button" ic-post-to="${action}&preset=today" ic-target="#ticket-due-date" title="${presets['today']}" i18n:translate>Today</button>
+                <button type="button" ic-post-to="${action}&preset=tomorrow" ic-target="#ticket-due-date" title="${presets['tomorrow']}" i18n:translate>Tomorrow</button>
+                <button type="button" ic-post-to="${action}&preset=end_of_week" ic-target="#ticket-due-date" title="${presets['end_of_week']}" i18n:translate>End of this week</button>
+                <button type="button" ic-post-to="${action}&preset=in_one_week" ic-target="#ticket-due-date" title="${presets['in_one_week']}" i18n:translate>In one week</button>
                 <label class="due-date-custom">
                     <span i18n:translate>Custom</span>
-                    <input type="date" name="date" data-auto-submit="true" value="${ticket.due_date and ticket.due_date.isoformat() or ''}">
+                    <input type="date" name="date" ic-post-to="${action}" ic-target="#ticket-due-date" value="${ticket.due_date and ticket.due_date.isoformat() or ''}">
                 </label>
-                <button tal:condition="current" type="submit" name="clear" value="1" class="due-date-clear" i18n:translate>Clear</button>
-            </form>
+                <button tal:condition="current" type="button" ic-post-to="${action}&clear=1" ic-target="#ticket-due-date" class="due-date-clear" i18n:translate>Clear</button>
+            </div>
         </details>
     </tal:b>
 </metal:due_date>

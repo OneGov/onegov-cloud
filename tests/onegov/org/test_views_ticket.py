@@ -1235,7 +1235,8 @@ def test_ticket_due_date(client: Client) -> None:
 
     def due_date_action() -> str:
         page = client.get(ticket_url)
-        return page.pyquery('form.due-date-menu').attr('action')
+        return page.pyquery(
+            '.due-date-menu input[name="date"]').attr('ic-post-to')
 
     from onegov.ticket import TicketCollection
 
@@ -1257,12 +1258,30 @@ def test_ticket_due_date(client: Client) -> None:
     client.post(due_date_action(), {'preset': 'tomorrow'})
     assert stored_due_date() == date.today() + timedelta(days=1)
 
+    client.post(due_date_action(), {'preset': 'end_of_week'})
+    today = date.today()
+    assert stored_due_date() == today + timedelta(
+        days=(4 - today.weekday()) % 7
+    )
+
     client.post(due_date_action(), {'preset': 'in_one_week'})
     assert stored_due_date() == date.today() + timedelta(days=7)
 
     # a custom date
     client.post(due_date_action(), {'date': '2030-01-15'})
     assert stored_due_date() == date(2030, 1, 15)
+
+    # a malformed date is rejected and leaves the due date unchanged
+    client.post(due_date_action(), {'date': 'not-a-date'}).follow()
+    assert stored_due_date() == date(2030, 1, 15)
+
+    # intercooler requests only return the due-date panel fragment
+    fragment = client.post(
+        due_date_action(), {'preset': 'today'},
+        headers={'X-IC-Request': 'true'})
+    assert stored_due_date() == date.today()
+    assert 'due-date-menu' in fragment.text
+    assert '<html' not in fragment.text.lower()
 
     # shows up in the due_dated filter and the menu count
     page = client.get('/tickets/ALL/due_dated')
