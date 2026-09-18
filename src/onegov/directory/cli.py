@@ -105,7 +105,7 @@ def import_directory_from_ogi_scraper(
             if not os.path.exists(path):
                 click.secho(f'  missing image {rel}', fg='red')
                 return {}
-            return Bunch(data=object(), file=open(path, 'rb'),  # noqa: SIM115
+            return Bunch(data=object(), file=open(path, 'rb'),
                          filename=os.path.basename(path))
 
         created = 0
