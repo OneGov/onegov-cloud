@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 
 import click
@@ -510,6 +511,120 @@ def import_horw(
                         orgs.extend(f'-{s}' for s in subs_by_top[top])
                     if orgs:
                         extra['organisations_multiple'] = orgs
+
+            _upsert_horw_person(people, first_name, last_name, extra)
+            count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho(
+                f'Dry run: would import {count} person(s)', fg='yellow')
+        else:
+            click.secho(f'Imported {count} person(s)', fg='green')
+        if errors:
+            click.secho(f'{errors} org/sub-org error(s)', fg='red')
+
+    return _import
+
+
+def _build_valid_orgs(app: Framework) -> dict[str, set[str]]:
+    """Read the configured organisation_hierarchy as {top: {sub, ...}}."""
+    hierarchy = getattr(
+        getattr(app, 'org', None), 'organisation_hierarchy', None
+    ) or []
+    valid_orgs: dict[str, set[str]] = {}
+    for item in hierarchy:
+        if isinstance(item, dict):
+            for top, subs in item.items():
+                valid_orgs[top] = set(subs or ())
+        elif isinstance(item, str):
+            valid_orgs[item] = set()
+    return valid_orgs
+
+
+@cli.command('import-from-ogi-scraper')
+@click.argument('file', type=click.Path(exists=True))
+@click.option('--dry-run', is_flag=True, default=False)
+def import_from_ogi_scraper(
+    file: str,
+    dry_run: bool,
+) -> Callable[[CoreRequest, Framework], None]:
+    """ Imports people from an ogi-scraper ``people.json`` export.
+
+    The file is the JSON produced by ogi-scraper (e.g. the Malters
+    ``get_malters_people.py`` script): a list of person records with
+    ``first_name``, ``last_name``, ``function``, ``email``, ``phone``,
+    ``location_address``, ``location_code_city`` and
+    ``organisations_multiple`` -- a flat list where each top-level
+    organisation is followed by its ``-``-prefixed sub-organisations.
+
+    People are matched by email, then by name, and updated in place, so the
+    import is idempotent and can be re-run without creating duplicates.
+    Organisations are validated against the configured
+    ``organisation_hierarchy``.
+
+    Example:
+
+        onegov-people --select /onegov_town6/abc \
+            import-from-ogi-scraper people.json
+
+    """
+
+    def _import(request: CoreRequest, app: Framework) -> None:
+        session = app.session()
+        people = PersonCollection(session)
+
+        with open(file, encoding='utf-8') as f:
+            records = json.load(f)
+        if not isinstance(records, list):
+            click.secho('Expected a JSON list of people', fg='red')
+            return
+
+        valid_orgs = _build_valid_orgs(app)
+
+        def validate_orgs(orgs: list[str], label: str) -> int:
+            errs = 0
+            current_top: str | None = None
+            for entry in orgs:
+                if entry.startswith('-'):
+                    sub = entry[1:]
+                    if valid_orgs and (
+                        current_top is None
+                        or sub not in valid_orgs.get(current_top, set())
+                    ):
+                        click.secho(
+                            f'{label}: sub-org {sub!r} not under '
+                            f'{current_top!r} in hierarchy', fg='red')
+                        errs += 1
+                else:
+                    current_top = entry
+                    if valid_orgs and entry not in valid_orgs:
+                        click.secho(
+                            f'{label}: org {entry!r} not in hierarchy',
+                            fg='red')
+                        errs += 1
+            return errs
+
+        count = 0
+        errors = 0
+        for rec in records:
+            first_name = (rec.get('first_name') or '').strip()
+            last_name = (rec.get('last_name') or '').strip()
+            if not first_name and not last_name:
+                continue
+
+            label = f'{last_name} {first_name}'.strip()
+            orgs = rec.get('organisations_multiple') or []
+            errors += validate_orgs(orgs, label)
+
+            extra: dict[str, object] = {}
+            for key in ('function', 'email', 'phone', 'location_address',
+                        'location_code_city'):
+                value = rec.get(key)
+                if value:
+                    extra[key] = value
+            if orgs:
+                extra['organisations_multiple'] = orgs
 
             _upsert_horw_person(people, first_name, last_name, extra)
             count += 1

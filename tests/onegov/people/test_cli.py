@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from click.testing import CliRunner
 from onegov.people.cli import cli
 from onegov.people.models import Person
@@ -9,7 +11,7 @@ import transaction
 from transaction import commit
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
 
@@ -207,3 +209,109 @@ def test_cli(
     flash = session.query(Person).filter_by(last_name='Gordon').one()
     assert flash.first_name == 'Flash'
     assert flash.function == 'Hero'
+
+
+def test_import_from_ogi_scraper(
+    cfg_path: str,
+    session_manager: SessionManager,
+    temporary_directory: str
+) -> None:
+
+    runner = CliRunner()
+
+    records: list[dict[str, Any]] = [
+        {
+            'person_id': '1',
+            'first_name': 'Hans',
+            'last_name': 'Muster',
+            'function': 'Leiter Kanzlei',
+            'email': 'hans.muster@example.org',
+            'phone': '000 000 00 01',
+            'location_address': 'Musterstrasse 1',
+            'location_code_city': '0000 Musterhausen',
+            'organisations_multiple': [
+                'Verwaltung', '-Gemeindekanzlei', '-Personal'],
+        },
+        {
+            'person_id': '2',
+            'first_name': 'Erika',
+            'last_name': 'Beispiel',
+            'function': None,
+            'email': None,
+            'phone': None,
+            'location_address': 'Beispielweg 2',
+            'location_code_city': '0000 Musterhausen',
+            'organisations_multiple': [
+                'Behörden', '-Kommission für Altersfragen'],
+        },
+    ]
+    path = Path(temporary_directory) / 'people.json'
+    path.write_text(json.dumps(records), encoding='utf-8')
+
+    session = session_manager.session()
+
+    # Import
+    result = runner.invoke(cli, [
+        '--config', cfg_path, '--select', '/foo/bar',
+        'import-from-ogi-scraper', str(path)
+    ])
+    assert result.exit_code == 0
+    assert 'Imported 2 person(s)' in result.output
+    assert session.query(Person).count() == 2
+
+    hans = session.query(Person).filter_by(last_name='Muster').one()
+    assert hans.first_name == 'Hans'
+    assert hans.function == 'Leiter Kanzlei'
+    assert hans.email == 'hans.muster@example.org'
+    assert hans.phone == '000 000 00 01'
+    assert hans.location_address == 'Musterstrasse 1'
+    assert hans.location_code_city == '0000 Musterhausen'
+    assert hans.organisations_multiple == [
+        'Verwaltung', '-Gemeindekanzlei', '-Personal']
+
+    # person without email is matched by name; imported fine
+    erika = session.query(Person).filter_by(last_name='Beispiel').one()
+    assert erika.email is None
+    assert erika.organisations_multiple == [
+        'Behörden', '-Kommission für Altersfragen']
+
+    # Re-run: idempotent, no duplicates
+    result = runner.invoke(cli, [
+        '--config', cfg_path, '--select', '/foo/bar',
+        'import-from-ogi-scraper', str(path)
+    ])
+    assert result.exit_code == 0
+    session.expunge_all()
+    assert session.query(Person).count() == 2
+
+    # Update an existing person (matched by email); org list replaced,
+    # new function appended
+    records[0]['function'] = 'Gemeindeschreiber'
+    records[0]['phone'] = '000 000 00 02'
+    records[0]['organisations_multiple'] = ['Verwaltung', '-Gemeindekanzlei']
+    path.write_text(json.dumps(records), encoding='utf-8')
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path, '--select', '/foo/bar',
+        'import-from-ogi-scraper', str(path)
+    ])
+    assert result.exit_code == 0
+    session.expunge_all()
+    assert session.query(Person).count() == 2
+    hans = session.query(Person).filter_by(last_name='Muster').one()
+    assert hans.phone == '000 000 00 02'
+    assert hans.organisations_multiple == ['Verwaltung', '-Gemeindekanzlei']
+    assert 'Gemeindeschreiber' in (hans.function or '')
+
+    # Dry-run must not persist
+    records[0]['phone'] = '000 000 00 99'
+    path.write_text(json.dumps(records), encoding='utf-8')
+    result = runner.invoke(cli, [
+        '--config', cfg_path, '--select', '/foo/bar',
+        'import-from-ogi-scraper', str(path), '--dry-run'
+    ])
+    assert result.exit_code == 0
+    assert 'Dry run: would import 2 person(s)' in result.output
+    session.expunge_all()
+    hans = session.query(Person).filter_by(last_name='Muster').one()
+    assert hans.phone == '000 000 00 02', 'dry-run must not commit'
