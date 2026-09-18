@@ -981,6 +981,30 @@ msgstr "Abgeschlossen"
 msgid "Archived"
 msgstr "Archiviert"
 
+msgid "No due date"
+msgstr "Kein Fälligkeitsdatum"
+
+msgid "Set due date"
+msgstr "Fälligkeit setzen"
+
+msgid "Today"
+msgstr "Heute"
+
+msgid "Tomorrow"
+msgstr "Morgen"
+
+msgid "End of this week"
+msgstr "Ende dieser Woche"
+
+msgid "In one week"
+msgstr "In einer Woche"
+
+msgid "Custom"
+msgstr "Eigene"
+
+msgid "Clear"
+msgstr "Löschen"
+
 msgid "Paid"
 msgstr "Bezahlt"
 
@@ -1351,6 +1375,15 @@ msgstr "${name} wurde am ${date} mit einem digitalen Siegel versehen"
 
 msgid "${name} is not in our database"
 msgstr "${name} ist nicht in unserer Datenbank"
+
+msgid "Group"
+msgstr "Gruppe"
+
+msgid "Due Date"
+msgstr "Fälligkeitsdatum"
+
+msgid "User"
+msgstr "Benutzer"
 
 msgid "Accept"
 msgstr "Annehmen"
@@ -1898,6 +1931,15 @@ msgstr "Anfrageverlauf"
 
 msgid "Thank you for your request."
 msgstr "Vielen Dank für Ihre Anfrage."
+
+msgid "The following tickets assigned to you are overdue:"
+msgstr "Die folgenden Ihnen zugewiesenen Tickets sind überfällig:"
+
+msgid "due"
+msgstr "fällig am"
+
+msgid "The following tickets assigned to you are due today:"
+msgstr "Die folgenden Ihnen zugewiesenen Tickets sind heute fällig:"
 
 msgid "Your request has been registered with the following reference:"
 msgstr "Ihre Anfrage wurde unter der folgenden Referenz registriert:"
@@ -2690,9 +2732,6 @@ msgstr "Kostenlos"
 msgid "View Invoice"
 msgstr "Rechnung anzeigen"
 
-msgid "Group"
-msgstr "Gruppe"
-
 msgid "Change tag"
 msgstr "Schlagwort ändern"
 
@@ -2799,7 +2838,7 @@ msgid "Internal Comments"
 msgstr "Internes Kommentarfeld"
 
 msgid "Keywords"
-msgstr ""
+msgstr "Schlagworte"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -3205,3 +3244,9 @@ msgstr "Neue Notiz"
 
 #~ msgid "Party"
 #~ msgstr "Party"
+
+#~ msgid "Invalid date"
+#~ msgstr "Ungültiges Datum"
+
+#~ msgid "Due Dated Tickets"
+#~ msgstr "Fällige Tickets"

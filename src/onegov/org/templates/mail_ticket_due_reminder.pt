@@ -1,0 +1,29 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Good morning,</p>
+
+        <tal:b tal:condition="overdue">
+            <p i18n:translate>The following tickets assigned to you are overdue:</p>
+            <ul>
+                <li tal:repeat="ticket overdue">
+                    <a href="${ticket['link']}">${ticket['number']}</a>
+                    (<span i18n:translate>due</span> ${ticket['due_date']})
+                </li>
+            </ul>
+        </tal:b>
+
+        <tal:b tal:condition="due_today">
+            <p i18n:translate>The following tickets assigned to you are due today:</p>
+            <ul>
+                <li tal:repeat="ticket due_today">
+                    <a href="${ticket['link']}">${ticket['number']}</a>
+                </li>
+            </ul>
+        </tal:b>
+
+        <p i18n:translate>Have a great day!</p>
+    </tal:b>
+</div>

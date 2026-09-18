@@ -983,6 +983,30 @@ msgstr "Chiuso"
 msgid "Archived"
 msgstr "Fare Archivio"
 
+msgid "No due date"
+msgstr "Nessuna scadenza"
+
+msgid "Set due date"
+msgstr "Imposta scadenza"
+
+msgid "Today"
+msgstr "Oggi"
+
+msgid "Tomorrow"
+msgstr "Domani"
+
+msgid "End of this week"
+msgstr "Fine di questa settimana"
+
+msgid "In one week"
+msgstr "Tra una settimana"
+
+msgid "Custom"
+msgstr "Personalizzato"
+
+msgid "Clear"
+msgstr "Cancella"
+
 msgid "Paid"
 msgstr "Pagato"
 
@@ -1352,6 +1376,15 @@ msgstr "${name} è stato dotato di sigillo digitale il ${date}"
 
 msgid "${name} is not in our database"
 msgstr "${name} non è contenuto nel nostro database"
+
+msgid "Group"
+msgstr "Gruppo"
+
+msgid "Due Date"
+msgstr "Data di scadenza"
+
+msgid "User"
+msgstr "Utente"
 
 msgid "Accept"
 msgstr "Accetta"
@@ -1892,6 +1925,15 @@ msgstr "Cronologia delle richieste"
 
 msgid "Thank you for your request."
 msgstr "Ti ringraziamo per la tua richiesta."
+
+msgid "The following tickets assigned to you are overdue:"
+msgstr "I seguenti ticket a lei assegnati sono in ritardo:"
+
+msgid "due"
+msgstr "scadenza"
+
+msgid "The following tickets assigned to you are due today:"
+msgstr "I seguenti ticket a lei assegnati scadono oggi:"
 
 msgid "Your request has been registered with the following reference:"
 msgstr "La tua richiesta è stata registrata con il seguente riferimento:"
@@ -2688,9 +2730,6 @@ msgstr "Gratuito"
 msgid "View Invoice"
 msgstr "Visualizza fattura"
 
-msgid "Group"
-msgstr "Gruppo"
-
 msgid "Change tag"
 msgstr "Modificare il tag"
 
@@ -2799,7 +2838,7 @@ msgid "Internal Comments"
 msgstr "Commenti interni"
 
 msgid "Keywords"
-msgstr ""
+msgstr "Parole chiave"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
@@ -3167,3 +3206,9 @@ msgstr "Nuova nota"
 
 #~ msgid "Parties"
 #~ msgstr "Partiti"
+
+#~ msgid "Invalid date"
+#~ msgstr "Data non valida"
+
+#~ msgid "Due Dated Tickets"
+#~ msgstr "Tickets con scadenza"

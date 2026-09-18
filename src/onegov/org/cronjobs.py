@@ -568,6 +568,61 @@ def send_monthly_ticket_statistics(request: OrgRequest) -> None:
         )
 
 
+@OrgApp.cronjob(hour=6, minute=5, timezone='Europe/Zurich')
+def send_daily_ticket_due_date_reminders(request: OrgRequest) -> None:
+    """ Reminds each ticket owner of their tickets due today or overdue. """
+
+    today = to_timezone(utcnow(), 'Europe/Zurich').date()
+    app = request.app
+
+    tickets = (
+        TicketCollection(app.session()).query()
+        .filter(Ticket.due_date <= today)
+        .filter(Ticket.state.notin_(('closed', 'archived')))
+        .filter(Ticket.user_id.isnot(None))
+        .options(joinedload(Ticket.user))
+        .order_by(Ticket.user_id, Ticket.due_date, Ticket.created)
+    )
+
+    layout = DefaultMailLayout(object(), request)
+
+    title = request.translate(
+        _('${org}: Tickets due today', mapping={'org': app.org.title})
+    )
+
+    # note: no ticket title -> it may contain personal information
+    def row(ticket: Ticket) -> dict[str, Any]:
+        return {
+            'number': ticket.number,
+            'due_date': layout.format_date(ticket.due_date, 'date'),
+            'link': request.link(ticket),
+        }
+
+    # send one e-mail per user, split into overdue and due-today sections
+    for user, user_tickets in groupby(tickets, key=lambda t: t.user):
+        overdue: list[dict[str, Any]] = []
+        due_today: list[dict[str, Any]] = []
+        for ticket in user_tickets:
+            # due_date is never None here (filtered in the query)
+            assert ticket.due_date is not None
+            target = overdue if ticket.due_date < today else due_today
+            target.append(row(ticket))
+
+        content = render_template('mail_ticket_due_reminder.pt', request, {
+            'layout': layout,
+            'title': title,
+            'org': app.org.title,
+            'overdue': overdue,
+            'due_today': due_today,
+        })
+
+        app.send_transactional_email(
+            subject=title,
+            receivers=(user.username, ),
+            content=content,
+        )
+
+
 @OrgApp.cronjob(hour='*', minute='*/5', timezone='Europe/Zurich')
 def send_daily_resource_usage_overview(request: OrgRequest) -> None:
     today = to_timezone(utcnow(), 'Europe/Zurich')
