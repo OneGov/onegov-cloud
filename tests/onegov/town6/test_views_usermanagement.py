@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 
-import importlib
 
 import pytest
 
@@ -49,10 +48,8 @@ def test_new_feature_close_and_read(
         encoding='utf-8'
     )
 
-    town6_layout = importlib.import_module('onegov.town6.layout')
     monkeypatch.setattr(
-        town6_layout,
-        '__file__',
+        'onegov.town6.layout.__file__',
         str(tmp_path / 'src' / 'onegov' / 'town6' / 'layout.py')
     )
 

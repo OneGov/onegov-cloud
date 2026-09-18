@@ -58,8 +58,6 @@ def add_release_features_column(context: UpgradeContext) -> None:
     context.operations.add_column(
         'users', Column('release_features', Text, nullable=True))
 
-    context.session.flush()
-
 
 def change_ownership_by_name(
     context: UpgradeContext,

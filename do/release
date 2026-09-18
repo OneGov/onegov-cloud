@@ -154,10 +154,6 @@ function archive-current-release() {
             continue
         fi
 
-        if [[ "$file" == "$release_dir" ]]; then
-            continue
-        fi
-
         mv -- "$file" "$release_dir/"
     done
 }
