@@ -205,9 +205,6 @@ def import_zug_kub_data(
         ]
 
         log_status = 'completed'
-        logger.info(
-            'KUB data import processing successful within transaction.'
-        )
     except Exception as e:
         savepoint.rollback()
         final_error = e
@@ -233,19 +230,10 @@ def import_zug_kub_data(
                 # Add import log ID to import details for redirect
                 import_details['_import_log_id'] = import_log.id  # type: ignore
 
-                logger.info(
-                    f'KUB data import attempt logged with status: {log_status}'
-                )
             except Exception:
                 logger.exception(
                     'Failed to log import status'
                 )
-        else:
-            # ImportLog creation is handled by the orchestrator
-            logger.info(
-                f'KUB data import completed with status: {log_status}'
-            )
-
         if final_error:
             raise RuntimeError('KUB data import failed.') from final_error
 

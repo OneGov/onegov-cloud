@@ -419,7 +419,10 @@ class PoliticalBusinessCollection(
         """ Returns the given political business by display name or None. """
         return (
             self.query()
-            .filter(PoliticalBusiness.display_name == display_name)
+            .filter(
+                func.trim(PoliticalBusiness.display_name)
+                == display_name.strip()
+            )
             .first()
         )
 

@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -194,15 +195,15 @@ def view_registration_window(
         FormSubmission.data['name'],
         FormSubmission.data['vorname'],
     )
-    has_pending_or_confirmed = False
+    deletable = True
 
     for submission in q:
         if not submission.registration_state:
             continue
 
         registrations[submission.registration_state].append(submission)
-        if submission.registration_state != 'cancelled':
-            has_pending_or_confirmed = True
+        if submission.registration_state == 'open':
+            deletable = False
 
     if request.is_manager:
         edit_url = request.link(self, 'edit')
@@ -276,11 +277,11 @@ def view_registration_window(
                         request_method='DELETE',
                         redirect_after=redirect_after_delete
                     )
-                ) if not has_pending_or_confirmed else (
+                ) if deletable else (
                     Block(
                         _("This registration window can't be deleted."),
-                        _('There are confirmed or open submissions associated '
-                          'with it. Cancel the registration window first.'),
+                        _('There are open submissions associated with it. '
+                          'Cancel the registration window first.'),
                         _('Cancel')
                     )
                 )

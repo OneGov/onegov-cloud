@@ -485,6 +485,22 @@ class UpgradeContext:
             }
         ).scalar_one()
 
+    def is_nullable(self, table_name: str, column_name: str) -> bool:
+        return self.session.execute(
+            text("""
+                SELECT is_nullable = 'YES'
+                FROM information_schema.columns
+                WHERE table_name = :table_name
+                  AND column_name = :column_name
+                  AND table_schema = :schema
+            """),
+            {
+                'schema': self.schema,
+                'table_name': table_name,
+                'column_name': column_name,
+            }
+        ).scalar_one()
+
     def has_table(self, table: str) -> bool:
         inspector = Inspector(self.operations_connection)
         return table in inspector.get_table_names(schema=self.schema)

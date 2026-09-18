@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import html
+import turbohtml
 
 from mistletoe import Document, HtmlRenderer
 from onegov.core.html import sanitize_html
@@ -19,11 +19,11 @@ class HTMLRendererWithoutInlineHtml(HtmlRenderer):
 
     @staticmethod
     def render_html_block(token: HTMLBlock) -> str:
-        return html.escape(token.content)
+        return turbohtml.escape(token.content)
 
     @staticmethod
     def render_html_span(token: HTMLSpan) -> str:
-        return html.escape(token.content)
+        return turbohtml.escape(token.content)
 
 
 def render_untrusted_markdown(

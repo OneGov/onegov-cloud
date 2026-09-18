@@ -17,6 +17,7 @@ from onegov.newsletter import Newsletter
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
     Layout as OrgLayout,
+    AuditTrailLayout as OrgAuditTrailLayout,
     DefaultLayout as OrgDefaultLayout,
     DefaultMailLayout as OrgDefaultMailLayout,
     AdjacencyListLayout as OrgAdjacencyListLayout,
@@ -740,6 +741,12 @@ class ImageSetCollectionLayout(OrgImageSetCollectionLayout, DefaultLayout):
 
 @TownApp.layout(model=ImageSet)
 class ImageSetLayout(OrgImageSetLayout, DefaultLayout):
+
+    app: TownApp
+    request: TownRequest
+
+
+class AuditTrailLayout(OrgAuditTrailLayout, DefaultLayout):
 
     app: TownApp
     request: TownRequest

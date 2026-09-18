@@ -6,6 +6,7 @@ from onegov.org.forms import (
     KabaEditForm,
     InternalTicketChatMessageForm,
     ReservationAdjustmentForm,
+    ReservationTicketChatMessageForm,
 )
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.views.reservation import (
@@ -91,13 +92,13 @@ def town_finalize_reservation(
     model=Reservation,
     name='accept-with-message',
     permission=Private,
-    form=InternalTicketChatMessageForm,
+    form=ReservationTicketChatMessageForm,
     template='form.pt'
 )
 def town_accept_reservation_with_message(
     self: Reservation,
     request: TownRequest,
-    form: InternalTicketChatMessageForm
+    form: ReservationTicketChatMessageForm,
 ) -> RenderData | Response:
     layout = TicketChatMessageLayout(self, request)  # type:ignore
     return accept_reservation_with_message(self, request, form, layout)
@@ -107,13 +108,13 @@ def town_accept_reservation_with_message(
     model=ReservationTicket,
     name='accept-reservation-with-message',
     permission=Private,
-    form=InternalTicketChatMessageForm,
+    form=ReservationTicketChatMessageForm,
     template='form.pt'
 )
 def town_accept_reservation_with_message_from_ticket(
     self: ReservationTicket,
     request: TownRequest,
-    form: InternalTicketChatMessageForm,
+    form: ReservationTicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None
 ) -> RenderData | Response | None:
     layout = TicketChatMessageLayout(self, request, internal=True)

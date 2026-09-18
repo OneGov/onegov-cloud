@@ -30,6 +30,7 @@ from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Dashboard, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
+from onegov.page.audit import register_page_auditing
 from onegov.pay import PayApp, log as pay_log
 from onegov.reservation import LibresIntegration
 from onegov.search import SearchApp
@@ -107,6 +108,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
 
     def configure_application(self, **cfg: Any) -> None:
         super().configure_application(**cfg)
+        register_page_auditing()
         self.known_schemas = set()
 
         if self.has_database_connection:
@@ -338,7 +340,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
     def font_family(self) -> str | None:
         return self.theme_options.get('font-family-sans-serif')
 
-    @property
+    @request_cached
     def custom_event_tags(self) -> list[str] | None:
         return self.cache.get_or_create(
             'custom_event_tags', self.load_custom_event_tags

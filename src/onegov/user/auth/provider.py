@@ -45,6 +45,8 @@ if TYPE_CHECKING:
 
 AUTHENTICATION_PROVIDERS: dict[str, type[AuthenticationProvider]] = {}
 
+type RoleGroupNames = str | list[str]
+
 
 class Conclusion:
     """ A final answer of :meth:`AuthenticationProvider`. """
@@ -341,7 +343,7 @@ def ensure_user(
 
 @attrs(auto_attribs=True)
 class RolesMapping:
-    """ Takes a role mapping and provides access to it.
+    """Takes a role mapping and provides access to it.
 
     A role mapping maps a onegov-cloud role to an LDAP role. For example:
 
@@ -354,17 +356,18 @@ class RolesMapping:
        * "onegov_org"          Namespace specific config
        * "onegov_org/govikon"  Application specific config
 
-    Each level contains a group name for admins, editors and members.
+    Each level contains one or more group names for admins, editors and
+    members.
     See onegov.yml.example for an illustrated example.
 
     """
 
-    roles: dict[str, dict[str, str]]
+    roles: Mapping[str, Mapping[str, RoleGroupNames]]
 
     def app_specific(
         self,
         app: HasApplicationIdAndNamespace
-    ) -> dict[str, str] | None:
+    ) -> Mapping[str, RoleGroupNames] | None:
 
         if app.application_id in self.roles:
             return self.roles[app.application_id]
@@ -377,9 +380,7 @@ class RolesMapping:
         return self.roles.get('__default__')
 
     def match(
-        self,
-        roles: Mapping[str, str],
-        groups: Collection[str]
+        self, roles: Mapping[str, RoleGroupNames], groups: Collection[str]
     ) -> str | None:
         """ Takes a role mapping (the fallback, namespace, or app specific one)
         and matches it against the given LDAP groups.
@@ -390,10 +391,12 @@ class RolesMapping:
         groups = {g.lower() for g in groups}
 
         for role in ('admin', 'editor', 'supporter', 'member'):
-            if (
-                (group := roles.get(f'{role}s', None)) is not None
-                and group.lower() in groups
-            ):
+            role_groups = roles.get(f'{role}s')
+            if role_groups is None:
+                continue
+            if isinstance(role_groups, str):
+                role_groups = [role_groups]
+            if any(group.lower() in groups for group in role_groups):
                 return role
 
         return None
