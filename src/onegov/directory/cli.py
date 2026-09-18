@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 import json
+import os
 
 import click
 import transaction
 
 from onegov.core.cli import command_group
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import DirectoryCollection
 from onegov.directory.types import DirectoryConfiguration
 
@@ -90,7 +91,22 @@ def import_directory_from_ogi_scraper(
             click.secho(f'Using existing directory {title!r}', fg='yellow')
 
         field_ids = [f.id for f in directory.basic_fields]
+        file_field_ids = [f.id for f in directory.file_fields]
         existing = {entry.name: entry for entry in directory.entries}
+        # image paths in the export are relative to the json file's directory
+        base_dir = os.path.dirname(os.path.abspath(file))
+
+        def file_value(rec: dict[str, Any], fid: str) -> Any:
+            """A Bunch(file, filename) for an image field, or {} if none."""
+            rel = rec.get(mapping.get(fid, ''), '')
+            if not rel:
+                return {}
+            path = os.path.join(base_dir, rel)
+            if not os.path.exists(path):
+                click.secho(f'  missing image {rel}', fg='red')
+                return {}
+            return Bunch(data=object(), file=open(path, 'rb'),  # noqa: SIM115
+                         filename=os.path.basename(path))
 
         created = 0
         updated = 0
@@ -100,6 +116,8 @@ def import_directory_from_ogi_scraper(
             for fid, key in mapping.items():
                 if fid in values:
                     values[fid] = rec.get(key) or ''
+            for fid in file_field_ids:
+                values[fid] = file_value(rec, fid)
 
             entry_title = directory.configuration.extract_title(values)
             if not entry_title:
