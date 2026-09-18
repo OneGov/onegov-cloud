@@ -29,7 +29,7 @@
                 <div class="sidebar-wrapper">
                     <div class="side-panel">
                         <div tal:condition="commission.description">
-                            <h2 class="h3" i18n:translate>Contact</h2>
+                            <h2 class="h3" i18n:translate>Description</h2>
                             <div>${commission.description}</div>
                         </div>
                         <div tal:condition="commission.start">

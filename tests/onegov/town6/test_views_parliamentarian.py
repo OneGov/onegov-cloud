@@ -226,6 +226,7 @@ def test_parliamentarians(client: Client) -> None:
     # delete commissions
     commission_page = client.get('/commissions').click('Verkehrskommission')
     assert 'Kommissionsmitglieder' in commission_page
+    assert 'Beschreibung' in commission_page  # sidebar
     commission_page.click('Löschen')
     commissions = client.get('/commissions')
     assert 'Keine aktiven Kommissionen' in commissions
@@ -235,6 +236,7 @@ def test_parliamentarians(client: Client) -> None:
         'Die Moderne Fraktion'
     )
     assert 'Fraktionsmitglieder' in group_page
+    assert 'Beschreibung' in commission_page  # sidebar
     group_page.click('Löschen')
     (client.get('/parliamentary-groups')
      .click('Old Party').click('Löschen'))
