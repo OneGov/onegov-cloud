@@ -25,6 +25,12 @@ msgstr "Politische Geschäfte"
 msgid "Parliamentarians"
 msgstr "Parlamentsmitglieder"
 
+msgid "Commission members"
+msgstr "Kommissionsmitglieder"
+
+msgid "Parliamentary group members"
+msgstr "Fraktionsmitglieder"
+
 msgid "Commissions"
 msgstr "Kommissionen"
 

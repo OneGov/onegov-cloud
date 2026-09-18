@@ -17,6 +17,12 @@ msgstr "Attività politico"
 msgid "Parliamentarians"
 msgstr "Parlamentari"
 
+msgid "Commission members"
+msgstr "Membri della commissione"
+
+msgid "Parliamentary group members"
+msgstr "Membri del gruppo parlamentare"
+
 msgid "Commissions"
 msgstr "Commissioni"
 

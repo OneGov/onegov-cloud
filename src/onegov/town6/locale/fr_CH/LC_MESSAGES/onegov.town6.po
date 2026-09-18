@@ -25,6 +25,12 @@ msgstr "Affaires politiques"
 msgid "Parliamentarians"
 msgstr "Parlementaires"
 
+msgid "Commission members"
+msgstr "Membres de la commission"
+
+msgid "Parliamentary group members"
+msgstr "Membres du groupe parlementaire"
+
 msgid "Commissions"
 msgstr "Commissions"
 
