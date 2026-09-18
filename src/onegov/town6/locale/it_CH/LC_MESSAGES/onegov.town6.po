@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-09-15 11:37+0200\n"
+"POT-Creation-Date: 2026-09-18 10:37+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -487,6 +487,9 @@ msgstr "Chat attive"
 
 msgid "No active chats."
 msgstr "Nessuna chat attiva."
+
+msgid "Commission members"
+msgstr "Membri della commissione"
 
 #, fuzzy
 msgid "Contact"
@@ -2320,6 +2323,9 @@ msgstr "Ruolo"
 msgid "No filter results found or no parliamentarians defined yet."
 msgstr ""
 "Nessun risultato del filtro trovato o nessun parlamentare ancora definito."
+
+msgid "Parliamentary group members"
+msgstr "Membri del gruppo parlamentare"
 
 msgid "No parliamentary groups defined yet."
 msgstr "Nessun gruppo parlamentare ancora definito."

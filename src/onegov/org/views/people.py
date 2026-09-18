@@ -42,7 +42,7 @@ def organisations_as_dict(person: Person) -> dict[str, list[str]]:
 
 
 def get_top_level_organisations(
-        data: list[dict[str, list[str]] | str]) -> list[str]:
+        data: list[dict[str, list[str] | None] | str]) -> list[str]:
     top_level_organisations: list[str] = []
     for item in data:
         if isinstance(item, dict):
@@ -53,12 +53,12 @@ def get_top_level_organisations(
 
 
 def get_sub_organisations(
-        data: list[dict[str, list[str]] | str]) -> list[str]:
+        data: list[dict[str, list[str] | None] | str]) -> list[str]:
     sub_organisations: set[str] = set()
     for item in data:
         if isinstance(item, dict):
             for sub_orgs in item.values():
-                sub_organisations.update(sub_orgs)
+                sub_organisations.update(sub_orgs or [])
     return list(sub_organisations)
 
 
@@ -132,7 +132,7 @@ def view_people(
         index = top_orgs.index(selected_org)
         top_org = request.app.org.organisation_hierarchy[index]
         if isinstance(top_org, dict):
-            sub_orgs = top_org[selected_org]
+            sub_orgs = top_org[selected_org] or []
 
     if selected_sub_org and selected_sub_org not in sub_orgs:
         sub_orgs.append(selected_sub_org)
