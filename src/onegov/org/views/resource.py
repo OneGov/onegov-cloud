@@ -7,8 +7,6 @@ import morepath
 import secrets
 import sedate
 
-from uuid import UUID
-
 from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
@@ -56,6 +54,7 @@ from webob import exc
 
 from typing import cast, Any, NamedTuple, Self, TYPE_CHECKING
 if TYPE_CHECKING:
+    from uuid import UUID
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Mapping
     from libres.db.models import Reservation as BaseReservation
