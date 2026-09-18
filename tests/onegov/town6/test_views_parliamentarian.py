@@ -9,6 +9,38 @@ if TYPE_CHECKING:
     from .conftest import Client
 
 
+def test_parliamentary_group_members_sorted_by_name(client: Client) -> None:
+    client.login_admin()
+
+    settings = client.get('/module-activation-settings')
+    settings.form['ris_enabled'] = True
+    settings.form.submit()
+
+    page = client.get('/parliamentary-groups/new')
+    page.form['name'] = 'Fraktion'
+    page.form.submit()
+
+    # add members out of alphabetical order
+    for first, last in (('First', 'Zulu'), ('First', 'Alpha'),
+                        ('First', 'Mike')):
+        new = client.get('/parliamentarians/new')
+        new.form['first_name'] = first
+        new.form['last_name'] = last
+        new.form['email_primary'] = f'{last.lower()}@example.org'
+        parliamentarian = new.form.submit().follow()
+        role = parliamentarian.click('Neue Fraktionsfunktion')
+        options = role.form['parliamentary_group_id'].options
+        id = next(opt[0] for opt in options if opt[2] == 'Fraktion')
+        role.form['parliamentary_group_id'] = id
+        role.form['parliamentary_group_role'] = 'member'
+        role.form.submit()
+
+    group = client.get('/parliamentary-groups').click(
+        href='/parliamentary-group/')
+    body = group.text
+    assert body.index('Alpha') < body.index('Mike') < body.index('Zulu')
+
+
 def test_parliamentarians(client: Client) -> None:
     client.login_admin()
 
