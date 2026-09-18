@@ -312,9 +312,9 @@ def test_directory_entry_collection(session: Session) -> None:
         'genre', 'Rock'
     ).query().count() == 1
 
-    # test ordering
-    # FIXME: This used to assert reverse ordering, why has this changed?
-    #        was this bugged before? Or did it not get updated as eagerly?
+    # test ordering: expire so the relationship reloads in its order_by
+    # order instead of the (session-state dependent) insertion order
+    session.expire(directory, ['entries'])
     sorted_entries = sorted(directory.entries, key=lambda en: en.order)
     assert directory.entries == sorted_entries
     assert albums.query().all() == sorted_entries

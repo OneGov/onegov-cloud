@@ -3,6 +3,7 @@ from __future__ import annotations
 from markupsafe import Markup
 from onegov.org.models import Topic
 from onegov.org.request import OrgRequest
+from onegov.org.views.people import get_sub_organisations
 from onegov.org.views.people import person_functions_by_organization
 from onegov.people import Person
 from uuid import UUID
@@ -487,6 +488,11 @@ def test_delete_linked_person_issue_149(client: Client) -> None:
 
     # this used to throw an error before issue 149 was fixed
     edit_page.form.submit().follow()
+
+
+def test_get_sub_organisations_none_value() -> None:
+    # a top-level org written as "Org:" in the hierarchy yields a None value
+    assert get_sub_organisations(['A', {'B': None}, {'C': ['c1']}]) == ['c1']
 
 
 def test_context_specific_function(
