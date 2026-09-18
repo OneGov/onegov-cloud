@@ -86,9 +86,13 @@ def view_parliamentary_group(
     layout: RISParliamentaryGroupLayout | PASParliamentaryGroupLayout
 ) -> RenderData | Response:
 
-    active_roles = [
-        role for role in self.roles if not role.end
-    ]
+    active_roles = sorted(
+        (role for role in self.roles if not role.end),
+        key=lambda role: (
+            role.parliamentarian.last_name,
+            role.parliamentarian.first_name
+        )
+    )
 
     return {
         'layout': layout,
