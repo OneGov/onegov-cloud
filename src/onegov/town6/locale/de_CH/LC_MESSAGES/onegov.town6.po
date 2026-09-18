@@ -1863,6 +1863,9 @@ msgstr "Stornierung beantragen"
 msgid "See all your reservations"
 msgstr "Alle Ihre Reservationen einsehen"
 
+msgid "Subscribe to your reservations calendar"
+msgstr "Reservationskalender abonnieren"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
@@ -2501,6 +2504,12 @@ msgstr ""
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
 
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr "Dies ist eine limitierte Übersicht Ihrer bestätigten Reservationen."
+
+msgid "Log in for full details"
+msgstr "Für alle Details anmelden"
+
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
 
@@ -2799,7 +2808,7 @@ msgid "Internal Comments"
 msgstr "Internes Kommentarfeld"
 
 msgid "Keywords"
-msgstr ""
+msgstr "Schlagworte"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "

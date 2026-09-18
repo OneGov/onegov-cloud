@@ -1855,6 +1855,9 @@ msgstr "Richiedere la cancellazione"
 msgid "See all your reservations"
 msgstr "Vedere tutte le prenotazioni"
 
+msgid "Subscribe to your reservations calendar"
+msgstr "Abbonarsi al calendario delle prenotazioni"
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
@@ -2499,6 +2502,14 @@ msgstr ""
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
 
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr ""
+"State visualizzando un riepilogo limitato delle prenotazioni "
+"confermate."
+
+msgid "Log in for full details"
+msgstr "Accedere per tutti i dettagli"
+
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
 
@@ -2799,7 +2810,7 @@ msgid "Internal Comments"
 msgstr "Commenti interni"
 
 msgid "Keywords"
-msgstr ""
+msgstr "Parole chiave"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
