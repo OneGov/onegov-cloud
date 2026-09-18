@@ -192,13 +192,18 @@ def test_parliamentarians(client: Client) -> None:
                 'Parlamentarier erfasst') in page
 
     # delete commissions
-    client.get('/commissions').click('Verkehrskommission').click('Löschen')
+    commission_page = client.get('/commissions').click('Verkehrskommission')
+    assert 'Kommissionsmitglieder' in commission_page
+    commission_page.click('Löschen')
     commissions = client.get('/commissions')
     assert 'Keine aktiven Kommissionen' in commissions
 
     # delete parliamentary groups
-    (client.get('/parliamentary-groups')
-     .click('Die Moderne Fraktion').click('Löschen'))
+    group_page = client.get('/parliamentary-groups').click(
+        'Die Moderne Fraktion'
+    )
+    assert 'Fraktionsmitglieder' in group_page
+    group_page.click('Löschen')
     (client.get('/parliamentary-groups')
      .click('Old Party').click('Löschen'))
     groups = client.get('/parliamentary-groups')
