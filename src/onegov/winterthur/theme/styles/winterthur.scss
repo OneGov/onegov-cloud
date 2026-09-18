@@ -40,7 +40,6 @@ input[data-street-search]::placeholder {
 input[type="text"], input[type="password"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="week"], input[type="email"], input[type="number"], input[type="search"], input[type="tel"], input[type="time"], input[type="url"], input[type="color"], textarea, select, button.secondary.dropdown {
     border: 1px solid $gray-light;
     border-radius: 4px !important;
-    background-color: $white !important;
     box-shadow: none;
     color: $body-font-color;
 }
@@ -1258,7 +1257,7 @@ table.responsive {
     }
 }
 
-.page-content-main a,
+.page-content-main a:not(.re-icon),
 a.mission-nature-title,
 .side-panel.highlighted.without-title > ul:first-of-type:not(.bulleted) a {
     font-weight: bold;

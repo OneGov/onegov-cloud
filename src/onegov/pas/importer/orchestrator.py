@@ -77,10 +77,6 @@ def _fetch_custom_data_worker(
             ))
         except niquests.exceptions.HTTPError as e:
             if e.response is not None and e.response.status_code == 404:
-                log.warning(
-                    f'Person not found in API: {parliamentarian.title} '
-                    f'(ID: {person_id})'
-                )
                 result_queue.put(
                     UpdateResult(
                         parliamentarian_id=parliamentarian.id,
@@ -323,16 +319,18 @@ class KubImporter:
                     url = None
 
             except niquests.exceptions.RequestException as e:
-                log.warning(f'Failed to fetch from {endpoint}: {e}')
                 if self.output:
                     self.output.error(f'Failed to fetch from {endpoint}: {e}')
+                else:
+                    log.warning(f'Failed to fetch from {endpoint}: {e}')
                 break
             except ValueError as e:
-                log.warning(f'Invalid JSON response from {endpoint}: {e}')
                 if self.output:
                     self.output.error(
                         f'Invalid JSON response from {endpoint}: {e}'
                     )
+                else:
+                    log.warning(f'Invalid JSON response from {endpoint}: {e}')
                 break
 
         return all_results
@@ -384,11 +382,8 @@ class KubImporter:
             )
             if self.output:
                 self.output.error(warning_msg)
-            log.warning(
-                f'Found {len(parliamentarians_without_id)} parliamentarians '
-                f'without external_kub_id: {missing_names}. '
-                f'These will not be synchronized.'
-            )
+            else:
+                log.warning(warning_msg)
 
         if not parliamentarians_with_id:
             if self.output:
@@ -579,7 +574,6 @@ class KubImporter:
             try:
                 self._check_api_accessibility()
             except APIAccessibilityError as e:
-                log.warning(f'API accessibility check failed: {e}')
                 import_log.details.update(
                     {'error': str(e), 'status': 'failed'}
                 )
@@ -601,7 +595,6 @@ class KubImporter:
             people_raw = self._fetch_api_data_with_pagination('people')
             if not people_raw:
                 error_msg = 'Fetched 0 people records — aborting import'
-                log.warning(error_msg)
                 import_log.details.update(
                     {'error': error_msg, 'status': 'failed'}
                 )
@@ -609,6 +602,8 @@ class KubImporter:
                 import_log.status = 'failed'
                 if self.output:
                     self.output.error(error_msg)
+                else:
+                    log.warning(error_msg)
                 request.session.flush()
                 return (
                     {},

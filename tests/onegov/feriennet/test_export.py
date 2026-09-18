@@ -7,13 +7,15 @@ from onegov.activity import BookingPeriodInvoiceCollection
 from datetime import date
 from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
+from onegov.activity.models.volunteer import VolunteerState
 from onegov.feriennet.exports.booking import BookingExport
+from onegov.feriennet.exports.const import STATES
 from onegov.feriennet.exports.invoiceitem import InvoiceItemExport
 from onegov.pay import InvoiceReference
 from sqlalchemy import func
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, get_args, TYPE_CHECKING
 if TYPE_CHECKING:
     from uuid import UUID
     from .conftest import Client, Scenario
@@ -181,3 +183,8 @@ def test_exports(client: Client, scenario: Scenario) -> None:
     assert data['Attendee Political Municipality'] == 'Someotherplace'
     assert data['Attendee SwissPass ID'] == '123-456-789-0'
     assert data['Invoice Item Payment date'] == date(2020, 3, 5)
+
+
+def test_volunteer_states_are_all_exportable() -> None:
+    # STATES must cover every volunteer_state
+    assert set(STATES) == set(get_args(VolunteerState.__value__))

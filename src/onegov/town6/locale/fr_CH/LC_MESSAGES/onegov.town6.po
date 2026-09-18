@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-08-31 11:00+0200\n"
+"POT-Creation-Date: 2026-09-18 10:37+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -492,6 +492,9 @@ msgstr "Chats actifs"
 
 msgid "No active chats."
 msgstr "Aucun chat actif."
+
+msgid "Commission members"
+msgstr "Membres de la commission"
 
 msgid "Contact"
 msgstr "Contact"
@@ -2289,6 +2292,9 @@ msgid "No filter results found or no parliamentarians defined yet."
 msgstr ""
 "Aucun résultat de filtre trouvé ou aucun parlementaire n'a été défini pour "
 "le moment."
+
+msgid "Parliamentary group members"
+msgstr "Membres du groupe parlementaire"
 
 msgid "No parliamentary groups defined yet."
 msgstr "Aucun groupe parlementaire n'a été défini pour le moment."

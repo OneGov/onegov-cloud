@@ -40,7 +40,7 @@ from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
-        Callable, Collection, Iterable, Iterator, Sequence)
+        Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from libres.db.models import ReservationBlocker
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
@@ -1869,19 +1869,19 @@ def narrowest_access(*accesses: str) -> str:
 
 @overload
 def extract_categories_and_subcategories(
-    categories: Sequence[dict[str, list[str]] | str],
+    categories: Sequence[Mapping[str, Sequence[str] | None] | str],
     flattened: Literal[False] = False
 ) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
-    categories: Sequence[dict[str, list[str]] | str],
+    categories: Sequence[Mapping[str, Sequence[str] | None] | str],
     flattened: Literal[True]
 ) -> list[str]: ...
 
 
 def extract_categories_and_subcategories(
-    categories: Sequence[dict[str, list[str]] | str],
+    categories: Sequence[Mapping[str, Sequence[str] | None] | str],
     flattened: bool = False
 ) -> tuple[list[str], list[list[str]]] | list[str]:
     """
@@ -1908,13 +1908,13 @@ def extract_categories_and_subcategories(
         return cats, sub_cats
 
     for item in categories:
-        if isinstance(item, dict):
-            for topic, subs in item.items():
-                cats.append(topic)
-                sub_cats.append(subs or [])
-        else:
+        if isinstance(item, str):
             cats.append(item)
             sub_cats.append([])
+        else:
+            for topic, subs in item.items():
+                cats.append(topic)
+                sub_cats.append(list(subs) if subs else [])
 
     if flattened:
         cats.extend(
