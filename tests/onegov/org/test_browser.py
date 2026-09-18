@@ -176,8 +176,8 @@ def test_upload_image_with_error(
 
     assert browser.is_text_present("Seven Seas Motel")
 
-    # the image won't be there however (it gets cleared in between requests)
-    assert not browser.is_element_present_by_css('.field-display img')
+    # the resent upload is preserved across the validation error
+    assert browser.is_element_present_by_css('.field-display img')
 
 
 @pytest.mark.skip('Picture upload is needed to check scaling')

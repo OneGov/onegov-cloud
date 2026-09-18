@@ -16,7 +16,8 @@ from PIL import Image
 from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead, StrOrBytesPath
-    from collections.abc import Iterator
+    from collections.abc import Iterator, MutableSequence
+    from onegov.file.models import File
 
 
 def content_type_from_fileobj(fileobj: SupportsRead[bytes]) -> str:
@@ -58,6 +59,38 @@ def as_fileintent(
 
         return FileIntent(
             content, filename, content_type_from_fileobj(content))
+
+
+def store_uploaded_file[FileT: File](
+    file_cls: type[FileT],
+    files: MutableSequence[FileT],
+    note: str,
+    content: IO[bytes],
+    filename: str,
+) -> FileT:
+    """ Creates a file of the given type from an uploaded file, appends it to
+    the collection under the given note and returns it. Shared by form
+    submissions and directory entries so both persist uploads the same way. """
+    # lazy import to avoid a runtime dependency on onegov.core
+    from onegov.core.crypto import random_token
+
+    stored = file_cls(
+        id=random_token(),
+        name=filename,
+        note=note,
+        reference=as_fileintent(content=content, filename=filename),
+    )
+    files.append(stored)
+    return stored
+
+
+def is_stored_file_reference(value: object) -> bool:
+    """ Whether a submitted upload value references an already-stored file
+    (encoded as ``@<id>``) rather than being a new upload or a removal. """
+    return (
+        isinstance(value, dict)
+        and str(value.get('data', '')).startswith('@')
+    )
 
 
 @lru_cache(maxsize=1)

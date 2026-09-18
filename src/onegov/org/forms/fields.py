@@ -195,7 +195,7 @@ class UploadOrSelectExistingFileField(UploadOrLinkExistingFileField):
             action = valuelist[0]
             fieldstorage = valuelist[1]
             existing = valuelist[2]
-            self.data = binary_to_dictionary(  # type: ignore[assignment]
+            self.data = binary_to_dictionary(
                 dictionary_to_binary({'data': str(valuelist[4])}),
                 str(valuelist[3])
             )

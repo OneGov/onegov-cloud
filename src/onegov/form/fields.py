@@ -8,6 +8,7 @@ import sedate
 from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
 from datetime import timedelta
 from enum import Enum
+from io import BytesIO
 from itertools import chain, zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup
@@ -348,11 +349,15 @@ class UploadField(FileField):
         caller = frame.f_back.f_locals.get('self')
 
         # give the required validators the idea that the data is there
-        # when the action was to keep the current file - an evil approach
+        # when the action was to keep the current file - an evil approach.
+        # a delete counts as empty (even if data was restored for display)
         if isinstance(caller, (DataRequired, InputRequired)):
             truthy = (
-                getattr(self, '_data', None)
-                or getattr(self, 'action', None) == 'keep'
+                getattr(self, 'action', None) != 'delete'
+                and (
+                    getattr(self, '_data', None)
+                    or getattr(self, 'action', None) == 'keep'
+                )
             )
 
             return truthy  # type:ignore[return-value]
@@ -360,7 +365,7 @@ class UploadField(FileField):
         return getattr(self, '_data', None)
 
     @data.setter
-    def data(self, value: FileDict) -> None:
+    def data(self, value: StrictFileDict | FileDict) -> None:
         self._data = value
 
     @property
@@ -377,16 +382,14 @@ class UploadField(FileField):
 
         fieldstorage: RawFormValue
         action: RawFormValue
+        resend: str | None = None
+        resend_filename: str = ''
         if len(valuelist) == 4:
             # resend_upload
             action = valuelist[0]
             fieldstorage = valuelist[1]
-            # NOTE: I'm not sure why mypy complains here, a total version
-            #       of a TypedDict should be assignable to a non-total version
-            self.data = binary_to_dictionary(  # type: ignore[assignment]
-                dictionary_to_binary({'data': str(valuelist[3])}),
-                str(valuelist[2])
-            )
+            resend_filename = str(valuelist[2])
+            resend = str(valuelist[3])
         elif len(valuelist) == 2:
             # force_simple
             action, fieldstorage = valuelist
@@ -403,8 +406,29 @@ class UploadField(FileField):
             self.data = {}
         elif action == 'keep':
             self.action = 'keep'
+            # a resend only carries a fresh upload; the widget reset the
+            # radio to keep, so store it (a replace)
+            if resend is not None:
+                self.action = 'replace'
+                self.data = self.process_resend(resend_filename, resend)
         else:
             raise NotImplementedError()
+
+    def process_resend(
+        self,
+        filename: str,
+        raw_data: str
+    ) -> StrictFileDict | FileDict:
+        """ Restores a file resent across a re-render.
+
+        Only fresh, not-yet-stored uploads are ever resent (the widget gates
+        the resend on ``field.raw_data``), so the payload is always real upload
+        data we can decode and expose as a file to be stored.
+        """
+        raw = dictionary_to_binary({'data': raw_data})
+        self.file = BytesIO(raw)
+        self.filename = filename
+        return binary_to_dictionary(raw, filename)
 
     def process_fieldstorage(
         self,

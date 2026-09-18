@@ -400,6 +400,9 @@ def test_file_submissions_update(session: Session) -> None:
     assert len(submission.files) == 1
     assert previous_file.id == submission.files[0].id
     assert previous_file.checksum == submission.files[0].checksum
+    # a kept file is referenced by '@<id>' in the submission data
+    assert submission.data['file']['data'] == f'@{submission.files[0].id}'
+    assert submission.data['file']['filename'] == 'foobar.txt'
 
     # delete the file
     session.refresh(submission)
