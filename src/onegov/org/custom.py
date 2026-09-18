@@ -315,7 +315,12 @@ def get_global_tools(
     if request.is_manager or request.is_supporter:
         assert request.current_user is not None
         ticket_count = request.app.ticket_count
-        screen_count = ticket_count.open or ticket_count.pending
+        # due tickets outrank pending ones in the dropdown counter
+        screen_count = (
+            ticket_count.open
+            or ticket_count.due_dated
+            or ticket_count.pending
+        )
 
         links = []
 
@@ -387,8 +392,12 @@ def get_global_tools(
             )
         )
 
-        if screen_count:
-            css = ticket_count.open and 'alert' or 'info'
+        if ticket_count.open:
+            css = 'alert'
+        elif ticket_count.due_dated:
+            css = 'warning'
+        elif ticket_count.pending:
+            css = 'info'
         else:
             css = 'no-tickets'
 

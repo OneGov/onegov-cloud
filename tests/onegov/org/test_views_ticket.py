@@ -1289,6 +1289,10 @@ def test_ticket_due_date(client: Client) -> None:
     assert client.get('/').pyquery(
         '.due-dated-tickets').attr('data-count') == '1'
 
+    # with no open tickets the dropdown counter surfaces due before pending
+    dropdown = client.get('/').pyquery('a.dropdown.with-count.warning')
+    assert dropdown.attr('data-count') == '1'
+
     # clearing removes it again
     client.post(due_date_action(), {'clear': '1'})
     assert stored_due_date() is None
@@ -1296,3 +1300,7 @@ def test_ticket_due_date(client: Client) -> None:
         '/tickets/ALL/due_dated').pyquery('tr.ticket')) == 0
     assert client.get('/').pyquery(
         '.due-dated-tickets').attr('data-count') == '0'
+
+    # back to a pending-only counter once the due date is gone
+    dropdown = client.get('/').pyquery('a.dropdown.with-count.info')
+    assert dropdown.attr('data-count') == '1'
