@@ -6,8 +6,8 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="large-8 medium-8 cell main-content">
+                <h2 i18n:translate class="h3">Commission members</h2>
                 <div tal:condition="commission.memberships">
-                    <h2 i18n:translate class="h3">Parliamentarians</h2>
                     <dd>
                         <ul class="more-list">
                             <li tal:repeat="membership memberships">
