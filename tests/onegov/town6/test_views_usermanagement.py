@@ -2,13 +2,13 @@ from __future__ import annotations
 
 
 
-import pytest
-
 from onegov.user import User
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    import pytest
+
     from pathlib import Path
     from .conftest import Client
 
@@ -49,8 +49,8 @@ def test_new_feature_close_and_read(
     )
 
     monkeypatch.setattr(
-        'onegov.town6.layout.__file__',
-        str(tmp_path / 'src' / 'onegov' / 'town6' / 'layout.py')
+        'onegov.town6.layout.resource_files',
+        lambda _: tmp_path
     )
 
     page = client.get('/')

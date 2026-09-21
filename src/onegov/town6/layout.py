@@ -4,7 +4,7 @@ import secrets
 import yaml
 
 from functools import cached_property
-from pathlib import Path
+from importlib.resources import files as resource_files
 
 from onegov.core import Framework
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
@@ -179,15 +179,6 @@ class Layout(OrgLayout):
             if user_release == self.app.version:
                 return features
 
-            repo_root: Path | None = None
-            for parent in Path(__file__).resolve().parents:
-                if (parent / 'changes').is_dir():
-                    repo_root = parent
-                    break
-
-            if not repo_root:
-                return features
-
             def add_payload(
                     payload: dict[str, Any],
             ) -> None:
@@ -197,8 +188,8 @@ class Layout(OrgLayout):
                     payload.keys()):
                     features.append(payload)
 
-            changes_path = repo_root / 'changes'
-            if not changes_path.exists():
+            changes_path = resource_files('onegov.town6').joinpath('changes')
+            if not changes_path.is_dir():
                 return features
 
             release_names = self.app.cache.get_or_create(
@@ -221,8 +212,9 @@ class Layout(OrgLayout):
                             yaml_file.read_text(encoding='utf-8')) or {}
                         for yaml_file in sorted(
                             (path for path in
-                             (changes_path / release_name).glob('*.yaml')
-                             if path.is_file()),
+                             changes_path.joinpath(release_name).iterdir()
+                             if path.is_file() and path.name.endswith(
+                                 '.yaml')),
                             key=lambda path: path.name
                         )
                     ]
