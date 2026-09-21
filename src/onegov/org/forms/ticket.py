@@ -92,7 +92,7 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
 
     notify_hint = PanelField(
         label=_('Notify about replies hint'),
-        kind='callout',
+        kind='callout alert-warning',
         text=_(
             'The "Always send email notifications for new ticket messages" '
             'setting is enabled. You will receive an email whenever theres a '

@@ -92,7 +92,7 @@ class IframeForm(PageBaseForm):
     domain_hint = PanelField(
         text=_('There are currently no allowed domains for iFrames. To enable '
                'domains for iFrames, please contact info@seantis.ch.'),
-        kind='callout',
+        kind='callout alert-warning',
         fieldset=_('URL')
     )
 

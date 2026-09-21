@@ -592,10 +592,10 @@ class PanelWidget:
     def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
         return Markup(  # nosec: B704
-            f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
+            f'<div class="panel alert {{kind}}" {html_params(**kwargs)}>'
             '{text}</div>'
         ).format(
-            kind=field.kind,
+            kind=field.kind if field.kind else 'alert-secondary',
             text=text.replace('\n', Markup('<br>'))
         )
 
@@ -606,12 +606,14 @@ class LinkPanelWidget(PanelWidget):
     def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
         return Markup(  # nosec: B704
-            f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
+            f'<div class="panel alert {{kind}}" {html_params(**kwargs)}>'
+            '<p>{label}</p>'
             '<a href="{link}">{text}</a></div>'
         ).format(
-            kind=field.kind,
+            kind=field.kind if field.kind else 'alert-secondary',
             text=text.replace('\n', Markup('<br>')),
-            link=field.text
+            link=field.text,
+            label=field.label
         )
 
 

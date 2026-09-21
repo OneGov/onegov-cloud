@@ -42,6 +42,7 @@ from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.forms.util import KABA_CODE_RE
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.kaba import KabaApiError, KabaClient
+from onegov.org.models import push_notification
 from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
@@ -933,7 +934,7 @@ class AnalyticsSettingsForm(Form):
         render_kw={'readonly': True},
         validators=[Optional()],
         text='',
-        kind='panel',
+        kind='',
         hide_label=False
     )
 
@@ -2233,6 +2234,16 @@ class FirebaseSettingsForm(Form):
         },
     )
 
+    # Links to the overview of current notifications
+    push_notification_overview = URLPanelField(
+        label=_(_('Push Notification Overview')),
+        render_kw={'readonly': True},
+        validators=[Optional()],
+        text='',
+        kind='',
+        hide_label=False
+    )
+
     if TYPE_CHECKING:
         hashtag_errors: dict[int, str]
     else:
@@ -2324,6 +2335,9 @@ class FirebaseSettingsForm(Form):
             self.selectable_push_notification_options.data = self.tags_to_json(
                 model.selectable_push_notification_options
             )
+
+        self.push_notification_overview.text = self.request.class_link(
+            push_notification.PushNotificationCollection)
 
     def on_request(self) -> None:
         # Initialize the field if it's empty

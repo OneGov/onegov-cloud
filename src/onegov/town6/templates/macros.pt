@@ -509,9 +509,7 @@
                     </tal:b>
                     <tal:b condition="input_type != 'hidden'">
                         <div tal:attributes="class field.errors and not field_list and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
-                            <div class="form-floating">
-                                <metal:b use-macro="layout.macros['field']" />
-                            </div>
+                            <metal:b use-macro="layout.macros['field']" />
                         </div>
                     </tal:b>
                 </tal:b>
@@ -530,35 +528,49 @@
 </metal:fields>
 
 <metal:single_field define-macro="field">
-     <!--! render the label after the field if it's a boolean field -->
-    <tal:b condition="field.type == 'BooleanField'">
-        ${field()}
-        <label class="form-check-label" for="${field.label.text}">
-            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-        </label>
-        <div class="form-text" tal:condition="field.description">
-            <tal:b replace="request.translate(field.description)" />
-        </div>
-    </tal:b>
-    <tal:b condition="field.type != 'BooleanField'">
-        <!--
-            Note how the field is rendered *first* in the 'define' step,
-            before the label is accessed. This is due to the field call
-            setting up translatable labels as a side-effect.
+    <!--! render the label after the field if it's a boolean field -->
+    <tal:b define="field_type_groups python: {
+        'URLPanelField': 'panel',
+        'PanelField': 'panel',
+    }">
+        <tal:b tal:switch="field_type_groups.get(field.type, field.type)">
+            <tal:b case="'panel'">
+                <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
+                        <tal:b replace="content" />
+                    </tal:b>
+            </tal:b>
+            <tal:b case="'BooleanField'">
+                ${field()}
+                <label class="form-check-label" for="${field.label.text}">
+                    <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+                    <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                </label>
+                <div class="form-text" tal:condition="field.description">
+                    <tal:b replace="request.translate(field.description)" />
+                </div>
+            </tal:b>
+            <tal:b case="default">
+                <!--
+                    Note how the field is rendered *first* in the 'define' step,
+                    before the label is accessed. This is due to the field call
+                    setting up translatable labels as a side-effect.
 
-            See onegov.core.i18n.get_translation_bound_meta.render_field
-        -->
-        <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
-            <!--! The field is placed here -->
-            <tal:b replace="content" />
-            <label>
-                <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-                <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-            </label>
-            <div class="form-text" tal:condition="long_description">
-                <tal:b replace="long_description"/>
-            </div>
+                    See onegov.core.i18n.get_translation_bound_meta.render_field
+                -->
+                <div class="form-floating">
+                    <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
+                        <!--! The field is placed here -->
+                        <tal:b replace="content" />
+                        <label>
+                            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+                            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                        </label>
+                        <div class="form-text" tal:condition="long_description">
+                            <tal:b replace="long_description"/>
+                        </div>
+                    </tal:b>
+                </div>
+            </tal:b>
         </tal:b>
     </tal:b>
 </metal:single_field>
