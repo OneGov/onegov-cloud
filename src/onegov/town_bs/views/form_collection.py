@@ -5,7 +5,7 @@ from onegov.form import FormCollection
 from onegov.form.collection import SurveyCollection
 from onegov.org.views.form_collection import (view_form_collection,
                                               view_survey_collection)
-from onegov.town6 import TownApp
+from onegov.town_bs import TownBsApp
 from onegov.town6.layout import FormCollectionLayout, SurveyCollectionLayout
 
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-@TownApp.html(model=FormCollection, template='forms.pt', permission=Public)
+@TownBsApp.html(model=FormCollection, template='forms.pt', permission=Public)
 def town_view_form_collection(
     self: FormCollection,
     request: TownRequest
@@ -29,11 +29,13 @@ def town_view_form_collection(
         self, request, FormCollectionLayout(self, request))
 
 
-@TownApp.html(model=SurveyCollection, template='surveys.pt',
+@TownBsApp.html(model=SurveyCollection, template='surveys.pt',
               permission=Private)
 def town_view_survey_collection(
     self: SurveyCollection,
     request: TownRequest
 ) -> RenderData:
+
+    request.include('lazy-wolves')
     return view_survey_collection(
         self, request, SurveyCollectionLayout(self, request))
