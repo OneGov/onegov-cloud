@@ -134,10 +134,14 @@ class Layout(OrgLayout):
     app: TownApp
     request: TownRequest
 
+    @property
+    def framework_asset(self) -> str:
+        return self.app.framework_asset
+
     def __init__(self, model: Any, request: TownRequest,
                  edit_mode: bool = False) -> None:
         super().__init__(model, request)
-        self.request.include('foundation6')
+        self.request.include(self.framework_asset)
         self.edit_mode = edit_mode
 
     @property

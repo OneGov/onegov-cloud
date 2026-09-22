@@ -10,7 +10,7 @@ from onegov.core.i18n import default_locale_negotiator
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
 from onegov.bootstrap.integration import BootstrapApp
-from onegov.org.app import OrgApp
+from onegov.town6.app import TownApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.town6.custom import get_api_endpoints
 from onegov.town6.custom import get_global_tools, get_modules
@@ -29,7 +29,11 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
 
-class TownBsApp(OrgApp, BootstrapApp):
+class TownBsApp(TownApp, BootstrapApp):
+
+    @property
+    def framework_asset(self) -> str:
+        return 'bootstrap'
 
     def configure_organisation(
         self,

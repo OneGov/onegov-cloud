@@ -31,6 +31,10 @@ if TYPE_CHECKING:
 
 class TownApp(OrgApp, FoundationApp):
 
+    @property
+    def framework_asset(self) -> str:
+        return 'foundation6'
+
     def configure_organisation(
         self,
         *,

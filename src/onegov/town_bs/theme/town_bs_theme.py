@@ -34,6 +34,7 @@ default_font_families = {
     'Courier New': COURIER_NEW,
 }
 
+
 class TownBsTheme(BootstrapBaseTheme):
     name = 'onegov.town6.bootstrap'
 
@@ -111,7 +112,7 @@ class TownBsTheme(BootstrapBaseTheme):
     def extra_search_paths(self) -> list[str]:
         return [
             *super().extra_search_paths,
-            module_path('onegov.town6.theme', 'custom_styles'),
+            module_path('onegov.town_bs.theme', 'styles'),
             self.font_search_path
         ]
 
