@@ -125,6 +125,28 @@ def test_get_token_basic(client: Client) -> None:
     assert response.status_code == 200
 
 
+def test_get_token_malformed(client: Client) -> None:
+    # A malformed token will result in a bad request
+    headers = {"Authorization": "Bearer bogus"}
+    response = client.get(
+        '/api/authenticate',
+        headers=headers,
+        expect_errors=True
+    )
+    assert response.status_code == 400
+
+
+def test_get_token_incorrect(client: Client) -> None:
+    # An incorrect token will also result in a bad request
+    headers = {"Authorization": f"Bearer {uuid4()}"}
+    response = client.get(
+        '/api/authenticate',
+        headers=headers,
+        expect_errors=True
+    )
+    assert response.status_code == 400
+
+
 def test_jwt_auth_bearer(client: Client) -> None:
 
     user = UserCollection(client.app.session()).add(
