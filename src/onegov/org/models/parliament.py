@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.models.political_business import (
     par_political_business_parliamentary_groups
 )

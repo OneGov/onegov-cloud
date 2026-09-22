@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.town6.views.parliamentarian_role import (
     view_parliamentarian_role,

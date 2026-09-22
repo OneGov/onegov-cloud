@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile

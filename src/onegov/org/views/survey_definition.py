@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 
 from webob.exc import HTTPForbidden

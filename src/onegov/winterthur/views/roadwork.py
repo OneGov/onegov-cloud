@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.winterthur import WinterthurApp, _
 from onegov.winterthur.layout import RoadworkLayout, RoadworkCollectionLayout

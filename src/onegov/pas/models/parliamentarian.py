@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.parliament.models import Parliamentarian
 from onegov.pas.i18n import _
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole

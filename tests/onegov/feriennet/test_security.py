@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import ActivityCollection
 from onegov.core.security import Public, Private
 from onegov.core.utils import Bunch

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 from babel import Locale
 from niquests.exceptions import JSONDecodeError

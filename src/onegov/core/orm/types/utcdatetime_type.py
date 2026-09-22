@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from sedate import standardize_date, to_timezone
 from sqlalchemy.types import DateTime, TypeDecorator

@@ -30,8 +30,6 @@ widget variables need to be injected before rendering::
     template.render(**inject_variables(widgets, layout, structure))
 
 """
-from __future__ import annotations
-
 from lxml import etree
 from wtforms.validators import ValidationError
 

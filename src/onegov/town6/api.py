@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.api.models import ApiEndpoint
 from onegov.org.api import PaginatedCollection
 from onegov.org.models.meeting import Meeting, MeetingCollection

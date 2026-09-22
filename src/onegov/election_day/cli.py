@@ -1,6 +1,4 @@
 """ Provides commands used to initialize election day websites. """
-from __future__ import annotations
-
 import click
 import os
 

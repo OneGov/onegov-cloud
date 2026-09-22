@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import magic
 from onegov.qrcode import QrCode
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form import Form
 from onegov.org import _
 from wtforms.fields import RadioField

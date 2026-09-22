@@ -15,8 +15,6 @@ Using the framework does not really differ from using Morepath::
         pass
 
 """
-from __future__ import annotations
-
 import dectate
 import hashlib
 import inspect
@@ -56,9 +54,10 @@ from onegov.core.datamanager import FileDataManager
 from onegov.core.mail import prepare_email
 from onegov.core.orm import (
     Base, SessionManager, debug, DB_CONNECTION_ERRORS)
+from onegov.core.orm.audit import register_audit_handlers
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.orm.observer import ScopedPropertyObserver
-from onegov.core.request import CoreRequest
+from onegov.core.request import CoreRequest, is_logged_in
 from onegov.core.identity import OneGovIdentity as Identity
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
@@ -163,6 +162,9 @@ class Framework(
         if getattr(self, 'sql_query_report', False):
             fn = self.with_query_report(fn)
 
+        if getattr(self, 'cache_query_report', False):
+            fn = self.with_cache_query_report(fn)
+
         if getattr(self, 'profile', False):
             fn = self.with_profiler(fn)
 
@@ -185,6 +187,25 @@ class Framework(
                 return fn(*args, **kwargs)
 
         return with_query_report_wrapper
+
+    def with_cache_query_report[**P, T](
+        self,
+        fn: Callable[P, T]
+    ) -> Callable[P, T]:
+
+        from onegov.core.cache import debug as cache_debug
+
+        @wraps(fn)
+        def with_cache_query_report_wrapper(
+            *args: P.args,
+            **kwargs: P.kwargs
+        ) -> T:
+
+            assert isinstance(self.cache_query_report, str)
+            with cache_debug.analyze_cache_queries(self.cache_query_report):
+                return fn(*args, **kwargs)
+
+        return with_cache_query_report_wrapper
 
     def with_profiler[**P, T](self, fn: Callable[P, T]) -> Callable[P, T]:
 
@@ -411,6 +432,14 @@ class Framework(
 
             Do not use in production!
 
+        :cache_query_report:
+            Prints out a report of the redis commands sent for each request,
+            unless False. Same values as ``sql_query_report`` ('summary',
+            'redundant', 'all'). Useful for spotting cache N+1s that don't
+            show up in the sql report.
+
+            Do not use in production!
+
         :profile:
             If true, profiles the request and stores the result in the profiles
             folder with the following format: ``YYYY-MM-DD hh:mm:ss.profile``
@@ -451,6 +480,7 @@ class Framework(
 
         if self.dsn:
             self.session_manager = SessionManager(self.dsn, base)
+            register_audit_handlers(self.session_manager)
             # NOTE: We used to only add the ORMBase, when we derived
             #       from LibresIntegration, however this leads to
             #       issues when we add a backref from a model derived
@@ -572,6 +602,8 @@ class Framework(
         allow_shift_f5_compile: bool = False,
         sql_query_report: Literal[
             False, 'summary', 'redundant', 'all'] = False,
+        cache_query_report: Literal[
+            False, 'summary', 'redundant', 'all'] = False,
         profile: bool = False,
         print_exceptions: bool = False,
         **cfg: Any
@@ -580,6 +612,7 @@ class Framework(
         self.always_compile_theme = always_compile_theme
         self.allow_shift_f5_compile = allow_shift_f5_compile
         self.sql_query_report = sql_query_report
+        self.cache_query_report = cache_query_report
         self.profile = profile
         self.print_exceptions = print_exceptions
 
@@ -1825,7 +1858,36 @@ def current_language_tween_factory(
     return current_language_tween
 
 
-@Framework.tween_factory(under=current_language_tween_factory)
+@Framework.tween_factory(
+    under=current_language_tween_factory,
+    over=transaction_tween_factory,
+)
+def current_user_tween_factory(
+    app: Framework, handler: Callable[[CoreRequest], Response]
+) -> Callable[[CoreRequest], Response]:
+    def current_user(request: CoreRequest) -> Response:
+        identity = request.identity
+        if is_logged_in(identity):
+            identity_user_id = getattr(identity, 'uid', None)
+            user_id = str(identity_user_id) if identity_user_id else None
+            username = identity.userid
+        else:
+            user_id = None
+            username = None
+
+        if app.has_database_connection:
+            with app.session_manager.set_current_user(
+                user_id=user_id,
+                username=username,
+            ):
+                return handler(request)
+
+        return handler(request)
+
+    return current_user
+
+
+@Framework.tween_factory(under=current_user_tween_factory)
 def spawn_cronjob_thread_tween_factory(
     app: Framework,
     handler: Callable[[CoreRequest], Response]

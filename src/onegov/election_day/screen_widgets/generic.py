@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.qrcode import QrCode

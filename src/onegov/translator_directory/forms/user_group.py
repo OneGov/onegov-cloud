@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org.forms import ManageUserGroupForm

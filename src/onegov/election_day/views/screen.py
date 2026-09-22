@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure

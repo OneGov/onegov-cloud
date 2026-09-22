@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.swissvotes.forms.attachments import AttachmentsForm
 from onegov.swissvotes.forms.external_resources import (
     UpdateExternalResourcesForm)

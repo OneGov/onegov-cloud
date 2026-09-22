@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.utils import normalize_for_url

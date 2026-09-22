@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import onegov.election_day
 
 from functools import cached_property

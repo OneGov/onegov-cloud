@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core import Framework
 from onegov.core.layout import ChameleonLayout
 

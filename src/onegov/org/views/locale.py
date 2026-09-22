@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.i18n import SiteLocale
 from onegov.core.security import Public
 from onegov.org import OrgApp

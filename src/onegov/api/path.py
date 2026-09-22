@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint, AuthEndpoint
 from onegov.api.models import ApiEndpointCollection

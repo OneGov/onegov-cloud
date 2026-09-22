@@ -1,4 +1,5 @@
-from __future__ import annotations
+from fnmatch import fnmatch
+from urllib.parse import urlparse
 
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -139,19 +140,39 @@ class IframeForm(PageBaseForm):
             )
 
     def validate_url(self, field: URLField) -> None:
+        """ Validates the URL against the iFrame allow-list.
+
+        This implements only a subset of CSP source matching: the scheme
+        (an ``http`` source also allows ``https``, an empty scheme allows
+        any) and the host (with wildcard support, e.g. ``*.vimeo.com``).
+        Ports and paths on the allow-list entries are not honoured.
+        """
 
         if not field.data:
             return
 
-        domain = '/'.join(field.data.split('/', 3)[:3])
-        allowed_domains = {
-            d.rstrip('/')
-            for d in self.allowed_domains
-        }
-        if domain not in allowed_domains:
+        url = urlparse(field.data)
+        if url.hostname is None:
             raise ValidationError(
                 _('The domain of the URL is not allowed for iFrames.')
             )
+
+        for allowed in self.allowed_domains:
+            allowed_url = urlparse(allowed)
+            if allowed_url.hostname is None:
+                continue
+            scheme_matches = (
+                not allowed_url.scheme
+                or url.scheme == allowed_url.scheme
+                # an http source also allows the https upgrade
+                or (allowed_url.scheme == 'http' and url.scheme == 'https')
+            )
+            # CSP child_src entries may use a wildcard host (*.vimeo.com)
+            if scheme_matches and fnmatch(url.hostname, allowed_url.hostname):
+                return
+        raise ValidationError(
+            _('The domain of the URL is not allowed for iFrames.')
+        )
 
 
 class PageUrlForm(ChangeAdjacencyListUrlForm):

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import redirect
 from onegov.translator_directory import _
 from onegov.core.security import Secret

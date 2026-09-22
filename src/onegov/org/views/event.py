@@ -1,6 +1,4 @@
 """ The onegov org collection of images uploaded to the site. """
-from __future__ import annotations
-
 import morepath
 
 from morepath.request import Response

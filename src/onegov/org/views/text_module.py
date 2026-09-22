@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import redirect
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection

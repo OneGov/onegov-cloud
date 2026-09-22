@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 ALLOWED_MIME_TYPES = {
     'application/excel',
     'application/vnd.ms-excel',

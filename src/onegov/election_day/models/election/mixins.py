@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy import case
 from sqlalchemy import cast
 from sqlalchemy import Float

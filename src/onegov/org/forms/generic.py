@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dicttoxml import dicttoxml  # type:ignore[import-untyped]
 from morepath.request import Response
 from onegov.core.csv import convert_list_of_dicts_to_csv

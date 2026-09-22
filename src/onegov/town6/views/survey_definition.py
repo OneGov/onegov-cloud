@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private, Public
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition

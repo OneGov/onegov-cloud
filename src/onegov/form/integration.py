@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from more.webassets import WebassetsApp
 from onegov.core.security import Public
 from onegov.form import _

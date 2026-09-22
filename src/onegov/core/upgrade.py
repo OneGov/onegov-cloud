@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import inspect
 import importlib
 import transaction
@@ -482,6 +480,22 @@ class UpgradeContext:
             {
                 'schema': self.schema,
                 'enum_name': enum_name,
+            }
+        ).scalar_one()
+
+    def is_nullable(self, table_name: str, column_name: str) -> bool:
+        return self.session.execute(
+            text("""
+                SELECT is_nullable = 'YES'
+                FROM information_schema.columns
+                WHERE table_name = :table_name
+                  AND column_name = :column_name
+                  AND table_schema = :schema
+            """),
+            {
+                'schema': self.schema,
+                'table_name': table_name,
+                'column_name': column_name,
             }
         ).scalar_one()
 

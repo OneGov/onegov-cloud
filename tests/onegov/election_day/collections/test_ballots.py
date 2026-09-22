@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.election_day.collections import BallotCollection
 from onegov.election_day.models import Vote

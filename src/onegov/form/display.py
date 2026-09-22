@@ -1,6 +1,4 @@
 """ Contains renderers to display form fields. """
-from __future__ import annotations
-
 from datetime import datetime, date
 import humanize
 import re

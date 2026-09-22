@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import http
 from asyncio import Future
 from cryptography.hazmat.primitives.hashes import SHA256

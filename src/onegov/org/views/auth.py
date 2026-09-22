@@ -1,6 +1,4 @@
 """ The authentication views. """
-from __future__ import annotations
-
 import morepath
 
 from onegov.core.markdown import render_untrusted_markdown

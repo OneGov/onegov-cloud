@@ -1,6 +1,4 @@
 """ Renders a onegov.page. """
-from __future__ import annotations
-
 import morepath
 from markupsafe import Markup
 
@@ -16,7 +14,6 @@ from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, NewsCollection, Topic
 from onegov.org.models.editor import Editor
-from onegov.page import PageCollection
 from webob import exc, Response
 
 
@@ -37,11 +34,9 @@ def delete_page(self: Topic | News, request: OrgRequest) -> None:
     if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 
-    # first remove all the linked files
+    request.session.delete(self)
     self.files = []
     request.session.flush()
-
-    PageCollection(request.session).delete(self)
     assert self.trait is not None
     request.success(self.trait_messages[self.trait]['delete_message'])
 

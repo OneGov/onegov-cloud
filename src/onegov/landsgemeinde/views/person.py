@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.landsgemeinde import _
 from onegov.core.security import Private
 from onegov.landsgemeinde.app import LandsgemeindeApp

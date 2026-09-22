@@ -1,6 +1,4 @@
 """ Provides commands used to initialize org websites. """
-from __future__ import annotations
-
 import base64
 import click
 import html
@@ -26,6 +24,7 @@ from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
+from onegov.core.custom import json as custom_json
 from onegov.core.orm.utils import QueryChain
 from onegov.core.utils import Bunch
 from onegov.directory import (
@@ -78,6 +77,7 @@ from onegov.org.models import (
     RISParliamentaryGroupCollection,
 )
 from onegov.page.collection import PageCollection
+from onegov.page.restore import PageRestore
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -89,6 +89,7 @@ from operator import add as add_op
 from pathlib import Path
 from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
+from sqlalchemy.exc import StatementError
 from uuid import uuid4
 
 
@@ -113,6 +114,60 @@ if TYPE_CHECKING:
     )
 
 cli = command_group()
+
+
+@cli.command(context_settings={'singular': True})
+@click.argument('snapshot', type=click.File('r', encoding='utf-8'))
+@click.option('--dry-run', is_flag=True, help='Validate without saving.')
+@click.option(
+    '--skip-missing-files',
+    is_flag=True,
+    help='Restore even if some referenced files no longer exist.',
+)
+def restore_page(
+    snapshot: IO[str],
+    dry_run: bool,
+    skip_missing_files: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """Restore a page and included descendants from audit snapshot JSON.
+
+    Existing pages are overwritten by ID. Children absent from the snapshot
+    are retained. File IDs reconnect existing files; binaries are not restored.
+    """
+    try:
+        data = custom_json.load(snapshot)
+    except (ValueError, TypeError) as error:
+        raise click.ClickException(
+            f'Invalid snapshot JSON: {error}'
+        ) from error
+
+    def restore(request: OrgRequest, app: OrgApp) -> None:
+        session = request.session
+        try:
+            plan = PageRestore.prepare(session, data, skip_missing_files)
+            for item in plan.snapshots:
+                action = (
+                    'Update' if session.get(Page, item['id']) else 'Create'
+                )
+                click.echo(f"{action} page {item['id']}: {item['title']}")
+            if plan.missing_files:
+                click.echo(
+                    f"Skipping missing files: {', '.join(plan.missing_files)}"
+                )
+            with app.session_manager.set_current_user(
+                None, 'cli:restore-page'
+            ):
+                plan.apply(session)
+            if dry_run:
+                transaction.abort()
+                click.echo('Dry run complete. No changes saved.')
+            else:
+                click.echo(f'Restored {len(plan.snapshots)} page(s).')
+        except (ValueError, TypeError, StatementError) as error:
+            transaction.abort()
+            raise click.ClickException(str(error)) from error
+
+    return restore
 
 
 @cli.command(context_settings={'creates_path': True})

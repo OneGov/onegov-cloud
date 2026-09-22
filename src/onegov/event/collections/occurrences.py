@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from collections import defaultdict
 from datetime import date, timedelta, datetime
@@ -160,6 +158,12 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self.search_widget = search_widget
         self.event_filter_configuration = event_filter_configuration or {}
         self.event_filter_fields = event_filter_fields or ()
+
+        # batch-default eager-load; set here, not as class attr, to defer
+        # mapper configuration past import
+        self.set_query_options(
+            contains_eager(Occurrence.event).joinedload(Event.image)
+        )
 
     @property
     def q(self) -> str | None:
@@ -659,7 +663,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         query = self.apply_common_filters(
             self.session.query(Occurrence).join(Event)
-            .options(contains_eager(Occurrence.event).joinedload(Event.image))
         )
 
         if self.term:

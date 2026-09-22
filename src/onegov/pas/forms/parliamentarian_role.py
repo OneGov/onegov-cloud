@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form import move_fields
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField

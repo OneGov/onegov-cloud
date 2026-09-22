@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 
 from onegov.foundation6 import BaseTheme
@@ -145,6 +143,7 @@ class TownTheme(BaseTheme):
             'chat',
             'bar-graph',
             'dashboard',
+            'audit',
         ]
 
     @property

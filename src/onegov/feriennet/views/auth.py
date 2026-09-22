@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.feriennet import FeriennetApp, _
 from onegov.town6.views.auth import town_handle_registration

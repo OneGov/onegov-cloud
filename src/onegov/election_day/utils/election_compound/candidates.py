@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import groupbylist
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import Election

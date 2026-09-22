@@ -3,8 +3,6 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 # pragma: exclude file
-from __future__ import annotations
-
 from libres.db.models import Allocation, Reservation
 from libres.db.models.types.json_type import JSON
 from onegov.core.upgrade import upgrade_task

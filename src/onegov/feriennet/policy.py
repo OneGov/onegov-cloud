@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import Activity, Occasion
 from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
 from morepath.authentication import NO_IDENTITY

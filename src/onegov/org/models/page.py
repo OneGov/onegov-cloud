@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from functools import cached_property
 from onegov.core.collection import Pagination
@@ -97,26 +95,27 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     @property
     def paste_target(self) -> Topic | News:
-        if self.trait == 'link':
-            return self.parent or self  # type: ignore[return-value]
+        match self.trait:
+            case 'link' | 'iframe':
+                return self.parent or self  # type: ignore[return-value]
 
-        if self.trait == 'page':
-            return self
+            case 'page':
+                return self
 
-        raise NotImplementedError
+            case _:
+                raise NotImplementedError
 
     @property
     def allowed_subtraits(self) -> tuple[str, ...]:
-        if self.trait == 'link':
-            return ()
+        match self.trait:
+            case 'link' | 'iframe':
+                return ()
 
-        if self.trait == 'page':
-            return ('page', 'link', 'iframe')
+            case 'page':
+                return ('page', 'link', 'iframe')
 
-        if self.trait == 'iframe':
-            return ()
-
-        raise NotImplementedError
+            case _:
+                raise NotImplementedError
 
     def is_supported_trait(self, trait: str) -> bool:
         return trait in {'link', 'page', 'iframe'}

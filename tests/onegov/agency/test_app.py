@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from io import BytesIO
 from onegov.agency.custom import (
     get_global_tools, get_top_navigation, get_modules
@@ -109,11 +107,30 @@ def test_app_custom(agency_app: AgencyApp) -> None:
     assert as_text_nav(get_top_navigation(request)) == ['People', 'Agencies']
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
-        {'Management': ['Overview', 'Timeline', 'Files', 'Images', 'Payments',
-                        'Invoices', 'Users', 'User groups', 'Settings',
-                        'Link Check', 'Hidden contents']},
-        {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
-                     'Closed Tickets']}
+        {
+            'Management': [
+                'Overview',
+                'Timeline',
+                'Audit Trail',
+                'Files',
+                'Images',
+                'Payments',
+                'Invoices',
+                'Users',
+                'User groups',
+                'Settings',
+                'Link Check',
+                'Hidden contents',
+            ]
+        },
+        {
+            'Tickets': [
+                'My Tickets',
+                'Open Tickets',
+                'Pending Tickets',
+                'Closed Tickets',
+            ]
+        },
     ]
     assert as_text([get_modules(request)]) == [{'Modules': [
         'Agencies', 'People', 'Forms']}]

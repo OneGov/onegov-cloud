@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from onegov.election_day.utils import add_last_modified_header
 from unittest.mock import Mock
