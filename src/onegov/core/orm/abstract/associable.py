@@ -204,9 +204,6 @@ def associated[M: Associable](
     if uselist == 'auto':
         uselist = not cardinality.endswith('to-one')
 
-    if not TYPE_CHECKING:
-        M = associated_cls  # ruff: ignore[non-lowercase-variable-in-function]
-
     def descriptor(cls: type[Base]) -> Mapped[list[M]] | Mapped[M | None]:
         # HACK: forms is one of the only tables which doesn't use id as
         #       its primary key, we probably should just use id everywhere
