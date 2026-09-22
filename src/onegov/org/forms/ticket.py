@@ -44,7 +44,9 @@ class TicketNoteForm(Form):
         label=_('Text'),
         description=_('Your note about this ticket'),
         validators=[
+            # NOTE: We need both because of strip_whitespace
             InputRequired(),
+            DataRequired(),
             Length(max=TABLE_CELL_CHAR_LIMIT)
         ],
         filters=(strip_whitespace, ),
@@ -65,7 +67,9 @@ class TicketChatMessageForm(Form):
         label=_('Message'),
         description=_('Your message'),
         validators=[
+            # NOTE: We need both because of strip_whitespace
             InputRequired(),
+            DataRequired(),
             Length(max=TABLE_CELL_CHAR_LIMIT)
         ],
         filters=(strip_whitespace, ),

@@ -4,7 +4,7 @@ from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import strip_whitespace
 from wtforms.fields import StringField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, DataRequired
 
 
 from typing import TYPE_CHECKING
@@ -22,7 +22,8 @@ class SearchForm(Form):
 
     q = StringField(
         id='search',
-        validators=[InputRequired()],
+        # NOTE: We need both because of strip_whitespace
+        validators=[InputRequired(), DataRequired()],
         filters=(strip_whitespace, ),
         render_kw={
             'data-typeahead-subject': True,
