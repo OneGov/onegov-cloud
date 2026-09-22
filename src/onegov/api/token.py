@@ -7,6 +7,7 @@ from datetime import timedelta
 from onegov.api.models import ApiKey
 from sedate import utcnow
 from webob.exc import HTTPBadRequest
+from uuid import UUID
 
 
 from typing import Any, TYPE_CHECKING
@@ -30,10 +31,16 @@ def jwt_encode(request: CoreRequest, payload: dict[str, Any]) -> str:
 
 
 def get_token(request: CoreRequest) -> dict[str, str]:
+    raw_key = try_get_encoded_token(request)
+    try:
+        key = UUID(raw_key)
+    except ValueError:
+        raise HTTPBadRequest() from None
 
-    key = try_get_encoded_token(request)
+    api_key = request.session.query(ApiKey).filter_by(key=key).one_or_none()
+    if api_key is None:
+        raise HTTPBadRequest()
 
-    api_key = request.session.query(ApiKey).filter_by(key=key).one()
     today = utcnow()
     api_key.last_used = today
     payload = {
