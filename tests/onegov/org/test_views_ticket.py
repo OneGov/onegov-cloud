@@ -675,6 +675,11 @@ def test_ticket_notes(client: Client) -> None:
     # add a note
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     page = page.click("Neue Notiz")
+    # creating a note that contains just whitespace is the same as
+    # leaving it empty and will be rejected
+    page.form['text'] = " \r\n\r\n  "
+    page = page.form.submit()
+    assert "Dieses Feld wird benötigt" in page
     page.form['text'] = "Looks like example input to me"
     page = page.form.submit().follow()
 
@@ -688,6 +693,10 @@ def test_ticket_notes(client: Client) -> None:
     note_url = note_url_ex.search(str(page)).group()  # type: ignore[union-attr]
 
     page = client.get(note_url + '/edit')
+    # editing to just whitespace is also disallowed
+    page.form['text'] = " \r\n\r\n  "
+    page = page.form.submit()
+    assert "Dieses Feld wird benötigt" in page
     page.form['text'] = "I will investigate"
     page = page.form.submit().follow()
 
