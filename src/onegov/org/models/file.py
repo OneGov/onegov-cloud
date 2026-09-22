@@ -1,6 +1,4 @@
 """ Contains the models describing files and images. """
-from __future__ import annotations
-
 import sedate
 
 from datetime import datetime

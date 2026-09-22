@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private, Public
 from onegov.form import FormCollection, FormDefinition
 from onegov.org.forms.form_definition import FormDefinitionUrlForm

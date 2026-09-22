@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base

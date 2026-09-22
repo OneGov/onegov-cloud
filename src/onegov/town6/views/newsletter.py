@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Private
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection

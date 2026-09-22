@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency.api import AgencyApiEndpoint
 from onegov.agency.api import MembershipApiEndpoint
 from onegov.agency.api import PersonApiEndpoint

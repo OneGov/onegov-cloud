@@ -1,6 +1,4 @@
 """ Imports directories scraped by ogi-scraper into onegov directories. """
-from __future__ import annotations
-
 import json
 
 import click

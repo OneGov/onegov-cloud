@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging.config
 
 from onegov.server.collection import ApplicationCollection

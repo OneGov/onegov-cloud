@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import babel.dates
 import json
 import os

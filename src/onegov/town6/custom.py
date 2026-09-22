@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat.collections import ChatCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.custom import get_api_endpoints as get_api_endpoints_base

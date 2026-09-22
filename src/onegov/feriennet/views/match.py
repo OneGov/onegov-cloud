@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from functools import lru_cache
 from onegov.activity import Attendee

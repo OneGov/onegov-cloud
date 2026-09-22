@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.org.views.editor import get_form_class
 from onegov.org.views.editor import handle_page_form, view_topics_sort

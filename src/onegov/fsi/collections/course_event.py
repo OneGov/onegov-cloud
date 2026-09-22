@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from sedate import utcnow
 from sqlalchemy import desc

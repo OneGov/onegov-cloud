@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.abstract.associable import Associable

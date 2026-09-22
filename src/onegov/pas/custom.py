@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.core.elements import Link
 from onegov.org.custom import logout_path

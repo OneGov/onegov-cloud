@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security.permissions import Personal
 
 from onegov.org.models import Organisation

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from json import dumps
 from json import loads
 from onegov.websockets import log

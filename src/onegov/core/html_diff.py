@@ -22,8 +22,6 @@ Examples:
 :copyright: (c) 2011 by Armin Ronacher
 :license: BSD
 """
-from __future__ import annotations
-
 import re
 from contextlib import contextmanager
 from difflib import SequenceMatcher

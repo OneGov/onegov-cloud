@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import lxml.etree
 import niquests
 from datetime import datetime

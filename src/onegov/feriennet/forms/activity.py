@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import _
 from onegov.form import Form

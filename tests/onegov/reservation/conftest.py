@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from libres.context.registry import create_default_registry

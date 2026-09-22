@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from click.testing import CliRunner
 from onegov.translator_directory.cli import cli, LANGUAGES
 from onegov.translator_directory.models.language import Language

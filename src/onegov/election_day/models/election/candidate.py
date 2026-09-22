@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from builtins import list as list_t
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin

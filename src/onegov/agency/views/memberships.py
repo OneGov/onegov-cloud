@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import redirect
 from morepath.request import Response
 from onegov.agency import _

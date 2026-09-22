@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency.excel_export import column_mapper
 from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.excel_export import extract_person_data

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from click.testing import CliRunner
 from onegov.people.cli import cli
 from onegov.people.models import Person

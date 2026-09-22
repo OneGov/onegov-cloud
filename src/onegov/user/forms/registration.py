@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form import Form
 from onegov.form.validators import ValidPassword
 from onegov.user import _

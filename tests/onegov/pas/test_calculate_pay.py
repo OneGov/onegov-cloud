@@ -1,4 +1,3 @@
-from __future__ import annotations
 from decimal import Decimal
 
 from onegov.pas.calculate_pay import calculate_compensation

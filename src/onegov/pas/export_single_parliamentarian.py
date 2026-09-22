@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from decimal import Decimal
 from onegov.pas.calculate_pay import calculate_attendance_compensation

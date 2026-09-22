@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.org.views.exceptionviews import handle_forbidden, handle_notfound
 from onegov.town6 import TownApp

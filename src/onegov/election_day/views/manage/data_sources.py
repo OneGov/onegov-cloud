@@ -1,6 +1,4 @@
 """ The manage subscription views. """
-from __future__ import annotations
-
 import morepath
 
 from onegov.election_day import _

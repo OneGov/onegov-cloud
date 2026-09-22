@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 
 from decimal import Decimal, ROUND_HALF_UP

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.file import File
 from operator import attrgetter
 

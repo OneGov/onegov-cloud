@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.collections import TranslatablePageCollection

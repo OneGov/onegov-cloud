@@ -1,6 +1,4 @@
 """ The authentication views. """
-from __future__ import annotations
-
 from morepath import redirect
 from onegov.core.security import Private
 from onegov.core.security import Public

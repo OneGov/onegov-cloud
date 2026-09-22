@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.people.models.agency import Agency
 from onegov.people.models.agency import AgencyOrganigram
 from onegov.people.models.membership import AgencyMembership
