@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-
 from email_validator import validate_email
 from enum import Enum
 from onegov.core.cache import instance_lru_cache

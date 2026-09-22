@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import onegov.ticket
 import os
 import transaction
@@ -119,6 +117,49 @@ def cfg_path(
     }
 
     session_manager.ensure_schema_exists('foo-bar')
+
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    with open(cfg_path, 'w') as f:
+        f.write(dump(cfg))
+    return cfg_path
+
+
+@pytest.fixture(scope='function')
+def cfg_path_multi_namespace(
+    postgres_dsn: str,
+    session_manager: SessionManager,
+    temporary_directory: str,
+    redis_url: str
+) -> str:
+    cfg = {
+        'applications': [
+            {
+                'path': '/space1/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'space1',
+                'configuration': {'dsn': postgres_dsn, 'redis_url': redis_url},
+                'websockets': {
+                    'client_url': 'ws://localhost:8766',
+                    'manage_url': 'ws://localhost:8766',
+                    'manage_token': 'super-super-secret-token',
+                },
+            },
+            {
+                'path': '/space2/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'space2',
+                'configuration': {'dsn': postgres_dsn, 'redis_url': redis_url},
+                'websockets': {
+                    'client_url': 'ws://localhost:8766',
+                    'manage_url': 'ws://localhost:8766',
+                    'manage_token': 'super-super-secret-token',
+                },
+            },
+        ]
+    }
+
+    session_manager.ensure_schema_exists('space1-bar')
+    session_manager.ensure_schema_exists('space2-bar')
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     with open(cfg_path, 'w') as f:

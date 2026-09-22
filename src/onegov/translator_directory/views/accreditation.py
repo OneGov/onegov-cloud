@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import redirect
 from onegov.core.crypto import random_token
 from onegov.core.security import Public

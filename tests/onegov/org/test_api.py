@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 import transaction
 from base64 import b64encode
@@ -412,6 +410,56 @@ def test_api_syndicate_filter(
     assert not collection('/api/events?syndicate=true&highlight=true').items
 
 
+def test_api_events_no_n_plus_one(client: Client) -> None:
+    from sqlalchemy import event as sa_event
+    from onegov.core.utils import Bunch
+    from onegov.org.api import EventApiEndpoint
+
+    request: Any = Bunch(app=client.app, identity=None)
+    occurrences = EventApiEndpoint(request).collection.batch
+    assert len(occurrences) > 1
+
+    statements: list[str] = []
+    engine = client.app.session().get_bind()
+
+    def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
+        statements.append(statement)
+
+    sa_event.listen(engine, 'before_cursor_execute', count)
+    try:
+        # what the API serializer touches per row
+        for occurrence in occurrences:
+            occurrence.content
+            occurrence.event.content
+            occurrence.event.image
+    finally:
+        sa_event.remove(engine, 'before_cursor_execute', count)
+
+    # all eager-loaded: no per-row lazy queries
+    assert statements == [], f'unexpected lazy queries: {statements}'
+
+
+def test_api_events_no_n_plus_one_cache(client: Client) -> None:
+    from onegov.core.cache.redis import RedisCacheRegion
+
+    client.login_admin()  # prevent rate limit
+
+    calls: list[str] = []
+    orig = RedisCacheRegion.get_or_create
+
+    def count(self: Any, key: str, *args: Any, **kwargs: Any) -> Any:
+        if key == 'custom_event_tags':
+            calls.append(key)
+        return orig(self, key, *args, **kwargs)
+
+    with patch.object(RedisCacheRegion, 'get_or_create', count):
+        response = client.get('/api/events')
+
+    # more than one item, but the custom_event_tags cache is only hit once
+    assert response.body.count(b'"start"') > 1
+    assert len(calls) <= 1, f'N+1 on cache: {len(calls)} redis round-trips'
+
+
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')
@@ -801,3 +849,47 @@ def test_api_directory_content_hash(client: Client) -> None:
     items = api_items(client, '/api/clubs')
     item_data = api_item_data(items[0])
     assert item_data['content_hash'] != first_hash
+
+
+def test_api_directory_no_n_plus_one_content(client: Client) -> None:
+    from sqlalchemy import event as sa_event
+    from onegov.core.utils import Bunch
+    from onegov.org.api import DirectoryEntryApiEndpoint
+
+    session = client.app.session()
+    directory: ExtendedDirectory = DirectoryCollection(
+        session, type='extended'
+    ).add(
+        title='Clubs',
+        structure='Name *= ___',
+        configuration=DirectoryConfiguration(title='Name', order=['Name']),
+    )
+    for i in range(5):
+        directory.add(values={'name': f'Club {i}'})
+    transaction.commit()
+
+    request: Any = Bunch(
+        app=client.app, session=client.app.session(), identity=None
+    )
+    entries = DirectoryEntryApiEndpoint(request, 'clubs').collection.batch
+    assert len(entries) == 5
+
+    statements: list[str] = []
+    engine = client.app.session().get_bind()
+
+    def count(conn: Any, cursor: Any, statement: str, *args: Any) -> None:
+        statements.append(statement)
+
+    sa_event.listen(engine, 'before_cursor_execute', count)
+    try:
+        # what the API serializer touches per row
+        for entry in entries:
+            entry.content
+            entry.files
+    finally:
+        sa_event.remove(engine, 'before_cursor_execute', count)
+
+    content_loads = [s for s in statements if 'directory_entries.content' in s]
+    assert content_loads == [], f'N+1 on content: {len(content_loads)} queries'
+    file_loads = [s for s in statements if 'files_for_directory_entries' in s]
+    assert len(file_loads) <= 1, f'N+1 on files: {len(file_loads)} queries'

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from itertools import groupby
 from datetime import date
 

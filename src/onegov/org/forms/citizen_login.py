@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form import Form
 from onegov.form.fields import HoneyPotField
 from onegov.org import _

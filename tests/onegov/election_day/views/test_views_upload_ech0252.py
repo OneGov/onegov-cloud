@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tests.onegov.election_day.common import login
 from unittest.mock import patch
 from webtest import TestApp as Client

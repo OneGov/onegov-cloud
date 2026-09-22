@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity.models.activity import Activity, ACTIVITY_STATES
 from onegov.activity.models.attendee import Attendee
 from onegov.activity.models.booking import Booking

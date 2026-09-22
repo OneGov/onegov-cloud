@@ -113,8 +113,8 @@ h2 + div.timeline {
         display: inline-block;
         padding: 1px 6px;
 
-        ::before {
-            @include icon('\f0c6');
+        a::before {
+            @include icon-bold('\f0c6');
             margin-right: .5ex;
         }
     }

@@ -108,7 +108,7 @@
 
                     <tal:b condition="not event_source and ticket.state != 'closed'">
                         <a tal:condition="is_manager" class="button small primary" href="${request.link(ticket, 'message-to-submitter')}">
-                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <i class="far fa-fw fa-comment" aria-hidden="true"></i>
                             <span i18n:translate>Send Message</span>
                         </a>
                     </tal:b>
@@ -120,7 +120,7 @@
                             data-confirm-no="Cancel"
                             i18n:attributes="data-confirm;data-confirm-extra;data-confirm-no">
 
-                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <i class="far fa-fw fa-comment" aria-hidden="true"></i>
                             <span i18n:translate>Send Message</span>
                         </a>
                     </tal:b>
@@ -131,7 +131,7 @@
                             data-confirm-no="Cancel"
                             i18n:attributes="data-confirm;data-confirm-no">
 
-                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <i class="far fa-fw fa-comment" aria-hidden="true"></i>
                             <span i18n:translate>Send Message</span>
                         </a>
                     </tal:b>
@@ -193,7 +193,7 @@
 
                     <tal:b tal:condition="payment_button" tal:replace="payment_button(layout)" />
 
-                    <a tal:condition="is_manager and invoice" href="${request.link(ticket, 'invoice')}" class="button small primary view-invoice" i18n:translate>View Invoice</a>
+                    <a tal:condition="is_manager and invoice" href="${request.link(ticket, 'invoice')}" class="button primary view-invoice" i18n:translate>View Invoice</a>
                 </div>
 
                 <div class="ticket-panel">

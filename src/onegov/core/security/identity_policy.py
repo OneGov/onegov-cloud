@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import Identity
 from onegov.core.browser_session import BrowserSession
 from onegov.core.framework import Framework

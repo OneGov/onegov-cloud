@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.feriennet import _
 
 
@@ -46,5 +44,6 @@ ROLES = {
 STATES = {
     'open': _('Open'),
     'contacted': _('Contacted'),
-    'confirmed': _('Confirmed')
+    'confirmed': _('Confirmed'),
+    'cancelled': _('Denied')
 }

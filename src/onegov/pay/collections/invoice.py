@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from onegov.core.collection import GenericCollection
 from onegov.pay.models.invoice import Invoice

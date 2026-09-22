@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date, datetime
 from sqlalchemy import and_, case, func, or_
 from sqlalchemy import Column, Enum, ForeignKey, UUID as UUIDType
@@ -419,7 +417,10 @@ class PoliticalBusinessCollection(
         """ Returns the given political business by display name or None. """
         return (
             self.query()
-            .filter(PoliticalBusiness.display_name == display_name)
+            .filter(
+                func.trim(PoliticalBusiness.display_name)
+                == display_name.strip()
+            )
             .first()
         )
 

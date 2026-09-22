@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import transaction
 
 from datetime import date
@@ -9,6 +7,7 @@ from onegov.api.models import ApiException, ApiInvalidParamException
 from onegov.core.collection import Pagination
 from onegov.core.converters import extended_date_decode
 from onegov.event.collections import OccurrenceCollection
+from onegov.event.models import Event, Occurrence
 from onegov.form import Form, FormCollection
 from onegov.form.models import FormDefinition
 from onegov.gis import Coordinates
@@ -27,6 +26,7 @@ from onegov.search import SearchIndex
 from onegov.search.utils import language_from_locale
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import contains_eager, selectinload, undefer
 from uuid import UUID
 
 
@@ -36,7 +36,6 @@ if TYPE_CHECKING:
     from onegov.core.collection import PKType
     from onegov.core.orm.mixins import ContentMixin
     from onegov.core.orm.mixins import TimestampMixin
-    from onegov.event.models import Occurrence
     from onegov.org.app import OrgApp
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import DeclarativeBase, Query
@@ -401,7 +400,14 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
 
         result.page = self.page or 0
         result.batch_size = self.batch_size
-        return result
+
+        # eager-load the serialized event data, batch only
+        event = contains_eager(Occurrence.event)
+        return result.set_query_options(
+            event.joinedload(Event.image),
+            event.undefer(Event.content),
+            undefer(Occurrence.content),
+        )
 
     def item_data(self, item: Occurrence) -> dict[str, Any]:
         source = item.event.source
@@ -657,7 +663,12 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
                     term
                 )
         result.batch_size = 25
-        return result
+
+        # eager-load the serialized entry data, batch only
+        return result.set_query_options(
+            undefer(ExtendedDirectoryEntry.content),
+            selectinload(ExtendedDirectoryEntry.files),
+        )
 
     def for_page(self, page: int | None) -> DirectoryEntryApiEndpoint:
         """ Return a new endpoint instance with the given page while keeping

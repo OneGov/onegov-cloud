@@ -159,6 +159,7 @@ jobs:
           --only-rerun "AttributeError: 'SessionManager'" \
           --only-rerun "AttributeError: 'DefaultLayout'" \
           --only-rerun ".*ReferenceError: [$] is not defined" \
+          --only-rerun "FileExistsError:" \
           --only-rerun "FileNotFoundError:" \
           --only-rerun "Bad response: 404 Not Found" \
           --only-rerun "playwright[.]_impl[.]_errors[.]TimeoutError" \

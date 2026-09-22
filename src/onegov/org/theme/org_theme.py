@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 
 from onegov.foundation import BaseTheme
@@ -83,7 +81,8 @@ class OrgTheme(BaseTheme):
         return [
             'org',
             'chosen',
-            'bar-graph'
+            'bar-graph',
+            'redactor',
         ]
 
     @property

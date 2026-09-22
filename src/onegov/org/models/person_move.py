@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.models.document_form import FormDocument
 from onegov.page import Page
 from onegov.form import FormDefinition

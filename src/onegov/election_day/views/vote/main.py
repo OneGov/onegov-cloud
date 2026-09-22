@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import defaultdict
 from morepath import redirect
 from onegov.core.utils import normalize_for_url

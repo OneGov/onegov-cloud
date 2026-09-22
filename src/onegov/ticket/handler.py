@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
 from translationstring import TranslationString

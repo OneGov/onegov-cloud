@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import escape, Markup
 from onegov.core.orm.types import MarkupText
 from sqlalchemy import func, literal, type_coerce

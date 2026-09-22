@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.api.models import ApiKey
 from onegov.org.theme.org_theme import HELVETICA
 from xml.etree.ElementTree import tostring
@@ -123,19 +121,20 @@ def test_settings_tags(client: Client) -> None:
     settings.form.submit()
     assert client.app.org.event_locations == []
 
+    # stringified list/tuple reprs are sanitized away (non-alphanumerics)
     settings = client.get('/event-settings')
     settings.form['event_locations'] = '[]'
     settings.form.submit()
-    assert client.app.org.event_locations == ['[]']
+    assert client.app.org.event_locations == []
     settings = client.get('/event-settings')
-    assert settings.form['event_locations'].value == '[]'  # not visible on UI
+    assert settings.form['event_locations'].value == ''
 
     settings = client.get('/event-settings')
     settings.form['event_locations'] = '()'
     settings.form.submit()
-    assert client.app.org.event_locations == ['()']
+    assert client.app.org.event_locations == []
     settings = client.get('/event-settings')
-    assert settings.form['event_locations'].value == '()'  # not visible on UI
+    assert settings.form['event_locations'].value == ''
 
     settings.form['event_locations'] = 'Tag A, BBBB'
     settings.form.submit()

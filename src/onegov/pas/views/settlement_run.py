@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from io import BytesIO
 from zipfile import ZipFile
 from webob import Response

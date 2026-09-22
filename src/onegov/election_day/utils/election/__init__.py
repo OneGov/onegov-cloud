@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.utils.election.candidates import get_candidates_data
 from onegov.election_day.utils.election.candidates import (
     get_candidates_results)

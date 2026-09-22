@@ -398,8 +398,6 @@ Example discount::
         ( ) School (100%)
 
 """
-from __future__ import annotations
-
 import pyparsing as pp
 import re
 import yaml

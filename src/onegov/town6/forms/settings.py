@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 from wtforms.fields import BooleanField, RadioField
 from wtforms.fields.simple import TextAreaField
@@ -201,7 +199,7 @@ class ChatSettingsForm(Form):
         super().populate_obj(obj, *args, **kwargs)
         obj.chat_staff = self.chat_staff.data
         obj.enable_chat = self.enable_chat.data
-        obj.chat_topics = self.chat_topics.data  # type:ignore[assignment]
+        obj.chat_topics = self.chat_topics.data
         obj.specific_opening_hours = self.specific_opening_hours.data
         obj.opening_hours_chat = self.json_to_time(
             self.opening_hours_chat.data) or None

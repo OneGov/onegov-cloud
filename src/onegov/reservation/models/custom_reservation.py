@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import timedelta
 from decimal import Decimal
 from libres.db.models import Allocation, Reservation

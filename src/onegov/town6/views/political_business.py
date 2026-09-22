@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy import func, exc
 from sqlalchemy.orm import joinedload
 from webob.exc import HTTPNotFound

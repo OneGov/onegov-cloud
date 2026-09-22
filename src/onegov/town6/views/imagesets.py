@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Private
 from onegov.org.views.imagesets import (
     view_imagesets, select_images, handle_select_images, get_form_class,

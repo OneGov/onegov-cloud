@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import os
 import zipfile
@@ -244,7 +242,7 @@ def delete_ticket(
 def manual_payment_button(
     payment: Payment,
     layout: Layout,
-    css_class: str = 'small secondary'
+    css_class: str = 'secondary'
 ) -> Link:
 
     if payment.state == 'open':
@@ -281,7 +279,7 @@ def manual_payment_button(
 def online_payment_button(
     payment: Payment,
     layout: Layout,
-    css_class: str = 'small secondary'
+    css_class: str = 'secondary'
 ) -> Link | None:
 
     if payment.state == 'open':

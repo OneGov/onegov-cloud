@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from cgi import FieldStorage
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection

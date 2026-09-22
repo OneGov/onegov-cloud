@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.people.collections.agencies import AgencyCollection
 from onegov.people.collections.memberships import AgencyMembershipCollection
 from onegov.people.collections.people import PersonCollection

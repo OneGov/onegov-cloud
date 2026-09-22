@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dateutil.parser import isoparse
 from functools import cached_property
 from onegov.agency import _

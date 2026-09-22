@@ -1,6 +1,4 @@
 """ The newsletter view. """
-from __future__ import annotations
-
 import morepath
 
 from collections import OrderedDict

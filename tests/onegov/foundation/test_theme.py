@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.foundation import BaseTheme, Theme
 
 

@@ -1,12 +1,10 @@
-from __future__ import annotations
-
 import morepath
 import ua_parser
 
 from datetime import timedelta
 from functools import cached_property
 from onegov.core.cache import instance_lru_cache
-from onegov.core.custom import msgpack
+from onegov.core.custom import json as custom_json, msgpack
 from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
@@ -859,7 +857,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         using :meth:`load_url_safe_token`.
 
         """
-        serializer = URLSafeTimedSerializer(self.identity_secret)
+        serializer = URLSafeTimedSerializer(
+            self.identity_secret, serializer=custom_json
+        )
         return serializer.dumps(data, salt=salt)
 
     def load_url_safe_token(
@@ -875,7 +875,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """
         if not data:
             return None
-        serializer = URLSafeTimedSerializer(self.identity_secret)
+        serializer = URLSafeTimedSerializer(
+            self.identity_secret, serializer=custom_json
+        )
         try:
             return serializer.loads(data, salt=salt, max_age=max_age)
         except (SignatureExpired, BadSignature):

@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 import isodate
 import morepath
+import secrets
 import pytz
 import sedate
 import transaction
@@ -19,8 +18,14 @@ from onegov.org import utils
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import (
-    AddReservationForm, KabaEditForm, ReservationAdjustmentForm,
-    ReservationForm, InternalTicketChatMessageForm, RequestCancellationForm)
+    AddReservationForm,
+    KabaEditForm,
+    ReservationAdjustmentForm,
+    ReservationForm,
+    InternalTicketChatMessageForm,
+    RequestCancellationForm,
+    ReservationTicketChatMessageForm,
+)
 from onegov.org.kaba import KabaApiError, KabaClient
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
 from onegov.org.layout import DefaultLayout, DefaultMailLayout, TicketLayout
@@ -32,15 +37,14 @@ from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ReservationTicket
 from onegov.org.pdf.my_reservations import MyReservationsPdf
 from onegov.org.utils import emails_for_new_ticket, group_invoice_items
+from onegov.org.views.ticket import create_attachment_from_file
 from onegov.pay import InvoiceMeta, PaymentError, Price
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.reservation.collection import ResourceCollection
 from onegov.ticket import TicketCollection, TicketInvoice
-from onegov.user import Auth
-from onegov.user.collections import TANCollection
 from purl import URL
 from sqlalchemy import and_, or_
-from uuid import uuid4
+from uuid import UUID, uuid4
 from webob import exc, Response
 from wtforms import HiddenField
 
@@ -50,6 +54,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from onegov.core.types import EmailJsonDict, JSON_ro, RenderData
     from onegov.form import Form
+    from onegov.file import File
     from onegov.org.request import OrgRequest
 
 
@@ -964,28 +969,64 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
     return morepath.redirect(url)
 
 
-def get_my_reservations_url(request: OrgRequest, email: str) -> str | None:
+def get_my_reservations_url(
+    request: OrgRequest,
+    email: str,
+    reservation_token: UUID | None = None
+) -> str | None:
+    """ Durable magic link to a limited summary of the recipient's
+    reservations, with an option to log in for full details.
+
+    When ``reservation_token`` is given, the limited view is restricted to
+    the reservations of that single ticket. """
     if not request.app.org.citizen_login_enabled:
         return None
 
-    auth = Auth.from_request(
-        request,
-        to=request.class_link(
-            ResourceCollection,
-            name='my-reservations'
-        )
+    salt = secrets.token_urlsafe(16)
+    payload = {
+        'email': email,
+        # libres SoftUUIDs aren't json serializable; convert to the base class
+        'token': UUID(int=reservation_token.int)
+        if reservation_token
+        else None,
+    }
+    return request.class_link(
+        ResourceCollection,
+        name='my-reservations',
+        query_params={
+            'token': request.new_url_safe_token(payload, salt),
+            'salt': salt,
+        }
     )
-    tans = TANCollection(request.session, scope='citizen-login')
-    tan_obj = tans.add(
-        client='unknown',
-        email=email,
-        redirect_to=auth.to,
-    )
-    return request.link(
-        auth,
-        name='confirm-citizen-login',
-        query_params={'token': tan_obj.tan}
-    )
+
+
+def get_reservations_subscribe_url(
+    request: OrgRequest,
+    email: str,
+    reservation_token: UUID | None = None
+) -> str | None:
+    """ Durable magic link to the recipient's reservations calendar feed.
+
+    When ``reservation_token`` is given, the feed is restricted to the
+    reservations of that single ticket. """
+    if not request.app.org.citizen_login_enabled:
+        return None
+
+    salt = secrets.token_urlsafe(16)
+    url_obj = URL(request.class_link(
+        ResourceCollection, name='my-reservations-ical'
+    ))
+    payload = {
+        'email': email,
+        # libres SoftUUIDs aren't json serializable; convert to the base class
+        'token': UUID(int=reservation_token.int)
+        if reservation_token
+        else None,
+    }
+    token = request.new_url_safe_token(payload, salt)
+    url_obj = url_obj.query_param('token', token)
+    url_obj = url_obj.query_param('salt', salt)
+    return url_obj.as_string()
 
 
 @OrgApp.view(model=Reservation, name='accept', permission=Private)
@@ -995,6 +1036,7 @@ def accept_reservation(
     text: str | None = None,
     notify: bool = False,
     view_ticket: ReservationTicket | None = None,
+    file: File | None = None,
 ) -> Response:
 
     resource = request.app.libres_resources.by_reservation(self)
@@ -1114,6 +1156,7 @@ def accept_reservation(
                 recipient=self.email,
                 notify=notify,
                 origin='internal',
+                file=file,
             )
 
         _cancel_url = (
@@ -1137,7 +1180,10 @@ def accept_reservation(
                 'form': form,
                 'message': message,
                 'my_reservations_url': get_my_reservations_url(
-                    request, self.email
+                    request, self.email, self.token
+                ),
+                'subscribe_url': get_reservations_subscribe_url(
+                    request, self.email, self.token
                 ),
                 'cancel_url': _cancel_url,
             },
@@ -1147,6 +1193,7 @@ def accept_reservation(
                     MyReservationsPdf.from_ticket(request, ticket),
                     'application/pdf'
                 ),
+                *create_attachment_from_file(file),
             )
         )
 
@@ -1240,13 +1287,13 @@ def accept_reservation_from_ticket(
     model=Reservation,
     name='accept-with-message',
     permission=Private,
-    form=InternalTicketChatMessageForm,
+    form=ReservationTicketChatMessageForm,
     template='form.pt'
 )
 def accept_reservation_with_message(
     self: Reservation,
     request: OrgRequest,
-    form: InternalTicketChatMessageForm,
+    form: ReservationTicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None,
     view_ticket: ReservationTicket | None = None,
 ) -> RenderData | Response:
@@ -1264,7 +1311,8 @@ def accept_reservation_with_message(
             request,
             text=form.text.data,
             notify=form.notify.data if form.notify is not None else True,
-            view_ticket=view_ticket
+            view_ticket=view_ticket,
+            file=form.file.create(),
         )
 
     layout = layout or TicketChatMessageLayout(self, request)  # type:ignore
@@ -1285,13 +1333,13 @@ def accept_reservation_with_message(
     model=ReservationTicket,
     name='accept-reservation-with-message',
     permission=Private,
-    form=InternalTicketChatMessageForm,
+    form=ReservationTicketChatMessageForm,
     template='form.pt'
 )
 def accept_reservation_with_message_from_ticket(
     self: ReservationTicket,
     request: OrgRequest,
-    form: InternalTicketChatMessageForm,
+    form: ReservationTicketChatMessageForm,
     layout: TicketChatMessageLayout | None = None
 ) -> RenderData | Response:
 
@@ -1899,7 +1947,10 @@ def send_reservation_summary(
                 'code': self.handler.data.get('key_code'),
                 'changes': self.handler.get_changes(request),
                 'my_reservations_url': get_my_reservations_url(
-                    request, recipient
+                    request, recipient, self.handler.reservations[0].token
+                ),
+                'subscribe_url': get_reservations_subscribe_url(
+                    request, recipient, self.handler.reservations[0].token
                 ),
             }
         )

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from webob import Response
 from webob.exc import HTTPForbidden
 

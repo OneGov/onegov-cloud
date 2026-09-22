@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm import Base
 from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy import Boolean, Text, UUID as UUIDType

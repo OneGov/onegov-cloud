@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from contextlib import contextmanager
 from datetime import datetime
 from functools import cached_property
@@ -412,14 +410,13 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
         #       payload, as long as we can generate a valid pydantic
         #       model for it.
         if request.method in ('POST', 'PUT') and not request.POST:
-            try:
-                model_class = model_from_form(form)
-            except Exception as exc:
+            model_class = model_from_form(form)
+            if model_class is None:
                 raise ApiException(
                     'This endpoint only supports multipart/form-data or '
                     'application/x-www-form-urlencoded form submissions',
                     status_code=400
-                ) from exc
+                )
 
             data: dict[str, Any] = {}
             with ApiException.capture_exceptions(

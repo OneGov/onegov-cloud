@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency.app import AgencyApp
 from onegov.agency.initial_content import create_new_organisation
 from tests.shared.utils import create_app

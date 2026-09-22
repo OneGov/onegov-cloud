@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.event.utils.guidle import GuidleExportData
 from onegov.event.utils.utils import as_rdates
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.town6.request import TownRequest
 from onegov.user import UserGroup

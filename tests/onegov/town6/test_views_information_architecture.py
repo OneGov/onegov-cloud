@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from tests.onegov.town6.conftest import Client

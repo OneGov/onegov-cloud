@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date as date_t
 from datetime import datetime
 from onegov.core.orm import Base

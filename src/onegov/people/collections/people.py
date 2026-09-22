@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core import utils
 from onegov.core.collection import GenericCollection
 from onegov.people.models import Person

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from decimal import Decimal
 from onegov.core.orm import Base
@@ -40,8 +38,7 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     )
 
     #: the invoice this item belongs to
-    # FIXME: Shouldn't this be nullable=False?
-    invoice_id: Mapped[UUID | None] = mapped_column(ForeignKey('invoices.id'))
+    invoice_id: Mapped[UUID] = mapped_column(ForeignKey('invoices.id'))
     invoice: Mapped[Invoice] = relationship(back_populates='items')
 
     #: the item group (all items with the same text are visually grouped)

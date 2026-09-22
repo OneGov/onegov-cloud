@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import timedelta
 from onegov.form import move_fields
 from onegov.form.fields import FieldTable

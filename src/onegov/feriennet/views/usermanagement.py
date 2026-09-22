@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import (Activity, Attendee, Booking, BookingPeriod,
                              Occasion)
 from onegov.activity.models.invoice import BookingPeriodInvoice

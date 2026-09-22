@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import Activity, ActivityCollection
 from onegov.activity import Attendee, Booking, Occasion
 from onegov.core.security import Public, Private, Personal

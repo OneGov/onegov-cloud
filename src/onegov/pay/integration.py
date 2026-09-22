@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import IntEnum
 from more.webassets import WebassetsApp
 from onegov.core.orm.cache import request_cached

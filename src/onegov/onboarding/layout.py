@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile

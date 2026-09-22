@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.models import Export
 from onegov.org import _
 

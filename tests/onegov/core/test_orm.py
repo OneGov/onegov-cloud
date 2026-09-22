@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import pytest
 import pickle
@@ -609,6 +607,43 @@ def test_session_manager_i18n(postgres_dsn: str) -> None:
 
     sec.dispose()
     mgr.dispose()
+
+
+def test_session_manager_current_user_context(
+    session_manager: SessionManager,
+) -> None:
+    assert (
+        session_manager.current_user_id,
+        session_manager.current_username,
+    ) == (None, None)
+
+    with session_manager.set_current_user(
+        'user-id',
+        'user@example.org',
+    ):
+        assert (
+            session_manager.current_user_id,
+            session_manager.current_username,
+        ) == ('user-id', 'user@example.org')
+
+        with session_manager.set_current_user(
+            'other-user-id',
+            'other@example.org',
+        ):
+            assert (
+                session_manager.current_user_id,
+                session_manager.current_username,
+            ) == ('other-user-id', 'other@example.org')
+
+        assert (
+            session_manager.current_user_id,
+            session_manager.current_username,
+        ) == ('user-id', 'user@example.org')
+
+    assert (
+        session_manager.current_user_id,
+        session_manager.current_username,
+    ) == (None, None)
 
 
 def test_uuid_type(postgres_dsn: str) -> None:
