@@ -15,6 +15,9 @@ if TYPE_CHECKING:
     from datetime import date
     from playwright.sync_api import (
         Browser, ConsoleMessage, ElementHandle, JSHandle, Locator, Page)
+else:
+    # FIXME: https://github.com/microsoft/playwright/issues/42857
+    ConsoleMessage = object
 
 
 with open(module_path('tests.shared', 'drop_file.js')) as f:
