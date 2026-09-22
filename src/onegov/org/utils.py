@@ -40,7 +40,7 @@ from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
-        Callable, Collection, Iterable, Iterator, Sequence)
+        Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from libres.db.models import ReservationBlocker
     from lxml.etree import _Element
     from onegov.core.request import CoreRequest
@@ -1156,6 +1156,7 @@ class MyReservationEventInfo:
         'handler_code',
         'ticket_number',
         'key_code',
+        'limited',
         'request',
         'translate',
     )
@@ -1175,6 +1176,7 @@ class MyReservationEventInfo:
         ticket_number: str,
         key_code: str | None,
         request: OrgRequest,
+        limited: bool = False,
     ) -> None:
 
         self.id = id
@@ -1191,6 +1193,8 @@ class MyReservationEventInfo:
         self.ticket_id = ticket_id
         self.handler_code = handler_code
         self.key_code = key_code
+        # limited magic-link view: no key codes, no ticket links
+        self.limited = limited
         self.request = request
         self.translate = request.translate
 
@@ -1222,7 +1226,7 @@ class MyReservationEventInfo:
             self.resource,
             self.event_time,
             f'{self.translate(_("Key Code"))}: {self.key_code}'
-            if self.key_code else '',
+            if self.key_code and not self.limited else '',
             self.translate(_('Pending approval')) if not self.accepted else '',
         ) if part)
 
@@ -1247,7 +1251,7 @@ class MyReservationEventInfo:
             'allDay': False,
             'title': self.event_title,
             'classNames': list(self.event_classes),
-            'url': self.request.class_link(
+            'url': '' if self.limited else self.request.class_link(
                 Ticket,
                 {
                     'handler_code': self.handler_code,
@@ -1865,19 +1869,19 @@ def narrowest_access(*accesses: str) -> str:
 
 @overload
 def extract_categories_and_subcategories(
-    categories: Sequence[dict[str, list[str]] | str],
+    categories: Sequence[Mapping[str, Sequence[str] | None] | str],
     flattened: Literal[False] = False
 ) -> tuple[list[str], list[list[str]]]: ...
 
 @overload
 def extract_categories_and_subcategories(
-    categories: Sequence[dict[str, list[str]] | str],
+    categories: Sequence[Mapping[str, Sequence[str] | None] | str],
     flattened: Literal[True]
 ) -> list[str]: ...
 
 
 def extract_categories_and_subcategories(
-    categories: Sequence[dict[str, list[str]] | str],
+    categories: Sequence[Mapping[str, Sequence[str] | None] | str],
     flattened: bool = False
 ) -> tuple[list[str], list[list[str]]] | list[str]:
     """
@@ -1904,13 +1908,13 @@ def extract_categories_and_subcategories(
         return cats, sub_cats
 
     for item in categories:
-        if isinstance(item, dict):
-            for topic, subs in item.items():
-                cats.append(topic)
-                sub_cats.append(subs or [])
-        else:
+        if isinstance(item, str):
             cats.append(item)
             sub_cats.append([])
+        else:
+            for topic, subs in item.items():
+                cats.append(topic)
+                sub_cats.append(list(subs) if subs else [])
 
     if flattened:
         cats.extend(
