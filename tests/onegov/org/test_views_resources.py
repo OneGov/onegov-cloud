@@ -5060,7 +5060,9 @@ def test_my_reservations_view(client: Client) -> None:
     reservation.data = {**(reservation.data or {}), 'kaba': {'code': KABA}}
     org = client.app.org
     org.meta = {**org.meta, 'kaba_configurations': [{
-        'site_id': 'site', 'api_key': 'key', 'api_secret': 'secret',
+        'site_id': 'site',
+        'client_id': 'client',
+        'client_secret': 'secret',
     }]}
     transaction.commit()
 
