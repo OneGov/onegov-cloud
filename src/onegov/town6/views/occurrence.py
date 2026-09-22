@@ -1,6 +1,4 @@
 """ The onegov org collection of images uploaded to the site. """
-from __future__ import annotations
-
 from onegov.core.security import Public, Private
 
 from onegov.event import Occurrence, OccurrenceCollection

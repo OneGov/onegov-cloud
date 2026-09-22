@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 log = logging.getLogger('onegov.form')
 log.addHandler(logging.NullHandler())

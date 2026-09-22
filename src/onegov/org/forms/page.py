@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from fnmatch import fnmatch
 from urllib.parse import urlparse
 

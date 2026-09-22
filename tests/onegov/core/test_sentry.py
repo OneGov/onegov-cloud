@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 import sentry_sdk
 from morepath import Identity

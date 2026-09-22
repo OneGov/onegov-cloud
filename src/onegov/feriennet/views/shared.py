@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.user import User, UserCollection
 from sqlalchemy import func
 

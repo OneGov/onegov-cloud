@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.quill.validators import HtmlDataRequired
 from pytest import raises
 from wtforms.validators import ValidationError

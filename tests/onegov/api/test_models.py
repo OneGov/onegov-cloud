@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.api.models import ApiEndpoint
 from onegov.api.models import ApiEndpointItem
 from onegov.api.models import ApiException, ApiInvalidParamException

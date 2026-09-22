@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property

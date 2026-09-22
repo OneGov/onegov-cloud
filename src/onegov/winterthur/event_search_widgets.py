@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from sqlalchemy import func, or_, cast, String
 from sqlalchemy.orm import QueryableAttribute

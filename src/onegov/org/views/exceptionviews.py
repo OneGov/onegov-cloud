@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultLayout

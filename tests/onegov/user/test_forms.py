@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.custom import json
 from onegov.user.auth import Auth
 from onegov.user.collections import UserCollection

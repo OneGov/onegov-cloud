@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import base64
 
 from onegov.core.security import Public

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.metadata import PublicMetadata
 from onegov.core.security import Public, Private, Personal, Secret
 from onegov.core.static import StaticFile

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from email.headerregistry import Address
 from onegov.core.collection import Pagination
 from onegov.core.templates import render_template

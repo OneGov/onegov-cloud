@@ -1,4 +1,3 @@
-from __future__ import annotations
 from onegov.form import merge_forms
 from onegov.org.forms import ManageUserForm
 from onegov.org.forms.user import PartialNewUserForm

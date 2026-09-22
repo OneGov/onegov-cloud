@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security.rules import has_permission_not_logged_in
 from onegov.landsgemeinde.app import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection

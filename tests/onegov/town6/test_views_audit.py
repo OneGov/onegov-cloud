@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 import transaction
 from uuid import uuid4

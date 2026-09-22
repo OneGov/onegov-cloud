@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.cronjobs import Job
 from onegov.core.framework import Framework
 from onegov.core.security import Public

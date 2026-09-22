@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy.dialects.postgresql import HSTORE as HSTOREBase
 from sqlalchemy.ext.mutable import MutableDict
 

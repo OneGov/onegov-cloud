@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Private
 from onegov.form.models.submission import SurveySubmission
 from onegov.org.models.ticket import (

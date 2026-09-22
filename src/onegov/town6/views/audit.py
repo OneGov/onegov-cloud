@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm.audit import AuditEntry, AuditEntryCollection
 from onegov.core.security import Secret
 from onegov.org.views.audit import view_audit_entry, view_audit_trail

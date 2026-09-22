@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.formats.imports.common import EXPATS

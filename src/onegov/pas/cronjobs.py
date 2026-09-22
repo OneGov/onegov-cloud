@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import glob
 import logging
 from onegov.pas.app import PasApp

@@ -1,4 +1,3 @@
-from __future__ import annotations
 from onegov.activity import BookingCollection
 from onegov.activity import BookingPeriodCollection
 from onegov.activity import VolunteerCollection

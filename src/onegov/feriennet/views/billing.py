@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO

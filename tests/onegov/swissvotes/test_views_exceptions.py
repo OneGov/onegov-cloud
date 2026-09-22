@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from webtest import TestApp as Client
 
 

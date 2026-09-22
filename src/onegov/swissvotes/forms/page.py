@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url

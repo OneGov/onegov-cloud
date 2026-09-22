@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm.audit import register_audit_model
 from onegov.page.model import Page
 from sqlalchemy import inspect

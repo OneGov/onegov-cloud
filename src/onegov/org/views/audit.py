@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.custom import json
 from onegov.core.elements import Link
 from onegov.core.orm.audit import AuditEntry, AuditEntryCollection

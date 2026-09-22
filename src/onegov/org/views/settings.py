@@ -1,6 +1,4 @@
 """ The settings view, defining things like the logo or color of the org. """
-from __future__ import annotations
-
 from itertools import groupby
 from markupsafe import Markup
 from webob.exc import HTTPForbidden

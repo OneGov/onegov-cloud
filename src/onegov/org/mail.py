@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
 from onegov.ticket import Ticket, TicketCollection
