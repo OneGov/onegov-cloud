@@ -188,7 +188,7 @@ class Layout(OrgLayout):
                     payload.keys()):
                     features.append(payload)
 
-            changes_path = resource_files('onegov.town6').joinpath('changes')
+            changes_path = resource_files('onegov.town6') / 'changes'
             if not changes_path.is_dir():
                 return features
 
