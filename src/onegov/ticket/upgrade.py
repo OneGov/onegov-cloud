@@ -10,7 +10,15 @@ from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.pay import PaymentProvider
 from onegov.ticket import Ticket, TicketInvoice
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Numeric
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    Enum,
+    ForeignKey,
+    Integer,
+    Numeric,
+)
 from sqlalchemy import String, Text, UUID
 from sqlalchemy import column, text, update, func, and_, true, false
 from sqlalchemy.orm import load_only, selectinload
@@ -465,4 +473,14 @@ def add_customer_message_ids_to_ticket(context: UpgradeContext) -> None:
 
     context.operations.add_column(
         'tickets', Column('customer_message_ids', ARRAY(String), nullable=True)
+    )
+
+
+@upgrade_task('Add due_date to ticket')
+def add_due_date_to_ticket(context: UpgradeContext) -> None:
+    if context.has_column('tickets', 'due_date'):
+        return
+
+    context.operations.add_column(
+        'tickets', Column('due_date', Date, nullable=True)
     )

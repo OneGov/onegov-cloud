@@ -985,6 +985,30 @@ msgstr "Fermé"
 msgid "Archived"
 msgstr "Archivé"
 
+msgid "No due date"
+msgstr "Sans échéance"
+
+msgid "Set due date"
+msgstr "Définir l'échéance"
+
+msgid "Today"
+msgstr "Aujourd'hui"
+
+msgid "Tomorrow"
+msgstr "Demain"
+
+msgid "End of this week"
+msgstr "Fin de cette semaine"
+
+msgid "In one week"
+msgstr "Dans une semaine"
+
+msgid "Custom"
+msgstr "Personnalisé"
+
+msgid "Clear"
+msgstr "Supprimer"
+
 msgid "Paid"
 msgstr "Payé"
 
@@ -1354,6 +1378,15 @@ msgstr "${name} a été pourvu d'un sceau numérique le ${date}"
 
 msgid "${name} is not in our database"
 msgstr "${name} n'est pas dans notre base de données"
+
+msgid "Group"
+msgstr "Groupe"
+
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+msgid "User"
+msgstr "Utilisateur"
 
 msgid "Accept"
 msgstr "Accepter"
@@ -1904,6 +1937,17 @@ msgstr "Historique de la demande"
 
 msgid "Thank you for your request."
 msgstr "Merci pour votre requête."
+
+msgid "The following tickets assigned to you are overdue:"
+msgstr "Les tickets suivants qui vous sont attribués sont en retard :"
+
+msgid "due"
+msgstr "échéance"
+
+msgid "The following tickets assigned to you are due today:"
+msgstr "Les tickets suivants qui vous sont attribués arrivent à échéance aujourd'hui :"
+"Les tickets suivants qui vous sont attribués arrivent à échéance "
+"aujourd'hui :"
 
 msgid "Your request has been registered with the following reference:"
 msgstr "Votre demande a été enregistrée avec la référence suivante :"
@@ -2711,9 +2755,6 @@ msgstr "Gratuit"
 msgid "View Invoice"
 msgstr "Voir la facture"
 
-msgid "Group"
-msgstr "Groupe"
-
 msgid "Change tag"
 msgstr "Changer d'étiquette"
 
@@ -3188,3 +3229,9 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "Parties"
 #~ msgstr "Partis"
+
+#~ msgid "Invalid date"
+#~ msgstr "Date invalide"
+
+#~ msgid "Due Dated Tickets"
+#~ msgstr "Tickets avec échéance"

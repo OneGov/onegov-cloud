@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-09-07 14:57+0200\n"
+"POT-Creation-Date: 2026-09-15 11:37+0200\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -220,6 +220,10 @@ msgstr "Newsletter quotidienne ${time}"
 msgid "${org} OneGov Cloud Status"
 msgstr "Statut du OneGov Cloud de ${org}"
 
+#, python-format
+msgid "${org}: Tickets due today"
+msgstr "${org} : Tickets à échéance aujourd'hui"
+
 #.
 #. get the resource titles and ids
 msgid "General"
@@ -319,6 +323,9 @@ msgstr "Gestion"
 
 msgid "My Tickets"
 msgstr "Mes tickets"
+
+msgid "Due Dated Tickets"
+msgstr "Tickets avec échéance"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -4647,8 +4654,8 @@ msgstr "Quantité"
 msgid "VAT"
 msgstr "TVA"
 
-#.
 #. credit card
+#.
 msgid "Payment"
 msgstr "Paiement"
 
@@ -5194,6 +5201,24 @@ msgstr "Facture"
 
 msgid "Online Payment"
 msgstr "Paiement en ligne"
+
+msgid "No due date"
+msgstr "Sans échéance"
+
+msgid "Set due date"
+msgstr "Définir l'échéance"
+
+msgid "Today"
+msgstr "Aujourd’hui"
+
+msgid "Tomorrow"
+msgstr "Demain"
+
+msgid "End of this week"
+msgstr "Fin de cette semaine"
+
+msgid "In one week"
+msgstr "Dans une semaine"
 
 msgid "Previous Page"
 msgstr "Page précédente"
@@ -5939,6 +5964,17 @@ msgstr "Historique de la demande"
 msgid "Thank you for your request."
 msgstr "Merci pour votre requête."
 
+msgid "The following tickets assigned to you are overdue:"
+msgstr "Les tickets suivants qui vous sont attribués sont en retard :"
+
+msgid "due"
+msgstr "échéance"
+
+msgid "The following tickets assigned to you are due today:"
+msgstr "Les tickets suivants qui vous sont attribués arrivent à échéance aujourd'hui :"
+"Les tickets suivants qui vous sont attribués arrivent à échéance "
+"aujourd'hui :"
+
 msgid "Your request has been registered with the following reference:"
 msgstr "Votre demande a été enregistrée avec la référence suivante :"
 
@@ -6584,6 +6620,9 @@ msgstr "${count} notes"
 msgid "View Invoice"
 msgstr "Voir la facture"
 
+msgid "Due Date"
+msgstr "Date d'échéance"
+
 msgid "Change tag"
 msgstr "Changer d'étiquette"
 
@@ -6851,8 +6890,8 @@ msgid "Delete availability period"
 msgstr "Supprimer la période de disponibilité"
 
 #.
-#. type:ignore[attr-defined]  # trigger updates
 #. type:ignore[attr-defined]
+#. type:ignore[attr-defined]  # trigger updates
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
@@ -7679,12 +7718,6 @@ msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
 "Le même format que l'exportation (XLSX) peut être utilisé pour l'importation."
 
-msgid "Today"
-msgstr "Aujourd’hui"
-
-msgid "Tomorrow"
-msgstr "Demain"
-
 msgid "This weekend"
 msgstr "Ce week-end"
 
@@ -8050,8 +8083,8 @@ msgstr ""
 "Votre demande d'annulation a été soumise. Vous serez informé(e) une fois "
 "qu'elle aura été traitée."
 
-#.
 #. We adjust the wording for users that do not know what a ticket is
+#.
 msgid "Request Status"
 msgstr "Status Demand"
 
@@ -8478,6 +8511,9 @@ msgstr "Le ticket ne peut pas être archivé car il n'est pas clôturé"
 msgid "You archived ticket ${number}"
 msgstr "Vous avez archivé le ticket avec le numéro ${number}"
 
+msgid "Invalid date"
+msgstr "Date invalide"
+
 msgid ""
 "The ticket cannot be recovered from the archive because it's not archived"
 msgstr ""
@@ -8562,6 +8598,9 @@ msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
 
 msgid "My"
 msgstr "Mes"
+
+msgid "Due dated"
+msgstr "Avec échéance"
 
 msgid "All Tickets"
 msgstr "Tous les tickets"

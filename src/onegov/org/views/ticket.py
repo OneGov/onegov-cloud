@@ -4,7 +4,7 @@ import morepath
 import os
 import zipfile
 
-from datetime import date
+from datetime import date, timedelta
 from email_validator import validate_email, EmailNotValidError
 from io import BytesIO
 from markupsafe import Markup
@@ -16,6 +16,7 @@ from onegov.core.html import html_to_text
 from onegov.core.mail import Attachment
 from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Personal, Private, Secret
+from onegov.core.templates import render_macro
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
@@ -897,6 +898,45 @@ def archive_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     return morepath.redirect(request.link(self))
 
 
+@OrgApp.view(model=Ticket, name='set-due-date', permission=Private,
+             request_method='POST')
+def set_ticket_due_date(self: Ticket, request: OrgRequest) -> BaseResponse:
+    request.assert_valid_csrf_token()
+
+    layout = TicketLayout(self, request)
+    today = layout.today()
+    preset = request.params.get('preset')
+
+    if request.params.get('clear'):
+        self.due_date = None
+    elif preset == 'today':
+        self.due_date = today
+    elif preset == 'tomorrow':
+        self.due_date = today + timedelta(days=1)
+    elif preset == 'end_of_week':
+        # coming Friday
+        self.due_date = today + timedelta(days=(4 - today.weekday()) % 7)
+    elif preset == 'in_one_week':
+        self.due_date = today + timedelta(days=7)
+    else:
+        raw = request.params.get('date')
+        try:
+            self.due_date = date.fromisoformat(raw) if isinstance(
+                raw, str) and raw else None
+        except ValueError:
+            request.alert(_('Invalid date'))
+            return request.redirect(request.link(self))
+
+    if request.headers.get('X-IC-Request'):
+        return Response(render_macro(layout.macros['due_date'], request, {
+            'ticket': self,
+            'layout': layout,
+            'is_manager': request.is_manager_for_model(self),
+        }))
+
+    return request.redirect(request.link(self))
+
+
 @OrgApp.view(model=Ticket, name='unarchive', permission=Private)
 def unarchive_ticket(self: Ticket, request: OrgRequest) -> BaseResponse:
     user = request.current_user
@@ -1587,22 +1627,26 @@ def get_filters(
         active=self.state == 'unfinished',
         attrs={'class': 'ticket-filter-my'}
     )
-    for state, text in TICKET_STATES.items():
-        if state != 'archived':
-            coll = self.for_state(state)
-            if self.state == 'unfinished':
-                # FIXME: This is another case where we pass invalid
-                #        state just so the generated URL is shorter
-                #        we should make morepath aware of defaults
-                #        so it can ellide parameters that have been
-                #        set to their default value automatically
-                coll = coll.for_owner(None)  # type: ignore[arg-type]
-            yield Link(
-                text=text,
-                url=request.link(coll),
-                active=self.state == state,
-                attrs={'class': 'ticket-filter-' + state}
-            )
+    # build the filter order, placing the due-date filter right after 'open'
+    states = [(s, t) for s, t in TICKET_STATES.items() if s != 'archived']
+    after_open = next(i for i, (s, _t) in enumerate(states) if s == 'open') + 1
+    states.insert(after_open, ('due_dated', _('Due dated')))
+
+    for state, text in states:
+        coll = self.for_state(state)
+        if self.state == 'unfinished':
+            # FIXME: This is another case where we pass invalid
+            #        state just so the generated URL is shorter
+            #        we should make morepath aware of defaults
+            #        so it can ellide parameters that have been
+            #        set to their default value automatically
+            coll = coll.for_owner(None)  # type: ignore[arg-type]
+        yield Link(
+            text=text,
+            url=request.link(coll),
+            active=self.state == state,
+            attrs={'class': 'ticket-filter-' + state}
+        )
 
 
 def get_groups(

@@ -11,7 +11,7 @@ import vcr  # type: ignore[import-untyped]
 from babel import Locale as BabelLocale
 from base64 import b64decode
 from babel.dates import format_datetime as babel_format_datetime
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from freezegun import freeze_time
 from io import BytesIO
@@ -507,6 +507,89 @@ def test_monthly_ticket_statistics(
 
     # no additional mails have been sent
     assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_daily_ticket_due_date_reminders(
+    client: Client[TestOrgApp],
+    handlers: HandlerRegistry
+) -> None:
+
+    register_echo_handler(handlers)
+
+    job = get_cronjob_by_name(client.app, 'daily_ticket_due_date_reminders')
+    assert job is not None
+    job.app = client.app
+    url = get_cronjob_url(job)
+
+    tz = ensure_timezone('Europe/Zurich')
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    transaction.begin()
+    session = client.app.session()
+    collection = TicketCollection(session)
+
+    request: Any = Bunch(client_addr='127.0.0.1')
+    users = UserCollection(session)
+    user_a = users.register(
+        'user_a@example.org', 'p@ssw0rd12', request, role='editor')
+    user_b = users.register(
+        'user_b@example.org', 'p@ssw0rd12', request, role='editor')
+
+    tickets = [
+        collection.open_ticket(
+            handler_id=str(i), handler_code='EHO', title=f'Title {i}',
+            group='Group', email='citizen@example.org',
+            created=datetime(2016, 1, 2, 10, tzinfo=tz),
+        )
+        for i in range(1, 7)
+    ]
+
+    # relative to the run on 2016-01-05:
+    tickets[0].accept_ticket(user_a)
+    tickets[0].due_date = date(2016, 1, 4)   # user A, overdue
+    tickets[1].accept_ticket(user_a)
+    tickets[1].due_date = date(2016, 1, 5)   # user A, due today
+    tickets[2].accept_ticket(user_b)
+    tickets[2].due_date = date(2016, 1, 4)   # user B, overdue
+    tickets[3].accept_ticket(user_a)
+    tickets[3].due_date = date(2016, 1, 6)   # user A, not due yet
+    tickets[4].accept_ticket(user_a)
+    tickets[4].due_date = date(2016, 1, 3)   # user A, overdue but closed
+    tickets[4].close_ticket()
+    tickets[5].accept_ticket(user_a)
+    tickets[5].due_date = date(2016, 1, 2)   # user A, overdue but archived
+    tickets[5].close_ticket()
+    tickets[5].archive_ticket()
+
+    numbers = [t.number for t in tickets]
+
+    transaction.commit()
+
+    with freeze_time(datetime(2016, 1, 5, 6, 5, tzinfo=tz), tick=True):
+        client.get(url)
+
+    # one e-mail per user with due-today or overdue tickets
+    assert len(os.listdir(client.app.maildir)) == 2
+
+    bodies = [client.get_email(i)['TextBody'] for i in range(2)]
+    user_a_mail = next(b for b in bodies if numbers[0] in b)
+    user_b_mail = next(b for b in bodies if numbers[2] in b)
+
+    # user A: overdue ticket listed before the due-today one; future and
+    # closed tickets excluded
+    assert numbers[1] in user_a_mail
+    assert numbers[3] not in user_a_mail   # not due yet
+    assert numbers[4] not in user_a_mail   # closed
+    assert numbers[5] not in user_a_mail   # archived
+    assert user_a_mail.index(numbers[0]) < user_a_mail.index(numbers[1])
+
+    # user B: only their own overdue ticket
+    assert numbers[0] not in user_b_mail
+
+    # before any due date nothing is due or overdue -> no mail
+    with freeze_time(datetime(2016, 1, 2, 6, 5, tzinfo=tz), tick=True):
+        client.get(url)
+    assert len(os.listdir(client.app.maildir)) == 2
 
 
 def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
