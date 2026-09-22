@@ -9,13 +9,13 @@ from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
-from onegov.foundation6.integration import FoundationApp
+from onegov.bootstrap.integration import BootstrapApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.town6.custom import get_api_endpoints
 from onegov.town6.custom import get_global_tools, get_modules
 from onegov.town6.initial_content import create_new_organisation
-from onegov.town6.theme import TownTheme
+from onegov.town6.theme import TownBsTheme
 from webob import Response
 
 
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
 
 
-class TownApp(OrgApp, FoundationApp):
+class TownBsApp(OrgApp, BootstrapApp):
 
     def configure_organisation(
         self,
@@ -72,22 +72,22 @@ class TownApp(OrgApp, FoundationApp):
         return False
 
 
-@TownApp.webasset_path()
+@TownBsApp.webasset_path()
 def get_shared_assets_path() -> str:
     return utils.module_path('onegov.shared', 'assets/js')
 
 
-@TownApp.static_directory()
+@TownBsApp.static_directory()
 def get_static_directory() -> str:
     return 'static'
 
 
-@TownApp.template_directory()
+@TownBsApp.template_directory()
 def get_template_directory() -> str:
     return 'templates'
 
 
-@TownApp.template_variables()
+@TownBsApp.template_variables()
 def get_template_variables(request: TownRequest) -> RenderData:
     return {
         'global_tools': tuple(get_global_tools(request)),
@@ -95,17 +95,17 @@ def get_template_variables(request: TownRequest) -> RenderData:
     }
 
 
-@TownApp.setting(section='core', name='theme')
-def get_theme() -> TownTheme:
-    return TownTheme()
+@TownBsApp.setting(section='core', name='theme')
+def get_theme() -> TownBsTheme:
+    return TownBsTheme()
 
 
-@TownApp.setting(section='i18n', name='locales')
+@TownBsApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales() -> set[str]:
     return {'de_CH', 'fr_CH', 'it_CH'}
 
 
-@TownApp.setting(section='i18n', name='localedirs')
+@TownBsApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     return [
         module_path('onegov.town6', 'locale'),
@@ -113,12 +113,12 @@ def get_i18n_localedirs() -> list[str]:
     ]
 
 
-@TownApp.setting(section='i18n', name='default_locale')
+@TownBsApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale() -> str:
     return 'de_CH'
 
 
-@TownApp.setting(section='i18n', name='locale_negotiator')
+@TownBsApp.setting(section='i18n', name='locale_negotiator')
 def get_locale_negotiator(
 ) -> Callable[[Sequence[str], TownRequest], str | None]:
     def locale_negotiator(
@@ -137,28 +137,28 @@ def get_locale_negotiator(
     return locale_negotiator
 
 
-@TownApp.setting(section='org', name='create_new_organisation')
+@TownBsApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory(
-) -> Callable[[TownApp, str], Organisation]:
+) -> Callable[[TownBsApp, str], Organisation]:
     return create_new_organisation
 
 
-@TownApp.setting(section='org', name='status_mail_roles')
+@TownBsApp.setting(section='org', name='status_mail_roles')
 def get_status_mail_roles() -> tuple[str, ...]:
     return ('admin', 'editor')
 
 
-@TownApp.setting(section='org', name='ticket_manager_roles')
+@TownBsApp.setting(section='org', name='ticket_manager_roles')
 def get_ticket_manager_roles() -> tuple[str, ...]:
     return ('admin', 'editor', 'supporter')
 
 
-@TownApp.setting(section='org', name='require_complete_userprofile')
+@TownBsApp.setting(section='org', name='require_complete_userprofile')
 def get_require_complete_userprofile() -> bool:
     return False
 
 
-@TownApp.setting(section='org', name='is_complete_userprofile')
+@TownBsApp.setting(section='org', name='is_complete_userprofile')
 def get_is_complete_userprofile_handler(
 ) -> Callable[[TownRequest, str], bool]:
     def is_complete_userprofile(request: TownRequest, username: str) -> bool:
@@ -167,17 +167,17 @@ def get_is_complete_userprofile_handler(
     return is_complete_userprofile
 
 
-@TownApp.setting(section='org', name='default_directory_search_widget')
+@TownBsApp.setting(section='org', name='default_directory_search_widget')
 def get_default_directory_search_widget() -> None:
     return None
 
 
-@TownApp.setting(section='org', name='default_event_search_widget')
+@TownBsApp.setting(section='org', name='default_event_search_widget')
 def get_default_event_search_widget() -> None:
     return None
 
 
-@TownApp.setting(section='org', name='public_ticket_messages')
+@TownBsApp.setting(section='org', name='public_ticket_messages')
 def get_public_ticket_messages() -> tuple[str, ...]:
     """ Returns a list of message types which are availble on the ticket
     status page, visible to anyone that knows the unguessable url.
@@ -196,18 +196,18 @@ def get_public_ticket_messages() -> tuple[str, ...]:
     )
 
 
-@TownApp.setting(section='org', name='disabled_extensions')
+@TownBsApp.setting(section='org', name='disabled_extensions')
 def get_disabled_extensions() -> tuple[str, ...]:
     return ()
 
 
-@TownApp.setting(section='api', name='endpoints')
+@TownBsApp.setting(section='api', name='endpoints')
 def get_api_endpoints_handler(
 ) -> Callable[[TownRequest], Iterator[ApiEndpoint[Any, Any]]]:
     return get_api_endpoints
 
 
-@TownApp.setting(section='org', name='render_mtan_access_limit_exceeded')
+@TownBsApp.setting(section='org', name='render_mtan_access_limit_exceeded')
 def get_render_mtan_access_limit_exceeded(
 ) -> Callable[[MTANAccessLimitExceeded, TownRequest], Response]:
 
@@ -228,22 +228,22 @@ def get_render_mtan_access_limit_exceeded(
     return render_mtan_access_limit_exceeded
 
 
-@TownApp.webasset_path()
+@TownBsApp.webasset_path()
 def get_js_path() -> str:
     return 'assets/js'
 
 
-@TownApp.webasset_path()
+@TownBsApp.webasset_path()
 def get_css_path() -> str:
     return 'assets/css'
 
 
-@TownApp.webasset_output()
+@TownBsApp.webasset_output()
 def get_webasset_output() -> str:
     return 'assets/bundles'
 
 
-@TownApp.webasset('common')
+@TownBsApp.webasset('common')
 def get_common_asset() -> Iterator[str]:
     yield 'jquery.js'
     yield 'global.js'
@@ -274,7 +274,6 @@ def get_common_asset() -> Iterator[str]:
     yield 'date-range-selector.js'
     yield 'lazyalttext.js'
     yield 'lazysizes.js'
-    yield 'button-toggler.js'
     yield 'common.js'
     yield '_blank.js'
     yield 'homepage_video_or_slider.js'
@@ -287,17 +286,19 @@ def get_common_asset() -> Iterator[str]:
     yield 'aos-init.js'
     yield 'aos.css'
     yield 'notifications.js'
-    yield 'sidebar_mobile.js'
-    yield 'ResizeSensor.js'
-    yield 'theia-sticky-sidebar.js'
-    yield 'apply-filters.js'
-    yield 'foundation-intercooler.js'
+    yield 'main_navigation_drilldown.js'
     yield 'chosen_select_hierarchy.js'
     yield 'iframe_request_parameters.js'
     yield 'ai_formcoder.js'
+    yield 'htmx.min.js'
 
 
-@TownApp.webasset('editor')
+@TownBsApp.webasset('form-modal')
+def get_modal_customizations_asset() -> Iterator[str]:
+    yield 'form-modal.js'
+
+
+@TownBsApp.webasset('editor')
 def get_editor_asset() -> Iterator[str]:
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
@@ -312,7 +313,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'editor.js'
 
 
-@TownApp.webasset('fullcalendar')
+@TownBsApp.webasset('fullcalendar')
 def get_fullcalendar_asset() -> Iterator[str]:
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
@@ -321,27 +322,27 @@ def get_fullcalendar_asset() -> Iterator[str]:
     yield 'reservationcalendar_custom.js'
 
 
-@TownApp.webasset('occupancycalendar')
+@TownBsApp.webasset('occupancycalendar')
 def get_occupancycalendar_asset() -> Iterator[str]:
     yield 'occupancycalendar.jsx'
     yield 'occupancycalendar_custom.js'
 
 
-@TownApp.webasset('staff-chat')
-def get_staff_chat_asset() -> Iterator[str]:
-    yield 'chat-shared.js'
-    yield 'chat-staff.js'
+# @TownBsApp.webasset('staff-chat')
+# def get_staff_chat_asset() -> Iterator[str]:
+#     yield 'chat-shared.js'
+#     yield 'chat-staff.js'
 
 
-@TownApp.webasset('client-chat')
-def get_staff_client_asset() -> Iterator[str]:
-    yield 'chat-shared.js'
-    yield 'chat-client.js'
+# @TownBsApp.webasset('client-chat')
+# def get_staff_client_asset() -> Iterator[str]:
+#     yield 'chat-shared.js'
+#     yield 'chat-client.js'
 
 
-@TownApp.webasset('d3-charts')
-def get_d3_chart_assets() -> Iterator[str]:
-    yield 'd3.v7.min.js'
-    yield 'd3-flextree.js'
-    yield 'd3-org-chart.js'
-    yield 'd3-display.js'
+# @TownBsApp.webasset('d3-charts')
+# def get_d3_chart_assets() -> Iterator[str]:
+#     yield 'd3.v7.min.js'
+#     yield 'd3-flextree.js'
+#     yield 'd3-org-chart.js'
+#     yield 'd3-display.js'

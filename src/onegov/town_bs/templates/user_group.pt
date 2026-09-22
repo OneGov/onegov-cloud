@@ -1,0 +1,39 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <dl class="field-display">
+            <div>
+                <dt i18n:translate>Users</dt>
+                <dd>
+                    <ul>
+                      <li tal:repeat="user layout.model.users">${user.title}</li>
+                    </ul>
+                </dd>
+            </div>
+
+            <div tal:condition="layout.model.ticket_permissions">
+                <dt i18n:translate>Ticket permissions</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="permission layout.model.ticket_permissions">
+                            ${layout.handler_label(permission.handler_code)}<tal:block tal:condition="permission.group">: ${permission.group}</tal:block>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
+            <tal:block tal:condition="directories">
+                <dt i18n:translate>Directories</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="dir directories">
+                            <p>${dir}</p>
+                        </li>
+                    </ul>
+               </dd>
+            </tal:block>
+            <metal:b use-macro="layout.macros['extra_usergroup_fields']" tal:define="usergroup layout.model" />
+        </dl>
+    </tal:block>
+</div>

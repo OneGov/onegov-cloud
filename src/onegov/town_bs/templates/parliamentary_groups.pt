@@ -1,0 +1,29 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="large-7 medium-8 cell main-content">
+                <p tal:condition="not:parliamentary_groups" i18n:translate="">No parliamentary groups defined yet.</p>
+                <ul tal:condition="parliamentary_groups" class="more-list parliamentary-group-list">
+                    <li tal:repeat="parliamentary_group parliamentary_groups">
+                        <a class="list-link" tal:attributes="href request.link(parliamentary_group)">
+                            <h5 class="list-title">${parliamentary_group.name}</h5>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="large-4 medium-4 cell sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="side-panel">
+                        <h2 i18n:translate class="h3">Filters</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </tal:b>
+</div>

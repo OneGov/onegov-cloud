@@ -1,0 +1,97 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6" tal:define="fullpage True">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b tal:condition="ticket.state in {'open', 'closed'} and not pick_up_hint">
+            <tal:b tal:condition="not: pick_up_hint" metal:use-macro="layout.macros['ticket_status_page_message']" />
+        </tal:b>
+
+        <div tal:condition="pick_up_hint" class="field-display-label" i18n:translate>Pick-Up</div>
+        <div tal:condition="pick_up_hint" class="field-display-data ticket-title">
+            <tal:b content="layout.linkify(pick_up_hint)" />
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 rounded-2 bg-primary text-white p-md my-3xl">
+                <dl class="row justify-content-between mb-0">
+                    <div class="col-auto">
+                    <dt class="text-white fw-bold text-opacity-75" i18n:translate>State</dt>
+                    <dd class="mb-0">
+                        <span class="badge rounded-pill bg-opacity-75 bg-white text-primary bg-opacity-50 fw-bold py-xs px-sm">
+                            <tal:b metal:use-macro="layout.macros['ticket_status']" />
+                        </span>
+                    </dd>
+                    </div>
+
+                    <div class="col-auto text-end">
+                    <dt class="visually-hidden" i18n:translate>Subject</dt>
+                    <dl class="text-white text-opacity-75 fw-bold mb-md">${ticket.reference_group(request)}</dl>
+                    <dt class="text-white fw-normal" i18n:translate>Request Reference</dt>
+                    <dd class="fs-md fw-bold mb-0">
+                        <tal:b condition="request.is_manager">
+                            <a class="text-reset text-decoration-none" href="${request.link(ticket)}">${ticket.number}</a>
+                        </tal:b>
+                        <tal:b condition="not:request.is_manager">
+                            ${ticket.number}
+                        </tal:b>
+                    </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <tal:b tal:condition="extra_information">
+            <h2 i18n:translate>Additional Information</h2>
+            <p>${extra_information}</p>
+        </tal:b>
+        <tal:b tal:condition="ticket.handler.payment">
+            <tal:b tal:define="payment ticket.handler.payment; show_vat ticket.handler.show_vat" metal:use-macro="layout.macros['payment']" />
+        </tal:b>
+
+        <div class="field-display">
+            <div tal:condition="True">
+                <h2 i18n:translate>Additional Information</h2>extra Information
+            </div>
+            <tal:b tal:condition="ticket.handler.payment">
+                <tal:b tal:define="payment ticket.handler.payment; show_vat ticket.handler.show_vat" metal:use-macro="layout.macros['payment']" />
+            </tal:b>
+        </div>
+
+        <div class="status-chat">
+            <h2 class="mt-lg" i18n:translate>Timeline</h2>
+
+            <div tal:condition="feed_data"
+                class="timeline"
+                    data-feed-data="${feed_data}"
+                    data-feed-order="asc"
+                    data-feed='static'>
+            </div>
+
+            <tal:b condition="ticket.handler_code == 'EVN' and ticket.unguessable_edit_link(request)">
+                <div class="alert alert-secondary">
+                    <span i18n:translate>Would you like to make corrections to the event?</span>
+                    <a href="${ticket.unguessable_edit_link(request)}" i18n:translate>Edit this event.</a>
+                </div>
+            </tal:b>
+
+            <tal:b condition="ticket.state != 'closed'">
+                <div class="alert alert-secondary">
+                    <span i18n:translate>Forgot something or have a special request?</span>
+                    <a href="javascript:;" data-open="send-message" i18n:translate>Add a message to the ticket.</a>
+                </div>
+
+                <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id 'send-message'">
+                    <tal:block metal:fill-slot="modal_content">
+                        <div metal:use-macro="layout.macros['form']" />
+                    </tal:block>
+                </tal:block>
+            </tal:b>
+
+            <p class="panel" tal:condition="ticket.state == 'closed'" i18n:translate style="text-align: center;">
+                New messages have been disabled because the ticket has been closed.
+            </p>
+
+        </div>
+    </tal:b>
+</div>

@@ -43,7 +43,6 @@ class TownBsTheme(BootstrapBaseTheme):
         return {
             'primary': user_options['primary-color-ui'],
             'body-font-family': user_options['body-font-family-ui'],
-            # Bootstrap-Pendant zu header-font-family: $headings-font-family
             'headings-font-family': user_options['header-font-family-ui'],
         }
 
