@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from lazy_object_proxy import Proxy  # type: ignore[import-untyped]
 from onegov.form.parser.form import ParsedForm
 from sqlalchemy.dialects.postgresql import JSONB

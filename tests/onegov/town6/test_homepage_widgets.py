@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import scan_morepath_modules
 from onegov.core.widgets import transform_structure
 from onegov.town6 import TownApp

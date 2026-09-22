@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.core.utils import module_path
 from onegov.people.models import Agency

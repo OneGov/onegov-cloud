@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Personal, Private
 from onegov.core.security.roles import (
     get_roles_setting as get_roles_setting_base)

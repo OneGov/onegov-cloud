@@ -56,8 +56,7 @@ table. The link between the two is established in the automatically created
 ``payments_for_products`` table.
 
 """
-from __future__ import annotations
-
+from annotationlib import get_annotations, Format
 from onegov.core.orm.utils import QueryChain
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -205,6 +204,9 @@ def associated[M: Associable](
     if uselist == 'auto':
         uselist = not cardinality.endswith('to-one')
 
+    if not TYPE_CHECKING:
+        M = associated_cls  # ruff: ignore[non-lowercase-variable-in-function]
+
     def descriptor(cls: type[Base]) -> Mapped[list[M]] | Mapped[M | None]:
         # HACK: forms is one of the only tables which doesn't use id as
         #       its primary key, we probably should just use id everywhere
@@ -308,6 +310,12 @@ def associated[M: Associable](
     # NOTE: We manually set the  return type on __annotations__ so
     #       that SQLAlchemy can actually understand what it means
     if not TYPE_CHECKING:
+        # NOTE: Populate __annotations__ with format FORWARDREF so
+        #       we avoid a `NameError` for `Base`
+        descriptor.__annotations__ = get_annotations(
+            descriptor,
+            format=Format.FORWARDREF
+        )
         descriptor.__annotations__['return'] = Mapped[
             list[associated_cls] if uselist else associated_cls
         ]

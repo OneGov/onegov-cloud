@@ -4,8 +4,6 @@ An analytics provider can provide both user- and application-facing
 configuration
 
 """
-from __future__ import annotations
-
 from abc import abstractmethod, ABCMeta
 
 

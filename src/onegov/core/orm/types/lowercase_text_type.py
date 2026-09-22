@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.operators import CaseInsensitiveComparator
 

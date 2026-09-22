@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.org.models import News, NewsCollection, Topic
 from onegov.org.views.page import view_topic, view_news, view_news_collection

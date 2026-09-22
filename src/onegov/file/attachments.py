@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pdftotext  # type:ignore
 
 from depot.fields.upload import UploadedFile

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import lxml.etree
 import lxml.html
 import random

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from wtforms import StringField
 from onegov.form import Form
 from onegov.org import _

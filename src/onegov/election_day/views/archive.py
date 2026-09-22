@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from operator import itemgetter
 from morepath import redirect
 from morepath.request import Response

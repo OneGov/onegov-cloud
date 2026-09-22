@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form import merge_forms
 from onegov.form.fields import MultiCheckboxField
 from onegov.org import _

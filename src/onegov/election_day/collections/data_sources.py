@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy import desc
 
 from onegov.core.collection import Pagination

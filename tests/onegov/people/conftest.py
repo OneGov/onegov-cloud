@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 from onegov.core import Framework
 from onegov.file import DepotApp

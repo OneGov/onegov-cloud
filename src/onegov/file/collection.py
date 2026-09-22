@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import timedelta
 from depot.io.utils import file_from_content
 from onegov.file.models import File, FileSet

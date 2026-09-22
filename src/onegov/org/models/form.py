@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.form.models import FormDefinition
 from onegov.org.i18n import _

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from datetime import timedelta
 from dateutil.parser import parse

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import sqlalchemy_utils.observer
 from dectate.tool import resolve_dotted_name
 from functools import wraps

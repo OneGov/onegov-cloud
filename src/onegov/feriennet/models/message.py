@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import BookingPeriod
 from onegov.chat import Message
 from onegov.org.models.message import TicketMessageMixin

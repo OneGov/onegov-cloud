@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.town6.layout import (
     UserManagementLayout as Town6UserManagementLayout
 )

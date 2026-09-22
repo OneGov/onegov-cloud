@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.custom import json
 from datetime import date
 from functools import cached_property

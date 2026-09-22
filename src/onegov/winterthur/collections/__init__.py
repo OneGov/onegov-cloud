@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.winterthur.collections.address import AddressCollection
 from onegov.winterthur.collections.address import AddressSubsetCollection
 

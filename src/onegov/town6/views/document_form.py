@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security.permissions import Public
 from onegov.org.models.document_form import (FormDocument,
                                               FormDocumentCollection)

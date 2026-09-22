@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from itertools import groupby
 from onegov.activity import OccasionNeed
 from onegov.core.orm.sql import as_selectable_from_path

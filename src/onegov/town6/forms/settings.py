@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 from wtforms.fields import BooleanField, RadioField
 from wtforms.fields.simple import TextAreaField

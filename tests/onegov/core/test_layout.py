@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date, datetime, timedelta
 from sedate import replace_timezone, utcnow
 from onegov.core.layout import Layout

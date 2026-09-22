@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private, Public
 from onegov.town6 import TownApp
 from morepath import redirect

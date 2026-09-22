@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import niquests
 
 from babel.numbers import format_decimal

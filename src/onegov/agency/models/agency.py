@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency.models.membership import ExtendedAgencyMembership
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.crypto import random_token

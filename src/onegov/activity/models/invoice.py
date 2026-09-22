@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.pay import Invoice
 from onegov.user import User
 from sqlalchemy import ForeignKey

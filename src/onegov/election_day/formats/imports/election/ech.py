@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day import _
 from onegov.election_day import log
 from onegov.election_day.formats.imports.common import convert_ech_domain

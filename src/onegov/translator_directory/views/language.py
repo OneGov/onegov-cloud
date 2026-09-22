@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.elements import Link
 from onegov.core.security import Secret, Private
 from onegov.translator_directory import TranslatorDirectoryApp

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Personal, Private, Secret
 from onegov.form import Form
 from onegov.org.models.ticket import ReservationTicket

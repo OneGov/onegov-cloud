@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from libres.db.models import Allocation
 from onegov.core.orm import ModelBase
 from onegov.reservation.models.resource import Resource

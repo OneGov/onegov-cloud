@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import OrderedDict
 from onegov.core.security import Private
 from onegov.form import FormDefinition

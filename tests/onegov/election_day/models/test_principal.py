@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from freezegun import freeze_time
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality

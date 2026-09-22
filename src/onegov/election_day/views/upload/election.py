@@ -1,6 +1,4 @@
 """ The upload view. """
-from __future__ import annotations
-
 import morepath
 import transaction
 

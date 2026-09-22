@@ -1,6 +1,4 @@
 """ Extra webasset filters. """
-from __future__ import annotations
-
 import os
 import rcssmin  # type:ignore[import-untyped]
 

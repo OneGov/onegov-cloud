@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from onegov.swissvotes.models import TranslatablePage

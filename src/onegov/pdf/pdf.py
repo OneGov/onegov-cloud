@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import turbohtml
 
 from copy import deepcopy

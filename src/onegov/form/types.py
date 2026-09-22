@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Any, Literal, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from decimal import Decimal

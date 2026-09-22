@@ -20,8 +20,6 @@ If there are any changes to the users table, the cache is removed. Since the
 cache is usually a shared redis instance, this works for multiple processes.
 
 """
-from __future__ import annotations
-
 import inspect
 
 from functools import wraps

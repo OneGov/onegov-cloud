@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import ensure_scheme
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField

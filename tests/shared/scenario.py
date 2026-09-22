@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import transaction
 from contextlib import contextmanager
 
