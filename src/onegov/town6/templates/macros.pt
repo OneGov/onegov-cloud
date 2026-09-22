@@ -31,10 +31,12 @@
 </metal:b>
 
 <metal:b define-macro="consume_messages" i18n:domain="onegov.town6">
-    <div tal:repeat="message request.consume_messages()"  class="alert alert-${message.type} alert-dismissible fade show mt-md" role="alert">
+    <div tal:repeat="message request.consume_messages()" data-closable class="callout alert-box ${message.type}">
         ${message.text}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 </metal:b>
 
 <metal:navigation define-macro="sort-items-nested">
@@ -59,125 +61,102 @@
     </ul>
 </metal:navigation>
 
-<metal:navigation define-macro="main-navigation-nested">
-    <div class="drilldown-item" tal:define="page page|None">
-        <a class="nav-link drilldown-link ${'active' if nav_page.id == (page.id if page else None) else ''} py-md" href="${link.attrs['href']}">
-            ${link.text}
-            <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
-            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
+<metal:navigation define-macro="side-navigation-nested">
+    <a tal:condition="children" tal:define="page page|None">
+        <div class="navlink ${'current' if nav_page == page else ''}">
+            <span data-click-target="${link.attrs['href']}">
+                ${link.text}
+                <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+                <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
+            </span>
+        </div>
+    </a>
+    <tal:b tal:condition="not: children" tal:define="page page|None">
+        <a href="${link.attrs['href']}">
+            <div class="navlink ${'current' if nav_page == page else ''}">
+                <span>
+                    ${link.text}
+                    <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+                    <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
+                </span>
+            </div>
         </a>
-        <button tal:condition="children" class="drilldown-toggle py-md pe-sm" type="button" data-bs-toggle="drilldown" aria-label="open submenu" i18n:attributes="aria-label">
-             <i class="fas fa-arrow-right"></i>
-        </button>
-    </div>
-
-    <tal:b tal:condition="children" tal:define="ancestors layout.model.ancestors|[]">
-        <ul class="drilldown-menu ${'is-active current-list' if nav_page in ancestors else ''} p-lg">
-            <li class="drilldown-back-item">
-                <button type="button" class="drilldown-back fs-2xs px-0" data-bs-toggle="drilldown-back">
-                    <i class="fas fa-arrow-left"></i> ${link.text}
-                </button>
-            </li>
+    </tal:b>
+    <tal:b tal:define="ancestors layout.model.ancestors|[]">
+        <ul class="vertical menu nested ${'is-active current-list' if nav_page in ancestors else ''}"  tal:condition="children">
             <tal:b tal:repeat="(nav_page, sublink, c) children">
                 <li data-sortable-id="${nav_page.id}">
-                    <metal:b use-macro="layout.macros['main_navigation_nested']" tal:define="link sublink; children c" />
+                    <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
                 </li>
             </tal:b>
         </ul>
     </tal:b>
 </metal:navigation>
 
-<metal:navigation define-macro="main-navigation">
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offCanvasMainMenu">
-        <div class="offcanvas-header p-lg">
-            <button type="button" class="btn-close primary-color" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body p-0">
-            <ul class="navbar-nav drilldown-menu is-current p-xl" tal:define="links top_navigation|layout.top_navigation">
-                <tal:b tal:repeat="(nav_page, link, children) links">
-                    <li class="nav-item" data-sortable-id="${nav_page.id}">
-                        <metal:b use-macro="layout.macros['main_navigation_nested']" />
-                    </li>
-                </tal:b>
-            </ul>
-        </div>
-    </div>
+<metal:navigation define-macro="side-navigation">
+    <ul class="vertical menu side-navigation drilldown" data-auto-height="true" data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
+        <li tal:repeat="(nav_page, link, children) links" data-sortable-id="${nav_page.id}">
+            <metal:b use-macro="layout.macros['side_navigation_nested']" />
+        </li>
+    </ul>
 </metal:navigation>
 
 <metal:header_links define-macro="header_links">
-    <div tal:condition="links" id="header_links" class="text-center" tal:define="links header_options.get('header_links')">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white pb-0 pt-lg">
-            <div class="container-fluid">
-                <button class="navbar-toggler mx-auto border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topNav" aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="topNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item" tal:repeat="link links">
-                            <a class="nav-link link-secondary small px-2" href="${link[1]}">${link[0] if link[0] else link[1]}</a>
-                        </li>
+    <div id="header_links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
+        <div class="grid-container">
+            <div class="title-bar align-center" data-responsive-toggle="animated-menu" data-hide-for="medium">
+                <button type="button" data-toggle><i class="fa fa-bars"></i> </button>
+                </div>
+
+                <div class="top-bar" id="animated-menu">
+                <div class="top-bar-left">
+                    <ul class="dropdown menu align-center" data-dropdown-menu>
+                        <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
                     </ul>
                 </div>
             </div>
-        </nav>
+        </div>
     </div>
 </metal:header_links>
 
-<metal:header_text define-macro="header_text">
-    <div id="header_text" tal:condition="header_options['left_header_name']|nothing" class="bg-dark" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
-        <div class="container-fluid py-xs">
-            <a class="h4 text-decoration-none" href="${header_options.get('left_header_url', '#')}"
+<metal:header-text define-macro="header-text">
+    <div id="header_text" tal:condition="header_options['left_header_name']|nothing" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+        <div class="grid-container">
+            <a class="h4" href="${header_options.get('left_header_url', '#')}"
                 style="color:${color or '#fff'}; font-size: ${rem_size}rem">
                     ${header_options['left_header_name']}
             </a>
         </div>
     </div>
-</metal:header_text>
+</metal:header-text>
 
-<metal:editbar define-macro="editbar">
-    <tal:b define="editbar_links layout.editbar_links if not layout.edit_mode else layout.editmode_links|[]">
-        <nav class="bg-dark-subtle navbar navbar-expand-lg p-0" tal:condition="editbar_links">
-            <div class="container">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarEditbar" aria-controls="navbarEditbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarEditbar">
-                    <ul class="navbar-nav edit-bar">
-                        <li class="nav-item dropdown" tal:repeat="group editbar_links|layout.editbar_links">
-                            <tal:b condition="group.links|nothing">
-                                <a href="#" role="button" data-bs-toggle="dropdown" class="nav-link dropdown-toggle ${' '.join(group.classes or ())}">${group.title}</a>
-                                <ul class="dropdown-menu">
-                                    <li tal:repeat="link group.links">
-                                        <tal:b replace="link(layout, ('nav-link', ))" />
-                                    </li>
-                                </ul>
-                            </tal:b>
-                            <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                                <tal:b replace="link(layout, ('nav-link', ))" />
-                            </tal:b>
+<metal:editbar define-macro="dropdown-editbar">
+        <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links">
+            <li tal:repeat="group editbar_links|layout.editbar_links">
+                <tal:b condition="group.links|nothing">
+                    <a href="#" class="${' '.join(group.classes or ())}">${group.title}</a>
+                    <ul class="menu">
+                        <li tal:repeat="link group.links">
+                            <tal:b replace="link(layout)" />
                         </li>
                     </ul>
-                </div>
-            </div>
-        </nav>
-    </tal:b>
+                </tal:b>
+                <tal:b condition="group.url|group.attrs|nothing" define="link group">
+                    <tal:b replace="link(layout)" />
+                </tal:b>
+            </li>
+        </ul>
 </metal:editbar>
 
 <metal:breadcrumbs define-macro="breadcrumbs">
     <tal:b tal:define="bc_level request.GET.get('bc-level', False)">
         <div id="breadcrumbs" class="${'show-in-iframe' if bc_level else ''}">
             <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
-                <ol class="breadcrumb mt-xl" tal:condition="layout.breadcrumbs"
-                    tal:define="shown_breadcrumbs layout.breadcrumbs[int(bc_level or 0):];
-                        last_breadcrumb shown_breadcrumbs[-1] if shown_breadcrumbs else None">
-                    <tal:b repeat="link shown_breadcrumbs">
-                        <li
-                            class="breadcrumb-item link-underline-opacity-0 ${'fw-bold' if link is last_breadcrumb else ''}"
-                            tal:content="link(layout, ('link-secondary', ))"
-                            tal:attributes="aria-current 'page' if link is last_breadcrumb else None"
-                        ></li>
+                <ul class="breadcrumbs" tal:condition="layout.breadcrumbs" >
+                    <tal:b repeat="link layout.breadcrumbs[int(bc_level or 0):]">
+                        <li tal:content="link(layout)"></li>
                     </tal:b>
-                </ol>
+                </ul>
             </nav>
         </div>
     </tal:b>
@@ -193,10 +172,12 @@
 </metal:panel-links>
 
 <metal:footer define-macro="footer">
-    <footer id="footer" class="bg-tertiary-subtle py-5xl">
-        <div class="container-fluid">
+    <footer id="footer" class="footer-container">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x footer-content">
                 <metal:b use-macro="layout.macros['footer_columns']" />
                 <metal:b use-macro="layout.macros['footer_links']" />
+            </div>
         </div>
     </footer>
 </metal:footer>
@@ -374,7 +355,7 @@
         <a tal:attributes="href item.url">
             <img src="${item.image_url}" alt="${item.lead or ''}">
         </a>
-        <div tal:condition="item.lead" class="card-section visually-hidden">${item.lead}</div>
+        <div tal:condition="item.lead" class="card-section show-for-sr">${item.lead}</div>
     </div>
 </metal:partners>
 
@@ -459,12 +440,12 @@
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="${fieldset.id}">
                 <legend>${fieldset.label}</legend>
-                <div class="formfields ${'row' if form_two_columns else ''}">
+                <div class="formfields ${'grid-x grid-padding-x wrapper' if form_two_columns else ''}">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                 </div>
             </fieldset>
             <tal:b condition="not:fieldset.is_visible">
-                <div class="formfields ${'row' if form_two_columns else ''}">
+                <div class="formfields ${'grid-x grid-padding-x wrapper' if form_two_columns else ''}">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                 </div>
             </tal:b>
@@ -482,10 +463,10 @@
                 </a>
             </tal:b>
             <tal:b condition="not: button_text|nothing">
-                <input type="submit" value="Submit" class="btn btn-primary" i18n:attributes="value">
+                <input type="submit" value="Submit" class="button" i18n:attributes="value">
             </tal:b>
             <tal:b condition="button_text|nothing">
-                <input type="submit" value="${button_text}" class="btn btn-primary" role="button">
+                <input type="submit" value="${button_text}" class="button" role="button">
             </tal:b>
             <a tal:condition="not hide_cancel|False" class="cancel-link" href="#" data-back-link> <span i18n:translate="">Cancel</span></a>
         </tal:b>
@@ -494,25 +475,17 @@
 
 <metal:fields define-macro="fields">
     <tal:b repeat="field fields">
-        <div
-            tal:define="hidden form.is_hidden(field)|False;
-            radio_field field.type == 'RadioField';
-            checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField');
-            field_list field.type == 'UploadMultipleField'"
-            class="${'col-12 col-md-6' if form_two_columns else ''} field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}"
-        >
-            <div class="mb-md">
+        <div tal:define="hidden form.is_hidden(field)|False" class="${'small-12 large-6 cell' if form_two_columns else 'grid-x'} field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}">
+            <div class="large-12 cell">
                 <tal:b define="input_type field.widget.input_type|None">
                     <tal:b condition="input_type == 'hidden'">
                         ${field()}
                         <small class="error" tal:repeat="error field.errors">${error}</small>
                     </tal:b>
-                    <tal:b condition="input_type != 'hidden'">
-                        <div tal:attributes="class field.errors and not field_list and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
+                    <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField'); field_list field.type == 'UploadMultipleField'">
+                        <label tal:attributes="class field.errors and not field_list and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
                             <metal:b use-macro="layout.macros['field']" />
-                        </div>
-                    </tal:b>
-                </tal:b>
+                        </label>
 
                 <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
                     <metal:b use-macro="layout.macros['field']" />
@@ -522,70 +495,65 @@
                         ${error}
                     </small>
                 </tal:b>
-            </div>
-        </div>
+            </tal:b>
+        </tal:b>
+    </div></div>
     </tal:b>
 </metal:fields>
 
-<metal:single_field define-macro="field">
-    <!--! render the label after the field if it's a boolean field -->
-    <tal:b define="field_type_groups python: {
-        'URLPanelField': 'panel',
-        'PanelField': 'panel',
-        'MultiCheckboxField': 'choice',
-        'RadioField': 'choice',
-    }">
-        <tal:b tal:switch="field_type_groups.get(field.type, field.type)">
-            <tal:b case="'panel'">
-                <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
-                        <tal:b replace="content" />
-                    </tal:b>
-            </tal:b>
-            <tal:b case="'BooleanField'">
-                ${field()}
-                <label class="form-check-label" for="${field.label.text}">
-                    <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-                    <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                </label>
-                <div class="form-text" tal:condition="field.description">
-                    <tal:b replace="request.translate(field.description)" />
-                </div>
-            </tal:b>
-            <tal:b case="'choice'">
-                    <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
-                        <!--! The field is placed here -->
-                        <label>
-                            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-                            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                        </label>
-                        <div class="form-text" tal:condition="long_description">
-                            <tal:b replace="long_description"/>
-                        </div>
-                            <tal:b replace="content" />
-                    </tal:b>
-            </tal:b>
-            <tal:b case="default">
-                <!--
-                    Note how the field is rendered *first* in the 'define' step,
-                    before the label is accessed. This is due to the field call
-                    setting up translatable labels as a side-effect.
+<metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
+    <div class="card" data-aos="fade" data-aos-duration="800"  id="homepage-tile-${item.number}" tal:condition="item.links">
+        <div class="card-divider">
+            <a tal:condition="item.page.url" href="${item.page.url}"><h5>${item.page.text}</h5></a>
+            <h5 tal:condition="not item.page.url">${item.page.text}</h5>
+        </div>
+        <div class="card-section">
+            <ul class="more-list">
+                <li tal:repeat="link item.links" tal:content="link(layout)" />
+            </ul>
+        </div>
+    </div>
+</metal:homepage-tiles>
 
-                    See onegov.core.i18n.get_translation_bound_meta.render_field
-                -->
-                <div class="form-floating">
-                    <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
-                        <!--! The field is placed here -->
-                        <tal:b replace="content" />
-                        <label>
-                            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-                            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                        </label>
-                        <div class="form-text" tal:condition="long_description">
-                            <tal:b replace="long_description"/>
-                        </div>
-                    </tal:b>
+<metal:homepage-tiles define-macro="homepage-tiles">
+    <div>
+        <div class="grid-x grid-padding-x align-center" >
+            <tal:block tal:repeat="item tiles">
+                <div class="cell small-12 medium-6 large-4 homepage-tile" tal:condition="item.links">
+                    <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
                 </div>
-            </tal:b>
+            </tal:block>
+        </div>
+    </div>
+</metal:homepage-tiles>
+
+<metal:single_field define-macro="field">
+     <!--! render the label after the field if it's a boolean field -->
+    <tal:b condition="field.type == 'BooleanField'">
+        ${field()}
+        <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+        <div class="field-help" tal:condition="field.description">
+            <tal:b replace="request.translate(field.description)" />
+        </div>
+    </tal:b>
+    <tal:b condition="field.type != 'BooleanField'">
+        <!--
+            Note how the field is rendered *first* in the 'define' step,
+            before the label is accessed. This is due to the field call
+            setting up translatable labels as a side-effect.
+
+            See onegov.core.i18n.get_translation_bound_meta.render_field
+        -->
+        <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
+            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+            <div class="long-field-help" tal:condition="long_description">
+                <tal:b replace="long_description"/>
+            </div>
+
+            <!--! The field is placed here -->
+            <tal:b replace="content" />
         </tal:b>
     </tal:b>
 </metal:single_field>
@@ -611,22 +579,19 @@
 </metal:upload>
 
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
-    <div class="card h-100 news-card border-0 bg-tertiary-subtle" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
-        <div class="card-body d-flex flex-column p-0">
-            <p tal:condition="not:hide_date|False" class="subheader text-primary m-2xl">${layout.format_date(item.published_or_created, 'date')}</p>
-            <a class="text-decoration-none" href="${url}">
-                <h5 class="fs-lg fw-bold mx-2xl mb-2xl">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h5>
+    <div class="card news-card" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
+        <a href="${url}">
+            <div tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></div>
+        </a>
+        <div class="card-section">
+            <a href="${url}">
+                <div>
+                    <h5>${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h5>
+                    <p tal:condition="not:hide_date|False" class="subheader">${layout.format_date(item.published_or_created, 'date_long')}</p>
+                    <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
+                </div>
             </a>
-            <div class="p-lg mt-auto">
-                <a class="text-decoration-none position-relative d-block" href="${url}">
-                    <div tal:condition="item.page_image and item.show_preview_image" class="ratio ratio-16x9">
-                        <img src="${item.page_image}" class="object-fit-cover rounded-2">
-                    </div>
-                    <span class="read-more-link position-absolute bottom-0 start-0 mb-lg ms-lg d-inline-flex align-items-center gap-2">
-                        <tal:b i18n:translate="">read more</tal:b> <i class="fa fa-arrow-right"></i>
-                    </span>
-                </a>
-            </div>
+            <a href="${url}" class="read-more-link" i18n:translate="">read more</a>
         </div>
     </div>
 </metal:newslist>
@@ -647,8 +612,8 @@
 
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
-    <div tal:condition="newsletter.show_only_previews|True and news" class="newslist row g-md" >
-        <div class="news-list-item col-12 col-md-4" tal:repeat="item news">
+    <div tal:condition="newsletter.show_only_previews|True and news" class="newslist grid-x grid-padding-x align-center" >
+        <div class="cell small-12 medium-${md_span|6} large-${lg_span|4} news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
     </div>
@@ -774,205 +739,155 @@
     </tal:b>
 </metal:empty_lead_hint>
 
-<metal:page_content define-macro="side_panel_card" i18n:domain="onegov.town6">
-    <div class="card me-md-2xl side_panel_card mb-md border-1 side-panel ${extra_class|''}"
-         tal:attributes="data-toc-level data_toc_level|nothing">
-        <div class="card-body">
-            <h3><metal:b define-slot="panel-title"></metal:b></h3>
-            <metal:b define-slot="panel-content"></metal:b>
-        </div>
-    </div>
-</metal:page_content>
-
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
-    <div tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
-         class="col-12 col-md-3 sidebar ${'filter-panel' if filter_panel else ''}"
-         tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
+    <div tal:condition="no_sidebar_offset|False" class="small-12 medium-4 cell sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
+    tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <div class="sidebar-wrapper">
             <tal:b metal:define-slot="before-panels"></tal:b>
-
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:define="hide page.hide_contact|hide_contact|False; extra_class 'contact-panel'"
-                   tal:condition="not hide and (contact or coordinates or location)">
-                <tal:b metal:fill-slot="panel-title">
-                    <tal:b tal:condition="contact and not hide" i18n:translate>Contact</tal:b>
-                    <tal:b tal:condition="not contact" i18n:translate>Map</tal:b>
-                </tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <tal:b tal:condition="contact and not hide">
-                        <tal:b content="contact" />
-                        <div tal:condition="sidepanel_contact|False">
-                            <ul class="sidebar-links more-list">
-                                <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
-                                    <a class="list-link" href="${contact[1]}">
-                                        <i class="fa fa-link" aria-hidden="true"></i>
-                                        <span class="list-title">${contact[0]}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </tal:b>
-                    <br tal:condition="coordinates and contact" />
-                    <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br>
-                    <div class="location" tal:condition="location">${location}</div>
-                </tal:b>
-            </tal:b>
-
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="people and not show_people_on_main_page"
-                   tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; extra_class 'people-panel'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>People</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
-                        <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                            <div class="person-card person-list-card">
-                                <div tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-                                    <a tal:condition="url" href="${request.link(person)}" aria-hidden="true">
-                                        <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
-                                            <div class="cover-image" style='background-image: url("${url}");'></div>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div>
-                                    <a href="${request.link(person)}">
-                                        <b tal:condition="western_name_order" class="list-title">${person.first_name} ${person.last_name}</b>
-                                        <b tal:condition="not western_name_order" class="list-title">${person.title}</b>
-                                    </a>
-                                    <a href="${request.link(person)}">
-                                        <p class="list-lead preview">${person.context_specific_function}</p>
-                                    </a>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </tal:b>
-            </tal:b>
-
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="files and page.show_file_links_in_sidebar|True"
-                   tal:define="extra_class 'files-panel'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>Documents</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list">
-                        <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
-                            <a class="list-link" title="${file.name}" href="${request.link(file)}">
-                                <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                                <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </tal:b>
-            </tal:b>
-
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="sidepanel_links|False"
-                   tal:define="extra_class 'links-panel'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>Links</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list">
-                        <li tal:repeat="sl python: sorted(sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
-                            <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+            <div tal:define="hide page.hide_contact|hide_contact|False" class="side-panel contact-panel" tal:condition="not hide and contact or coordinates or location">
+                <div tal:condition="contact and not hide">
+                    <h3 i18n:translate>Contact</h3>
+                    <tal:b content="contact" />
+                    <div tal:condition="sidepanel_contact|False">
+                        <ul class="sidebar-links more-list">
+                            <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
+                                <a class="list-link" href="${contact[1]}">
                                 <i class="fa fa-link" aria-hidden="true"></i>
-                                <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </tal:b>
-            </tal:b>
-
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="siblings|False"
-                   tal:define="extra_class 'more-news'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>More news</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list">
-                        <li tal:repeat="sibling siblings">
-                            <a href="${request.link(sibling)}" class="list-link">
-                                <span class="list-title">${sibling.title}</span>
-                            </a>
-                            <a href="${request.link(sibling)}">
-                                <p class="list-lead preview">
-                                    ${layout.format_date(sibling.published_or_created, 'date_long')}
-                                </p>
-                            </a>
-                        </li>
-                    </ul>
-                </tal:b>
-            </tal:b>
-
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="more_entries|False"
-                   tal:define="extra_class 'more-entries'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>Other Entries</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list">
-                        <li tal:condition="prev_entry">
-                            <a href="${request.link(prev_entry)}" class="list-link">
-                                <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate>Previous Entry</span>
-                            </a>
-                            <a href="${request.link(prev_entry)}">
-                                <p class="list-lead preview">${prev_entry.title}</p>
-                            </a>
-                        </li>
-                        <li tal:condition="next_entry">
-                            <a href="${request.link(next_entry)}" class="list-link">
-                                <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate>Next Entry</span>
-                            </a>
-                            <a href="${request.link(next_entry)}">
-                                <p class="list-lead preview">${next_entry.title}</p>
-                            </a>
-                        </li>
-                    </ul>
-                </tal:b>
-            </tal:b>
-
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:define="extra_class 'content-panel d-none'; data_toc_level layout.org.level_table_of_contents">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>Content</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list"></ul>
-                </tal:b>
-            </tal:b>
-
+                                <span class="list-title">${contact[0]}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <br tal:condition="coordinates and contact" />
+                <h3 i18n:translate tal:condition="not contact">Map</h3>
+                <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br>
+                <div class="location" tal:condition="location">${location}</div>
+            </div>
+            <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
+                <h3 i18n:translate>People</h3>
+                <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
+                    <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
+                        <div class="person-card person-list-card">
+                            <div tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                                <a tal:condition="url" href="${request.link(person)}" aria-hidden="true" >
+                                    <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                        <div class="cover-image" style='background-image: url("${url}");'></div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div>
+                                <a href="${request.link(person)}">
+                                    <b tal:condition="western_name_order" class="list-title">${person.first_name} ${person.last_name}</b>
+                                    <b tal:condition="not western_name_order" class="list-title">${person.title}</b>
+                                </a>
+                                <a href="${request.link(person)}">
+                                    <p class="list-lead preview">${person.context_specific_function}</p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="side-panel files-panel" tal:condition="files and page.show_file_links_in_sidebar|True">
+                <h3 i18n:translate>Documents</h3>
+                <ul class="more-list">
+                    <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
+                        <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                            <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                            <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
+                <h3 i18n:translate>Links</h3>
+                <ul class="more-list">
+                    <li tal:repeat="sl python: sorted(sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
+                        <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                            <i class="fa fa-link" aria-hidden="true"></i>
+                            <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="more-news side-panel" tal:condition="siblings|False">
+                <h3 i18n:translate="">More news</h3>
+                <ul class="more-list">
+                    <li tal:repeat="sibling siblings">
+                        <a href="${request.link(sibling)}" class="list-link">
+                            <span class="list-title">${sibling.title}</span>
+                        </a>
+                        <a href="${request.link(sibling)}">
+                            <p class="list-lead preview">
+                                ${layout.format_date(sibling.published_or_created, 'date_long')}
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="more-entries side-panel" tal:condition="more_entries|False">
+                <h3 i18n:translate="">Other Entries</h3>
+                <ul class="more-list">
+                    <li tal:condition="prev_entry">
+                        <a href="${request.link(prev_entry)}" class="list-link">
+                            <i class="fa fa-chevron-left"></i><span
+                                class="list-title" i18n:translate="">Previous Entry</span>
+                        </a>
+                        <a href="${request.link(prev_entry)}">
+                            <p class="list-lead preview">
+                                    ${prev_entry.title}
+                            </p>
+                        </a>
+                    </li>
+                    <li tal:condition="next_entry">
+                        <a href="${request.link(next_entry)}" class="list-link">
+                            <i class="fa fa-chevron-right"></i><span
+                                class="list-title" i18n:translate="">Next Entry</span>
+                        </a>
+                        <a href="${request.link(next_entry)}">
+                            <p class="list-lead preview">
+                                    ${next_entry.title}
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="side-panel content-panel" style="display: none;" data-toc-level="${layout.org.level_table_of_contents}">
+                <h3 i18n:translate>Content</h3>
+                <ul class="more-list"></ul>
+            </div>
             <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
+
         </div>
     </div>
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="row"
-        tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;"
-    >
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
-            <tal:b condition="full_page_width|False">
-                <div class="col-12 page-content-main">
-                    <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
-                    <div metal:define-slot="before-lead"></div>
-                    <div metal:define-slot="after-lead"></div>
-
-                    <div class="page-text" tal:condition="text" tal:content="text" />
-                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
-                    <div metal:define-slot="after-text"></div>
+            <div class="small-12 cell page-content-main">
+                <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
+                <div metal:define-slot="before-lead"></div>
+                <div class="limit-line-width">
+                    <span class="page-lead h5" tal:condition="lead" tal:content="lead" />
                 </div>
-            </tal:b>
-            <tal:b condition="not full_page_width|True">
-                <div class="col-12 col-md-9 offset-md-3 page-content-main">
-                    <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
-                    <div metal:define-slot="before-lead"></div>
-                    <div metal:define-slot="after-lead"></div>
+                <div metal:define-slot="after-lead"></div>
 
-                    <div class="page-text" tal:condition="text" tal:content="text" />
-                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
-                    <div metal:define-slot="after-text"></div>
-                </div>
-            </tal:b>
+                <div class="page-text" tal:condition="text" tal:content="text" />
+                <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+                <div metal:define-slot="after-text"></div>
+
+            </div>
         </tal:b>
         <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|False">
-            <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
-            <div class="col-12 col-md-9 page-content-main content">
+            <div class="small-12 medium-7 cell page-content-main content">
                 <div class="theiaStickySidebar">
-                    <img class="page-image img-fluid rounded-3" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
+                    <img class="page-image" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
+                    <div class="limit-line-width">
+                        <span class="page-lead h5" tal:condition="lead" tal:content="lead" />
+                    </div>
                     <div metal:define-slot="after-lead"></div>
 
                     <div class="page-text" tal:condition="text" tal:content="text" />
@@ -1004,11 +919,14 @@
                     </div>
                 </div>
             </div>
+            <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
         </tal:b>
     </div>
 </metal:page_content>
 
 <metal:display_form define-macro="display_form" i18n:domain="onegov.town6">
+
+    <div metal:use-macro="layout.macros['progress_indicator']" tal:define="steps layout.get_step_sequence()|nothing"/>
 
     <div tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:b define="fields fieldset.non_empty_fields" condition="fields">
@@ -1191,84 +1109,40 @@
     </tal:b>
 </metal:payment>
 
-<metal:person_card define-macro="person_card_link">
-    <a
-        class="text-body link-underline-primary link-offset-2"
-        href="${link}"
-    >
-        ${link_text}
-    </a>
-</metal:person_card>
-
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
-    <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request); url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-        <div class="card-body" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
-            <div class="row mb-lg">
-                <div class="col-6 col-md-4">
-                    <div class="ratio square-6xl"
-                        tal:define="initials python: (person.first_name[0] + person.last_name[0]).upper() if western_name_order else (person.last_name[0] + person.first_name[0]).upper()">
-                        <img tal:condition="url"
-                            class="object-fit-cover rounded-1"
-                            src="${url}"
-                            alt="Person image">
-                        <div tal:condition="not url"
-                            class="rounded-1 bg-tertiary-subtle d-flex align-items-center justify-content-center">
-                            <span class="fs-xl" tal:content="initials"></span>
-                        </div>
-                    </div>
-                </div>
+    <div class="person-card person-list-card card-section" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
+        <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+            <div class="person-card-portrait" tal:condition="url" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                <i class="fa fa-user" tal:condition="not:url"></i>
+                <div class="cover-image"  style='background-image: url("${url}");'></div>
             </div>
-            <div class="row">
-                <div class="person-card-details col-9">
-                    <p class="mb-sm">
-                        <tal:b tal:condition="person.function">
-                            <span title="${person.function}">${person.function}</span>
-                        </tal:b>
-                    </p>
-                    <h3 class="h4 mb-0">
-                        <a class="text-decoration-none" href="${link}">
-                                <span tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
-                                <span tal:condition="not western_name_order">${person.title}</span>
-                        </a>
-                    </h3>
-
-                    <ul class="list-unstyled mb-0 mt-md">
-                        <li tal:condition="person.email and 'email' not in exclude">
-                            <tal:b
-                                metal:use-macro="layout.macros['person_card_link']"
-                                tal:define="link f'mailto:{person.email}'; link_text person.email"
-                            />
-                        </li>
-                        <li tal:condition="person.phone and 'phone' not in exclude" class="person-card-phone">
-                            <tal:b
-                                metal:use-macro="layout.macros['person_card_link']"
-                                tal:define="link f'tel:{layout.format_phone_number(person.phone)}'; link_text layout.format_phone_number(person.phone)"
-                            />
-                        </li>
-                        <li tal:condition="person.phone_direct and 'phone_direct' not in exclude" class="person-card-phone_direct">
-                            <tal:b
-                                metal:use-macro="layout.macros['person_card_link']"
-                                tal:define="link f'tel:{layout.format_phone_number(person.phone_direct)}'; link_text layout.format_phone_number(person.phone_direct)"
-                            />
-                        </li>
-                    </ul>
-
-                    <div class="collapse" id="personDetails${person.id}">
-                        <tal:b define="organisations organisations_as_dict(person)" tal:condition="'organisation' not in exclude">
-                            <div tal:repeat="top_organisation organisations.keys()" class="mt-2xl">
-                                <span tal:define="sub_organisations organisations[top_organisation]" i18n:attributes="title" title="Organisation">${top_organisation}${' - ' if sub_organisations else ''}${', '.join(sub_organisations)}</span>
-                            </div>
-                        </tal:b>
-                    </div>
-                </div>
-
-                <div class="col-3 align-content-end text-end">
-                    <button class="btn p-0 btn-primary rounded-circle square-2xl" type="button" data-bs-toggle="collapse" data-bs-target="#personDetails${person.id}" aria-expanded="false" aria-controls="collapseExample">
-                        <i class="fa fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
+        </a>
+        <ul class="person-card-details">
+            <li class="person-card-title" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
+                <a href="${link}">
+                    <span tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
+                    <span tal:condition="not western_name_order">${person.title}</span>
+                </a>
+            </li>
+            <li tal:condition="person.function" class="person-card-function">
+                <span title="${person.function}">${person.function}</span>
+            </li>
+            <tal:b define="organisations organisations_as_dict(person)" tal:condition="'organisation' not in exclude">
+                <li tal:repeat="top_organisation organisations.keys()" class="person-card-organisation">
+                    <span tal:define="sub_organisations organisations[top_organisation]" i18n:attributes="title" title="Organisation">${top_organisation}${' - ' if sub_organisations else ''}${', '.join(sub_organisations)}</span>
+                </li>
+            </tal:b>
+            <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
+                <a href="mailto:${person.email}">${person.email}</a>
+            </li>
+            <li tal:condition="person.phone and 'phone' not in exclude" class="person-card-phone">
+                <a href="tel:${layout.format_phone_number(person.phone)}">${layout.format_phone_number(person.phone)}</a>
+            </li>
+            <li tal:condition="person.phone_direct and 'phone_direct' not in exclude" class="person-card-phone_direct">
+                <a href="tel:${layout.format_phone_number(person.phone_direct)}">${layout.format_phone_number(person.phone_direct)}</a>
+            </li>
+        </ul>
+        <a href="${link}"><i class="fa fa-chevron-right"></i></a>
     </div>
 </metal:person_card>
 
@@ -1448,7 +1322,7 @@
                     </tal:b>
 
                     <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
-                        <a href="${request.link(page, name)}"><span class="visually-hidden" i18n:translate>You're on page </span><span>${page.page + 1}</span></a>
+                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span><span>${page.page + 1}</span></a>
                     </li>
 
                     <tal:b condition="repeat.page.end and next">
@@ -1638,18 +1512,14 @@
 </metal:display_event>
 
 <metal:atoz define-macro="atoz" i18n:domain="onegov.town6">
-    <div class="atoz-block row mb-3xl" tal:repeat="item items">
-        <div class="col-12 col-sm-6 col-md-3">
-            <h2 class="fs-2xl text-primary sticky-top">${item[0]}</h2>
-        </div>
-        <div class="col-12 col-sm-6 col-md-9">
-            <div class="row g-lg">
-                <div class="col-12 col-md-6" tal:repeat="detail item[1]">
-                    <div class="card">
-                        <tal:b metal:define-slot="item-detail">
-                            <a href="${request.link(detail)}">${detail.title}</a>
-                            <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
-                        </tal:b>
+    <div class="atoz-block" tal:repeat="item items">
+        <h2>${item[0]}</h2>
+        <div class="grid-x grid-padding-x subpage-cards">
+            <div class="cell small-12 medium-6" tal:repeat="detail item[1]">
+                <div class="card">
+                    <div metal:define-slot="item-detail">
+                        <a href="${request.link(detail)}">${detail.title}</a>
+                        <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
                     </div>
                 </div>
             </div>
@@ -1970,90 +1840,62 @@
             </a>
         </div>
 </metal:icon_links>
+
 <metal:slider define-macro="slider" i18n:domain="onegov.town6" tal:define="searchbox searchbox|'true';">
-
-    <div class="position-relative">
-
-        <div tal:condition="images" id="homepageCarousel" class="carousel slide homepage-image-slider" data-bs-ride="carousel" data-bs-interval="7200" role="region" aria-label="Homepage Image Slider" tal:define="height height|None;">
-            <div tal:condition="images and len(images) > 1" class="carousel-indicators">
-                <button tal:repeat="image images"
-                        type="button"
-                        data-bs-target="#homepageCarousel"
-                        data-bs-slide-to="${repeat.image.index}"
-                        class="${'active' if repeat.image.index == 0 else ''}"
-                        aria-current="${'true' if repeat.image.index == 0 else 'false'}"
-                        aria-label="Slide ${repeat.image.index + 1}">
-                </button>
+    <div tal:condition="images" class="orbit slider homepage-image-slider ${'' if searchbox == 'false' else 'with-searchbox'}" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
+        <div class="orbit-wrapper">
+            <div tal:condition="images and len(images) > 1" class="orbit-controls show-for-medium">
+                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
+                <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
-
-            <div class="carousel-inner" data-height-m="${height_m}" data-height-d="${height_d}">
-                <div tal:repeat="image images"
-                    class="carousel-item ${'active' if repeat.image.index == 0 else ''}">
-                    <div class="carousel-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
-                    <div class="carousel-caption-overlay" tal:condition="image.note"></div>
-                    <div class="carousel-caption d-md-block text-container" tal:condition="image.note">
-                        <div class="text">
-                            <span>${image.note}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button tal:condition="images and len(images) > 1" class="carousel-control-prev d-none d-md-flex" type="button" data-bs-target="#homepageCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous Slide</span>
-            </button>
-            <button tal:condition="images and len(images) > 1" class="carousel-control-next d-none d-md-flex" type="button" data-bs-target="#homepageCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next Slide</span>
-            </button>
-        </div>
-
-        <div class="homepage-searchbox-wrapper position-absolute bottom-0 start-0 end-0 mb-4xl z-2"
-             tal:condition="len(images) and not searchbox == 'false'|True">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 col-md-6 col-lg-7">
-                        <form class="searchbox" action="${layout.search_url}" method="GET"
-                            data-typeahead="on"
-                            data-typeahead-source="${layout.suggestions_url}"
-                            data-typeahead-target="${layout.search_url}">
-
-                            <div class="position-relative">
-
-                                <input class="form-control rounded-pill py-lg pe-lg" type="search" id="search"
-                                    data-typeahead-subject name="q" autocomplete="off" autocorrect="off"
-                                    required maxlength="200" placeholder="What are you searching for?"
-                                    i18n:attributes="placeholder">
-
-                                <button class="square-4xl btn btn-primary rounded-circle position-absolute top-50 end-0 translate-middle-y me-xs p-0 d-flex align-items-center justify-content-center"
-                                        type="submit">
-                                    <i class="fa fa-search"></i>
-                                </button>
-
-                                <div class="typeahead position-absolute top-100 start-0 mt-2 z-3 bg-white rounded-3 shadow-sm overflow-hidden">
-                                    <div class="cell col-12" data-typeahead-container></div>
-                                </div>
-
+            <ul class="orbit-container" data-height-m="${height_m}" data-height-d="${height_d}">
+                <li tal:repeat="image images" class="orbit-slide">
+                    <figure class="orbit-figure">
+                        <div class="orbit-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
+                        <div class="dark-overlay" tal:condition="image.note"></div>
+                        <div class="grid-container text-container" tal:condition="image.note">
+                            <div class="text">
+                                <span>${image.note}</span>
                             </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                      </div>
+                    </figure>
+                </li>
+            </ul>
         </div>
-
+        <metal:b tal:condition="images and len(images) > 1" use-macro="layout.macros['orbit-bullets']" />
     </div>
-
     <div class="slider no-images" tal:condition="not images and request.is_manager">
-        <div class="container">
+        <div class="grid-container">
             <tal:b i18n:translate>
                 This space holds images from your photo-albums. To show photos add a few
                 photos to an album and mark it as available for the homepage.
             </tal:b>
         </div>
     </div>
-
+    <div class="homepage-searchbox-wrapper" tal:condition="len(images) and not searchbox == 'false'|True">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x">
+                <div class="cell small-12 medium-6 large-7">
+                    <form class="searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                        <div class="input-group">
+                            <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="What are you searching for?" i18n:attributes="placeholder">
+                            <div class="typeahead">
+                                <div class="cell small-12" data-typeahead-container>
+                                </div>
+                            </div>
+                            <div class="input-group-button">
+                                <button class="button" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </metal:slider>
+
 
 <metal:testimonial_slider define-macro="testimonial_slider" i18n:domain="onegov.town6">
 <tal:b tal:condition="description_1 and image_1 and quote_1">
@@ -2107,8 +1949,8 @@
                 </li>
             </ul>
             <div class="orbit-controls" tal:condition="image_2 and image_2 and quote_2">
-                <button class="orbit-previous"><span class="visually-hidden">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
-                <button class="orbit-next"><span class="visually-hidden">Next Slide</span><i class="fa fa-chevron-right"></i></button>
+                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
+                <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
         </div>
     </div>
@@ -2119,17 +1961,17 @@
     <div class="orbit-bullet-wrapper show-for-medium">
         <nav class="orbit-bullets">
             <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
-                <span class="visually-hidden" tal:condition="image.note">${image.note}</span>
-                <span tal:condition="repeat.image.start" class="visually-hidden" data-slide-active-label i18n:translate>Current Image</span>
+                <span class="show-for-sr" tal:condition="image.note">${image.note}</span>
+                <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Image</span>
             </button>
         </nav>
     </div>
 </metal:bullets>
 
 <metal:search_results define-macro="search_results" i18n:domain="onegov.town6">
-    <ul class="list-group list-group-flush search-results">
+    <ul class="more-list search-results">
         <tal:b repeat="result model.load_batch_results">
-            <li class="search-result-${result.__tablename__} list-group-item" tal:condition="result">
+            <li class="search-result-${result.__tablename__}" tal:condition="result">
                 <tal:b
                     define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                     metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
@@ -2141,44 +1983,34 @@
 
 <metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
     <div tal:condition="result_layout and len(result_layout.breadcrumbs) > 1" tal:define="links result_layout.breadcrumbs">
-        <ul class="search-breadcrumbs breadcrumb fs-2xs mb-0 mt-sm">
+        <ul class="breadcrumbs search-breadcrumbs">
             <tal:b repeat="link links">
-                <li class="breadcrumb-item link-underline-opacity-0">
-                    ${link(result_layout, ('link-secondary', )).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
+                <li class="breadcrumb-item">
+                    ${link(result_layout).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
                 </li>
             </tal:b>
         </ul>
     </div>
 </metal:search_breadcrumbs>
 
-<metal:search_result_template define-macro="search_result_template">
-    <a href="${link}" class="text-reset text-decoration-none">
-        <h3 class="fs-md mb-sm"><metal:b define-slot="list-title" /></h3>
-        <p class="search-preview mb-0"><metal:b define-slot="search-preview" /></p>
-    </a>
-    <metal:b define-slot="content" />
-    <metal:b use-macro="layout.macros['search_breadcrumbs']" />
-</metal:search_result_template>
-
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']"
-             tal:define="link request.return_here(request.link(result)); result_layout request.get_layout(result)">
-        <tal:b metal:fill-slot="list-title">
-            ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview">
-            ${translate(result.role.capitalize())}
-        </tal:b>
-    </metal:b>
+    <a href="${request.return_here(request.link(result))}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview">
+        ${translate(result.role.capitalize())}
+    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_users>
 
 <metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']"
-             tal:define="link request.return_here(request.link(result)); result_layout request.get_layout(result)">
-        <tal:b metal:fill-slot="list-title">
+    <a class="list-link" href="${request.return_here(request.link(result))}">
+        <h5 class="list-title">
             ${result.name} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview">
+        </h5>
+    </a>
+    <a href="${request.return_here(request.link(result))}">
+        <div class="search-preview">
             <tal:b condition="result.signed">
                 <span i18n:translate>Has a digital seal</span>,
             </tal:b>
@@ -2191,31 +2023,36 @@
                     <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
                 </tal:b>
             </span>
-        </tal:b>
-    </metal:b>
+        </div>
+    </a>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_files>
 
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
-        <tal:b metal:fill-slot="list-title">
+    <a class="list-link" href="${request.link(result)}">
+        <h5 class="list-title">
             ${result.number}
             <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview">
+        </h5>
+    </a>
+    <a href="${request.link(result)}">
+        <p class="search-preview">
             <tal:b>${translate(result.group)}</tal:b><br/>
             <tal:b tal:content="result.title"></tal:b><br/>
             <tal:b tal:content="result.subtitle"></tal:b>
-        </tal:b>
-    </metal:b>
+        </p>
+    </a>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_tickets>
 
+
 <metal:search_result_events define-macro="search_result_events" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result, 'latest'); result_layout request.get_layout(result.latest_occurrence)">
-        <tal:b metal:fill-slot="list-title">
+    <a class="list-link" href="${request.link(result, 'latest')}">
+        <h5 class="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview">
-            <tal:b tal:define="latest result.latest_occurrence">
+        </h5>
+    </a>
+    <p tal:define="latest result.latest_occurrence" class="search-preview">
         <tal:b tal:condition="latest">
             ${
             '{}, {} - {}'.format(
@@ -2227,10 +2064,8 @@
         </tal:b>
         <tal:b tal:condition="result.location">
         ${result.location}</tal:b>
-            </tal:b>
-        </tal:b>
-        <tal:b metal:fill-slot="content">
-            <tal:b tal:condition="future_occ" tal:define="future_occ result.future_occurrences(offset=1).all()">
+    </p>
+    <tal:b tal:condition="future_occ" tal:define="future_occ result.future_occurrences(offset=1).all()">
         <ul>
             <li><span i18n:translate="">Further occurrences:</span>
                 <div class="event-child-results">
@@ -2251,119 +2086,108 @@
                     </ul>
                 </div></li>
         </ul>
-            </tal:b>
-        </tal:b>
-    </metal:b>
+    </tal:b>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result.latest_occurrence)" />
 </metal:search_result_events>
 
 
 <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
-        <tal:b metal:fill-slot="list-title">
-            ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview">
-            <span tal:condition="result.function|nothing"><i>${result.function}</i></span>
-            <span tal:condition="result_layout.organisation_texts|nothing" tal:repeat="org result_layout.organisation_texts">
-                <span i18n:attributes="title" title="Organisation">${org}</span><br>
-            </span>
-        </tal:b>
-    </metal:b>
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.function|nothing"><i>${result.function}</i></div>
+    <tal:b tal:define="result_layout request.get_layout(result)">
+        <div class="search-preview" tal:condition="result_layout.organisation_texts|nothing" tal:repeat="org result_layout.organisation_texts">
+            <span i18n:attributes="title" title="Organisation">${org}</span>
+        </div>
+        <metal:b use-macro="layout.macros['search_breadcrumbs']" />
+    </tal:b>
 </metal:search_result_people>
 
 
 <metal:search_result_par_parliamentarians define-macro="search_result_par_parliamentarians" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
-        <tal:b metal:fill-slot="list-title">
-            ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview">
-            <span tal:condition="result.function|nothing">${result.function}</span>
-            <span tal:condition="not:result.active|nothing" i18n:translate>Former member or parliament</span>
-            <span tal:condition="result.roles|nothing" tal:repeat="role result.roles">
-                <span tal:condition="role.role_label">
-                    <span>${role.role_label}</span> <span i18n:translate>Parliament</span>
-                </span>
-                <span tal:condition="role.parliamentary_group">
-                    ${role.parliamentary_group_role_label}
-                    <span i18n:translate>Parliamentary Group</span>
-                    ${role.parliamentary_group.title}
-                </span><br>
-            </span>
-            <span tal:condition="result.commission_memberships|nothing" tal:repeat="role result.commission_memberships">
-                <span>${role.role_label}</span> <span>${role.commission.title}
-            </span><br>
-        </tal:b>
-    </metal:b>
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.function|nothing">${result.function}</div>
+    <div class="search-preview" tal:condition="not:result.active|nothing" i18n:translate>Former member or parliament</div>
+    <div class="search-preview" tal:condition="result.roles|nothing" tal:repeat="role result.roles">
+        <div class="search-preview" tal:condition="role.role_label">
+            <span>${role.role_label}</span> <span i18n:translate>Parliament</span>
+        </div>
+        <div tal:condition="role.parliamentary_group">
+            ${role.parliamentary_group_role_label}
+            <span i18n:translate>Parliamentary Group</span>
+            ${role.parliamentary_group.title}
+        </div>
+    </div>
+    <div class="search-preview" tal:condition="result.commission_memberships|nothing" tal:repeat="role result.commission_memberships">
+        <span>${role.role_label}</span> <span>${role.commission.title}
+    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_par_parliamentarians>
 
 
 <metal:search_result_par_political_businesses define-macro="search_result_par_political_businesses" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
-        <tal:b metal:fill-slot="list-title">
-            ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview">
-            <span tal:condition="result.number|nothing">
-                <span><tal:b i18n:translate>Number</tal:b>:</span>
-                <span>${result.number}</span>
-            </span><br tal:condition="result.number|nothing">
-            <span tal:condition="result.entry_date|nothing">
-                <span><tal:b i18n:translate>Date</tal:b>:</span>
-                <span>${layout.format_date(result.entry_date, 'date')}</span>
-            </span><br tal:condition="result.entry_date|nothing">
-            <span tal:condition="result.status|nothing">
-                <span><tal:b i18n:translate>Status</tal:b>:</span>
-                <span>${result.status.capitalize()}</span>
-            </span>
-        </tal:b>
-    </metal:b>
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <div class="search-preview" tal:condition="result.number|nothing">
+        <span><tal:b i18n:translate>Number</tal:b>:</span>
+        <span>${result.number}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.entry_date|nothing">
+        <span><tal:b i18n:translate>Date</tal:b>:</span>
+        <span>${layout.format_date(result.entry_date, 'date')}</span>
+    </div>
+    <div class="search-preview" tal:condition="result.status|nothing">
+        <span><tal:b i18n:translate>Status</tal:b>:</span>
+        <span>${result.status.capitalize()}</span>
+    </div>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_par_political_businesses>
 
 
 <metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']" tal:define="link result.url; result_layout request.get_layout(result)">
-        <tal:b metal:fill-slot="list-title">
-            ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview">
+    <a href="${result.url}" class="list-link">
+        <span class="h5 list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>
+    </a>
+    <a tal:condition="result.lead" href="${result.url}">
+        <p class="search-preview">
             ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-        </tal:b>
-        <tal:b metal:fill-slot="content">
-            <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="far fa-edit"></i></a>
-        </tal:b>
-    </metal:b>
+        </p>
+    </a>
+    <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="far fa-edit"></i></a>
 </metal:search_result_external_links>
 
 
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.town6">
-    <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
-        <tal:b metal:fill-slot="list-title">
-            ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
-        </tal:b>
-        <tal:b metal:fill-slot="search-preview" tal:condition="result.lead|None">
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <a tal:condition="result.lead|None" href="${request.link(result)}">
+        <div class="search-preview">
             ${result.lead[:260]}<tal:b condition="len(result.lead) > 260">…</tal:b>
-        </tal:b>
-    </metal:b>
+        </div>
+    </a>
+    <metal:b use-macro="layout.macros['search_breadcrumbs']" tal:define="result_layout request.get_layout(result)" />
 </metal:search_result_default>
 
 
 <metal:ticket_status_page_message define-macro="ticket_status_page_message" i18n:domain="onegov.town6" tal:define="mute_all request.app.org.mute_all_tickets; skip request.app.org.tickets_skip_opening_email or []">
     <tal:b tal:condition="ticket.state == 'open'">
-        <p class="fs-md" >
-            <tal:b tal:switch="not mute_all and ticket.handler_code in skip">
-                <tal:b tal:case="False" i18n:translate>
-                    Your request will be processed shortly. To see the state of
-                    your process your may return to this page at any time.
+        <tal:b tal:switch="not mute_all and ticket.handler_code in skip">
+            <p tal:case="False" i18n:translate>
+                Your request will be processed shortly. To see the state of
+                your process your may return to this page at any time.
 
-                    All information on this page has been sent to your e-mail address.
-                </tal:b>
-                <tal:b tal:case="True"  i18n:translate>
-                    Your request will be processed shortly. To see the state of
-                    your process your may return to this page at any time.
-                </tal:b>
-            </tal:b>
-        </p>
+                All information on this page has been sent to your e-mail address.
+            </p>
+            <p tal:case="True" i18n:translate>
+                Your request will be processed shortly. To see the state of
+                your process your may return to this page at any time.
+            </p>
+        </tal:b>
     </tal:b>
 
     <p i18n:translate tal:condition="ticket.state == 'closed'">
@@ -2425,13 +2249,13 @@
                 <metal:b define-slot="after-submit" />
             </div>
             <div data-depends-on="payment_method/manual">
-                <input type="submit" value="Complete" class="btn btn-primary me-lg" i18n:attributes="value">
+                <input type="submit" value="Complete" class="button" i18n:attributes="value">
                 <metal:b define-slot="after-submit" />
             </div>
         </tal:b>
 
         <tal:b condition="not price">
-            <input type="submit" value="Complete" class="btn btn-primary me-lg" i18n:attributes="value">
+            <input type="submit" value="Complete" class="button" i18n:attributes="value">
             <metal:b define-slot="after-submit" />
         </tal:b>
     </form>
@@ -2623,21 +2447,21 @@
                 <td class="invoiced-state">
                     <tal:b tal:condition="invoice.invoiced">
                         <i class="fa fa-check-circle" aria-hidden="true" title="Invoiced" i18n:attributes="title"></i>
-                        <span i18n:translate class="visually-hidden">Invoiced</span>
+                        <span i18n:translate class="show-for-sr">Invoiced</span>
                     </tal:b>
                     <tal:b tal:condition="not:invoice.invoiced">
                         <i class="fa fa-times-circle" aria-hidden="true" title="Uninvoiced" i18n:attributes="title"></i>
-                        <span i18n:translate class="visually-hidden">Uninvoiced</span>
+                        <span i18n:translate class="show-for-sr">Uninvoiced</span>
                     </tal:b>
                 </td>
                 <td class="paid-state">
                     <tal:b tal:condition="invoice.paid">
                         <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
-                        <span i18n:translate class="visually-hidden">Paid</span>
+                        <span i18n:translate class="show-for-sr">Paid</span>
                     </tal:b>
                     <tal:b tal:condition="not:invoice.paid">
                         <i class="fa fa-times-circle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
-                        <span i18n:translate class="visually-hidden">Unpaid</span>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
                     </tal:b>
                 </td>
                 <td>
@@ -2671,14 +2495,14 @@
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.town6">
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
-        <a id="${group}"></a>
+        <a class="category-anchor" id="${group}"></a>
         <div class="group-title align-justify">
             <h2 tal:condition="len(grouped) > 1">
                 ${group}
                 <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
             </h2>
         </div>
-        <ul class="forms-list list-group list-group-flush">
+        <ul class="forms-list more-list">
             <tal:b tal:repeat="record grouped[group]">
                 <metal:b use-macro="layout.macros['group_record']"/>
             </tal:b>
@@ -2699,236 +2523,6 @@
         <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
     </li>
 </metal:group_record>
-
-<metal:group_by_column_forms define-macro="accordion_grouped_by_column" i18n:domain="onegov.town6">
-    <tal:b tal:condition="len(grouped) == 1" tal:repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
-        <ul class="forms-list list-group list-group-flush">
-            <tal:b tal:repeat="record grouped[group]">
-                <metal:b use-macro="layout.macros['group_record_form_overlay']"/>
-            </tal:b>
-        </ul>
-    </tal:b>
-
-    <div class="accordion" id="forms-accordion" tal:condition="len(grouped) > 1">
-        <tal:b tal:repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading-${repeat.group.index}">
-                    <button class="accordion-button collapsed"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapse-${repeat.group.index}"
-                            aria-expanded="false"
-                            aria-controls="collapse-${repeat.group.index}">
-                        ${group}
-                        <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
-                    </button>
-                </h2>
-                <div id="collapse-${repeat.group.index}"
-                    class="accordion-collapse collapse"
-                    aria-labelledby="heading-${repeat.group.index}"
-                    data-bs-parent="#forms-accordion">
-                    <div class="accordion-body">
-                        <ul class="forms-list list-group list-group-flush">
-                            <tal:b tal:repeat="record grouped[group]">
-                                <metal:b use-macro="layout.macros['group_record_form_link']"/>
-                            </tal:b>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </tal:b>
-    </div>
-</metal:group_by_column_forms>
-
-<metal:group_record_form_link define-macro="group_record_form_link" i18n:domain="onegov.town6">
-    <li tal:define="link edit_link(record)|nothing;
-                     modal_href request.link(record, 'modal')|nothing;
-                     form_href form_url(record)"
-        class="list-group-item">
-        <a class="list-link"
-           tal:attributes="href link_func(record);
-                            hx-get modal_href;
-                            hx-target ('#form-modal-body' if modal_href else None);
-                            hx-push-url (form_href if modal_href else None);
-                            data-form-name record.name;
-                            data-bs-toggle ('modal' if modal_href else None);
-                            data-bs-target ('#form-modal' if modal_href else None)">
-            <span class="h5 list-title">${record.title}</span>
-            <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
-        </a>
-        <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))">
-            <p class="list-lead preview" tal:condition="lead">${lead}</p>
-            <div class="list-hint hints" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
-        </a>
-        <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
-    </li>
-</metal:group_record_form_link>
-
-<metal:group_record_form_link define-macro="form-modal" i18n:domain="onegov.town6">
-    <div class="row g-0 h-100 bg-primary">
-
-        <!-- Sidebar: Steps -->
-        <tal:b tal:define="steps layout.get_step_sequence()|nothing">
-            <div tal:condition="steps" class="col-12 col-lg-3 text-white p-xl p-lg-2xl d-flex flex-column">
-                <ul class="list-unstyled d-flex flex-column">
-
-                    <tal:b tal:repeat="step steps">
-                    <tal:b tal:define="index list(steps).index(step) + 1;">
-                        <li tal:define="complete step.position < layout.step_position; current step.position == layout.step_position;"
-                            tal:attributes="data-step step.position"
-                            class="d-flex align-items-center mb-md"
-                        >
-
-                            <!-- Connector line + circle -->
-                            <div class="d-flex me-md">
-                                <span
-                                    tal:condition="complete"
-                                    class="square-2xl rounded-circle bg-white text-primary d-flex align-items-center justify-content-center border border-2 border-white"
-                                >
-                                    <i class="fas fa-check small"></i>
-                                </span>
-                                <span
-                                    tal:condition="current"
-                                    class="square-2xl rounded-circle bg-white text-primary fw-bold d-flex align-items-center justify-content-center border border-2 border-white"
-                                >
-                                    ${index}
-                                </span>
-                                <span
-                                    tal:condition="not complete and not current"
-                                    class="square-2xl rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center border border-2 border-white opacity-75"
-                                >
-                                    ${index}
-                                </span>
-                            </div>
-
-                            <!-- Label -->
-                            <span class="fw-bold pt-xs">${request.translate(step.title)}</span>
-                        </li>
-                        <div tal:condition="index < len(steps)" class="square-2xl d-flex align-items-center justify-content-center">
-                            <div class="connector-line"></div>
-                        </div>
-                    </tal:b>
-                    </tal:b>
-                </ul>
-            </div>
-        </tal:b>
-
-        <!-- Main content -->
-        <div class="col-12 col-lg-9 bg-white h-100 overflow-hidden rounded-start-3">
-            <div metal:use-macro="layout.macros['editbar']"></div>
-            <div class="d-flex justify-content-end p-md">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" i18n:attributes="aria-label"></button>
-            </div>
-            <div class="overflow-auto">
-                    <div class="col-md-6 offset-md-3">
-                        <div tal:condition="form.errors|nothing" class="alert alert-warning alert-dismissible fade show mt-md" role="alert">
-                            <tal:b i18n:translate>The form contains errors. Please check the fields marked in red.</tal:b>
-                        </div>
-
-                        <tal:b metal:use-macro="layout.macros['consume_messages']" />
-                        <div class="alert alert-warning" role="alert" tal:condition="form.callout|callout|nothing">
-                                <p>${form.callout|callout}</p>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-
-                        <div class="alert alert-secondary" role="alert" tal:condition="helptext|nothing">
-                                <p>${helptext}</p>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        <tal:b tal:define="item definition|nothing" tal:condition="item">
-
-                            <metal:hint use-macro="layout.macros['access_hint_long']" />
-                            <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
-                        </tal:b>
-
-                        <tal:b tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing; files files|nothing;">
-                            <tal:b tal:condition="hints|nothing">
-                                <div class="cell small-12 panel ${hints_callout and 'callout' or ''}">
-                                    <div class="hints" tal:condition="hints|nothing">
-                                        <div tal:repeat="(name, hint) hints" class="hint hint-${name}">${hint}</div>
-                                    </div>
-                                </div>
-                            </tal:b>
-                            <metal:b define-slot="modal-main-content" />
-                        </tal:b>
-                </div>
-            </div>
-        </div>
-    </div>
-</metal:group_record_form_link>
-
-<metal:group_record_form_link define-macro="form-modal-definition" i18n:domain="onegov.town6">
-    <tal:b metal:use-macro="layout.macros['form-modal']">
-        <tal:b metal:fill-slot="modal-main-content">
-            <div tal:define="form_id 'main-form'">
-                <div metal:use-macro="layout.macros['form-definition']" tal:condition="form" />
-            </div>
-        </tal:b>
-    </tal:b>
-</metal:group_record_form_link>
-
-<metal:form define-macro="form-definition">
-
-<form tal:attributes="action form.action|'.';
-                       data-image-upload-url layout.image_upload_json_url;
-                       data-image-list-url layout.image_list_url;
-                       data-file-upload-url layout.file_upload_json_url;
-                       data-file-list-url layout.file_list_url;
-                       data-sitecollection-url layout.sitecollection_url;
-                       id form_id|''"
-      class="${form.css_class|''}"
-      method="${form.method|'POST'}"
-      enctype="multipart/form-data"
-      hx-post="${form.action}"
-      hx-target="#form-modal-body"
-      hx-select="#content > *"
-      hx-swap="innerHTML"
-      hx-encoding="multipart/form-data"
-      tal:define="form_two_columns form_two_columns|False">
-
-        <tal:b repeat="fieldset form.fieldsets" tal:define="visible_fieldsets [f for f in form.fieldsets if f.is_visible]">
-            <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}" class="border-0 mb-md p-0">
-                <div class="mb-md">
-                    <span class="text-muted" tal:define="index visible_fieldsets.index(fieldset)">${index + 1} / ${len(visible_fieldsets)}</span>
-                    <span class="fw-bold ms-md">
-                        ${fieldset.label}
-                    </span>
-                </div>
-                <div class="formfields ${'row' if form_two_columns else ''}">
-                    <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
-                </div>
-            </fieldset>
-            <tal:b condition="not:fieldset.is_visible">
-                <div class="formfields ${'row' if form_two_columns else ''}">
-                    <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
-                </div>
-            </tal:b>
-        </tal:b>
-
-        <metal:b define-slot="before-submit" />
-
-        <div class="d-flex justify-content-between align-items-center mt-5" tal:condition="not: layout.edit_mode|False">
-            <a tal:condition="not hide_cancel|False" class="text-muted text-decoration-none" href="#" data-back-link>
-            <i class="fas fa-arrow-left me-1"></i>
-            <span i18n:translate="">zurück</span>
-            </a>
-            <div class="ms-auto" tal:condition="cancel|nothing">
-            <a class="btn btn-outline-secondary me-2" href="${cancel}" role="button">
-                <tal:b condition="not:cancel_text|nothing" i18n:translate="">Cancel</tal:b>
-                <tal:b condition="cancel_text|nothing">${cancel_text}</tal:b>
-            </a>
-            </div>
-            <tal:b condition="not: button_text|nothing">
-            <input type="submit" value="weiter" class="btn btn-dark rounded-pill px-4" i18n:attributes="value">
-            </tal:b>
-            <tal:b condition="button_text|nothing">
-            <input type="submit" value="${button_text}" class="btn btn-dark rounded-pill px-4" role="button">
-            </tal:b>
-        </div>
-    </form>
-
-</metal:form>
-
 
 <metal:resource_groups define-macro="resource_groups" i18n:domain="onegov.town6">
     <tal:b repeat="group resources" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
@@ -3055,7 +2649,7 @@
 
                                     <a ic-post-to="${post_url}&clear_start_date=1" ic-target="#button-${file.id}" ic-success-action="change">
                                         <i class="far fa-times-circle"></i>
-                                        <span class="visually-hidden" i18n:translate>Reset</span>
+                                        <span class="show-for-sr" i18n:translate>Reset</span>
                                     </a>
                                 </div>
                             </fieldset>
@@ -3075,7 +2669,7 @@
 
                                 <a ic-post-to="${post_url}&clear_end_date=1" ic-target="#button-${file.id}" ic-success-action="change">
                                     <i class="far fa-times-circle"></i>
-                                    <span class="visually-hidden" i18n:translate>Reset</span>
+                                    <span class="show-for-sr" i18n:translate>Reset</span>
                                 </a>
                             </div>
                         </fieldset>
@@ -3506,23 +3100,11 @@
 </metal:progress_indicator>
 
 <metal:modal define-macro="modal">
-<div class="modal fade" id="${modal_id}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 tal:condition="modal_title|False" class="modal-title fs-5" id="exampleModalLabel">
-                    ${modal_title}
-                </h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <tal:block metal:define-slot="modal_body"></tal:block>
-            </div>
-            <div class="modal-footer">
-                <tal:block metal:define-slot="modal_footer"></tal:block>
-            </div>
-        </div>
-    </div>
+<div id="${modal_id}" class="reveal" data-reveal>
+    <tal:block metal:define-slot="modal_content"></tal:block>
+    <button class="close-button" data-close aria-label="Close" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
 </div>
 </metal:modal>
 
@@ -3822,7 +3404,7 @@
                 <th tal:condition="show_vat" class="centered" i18n:translate>VAT</th>
                 <th class="centered" i18n:translate>Amount</th>
                 <th tal:condition="item_actions">
-                    <span i18n:translate class="visually-hidden">Actions</span>
+                    <span i18n:translate class="show-for-sr">Actions</span>
                 </th>
             </tr>
         </thead>
@@ -3867,11 +3449,11 @@
                             ${'{:.2f}'.format(item.amount)}
                             <tal:b tal:condition="show_payment_state and paid">
                                 <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
-                                <span i18n:translate class="visually-hidden">Paid</span>
+                                <span i18n:translate class="show-for-sr">Paid</span>
                             </tal:b>
                             <tal:b tal:condition="show_payment_state and not paid">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
-                                <span i18n:translate class="visually-hidden">Unpaid</span>
+                                <span i18n:translate class="show-for-sr">Unpaid</span>
                             </tal:b>
                         </td>
                         <td class="actions" tal:condition="item_actions">
@@ -3897,11 +3479,11 @@
                     ${'{:.2f}'.format(total_amount)}
                     <tal:b tal:condition="show_payment_state and total_paid">
                         <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
-                        <span i18n:translate class="visually-hidden">Paid</span>
+                        <span i18n:translate class="show-for-sr">Paid</span>
                     </tal:b>
                     <tal:b tal:condition="show_payment_state and not total_paid">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
-                        <span i18n:translate class="visually-hidden">Unpaid</span>
+                        <span i18n:translate class="show-for-sr">Unpaid</span>
                     </tal:b>
                 </td>
                 <td tal:condition="item_actions"></td>
@@ -3911,17 +3493,17 @@
 </metal:invoice_items>
 
 <metal:globals-left define-macro="globals-left">
-    <ul tal:condition="modules and modules.links|nothing" class="navbar-nav global-tools-menu">
-        <li class="nav-item">
-            <a class="docs nav-link" href="https://docs.admin.digital/" i18n:translate>User manual</a>
-        </li>
-        <li class="nav-item dropdown">
-            <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="nav-link dropdown-toggle" i18n:translate>Modules</a>
-            <ul id="modules-dropdown" class="dropdown-menu">
+    <ul tal:condition="modules and modules.links|nothing" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
+        <li>
+            <a href="#" data-dropdown="modules-dropdown" class="dropdown modules" i18n:translate>Modules</a>
+            <ul id="modules-dropdown" data-dropdown-content class="vertical menu">
                 <li tal:repeat="link modules.links">
-                    <tal:b replace="link(layout, ('nav-link', ))" />
+                    <tal:b replace="link(layout)" />
                 </li>
             </ul>
+        </li>
+        <li>
+            <a class="docs" href="https://docs.admin.digital/" i18n:translate>User manual</a>
         </li>
     </ul>
 </metal:globals-left>

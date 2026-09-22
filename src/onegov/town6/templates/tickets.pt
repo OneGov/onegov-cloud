@@ -16,7 +16,7 @@
         <div class="ticket-filters">
 
             <ul class="menu">
-                <li><a  class="visually-hidden" href="#" i18n:translate>State:</a></li>
+                <li><a  class="show-for-sr" href="#" i18n:translate>State:</a></li>
                 <tal:b repeat="link filters">
                     <li class="${link.active and 'active' or ''}">
                         <tal:b replace="link(layout)"></tal:b>
@@ -27,7 +27,7 @@
                 <div class="right-side">
                     <span>
                         <button type="button" data-toggle="submitters" class="${has_submitter_filter and 'primary radius button small' or 'secondary radius button small'} selected-submitter">
-                            <span class="visually-hidden"><tal:b i18n:translate>Submitter</tal:b>:</span>
+                            <span class="show-for-sr"><tal:b i18n:translate>Submitter</tal:b>:</span>
                             <span>${submitter}</span>
                         </button>
                         <div id="submitters" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
@@ -42,7 +42,7 @@
                     </span>
                     <span>
                         <button type="button" data-toggle="owners" class="${has_owner_filter and 'primary radius button small' or 'secondary radius button small'} selected-owner">
-                            <span i18n:translate class="visually-hidden">Owner:</span>
+                            <span i18n:translate class="show-for-sr">Owner:</span>
                             <span>${owner}</span>
                         </button>
                         <div id="owners" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
@@ -61,7 +61,7 @@
                     </span>
                     <span>
                         <button type="button" data-toggle="handlers" class="${has_handler_filter and 'primary radius button small' or 'secondary radius button small'} selected-handler">
-                            <span i18n:translate class="visually-hidden">Kind:</span>
+                            <span i18n:translate class="show-for-sr">Kind:</span>
                             <span class="${handler_class}">${handler}</span>
                         </button>
                         <div id="handlers" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">

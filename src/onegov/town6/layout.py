@@ -137,7 +137,7 @@ class Layout(OrgLayout):
     def __init__(self, model: Any, request: TownRequest,
                  edit_mode: bool = False) -> None:
         super().__init__(model, request)
-        self.request.include('bootstrap')
+        self.request.include('foundation6')
         self.edit_mode = edit_mode
 
     @property

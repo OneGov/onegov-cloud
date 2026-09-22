@@ -32,8 +32,8 @@ if TYPE_CHECKING:
 class RowWidget:
     template = """
         <xsl:template match="row">
-            <div class="container">
-                <div class="row {@class}">
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x {@class}">
                     <xsl:apply-templates select="node()"/>
                 </div>
             </div>
@@ -45,8 +45,8 @@ class RowWidget:
 class RowWidgetWide:
     template = """
         <xsl:template match="row-wide">
-            <div class="container-fluid {@bgcolor}">
-                <div class="row {@class}">
+            <div class="grid-container full {@bgcolor}">
+                <div class="grid-x {@class}">
                     <xsl:apply-templates select="node()"/>
                 </div>
             </div>
@@ -58,7 +58,7 @@ class RowWidgetWide:
 class ColumnWidget:
     template = """
         <xsl:template match="column">
-            <div class="col-12 col-md-{@span} {@class}">
+            <div class="small-12 medium-{@span} cell {@class}">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
@@ -266,7 +266,7 @@ class ServicesWidget:
     template = """
         <xsl:template match="services">
             <div class="services-panel">
-                <ul class="list-unstyled bg-light rounded-3 p-md">
+                <ul class="panel-links callout">
                     <li tal:repeat="link services_panel.links">
                         <tal:b content="structure link(layout)" />
                     </li>

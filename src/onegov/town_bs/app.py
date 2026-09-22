@@ -15,7 +15,7 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.town6.custom import get_api_endpoints
 from onegov.town6.custom import get_global_tools, get_modules
 from onegov.town6.initial_content import create_new_organisation
-from onegov.town6.theme import TownBsTheme
+from onegov.town_bs.theme import TownBsTheme
 from webob import Response
 
 

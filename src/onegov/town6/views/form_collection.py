@@ -13,18 +13,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
-    from webob import Response
 
 
 @TownApp.html(model=FormCollection, template='forms.pt', permission=Public)
 def town_view_form_collection(
     self: FormCollection,
     request: TownRequest
-) -> RenderData | Response:
-
-    request.include('form-modal')
-    request.include('lazy-wolves')
-
+) -> RenderData:
     return view_form_collection(
         self, request, FormCollectionLayout(self, request))
 

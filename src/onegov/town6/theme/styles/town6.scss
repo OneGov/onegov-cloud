@@ -542,7 +542,7 @@ input[type="url"] {
         margin: 0 .5rem;
     }
 
-    *:first-child.fa:has(+ span:not(.visually-hidden)) {
+    *:first-child.fa:has(+ span:not(.show-for-sr)) {
         margin-left: 0;
     }
 

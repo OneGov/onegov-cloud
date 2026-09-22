@@ -245,7 +245,6 @@ def get_webasset_output() -> str:
 
 @TownApp.webasset('common')
 def get_common_asset() -> Iterator[str]:
-    yield 'jquery.js'
     yield 'global.js'
     yield 'polyfills.js'
     yield 'jquery.datetimepicker.css'
@@ -288,6 +287,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'aos.css'
     yield 'notifications.js'
     yield 'sidebar_mobile.js'
+    yield 'sidebar_fixed.js'
     yield 'ResizeSensor.js'
     yield 'theia-sticky-sidebar.js'
     yield 'apply-filters.js'

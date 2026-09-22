@@ -34,7 +34,6 @@ default_font_families = {
     'Courier New': COURIER_NEW,
 }
 
-
 class TownBsTheme(BootstrapBaseTheme):
     name = 'onegov.town6.bootstrap'
 
