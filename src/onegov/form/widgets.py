@@ -22,9 +22,9 @@ from wtforms.widgets import TextInput
 from wtforms.widgets.core import html_params
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING, cast
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterable, Iterator
     from onegov.chat import TextModule
     from onegov.form.fields import (
         DurationField, FieldTable, PanelField, PreviewField, UploadField,
@@ -51,7 +51,7 @@ class OrderedListWidget(ListWidget):
         # require even more knowledge, so this is the better approach
 
         assert hasattr(field, '__iter__')
-        ordered: list[Field] = list(field)
+        ordered: list[Field] = list(cast('Iterable[Field]', field))
         ordered.sort(key=lambda f: field.gettext(f.label.text))
 
         class FakeField:
@@ -75,7 +75,7 @@ class MultiCheckboxWidget(ListWidget):
             field.meta.request.include('multicheckbox')
 
         options = []
-        for subfield in field:
+        for subfield in cast('Iterable[Field]', field):
             input_html = subfield()
             label_html = subfield.label()
             options.append(
@@ -85,7 +85,7 @@ class MultiCheckboxWidget(ListWidget):
                 '</div>'
             )
 
-        return Markup(
+        return Markup(  # nosec: B704
             f'<div {html_params(**kwargs)}>' + ''.join(options) + '</div>'
         )
 
@@ -98,7 +98,7 @@ class RadioWidget(ListWidget):
 
     def __call__(self, field: Field, **kwargs: Any) -> Markup:
         options = []
-        for subfield in field:
+        for subfield in cast('Iterable[Field]', field):
             input_html = subfield()
             label_html = subfield.label()
             options.append(
@@ -108,7 +108,7 @@ class RadioWidget(ListWidget):
                 '</div>'
             )
 
-        return Markup(
+        return Markup(  # nosec: B704
             f'<div {html_params(**kwargs)}>' + ''.join(options) + '</div>'
         )
 

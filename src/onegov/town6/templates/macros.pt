@@ -532,6 +532,8 @@
     <tal:b define="field_type_groups python: {
         'URLPanelField': 'panel',
         'PanelField': 'panel',
+        'MultiCheckboxField': 'choice',
+        'RadioField': 'choice',
     }">
         <tal:b tal:switch="field_type_groups.get(field.type, field.type)">
             <tal:b case="'panel'">
@@ -548,6 +550,19 @@
                 <div class="form-text" tal:condition="field.description">
                     <tal:b replace="request.translate(field.description)" />
                 </div>
+            </tal:b>
+            <tal:b case="'choice'">
+                    <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '', iconfont='Font Awesome 5 Free')">
+                        <!--! The field is placed here -->
+                        <label>
+                            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+                            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                        </label>
+                        <div class="form-text" tal:condition="long_description">
+                            <tal:b replace="long_description"/>
+                        </div>
+                            <tal:b replace="content" />
+                    </tal:b>
             </tal:b>
             <tal:b case="default">
                 <!--
