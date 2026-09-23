@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from onegov.core.security import Secret
+from onegov.core.security import Secret, Private
 
 from onegov.org.forms import ChangeUsernameForm, NewUserForm
 from onegov.org.views.usermanagement import (
@@ -114,7 +114,7 @@ def town_handle_new_user(
 
 @TownApp.view(
         model=User,
-        permission=Secret,
+        permission=Private,
         request_method='POST',
         name='read-features'
 )
@@ -130,7 +130,7 @@ def add_release_number(
 
 @TownApp.view(
         model=User,
-        permission=Secret,
+        permission=Private,
         request_method='POST',
         name='close-features'
 )

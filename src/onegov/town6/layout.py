@@ -179,15 +179,6 @@ class Layout(OrgLayout):
             if user_release == self.app.version:
                 return features
 
-            def add_payload(
-                    payload: dict[str, Any],
-            ) -> None:
-                required_keys = {'title', 'description'}
-
-                if isinstance(payload, dict) and required_keys.issubset(
-                    payload.keys()):
-                    features.append(payload)
-
             changes_path = resource_files('onegov.town6') / 'changes'
             if not changes_path.is_dir():
                 return features
@@ -208,8 +199,7 @@ class Layout(OrgLayout):
                 release_features = self.app.cache.get_or_create(
                     f'new_features_release_{release_name}',
                     creator=lambda release_name=release_name: [
-                        yaml.safe_load(
-                            yaml_file.read_text(encoding='utf-8')) or {}
+                        payload
                         for yaml_file in sorted(
                             (path for path in
                              changes_path.joinpath(release_name).iterdir()
@@ -217,13 +207,18 @@ class Layout(OrgLayout):
                                  '.yaml')),
                             key=lambda path: path.name
                         )
+                        if isinstance(
+                            payload := yaml.safe_load(
+                                yaml_file.read_text(encoding='utf-8')),
+                            dict
+                        ) and {'title', 'description'}.issubset(payload)
                     ]
                 )
 
                 for payload in release_features:
                     if index > 0 and len(features) >= 5:
                         break
-                    add_payload(payload)
+                    features.append(payload)
 
                 if index > 0 and len(features) >= 5:
                     break

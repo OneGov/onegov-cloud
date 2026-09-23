@@ -37,7 +37,7 @@ def test_new_feature_close_and_read(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    client.login_admin()
+    client.login_member()
 
     changes_root = tmp_path / 'changes'
     release_changes = changes_root / '2026.47'
