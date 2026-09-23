@@ -5,6 +5,8 @@ import yaml
 
 from functools import cached_property
 from importlib.resources import files as resource_files
+from itertools import groupby
+from operator import itemgetter
 
 from onegov.core import Framework
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
@@ -171,59 +173,67 @@ class Layout(OrgLayout):
         )
 
     @property
-    def new_features(self) -> list[dict[str, Any]]:
-        features: list[dict[str, Any]] = []
+    def released_features(self) -> dict[str, list[dict[str, Any]]]:
+        changes_path = resource_files('onegov.town6') / 'changes'
+        if not changes_path.is_dir():
+            return {}
 
-        if user := self.request.current_user:
-            user_release = user.release_features
-            if user_release == self.app.version:
-                return features
-
-            changes_path = resource_files('onegov.town6') / 'changes'
-            if not changes_path.is_dir():
-                return features
-
-            release_names = self.app.cache.get_or_create(
-                'new_features_releases',
-                creator=lambda: sorted(
-                    (path.name for path in changes_path.iterdir()
-                     if path.is_dir()),
-                    reverse=True
-                )
+        def releases_generator() -> Iterator[tuple[str, dict[str, Any]]]:
+            feature_count = 0
+            release_names = sorted(
+                (path.name for path in changes_path.iterdir()
+                 if path.is_dir()),
+                reverse=True
             )
 
-            for index, release_name in enumerate(release_names):
-                if user_release is not None and release_name <= user_release:
-                    break
+            for release_index, release_name in enumerate(release_names):
+                for yaml_file in sorted(
+                    (path for path in
+                     changes_path.joinpath(release_name).iterdir()
+                     if path.is_file() and path.name.endswith('.yaml')),
+                    key=lambda path: path.name
+                ):
+                    payload = yaml.safe_load(
+                        yaml_file.read_text(encoding='utf-8'))
+                    if not (
+                        isinstance(payload, dict)
+                        and {'title', 'description'}.issubset(payload)
+                    ):
+                        continue
+                    if release_index > 0 and feature_count >= 5:
+                        return
 
-                release_features = self.app.cache.get_or_create(
-                    f'new_features_release_{release_name}',
-                    creator=lambda release_name=release_name: [
-                        payload
-                        for yaml_file in sorted(
-                            (path for path in
-                             changes_path.joinpath(release_name).iterdir()
-                             if path.is_file() and path.name.endswith(
-                                 '.yaml')),
-                            key=lambda path: path.name
-                        )
-                        if isinstance(
-                            payload := yaml.safe_load(
-                                yaml_file.read_text(encoding='utf-8')),
-                            dict
-                        ) and {'title', 'description'}.issubset(payload)
-                    ]
-                )
+                    yield release_name, payload
+                    feature_count += 1
 
-                for payload in release_features:
-                    if index > 0 and len(features) >= 5:
-                        break
-                    features.append(payload)
+        return self.app.cache.get_or_create(
+            'released_features',
+            creator=lambda: {
+                release: [
+                    payload for _, payload in group
+                ]
+                for release, group in groupby(
+                    releases_generator(), key=itemgetter(0))
+            }
+        )
 
-                if index > 0 and len(features) >= 5:
-                    break
+    @property
+    def new_features(self) -> list[dict[str, Any]]:
+        user = self.request.current_user
+        if not user or user.release_features == self.app.version:
+            return []
 
-        return features
+        return [
+            feature
+            for release_name, release_features in (
+                self.released_features.items()
+            )
+            if (
+                user.release_features is None
+                or release_name > user.release_features
+            )
+            for feature in release_features
+        ]
 
     @property
     def on_homepage(self) -> bool:
