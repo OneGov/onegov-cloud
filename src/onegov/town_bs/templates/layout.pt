@@ -82,7 +82,7 @@
                         <ul tal:condition="toolbox" class="navbar-nav global-tools-menu">
                             <li class="nav-item dropdown" tal:repeat="tool toolbox">
                                 <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="nav-link dropdown-toggle ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
+                                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="nav-link dropdown-toggle mb-0 p-sm ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
                                 <ul id="${dropdown_id}" class="dropdown-menu">
                                     <li tal:repeat="link tool.links">
                                         <tal:b replace="link(layout, ('nav-link', ))" />
