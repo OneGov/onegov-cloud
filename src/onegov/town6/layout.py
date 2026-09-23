@@ -174,11 +174,11 @@ class Layout(OrgLayout):
 
     @property
     def released_features(self) -> dict[str, list[dict[str, Any]]]:
-        changes_path = resource_files('onegov.town6') / 'changes'
-        if not changes_path.is_dir():
-            return {}
-
         def releases_generator() -> Iterator[tuple[str, dict[str, Any]]]:
+            changes_path = resource_files('onegov.town6') / 'changes'
+            if not changes_path.is_dir():
+                return
+
             feature_count = 0
             release_names = sorted(
                 (path.name for path in changes_path.iterdir()
