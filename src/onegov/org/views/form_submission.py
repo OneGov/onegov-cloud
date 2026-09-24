@@ -218,6 +218,11 @@ def handle_pending_submission(
         checkout_button = None
 
     show_vat = getattr(self.form, 'show_vat', False)
+
+    @request.after
+    def set_push_url(response: Response) -> None:
+        response.headers['HX-Push-Url'] = self_url
+
     return {
         'layout': layout or FormSubmissionLayout(self, request, title),
         'title': title,

@@ -1,0 +1,64 @@
+
+#offCanvasMainMenu .offcanvas-body {
+    position: relative;
+    overflow: hidden;
+}
+
+.drilldown-menu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+    background: var(--bs-body-bg, #fff);
+    transition: left .3s ease-in-out;
+}
+
+.drilldown-menu.is-current {
+    left: 0;
+}
+
+.drilldown-menu.is-prev {
+    left: -100%;
+}
+
+.drilldown-item {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 2px solid $tertiary-subtle;
+}
+
+.drilldown-link {
+    flex-grow: 1;
+    color: var(--bs-body-color);
+    text-decoration: none;
+}
+
+.drilldown-toggle {
+    border: 0;
+    background: transparent;
+    color: var(--bs-body-color);
+}
+
+
+.drilldown-back {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: .75rem 1rem;
+    color: $primary;
+    font-weight: 600;
+    text-align: left;
+}
+
+#offCanvasMainMenu .btn-close {
+  --bs-btn-close-bg: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$primary}'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>"))};
+  --bs-btn-close-opacity: 1;
+}

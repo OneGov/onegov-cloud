@@ -1,0 +1,69 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content" tal:define="separate_available [p for p in providers if p.kind == 'separate' and p.available(request.app)]; primary_separate next((p for p in separate_available if p.is_primary(request.app)), separate_available[0] if separate_available else None)">
+        <div class="row" tal:condition="primary_separate">
+            <div class="col col-md-7 col-lg-5">
+                <div class="provider-login">
+                    <a href="${provider_login(primary_separate)}" class="button">
+                        <tal:b replace="render_untrusted_markdown(request.translate(primary_separate.button_text(request)))" />
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-md-12 col-lg-8">
+                <a href="#local-login" class="local-login-toggle ${'ogc-login' if primary_separate else ''}" data-local-login-toggle
+                   aria-controls="local-login" aria-expanded="true"
+                   tal:condition="primary_separate" i18n:translate>Alternative login methods</a>
+                <tal:b define="integrated [p for p in providers if p.kind == 'integrated']">
+                    <tal:b tal:repeat="provider integrated">
+                        <div class="panel" tal:define="hint provider.hint(request)" tal:condition="hint">
+                            <tal:b replace="render_untrusted_markdown(request.translate(provider.hint(request)))" />
+                        </div>
+                    </tal:b>
+                </tal:b>
+            </div>
+        </div>
+        <div id="local-login" class="row ${'ogc-login' if primary_separate else ''}">
+            <div class="col col-md-7 col-lg-5">
+                <div metal:use-macro="layout.macros['form']" tal:define="form_id 'main-form'"/>
+            </div>
+        </div>
+        <div class="row no-account-yet" tal:condition="may_register">
+            <div class="col">
+                <span i18n:translate>
+                    Don't have an account yet?
+                </span>
+                <span>
+                    <a href="${register_link}" i18n:translate>
+                        Register now
+                    </a>.
+                </span>
+            </div>
+        </div>
+        <div class="mt-xl row ${'ogc-login' if primary_separate else ''}">
+            <div class="col col-md-7 col-lg-5" tal:condition="not: request.app.disable_password_reset">
+                <p>
+                    <span id="text" i18n:translate>Forgot your password?</span><br/>
+                    <a href="${password_reset_link}" i18n:translate>
+                        Reset password
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="row" tal:condition="providers">
+            <tal:b define="separate [p for p in separate_available if p.name != primary_separate.name]" condition="separate">
+                <div class="col col-md-7 col-lg-5 alternatives">
+                    <h2 tal:condition="not primary_separate" i18n:translate>Alternatives</h2>
+                    <div tal:repeat="provider separate" class="provider-login">
+                        <a href="${provider_login(provider)}" class="btn btn-outline-primary">
+                            <tal:b replace="render_untrusted_markdown(request.translate(provider.button_text(request)))" />
+                        </a>
+                    </div>
+                </div>
+            </tal:b>
+        </div>
+    </tal:b>
+</div>

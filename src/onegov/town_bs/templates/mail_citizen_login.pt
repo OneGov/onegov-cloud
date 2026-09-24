@@ -1,0 +1,28 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+
+        <p tal:define="homepage request.link(request.app.org)">
+            <span i18n:translate>Your e-mail address was just used to send a login link to <a href="${homepage}" tal:content='homepage' i18n:name='homepage' />.</span>
+        </p>
+
+        <p i18n:translate>
+            Use the token below or click on the link to complete your login.
+        </p>
+
+        <p class="token">
+            ${token}
+        </p>
+
+        <p>
+            <a href="${confirm_link}" i18n:translate>Complete Login</a>
+        </p>
+
+        <p i18n:translate>
+            If you believe this is an error, ignore this message and we'll never bother you again.
+        </p>
+    </tal:b>
+</div>

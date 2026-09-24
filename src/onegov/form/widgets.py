@@ -20,9 +20,9 @@ from wtforms.widgets import TextInput
 from wtforms.widgets.core import html_params
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING, cast
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterable, Iterator
     from onegov.chat import TextModule
     from onegov.form.fields import (
         DurationField, FieldTable, PanelField, PreviewField, UploadField,
@@ -49,7 +49,7 @@ class OrderedListWidget(ListWidget):
         # require even more knowledge, so this is the better approach
 
         assert hasattr(field, '__iter__')
-        ordered: list[Field] = list(field)
+        ordered: list[Field] = list(cast('Iterable[Field]', field))
         ordered.sort(key=lambda f: field.gettext(f.label.text))
 
         class FakeField:
@@ -63,7 +63,7 @@ class OrderedListWidget(ListWidget):
 
 
 class MultiCheckboxWidget(ListWidget):
-    """ The default list widget with the label behind the checkbox. """
+    """ Render choices as Bootstrap-style checkboxes. """
 
     def __init__(self, html_tag: Literal['ul', 'ol'] = 'ul'):
         super().__init__(html_tag=html_tag, prefix_label=False)
@@ -71,7 +71,44 @@ class MultiCheckboxWidget(ListWidget):
     def __call__(self, field: Field, **kwargs: Any) -> Markup:
         if hasattr(field.meta, 'request'):
             field.meta.request.include('multicheckbox')
-        return super().__call__(field, **kwargs)
+
+        options = []
+        for subfield in cast('Iterable[Field]', field):
+            input_html = subfield()
+            label_html = subfield.label()
+            options.append(
+                '<div class="form-check">'
+                f'{input_html}'
+                f'{label_html}'
+                '</div>'
+            )
+
+        return Markup(  # nosec: B704
+            f'<div {html_params(**kwargs)}>' + ''.join(options) + '</div>'
+        )
+
+
+class RadioWidget(ListWidget):
+    """Render choices as Bootstrap-style radio buttons using div wrappers."""
+
+    def __init__(self) -> None:
+        super().__init__(html_tag='ul', prefix_label=False)
+
+    def __call__(self, field: Field, **kwargs: Any) -> Markup:
+        options = []
+        for subfield in cast('Iterable[Field]', field):
+            input_html = subfield()
+            label_html = subfield.label()
+            options.append(
+                '<div class="form-check">'
+                f'{input_html}'
+                f'{label_html}'
+                '</div>'
+            )
+
+        return Markup(  # nosec: B704
+            f'<div {html_params(**kwargs)}>' + ''.join(options) + '</div>'
+        )
 
 
 class OrderedMultiCheckboxWidget(MultiCheckboxWidget, OrderedListWidget):
@@ -553,10 +590,10 @@ class PanelWidget:
     def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
         return Markup(  # nosec: B704
-            f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
+            f'<div class="panel alert {{kind}}" {html_params(**kwargs)}>'
             '{text}</div>'
         ).format(
-            kind=field.kind,
+            kind=field.kind if field.kind else 'alert-secondary',
             text=text.replace('\n', Markup('<br>'))
         )
 
@@ -567,12 +604,14 @@ class LinkPanelWidget(PanelWidget):
     def __call__(self, field: PanelField, **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
         return Markup(  # nosec: B704
-            f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
+            f'<div class="panel alert {{kind}}" {html_params(**kwargs)}>'
+            '<p>{label}</p>'
             '<a href="{link}">{text}</a></div>'
         ).format(
-            kind=field.kind,
+            kind=field.kind if field.kind else 'alert-secondary',
             text=text.replace('\n', Markup('<br>')),
-            link=field.text
+            link=field.text,
+            label=field.label
         )
 
 
@@ -581,7 +620,14 @@ class HoneyPotWidget(TextInput):
 
     def __call__(self, field: Field, **kwargs: Any) -> Markup:
         field.meta.request.include('lazy-wolves')
-        kwargs['class_'] = (kwargs.get('class_', '') + ' lazy-wolves').strip()
+
+        classes = [
+            kwargs.pop('class_', ''),
+            kwargs.pop('class', ''),
+            'lazy-wolves'
+        ]
+
+        kwargs['class_'] = ' '.join(filter(None, classes)).strip()
         return super().__call__(field, **kwargs)
 
 

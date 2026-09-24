@@ -1,0 +1,21 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x">
+            <div class="column small-12 medium-8">
+                <div class="timeline"
+                    data-feed="${feed}"
+                    data-feed-data="${feed_data}"
+                    data-feed-interval="${feed_interval}">
+                </div>
+                <p class="timeline-no-messages" i18n:translate style="display: none;">
+                    No activities yet.
+                </p>
+            </div>
+            <div class="column small-12 medium-4">
+            </div>
+        </div>
+    </tal:b>
+</div>

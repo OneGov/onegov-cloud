@@ -25,7 +25,7 @@ for (var i = 0, linksLength = links.length; i < linksLength; i++) {
     if (is_external_link(links[i])) {
         links[i].target = '_blank';
         const external_link_icon = document.createElement('i');
-        external_link_icon.className = 'fas fa-external-link-alt fa-xs';
+        external_link_icon.className = 'fas fa-external-link-alt fa-xs ms-xs';
         const accesibility_info = document.createElement('span');
         accesibility_info.className = 'visually-hidden';
         accesibility_info.textContent = '(External Link)';
