@@ -1,0 +1,74 @@
+name: Add release notes to admin digital docs
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag (z.B. master oder release-2026.47)'
+        required: false
+        default: 'master'
+
+permissions: {}
+
+env:
+  IMAGE: ghcr.io/onegov/onegov-cloud:${{ inputs.image_tag }}
+  CHANGES_PATH: /app/lib/python3.14/site-packages/onegov/town6/changes
+
+jobs:
+  find-changes-path:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+
+    steps:
+      - name: Log in to the container registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull image
+        run: docker pull "$IMAGE"
+
+      - name: Create temp container
+        id: container
+        run: |
+          CONTAINER_ID=$(docker create "$IMAGE")
+          echo "id=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Find newest release folder inside container
+        id: latest
+        run: |
+          LATEST_DIR=$(docker run --rm "$IMAGE" sh -c "ls -1 $CHANGES_PATH | sort -V | tail -n 1")
+          echo "Neuester Ordner: $LATEST_DIR"
+          echo "dir=$LATEST_DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Copy only newest release folder
+        env:
+          CONTAINER_ID: ${{ steps.container.outputs.id }}
+          LATEST_DIR: ${{ steps.latest.outputs.dir }}
+        run: |
+          docker cp "${CONTAINER_ID}:${CHANGES_PATH}/${LATEST_DIR}" ./latest-changes
+
+      - name: Remove temp container
+        if: always()
+        env:
+          CONTAINER_ID: ${{ steps.container.outputs.id }}
+        run: docker rm "${CONTAINER_ID}"
+
+      - name: Check for yaml files
+        id: check
+        run: |
+          COUNT=$(find ./latest-changes -maxdepth 1 -type f -name "*.yaml" | wc -l)
+          echo "Anzahl gefundener yaml-Dateien: $COUNT"
+          if [ "$COUNT" -gt 0 ]; then
+            echo "has_files=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_files=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: List yaml files
+        if: steps.check.outputs.has_files == 'true'
+        run: |
+          find ./latest-changes -type f -name "*.yaml"
