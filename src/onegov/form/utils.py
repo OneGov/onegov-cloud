@@ -10,6 +10,9 @@ from unidecode import unidecode
 from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from bs4 import NavigableString, Tag
+    from collections.abc import (
+        Callable, Collection, Mapping, MutableSequence)
+    from onegov.file.models import File
     from onegov.form import Form
     from typing import Self
     from wtforms.fields.core import UnboundField
@@ -186,3 +189,157 @@ def remove_empty_links(
                 link.decompose()
 
     return str(soup)
+
+
+def _file_meta(file: File) -> dict[str, Any]:
+    """ The serialized ``@<id>`` reference for an already-stored file. """
+    try:
+        size = file.reference.file.content_length
+    except OSError:
+        size = -1
+    return {
+        'data': f'@{file.id}',
+        'filename': file.name,
+        'mimetype': file.reference.content_type,
+        'size': size,
+    }
+
+
+def reconcile_uploaded_files[FileT: File](
+    *,
+    file_cls: type[FileT],
+    fields: Mapping[str, Any],
+    multiple: Collection[str],
+    files: MutableSequence[FileT],
+    delete: Callable[[FileT], None],
+    flush: Callable[[], None] = lambda: None,  # noop
+) -> dict[str, Any]:
+    """ Reconciles the submitted upload fields against the already-stored
+    files, shared by form submissions and directory entries. Follows the shape
+    of the original form-submission update: compute ``files_to_add``/
+    ``files_to_keep`` (and their multiple-field counterparts), trash what is no
+    longer kept, then store the new single- and multiple-file uploads.
+
+    ``multiple`` holds the ids of the multi-file fields. Stored files are
+    matched by ``note`` (``<field id>`` single, ``<field id>:<index>`` multi).
+    ``files`` is mutated in place; ``flush`` runs after storing a new file
+    (form submissions pass ``session.flush``); the new values are returned.
+
+    """
+    from onegov.file.utils import (
+        is_stored_file_reference, store_uploaded_file)
+
+    # on a plain 'keep' the field carries no data (directories), so fall back
+    # to the value bound as object_data
+    def serialized(slot: Any) -> Any:
+        value = getattr(slot, 'data', None)
+        if value is None:
+            value = getattr(slot, 'object_data', None)
+        return value
+
+    data: dict[str, Any] = {}
+    for field_id, field in fields.items():
+        if field_id in multiple:
+            data[field_id] = [serialized(sub) for sub in field]
+        else:
+            data[field_id] = serialized(field)
+
+    # single fields present (value != {}), split by fresh upload vs '@<id>' ref
+    single_files = {
+        field_id for field_id in fields
+        if field_id not in multiple and data.get(field_id) != {}
+    }
+    files_to_add = {
+        id for id in single_files
+        if (file_meta := data.get(id))
+        and not is_stored_file_reference(file_meta)
+    }
+    files_to_keep = single_files - files_to_add
+
+    multi_files = {
+        field_id: [
+            index
+            for index, value in enumerate(data.get(field_id, []))
+            if value != {}
+        ]
+        for field_id in multiple
+        if field_id in fields
+    }
+    # a kept file is None (unchanged) or an '@<id>' resend
+    multi_files_to_keep = {
+        f'{id}:{idx}'
+        for id, indeces in multi_files.items()
+        if (file_metas := data.get(id))
+        for idx in indeces
+        if file_metas[idx] is None or is_stored_file_reference(file_metas[idx])
+    }
+    files_to_keep |= multi_files_to_keep
+
+    files_by_note = {f.note: f for f in files}
+    updated: dict[str, Any] = {}
+
+    # trash files owned by a processed field that are no longer kept
+    for file in list(files):
+        if file.note is None or file.note in files_to_keep:
+            continue
+        base, sep, idx = file.note.rpartition(':')
+        owner = base if sep and idx.isdigit() else file.note
+        if owner in fields:
+            delete(file)
+
+    for field_id in single_files:
+        if field_id in files_to_add:
+            field = fields[field_id]
+            # outdated formdata may lack a real file/filename; skip it
+            if not getattr(field, 'file', None) or not getattr(
+                field, 'filename', None
+            ):
+                updated[field_id] = {}
+                continue
+            new_file = store_uploaded_file(
+                file_cls, files, field_id, field.file, field.filename)
+            flush()
+            updated[field_id] = _file_meta(new_file)
+        else:
+            existing = files_by_note.get(field_id)
+            updated[field_id] = (
+                _file_meta(existing) if existing is not None else {}
+            )
+
+    # explicitly cleared single fields (value == {})
+    for field_id in fields:
+        if field_id not in multiple and field_id not in single_files:
+            updated[field_id] = {}
+
+    for field_id, indeces in multi_files.items():
+        subfields = list(fields[field_id])
+        datalist = []
+        new_idx = 0
+        for old_idx in indeces:
+            value = data[field_id][old_idx]
+            old_key = f'{field_id}:{old_idx}'
+            new_key = f'{field_id}:{new_idx}'
+            if old_key in multi_files_to_keep:
+                existing = files_by_note.get(old_key)
+                if existing is not None:
+                    if old_idx != new_idx:  # renumber the note
+                        existing.note = new_key
+                    value = _file_meta(existing)
+            else:
+                slot = subfields[old_idx]
+                # skip subfields without a real file/filename (outdated data)
+                if not getattr(slot, 'file', None) or not getattr(
+                    slot, 'filename', None
+                ):
+                    continue
+                new_file = store_uploaded_file(
+                    file_cls, files, new_key, slot.file, slot.filename)
+                flush()
+                value = _file_meta(new_file)
+
+            datalist.append(value)
+            new_idx += 1
+
+        updated[field_id] = datalist
+
+    return updated
