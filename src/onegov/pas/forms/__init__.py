@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.forms.commission import CommissionForm
 from onegov.org.forms.parliamentary_group import ParliamentaryGroupForm
 from onegov.pas.forms.attendence import AttendenceAddCommissionForm

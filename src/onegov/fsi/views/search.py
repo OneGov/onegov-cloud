@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Personal
 from onegov.fsi import FsiApp
 from onegov.org.models import Search

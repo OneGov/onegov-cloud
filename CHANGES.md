@@ -1,8 +1,60 @@
 # Changes
 
+## 2026.47
+
+`2026-09-17` | [6bf623e9f7...34843bb32b](https://github.com/OneGov/onegov-cloud/compare/6bf623e9f7^...34843bb32b)
+
+### Api
+
+##### Extends `Collection+JSON` templates with additional metadata
+
+This adds the extra fields `required`, `fieldset`, `depends_on` and
+`value_json_schema` to template items, to give more detailed information
+on what kind of JSON values these endpoints expect to receive.
+
+`Feature` | [OGC-3410](https://linear.app/onegovcloud/issue/OGC-3410) | [5627d5289e](https://github.com/onegov/onegov-cloud/commit/5627d5289e86e82c879bade3de9d224a2c67905a)
+
+### Core
+
+##### Add audit trail.
+
+`Feature` | [OGC-180](https://linear.app/onegovcloud/issue/OGC-180) | [6bf623e9f7](https://github.com/onegov/onegov-cloud/commit/6bf623e9f75542974cab59c3180c8cdbe3a29cf5)
+
+##### Replace `bleach`, `html2text`, `urlextract` with `turbohtml`
+
+`Performance` | [a099b6270f](https://github.com/onegov/onegov-cloud/commit/a099b6270f00e6481b6f56382423c6aef19391d4)
+
+### Feriennet
+
+##### Fix volunteer bug
+
+`Bugfix` | [PRO-1600](https://linear.app/projuventute/issue/PRO-1600) | [c147bcbeb1](https://github.com/onegov/onegov-cloud/commit/c147bcbeb1dfbb52c700d8b0f9a06b8205fa44ab)
+
+### Org
+
+##### Fixes pasting topics into iframe topics
+
+`Bugfix` | [ONEGOV-CLOUD-5Z0](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5Z0) | [f48abd2622](https://github.com/onegov/onegov-cloud/commit/f48abd2622e10e8d4769b470451dac34cff56370)
+
+##### Allow wildcard CSP domains for iFrame URLs
+
+`Bugfix` | [PRO-1583](https://linear.app/projuventute/issue/PRO-1583) | [ed1c89d156](https://github.com/onegov/onegov-cloud/commit/ed1c89d1563927614a00435f367465b9ec065692)
+
+### Pay
+
+##### Makes sure invoice items cannot be orphaned and deletes orphans
+
+`Bugfix` | [ONEGOV-CLOUD-5Z1](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-5Z1) | [271f4cb329](https://github.com/onegov/onegov-cloud/commit/271f4cb329e26743b67d9f8747f0d53821568675)
+
+### User
+
+##### Adds inline user search
+
+`Feature` | [PRO-1472](https://linear.app/projuventute/issue/PRO-1472) | [34843bb32b](https://github.com/onegov/onegov-cloud/commit/34843bb32b97e3e6511871cedb3f2b98d7ecfbd0)
+
 ## 2026.46
 
-`2026-09-15` | [a3d2533914...8e55333a18](https://github.com/OneGov/onegov-cloud/compare/a3d2533914^...8e55333a18)
+`2026-09-15` | [a3d2533914...44eba53408](https://github.com/OneGov/onegov-cloud/compare/a3d2533914^...44eba53408)
 
 ### Org
 
@@ -5382,87 +5434,4 @@ cronjob after all the other things have been done.
 ##### Option to display breadcrumbs via parameters in iframe
 
 `Feature` | [OGC-2175](https://linear.app/onegovcloud/issue/OGC-2175) | [72113ad510](https://github.com/onegov/onegov-cloud/commit/72113ad510e1c71cec926498bb7cec0a86c8ec2c)
-
-## 2025.18
-
-`2025-04-11` | [a149dc874d...3a75844229](https://github.com/OneGov/onegov-cloud/compare/a149dc874d^...3a75844229)
-
-### Agency
-
-##### Suppress VAT settings
-
-`Bugfix` | [NONE](#NONE) | [21362a6973](https://github.com/onegov/onegov-cloud/commit/21362a6973f8e1d1970e85dae70c14a590889c54)
-
-### Feriennet
-
-##### Hide ticket archive options for feriennet
-
-`Feature` | [PRO-1386](https://linear.app/projuventute/issue/PRO-1386) | [f534636992](https://github.com/onegov/onegov-cloud/commit/f534636992a82088fc6423caa1ecdf6b940ba338)
-
-##### Add field for SwissPass ID
-
-`Feature` | [PRO-1388](https://linear.app/projuventute/issue/PRO-1388) | [5949eba81c](https://github.com/onegov/onegov-cloud/commit/5949eba81c3cf40584aba9740be76fc858398da7)
-
-##### Remove Logo in Mail Header
-
-`Bugfix` | [PRO-1362](https://linear.app/projuventute/issue/PRO-1362) | [3b08b37994](https://github.com/onegov/onegov-cloud/commit/3b08b379942a6f80e710ec9f32b6e4387d4c305c)
-
-### Fsi
-
-##### Ensure the six year intervall gets checked everywhere
-
-`Bugfix` | [b05f2640a7](https://github.com/onegov/onegov-cloud/commit/b05f2640a77cf562794b7b6c5a2ce8120beda553)
-
-### Landsgemeinde
-
-##### Rename Audio ZIP
-
-`Feature` | [OGC-2194](https://linear.app/onegovcloud/issue/OGC-2194) | [293a30e2f1](https://github.com/onegov/onegov-cloud/commit/293a30e2f17d2efb00c73fd02e1542aea433c68a)
-
-### Org
-
-##### Improve dashboard configuration
-
-`Feature` | [OGC-1528](https://linear.app/onegovcloud/issue/OGC-1528) | [80cf9f7610](https://github.com/onegov/onegov-cloud/commit/80cf9f76103eb5329e5e196378897e6a60d5afc4)
-
-##### Adds optional immediate ticket notifications for all ticket types
-
-`Feature` | [OGC-2124](https://linear.app/onegovcloud/issue/OGC-2124) | [650f306032](https://github.com/onegov/onegov-cloud/commit/650f3060328a7dd8014b528f69bef2e0bb9cda39)
-
-##### Adds the ability for resources to be organized into subgroups
-
-`Feature` | [OGC-2021](https://linear.app/onegovcloud/issue/OGC-2021) | [8431ad8d0d](https://github.com/onegov/onegov-cloud/commit/8431ad8d0d7508ee214e58e90bb86b99d3671edf)
-
-##### Improves support for series-reservations using find your spot
-
-`Feature` | [OGC-2023](https://linear.app/onegovcloud/issue/OGC-2023) | [1781c0fd97](https://github.com/onegov/onegov-cloud/commit/1781c0fd970824c760b3c91240363746facb0686)
-
-##### Scheduled daily newsletter
-
-Add option for a scheduled daily newsletter.
-
-`Feature` | [OGC-2217](https://linear.app/onegovcloud/issue/OGC-2217) | [c104a256f1](https://github.com/onegov/onegov-cloud/commit/c104a256f1c95da8f11b904509280b664eda88ab)
-
-##### Rename rules and allocations
-
-`Feature` | [OGC-2168](https://linear.app/onegovcloud/issue/OGC-2168) | [1f1f981a74](https://github.com/onegov/onegov-cloud/commit/1f1f981a7455e8fa90ad4046057cddcd32cab8c9)
-
-### Reservation
-
-##### Fixes price/hour calculation dropping decimal fractions.
-
-This only occurred when the reservation duration wasn’t a whole hour
-e.g., 1.5 hours was truncated to 1.0 hour.
-
-`Bugfix` | [OGC-2152](https://linear.app/onegovcloud/issue/OGC-2152) | [cac7125206](https://github.com/onegov/onegov-cloud/commit/cac71252065e4293d790cd406e0896eb80a784fd)
-
-### Search
-
-##### Support phone number search (Agency, Org, Town6)
-
-`Feature` | [OGC-2108](https://linear.app/onegovcloud/issue/OGC-2108) | [a149dc874d](https://github.com/onegov/onegov-cloud/commit/a149dc874d74c2066f2cfe2979e04402079cc2b6)
-
-##### Returns the last change date of news items using the published_or_created attribute to lower priority of older news items (in favor for topics)
-
-`Feature` | [OGC-2180](https://linear.app/onegovcloud/issue/OGC-2180) | [f21afb58e7](https://github.com/onegov/onegov-cloud/commit/f21afb58e766a75b26c64ab21e17a06d8208f3ab)
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.elements import BackLink, Link
 from onegov.org import _
 from onegov.core.security import Private

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import OccasionNeed
 from onegov.activity.types import BoundedIntegerRange
 from onegov.feriennet import _

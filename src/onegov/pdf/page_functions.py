@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from lxml import etree
 from textwrap import shorten

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.winterthur.app import WinterthurApp
 from onegov.winterthur.collections import AddressCollection

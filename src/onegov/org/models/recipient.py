@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm.mixins import content_property, dict_property
 from onegov.recipient import GenericRecipient, GenericRecipientCollection
 

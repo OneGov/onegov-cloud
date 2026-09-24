@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from onegov.agency.collections import ExtendedPersonCollection
@@ -10,6 +8,7 @@ from onegov.agency.api import PersonApiEndpoint
 from onegov.agency.models import ExtendedPerson
 from onegov.core.utils import Bunch
 from onegov.form import Form
+from onegov.form.fields import UploadField
 from tests.shared.client import Client
 from tests.shared.utils import create_app
 from uuid import UUID
@@ -30,6 +29,7 @@ class App(Framework, ApiApp):
 
 class ItemForm(Form):
     title = StringField(validators=[InputRequired()])
+    file = UploadField()
 
 
 class Collection:
@@ -47,6 +47,11 @@ class Collection:
         ]
         self.next = None
         self.previous = None
+        self.pages_count = 1
+
+    @property
+    def subset_count(self) -> int:
+        return len(self.batch)
 
     def by_id(self, id_: int | str) -> Bunch | None:
         return self.items.get(str(id_))

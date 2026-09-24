@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-09-16 15:31+0200\n"
+"POT-Creation-Date: 2026-09-18 10:37+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -489,6 +489,9 @@ msgstr "Aktive Chats"
 
 msgid "No active chats."
 msgstr "Keine aktiven Chats."
+
+msgid "Commission members"
+msgstr "Kommissionsmitglieder"
 
 msgid "Contact"
 msgstr "Kontakt"
@@ -1561,8 +1564,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Neue Kunden Nachricht in Ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Bitte ${link} um zu antworten"
 
@@ -1871,6 +1874,9 @@ msgstr "Stornierung beantragen"
 
 msgid "See all your reservations"
 msgstr "Alle Ihre Reservationen einsehen"
+
+msgid "Subscribe to your reservations calendar"
+msgstr "Reservationskalender abonnieren"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
@@ -2294,6 +2300,9 @@ msgid "No filter results found or no parliamentarians defined yet."
 msgstr ""
 "Keine Filterergebnisse gefunden oder noch keine Parlamentarier erfasst."
 
+msgid "Parliamentary group members"
+msgstr "Fraktionsmitglieder"
+
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
 
@@ -2506,6 +2515,12 @@ msgstr ""
 "Verfügbarkeitszeitraum erstellt wurden. Um diese Verfügbarkeiten wieder zu "
 "erstellen, klicken Sie auf \"Bearbeiten\" in der Verfügbarkeitszeitraum und "
 "danach auf \"Speichern\" ohne etwas zu ändern."
+
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr "Dies ist eine limitierte Übersicht Ihrer bestätigten Reservationen."
+
+msgid "Log in for full details"
+msgstr "Für alle Details anmelden"
 
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."

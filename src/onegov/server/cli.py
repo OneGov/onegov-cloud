@@ -48,8 +48,6 @@ A onegov.yml file looks like this:
         level: DEBUG
         handlers: [console]
 """
-from __future__ import annotations
-
 import bjoern  # type:ignore[import-untyped]
 import click
 import multiprocessing

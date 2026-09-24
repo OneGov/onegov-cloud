@@ -8,8 +8,6 @@ Because nobody else does all of these. And if they do (like standardjson), they
 don't support decoding...
 
 """
-from __future__ import annotations
-
 import datetime
 import isodate
 import json

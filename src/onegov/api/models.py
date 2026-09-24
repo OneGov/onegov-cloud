@@ -1,13 +1,15 @@
-from __future__ import annotations
-
 from contextlib import contextmanager
 from datetime import datetime
 from functools import cached_property
+from io import BytesIO
 from json import JSONDecodeError
 from logging import getLogger
 from logging import NullHandler
 from onegov.api.form import model_from_form
 from onegov.core.orm import Base
+from onegov.core.utils import dictionary_to_binary
+from onegov.form.fields import UploadField
+from onegov.form.fields import UploadMultipleField
 from onegov.user import User
 from pydantic import ValidationError
 from sqlalchemy import ForeignKey
@@ -412,14 +414,13 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
         #       payload, as long as we can generate a valid pydantic
         #       model for it.
         if request.method in ('POST', 'PUT') and not request.POST:
-            try:
-                model_class = model_from_form(form)
-            except Exception as exc:
+            model_class = model_from_form(form)
+            if model_class is None:
                 raise ApiException(
                     'This endpoint only supports multipart/form-data or '
                     'application/x-www-form-urlencoded form submissions',
                     status_code=400
-                ) from exc
+                )
 
             data: dict[str, Any] = {}
             with ApiException.capture_exceptions(
@@ -478,6 +479,23 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
                 ) from exc
 
             form.process(obj=model)
+            # NOTE: For file fields we need to set the filename/file attributes
+            #       so they match what populating via formdata would give us.
+            for field in form:
+                if isinstance(field, UploadField) and field.data:
+                    upload_fields = [field]
+                elif isinstance(field, UploadMultipleField):
+                    upload_fields = [f for f in field if f.data]
+                else:
+                    continue
+
+                for upload_field in upload_fields:
+                    assert upload_field.data
+                    upload_field.action = 'replace'
+                    upload_field.filename = upload_field.data['filename']
+                    upload_field.file = BytesIO(dictionary_to_binary(
+                        upload_field.data  # type: ignore[arg-type]
+                    ))
             # NOTE: We already validated the data using pydantic, so we
             #       bypass the validation on the form itself. This way
             #       we don't have to construct valid formdata.

@@ -3,8 +3,6 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 # pragma: exclude file
-from __future__ import annotations
-
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.upgrade import UpgradeContext

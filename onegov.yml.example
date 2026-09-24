@@ -88,6 +88,11 @@ configuration: &global-config
   # number of queries. Either comment out or set to False to disable reporting.
   sql_query_report: summary
 
+  # Same as sql_query_report but for the redis commands sent. Useful for
+  # spotting cache N+1s that don't show up in the sql report. Values:
+  # 'summary', 'redundant', 'all'. Comment out or set to False to disable.
+  cache_query_report: summary
+
   # If this is set to true, each request will create a cprofile in the
   # profiles folder. This slows down requests significantly.
   profile: false

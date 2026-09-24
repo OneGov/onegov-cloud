@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.file import File, FileCollection
 from onegov.core.utils import binary_to_dictionary, dictionary_to_binary
 from onegov.form.fields import HtmlField as HtmlFieldBase

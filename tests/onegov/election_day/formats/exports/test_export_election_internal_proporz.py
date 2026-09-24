@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import OrderedDict
 from datetime import date
 from onegov.election_day.formats import export_election_internal_proporz

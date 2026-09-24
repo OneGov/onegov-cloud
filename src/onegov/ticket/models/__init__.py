@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.ticket.models.invoice import TicketInvoice
 from onegov.ticket.models.invoice_item import TicketInvoiceItem
 from onegov.ticket.models.ticket import Ticket

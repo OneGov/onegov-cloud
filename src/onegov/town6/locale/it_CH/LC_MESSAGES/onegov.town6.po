@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-09-16 15:31+0200\n"
+"POT-Creation-Date: 2026-09-18 10:37+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -487,6 +487,9 @@ msgstr "Chat attive"
 
 msgid "No active chats."
 msgstr "Nessuna chat attiva."
+
+msgid "Commission members"
+msgstr "Membri della commissione"
 
 #, fuzzy
 msgid "Contact"
@@ -1560,8 +1563,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nuovo messaggio del cliente nel ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request status page"
 #. Canonical text for ${link} is: "visit the request page"
+#. Canonical text for ${link} is: "visit the request status page"
 msgid "Please ${link} to reply."
 msgstr "Per favore ${link} per rispondere."
 
@@ -1863,6 +1866,9 @@ msgstr "Richiedere la cancellazione"
 
 msgid "See all your reservations"
 msgstr "Vedere tutte le prenotazioni"
+
+msgid "Subscribe to your reservations calendar"
+msgstr "Abbonarsi al calendario delle prenotazioni"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
@@ -2291,6 +2297,9 @@ msgid "No filter results found or no parliamentarians defined yet."
 msgstr ""
 "Nessun risultato del filtro trovato o nessun parlamentare ancora definito."
 
+msgid "Parliamentary group members"
+msgstr "Membri del gruppo parlamentare"
+
 msgid "No parliamentary groups defined yet."
 msgstr "Nessun gruppo parlamentare ancora definito."
 
@@ -2504,6 +2513,14 @@ msgstr ""
 "fine. Ciò include le allocazioni create utilizzando un periodo di "
 "disponibilità. Per ricreare queste allocazioni, fare clic su \"modifica\" "
 "nel periodo di disponibilità e quindi \"salva\" senza modificare nulla."
+
+msgid "You are viewing a limited summary of your confirmed reservations."
+msgstr ""
+"State visualizzando un riepilogo limitato delle prenotazioni "
+"confermate."
+
+msgid "Log in for full details"
+msgstr "Accedere per tutti i dettagli"
 
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."

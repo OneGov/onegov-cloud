@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 from collections import defaultdict
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import distinct, false
 
@@ -38,6 +36,7 @@ from onegov.pas.utils import (
     get_active_kantonsrat_parliamentarians,
     is_active_kantonsrat_member,
 )
+from onegov.user import User
 from uuid import UUID
 
 
@@ -356,25 +355,65 @@ def add_bulk_attendence(
 
         data = form.get_useful_data()
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
-            if (
-                not request.is_admin
-                and form.commission_id.data
-                and form.date.data
-            ):
+            if not request.is_admin and form.commission_id.data:
                 blocked_parls: list[str] = []
-                commission_id = UUID(form.commission_id.data)
+                try:
+                    commission_id = UUID(form.commission_id.data)
+                except (TypeError, ValueError):
+                    commission_id = None
+
+                user = (
+                    request.session.query(User)
+                    .filter_by(username=request.identity.userid)
+                    .first()
+                )
+                today = date.today()
+                led_commission_ids = set()
+                if user and user.parliamentarian:  # type: ignore[attr-defined]
+                    led_commission_ids = {
+                        membership.commission_id
+                        for membership in (
+                            user.parliamentarian.commission_memberships_on(  # type: ignore[attr-defined]
+                                on_date=today,
+                                role='president',
+                            )
+                        )
+                    }
+
+                valid_membership_ids = set()
+                if commission_id in led_commission_ids:
+                    valid_membership_ids = {
+                        membership.parliamentarian_id
+                        for membership in request.session.query(
+                            PASCommissionMembership
+                        ).filter_by(commission_id=commission_id)
+                        if membership.is_active_on(today)
+                    }
+
                 for parl_id in raw_parl_ids:
                     if not isinstance(parl_id, str):
-                        continue
+                        blocked_parls.append(_('a selected parliamentarian'))
+                        break
                     try:
                         pid = UUID(parl_id)
                     except ValueError:
-                        continue
-                    if has_user_set_abschluss_for_commission(
-                        request.session,
-                        pid,
-                        commission_id,
-                        form.date.data,
+                        blocked_parls.append(_('a selected parliamentarian'))
+                        break
+                    if commission_id not in led_commission_ids:
+                        blocked_parls.append(_('the selected commission'))
+                        break
+                    assert commission_id is not None
+                    if pid not in valid_membership_ids:
+                        blocked_parls.append(_('a selected parliamentarian'))
+                        break
+                    if (
+                        form.date.data
+                        and has_user_set_abschluss_for_commission(
+                            request.session,
+                            pid,
+                            commission_id,
+                            form.date.data,
+                        )
                     ):
                         parl = PASParliamentarianCollection(request.app).by_id(
                             pid
@@ -384,10 +423,8 @@ def add_bulk_attendence(
                 if blocked_parls:
                     request.alert(
                         _(
-                            'Cannot book attendance - '
-                            'abschluss already set '
-                            'for: ${names}',
-                            mapping={'names': ', '.join(blocked_parls)},
+                            'Cannot book attendance for the selected '
+                            'commission or parliamentarian.'
                         )
                     )
                     return {

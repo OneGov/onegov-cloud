@@ -2,8 +2,6 @@
 macros.
 
 """
-from __future__ import annotations
-
 from random import choice
 
 from lxml.html import builder, tostring

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.pas.collections.attendence import AttendenceCollection
 from onegov.pas.collections.change import ChangeCollection
 from onegov.pas.collections.commission import PASCommissionCollection

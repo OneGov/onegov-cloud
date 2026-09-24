@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.town6.views.auth import town_handle_login as handle_login_base
 from onegov.translator_directory import _

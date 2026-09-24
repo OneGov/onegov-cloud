@@ -127,29 +127,19 @@ target-version = "py314"
 
 [tool.ruff.lint]
 select = [
-    "stdlib-module-shadowing",
     "ASYNC",
     "B0",
-    "raise-without-from-inside-except",
-    "loop-iterator-mutation",
     "C4",
-    "trailing-comma-on-bare-tuple",
     "D2",
-    "escape-sequence-in-docstring",
     "D4",
     "E",
     "F",
-    "static-join-to-f-string",
     "FURB",
-    "logging-warn",
     "G2",
-    "missing-required-import",
     "ISC",
     "LOG",
     "N",
     "PERF",
-    "blanket-noqa",
-    "invalid-mock-access",
     "PIE",
     "PYI",
     "Q",
@@ -157,75 +147,84 @@ select = [
     "SIM",
     "SLOT",
     "T",
-    "banned-api",
     "TRY",
     "UP",
-    "W"
+    "W",
+    "banned-api",
+    "blanket-noqa",
+    "escape-sequence-in-docstring",
+    "invalid-mock-access",
+    "logging-warn",
+    "loop-iterator-mutation",
+    "raise-without-from-inside-except",
+    "static-join-to-f-string",
+    "stdlib-module-shadowing",
+    "trailing-comma-on-bare-tuple",
 ]
 ignore = [
-    "unused-loop-control-variable",
-    "unnecessary-dict-comprehension-for-iterable",
-    "unnecessary-multiline-docstring",
-    "blank-line-before-function",
+    "ambiguous-variable-name",
     "blank-line-after-function",
-    "incorrect-blank-line-after-class",
-    "missing-blank-line-after-summary",
-    "new-line-after-last-paragraph",
-    "surrounding-whitespace",
     "blank-line-before-class",
-    "missing-trailing-period",
-    "non-imperative-mood",
+    "blank-line-before-function",
     "blank-lines-between-header-and-content",
+    # TODO: We would like to enable collapsible-if, but it has a ton of
+    #       violations, so it's a big job to clean it up
+    "collapsible-if",
+    "custom-type-var-for-self",
+    "dict-get-with-none-default",
+    "error-suffix-on-exception-name",
+    "f-string",
+    "falsy-dict-get-fallback",
+    "hardcoded-string-charset",
+    "if-else-block-instead-of-if-exp",
+    "if-exp-instead-of-or-operator",
+    "if-expr-with-true-false",
+    "in-dict-keys",
+    "implicit-optional",
+    "incorrect-blank-line-after-class",
+    "incorrectly-parenthesized-tuple-in-subscript",
+    "invalid-get-logger-argument",
+    "missing-blank-line-after-summary",
+    "meta-class-abc-meta",
+    "missing-trailing-period",
     "missing-whitespace-around-arithmetic-operator",
     "module-import-not-at-top-of-file",
+    "mutable-class-default",
+    "needless-bool",
+    "new-line-after-last-paragraph",
+    # TODO: Brings lots of violations, needs cleanup in all __init__.py files
+    "non-empty-init-module",
+    "non-imperative-mood",
     "none-comparison",
-    "true-false-comparison",
-    "ambiguous-variable-name",
+    "parenthesize-chained-operators",
+    "raise-vanilla-args",
+    # NOTE: It probably makes sense to enable this, but the refactor
+    #       will take a bit of effort.
+    "raise-within-try",
     "read-whole-file",
-    "write-whole-file",
-    "if-exp-instead-of-or-operator",
+    "redundant-numeric-union",
+    "reimplemented-builtin",
+    "reimplemented-starmap",
     # NOTE: We should probably enable this, but we use repeated appends
     #       as a stylistic choice in some cases, extend would add another
     #       level of indentation.
     "repeated-append",
     "slice-copy",
-    "reimplemented-starmap",
-    "hardcoded-string-charset",
-    "verbose-decimal-constructor",
-    "meta-class-abc-meta",
     "subclass-builtin",
-    "invalid-get-logger-argument",
-    "error-suffix-on-exception-name",
-    "custom-type-var-for-self",
-    "redundant-numeric-union",
-    "mutable-class-default",
-    "implicit-optional",
-    "parenthesize-chained-operators",
+    "suppressible-exception",
+    "surrounding-whitespace",
+    "true-false-comparison",
+    "try-consider-else",
+    "unnecessary-dict-comprehension-for-iterable",
+    "unnecessary-encode-utf8",
+    "unnecessary-multiline-docstring",
     "unsorted-dunder-all",
     "unsorted-dunder-slots",
-    "incorrectly-parenthesized-tuple-in-subscript",
+    "unused-loop-control-variable",
     "used-dummy-variable",
-    "falsy-dict-get-fallback",
-    # TODO: Brings lots of violations, needs cleanup in all __init__.py files
-    "non-empty-init-module",
-    # TODO: We would like to enable SIM102, but it has a ton of
-    #       violations, so it's a big job to clean it up
-    "collapsible-if",
-    "needless-bool",
-    "suppressible-exception",
-    "if-else-block-instead-of-if-exp",
-    "reimplemented-builtin",
-    "in-dict-keys",
-    "if-expr-with-true-false",
-    "dict-get-with-none-default",
-    "raise-vanilla-args",
-    "try-consider-else",
-    # NOTE: It probably makes sense to enable this, but the refactor
-    #       will take a bit of effort.
-    "raise-within-try",
     "utf8-encoding-declaration",
-    "unnecessary-encode-utf8",
-    "f-string",
+    "verbose-decimal-constructor",
+    "write-whole-file",
 ]
 unfixable = []
 external = ["TC"]
@@ -234,38 +233,27 @@ preview = true
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/onegov/core/types.py" = ["useless-expression"]
-"reportlab_settings.py" = ["N", "missing-required-import"]
-"*/__init__.py" = ["missing-required-import"]
+"reportlab_settings.py" = ["N"]
 "*.pyi" = [
-    "line-too-long",
     "FURB",
     "N",
     "Q",
     # NOTE: We would prefer to set a different target version instead
     #       but there's no per-file-target-version
     "UP",
+    "line-too-long",
 ]
 "src/onegov/*/upgrade.py" = [
     "T2",
 ]
 "tests/**/*.py" = [
-    "useless-expression",
     "C4",
     "D",
-    "blank-line-between-methods",
-    "blank-lines-top-level",
-    "too-many-blank-lines",
-    "blank-line-after-decorator",
-    "blank-lines-after-function-or-class",
-    "blank-lines-before-nested-definition",
-    "unused-variable",
-    "static-join-to-f-string",
     "FURB",
     "ISC",
     "N",
     "Q",
     "PERF",
-    "blanket-noqa",
     "PIE",
     "PYI",
     "RUF",
@@ -273,10 +261,17 @@ preview = true
     "T",
     "TRY",
     "UP",
+    "blank-line-after-decorator",
+    "blank-line-between-methods",
+    "blank-lines-before-nested-definition",
+    "blank-lines-after-function-or-class",
+    "blank-lines-top-level",
+    "blanket-noqa",
+    "static-join-to-f-string",
+    "too-many-blank-lines",
+    "unused-variable",
+    "useless-expression",
 ]
-
-[tool.ruff.lint.isort]
-required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.pep8-naming]
 extend-ignore-names = [

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import log
 from onegov.activity.utils import dates_overlap
 from sortedcontainers import SortedSet

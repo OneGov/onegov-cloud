@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from base64 import b64encode
@@ -31,6 +29,7 @@ def test_text_fields() -> None:
 
     form = parse_form(text)()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'first_name\s+Field required'):
         model.model_validate({})
@@ -92,6 +91,7 @@ def test_text_fields() -> None:
 def test_email_field() -> None:
     form = parse_form("E-Mail = @@@")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'not a valid email address'):
         model.model_validate({'e_mail': 'bogus'})
@@ -103,6 +103,7 @@ def test_email_field() -> None:
 def test_url_field() -> None:
     form = parse_form("Url = http://")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be a valid URL'):
         model.model_validate({'url': 'bogus'})
@@ -117,6 +118,7 @@ def test_url_field() -> None:
 def test_video_url_field() -> None:
     form = parse_form("Url = video-url")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be a valid URL'):
         model.model_validate({'url': 'bogus'})
@@ -132,6 +134,7 @@ def test_video_url_field() -> None:
 def test_date_field() -> None:
     form = parse_form("Date = YYYY.MM.DD (today..+1 months)")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be a valid date'):
         model.model_validate({'date': 'bogus'})
@@ -150,6 +153,7 @@ def test_date_field() -> None:
 def test_datetime_field() -> None:
     form = parse_form("Date = YYYY.MM.DD HH:MM (today..+1 months)")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be a valid date'):
         model.model_validate({'date': 'bogus'})
@@ -167,6 +171,7 @@ def test_datetime_field() -> None:
 def test_time_field() -> None:
     form = parse_form("Time = HH:MM")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be in a valid time'):
         model.model_validate({'time': 'bogus'})
@@ -188,6 +193,7 @@ def create_pdf_file_dict(path: Path, filename: str) -> dict[str, str]:
 def test_fileinput_field(tmp_path: Path) -> None:
     form = parse_form("File * = *.pdf|*.doc")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be a valid dict'):
         model.model_validate({'file': 'bogus'})
@@ -239,6 +245,7 @@ def test_fileinput_field(tmp_path: Path) -> None:
 def test_multiplefileinput_field(tmp_path: Path) -> None:
     form = parse_form("Files * = *.pdf|*.doc (multiple)")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be a valid list'):
         model.model_validate({'files': 'bogus'})
@@ -301,6 +308,7 @@ def test_multiplefileinput_field(tmp_path: Path) -> None:
 def test_integer_field() -> None:
     form = parse_form("Age = 21..150")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be a valid integer'):
         model.model_validate({'age': 'bogus'})
@@ -318,6 +326,7 @@ def test_integer_field() -> None:
 def test_decimal_field() -> None:
     form = parse_form("Percentage = 0.00..100.00")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'should be a valid decimal'):
         model.model_validate({'percentage': 'bogus'})
@@ -335,6 +344,7 @@ def test_decimal_field() -> None:
 def test_stdnum_field() -> None:
     form = parse_form("Bank Account = # iban")()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError):
         model.model_validate({'bank_account': 'bogus'})
@@ -353,6 +363,7 @@ def test_radio_field() -> None:
     """)
     form = parse_form(text)()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r"should be 'Male' or 'Female'"):
         model.model_validate({'gender': 'bogus'})
@@ -374,6 +385,7 @@ def test_checkbox_field() -> None:
     """)
     form = parse_form(text)()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'required\s+Field required'):
         model.model_validate({})
@@ -411,6 +423,7 @@ def test_dependency_validation_chain() -> None:
     """)
     form = parse_form(text)()
     model = model_from_form(form)
+    assert model is not None
 
     with pytest.raises(ValidationError, match=r'say_this is required'):
         model.model_validate({'say': 'Yes'})

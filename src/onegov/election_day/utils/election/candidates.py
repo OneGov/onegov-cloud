@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from onegov.core.utils import groupbylist
 from onegov.election_day.models import Candidate

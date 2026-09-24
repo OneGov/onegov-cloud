@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.translator_directory.models.ticket import TimeReportTicket
 
 from onegov.core.security import Public, Personal

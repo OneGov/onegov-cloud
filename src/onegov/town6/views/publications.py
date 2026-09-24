@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.org.views.publications import view_publications
 from onegov.town6 import TownApp

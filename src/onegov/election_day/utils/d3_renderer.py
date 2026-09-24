@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from base64 import b64decode
 from io import BytesIO
 from io import StringIO

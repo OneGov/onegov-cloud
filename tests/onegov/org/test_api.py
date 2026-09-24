@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 import json
+import textwrap
 import transaction
 from base64 import b64encode
 from datetime import timedelta
@@ -309,6 +308,104 @@ def test_api_submitting_forms(
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
 @patch('onegov.websockets.integration.authenticate')
+def test_api_submitting_forms_files(
+    authenticate: MagicMock,
+    broadcast: MagicMock,
+    connect: MagicMock,
+    client: Client
+) -> None:
+
+    form_collection = FormCollection(client.app.session())
+    form_collection.definitions.add(
+        'Files',
+        parsed=ParsedForm.from_formcode(textwrap.dedent("""
+            E-mail * = @@@
+            File * = *.txt
+            Files * = *.txt (multiple)
+        """)),
+        type='custom'
+    )
+
+    transaction.commit()
+
+    client.login_admin()  # allow access to PUT endpoint
+
+    def collection(url: str) -> Collection:
+        return Collection.from_json(client.get(url).body)
+
+    def data(item: Any) -> dict[str, Any]:
+        return {x.name: x.value for x in item.data}
+
+    def filters(item: Any) -> dict[str, Any]:
+        return {x.name: x.values or x.prompt for x in item.data}
+
+    def links(item: Any) -> dict[str, str]:
+        return {x.rel: x.href for x in item.links}
+
+    def template(item: Any) -> set[str]:
+        return {x.name for x in item.template.data}
+
+    forms_collection = collection('/api/forms')
+    forms = {
+        data(item)['title']: item.href
+        for item in forms_collection.items
+    }
+    assert set(forms) == {'Anmeldung', 'Files'}
+    # Forms are different for every item so there is no shared template
+    assert forms_collection.template is None
+    files_collection = collection(forms['Files'])
+    assert template(files_collection) == {'e_mail', 'file', 'files'}
+
+    # test submitting an invalid change (missing fields)
+    payload = Template(data=[
+        {'name': 'e_mail', 'value': 'john.doe@example.com'},
+        {'name': 'file', 'value': None}
+    ]).to_dict()
+    response = client.put_json(
+        forms['Files'],
+        payload,
+        expect_errors=True
+    )
+    assert response.status_code == 400
+    parsed = Collection.from_json(response.text)
+    message = parsed.error.message
+    assert 'file: Input should be a valid dictionary' in message
+    assert 'files: Field required' in message
+
+    # test submitting a valid change
+    file_data = get_base64_encoded_json_string('Hello world')
+    payload = Template(data=[
+        {'name': 'e_mail', 'value': 'john.doe@example.com'},
+        {'name': 'file', 'value': {'filename': 'test.txt', 'data': file_data}},
+        {'name': 'files', 'value': [
+            {'filename': 'test1.txt', 'data': file_data},
+            {'filename': 'test2.txt', 'data': file_data},
+        ]},
+    ]).to_dict()
+    response = client.put_json(forms['Files'], payload)
+    assert response.status_code == 200
+    parsed = Collection.from_json(response.text)
+    assert links(parsed).keys() == {'ticket', 'ticket_status'}
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
+
+    # the ticket links are both valid
+    ticket_page = client.get(links(parsed)['ticket'])
+    assert 'john.doe@example.com' in ticket_page
+    assert 'test.txt' in ticket_page
+    assert 'test1.txt' in ticket_page
+    assert 'test2.txt' in ticket_page
+    assert 'Offen' in client.get(links(parsed)['ticket_status'])
+
+
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.broadcast')
+@patch('onegov.websockets.integration.authenticate')
 def test_api_syndicate_filter(
     authenticate: MagicMock,
     broadcast: MagicMock,
@@ -439,6 +536,27 @@ def test_api_events_no_n_plus_one(client: Client) -> None:
 
     # all eager-loaded: no per-row lazy queries
     assert statements == [], f'unexpected lazy queries: {statements}'
+
+
+def test_api_events_no_n_plus_one_cache(client: Client) -> None:
+    from onegov.core.cache.redis import RedisCacheRegion
+
+    client.login_admin()  # prevent rate limit
+
+    calls: list[str] = []
+    orig = RedisCacheRegion.get_or_create
+
+    def count(self: Any, key: str, *args: Any, **kwargs: Any) -> Any:
+        if key == 'custom_event_tags':
+            calls.append(key)
+        return orig(self, key, *args, **kwargs)
+
+    with patch.object(RedisCacheRegion, 'get_or_create', count):
+        response = client.get('/api/events')
+
+    # more than one item, but the custom_event_tags cache is only hit once
+    assert response.body.count(b'"start"') > 1
+    assert len(calls) <= 1, f'N+1 on cache: {len(calls)} redis round-trips'
 
 
 @patch('onegov.websockets.integration.connect')

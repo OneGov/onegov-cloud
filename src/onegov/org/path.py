@@ -1,6 +1,4 @@
 """ Contains the paths to the different models served by onegov.org. """
-from __future__ import annotations
-
 import sedate
 from datetime import date, datetime
 from libres.db.models import ReservationBlocker
@@ -192,6 +190,8 @@ def get_user(app: OrgApp, id: UUID) -> User | None:
 )
 def get_users(
     app: OrgApp,
+    request: OrgRequest,
+    q: str | None = None,
     active: list[bool] | None = None,
     role: list[str] | None = None,
     tag: list[str] | None = None,
@@ -200,7 +200,12 @@ def get_users(
 ) -> UserCollection:
     return UserCollection(
         app.session(),
-        active=active, role=role, tag=tag, provider=provider, source=source
+        term=q,
+        active=active,
+        role=role,
+        tag=tag,
+        provider=provider,
+        source=source,
     )
 
 

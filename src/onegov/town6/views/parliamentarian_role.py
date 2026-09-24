@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.elements import Link
 from onegov.org.forms import ParliamentarianRoleForm
 from onegov.org.security import Private, Public

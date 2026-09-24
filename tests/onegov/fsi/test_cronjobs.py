@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 
 from onegov.fsi.collections.course_event import CourseEventCollection

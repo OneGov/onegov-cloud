@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity.types import BoundedIntegerRange
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency import AgencyApp
 from onegov.agency.layout import AgencySearchLayout
 from onegov.core.security import Public

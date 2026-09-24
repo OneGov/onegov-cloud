@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-
 from datetime import date, datetime, timezone
 from decimal import Decimal
 from onegov.translator_directory.collections.translator import (

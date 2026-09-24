@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from wtforms import RadioField
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (

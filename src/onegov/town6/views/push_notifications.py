@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.org.models import PushNotificationCollection
 from onegov.org.views.push_notifications import view_push_notifications

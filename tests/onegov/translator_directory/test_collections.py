@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.gis import Coordinates
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import (

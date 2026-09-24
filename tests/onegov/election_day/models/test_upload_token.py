@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy.exc import IntegrityError
 from onegov.election_day.models import UploadToken
 from pytest import raises

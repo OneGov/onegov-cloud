@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from onegov.pas.layouts import DefaultLayout
 from onegov.core.utils import Bunch

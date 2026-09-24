@@ -1,6 +1,4 @@
 """ Contains the base application used by other applications. """
-from __future__ import annotations
-
 import re
 
 import niquests
@@ -342,7 +340,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
     def font_family(self) -> str | None:
         return self.theme_options.get('font-family-sans-serif')
 
-    @property
+    @request_cached
     def custom_event_tags(self) -> list[str] | None:
         return self.cache.get_or_create(
             'custom_event_tags', self.load_custom_event_tags

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from freezegun import freeze_time
 from onegov.core.utils import module_path
 from onegov.election_day.layouts import ElectionLayout

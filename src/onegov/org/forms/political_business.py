@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from itertools import zip_longest
 from markupsafe import Markup
