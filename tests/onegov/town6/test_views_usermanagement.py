@@ -1,7 +1,3 @@
-from __future__ import annotations
-
-
-
 from onegov.user import User
 
 
