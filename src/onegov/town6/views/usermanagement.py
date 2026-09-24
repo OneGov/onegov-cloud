@@ -11,6 +11,7 @@ from onegov.town6 import TownApp
 from onegov.town6.layout import UserManagementLayout, UserLayout
 from onegov.user import User, UserCollection
 from onegov.user.forms import SignupLinkForm
+from webob.exc import HTTPNotFound
 
 
 from typing import TYPE_CHECKING
@@ -125,7 +126,11 @@ def add_release_number(
 
     request.assert_valid_csrf_token()
 
+    if not request.app.show_new_release_features:
+        raise HTTPNotFound()
+
     self.release_features = request.app.version
+    return None
 
 
 @TownApp.view(
@@ -138,5 +143,8 @@ def close_features(
     self: User,
     request: TownRequest,
 ) -> None:
+
+    if not request.app.show_new_release_features:
+        raise HTTPNotFound()
 
     request.browser_session.dismissed_new_features = True

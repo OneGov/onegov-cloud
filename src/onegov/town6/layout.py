@@ -220,7 +220,9 @@ class Layout(OrgLayout):
     @property
     def new_features(self) -> list[dict[str, Any]]:
         user = self.request.current_user
-        if not user or user.release_features == self.app.version:
+        if not user or user.release_features == self.app.version or (
+            not self.app.show_new_release_features
+        ):
             return []
 
         return [

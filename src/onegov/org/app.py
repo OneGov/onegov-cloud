@@ -125,12 +125,14 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
         enable_user_registration: bool = False,
         enable_yubikey: bool = False,
         disable_password_reset: bool = False,
+        show_new_release_features: bool = False,
         **cfg: Any
     ) -> None:
 
         self.enable_user_registration = enable_user_registration
         self.enable_yubikey = enable_yubikey
         self.disable_password_reset = disable_password_reset
+        self.show_new_release_features = show_new_release_features
 
     def configure_plausible_api_token(
         self,

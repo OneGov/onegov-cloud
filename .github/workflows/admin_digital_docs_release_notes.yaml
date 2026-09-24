@@ -2,9 +2,17 @@ name: Add release notes to admin digital docs
 
 on:
   workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag'
+        required: false
+        default: 'master'
+
+permissions: {}
 
 jobs:
-  build:
+  placeholder:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Placeholder
+        run: echo "Add release notes to admin digital docs"

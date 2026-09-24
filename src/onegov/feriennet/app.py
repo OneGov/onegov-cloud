@@ -172,12 +172,14 @@ class FeriennetApp(TownApp):
         enable_user_registration: bool = True,
         enable_yubikey: bool = False,
         disable_password_reset: bool = False,
+        show_new_release_features: bool = False,
         **cfg: Any
     ) -> None:
         super().configure_organisation(
             enable_user_registration=enable_user_registration,
             enable_yubikey=enable_yubikey,
             disable_password_reset=disable_password_reset,
+            show_new_release_features=show_new_release_features,
             **cfg
         )
 
