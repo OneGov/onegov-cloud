@@ -41,7 +41,7 @@ jobs:
         id: latest
         run: |
           LATEST_DIR=$(docker run --rm "$IMAGE" sh -c "ls -1 $CHANGES_PATH | sort -V | tail -n 1")
-          echo "Neuester Ordner: $LATEST_DIR"
+          echo "Newest folder: $LATEST_DIR"
           echo "dir=$LATEST_DIR" >> "$GITHUB_OUTPUT"
 
       - name: Copy only newest release folder
@@ -72,3 +72,82 @@ jobs:
         if: steps.check.outputs.has_files == 'true'
         run: |
           find ./latest-changes -type f -name "*.yaml"
+
+      - name: Checkout docs-admin-digital
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.check.outputs.has_files == 'true'
+        with:
+          repository: onegov/docs-admin-digital
+          path: docs-admin-digital
+          persist-credentials: false
+
+      - name: Set up Python
+        if: steps.check.outputs.has_files == 'true'
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        if: steps.check.outputs.has_files == 'true'
+        run: pip install pyyaml
+
+      - name: Build release notes block and insert into index.md
+        if: steps.check.outputs.has_files == 'true'
+        env:
+          RELEASE_VERSION: ${{ steps.latest.outputs.dir }}
+        run: |
+          python3 << 'EOF'
+          import os
+          import re
+          import yaml
+          from datetime import date
+
+          changes_dir = "./latest-changes"
+          index_path = "docs-admin-digital/content/neuerungen/index.md"
+          release_version = os.environ["RELEASE_VERSION"]
+          release_date = date.today().strftime("%d.%m.%Y")
+
+          # Read and parse every yaml file in the release folder
+          features = []
+          for filename in sorted(os.listdir(changes_dir)):
+              if filename.endswith((".yaml", ".yml")):
+                  filepath = os.path.join(changes_dir, filename)
+                  with open(filepath, "r", encoding="utf-8") as f:
+                      data = yaml.safe_load(f)
+                      title = data["title"]
+                      # prefer long_description once it exists, fall back to description
+                      body = data.get("long_description") or data["description"]
+                      features.append((title, body.strip()))
+
+          # Build the "#### Title\nBody\n" section for each feature
+          feature_blocks = [f"#### {title}\n{body}" for title, body in features]
+
+          new_release_block = (
+              f"## {release_version}\n"
+              f"*Veröffentlicht am {release_date}*\n\n"
+              f"### Neuerungen\n"
+              + "\n\n".join(feature_blocks)
+              + "\n\n---\n\n"
+          )
+
+          # Insert the new block right before the first existing "## " release heading
+          with open(index_path, "r", encoding="utf-8") as f:
+              content = f.read()
+
+          match = re.search(r"\n## \d", content)
+          if not match:
+              raise RuntimeError("Could not find an existing release heading (## ...) to insert before.")
+
+          insert_pos = match.start() + 1  # position right at the start of "## "
+          updated_content = content[:insert_pos] + new_release_block + content[insert_pos:]
+
+          with open(index_path, "w", encoding="utf-8") as f:
+              f.write(updated_content)
+
+          print(f"Inserted release {release_version} with {len(features)} feature(s).")
+          EOF
+
+      - name: Show resulting diff
+        if: steps.check.outputs.has_files == 'true'
+        working-directory: docs-admin-digital
+        run: git diff
