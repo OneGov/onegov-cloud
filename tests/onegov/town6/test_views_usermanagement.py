@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import transaction
 
 
 from onegov.user import User
@@ -37,7 +38,13 @@ def test_new_feature_close_and_read(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    client.login_member()
+    user = client.app.session().query(User).filter_by(
+        username='editor@example.org'
+    ).one()
+    user.release_features = None
+    transaction.commit()
+
+    client.login_editor()
 
     changes_root = tmp_path / 'changes'
     release_changes = changes_root / '2026.47'
@@ -64,10 +71,10 @@ def test_new_feature_close_and_read(
     assert '#newFeaturesModal' not in client.get('/')
 
     user = client.app.session().query(User).filter_by(
-        username='admin@example.org'
+        username='editor@example.org'
     ).one()
     assert user.release_features == client.app.version
 
     client.logout()
-    client.login_admin()
+    client.login_editor()
     assert '#newFeaturesModal' not in client.get('/')
