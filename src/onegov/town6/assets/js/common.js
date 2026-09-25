@@ -481,10 +481,3 @@ $('body').each(function() {
         this.className += " framed";
     }
 });
-
-$(document).ready(function() {
-  var $modal = $('#newFeaturesModal');
-  if ($modal.length) {
-    $modal.foundation('open');
-  }
-});

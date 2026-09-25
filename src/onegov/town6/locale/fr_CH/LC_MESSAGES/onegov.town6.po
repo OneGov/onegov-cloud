@@ -1421,18 +1421,6 @@ msgstr "Différence d'arrondi"
 msgid "Total"
 msgstr "Total"
 
-msgid "New features available"
-msgstr "Nouvelles fonctionnalités disponibles"
-
-msgid "Suggested by"
-msgstr "Suggéré par"
-
-msgid "Close"
-msgstr "Fermer"
-
-msgid "Read"
-msgstr "Je l'ai lu"
-
 msgid "Hello!"
 msgstr "Bonjour"
 

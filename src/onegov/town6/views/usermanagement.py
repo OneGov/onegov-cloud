@@ -1,4 +1,4 @@
-from onegov.core.security import Secret, Private
+from onegov.core.security import Secret
 
 from onegov.org.forms import ChangeUsernameForm, NewUserForm
 from onegov.org.views.usermanagement import (
@@ -9,7 +9,6 @@ from onegov.town6 import TownApp
 from onegov.town6.layout import UserManagementLayout, UserLayout
 from onegov.user import User, UserCollection
 from onegov.user.forms import SignupLinkForm
-from webob.exc import HTTPNotFound
 
 
 from typing import TYPE_CHECKING
@@ -109,40 +108,3 @@ def town_handle_new_user(
     layout.edit_mode = True
     return handle_new_user(
         self, request, form, layout)
-
-
-@TownApp.view(
-        model=User,
-        permission=Private,
-        request_method='POST',
-        name='read-features'
-)
-def add_release_number(
-    self: User,
-    request: TownRequest,
-) -> None:
-
-    request.assert_valid_csrf_token()
-
-    if not request.app.show_new_release_features:
-        raise HTTPNotFound()
-
-    self.release_features = request.app.version
-    return None
-
-
-@TownApp.view(
-        model=User,
-        permission=Private,
-        request_method='POST',
-        name='close-features'
-)
-def close_features(
-    self: User,
-    request: TownRequest,
-) -> None:
-
-    if not request.app.show_new_release_features:
-        raise HTTPNotFound()
-
-    request.browser_session.dismissed_new_features = True

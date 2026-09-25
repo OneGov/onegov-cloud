@@ -1418,18 +1418,6 @@ msgstr "Rundungsdifferenz"
 msgid "Total"
 msgstr "Total"
 
-msgid "New features available"
-msgstr "Neue Funktionen verfügbar"
-
-msgid "Suggested by"
-msgstr "Vorgeschlagen von"
-
-msgid "Close"
-msgstr "Schliessen"
-
-msgid "Read"
-msgstr "Gelesen"
-
 msgid "Hello!"
 msgstr "Guten Tag"
 

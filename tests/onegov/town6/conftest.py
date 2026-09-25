@@ -179,20 +179,17 @@ def create_town_app(
     session.add(User(
         username='admin@example.org',
         password_hash=test_password,
-        role='admin',
-        release_features=app.version
+        role='admin'
     ))
     session.add(User(
         username='editor@example.org',
         password_hash=test_password,
-        role='editor',
-        release_features=app.version
+        role='editor'
     ))
     session.add(User(
         username='member@example.org',
         password_hash=test_password,
-        role='member',
-        release_features=app.version
+        role='member'
     ))
 
     transaction.commit()
