@@ -1,4 +1,5 @@
 graft src/onegov
+recursive-include src/onegov/town6/changes *.yaml
 include *.md
 global-exclude *.mo
 global-exclude *.pyc

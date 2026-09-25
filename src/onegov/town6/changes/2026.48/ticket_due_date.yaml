@@ -1,0 +1,5 @@
+title: Fälligkeitsdatum für Tickets
+description:
+  Tickets können jetzt mit einem Fälligkeitsdatum versehen werden. Das Datum wird direkt in der Ticketübersicht farblich markiert angezeigt, sodass fällige Tickets auf einen Blick erkennbar sind.
+  Zusätzlich wird am Fälligkeitstag automatisch eine E-Mail-Erinnerung verschickt, damit kein Ticket unbemerkt überfällig wird.
+idea_by: Edi & Isabel aus Horw

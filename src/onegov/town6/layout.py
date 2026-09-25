@@ -1,5 +1,10 @@
 import secrets
+import yaml
+
 from functools import cached_property
+from importlib.resources import files as resource_files
+from itertools import groupby
+from operator import itemgetter
 
 from onegov.core import Framework
 from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
@@ -164,6 +169,71 @@ class Layout(OrgLayout):
             '<li class="js-drilldown-back">'
             f'<a tabindex="0">{back}</a></li>'
         )
+
+    @property
+    def released_features(self) -> dict[str, list[dict[str, Any]]]:
+        def releases_generator() -> Iterator[tuple[str, dict[str, Any]]]:
+            changes_path = resource_files('onegov.town6') / 'changes'
+            if not changes_path.is_dir():
+                return
+
+            feature_count = 0
+            release_names = sorted(
+                (path.name for path in changes_path.iterdir()
+                 if path.is_dir()),
+                reverse=True
+            )
+
+            for release_index, release_name in enumerate(release_names):
+                for yaml_file in sorted(
+                    (path for path in
+                     changes_path.joinpath(release_name).iterdir()
+                     if path.is_file() and path.name.endswith('.yaml')),
+                    key=lambda path: path.name
+                ):
+                    payload = yaml.safe_load(
+                        yaml_file.read_text(encoding='utf-8'))
+                    if not (
+                        isinstance(payload, dict)
+                        and {'title', 'description'}.issubset(payload)
+                    ):
+                        continue
+                    if release_index > 0 and feature_count >= 5:
+                        return
+
+                    yield release_name, payload
+                    feature_count += 1
+
+        return self.app.cache.get_or_create(
+            'released_features',
+            creator=lambda: {
+                release: [
+                    payload for _, payload in group
+                ]
+                for release, group in groupby(
+                    releases_generator(), key=itemgetter(0))
+            }
+        )
+
+    @property
+    def new_features(self) -> list[dict[str, Any]]:
+        user = self.request.current_user
+        if not user or user.release_features == self.app.version or (
+            not self.app.show_new_release_features
+        ):
+            return []
+
+        return [
+            feature
+            for release_name, release_features in (
+                self.released_features.items()
+            )
+            if (
+                user.release_features is None
+                or release_name > user.release_features
+            )
+            for feature in release_features
+        ]
 
     @property
     def on_homepage(self) -> bool:
