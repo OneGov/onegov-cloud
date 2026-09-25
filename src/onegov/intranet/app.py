@@ -17,6 +17,7 @@ class IntranetApp(TownApp):
         enable_user_registration: bool = False,
         enable_yubikey: bool = True,
         disable_password_reset: bool = False,
+        show_new_release_features: bool = False,
         **cfg: Any
     ) -> None:
 
@@ -24,6 +25,7 @@ class IntranetApp(TownApp):
             enable_user_registration=enable_user_registration,
             enable_yubikey=enable_yubikey,
             disable_password_reset=disable_password_reset,
+            show_new_release_features=show_new_release_features,
             **cfg
         )
 
