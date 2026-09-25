@@ -1,8 +1,18 @@
 # Changes
 
+## 2026.49
+
+`2026-09-25` | [2de18b788e...9255084ad8](https://github.com/OneGov/onegov-cloud/compare/2de18b788e^...9255084ad8)
+
+### Town6
+
+##### Show new release notes
+
+`Feature` | [OGC-643](https://linear.app/onegovcloud/issue/OGC-643) | [88a3c82d03](https://github.com/onegov/onegov-cloud/commit/88a3c82d03e5f542df035b88729dcdd1cb62a2d9)
+
 ## 2026.48
 
-`2026-09-25` | [5efd8fe8fd...79676718db](https://github.com/OneGov/onegov-cloud/compare/5efd8fe8fd^...79676718db)
+`2026-09-25` | [5efd8fe8fd...1d21cab334](https://github.com/OneGov/onegov-cloud/compare/5efd8fe8fd^...1d21cab334)
 
 ### Api
 
@@ -5457,14 +5467,4 @@ Refactors capturing of exceptions and re-emitting them as `APIException`
 ##### Fixes upgrade task not running, when it should be run
 
 `Bugfix` | [6864d7cf50](https://github.com/onegov/onegov-cloud/commit/6864d7cf50cd01fa78c71c698cfed93e8f712819)
-
-## 2025.20
-
-`2025-04-22` | [196ff526a9...3c6edf9228](https://github.com/OneGov/onegov-cloud/compare/196ff526a9^...3c6edf9228)
-
-### Pas
-
-##### Import data.
-
-`Feature` | [OGC-2091](https://linear.app/onegovcloud/issue/OGC-2091) | [196ff526a9](https://github.com/onegov/onegov-cloud/commit/196ff526a9e3744fa7f3a64a9e0ffacc4ac93927)
 
