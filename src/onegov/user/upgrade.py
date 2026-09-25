@@ -51,12 +51,6 @@ def add_realname_column(context: UpgradeContext) -> None:
     context.session.flush()
 
 
-@upgrade_task('Add release features column')
-def add_release_features_column(context: UpgradeContext) -> None:
-    context.operations.add_column(
-        'users', Column('release_features', Text, nullable=True))
-
-
 def change_ownership_by_name(
     context: UpgradeContext,
     old_username: str,

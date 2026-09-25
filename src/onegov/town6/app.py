@@ -18,7 +18,6 @@ from webob import Response
 
 
 from typing import Any, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from onegov.api.models import ApiEndpoint
@@ -26,7 +25,6 @@ if TYPE_CHECKING:
     from onegov.org.exceptions import MTANAccessLimitExceeded
     from onegov.org.models import Organisation
     from onegov.town6.request import TownRequest
-    from onegov.user.models.user import User
 
 
 class TownApp(OrgApp, FoundationApp):
@@ -37,23 +35,14 @@ class TownApp(OrgApp, FoundationApp):
         enable_user_registration: bool = False,
         enable_yubikey: bool = True,
         disable_password_reset: bool = False,
-        show_new_release_features: bool = True,
         **cfg: Any
     ) -> None:
         super().configure_organisation(
             enable_user_registration=enable_user_registration,
             enable_yubikey=enable_yubikey,
             disable_password_reset=disable_password_reset,
-            show_new_release_features=show_new_release_features,
             **cfg
         )
-
-    def on_login(
-        self,
-        request: TownRequest,  # type:ignore[override]
-        user: User,
-    ) -> None:
-        request.browser_session.pop('dismissed_new_features', None)
 
     @property
     def font_family(self) -> str | None:
