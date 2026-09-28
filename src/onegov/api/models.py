@@ -180,18 +180,21 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
     endpoint: str = ''
     form_class: ClassVar[type[Form] | None] = None
     pk_type: Callable[[str], IdT]
+    default_batch_size = 100
 
     def __init__(
         self,
         request: CoreRequest,
         extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
+        batch_size: int | None = None,
     ):
         self.request = request
         self.app = request.app
         self.extra_parameters = extra_parameters or {}
         self.page = int(page) if page else page
-        self.batch_size = 100
+        self.batch_size = (
+            int(batch_size) if batch_size else self.default_batch_size)
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -216,13 +219,15 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
         """ A human readable description for this endpoint. """
         return None
 
-    def for_page(self, page: int | None) -> Self | None:
+    def for_page(self, page: int | None,
+                 batch_size: int | None) -> Self | None:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
         """
 
-        return self.__class__(self.request, self.extra_parameters, page)
+        return self.__class__(
+            self.request, self.extra_parameters, page, batch_size)
 
     def for_filter(self, **filters: list[str]) -> Self:
         """ Return a new endpoint instance with the given filters while
@@ -331,10 +336,12 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
 
         previous = self.collection.previous
         if previous:
-            result['prev'] = self.for_page(previous.page)
+            result['prev'] = self.for_page(previous.page,
+                                           batch_size=self.batch_size)
         next_ = self.collection.next
         if next_:
-            result['next'] = self.for_page(next_.page)
+            result['next'] = self.for_page(next_.page,
+                                           batch_size=self.batch_size)
         return result
 
     @property
@@ -534,6 +541,7 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
             {
                 'endpoint': self.endpoint,
                 'page': self.page,
+                'batch_size': self.batch_size
             },
             query_params=MultiDict(
                 (key, value)
@@ -561,6 +569,7 @@ class ApiEndpointCollection:
     def get_endpoint(
             self,
             name: str,
+            batch_size: int | None,
             page: int = 0,
             extra_parameters: dict[str, list[str]] | None = None
     ) -> ApiEndpoint[Any, Any] | None:
@@ -570,8 +579,8 @@ class ApiEndpointCollection:
 
         if extra_parameters:
             endpoint = endpoint.for_filter(**extra_parameters)
-        if page:
-            endpoint = endpoint.for_page(page)
+        if page or batch_size:
+            endpoint = endpoint.for_page(page, batch_size)
         return endpoint
 
 

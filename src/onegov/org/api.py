@@ -317,6 +317,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         result = OccurrenceCollection(
             self.session,
             page=self.page or 0,
+            batch_size=self.batch_size,
             available_accesses=available_accesses
         )
 
@@ -460,6 +461,18 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
     request: OrgRequest
     endpoint = 'news'
     pk_type = int
+    default_batch_size = 25
+
+    def __init__(
+        self,
+        request: OrgRequest,
+        extra_parameters: dict[str, list[str]] | None = None,
+        page: int | None = None,
+        batch_size: int | None = None,
+    ):
+        self.batch_size = (
+                    int(batch_size) if batch_size else self.default_batch_size)
+        super().__init__(request, extra_parameters, page, self.batch_size)
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -476,12 +489,13 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
         result = NewsCollection(
             self.request,
             page=self.page or 0,
+            batch_size=self.batch_size
         )
         for key, values in self.extra_parameters.items():
             self.assert_valid_filter(key)
             if key == 'search':
                 result.term = self.scalarize_value(key, values)
-        result.batch_size = 25
+        result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: News) -> dict[str, Any]:
@@ -628,8 +642,9 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
         name: str,
         extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
+        batch_size: int = 25
     ):
-        super().__init__(request, extra_parameters, page)
+        super().__init__(request, extra_parameters, page, batch_size)
         self.endpoint = name
 
     @property
@@ -662,7 +677,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
                     self.request,
                     term
                 )
-        result.batch_size = 25
+        result.batch_size = self.batch_size
 
         # eager-load the serialized entry data, batch only
         return result.set_query_options(
@@ -670,14 +685,15 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
             selectinload(ExtendedDirectoryEntry.files),
         )
 
-    def for_page(self, page: int | None) -> DirectoryEntryApiEndpoint:
+    def for_page(self, page: int | None,
+                 batch_size: int | None = 25) -> DirectoryEntryApiEndpoint:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
         """
 
         return self.__class__(self.request, self.endpoint,
-                              self.extra_parameters, page)
+                              self.extra_parameters, page, self.batch_size)
 
     def for_filter(self, **filters: Any) -> Self:
         """ Return a new endpoint instance with the given filters while

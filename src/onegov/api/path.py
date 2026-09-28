@@ -24,12 +24,14 @@ def get_api_endpoints(
 @ApiApp.path(
     model=ApiEndpoint,
     path='/api/{endpoint}',
-    converters={'page': int}
+    converters={'page': int,
+                'batch_size': int},
 )
 def get_api_endpoint(
     request: CoreRequest,
     app: Framework,
     endpoint: str,
+    batch_size: int | None,
     page: int = 0,
 ) -> ApiEndpoint[Any, Any] | AuthEndpoint:
 
@@ -42,10 +44,12 @@ def get_api_endpoint(
     #       only allows specifying each parameter once
     extra_parameters = request.GET.dict_of_lists()
     extra_parameters.pop('page', None)
+    extra_parameters.pop('batch_size', None)
 
     item = ApiEndpointCollection(request).get_endpoint(
         endpoint,
         page=page,
+        batch_size=batch_size,
         extra_parameters=extra_parameters
     )
     if not item:
