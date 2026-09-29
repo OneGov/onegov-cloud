@@ -215,9 +215,10 @@ class Pagination[M: DeclarativeBase]:
 
     """
 
+    batch_size = 10
     query_options: tuple[ExecutableOption, ...] = ()
 
-    def __init__(self, page: int = 0, batch_size: int = 10):
+    def __init__(self, batch_size: int, page: int = 0):
         assert page is not None
         self.page = max(page, 0)
         self.batch_size = batch_size
