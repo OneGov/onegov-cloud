@@ -717,11 +717,17 @@ class OccurrenceCollection(Pagination[Occurrence]):
             )
 
         if self.sources:
-            query = query.filter(or_(*(
-                Event.source.astext.startswith(f'{source}-')
-                for source in self.sources
-            )))
+            source_filters = []
+            for source in self.sources:
+                source = str(source)
+                if source.lower() == 'null':
+                    source_filters.append(Event.source.is_(None))
+                else:
+                    source_filters.append(
+                        Event.source.astext.startswith(f'{source}-')
+                    )
 
+            query = query.filter(or_(*source_filters))
         if self.syndicate is not None:
             query = query.filter(Event.syndicate.is_(self.syndicate))
 

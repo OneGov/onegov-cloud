@@ -269,7 +269,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
             '(ISO-8601 encoded date: YYYY-MM-DD, defaults to today)',
             'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
             'locations': 'Can be specified multiple times',
-            'sources': sorted(collection.used_sources),
+            'sources': [*sorted(collection.used_sources), 'null'],
             'syndicate': ('true', 'false'),
             'highlight': ('true', 'false'),
         }
