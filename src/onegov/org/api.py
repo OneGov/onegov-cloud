@@ -317,9 +317,9 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         result = OccurrenceCollection(
             self.session,
             page=self.page or 0,
-            batch_size=self.batch_size,
             available_accesses=available_accesses
         )
+        result.batch_size = self.batch_size
 
         filter_type = self.app.org.event_filter_type
         filter_config = self.app.org.event_filter_configuration
@@ -463,17 +463,6 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
     pk_type = int
     default_batch_size = 25
 
-    def __init__(
-        self,
-        request: OrgRequest,
-        extra_parameters: dict[str, list[str]] | None = None,
-        page: int | None = None,
-        batch_size: int | None = None,
-    ):
-        self.batch_size = (
-            int(batch_size) if batch_size else self.default_batch_size)
-        super().__init__(request, extra_parameters, page, self.batch_size)
-
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
         if self.app.fts_search_enabled:
@@ -536,17 +525,6 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
     endpoint = 'topics'
     pk_type = int
     default_batch_size = 25
-
-    def __init__(
-        self,
-        request: OrgRequest,
-        extra_parameters: dict[str, list[str]] | None = None,
-        page: int | None = None,
-        batch_size: int | None = None,
-    ):
-        self.batch_size = (
-                    int(batch_size) if batch_size else self.default_batch_size)
-        super().__init__(request, extra_parameters, page, self.batch_size)
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:

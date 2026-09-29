@@ -116,7 +116,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self,
         session: Session,
         page: int = 0,
-        batch_size: int = 10,
         term: str | None = None,
         range: DateRange | None = None,
         start: date | None = None,
@@ -143,7 +142,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
                 for value in (values if isinstance(values, list) else [values])
             )
 
-        super().__init__(page=page, batch_size=batch_size)
+        super().__init__(page=page)
         self.session = session
         self.term = term
         self.range = range if range in self.date_ranges else None
@@ -192,7 +191,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=index,
-            batch_size=self.batch_size,
             term=self.term,
             range=self.range,
             start=self.start,
@@ -267,7 +265,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=0,
-            batch_size=self.batch_size,
             term=self.term,
             range=self.range,
             start=self.start,
@@ -313,7 +310,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=0,
-            batch_size=self.batch_size,
             term=self.term,
             range=self.range,
             start=self.start,
@@ -406,7 +402,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=0,
-            batch_size=self.batch_size,
             term=term,
             range=range,
             start=start,
@@ -428,7 +423,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
         return self.__class__(
             self.session,
             page=self.page,
-            batch_size=self.batch_size,
             term=self.term,
             range=self.range,
             start=self.start,

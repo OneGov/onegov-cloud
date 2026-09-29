@@ -216,12 +216,12 @@ class Pagination[M: DeclarativeBase]:
     """
 
     batch_size = 10
+
     query_options: tuple[ExecutableOption, ...] = ()
 
-    def __init__(self, batch_size: int, page: int = 0):
+    def __init__(self, page: int = 0):
         assert page is not None
         self.page = max(page, 0)
-        self.batch_size = batch_size
 
     def set_query_options(self, *options: ExecutableOption) -> Self:
         """ Loader options applied to the batch query only, not to

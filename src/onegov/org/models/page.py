@@ -309,14 +309,12 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
     def __init__(
         self,
         request: OrgRequest,
-        batch_size: int = 10,
         page: int = 0,
         term: str | None = None,
     ):
         self.request = request
         self.session = request.session
         self.page = page
-        self.batch_size = batch_size
         self.term = term
 
     @property
