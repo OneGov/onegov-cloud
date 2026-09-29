@@ -478,7 +478,6 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
         result = NewsCollection(
             self.request,
             page=self.page or 0,
-            batch_size=self.batch_size
         )
         for key, values in self.extra_parameters.items():
             self.assert_valid_filter(key)
@@ -679,14 +678,14 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
         )
 
     def for_page(self, page: int | None,
-                 batch_size: int | None = 25) -> DirectoryEntryApiEndpoint:
+                 batch_size: int | None) -> DirectoryEntryApiEndpoint:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
         """
 
         return self.__class__(self.request, self.endpoint,
-                              self.extra_parameters, page, self.batch_size)
+                              self.extra_parameters, page, batch_size)
 
     def for_filter(self, **filters: Any) -> Self:
         """ Return a new endpoint instance with the given filters while
