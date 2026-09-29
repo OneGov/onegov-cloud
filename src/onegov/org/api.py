@@ -471,7 +471,7 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
         batch_size: int | None = None,
     ):
         self.batch_size = (
-                    int(batch_size) if batch_size else self.default_batch_size)
+            int(batch_size) if batch_size else self.default_batch_size)
         super().__init__(request, extra_parameters, page, self.batch_size)
 
     @cached_property
@@ -535,6 +535,18 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
     app: OrgApp
     endpoint = 'topics'
     pk_type = int
+    default_batch_size = 25
+
+    def __init__(
+        self,
+        request: OrgRequest,
+        extra_parameters: dict[str, list[str]] | None = None,
+        page: int | None = None,
+        batch_size: int | None = None,
+    ):
+        self.batch_size = (
+                    int(batch_size) if batch_size else self.default_batch_size)
+        super().__init__(request, extra_parameters, page, self.batch_size)
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -556,7 +568,7 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
             self.assert_valid_filter(key)
             if key == 'search':
                 result.term = self.scalarize_value(key, values)
-        result.batch_size = 25
+        result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: Topic) -> dict[str, Any]:
@@ -629,12 +641,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
     app: OrgApp
     endpoint: str
     pk_type = UUID
-
-    @cached_property
-    def filters(self) -> Mapping[str, Collection[str] | str | None]:
-        if self.app.fts_search_enabled:
-            return {'search': 'Performs a full-text search for the given term'}
-        return {}
+    default_batch_size = 25
 
     def __init__(
         self,
@@ -642,10 +649,18 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
         name: str,
         extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
-        batch_size: int = 25
+        batch_size: int | None = None,
     ):
+        self.batch_size = (
+            int(batch_size) if batch_size else self.default_batch_size)
         super().__init__(request, extra_parameters, page, batch_size)
         self.endpoint = name
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     @property
     def title(self) -> str:

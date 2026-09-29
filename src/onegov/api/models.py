@@ -235,7 +235,8 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
 
         """
 
-        return self.__class__(self.request, filters)
+        return self.__class__(
+            self.request, filters, batch_size=self.batch_size)
 
     @overload
     def for_item(self, item: None) -> None: ...
@@ -541,7 +542,11 @@ class ApiEndpoint[M: DeclarativeBase, IdT: PKType]:
             {
                 'endpoint': self.endpoint,
                 'page': self.page,
-                'batch_size': self.batch_size
+                'page_size': (
+                    self.batch_size
+                    if self.batch_size != self.default_batch_size
+                    else None
+                )
             },
             query_params=MultiDict(
                 (key, value)
