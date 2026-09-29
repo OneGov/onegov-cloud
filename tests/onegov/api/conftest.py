@@ -66,11 +66,12 @@ class Endpoint(ApiEndpoint[Bunch, int]):  # type: ignore[type-var]
         self,
         request: CoreRequest,
         extra_parameters: dict[str, list[str]] | None = None,
-        page: int | None = None
+        page: int | None = None,
+        batch_size: int | None = None
     ) -> None:
 
         self._collection = Collection()
-        super().__init__(request, extra_parameters, page)
+        super().__init__(request, extra_parameters, page, batch_size)
 
     @property
     def title(self) -> str:

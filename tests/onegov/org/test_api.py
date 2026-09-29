@@ -211,6 +211,10 @@ def test_view_api(
         for item in collection('/api/topics').items
     } == {'Organisation', 'Themen', 'Kontakt'}
 
+    # test page_size
+    assert len(collection('/api/topics').items) > 1
+    assert len(collection('/api/topics?page_size=1').items) == 1
+
 
 @patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.broadcast')
