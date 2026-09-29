@@ -527,6 +527,15 @@ class FormSubmissionHandler(Handler):
                         ),
                         attrs={'class': 'delete-link'},
                         traits=(
+                            Confirm(
+                                _(
+                                    'Do you really want to cancel this '
+                                    'registration?'
+                                ),
+                                _('This cannot be undone.'),
+                                _('Cancel registration'),
+                                _('Cancel'),
+                            ),
                             Intercooler(
                                 request_method='POST',
                                 redirect_after=request.url
