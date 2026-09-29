@@ -615,6 +615,7 @@ def handle_submission_action(
     force_email: bool = False,
     return_url: str | None = None,
     owner: str | None = None,
+    restore_cancelled: bool = False,
 ) -> Response | None:
 
     if not ignore_csrf:
@@ -627,7 +628,10 @@ def handle_submission_action(
                     'maximum number of participants has been reached')
 
         def execute() -> bool:
-            if self.registration_window and self.claimed is None:
+            if self.registration_window and (
+                self.claimed is None
+                or (restore_cancelled and self.claimed == 0)
+            ):
                 return self.claim()
             return False
 

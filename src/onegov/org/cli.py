@@ -41,6 +41,7 @@ from onegov.event.collections.events import EventImportItem
 from onegov.file.collection import FileCollection
 from onegov.file.models import File, SigningRequest
 from onegov.form import (
+    CompleteFormSubmission,
     FormCollection,
     FormDefinition,
     FormSubmission,
@@ -90,7 +91,7 @@ from pathlib import Path
 from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.exc import StatementError
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 
 from typing import IO, Any, TypedDict, TYPE_CHECKING
@@ -107,7 +108,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
 
     from translationstring import TranslationString
-    from uuid import UUID
     from onegov.org.models.political_business import (
         PoliticalBusinessStatus,
         PoliticalBusiness
@@ -1058,7 +1058,69 @@ def fix_submission_file_sizes(
 
         click.secho(
             f'{app.schema} - updated sizes for {count} file field(s)',
-            fg='green'
+            fg='green',
+        )
+
+    return execute
+
+
+@cli.command('restore-form-registration')
+@click.argument('ticket_id', type=click.UUID)
+@click.option(
+    '--yes',
+    is_flag=True,
+    help='Apply the correction without asking for confirmation.',
+)
+@pass_group_context
+def restore_form_registration(
+    group_context: GroupContext, ticket_id: UUID, yes: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """Restore a cancelled registration for an FRM ticket.
+
+    The command keeps the cancellation in the ticket history, restores the
+    registration through the normal confirmation flow and sends the regular
+    confirmation email.
+    """
+
+    def execute(request: OrgRequest, app: OrgApp) -> None:
+        from onegov.org.views.form_submission import handle_submission_action
+
+        tickets = TicketCollection(request.session)
+        ticket = tickets.by_id(ticket_id, ensure_handler_code='FRM')
+        if ticket is None:
+            abort(f'FRM ticket {ticket_id} was not found')
+
+        submission = ticket.handler.submission
+        if not isinstance(submission, CompleteFormSubmission):
+            abort(f'Ticket {ticket.number} has no complete form submission')
+
+        if submission.registration_state != 'cancelled':
+            abort(
+                f'Ticket {ticket.number} is not cancelled '
+                f'(current state: {submission.registration_state})'
+            )
+
+        if not yes:
+            click.confirm(
+                f'Restore registration for {ticket.number}?', abort=True
+            )
+
+        try:
+            handle_submission_action(
+                submission,
+                request,
+                'confirmed',
+                ignore_csrf=True,
+                raises=True,
+                return_url=request.link(ticket),
+                restore_cancelled=True,
+            )
+        except Exception:
+            submission.claimed = 0
+            raise
+
+        click.secho(
+            f'{ticket.number} restored and confirmation sent', fg='green'
         )
 
     return execute
