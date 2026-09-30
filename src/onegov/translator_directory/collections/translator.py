@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy import desc, and_, or_
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.crypto import random_password

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import TimestampMixin

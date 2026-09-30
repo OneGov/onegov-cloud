@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from itertools import groupby
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.utils import toggle

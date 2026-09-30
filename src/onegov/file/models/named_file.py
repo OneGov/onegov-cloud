@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.crypto import random_token
 from onegov.file.models.file import File
 from onegov.file.utils import as_fileintent

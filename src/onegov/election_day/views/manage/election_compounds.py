@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import redirect
 from onegov.core.utils import groupbylist
 from onegov.election_day import _

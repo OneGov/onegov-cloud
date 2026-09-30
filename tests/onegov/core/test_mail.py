@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from email.headerregistry import Address
 from email.policy import SMTP
 

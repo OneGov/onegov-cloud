@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity.models.occasion import Occasion
 from onegov.activity.models.period import BookingPeriod
 from onegov.activity.utils import extract_thumbnail, extract_municipality

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils import replace_url
 from pytest import raises

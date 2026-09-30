@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast
 from onegov.websockets.client import status

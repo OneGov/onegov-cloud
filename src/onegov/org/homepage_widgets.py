@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.org import _, OrgApp

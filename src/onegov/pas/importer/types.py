@@ -1,7 +1,5 @@
 """Type definitions for JSON import data structures."""
 
-from __future__ import annotations
-
 import logging
 from typing import Literal, TypedDict
 

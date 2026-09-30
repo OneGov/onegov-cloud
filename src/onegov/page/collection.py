@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm.abstract import AdjacencyListCollection
 from onegov.page.model import Page
 

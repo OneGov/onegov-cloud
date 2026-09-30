@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.converters import LiteralConverter
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.documents import (

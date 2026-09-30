@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dateutil.parser import parse
 from decimal import Decimal
 from onegov.form.fields import UploadField

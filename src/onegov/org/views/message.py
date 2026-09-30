@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat import Message
 from onegov.chat import MessageCollection
 from onegov.core.custom import json

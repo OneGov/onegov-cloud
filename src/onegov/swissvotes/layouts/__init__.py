@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.swissvotes.layouts.default import DefaultLayout
 from onegov.swissvotes.layouts.mail import MailLayout
 from onegov.swissvotes.layouts.page import AddPageLayout

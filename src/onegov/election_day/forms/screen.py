@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from lxml.etree import XMLSyntaxError
 from onegov.core.widgets import transform_structure
 from onegov.election_day import _

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 
 from subprocess import run, PIPE, DEVNULL, TimeoutExpired

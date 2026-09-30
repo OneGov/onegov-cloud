@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import redirect
 from onegov.core.security import Secret
 from onegov.election_day import _

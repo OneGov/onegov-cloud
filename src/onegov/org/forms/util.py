@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from dateutil.rrule import MO, TU, WE, TH, FR, SA, SU
 

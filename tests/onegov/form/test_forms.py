@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from cgi import FieldStorage
 from onegov.file import NamedFile
 from onegov.form.fields import UploadField

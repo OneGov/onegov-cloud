@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 
 from onegov.core.utils import relative_url

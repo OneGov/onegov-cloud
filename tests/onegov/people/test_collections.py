@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from uuid import uuid4
 
 from onegov.core.orm.abstract import MoveDirection

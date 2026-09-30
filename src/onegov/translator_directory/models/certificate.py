@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from uuid import uuid4, UUID
 
 from sqlalchemy import Column, ForeignKey, Table, UUID as UUIDType

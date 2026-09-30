@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm import observes as base_observes
 
 

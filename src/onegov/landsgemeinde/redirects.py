@@ -1,4 +1,3 @@
-from __future__ import annotations
 from onegov.core.redirect import Redirect
 from onegov.landsgemeinde import LandsgemeindeApp
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from io import BytesIO
 from morepath import redirect

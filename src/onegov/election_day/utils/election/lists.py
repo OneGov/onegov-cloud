@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import OrderedDict
 from onegov.election_day import _
 from onegov.election_day.models import ElectionResult

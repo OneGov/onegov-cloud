@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import ActivityCollection
 from onegov.feriennet.policy import ActivityQueryPolicy
 from sqlalchemy.orm import selectinload

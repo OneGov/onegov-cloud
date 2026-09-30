@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import sqlalchemy
 
 from sqlalchemy_utils import QueryChain as QueryChainBase

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.core.analytics import AnalyticsProvider
 from onegov.feriennet import _

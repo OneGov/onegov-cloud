@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from libres.db.models import Allocation, Reservation, ReservedSlot
 from onegov.core.utils import Bunch

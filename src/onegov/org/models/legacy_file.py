@@ -2,8 +2,6 @@
 forward, onegov.file and onegov.org.models.file is used.
 
 """
-from __future__ import annotations
-
 import base64
 
 from onegov.core.filestorage import FilestorageFile

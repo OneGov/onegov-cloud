@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.core.collection import GenericCollection
 from onegov.parliament.models import ParliamentaryGroup

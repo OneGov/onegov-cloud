@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-
 import csv
 import json
 from onegov.translator_directory.i18n import _

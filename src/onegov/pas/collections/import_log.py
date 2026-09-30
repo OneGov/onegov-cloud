@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.collection import GenericCollection
 from onegov.pas.models.import_log import ImportLog
 from onegov.user import User

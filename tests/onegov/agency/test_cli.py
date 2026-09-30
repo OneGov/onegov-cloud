@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from click.testing import CliRunner
 from onegov.agency.cli import cli
 from onegov.org.cli import cli as org_cli

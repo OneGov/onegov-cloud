@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.form.fields import UploadField
 from onegov.form import Form

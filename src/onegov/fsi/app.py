@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core import utils
 from onegov.fsi.initial_content import create_new_organisation
 from onegov.fsi.models.course_attendee import CourseAttendee

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from libres.db.models import ORMBase as LibresORMBase

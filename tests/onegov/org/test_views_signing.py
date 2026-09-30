@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 import transaction
 import vcr  # type: ignore[import-untyped]

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from wtforms import BooleanField
 
 from onegov.form import Form

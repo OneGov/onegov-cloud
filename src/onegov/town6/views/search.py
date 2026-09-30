@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.org.models import Search
 from onegov.org.views.search import search

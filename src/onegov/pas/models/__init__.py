@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.change import Change
 from onegov.pas.models.commission import PASCommission

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import WinterthurApp
 from onegov.org.views import directory as base

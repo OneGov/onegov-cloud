@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import isodate
 import pytz
 import sedate

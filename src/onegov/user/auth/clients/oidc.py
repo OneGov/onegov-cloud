@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import niquests
 from attr import attrs, attrib
 from base64 import urlsafe_b64encode

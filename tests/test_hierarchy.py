@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import lru_cache
 from findimports import ModuleGraph  # type: ignore[import-untyped]
 from pathlib import Path

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from email.headerregistry import Address
 from itertools import chain

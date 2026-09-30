@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from wtforms import RadioField
 from wtforms.fields import EmailField
 from onegov.form import Form

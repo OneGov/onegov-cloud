@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from copy import deepcopy
 from datetime import date, timedelta
 from docx.document import Document

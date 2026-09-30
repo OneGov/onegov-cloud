@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 import pytz
 from onegov.core.orm import Base

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from cgi import FieldStorage
 from io import BytesIO
 

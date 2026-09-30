@@ -1,6 +1,4 @@
 """ The onegov org collection of images uploaded to the site. """
-from __future__ import annotations
-
 from datetime import date
 from markupsafe import Markup
 from morepath import redirect

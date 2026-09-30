@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import transaction
 
 from datetime import date
@@ -321,6 +319,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
             page=self.page or 0,
             available_accesses=available_accesses
         )
+        result.batch_size = self.batch_size
 
         filter_type = self.app.org.event_filter_type
         filter_config = self.app.org.event_filter_configuration
@@ -462,6 +461,7 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
     request: OrgRequest
     endpoint = 'news'
     pk_type = int
+    default_batch_size = 25
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -483,7 +483,7 @@ class NewsApiEndpoint(ApiEndpoint[News, int]):
             self.assert_valid_filter(key)
             if key == 'search':
                 result.term = self.scalarize_value(key, values)
-        result.batch_size = 25
+        result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: News) -> dict[str, Any]:
@@ -523,6 +523,7 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
     app: OrgApp
     endpoint = 'topics'
     pk_type = int
+    default_batch_size = 25
 
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
@@ -544,7 +545,7 @@ class TopicApiEndpoint(ApiEndpoint[Topic, int]):
             self.assert_valid_filter(key)
             if key == 'search':
                 result.term = self.scalarize_value(key, values)
-        result.batch_size = 25
+        result.batch_size = self.batch_size
         return result
 
     def item_data(self, item: Topic) -> dict[str, Any]:
@@ -617,12 +618,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
     app: OrgApp
     endpoint: str
     pk_type = UUID
-
-    @cached_property
-    def filters(self) -> Mapping[str, Collection[str] | str | None]:
-        if self.app.fts_search_enabled:
-            return {'search': 'Performs a full-text search for the given term'}
-        return {}
+    default_batch_size = 25
 
     def __init__(
         self,
@@ -630,9 +626,18 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
         name: str,
         extra_parameters: dict[str, list[str]] | None = None,
         page: int | None = None,
+        batch_size: int | None = None,
     ):
-        super().__init__(request, extra_parameters, page)
+        self.batch_size = (
+            int(batch_size) if batch_size else self.default_batch_size)
+        super().__init__(request, extra_parameters, page, batch_size)
         self.endpoint = name
+
+    @cached_property
+    def filters(self) -> Mapping[str, Collection[str] | str | None]:
+        if self.app.fts_search_enabled:
+            return {'search': 'Performs a full-text search for the given term'}
+        return {}
 
     @property
     def title(self) -> str:
@@ -664,7 +669,7 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
                     self.request,
                     term
                 )
-        result.batch_size = 25
+        result.batch_size = self.batch_size
 
         # eager-load the serialized entry data, batch only
         return result.set_query_options(
@@ -672,14 +677,15 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
             selectinload(ExtendedDirectoryEntry.files),
         )
 
-    def for_page(self, page: int | None) -> DirectoryEntryApiEndpoint:
+    def for_page(self, page: int | None,
+                 batch_size: int | None) -> DirectoryEntryApiEndpoint:
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
         """
 
         return self.__class__(self.request, self.endpoint,
-                              self.extra_parameters, page)
+                              self.extra_parameters, page, batch_size)
 
     def for_filter(self, **filters: Any) -> Self:
         """ Return a new endpoint instance with the given filters while

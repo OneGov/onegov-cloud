@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.election_day.models import Election
 from onegov.election_day.models import ProporzElection

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import niquests_mock
 import textwrap
 import transaction

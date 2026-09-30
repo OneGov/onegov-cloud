@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.form import Form, FormDefinition
 from onegov.form.fields import MultiCheckboxField

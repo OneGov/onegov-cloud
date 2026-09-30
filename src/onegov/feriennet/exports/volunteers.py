@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import Occasion, OccasionNeed
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _

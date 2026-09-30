@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dateutil import parser
 from freezegun import freeze_time
 from lxml import etree

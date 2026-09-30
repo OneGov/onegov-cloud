@@ -1,6 +1,4 @@
 """ The onegov winterthur occurrence views. """
-from __future__ import annotations
-
 from morepath.request import Response
 
 from onegov.core.security import Public

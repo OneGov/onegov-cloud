@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat import MessageCollection
 from time import sleep
 

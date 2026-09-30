@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.chat import Message
 from onegov.org.models.message import TicketMessageMixin

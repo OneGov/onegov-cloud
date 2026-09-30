@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property

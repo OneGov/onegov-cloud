@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytz
 
 from datetime import timedelta, datetime

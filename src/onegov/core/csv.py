@@ -1,6 +1,4 @@
 """ Offers tools to deal with csv (and xls, xlsx) files. """
-from __future__ import annotations
-
 import codecs
 
 import openpyxl

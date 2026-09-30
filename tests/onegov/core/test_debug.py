@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import click
 
 from onegov.core.orm import debug

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Private, Secret
 from onegov.directory import DirectoryCollection, Directory
 from onegov.org.forms.directory import DirectoryRecipientForm, DirectoryUrlForm

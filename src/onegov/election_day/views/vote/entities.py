@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import redirect
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout

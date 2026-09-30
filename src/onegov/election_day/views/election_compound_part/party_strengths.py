@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.models import ElectionCompoundPart

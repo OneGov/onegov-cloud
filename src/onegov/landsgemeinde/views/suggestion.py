@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.models import PersonFunctionSuggestion

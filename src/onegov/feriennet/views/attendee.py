@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import (ActivityInvoiceItem, Attendee, AttendeeCollection,
                              BookingCollection)
 from onegov.core.security import Personal

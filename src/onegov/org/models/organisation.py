@@ -1,6 +1,4 @@
 """ Contains the model describing the organisation proper. """
-from __future__ import annotations
-
 from cryptography.fernet import InvalidToken
 from datetime import date, timedelta
 from functools import cached_property

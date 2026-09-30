@@ -3,8 +3,6 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 # pragma: exclude file
-from __future__ import annotations
-
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.fsi.models.course_attendee import external_attendee_org

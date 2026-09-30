@@ -1,6 +1,4 @@
 """ The onegov org collection of files uploaded to the site. """
-from __future__ import annotations
-
 import datetime
 import isodate
 import morepath

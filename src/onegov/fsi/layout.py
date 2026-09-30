@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.fsi.models.course_event import (
     COURSE_EVENT_STATUSES_TRANSLATIONS, COURSE_EVENT_STATUSES
 )

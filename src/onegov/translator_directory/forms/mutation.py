@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from depot.io.utils import FileIntent
 from functools import cached_property
 from io import BytesIO

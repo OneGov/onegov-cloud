@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import dectate
 import morepath
 import os

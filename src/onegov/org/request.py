@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-
 from functools import cached_property
 from onegov.core.custom import msgpack
 from onegov.core.orm import orm_cached

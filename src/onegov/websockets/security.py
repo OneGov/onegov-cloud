@@ -50,8 +50,6 @@ Resources
 
 
 """
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any
 
 from onegov.chat.utils import param_from_path

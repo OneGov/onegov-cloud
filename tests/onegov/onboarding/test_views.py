@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 import onegov.onboarding
 import os

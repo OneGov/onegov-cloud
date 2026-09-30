@@ -50,8 +50,6 @@ In other words, if nobody visits the website the cronjob runs on, then
 the cronjobs won't run.
 
 """
-from __future__ import annotations
-
 import sched
 import re
 import time

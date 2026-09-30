@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.form import merge_forms
 from onegov.org.views.payment import (

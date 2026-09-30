@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.fsi.forms.course import InviteCourseForm
 
 

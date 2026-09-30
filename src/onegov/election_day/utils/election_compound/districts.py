@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import groupbylist
 from operator import itemgetter
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from io import BytesIO
 from onegov.agency.custom import (
     get_global_tools, get_top_navigation, get_modules

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from hashlib import sha256
 from onegov.election_day.models import Ballot
 from onegov.election_day.models import Election

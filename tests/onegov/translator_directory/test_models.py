@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from freezegun import freeze_time
 from onegov.core.utils import Bunch

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import turbohtml
 
 from mistletoe import Document, HtmlRenderer

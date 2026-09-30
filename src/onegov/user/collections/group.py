@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.user.models import UserGroup
 from onegov.core.collection import GenericCollection
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.landsgemeinde.forms import AgendaItemForm
 from onegov.landsgemeinde.forms import AssemblyForm
 from onegov.landsgemeinde.forms import VotumForm

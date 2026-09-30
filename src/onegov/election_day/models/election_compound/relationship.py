@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.orm import Base
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column

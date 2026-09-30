@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.activity.models import Attendee, Booking, Occasion, BookingPeriod
 from onegov.activity.utils import random_group_code

@@ -1,8 +1,6 @@
 # borrowed from https://bitbucket.org/memedough/pytest-capturelog/
 # adjusted to our needs (namely, we don't want the log displayed
 # when the test fails)
-from __future__ import annotations
-
 import logging
 import pytest
 from io import StringIO

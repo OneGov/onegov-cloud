@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.pas.custom import get_global_tools
 from onegov.pas.custom import get_top_navigation
 from onegov.core.elements import Link

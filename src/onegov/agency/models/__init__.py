@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency.models.agency import AgencyPdf
 from onegov.agency.models.agency import AgencyProxy
 from onegov.agency.models.agency import ExtendedAgency

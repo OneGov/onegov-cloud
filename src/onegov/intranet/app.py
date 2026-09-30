@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.town6 import TownApp
 from typing import Any
 from typing import TYPE_CHECKING

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import onegov.intranet
 
 from onegov.intranet import IntranetApp

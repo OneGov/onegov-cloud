@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from attr import attrs
 from itertools import groupby
 from operator import attrgetter

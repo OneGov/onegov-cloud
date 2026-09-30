@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.forms import LandsgemeindeSearchForm

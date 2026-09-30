@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.user.models.group import UserGroup
 from onegov.user.models.role_mapping import RoleMapping
 from onegov.user.models.tan import TAN

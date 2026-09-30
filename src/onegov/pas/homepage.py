@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.user.auth.core import Auth
 from onegov.pas.app import PasApp
 from onegov.core.security import Public

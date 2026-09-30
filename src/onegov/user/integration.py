@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween

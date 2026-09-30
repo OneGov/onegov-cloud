@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import colorsys
 import hashlib
 import phonenumbers

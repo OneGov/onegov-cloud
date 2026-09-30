@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.fsi import FsiApp

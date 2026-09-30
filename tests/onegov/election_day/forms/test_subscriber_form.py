@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.forms import EmailSubscriptionForm
 from onegov.election_day.forms import SmsSubscriptionForm
 from tests.onegov.election_day.common import DummyPostData

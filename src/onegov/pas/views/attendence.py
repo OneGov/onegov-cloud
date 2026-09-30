@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import defaultdict
 import uuid
 from datetime import date, datetime

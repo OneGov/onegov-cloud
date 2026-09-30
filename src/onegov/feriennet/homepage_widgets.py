@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy.orm import selectinload
 
 from onegov.activity import ActivityFilter

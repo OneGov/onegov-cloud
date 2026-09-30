@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import onegov.ticket
 import os
 import transaction

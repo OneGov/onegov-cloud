@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat import Message
 from sqlalchemy.orm import object_session
 

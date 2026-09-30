@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import onegov.org
 from tests.shared import utils
 

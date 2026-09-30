@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from markupsafe import Markup
 from onegov.activity import AttendeeCollection

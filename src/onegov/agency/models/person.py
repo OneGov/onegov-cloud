@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.core.utils import generate_fts_phonenumbers

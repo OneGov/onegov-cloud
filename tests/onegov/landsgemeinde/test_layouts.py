@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.landsgemeinde.layouts import DefaultLayout
 from unittest.mock import Mock
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import export_vote_internal

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import csv
 import openpyxl
 from dataclasses import dataclass

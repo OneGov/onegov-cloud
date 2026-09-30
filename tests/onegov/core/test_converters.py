@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 from datetime import date, datetime
 from onegov.core.converters import extended_date_converter

@@ -1,7 +1,4 @@
 """ Contains the model describing the page editor. """
-from __future__ import annotations
-
-
 from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import TypeGuard

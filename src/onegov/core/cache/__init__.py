@@ -33,8 +33,6 @@ Currently there is one cache per app that never expires (though values will
 eventually be discarded by redis if the cache is full).
 
 """
-from __future__ import annotations
-
 from .instance_cache import instance_lru_cache
 from .redis import RedisCacheRegion, get, get_pool
 

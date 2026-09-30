@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.form.fields import ChosenSelectMultipleField

@@ -183,8 +183,6 @@ If a selector is passed which matches more than one application, the command
 is not executed.
 
 """
-from __future__ import annotations
-
 import click
 import inspect
 import logging.config

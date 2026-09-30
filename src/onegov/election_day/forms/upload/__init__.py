@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.forms.upload.election_compound import (
     UploadElectionCompoundForm)
 from onegov.election_day.forms.upload.election import UploadMajorzElectionForm

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.form import Form
 from onegov.quill.fields import QuillField

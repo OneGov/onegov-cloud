@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import msal  # type:ignore[import-untyped]
 from attr import attrs, attrib
 from functools import cached_property

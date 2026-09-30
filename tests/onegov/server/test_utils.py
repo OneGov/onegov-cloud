@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.server.utils import load_class
 from onegov.server.core import Server
 

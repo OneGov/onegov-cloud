@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from csv import writer
 from datetime import date
 from decimal import Decimal

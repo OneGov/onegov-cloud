@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath.request import Response
 from onegov.core.security import Private
 from onegov.core.security import Public

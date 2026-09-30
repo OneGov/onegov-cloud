@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import port_for
 
 from attr import attrs, attrib

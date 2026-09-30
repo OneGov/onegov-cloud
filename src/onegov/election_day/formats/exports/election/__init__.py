@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.formats.exports.election.internal_majorz import \
     export_election_internal_majorz
 from onegov.election_day.formats.exports.election.internal_proporz import \

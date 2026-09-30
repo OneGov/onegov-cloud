@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 
 from onegov.swissvotes.models.policy_area import PolicyArea

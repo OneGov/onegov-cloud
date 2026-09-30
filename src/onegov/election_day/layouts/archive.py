@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.election_day import _
 from onegov.election_day.collections import SearchableArchivedResultCollection

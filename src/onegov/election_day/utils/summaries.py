@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound

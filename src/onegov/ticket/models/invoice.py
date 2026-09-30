@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from decimal import Decimal
 from onegov.pay import Invoice
 from sqlalchemy.orm import relationship, Mapped

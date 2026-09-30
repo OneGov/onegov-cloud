@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat.models import TextModule
 from onegov.core.collection import GenericCollection
 from sqlalchemy import or_

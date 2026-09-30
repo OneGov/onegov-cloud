@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import babel
 import os
 import transaction

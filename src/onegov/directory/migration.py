@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.directory.models.directory_entry import DirectoryEntry
 from onegov.form import as_internal_id
 from sqlalchemy.orm import object_session, joinedload, undefer

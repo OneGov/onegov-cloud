@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 from decimal import ROUND_HALF_UP, Decimal
 from onegov.core.orm import Base

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency import _
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson

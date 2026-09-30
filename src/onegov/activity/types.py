@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy.dialects.postgresql import Range
 
 from typing import Literal, TYPE_CHECKING

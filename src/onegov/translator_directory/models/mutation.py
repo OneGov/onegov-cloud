@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.gis import Coordinates
 from onegov.translator_directory import _

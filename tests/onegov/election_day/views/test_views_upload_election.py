@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_proporz_election

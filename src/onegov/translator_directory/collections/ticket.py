@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.models.ticket import (
     FilteredTicketCollection,
     FilteredArchivedTicketCollection,

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest

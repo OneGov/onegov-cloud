@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import niquests
 import transaction
 
@@ -35,7 +33,7 @@ from uuid import uuid4, uuid5, UUID
 from wtforms.widgets import html_params
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.pay.types import FeePolicy
@@ -547,7 +545,7 @@ class WorldlineFeePolicy:
 class SaferpayPayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'worldline_saferpay'}
 
-    fee_policy: FeePolicy = WorldlineFeePolicy
+    fee_policy: ClassVar[FeePolicy] = WorldlineFeePolicy
 
     #: the order_id of the transaction
     order_id: dict_property[str | None] = meta_property()
@@ -712,7 +710,7 @@ class WorldlineSaferpay(PaymentProvider[SaferpayPayment]):
 
     __mapper_args__ = {'polymorphic_identity': 'worldline_saferpay'}
 
-    fee_policy: FeePolicy = WorldlineFeePolicy
+    fee_policy: ClassVar[FeePolicy] = WorldlineFeePolicy
 
     #: Whether or not this is a Sandbox account
     sandbox: dict_property[bool] = meta_property(default=False)

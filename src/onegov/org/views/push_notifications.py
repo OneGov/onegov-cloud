@@ -1,4 +1,3 @@
-from __future__ import annotations
 import json
 from onegov.core.security import Private
 from onegov.org import _, OrgApp

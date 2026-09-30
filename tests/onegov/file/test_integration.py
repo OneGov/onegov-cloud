@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import AIS
 import hashlib
 import isodate

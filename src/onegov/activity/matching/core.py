@@ -4,8 +4,6 @@ The algorithm used is based on Deferred Acceptance. The algorithm has a
 quadratic runtime.
 
 """
-from __future__ import annotations
-
 from onegov.activity import Attendee, Booking, Occasion, BookingPeriod
 from onegov.activity.matching.score import Scoring
 from onegov.activity.matching.utils import overlaps, LoopBudget, HashableID

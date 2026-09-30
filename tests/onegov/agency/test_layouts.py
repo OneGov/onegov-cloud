@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import append_query_param
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection

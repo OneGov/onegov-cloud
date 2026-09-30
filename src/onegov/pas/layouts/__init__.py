@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.pas.layouts.attendence import AttendenceLayout
 from onegov.pas.layouts.attendence import AttendenceCollectionLayout
 from onegov.pas.layouts.change import ChangeCollectionLayout

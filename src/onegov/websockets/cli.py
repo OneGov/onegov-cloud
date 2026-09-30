@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from asyncio import run
 from json import loads
 from typing import TYPE_CHECKING

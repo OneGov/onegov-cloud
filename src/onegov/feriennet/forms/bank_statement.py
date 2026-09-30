@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import BookingPeriod, BookingPeriodCollection
 from onegov.feriennet import _
 from onegov.form import Form

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.core.i18n import SiteLocale
 from onegov.election_day import _

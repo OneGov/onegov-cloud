@@ -1,6 +1,4 @@
 """ Contains the paths to the different models served by onegov.org. """
-from __future__ import annotations
-
 import sedate
 from datetime import date, datetime
 from libres.db.models import ReservationBlocker

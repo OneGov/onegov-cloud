@@ -15,8 +15,6 @@ Using the framework does not really differ from using Morepath::
         pass
 
 """
-from __future__ import annotations
-
 import dectate
 import hashlib
 import inspect

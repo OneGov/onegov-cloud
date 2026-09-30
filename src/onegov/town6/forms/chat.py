@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from wtforms.fields import EmailField, HiddenField, SelectField, StringField
 from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired

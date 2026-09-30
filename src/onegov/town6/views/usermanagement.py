@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Secret
 
 from onegov.org.forms import ChangeUsernameForm, NewUserForm

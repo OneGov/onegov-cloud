@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public
 from onegov.org.views.homepage import view_org
 from onegov.org.models import Organisation

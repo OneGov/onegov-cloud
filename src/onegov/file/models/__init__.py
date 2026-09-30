@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.file.models.associated_files import (
     AssociatedFiles, MultiAssociatedFiles)
 from onegov.file.models.file import File, SearchableFile

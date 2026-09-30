@@ -4,8 +4,6 @@
 # to read each others json.
 #
 # Therefore we use a common denominator kind of json encoder/decoder.
-from __future__ import annotations
-
 from onegov.core.custom import json
 from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.types import TypeDecorator

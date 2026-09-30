@@ -1,6 +1,4 @@
 """ Lists the custom forms. """
-from __future__ import annotations
-
 import collections
 from markupsafe import Markup
 from onegov.core.security import Public, Private

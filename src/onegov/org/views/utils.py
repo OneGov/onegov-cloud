@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import lru_cache
 from onegov.org.i18n import _
 from onegov.user import Auth

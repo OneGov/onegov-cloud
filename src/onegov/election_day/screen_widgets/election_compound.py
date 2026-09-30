@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.screen_widgets.generic import ChartWidget
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget

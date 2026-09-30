@@ -92,8 +92,6 @@ Anmeldungen in Teilnehmer.txt die keine Referenz zu Personen.txt haben,
 wurden berücksichtigt, sofern eine Email vorlag.
 
 """
-from __future__ import annotations
-
 import click
 import dateutil.parser
 from collections import OrderedDict, defaultdict

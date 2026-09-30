@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from itertools import chain
 from onegov.core.utils import normalize_for_url
 from onegov.form.core import Form

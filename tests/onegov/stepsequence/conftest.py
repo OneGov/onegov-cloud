@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 import onegov.stepsequence
 from onegov.stepsequence.core import StepSequenceRegistry

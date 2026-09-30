@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
 from onegov.core.security import Private

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.org.i18n import _
 from webob.exc import HTTPLocked
 

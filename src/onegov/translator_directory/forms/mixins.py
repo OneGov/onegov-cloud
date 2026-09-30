@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from json import dumps
 from onegov.gis.utils import MapboxRequests
 from onegov.translator_directory import _, log

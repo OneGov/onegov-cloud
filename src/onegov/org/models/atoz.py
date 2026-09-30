@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections import OrderedDict
 from itertools import groupby
 from unidecode import unidecode

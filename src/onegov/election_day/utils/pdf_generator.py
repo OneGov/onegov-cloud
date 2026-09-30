@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os.path
 
 from onegov.election_day import _

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date, datetime
 from sqlalchemy import and_, case, func, or_
 from sqlalchemy import Column, Enum, ForeignKey, UUID as UUIDType

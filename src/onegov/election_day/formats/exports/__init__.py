@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.formats.exports.election import \
     export_election_internal
 from onegov.election_day.formats.exports.election import \

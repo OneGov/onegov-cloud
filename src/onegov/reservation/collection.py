@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import enum
 
 from onegov.core.utils import normalize_for_url

@@ -1,6 +1,4 @@
 """ Metadata about the instance, available through HTTP. """
-from __future__ import annotations
-
 import hashlib
 import inspect
 import morepath

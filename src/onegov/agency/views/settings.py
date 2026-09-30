@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.agency import _
 from onegov.agency.app import AgencyApp
 from onegov.core.security import Secret

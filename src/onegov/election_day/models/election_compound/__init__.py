@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.election_day.models.election_compound.election_compound import \
     ElectionCompound
 from onegov.election_day.models.election_compound.part import \

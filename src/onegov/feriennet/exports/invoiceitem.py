@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity import (
     BookingPeriodInvoice, ActivityInvoiceItem, Activity, Occasion, Attendee)
 from onegov.core.security import Secret

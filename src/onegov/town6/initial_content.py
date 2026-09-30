@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.utils import module_path
 from onegov.reservation import ResourceCollection
 from onegov.org.initial_content import add_builtin_forms

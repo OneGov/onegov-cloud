@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity.matching.score import PreferAdminChildren
 from onegov.activity.matching.score import PreferOrganiserChildren
 from onegov.activity.matching.score import PreferGroups

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.feriennet.models.activity import VacationActivity
 from onegov.feriennet.models.calendar import Calendar, AttendeeCalendar
 from onegov.feriennet.models.group_invite import GroupInvite

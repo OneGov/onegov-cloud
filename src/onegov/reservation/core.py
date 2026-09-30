@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from libres.context.registry import create_default_registry
 from libres.db.models import ORMBase
 from onegov.core.orm import orm_cached

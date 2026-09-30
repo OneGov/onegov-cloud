@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sedate import utcnow
 
 from onegov.pas.models.presidential_allowance import (

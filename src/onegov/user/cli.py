@@ -1,6 +1,4 @@
 """ Provides commands used to manage users. """
-from __future__ import annotations
-
 import click
 import phonenumbers
 import pyotp

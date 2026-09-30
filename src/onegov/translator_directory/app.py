@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core import utils
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation

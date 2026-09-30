@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import AdjacencyList

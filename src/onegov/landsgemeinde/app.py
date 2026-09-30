@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.framework import current_language_tween_factory
 from onegov.core.framework import transaction_tween_factory
 from onegov.core.utils import module_path

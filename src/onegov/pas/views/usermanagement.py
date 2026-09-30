@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Secret
 from onegov.org.views.usermanagement import get_manage_user_form
 from onegov.org.views.usermanagement import view_usermanagement

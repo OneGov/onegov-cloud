@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from morepath import Identity
 from morepath.authentication import NO_IDENTITY
 from onegov.agency.collections import ExtendedAgencyCollection

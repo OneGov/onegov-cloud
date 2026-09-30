@@ -2,8 +2,6 @@
 exist in external packages which provide no translations.
 
 """
-from __future__ import annotations
-
 from onegov.org import _
 
 # lingua ignores the first translation string in this file for some reason

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from asyncio import run
 from more.content_security.core import content_security_policy_tween_factory
 from more.webassets import WebassetsApp

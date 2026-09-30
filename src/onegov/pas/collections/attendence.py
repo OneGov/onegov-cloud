@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from sqlalchemy import desc, or_
 from sqlalchemy.orm import joinedload

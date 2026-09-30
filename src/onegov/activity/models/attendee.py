@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base

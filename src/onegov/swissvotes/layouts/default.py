@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from babel import Locale
 from decimal import Decimal
 from decimal import ROUND_HALF_UP

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from onegov.org.layout import DefaultLayout
 from onegov.core.elements import Link, LinkGroup, Intercooler, Confirm, Block

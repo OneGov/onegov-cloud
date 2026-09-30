@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import tarfile
 
 from datetime import date

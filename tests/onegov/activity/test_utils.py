@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.activity.iso20022 import get_esr
 from onegov.activity.utils import merge_ranges
 from onegov.activity.utils import extract_municipality

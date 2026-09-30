@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tests.shared.utils import create_image, get_meta
 from webtest import Upload
 

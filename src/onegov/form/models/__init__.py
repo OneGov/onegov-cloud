@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.form.models.definition import FormDefinition
 from onegov.form.models.submission import FormSubmission
 from onegov.form.models.definition import SurveyDefinition

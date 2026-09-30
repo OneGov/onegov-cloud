@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.people import AgencyCollection
 from onegov.core.utils import Bunch

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.search.utils import classproperty
 from onegov.search.utils import extract_hashtags
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from markupsafe import Markup
 from onegov.org.models import Topic
 from onegov.org.request import OrgRequest

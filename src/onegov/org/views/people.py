@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import morepath
 from morepath.request import Response
 from sqlalchemy import and_, func, type_coerce

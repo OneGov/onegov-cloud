@@ -1,6 +1,4 @@
 """ The onegov organisation homepage. """
-from __future__ import annotations
-
 from morepath import redirect
 from onegov.core.security import Public, Private
 from onegov.core.widgets import inject_variables

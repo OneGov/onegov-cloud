@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Iterable
 from onegov.core.crypto import random_token
 from onegov.core.utils import toggle

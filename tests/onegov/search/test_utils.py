@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.search import ORMSearchable, Searchable, SearchableContent
 from onegov.search import utils
 from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped

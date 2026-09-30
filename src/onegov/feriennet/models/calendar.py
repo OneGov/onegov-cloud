@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import icalendar
 
 from onegov.activity import Attendee

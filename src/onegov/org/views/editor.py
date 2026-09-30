@@ -1,6 +1,4 @@
 """ Implements the adding/editing/removing of pages. """
-from __future__ import annotations
-
 import morepath
 from webob.exc import HTTPForbidden, HTTPNotFound
 

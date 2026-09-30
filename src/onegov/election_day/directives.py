@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dectate import Action
 from morepath.directive import HtmlAction
 from morepath.directive import ViewAction

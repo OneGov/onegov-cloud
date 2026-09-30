@@ -1,6 +1,4 @@
 """ Provides commands related to the onegov.search. """
-from __future__ import annotations
-
 import click
 
 from onegov.core.cli import command_group, pass_group_context

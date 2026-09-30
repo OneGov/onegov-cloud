@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Private
 from onegov.org.forms import BatchCopyAllocationRulesForm
 from onegov.org.views.allocation import (

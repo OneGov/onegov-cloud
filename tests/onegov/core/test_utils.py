@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import onegov.core
 import os.path
 import pytest

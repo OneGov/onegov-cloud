@@ -7,8 +7,6 @@ will occur.
 The importers cannot work independently due to tight coupling between entities.
 """
 
-from __future__ import annotations
-
 from datetime import date, datetime
 from uuid import UUID
 

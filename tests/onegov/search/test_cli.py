@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from click.testing import CliRunner
 from onegov.event import Event
 from onegov.search.cli import cli

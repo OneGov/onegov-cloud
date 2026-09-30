@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import TriggerNotificationsForm

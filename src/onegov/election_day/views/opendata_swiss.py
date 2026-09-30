@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from babel.dates import format_date
 from io import BytesIO
 from onegov.core.security import Public

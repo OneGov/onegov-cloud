@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.pas.i18n import _
 from onegov.pas.utils import is_parliamentarian
 from functools import cached_property

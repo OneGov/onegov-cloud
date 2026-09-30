@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import cached_property
 from datetime import date, datetime
 from onegov.activity import Activity, BookingPeriod, Occasion, OccasionDate

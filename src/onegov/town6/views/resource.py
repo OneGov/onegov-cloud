@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from onegov.core.security import Public, Private, Personal
 from onegov.org.forms.resource import AllResourcesExportForm
 
