@@ -25,6 +25,14 @@ $tertiary-subtle: #e4eaee;
   }
 }
 
+.black-gradient{
+  background: linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.black-transparent-bg {
+  background: rgba(0,0,0,.5);
+}
+
 // Tertiary color utilities
 .text-tertiary {
   color: $tertiary !important;
