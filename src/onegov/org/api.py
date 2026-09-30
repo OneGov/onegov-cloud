@@ -628,8 +628,6 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
         page: int | None = None,
         batch_size: int | None = None,
     ):
-        self.batch_size = (
-            int(batch_size) if batch_size else self.default_batch_size)
         super().__init__(request, extra_parameters, page, batch_size)
         self.endpoint = name
 
