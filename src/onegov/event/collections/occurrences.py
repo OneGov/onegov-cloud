@@ -712,22 +712,20 @@ class OccurrenceCollection(Pagination[Occurrence]):
                     Occurrence.location.op('~')(
                         rf'\y{re.escape(loc.translate(_clean_search_term))}\y'
                     )
+                    if loc != 'null'
+                    else Occurrence.location.is_(None)
                     for loc in self.locations
                 ])
             )
 
         if self.sources:
-            source_filters = []
-            for source in self.sources:
-                source = str(source)
-                if source.lower() == 'null':
-                    source_filters.append(Event.source.is_(None))
-                else:
-                    source_filters.append(
-                        Event.source.astext.startswith(f'{source}-')
-                    )
+            query = query.filter(or_(*(
+                Event.source.astext.startswith(f'{source}-')
+                if source.lower() != 'null'
+                else Event.source.is_(None)
+                for source in self.sources
+            )))
 
-            query = query.filter(or_(*source_filters))
         if self.syndicate is not None:
             query = query.filter(Event.syndicate.is_(self.syndicate))
 
