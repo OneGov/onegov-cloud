@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-09-07 14:57+0200\n"
+"POT-Creation-Date: 2026-09-29 16:35+0200\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4711,35 +4711,23 @@ msgstr "Propriétaire :"
 msgid "Kind:"
 msgstr "Type :"
 
-msgid "When"
-msgstr "Date"
-
-msgid "Action"
-msgstr "Action"
-
-msgid "Who"
-msgstr "Utilisateur"
-
-msgid "Target table"
-msgstr "Table cible"
-
-msgid "Target ID"
-msgstr "ID cible"
-
-msgid "Current page"
-msgstr "Page actuelle"
-
-msgid "JSON Snapshot"
-msgstr "Instantané JSON"
+msgid "Changes"
+msgstr "Modifications"
 
 msgid "Before update"
 msgstr "Avant modification"
 
+msgid "Copy JSON"
+msgstr "Copier le JSON"
+
+msgid "Copied to Clipboard!"
+msgstr "Copié dans le presse-papiers!"
+
+msgid "JSON Snapshot"
+msgstr "Instantané JSON"
+
 msgid "After update"
 msgstr "Après modification"
-
-msgid "No audit entries yet."
-msgstr "Aucune entrée dans le journal d’audit."
 
 msgid ""
 "The audit trail shows when and by whom records were created, changed or "
@@ -4748,23 +4736,26 @@ msgstr ""
 "Le journal d’audit indique quand et par qui des enregistrements ont été "
 "créés, modifiés ou supprimés."
 
-msgid "Page"
-msgstr "Page"
+msgid "Action"
+msgstr "Action"
+
+msgid "No audit entries yet."
+msgstr "Aucune entrée dans le journal d’audit."
+
+msgid "When"
+msgstr "Date"
 
 msgid "Target"
 msgstr "Cible"
 
-msgid "Contained subpages"
-msgstr "Sous-pages contenues"
+msgid "Who"
+msgstr "Utilisateur"
 
 msgid "Changed"
 msgstr "Modifié"
 
 msgid "Deleted"
 msgstr "Supprimé"
-
-msgid "Copy JSON"
-msgstr "Copier le JSON"
 
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
@@ -5083,9 +5074,6 @@ msgstr "Chercher"
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés."
-
-msgid "Copied to Clipboard!"
-msgstr "Copié dans le presse-papiers!"
 
 msgid "Healthy"
 msgstr "Santé"
@@ -5578,8 +5566,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -6408,8 +6396,7 @@ msgstr ""
 "changer."
 
 msgid "You are viewing a limited summary of your confirmed reservations."
-msgstr ""
-"Vous consultez un résumé limité de vos réservations confirmées."
+msgstr "Vous consultez un résumé limité de vos réservations confirmées."
 
 msgid "Log in for full details"
 msgstr "Se connecter pour tous les détails"
@@ -6930,6 +6917,9 @@ msgstr ""
 
 msgid "Topics A-Z"
 msgstr "Sujets de A à Z"
+
+msgid "Contained subpages"
+msgstr "Sous-pages contenues"
 
 msgid "Audit Trail Entry"
 msgstr "Entrée du journal d’audit"
@@ -8050,8 +8040,8 @@ msgstr ""
 "Votre demande d'annulation a été soumise. Vous serez informé(e) une fois "
 "qu'elle aura été traitée."
 
-#.
 #. We adjust the wording for users that do not know what a ticket is
+#.
 msgid "Request Status"
 msgstr "Status Demand"
 
@@ -8622,6 +8612,18 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid "Target table"
+#~ msgstr "Table cible"
+
+#~ msgid "Target ID"
+#~ msgstr "ID cible"
+
+#~ msgid "Current page"
+#~ msgstr "Page actuelle"
+
+#~ msgid "Page"
+#~ msgstr "Page"
 
 #~ msgid "Confirmation"
 #~ msgstr "Confirmation"
