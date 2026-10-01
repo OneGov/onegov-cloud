@@ -209,8 +209,13 @@ def town_handle_ticket_data_deletion_settings(
     request: TownRequest,
     form: DataRetentionPolicyForm
 ) -> RenderData | Response:
-    request.message(_('Proceed with caution. Tickets and the data they '
-                      'contain may be irrevocable deleted.'), 'alert')
+    request.message(
+        _(
+            'Proceed with caution. Tickets and the data they contain, as well '
+            'as audit trail entries, may be irreversibly deleted.'
+        ),
+        'alert',
+    )
     return handle_generic_settings(
         self, request, form, _('Data Retention Policy'),
         SettingsLayout(self, request),
