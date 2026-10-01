@@ -1700,7 +1700,7 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         font_src={SELF, 'http:', 'https:', 'data:'},
 
         # allow images from practically anywhere (no mixed content though)
-        img_src={SELF, 'http:', 'https:', 'data:'},
+        img_src={SELF, 'http:', 'https:', 'data:', 'blob:'},
 
         # enable inline styles and external stylesheets
         style_src={SELF, 'https:', UNSAFE_INLINE},

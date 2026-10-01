@@ -57,7 +57,12 @@ class PersonForm(Form):
     picture_url = StringField(
         label=_('Picture'),
         description=_('URL pointing to the picture'),
-        render_kw={'class_': 'image-url'}
+        render_kw={
+            'class_': 'image-url',
+            'data-initial-aspect-ratio': '1:1',
+            'data-fixed-aspect-ratio': 'true',
+            'data-circular': 'true',
+        }
     )
 
     notes = TextAreaField(
