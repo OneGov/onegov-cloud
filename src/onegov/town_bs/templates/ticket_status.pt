@@ -1,4 +1,4 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town6" tal:define="fullpage True">
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6" tal:define="narrow_page True">
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>

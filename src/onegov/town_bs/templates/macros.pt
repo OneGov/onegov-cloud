@@ -689,6 +689,7 @@
 
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
+
     <div tal:condition="newsletter.show_only_previews|True and news" class="newslist row g-md" >
         <tal:b tal:condition="first_wide|False" tal:define="rest news[1:]">
             <div class="news-list-item col-12">
@@ -705,11 +706,12 @@
         </tal:b>
     </div>
     <div tal:condition="not: newsletter.show_only_previews|True" class="newslist grid-x align-center" tal:repeat="item news">
-        <metal:newlist use-macro="layout.macros['news-item-full']"" />
+        <metal:newlist use-macro="layout.macros['news-item-full']" />
     </div>
     <div class="newslist grid-x align-center">
         <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All posts</span></a>
     </div>
+
 </metal:newslist>
 
 <metal:newsletter define-macro="newsletter_signup" i18n:domain="onegov.town6">
@@ -993,35 +995,46 @@
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
     <div class="row"
-        tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False; imageset page.photo_album|None; as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'; sidepanel_contact page.sidepanel_contact|None; no_sidebar_offset no_sidebar_offset|False;"
-    >
-        <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
-            <tal:b condition="full_page_width|False">
-                <div class="col-12 page-content-main">
-                    <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
-                    <div metal:define-slot="before-lead"></div>
-                    <div metal:define-slot="after-lead"></div>
+        tal:define="
+            show_side_panel show_side_panel|False;
+            sidepanel_contact page.sidepanel_contact|None;
+            location location|False;
+            files files|None;
+            sidepanel_links sidepanel_links|None;
+            no_sidebar_offset no_sidebar_offset|False;
+            news page.type == 'news'|False;
+            imageset page.photo_album|None;
+            show_page_image page.show_page_image|None;
+            as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content';
+    ">
 
-                    <div class="page-text" tal:condition="text" tal:content="text" />
-                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
-                    <div metal:define-slot="after-text"></div>
-                </div>
-            </tal:b>
-            <tal:b condition="not full_page_width|True">
-                <div class="col-12 col-md-9 offset-md-3 page-content-main">
-                    <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
-                    <div metal:define-slot="before-lead"></div>
-                    <div metal:define-slot="after-lead"></div>
+        <!-- No sidebar -->
+        <tal:b condition="
+            not:
+            show_side_panel
+            or people
+            or files
+            or contact
+            or coordinates
+            or location
+            or more_entries|None
+        ">
+            <div class="col-12 page-content-main">
+                <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
+                <div metal:define-slot="before-lead"></div>
+                <div metal:define-slot="after-lead"></div>
 
-                    <div class="page-text" tal:condition="text" tal:content="text" />
-                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
-                    <div metal:define-slot="after-text"></div>
-                </div>
-            </tal:b>
+                <div class="page-text" tal:condition="text" tal:content="text" />
+                <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+                <div metal:define-slot="after-text"></div>
+            </div>
         </tal:b>
-        <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|False">
+
+        <!-- With sidebar -->
+        <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|None">
             <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
-            <div class="col-12 col-md-9 page-content-main content">
+
+            <div class="col-12 col-md-9 page-content-main">
                 <div class="theiaStickySidebar">
                     <img class="page-image img-fluid rounded-3" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
@@ -1057,6 +1070,7 @@
                 </div>
             </div>
         </tal:b>
+
     </div>
 </metal:page_content>
 
