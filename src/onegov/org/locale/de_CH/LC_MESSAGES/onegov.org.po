@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-09-29 16:35+0200\n"
+"POT-Creation-Date: 2026-09-29 13:50+0200\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4305,6 +4305,9 @@ msgstr "Anmeldung ablehnen"
 
 msgid "Cancel registration"
 msgstr "Anmeldung stornieren"
+
+msgid "Do you really want to cancel this registration?"
+msgstr "Möchten Sie diese Anmeldung wirklich stornieren?"
 
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"

@@ -47,6 +47,11 @@ class Collection:
         ]
         self.next = None
         self.previous = None
+        self.pages_count = 1
+
+    @property
+    def subset_count(self) -> int:
+        return len(self.batch)
 
     def by_id(self, id_: int | str) -> Bunch | None:
         return self.items.get(str(id_))
