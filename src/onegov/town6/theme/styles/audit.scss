@@ -173,6 +173,12 @@ table.audit-trail {
     margin-bottom: 1rem;
     overflow: hidden;
 
+    summary {
+        background: $smoke;
+        cursor: pointer;
+        padding: .75rem 1.25rem;
+    }
+
     .audit-snapshot-heading {
         align-items: center;
         background: $smoke;
@@ -207,6 +213,96 @@ table.audit-trail {
             i {
                 margin: 0;
             }
+        }
+    }
+}
+
+.audit-diff-panel {
+    border: 1px solid $light-gray;
+    border-radius: .5rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+
+    .audit-snapshot-heading {
+        align-items: center;
+        background: $smoke;
+        display: flex;
+        justify-content: space-between;
+        padding: .5rem 1.25rem;
+
+        h2 {
+            font-size: 1rem;
+            margin: 0;
+        }
+    }
+}
+
+.audit-diff {
+    overflow-x: auto;
+
+    table.diff {
+        border: 0;
+        font-size: .9rem;
+        margin: 0;
+        table-layout: fixed;
+        width: 100%;
+
+        th,
+        td {
+            border: 0;
+            border-bottom: 1px solid $light-gray;
+            padding: .75rem 1rem;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+            white-space: normal;
+        }
+
+        th {
+            background: $smoke;
+            color: $dark-gray;
+            font-family: inherit;
+            font-size: .75rem;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        tr > :first-child {
+            width: 24%;
+        }
+
+        pre {
+            background: transparent;
+            border: 0;
+            color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            margin: 0;
+            max-height: 18rem;
+            overflow: auto;
+            padding: 0;
+            white-space: pre-wrap;
+        }
+
+        .diff_header {
+            background: $smoke;
+        }
+
+        .diff_next {
+            background: $white;
+            color: $gray;
+            width: 1.5rem;
+        }
+
+        .diff_add {
+            background: rgba($success-color, .16);
+        }
+
+        .diff_sub {
+            background: rgba($alert-color, .16);
+        }
+
+        .diff_chg {
+            background: rgba($warning-color, .2);
         }
     }
 }

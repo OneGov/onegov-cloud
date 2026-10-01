@@ -4714,6 +4714,9 @@ msgstr "Propriétaire :"
 msgid "Kind:"
 msgstr "Type :"
 
+msgid "Changes"
+msgstr "Modifications"
+
 msgid "Before update"
 msgstr "Avant modification"
 
@@ -4723,11 +4726,11 @@ msgstr "Copier le JSON"
 msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"
 
-msgid "After update"
-msgstr "Après modification"
-
 msgid "JSON Snapshot"
 msgstr "Instantané JSON"
+
+msgid "After update"
+msgstr "Après modification"
 
 msgid ""
 "The audit trail shows when and by whom records were created, changed or "

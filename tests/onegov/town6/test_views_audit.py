@@ -66,6 +66,13 @@ def test_view_audit_trail(client: Client) -> None:
     assert 'Eintrag im Audit Trail' in detail
     assert 'Vor der Änderung' in detail
     assert 'Nach der Änderung' in detail
+    assert len(detail.pyquery('.audit-diff table.diff')) == 1
+    assert not detail.pyquery('details.audit-snapshot-panel[open]')
+    assert len(detail.pyquery('details.audit-snapshot-panel')) == 2
+    assert (
+        len(detail.pyquery('.audit-diff .diff_add')) > 0
+        or len(detail.pyquery('.audit-diff .diff_sub')) > 0
+    )
     assert len(detail.pyquery('.audit-entry-meta')) == 0
     assert detail.pyquery('.audit-entry-user').text() == 'editor@example.org'
     copy_buttons = detail.pyquery('.audit-snapshot-panel .audit-copy')

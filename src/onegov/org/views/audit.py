@@ -5,9 +5,10 @@ from onegov.core.security import Secret
 from onegov.org import _, OrgApp
 from onegov.org.layout import AuditTrailLayout
 from onegov.page import Page
+from markupsafe import Markup
 
 
-from typing import NamedTuple, TYPE_CHECKING
+from typing import Any, NamedTuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -70,6 +71,63 @@ def audit_entry_facts(
 ) -> tuple[AuditEntryFact, ...]:
     factory = AUDIT_ENTRY_FACTORIES.get(entry.target_table)
     return factory(entry, request) if factory else ()
+
+
+def audit_snapshot_diff(
+    previous_snapshot: dict[str, Any],
+    snapshot: dict[str, Any],
+    previous_label: str,
+    snapshot_label: str,
+) -> Markup:
+    missing = object()
+
+    def display(value: object) -> str:
+        if value is missing:
+            return '—'
+        if isinstance(value, str):
+            return value or '""'
+        return json.dumps(value, indent=2, sort_keys=True)
+
+    def changes(
+        previous: Any,
+        current: Any,
+        path: tuple[str, ...] = (),
+    ) -> list[Markup]:
+        if type(previous) is type(current) and previous == current:
+            return []
+        rows: list[Markup] = []
+        if isinstance(previous, dict) and isinstance(current, dict):
+            for key in sorted(previous.keys() | current.keys()):
+                rows.extend(
+                    changes(
+                        previous.get(key, missing),
+                        current.get(key, missing),
+                        (*path, key),
+                    )
+                )
+        else:
+            rows.append(
+                Markup(
+                    '<tr><th scope="row">{}</th>'
+                    '<td class="diff_sub"><pre>{}</pre></td>'
+                    '<td class="diff_add"><pre>{}</pre></td></tr>'
+                ).format(
+                    ' / '.join(path),
+                    display(previous),
+                    display(current),
+                )
+            )
+        return rows
+
+    return Markup(
+        '<table class="diff"><thead><tr><td></td>'
+        '<th scope="col">{}</th><th scope="col">{}</th>'
+        '</tr></thead><tbody>{}</tbody></table>'
+    ).format(
+        previous_label,
+        snapshot_label,
+        Markup('').join(changes(previous_snapshot, snapshot)),
+    )
 
 
 @OrgApp.html(
@@ -144,6 +202,16 @@ def view_audit_entry(
         'entry': self,
         'operation': operation,
         'current_page': current_page,
+        'diff': (
+            audit_snapshot_diff(
+                self.previous_snapshot,
+                self.snapshot,
+                request.translate(_('Before update')),
+                request.translate(_('After update')),
+            )
+            if self.previous_snapshot
+            else None
+        ),
         'snapshot': json.dumps(self.snapshot, indent=2),
         'previous_snapshot': (
             json.dumps(self.previous_snapshot, indent=2)
