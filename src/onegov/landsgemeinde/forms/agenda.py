@@ -171,6 +171,7 @@ class AgendaItemForm(NamedFileForm):
     def on_request(self) -> None:
         layout = DefaultLayout(self.model, self.request)
         self.request.include('redactor')
+        self.request.include('cropper')
         self.request.include('editor')
         self.request.include('tags-input')
         self.memorial_page.description = _(
