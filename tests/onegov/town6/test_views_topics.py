@@ -195,6 +195,54 @@ def test_contact_info_visible(client: Client) -> None:
     assert "Test contact info" in page
 
 
+def test_contact_opening_hours_link(client: Client) -> None:
+    client.login_admin()
+
+    page = client.get('/topics/themen').click('Bearbeiten')
+    page.form['contact'] = 'Test contact info'
+    page.form.submit().follow()
+
+    selector = '.contact-panel h3 a'
+    assert not client.get('/topics/themen').pyquery(selector)
+
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url'] = 'https://example.org/topics/kontakt'
+    settings.form.submit().follow()
+
+    anonymous = client.spawn()
+    page = anonymous.get('/topics/themen')
+    link = page.pyquery(selector)
+    assert link.text() == 'Öffnungszeiten'
+    assert link.attr('href') == 'https://example.org/topics/kontakt'
+    target = page.click('Öffnungszeiten', href='/topics/kontakt')
+    assert target.status_code == 200
+
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url'] = (
+        'https://example.org/topics/organisation'
+    )
+    settings.form.submit().follow()
+
+    page = anonymous.get('/topics/themen')
+    assert page.pyquery(selector).attr('href') == (
+        'https://example.org/topics/organisation'
+    )
+
+    page = client.get('/topics/themen').click('Bearbeiten')
+    page.form['hide_contact'] = True
+    page.form.submit().follow()
+    assert not anonymous.get('/topics/themen').pyquery(selector)
+
+    page = client.get('/topics/themen').click('Bearbeiten')
+    page.form['hide_contact'] = False
+    page.form.submit().follow()
+
+    settings = client.get('/footer-settings')
+    settings.form['opening_hours_url'] = ''
+    settings.form.submit().follow()
+    assert not anonymous.get('/topics/themen').pyquery(selector)
+
+
 def test_view_page_as_member(client: Client) -> None:
     admin = client
     client.login_admin()

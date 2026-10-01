@@ -758,6 +758,10 @@
                             </li>
                         </ul>
                     </div>
+                    <h3 tal:condition="layout.org.opening_hours_url">
+                        <a href="${layout.org.opening_hours_url}"
+                           i18n:translate>Opening Hours</a>
+                    </h3>
                 </div>
                 <br tal:condition="coordinates and contact" />
                 <h3 i18n:translate tal:condition="not contact">Map</h3>
