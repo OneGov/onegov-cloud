@@ -19,12 +19,14 @@ from onegov.pas.forms import AttendenceForm
 from onegov.pas.forms import PASParliamentarianRoleForm
 from onegov.pas.forms import RateSetForm
 from onegov.pas.forms import SettlementRunForm
+from onegov.pas.forms.attendence import AttendenceCommissionBulkEditForm
 from onegov.pas.models import Attendence
 from onegov.pas.models import PASParliamentarian
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from pytest import fixture
 from tests.onegov.pas.conftest import DummyApp
+from uuid import uuid4
 
 
 from typing import Any, TYPE_CHECKING
@@ -262,6 +264,61 @@ def test_add_plenary_attendence_form(
     form2.request = dummy_request
     assert not form2.validate()
     assert form2.date.errors[0] == 'No within an active settlement run.'
+
+
+@freeze_time('2024-01-01')
+def test_edit_commission_bulk_unique_parliamentarians(
+    session: Session, dummy_request: Any
+) -> None:
+    SettlementRunCollection(session).add(
+        name='2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 12, 31),
+        active=True,
+    )
+    app: Any = DummyApp(session=session)
+    parliamentarians = PASParliamentarianCollection(app)
+    selected = parliamentarians.add(first_name='Anna', last_name='Muster')
+    unselected = parliamentarians.add(first_name='Anna', last_name='Muster')
+    commission = PASCommissionCollection(session).add(name='Gesundheit')
+    roles = PASParliamentarianRoleCollection(session)
+    memberships = PASCommissionMembershipCollection(session)
+    for person in (selected, unselected):
+        roles.add(
+            parliamentarian_id=person.id,
+            start=date(2024, 1, 1),
+            meta={'org_type': 'Kantonsrat'},
+        )
+        for role in ('member', 'president'):
+            memberships.add(
+                commission_id=commission.id,
+                parliamentarian_id=person.id,
+                role=role,
+                start=date(2024, 1, 1),
+            )
+    attendance = Attendence(
+        parliamentarian=selected,
+        commission=commission,
+        date=date(2024, 1, 1),
+        duration=Decimal('180'),
+        type='commission',
+        bulk_edit_id=uuid4(),
+    )
+    session.add(attendance)
+    session.flush()
+
+    form = AttendenceCommissionBulkEditForm()
+    form.request = dummy_request
+    form.on_request()
+    form.process_obj(attendance)
+
+    choices = form.parliamentarian_id.choices
+    assert len(choices) == 2
+    assert set(choices) == {
+        (str(selected.id), selected.title),
+        (str(unselected.id), unselected.title),
+    }
+    assert form.parliamentarian_id.data == [str(selected.id)]
 
 
 @freeze_time('2024-01-01')

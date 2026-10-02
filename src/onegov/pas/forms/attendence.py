@@ -616,11 +616,13 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
         eligible = {
             p.id for p in get_attendance_parliamentarians(self.request)
         }
-        self.parliamentarian_id.choices = [
-            (str(m.parliamentarian.id), m.parliamentarian.title)
-            for m in memberships
-            if m.parliamentarian_id in eligible
-        ]
+        self.parliamentarian_id.choices = list(
+            {
+                str(m.parliamentarian_id): m.parliamentarian.title
+                for m in memberships
+                if m.parliamentarian_id in eligible
+            }.items()
+        )
 
         self.duration.data = minutes_to_hours(obj.duration)
         self.abschluss.data = obj.abschluss
