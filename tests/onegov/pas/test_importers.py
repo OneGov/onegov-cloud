@@ -460,7 +460,7 @@ def test_membership_importer_keeps_open_kantonsrat_role(
     assert str(roles[0].end) == '2020-12-17'
     assert str(roles[1].start) == '2024-12-20'
     assert roles[1].end is None
-    assert is_active_kantonsrat_member(parliamentarian)
+    assert is_active_kantonsrat_member(parliamentarian, date(2026, 7, 1))
 
 
 def test_membership_importer_merges_duplicate_kub_memberships(

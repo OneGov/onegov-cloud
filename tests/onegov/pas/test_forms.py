@@ -48,6 +48,7 @@ class DummyPostData(DummyPostDataBase):
 @fixture(scope='function')
 def dummy_request(session: Session) -> Any:
     return Bunch(
+        params={},
         app=Bunch(
             org=Bunch(
                 geo_provider=None,
@@ -73,6 +74,7 @@ def dummy_request(session: Session) -> Any:
 @fixture(scope='function')
 def dummy_admin_request(session: Session) -> Any:
     return Bunch(
+        params={},
         app=Bunch(
             org=Bunch(
                 geo_provider=None,

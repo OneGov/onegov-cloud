@@ -608,6 +608,103 @@ def test_attendance_blocked_outside_any_settlement_run(
     assert 'Neue Anwesenheit hinzugefügt' in page
 
 
+def test_attendance_choices_use_selected_settlement(
+    client: Client[TestPasApp],
+) -> None:
+    client.login_admin()
+    transaction.begin()
+    session = client.app.session()
+    run = SettlementRun(
+        name='Q3',
+        start=datetime.date(2024, 7, 1),
+        end=datetime.date(2024, 9, 30),
+        closed=False,
+    )
+    later = SettlementRun(
+        name='Q4',
+        start=datetime.date(2024, 10, 1),
+        end=datetime.date(2024, 12, 31),
+        closed=False,
+    )
+    session.add_all([run, later])
+    commission = PASCommissionCollection(session).add(name='Gesundheit')
+    people = PASParliamentarianCollection(client.app)
+    ids: dict[str, str] = {}
+    for name, start, end in (
+        ('Anna', datetime.date(2024, 1, 1), datetime.date(2024, 9, 23)),
+        ('Joined', datetime.date(2024, 8, 1), None),
+        ('Left', datetime.date(2024, 1, 1), datetime.date(2024, 6, 30)),
+        ('Future', datetime.date(2024, 10, 1), None),
+    ):
+        person = people.add(first_name=name, last_name='Test')
+        ids[name] = str(person.id)
+        session.add(
+            PASParliamentarianRole(
+                parliamentarian_id=person.id,
+                role='member',
+                start=start,
+                end=end,
+                meta={'org_type': 'Kantonsrat'},
+            )
+        )
+        session.add(
+            PASCommissionMembership(
+                parliamentarian_id=person.id,
+                commission_id=commission.id,
+                role='member',
+                start=start,
+                end=end,
+            )
+        )
+    session.flush()
+    run_id = str(run.id)
+    commission_id = str(commission.id)
+    transaction.commit()
+
+    query = f'?settlement_run_id={run_id}'
+    page = client.get('/attendences/new' + query)
+    options = {option[0] for option in page.form['parliamentarian_id'].options}
+    assert options == {ids['Anna'], ids['Joined']}
+    assert page.form['date'].value == '2024-07-01'
+    data = client.get(
+        '/commissions/commissions-parliamentarians-json' + query
+    ).json
+    assert {p['id'] for p in data[commission_id]} == options
+
+    bulk = client.get('/attendences/new-commission-bulk' + query)
+    bulk_ids = {
+        element.attrib['value']
+        for element in bulk.pyquery('input[name="parliamentarian_id"]')
+    }
+    assert bulk_ids == options
+    fallback = client.get('/attendences/new')
+    assert {
+        option[0] for option in fallback.form['parliamentarian_id'].options
+    } == {ids['Joined'], ids['Future']}
+    client.get(
+        '/commissions/commissions-parliamentarians-json'
+        '?settlement_run_id=invalid',
+        status=400,
+    )
+
+    page.form['parliamentarian_id'] = ids['Anna']
+    page.form['commission_id'] = commission_id
+    page.form['type'] = 'commission'
+    page.form['date'] = '2024-09-01'
+    page.form['duration'] = '1'
+    response = page.form.submit().follow()
+    assert 'Neue Anwesenheit hinzugefügt' in response
+    assert (
+        client.app.session()
+        .query(Attendence)
+        .filter_by(
+            parliamentarian_id=UUID(ids['Anna']),
+        )
+        .count()
+        == 1
+    )
+
+
 def test_fetch_commissions_parliamentarians_json(
     client: Client[TestPasApp]
 ) -> None:
