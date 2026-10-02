@@ -225,7 +225,7 @@ def get_manage_user_form(
                     mapping={'url': request.link(self, 'change-username')},
                     markup=True
                 ),
-                kind='callout'
+                kind='callout alert-warning'
             )
 
         base = merge_forms(ChangeUsernameCallout, base)

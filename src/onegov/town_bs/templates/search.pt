@@ -1,0 +1,55 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="lead">
+        ${resultslabel}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content" tal:define="lead resultslabel; show_side_panel True; text None; ">
+            <tal:b metal:fill-slot="after-text">
+                <div tal:condition="not:connection" i18n:translate>
+                    Searching is currently unavailable due to technical difficulties.
+                    Please excuse the inconvenience and try again later.
+                </div>
+
+                <tal:b tal:condition="connection">
+                    <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${request.link(model, name='suggest')}" data-typeahead-target="${request.link(model)}" data-typeahead-filter-params='["type"${form.start and form.end and ",\"start\",\"end\""|""}]'>
+                    <tal:b tal:condition="form.type">
+                        ${form.type(class_='row row-cols-1 row-cols-md-2 row-cols-lg-3 px-md')}
+                    </tal:b>
+                    <div class="row row-cols-1 row-cols-md-2" tal:condition="form.start and form.end|nothing">
+                        <ul>
+                            <li tal:define="content form.start()">
+                                    <label for="start" i18n:translate>From</label>
+                                    ${form.start()}
+                            </li>
+                            <li tal:define="content form.end()">
+                                    <label for="end" i18n:translate>To</label>
+                                    ${form.end()}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="input-group mt-lg mb-lg">
+                        <button type="submit" placeholder="${searchlabel}" class="btn btn-outline-secondary rounded-start-1" aria-label="Search" i18n:attributes="aria-label">
+                            <i class="fa fa-fw fa-search"></i>
+                        </button>
+                        ${form.q(class_='input-group-field', placeholder=request.translate(searchlabel))}
+                    </div>
+                    <div class="typeahead">
+                        <div data-typeahead-container></div>
+                    </div>
+                    </form>
+                </tal:b>
+
+                <tal:b condition="connection and model.query">
+                    <p tal:condition="not: model.batch" i18n:translate="">Your search returned no results.</p>
+
+                    ${results_html}
+
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model; pagination_centered True" />
+                </tal:b>
+            </tal:b>
+        </tal:b>
+    </tal:b>
+</div>

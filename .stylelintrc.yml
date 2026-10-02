@@ -42,6 +42,7 @@ rules:
 ignoreFiles:
   - '**/font-awesome/scss/*.scss'
   - '**/foundation/*/*.scss'
+  - '**/bootstrap/*/*.scss'
   - '**/foundation6/foundation/**/**/*.scss'
   - '**/font-*.scss'
   - '**/fonts/*.scss'

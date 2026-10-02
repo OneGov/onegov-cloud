@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.town6">
+<body>
+
+<metal:reservations define-macro="reservations" i18n:domain="onegov.town6">
+    <tal:b condition="reservations">
+        <tal:b repeat="reservation reservations">
+            <tal:b define="start reservation.display_start(); end reservation.display_end(); quota reservation.quota; accepted reservation.data and reservation.data.get('accepted')">
+                <p>
+                    <metal:b use-macro="layout.macros['reservation']" />
+                </p>
+            </tal:b>
+        </tal:b>
+    </tal:b>
+</metal:reservations>
+
+<metal:reservation define-macro="reservation" i18n:domain="onegov.town6">
+    <span>
+        ${layout.format_date(start, 'weekday_long')},
+        ${layout.format_date(start, 'date_long')}
+        <!--! simple whole day check: -->
+        <tal:b condition="start.time() != end.time()">
+        <br>
+            ${layout.format_time_range(start, end)}
+        </tal:b>
+    </span>
+    <tal:b tal:condition="exists:quota">
+        <br>
+        <span i18n:translate>Quota</span>: <span>
+            ${quota}
+        </span>
+    </tal:b>
+    <tal:b tal:condition="show_status and not accepted|False">
+        <br>
+        <span i18n:translate>Pending approval</span>
+    </tal:b>
+</metal:reservation>
+
+<metal:event define-macro="event" i18n:domain="onegov.town6">
+    <p><b>${model.title}</b></p>
+    <p tal:condition="model.description" tal:content="escape(model.description).replace('\n', Markup('<br />'))" />
+
+    <p>${model.location}</p>
+    <p>${model.price}</p>
+    <p>${model.organizer}</p>
+    <p>${model.organizer_email}</p>
+    <p>${model.organizer_phone}</p>
+
+    <p>
+        <ul tal:define="occurrences model.occurrence_dates(localize=True)">
+            <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'datetime')} - ${layout.format_date(model.localized_end, 'time')}</li>
+        </ul>
+    </p>
+    <p tal:condition="model.tags">
+        <ul><li tal:repeat="tag model.tags" i18n:translate="">${tag}</li></ul>
+    </p>
+</metal:event>
+
+<metal:display_form define-macro="display_form" i18n:domain="onegov.town6">
+    <p tal:condition="form" tal:repeat="fieldset form.fieldsets">
+        <tal:b define="fields fieldset.non_empty_fields" condition="fields">
+            <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()" />
+        </tal:b>
+    </p>
+    <p tal:condition="price|nothing">
+        <table class="field-display">
+            <tr><td><b i18n:translate>Total Amount</b></td></tr>
+            <tr><td><metal:b use-macro="layout.macros['price']" /></td></tr>
+            <tr><td height="5"></td></tr>
+        </table>
+    </p>
+</metal:display_form>
+
+<metal:display_field define-macro="display_fields" i18n:domain="onegov.town6">
+    <?python
+        if fields:
+            rendered_fields = ((f, form.render_display(f)) for f in fields)
+            rendered_fields = ((f, rendered) for f, rendered in rendered_fields if rendered)
+
+            rendered_fields = tuple(rendered_fields)
+        else:
+            rendered_fields = None
+    ?>
+    <div class="fieldset" tal:condition="fieldset.is_visible and rendered_fields|nothing">${fieldset.label}</div>
+
+    <table class="field-display" tal:condition="rendered_fields">
+        <tal:b repeat="(field, rendered) rendered_fields">
+            <tr><td><b>${field.label.text}</b></td></tr>
+            <tr><td>${rendered}</td></tr>
+            <tr><td height="5"></td></tr>
+        </tal:b>
+    </table>
+</metal:display_field>
+
+<metal:price define-macro="price" i18n:domain="onegov.town6">
+    <tal:b tal:define="show_fee show_fee|False; show_vat show_vat|False">
+        ${layout.format_number(price.net_amount)} ${price.currency}
+        <tal:b condition="show_fee and price.fee">
+            (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+        </tal:b>
+        <tal:b tal:define="vat_amount layout.get_vat_amount(price.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
+            <br>
+            (<tal:b i18n:translate>VAT</tal:b> <tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${price.currency}</tal:b>)
+        </tal:b>
+    </tal:b>
+</metal:price>
+
+<metal:payment define-macro="payment" i18n:domain="onegov.town6">
+    <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
+        <p><b i18n:translate>Payment</b></p>
+        <p>
+            <table class="field-display">
+                <tr><td><b i18n:translate>Total Amount</b></td></tr>
+                <tr><td>${layout.format_number(payment.amount)} ${payment.currency}</td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p tal:define="show_vat show_vat|False; vat_amount layout.get_vat_amount(payment.amount); hide_vat_amount hide_vat_amount|False" tal:condition="show_vat and layout.vat_rate and vat_amount">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Value Added Tax</b></td></tr>
+                <tr><td><tal:b i18n:translate><tal:b i18n:name="vat_rate">${layout.format_number(layout.vat_rate, 1)}</tal:b>% included</tal:b><tal:b tal:condition="not:hide_vat_amount">: ${layout.format_number(vat_amount, 2)} ${payment.currency}</tal:b></td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p>
+            <table class="field-display">
+                <tr><td><b i18n:translate>State</b></td></tr>
+                <tr tal:switch="payment.state">
+                    <td tal:case="'open'" i18n:translate>Open</td>
+                    <td tal:case="'paid'" i18n:translate>Paid</td>
+                    <td tal:case="'failed'" i18n:translate>Failed</td>
+                    <td tal:case="'cancelled'" i18n:translate>Refunded</td>
+                </tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p tal:condition="not:show_fee">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Payment Method</b></td></tr>
+                <tr tal:switch="payment.source">
+                    <td tal:case="'manual'" i18n:translate>Offline Payment</td>
+                    <td tal:case="default" i18n:translate>Online Payment</td>
+                </tr>
+            </table>
+        </p>
+        <p tal:condition="show_fee">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Source</b></td></tr>
+                <tr tal:switch="payment.source">
+                    <td tal:case="'manual'" i18n:translate>Manual</td>
+                    <td tal:case="'datatrans'" i18n:translate>Datatrans</td>
+                    <td tal:case="'stripe_connect'" i18n:translate>Stripe Connect</td>
+                    <td tal:case="'worldline_saferpay'" i18n:translate>Worldline Saferpay</td>
+                </tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+        <p tal:condition="show_fee and payment.fee">
+            <table class="field-display">
+                <tr><td><b i18n:translate>Fee</b></td></tr>
+                <tr><td>${layout.format_number(payment.fee)</td></tr>
+                <tr><td height="5"></td></tr>
+            </table>
+        </p>
+    </tal:b>
+</metal:payment>
+
+<metal:directory_entry_notification_details define-macro="directory_entry_notification_details" i18n:domain="onegov.town6">
+    <p><u i18n:translate="">Publication</u></p>
+    <p tal:define="form python: directory.form_class(data=entry.values)">
+        <tal:b tal:repeat="field form._fields.values()">
+            <tal:b tal:condition="python: field.type not in ('UploadField', 'UploadMultipleField')"
+                   tal:define="rendered python: form.render_display(field)">
+                <tal:b tal:condition="rendered">
+                    - <strong>${field.label.text}:</strong>
+                    <tal:b tal:content="rendered">value</tal:b>
+                    <br/>
+                </tal:b>
+            </tal:b>
+        </tal:b>
+    </p>
+
+    <p><u i18n:translate="">Attachments</u></p>
+    <tal:b condition="not: entry.files">
+        <p>
+            - <span i18n:translate="">None</span>
+        </p>
+    </tal:b>
+    <tal:b condition="entry.files">
+        <p tal:repeat="file entry.files">
+            <strong>${file.name}</strong><br/>
+            - <span i18n:translate="">Size</span>: ${file.reference.file.content_length} Bytes<br/>
+            - <span i18n:translate="">Date</span>: ${layout.format_date(file.created, 'datetime')}<br/>
+            - <span i18n:translate="">Hash</span>: ${file.checksum or file.id}
+        </p>
+    </tal:b>
+
+    <p><u i18n:translate="">Publication details</u></p>
+    <p>
+        - <strong i18n:translate="">Publication start:</strong>
+        <tal:b condition="publication_start | nothing"> ${layout.format_date(publication_start, 'datetime')}</tal:b>
+        <tal:b condition="not: publication_start | nothing"> <span i18n:translate="">Not set</span></tal:b><br/>
+        - <strong i18n:translate="">Publication end:</strong>
+        <tal:b condition="publication_end | nothing"> ${layout.format_date(publication_end, 'datetime')}</tal:b>
+        <tal:b condition="not: publication_end | nothing"> <span i18n:translate="">Not set</span></tal:b><br/>
+        - <strong><span i18n:translate="">Access</span>:</strong> ${layout.access_label(entry.access)}<br/>
+        - <strong><span i18n:translate="">Entry checksum</span>:</strong> ${content_hash}
+    </p>
+</metal:directory_entry_notification_details>
+
+</body>
+</html>

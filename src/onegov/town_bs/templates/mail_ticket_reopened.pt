@@ -1,0 +1,12 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p i18n:translate>Your request has been reopened</p>
+
+        <p i18n:translate>You can see the current status of your ticket at any time here:</p>
+        <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
+    </tal:b>
+</div>

@@ -1,0 +1,9 @@
+.navbar-brand img {
+  width: 210px;
+  height: 80px;
+  object-fit: contain;
+}
+
+#navbarGlobals ul {
+    z-index: $zindex-fixed;
+}

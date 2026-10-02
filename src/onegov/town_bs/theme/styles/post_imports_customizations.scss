@@ -1,0 +1,21 @@
+/*
+  Customizations for bootstrap components and non-bootstrap utilities
+*/
+
+@include media-breakpoint-up(md) {
+  .offcanvas {
+    --bs-offcanvas-width: 600px;
+  }
+}
+
+.card.hover {
+    transition: all 0.2s ease-in-out;
+    &:hover {
+        border-color: $primary;
+    }
+}
+
+//Alerts
+.alert-secondary {
+  --bs-alert-bg: #{$tertiary-subtle};
+}

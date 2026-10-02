@@ -1,0 +1,75 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content" define="confirm_migration migration and migration.possible">
+        <tal:b condition="confirm_migration">
+            <div class="panel" tal:condition="not error">
+                <p i18n:translate>
+                    Your edit requires a migration of existing entries. Please
+                    confirm the following changes.
+                </p>
+
+                <p i18n:translate>
+                    Changes are detected using a heuristic. Therefore it is possible
+                    that your changes were misdetected. If in doubt, press cancel and
+                    try to change the directory in small increments.
+                </p>
+
+                <p>
+                    <div i18n:translate>For additional safety you can also download a backup before continuing:</div>
+                    <div><i class="fa fa-download" aria-hidden="true"></i> <a i18n:translate href="${request.link(model, '+zip')}">Download backup</a></div>
+                </p>
+            </div>
+
+            <div class="panel" tal:condition="error">
+                <p i18n:translate>
+                    There was an error while migrating your directory! You can fix the displayed entries in a separate window and then continue here.
+                </p>
+
+                <p>
+                    <metal:b use-macro="layout.macros['directory_error']" />
+                </p>
+            </div>
+
+            <ul>
+                <li tal:repeat="field migration.changes.added_fields">
+                    <tal:b i18n:translate>Added:</tal:b> ${field}
+                </li>
+                <li tal:repeat="field migration.changes.removed_fields">
+                    <tal:b i18n:translate>Removed:</tal:b> ${field}
+                </li>
+                <li tal:repeat="(old, new) migration.changes.renamed_fields.items()|nothing">
+                    <tal:b i18n:translate>Renamed:</tal:b> ${old} <i class="fa fa-caret-right" aria-hidden="true"></i> ${new}
+                </li>
+                <li tal:repeat="field migration.changes.changed_fields">
+                    <tal:b i18n:translate>Changed:</tal:b> ${field}
+                </li>
+                <li tal:repeat="(field, option) migration.changes.added_options">
+                    <tal:b i18n:translate>Added:</tal:b> ${field} - ${option}
+                </li>
+                <li tal:repeat="(field, option) migration.changes.removed_options">
+                    <tal:b i18n:translate>Removed:</tal:b> ${field} - ${option}.
+                    <tal:b i18n:translate>Please note, that data for existing entries that use the removed option will be lost.</tal:b>
+                </li>
+                <li tal:repeat="(old, new) migration.changes.renamed_options.items()|nothing">
+                    <tal:b i18n:translate>Renamed:</tal:b> ${old[0]}: ${old[1]} <i class="fa fa-caret-right" aria-hidden="true"></i> ${new[0]}: ${new[1]}
+                </li>
+            </ul>
+
+            <div class="button primary" data-submits-form="#confirm-migration form" i18n:translate>
+                Confirm
+            </div>
+
+            <div class="button secondary" data-back-link i18n:translate>
+                Cancel
+            </div>
+        </tal:b>
+
+        <div class="grid-x" style="display: ${confirm_migration and 'none' or 'block'}">
+            <div class="small-12 medium-10 large-8 cell" id="confirm-migration">
+                <div metal:use-macro="layout.macros['form']" tal:define="form_id 'main-form'"/>
+            </div>
+        </div>
+    </tal:b>
+</div>
