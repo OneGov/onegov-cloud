@@ -677,13 +677,14 @@
 <metal:newslist define-macro="news-item-full" i18n:domain="onegov.town6">
     <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
         <hr>
-        <a href="${url}">
+        <a class="text-decoration-none" href="${url}">
             <h3>${item.title} <metal:hint use-macro="layout.macros['access_hint']"/> <metal:hint use-macro="layout.macros['publication_hint']"/></h3>
-            <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; margin-bottom: 20px; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
-            <div class="news-lead">${item.lead}</div>
-            <div tal:condition="not:hide_date|False" class="subheader">${layout .format_date(item .published_or_created, 'date_long')}</div>
-            <div class="news-text" tal:content="item.text"></div>
         </a>
+            <div tal:condition="not:hide_date|False" class="subheader text-body my-md text-body-secondary">${layout .format_date(item .published_or_created, 'date_long')}</div>
+            <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; margin-bottom: 20px; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
+            <p class="news-lead text-body fw-bold">${item.lead}</p>
+            <div class="news-text text-body" tal:content="item.text"></div>
+
     </div>
 </metal:newslist>
 
@@ -699,7 +700,7 @@
                 <metal:newlist use-macro="layout.macros['news-item-card']" />
             </div>
         </tal:b>
-        <tal:b tal:condition="not first_wide|False">
+        <tal:b tal:condition="not: first_wide|False">
             <div class="news-list-item col-12 col-md-4" tal:repeat="item news">
                 <metal:newlist use-macro="layout.macros['news-item-card']" />
             </div>
@@ -708,7 +709,7 @@
     <div tal:condition="not: newsletter.show_only_previews|True" class="newslist grid-x align-center" tal:repeat="item news">
         <metal:newlist use-macro="layout.macros['news-item-full']" />
     </div>
-    <div class="newslist grid-x align-center">
+    <div class="newslist my-lg">
         <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All posts</span></a>
     </div>
 
@@ -1752,80 +1753,39 @@
 </metal:calendar_day_content>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.town6">
-        <div class="grid-x grid-padding-x events" >
+        <div class="row row-cols-2 g-md events" >
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
         </div>
     <tal:b condition="not occurrences">
         <p i18n:translate>No events found.</p>
-        <br><a tal:condition="'range' not in request.url" href="${no_event_link}" class="button hollow" i18n:translate>Past events</a>
+        <br><a tal:condition="'range' not in request.url" href="${no_event_link}" class="btn btn-outline-primary" i18n:translate>Past events</a>
     </tal:b>
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
-    <div class="occurrence subpage-cards medium-12 small-12 cell" tal:define="use_links use_links|True">
-        <div class="card">
-            <a tal:attributes="href request.link(occurrence) if use_links else None">
-                <div class="show-for-small-only" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat;"></div>
-                <div class="grid-x align-middle">
-                    <div class="cell medium-7 card-section">
-                        <h5>${occurrence.title}</h5>
-                        <tal:b tal:define="
-                            date occurrence.localized_start;
-                        ">
-                            <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
-
-                            <div class="date-place">
-                                <div class="grid-x">
-                                    <div class="cell small-1 medium-2">
-                                        <i class="far fa-calendar-alt"></i>
-                                    </div>
-                                    <div class="cell small-11 medium-10" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
-                                        <b>
-                                            ${layout.format_date(date, 'weekday_short').rstrip('.')}, ${date.day}. ${layout.format_date(date, 'month_long')}  ${date.year}
-                                        </b>
-                                    </div>
-                                </div>
-                                <hr/>
-                                <div class="grid-x">
-                                    <div class="cell small-1 medium-2">
-                                        <i class="fa fa-clock"></i>
-                                    </div>
-                                    <div class="cell small-11 medium-10" tal:define="time layout.format_event_time_range(occurrence.localized_start, occurrence.localized_end)">
-                                        <div> ${time[0].upper()}${time[1:]}</div>
-                                    </div>
-                                </div>
-                                <hr/>
-                                <div class="grid-x">
-                                    <div class="cell small-1 medium-2">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                    </div>
-                                    <div class="cell small-11 medium-10">
-                                        <div>${occurrence.location}</div>
-                                    </div>
-                                </div>
-                                <hr/>
-                                <div class="grid-x">
-                                    <div class="cell small-11 medium-12">
-                                        <div tal:condition="occurrence.tags and show_tags" class="occurrence-tags">
-                                            <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span>
-                                        </div>
-                                        <div tal:condition="occurrence.filter_keywords and show_filters">
-                                            <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
-                                                <span tal:condition="filter[1]" class="blank-label-description">${layout.org.event_filter_names[filter[0]]}:</span>
-                                                <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
-                                                <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </tal:b>
+    <div class="occurrence col" tal:define="use_links use_links|True">
+        <div class="card bg-tertiary-subtle border-0 h-100">
+            <a class="d-flex flex-column justify-content-center flex-grow-1 text-decoration-none"
+            tal:attributes="href request.link(occurrence) if use_links else None">
+                <div class="d-flex card-body flex-grow-0 p-0">
+                    <div class="text-nowrap flex-shrink-0 p-2xl pe-md">
+                        <p class="mb-0" tal:define="date occurrence.localized_start;">
+                            <b>${layout.format_date(date, 'day_short')}</b>
+                            ${layout.format_date(date, 'month_short')}
+                        </p>
                     </div>
-                    <div class="cell medium-5 align-self-top">
-                        <div class="show-for-medium" tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: contain; background-position: center center; background-repeat: no-repeat; border-radius: 0 .7rem;"></div>
-                        <span class="button hollow event-more-link" style="margin: 1.5rem 1rem 1.5rem 0.7rem; display: block;" i18n:translate="">Learn more</span>
+                    <div class="p-2xl ps-md">
+                        <h2 class="fw-bold line-clamp-2 mb-0">${occurrence.title}</h2>
+                        <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
+                        <div class="date-place"
+                            tal:define="time layout.format_event_time_range(occurrence.localized_start, occurrence.localized_end)">
+                            <div>
+                                ${time[0].upper()}${time[1:]}<br/>
+                                ${occurrence.location}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </a>

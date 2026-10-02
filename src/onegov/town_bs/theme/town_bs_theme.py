@@ -104,8 +104,10 @@ class TownBsTheme(BootstrapBaseTheme):
             'homepage',
             'header',
             'navigation',
+            'events_page',
             'forms_page',
-            'search'
+            'search',
+            'custom_utilities',
         ]
 
     @property
