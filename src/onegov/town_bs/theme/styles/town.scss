@@ -16,28 +16,28 @@
         //     margin-bottom: $s-md;
         // }
 
-    img {
-         border-radius: $border-radius-lg;
-         max-width: 100%;
-    }
-
-    .anchor-link {
-        color: $tertiary-subtle;
-        display: inline !important;
-        font-size: 80%;
-        opacity: 0;
-        margin-left: .5rem;
-        position: absolute !important;
-        transition: opacity 200ms linear;
-    }
-
-    .anchor-link-heading {
-        position: relative;
-
-        &:hover .anchor-link {
-            opacity: 1;
+        img {
+            border-radius: $border-radius-lg;
+            max-width: 100%;
         }
-    }
+
+        .anchor-link {
+            color: $tertiary-subtle;
+            display: inline !important;
+            font-size: 80%;
+            opacity: 0;
+            margin-left: .5rem;
+            position: absolute !important;
+            transition: opacity 200ms linear;
+        }
+
+        .anchor-link-heading {
+            position: relative;
+
+            // &:hover .anchor-link {
+            //     opacity: 1;
+            // }
+        }
 }
 
 .typeahead {

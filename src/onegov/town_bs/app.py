@@ -279,7 +279,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'lazyalttext.js'
     yield 'lazysizes.js'
     yield 'common.js'
-    yield '_blank.js'
+    # yield '_blank.js'
     yield 'homepage_video_or_slider.js'
     yield 'animate.js'
     yield 'forms.js'

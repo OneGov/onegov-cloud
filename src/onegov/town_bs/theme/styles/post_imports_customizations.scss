@@ -1,5 +1,5 @@
 /*
-  Customizations for bootstrap components and non-bootstrap utilities
+  Customizations for bootstrap components
 */
 
 @include media-breakpoint-up(md) {
@@ -8,9 +8,18 @@
   }
 }
 
-.card.hover {
-    transition: all 0.2s ease-in-out;
-    &:hover {
-        border-color: $primary;
-    }
+
+// Accordion
+.accordion-item {
+  margin-bottom: $s-md;
+  overflow: hidden;
+  border-radius: $border-radius-sm;
+}
+.accordion-item:last-child {
+  margin-bottom: 0;
+}
+
+.accordion-body {
+  background-color: $white;
+  border-radius: 0 0 $border-radius-sm $border-radius-sm;
 }

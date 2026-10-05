@@ -62,3 +62,21 @@ $offcanvas-horizontal-width: 100vw;
 $list-group-item-padding-y: map-get($spacers, "md");
 $list-group-item-padding-x: 0;
 
+// Accordion
+$accordion-border-color:          $tertiary-subtle;
+$accordion-border-radius:         $border-radius-sm;
+$accordion-inner-border-radius:   $border-radius-sm;
+
+$accordion-padding-y:             1rem;
+$accordion-padding-x:             1.25rem;
+
+$accordion-button-padding-y:      $s-lg;
+$accordion-button-padding-x:      $s-lg;
+
+$accordion-bg:                    $tertiary-subtle;
+$accordion-button-color:          $body-color;
+$accordion-button-active-bg:      $tertiary-subtle;
+$accordion-button-active-color:   $body-color;
+
+$accordion-button-focus-border-color: transparent;
+$accordion-button-focus-box-shadow:   none;

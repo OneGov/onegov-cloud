@@ -2715,7 +2715,7 @@
 <metal:group_record define-macro="group_record" i18n:domain="onegov.town6">
     <li tal:define="link edit_link(record)|nothing">
         <a class="list-link" tal:attributes="href link_func(record); target link">
-                <span class="h5 list-title">${record.title}</span>
+                <p class="h5 list-title">${record.title}</p>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
         </a>
         <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))">
@@ -2728,14 +2728,14 @@
 
 <metal:group_by_column_forms define-macro="accordion_grouped_by_column" i18n:domain="onegov.town6">
     <tal:b tal:condition="len(grouped) == 1" tal:repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
-        <ul class="forms-list list-group list-group-flush">
+        <ul class="forms-list accordion-list">
             <tal:b tal:repeat="record grouped[group]">
                 <metal:b use-macro="layout.macros['group_record_form_overlay']"/>
             </tal:b>
         </ul>
     </tal:b>
 
-    <div class="accordion" id="forms-accordion" tal:condition="len(grouped) > 1">
+    <div class="accordion" id="formsAccordion" tal:condition="len(grouped) > 1">
         <tal:b tal:repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading-${repeat.group.index}">
@@ -2745,16 +2745,16 @@
                             data-bs-target="#collapse-${repeat.group.index}"
                             aria-expanded="false"
                             aria-controls="collapse-${repeat.group.index}">
-                        ${group}
+                        <h2 class="fw-bold mb-0">${group}</h2>
                         <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
                     </button>
                 </h2>
                 <div id="collapse-${repeat.group.index}"
                     class="accordion-collapse collapse"
                     aria-labelledby="heading-${repeat.group.index}"
-                    data-bs-parent="#forms-accordion">
+                    data-bs-parent="#formsAccordion">
                     <div class="accordion-body">
-                        <ul class="forms-list list-group list-group-flush">
+                        <ul class="forms-list accordion-list">
                             <tal:b tal:repeat="record grouped[group]">
                                 <metal:b use-macro="layout.macros['group_record_form_link']"/>
                             </tal:b>
@@ -2769,24 +2769,35 @@
 <metal:group_record_form_link define-macro="group_record_form_link" i18n:domain="onegov.town6">
     <li tal:define="link edit_link(record)|nothing;
                      modal_href request.link(record, 'modal')|nothing;
-                     form_href form_url(record)"
-        class="list-group-item">
-        <a class="list-link"
-           tal:attributes="href link_func(record);
-                            hx-get modal_href;
-                            hx-target ('#form-modal-body' if modal_href else None);
-                            hx-push-url (form_href if modal_href else None);
-                            data-form-name record.name;
-                            data-bs-toggle ('modal' if modal_href else None);
-                            data-bs-target ('#form-modal' if modal_href else None)">
-            <span class="h5 list-title">${record.title}</span>
-            <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
-        </a>
-        <a tal:attributes="href link_func(record); target link" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))">
-            <p class="list-lead preview" tal:condition="lead">${lead}</p>
-            <div class="list-hint hints" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
-        </a>
+                         form_href form_url(record);
+                     internal record.name|False;"
+        class="accordion-list-item d-flex align-items-center justify-content-between gap-3">
+
+        <div class="flex-grow-1 min-w-0">
+            <a class="accordion-list-link"
+                tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                tal:attributes="href link_func(record);
+                                hx-get (modal_href if internal else None);
+                                hx-target ('#form-modal-body' if (internal and modal_href) else None);
+                                hx-push-url (form_href if (internal and modal_href) else None);
+                                data-form-name (record.name if internal else None);
+                                data-bs-toggle ('modal' if (internal and modal_href) else None);
+                                data-bs-target ('#form-modal' if (internal and modal_href) else None)">
+
+                <p class="h5 list-title m-0">${record.title}</p>
+                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+                <p class="list-lead preview mb-0 pt-sm" tal:condition="lead">${lead}</p>
+                <div class="list-hint hints" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
+
+            </a>
+        </div>
+
         <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+
+        <a class="text-primary flex-shrink-0 px-md" tal:attributes="href link_func(record)">
+            <i class="fa fa-arrow-right"></i>
+        </a>
+
     </li>
 </metal:group_record_form_link>
 

@@ -76,7 +76,7 @@
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
                     <div tal:repeat="setting item[1]" class="${setting.name} col" data-settings-item="">
                         <a class="link-underline link-underline-opacity-0 " href="${setting.link}">
-                            <div class="card hover">
+                            <div class="card border-hover">
                                 <div class="card-body">
                                     <i class="fas ${setting.icon}" aria-hidden="true"></i>
                                     <span class="fs-sm">
