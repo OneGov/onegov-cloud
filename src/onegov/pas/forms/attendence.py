@@ -21,7 +21,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
-from wtforms.validators import InputRequired, ValidationError
+from wtforms.validators import InputRequired, NumberRange, ValidationError
 from onegov.user import User
 from uuid import UUID
 
@@ -93,7 +93,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     type = RadioField(
@@ -413,7 +413,7 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     parliamentarian_id = MultiCheckboxField(
@@ -462,7 +462,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     commission_id = ChosenSelectField(
@@ -554,7 +554,7 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     commission_id = ChosenSelectField(
@@ -707,7 +707,7 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     type = RadioField(
