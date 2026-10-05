@@ -624,3 +624,9 @@ def test_duration_survives_the_edit_round_trip(session: Session) -> None:
         assert attendence.duration == minutes
         edit_form = AttendenceForm(obj=attendence)
         assert edit_form.duration.data == entered
+
+
+def test_attendence_duration_must_not_be_negative() -> None:
+    for duration, valid in (('0', True), ('-0.01', False)):
+        form = AttendenceForm(DummyPostData({'duration': duration}))
+        assert form.duration.validate(form) is valid
