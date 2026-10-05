@@ -6,7 +6,7 @@
         <tal:b tal:condition="completable">
             <tal:b metal:use-macro="layout.macros['form-modal']">
                 <tal:b metal:fill-slot="modal-main-content">
-                        <div class="alert alert-secondary" role="alert" tal:condition="model.state == 'pending'">
+                        <div class="alert alert-info" role="alert" tal:condition="model.state == 'pending'">
                                 <p i18n:translate="">
                                 Please review your data and press "Complete" to finalize the process.
                                 If there's anything you'd like to change, click on "Edit" to return

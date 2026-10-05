@@ -17,6 +17,16 @@ if TYPE_CHECKING:
     type RenderData = dict[str, Any]
 
     type MessageType = Literal['success', 'info', 'warning', 'alert']
+    type BsMessageType = Literal[
+        'success',
+        'info',
+        'warning',
+        'danger',
+        'primary',
+        'secondary',
+        'light',
+        'dark'
+    ]
 
     class HeaderJsonDict(TypedDict):
         Name: str

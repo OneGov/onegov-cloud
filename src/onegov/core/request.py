@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from onegov.core.browser_session import BrowserSession
     from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
-    from onegov.core.types import MessageType
+    from onegov.core.types import MessageType, BsMessageType
     from sqlalchemy.orm import Mapped, Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol, TypeGuard
@@ -84,6 +84,7 @@ else:
 class Message(NamedTuple):
     text: str
     type: MessageType
+    bs_type: BsMessageType | None = 'info'
 
 
 class ReturnToMixin(_BaseRequest):
@@ -605,7 +606,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         else:
             return self.app.translations.get(locale)
 
-    def message(self, text: str, type: MessageType) -> None:
+    def message(self, text: str, type: MessageType,
+                bs_type: BsMessageType | None = None) -> None:
         """ Adds a message with the given type to the messages list. This
         messages list may then be displayed by an application building on
         onegov.core.
@@ -621,13 +623,17 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         :meth:`info`
         :meth:`alert`
 
+        For the new design there's the bs_type::
+
+            https://getbootstrap.com/docs/5.3/components/alerts/
+
         The messages are stored with the session and to display them, the
         template using the messages should call :meth:`consume_messages`.
 
         """
         self.browser_session.messages = [
             *self.browser_session.get('messages', ()),
-            Message(text, type)
+            Message(text, type, bs_type)
         ]
 
     def consume_messages(self) -> Iterator[Message]:
@@ -640,19 +646,19 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     def success(self, text: str) -> None:
         """ Adds a success message. """
-        self.message(text, 'success')
+        self.message(text, 'success', bs_type='success')
 
     def warning(self, text: str) -> None:
         """ Adds a warning message. """
-        self.message(text, 'warning')
+        self.message(text, 'warning', bs_type='warning')
 
     def info(self, text: str) -> None:
         """ Adds an info message. """
-        self.message(text, 'info')
+        self.message(text, 'info', bs_type='info')
 
     def alert(self, text: str) -> None:
         """ Adds an alert message. """
-        self.message(text, 'alert')
+        self.message(text, 'alert', bs_type='danger')
 
     @cached_property
     def is_logged_in(self) -> bool:

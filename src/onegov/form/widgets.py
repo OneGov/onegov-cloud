@@ -593,7 +593,7 @@ class PanelWidget:
             f'<div class="panel alert {{kind}}" {html_params(**kwargs)}>'
             '{text}</div>'
         ).format(
-            kind=field.kind if field.kind else 'alert-secondary',
+            kind=field.kind if field.kind else 'alert-info',
             text=text.replace('\n', Markup('<br>'))
         )
 
@@ -608,7 +608,7 @@ class LinkPanelWidget(PanelWidget):
             '<p>{label}</p>'
             '<a href="{link}">{text}</a></div>'
         ).format(
-            kind=field.kind if field.kind else 'alert-secondary',
+            kind=field.kind if field.kind else 'alert-info',
             text=text.replace('\n', Markup('<br>')),
             link=field.text,
             label=field.label

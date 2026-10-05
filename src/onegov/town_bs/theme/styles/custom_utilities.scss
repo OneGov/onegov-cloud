@@ -59,6 +59,12 @@
   }
 }
 
+.alert-tertiary {
+  --bs-alert-bg: #{$tertiary-subtle};
+  --bs-alert-color: #{$tertiary};
+  --bs-alert-border-color: #{$tertiary-subtle};
+}
+
 // Other utilities
 @each $key, $value in $spacers {
   .square-#{$key} {

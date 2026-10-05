@@ -31,7 +31,7 @@
 </metal:b>
 
 <metal:b define-macro="consume_messages" i18n:domain="onegov.town6">
-    <div tal:repeat="message request.consume_messages()"  class="alert alert-${message.type} alert-dismissible fade show mt-md" role="alert">
+    <div tal:repeat="message request.consume_messages()"  class="alert alert-${message.bs_type} alert-dismissible fade show mt-md" role="alert">
         ${message.text}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -2857,7 +2857,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
 
-                        <div class="alert alert-secondary" role="alert" tal:condition="helptext|nothing">
+                        <div class="alert alert-info" role="alert" tal:condition="helptext|nothing">
                                 <p>${helptext}</p>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
