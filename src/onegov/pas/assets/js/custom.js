@@ -1,8 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
+    preventNumberInputScroll();
     handleBulkAddCommission();
     handleAttendanceFormSync();
     handleParliamentarianCounter();
 });
+
+
+function preventNumberInputScroll() {
+  document.addEventListener("wheel", function (event) {
+    if (event.target instanceof HTMLInputElement &&
+        event.target.type === "number") {
+      event.preventDefault();
+    }
+  }, { passive: false });
+}
 
 
 function handleBulkAddCommission() {
