@@ -123,7 +123,7 @@
                     </tal:b>
 
                     <nav class="main-menu navbar sticky-top navbar-light bg-white py-3">
-                        <div class="container-fluid align-items-end">
+                        <div class="container align-items-end">
 
                             <a class="navbar-brand" href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
                                 <img tal:condition="logo_url" height="100" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
@@ -210,7 +210,7 @@
                 <!-- Without sidebar, narrow page width only title in intro -->
                 <div id="narrow" tal:condition="narrow_page" class="content my-5xl container">
                     <div class="row justify-content-center">
-                        <div class="col-md-9">
+                        <div class="col-lg-9">
                             <div id="intro">
                                 <h1 class="main-title text-primary fs-2xl mb-3xl">
                                     <tal:b metal:define-slot="title"></tal:b>

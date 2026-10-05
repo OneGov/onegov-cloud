@@ -107,7 +107,7 @@
 <metal:header_links define-macro="header_links">
     <div tal:condition="links" id="header_links" class="text-center" tal:define="links header_options.get('header_links')">
         <nav class="navbar navbar-expand-lg navbar-light bg-white pb-0 pt-lg">
-            <div class="container-fluid">
+            <div class="container">
                 <button class="navbar-toggler mx-auto border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topNav" aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -125,7 +125,7 @@
 
 <metal:header_text define-macro="header_text">
     <div id="header_text" tal:condition="header_options['left_header_name']|nothing" class="bg-dark" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
-        <div class="container-fluid py-xs">
+        <div class="container py-xs">
             <a class="h4 text-decoration-none" href="${header_options.get('left_header_url', '#')}"
                 style="color:${color or '#fff'}; font-size: ${rem_size}rem">
                     ${header_options['left_header_name']}
@@ -194,7 +194,7 @@
 
 <metal:footer define-macro="footer">
     <footer id="footer" class="bg-tertiary-subtle py-5xl">
-        <div class="container-fluid">
+        <div class="container">
                 <metal:b use-macro="layout.macros['footer_columns']" />
                 <metal:b use-macro="layout.macros['footer_links']" />
         </div>
@@ -821,8 +821,8 @@
     <tal:b condition="not item.lead and request.is_manager|nothing">
         <div class="grid-x">
             <div class="small-12 cell">
-                <div class="panel">
-                    <p i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
+                <div class="alert alert-warning">
+                    <p class="mb-0" i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
                 </div>
             </div>
         </div>
@@ -1753,7 +1753,7 @@
 </metal:calendar_day_content>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.town6">
-        <div class="row row-cols-2 g-md events" >
+        <div class="row g-md events" >
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
@@ -1765,7 +1765,7 @@
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
-    <div class="occurrence col" tal:define="use_links use_links|True">
+    <div class="occurrence col-12 col-xl-6" tal:define="use_links use_links|True">
         <div class="card bg-tertiary-subtle border-0 h-100">
             <a class="d-flex flex-column justify-content-center flex-grow-1 text-decoration-none"
             tal:attributes="href request.link(occurrence) if use_links else None">
@@ -3493,7 +3493,7 @@
                 </div>
             </tal:block>
         </div>
-        <div class="panel" tal:condition="python: not image_src">
+        <div class="alert alert-info" tal:condition="python: not image_src">
             <p i18n:translate="">Available options for the focus widget:</p>
             <code>&lt;focus<br>
                 image-src="https://..."<br>

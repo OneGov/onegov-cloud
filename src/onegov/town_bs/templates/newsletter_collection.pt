@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div tal:condition="request.is_manager and not request.app.org.show_newsletter" class="panel">
+        <div tal:condition="request.is_manager and not request.app.org.show_newsletter" class="alert alert-info">
             <p i18n:translate>The newsletter is disabled. You can only see this page because you are logged in.</p>
         </div>
 

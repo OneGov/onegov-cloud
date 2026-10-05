@@ -45,6 +45,10 @@
     max-width: 400px;
 }
 
+.alert p:last-child {
+    margin-bottom: 0;
+}
+
 // Homepage
 #homepage {
     &> .container,

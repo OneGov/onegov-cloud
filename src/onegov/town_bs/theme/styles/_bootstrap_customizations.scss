@@ -31,3 +31,11 @@ $info: #448aff;
 $btn-border-width: 2px;
 
 $standard-transition: .2s linear;
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1960px
+);

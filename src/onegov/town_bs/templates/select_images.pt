@@ -6,7 +6,7 @@
         <div class="grid-x">
             <div class="small-12 cell">
                 <form id="main-form" action="${action}" method="POST" enctype="multipart/form-data">
-                    <div class="panel">
+                    <div class="alert alert-info">
                         <p i18n:translate="">
                             Select the images that should be shown inside this album.
                         </p>
@@ -28,7 +28,7 @@
                             </ul>
                     </tal:b>
 
-                    <div class="panel">
+                    <div class="alert alert-info">
                         <p i18n:translate="">
                             Select the images that should be shown inside this album.
                         </p>

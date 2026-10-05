@@ -1,4 +1,4 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6" tal:define="narrow_page True">
     <tal:b metal:fill-slot="title" tal:define="title title|layout.title">
         ${title}
     </tal:b>
@@ -40,7 +40,7 @@
                 <p>${form.callout|callout}</p>
         </div>
 
-        <div class="panel" tal:condition="helptext|nothing">
+        <div class="alert alert-info" tal:condition="helptext|nothing">
                 <p>${helptext}</p>
         </div>
         <tal:b tal:define="steps layout.get_step_sequence()|nothing">

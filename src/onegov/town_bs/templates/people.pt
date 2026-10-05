@@ -36,10 +36,10 @@
     </div>
 
         <tal:b tal:condition="python: not people and not (selected_organisation or selected_sub_organisation or selected_search)">
-            <p class="panel" i18n:translate="">No people added yet.</p>
+            <p class="alert alert-info" i18n:translate="">No people added yet.</p>
         </tal:b>
         <tal:b tal:condition="python: not people and (selected_organisation or selected_sub_organisation or selected_search)">
-            <p class="panel" i18n:translate="">No people found for current filter selection.</p>
+            <p class="alert alert-info" i18n:translate="">No people found for current filter selection.</p>
             <a class="btn secondary" href="${request.class_link(layout.model.__class__)}" i18n:translate>Reset filter</a>
         </tal:b>
 

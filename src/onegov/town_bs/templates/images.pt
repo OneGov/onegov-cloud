@@ -11,7 +11,7 @@
                     <tal:b metal:fill-slot="upload-filelist">
                         <div class="upload-filelist-header" style="display: none;">
                             <h2 i18n:translate>Just Uploaded</h2>
-                            <div class="panel">
+                            <div class="alert alert-info">
                                 <p i18n:translate="">
                                     To edit the image descriptions, click on one, enter your descrption and press return.
                                     To abort press escape.

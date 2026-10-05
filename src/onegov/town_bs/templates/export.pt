@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="small-12 medium-8 cell">
-            <div class="panel">
+            <div class="alert alert-info">
                 <p>${explanation}</p>
             </div>
             <div class="callout panel" tal:condition="has_note|nothing">
