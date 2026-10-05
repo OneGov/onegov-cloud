@@ -3967,3 +3967,21 @@
         </div>
     </form>
 </metal:inline_search>
+
+<metal:offcanvas_filters define-macro="offcanvas_filters">
+    <div class="d-flex align-items-end flex-column mb-lg">
+        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offCanvasFilter" aria-controls="offCanvasFilter" >
+            <i class="fas fa-filter"></i> <span class="visually-hidden" i18n:translate="">Filters</span>
+        </button>
+    </div>
+
+    <div class="offcanvas offcanvas-end bg-light" tabindex="-1" id="offCanvasFilter" aria-labelledby="offcanvasFilterLabel">
+        <div class="offcanvas-header">
+            <h5 class="visually-hidden" i18n:translate="">Filters</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <metal:b define-slot="filters-body" />
+        </div>
+    </div>
+</metal:offcanvas_filters>

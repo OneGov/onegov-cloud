@@ -7,18 +7,8 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
-    <div class="d-flex align-items-end flex-column mb-lg">
-        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offCanvasFilter" aria-controls="offCanvasFilter" i18n:translate="">
-            <i class="fas fa-filter"></i> Filters
-        </button>
-    </div>
-
-    <div class="offcanvas offcanvas-end bg-light" tabindex="-1" id="offCanvasFilter" aria-labelledby="offcanvasFilterLabel">
-        <div class="offcanvas-header">
-            <h5 class="visually-hidden" i18n:translate="">Filters</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
+    <div metal:use-macro="layout.macros['offcanvas_filters']">
+        <tal:b metal:fill-slot="filters-body">
             <form method="get" id="people-filters">
                 <input type="search" name="search"
                         style="font-family: inherit"
@@ -42,7 +32,7 @@
                     </select>
                 </tal:b>
             </form>
-        </div>
+        </tal:b>
     </div>
 
         <tal:b tal:condition="python: not people and not (selected_organisation or selected_sub_organisation or selected_search)">
