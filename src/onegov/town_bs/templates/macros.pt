@@ -868,7 +868,7 @@
                         </div>
                     </tal:b>
                     <br tal:condition="coordinates and contact" />
-                    <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br>
+                    <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br tal:condition="location">
                     <div class="location" tal:condition="location">${location}</div>
                 </tal:b>
             </tal:b>
@@ -2784,7 +2784,7 @@
                                 data-bs-toggle ('modal' if (internal and modal_href) else None);
                                 data-bs-target ('#form-modal' if (internal and modal_href) else None)">
 
-                <p class="h5 list-title m-0">${record.title}</p>
+                <p class="h3 list-title m-0">${record.title}</p>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 <p class="list-lead preview mb-0 pt-sm" tal:condition="lead">${lead}</p>
                 <div class="list-hint hints" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
