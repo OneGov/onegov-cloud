@@ -451,7 +451,7 @@ def handle_mtan_second_factor(
             del request.browser_session['pending_username']
             if is_mtan_setup:
                 factor.complete_activation(user, mobile_number)
-                del request.browser_session['mtan_setup_enabled']
+                del request.browser_session['mtan_setup_username']
                 del request.browser_session['mtan_setup']
 
             response = self.complete_login(user, request)
@@ -515,9 +515,6 @@ def handle_mtan_second_factor_setup(
     if not request.app.mtan_automatic_setup:
         raise exc.HTTPNotFound()
 
-    if not request.browser_session.get('mtan_setup_enabled'):
-        raise exc.HTTPNotFound()
-
     @request.after
     def respond_with_no_index(response: Response) -> None:
         response.headers['X-Robots-Tag'] = 'noindex'
@@ -534,6 +531,9 @@ def handle_mtan_second_factor_setup(
             _('Failed to continue login, please ensure cookies are allowed.')
         )
         return morepath.redirect(request.link(self, name='login'))
+    elif request.browser_session.get('mtan_setup_username') != username:
+        # this must've leaked from a previous login attempt with another user
+        raise exc.HTTPNotFound()
 
     if form.submitted(request):
         phone_number = form.phone_number.formatted_data
