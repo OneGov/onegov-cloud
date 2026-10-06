@@ -32,6 +32,9 @@ msgstr "Invité"
 msgid "Member"
 msgstr "Membres"
 
+msgid "Substitute Member"
+msgstr "Membre suppléant"
+
 msgid "Extended Member"
 msgstr "Membre élargi"
 
