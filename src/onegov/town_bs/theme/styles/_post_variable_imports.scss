@@ -25,6 +25,8 @@ $spacers: map-merge($spacers, (
 
 $gutters: $spacers;
 
+$negative-spacers: if($enable-negative-margins, negativify-map($spacers), null);
+
 // Cards
 $card-spacer-y: map-get($spacers, "lg"); // 1.5rem / 24px
 $card-spacer-x: map-get($spacers, "lg"); // 1.5rem / 24px

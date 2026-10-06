@@ -1,16 +1,54 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.town6">
     <tal:b metal:fill-slot="title">
-        ${title}
+        ${organizer}
+    </tal:b>
+    <tal:b metal:fill-slot="lead">
+        <dl class="event-details styled-dl pb-4xl row g-lg">
+            <div class="styled-dl-entry col-12 col-md-6">
+                <dt i18n:translate>Date</dt>
+                <dd>${layout.format_date(occurrence.localized_start, 'event')}</dd>
+            </div>
+            <div class="styled-dl-entry col-12 col-md-6">
+                <dt i18n:translate>Time</dt>
+                <dd>${layout.format_event_time_range(occurrence.localized_start, occurrence.localized_end)}</dd>
+            </div>
+            <div class="styled-dl-entry col-12 col-md-6" tal:condition="occurrence.event.location">
+                <dt i18n:translate>Location</dt>
+                <dd>${occurrence.event.location}</dd>
+            </div>
+            <div class="styled-dl-entry occurrence-price col-12 col-md-6" tal:condition="occurrence.event.price">
+                <dt i18n:translate>Price</dt>
+                <dd tal:repeat="line occurrence.event.price.split('\n')">
+                ${line}<br tal:condition="not:repeat.line.end" />
+                </dd>
+            </div>
+        </dl>
+
+    </tal:b>
+    <tal:b metal:fill-slot="before-intro">
+        <div class="bg-primary">
+            <div class="container mt-lg px-xl py-3xl">
+                <div class="row">
+                    <div class="col-12 col-md-8 d-flex align-items-end">
+
+                        <h1 class="fs-2xl text-white">${title}</h1>
+                    </div>
+                    <div tal:condition="occurrence.event.image" class="occurrence-image col-12 col-md-4">
+                        <img class="img-fluid rounded-3" src="${request.link(occurrence.event.image)}">
+                    </div>
+                </div>
+            </div>
+        </div>
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="grid-x grid-padding-x wrapper">
-            <div class="medium-7 cell content">
-                <div class="page-lead h5 limit-line-width">
-                    <div>
-                        ${layout.format_date(occurrence.localized_start, 'event')},
-                        ${layout.format_event_time_range(occurrence.localized_start, occurrence.localized_end)}
-                    </div>
-                    <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
+        <div class="row">
+            <div class="col-12 col-md-8 col-lg-9 offset-md-4 offset-lg-3 page-content-main">
+                <div class="occurrence-description">
+                    <p class="fs-sm" tal:content="description"></p>
+                </div>
+
+                <div class="occurence-link mt-xl" tal:define="registration_link occurrence.event.content.get('event_registration_url')">
+                    <a tal:condition="registration_link and registration_link != 'https://' and 'keine' not in registration_link.lower()" class="btn btn-primary btn-arrow" href="${registration_link}" i18n:translate="">Link to registration</a>
                 </div>
 
                 <div class="occurrence-tags" tal:condition="occurrence.tags and show_tags">
@@ -29,17 +67,6 @@
                     <a tal:condition="event_link and event_link != 'https://' and 'keine' not in event_link.lower()" class="button" href="${event_link}" i18n:translate="">Link to organizers page</a>
                 </div>
 
-                <div class="occurence-link" tal:define="registration_link occurrence.event.content.get('event_registration_url')">
-                    <a tal:condition="registration_link and registration_link != 'https://' and 'keine' not in registration_link.lower()" class="button" href="${registration_link}" i18n:translate="">Link to registration</a>
-                </div>
-
-                <div class="occurrence-description">
-                    <p tal:content="description"></p>
-                </div>
-
-                <div class="occurrence-image" tal:condition="occurrence.event.image">
-                    <img src="${request.link(occurrence.event.image)}">
-                </div>
 
                 <div class="occurrence-pdf" tal:condition="occurrence.event.pdf">
                     <dl>
@@ -48,14 +75,6 @@
                     </dl>
                 </div>
 
-                <div class="occurrence-price" tal:condition="occurrence.event.price">
-                    <dl>
-                        <dt i18n:translate>Price</dt>
-                        <tal:dd tal:repeat="line occurrence.event.price.split('\n')">
-                        ${line}<br tal:condition="not:repeat.line.end" />
-                        </tal:dd>
-                    </dl>
-                </div>
 
                 <div class="occurrence-organizer" tal:condition="organizer or organizer_email">
                     <dl>

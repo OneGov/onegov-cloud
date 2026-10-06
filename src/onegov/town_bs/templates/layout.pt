@@ -182,6 +182,9 @@
             <div id="breadcrumbs" class="container">
                 <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
             </div>
+            <div id="beforeIntro">
+                <div metal:define-slot="before-intro"></div>
+            </div>
 
             <tal:b tal:define="narrow_page narrow_page|False" tal:condition="not on_homepage">
                 <!-- With sidebar, full page width with title and lead-->

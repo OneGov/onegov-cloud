@@ -108,6 +108,7 @@ class TownBsTheme(BootstrapBaseTheme):
             'forms_page',
             'search',
             'custom_utilities',
+            'custom_components',
         ]
 
     @property

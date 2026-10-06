@@ -114,7 +114,7 @@
                 <div class="collapse navbar-collapse" id="topNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item" tal:repeat="link links">
-                            <a class="nav-link link-secondary small px-2" href="${link[1]}">${link[0] if link[0] else link[1]}</a>
+                            <a class="nav-link link-tertiary text-decoration-none small px-2" href="${link[1]}">${link[0] if link[0] else link[1]}</a>
                         </li>
                     </ul>
                 </div>
@@ -173,7 +173,7 @@
                     <tal:b repeat="link shown_breadcrumbs">
                         <li
                             class="breadcrumb-item link-underline-opacity-0 ${'fw-bold' if link is last_breadcrumb else ''}"
-                            tal:content="link(layout, ('link-secondary', ))"
+                            tal:content="link(layout, ('link-tertiary text-decoration-none', ))"
                             tal:attributes="aria-current 'page' if link is last_breadcrumb else None"
                         ></li>
                     </tal:b>
@@ -841,7 +841,7 @@
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
     <div tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
-         class="col-12 col-md-3 sidebar ${'filter-panel' if filter_panel else ''}"
+         class="col-12 col-md-4 col-lg-3 sidebar ${'filter-panel' if filter_panel else ''}"
          tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <div class="sidebar-wrapper">
             <tal:b metal:define-slot="before-panels"></tal:b>
@@ -1035,7 +1035,7 @@
         <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|None">
             <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
 
-            <div class="col-12 col-md-9 page-content-main">
+            <div class="col-12 col-md-8 col-lg-9 page-content-main">
                 <div class="theiaStickySidebar">
                     <img class="page-image img-fluid rounded-3" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
@@ -2170,7 +2170,7 @@
         <ul class="search-breadcrumbs breadcrumb fs-2xs mb-0 mt-sm">
             <tal:b repeat="link links">
                 <li class="breadcrumb-item link-underline-opacity-0">
-                    ${link(result_layout, ('link-secondary', )).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
+                    ${link(result_layout, ('link-tertiary', )).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
                 </li>
             </tal:b>
         </ul>
