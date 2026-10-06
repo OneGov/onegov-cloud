@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from onegov.org.models import MeetingItem
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
+    from sqlalchemy.sql.elements import ColumnElement
 
 
 class Meeting(
@@ -106,11 +107,12 @@ class Meeting(
     video_link: dict_property[str] = content_property(default='')
 
     @hybrid_property
-    def past(self):
+    def past(self) -> bool:
         return self.start_datetime < utcnow() if self.start_datetime else False
 
-    @past.expression  # type:ignore[no-redef]
-    def past(cls):
+    @past.inplace.expression
+    @classmethod
+    def _past_expression(cls) -> ColumnElement[bool]:
         return cls.start_datetime < func.now()
 
     def __repr__(self) -> str:

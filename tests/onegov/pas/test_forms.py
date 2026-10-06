@@ -102,6 +102,12 @@ def dummy_admin_request(session: Session) -> Any:
 
 @freeze_time('2024-01-01')
 def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
+    settlement_run = SettlementRunCollection(session).add(
+        name='2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 12, 31),
+        active=True,
+    )
     app: Any = DummyApp(session=session)
     parliamentarians = PASParliamentarianCollection(app)
     parliamentarian = parliamentarians.add(
@@ -165,6 +171,7 @@ def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
     assert obj.commission_id is None
 
     # ensure date
+    settlement_run.active = False
     form = AttendenceForm(DummyPostData({'date': '2024-01-01'}))
     form.request = dummy_admin_request
     form.on_request()
@@ -177,13 +184,7 @@ def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
     assert not form.validate()
     assert form.date.errors[0] == 'No within an active settlement run.'
 
-    settlement_runs = SettlementRunCollection(session)
-    settlement_run = settlement_runs.add(
-        name='2024',
-        start=date(2024, 1, 1),
-        end=date(2024, 12, 31),
-        active=True
-    )
+    settlement_run.active = True
 
     assert not form.validate()
     assert 'date' not in form.errors
@@ -234,7 +235,12 @@ def test_add_plenary_attendence_form(
     session: Session,
     dummy_request: Any
 ) -> None:
-
+    settlement_run = SettlementRunCollection(session).add(
+        name='2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 12, 31),
+        active=True,
+    )
     app: Any = DummyApp(session=session)
     parliamentarians = PASParliamentarianCollection(app)
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
@@ -260,6 +266,7 @@ def test_add_plenary_attendence_form(
     assert form.get_useful_data()['duration'] == 120
 
     # ensure date (full test above)
+    settlement_run.active = False
     form2 = AttendenceAddCommissionForm(DummyPostData({'date': '2024-01-01'}))
     form2.request = dummy_request
     assert not form2.validate()

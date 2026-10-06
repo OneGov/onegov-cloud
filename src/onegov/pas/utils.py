@@ -22,7 +22,6 @@ from webob.exc import HTTPBadRequest
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core import Framework
     from onegov.core.request import CoreRequest
     from onegov.parliament.models.parliamentarian import Parliamentarian
     from onegov.parliament.models.parliamentarian_role import (

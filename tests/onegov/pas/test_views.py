@@ -712,6 +712,14 @@ def test_fetch_commissions_parliamentarians_json(
     dropdown uses."""
 
     session = client.app.session()
+    session.add(
+        SettlementRun(
+            name='2024',
+            start=datetime.date(2024, 1, 1),
+            end=datetime.date(2024, 12, 31),
+            closed=False,
+        )
+    )
     commissions = PASCommissionCollection(session)
     commission1 = commissions.add(name='Commission A')
     commission2 = commissions.add(name='Commission B')
