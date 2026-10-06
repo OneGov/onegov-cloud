@@ -188,9 +188,8 @@
 
             <tal:b tal:define="narrow_page narrow_page|False" tal:condition="not on_homepage">
                 <!-- With sidebar, full page width with title and lead-->
-                <div id="withSidebar" tal:condition="not narrow_page" class="content my-5xl">
-                    <div id="intro" class="container mb-3xl">
-                        <div class="row">
+                <div id="withSidebar" tal:condition="not narrow_page" class="page-container container my-5xl">
+                        <div  id="intro" class="row mb-3xl">
                             <div class="col-12 col-md-4 col-lg-3">
                                 <h1 class="main-title fs-xs fw-bold text-primary">
                                     <tal:b metal:define-slot="title"></tal:b>
@@ -202,18 +201,17 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="container" role="main" id="content" data-reinit-foundation>
+                    <div class="row" role="main" id="content" data-reinit-foundation>
                         <div metal:define-slot="before-content"></div>
                         <div metal:define-slot="content"></div>
                     </div>
                 </div>
 
                 <!-- Without sidebar, narrow page width only title in intro -->
-                <div id="narrow" tal:condition="narrow_page" class="content my-5xl container">
+                <div id="narrow" tal:condition="narrow_page" class="page-container my-5xl container">
                     <div class="row justify-content-center">
-                        <div class="col-lg-9">
+                        <div class="col-lg-10 col-xl-8">
                             <div id="intro">
                                 <h1 class="main-title text-primary fs-2xl mb-3xl">
                                     <tal:b metal:define-slot="title"></tal:b>

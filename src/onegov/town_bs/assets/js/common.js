@@ -388,7 +388,7 @@ if (level !== 'none' && $('.sidebar-wrapper').length) {
             headingSelector = 'h1, h2, h3, h4, h5'; // fallback
     }
 
-    var mainContent = $('.main-content').length ? $('.main-content') : $('.page-content-main');
+    var mainContent = $('.page-main-content');
     var headings = mainContent.find(headingSelector);
 
     if (headings.length > 2) {
@@ -428,8 +428,8 @@ $('.is-accordion-submenu-parent a span').on('click', function(e) {
     e.stopPropagation();
 });
 
-$('.main-content table, .page-content-main table').each(function() {
-    if ($(this).width() > $('.main-content').width() || $(this).width() > $('.page-content-main').width()) {
+$('.page-main-content table, .page-main-content table').each(function() {
+    if ($(this).width() > $('.page-main-content').width() || $(this).width() > $('.page-main-content').width()) {
         const $table = $(this);
         const $container = $('<div class="table-container"></div>');
         const $gradient = $('<div class="scroll-gradient"></div>');

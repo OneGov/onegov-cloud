@@ -193,10 +193,12 @@
 </metal:panel-links>
 
 <metal:footer define-macro="footer">
-    <footer id="footer" class="bg-tertiary-subtle py-5xl">
+    <footer id="footer" class="bg-tertiary-subtle">
         <div class="container">
+            <div class="row g-lg py-5xl">
                 <metal:b use-macro="layout.macros['footer_columns']" />
-                <metal:b use-macro="layout.macros['footer_links']" />
+            </div>
+            <metal:b use-macro="layout.macros['footer_links']" />
         </div>
     </footer>
 </metal:footer>
@@ -228,15 +230,15 @@
             tiktok,
             custom_links
         ))">
-            <div class="small-12 medium-4 cell">
+            <div class="col-12 col-md-4">
                 <metal:b use-macro="layout.macros['footer_contact']" />
             </div>
 
-            <div class="small-12 medium-4 cell">
+            <div class="col-12 col-md-4">
                 <metal:b use-macro="layout.macros['footer_opening_hours']" />
             </div>
 
-            <div class="small-12 medium-4 cell">
+            <div class="col-12 col-md-4">
                 <metal:b use-macro="layout.macros['footer_social_media']" />
                 <metal:b use-macro="layout.macros['footer_custom_links']" />
             </div>
@@ -253,44 +255,45 @@
 </metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
-<div class="medium-4 cell"></div>
-<div class="small-12 medium-6 cell footer-links">
-    <tal:b condition="not request.app.org.hide_onegov_footer|True">
-        <span>
-            <a class="footer-link" href="https://www.admin.digital">OneGov Cloud</a> | <a class="footer-link" href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
-        </span>
-        <br/>
-        <span>
-            <a class="footer-link" href="https://www.admin.digital/datenschutz" i18n:translate>
-                Privacy Protection
+<div class="d-flex justify-content-center footer-links pb-md">
+    <div class="footer-links">
+        <tal:b condition="not request.app.org.hide_onegov_footer|True">
+            <span>
+                <a class="footer-link" href="https://www.admin.digital">OneGov Cloud</a> | <a class="footer-link" href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
+            </span>
+            <br/>
+            <span>
+                <a class="footer-link" href="https://www.admin.digital/datenschutz" i18n:translate>
+                    Privacy Protection
+                </a>
+            </span>
+            <span tal:condition="request.app.org.impressum_url|None">
+                <a class="footer-link" href="${request.app.org.impressum_url}" i18n:translate>
+                    Impressum
+                </a>
+            </span>
+        </tal:b>
+        <span tal:condition="not request.is_logged_in">
+            <a class="footer-link" href="${layout.login_from_path()}" i18n:translate>
+                Login
             </a>
         </span>
-        <span tal:condition="request.app.org.impressum_url|None">
-            <a class="footer-link" href="${request.app.org.impressum_url}" i18n:translate>
-                Impressum
+        <span tal:condition="request.app.org.citizen_login_enabled and not request.authenticated_email">
+            <a href="${layout.citizen_login()}" i18n:translate>
+                Citizen Login
             </a>
         </span>
-    </tal:b>
-    <span tal:condition="not request.is_logged_in">
-        <a class="footer-link" href="${layout.login_from_path()}" i18n:translate>
-            Login
-        </a>
-    </span>
-    <span tal:condition="request.app.org.citizen_login_enabled and not request.authenticated_email">
-        <a href="${layout.citizen_login()}" i18n:translate>
-            Citizen Login
-        </a>
-    </span>
-    <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
-        <a class="footer-link" href="${about_url}" i18n:translate>
-            About
-        </a>
-    </span>
+        <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
+            <a class="footer-link" href="${about_url}" i18n:translate>
+                About
+            </a>
+        </span>
+    </div>
 </div>
 </metal:footer_links>
 
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town6">
-    <h5 i18n:translate tal:condition="contact or contact_url">Contact</h5>
+    <h5 class="text-primary fs-xs fw-bold" i18n:translate tal:condition="contact or contact_url">Contact</h5>
     <div tal:content="layout.org.contact_html" />
     <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url">
         <strong>
@@ -301,7 +304,7 @@
 </metal:footer_contact>
 
 <metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town6">
-    <h5 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h5>
+    <h5 class="text-primary fs-xs fw-bold" i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h5>
     <div tal:content="opening_hours" />
     <a class="footer-link" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">
         <strong>
@@ -321,7 +324,7 @@
             tiktok,
         ))">
 
-        <h5 i18n:translate>Social Media</h5>
+        <h5 class="text-primary fs-xs fw-bold" i18n:translate>Social Media</h5>
         <ul class="social-media-links">
             <li tal:condition="facebook">
                 <a class="footer-link" tal:attributes="href facebook">
@@ -359,7 +362,7 @@
 
 <metal:footer_locales define-macro="footer_locales">
     <div class="footer-locales" tal:condition="layout.org.locales and len(layout.org.locales) > 1">
-        <h5>Languages</h5>
+        <h5 class="text-primary fs-xs fw-bold">Languages</h5>
         <div class="text-links">
             <tal:b repeat="(name, url) layout.locales">
                 <a class="footer-link" tal:condition="request.locale not in url" href="${url}">${name}</a>
@@ -779,25 +782,13 @@
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
     <tal:b tal:switch="item.access|False">
         <tal:b tal:case="'private'">
-            <div class="row">
-                <div class="small-12 columns">
-                    <div class="panel callout">
-                        <p i18n:translate>
-                            This site is not public.
-                        </p>
-                    </div>
-                </div>
+            <div class="alert alert-warning">
+                <p i18n:translate>This site is not public.</p>
             </div>
         </tal:b>
         <tal:b tal:case="'member'">
-            <div class="row">
-                <div class="small-12 columns">
-                    <div class="panel callout">
-                        <p i18n:translate>
-                            This site is not public but it can be seen by members.
-                        </p>
-                    </div>
-                </div>
+            <div class="alert alert-warning">
+                <p i18n:translate>This site is not public but it can be seen by members.</p>
             </div>
         </tal:b>
     </tal:b>
@@ -805,26 +796,16 @@
 
 <metal:publication_hint_long define-macro="publication_hint_long" i18n:domain="onegov.town6">
     <tal:b condition="not: item.published">
-        <div class="grid-x">
-            <div class="small-12 cell">
-                <div class="panel callout">
-                    <p i18n:translate>
-                        This site is not published.
-                    </p>
-                </div>
-            </div>
+        <div class="alert alert-warning">
+            <p i18n:translate>This site is not published.</p>
         </div>
     </tal:b>
 </metal:publication_hint_long>
 
 <metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.town6">
     <tal:b condition="not item.lead and request.is_manager|nothing">
-        <div class="grid-x">
-            <div class="small-12 cell">
-                <div class="alert alert-warning">
-                    <p class="mb-0" i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
-                </div>
-            </div>
+        <div class="alert alert-warning">
+            <p i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
         </div>
     </tal:b>
 </metal:empty_lead_hint>
@@ -841,7 +822,7 @@
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
     <div tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
-         class="col-12 col-md-4 col-lg-3 sidebar ${'filter-panel' if filter_panel else ''}"
+         class="page-sidebar-content col-12 col-md-4 col-lg-3 sidebar ${'filter-panel' if filter_panel else ''}"
          tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <div class="sidebar-wrapper">
             <tal:b metal:define-slot="before-panels"></tal:b>
@@ -1020,7 +1001,7 @@
             or location
             or more_entries|None
         ">
-            <div class="col-12 page-content-main">
+            <div class="col-12 page-main-content">
                 <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                 <div metal:define-slot="before-lead"></div>
                 <div metal:define-slot="after-lead"></div>
@@ -1035,9 +1016,9 @@
         <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|None">
             <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
 
-            <div class="col-12 col-md-8 col-lg-9 page-content-main">
+            <div class="col-12 col-md-8 col-lg-9 page-main-content">
                 <div class="theiaStickySidebar">
-                    <img class="page-image img-fluid rounded-3" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
+                    <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
                     <div metal:define-slot="after-lead"></div>
 
@@ -2886,7 +2867,7 @@
                                     </div>
                                 </div>
                             </tal:b>
-                            <metal:b define-slot="modal-main-content" />
+                            <metal:b define-slot="modal-page-main-content" />
                         </tal:b>
                 </div>
             </div>
@@ -2896,7 +2877,7 @@
 
 <metal:group_record_form_link define-macro="form-modal-definition" i18n:domain="onegov.town6">
     <tal:b metal:use-macro="layout.macros['form-modal']">
-        <tal:b metal:fill-slot="modal-main-content">
+        <tal:b metal:fill-slot="modal-page-main-content">
             <div tal:define="form_id 'main-form'">
                 <div metal:use-macro="layout.macros['form-definition']" tal:condition="form" />
             </div>

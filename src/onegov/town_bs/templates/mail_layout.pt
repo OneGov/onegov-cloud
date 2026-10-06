@@ -296,13 +296,13 @@
         padding: 20px;
     }
 
-    .content {
+    .page-container {
         max-width: 600px;
         Margin: 0 auto;
         display: block;
     }
 
-    .content table {
+    .page-container table {
         width: 100%;
     }
 

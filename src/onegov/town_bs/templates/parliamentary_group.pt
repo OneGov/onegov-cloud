@@ -5,7 +5,7 @@
 
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="large-7 medium-8 cell main-content">
+            <div class="large-7 medium-8 cell page-main-content">
                 <h2 i18n:translate class="h3">Parliamentary group members</h2>
                 <div tal:condition="parliamentary_group.roles">
                     <ul class="more-list">
