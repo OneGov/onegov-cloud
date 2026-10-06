@@ -241,6 +241,7 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
         if not self.self_activation:
             return None
 
+        request.browser_session['mtan_setup_enabled'] = True
         activation_url = request.link(auth, name='mtan-setup')
         return morepath.redirect(activation_url)
 
