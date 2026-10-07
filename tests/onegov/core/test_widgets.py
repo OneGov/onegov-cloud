@@ -24,10 +24,13 @@ class TextWidget:
 
 
 @pytest.mark.parametrize('invalid_structure', [
-    " <panel><?python assert False></panel>",
-    "<panel>${{request.password}}</panel>",
-    "<panel>${request.password}</panel>",
-    "<panel tal:content='request.password'></panel>",
+    " <text><?python assert False></text>",
+    " <text>&lt;?python assert False></text>",
+    "<text>${{request.password}}</text>",
+    "<text class='${request.password}'></text>",
+    "<text>&dollar;{{request.password}}</text>",
+    "<text class='&#36;{request.password}'></text>",
+    "<text tal:content='request.password'></text>",
     "<div>html</div>"
 
 ])
