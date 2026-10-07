@@ -101,14 +101,15 @@ class TownBsTheme(BootstrapBaseTheme):
         return [
             'post_imports_customizations',
             'town',
+            'custom_utilities',
+            'custom_components',
             'homepage',
             'header',
             'navigation',
             'events_page',
             'forms_page',
             'search',
-            'custom_utilities',
-            'custom_components',
+            'timeline',
         ]
 
     @property
@@ -124,156 +125,6 @@ class TownBsTheme(BootstrapBaseTheme):
         """ Load fonts of the current theme folder and ignore fonts from
         parent applications if OrgTheme is inherited. """
         return module_path('onegov.town6.theme', 'fonts')
-
-    @property
-    def font_families(self) -> dict[str, str]:
-        families = default_font_families.copy()
-        families.update(self.additional_font_families)
-        return families
-
-    @property
-    def additional_font_families(self) -> dict[str, str]:
-        """ Filenames for use as labels in the settings and to construct the
-        font-family string. Only sans-serif fonts are currently supported.
-        """
-        if not os.path.exists(self.font_search_path):
-            return {}
-
-        return {
-            parts[0]: f'"{parts[0]}", {HELVETICA}'
-            for filename in os.listdir(self.font_search_path)
-            if (parts := filename.rpartition('.'))
-            and parts[2] in ('css', 'scss')
-        }
-
-
-class TownTheme(BaseTheme):
-    name = 'onegov.town6.foundation'
-
-    _force_compile = False
-    use_flex = True
-    include_motion_ui = True
-
-    @property
-    def default_options(self) -> dict[str, Any]:
-        return user_options
-
-    @property
-    def foundation_styles(self) -> Sequence[str]:
-        return 'global-styles', 'forms', 'typography'
-
-    @property
-    def foundation_components(self) -> tuple[str, ...]:
-        return (
-            'button',
-            'button-group',
-            'close-button',
-            'label',
-            # 'progress-bar',
-            # 'slider',
-            # 'switch',
-            'table',
-            # 'badge',
-            'breadcrumbs',
-            'callout',
-            'card',
-            'dropdown',
-            'pagination',
-            'tooltip',
-            'accordion',
-            'media-object',
-            'orbit',
-            'responsive-embed',
-            'tabs',
-            'thumbnail',
-            'menu',
-            'menu-icon',
-            'accordion-menu',
-            'drilldown-menu',
-            'dropdown-menu',
-            'off-canvas',
-            'reveal',
-            'sticky',
-            'title-bar',
-            'top-bar',
-        )
-
-    @property
-    def pre_imports(self) -> list[str]:
-        return [
-            'foundation-mods',
-            *self.additional_font_families
-        ]
-
-    @property
-    def post_imports(self) -> list[str]:
-        """Our scss code split into various files"""
-        return [
-            'custom_mixins',
-            'typography',
-            'header',
-            'town6',
-            'sortable',
-            'sidebars',
-            'forms',
-            'formcode',
-            'panels',
-            'sliders',
-            'org-settings',
-            'helpers',
-            'footer',
-            'chosen',
-            'treeselect',
-            'news',
-            'events',
-            'homepage-tiles',
-            'tickets',
-            'user',
-            'timeline',
-            'upload',
-            'files',
-            'publication_signature',
-            'image-grid',
-            'widgets',
-            'popup',
-            'fullcalendar',
-            'alert',
-            'redactor',
-            'directories',
-            'daypicker',
-            'payment',
-            'person',
-            'newsletter',
-            'search',
-            'hints',
-            'allocations',
-            'homepage',
-            'progress_indicator',
-            'healthcheck',
-            'qrcode',
-            'leaflet',
-            'tags',
-            'print',
-            'chat',
-            'bar-graph',
-            'dashboard',
-            'audit',
-        ]
-
-    @property
-    def extra_search_paths(self) -> list[str]:
-        return [
-            *super().extra_search_paths,
-            module_path('onegov.town6.theme', 'styles'),
-            self.font_search_path
-        ]
-
-    @property
-    def font_search_path(self) -> str:
-        """ Load fonts of the current theme folder and ignore fonts from
-        parent applications if OrgTheme is inherited. """
-        module = self.name.replace('foundation', 'theme')
-        return module_path(module, 'fonts')
 
     @property
     def font_families(self) -> dict[str, str]:

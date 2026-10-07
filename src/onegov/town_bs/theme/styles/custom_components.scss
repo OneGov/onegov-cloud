@@ -55,3 +55,30 @@
         }
     }
 }
+
+.messages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .date {
+    margin-bottom: $s-xl;
+    text-align: center;
+
+      &::after {
+        border-right: 2px solid $tertiary-subtle;
+        content: '';
+        display: block;
+        height: $s-xl;
+        left: 50%;
+        position: absolute;
+      }
+
+      span {
+        background-color: $tertiary-subtle;
+        border-radius: $border-radius-pill;
+        display: inline-block;
+        padding: $s-xs $s-sm;
+      }
+  }
+}
