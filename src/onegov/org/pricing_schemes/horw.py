@@ -81,7 +81,7 @@ class HorwHorwerhalle(
         request: OrgRequest
     ) -> type[T]:
 
-        class StadtSchulenZugForm(form_class):  # type:ignore
+        class HorwerhalleForm(form_class):  # type:ignore
             horw_horwerhalle_price_table = FieldTable(
                 DecimalField(validators=[InputRequired(), NumberRange(min=0)]),
                 ['2 h', '½ Tag', '1 Tag'],
@@ -206,7 +206,7 @@ class HorwHorwerhalle(
                 return None
 
         return move_fields(
-            StadtSchulenZugForm,
+            HorwerhalleForm,
             ('horw_horwerhalle_price_table',),
             after='pricing_scheme'
         )
