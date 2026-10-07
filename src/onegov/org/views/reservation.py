@@ -460,11 +460,6 @@ def handle_reservation_form(
     else:
         data = {}
 
-        # the email is the same for all reservations
-        # Todo: This entry created remained after a reservation
-        if reservations[0].email != '0xdeadbeef@example.org':
-            data['email'] = reservations[0].email
-
         if submission:
             data.update(submission.data)
         # set defaults based on remembered submissions from session
@@ -478,9 +473,21 @@ def handle_reservation_form(
         }):
             data.update(remembered)
 
+        # the email is the same for all reservations
+        # Todo: This entry created remained after a reservation
+        if reservations[0].email != '0xdeadbeef@example.org':
+            data['email'] = reservations[0].email
+
+        # the same goes for the ticket tag
+        if 'ticket_tag' in form and reservations[0].data:
+            data['ticket_tag'] = reservations[0].data.get('ticket_tag', '')
+
         form.process(data=data)
 
         if submission and not request.POST:
+            # ensure we don't generate a missing input error for the email
+            if form.email.data:
+                form.email.raw_data = [form.email.data]
             # ensure we see the correct validation errors based on the
             # already submitted data when we navigate back to edit it
             form.validate()
