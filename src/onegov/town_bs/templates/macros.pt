@@ -824,154 +824,152 @@
     <div tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
          class="page-sidebar-content col-12 col-md-4 col-lg-3 sidebar ${'filter-panel' if filter_panel else ''}"
          tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
-        <div class="sidebar-wrapper">
-            <tal:b metal:define-slot="before-panels"></tal:b>
+        <tal:b metal:define-slot="before-panels"></tal:b>
 
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:define="hide page.hide_contact|hide_contact|False; extra_class 'contact-panel'"
-                   tal:condition="not hide and (contact or coordinates or location)">
-                <tal:b metal:fill-slot="panel-title">
-                    <tal:b tal:condition="contact and not hide" i18n:translate>Contact</tal:b>
-                    <tal:b tal:condition="not contact" i18n:translate>Map</tal:b>
-                </tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <tal:b tal:condition="contact and not hide">
-                        <tal:b content="contact" />
-                        <div tal:condition="sidepanel_contact|False">
-                            <ul class="sidebar-links more-list">
-                                <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
-                                    <a class="list-link" href="${contact[1]}">
-                                        <i class="fa fa-link" aria-hidden="true"></i>
-                                        <span class="list-title">${contact[0]}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </tal:b>
-                    <br tal:condition="coordinates and contact" />
-                    <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br tal:condition="location">
-                    <div class="location" tal:condition="location">${location}</div>
-                </tal:b>
+        <tal:b metal:use-macro="layout.macros['side_panel_card']"
+                tal:define="hide page.hide_contact|hide_contact|False; extra_class 'contact-panel'"
+                tal:condition="not hide and (contact or coordinates or location)">
+            <tal:b metal:fill-slot="panel-title">
+                <tal:b tal:condition="contact and not hide" i18n:translate>Contact</tal:b>
+                <tal:b tal:condition="not contact" i18n:translate>Map</tal:b>
             </tal:b>
+            <tal:b metal:fill-slot="panel-content">
+                <tal:b tal:condition="contact and not hide">
+                    <tal:b content="contact" />
+                    <div tal:condition="sidepanel_contact|False">
+                        <ul class="sidebar-links more-list">
+                            <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
+                                <a class="list-link" href="${contact[1]}">
+                                    <i class="fa fa-link" aria-hidden="true"></i>
+                                    <span class="list-title">${contact[0]}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </tal:b>
+                <br tal:condition="coordinates and contact" />
+                <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br tal:condition="location">
+                <div class="location" tal:condition="location">${location}</div>
+            </tal:b>
+        </tal:b>
 
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="people and not show_people_on_main_page"
-                   tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; extra_class 'people-panel'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>People</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
-                        <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                            <div class="person-card person-list-card">
-                                <div tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-                                    <a tal:condition="url" href="${request.link(person)}" aria-hidden="true">
-                                        <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
-                                            <div class="cover-image" style='background-image: url("${url}");'></div>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div>
-                                    <a href="${request.link(person)}">
-                                        <b tal:condition="western_name_order" class="list-title">${person.first_name} ${person.last_name}</b>
-                                        <b tal:condition="not western_name_order" class="list-title">${person.title}</b>
-                                    </a>
-                                    <a href="${request.link(person)}">
-                                        <p class="list-lead preview">${person.context_specific_function}</p>
-                                    </a>
-                                </div>
+        <tal:b metal:use-macro="layout.macros['side_panel_card']"
+                tal:condition="people and not show_people_on_main_page"
+                tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; extra_class 'people-panel'">
+            <tal:b metal:fill-slot="panel-title" i18n:translate>People</tal:b>
+            <tal:b metal:fill-slot="panel-content">
+                <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
+                    <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
+                        <div class="person-card person-list-card">
+                            <div tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                                <a tal:condition="url" href="${request.link(person)}" aria-hidden="true">
+                                    <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                        <div class="cover-image" style='background-image: url("${url}");'></div>
+                                    </div>
+                                </a>
                             </div>
-                        </li>
-                    </ul>
-                </tal:b>
+                            <div>
+                                <a href="${request.link(person)}">
+                                    <b tal:condition="western_name_order" class="list-title">${person.first_name} ${person.last_name}</b>
+                                    <b tal:condition="not western_name_order" class="list-title">${person.title}</b>
+                                </a>
+                                <a href="${request.link(person)}">
+                                    <p class="list-lead preview">${person.context_specific_function}</p>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
             </tal:b>
+        </tal:b>
 
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="files and page.show_file_links_in_sidebar|True"
-                   tal:define="extra_class 'files-panel'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>Documents</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list">
-                        <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
-                            <a class="list-link" title="${file.name}" href="${request.link(file)}">
-                                <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                                <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </tal:b>
+        <tal:b metal:use-macro="layout.macros['side_panel_card']"
+                tal:condition="files and page.show_file_links_in_sidebar|True"
+                tal:define="extra_class 'files-panel'">
+            <tal:b metal:fill-slot="panel-title" i18n:translate>Documents</tal:b>
+            <tal:b metal:fill-slot="panel-content">
+                <ul class="more-list">
+                    <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
+                        <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                            <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                            <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
+                        </a>
+                    </li>
+                </ul>
             </tal:b>
+        </tal:b>
 
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="sidepanel_links|False"
-                   tal:define="extra_class 'links-panel'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>Links</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list">
-                        <li tal:repeat="sl python: sorted(sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
-                            <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
-                                <i class="fa fa-link" aria-hidden="true"></i>
-                                <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </tal:b>
+        <tal:b metal:use-macro="layout.macros['side_panel_card']"
+                tal:condition="sidepanel_links|False"
+                tal:define="extra_class 'links-panel'">
+            <tal:b metal:fill-slot="panel-title" i18n:translate>Links</tal:b>
+            <tal:b metal:fill-slot="panel-content">
+                <ul class="more-list">
+                    <li tal:repeat="sl python: sorted(sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
+                        <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                            <i class="fa fa-link" aria-hidden="true"></i>
+                            <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                        </a>
+                    </li>
+                </ul>
             </tal:b>
+        </tal:b>
 
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="siblings|False"
-                   tal:define="extra_class 'more-news'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>More news</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list">
-                        <li tal:repeat="sibling siblings">
-                            <a href="${request.link(sibling)}" class="list-link">
-                                <span class="list-title">${sibling.title}</span>
-                            </a>
-                            <a href="${request.link(sibling)}">
-                                <p class="list-lead preview">
-                                    ${layout.format_date(sibling.published_or_created, 'date_long')}
-                                </p>
-                            </a>
-                        </li>
-                    </ul>
-                </tal:b>
+        <tal:b metal:use-macro="layout.macros['side_panel_card']"
+                tal:condition="siblings|False"
+                tal:define="extra_class 'more-news'">
+            <tal:b metal:fill-slot="panel-title" i18n:translate>More news</tal:b>
+            <tal:b metal:fill-slot="panel-content">
+                <ul class="more-list">
+                    <li tal:repeat="sibling siblings">
+                        <a href="${request.link(sibling)}" class="list-link">
+                            <span class="list-title">${sibling.title}</span>
+                        </a>
+                        <a href="${request.link(sibling)}">
+                            <p class="list-lead preview">
+                                ${layout.format_date(sibling.published_or_created, 'date_long')}
+                            </p>
+                        </a>
+                    </li>
+                </ul>
             </tal:b>
+        </tal:b>
 
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:condition="more_entries|False"
-                   tal:define="extra_class 'more-entries'">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>Other Entries</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list">
-                        <li tal:condition="prev_entry">
-                            <a href="${request.link(prev_entry)}" class="list-link">
-                                <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate>Previous Entry</span>
-                            </a>
-                            <a href="${request.link(prev_entry)}">
-                                <p class="list-lead preview">${prev_entry.title}</p>
-                            </a>
-                        </li>
-                        <li tal:condition="next_entry">
-                            <a href="${request.link(next_entry)}" class="list-link">
-                                <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate>Next Entry</span>
-                            </a>
-                            <a href="${request.link(next_entry)}">
-                                <p class="list-lead preview">${next_entry.title}</p>
-                            </a>
-                        </li>
-                    </ul>
-                </tal:b>
+        <tal:b metal:use-macro="layout.macros['side_panel_card']"
+                tal:condition="more_entries|False"
+                tal:define="extra_class 'more-entries'">
+            <tal:b metal:fill-slot="panel-title" i18n:translate>Other Entries</tal:b>
+            <tal:b metal:fill-slot="panel-content">
+                <ul class="more-list">
+                    <li tal:condition="prev_entry">
+                        <a href="${request.link(prev_entry)}" class="list-link">
+                            <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate>Previous Entry</span>
+                        </a>
+                        <a href="${request.link(prev_entry)}">
+                            <p class="list-lead preview">${prev_entry.title}</p>
+                        </a>
+                    </li>
+                    <li tal:condition="next_entry">
+                        <a href="${request.link(next_entry)}" class="list-link">
+                            <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate>Next Entry</span>
+                        </a>
+                        <a href="${request.link(next_entry)}">
+                            <p class="list-lead preview">${next_entry.title}</p>
+                        </a>
+                    </li>
+                </ul>
             </tal:b>
+        </tal:b>
 
-            <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                   tal:define="extra_class 'content-panel d-none'; data_toc_level layout.org.level_table_of_contents">
-                <tal:b metal:fill-slot="panel-title" i18n:translate>Content</tal:b>
-                <tal:b metal:fill-slot="panel-content">
-                    <ul class="more-list"></ul>
-                </tal:b>
+        <tal:b metal:use-macro="layout.macros['side_panel_card']"
+                tal:define="extra_class 'content-panel d-none'; data_toc_level layout.org.level_table_of_contents">
+            <tal:b metal:fill-slot="panel-title" i18n:translate>Content</tal:b>
+            <tal:b metal:fill-slot="panel-content">
+                <ul class="more-list"></ul>
             </tal:b>
+        </tal:b>
 
-            <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
-        </div>
+        <tal:b metal:define-slot="after-panels"><div id="after-panels"></div></tal:b>
     </div>
 </metal:page_content>
 
@@ -990,7 +988,8 @@
             show_page_image page.show_page_image|None;
             as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'">
 
-        <tal:b tal:switch="show_side_panel
+        <tal:b tal:switch="
+            not: show_side_panel
             or people
             or files
             or contact
@@ -1000,7 +999,7 @@
         >
 
             <!-- No sidebar -->
-            <tal:b case="False">
+            <tal:b case="True">
                 <div class="col-12 page-main-content">
                     <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
@@ -1013,42 +1012,40 @@
             </tal:b>
 
             <!-- With sidebar -->
-            <tal:b case="True">
+            <tal:b case="False">
                 <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
 
                 <div class="col-12 col-md-8 col-lg-9 page-main-content">
-                    <div class="theiaStickySidebar">
-                        <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
-                        <div metal:define-slot="before-lead"></div>
-                        <div metal:define-slot="after-lead"></div>
+                    <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
+                    <div metal:define-slot="before-lead"></div>
+                    <div metal:define-slot="after-lead"></div>
 
-                        <div class="page-text" tal:condition="text" tal:content="text" />
-                        <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+                    <div class="page-text" tal:condition="text" tal:content="text" />
+                    <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
 
-                        <div metal:define-slot="after-text"></div>
+                    <div metal:define-slot="after-text"></div>
 
-                        <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
-                            <h3 i18n:translate>People</h3>
-                            <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
-                                <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
-                                    <div>
-                                        <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-                                            <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
-                                                <i class="fa fa-user" tal:condition="not:url"></i>
-                                                <div class="cover-image" style='background-image: url("${url}");'></div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div>
-                                        <a href="${request.link(person)}">
-                                            <b class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</b>
-                                            <b class="list-title" tal:condition="not western_name_order">${person.title}</b>
-                                        </a>
-                                            <p class="list-lead preview">${person.context_specific_function}</p>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+                    <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
+                        <h3 i18n:translate>People</h3>
+                        <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
+                            <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
+                                <div>
+                                    <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                                        <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                            <i class="fa fa-user" tal:condition="not:url"></i>
+                                            <div class="cover-image" style='background-image: url("${url}");'></div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="${request.link(person)}">
+                                        <b class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</b>
+                                        <b class="list-title" tal:condition="not western_name_order">${person.title}</b>
+                                    </a>
+                                        <p class="list-lead preview">${person.context_specific_function}</p>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </tal:b>
@@ -3974,7 +3971,7 @@
 
 <metal:offcanvas_filters define-macro="offcanvas_filters">
     <div class="d-flex align-items-end flex-column mb-lg">
-        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offCanvasFilter" aria-controls="offCanvasFilter" >
+        <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offCanvasFilter" aria-controls="offCanvasFilter" >
             <i class="fas fa-filter"></i> <span class="visually-hidden" i18n:translate="">Filters</span>
         </button>
     </div>
