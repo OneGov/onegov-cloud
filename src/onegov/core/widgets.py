@@ -124,6 +124,9 @@ def parse_structure(
     # against the unescaped structure instead.
     unescaped_structure = unescape(structure)
 
+    if '<![CDATA[' in unescaped_structure:
+        raise ValidationError('Use of <![CDATA[]]> is not allowed')
+
     # should not be possible anyway, but let's be extra sure
     # (<?python can be used in chameleon to write python code)
     if '<?' in unescaped_structure:
