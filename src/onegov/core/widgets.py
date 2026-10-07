@@ -31,6 +31,7 @@ widget variables need to be injected before rendering::
 
 """
 from lxml import etree
+from turbohtml import unescape
 from wtforms.validators import ValidationError
 
 
@@ -116,13 +117,20 @@ def parse_structure(
     valid_tags.add('page')  # wrapper element
     valid_tags.add('link')  # doesn't exist as a widget
 
+    # because lxml performs some normalization on the input, some of the
+    # entities like &#36; will be converted back to their corresponding
+    # character based on where they occur, which could bypass our
+    # detection of <? and ${} in some cases, so we run our detection
+    # against the unescaped structure instead.
+    unescaped_structure = unescape(structure)
+
     # should not be possible anyway, but let's be extra sure
     # (<?python can be used in chameleon to write python code)
-    if '<?' in structure:
+    if '<?' in unescaped_structure:
         raise ValidationError("Invalid element '<?'")
 
     # do not allow chameleon variables
-    if '${' in structure:
+    if '${' in unescaped_structure:
         raise ValidationError('Chameleon variables are not allowed')
 
     xml = XML_BASE.format(structure)
