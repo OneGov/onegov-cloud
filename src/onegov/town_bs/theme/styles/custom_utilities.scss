@@ -95,3 +95,12 @@
         border-color: $primary;
     }
 }
+
+.list-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $s-md;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}

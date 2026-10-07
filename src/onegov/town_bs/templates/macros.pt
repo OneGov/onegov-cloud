@@ -983,74 +983,75 @@
             location location|False;
             files files|None;
             sidepanel_links sidepanel_links|None;
+            people people|None;
             no_sidebar_offset no_sidebar_offset|False;
             news page.type == 'news'|False;
             imageset page.photo_album|None;
             show_page_image page.show_page_image|None;
-            as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content';
-    ">
+            as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'">
 
-        <!-- No sidebar -->
-        <tal:b condition="
-            not:
-            show_side_panel
+        <tal:b tal:switch="show_side_panel
             or people
             or files
             or contact
             or coordinates
             or location
-            or more_entries|None
-        ">
-            <div class="col-12 page-main-content">
-                <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
-                <div metal:define-slot="before-lead"></div>
-                <div metal:define-slot="after-lead"></div>
+            or more_entries|None"
+        >
 
-                <div class="page-text" tal:condition="text" tal:content="text" />
-                <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
-                <div metal:define-slot="after-text"></div>
-            </div>
-        </tal:b>
-
-        <!-- With sidebar -->
-        <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|None">
-            <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
-
-            <div class="col-12 col-md-8 col-lg-9 page-main-content">
-                <div class="theiaStickySidebar">
+            <!-- No sidebar -->
+            <tal:b case="False">
+                <div class="col-12 page-main-content">
                     <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
                     <div metal:define-slot="after-lead"></div>
 
                     <div class="page-text" tal:condition="text" tal:content="text" />
                     <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
-
                     <div metal:define-slot="after-text"></div>
+                </div>
+            </tal:b>
 
-                    <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
-                        <h3 i18n:translate>People</h3>
-                        <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
-                            <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
-                                <div>
-                                    <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-                                        <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
-                                            <i class="fa fa-user" tal:condition="not:url"></i>
-                                            <div class="cover-image" style='background-image: url("${url}");'></div>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div>
-                                    <a href="${request.link(person)}">
-                                        <b class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</b>
-                                        <b class="list-title" tal:condition="not western_name_order">${person.title}</b>
-                                    </a>
-                                        <p class="list-lead preview">${person.context_specific_function}</p>
-                                </div>
-                            </li>
-                        </ul>
+            <!-- With sidebar -->
+            <tal:b case="True">
+                <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
+
+                <div class="col-12 col-md-8 col-lg-9 page-main-content">
+                    <div class="theiaStickySidebar">
+                        <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
+                        <div metal:define-slot="before-lead"></div>
+                        <div metal:define-slot="after-lead"></div>
+
+                        <div class="page-text" tal:condition="text" tal:content="text" />
+                        <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+
+                        <div metal:define-slot="after-text"></div>
+
+                        <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
+                            <h3 i18n:translate>People</h3>
+                            <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
+                                <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
+                                    <div>
+                                        <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                                            <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                                <i class="fa fa-user" tal:condition="not:url"></i>
+                                                <div class="cover-image" style='background-image: url("${url}");'></div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <a href="${request.link(person)}">
+                                            <b class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</b>
+                                            <b class="list-title" tal:condition="not western_name_order">${person.title}</b>
+                                        </a>
+                                            <p class="list-lead preview">${person.context_specific_function}</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </tal:b>
         </tal:b>
 
     </div>
@@ -2150,8 +2151,8 @@
     <div tal:condition="result_layout and len(result_layout.breadcrumbs) > 1" tal:define="links result_layout.breadcrumbs">
         <ul class="search-breadcrumbs breadcrumb fs-2xs mb-0 mt-sm">
             <tal:b repeat="link links">
-                <li class="breadcrumb-item link-underline-opacity-0">
-                    ${link(result_layout, ('link-tertiary', )).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
+                <li class="breadcrumb-item fw-bold">
+                    ${link(result_layout, ('link-tertiary',)).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
                 </li>
             </tal:b>
         </ul>
