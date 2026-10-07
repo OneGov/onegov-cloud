@@ -432,12 +432,6 @@ def handle_reservation_form(
                 forms.submissions.delete(submission)
                 submission = None
             else:
-                if submission.parsed != self.parsed:
-                    # the definition has been changed in the meantime
-                    # so we need to update it, so it still matches
-                    # the form we present here
-                    submission.parsed = self.parsed
-
                 # update the data on the submission
                 forms.submissions.update(
                     submission, form, exclude=form.reserved_fields
