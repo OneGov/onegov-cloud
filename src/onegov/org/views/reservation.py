@@ -13,6 +13,7 @@ from onegov.core.mail import Attachment
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.form import FormCollection, merge_forms, as_internal_id
+from onegov.form.errors import UnableToComplete
 from onegov.org import _, log, OrgApp
 from onegov.org import utils
 from onegov.org.cli import close_ticket
@@ -457,9 +458,11 @@ def handle_reservation_form(
         if reservations[0].email != '0xdeadbeef@example.org':
             data['email'] = reservations[0].email
 
+        if submission:
+            data.update(submission.data)
         # set defaults based on remembered submissions from session
         # TODO: should we first apply defaults based on the remembered tag?
-        if not request.POST and (remembered := {
+        elif not request.POST and (remembered := {
             field_id: value
             for key, value in request.browser_session.get(
                 'field_submissions', {}).items()
@@ -468,10 +471,13 @@ def handle_reservation_form(
         }):
             data.update(remembered)
 
-        if submission:
-            data.update(submission.data)
-
         form.process(data=data)
+
+        if submission and not request.POST:
+            # ensure we see the correct validation errors based on the
+            # already submitted data when we navigate back to edit it
+            form.validate()
+            form.ignore_csrf_error()
 
     if not form.errors and blocked:
         request.alert(_(
@@ -599,7 +605,7 @@ def confirm_reservation(
     self: Resource,
     request: OrgRequest,
     layout: ReservationLayout | None = None
-) -> RenderData:
+) -> RenderData | Response:
 
     reservations: list[Reservation]
     reservations = self.bound_reservations(request).all()  # type: ignore[attr-defined]
@@ -612,6 +618,10 @@ def confirm_reservation(
 
     if submission:
         form = request.get_form(submission.form_class, data=submission.data)
+        form.validate()
+        form.ignore_csrf_error()
+        if form.errors:
+            return morepath.redirect(request.link(self, 'form'))
         item_extra = {'submission_id': submission.id}
         extras = form.invoice_items(
             cost_object=self.cost_object,
@@ -720,6 +730,16 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
+
+    # NOTE: We should try this first, we don't want to have to roll back
+    #       after we have already processed the payments.
+    if submission:
+        try:
+            forms.submissions.complete_submission(submission)
+        except UnableToComplete:
+            transaction.abort()
+            return morepath.redirect(request.link(self, name='form'))
+
     provider = request.app.default_payment_provider
     if request.method == 'GET' and (
         provider is None or not provider.payment_via_get
@@ -806,9 +826,6 @@ def finalize_reservation(self: Resource, request: OrgRequest) -> Response:
             'failed_reservations', str(e.reservation.id))
 
         return morepath.redirect(url_obj.as_string())
-
-    if submission:
-        forms.submissions.complete_submission(submission)
 
     with request.session.no_autoflush:
         order_id = request.browser_session.get('ticket_order_id')

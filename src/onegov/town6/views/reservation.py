@@ -66,7 +66,7 @@ def town_handle_reservation_form(
 def town_confirm_reservation(
     self: Resource,
     request: TownRequest
-) -> RenderData:
+) -> RenderData | Response:
     return confirm_reservation(self, request, ReservationLayout(self, request))
 
 
