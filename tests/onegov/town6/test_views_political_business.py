@@ -62,13 +62,15 @@ def test_political_businesses(client_with_fts: Client) -> None:
         page.form['political_business_type'] = 'inquiry'
         page.form['entry_date'] = '2025-10-02'
         page.form['status'] = 'pendent_legislative'
+        page.form['chronology'] = 'Schriftlich beantwortet am 03.11.2025'
         options = page.form['parliamentary_groups'].options
         page.form['parliamentary_groups'] = [o[0] for o in options]
         page = page.form.submit().follow()
         assert title in page
         keywords = ['Für ein schöneres Luzern', 'Oberfraktion',
                     'Geschäftsart', 'Anfrage', 'Status', 'Pendent Legislative',
-                    'Einreichungs-/Publikationsdatum', '02.10.2025']
+                    'Einreichungs-/Publikationsdatum', '02.10.2025',
+                    'Chronologie', 'Schriftlich beantwortet am 03.11.2025']
         for keyword in keywords:
             assert keyword in page
 

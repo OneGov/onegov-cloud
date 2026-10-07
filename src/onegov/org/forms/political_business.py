@@ -19,6 +19,7 @@ from wtforms.fields import DateField
 from wtforms.fields import FormField
 from wtforms.fields import FieldList
 from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.fields import SelectField
 from wtforms.utils import unset_value
 from wtforms.validators import InputRequired
@@ -165,6 +166,12 @@ class PoliticalBusinessForm(Form):
         label=_('Submission/publication date'),
         validators=[InputRequired()],
         default=date.today,
+    )
+
+    chronology = TextAreaField(
+        label=_('Chronology'),
+        validators=[Optional()],
+        description='Schriftlich beantwortet am ...',
     )
 
     parliamentary_groups = ChosenSelectMultipleField(

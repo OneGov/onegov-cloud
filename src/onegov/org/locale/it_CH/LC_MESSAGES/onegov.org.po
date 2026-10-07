@@ -1788,6 +1788,9 @@ msgstr "Cofirmatario"
 msgid "Business Status"
 msgstr "Stato"
 
+msgid "Chronology"
+msgstr "Cronologia"
+
 msgid "Submission/publication date"
 msgstr "Data di invio/pubblicazione"
 

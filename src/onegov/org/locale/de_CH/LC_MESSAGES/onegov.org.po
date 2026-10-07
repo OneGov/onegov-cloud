@@ -1786,6 +1786,9 @@ msgstr "Mitunterzeichner/in"
 msgid "Business Status"
 msgstr "Status"
 
+msgid "Chronology"
+msgstr "Chronologie"
+
 msgid "Submission/publication date"
 msgstr "Einreichungs-/Publikationsdatum"
 

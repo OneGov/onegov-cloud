@@ -8,7 +8,11 @@ from uuid import uuid4, UUID
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import (
+    ContentMixin,
+    content_property,
+    dict_property,
+)
 from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
@@ -147,6 +151,8 @@ class PoliticalBusiness(
         'title': {'type': 'text', 'weight': 'A'},
         'number': {'type': 'text', 'weight': 'A'}
     }
+
+    chronology: dict_property[str | None] = content_property()
 
     @property
     def fts_suggestion(self) -> list[str]:

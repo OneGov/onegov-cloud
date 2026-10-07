@@ -1786,6 +1786,9 @@ msgstr "Co-signataire"
 msgid "Business Status"
 msgstr "Statut"
 
+msgid "Chronology"
+msgstr "Chronologie"
+
 msgid "Submission/publication date"
 msgstr "Date de soumission/publication"
 
