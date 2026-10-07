@@ -28,7 +28,7 @@ from uuid import UUID
 from webob.multidict import MultiDict
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, cast
 if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
     from onegov.form import Form
@@ -981,9 +981,8 @@ def test_ticket_assignment_form(session: Session) -> None:
         event.remove(connection, 'before_cursor_execute', count_query)
 
     assert len(statements) == 1
-    names = sorted(  # type: ignore[misc, str-unpack]
-        name for id_, name in form.user.choices
-    )
+    choices = cast(list[tuple[str, str]], form.user.choices)
+    names = sorted(name for _, name in choices)
     assert names == ['a (A)', 'e']
     assert form.username == 'a'
 

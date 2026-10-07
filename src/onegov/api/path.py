@@ -24,12 +24,14 @@ def get_api_endpoints(
 @ApiApp.path(
     model=ApiEndpoint,
     path='/api/{endpoint}',
-    converters={'page': int}
+    converters={'page': int,
+                'page_size': int},
 )
 def get_api_endpoint(
     request: CoreRequest,
     app: Framework,
     endpoint: str,
+    page_size: int | None,
     page: int = 0,
 ) -> ApiEndpoint[Any, Any] | AuthEndpoint:
 
@@ -42,12 +44,18 @@ def get_api_endpoint(
     #       only allows specifying each parameter once
     extra_parameters = request.GET.dict_of_lists()
     extra_parameters.pop('page', None)
+    extra_parameters.pop('page_size', None)
 
     item = ApiEndpointCollection(request).get_endpoint(
         endpoint,
         page=page,
+        batch_size=page_size,
         extra_parameters=extra_parameters
     )
+
+    if page_size and not 0 < page_size <= 100:
+        raise ApiException('Max batch page_size: 100', status_code=400)
+
     if not item:
         raise ApiException('Not found', status_code=404)
     return item

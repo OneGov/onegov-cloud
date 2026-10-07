@@ -41,7 +41,8 @@ from uuid import uuid4
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
-    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from collections.abc import (
+        Generator, Iterable, Mapping, Sequence)
     from reportlab.lib.styles import PropertySet
     from reportlab.platypus.doctemplate import _PageCallback
     from reportlab.platypus.tables import _TableCommand
@@ -244,7 +245,7 @@ class Pdf(PDFDocument):
         )
 
     @contextmanager
-    def keep_together(self) -> Iterator[None]:
+    def keep_together(self) -> Generator[None]:
         """ Keeps anything added during the lifetime of this contextmanager
         together.
 

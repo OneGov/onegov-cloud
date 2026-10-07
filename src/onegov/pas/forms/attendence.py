@@ -9,13 +9,10 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.pas import _
-from onegov.pas.custom import get_current_settlement_run
 from onegov.pas.collections import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
-from onegov.pas.utils import (
-    get_active_kantonsrat_parliamentarians,
-    is_active_kantonsrat_member,
-)
+from onegov.pas.utils import get_attendance_parliamentarians
+from onegov.pas.utils import get_attendance_settlement_run
 from onegov.pas.custom import AttendenceCollection
 from onegov.pas.models import PASCommission, PASCommissionMembership
 from onegov.pas.models import SettlementRun
@@ -24,7 +21,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
-from wtforms.validators import InputRequired, ValidationError
+from wtforms.validators import InputRequired, NumberRange, ValidationError
 from onegov.user import User
 from uuid import UUID
 
@@ -63,7 +60,7 @@ class SettlementRunBoundMixin:
         if self.request.method == 'POST':
             return
 
-        settlement_run = get_current_settlement_run(self.request.session)
+        settlement_run = get_attendance_settlement_run(self.request)
         if settlement_run is not None:
             self.date.data = settlement_run.start
 
@@ -96,7 +93,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     type = RadioField(
@@ -307,9 +304,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         else:
             self.parliamentarian_id.choices = [
                 (str(p.id), p.title)
-                for p in get_active_kantonsrat_parliamentarians(
-                    self.request.app
-                )
+                for p in get_attendance_parliamentarians(self.request)
             ]
 
         # Filter commission choices based on user role
@@ -403,9 +398,7 @@ class AttendenceAddForm(AttendenceForm):
         else:
             self.parliamentarian_id.choices = [
                 (str(p.id), p.title)
-                for p in get_active_kantonsrat_parliamentarians(
-                    self.request.app
-                )
+                for p in get_attendance_parliamentarians(self.request)
             ]
 
 
@@ -420,7 +413,7 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     parliamentarian_id = MultiCheckboxField(
@@ -437,7 +430,7 @@ class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
         self.set_default_value_to_settlement_run_start()
         self.parliamentarian_id.choices = [
             (str(p.id), p.title)
-            for p in get_active_kantonsrat_parliamentarians(self.request.app)
+            for p in get_attendance_parliamentarians(self.request)
         ]
         self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices
@@ -469,7 +462,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     commission_id = ChosenSelectField(
@@ -496,9 +489,7 @@ class AttendenceAddCommissionBulkForm(Form, SettlementRunBoundMixin):
     def on_request(self) -> None:
         self.set_default_value_to_settlement_run_start()
         commissions = PASCommissionCollection(self.request.session).query()
-        parliamentarians = get_active_kantonsrat_parliamentarians(
-            self.request.app
-        )
+        parliamentarians = get_attendance_parliamentarians(self.request)
 
         if (
             hasattr(self.request.identity, 'role')
@@ -563,7 +554,7 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     commission_id = ChosenSelectField(
@@ -602,7 +593,7 @@ class AttendenceEditBulkForm(Form, SettlementRunBoundMixin):
         ]
         self.parliamentarian_id.choices = [
             (str(p.id), p.title)
-            for p in get_active_kantonsrat_parliamentarians(self.request.app)
+            for p in get_attendance_parliamentarians(self.request)
         ]
 
 
@@ -622,11 +613,16 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
                 PASCommissionMembership.commission_id == obj.commission_id
             ).all()
 
-        self.parliamentarian_id.choices = [
-            (str(m.parliamentarian.id), m.parliamentarian.title)
-            for m in memberships
-            if is_active_kantonsrat_member(m.parliamentarian)
-        ]
+        eligible = {
+            p.id for p in get_attendance_parliamentarians(self.request)
+        }
+        self.parliamentarian_id.choices = list(
+            {
+                str(m.parliamentarian_id): m.parliamentarian.title
+                for m in memberships
+                if m.parliamentarian_id in eligible
+            }.items()
+        )
 
         self.duration.data = minutes_to_hours(obj.duration)
         self.abschluss.data = obj.abschluss
@@ -684,7 +680,7 @@ class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
 
         self.parliamentarian_id.choices = [
             (str(p.id), p.title)
-            for p in get_active_kantonsrat_parliamentarians(self.request.app)
+            for p in get_attendance_parliamentarians(self.request)
         ]
 
         self.parliamentarian_id.data = [
@@ -711,7 +707,7 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
     duration = DecimalField(
         places=2,
         label=_('Duration in hours'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), NumberRange(min=0)],
     )
 
     type = RadioField(

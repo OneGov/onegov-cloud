@@ -47,6 +47,7 @@ type PoliticalBusinessType = Literal[
 type PoliticalBusinessStatus = Literal[
     'abgeschrieben',
     'beantwortet',
+    'eingereicht',
     'erheblich_erklaert',
     'erledigt',
     'nicht_erheblich_erklaert',
@@ -78,6 +79,7 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
 POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
     'abgeschrieben': 'Abgeschrieben',
     'beantwortet': 'Beantwortet',
+    'eingereicht': 'Eingereicht',
     'erheblich_erklaert': 'Erheblich erklärt',
     'erledigt': 'Erledigt',
     'nicht_erheblich_erklaert': 'Nicht erheblich erklärt',
@@ -121,6 +123,7 @@ class PoliticalBusiness(
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
         'Abgeschrieben': 'written_off',
         'Beantwortet': 'answered',
+        'Eingereicht': 'submitted',
         'Erheblich erklärt': 'declared_significant',
         'Erledigt': 'completed',
         'Nicht erheblich erklärt': 'declared_insignificant',

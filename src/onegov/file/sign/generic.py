@@ -8,7 +8,7 @@ from io import UnsupportedOperation
 from typing import Any, ClassVar, Protocol, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead, SupportsWrite
-    from collections.abc import Iterator
+    from collections.abc import Generator
     from onegov.file.models import File, SigningRequest
     from onegov.file.types import SigningServiceConfig
     from sqlalchemy.orm import Session
@@ -111,7 +111,7 @@ class SigningService:
     def materialise(
         self,
         file: SupportsRead[bytes]
-    ) -> Iterator[SupportsReadAndHasName]:
+    ) -> Generator[SupportsReadAndHasName]:
         """ Takes the given file-like object and ensures that it exists
         somewhere on the disk during the lifetime of the context.
 

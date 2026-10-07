@@ -11,7 +11,7 @@ from sqlparse import format
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
     from datetime import timedelta
     from psycopg import Cursor
     from sqlalchemy.engine import Connection
@@ -44,7 +44,7 @@ def print_query(query: bytes) -> None:
 @contextmanager
 def analyze_sql_queries(
     report: Literal['summary', 'redundant', 'all'] = 'summary'
-) -> Iterator[None]:
+) -> Generator[None]:
     """ Analyzes the sql-queries executed during its context. There are three
     levels of information (report argument):
 

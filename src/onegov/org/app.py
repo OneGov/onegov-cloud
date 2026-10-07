@@ -829,6 +829,7 @@ def get_editor_asset() -> Iterator[str]:
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
     yield 'filemanager.js'
+    yield 'imagecropper.js'
     yield 'imagemanager.js'
     yield 'table.js'
     yield 'alphalist.js'

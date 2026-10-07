@@ -8,7 +8,7 @@ from webob.exc import HTTPUnauthorized
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
     from onegov.core.request import CoreRequest
     from webob import Response
 
@@ -36,7 +36,7 @@ class KerberosClient:
             kerberos.getServerPrincipalDetails(self.service, self.hostname)
 
     @contextmanager
-    def context(self) -> Iterator[None]:
+    def context(self) -> Generator[None]:
         """ Runs the block inside the context manager with the keytab
         set to the provider's keytab.
 

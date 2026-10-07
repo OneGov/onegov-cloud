@@ -19,7 +19,7 @@ from onegov.pas.utils import is_active_kantonsrat_member
 
 from typing import Any, cast, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.pas.importer.types import MembershipData
+    from onegov.pas.importer.types import MembershipData, OrganizationData
     from sqlalchemy.orm import Session
 
 
@@ -213,6 +213,28 @@ def test_organization_importer_existing(
     assert party_count == 1
 
 
+def test_organization_importer_imports_intercantonal_commission(
+    session: Session,
+) -> None:
+    importer = OrganizationImporter(session)
+    organization = cast(
+        'OrganizationData',
+        {
+            'id': 'a8e8fd19-d0aa-42f7-9515-22cdc26b89e3',
+            'name': 'Interkantonale Kommission',
+            'organizationTypeTitle': 'Interkantonale Kommission',
+        },
+    )
+
+    commission_map, _, _, _, _, processed_counts = importer.bulk_import(
+        [organization]
+    )
+
+    commission = commission_map[organization['id']]
+    assert commission.type == 'intercantonal'
+    assert processed_counts['commissions'] == 1
+
+
 def test_membership_importer_role_transition(
     session: Session,
 ) -> None:
@@ -233,6 +255,7 @@ def test_membership_importer_role_transition(
     commission = PASCommission(
         name='Kommission Gesundheit und Soziales',
         external_kub_id=UUID('a8e8fd19-d0aa-42f7-9515-22cdc26b89e3'),
+        type='intercantonal',
     )
     session.add_all([parl, commission])
     session.flush()
@@ -253,7 +276,7 @@ def test_membership_importer_role_transition(
             'organization': {
                 'id': commission_kub_id,
                 'name': 'Kommission Gesundheit und Soziales',
-                'organizationTypeTitle': 'Kommission',
+                'organizationTypeTitle': 'Interkantonale Kommission',
             },
             'person': {
                 'id': person_kub_id,
@@ -278,7 +301,7 @@ def test_membership_importer_role_transition(
             'organization': {
                 'id': commission_kub_id,
                 'name': 'Kommission Gesundheit und Soziales',
-                'organizationTypeTitle': 'Kommission',
+                'organizationTypeTitle': 'Interkantonale Kommission',
             },
             'person': {
                 'id': person_kub_id,
@@ -437,7 +460,7 @@ def test_membership_importer_keeps_open_kantonsrat_role(
     assert str(roles[0].end) == '2020-12-17'
     assert str(roles[1].start) == '2024-12-20'
     assert roles[1].end is None
-    assert is_active_kantonsrat_member(parliamentarian)
+    assert is_active_kantonsrat_member(parliamentarian, date(2026, 7, 1))
 
 
 def test_membership_importer_merges_duplicate_kub_memberships(

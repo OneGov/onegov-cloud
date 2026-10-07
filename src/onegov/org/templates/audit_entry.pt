@@ -39,8 +39,16 @@
                 </div>
             </div>
 
-            <section class="audit-snapshot-panel"
+            <section class="audit-diff-panel" tal:condition="diff">
+                <div class="audit-snapshot-heading">
+                    <h2 i18n:translate>Changes</h2>
+                </div>
+                <div class="audit-diff">${diff}</div>
+            </section>
+
+            <details class="audit-snapshot-panel"
                      tal:condition="previous_snapshot">
+                <summary i18n:translate>Before update</summary>
                 <div class="audit-snapshot-heading">
                     <h2 i18n:translate>Before update</h2>
                     <button class="button clear audit-copy"
@@ -60,9 +68,10 @@
                 </div>
                 <pre id="audit-previous-snapshot"
                      class="audit-snapshot">${previous_snapshot}</pre>
-            </section>
+            </details>
 
-            <section class="audit-snapshot-panel">
+            <details class="audit-snapshot-panel">
+                <summary i18n:translate>JSON Snapshot</summary>
                 <div class="audit-snapshot-heading">
                     <h2 tal:condition="previous_snapshot"
                         i18n:translate>After update</h2>
@@ -84,7 +93,7 @@
                 </div>
                 <pre id="audit-snapshot"
                      class="audit-snapshot">${snapshot}</pre>
-            </section>
+            </details>
         </div>
     </tal:b>
 </div>
