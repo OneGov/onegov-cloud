@@ -2428,6 +2428,16 @@ def test_reserve_confirmation_with_definition(client: Client) -> None:
     assert 'Elliot' in confirmation
     assert 'Alderson' in confirmation
 
+    # introducing errors causes the confirmation/finish views to
+    # redirect back to the form view when manually navigated to
+    formular = confirmation.click('Bearbeiten')
+    formular.form['nachname'] = ''
+    assert 'Dieses Feld wird benötigt' in formular.form.submit()
+    assert 'Dieses Feld wird benötigt' in client.get(
+        '/resource/tageskarte/confirmation').follow()
+    assert 'Dieses Feld wird benötigt' in client.get(
+        '/resource/tageskarte/finish').follow()
+
 
 @freeze_time('2015-08-28', tick=True)
 def test_reserve_session_bound(client: Client) -> None:
