@@ -1481,8 +1481,10 @@
 </metal:ticket_callout>
 
 <metal:pagination define-macro="pagination" i18n:domain="onegov.town6">
-    <nav aria-label="Pagination" tal:define="centered pagination_centered|False; name collection.name_of_view">
-        <ul class="pagination ${'text-center' if centered else ''}" tal:condition="collection.pages_count > 1">
+    <nav aria-label="Pagination" i18n:attributes="aria-label"
+        tal:define="centered pagination_centered|False; name collection.name_of_view"
+        tal:condition="collection.pages_count > 1">
+        <ul class="pagination ${'justify-content-center' if centered else ''}">
             <tal:b repeat="page collection.pages">
                 <tal:b define="
                     previous current_page.previous;
@@ -1490,21 +1492,30 @@
                     is_current current_page == page;
                     is_visible abs(current_page.page-page.page) < 6;
                 ">
-                    <tal:b condition="repeat.page.start and previous">
-                        <li class="pagination-previous">
-                            <a href="${request.link(previous, name)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
-                        </li>
-                    </tal:b>
-
-                    <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
-                        <a href="${request.link(page, name)}"><span class="visually-hidden" i18n:translate>You're on page </span><span>${page.page + 1}</span></a>
+                    <li class="page-item" tal:condition="repeat.page.start and previous">
+                        <a class="page-link"
+                        href="${request.link(previous, name)}"
+                        aria-label="Previous Page" i18n:attributes="aria-label">
+                            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                        </a>
                     </li>
 
-                    <tal:b condition="repeat.page.end and next">
-                        <li class="pagination-next">
-                            <a href="${request.link(next, name)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
-                        </li>
-                    </tal:b>
+                    <li tal:condition="is_visible"
+                        class="page-item ${is_current and 'active' or ''}">
+                        <a class="page-link"
+                        href="${request.link(page, name)}"
+                        tal:attributes="aria-current is_current and 'page' or None">
+                            <span class="visually-hidden" i18n:translate>You're on page </span><span>${page.page + 1}</span>
+                        </a>
+                    </li>
+
+                    <li class="page-item" tal:condition="repeat.page.end and next">
+                        <a class="page-link"
+                        href="${request.link(next, name)}"
+                        aria-label="Next Page" i18n:attributes="aria-label">
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                        </a>
+                    </li>
                 </tal:b>
             </tal:b>
         </ul>
@@ -3410,13 +3421,13 @@
     <tr tal:define="ticket_url request.link(ticket); has_access request.is_manager_for_model(ticket)"
             class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}" tal:attributes="data-url action_link(ticket) if has_access else nothing">
         <tal:block tal:condition="has_access">
-          <td class="ticket-number-plain">
-              <a href="${ticket_url}">
+          <td class="ticket-number-plain p-0">
+              <a class="fw-bold text-decoration-none h-100 w-100 d-block p-sm" href="${ticket_url}">
                   ${ticket.number}
               </a>
           </td>
           <td class="ticket-group" colspan="2">
-              <div>${translate(ticket.group)}</div>
+              <div class="fw-bold">${translate(ticket.group)}</div>
               <div>${ticket.title}</div>
               <div>${ticket.subtitle}</div>
               <tal:b define="payment ticket.handler.payment" tal:condition="payment">
