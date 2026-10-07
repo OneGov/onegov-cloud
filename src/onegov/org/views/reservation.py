@@ -334,7 +334,7 @@ def get_reservation_form_class(
     request: OrgRequest
 ) -> type[ReservationForm]:
 
-    if resource.definition:
+    if resource.parsed is not None:
         form_class = resource.form_class
         assert form_class is not None
         return merge_forms(ReservationForm, form_class)
@@ -413,7 +413,7 @@ def handle_reservation_form(
                     data['ticket_tag_meta'] = filtered_meta
 
         # add the submission if it doesn't yet exist
-        if self.definition and not submission:
+        if self.parsed is not None and not submission:
             form_class = self.form_class
             assert form_class is not None
             submission = forms.submissions.add_external(
@@ -424,11 +424,24 @@ def handle_reservation_form(
                 minimum_price_total=self.minimum_price_total,
             )
 
-        # update the data on the submission
+        # make any necessary changes to the submission
         if submission:
-            forms.submissions.update(
-                submission, form, exclude=form.reserved_fields
-            )
+            if self.parsed is None:
+                # the definition has been removed in the meantime
+                # so we can delete the submission
+                forms.submissions.delete(submission)
+                submission = None
+            else:
+                if submission.parsed != self.parsed:
+                    # the definition has been changed in the meantime
+                    # so we need to update it, so it still matches
+                    # the form we present here
+                    submission.parsed = self.parsed
+
+                # update the data on the submission
+                forms.submissions.update(
+                    submission, form, exclude=form.reserved_fields
+                )
 
     # enforce the zip-code block if configured
     if request.POST:
