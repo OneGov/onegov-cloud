@@ -27,7 +27,7 @@ class UTCPublicationMixin:
     def _publication_started_expression(cls) -> ColumnElement[bool]:
         return case(
             (cls.publication_start == None, True),
-            else_=cls.publication_start <= func.now(),
+            else_=cls.publication_start <= func.now()
         )
 
     @hybrid_property
@@ -41,7 +41,7 @@ class UTCPublicationMixin:
     def _publication_ended_expression(cls) -> ColumnElement[bool]:
         return case(
             (cls.publication_end == None, False),
-            else_=cls.publication_end < func.now(),
+            else_=cls.publication_end < func.now()
         )
 
     @hybrid_property

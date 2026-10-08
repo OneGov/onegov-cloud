@@ -336,7 +336,7 @@ class PoliticalBusinessCollection(
                 PoliticalBusiness.meta['access'].is_(None)
             ))
 
-        if role not in ('admin', 'editor'):
+        if not self.request.is_manager:
             query = query.filter(PoliticalBusiness.published.is_(True))
 
         if self.term:
