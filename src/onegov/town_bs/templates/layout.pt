@@ -230,17 +230,9 @@
         </tal:b>
 
         <div tal:condition="layout.show_partners" id="partners-everywhere" class="partners-everywhere">
-            <div class="grid-container full gray">
-                <div class="grid-x">
-                    <div class="cell small-12">
-                        <div class="grid-container">
-                            <div class="grid-x grid-padding-x grid-padding-y">
-                                <div class="cell small-12">
-                                    <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners; subpage layout.show_partners"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="w-100 bg-tertiary">
+                <div class="container">
+                    <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners; subpage layout.show_partners"/>
                 </div>
             </div>
         </div>

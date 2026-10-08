@@ -89,8 +89,17 @@
   overflow: hidden;
 }
 
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
 .border-hover {
-    transition: all $standard-transition;
+    transition: border $standard-transition;
+
     &:hover {
         border-color: $primary;
     }
@@ -103,4 +112,13 @@
   padding-left: 0;
   margin-bottom: 0;
   list-style: none;
+}
+
+.icon-circle {
+  background: $primary;
+  color: white;
+  border-radius: 50%;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
 }

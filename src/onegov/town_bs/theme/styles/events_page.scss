@@ -7,16 +7,7 @@
   }
 
   .date-place {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition:
-      grid-template-rows $standard-transition,
-      opacity $standard-transition;
-
-    > div {
-      min-height: 0;
-    }
+    @include hover-reveal-collapsed;
   }
 
   &:hover {
@@ -27,8 +18,7 @@
     }
 
     .date-place {
-      grid-template-rows: 1fr;
-      opacity: 1;
+      @include hover-reveal-expanded;
     }
   }
 }

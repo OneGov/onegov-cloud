@@ -67,7 +67,7 @@
             <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
         </a>
         <button tal:condition="children" class="drilldown-toggle py-md pe-sm" type="button" data-bs-toggle="drilldown" aria-label="open submenu" i18n:attributes="aria-label">
-             <i class="fas fa-arrow-right"></i>
+            <i class="fas fa-arrow-right"></i>
         </button>
     </div>
 
@@ -106,7 +106,7 @@
 
 <metal:header_links define-macro="header_links">
     <div tal:condition="links" id="header_links" class="text-center" tal:define="links header_options.get('header_links')">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white pb-0 pt-lg">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white pb-0">
             <div class="container">
                 <button class="navbar-toggler mx-auto border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topNav" aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -382,8 +382,8 @@
 </metal:partners>
 
 <metal:partners define-macro="partner-cards" i18n:domain="onegov.town6" tal:define="subpage subpage|False">
-    <div class="partners grid-x grid-padding-x columns small-up-2 medium-up-3 large-up-4 align-center">
-        <div class="cell" tal:repeat="item partners">
+    <div class="partners row row-cols-4 row-cols-lg-6 g-3 justify-content-center">
+        <div class="col" tal:repeat="item partners">
             <metal:b use-macro="layout.macros['partner-card']" />
         </div>
     </div>
@@ -1955,7 +1955,7 @@
                                        required maxlength="200" placeholder="What are you searching for?"
                                        i18n:attributes="placeholder">
 
-                                <button class="square-4xl btn btn-primary rounded-circle position-absolute top-50 end-0 translate-middle-y me-xs p-0 d-flex align-items-center justify-content-center"
+                                <button class="square-4xl btn btn-primary rounded-circle position-absolute top-50 end-0 translate-middle-y me-xs p-0 icon-circle"
                                         type="submit">
                                     <i class="fa fa-search"></i>
                                 </button>
@@ -1996,13 +1996,19 @@
 </metal:testimonial>
 
 <metal:icon_links define-macro="icon_link" i18n:domain="onegov.town6">
-        <div tal:condition="title and icon" class="icon-link card inverted-${str(invert).lower()}" data-aos="fade">
-            <a href="${link}">
-                <h5 class="title"><i class="fa ${icon} icon"></i> <span>${title}</span></h5>
-                <p tal:condition="text" >${text}</p>
+        <div tal:condition="title and icon" class="icon-link card border-hover h-100 w-100 inverted-${str(invert).lower()}" data-aos="fade">
+            <a class="card-body d-flex flex-column text-decoration-none" href="${link}">
+                <i class="square-3xl icon-circle fa ${icon} icon"></i>
+                <h5 class="title mt-auto mb-0 fs-md line-clamp-2"> <span>${title}</span></h5>
+                <div class="hover-reveal" tal:condition="text">
+                    <div>
+                        <p class="fs-xs line-clamp-3 mt-sm mb-0">${text}</p>
+                    </div>
+                </div>
             </a>
         </div>
 </metal:icon_links>
+
 <metal:slider define-macro="slider" i18n:domain="onegov.town6" tal:define="searchbox searchbox|'true';">
 
     <div class="homepage-image-slider">
