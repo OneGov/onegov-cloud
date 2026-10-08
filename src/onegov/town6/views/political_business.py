@@ -44,7 +44,7 @@ def count_political_businesses_by_type(
     query = PoliticalBusinessCollection(request).query().order_by(None)
     counts = query.with_entities(
         PoliticalBusiness.political_business_type,
-        func.count(PoliticalBusiness.id).label('count')
+        func.count(PoliticalBusiness.id).label('count'),
     ).group_by(PoliticalBusiness.political_business_type)
 
     return dict(counts.tuples())
@@ -56,7 +56,7 @@ def count_political_businesses_by_status(
     query = PoliticalBusinessCollection(request).query().order_by(None)
     counts = query.with_entities(
         PoliticalBusiness.status,
-        func.count(PoliticalBusiness.id).label('count')
+        func.count(PoliticalBusiness.id).label('count'),
     ).group_by(PoliticalBusiness.status)
 
     return dict(counts.tuples())

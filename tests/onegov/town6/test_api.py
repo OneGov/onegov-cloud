@@ -1,5 +1,6 @@
 import transaction
 
+from datetime import timedelta
 from onegov.org.models.meeting import Meeting
 from onegov.org.models.parliament import (
     RISCommission, RISParliamentarian, RISParliamentaryGroup)
@@ -222,5 +223,32 @@ def test_api_political_businesses_endpoint_hides_private_entries(
 
     client.get(
         f'/api/political_businesses/{hidden_id.hex}',
+        status=404,
+    )
+
+
+def test_api_political_businesses_endpoint_hides_scheduled_entries(
+    client: Client,
+) -> None:
+    session = client.app.session()
+    client.app.org.ris_enabled = True
+    business_id = uuid4()
+    business = PoliticalBusiness(
+        id=business_id,
+        title='Scheduled Business',
+        number='2024.012',
+        political_business_type='motion',
+        status='pendent_legislative',
+        publication_start=utcnow() + timedelta(hours=1),
+    )
+    session.add(business)
+    transaction.commit()
+
+    items = api_items(client, '/api/political_businesses')
+    titles = {api_item_data(item)['title'] for item in items}
+
+    assert 'Scheduled Business' not in titles
+    client.get(
+        f'/api/political_businesses/{business_id.hex}',
         status=404,
     )

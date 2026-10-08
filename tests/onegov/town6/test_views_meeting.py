@@ -4,13 +4,58 @@ import zipfile
 from datetime import datetime, timedelta
 
 from freezegun import freeze_time
+from markupsafe import Markup
+from onegov.org.models.meeting import Meeting
+from onegov.org.models.meeting_item import MeetingItem
+from onegov.org.models.political_business import PoliticalBusiness
+from sedate import utcnow
 from tests.shared.utils import create_image
+from transaction import commit
 from webtest import Upload
+from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .conftest import Client
+
+
+def test_meeting_hides_scheduled_political_businesses(client: Client) -> None:
+    client.app.org.ris_enabled = True
+    meeting_id = uuid4()
+    meeting = Meeting(
+        id=meeting_id,
+        title='Public Meeting',
+        start_datetime=utcnow(),
+        address=Markup('Town Hall'),
+    )
+    business = PoliticalBusiness(
+        title='Scheduled Business',
+        political_business_type='motion',
+        status='pendent_legislative',
+        publication_start=utcnow() + timedelta(hours=1),
+    )
+    business.meta = {'self_id': 'scheduled-business'}
+    meeting.meeting_items = [
+        MeetingItem(
+            title='Linked scheduled item',
+            number='1',
+            political_business=business,
+            meeting=meeting,
+        ),
+        MeetingItem(
+            title='Imported scheduled item',
+            number='2',
+            political_business_link_id='scheduled-business',
+            meeting=meeting,
+        ),
+    ]
+    client.app.session().add(meeting)
+    commit()
+
+    page = client.get(f'/meeting/{meeting_id.hex}')
+    assert 'Linked scheduled item' not in page
+    assert 'Imported scheduled item' not in page
 
 
 def test_meetings(client: Client) -> None:

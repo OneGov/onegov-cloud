@@ -10,6 +10,7 @@ from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
     ContentMixin,
+    UTCPublicationMixin,
     content_property,
     dict_property,
 )
@@ -18,6 +19,7 @@ from onegov.file import MultiAssociatedFiles
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
+from onegov.org.models.extensions import PublicationExtension
 from onegov.search import ORMSearchable, SearchIndex
 from onegov.search.utils import language_from_locale
 from sedate import as_datetime, replace_timezone
@@ -121,8 +123,10 @@ class PoliticalBusiness(
     MultiAssociatedFiles,
     Base,
     ContentMixin,
+    ORMSearchable,
+    PublicationExtension,
     GeneralFileLinkExtension,
-    ORMSearchable
+    UTCPublicationMixin,
 ):
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
         'Abgeschrieben': 'written_off',
@@ -330,7 +334,9 @@ class PoliticalBusinessCollection(
 
     def is_listed(self, business: PoliticalBusiness) -> bool:
         accesses = self.available_accesses
-        return not accesses or business.access in accesses
+        return not accesses or (
+            business.access in accesses and business.published
+        )
 
     def query(
         self,
@@ -350,6 +356,9 @@ class PoliticalBusinessCollection(
                 ),
                 PoliticalBusiness.meta['access'].is_(None)
             ))
+
+        if not self.request.is_manager:
+            query = query.filter(PoliticalBusiness.published.is_(True))
 
         if self.term:
             language = self.request.locale

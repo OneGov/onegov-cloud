@@ -1,6 +1,6 @@
 import pytest
 
-from datetime import date
+from datetime import date, timedelta
 from freezegun import freeze_time
 from markupsafe import Markup
 from onegov.org.models import Meeting, MeetingItem, RISParliamentarian
@@ -10,11 +10,33 @@ from onegov.org.models.political_business import (
 )
 from sedate import utcnow
 from transaction import commit
+from uuid import uuid4
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .conftest import Client
+
+
+def test_scheduled_political_business_is_hidden_from_public_views(
+    client: Client,
+) -> None:
+    client.app.org.ris_enabled = True
+    business_id = uuid4()
+    client.app.session().add(
+        PoliticalBusiness(
+            id=business_id,
+            title='Scheduled Business',
+            political_business_type='motion',
+            status='pendent_legislative',
+            publication_start=utcnow() + timedelta(hours=1),
+        )
+    )
+    commit()
+
+    page = client.get('/political-businesses')
+    assert 'Scheduled Business' not in page
+    client.get(f'/political-business/{business_id.hex}', status=404)
 
 
 @pytest.mark.parametrize('access', ['public', 'secret', 'private', 'member'])
@@ -62,7 +84,11 @@ def test_political_business_access(client: Client, access: str) -> None:
     client.get(url)
 
 
-def test_private_business_hidden_from_related_pages(client: Client) -> None:
+@pytest.mark.parametrize('scheduled', [False, True])
+def test_private_business_hidden_from_related_pages(
+    client: Client,
+    scheduled: bool,
+) -> None:
     client.app.org.ris_enabled = True
     person = RISParliamentarian(first_name='Anna', last_name='Example')
     business = PoliticalBusiness(
@@ -70,7 +96,13 @@ def test_private_business_hidden_from_related_pages(client: Client) -> None:
         political_business_type='postulate',
         status='beantwortet',
         entry_date=date(2037, 1, 1),
-        meta={'access': 'private', 'self_id': 'private-business'},
+        meta={
+            'access': 'public' if scheduled else 'private',
+            'self_id': 'private-business',
+        },
+        publication_start=(
+            utcnow() + timedelta(hours=1) if scheduled else None
+        ),
         participants=[
             PoliticalBusinessParticipation(
                 parliamentarian=person,
@@ -169,6 +201,8 @@ def test_political_businesses(client_with_fts: Client) -> None:
         assert 'Es wurden noch keine politischen Geschäfte erfasst' in page
 
         page = page.click('Politisches Geschäft')
+        assert 'publication_start' in page.form.fields
+        assert 'publication_end' in page.form.fields
         title = 'How many congressmen does it take to change a light bulb?'
         page.form['title'] = title
         page.form['number'] = '25.10'
@@ -180,10 +214,18 @@ def test_political_businesses(client_with_fts: Client) -> None:
         page.form['parliamentary_groups'] = [o[0] for o in options]
         page = page.form.submit().follow()
         assert title in page
-        keywords = ['Für ein schöneres Luzern', 'Oberfraktion',
-                    'Geschäftsart', 'Anfrage', 'Status', 'Pendent Legislative',
-                    'Einreichungs-/Publikationsdatum', '02.10.2025',
-                    'Chronologie', 'Schriftlich beantwortet am 03.11.2025']
+        keywords = [
+            'Für ein schöneres Luzern',
+            'Oberfraktion',
+            'Geschäftsart',
+            'Anfrage',
+            'Status',
+            'Pendent Legislative',
+            'Einreichungs-/Publikationsdatum',
+            '02.10.2025',
+            'Chronologie',
+            'Schriftlich beantwortet am 03.11.2025',
+        ]
         for keyword in keywords:
             assert keyword in page
 
