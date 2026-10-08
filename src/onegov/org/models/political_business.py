@@ -320,14 +320,27 @@ class PoliticalBusinessCollection(
             and self.page == other.page
         )
 
-    def query(self) -> Query[PoliticalBusiness]:
+    @property
+    def available_accesses(self) -> tuple[str, ...]:
+        if self.request.is_manager:
+            return ()
+        if self.request.is_member:
+            return ('member', 'mtan', 'public')
+        return ('mtan', 'public')
+
+    def is_listed(self, business: PoliticalBusiness) -> bool:
+        accesses = self.available_accesses
+        return not accesses or business.access in accesses
+
+    def query(
+        self,
+        include_unlisted: bool = False,
+    ) -> Query[PoliticalBusiness]:
         query = super().query()
-        role = getattr(self.request.identity, 'role', 'anonymous')
-        available_accesses = {
-            'admin': (),
-            'editor': (),
-            'member': ('member', 'mtan', 'public'),
-        }.get(role, ('mtan', 'public'))
+        available_accesses = self.available_accesses
+
+        if include_unlisted and available_accesses:
+            available_accesses += ('secret', 'secret_mtan')
 
         if available_accesses:
             query = query.filter(or_(
@@ -411,13 +424,22 @@ class PoliticalBusinessCollection(
             years=years,
         )
 
+    def by_id(self, id: UUID) -> PoliticalBusiness | None:
+        return self.query(include_unlisted=True).filter_by(id=id).first()
+
     def years_for_entries(self) -> list[int]:
         """ Returns a list of years for which there are entries in the db """
 
         year = func.extract('year', PoliticalBusiness.entry_date).label('year')
-        years = self.session.query(year).filter(
-            PoliticalBusiness.entry_date.isnot(None)
-        ).distinct().order_by(year.desc())
+        years = (
+            self.__class__(self.request)
+            .query()
+            .order_by(None)
+            .with_entities(year)
+            .filter(PoliticalBusiness.entry_date.isnot(None))
+            .distinct()
+            .order_by(year.desc())
+        )
 
         # convert to a list of integers, remove duplicates, and sort
         return sorted({int(year[0]) for year in years}, reverse=True)
@@ -439,7 +461,7 @@ class PoliticalBusinessCollection(
     ) -> Query[PoliticalBusiness]:
         """ Returns political businesses by given parliamentarian id """
         return (
-            self.session.query(PoliticalBusiness)
+            self.query()
             .filter(PoliticalBusiness.participants.any(
                 PoliticalBusinessParticipation.parliamentarian_id ==
                 parliamentarian_id
