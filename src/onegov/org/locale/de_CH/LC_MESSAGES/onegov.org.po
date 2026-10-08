@@ -1786,6 +1786,9 @@ msgstr "Mitunterzeichner/in"
 msgid "Business Status"
 msgstr "Status"
 
+msgid "Chronology"
+msgstr "Chronologie"
+
 msgid "Submission/publication date"
 msgstr "Einreichungs-/Publikationsdatum"
 
@@ -4709,6 +4712,9 @@ msgstr "Besitzer:"
 msgid "Kind:"
 msgstr "Art:"
 
+msgid "Changes"
+msgstr "Änderungen"
+
 msgid "Before update"
 msgstr "Vor der Änderung"
 
@@ -4718,11 +4724,11 @@ msgstr "JSON kopieren"
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
 
-msgid "After update"
-msgstr "Nach der Änderung"
-
 msgid "JSON Snapshot"
 msgstr "JSON-Snapshot"
+
+msgid "After update"
+msgstr "Nach der Änderung"
 
 msgid ""
 "The audit trail shows when and by whom records were created, changed or "

@@ -406,6 +406,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         event = contains_eager(Occurrence.event)
         return result.set_query_options(
             event.joinedload(Event.image),
+            event.joinedload(Event.pdf),
             event.undefer(Event.content),
             undefer(Occurrence.content),
         )
@@ -628,8 +629,6 @@ class DirectoryEntryApiEndpoint(ApiEndpoint[ExtendedDirectoryEntry, UUID]):
         page: int | None = None,
         batch_size: int | None = None,
     ):
-        self.batch_size = (
-            int(batch_size) if batch_size else self.default_batch_size)
         super().__init__(request, extra_parameters, page, batch_size)
         self.endpoint = name
 

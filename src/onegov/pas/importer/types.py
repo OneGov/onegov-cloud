@@ -78,7 +78,14 @@ class OrganizationData(TypedDict):
     modified: str
     name: str
     organizationTypeTitle: (
-        Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
+        Literal[
+            'Kommission',
+            'Interkantonale Kommission',
+            'Fraktion',
+            'Kantonsrat',
+            'Sonstige',
+        ]
+        | None
     )
     primaryEmail: None
     status: int
@@ -96,7 +103,14 @@ class OrganizationDataWithinMembership(TypedDict):
     modified: str
     name: str
     organizationTypeTitle: (
-        Literal['Kommission', 'Fraktion', 'Kantonsrat', 'Sonstige'] | None
+        Literal[
+            'Kommission',
+            'Interkantonale Kommission',
+            'Fraktion',
+            'Kantonsrat',
+            'Sonstige',
+        ]
+        | None
     )
     primaryEmail: EmailData | None
     status: int

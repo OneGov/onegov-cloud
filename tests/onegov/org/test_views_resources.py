@@ -2428,6 +2428,69 @@ def test_reserve_confirmation_with_definition(client: Client) -> None:
     assert 'Elliot' in confirmation
     assert 'Alderson' in confirmation
 
+    # introducing errors causes the confirmation/finish views to
+    # redirect back to the form view when manually navigated to
+    formular = confirmation.click('Bearbeiten')
+    formular.form['nachname'] = ''
+    assert 'Dieses Feld wird benötigt' in formular.form.submit()
+    assert 'Dieses Feld wird benötigt' in client.get(
+        '/resource/tageskarte/confirmation').follow()
+    assert 'Dieses Feld wird benötigt' in client.get(
+        '/resource/tageskarte/finish').follow()
+
+
+@freeze_time('2015-08-28', tick=True)
+def test_reserve_confirmation_definition_removed(client: Client) -> None:
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.definition = 'Vorname *= ___\nNachname *= ___'
+
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 12)),
+        whole_day=False,
+        partly_available=True,
+    )
+    reserve = client.bound_reserve(allocations[0])
+
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('10:30', '12:00').json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['vorname'] = 'Thomas'
+    formular.form['nachname'] = 'Anderson'
+
+    confirmation = formular.form.submit().follow()
+    assert '10:30' in confirmation
+    assert '12:00' in confirmation
+    assert 'Thomas' in confirmation
+    assert 'Anderson' in confirmation
+    assert client.app.session().query(FormSubmission).count() == 1
+
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    resource.parsed = None
+    transaction.commit()
+
+    # edit the reservation after the definition has been removed
+    formular = confirmation.click('Bearbeiten')
+    assert 'vorname' not in formular.form.fields
+    assert 'nachname' not in formular.form.fields
+
+    confirmation = formular.form.submit().follow()
+    assert '10:30' in confirmation
+    assert '12:00' in confirmation
+    assert 'Elliot' not in confirmation
+    assert 'Alderson' not in confirmation
+
+    # the submission that is no longer needed has been removed
+    assert client.app.session().query(FormSubmission).count() == 0
+
 
 @freeze_time('2015-08-28', tick=True)
 def test_reserve_session_bound(client: Client) -> None:

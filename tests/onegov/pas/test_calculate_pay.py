@@ -1,8 +1,10 @@
 from decimal import Decimal
 
 from onegov.pas.calculate_pay import calculate_compensation
+from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.calculate_pay import cost_of_living_multiplier
 from onegov.pas.calculate_pay import round_to_five_rappen
+from onegov.pas.models import RateSet
 
 
 def test_financial_rounding() -> None:
@@ -36,3 +38,15 @@ def test_compensation_totals_sum_rounded_bookings() -> None:
     assert total.adjustment == Decimal('18.90')
     assert total.adjusted == Decimal('104.90')
     assert rounded_after_aggregation.adjusted == Decimal('104.85')
+
+
+def test_zero_duration_has_no_compensation() -> None:
+    rate_set = RateSet(commission_normal_member_initial=170)
+
+    assert calculate_rate(
+        rate_set=rate_set,
+        attendence_type='commission',
+        duration_minutes=0,
+        is_president=False,
+        commission_type='normal',
+    ) == Decimal('0')

@@ -372,6 +372,21 @@ class UploadMultipleWidget(FileInput):
             return existing_html + simple_template.format(additional_html)
 
 
+class CropperUploadWidget(UploadWidget):
+
+    def __call__(
+        self,
+        field: UploadField,  # type:ignore[override]
+        **kwargs: Any
+    ) -> Markup:
+        field.meta.request.include('cropper')
+        if 'wrapper_css_class' in kwargs:
+            kwargs['wrapper_css_class'] += ' cropper-upload-widget'
+        else:
+            kwargs['wrapper_css_class'] = 'cropper-upload-widget'
+        return super().__call__(field, **kwargs)
+
+
 class TextAreaWithTextModules(TextArea):
     """An extension of a regular textarea with a button that lets
     you select and insert text modules. If no text modules have

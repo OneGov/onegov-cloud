@@ -386,13 +386,13 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
     """
 
     __listclass__ = News
+    batch_size = 40
     absorb = ''
 
     def __init__(
         self,
         request: CoreRequest,
         page: int = 0,
-        batch_size: int = 40,
         term: str | None = None,
         filter_years: list[int] | None = None,
         filter_tags: list[str] | None = None,
@@ -402,7 +402,6 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
         self.request = request
         self.session = request.session
         self.page = page
-        self.batch_size = batch_size
         self.term = term
         self.filter_years = filter_years or []
         self.filter_tags = filter_tags or []

@@ -8,6 +8,7 @@ from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import PASCommission
 from onegov.pas.models.commission_membership import PASCommissionMembership
 from onegov.pas.models.party import Party
+from onegov.pas.models import SettlementRun
 from onegov.pas.models.parliamentarian import PASParliamentarian
 from onegov.pas.models.parliamentarian_role import PASParliamentarianRole
 from onegov.pas.models.presidential_allowance import (
@@ -15,11 +16,13 @@ from onegov.pas.models.presidential_allowance import (
 )
 from onegov.pas.collections import PASParliamentarianCollection
 from sqlalchemy.orm import selectinload
+from uuid import UUID
+from webob.exc import HTTPBadRequest
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core import Framework
+    from onegov.core.request import CoreRequest
     from onegov.parliament.models.parliamentarian import Parliamentarian
     from onegov.parliament.models.parliamentarian_role import (
         ParliamentarianRole,
@@ -27,7 +30,6 @@ if TYPE_CHECKING:
 
     from onegov.user import User
     from sqlalchemy.orm import Session
-    from uuid import UUID
 
 
 def _is_kantonsrat_role(
@@ -44,30 +46,63 @@ def _is_kantonsrat_role(
 
 def is_active_kantonsrat_member(
     parliamentarian: PASParliamentarian | Parliamentarian,
-    reference_date: date | None = None,
+    reference_date: date,
+    end_date: date | None = None,
 ) -> bool:
-    if reference_date is None:
-        reference_date = date.today()
     return any(
-        _is_kantonsrat_role(r) and (r.end is None or r.end >= reference_date)
+        _is_kantonsrat_role(r)
+        and (r.start is None or r.start <= (end_date or reference_date))
+        and (r.end is None or r.end >= reference_date)
         for r in parliamentarian.roles
     )
 
 
-def get_active_kantonsrat_parliamentarians(
-    app: Framework,
-    reference_date: date | None = None,
+def get_attendance_settlement_run(
+    request: CoreRequest,
+) -> SettlementRun | None:
+    query = request.session.query(SettlementRun)
+    run_id = request.params.get('settlement_run_id')
+    run = None
+    if run_id and run_id != 'all':
+        if not isinstance(run_id, str):
+            raise HTTPBadRequest('Invalid settlement run')
+        try:
+            selected_id = UUID(run_id)
+        except ValueError:
+            raise HTTPBadRequest('Invalid settlement run') from None
+        run = query.filter(SettlementRun.id == selected_id).first()
+        if run is None:
+            raise HTTPBadRequest('Unknown settlement run')
+    if run is None:
+        run = (
+            query.filter(SettlementRun.active.is_(True))
+            .order_by(SettlementRun.start.desc())
+            .first()
+        )
+    return run
+
+
+def get_attendance_parliamentarians(
+    request: CoreRequest,
 ) -> list[PASParliamentarian]:
+    run = get_attendance_settlement_run(request)
+    if run is None:
+        return []
+
     parliamentarians = (
-        PASParliamentarianCollection(app)
+        PASParliamentarianCollection(request.app)
         .query()
         .options(selectinload(PASParliamentarian.roles))
         .all()
     )
     return [
-        p
-        for p in parliamentarians
-        if is_active_kantonsrat_member(p, reference_date)
+        parliamentarian
+        for parliamentarian in parliamentarians
+        if is_active_kantonsrat_member(
+            parliamentarian,
+            run.start,
+            run.end,
+        )
     ]
 
 
@@ -75,16 +110,13 @@ CLEX_URL = 'https://zg-compwork.clex.ch/frontend/people'
 
 
 def fetch_clex_kantonsrat_members(
-    reference_date: date | None = None,
+    reference_date: date,
 ) -> set[tuple[str, str]]:
     """Fetch active Kantonsrat members from the CLEX frontend.
 
     Returns set of (last_name, first_name) tuples for members
     without an exit date or with an exit date >= reference_date.
     """
-    if reference_date is None:
-        reference_date = date.today()
-
     resp = niquests.get(CLEX_URL, timeout=30)
     resp.raise_for_status()
     assert resp.content is not None

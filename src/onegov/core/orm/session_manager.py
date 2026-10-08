@@ -23,7 +23,7 @@ from zope.sqlalchemy import datamanager
 
 from typing import Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator, Iterator
     from sqlalchemy.engine import Connection, Engine, Result
     from sqlalchemy.engine.interfaces import (
         DBAPICursor,
@@ -376,7 +376,7 @@ class SessionManager:
         self.register_session(self.session_factory)
 
     @contextmanager
-    def ignore_bulk_updates(self) -> Iterator[Self]:
+    def ignore_bulk_updates(self) -> Generator[Self]:
         """ Ensures bulk updates don't get blocked when we can't emit
         update events for each changed object.
 
@@ -393,7 +393,7 @@ class SessionManager:
             self._ignore_bulk_updates = previous_state
 
     @contextmanager
-    def ignore_bulk_deletes(self) -> Iterator[Self]:
+    def ignore_bulk_deletes(self) -> Generator[Self]:
         """ Ensures bulk delete don't get blocked when we can't emit
         delete events for each changed object.
 
@@ -410,7 +410,7 @@ class SessionManager:
             self._ignore_bulk_deletes = previous_state
 
     @contextmanager
-    def disable_change_signals(self) -> Iterator[Self]:
+    def disable_change_signals(self) -> Generator[Self]:
         """ Disables the insert/update/delete signals temporarily. """
         previous_state = self._change_signals_disabled
         self._change_signals_disabled = True
@@ -717,7 +717,7 @@ class SessionManager:
         self,
         user_id: str | None,
         username: str | None,
-    ) -> Iterator[Self]:
+    ) -> Generator[Self]:
         """Sets the user responsible for changes within the context."""
         previous_user_id = self.current_user_id
         previous_username = self.current_username

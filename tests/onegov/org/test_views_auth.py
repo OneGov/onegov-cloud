@@ -169,6 +169,13 @@ def test_login_setup_mtan(client: Client, smsdir: str) -> None:
     assert "mTAN eingeben" in mtan_page.text
     assert "mTAN aktivieren" not in mtan_page.text
     assert "Sie wurden angemeldet" not in mtan_page.text
+
+    # we can't access the setup-mtan view once the mtan is setup
+    assert client.get(
+        '/auth/mtan-setup',
+        expect_errors=True
+    ).status_code == 404
+
     sms_files = os.listdir(smsdir)
     assert len(sms_files) == 1
     sms_path = os.path.join(smsdir, sms_files[0])
@@ -238,6 +245,14 @@ def test_login_totp(client: Client, test_password: str) -> None:
     totp_page.form['totp'] = 'bogus'
     totp_page = totp_page.form.submit()
     assert "Ungültige oder abgelaufenes TOTP eingegeben." in totp_page.text
+
+    # we can't access the setup-mtan view during TOTP login
+    client.app.mtan_second_factor_enabled = True
+    client.app.mtan_automatic_setup = True
+    assert client.get(
+        '/auth/mtan-setup',
+        expect_errors=True
+    ).status_code == 404
 
     totp_page.form['totp'] = totp.now()
     index_page = totp_page.form.submit().follow()

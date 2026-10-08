@@ -20,7 +20,7 @@ from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
-        Callable, Collection, Iterable, Iterator, Mapping, Sequence)
+        Callable, Collection, Generator, Iterable, Iterator, Mapping, Sequence)
     from sqlalchemy import Column
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
@@ -573,7 +573,7 @@ class UpgradeContext:
             yield from filter_columns(model, self.session.query(model))
 
     @contextmanager
-    def stop_search_updates(self) -> Iterator[None]:
+    def stop_search_updates(self) -> Generator[None]:
         # XXX this would be better handled with a more general approach
         # that doesn't require knowledge of onegov.search
         if hasattr(self.app, 'fts_orm_events'):

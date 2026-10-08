@@ -32,6 +32,9 @@ msgstr "Ospite"
 msgid "Member"
 msgstr "Membro"
 
+msgid "Substitute Member"
+msgstr "Membro supplente"
+
 msgid "Extended Member"
 msgstr "Membro esteso"
 

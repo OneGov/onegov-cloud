@@ -154,3 +154,14 @@ def get_typeahead_asset() -> Iterator[str]:
 @FormApp.webasset('multicheckbox')
 def get_multicheckbox_asset() -> Iterator[str]:
     yield 'multicheckbox.js'
+
+
+@FormApp.webasset(
+    'cropper',
+    filters={'css': ['custom-rcssmin']}
+)
+def get_cropper_asset() -> Iterator[str]:
+    yield 'cropper.css'
+    yield 'cropper.min.js'
+    yield 'cropper.jquery.min.js'
+    yield 'cropper-upload.jsx'

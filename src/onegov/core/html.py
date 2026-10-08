@@ -154,12 +154,9 @@ def html_to_text(
         ),
         # NOTE: We don't care about producing valid markdown as much
         #       as producing something human-readable, the escaped
-        #       markdown would be a nuisance. This minimizes the
-        #       amount of escaping that will happen, although it would
-        #       be nice to have a `mode='none' that will attemp no
-        #       escaping whatsoever.
+        #       markdown would be a nuisance.
         escaping=turbohtml.Markdown.Escaping(
-            mode='minimal',
+            mode='none',
             asterisks=False,
             underscores=False,
         ),
@@ -192,9 +189,5 @@ def html_to_text(
 
     # use double newlines to get paragraphs
     plaintext = '\n\n'.join(lines)
-
-    # in an attempt to create proper markdown html2text will escape
-    # dots. Since markdown is not something we care about here, we undo that
-    plaintext = plaintext.replace('\\.', '.')
 
     return plaintext

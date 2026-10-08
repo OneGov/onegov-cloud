@@ -8,7 +8,11 @@ from uuid import uuid4, UUID
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import (
+    ContentMixin,
+    content_property,
+    dict_property,
+)
 from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
@@ -47,6 +51,7 @@ type PoliticalBusinessType = Literal[
 type PoliticalBusinessStatus = Literal[
     'abgeschrieben',
     'beantwortet',
+    'eingereicht',
     'erheblich_erklaert',
     'erledigt',
     'nicht_erheblich_erklaert',
@@ -78,6 +83,7 @@ POLITICAL_BUSINESS_TYPE: dict[PoliticalBusinessType, str] = {
 POLITICAL_BUSINESS_STATUS: dict[PoliticalBusinessStatus, str] = {
     'abgeschrieben': 'Abgeschrieben',
     'beantwortet': 'Beantwortet',
+    'eingereicht': 'Eingereicht',
     'erheblich_erklaert': 'Erheblich erklärt',
     'erledigt': 'Erledigt',
     'nicht_erheblich_erklaert': 'Nicht erheblich erklärt',
@@ -121,6 +127,7 @@ class PoliticalBusiness(
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
         'Abgeschrieben': 'written_off',
         'Beantwortet': 'answered',
+        'Eingereicht': 'submitted',
         'Erheblich erklärt': 'declared_significant',
         'Erledigt': 'completed',
         'Nicht erheblich erklärt': 'declared_insignificant',
@@ -144,6 +151,8 @@ class PoliticalBusiness(
         'title': {'type': 'text', 'weight': 'A'},
         'number': {'type': 'text', 'weight': 'A'}
     }
+
+    chronology: dict_property[str | None] = content_property()
 
     @property
     def fts_suggestion(self) -> list[str]:

@@ -6,6 +6,7 @@ from onegov.pas.models import (
     Party,
 )
 from onegov.pas.utils import get_parties_with_settlements
+from onegov.pas.utils import is_active_kantonsrat_member
 from onegov.pas.utils import get_parliamentarians_with_settlements
 from uuid import uuid4
 
@@ -13,6 +14,30 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
+
+
+def test_kantonsrat_membership_overlaps_settlement() -> None:
+    person = PASParliamentarian(first_name='Anna', last_name='Bieri')
+    role = PASParliamentarianRole(
+        role='vice_president',
+        start=date(2024, 12, 20),
+        end=date(2026, 9, 23),
+        meta={'org_type': 'Kantonsrat'},
+    )
+    person.roles = [role]
+    assert not is_active_kantonsrat_member(person, date(2026, 10, 2))
+    assert is_active_kantonsrat_member(
+        person, date(2026, 7, 1), date(2026, 9, 30)
+    )
+    role.end = date(2026, 6, 30)
+    assert not is_active_kantonsrat_member(
+        person, date(2026, 7, 1), date(2026, 9, 30)
+    )
+    role.start = date(2026, 10, 1)
+    role.end = None
+    assert not is_active_kantonsrat_member(
+        person, date(2026, 7, 1), date(2026, 9, 30)
+    )
 
 
 def test_get_parliamentarians_with_settlements(session: Session) -> None:

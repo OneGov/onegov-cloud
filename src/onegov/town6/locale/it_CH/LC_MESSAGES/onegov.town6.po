@@ -2340,6 +2340,9 @@ msgstr "Conferma"
 msgid "Business Type"
 msgstr "Tipo di attività"
 
+msgid "Chronology"
+msgstr "Cronologia"
+
 msgid "Submission/publication date"
 msgstr "Data di invio/pubblicazione"
 
