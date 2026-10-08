@@ -510,5 +510,5 @@ def model_from_form(form: Form) -> type[BaseModel] | None:
         __config__=ConfigDict(frozen=True),
         __validators__=validators,
         __cls_kwargs__=None,
-        **fields
+        **cast('dict[str, Any]', fields),
     )
