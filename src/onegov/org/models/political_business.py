@@ -9,11 +9,13 @@ from uuid import uuid4, UUID
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.utils import toggle
 from onegov.file import MultiAssociatedFiles
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
+from onegov.org.models.extensions import PublicationExtension
 from onegov.search import ORMSearchable, SearchIndex
 from onegov.search.utils import language_from_locale
 from sedate import as_datetime, replace_timezone
@@ -117,8 +119,10 @@ class PoliticalBusiness(
     MultiAssociatedFiles,
     Base,
     ContentMixin,
+    ORMSearchable,
+    PublicationExtension,
     GeneralFileLinkExtension,
-    ORMSearchable
+    UTCPublicationMixin,
 ):
     GERMAN_STATUS_NAME_TO_VALUE_MAP: dict[str, str] = {
         'Abgeschrieben': 'written_off',
@@ -332,6 +336,9 @@ class PoliticalBusinessCollection(
                 PoliticalBusiness.meta['access'].is_(None)
             ))
 
+        if role not in ('admin', 'editor'):
+            query = query.filter(PoliticalBusiness.published.is_(True))
+
         if self.term:
             language = self.request.locale
             if language_from_locale(language) == 'simple':
@@ -433,7 +440,7 @@ class PoliticalBusinessCollection(
     ) -> Query[PoliticalBusiness]:
         """ Returns political businesses by given parliamentarian id """
         return (
-            self.session.query(PoliticalBusiness)
+            self.query()
             .filter(PoliticalBusiness.participants.any(
                 PoliticalBusinessParticipation.parliamentarian_id ==
                 parliamentarian_id

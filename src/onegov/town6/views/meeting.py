@@ -162,11 +162,18 @@ def view_meeting(
                 item.political_business_link_id
             ).first()
             if business is not None:
+                if not business.published and not request.is_manager:
+                    continue
                 item_data['political_business_link'] = request.link(business)
                 item_data['business_type'] = (
                     POLITICAL_BUSINESS_TYPE)[business.political_business_type]
         else:
             if item.political_business:
+                if (
+                    not item.political_business.published
+                    and not request.is_manager
+                ):
+                    continue
                 item_data['political_business_link'] = (
                     request.link(item.political_business))
                 item_data['business_type'] = (
