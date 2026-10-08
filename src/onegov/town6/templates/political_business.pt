@@ -26,6 +26,10 @@
                             <dt i18n:translate>Submission/publication date</dt>
                             <dd><div tal:content="layout.format_date(business.entry_date, 'date')"></div></dd>
                         </div>
+                        <div tal:condition="business.chronology">
+                            <dt i18n:translate>Chronology</dt>
+                            <dd><div tal:content="business.chronology"></div></dd>
+                        </div>
                     </dl>
                 </div>
             </tal:b>

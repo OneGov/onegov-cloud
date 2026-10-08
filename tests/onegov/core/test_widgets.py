@@ -28,8 +28,10 @@ class TextWidget:
     " <text>&lt;?python assert False></text>",
     "<text>${{request.password}}</text>",
     "<text class='${request.password}'></text>",
+    "<text><![CDATA[$]]>{request.password}</text>",
     "<text>&dollar;{{request.password}}</text>",
     "<text class='&#36;{request.password}'></text>",
+    "<text>$<![CDATA[{]]>{request.password}}</text>",
     "<text tal:content='request.password'></text>",
     "<div>html</div>"
 

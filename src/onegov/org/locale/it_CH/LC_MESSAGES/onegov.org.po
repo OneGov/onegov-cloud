@@ -1788,6 +1788,9 @@ msgstr "Cofirmatario"
 msgid "Business Status"
 msgstr "Stato"
 
+msgid "Chronology"
+msgstr "Cronologia"
+
 msgid "Submission/publication date"
 msgstr "Data di invio/pubblicazione"
 
@@ -3103,6 +3106,19 @@ msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
 
 msgid "Duration from archived state until deleted automatically"
 msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
+
+msgid ""
+"Duration from audit trail entry creation until deleted automatically"
+msgstr ""
+"Durata dalla creazione di una voce del registro di audit alla sua "
+"cancellazione automatica"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain, as well as audit "
+"trail entries, may be irreversibly deleted."
+msgstr ""
+"Procedere con cautela. I ticket e i dati in essi contenuti, così come le "
+"voci del registro di audit, possono essere cancellati irreversibilmente."
 
 msgid "Firebase adminsdk credentials (JSON)"
 msgstr "Credenziali Firebase Adminsdk (JSON)"

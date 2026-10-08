@@ -41,45 +41,33 @@ def get_political_business_form_class(
 def count_political_businesses_by_type(
     request: TownRequest
 ) -> dict[str, int]:
-    collection = PoliticalBusinessCollection(request)
-    query = (
-        collection.query()
-        .order_by(None)
-        .with_entities(
-            PoliticalBusiness.political_business_type,
-            func.count(PoliticalBusiness.id).label('count'),
-        )
-        .group_by(PoliticalBusiness.political_business_type)
-    )
+    query = PoliticalBusinessCollection(request).query().order_by(None)
+    counts = query.with_entities(
+        PoliticalBusiness.political_business_type,
+        func.count(PoliticalBusiness.id).label('count'),
+    ).group_by(PoliticalBusiness.political_business_type)
 
-    return dict(query.tuples())
+    return dict(counts.tuples())
 
 
 def count_political_businesses_by_status(
     request: TownRequest
 ) -> dict[str | None, int]:
-    collection = PoliticalBusinessCollection(request)
-    query = (
-        collection.query()
-        .order_by(None)
-        .with_entities(
-            PoliticalBusiness.status,
-            func.count(PoliticalBusiness.id).label('count'),
-        )
-        .group_by(PoliticalBusiness.status)
-    )
+    query = PoliticalBusinessCollection(request).query().order_by(None)
+    counts = query.with_entities(
+        PoliticalBusiness.status,
+        func.count(PoliticalBusiness.id).label('count'),
+    ).group_by(PoliticalBusiness.status)
 
-    return dict(query.tuples())
+    return dict(counts.tuples())
 
 
 def count_political_businesses_by_year(
     request: TownRequest
 ) -> dict[str, int]:
-    collection = PoliticalBusinessCollection(request)
+    query = PoliticalBusinessCollection(request).query().order_by(None)
     result = (
-        collection.query()
-        .order_by(None)
-        .with_entities(
+        query.with_entities(
             func.extract('year', PoliticalBusiness.entry_date).label('year'),
             func.count(PoliticalBusiness.id).label('count'),
         )

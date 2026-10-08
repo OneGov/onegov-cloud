@@ -1,6 +1,13 @@
-from datetime import timedelta
+import pytest
+
+from datetime import date, timedelta
 from freezegun import freeze_time
-from onegov.org.models.political_business import PoliticalBusiness
+from markupsafe import Markup
+from onegov.org.models import Meeting, MeetingItem, RISParliamentarian
+from onegov.org.models.political_business import (
+    PoliticalBusiness,
+    PoliticalBusinessParticipation,
+)
 from sedate import utcnow
 from transaction import commit
 from uuid import uuid4
@@ -30,6 +37,118 @@ def test_scheduled_political_business_is_hidden_from_public_views(
     page = client.get('/political-businesses')
     assert 'Scheduled Business' not in page
     client.get(f'/political-business/{business_id.hex}', status=404)
+
+
+@pytest.mark.parametrize('access', ['public', 'secret', 'private', 'member'])
+def test_political_business_access(client: Client, access: str) -> None:
+    client.login_admin()
+    settings = client.get('/module-activation-settings')
+    settings.form['ris_enabled'] = True
+    settings.form.submit()
+
+    page = client.get('/political-businesses/new')
+    assert page.form['access'].value == 'public'
+    page.form['title'] = 'Restricted Business'
+    page.form['political_business_type'] = 'postulate'
+    page.form['status'] = 'beantwortet'
+    page.form['entry_date'] = '2037-01-01'
+    page.form['access'] = access
+    page = page.form.submit().follow()
+    url = page.request.path
+
+    edit = page.click('Bearbeiten')
+    assert edit.form['access'].value == access
+
+    client.logout()
+    page = client.get('/political-businesses')
+    assert ('Restricted Business' in page) == (access == 'public')
+    assert ('2037' in page) == (access == 'public')
+    client.get(url, status=200 if access in ('public', 'secret') else 404)
+
+    client.login_member()
+    page = client.get('/political-businesses')
+    assert ('Restricted Business' in page) == (access in ('public', 'member'))
+    client.get(url, status=404 if access == 'private' else 200)
+
+    client.logout()
+    client.login_editor()
+    page = client.get('/political-businesses')
+    assert 'Restricted Business' in page
+    assert '2037' in page
+    page = client.get(url).click('Bearbeiten')
+    assert page.form['access'].value == access
+    page.form['access'] = 'public'
+    page.form.submit().follow()
+    client.logout()
+    assert 'Restricted Business' in client.get('/political-businesses')
+    client.get(url)
+
+
+@pytest.mark.parametrize('scheduled', [False, True])
+def test_private_business_hidden_from_related_pages(
+    client: Client,
+    scheduled: bool,
+) -> None:
+    client.app.org.ris_enabled = True
+    person = RISParliamentarian(first_name='Anna', last_name='Example')
+    business = PoliticalBusiness(
+        title='Private Business',
+        political_business_type='postulate',
+        status='beantwortet',
+        entry_date=date(2037, 1, 1),
+        meta={
+            'access': 'public' if scheduled else 'private',
+            'self_id': 'private-business',
+        },
+        publication_start=(
+            utcnow() + timedelta(hours=1) if scheduled else None
+        ),
+        participants=[
+            PoliticalBusinessParticipation(
+                parliamentarian=person,
+                participant_type='First signatory',
+            )
+        ],
+    )
+    meeting = Meeting(
+        title='Public Meeting',
+        start_datetime=utcnow(),
+        address=Markup('Town Hall'),
+        meeting_items=[
+            MeetingItem(
+                title='Linked private item',
+                number='1',
+                political_business=business,
+            ),
+            MeetingItem(
+                title='Imported private item',
+                number='2',
+                political_business_link_id='private-business',
+            ),
+            MeetingItem(title='Public agenda item', number='3'),
+        ],
+    )
+    session = client.app.session()
+    session.add(meeting)
+    session.flush()
+    meeting_url = f'/meeting/{meeting.id.hex}'
+    person_url = f'/parliamentarian/{person.id.hex}'
+    commit()
+
+    page = client.get(meeting_url)
+    assert 'Linked private item' not in page
+    assert 'Imported private item' not in page
+    assert 'Public agenda item' in page
+    assert 'Private Business' not in client.get(person_url)
+    page = client.get(meeting_url + '/export')
+    assert 'Linked private item' not in page
+    assert 'Imported private item' not in page
+
+    client.login_editor()
+    page = client.get(meeting_url)
+    assert 'Linked private item' in page
+    assert 'Imported private item' in page
+    assert 'Private Business' in client.get(person_url)
 
 
 def test_political_businesses(client_with_fts: Client) -> None:
@@ -90,13 +209,23 @@ def test_political_businesses(client_with_fts: Client) -> None:
         page.form['political_business_type'] = 'inquiry'
         page.form['entry_date'] = '2025-10-02'
         page.form['status'] = 'pendent_legislative'
+        page.form['chronology'] = 'Schriftlich beantwortet am 03.11.2025'
         options = page.form['parliamentary_groups'].options
         page.form['parliamentary_groups'] = [o[0] for o in options]
         page = page.form.submit().follow()
         assert title in page
-        keywords = ['Für ein schöneres Luzern', 'Oberfraktion',
-                    'Geschäftsart', 'Anfrage', 'Status', 'Pendent Legislative',
-                    'Einreichungs-/Publikationsdatum', '02.10.2025']
+        keywords = [
+            'Für ein schöneres Luzern',
+            'Oberfraktion',
+            'Geschäftsart',
+            'Anfrage',
+            'Status',
+            'Pendent Legislative',
+            'Einreichungs-/Publikationsdatum',
+            '02.10.2025',
+            'Chronologie',
+            'Schriftlich beantwortet am 03.11.2025',
+        ]
         for keyword in keywords:
             assert keyword in page
 
