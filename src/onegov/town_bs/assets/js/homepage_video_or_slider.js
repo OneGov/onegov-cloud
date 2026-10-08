@@ -2,9 +2,11 @@ var header_height = $('#header').height();
 
 let header = document.getElementById('header');
 
+// Find out if we're on desktop or mobile
+var w = window.matchMedia("(max-width: 700px)");
 
 header.addEventListener('onegov.header-resized', function (event) {
-    header = document.getElementById('header')
+    header = document.getElementById('header');
 
     // Remove height of header from video
     var header_height = $('#header').height();
@@ -12,39 +14,34 @@ header.addEventListener('onegov.header-resized', function (event) {
     var current_height = video_wrapper.data('max-height');
     var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
 
-    video_wrapper.css('max-height', new_height)
-}, {once: true})
+    video_wrapper.css('max-height', new_height);
+}, {once: true});
 
-    // Slider
-    if ($('.homepage-image-slider').length) {
-        var carousel_slider = $('.homepage-image-slider .carousel-inner');
-        var current_mobile_height = carousel_slider.data('height-m');
-        var current_desktop_height = carousel_slider.data('height-d');
+// Slider
+if ($('.homepage-image-slider').length) {
+    var carousel_slider = $('.homepage-image-slider .carousel-inner');
+    var current_mobile_height = carousel_slider.data('height-m');
+    var current_desktop_height = carousel_slider.data('height-d');
 
-        if (current_mobile_height || current_desktop_height) {
-            if (w.matches) {
-                if (current_mobile_height.slice(-2) == "vh") {
-                    var new_height = 'calc(' + current_mobile_height + ' - ' + header_height + 'px)';
-                } else {
-                    var new_height = current_mobile_height;
-                }
+    if (current_mobile_height || current_desktop_height) {
+        if (w.matches) {
+            if (current_mobile_height.slice(-2) == "vh") {
+                var new_height = 'calc(' + current_mobile_height + ' - ' + header_height + 'px)';
             } else {
-                if (current_desktop_height.slice(-2) == "vh") {
-                    var new_height = 'calc(' + current_desktop_height + ' - ' + header_height + 'px)';
-                } else {
-                    var new_height = current_desktop_height;
-                }
+                var new_height = current_mobile_height;
             }
-            carousel_slider.css('height', new_height);
         } else {
-            carousel_slider.css('height', '40vw');
+            if (current_desktop_height.slice(-2) == "vh") {
+                var new_height = 'calc(' + current_desktop_height + ' - ' + header_height + 'px)';
+            } else {
+                var new_height = current_desktop_height;
+            }
         }
-
+        carousel_slider.css('height', new_height);
+    } else {
+        carousel_slider.css('height', '40vw');
     }
-
-
-// Find out if we're on desktop or mobile
-var w = window.matchMedia("(max-width: 700px)");
+}
 
 // Video
 if (document.getElementById("autoplay-video")) {
@@ -55,7 +52,7 @@ if (document.getElementById("autoplay-video")) {
         var count = children.length;
         var keep = Math.floor(Math.random() * count);
 
-        for (let i = 0; i < count-1; i++) {
+        for (let i = 0; i < count - 1; i++) {
             if (i < keep) {
                 parent.removeChild(children[0]);
             } else {
@@ -67,12 +64,13 @@ if (document.getElementById("autoplay-video")) {
     // Once only one video remains
     if (document.getElementsByClassName("homepage-video").length) {
 
-        // Resize spacer
+        // Adjust aspect ratio of the container to the video
         var vid = document.querySelector('#autoplay-video');
         vid.addEventListener('loadeddata', (event) => {
-            var ratio = vid.videoHeight / vid.videoWidth * 100;
-            var spacer = document.getElementById("spacer");
-            spacer.style.paddingBottom = ratio + "%";
+            var wrapper = document.querySelector('.homepage-video');
+            if (wrapper && vid.videoWidth && vid.videoHeight) {
+                wrapper.style.aspectRatio = vid.videoWidth + ' / ' + vid.videoHeight;
+            }
         });
 
         var source = document.createElement("source");
@@ -101,4 +99,3 @@ if (document.getElementById("autoplay-video")) {
         }
     }
 }
-
