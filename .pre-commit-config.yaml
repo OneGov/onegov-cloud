@@ -75,6 +75,14 @@ repos:
         language: system
         files:  '^stubs/.*\.pyi$'
         pass_filenames: false
+      - id: widget_template_injection
+        name: Widget template injection
+        entry: 'tal:(define|attributes)\s*=\s*"[^"]*?\s+''[^{'']*{[^}''"]+}''[^"]*"'
+        language: pygrep
+        files: '^src/.*\.py$'
+        # contains docstring with example exploitable code
+        exclude: src/onegov/core/widgets.py
+        args: [--multiline]
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
     hooks:
