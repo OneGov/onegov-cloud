@@ -1,0 +1,36 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6" tal:define="narrow_page True">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="alert alert-info" tal:condition="completable">
+            <p i18n:translate>
+                Please review your data and press "Complete" to finalize the process.
+                If there's anything you'd like to change, click on "Edit" to return
+                to the filled-out form.
+            </p>
+        </div>
+        <tal:b tal:define="steps layout.get_step_sequence()|nothing">
+            <div class="progress-wrapper" tal:condition="steps">
+                <div metal:use-macro="layout.macros['progress_indicator']" />
+                <br>
+            </div>
+        </tal:b>
+
+        <div class="row event-preview">
+            <tal:b metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
+
+            <div class="col-12 col-md-4">
+                <tal:b metal:use-macro="layout.macros['ticket_callout']" tal:define="ticket ticket"/>
+            </div>
+        </div>
+
+        <div class="fieldset-display-submit" tal:condition="completable">
+            <form action="" method="POST">
+                <input type="hidden" name="complete">
+                <input type="submit" value="Complete" class="button" i18n:attributes="value">
+            </form>
+            <a href="${edit_url}" i18n:translate="">Edit</a>
+        </div>
+    </tal:b>
+</div>

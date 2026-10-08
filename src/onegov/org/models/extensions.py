@@ -603,14 +603,9 @@ class PersonLinkExtension(ContentExtension):
             request.get_translate(for_chameleon=False)
         )
         meta.locales = [request.locale, 'en'] if request.locale else []
-        PersonForm.Meta = meta
+        PersonForm.Meta = meta  # type: ignore[misc]
 
-        if TYPE_CHECKING:
-            FieldBase = FieldList[FormField[PersonForm]]  # ruff:ignore[non-lowercase-variable-in-function]
-        else:
-            FieldBase = FieldList  # ruff:ignore[non-lowercase-variable-in-function]
-
-        class PeopleField(FieldBase):
+        class PeopleField(FieldList):  # type: ignore[type-arg]
             def is_ordered_people(self, people: list[tuple[str, Any]]) -> bool:
                 people_dict = dict(people)
                 return [
@@ -672,7 +667,7 @@ class PersonLinkExtension(ContentExtension):
         #        actually depend on the specific form
         dummy_form = request.get_form(Form, csrf_support=False)
 
-        def people_widget(field: FieldBase, **kwargs: Any) -> Markup:
+        def people_widget(field: FieldList[Any], **kwargs: Any) -> Markup:
             request.include('people-select')
             return Markup('<br>').join(
                 Markup('<div id="{}">{}</div>').format(f.id, f())

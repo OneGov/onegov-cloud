@@ -11,6 +11,7 @@ from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection, DirectoryEntry, Directory
 from onegov.event import Event
 from onegov.event import OccurrenceCollection, Occurrence
+from onegov.form.collection import FormCollection
 from onegov.newsletter import Newsletter
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
@@ -132,10 +133,14 @@ class Layout(OrgLayout):
     app: TownApp
     request: TownRequest
 
+    @property
+    def framework_asset(self) -> str:
+        return self.app.framework_asset
+
     def __init__(self, model: Any, request: TownRequest,
                  edit_mode: bool = False) -> None:
         super().__init__(model, request)
-        self.request.include('foundation6')
+        self.request.include(self.framework_asset)
         self.edit_mode = edit_mode
 
     @property
@@ -265,6 +270,10 @@ class DefaultLayout(OrgDefaultLayout, Layout):
 
         # fallback to the homepage
         return self.request.link(self.request.app.org, '')
+
+    @cached_property
+    def online_counter_url(self) -> str:
+        return self.request.class_link(FormCollection)
 
 
 # registers the `DefaultLayout` as the default layout for all models in

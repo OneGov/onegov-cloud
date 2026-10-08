@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
+    from webob import Response
 
     type SortKey = Callable[
         [FormDefinition | ExternalLink | FormDocument],
@@ -65,7 +66,7 @@ def view_form_collection(
     self: FormCollection,
     request: OrgRequest,
     layout: FormCollectionLayout | None = None
-) -> RenderData:
+) -> RenderData | Response:
 
     forms = group_by_column(
         request=request,
@@ -114,6 +115,19 @@ def view_form_collection(
             lead = ''
         return lead
 
+    def modal_url(
+            model: FormDefinition | ExternalLink | FormDocument) -> str | None:
+        if isinstance(model, FormDefinition):
+            return request.link(model, 'modal')
+        return None
+
+    def form_url(
+            model: FormDefinition | ExternalLink | FormDocument,
+    ) -> str | None:
+        if isinstance(model, FormDefinition):
+            return request.link(self, query_params={'form': model.name})
+        return None
+
     # FIXME: Should the hint function be able to deal with ExternalLink?
     def hint(model: FormDefinition) -> str:
         hints = dict(get_hints(layout, model.current_registration_window))
@@ -141,6 +155,8 @@ def view_form_collection(
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
+        'modal_url': modal_url,
+        'form_url': form_url,
         'hint': hint,
     }
 

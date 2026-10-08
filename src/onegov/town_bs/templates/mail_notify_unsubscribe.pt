@@ -1,0 +1,16 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello</p>
+
+        <p i18n:translate>
+            The user with the address <strong i18n:name="address">${address}</strong> just unsubscribed from the newsletter subscriber list.
+        </p>
+
+        <p>
+            <span i18n:translate>Have a great day!</span>
+        </p>
+    </tal:b>
+</div>

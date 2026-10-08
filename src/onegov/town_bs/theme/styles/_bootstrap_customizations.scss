@@ -1,0 +1,53 @@
+$fs-2xs: .75rem;    // 12px
+$fs-xs:  1rem;      // 16px
+$fs-sm:  1.25rem;   // 20px
+$fs-md:  1.5rem;    // 24px
+$fs-lg:  2rem;      // 32px
+$fs-xl:  2.5rem;    // 40px
+$fs-2xl: 3.75rem;   // 60px
+$fs-3xl: 4.375rem;  // 70px
+
+$font-sizes: (
+  "2xs": $fs-2xs,
+  "xs":  $fs-xs,
+  "sm":  $fs-sm,
+  "md":  $fs-md,
+  "lg":  $fs-lg,
+  "xl":  $fs-xl,
+  "2xl": $fs-2xl,
+  "3xl": $fs-3xl
+);
+
+$utilities: (
+  "font-size": (
+    rfs: true,
+    responsive: true,
+    property: font-size,
+    class: fs,
+    values: $font-sizes
+  )
+);
+
+// Todo: Make customizable in UI
+$secondary: orange;
+$tertiary: #aac0ce;
+$tertiary-subtle: #e4eaee;
+$body-color: #382d3f;
+
+$danger: #f44;
+$success: #00bf63;
+$warning: #ffb744;
+$info: #448aff;
+
+$btn-border-width: 2px;
+$enable-negative-margins: true;
+
+$standard-transition: .2s linear;
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1960px
+);

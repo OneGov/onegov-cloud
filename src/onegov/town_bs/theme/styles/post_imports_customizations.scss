@@ -1,0 +1,29 @@
+/*
+  Customizations for bootstrap components
+*/
+
+@include media-breakpoint-up(md) {
+  .offcanvas {
+    --bs-offcanvas-width: 600px;
+  }
+}
+
+// Accordion
+.accordion-item {
+  margin-bottom: $s-md;
+  overflow: hidden;
+  border-radius: $border-radius-sm;
+}
+.accordion-item:last-child {
+  margin-bottom: 0;
+}
+
+.accordion-body {
+  background-color: $white;
+  border-radius: 0 0 $border-radius-sm $border-radius-sm;
+}
+
+// Bootstrap
+.breadcrumb-item a {
+  text-decoration: none;
+}

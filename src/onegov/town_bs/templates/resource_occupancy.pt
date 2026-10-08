@@ -1,0 +1,30 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <div class="callout" tal:condition="limited|nothing">
+            <p i18n:translate>You are viewing a limited summary of your
+               confirmed reservations.</p>
+            <a href="${login_url}" class="button" i18n:translate>
+               Log in for full details</a>
+        </div>
+
+        <div class="occupancy-calendar"
+            data-feed="${feed}"
+            data-type="${resource.type}"
+            data-editable="${request.is_manager and 'true' or 'false'}"
+            data-view="${resource.view or resource.default_view or 'timeGridWeek'}"
+            data-date="${resource.date and resource.date.isoformat() or ''}"
+            data-highlights-min="${resource.highlights_min or ''}"
+            data-highlights-max="${resource.highlights_max or ''}"
+            data-resources-url="${resources_url|None}"
+            data-resource-active="${resource.name}"
+            data-stats-url="${stats_url|None}"
+            data-pdf-url="${pdf_url|None}"
+            data-show-holidays="${(request.app.org.holidays or request.app.org.has_school_holidays) and 'true' or 'false'}"
+        ></div>
+
+    </tal:b>
+</div>

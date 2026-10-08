@@ -1,0 +1,34 @@
+.occurrence .card {
+  min-height: 13rem; // auf die Höhe im Hover-Zustand abstimmen
+  transition: background-color $standard-transition;
+
+  * {
+    transition: color $standard-transition;
+  }
+
+  .date-place {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows $standard-transition,
+      opacity $standard-transition;
+
+    > div {
+      min-height: 0;
+    }
+  }
+
+  &:hover {
+    background-color: $primary !important;
+
+    * {
+      color: $white !important;
+    }
+
+    .date-place {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+  }
+}

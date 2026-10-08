@@ -1,0 +1,20 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p><tal:b i18n:translate="">A new entry has been added to the "<tal:b i18n:name="directory">${directory.title}</tal:b>" directory:</tal:b><br/>
+        <b><a href="${entry_link}">${entry_title}</a></b></p>
+
+        <p i18n:translate>Have a great day!</p>
+    </tal:b>
+    <tal:b metal:fill-slot="above-footer">
+        <p i18n:translate>
+            Do you no longer wish to receive these notifications?
+        </p>
+        <p>
+            <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>
+        </p>
+    </tal:b>
+</div>
