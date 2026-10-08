@@ -20,7 +20,7 @@ from wtforms.validators import Email, Length, NumberRange, Regexp, URL
 from wtforms.validators import HostnameValidation
 
 
-from typing import Annotated, Any, Literal, TypeVar, TYPE_CHECKING
+from typing import Annotated, Any, cast, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Sequence
     from onegov.core.types import FileDict
@@ -484,14 +484,17 @@ def model_from_form(form: Form) -> type[BaseModel] | None:
         ] = validate_required_dependent_fields
 
     try:
-        fields = {
-            field.name: Annotated[
-                *registry.adapt(field),
-                Field(
-                    title=field.label.text,
-                    description=field.description or None,
-                )
-            ]
+        fields: dict[str, TypeForm[Any]] = {
+            field.name: cast(
+                'TypeForm[Any]',
+                Annotated[
+                    *registry.adapt(field),
+                    Field(
+                        title=field.label.text,
+                        description=field.description or None,
+                    ),
+                ],
+            )
             for field in form
             if not isinstance(field, (HiddenField, HoneyPotField))
         }
