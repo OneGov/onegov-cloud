@@ -406,6 +406,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         event = contains_eager(Occurrence.event)
         return result.set_query_options(
             event.joinedload(Event.image),
+            event.joinedload(Event.pdf),
             event.undefer(Event.content),
             undefer(Occurrence.content),
         )
