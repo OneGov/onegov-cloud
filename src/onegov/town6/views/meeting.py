@@ -19,6 +19,7 @@ from onegov.org.models import Meeting
 from onegov.org.models import MeetingCollection
 from onegov.org.models import MeetingItem
 from onegov.org.models import PoliticalBusiness
+from onegov.org.models import PoliticalBusinessCollection
 from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
 from onegov.town6 import _
 from onegov.town6 import TownApp
@@ -31,6 +32,22 @@ if TYPE_CHECKING:
     from onegov.town6.request import TownRequest
     from onegov.core.types import RenderData
     from onegov.core.request import CoreRequest
+
+
+def get_meeting_item_business(
+    item: MeetingItem,
+    request: TownRequest,
+) -> PoliticalBusiness | None:
+    if item.political_business_link_id:
+        return (
+            request.session.query(PoliticalBusiness)
+            .filter(
+                PoliticalBusiness.meta['self_id'].astext
+                == item.political_business_link_id
+            )
+            .first()
+        )
+    return item.political_business
 
 
 def get_meeting_form_class(
@@ -148,6 +165,7 @@ def view_meeting(
 
     # Construct meeting items with political business links
     meeting_items_with_links = []
+    businesses = PoliticalBusinessCollection(request)
     for item in self.meeting_items or []:
         item_data = {
             'number': item.number,
@@ -156,21 +174,15 @@ def view_meeting(
             'political_business_link': None
         }
 
-        if item.political_business_link_id:
-            business = request.session.query(PoliticalBusiness).filter(
-                PoliticalBusiness.meta['self_id'].astext ==
-                item.political_business_link_id
-            ).first()
-            if business is not None:
-                item_data['political_business_link'] = request.link(business)
-                item_data['business_type'] = (
-                    POLITICAL_BUSINESS_TYPE)[business.political_business_type]
-        else:
-            if item.political_business:
-                item_data['political_business_link'] = (
-                    request.link(item.political_business))
-                item_data['business_type'] = (
-                    POLITICAL_BUSINESS_TYPE)[item.political_business.political_business_type]
+        business = get_meeting_item_business(item, request)
+
+        if business is not None:
+            if not businesses.is_listed(business):
+                continue
+            item_data['political_business_link'] = request.link(business)
+            item_data['business_type'] = POLITICAL_BUSINESS_TYPE[
+                business.political_business_type
+            ]
 
         meeting_items_with_links.append(item_data)
 
@@ -286,6 +298,13 @@ def view_meeting_export(
     request: TownRequest,
     form: MeetingExportPoliticalBusinessForm
 ) -> RenderData | Response:
+    businesses = PoliticalBusinessCollection(request)
+    meeting_items = [
+        item
+        for item in self.meeting_items
+        if (business := get_meeting_item_business(item, request)) is None
+        or businesses.is_listed(business)
+    ]
 
     def build_zip_response() -> Response:
         meeting_doc_ids = form.get_selected_meeting_documents_ids()
@@ -316,7 +335,7 @@ def view_meeting_export(
                             )
 
                 # agenda item documents
-                for meeting_item in self.meeting_items:
+                for meeting_item in meeting_items:
                     business = meeting_item.political_business
                     if business:
                         for file in business.files:
@@ -350,7 +369,7 @@ def view_meeting_export(
 
     file_count = 0
     file_count += len(self.files)
-    for meeting_item in self.meeting_items:
+    for meeting_item in meeting_items:
         if meeting_item.political_business:
             file_count += len(meeting_item.political_business.files)
 
@@ -361,7 +380,7 @@ def view_meeting_export(
     meeting_items_no_docs = []
     if not self.files:
         meeting_items_no_docs.append(self.display_name)
-    for meeting_item in self.meeting_items:
+    for meeting_item in meeting_items:
         if not meeting_item.political_business:
             meeting_items_no_docs.append(meeting_item.display_name)
         else:
