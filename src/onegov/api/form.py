@@ -12,7 +12,7 @@ from onegov.form.validators import Stdnum
 from onegov.form.validators import ValidDateRange
 from onegov.form.validators import WhitelistedMimeType
 from pydantic import create_model, model_validator
-from pydantic import AfterValidator, BaseModel, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 from pydantic import AwareDatetime, Base64Bytes, EmailStr, HttpUrl
 from wtforms import HiddenField
 from wtforms.validators import DataRequired, InputRequired, Optional
@@ -507,7 +507,7 @@ def model_from_form(form: Form) -> type[BaseModel] | None:
         __module__=form.__class__.__module__,
         __qualname__=None,
         __doc__=None,
-        __config__={'frozen': True},
+        __config__=ConfigDict(frozen=True),
         __validators__=validators,
         __cls_kwargs__=None,
         **fields
