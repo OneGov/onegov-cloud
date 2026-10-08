@@ -134,8 +134,8 @@
                                 <a href="#" class="" data-bs-toggle="modal" data-bs-target="#searchModal">
                                     <i class="fa fa-search"></i>
                                 </a>
-                                <a href="#" class="btn btn-primary">
-                                Online-Schalter
+                                <a href="${layout.online_counter_url}" class="btn btn-primary" i18n:translate="">
+                                    Online counter
                                 </a>
                                 <a data-bs-toggle="offcanvas" href="#offCanvasMainMenu" role="button" aria-controls="offcanvasExample">
                                     <i class="fa fa-bars"></i>

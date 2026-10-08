@@ -615,6 +615,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def get_user_color(self, username: str) -> str:
         return utils.get_user_color(username)
 
+    def get_extension_color(self, username: str) -> str:
+        return utils.get_extension_color(username)
+
     def get_user_title(self, username: str) -> str:
         user = UserCollection(self.request.session).by_username(username)
         return user and user.title or username

@@ -1,0 +1,184 @@
+
+/*
+        Timeline Messages
+*/
+
+.messages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: $fs-xs;
+
+    li {
+        position: relative;
+
+        // Connection line
+        + li .message::before {
+            border-right: 2px solid $tertiary-subtle;
+            content: '';
+            height: $s-lg;
+            left: 50%;
+            position: absolute;
+            top: -$s-lg;
+        }
+    }
+
+    // No line above first date
+    .first-of-day .message::before {
+        display: none;
+    }
+
+    .date {
+        margin-bottom: $s-lg;
+        position: relative;
+        text-align: center;
+
+        &::after {
+            border-right: 2px solid $tertiary-subtle;
+            content: '';
+            height: $s-lg;
+            left: 50%;
+            position: absolute;
+            top: 100%;
+        }
+
+        span {
+            background-color: $tertiary-subtle;
+            border-radius: $border-radius-pill;
+            display: inline-block;
+            padding: $s-xs $s-md;
+        }
+    }
+
+    .message {
+        border: 1px solid $tertiary;
+        border-radius: $border-radius-lg;
+        margin-bottom: $s-lg;
+        padding: $s-md;
+        position: relative;
+
+        .hashtag {
+            background: $tertiary-subtle;
+            border-radius: $border-radius-sm;
+        }
+
+        .title {
+            font-size: $fs-xs;
+            margin-bottom: $s-sm;
+
+            a {
+                font-weight: bold;
+                text-decoration: none;
+            }
+        }
+
+        .identicon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            span {
+                color: white;
+                font-weight: bold;
+                display:flex;
+                width: $s-2xl;
+                height: $s-2xl;
+                align-items: center;
+                justify-content: center;
+                border-radius: $border-radius-pill;
+            }
+        }
+
+        .text p {
+            font-size: $fs-xs;
+            margin-bottom: 0 !important;
+
+            + p {
+                margin-top: $s-sm;
+            }
+        }
+
+        .title,
+        .timestamp,
+        .file {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file {
+            background: $tertiary-subtle;
+            border-radius: $border-radius-sm;
+            display: inline-block;
+            padding: $s-xs $s-sm;
+
+            a::before {
+                content: '\f0c6';
+                font-family: 'Font Awesome 6 Free';
+                font-weight: 900;
+                margin-right: .5ex;
+            }
+        }
+
+        .reservation-adjustment {
+            align-items: center;
+            display: flex;
+            gap: $s-md;
+            margin: 0;
+
+            .fa {
+                color: $secondary;
+                font-size: $fs-md;
+            }
+
+            .reservation-details {
+                background: $tertiary-subtle;
+                border-radius: $border-radius-sm;
+                flex: 0 0 32.66%;
+                font-size: $fs-2xs;
+                margin: $s-sm 0;
+                padding: $s-sm;
+            }
+        }
+    }
+
+    /*
+            Ticket types
+    */
+    .message-reservation,
+    .message-payment,
+    .message-event,
+    .message-directory,
+    .message-submission,
+    .message-reservation_adjusted,
+    .message-ticket_note,
+    .message-file,
+    .message-ticket_chat-internal {
+        background-color: $tertiary-subtle;
+    }
+
+    .message-ticket_chat-external {
+        border-color: $secondary;
+    }
+
+    .message-ticket_note .text {
+        text-overflow: clip;
+        white-space: normal;
+    }
+
+    /*
+            Timeline Messages Fly-In
+    */
+    .messages-enter .message {
+        opacity: 0;
+        transform: translate3d(0, -250px, 0);
+    }
+
+    .messages-enter.messages-enter-active .message {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        transition-duration: 300ms;
+        transition-property: transform, opacity;
+        transition-timing-function: cubic-bezier(.175, .665, .320, 1), linear;
+    }
+}

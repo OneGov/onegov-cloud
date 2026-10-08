@@ -13,12 +13,7 @@
         max-width: 100%;
     }
 
-    p {
-        margin-bottom: $s-xl;
-    }
-
     .page-main-content{
-        font-size: $fs-sm;
 
         .has-img {
             margin: $s-xl 0;
@@ -72,6 +67,14 @@
     }
 }
 
-.ticket-state {
-    // don't break
+.user-initials-small {
+    font-size: $fs-2xs;
+    color: white;
+    font-weight: bold;
+    display:flex;
+    width: $s-xl;
+    height: $s-xl;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-pill;
 }

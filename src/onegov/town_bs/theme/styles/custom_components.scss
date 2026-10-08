@@ -1,84 +1,57 @@
 .accordion-list {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 0;
-  margin-top: -$s-md;
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+    margin-top: -$s-md;
 
-  .accordion-list-item {
-    border-bottom: 2px solid $tertiary-subtle;
-    transition: border $standard-transition;
+    .accordion-list-item {
+        border-bottom: 2px solid $tertiary-subtle;
+        transition: border $standard-transition;
 
-    // TODO: Add arrow as soon as we know the icon library
+        // TODO: Add arrow as soon as we know the icon library
 
-    * {
-      transition: all $standard-transition;
+        * {
+            transition: all $standard-transition;
+        }
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        .accordion-list-link {
+            display: block;
+            padding: $s-md 0;
+            text-decoration: none;
+            color: $body-color;
+        }
+
+        &:hover {
+            border-bottom-color: $primary;
+
+            .accordion-list-link {
+                color: $primary;
+            }
+        }
     }
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    .accordion-list-link {
-      display: block;
-      padding: $s-md 0;
-      text-decoration: none;
-      color: $body-color;
-    }
-
-    &:hover {
-      border-bottom-color: $primary;
-
-      .accordion-list-link {
-        color: $primary;
-      }
-    }
-  }
 }
 
 .styled-dl {
-    .styled-dl-entry {
-        border-left: 2px solid $primary;
-        padding: 0 $s-lg;
-        height: calc(5 * $s-lg);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        .styled-dl-entry {
+                border-left: 2px solid $primary;
+                padding: 0 $s-lg;
+                height: calc(5 * $s-lg);
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
 
-        dt {
-          font-size: $fs-xs;
-          font-weight: normal;
+                dt {
+                    font-size: $fs-xs;
+                    font-weight: normal;
+                }
+
+                dd {
+                        font-size: $fs-lg;
+                        font-weight: bold;
+                }
         }
-
-        dd {
-            font-size: $fs-lg;
-            font-weight: bold;
-        }
-    }
-}
-
-.messages {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    .date {
-    margin-bottom: $s-xl;
-    text-align: center;
-
-      &::after {
-        border-right: 2px solid $tertiary-subtle;
-        content: '';
-        display: block;
-        height: $s-xl;
-        left: 50%;
-        position: absolute;
-      }
-
-      span {
-        background-color: $tertiary-subtle;
-        border-radius: $border-radius-pill;
-        display: inline-block;
-        padding: $s-xs $s-sm;
-      }
-  }
 }

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 
-from onegov.foundation6 import BaseTheme
 from onegov.bootstrap import BootstrapBaseTheme
 from onegov.core.utils import module_path
 
@@ -100,6 +99,7 @@ class TownBsTheme(BootstrapBaseTheme):
         """Our scss code split into various files"""
         return [
             'post_imports_customizations',
+            'print',
             'town',
             'custom_utilities',
             'custom_components',
