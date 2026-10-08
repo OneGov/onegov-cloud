@@ -131,6 +131,20 @@ def test_link_icon_widget() -> None:
     assert "text \'Whenever you want\'" in result
 
 
+def test_link_icon_widget_injection() -> None:
+    class App(TownApp):
+        pass
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    widgets = App().config.homepage_widget_registry.values()
+
+    structure = '<icon_link title="\' + print(\'Hi\') + \'"/>'
+    result = transform_structure(widgets, structure)
+    assert "title '\\' + print(\\'Hi\\') + \\'" in result
+
+
 def test_testimonial_widget() -> None:
     class App(TownApp):
         pass
