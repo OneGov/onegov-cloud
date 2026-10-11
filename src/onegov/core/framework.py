@@ -456,7 +456,7 @@ class Framework(
         super().configure_application(**cfg)
 
         members = sorted(
-            inspect.getmembers(self.__class__, callable),
+            inspect.getmembers_static(self.__class__, callable),
             key=itemgetter(0)
         )
 
