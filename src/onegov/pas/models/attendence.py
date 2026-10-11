@@ -75,7 +75,8 @@ class Attendence(Base, TimestampMixin):
     #: Whether this attendance submission is closed/completed
     #: This is only relevant for commission attendance, not plenary sessions.
     #: Parliamentarians use this to signal they have recorded all activities
-    #: for this commission in a settlement run.
+    #: for this commission in a settlement run. A zero-duration entry may be
+    #: used as an administrative marker to close a commission without pay.
     abschluss: Mapped[bool] = mapped_column(default=False)
 
     #: The type as translated text

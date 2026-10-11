@@ -392,7 +392,7 @@ input.has-field-help {
         border-radius: .7rem 0 0 .7rem !important;
     }
 
-    .button.secondary{
+    .button.secondary.postfix{
         @include input-button;
         border-radius: 0 10rem 10rem 0 !important;
         height: 2.6rem !important;
@@ -614,5 +614,63 @@ p.file-title {
     &:hover {
         background: $iron;
         cursor: pointer !important;
+    }
+}
+
+/*
+    Cropper widget
+*/
+
+.cropper-widget {
+    .cropper-widget-canvas-container {
+        min-height: 320px;
+        max-height: 400px;
+        max-width: 640px;
+    }
+
+    .cropper-widget-toolbar {
+        display: flex;
+        flex-flow: row wrap;
+
+        label {
+            flex-basis: 100%;
+        }
+
+        .button {
+            @include input-button;
+            flex-basis: 50%;
+            line-height: 1.5rem;
+            height: 2.6rem !important;
+            padding: .5rem !important;
+            margin-top: .5rem;
+
+            &.prefix {
+                border-radius: 10rem 0 0 10rem !important;
+            }
+
+            &.postfix {
+                border-radius: 0 10rem 10rem 0 !important;
+            }
+
+            &:hover {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                padding: .5rem !important;
+            }
+        }
+    }
+}
+
+.cropper-widget-circular {
+    .cropper-view-box {
+        border-radius: 50%;
+    }
+
+    .cropper-face {
+        background-color:inherit !important;
+    }
+
+    .cropper-dashed {
+        display: none;
     }
 }

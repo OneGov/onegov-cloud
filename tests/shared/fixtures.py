@@ -148,15 +148,20 @@ def postgres(
         yield None
         return
 
-    postgres_args = ' '.join((
-        "-h 127.0.0.1",
-        "-F",
-        "-c logging_collector=off",
-        "-c fsync=off",
-        "-c full_page_writes=off",
-        # schema-heavy tests drop many schemas CASCADE in one teardown tx
-        "-c max_locks_per_transaction=1024",
-    ))
+    postgres_args = ' '.join(
+        (
+            "-h 127.0.0.1",
+            "-F",
+            # UTCDateTime stores naive UTC values; publication queries compare
+            # them with now(), which requires the DB timezone to be UTC.
+            '-c timezone=UTC',
+            "-c logging_collector=off",
+            "-c fsync=off",
+            "-c full_page_writes=off",
+            # schema-heavy tests drop many schemas CASCADE in one teardown tx
+            "-c max_locks_per_transaction=1024",
+        )
+    )
 
     postgres = Postgresql(  # type: ignore[no-untyped-call]
         postgres_args=postgres_args,

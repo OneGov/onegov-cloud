@@ -2204,6 +2204,17 @@ class DataRetentionPolicyForm(Form):
         choices=TIMESPANS
     )
 
+    audit_trail_delete_timespan = RadioField(
+        label=_(
+            'Duration from audit trail entry creation '
+            'until deleted automatically'
+        ),
+        validators=[InputRequired()],
+        default=0,
+        coerce=int,
+        choices=TIMESPANS,
+    )
+
 
 class FirebaseSettingsForm(Form):
     """Allows to setup sending firebase notifications for News with

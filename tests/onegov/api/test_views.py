@@ -134,6 +134,8 @@ def test_view_api(client: Client, app: App) -> None:
                     ]
                 }
             ],
+            'total_items_count': 2,
+            'total_pages_count': 1,
             'template': {
                 'data': [
                     {

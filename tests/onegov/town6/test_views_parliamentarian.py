@@ -158,10 +158,10 @@ def test_parliamentarians(client: Client) -> None:
         id = next(
             (opt[0] for opt in options if opt[2] == 'Verkehrskommission'))
         commission.form['commission_id'] = id
-        commission.form['role'] = 'member'
+        commission.form['role'] = 'substitute_member'
         parliamentarian = commission.form.submit().follow()
         assert 'Neue Rolle hinzugefügt' in parliamentarian
-        assert 'Mitglied' in parliamentarian
+        assert 'Ersatzmitglied' in parliamentarian
         assert 'Verkehrskommission' in parliamentarian
 
         # add another parliamentarian

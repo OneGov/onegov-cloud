@@ -308,3 +308,10 @@ def add_external_kub_id_to_roles_and_memberships(
                         'external_kub_id', UUID, nullable=True, unique=True
                     ),
                 )
+
+
+@upgrade_task('Add substitute member commission role')
+def add_substitute_member_commission_role(context: UpgradeContext) -> None:
+    enum_name = 'pas_commission_membership_role'
+    if context.has_enum(enum_name):
+        context.update_enum_values(enum_name, {'substitute_member'})

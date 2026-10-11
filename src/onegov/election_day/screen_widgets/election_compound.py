@@ -119,7 +119,7 @@ class ElectionCompoundPartyStrengthsTableWidget(ElectionCompoundWidget):
     tag = 'election-compound-party-strengths-table'
     template = """
         <xsl:template match="election-compound-party-strengths-table">
-            <div class="{@class}" tal:define="year '{@year}'">
+            <div class="{@class}" tal:define="year {ogc:safe-string(@year)}">
                 <tal:block
                     metal:use-macro="layout.macros['party-strengths-table']"
                     />
@@ -290,8 +290,9 @@ class ElectionCompoundPartyStrengthsChartWidget(
     tag = 'election-compound-party-strengths-chart'
     template = """
         <xsl:template match="election-compound-party-strengths-chart">
-            <div class="{@class}"
-                 tal:define="horizontal '{@horizontal}'=='true'">
+            <div class="{@class}" tal:define="
+                horizontal {ogc:safe-string(@horizontal)}=='true'
+            ">
                 <tal:block
                     metal:use-macro="layout.macros['party-strengths-chart']"
                     />

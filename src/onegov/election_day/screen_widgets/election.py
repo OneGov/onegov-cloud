@@ -24,7 +24,7 @@ class ElectionCandidatesTableWidget(ModelBoundWidget['Election']):
     tag = 'election-candidates-table'
     template = """
         <xsl:template match="election-candidates-table">
-            <div class="{@class}" tal:define="lists '{@lists}'">
+            <div class="{@class}" tal:define="lists {ogc:safe-string(@lists)}">
                 <tal:block
                     metal:use-macro="layout.macros['election-candidates-table']"
                     tal:define="show_percentage (election.type != 'proporz')"
@@ -80,7 +80,7 @@ class ElectionListsTableWidget(ModelBoundWidget['ProporzElection']):
     tag = 'election-lists-table'
     template = """
         <xsl:template match="election-lists-table">
-            <div class="{@class}" tal:define="names '{@names}'">
+            <div class="{@class}" tal:define="names {ogc:safe-string(@names)}">
                 <tal:block
                     metal:use-macro="layout.macros['election-lists-table']"
                     />
@@ -106,7 +106,7 @@ class ElectionPartyStrengthsTableWidget(ModelBoundWidget['ProporzElection']):
     tag = 'election-party-strengths-table'
     template = """
         <xsl:template match="election-party-strengths-table">
-            <div class="{@class}" tal:define="year '{@year}'">
+            <div class="{@class}" tal:define="year {ogc:safe-string(@year)}">
                 <tal:block
                     metal:use-macro="layout.macros['party-strengths-table']"
                     />
@@ -138,10 +138,10 @@ class ElectionCandidatesChartWidget(ChartWidget['Election']):
     template = """
         <xsl:template match="election-candidates-chart">
             <div class="{@class}"
-                 tal:define="limit '0{@limit}';
-                             lists '{@lists}';
-                             elected '{@elected}';
-                             sort_by_lists '{@sort-by-lists}';
+                 tal:define="limit '0' + {ogc:safe-string(@limit)};
+                             lists {ogc:safe-string(@lists)};
+                             elected {ogc:safe-string(@elected)};
+                             sort_by_lists {ogc:safe-string(@sort-by-lists)};
                              ">
                 <tal:block
                     metal:use-macro="layout.macros['candidates-chart']"
@@ -164,9 +164,9 @@ class ElectionListsChartWidget(ChartWidget['ProporzElection']):
     template = """
         <xsl:template match="election-lists-chart">
             <div class="{@class}"
-                 tal:define="limit '0{@limit}';
-                             names '{@names}';
-                             sort_by_names '{@sort-by-names}'
+                 tal:define="limit '0' + {ogc:safe-string(@limit)};
+                             names {ogc:safe-string(@names)};
+                             sort_by_names {ogc:safe-string(@sort-by-names)}
                              ">
                 <tal:block
                     metal:use-macro="layout.macros['lists-chart']"
@@ -188,8 +188,9 @@ class ElectionPartyStrengthsChartWidget(ChartWidget['ProporzElection']):
     tag = 'election-party-strengths-chart'
     template = """
         <xsl:template match="election-party-strengths-chart">
-            <div class="{@class}"
-                 tal:define="horizontal '{@horizontal}'=='true'">
+            <div class="{@class}" tal:define="
+                horizontal {ogc:safe-string(@horizontal)}=='true'
+            ">
                 <tal:block
                     metal:use-macro="layout.macros['party-strengths-chart']"
                     />

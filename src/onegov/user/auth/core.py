@@ -140,7 +140,7 @@ class Auth:
         if not user.second_factor:
             for factor in self.factors.values():
                 if factor.self_activation:
-                    response = factor.start_activation(request, self)
+                    response = factor.start_activation(request, user, self)
                     if response is not None:
                         return response
             return True
