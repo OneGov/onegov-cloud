@@ -2795,8 +2795,7 @@
     <li tal:define="link edit_link(record)|nothing;
                      modal_href request.link(record, 'modal')|nothing;
                          form_href form_url(record);
-                     internal record.name|False;"
-        class="styled-list-item d-flex align-items-center justify-content-between gap-3">
+                     internal record.name|False;">
 
         <a class="styled-list-link"
             tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
@@ -2810,9 +2809,8 @@
 
             <p class="styled-list-title">${record.title}</p>
             <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
-            <p class="styled-list-lead preview mb-0 pt-sm" tal:condition="lead">${lead}</p>
-            <div class="list-hint hints" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
-
+            <p class="styled-list-lead" tal:condition="lead">${lead}</p>
+            <div class="list-hint hints alert alert-warning mb-0" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
         </a>
 
         <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
@@ -2899,7 +2897,7 @@
 
                         <tal:b tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing; files files|nothing;">
                             <tal:b tal:condition="hints|nothing">
-                                <div class="cell small-12 panel ${hints_callout and 'callout' or ''}">
+                                <div class="alert alert-${hints_callout and 'warning' or 'info'}">
                                     <div class="hints" tal:condition="hints|nothing">
                                         <div tal:repeat="(name, hint) hints" class="hint hint-${name}">${hint}</div>
                                     </div>

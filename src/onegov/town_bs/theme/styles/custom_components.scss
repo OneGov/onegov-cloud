@@ -4,8 +4,7 @@
     margin-bottom: 0;
     margin-top: -$s-md;
 
-    .styled-list-item {
-        // Flex row: link (grows) | edit link (optional) | arrow
+    li {
         display: flex;
         align-items: center;
         gap: $s-md;
@@ -14,10 +13,6 @@
 
         * {
             transition: all $standard-transition;
-        }
-
-        &:first-child {
-            margin-top: 0;
         }
 
         // TODO: Replace ">" with the real icon as soon as the icon library is known
@@ -32,6 +27,7 @@
         .styled-list-link {
             display: grid;
             grid-template-columns: 1fr auto;
+            grid-template-rows: repeat(3, auto);
             align-items: center;
             flex: 1 1 auto;
             min-width: 0;
@@ -50,11 +46,19 @@
             .styled-list-lead {
                 grid-column: 1;
                 grid-row: 2;
+                margin-bottom: 0;
+                padding-top: $s-sm;
+            }
+
+            .list-hint {
+                grid-column: 1;
+                grid-row: 3;
+                margin-top: $s-sm;
             }
 
             > i {
                 grid-column: 2;
-                grid-row: 1 / span 2;
+                grid-row: 1 / span 3;
                 align-self: center;
                 margin-left: $s-md;
             }
@@ -79,22 +83,22 @@
 }
 
 .styled-dl {
-        .styled-dl-entry {
-                border-left: 2px solid $primary;
-                padding: 0 $s-lg;
-                height: calc(5 * $s-lg);
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
+    .styled-dl-entry {
+        border-left: 2px solid $primary;
+        padding: 0 $s-lg;
+        height: calc(5 * $s-lg);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
 
-                dt {
-                    font-size: $fs-xs;
-                    font-weight: normal;
-                }
-
-                dd {
-                        font-size: $fs-lg;
-                        font-weight: bold;
-                }
+        dt {
+            font-size: $fs-xs;
+            font-weight: normal;
         }
+
+        dd {
+            font-size: $fs-lg;
+            font-weight: bold;
+        }
+    }
 }

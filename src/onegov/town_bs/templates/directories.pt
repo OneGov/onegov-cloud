@@ -8,11 +8,11 @@
             <tal:b metal:fill-slot="after-text">
                 <p tal:condition="not:directories" i18n:translate="">No directories defined yet.</p>
                 <ul tal:condition="directories" class="styled-list directory-list">
-                    <li class="styled-list-item" tal:repeat="directory directories">
+                    <li tal:repeat="directory directories">
                         <a class="styled-list-link" tal:attributes="href link(directory)">
-                            <span class="h3 list-title">${directory.title}</span>
+                            <span class="styled-list-title">${directory.title}</span>
                             <metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
-                            <div class="list-lead preview" tal:content="layout.linkify(directory.lead)" />
+                            <div class="styled-list-lead" tal:content="layout.linkify(directory.lead)" />
                         </a>
                     </li>
                 </ul>
