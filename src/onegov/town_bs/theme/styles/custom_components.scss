@@ -1,14 +1,16 @@
-.accordion-list {
+.styled-list {
     list-style: none;
     padding-left: 0;
     margin-bottom: 0;
     margin-top: -$s-md;
 
-    .accordion-list-item {
+    .styled-list-item {
+        // Flex row: link (grows) | edit link (optional) | arrow
+        display: flex;
+        align-items: center;
+        gap: $s-md;
         border-bottom: 2px solid $tertiary-subtle;
         transition: border $standard-transition;
-
-        // TODO: Add arrow as soon as we know the icon library
 
         * {
             transition: all $standard-transition;
@@ -18,18 +20,59 @@
             margin-top: 0;
         }
 
-        .accordion-list-link {
-            display: block;
+        // TODO: Replace ">" with the real icon as soon as the icon library is known
+        &::after {
+            content: ">";
+            flex-shrink: 0;
+            color: $primary;
+            padding-right: $s-sm;
+            transition: transform $standard-transition;
+        }
+
+        .styled-list-link {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            flex: 1 1 auto;
+            min-width: 0;
             padding: $s-md 0;
             text-decoration: none;
             color: $body-color;
+
+            .styled-list-title {
+                grid-column: 1;
+                grid-row: 1;
+                display: block;
+                margin-bottom: 0;
+                font-size: $fs-md;
+            }
+
+            .styled-list-lead {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            > i {
+                grid-column: 2;
+                grid-row: 1 / span 2;
+                align-self: center;
+                margin-left: $s-md;
+            }
+        }
+
+        .edit-link {
+            flex-shrink: 0;
         }
 
         &:hover {
             border-bottom-color: $primary;
 
-            .accordion-list-link {
+            .styled-list-link {
                 color: $primary;
+            }
+
+            &::after {
+                transform: translateX($s-sm);
             }
         }
     }

@@ -21,14 +21,14 @@
 }
 
 .btn-tertiary {
-  color: color-contrast($tertiary);
-  background-color: $tertiary;
-  border-color: $tertiary;
+  color: $tertiary;
+  background-color: $tertiary-subtle;
+  border-color: $tertiary-subtle;
 
   &:hover {
-    color: color-contrast(shade-color($tertiary, 10%));
-    background-color: shade-color($tertiary, 10%);
-    border-color: shade-color($tertiary, 10%);
+    color: color-contrast(shade-color($tertiary-subtle, 50%));
+    background-color: shade-color($tertiary-subtle, 50%);
+    border-color: shade-color($tertiary-subtle, 50%);
   }
 }
 

@@ -53,15 +53,15 @@
                     </div>
                 </tal:b>
                 <tal:b metal:fill-slot="after-text">
-                    <ul class="more-list page-links row">
-                        <li tal:repeat="(lead, title, link, url, edit_link, page_image, show_preview_image) children" class="${'col-6' if children_images else ''}" >
-                            <a href="${url}" class="list-link">
+                    <ul class="styled-list row mt-5xl">
+                        <li tal:repeat="(lead, title, link, url, edit_link, page_image, show_preview_image) children" class="styled-list-item ${'col-6' if children_images else ''}" >
+                            <a href="${url}" class="styled-list-link">
                                 <div class="page-image" tal:condition="children_images" style="background-image: url(${page_image if (show_preview_image and page_image) else layout.org.meta.get('standard_image', None)}); background-size: cover;"></div>
                                 <tal:block tal:switch="children_images">
                                     <div class="list-title"  tal:case="True">
                                         <div class="gradient"></div><span class="h5">${title}</span>
                                     </div>
-                                    <span class="h5 list-title" tal:case="False">${title}</span>
+                                    <span class="h5 styled-list-title" tal:case="False">${title}</span>
                                 </tal:block>
                             </a>
                             <a href="${url}" tal:condition="lead and not children_images">

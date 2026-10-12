@@ -43,7 +43,7 @@
 
                     <tal:b repeat="link filters">
                         <li class="${link.active and 'active' or ''}">
-                            <tal:b replace="link(layout, ('btn', 'rounded-1', link.active and 'btn-primary' or 'btn-outline-tertiary', 'btn-sm'))" />
+                            <tal:b replace="link(layout, ('btn', link.active and 'btn-primary' or 'btn-tertiary', 'btn-sm'))" />
                         </li>
                     </tal:b>
                 </ul>

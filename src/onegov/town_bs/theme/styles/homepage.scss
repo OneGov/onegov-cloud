@@ -99,8 +99,6 @@
         }
     }
 
-$icon-link-icon-shift: $s-xs;
-
 .icon-link {
   min-height: 14rem; // match the height of the hover state
 
@@ -115,7 +113,7 @@ $icon-link-icon-shift: $s-xs;
   &:hover {
     @media (hover: hover) {
     .icon-circle {
-      transform: translateY($icon-link-icon-shift);
+      transform: translateY($s-xs);
     }
     }
 

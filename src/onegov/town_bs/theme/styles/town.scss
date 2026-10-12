@@ -11,6 +11,7 @@
     img {
         border-radius: $border-radius-lg;
         max-width: 100%;
+        height: auto;
     }
 
     .page-main-content{
@@ -34,7 +35,7 @@
         opacity: 0;
         margin-left: .5rem;
         position: absolute !important;
-        transition: opacity 200ms linear;
+        transition: opacity $standard-transition;
     }
 
     .anchor-link-heading {
@@ -69,4 +70,28 @@
     align-items: center;
     justify-content: center;
     border-radius: $border-radius-pill;
+}
+
+.news-list-item {
+    * {
+        transition: all $standard-transition;
+    }
+
+    .card {
+        background: $tertiary-subtle;
+        border: 0;
+        color: $primary;
+
+        &:hover {
+            background: $primary;
+            * {
+                color: $white;
+            }
+
+            .read-more-link .rounded-circle * {
+                transition: all $standard-transition;
+                transform: translateX($s-xs);
+            }
+        }
+    }
 }
