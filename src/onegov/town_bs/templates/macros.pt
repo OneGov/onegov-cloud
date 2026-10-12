@@ -428,9 +428,7 @@
             <metal:b use-macro="layout.macros['event-item-card']" />
         </div>
     </div>
-    <div class="newslist grid-x align-center">
-        <a class="button hollow" href="${layout.events_url}" i18n:translate="">All events</a>
-    </div>
+    <a class="button hollow" href="${layout.events_url}" i18n:translate="">All events</a>
 </metal:panel>
 
 <metal:card define-macro="directory-card">
