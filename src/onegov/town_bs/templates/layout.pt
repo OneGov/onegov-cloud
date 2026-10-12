@@ -134,10 +134,10 @@
                                 <a href="#" class="" data-bs-toggle="modal" data-bs-target="#searchModal">
                                     <i class="fa fa-search"></i>
                                 </a>
-                                <a href="${layout.online_counter_url}" class="btn btn-primary" i18n:translate="">
+                                <a tal:condition="request.app.has_forms" href="${layout.online_counter_url}" class="btn btn-primary" i18n:translate="">
                                     Online counter
                                 </a>
-                                <a data-bs-toggle="offcanvas" href="#offCanvasMainMenu" role="button" aria-controls="offcanvasExample">
+                                <a tal:condition="top_navigation|layout.top_navigation" data-bs-toggle="offcanvas" href="#offCanvasMainMenu" role="button" aria-controls="offCanvasMainMenu">
                                     <i class="fa fa-bars"></i>
                                 </a>
 
@@ -162,7 +162,7 @@
         <tal:b tal:define="on_homepage layout.on_homepage; sidebar_links layout.sidebar_links">
 
             <div tal:condition="on_homepage" id="homepage" class="content without-sidebar-links">
-                <div role="main" id="content" data-reinit-foundation>
+                <div role="main" id="content">
                     <div metal:define-slot="content"></div>
                 </div>
             </div>
@@ -202,7 +202,7 @@
                             </div>
                         </div>
 
-                    <div class="row" role="main" id="content" data-reinit-foundation>
+                    <div role="main" id="content">
                         <div metal:define-slot="before-content"></div>
                         <div metal:define-slot="content"></div>
                     </div>
@@ -218,7 +218,7 @@
                                 </h1>
                             </div>
 
-                            <div id="content" role="main" data-reinit-foundation>
+                            <div id="content" role="main">
                                 <div metal:define-slot="before-content"></div>
                                 <div metal:define-slot="content"></div>
                             </div>

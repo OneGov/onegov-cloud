@@ -7,7 +7,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <tal:b metal:use-macro="layout.macros.page_content" tal:define="lead resultslabel; show_side_panel True; text None; ">
-            <tal:b metal:fill-slot="after-text">
+            <tal:b metal:fill-slot="main-content">
                 <div tal:condition="not:connection" i18n:translate>
                     Searching is currently unavailable due to technical difficulties.
                     Please excuse the inconvenience and try again later.

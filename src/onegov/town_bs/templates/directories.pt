@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <tal:b metal:use-macro="layout.macros.page_content"
                  tal:define="lead None; text None; people None; coordinates None; contact layout.org.contact_html|None">
-            <tal:b metal:fill-slot="after-text">
+            <tal:b metal:fill-slot="main-content">
                 <p tal:condition="not:directories" i18n:translate="">No directories defined yet.</p>
                 <ul tal:condition="directories" class="styled-list directory-list">
                     <li tal:repeat="directory directories">

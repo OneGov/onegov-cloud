@@ -52,7 +52,7 @@
                         </div>
                     </div>
                 </tal:b>
-                <tal:b metal:fill-slot="after-text">
+                <tal:b metal:fill-slot="main-content">
                     <ul class="styled-list row mt-5xl">
                         <li tal:repeat="(lead, title, link, url, edit_link, page_image, show_preview_image) children" class="${'col-6' if children_images else ''}" >
                             <a href="${url}" class="styled-list-link">

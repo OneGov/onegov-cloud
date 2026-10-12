@@ -52,7 +52,7 @@
 
         <tal:b metal:use-macro="layout.macros.page_content"
                     tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing; files files|nothing;">
-            <tal:b metal:fill-slot="after-text">
+            <tal:b metal:fill-slot="main-content">
 
                 <div class="grid-x" tal:condition="hints|nothing">
                     <div class="cell small-12 panel ${hints_callout and 'callout' or ''}">

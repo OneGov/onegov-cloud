@@ -7,9 +7,11 @@ from sedate import replace_timezone
 
 from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
+from onegov.core.orm import orm_cached
 from onegov.core.templates import render_template
 from onegov.core.utils import module_path
 from onegov.bootstrap.integration import BootstrapApp
+from onegov.form.collection import FormCollection
 from onegov.town6.app import TownApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.town6.custom import get_api_endpoints
@@ -74,6 +76,13 @@ class TownBsApp(TownApp, BootstrapApp):
                     if now > open and now < close:
                         return True
         return False
+
+    @orm_cached(policy='on-table-change:forms')
+    def has_forms(self) -> bool:
+        return (
+            FormCollection(self.session()).definitions.query().first()
+            is not None
+        )
 
 
 @TownBsApp.webasset_path()

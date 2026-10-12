@@ -76,7 +76,7 @@ var processCommonNodes = function(elements, out_of_band) {
     });
 
     // Make sure files open in another window
-    targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
+    targets.find('.rich-text-container a[href*="/datei/"]').attr('target', '_blank');
 
     // send an event to allow optional scripts to hook themselves up
     // (we only do out of band updates since it's not guaranteed that these
@@ -175,10 +175,10 @@ $('.show-new-content-placeholder')
     });
 
 // Make sure files open in another window
-$('.page-text a[href*="/datei/"]').attr('target', '_blank');
+$('.rich-text-container a[href*="/datei/"]').attr('target', '_blank');
 
 // Turn video links into clickable thumbnails
-$('.page-text a.has-video').videoframe();
+$('.rich-text-container a.has-video').videoframe();
 
 // Turn hashtags into links (happens in the backend at times, this should).
 // This could be done in the templates (and it is done for the e-mail newsletter),

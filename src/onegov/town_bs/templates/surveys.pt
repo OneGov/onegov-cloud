@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <tal:b metal:use-macro="layout.macros.page_content"
                  tal:define="lead None; text None; people None; coordinates None; contact layout.org.contact_html|nothing">
-            <tal:b metal:fill-slot="after-text">
+            <tal:b metal:fill-slot="main-content">
                 <p tal:condition="not:surveys" i18n:translate="">No surveys defined yet.</p>
                 <metal:b use-macro="layout.macros['group_by_column']" tal:condition="surveys" tal:define="grouped surveys; add_pagerefs request.is_logged_in" />
             </tal:b>

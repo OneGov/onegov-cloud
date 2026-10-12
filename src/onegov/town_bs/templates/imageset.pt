@@ -10,7 +10,7 @@
             This album does not contain any images yet.
         </p>
 
-        <div tal:repeat="image imageset.ordered_files" tal:condition="imageset.view == 'full'" class="page-text full-imageset photoswipe">
+        <div tal:repeat="image imageset.ordered_files" tal:condition="imageset.view == 'full'" class="rich-text-container full-imageset photoswipe">
             <!--! the first three images are loaded conventionally, the rest are loaded lazily -->
             <tal:b tal:condition="size" tal:define="size getattr(image.reference, 'size', None)">
                 <p class="has-img" tal:condition="size and repeat.image.number <= 3">
@@ -26,7 +26,7 @@
             </tal:b>
         </div>
 
-        <div tal:condition="imageset.view == 'grid'" class="page-text grid-imageset photoswipe">
+        <div tal:condition="imageset.view == 'grid'" class="rich-text-container grid-imageset photoswipe">
             <div class="image-grid">
                 <tal:b tal:repeat="image imageset.ordered_files">
                     <div tal:condition="size" tal:define="size getattr(image.reference, 'size', None);

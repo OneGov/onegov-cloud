@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x reservation-form">
             <div class="small-12 cell">
-                <div class="page-text">
+                <div class="rich-text-container">
                     <h2>
                         <i class="fa fa-calendar"></i>
                         ${layout.format_date(allocation.display_start(), 'weekday_long')},
