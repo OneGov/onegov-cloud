@@ -1,8 +1,12 @@
 # Changes
 
+## 2026.51
+
+No changes since last release
+
 ## 2026.50
 
-`2026-10-12` | [59be39b99d...7dfffde78d](https://github.com/OneGov/onegov-cloud/compare/59be39b99d^...7dfffde78d)
+`2026-10-12` | [59be39b99d...08adf8cd27](https://github.com/OneGov/onegov-cloud/compare/59be39b99d^...08adf8cd27)
 
 ### Api
 
@@ -5530,72 +5534,4 @@ get distracted by red herrings.
 ##### Reactivate recipient in cron job if no longer on postmark suppression list
 
 `Feature` | [OGC-2212](https://linear.app/onegovcloud/issue/OGC-2212) | [4688da1d6f](https://github.com/onegov/onegov-cloud/commit/4688da1d6f6924b24f622055f9c072ba7a88a2a9)
-
-## 2025.22
-
-`2025-05-09` | [b1505595a8...71b5a6d944](https://github.com/OneGov/onegov-cloud/compare/b1505595a8^...71b5a6d944)
-
-### Feriennet
-
-##### Swisspass ID is now optional
-
-`Feature` | [OGC-1388](https://linear.app/onegovcloud/issue/OGC-1388) | [49ed887c76](https://github.com/onegov/onegov-cloud/commit/49ed887c76b6b644795f256849eb4fde9d917d69)
-
-### Form
-
-##### Adds generic field for geographic autocompletion.
-
-`Feature` | [OGC-2216](https://linear.app/onegovcloud/issue/OGC-2216) | [cf5e83d511](https://github.com/onegov/onegov-cloud/commit/cf5e83d5112446cfa82e14beaf844a791fd03a06)
-
-### Landsgemeinde
-
-##### Function color
-
-`Feature` | [OGC-1892](https://linear.app/onegovcloud/issue/OGC-1892) | [b1505595a8](https://github.com/onegov/onegov-cloud/commit/b1505595a85da7fe8177237cf023936850f1983d)
-
-##### Spacing between icon and time
-
-`Bugfix` | [OGC-1620](https://linear.app/onegovcloud/issue/OGC-1620) | [aa7807ad63](https://github.com/onegov/onegov-cloud/commit/aa7807ad635a9e84b46f338f90df69d1c8ad07b0)
-
-##### Fix ticker update
-
-`Bugfix` | [OGC-2240](https://linear.app/onegovcloud/issue/OGC-2240) | [6031de92b4](https://github.com/onegov/onegov-cloud/commit/6031de92b45b906f6d3a076e6cca3ae908e522f5)
-
-### Org
-
-##### IFrame Information
-
-`Feature` | [OGC-2175](https://linear.app/onegovcloud/issue/OGC-2175) | [0a11978dbd](https://github.com/onegov/onegov-cloud/commit/0a11978dbd8c07a9ba9461cf1b8acf3be05713ce)
-
-##### User Information
-
-Show additional user information
-
-`Feature` | [OGC-2147](https://linear.app/onegovcloud/issue/OGC-2147) | [d6620b16b4](https://github.com/onegov/onegov-cloud/commit/d6620b16b4c67efd4b53311f0c6b850b03779268)
-
-##### Add retry mechanism for postmark api calls on email bounce statistics cron job
-
-`Feature` | [NONE](#NONE) | [a053a278f3](https://github.com/onegov/onegov-cloud/commit/a053a278f391d66d96da7c4a564db5bbdb263812)
-
-##### People and Documents in Sidebar
-
-`Bugfix` | [OGC-2142](https://linear.app/onegovcloud/issue/OGC-2142) | [e14af7a359](https://github.com/onegov/onegov-cloud/commit/e14af7a3597b5eb99694220f6fc97316796ea220)
-
-### Ruff
-
-##### Enables `ASYNC` and `LOG` as well as a couple of additional rules
-
-Refactors capturing of exceptions and re-emitting them as `APIException`
-
-`Other` | [e66369e960](https://github.com/onegov/onegov-cloud/commit/e66369e960e02e11da70cedd95b4feae16d21d9d)
-
-### Town6
-
-##### Skip form if there are no form fields in reservation
-
-`Feature` | [OGC-2211](https://linear.app/onegovcloud/issue/OGC-2211) | [c33ffc11c2](https://github.com/onegov/onegov-cloud/commit/c33ffc11c2ed8c7130a2a3065e020ebe77218814)
-
-##### Copy event button
-
-`Feature` | [OGC-1900](https://linear.app/onegovcloud/issue/OGC-1900) | [a7e570ede0](https://github.com/onegov/onegov-cloud/commit/a7e570ede065c6f56b7e25fa3cb3a5b867fe68d9)
 
