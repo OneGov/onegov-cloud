@@ -23,8 +23,7 @@ from onegov.newsletter import Newsletter
 from onegov.org import log
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
-from onegov.org.models.political_business import (
-    POLITICAL_BUSINESS_STATUS, POLITICAL_BUSINESS_TYPE)
+from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.people import Person
@@ -604,22 +603,6 @@ def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
              WHERE data ? 'kaba'
                AND data->'kaba' ? 'visit_id'
         """), {'site_id': site_id})
-
-
-@upgrade_task('Update political business enum values')
-def update_political_business_enum_values(
-    context: UpgradeContext
-) -> None:
-    if context.has_enum('par_political_business_type'):
-        context.update_enum_values(
-            'par_political_business_type',
-            POLITICAL_BUSINESS_TYPE.keys()
-        )
-    if context.has_enum('par_political_business_status'):
-        context.update_enum_values(
-            'par_political_business_status',
-            POLITICAL_BUSINESS_STATUS.keys()
-        )
 
 
 @upgrade_task('Change political business participation type column type')
