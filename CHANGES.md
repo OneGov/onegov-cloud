@@ -1,8 +1,12 @@
 # Changes
 
+## 2026.52
+
+`2026-10-13` | [eeb6c96513...146bfb0eb4](https://github.com/OneGov/onegov-cloud/compare/eeb6c96513^...146bfb0eb4)
+
 ## 2026.51
 
-No changes since last release
+`2026-10-12` | [ac20a1737f...ac20a1737f](https://github.com/OneGov/onegov-cloud/compare/ac20a1737f^...ac20a1737f)
 
 ## 2026.50
 
@@ -5499,39 +5503,4 @@ will still use the old default of "one-off".
 ##### Adds daily cron job to import events from saiten
 
 `Feature` | [OGC-2184](https://linear.app/onegovcloud/issue/OGC-2184) | [2a00905128](https://github.com/onegov/onegov-cloud/commit/2a00905128f4d06b99d8a53dd7343d7355459571)
-
-## 2025.23
-
-`2025-05-19` | [cf50671551...039bb2563f](https://github.com/OneGov/onegov-cloud/compare/cf50671551^...039bb2563f)
-
-### Org
-
-##### Allows adjusting individual reservations within a ticket
-
-For now these adjustments are limited to the same allocation on the same
-day. Eventually we may allow moving reservations to arbitrary free
-allocations as long as the settings on the target allocation allow it.
-
-`Feature` | [OGC-2155](https://linear.app/onegovcloud/issue/OGC-2155) | [1d2870de8c](https://github.com/onegov/onegov-cloud/commit/1d2870de8cc67972c4f29ede5f236a9c2b8f62e2)
-
-### Server
-
-##### Avoids caching partially configured application instances
-
-Since `CachedApplication` was setting `self.instance` before the
-application was configured and the server will continue serving
-subsequent requests after a failed one, it was possible for a
-partially initialized application to end up in the cache, which
-leads to cryptic error messages.
-
-It's better if we fail the same way on every request, so we don't
-get distracted by red herrings.
-
-`Bugfix` | [6ae340b3d9](https://github.com/onegov/onegov-cloud/commit/6ae340b3d94c4b33c18b45dd7f41019db9b2958e)
-
-### Town6
-
-##### Reactivate recipient in cron job if no longer on postmark suppression list
-
-`Feature` | [OGC-2212](https://linear.app/onegovcloud/issue/OGC-2212) | [4688da1d6f](https://github.com/onegov/onegov-cloud/commit/4688da1d6f6924b24f622055f9c072ba7a88a2a9)
 
