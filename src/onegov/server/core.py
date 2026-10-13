@@ -136,8 +136,12 @@ class Server:
 
         # morepath is only loaded if there's at lest one app depending on it
         if next(self.applications.morepath_applications(), None):
+            import importscan
+            import onegov
             import morepath
             from onegov.server.utils import patch_morepath
+            # FIXME: Not sure why we suddenly need to manually do this
+            importscan.scan(onegov, ignore=['.test', '.tests'])
             patch_morepath()
             morepath.autoscan()
 

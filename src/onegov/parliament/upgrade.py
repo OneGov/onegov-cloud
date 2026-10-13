@@ -3,13 +3,16 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 # pragma: exclude file
+from sqlalchemy import text
 from sqlalchemy import Column
+from sqlalchemy import Enum
 from sqlalchemy import JSON
 from sqlalchemy import Text
 from sqlalchemy import UUID
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task, UpgradeContext
+from onegov.parliament.models.commission_membership import ROLES
 
 
 @upgrade_task('Introduce parliament module: rename pas tables')
@@ -314,4 +317,17 @@ def add_external_kub_id_to_roles_and_memberships(
 def add_substitute_member_commission_role(context: UpgradeContext) -> None:
     enum_name = 'pas_commission_membership_role'
     if context.has_enum(enum_name):
-        context.update_enum_values(enum_name, {'substitute_member'})
+        context.operations.execute(text("""
+            ALTER TABLE par_commission_memberships
+            ALTER COLUMN role TYPE Text;
+            DROP TYPE pas_commission_membership_role
+        """))
+        Enum(
+            *ROLES.keys(),
+            name=enum_name
+        ).create(context.operations.get_bind())
+        context.operations.execute(text("""
+            ALTER TABLE par_commission_memberships
+            ALTER COLUMN role TYPE pas_commission_membership_role
+            USING role::text::pas_commission_membership_role
+        """))
