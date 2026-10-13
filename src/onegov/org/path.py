@@ -782,6 +782,7 @@ def get_form_move(
         )
         if not move.is_valid():
             raise exc.HTTPBadRequest()
+        return move
     return None
 
 
@@ -811,6 +812,7 @@ def get_resource_move(
         )
         if not move.is_valid():
             raise exc.HTTPBadRequest()
+        return move
     return None
 
 
