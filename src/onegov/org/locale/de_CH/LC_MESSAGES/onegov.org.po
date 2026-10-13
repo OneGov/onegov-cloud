@@ -3098,6 +3098,19 @@ msgstr ""
 msgid "Duration from archived state until deleted automatically"
 msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
 
+msgid ""
+"Duration from audit trail entry creation until deleted automatically"
+msgstr ""
+"Dauer vom Erstellen eines Audit-Trail-Eintrags bis zum automatischen "
+"Löschen"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain, as well as audit "
+"trail entries, may be irreversibly deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten sowie "
+"Audit-Trail-Einträge können unwiderruflich gelöscht werden."
+
 msgid "Firebase adminsdk credentials (JSON)"
 msgstr "Firebase adminsdk Zugangsdaten (JSON)"
 

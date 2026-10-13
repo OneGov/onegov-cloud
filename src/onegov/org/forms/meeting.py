@@ -259,6 +259,8 @@ class MeetingExportPoliticalBusinessForm(Form):
     )
 
     def process_obj(self, obj: Meeting) -> None:  # type:ignore[override]
+        from onegov.org.models import PoliticalBusinessCollection
+
         super().process_obj(obj)
 
         self.meeting_documents.choices = [
@@ -270,9 +272,10 @@ class MeetingExportPoliticalBusinessForm(Form):
         self.meeting_documents.description = obj.display_name
 
         choices: list[_Choice] = []
+        businesses = PoliticalBusinessCollection(self.meta.request)
         for meeting_item in obj.meeting_items:
             business = meeting_item.political_business
-            if not business:
+            if business is None or not businesses.is_listed(business):
                 continue
 
             choices.extend([

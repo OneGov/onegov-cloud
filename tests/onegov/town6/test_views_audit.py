@@ -1,15 +1,79 @@
 import json
+import pytest
 import transaction
+from datetime import timedelta
+from freezegun import freeze_time
+from sedate import utcnow
 from uuid import uuid4
 
-from onegov.core.orm.audit import AuditEntry
+from onegov.core.orm.audit import AuditEntry, AuditOperation
 from onegov.page import Page, PageCollection
+from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .conftest import Client
+
+
+@pytest.mark.parametrize('retention', [0, None, 182])
+def test_delete_old_audit_entries(
+    client: Client,
+    retention: int | None,
+) -> None:
+    with freeze_time('2026-10-01 05:45'):
+        session = client.app.session()
+        assert client.app.org.audit_trail_delete_timespan == 0
+        client.app.org.meta['audit_trail_delete_timespan'] = retention
+        operations: tuple[AuditOperation, ...] = ('insert', 'update', 'delete')
+        for operation in operations:
+            for age in (183, 182, 181):
+                session.add(
+                    AuditEntry(
+                        target_table='pages',
+                        target_id=str(age),
+                        operation=operation,
+                        snapshot={'title': 'Personal data'},
+                        previous_snapshot={'title': 'Previous personal data'},
+                        username='editor@example.org',
+                        created=utcnow() - timedelta(days=age),
+                    )
+                )
+        transaction.commit()
+
+        job = get_cronjob_by_name(client.app, 'delete_old_audit_entries')
+        assert job is not None
+        job.app = client.app
+        client.get(get_cronjob_url(job))
+
+        entries = client.app.session().query(AuditEntry).all()
+        assert len(entries) == (3 if retention else 9)
+        if retention:
+            assert {entry.target_id for entry in entries} == {'181'}
+            assert {entry.operation for entry in entries} == set(operations)
+
+
+def test_audit_trail_retention_settings(client: Client) -> None:
+    client.login_admin()
+    settings = client.get('/data-retention-settings')
+    assert 'Dauer vom Erstellen eines Audit-Trail-Eintrags' in settings
+    assert (
+        'Audit-Trail-Einträge können unwiderruflich'
+        in settings.pyquery('body').text()
+    )
+    assert settings.form['audit_trail_delete_timespan'].value == '0'
+    settings.form['audit_trail_delete_timespan'] = '182'
+    settings.form.submit().maybe_follow()
+    assert client.app.org.audit_trail_delete_timespan == 182
+    assert client.app.org.auto_archive_timespan == 0
+    assert client.app.org.auto_delete_timespan == 0
+
+    settings = client.get('/data-retention-settings')
+    assert settings.form['audit_trail_delete_timespan'].value == '182'
+    settings.form['audit_trail_delete_timespan'] = '0'
+    settings.form.submit().maybe_follow()
+    assert client.app.org.audit_trail_delete_timespan == 0
 
 
 def test_view_audit_trail(client: Client) -> None:

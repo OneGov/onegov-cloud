@@ -5,7 +5,7 @@
 # version is to create release-dependent urls, artifacts and caches. During
 # development these dependencies do not need to be updated in lock-step.
 #
-__version__ = '2026.49'
+__version__ = '2026.52'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.
@@ -92,8 +92,9 @@ email_validator.CHECK_DELIVERABILITY = False
 
 from onegov.core.framework import Framework
 from onegov.core.filestorage import get_filestorage_file  # ruff:ignore[unused-import]
+from onegov.core.identity import OneGovIdentity as Identity
 
 # include the filters module so they get picked up by webassets
 from onegov.core import filters  # ruff:ignore[unused-import]
 
-__all__ = ['Framework', 'log']
+__all__ = ['Framework', 'Identity', 'log']

@@ -50,10 +50,14 @@ if TYPE_CHECKING:
         def template(self) -> str: ...
 
 
+OGC_NS = etree.FunctionNamespace('http://admin.digital/namespaces/ogc')
+
+
 XSLT_BASE = """<?xml version="1.0" encoding="UTF-8"?>
 
     <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:ogc="http://admin.digital/namespaces/ogc"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     xmlns:metal="http://xml.zope.org/namespaces/metal"
     xmlns:tal="http://xml.zope.org/namespaces/tal">
@@ -91,6 +95,58 @@ XML_BASE = """<?xml version="1.0" encoding="UTF-8"?>
 # the number of lines from the start of XML_Base to where the structure is
 # injected (for correct line error reporting on the UI side)
 XML_LINE_OFFSET = 6
+
+
+SAFE_STRING_TRANSLATION_TABLE = str.maketrans({
+    # ensure `\` in the source string will not be interpreted as an
+    # escape sequence itself.
+    '\\': '\\\\',
+    # single quotes need to be escaped
+    "'": "\\'",
+    # since we don't use the structure keyword the string literal
+    # will already get escaped by Chameleon, but XSLT will replace
+    # these characters with html entities, so we need to replace them
+    # with equivalent python string escape sequences instead.
+    '"': '\\x22',
+    '&': '\\x26',
+    '<': '\\x3c',
+    '>': '\\x3e',
+})
+
+
+@OGC_NS('safe-string')
+def safe_string(context: object, value: object) -> str:
+    """ Takes the given XPath value and turns it into a string that's
+    safe to use in a `tal:define` attribute.
+
+    A template like the following is vulnerable against arbitrary code
+    execution, since including "'" in the attribute "bar" will terminate
+    the string literal::
+
+        <xsl:template match="foo">
+            <tal:b tal:define="bar '{@bar}'" />
+        </xsl:template>
+
+    What you should do instead is this::
+
+        <xsl:template match="foo">
+            <tal:b tal:define="bar {ogc:safe-string(@bar)}" />
+        </xsl:template>
+
+    Which will always produce a valid python string literal that can be
+    used safely as a TAL variable definition.
+    """
+    if not value:
+        return "''"
+
+    if isinstance(value, list):
+        value = value[0]
+
+    value = str(value).translate(SAFE_STRING_TRANSLATION_TABLE)
+    # avoid the string literal getting broken into multiple lines
+    value = '\\n'.join(value.splitlines())
+
+    return f"'{value}'"
 
 
 def parse_structure(

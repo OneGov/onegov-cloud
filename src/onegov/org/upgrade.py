@@ -669,6 +669,22 @@ def make_political_business_participation_type_column_nullable(
         )
 
 
+@upgrade_task('Add publication dates to political businesses')
+def add_publication_dates_to_political_businesses(
+    context: UpgradeContext,
+) -> None:
+    table = 'par_political_businesses'
+    if not context.has_table(table):
+        return
+
+    for column in ('publication_start', 'publication_end'):
+        if not context.has_column(table, column):
+            context.operations.add_column(
+                table,
+                Column(column, UTCDateTime, nullable=True),
+            )
+
+
 @upgrade_task('Update political business type enum values')
 def update_political_business_type_enum_values(
     context: UpgradeContext

@@ -2,6 +2,7 @@ import pytest
 
 from base64 import b64encode
 from datetime import date, datetime, time, UTC
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from freezegun import freeze_time
 from onegov.api.form import model_from_form
@@ -130,8 +131,8 @@ def test_video_url_field() -> None:
     assert result.url == 'https://example.com/'
 
 
-@freeze_time('2022-10-10')
 def test_date_field() -> None:
+    today = date.today()
     form = parse_form("Date = YYYY.MM.DD (today..+1 months)")()
     model = model_from_form(form)
     assert model is not None
@@ -140,13 +141,17 @@ def test_date_field() -> None:
         model.model_validate({'date': 'bogus'})
 
     with pytest.raises(ValidationError, match=r'should be greater'):
-        model.model_validate({'date': '2022-10-09'})
+        model.model_validate(
+            {'date': (today - relativedelta(days=1)).isoformat()}
+        )
 
     with pytest.raises(ValidationError, match=r'should be less'):
-        model.model_validate({'date': '2022-11-11'})
+        model.model_validate(
+            {'date': (today + relativedelta(months=1, days=1)).isoformat()}
+        )
 
-    result: Any = model.model_validate({'date': '2022-10-10'})
-    assert result.date == date(2022, 10, 10)
+    result: Any = model.model_validate({'date': today.isoformat()})
+    assert result.date == today
 
 
 @freeze_time('2022-10-10')

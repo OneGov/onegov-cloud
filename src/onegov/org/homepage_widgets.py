@@ -346,8 +346,11 @@ class SliderWidget:
     template = """
         <xsl:template match="slider">
             <div metal:use-macro="layout.macros['slider']"
-            tal:define="height_m '{@height-m}';
-            height_d '{@height-d}'; searchbox '{@searchbox}';"
+            tal:define="
+                height_m {ogc:safe-string(@height-m)};
+                height_d {ogc:safe-string(@height-d)};
+                searchbox {ogc:safe-string(@searchbox)};
+            "
             />
         </xsl:template>
     """
