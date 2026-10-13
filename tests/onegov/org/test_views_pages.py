@@ -10,6 +10,7 @@ from onegov.org.models import Topic
 from onegov.page import Page, PageCollection
 from onegov.user import User
 from sedate import utcnow
+from uuid import uuid4
 from webtest.forms import Textarea
 from tests.onegov.org.common import edit_bar_links
 from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
@@ -269,6 +270,26 @@ def test_pages_person_link_extension(client: Client) -> None:
     edit_page.form['western_name_order'] = True
     page = edit_page.form.submit().follow()
     assert 'Franz Müller' in page
+
+    move_url = page.pyquery('[data-sortable-url]').attr('data-sortable-url')
+    missing_uuid = str(uuid4())
+    # A stale browser tab may try to move a person whose link, or whose
+    # target's link, has been removed. Reject both without losing other links.
+    for subject, target in (
+        (person_uuid, missing_uuid),
+        (missing_uuid, person_uuid),
+    ):
+        url = (
+            move_url.replace('%7Bsubject_id%7D', subject)
+            .replace('%7Btarget_id%7D', target)
+            .replace('%7Bdirection%7D', 'below')
+        )
+        response = client.put(url, status=409)
+        assert response.json['message'] == (
+            'Die verknüpften Personen haben sich geändert. Bitte laden Sie '
+            'die Seite neu, bevor Sie erneut sortieren.'
+        )
+        assert 'Franz Müller' in client.get(page.request.url)
 
 
 def test_delete_pages(client: Client) -> None:

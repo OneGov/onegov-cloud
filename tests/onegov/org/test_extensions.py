@@ -1,4 +1,5 @@
 import os.path
+import pytest
 
 from collections import defaultdict
 from markupsafe import Markup
@@ -340,6 +341,32 @@ def test_person_link_move_function() -> None:
         ('6d120102d90344868eb32614cf3acb1a', ('President', False)),
         ('aa37e9cc40ab402ea70b0d2b4d672de3', ('Vice-President', False)),
     ]
+
+
+@pytest.mark.parametrize('direction', list(MoveDirection))
+@pytest.mark.parametrize('missing', ['subject', 'target', 'both', 'empty'])
+def test_person_link_move_missing(
+    direction: MoveDirection, missing: str
+) -> None:
+    subject = '6d120102d90344868eb32614cf3acb1a'
+    target = 'aa37e9cc40ab402ea70b0d2b4d672de3'
+    people = [
+        (subject, ('President', True)),
+        (target, ('Vice-President', False)),
+        ('adad98ff74e2497a9e1dfbba0a6bbe96', ('Member', True)),
+    ]
+    if missing in ('subject', 'both'):
+        people = [entry for entry in people if entry[0] != subject]
+    if missing in ('target', 'both'):
+        people = [entry for entry in people if entry[0] != target]
+    if missing == 'empty':
+        people = []
+    topic = Topic(title='test', content={'people': people})
+
+    with pytest.raises(KeyError):
+        topic.move_person(subject, target, direction)
+
+    assert topic.content['people'] == people
 
 
 def test_contact_extension(org_app: TestOrgApp) -> None:
