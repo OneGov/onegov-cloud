@@ -2,11 +2,10 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
-    <tal:b metal:fill-slot="content">
+    <tal:b metal:fill-slot="content"  tal:define="show_side_panel True;">
+        <tal:b metal:use-macro="layout.macros.page_content">
+            <tal:b metal:fill-slot="main-content">
 
-        <div class="grid-x wrapper">
-
-            <div class="cell small-12 medium-7 content">
                 <div tal:condition="header_html|nothing" class="resource-header">
                     <ul class="accordion" data-accordion data-allow-all-closed="true">
                         <li class="accordion-item" data-accordion-item>
@@ -37,20 +36,26 @@
                         </li>
                     </ul>
                 </div>
-            </div>
 
-            <div class="cell small-12 medium-4 medium-offset-1 sidebar">
-                <div class="sidebar-wrapper">
-                    <div class="side-panel">
-                        <h3 i18n:translate="">Categories</h3>
-                        <ul class="more-list">
+            </tal:b>
+
+            <tal:b tal:condition="resources" metal:fill-slot="before-panels">
+
+                <tal:b metal:use-macro="layout.macros['side_panel_card']">
+                    <tal:b metal:fill-slot="panel-title">
+                        <tal:b i18n:translate>Categories</tal:b>
+                    </tal:b>
+                    <tal:b metal:fill-slot="panel-content">
+                        <ul>
                             <li tal:repeat="resource resources">
-                                <a class="list-link list-title" href="#${resource.title}">${resource.title}</a>
+                                <a href="#${resource.title}">${resource.title}</a>
                             </li>
                         </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </tal:b>
+                </tal:b>
+
+            </tal:b>
+
+        </tal:b>
     </tal:b>
 </div>

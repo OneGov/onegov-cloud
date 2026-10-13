@@ -18,6 +18,10 @@
         .has-img {
             margin: $s-xl 0;
 
+            img {
+                height: auto;
+            }
+
             .alt-text {
                 font-size: $fs-xs;
                 display: block;

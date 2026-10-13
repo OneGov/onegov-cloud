@@ -3,7 +3,7 @@
         ${organizer}
     </tal:b>
     <tal:b metal:fill-slot="lead">
-        <dl class="event-details styled-dl pb-4xl row g-lg">
+        <dl class="event-details styled-dl row g-lg">
             <div class="styled-dl-entry col-12 col-md-6">
                 <dt i18n:translate>Date</dt>
                 <dd>${layout.format_date(occurrence.localized_start, 'event')}</dd>
