@@ -810,7 +810,7 @@
 
 <metal:page_content define-macro="side_panel_card" i18n:domain="onegov.town6">
     <div class="card me-md-2xl side_panel_card mb-md border-1 side-panel ${extra_class|''}"
-         tal:attributes="data-toc-level data_toc_level|nothing">
+            tal:attributes="data-toc-level data_toc_level|nothing">
         <div class="card-body">
             <h3><metal:b define-slot="panel-title"></metal:b></h3>
             <metal:b define-slot="panel-content"></metal:b>
@@ -819,9 +819,8 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
-    <div tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False"
-         class="page-sidebar-content col-12 col-md-4 col-lg-3 sidebar ${'filter-panel' if filter_panel else ''}"
-         tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
+    <div class="page-sidebar-content col-12 col-md-4 col-lg-3 sidebar ${'filter-panel' if filter_panel else ''}"
+            tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <tal:b metal:define-slot="before-panels"></tal:b>
 
         <tal:b metal:use-macro="layout.macros['side_panel_card']"
@@ -973,57 +972,66 @@
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
     <div class="row"
-        tal:define="
-            show_side_panel show_side_panel|False;
+    tal:define="
+            requested_side_panel show_side_panel|False;
+            contact contact|None;
+            location location|None;
+            coordinates coordinates|None;
+            people people|None;
             sidepanel_contact page.sidepanel_contact|None;
-            location location|False;
             files files|None;
             sidepanel_links sidepanel_links|None;
-            people people|None;
+            more_entries more_entries|None;
             no_sidebar_offset no_sidebar_offset|False;
+
+            show_side_panel python: bool(
+                requested_side_panel
+                or contact
+                or location
+                or coordinates
+                or people
+                or sidepanel_contact
+                or files
+                or sidepanel_links
+                or more_entries
+            );
+
             news page.type == 'news'|False;
             imageset page.photo_album|None;
             show_page_image page.show_page_image|None;
             as_content layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content'">
 
-        <tal:b tal:switch="
-            not: show_side_panel
-            or people
-            or files
-            or contact
-            or coordinates
-            or location
-            or more_entries|None"
-        >
+        <tal:b tal:switch="show_side_panel">
 
-            <tal:b case="True">
+            <tal:b case="False">
             <!-- No sidebar -->
                 <div class="col-12 page-main-content">
                     <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <div metal:define-slot="before-lead"></div>
                     <div metal:define-slot="after-lead"></div>
 
-                    <div class="page-text" tal:condition="text" tal:content="text" />
+                    <div class="rich-text-container" tal:condition="text|False" tal:content="text" />
                     <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
-                    <div metal:define-slot="after-text"></div>
+                    <div metal:define-slot="main-content"></div>
                 </div>
             </tal:b>
 
-            <tal:b case="False">
+            <tal:b case="True">
             <!-- With sidebar -->
-                <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
+                <tal:b tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False">
+                    <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
+                </tal:b>
 
                 <div class="col-12 col-md-8 col-lg-9 page-main-content">
                     <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
-                    <div metal:define-slot="before-lead"></div>
-                    <div metal:define-slot="after-lead"></div>
+                    <tal:b metal:define-slot="before-lead"></tal:b>
+                    <tal:b metal:define-slot="after-lead"><tal:b>
 
-                    <div class="page-text" tal:condition="text" tal:content="text" />
+                    <div class="rich-text-container" tal:condition="text|False" tal:content="text" />
                     <metal:b tal:condition="imageset" use-macro="layout.macros['render_inline_photo_album']"/>
+                    <tal:b metal:define-slot="main-content"></tal:b>
 
-                    <div metal:define-slot="after-text"></div>
-
-                    <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
+                    <div class="people-container" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
                         <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
                             <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
