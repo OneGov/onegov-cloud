@@ -1,6 +1,7 @@
 import transaction
 import yaml
 
+from copy import copy
 from datetime import timedelta
 from freezegun import freeze_time
 from onegov.core.orm.audit import AuditEntry
@@ -15,6 +16,7 @@ from tests.onegov.org.common import edit_bar_links
 from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
 from tests.shared.utils import (get_meta, create_image,
                                 extract_intercooler_delete_link)
+from urllib.parse import unquote
 from webtest import Upload
 
 
@@ -234,7 +236,7 @@ def test_pages_person_link_extension(client: Client) -> None:
     editor = client.spawn()
     editor.login_editor()
 
-    # add person
+    # add person 1
     people_page = client.get('/people')
     new_person_page = people_page.click('Person', index=1)
     assert "Neue Person" in new_person_page
@@ -245,9 +247,24 @@ def test_pages_person_link_extension(client: Client) -> None:
 
     page = new_person_page.form.submit()
     assert page.location is not None
-    person_uuid = page.location.split('/')[-1]
+    person1_uuid = page.location.split('/')[-1]
     page = page.follow()
     assert 'Müller Franz' in page
+
+    # add person 2
+    people_page = client.get('/people')
+    new_person_page = people_page.click('Person', index=1)
+    assert "Neue Person" in new_person_page
+
+    new_person_page.form['first_name'] = 'Monika'
+    new_person_page.form['last_name'] = 'Meier'
+    new_person_page.form['function'] = 'Stadträtin'
+
+    page = new_person_page.form.submit()
+    assert page.location is not None
+    person2_uuid = page.location.split('/')[-1]
+    page = page.follow()
+    assert 'Meier Monika' in page
 
     # add topic
     root_page = client.get(root_url)
@@ -261,14 +278,45 @@ def test_pages_person_link_extension(client: Client) -> None:
                              "Govikon does not really exist.</i>"
                              )
     new_page.form['western_name_order'] = False
-    new_page.form['people-0-person'] = person_uuid
+    new_page.form['people-0-person'] = person1_uuid
+    # HACK: We manually insert a field for a second person
+    new_field = copy(new_page.form.fields['people-0-person'][0])
+    new_field.id = 'people-1-person'
+    new_field.name = 'people-1-person'
+    new_page.form.fields['people-1-person'] = [new_field]
+    new_page.form.field_order.append(('people-1-person', new_field))
+    new_page.form['people-1-person'] = person2_uuid
     page = new_page.form.submit().follow()
     assert 'Müller Franz' in page
+    assert 'Meier Monika' in page
 
     edit_page = page.click("Bearbeiten")
     edit_page.form['western_name_order'] = True
     page = edit_page.form.submit().follow()
     assert 'Franz Müller' in page
+    assert 'Monika Meier' in page
+
+    # change order
+    template = unquote(page.pyquery(
+        '[data-sortable]')[0].attrib['data-sortable-url'])
+    # bogus subject
+    assert client.put(template.format(
+        direction='above',
+        subject_id='bogus',
+        target_id=person1_uuid
+    ), expect_errors=True).status_code == 400
+    # subject matches target
+    assert client.put(template.format(
+        direction='above',
+        subject_id=person1_uuid,
+        target_id=person1_uuid
+    ), expect_errors=True).status_code == 400
+    # valid move
+    client.put(template.format(
+        direction='above',
+        subject_id=person1_uuid,
+        target_id=person2_uuid
+    ))
 
 
 def test_delete_pages(client: Client) -> None:
@@ -824,7 +872,7 @@ def test_add_iframe_csp_wildcard_domain(client: Client) -> None:
         assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page
 
 
-def test_open_graph_description_fallback(client: 'Client') -> None:
+def test_open_graph_description_fallback(client: Client) -> None:
     client.login_admin()
 
     # Create a topic without a lead
