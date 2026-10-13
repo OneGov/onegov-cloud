@@ -43,6 +43,16 @@ class PersonMove[OwnerT: PersonLinkExtension]:
             direction=self.direction
         )
 
+    def is_valid(self) -> bool:
+        if self.subject == self.target:
+            return False
+
+        people = self.obj.content.get('people')
+        if not people:
+            return False
+
+        return self.subject in people and self.target in people
+
     @staticmethod
     def get_implementation(
         obj: object
