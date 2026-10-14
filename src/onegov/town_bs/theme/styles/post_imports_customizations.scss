@@ -8,6 +8,21 @@
   }
 }
 
+// Responsive container padding: --bs-gutter-x is twice the actual padding
+$container-selectors: ".container, .container-fluid";
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+    $container-selectors: "#{$container-selectors}, .container-#{$breakpoint}";
+}
+
+#{$container-selectors} {
+    --#{$prefix}gutter-x: #{map-get($spacers, "xl")};
+
+    @include media-breakpoint-up(sm) {
+        --#{$prefix}gutter-x: #{map-get($spacers, "4xl")};
+    }
+}
+
 // Accordion
 .accordion-item {
   margin-bottom: $s-md;

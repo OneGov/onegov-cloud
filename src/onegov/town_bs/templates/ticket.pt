@@ -251,7 +251,7 @@
                     </tal:b>
                     <tal:b metal:fill-slot="panel-content">
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex align-items-center py-sm" tal:repeat="ticket related_tickets">
+                            <li class="list-group-item d-flex flex-wrap align-items-center py-sm" tal:repeat="ticket related_tickets">
                                 <a class="fw-bold text-decoration-none me-md" href="${request.link(ticket)}">
                                     <span class="ticket-number fs-xs" title="${ticket.number}: ${ticket.reference_group(request)}">${ticket.number}</span>
                                 </a>
