@@ -572,7 +572,7 @@
                 <div metal:define-slot="after-text"></div>
                 <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                     <h3 i18n:translate>People</h3>
-                    <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
+                    <ul id="people-list-sortable" data-sortable data-sortable-url="${layout.move_person_url_template}" ic-get-from="${request.url}" ic-target="this" ic-select-from-response="#people-list-sortable" ic-trigger-on="manual">
                         <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
                             <div>
                                 <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
@@ -624,7 +624,7 @@
                 </div>
                 <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; collapsible len(people or []) > 3">
                     <h2 i18n:translate>People</h2>
-                    <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
+                    <ul id="people-list-sortable" class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}" ic-get-from="${request.url}" ic-target="this" ic-select-from-response="#people-list-sortable" ic-trigger-on="manual">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}" class="${repeat.person.index > 2 and 'hidden hideable' or ''}">
                             <a tal:condition="western_name_order" href="${request.link(person)}">${person.first_name} ${person.last_name}</a>
                             <a tal:condition="not western_name_order" href="${request.link(person)}">${person.title}</a>
