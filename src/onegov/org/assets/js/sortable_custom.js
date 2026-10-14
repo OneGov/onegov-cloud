@@ -39,6 +39,9 @@ var on_move_element = function(list, element, new_index, old_index) {
         })
         .fail(function() {
             undo_move_element(list, element, new_index, old_index);
+            // In rare cases, another update removes a person after this list
+            // loads, so the server rejects a sort using the stale list.
+            // Refresh to show the current list.
             Intercooler.refresh(list);
         })
         .always(function() {
