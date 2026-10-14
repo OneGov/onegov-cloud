@@ -443,6 +443,7 @@ class PersonLinkExtension(ContentExtension):
     """
 
     western_name_order: dict_property[bool] = content_property(default=False)
+    show_people_pictures: dict_property[bool] = content_property(default=True)
 
     @property
     def people(self) -> list[PersonWithFunction] | None:
@@ -680,6 +681,11 @@ class PersonLinkExtension(ContentExtension):
             )
 
         class PeoplePageForm(form_class):  # type:ignore
+
+            show_people_pictures = BooleanField(
+                label=_('Show pictures of people'),
+                fieldset=_('People'),
+            )
 
             western_name_order = BooleanField(
                 label=_('Use Western ordered names'),
