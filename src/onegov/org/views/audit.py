@@ -87,6 +87,8 @@ def audit_snapshot_diff(
     def display(value: object) -> str:
         if value is missing:
             return '—'
+        if value is None:
+            return 'null'
         if isinstance(value, str):
             return value or '""'
         return json.dumps(value, indent=2, sort_keys=True)
