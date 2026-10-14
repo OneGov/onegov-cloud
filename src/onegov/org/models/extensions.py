@@ -514,12 +514,11 @@ class PersonLinkExtension(ContentExtension):
 
         """
         assert subject != target
-        subject_function, show_subject_function = (
-            self.get_person_function_by_id(subject)
-        )
-        self.get_person_function_by_id(target)
+        assert self.content.get('people')
 
         def new_order() -> Iterator[tuple[str, tuple[str, bool]]]:
+            subject_function, show_subject_function = (
+                self.get_person_function_by_id(subject))
             for person, (function, show_function) in self.content['people']:
 
                 if person == subject:

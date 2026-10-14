@@ -37,15 +37,9 @@ var on_move_element = function(list, element, new_index, old_index) {
         .done(function() {
             $(element).addClass('flash').addClass('success');
         })
-        .fail(function(xhr) {
+        .fail(function() {
             undo_move_element(list, element, new_index, old_index);
-            $(element).addClass('flash').addClass('failure');
-            if (xhr.status === 409 && xhr.responseJSON) {
-                $(document).trigger('show-alert', {
-                    message: xhr.responseJSON.message,
-                    type: 'warning'
-                });
-            }
+            Intercooler.refresh(list);
         })
         .always(function() {
             setTimeout(function() {

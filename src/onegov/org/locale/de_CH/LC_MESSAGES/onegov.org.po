@@ -15,13 +15,6 @@ msgstr ""
 "gengo-order-id: 7629695\n"
 "X-Generator: Poedit 3.0.1\n"
 
-#: src/onegov/org/views/person_move.py
-msgid ""
-"The linked people have changed. Please reload the page before sorting again."
-msgstr ""
-"Die verknüpften Personen haben sich geändert. Bitte laden Sie die Seite neu, "
-"bevor Sie erneut sortieren."
-
 msgid "Plausible"
 msgstr "Plausible"
 
