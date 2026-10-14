@@ -1422,17 +1422,23 @@
     </nav>
 </metal:sidebar>
 
-<metal:ticket_status define-macro="ticket_status" i18n:domain="onegov.town6">
-    <div i18n:translate tal:condition="ticket.state == 'open'" class="ticket-state-open">
+<metal:ticket_status define-macro="ticket_status" i18n:domain="onegov.town6"
+    tal:define="
+    open_classes open_classes|None;
+    pending_classes pending_classes|None;
+    closed_classes closed_classes|None;
+    archived_classes archived_classes|None;
+">
+    <div i18n:translate tal:condition="ticket.state == 'open'" class="badge ${open_classes if open_classes else 'badge-tertiary'}">
         Open
     </div>
-    <div i18n:translate tal:condition="ticket.state == 'pending'" class="ticket-state-pending">
+    <div i18n:translate tal:condition="ticket.state == 'pending'" class="badge ${pending_classes if pending_classes else 'badge-info'}">
         Pending
     </div>
-    <div i18n:translate tal:condition="ticket.state == 'closed'" class="ticket-state-closed">
+    <div i18n:translate tal:condition="ticket.state == 'closed'" class="badge ${closed_classes if closed_classes else 'badge-success'}">
         Closed
     </div>
-    <div i18n:translate tal:condition="ticket.state == 'archived'" class="ticket-state-archived">
+    <div i18n:translate tal:condition="ticket.state == 'archived'" class="badge ${archived_classes if archived_classes else 'badge-warning'}">
         Archived
     </div>
 </metal:ticket_status>

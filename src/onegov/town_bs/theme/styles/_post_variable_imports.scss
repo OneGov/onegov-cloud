@@ -27,6 +27,31 @@ $gutters: $spacers;
 
 $negative-spacers: if($enable-negative-margins, negativify-map($spacers), null);
 
+// Colors 
+$theme-colors-text: map-merge($theme-colors-text, (
+    "tertiary": shade-color($tertiary, 60%)
+));
+
+$theme-colors-bg-subtle: map-merge($theme-colors-bg-subtle, (
+    "tertiary": $tertiary-subtle
+));
+
+$theme-colors-border-subtle: map-merge($theme-colors-border-subtle, (
+    "tertiary": tint-color($tertiary, 60%)
+));
+
+$utilities-text-emphasis-colors: map-merge($utilities-text-emphasis-colors, (
+    "tertiary-emphasis": var(--#{$prefix}tertiary-text-emphasis)
+));
+
+$utilities-bg-subtle: map-merge($utilities-bg-subtle, (
+    "tertiary-subtle": var(--#{$prefix}tertiary-bg-subtle)
+));
+
+$utilities-border-subtle: map-merge($utilities-border-subtle, (
+    "tertiary-subtle": var(--#{$prefix}tertiary-border-subtle)
+));
+
 // Cards
 $card-spacer-y: map-get($spacers, "lg"); // 1.5rem / 24px
 $card-spacer-x: map-get($spacers, "lg"); // 1.5rem / 24px
@@ -86,3 +111,10 @@ $accordion-button-focus-box-shadow:   none;
 $breadcrumb-divider-color: $tertiary;
 
 $table-color: $body-color;
+
+// Badges
+$badge-font-size:                   $fs-xs;
+$badge-color:                       $body-color;
+$badge-padding-y:                   $s-sm;
+$badge-padding-x:                   $s-sm;
+$badge-border-radius:               $border-radius-sm;

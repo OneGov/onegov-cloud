@@ -23,7 +23,13 @@
   border-radius: 0 0 $border-radius-sm $border-radius-sm;
 }
 
-// Bootstrap
+// Breadcrumbs
 .breadcrumb-item a {
   text-decoration: none;
+}
+
+// Cards
+.card-body > *:last-child,
+.card-body > * > *:last-child {
+  margin-bottom: 0 !important;
 }

@@ -111,6 +111,7 @@ class TownBsTheme(BootstrapBaseTheme):
             'forms_page',
             'search',
             'timeline',
+            'ticket',
         ]
 
     @property

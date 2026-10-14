@@ -3,7 +3,6 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="lead">
-        People lead
     </tal:b>
     <tal:b metal:fill-slot="content">
 
