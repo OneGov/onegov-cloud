@@ -30,8 +30,13 @@ $utilities: (
 
 // Todo: Make customizable in UI
 $secondary: orange;
-$tertiary: #aac0ce;
-$tertiary-subtle: #e4eaee;
+
+$light:              #aac0ce;
+$light-subtle:       #eaeff3; 
+$light-bg-subtle:      $light-subtle; 
+$light-border-subtle:  tint-color(#aac0ce, 60%);
+$light-text-emphasis:  shade-color(#aac0ce, 40%);
+
 $body-color: #382d3f;
 
 $danger: #f44;

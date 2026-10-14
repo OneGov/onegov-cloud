@@ -14,7 +14,7 @@
 
         // Connection line
         + li .message::before {
-            border-right: 2px solid $tertiary-subtle;
+            border-right: 2px solid $light-subtle;
             content: '';
             height: $s-lg;
             left: 50%;
@@ -34,7 +34,7 @@
         text-align: center;
 
         &::after {
-            border-right: 2px solid $tertiary-subtle;
+            border-right: 2px solid $light-subtle;
             content: '';
             height: $s-lg;
             left: 50%;
@@ -43,7 +43,7 @@
         }
 
         span {
-            background-color: $tertiary-subtle;
+            background-color: $light-subtle;
             border-radius: $border-radius-pill;
             display: inline-block;
             padding: $s-xs $s-md;
@@ -51,14 +51,14 @@
     }
 
     .message {
-        border: 1px solid $tertiary;
+        border: 1px solid $light;
         border-radius: $border-radius-lg;
         margin-bottom: $s-lg;
         padding: $s-md;
         position: relative;
 
         .hashtag {
-            background: $tertiary-subtle;
+            background: $light-subtle;
             border-radius: $border-radius-sm;
         }
 
@@ -107,7 +107,7 @@
         }
 
         .file {
-            background: $tertiary-subtle;
+            background: $light-subtle;
             border-radius: $border-radius-sm;
             display: inline-block;
             padding: $s-xs $s-sm;
@@ -132,7 +132,7 @@
             }
 
             .reservation-details {
-                background: $tertiary-subtle;
+                background: $light-subtle;
                 border-radius: $border-radius-sm;
                 flex: 0 0 32.66%;
                 font-size: $fs-2xs;
@@ -154,7 +154,7 @@
     .message-ticket_note,
     .message-file,
     .message-ticket_chat-internal {
-        background-color: $tertiary-subtle;
+        background-color: $light-subtle;
     }
 
     .message-ticket_chat-external {

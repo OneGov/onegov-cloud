@@ -1,8 +1,14 @@
-@each $name, $value in $theme-colors-bg-subtle {
+
+// Badge
+@each $name, $value in $theme-colors {
     .badge-#{$name} {
-        color: map-get($theme-colors-text, $name);
-        background-color: $value;
+        color: map-get($theme-colors, $name);
+        background-color: map-get($theme-colors-bg-subtle, $name);
     }
+}
+
+.badge-light {
+  color: $light-text-emphasis
 }
 
 // Other utilities

@@ -230,7 +230,7 @@
         </tal:b>
 
         <div tal:condition="layout.show_partners" id="partners-everywhere" class="partners-everywhere">
-            <div class="w-100 bg-tertiary">
+            <div class="w-100 bg-light">
                 <div class="container">
                     <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners; subpage layout.show_partners"/>
                 </div>

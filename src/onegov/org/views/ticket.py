@@ -242,7 +242,7 @@ def delete_ticket(
 def manual_payment_button(
     payment: Payment,
     layout: Layout,
-    css_class: str = 'secondary btn-outline-tertiary'
+    css_class: str = 'secondary btn-outline-light'
 ) -> Link:
 
     if payment.state == 'open':
@@ -279,7 +279,7 @@ def manual_payment_button(
 def online_payment_button(
     payment: Payment,
     layout: Layout,
-    css_class: str = 'secondary btn-outline-tertiary'
+    css_class: str = 'secondary btn-outline-light'
 ) -> Link | None:
 
     if payment.state == 'open':

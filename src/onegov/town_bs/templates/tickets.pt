@@ -25,7 +25,7 @@
             </tal:b>
 
             <div class="input-group mt-lg mb-lg">
-                <button type="submit" class="btn btn-outline-tertiary rounded-start-1" aria-label="Search" i18n:attributes="aria-label">
+                <button type="submit" class="btn btn-outline-light rounded-start-1" aria-label="Search" i18n:attributes="aria-label">
                     <i class="fa fa-fw fa-search"></i>
                 </button>
                 <input class="input-group-field form-control" id="search" data-typeahead-subject type="search" name="q" value="${layout.model.q}" autocomplete="off" autocorrect="off" autofocus />
@@ -37,13 +37,13 @@
 
             </form>
 
-            <div class="border-bottom botder-tertiary-subtle d-flex justify-content-between pb-xl">
+            <div class="border-bottom botder-light-subtle d-flex justify-content-between pb-xl">
                 <ul class="list-unstyled list-horizontal">
                     <li class="visually-hidden"><a href="#" i18n:translate>State:</a></li>
 
                     <tal:b repeat="link filters">
                         <li class="${link.active and 'active' or ''}">
-                            <tal:b replace="link(layout, ('btn', link.active and 'btn-primary' or 'btn-tertiary', 'btn-sm'))" />
+                            <tal:b replace="link(layout, ('btn', link.active and 'btn-primary' or 'btn-light', 'btn-sm'))" />
                         </li>
                     </tal:b>
                 </ul>

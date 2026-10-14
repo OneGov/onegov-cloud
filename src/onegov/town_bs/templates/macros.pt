@@ -114,7 +114,7 @@
                 <div class="collapse navbar-collapse" id="topNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item" tal:repeat="link links">
-                            <a class="nav-link link-tertiary text-decoration-none small px-2" href="${link[1]}">${link[0] if link[0] else link[1]}</a>
+                            <a class="nav-link link-light text-decoration-none small px-2" href="${link[1]}">${link[0] if link[0] else link[1]}</a>
                         </li>
                     </ul>
                 </div>
@@ -173,7 +173,7 @@
                     <tal:b repeat="link shown_breadcrumbs">
                         <li
                             class="breadcrumb-item link-underline-opacity-0 ${'fw-bold' if link is last_breadcrumb else ''}"
-                            tal:content="link(layout, ('link-tertiary text-decoration-none', ))"
+                            tal:content="link(layout, ('link-light text-decoration-none', ))"
                             tal:attributes="aria-current 'page' if link is last_breadcrumb else None"
                         ></li>
                     </tal:b>
@@ -193,7 +193,7 @@
 </metal:panel-links>
 
 <metal:footer define-macro="footer">
-    <footer id="footer" class="bg-tertiary-subtle">
+    <footer id="footer" class="bg-light-subtle">
         <div class="container">
             <div class="row g-lg py-5xl">
                 <metal:b use-macro="layout.macros['footer_columns']" />
@@ -1264,7 +1264,7 @@
                             src="${url}"
                             alt="Person image">
                         <div tal:condition="not url"
-                            class="rounded-1 bg-tertiary-subtle d-flex align-items-center justify-content-center">
+                            class="rounded-1 bg-light-subtle d-flex align-items-center justify-content-center">
                             <span class="fs-xl" tal:content="initials"></span>
                         </div>
                     </div>
@@ -1429,7 +1429,7 @@
     closed_classes closed_classes|None;
     archived_classes archived_classes|None;
 ">
-    <div i18n:translate tal:condition="ticket.state == 'open'" class="badge ${open_classes if open_classes else 'badge-tertiary'}">
+    <div i18n:translate tal:condition="ticket.state == 'open'" class="badge ${open_classes if open_classes else 'badge-light'}">
         Open
     </div>
     <div i18n:translate tal:condition="ticket.state == 'pending'" class="badge ${pending_classes if pending_classes else 'badge-info'}">
@@ -1768,7 +1768,7 @@
 
 <metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
     <div class="occurrence col-12 col-xl-6" tal:define="use_links use_links|True">
-        <div class="card bg-tertiary-subtle border-0 h-100">
+        <div class="card bg-light-subtle border-0 h-100">
             <a class="d-flex flex-column justify-content-center flex-grow-1 text-decoration-none"
             tal:attributes="href request.link(occurrence) if use_links else None">
                 <div class="d-flex card-body flex-grow-0 p-0">
@@ -2195,7 +2195,7 @@
         <ul class="search-breadcrumbs breadcrumb fs-2xs mb-0 mt-sm">
             <tal:b repeat="link links">
                 <li class="breadcrumb-item fw-bold">
-                    ${link(result_layout, ('link-tertiary',)).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
+                    ${link(result_layout, ('link-light',)).replace(Markup('href="#"'), Markup('href="{}"'.format(request.link(result))))}
                 </li>
             </tal:b>
         </ul>
@@ -2501,7 +2501,7 @@
 <metal:filters define-macro="simple-internal-filters">
     <ul class="list-unstyled list-horizontal mb-lg">
         <li tal:repeat="link filters">
-            <tal:b replace="link(layout, ('btn', link.active and 'btn-primary' or 'btn-tertiary', 'btn-sm'))" />
+            <tal:b replace="link(layout, ('btn', link.active and 'btn-primary' or 'btn-light', 'btn-sm'))" />
         </li>
     </ul>
 </metal:filters>
