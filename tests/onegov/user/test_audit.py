@@ -184,12 +184,11 @@ def test_provider_role_change_audit(
             source_id='external-id',
             username=user.username,
             role=role,
-            provider_name='saml-company',
         )
         assert result is user
         assert session_manager.current_username is None
         entry = session.query(AuditEntry).filter_by(operation='update').one()
-        assert entry.username == 'idp:saml-company'
+        assert entry.username == 'unknown'
         assert entry.user_id is None
         assert entry.previous_snapshot['role'] == 'admin'
         assert entry.snapshot['role'] == 'member'

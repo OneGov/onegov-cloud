@@ -95,6 +95,7 @@ def test_delete_old_audit_entries(
             client.app.session()
             .query(AuditEntry)
             .filter_by(target_table='pages')
+            .filter(AuditEntry.target_id.in_(['181', '182', '183']))
             .all()
         )
         assert len(entries) == (3 if retention else 9)

@@ -156,7 +156,6 @@ def register_user_auditing() -> None:
         snapshot=user_snapshot,
         previous_snapshot=user_previous_snapshot,
         changed=user_changed,
-        require_identity=False,
     )
     register_audit_model(
         UserGroup,
@@ -164,12 +163,10 @@ def register_user_auditing() -> None:
         previous_snapshot=group_previous_snapshot,
         changed=group_changed,
         delete_snapshot=group_delete_snapshot,
-        require_identity=False,
     )
     register_audit_model(
         RoleMapping,
         snapshot=role_mapping_snapshot,
         previous_snapshot=role_mapping_previous_snapshot,
         changed=role_mapping_changed,
-        require_identity=False,
     )

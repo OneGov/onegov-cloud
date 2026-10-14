@@ -272,7 +272,6 @@ def ensure_user(
     force_role: bool = True,
     realname: str | None = None,
     force_active: bool = False,
-    provider_name: str | None = None,
 ) -> User | None:
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
@@ -291,55 +290,49 @@ def ensure_user(
     # fall back to the username
     user = user or users.by_username(username)
 
-    actor = f'idp:{provider_name or source or "unknown"}'
-    with app.session_manager.set_current_user(None, actor):
-        # run the application specific callback
-        result = app.settings.user.ensure_user_callback(
-            user,
-            request,
-            source=source,
-            source_id=source_id,
-            username=username,
-            role=role,
-            realname=realname,
-            force_role=force_role,
-            force_active=force_active,
-        )
-        if result is not True:
-            session.flush()
-            return result
+    # run the application specific callback
+    result = app.settings.user.ensure_user_callback(
+        user,
+        request,
+        source=source,
+        source_id=source_id,
+        username=username,
+        role=role,
+        realname=realname,
+        force_role=force_role,
+        force_active=force_active,
+    )
+    if result is not True:
+        return result
 
-        if not user:
-            log.info(f'Adding user {username} from {source}:{source_id}')
-            user = users.add(
-                username=username, password=random_token(), role=role
-            )
-        elif force_active and not user.active:
-            user.active = True
+    if not user:
+        log.info(f'Adding user {username} from {source}:{source_id}')
+        user = users.add(username=username, password=random_token(), role=role)
+    elif force_active and not user.active:
+        user.active = True
 
-        # update the username (if allowed)
-        if (
-            user.role in app.settings.user.change_username_roles
-            and user.username != username
-        ):
-            # ensure the new username is available
-            if users.by_username(username) is not None:
-                log.error(f'Cannot rename user {user.username} to {username}')
-            else:
-                user.change_username(username, app)
-                app.settings.user.change_username_callback(user, request)
+    # update the username (if allowed)
+    if (
+        user.role in app.settings.user.change_username_roles
+        and user.username != username
+    ):
+        # ensure the new username is available
+        if users.by_username(username) is not None:
+            log.error(f'Cannot rename user {user.username} to {username}')
+        else:
+            user.change_username(username, app)
+            app.settings.user.change_username_callback(user, request)
 
-        # update the role even if the user exists already
-        if force_role:
-            user.role = role
+    # update the role even if the user exists already
+    if force_role:
+        user.role = role
 
-        # the source of the user is always the last provider that was used
-        user.source = source
-        user.source_id = source_id
-        user.realname = realname
+    # the source of the user is always the last provider that was used
+    user.source = source
+    user.source_id = source_id
+    user.realname = realname
 
-        session.flush()
-        return user
+    return user
 
 
 @attrs(auto_attribs=True)
@@ -1308,7 +1301,6 @@ class SAML2Provider(
         user = ensure_user(
             request,
             source='ldap' if client.treat_as_ldap else self.name,
-            provider_name=self.name,
             source_id=source_id,
             username=username,
             role=role,

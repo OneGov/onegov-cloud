@@ -27,7 +27,6 @@ class AuditModelConfig(NamedTuple):
     previous_snapshot: PreviousSnapshot
     changed: Changed
     delete_snapshot: DeleteSnapshot | None
-    require_identity: bool
 
 
 AUDIT_MODELS: dict[type[Any], AuditModelConfig] = {}
@@ -39,14 +38,12 @@ def register_audit_model(
     previous_snapshot: PreviousSnapshot,
     changed: Changed,
     delete_snapshot: DeleteSnapshot | None = None,
-    require_identity: bool = True,
 ) -> None:
     AUDIT_MODELS[model] = AuditModelConfig(
         snapshot,
         previous_snapshot,
         changed,
         delete_snapshot,
-        require_identity,
     )
 
 
@@ -146,9 +143,6 @@ def write_audit_entry(
 
     username = session_manager.current_username
     if not isinstance(username, str):
-        config = audit_config(instance)
-        if config is None or config.require_identity:
-            return
         username = 'unknown'
 
     session.connection().execute(
