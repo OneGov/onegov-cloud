@@ -292,9 +292,11 @@ def test_pages_person_link_extension(client: Client) -> None:
 
     edit_page = page.click("Bearbeiten")
     edit_page.form['western_name_order'] = True
+    edit_page.form['show_people_pictures'] = False
     page = edit_page.form.submit().follow()
     assert 'Franz Müller' in page
     assert 'Monika Meier' in page
+    assert not page.pyquery('.people-panel .person-card-portrait')
 
     # change order
     template = unquote(page.pyquery(

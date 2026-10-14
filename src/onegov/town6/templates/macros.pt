@@ -764,12 +764,12 @@
                 <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br>
                 <div class="location" tal:condition="location">${location}</div>
             </div>
-            <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
+            <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; show_people_pictures page.show_people_pictures|resource.show_people_pictures|True">
                 <h3 i18n:translate>People</h3>
                 <ul id="people-list-sortable" class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}" ic-get-from="${request.url}" ic-target="this" ic-select-from-response="#people-list-sortable" ic-trigger-on="manual">
                     <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
                         <div class="person-card person-list-card">
-                            <div tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                            <div tal:condition="show_people_pictures" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
                                 <a tal:condition="url" href="${request.link(person)}" aria-hidden="true" >
                                     <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
                                         <div class="cover-image" style='background-image: url("${url}");'></div>
@@ -895,11 +895,11 @@
 
                     <div metal:define-slot="after-text"></div>
 
-                    <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
+                    <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; show_people_pictures page.show_people_pictures|resource.show_people_pictures|True">
                         <h3 i18n:translate>People</h3>
                         <ul id="people-list-sortable" data-sortable data-sortable-url="${layout.move_person_url_template}" ic-get-from="${request.url}" ic-target="this" ic-select-from-response="#people-list-sortable" ic-trigger-on="manual">
                             <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
-                                <div>
+                                <div tal:condition="show_people_pictures">
                                     <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
                                         <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
                                             <i class="fa fa-user" tal:condition="not:url"></i>
