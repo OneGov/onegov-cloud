@@ -6,10 +6,10 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content" tal:define="is_manager request.is_manager_for_model(ticket)">
-        
+
         <tal:b metal:use-macro="layout.macros.page_content" tal:define="show_side_panel True;">
             <tal:b metal:fill-slot="before-panels">
-                
+
                 <tal:b metal:use-macro="layout.macros['side_panel_card']">
                     <tal:b metal:fill-slot="panel-title">
                         <tal:b i18n:translate>Submitter</tal:b>
@@ -154,7 +154,7 @@
                                     Closed
                                 </div>
                             </dd>
-                            
+
                             <tal:b tal:condition="payment">
                                 <dt i18n:translate>Source</dt>
                                 <dd class="ticket-payment-source">
@@ -173,54 +173,54 @@
                     <tal:b metal:fill-slot="panel-title">
                         <tal:b i18n:translate>Ticket</tal:b>
                     </tal:b>
+
                     <tal:b metal:fill-slot="panel-content">
-                                            <dl>
-                        <dt i18n:translate>State</dt>
-                        <dd class="ticket-state">
-                            <tal:b metal:use-macro="layout.macros['ticket_status']" />
-                        </dd>
-
-
-                        <dt i18n:translate>Group</dt>
-                        <dd class="ticket-group" tal:define="group handler.group|ticket.group">
-                            <a tal:condition="exists:handler/resource" href="${request.link(handler.resource)}">${group}</a>
-                            <span tal:condition="not:exists:handler/resource">${group}</span>
-                        </dd>
-
-                        <tal:b tal:condition="ticket.handler_code == 'RSV' and request.app.org.ticket_tags">
-                            <dt><span i18n:translate>Tag</span> <a href="${request.link(ticket, 'change-tag')}" class="ticket-change-tag" title="Change tag" i18n:attributes="title" tal:condition="is_manager and ticket.state == 'pending'"></a></dt>
-                            <dd class="ticket-tag">
-                                <tal:b tal:condition="ticket.tag">${ticket.tag}</tal:b>
-                                <tal:b tal:condition="not:ticket.tag" i18n:translate>Without</tal:b>
+                        <dl>
+                            <dt i18n:translate>State</dt>
+                            <dd class="ticket-state">
+                                <tal:b metal:use-macro="layout.macros['ticket_status']" />
                             </dd>
-                        </tal:b>
 
-                        <tal:b tal:condition="ticket.user_id">
-                            <dt i18n:translate>Owner</dt>
-                            <dd class="ticket-owner">
-                                <a href="mailto:${ticket.user.username}">${ticket.user.username}</a>
+                            <dt i18n:translate>Group</dt>
+                            <dd class="ticket-group" tal:define="group handler.group|ticket.group">
+                                <a tal:condition="exists:handler/resource" href="${request.link(handler.resource)}">${group}</a>
+                                <span tal:condition="not:exists:handler/resource">${group}</span>
                             </dd>
-                        </tal:b>
 
-                        <dt i18n:translate>Created</dt>
-                        <dd class="ticket-date" tal:define="created layout.to_timezone(ticket.created, layout.timezone)">
-                            ${layout.format_date(created, 'weekday_long')}, ${layout.format_date(created, 'datetime')}
-                        </dd>
+                            <tal:b tal:condition="ticket.handler_code == 'RSV' and request.app.org.ticket_tags">
+                                <dt><span i18n:translate>Tag</span> <a href="${request.link(ticket, 'change-tag')}" class="ticket-change-tag" title="Change tag" i18n:attributes="title" tal:condition="is_manager and ticket.state == 'pending'"></a></dt>
+                                <dd class="ticket-tag">
+                                    <tal:b tal:condition="ticket.tag">${ticket.tag}</tal:b>
+                                    <tal:b tal:condition="not:ticket.tag" i18n:translate>Without</tal:b>
+                                </dd>
+                            </tal:b>
 
-                        <tal:b tal:condition="ticket.reaction_time">
-                            <dt i18n:translate>Reaction Time</dt>
-                            <dd class="ticket-date">
-                                ${layout.format_seconds(ticket.reaction_time)}
+                            <tal:b tal:condition="ticket.user_id">
+                                <dt i18n:translate>Owner</dt>
+                                <dd class="ticket-owner">
+                                    <a href="mailto:${ticket.user.username}">${ticket.user.username}</a>
+                                </dd>
+                            </tal:b>
+
+                            <dt i18n:translate>Created</dt>
+                            <dd class="ticket-date" tal:define="created layout.to_timezone(ticket.created, layout.timezone)">
+                                ${layout.format_date(created, 'weekday_long')}, ${layout.format_date(created, 'datetime')}
                             </dd>
-                        </tal:b>
 
-                        <tal:b tal:condition="ticket.process_time">
-                            <dt i18n:translate>Process Time</dt>
-                            <dd class="ticket-date">
-                                ${layout.format_seconds(ticket.process_time)}
-                            </dd>
-                        </tal:b>
-                    </dl>
+                            <tal:b tal:condition="ticket.reaction_time">
+                                <dt i18n:translate>Reaction Time</dt>
+                                <dd class="ticket-date">
+                                    ${layout.format_seconds(ticket.reaction_time)}
+                                </dd>
+                            </tal:b>
+
+                            <tal:b tal:condition="ticket.process_time">
+                                <dt i18n:translate>Process Time</dt>
+                                <dd class="ticket-date">
+                                    ${layout.format_seconds(ticket.process_time)}
+                                </dd>
+                            </tal:b>
+                        </dl>
                     </tal:b>
                 </tal:b>
 
@@ -250,30 +250,36 @@
                         </tal:b>
                     </tal:b>
                     <tal:b metal:fill-slot="panel-content">
-                        <dl tal:repeat="ticket related_tickets">
-                            <span class="ticket-number" title="${ticket.number}: ${ticket.reference_group(request)}"><a href="${request.link(ticket)}">${ticket.number}</a></span>
-                            <tal:b metal:use-macro="layout.macros['ticket_status']" />
-                            <tal:b tal:condition="not:ticket.muted">
-                                <a tal:condition="is_manager" href="${request.return_here(request.link(ticket, 'mute'))}" class="mute" title="Disable E-Mails" i18n:attributes="title">
-                                    <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
-                                    <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex align-items-center py-sm" tal:repeat="ticket related_tickets">
+                                <a class="fw-bold text-decoration-none me-md" href="${request.link(ticket)}">
+                                    <span class="ticket-number fs-xs" title="${ticket.number}: ${ticket.reference_group(request)}">${ticket.number}</span>
                                 </a>
-                            </tal:b>
-                            <tal:b tal:condition="ticket.muted" tal:define="event_source ticket.handler.data.get('source')">
-                                <tal:b condition="not event_source">
-                                    <a tal:condition="is_manager" href="${request.return_here(request.link(ticket, 'unmute'))}" class="unmute" title="Enable E-Mails" i18n:attributes="title">
-                                        <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                <div class="me-md">
+                                    <tal:b metal:use-macro="layout.macros['ticket_status']" />
+                                </div>
+                                <tal:b tal:condition="not:ticket.muted">
+                                    <a tal:condition="is_manager" href="${request.return_here(request.link(ticket, 'mute'))}" class="mute text-decoration-none" title="Disable E-Mails" i18n:attributes="title">
                                         <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                        <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
                                     </a>
                                 </tal:b>
-                                <tal:b condition="event_source">
-                                    <a tal:condition="is_manager" class="unmute confirm disabled" title="E-Mails can not be sent for tickets of imported events" data-confirm="E-Mails can not be sent for tickets of imported events" data-confirm-no="Cancel" i18n:attributes="title;data-confirm;data-confirm-no">
-                                        <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
-                                        <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
-                                    </a>
+                                <tal:b tal:condition="ticket.muted" tal:define="event_source ticket.handler.data.get('source')">
+                                    <tal:b condition="not event_source">
+                                        <a tal:condition="is_manager" href="${request.return_here(request.link(ticket, 'unmute'))}" class="unmute text-decoration-none" title="Enable E-Mails" i18n:attributes="title">
+                                            <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                            <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                        </a>
+                                    </tal:b>
+                                    <tal:b condition="event_source">
+                                        <a tal:condition="is_manager" class="unmute confirm disabled" title="E-Mails can not be sent for tickets of imported events" data-confirm="E-Mails can not be sent for tickets of imported events" data-confirm-no="Cancel" i18n:attributes="title;data-confirm;data-confirm-no">
+                                            <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                            <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                                        </a>
+                                    </tal:b>
                                 </tal:b>
-                            </tal:b>
-                        </dl>
+                            </li>
+                        </ul>
                     </tal:b>
                 </tal:b>
 
