@@ -8,7 +8,6 @@
   }
 }
 
-// Responsive container padding: --bs-gutter-x is twice the actual padding
 $container-selectors: ".container, .container-fluid";
 
 @each $breakpoint in map-keys($grid-breakpoints) {
@@ -21,6 +20,13 @@ $container-selectors: ".container, .container-fluid";
     @include media-breakpoint-up(sm) {
         --#{$prefix}gutter-x: #{map-get($spacers, "4xl")};
     }
+}
+
+// Limit dropdown height and make it scrollable
+.dropdown-menu {
+    max-height: 30rem;
+    max-width: 30rem;
+    overflow-y: auto;
 }
 
 // Accordion

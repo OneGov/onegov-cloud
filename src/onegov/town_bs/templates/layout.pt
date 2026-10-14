@@ -85,12 +85,12 @@
                                 <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="nav-link dropdown-toggle mb-0 p-sm ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
                                 <ul id="${dropdown_id}" class="dropdown-menu">
                                     <li tal:repeat="link tool.links">
-                                        <tal:b replace="link(layout, ('nav-link', ))" />
+                                        <tal:b replace="link(layout, ('nav-link', 'dropdown-item' ))" />
                                     </li>
                                 </ul>
                                 </tal:b>
                                 <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                                    <tal:b replace="link(layout, ('nav-link', ))" />
+                                    <tal:b replace="link(layout, ('nav-link', 'dropdown-item' ))" />
                                 </tal:b>
                             </li>
                         </ul>

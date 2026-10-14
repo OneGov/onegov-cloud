@@ -148,12 +148,12 @@
                                 <a href="#" role="button" data-bs-toggle="dropdown" class="nav-link dropdown-toggle ${' '.join(group.classes or ())}">${group.title}</a>
                                 <ul class="dropdown-menu">
                                     <li tal:repeat="link group.links">
-                                        <tal:b replace="link(layout, ('nav-link', ))" />
+                                        <tal:b replace="link(layout, ('nav-link', 'dropdown-item' ))" />
                                     </li>
                                 </ul>
                             </tal:b>
                             <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                                <tal:b replace="link(layout, ('nav-link', ))" />
+                                <tal:b replace="link(layout, ('nav-link', 'dropdown-item' ))" />
                             </tal:b>
                         </li>
                     </ul>
@@ -1566,11 +1566,11 @@
 </metal:reservations>
 
 <metal:reservations define-macro="reservations" i18n:domain="onegov.town6">
-    <ul tal:condition="reservations" tal:define="get_links get_links|None; get_occupancy_url get_occupancy_url|None" class="reservations">
-        <li tal:repeat="reservation reservations" tal:attributes="class 'reservation' if get_links else None">
+    <ul tal:condition="reservations" tal:define="get_links get_links|None; get_occupancy_url get_occupancy_url|None" class="reservations list-group list-group-flush">
+        <li tal:repeat="reservation reservations" class="list-group-item ${'reservation' if get_links else ''}">
             <tal:b define="start reservation.display_start(); end reservation.display_end(); links get_links(reservation, request) if get_links else []; url get_occupancy_url(reservation, request) if get_occupancy_url else None">
                 <div class="reservation-details" tal:omit-tag="not:links">
-                    <a href="${url}" title="Occupancy" tal:omit-tag="not:url" i18n:attributes="title">
+                    <a class="stretched-link" href="${url}" title="Occupancy" tal:omit-tag="not:url" i18n:attributes="title">
                         <strong>
                             ${layout.format_date(start, 'weekday_long')},
                             ${layout.format_date(start, 'date_long')}
@@ -3985,7 +3985,7 @@
             <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" class="nav-link dropdown-toggle" i18n:translate>Modules</a>
             <ul id="modules-dropdown" class="dropdown-menu">
                 <li tal:repeat="link modules.links">
-                    <tal:b replace="link(layout, ('nav-link', ))" />
+                    <tal:b replace="link(layout, ('nav-link', 'dropdown-item' ))" />
                 </li>
             </ul>
         </li>

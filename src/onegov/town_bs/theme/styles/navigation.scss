@@ -82,3 +82,13 @@
     margin-left: 0.5em;
   }
 }
+
+// Bridge the gap between toggle and menu to keep the hover state
+.dropdown:hover::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: $s-xs;
+}
