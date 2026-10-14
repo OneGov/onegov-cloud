@@ -318,6 +318,7 @@ def test_pages_person_link_extension(client: Client) -> None:
         target_id=person2_uuid
     ))
 
+
 def test_delete_pages(client: Client) -> None:
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
 
