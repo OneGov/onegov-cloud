@@ -1,3 +1,6 @@
+import difflib
+import re
+
 from onegov.core.custom import json
 from onegov.core.elements import Link
 from onegov.core.orm.audit import AuditEntry, AuditEntryCollection
@@ -88,6 +91,35 @@ def audit_snapshot_diff(
             return value or '""'
         return json.dumps(value, indent=2, sort_keys=True)
 
+    def word_diff(previous: str, current: str) -> tuple[Markup, Markup]:
+        previous_words = re.findall(r'\w+|\W+', previous)
+        current_words = re.findall(r'\w+|\W+', current)
+        previous_parts: list[Markup] = []
+        current_parts: list[Markup] = []
+        matcher = difflib.SequenceMatcher(
+            a=previous_words,
+            b=current_words,
+            autojunk=False,
+        )
+
+        for operation, start_a, end_a, start_b, end_b in matcher.get_opcodes():
+            old = previous_words[start_a:end_a]
+            new = current_words[start_b:end_b]
+            if operation == 'equal':
+                previous_parts.extend(Markup.escape(word) for word in old)
+                current_parts.extend(Markup.escape(word) for word in new)
+                continue
+            previous_parts.extend(
+                Markup('<del class="diff-word-removed">{}</del>').format(word)
+                for word in old
+            )
+            current_parts.extend(
+                Markup('<ins class="diff-word-added">{}</ins>').format(word)
+                for word in new
+            )
+
+        return Markup('').join(previous_parts), Markup('').join(current_parts)
+
     def changes(
         previous: Any,
         current: Any,
@@ -106,6 +138,12 @@ def audit_snapshot_diff(
                     )
                 )
         else:
+            previous_text = display(previous)
+            current_text = display(current)
+            previous_diff, current_diff = word_diff(
+                previous_text,
+                current_text,
+            )
             rows.append(
                 Markup(
                     '<tr><th scope="row">{}</th>'
@@ -113,8 +151,8 @@ def audit_snapshot_diff(
                     '<td class="diff_add"><pre>{}</pre></td></tr>'
                 ).format(
                     ' / '.join(path),
-                    display(previous),
-                    display(current),
+                    previous_diff,
+                    current_diff,
                 )
             )
         return rows
