@@ -94,8 +94,11 @@ def audit_snapshot_diff(
         return json.dumps(value, indent=2, sort_keys=True)
 
     def word_diff(previous: str, current: str) -> tuple[Markup, Markup]:
-        previous_words = re.findall(r'\w+|\W+', previous)
-        current_words = re.findall(r'\w+|\W+', current)
+        token_pattern = re.compile(
+            r'\d{4}-\d{2}-\d{2}|[a-zA-Z0-9_]+|[^a-zA-Z0-9_]+'
+        )
+        previous_words = token_pattern.findall(previous)
+        current_words = token_pattern.findall(current)
         previous_parts: list[Markup] = []
         current_parts: list[Markup] = []
         matcher = difflib.SequenceMatcher(
@@ -111,14 +114,18 @@ def audit_snapshot_diff(
                 previous_parts.extend(Markup.escape(word) for word in old)
                 current_parts.extend(Markup.escape(word) for word in new)
                 continue
-            previous_parts.extend(
-                Markup('<del class="diff-word-removed">{}</del>').format(word)
-                for word in old
-            )
-            current_parts.extend(
-                Markup('<ins class="diff-word-added">{}</ins>').format(word)
-                for word in new
-            )
+            if old:
+                previous_parts.append(
+                    Markup('<del class="diff-word-removed">{}</del>').format(
+                        ''.join(old)
+                    )
+                )
+            if new:
+                current_parts.append(
+                    Markup('<ins class="diff-word-added">{}</ins>').format(
+                        ''.join(new)
+                    )
+                )
 
         return Markup('').join(previous_parts), Markup('').join(current_parts)
 
