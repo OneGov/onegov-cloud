@@ -223,7 +223,7 @@ def list(
         users = users.order_by(User.username, User.role)
 
         click.echo(f'{app.schema}:')
-        for username, role, active, source in users.tuples():
+        for username, role, active, source in users:
             if active_only and not active:
                 continue
 

@@ -27,7 +27,7 @@ from onegov.page import Page, PageCollection
 from onegov.search import SearchableContent, SearchIndex
 from onegov.search.utils import language_from_locale
 from sedate import replace_timezone
-from sqlalchemy import desc, func, or_, and_
+from sqlalchemy import func, or_, and_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import object_session, relationship, undefer, Mapped
 
@@ -360,7 +360,7 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
                 func.websearch_to_tsquery(language, self.term)
             ))
 
-        topics = topics.order_by(desc(Topic.published_or_created))
+        topics = topics.order_by(Topic.published_or_created.desc())
         topics = topics.options(undefer(Topic.created))
         topics = topics.options(undefer(Topic.content))
         return topics
@@ -486,7 +486,7 @@ class NewsCollection(Pagination[News], AdjacencyListCollection[News]):
                 News.meta['hashtags'].has_any(array(self.filter_tags))
             )
 
-        news = news.order_by(desc(News.published_or_created))
+        news = news.order_by(News.published_or_created.desc())
         news = news.options(undefer(News.created))
         news = news.options(undefer(News.content))
         return news

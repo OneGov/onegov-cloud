@@ -1,5 +1,5 @@
 from datetime import date
-from sqlalchemy import desc, or_
+from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from onegov.core.collection import GenericCollection
@@ -10,8 +10,8 @@ from onegov.pas.models import (
     SettlementRun,
 )
 
-from typing import TYPE_CHECKING, Self
 
+from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from onegov.pas.request import PasRequest
@@ -103,7 +103,7 @@ class AttendenceCollection(GenericCollection[Attendence, 'UUID']):
                 )
             )
 
-        return query.order_by(desc(Attendence.date))
+        return query.order_by(Attendence.date.desc())
 
     def for_filter(
         self,

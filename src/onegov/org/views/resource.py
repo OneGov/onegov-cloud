@@ -1492,7 +1492,6 @@ def view_occupancy_stats(self: Resource, request: OrgRequest) -> JSON_ro:
         ))
         .group_by(accepted)
         .with_entities(accepted, func.count(Reservation.id))
-        .tuples()
     )
 
     layout = DefaultLayout(self, request)

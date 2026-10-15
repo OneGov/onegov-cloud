@@ -27,7 +27,7 @@ from onegov.search.utils import extract_hashtags
 from operator import attrgetter
 from purl import URL
 from sedate import utcnow
-from sqlalchemy import and_, desc, func, or_, text
+from sqlalchemy import and_, func, or_, text
 from sqlalchemy.orm import object_session, undefer
 from uuid import uuid4, UUID
 
@@ -613,7 +613,7 @@ class ReservationHandler(Handler):
     def most_future_reservation(self) -> Reservation | None:
         return (
             self.session.query(Reservation)
-            .order_by(desc(Reservation.start))
+            .order_by(Reservation.start.desc())
             .first()
         )
 

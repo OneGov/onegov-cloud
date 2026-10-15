@@ -321,7 +321,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     @property
     def votes_by_district(self) -> Query[VotesByDistrictRow]:
         query = self.results_query.order_by(None)
-        results: Query[VotesByDistrictRow] = query.with_entities(  # type: ignore[assignment]
+        results: Query[VotesByDistrictRow] = query.with_entities(
             self.__class__.id.label('election_id'),
             ElectionResult.district,
             func.array_agg(
