@@ -2836,50 +2836,9 @@
     <div class="row g-0 h-100 bg-primary">
 
         <!-- Sidebar: Steps -->
-        <tal:b tal:define="steps layout.get_step_sequence()|nothing">
-            <div tal:condition="steps" class="col-12 col-lg-3 text-white p-xl p-lg-2xl d-flex flex-column">
-                <ul class="list-unstyled d-flex flex-column">
-
-                    <tal:b tal:repeat="step steps">
-                    <tal:b tal:define="index list(steps).index(step) + 1;">
-                        <li tal:define="complete step.position < layout.step_position; current step.position == layout.step_position;"
-                            tal:attributes="data-step step.position"
-                            class="d-flex align-items-center mb-md"
-                        >
-
-                            <!-- Connector line + circle -->
-                            <div class="d-flex me-md">
-                                <span
-                                    tal:condition="complete"
-                                    class="square-2xl rounded-circle bg-white text-primary d-flex align-items-center justify-content-center border border-2 border-white"
-                                >
-                                    <i class="fas fa-check small"></i>
-                                </span>
-                                <span
-                                    tal:condition="current"
-                                    class="square-2xl rounded-circle bg-white text-primary fw-bold d-flex align-items-center justify-content-center border border-2 border-white"
-                                >
-                                    ${index}
-                                </span>
-                                <span
-                                    tal:condition="not complete and not current"
-                                    class="square-2xl rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center border border-2 border-white opacity-75"
-                                >
-                                    ${index}
-                                </span>
-                            </div>
-
-                            <!-- Label -->
-                            <span class="fw-bold pt-xs">${request.translate(step.title)}</span>
-                        </li>
-                        <div tal:condition="index < len(steps)" class="square-2xl d-flex align-items-center justify-content-center">
-                            <div class="connector-line"></div>
-                        </div>
-                    </tal:b>
-                    </tal:b>
-                </ul>
+            <div class="col-12 col-lg-3 text-white p-xl p-lg-2xl d-flex flex-column">
+                 <metal:hint use-macro="layout.macros['progress_indicator']" tal:define="bg_primary True" />
             </div>
-        </tal:b>
 
         <!-- Main content -->
         <div class="col-12 col-lg-9 bg-white h-100 overflow-hidden rounded-start-3">
@@ -2997,6 +2956,31 @@
 
 </metal:form>
 
+<metal:progress_indicator define-macro="progress_indicator" i18n:domain="onegov.town6">
+<tal:b tal:define="steps layout.get_step_sequence()|nothing; bg_primary bg_primary|False">
+    <div tal:condition="steps"
+         class="steps ${'steps-primary' if bg_primary else 'steps-white'}">
+        <ul class="steps-list">
+            <tal:b tal:repeat="step steps">
+                <li class="step step-${state}"
+                    tal:define="complete step.position &lt; layout.step_position;
+                                current step.position == layout.step_position;
+                                state python: 'current' if current else 'complete' if complete else 'upcoming'"
+                    tal:attributes="data-step step.position">
+                    <!-- Step indicator -->
+                    <span class="step-indicator">
+                        <i class="fas fa-check small" tal:condition="complete"></i>
+                        <tal:number condition="not complete">${repeat.step.number}</tal:number>
+                    </span>
+
+                    <!-- Label -->
+                    <span class="step-label">${request.translate(step.title)}</span>
+                </li>
+            </tal:b>
+        </ul>
+    </div>
+</tal:b>
+</metal:progress_indicator>
 
 <metal:resource_groups define-macro="resource_groups" i18n:domain="onegov.town6">
     <tal:b repeat="group resources" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
@@ -3560,18 +3544,6 @@
         </div>
     </tal:b>
 </metal:chat>
-
-<metal:progress_indicator define-macro="progress_indicator">
-<ol class="${'with-title ' if show_title else ''}progress-indicator" tal:define="show_number show_number|True; show_title show_title|True" tal:condition="steps|nothing">
-
-    <tal:b tal:repeat="step steps">
-        <li tal:define="complete step.position < layout.step_position; current step.position == layout.step_position"
-                tal:attributes="data-step step.position if show_number else ''" class="${'is-current' if current else '' + 'is-complete' if complete else ''}">
-            <span tal:condition="show_title">${request.translate(step.title)}</span>
-        </li>
-    </tal:b>
-</ol>
-</metal:progress_indicator>
 
 <metal:modal define-macro="modal">
 <div class="modal fade" id="${modal_id}" tabindex="-1" aria-hidden="true">

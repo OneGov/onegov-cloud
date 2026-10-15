@@ -102,3 +102,118 @@
         }
     }
 }
+
+// Step sequence
+$step-indicator-size: $s-2xl;
+$step-border-width: 2px;
+
+.steps {
+    .steps-list {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .step {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: $s-md;
+        padding-bottom: $s-xl;
+
+        // Connector line between two indicators
+        &:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: $step-indicator-size + $s-sm;
+            bottom: $s-sm;
+            left: calc(#{$step-indicator-size} / 2 - #{$step-border-width} / 2);
+            border-left: $step-border-width solid var(--step-line-color);
+        }
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    .step-indicator {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: $step-indicator-size;
+        height: $step-indicator-size;
+        border: $step-border-width solid var(--step-border-color);
+        border-radius: 50%;
+        color: var(--step-color);
+        background-color: var(--step-bg);
+        font-weight: bold;
+    }
+
+    .step-label {
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        min-height: $step-indicator-size;
+        color: var(--step-label-color);
+    }
+}
+
+// Variant for a primary colored background
+.steps-primary {
+    color: $white;
+
+    .step {
+        --step-line-color: #{rgba($white, .5)};
+        --step-label-color: #{$white};
+    }
+
+    .step-complete,
+    .step-current {
+        --step-color: #{$primary};
+        --step-bg: #{$white};
+        --step-border-color: #{$white};
+    }
+
+    .step-upcoming {
+        --step-color: #{$white};
+        --step-bg: #{$primary};
+        --step-border-color: #{$white};
+
+        .step-indicator {
+            opacity: .75;
+        }
+    }
+}
+
+// Variant for a white background
+.steps-white {
+    .step {
+        --step-line-color: #{$light};
+        --step-label-color: #{$light};
+    }
+
+    .step-current {
+        --step-label-color: #{$body-color};
+    }
+
+    .step-complete {
+        --step-color: #{$white};
+        --step-bg: #{$primary};
+        --step-border-color: #{$primary};
+    }
+
+    .step-current {
+        --step-color: #{$white};
+        --step-bg: #{$primary};
+        --step-border-color: #{$primary};
+    }
+
+    .step-upcoming {
+        --step-color: #{$light};
+        --step-bg: #{$white};
+        --step-border-color: #{$light};
+    }
+}

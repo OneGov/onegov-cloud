@@ -7132,7 +7132,7 @@ msgid "New Directory Entry"
 msgstr "Neuer Verzeichniseintrag"
 
 msgid "Submit a New Directory Entry"
-msgstr "Einen neuen Verzeichniseintrag vorschlagen."
+msgstr "Einen neuen Verzeichniseintrag vorschlagen"
 
 msgid "Continue"
 msgstr "Weiter"
