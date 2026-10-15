@@ -5,9 +5,9 @@ from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
 from onegov.feriennet.forms import PeriodExportForm
 from onegov.user import User
-from sqlalchemy.orm import contains_eager
-from sqlalchemy import distinct
 from sqlalchemy import or_
+from sqlalchemy.dialects.postgresql import distinct_on
+from sqlalchemy.orm import contains_eager
 
 
 from typing import Any, TYPE_CHECKING
@@ -53,10 +53,12 @@ class InvoiceItemExport(FeriennetExport):
         # resulting in double entries of invoice items
         # We filter by the period in order to get the correct tags
         activities = session.query(
-            distinct(Activity.title).label('title'),
+            Activity.title,
             Activity._tags.label('tags')
         ).join(Occasion).filter(
             Occasion.period_id == period.id
+        ).ext(
+            distinct_on(Activity.title)
         ).subquery()
 
         q = session.query(ActivityInvoiceItem, activities.c.tags, Attendee)
