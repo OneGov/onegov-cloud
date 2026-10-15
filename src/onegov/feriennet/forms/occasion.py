@@ -8,7 +8,6 @@ from onegov.core.custom import json
 from onegov.feriennet import _
 from onegov.form import Form
 from sedate import to_timezone, standardize_date, overlaps
-from sqlalchemy import desc
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
@@ -197,7 +196,10 @@ class OccasionForm(Form):
 
     def setup_period_choices(self) -> None:
         query = BookingPeriodCollection(self.request.session).query()
-        query = query.order_by(desc(BookingPeriod.active), BookingPeriod.title)
+        query = query.order_by(
+            BookingPeriod.active.desc(),
+            BookingPeriod.title
+        )
 
         def choice(period: BookingPeriod) -> tuple[str, str]:
             return str(period.id), '{} ({:%d.%m.%Y} - {:%d.%m.%Y})'.format(

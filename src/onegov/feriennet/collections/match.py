@@ -129,4 +129,4 @@ class MatchCollection:
 
         query = query.order_by(columns.title, columns.start)
 
-        return self.session.execute(query).tuples()
+        return self.session.execute(query)  # type: ignore[return-value]

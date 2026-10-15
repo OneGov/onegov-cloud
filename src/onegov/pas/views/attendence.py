@@ -2,7 +2,7 @@ from collections import defaultdict
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import distinct, false
+from sqlalchemy import false
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
@@ -161,11 +161,11 @@ def view_attendences(
 
     plenary_filters: list[Link] = []
     if request.is_admin:
-        plenary_dates = (
-            request.session.query(distinct(Attendence.date))
+        plenary_dates_query = (
+            request.session.query(Attendence.date)
             .filter(Attendence.type == 'plenary')
             .order_by(Attendence.date.desc())
-            .all()
+            .distinct()
         )
         plenary_filters = [
             Link(
@@ -185,7 +185,7 @@ def view_attendences(
                 ),
             )
         ]
-        for (d,) in plenary_dates:
+        for d, in plenary_dates_query:
             plenary_filters.append(
                 Link(
                     text=layout.format_date(d, 'date'),

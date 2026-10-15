@@ -343,7 +343,7 @@ class Search(Pagination[Any]):
     def load_batch(self, query: Query[SearchIndex]) -> tuple[Searchable, ...]:
         batch: list[tuple[str, UUID | int | str]]
         batch = [
-            (
+            (  # type: ignore[misc]
                 tablename,
                 id_uuid if id_uuid is not None else (
                 id_int if id_int is not None else

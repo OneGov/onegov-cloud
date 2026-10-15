@@ -109,18 +109,22 @@ def calc_content_hash_for_directory_entries(context: UpgradeContext) -> None:
         .filter(DirectoryEntry.content_hash.is_(None))
         .options(joinedload(DirectoryEntry.files))
     )
-
+    original_modified_values: list[dict[str, object]] = []
     for entry in entries:
+        original_modified_values.append({
+            'id': entry.id,
+            'modified': entry.modified
+        })
         entry.update_content_hash()
+    context.session.flush()
 
-        # Write only content_hash via raw SQL so modified is never touched,
-        # then expire the entry so the ORM doesn't re-flush the dirty state.
+    # Reset the modified columns back to what they were before
+    if original_modified_values:
         context.session.execute(
-            text('UPDATE directory_entries SET content_hash = :hash'
+            text('UPDATE directory_entries SET modified = :modified'
                  ' WHERE id = :id'),
-            {'hash': entry.content_hash, 'id': entry.id}
+            original_modified_values
         )
-        context.session.expire(entry)
 
 
 @upgrade_task('Switch to JSON serialized form structure')

@@ -107,7 +107,7 @@ class ManualBookingForm(Form):
     @cached_property
     def available_usernames(self) -> tuple[tuple[str, str], ...]:
         return tuple(
-            (username, realname)
+            (username, realname)  # type: ignore[misc]
             for username, realname in self.usercollection.query()
             .with_entities(User.username, User.realname)
             .filter(func.trim(func.coalesce(User.realname, '')) != '')

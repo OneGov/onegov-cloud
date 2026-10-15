@@ -981,7 +981,7 @@ def send_monthly_signing_service_statistics(request: OrgRequest) -> None:
     ).filter(and_(
         func.extract('year', SigningRequest.created) == year,
         func.extract('month', SigningRequest.created) == month,
-    )).group_by(SigningRequest.service_name).tuples())
+    )).group_by(SigningRequest.service_name))
     if not signing_request_counts:
         # don't send a mail if we generated no mTANs
         return

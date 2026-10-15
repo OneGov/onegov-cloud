@@ -58,9 +58,9 @@ class LanguageCollection(
         """ All distinct first letters of the languages' names. """
         letter = func.left(Language.name, 1)
         letter = func.unaccent(letter)
-        query = self.session.query(letter.distinct().label('letter'))
+        query = self.session.query(letter.label('letter'))
         query = query.order_by(letter)
-        return [r.letter for r in query if r.letter]
+        return [letter for letter, in query.distinct() if letter]
 
     def by_letter(self, letter: str | None) -> Self:
         return self.__class__(

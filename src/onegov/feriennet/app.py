@@ -26,7 +26,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from onegov.feriennet.sponsors import Sponsor
     from onegov.org.models import Organisation
-    from sqlalchemy.orm import Query
     from uuid import UUID
     from more.content_security import ContentSecurityPolicy
 
@@ -50,7 +49,7 @@ class FeriennetApp(TownApp):
 
     @orm_cached(policy='on-table-change:periods')
     def periods(self) -> tuple[BookingPeriodMeta, ...]:
-        query: Query[BookingPeriodMeta] = (
+        query = (
             BookingPeriodCollection(self.session())
             .query()
             .order_by(BookingPeriod.execution_start)
@@ -83,7 +82,7 @@ class FeriennetApp(TownApp):
                 BookingPeriod.age_barrier_type,
             )
         )
-        return tuple(BookingPeriodMeta(*row) for row in query)
+        return tuple(BookingPeriodMeta(*row) for row in query)  # type: ignore[call-arg]
 
     @orm_cached(policy='on-table-change:periods')
     def periods_by_id(self) -> dict[str, BookingPeriodMeta]:
@@ -94,12 +93,12 @@ class FeriennetApp(TownApp):
     @orm_cached(policy='on-table-change:users')
     def user_titles_by_name(self) -> dict[str, str]:
         return dict(UserCollection(self.session()).query().with_entities(
-            User.username, User.title).tuples())
+            User.username, User.title))
 
     @orm_cached(policy='on-table-change:users')
     def user_ids_by_name(self) -> dict[str | None, UUID]:
         return dict(UserCollection(self.session()).query().with_entities(
-            User.username, User.id).tuples())
+            User.username, User.id))
 
     @cached_property
     def sponsors(self) -> list[Sponsor]:

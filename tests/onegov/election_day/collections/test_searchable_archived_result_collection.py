@@ -164,7 +164,7 @@ def test_searchable_archive(
     assert 'archived_results.type IN' in sql_query
     assert 'archived_results.date >=' in sql_query
     assert 'archived_results.date <=' in sql_query
-    assert "archived_results.title_translations -> 'de_CH'" in sql_query
+    assert "archived_results.title_translations['de_CH']" in sql_query
     assert "archived_results.shortcode) @@ to_tsquery" in sql_query
 
     # Test pagination
