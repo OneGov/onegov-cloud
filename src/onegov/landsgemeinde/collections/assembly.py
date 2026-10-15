@@ -1,6 +1,5 @@
 from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import Assembly
-from sqlalchemy import desc
 from sqlalchemy.orm import undefer
 
 
@@ -18,7 +17,7 @@ class AssemblyCollection(GenericCollection[Assembly, 'UUID']):
         return Assembly
 
     def query(self) -> Query[Assembly]:
-        return super().query().order_by(desc(Assembly.date))
+        return super().query().order_by(Assembly.date.desc())
 
     def by_id(self, id: UUID) -> Assembly | None:
         return self.query().filter(Assembly.id == id).first()

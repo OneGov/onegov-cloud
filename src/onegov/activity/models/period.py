@@ -8,7 +8,6 @@ from onegov.activity.models.occasion import Occasion
 from onegov.core.custom import msgpack
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from sqlalchemy import desc, not_, distinct
 from sqlalchemy import CheckConstraint
 from sqlalchemy import column
 from sqlalchemy import Index
@@ -508,7 +507,7 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
 
         def future_periods() -> Iterator[UUID]:
             p = session.query(BookingPeriod)
-            p = p.order_by(desc(BookingPeriod.execution_start))
+            p = p.order_by(BookingPeriod.execution_start.desc())
             p = p.with_entities(BookingPeriod.id)
 
             for period in p:
@@ -525,7 +524,7 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
         # no occasion in any future period
         o = session.query(Occasion)
         o = o.filter(Occasion.period_id == self.id)
-        o = o.filter(not_(Occasion.activity_id.in_(f.scalar_subquery())))
+        o = o.filter(Occasion.activity_id.not_in(f.scalar_subquery()))
         o = o.options(joinedload(Occasion.activity))
 
         # archive those
@@ -535,13 +534,13 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
 
         # also archive all activities without an occasion
         w = session.query(Occasion)
-        w = w.with_entities(distinct(Occasion.activity_id))
+        w = w.with_entities(Occasion.activity_id.distinct())
 
         # XXX circular import
         from onegov.activity.models.activity import Activity
 
         a = session.query(Activity)
-        a = a.filter(not_(Activity.id.in_(w.scalar_subquery())))
+        a = a.filter(Activity.id.not_in(w.scalar_subquery()))
         a = a.filter(Activity.state == 'accepted')
 
         for activity in a:

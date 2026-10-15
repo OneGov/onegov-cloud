@@ -189,7 +189,7 @@ def ticket_links(request: OrgRequest, user: User) -> LinkGroup:
                 Ticket.id,
                 Ticket.number,
                 Ticket.handler_code
-            ).tuples()
+            )
         ]
     )
 

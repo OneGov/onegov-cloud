@@ -47,7 +47,8 @@ class CourseAttendeeForm(Form):
     @cached_property
     def unique_permission_codes(self) -> tuple[str, ...]:
         return tuple(
-            code for code, in self.request.session.query(
+            code  # type: ignore[misc]
+            for code, in self.request.session.query(
                 CourseAttendee.organisation.distinct().label('code')
             ).order_by(CourseAttendee.organisation).filter(
                 CourseAttendee.organisation.isnot(None)

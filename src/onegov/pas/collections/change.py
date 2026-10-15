@@ -1,7 +1,7 @@
 from onegov.core.collection import GenericCollection
 from onegov.core.collection import Pagination
 from onegov.pas.models import Change
-from sqlalchemy import desc
+
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -37,4 +37,4 @@ class ChangeCollection(GenericCollection[Change, 'UUID'], Pagination[Change]):
         return self.__class__(self.session, index)
 
     def query(self) -> Query[Change]:
-        return super().query().order_by(desc(Change.last_change))
+        return super().query().order_by(Change.last_change.desc())

@@ -38,7 +38,6 @@ from onegov.ticket import TicketCollection
 from purl import URL
 from re import search
 from sedate import dtrange, overlaps
-from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
@@ -111,7 +110,7 @@ def occasions_by_period(
         query = query.filter(BookingPeriod.active == False)
 
     query = query.order_by(
-        desc(BookingPeriod.active),
+        BookingPeriod.active.desc(),
         BookingPeriod.execution_start,
         Occasion.order)
 
@@ -738,7 +737,7 @@ def view_activities_for_volunteers(
             query = query.filter(BookingPeriod.archived == False)
 
             query = query.order_by(
-                desc(BookingPeriod.active),
+                BookingPeriod.active.desc(),
                 BookingPeriod.execution_start,
                 Occasion.order)
 

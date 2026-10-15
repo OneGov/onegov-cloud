@@ -1,6 +1,6 @@
 from functools import cached_property
 from sedate import utcnow
-from sqlalchemy import func, desc
+from sqlalchemy import func
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.fsi.models import (
@@ -161,8 +161,8 @@ class AuditCollection(
             func.row_number().over(
                 partition_by=CourseSubscription.attendee_id,
                 order_by=[
-                    desc(CourseSubscription.event_completed),
-                    desc(CourseEvent.start)]
+                    CourseSubscription.event_completed.desc(),
+                    CourseEvent.start.desc()]
             ).label('rownum'),
         )
         ranked = ranked.join(
@@ -283,4 +283,4 @@ class AuditCollection(
         return tuple(self.session.query(Course.id, Course.name).filter(
             Course.hidden_from_public == False,
             Course.mandatory_refresh != None
-        ).tuples())
+        ))

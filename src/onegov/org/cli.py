@@ -1614,7 +1614,7 @@ def signing_service_statistics(
         ).filter(and_(
             func.extract('year', SigningRequest.created) == year,
             func.extract('month', SigningRequest.created) == month,
-        )).group_by(SigningRequest.service_name).tuples())
+        )).group_by(SigningRequest.service_name))
         if signing_request_counts:
             org_name = app.org.name if hasattr(app, 'org') else None
             title = f'{org_name} ({app.schema})' if org_name else app.schema

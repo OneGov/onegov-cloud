@@ -1,8 +1,6 @@
 from onegov.core.collection import Pagination
 from onegov.election_day.models import Vote
 from sqlalchemy import cast
-from sqlalchemy import desc
-from sqlalchemy import distinct
 from sqlalchemy import extract
 from sqlalchemy import Integer
 
@@ -35,7 +33,7 @@ class VoteCollection(Pagination[Vote]):
 
     def subset(self) -> Query[Vote]:
         query = self.query()
-        query = query.order_by(desc(Vote.date), Vote.shortcode, Vote.title)
+        query = query.order_by(Vote.date.desc(), Vote.shortcode, Vote.title)
         if self.year:
             query = query.filter(extract('year', Vote.date) == self.year)
 
@@ -58,7 +56,7 @@ class VoteCollection(Pagination[Vote]):
         """ Returns the votes with the latest date. """
 
         latest_date = self.query().with_entities(Vote.date)
-        latest_date = latest_date.order_by(desc(Vote.date))
+        latest_date = latest_date.order_by(Vote.date.desc())
         latest_date = latest_date.limit(1).scalar()
         return self.by_date(latest_date) if latest_date else None
 
@@ -66,8 +64,8 @@ class VoteCollection(Pagination[Vote]):
         """ Returns a list of years for which there are votes. """
 
         year = cast(extract('year', Vote.date), Integer)
-        query = self.session.query(distinct(year))
-        query = query.order_by(desc(year))
+        query = self.session.query(year.distinct())
+        query = query.order_by(year.desc())
 
         return [year for year, in query]
 
