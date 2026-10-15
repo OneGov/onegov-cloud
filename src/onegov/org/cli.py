@@ -3298,12 +3298,12 @@ def fix_custom_event_tags(
         used_tags: set[str] = {
             tag
             for tag, in request.session.query(
-                func.skeys(Event._tags).distinct()
+                func.skeys(Event._tags)
             ).union_all(
                 request.session.query(
-                    func.skeys(Occurrence._tags).distinct()
+                    func.skeys(Occurrence._tags)
                 )
-            )
+            ).distinct()
         }
         old_tags = used_tags - custom_tags
         if not old_tags:

@@ -66,10 +66,10 @@ class ElectionCollection(Pagination[Election]):
         """ Returns a list of years for which there are elections. """
 
         year = cast(extract('year', Election.date), Integer)
-        query = self.session.query(year.distinct())
+        query = self.session.query(year)
         query = query.order_by(year.desc())
 
-        return [year for year, in query]
+        return [year for year, in query.distinct()]
 
     def by_date(self, date: date) -> list[Election]:
         """ Returns the elections on the given date. """

@@ -534,7 +534,7 @@ class BookingPeriod(Base, BookingPeriodMixin, TimestampMixin):
 
         # also archive all activities without an occasion
         w = session.query(Occasion)
-        w = w.with_entities(Occasion.activity_id.distinct())
+        w = w.with_entities(Occasion.activity_id).distinct()
 
         # XXX circular import
         from onegov.activity.models.activity import Activity

@@ -49,10 +49,10 @@ class CourseAttendeeForm(Form):
         return tuple(
             code  # type: ignore[misc]
             for code, in self.request.session.query(
-                CourseAttendee.organisation.distinct().label('code')
+                CourseAttendee.organisation.label('code')
             ).order_by(CourseAttendee.organisation).filter(
                 CourseAttendee.organisation.isnot(None)
-            )
+            ).distinct()
         )
 
     def update_model(self, model: CourseAttendee) -> None:

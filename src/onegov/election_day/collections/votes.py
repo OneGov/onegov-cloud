@@ -64,10 +64,10 @@ class VoteCollection(Pagination[Vote]):
         """ Returns a list of years for which there are votes. """
 
         year = cast(extract('year', Vote.date), Integer)
-        query = self.session.query(year.distinct())
+        query = self.session.query(year)
         query = query.order_by(year.desc())
 
-        return [year for year, in query]
+        return [year for year, in query.distinct()]
 
     def by_date(self, date: date) -> list[Vote]:
         """ Returns the votes on the given date. """

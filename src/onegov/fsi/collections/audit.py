@@ -274,13 +274,13 @@ class AuditCollection(
         """ All distinct first letters of people's last names. """
         letter = func.left(CourseAttendee.last_name, 1)
         letter = func.upper(func.unaccent(letter))
-        query = self.session.query(letter.distinct().label('letter'))
+        query = self.session.query(letter.label('letter'))
         query = query.order_by(letter)
-        return [r.letter for r in query if r.letter]
+        return [letter for letter, in query.distinct() if letter]
 
     @cached_property
     def relevant_courses(self) -> tuple[tuple[UUID, str], ...]:
         return tuple(self.session.query(Course.id, Course.name).filter(
             Course.hidden_from_public == False,
-            Course.mandatory_refresh != None
+            Course.mandatory_refresh.is_not(None)
         ))

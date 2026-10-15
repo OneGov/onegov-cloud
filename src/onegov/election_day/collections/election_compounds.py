@@ -73,10 +73,10 @@ class ElectionCompoundCollection(Pagination[ElectionCompound]):
         """
 
         year = cast(extract('year', ElectionCompound.date), Integer)
-        query = self.session.query(year.distinct())
+        query = self.session.query(year)
         query = query.order_by(year.desc())
 
-        return [year for year, in query]
+        return [year for year, in query.distinct()]
 
     def by_date(self, date: date) -> list[ElectionCompound]:
         """ Returns the election compounds on the given date. """
