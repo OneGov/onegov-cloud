@@ -79,12 +79,17 @@ class AutoplayVideoWidget:
     template = """
         <xsl:template match="autoplay_video">
             <div metal:use-macro="layout.macros.autoplay_video"
-            tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
-            link_mp4_low_res '{@link_mp4_low_res}';
-            link_webm '{@link_webm}'; button_url '{@button_url}';
-            link_webm_low_res '{@link_webm_low_res}'; text '{@text}';
-            button_text '{@button_text}'; searchbox '{@searchbox}';"
-            />
+            tal:define="
+                max_height {ogc:safe-string(@max-height)};
+                link_mp4 {ogc:safe-string(@link_mp4)};
+                link_mp4_low_res {ogc:safe-string(@link_mp4_low_res)};
+                link_webm {ogc:safe-string(@link_webm)};
+                button_url {ogc:safe-string(@button_url)};
+                link_webm_low_res {ogc:safe-string(@link_webm_low_res)};
+                text {ogc:safe-string(@text)};
+                button_text {ogc:safe-string(@button_text)};
+                searchbox {ogc:safe-string(@searchbox)};
+            " />
         </xsl:template>
     """
 
@@ -106,10 +111,12 @@ class IconLinksWidget:
         <xsl:template match="icon_link">
             <div metal:use-macro="layout.macros.icon_link"
             tal:define="
-                title '{@title}'; invert '{@invert}'; icon '{@icon}';
-                text '{@text}'; link '{@link}';
-            "
-            />
+                title {ogc:safe-string(@title)};
+                invert {ogc:safe-string(@invert)};
+                icon {ogc:safe-string(@icon)};
+                text {ogc:safe-string(@text)};
+                link {ogc:safe-string(@link)};
+            " />
         </xsl:template>
     """
 
@@ -226,7 +233,6 @@ class PartnerWidget:
 
     template = """
         <xsl:template match="partners">
-            <xsl:variable name="apos">'</xsl:variable>
             <xsl:variable name="show_title">
                 <xsl:choose>
                      <xsl:when test="@hide-title">
@@ -243,9 +249,7 @@ class PartnerWidget:
             <xsl:value-of
             select="concat(
                 'title ',
-                $apos,
-                @title,
-                $apos,
+                ogc:safe-string(@title),
                 '; ',
                 'show_title ',
                 $show_title,
@@ -269,7 +273,7 @@ class ServicesWidget:
                         <tal:b content="structure link(layout)" />
                     </li>
                     <xsl:for-each select="link">
-                        <li tal:define="icon '{@icon}'">
+                        <li tal:define="icon {ogc:safe-string(@icon)}">
                             <a tal:attributes="
                                 class ('h5 fa fa-' + icon) if icon
                                       else 'generic h5'
@@ -423,9 +427,12 @@ class FocusWidget:
                     </xsl:choose>
                 </xsl:variable>
                 <metal:block use-macro="layout.macros['focus-panel']"
-                tal:define="image_src '{@image-src}'; title '{@title}';
-                 text_on_image '{@text-on-image}'; lead '{@lead}';"
-                />
+                tal:define="
+                    image_src {ogc:safe-string(@image-src)};
+                    title {ogc:safe-string(@title)};
+                    text_on_image {ogc:safe-string(@text-on-image)};
+                    lead {ogc:safe-string(@lead)};
+                " />
                 <xsl:choose>
                     <xsl:when test="@text-on-image">
                         <xsl:if test="text">
@@ -481,8 +488,10 @@ class TestimonialsWidget:
     template = """
         <xsl:template match="testimonial">
             <div metal:use-macro="layout.macros.testimonial"
-             tal:define="description '{@description}'; quote '{@quote}';
-             image '{@image}';
+             tal:define="
+                description {ogc:safe-string(@description)};
+                quote {ogc:safe-string(@quote)};
+                image {ogc:safe-string(@image)};
              "
             />
         </xsl:template>
@@ -494,13 +503,17 @@ class TestimonialSliderWidget:
     template = """
         <xsl:template match="testimonial_slider">
             <div metal:use-macro="layout.macros.testimonial_slider"
-             tal:define="color '{@color}';
-             description_1 '{@description_1}';
-             quote_1 '{@quote_1}'; image_1 '{@image_1}';
-             description_2 '{@description_2}';
-             quote_2 '{@quote_2}'; image_2 '{@image_2}';
-             description_3 '{@description_3}';
-             quote_3 '{@quote_3}'; image_3 '{@image_3}';
+             tal:define="
+             color {ogc:safe-string(@color)};
+             description_1 {ogc:safe-string(@description_1)};
+             quote_1 {ogc:safe-string(@quote_1)};
+             image_1 {ogc:safe-string(@image_1)};
+             description_2 {ogc:safe-string(@description_2)};
+             quote_2 {ogc:safe-string(@quote_2)};
+             image_2 {ogc:safe-string(@image_2)};
+             description_3 {ogc:safe-string(@description_3)};
+             quote_3 {ogc:safe-string(@quote_3)};
+             image_3 {ogc:safe-string(@image_3)};
              "
             />
         </xsl:template>
@@ -513,8 +526,8 @@ class JobsWidget:
     template = """
     <xsl:template match="jobs">
         <div metal:use-macro="layout.macros['jobs-cards']"
-        tal:define="jobs_card_title '{@jobs_card_title}';
-        rss_feed '{@rss_feed}';
+        tal:define="jobs_card_title {ogc:safe-string(@jobs_card_title)};
+        rss_feed {ogc:safe-string(@rss_feed)};
         "
         />
     </xsl:template>

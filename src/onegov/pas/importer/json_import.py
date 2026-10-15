@@ -27,6 +27,11 @@ from onegov.pas.importer.types import (  # noqa: TC002
     PersonData,
 )
 
+COMMISSION_ORGANIZATION_TYPES = (
+    'Kommission',
+    'Interkantonale Kommission',
+)
+
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import logging
@@ -402,7 +407,7 @@ class OrganizationImporter(DataImporter):
                 organization_type_title = org_data.get('organizationTypeTitle')
                 org_name = org_data.get('name', '')
 
-                if organization_type_title == 'Kommission':
+                if organization_type_title in COMMISSION_ORGANIZATION_TYPES:
                     processed_counts['commissions'] += 1
                     try:
                         org_uuid = UUID(org_id)
@@ -413,11 +418,20 @@ class OrganizationImporter(DataImporter):
                         continue
 
                     commission = existing_commission_map.get(org_uuid)
+                    commission_type: Literal['normal', 'intercantonal'] = (
+                        'intercantonal'
+                        if organization_type_title
+                        == 'Interkantonale Kommission'
+                        else 'normal'
+                    )
                     if commission:
                         # Update existing commission found in initial query
                         updated = False
                         if commission.name != org_name:
                             commission.name = org_name
+                            updated = True
+                        if commission.type != commission_type:
+                            commission.type = commission_type
                             updated = True
                         if updated:
                             commissions_to_update.append(commission)
@@ -430,7 +444,7 @@ class OrganizationImporter(DataImporter):
                         commission = PASCommission(
                             external_kub_id=org_uuid,
                             name=org_name,
-                            type='normal',
+                            type=commission_type,
                         )
                         self.logger.debug(f'Creating new commission: {org_id}')
                         # Only add *new* commissions to the save list
@@ -969,7 +983,7 @@ class MembershipImporter(DataImporter):
                 kub_id = self._parse_kub_id(membership)
                 start_date, end_date = self._membership_dates(membership)
 
-                if org_type_title == 'Kommission':
+                if org_type_title in COMMISSION_ORGANIZATION_TYPES:
                     processed_counts['commission_memberships'] += 1
                     processed_membership_type = True
                     if kub_id is not None:

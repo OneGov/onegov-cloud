@@ -11,13 +11,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.feriennet.request import FeriennetRequest
     from onegov.user import User
-    from sqlalchemy.orm import Query
-    from uuid import UUID
 
 
 @FeriennetApp.userlinks()
 def activity_links(request: FeriennetRequest, user: User) -> LinkGroup:
-    activities: Query[tuple[str, str]] = (
+    activities = (
         VacationActivityCollection(
             session=request.session,
             identity=request.identity
@@ -29,7 +27,6 @@ def activity_links(request: FeriennetRequest, user: User) -> LinkGroup:
             VacationActivity.name,
             VacationActivity.title
         )
-        .tuples()
     )
 
     return LinkGroup(
@@ -46,12 +43,11 @@ def activity_links(request: FeriennetRequest, user: User) -> LinkGroup:
 
 @FeriennetApp.userlinks()
 def attendee_links(request: FeriennetRequest, user: User) -> LinkGroup:
-    attendees: Query[tuple[UUID, str]] = (
+    attendees = (
         AttendeeCollection(request.session).query()
         .filter_by(username=user.username)
         .order_by(Attendee.name)
         .with_entities(Attendee.id, Attendee.name)
-        .tuples()
     )
 
     return LinkGroup(

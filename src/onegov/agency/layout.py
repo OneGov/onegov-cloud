@@ -201,6 +201,7 @@ class AgencyLayout(
 
     def include_editor(self) -> None:
         self.request.include('redactor')
+        self.request.include('cropper')
         self.request.include('editor')
 
     @cached_property

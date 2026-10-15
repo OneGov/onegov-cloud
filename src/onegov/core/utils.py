@@ -43,7 +43,8 @@ from yubico_client.yubico_exceptions import (  # type:ignore[import-untyped]
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Collection, Iterator, Mapping
+    from collections.abc import (
+        Callable, Collection, Generator, Iterator, Mapping)
     from sqlalchemy.orm import InstrumentedAttribute, Session
     from types import ModuleType
     from webob import Response
@@ -70,7 +71,7 @@ ALPHABET_RE = re.compile(r'^[cbdefghijklnrtuv]{12,44}$')
 
 
 @contextmanager
-def local_lock(namespace: str, key: str) -> Iterator[None]:
+def local_lock(namespace: str, key: str) -> Generator[None]:
     """ Locks the given namespace/key combination on the current system,
     automatically freeing it after the with statement has been completed or
     once the process is killed.
@@ -183,7 +184,7 @@ def remove_repeated_dots(text: str) -> str:
 
 
 @contextmanager
-def profile(filename: str) -> Iterator[None]:
+def profile(filename: str) -> Generator[None]:
     """ Profiles the wrapped code and stores the result in the profiles folder
     with the given filename.
 
@@ -200,7 +201,7 @@ def profile(filename: str) -> Iterator[None]:
 
 
 @contextmanager
-def timing(name: str | None = None) -> Iterator[None]:
+def timing(name: str | None = None) -> Generator[None]:
     """ Runs the wrapped code and prints the time in ms it took to run it.
     The name is printed in front of the time, if given.
 

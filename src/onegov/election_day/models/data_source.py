@@ -3,7 +3,6 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.election_day import _
 from onegov.election_day.models.election import Election
 from onegov.election_day.models.vote import Vote
-from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column
@@ -75,7 +74,7 @@ class DataSource(Base, TimestampMixin):
         if self.type == 'vote':
             votes = session.query(Vote)
             votes = votes.order_by(
-                desc(Vote.date),
+                Vote.date.desc(),
                 Vote.domain,
                 Vote.shortcode,
                 Vote.title
@@ -84,7 +83,7 @@ class DataSource(Base, TimestampMixin):
 
         elections = session.query(Election).filter(Election.type == self.type)
         elections = elections.order_by(
-            desc(Election.date),
+            Election.date.desc(),
             Election.domain,
             Election.shortcode,
             Election.title

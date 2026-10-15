@@ -137,6 +137,14 @@ def test_registration_ticket_workflow(client: Client) -> None:
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
+    cancel_link = page.pyquery(
+        'a.delete-link:contains("Anmeldung stornieren")'
+    )
+    assert cancel_link.attr('ic-post-to')
+    assert cancel_link.attr('data-confirm') == (
+        'Möchten Sie diese Anmeldung wirklich stornieren?'
+    )
+
     page.click("Anmeldung stornieren").follow()
 
     msg = client.get_email(-1)['TextBody']

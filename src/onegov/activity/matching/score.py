@@ -266,7 +266,7 @@ class PreferGroups:
                     Booking.group_code,
                     func.count(Booking.group_code).label('count')
                 ).filter(
-                    Booking.group_code != None,
+                    Booking.group_code.is_not(None),
                     Booking.period_id == booking.period_id
                 ).group_by(
                     Booking.group_code
@@ -276,7 +276,7 @@ class PreferGroups:
 
                 group_scores = {
                     group_code: max(.5, .7 - 0.1 * (count - 2))
-                                + unique_score_modifier(group_code)
+                                + unique_score_modifier(group_code)  # type: ignore[arg-type]
                     for group_code, count in query
                 }
 

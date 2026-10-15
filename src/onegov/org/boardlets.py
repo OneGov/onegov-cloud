@@ -303,7 +303,6 @@ class CitizenTicketBoardlet(OrgBoardlet):
             )
             .filter(func.lower(Ticket.ticket_email) == email.lower())
             .group_by(Ticket.state)
-            .tuples()
         ) if (email := self.request.authenticated_email) else {}
 
         yield BoardletFact(

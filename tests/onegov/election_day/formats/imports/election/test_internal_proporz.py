@@ -975,7 +975,7 @@ def test_import_internal_proporz_panachage(session: Session) -> None:
         )
     )
     list_ids: dict[str, UUID | None]
-    list_ids = dict(session.query(List.list_id, List.id).tuples())
+    list_ids = dict(session.query(List.list_id, List.id))
     list_ids['999'] = None
     assert not errors
     assert lquery.count() == 4
@@ -1000,7 +1000,7 @@ def test_import_internal_proporz_panachage(session: Session) -> None:
             ]
         )
     )
-    list_ids = dict(session.query(List.list_id, List.id).tuples())
+    list_ids = dict(session.query(List.list_id, List.id))
     list_ids['999'] = None
     assert not errors
     assert lquery.count() == 4
@@ -1027,13 +1027,11 @@ def test_import_internal_proporz_panachage(session: Session) -> None:
         )
     )
     result_ids = dict(
-        session.query(ElectionResult.entity_id, ElectionResult.id).tuples()
+        session.query(ElectionResult.entity_id, ElectionResult.id)
     )
-    list_ids = dict(session.query(List.list_id, List.id).tuples())
+    list_ids = dict(session.query(List.list_id, List.id))
     list_ids['999'] = None
-    candidate_ids = dict(
-        session.query(Candidate.candidate_id, Candidate.id).tuples()
-    )
+    candidate_ids = dict(session.query(Candidate.candidate_id, Candidate.id))
     assert not errors
     assert cquery.count() == 14
     for candidate_id, result_id, list_id, votes in (
@@ -1105,7 +1103,7 @@ def test_import_internal_proporz_panachage(session: Session) -> None:
             ]
         )
     )
-    list_ids = dict(session.query(List.list_id, List.id).tuples())
+    list_ids = dict(session.query(List.list_id, List.id))
     list_ids['999'] = None
     assert not errors
     assert lquery.count() == 4

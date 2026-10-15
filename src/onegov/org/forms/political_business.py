@@ -19,6 +19,7 @@ from wtforms.fields import DateField
 from wtforms.fields import FormField
 from wtforms.fields import FieldList
 from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.fields import SelectField
 from wtforms.utils import unset_value
 from wtforms.validators import InputRequired
@@ -167,6 +168,12 @@ class PoliticalBusinessForm(Form):
         default=date.today,
     )
 
+    chronology = TextAreaField(
+        label=_('Chronology'),
+        validators=[Optional()],
+        description='Schriftlich beantwortet am ...',
+    )
+
     parliamentary_groups = ChosenSelectMultipleField(
         label=_('Parliamentary Group(s)'),
         validators=[Optional()],
@@ -204,10 +211,6 @@ class PoliticalBusinessForm(Form):
     )
 
     def on_request(self) -> None:
-        # prevent showing access field as all ris information is public
-        if hasattr(self, 'access'):
-            self.delete_field('access')
-
         selectable_participants = (
             self.request.session.query(RISParliamentarian)
             .filter(RISParliamentarian.active)

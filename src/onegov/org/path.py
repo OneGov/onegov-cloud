@@ -739,20 +739,20 @@ def get_person_move(
     target: str
 ) -> PagePersonMove | None:
 
-    if subject == target:
-        raise exc.HTTPBadRequest()
-
     session = app.session()
     page = PageCollection(session).by_id(key)
 
     if isinstance(page, PersonLinkExtension):
-        return PagePersonMove(  # type:ignore[unreachable]
+        move = PagePersonMove(  # type:ignore[unreachable]
             session,
             page,
             subject,
             target,
             direction
         )
+        if not move.is_valid():
+            raise exc.HTTPBadRequest()
+        return move
     return None
 
 
@@ -773,13 +773,16 @@ def get_form_move(
     form = FormCollection(session).definitions.by_name(key)
 
     if isinstance(form, PersonLinkExtension):
-        return FormPersonMove(  # type:ignore[unreachable]
+        move = FormPersonMove(  # type:ignore[unreachable]
             session,
             form,
             subject,
             target,
             direction
         )
+        if not move.is_valid():
+            raise exc.HTTPBadRequest()
+        return move
     return None
 
 
@@ -800,13 +803,16 @@ def get_resource_move(
     resource = ResourceCollection(app.libres_context).by_id(key)
 
     if isinstance(resource, PersonLinkExtension):
-        return ResourcePersonMove(  # type:ignore[unreachable]
+        move = ResourcePersonMove(  # type:ignore[unreachable]
             session,
             resource,
             subject,
             target,
             direction
         )
+        if not move.is_valid():
+            raise exc.HTTPBadRequest()
+        return move
     return None
 
 

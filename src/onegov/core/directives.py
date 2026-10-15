@@ -1,6 +1,6 @@
 import os.path
 
-from dectate import Action, Query, convert_dotted_name  # type:ignore[attr-defined]
+from dectate import Action, Query, convert_dotted_name
 from itertools import count
 
 from morepath import render_json, Request
@@ -16,7 +16,6 @@ from onegov.core.utils import Bunch
 
 from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from _typeshed import StrOrBytesPath, StrPath
     from collections.abc import Callable, Mapping
     from webob import Response
     from wtforms import Form
@@ -58,12 +57,12 @@ class HtmlHandleFormAction(HtmlAction):
     """
     def __init__[RequestT: CoreRequest](
         self,
-        model: type | str,
+        model: type,
         form: type[Form] | Callable[[Any, RequestT], type[Form]],
-        render: Callable[[Any, RequestT], Response] | str | None = None,
-        template: StrOrBytesPath | None = None,
-        load: Callable[[RequestT], Any] | str | None = None,
-        permission: object | str | None = None,
+        render: Callable[[Any, RequestT], Response] | None = None,
+        template: str | None = None,
+        load: Callable[[RequestT], Any] | None = None,
+        permission: object | None = None,
         internal: bool = False,
         pass_model: bool = False,
         **predicates: Any
@@ -206,7 +205,7 @@ class CronjobAction(Action):
     def identifier(self, **kw: Any) -> int:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: Callable[[CoreRequest], Any],
         cronjob_registry: Bunch
@@ -233,13 +232,13 @@ class AnalyticsProviderAction(Action):
         self.name = name
         self.title = title
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         analytics_provider_registry: dict[str, AnalyticsProvider]
     ) -> str:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: type[AnalyticsProvider],
         analytics_provider_registry: dict[str, type[AnalyticsProvider]]
@@ -265,13 +264,13 @@ class StaticDirectoryAction(Action):
     def __init__(self) -> None:
         self.name = next(self.counter)
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         staticdirectory_registry: Bunch
     ) -> int:
         return self.name
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: Callable[..., Any],
         staticdirectory_registry: Bunch
@@ -315,13 +314,13 @@ class TemplateVariablesAction(Action):
     def __init__(self) -> None:
         self.section = 'templatevariables'
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         setting_registry: SettingRegistry
     ) -> str:
         return self.section
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         func: Callable[[CoreRequest], dict[str, Any]],
         setting_registry: SettingRegistry
@@ -349,7 +348,7 @@ class ReplaceSettingSectionAction(Action):
     def identifier(self, **kw: Any) -> str:
         return self.section
 
-    def perform(  # type: ignore[override]
+    def perform(
         self,
         obj: Callable[[], Mapping[str, Any]],
         setting_registry: SettingRegistry
@@ -386,13 +385,13 @@ class Layout(Action):
     def __init__(self, model: type) -> None:
         self.model = model
 
-    def identifier(  # type:ignore[override]
+    def identifier(
         self,
         app_class: type[Framework]
     ) -> str:
         return str(self.model)
 
-    def perform(  # type:ignore[override]
+    def perform(
         self,
         obj: type[CoreLayout],
         app_class: type[Framework]
@@ -400,7 +399,7 @@ class Layout(Action):
 
         layout_class = obj
         # `lambda self, obj, request` is required to match the signature
-        app_class.get_layout.register(  # type:ignore[attr-defined]
+        app_class.get_layout.register(
             lambda self, obj, request: layout_class(obj, request),
             model=self.model)
 
@@ -429,10 +428,10 @@ class ExtendedJsonAction(JsonAction):
 
     def __init__(
         self,
-        model: type | str,
-        render: Callable[[Any, Any], Response] | str | None = None,
-        template: StrPath | None = None,
-        load: Callable[[Any], Any] | str | None = None,
+        model: type,
+        render: Callable[[Any, Any], Response] | None = None,
+        template: str | None = None,
+        load: Callable[[Any], Any] | None = None,
         permission: object = None,
         internal: bool = False,
         open_data: bool = False,

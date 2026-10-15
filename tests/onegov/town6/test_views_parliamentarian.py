@@ -103,6 +103,9 @@ def test_parliamentarians(client: Client) -> None:
         new.form['first_name'] = 'Funny'
         new.form['last_name'] = 'Comedian'
         new.form['email_primary'] = 'funny.comedian@fun.org'
+        new.form['email_secondary'] = 'secondary@fun.org'
+        new.form['website'] = 'https://fun.org'
+        new.form['private_address'] = 'Fun Street 1'
         new.form['party'] = 'Die Moderne'
         new.form['interest_ties'] = json.dumps({  # many field
             'values': [{
@@ -115,6 +118,13 @@ def test_parliamentarians(client: Client) -> None:
         assert 'Funny' in parliamentarian
         assert 'Comedian' in parliamentarian
         assert 'funny.comedian@fun.org' in parliamentarian
+        assert parliamentarian.pyquery(
+            'a[href="mailto:funny.comedian@fun.org"]'
+        )
+        assert parliamentarian.pyquery('a[href="mailto:secondary@fun.org"]')
+        assert parliamentarian.pyquery('a[href="https://fun.org"]')
+        assert 'Adresse' in parliamentarian.pyquery('dt').text()
+        assert 'Privatadresse' not in parliamentarian.pyquery('dt').text()
         assert 'Die Moderne' in parliamentarian
         assert 'Manager' in parliamentarian
         assert 'Work' in parliamentarian
@@ -158,10 +168,10 @@ def test_parliamentarians(client: Client) -> None:
         id = next(
             (opt[0] for opt in options if opt[2] == 'Verkehrskommission'))
         commission.form['commission_id'] = id
-        commission.form['role'] = 'member'
+        commission.form['role'] = 'substitute_member'
         parliamentarian = commission.form.submit().follow()
         assert 'Neue Rolle hinzugefügt' in parliamentarian
-        assert 'Mitglied' in parliamentarian
+        assert 'Ersatzmitglied' in parliamentarian
         assert 'Verkehrskommission' in parliamentarian
 
         # add another parliamentarian

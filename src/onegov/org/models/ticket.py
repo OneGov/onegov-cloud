@@ -27,7 +27,7 @@ from onegov.search.utils import extract_hashtags
 from operator import attrgetter
 from purl import URL
 from sedate import utcnow
-from sqlalchemy import and_, desc, func, or_, text
+from sqlalchemy import and_, func, or_, text
 from sqlalchemy.orm import object_session, undefer
 from uuid import uuid4, UUID
 
@@ -527,6 +527,15 @@ class FormSubmissionHandler(Handler):
                         ),
                         attrs={'class': 'delete-link'},
                         traits=(
+                            Confirm(
+                                _(
+                                    'Do you really want to cancel this '
+                                    'registration?'
+                                ),
+                                _('This cannot be undone.'),
+                                _('Cancel registration'),
+                                _('Cancel'),
+                            ),
                             Intercooler(
                                 request_method='POST',
                                 redirect_after=request.url
@@ -607,7 +616,7 @@ class ReservationHandler(Handler):
     def most_future_reservation(self) -> Reservation | None:
         return (
             self.session.query(Reservation)
-            .order_by(desc(Reservation.start))
+            .order_by(Reservation.start.desc())
             .first()
         )
 

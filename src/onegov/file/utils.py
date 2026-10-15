@@ -14,7 +14,7 @@ from PIL import Image
 from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead, StrOrBytesPath
-    from collections.abc import Iterator
+    from collections.abc import Generator
 
 
 def content_type_from_fileobj(fileobj: SupportsRead[bytes]) -> str:
@@ -179,7 +179,7 @@ def name_without_extension(name: str) -> str:
 
 
 @contextmanager
-def current_dir(dir: StrOrBytesPath) -> Iterator[None]:
+def current_dir(dir: StrOrBytesPath) -> Generator[None]:
     previous = os.getcwd()
     os.chdir(dir)
     try:

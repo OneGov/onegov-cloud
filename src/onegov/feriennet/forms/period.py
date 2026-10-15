@@ -7,7 +7,7 @@ from onegov.feriennet import _
 from onegov.form import Form, merge_forms
 from onegov.form.fields import PanelField
 from onegov.org.forms import ExportForm
-from sqlalchemy import distinct, func, or_, literal
+from sqlalchemy import func, or_, literal
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
@@ -489,8 +489,8 @@ class PeriodForm(Form):
         end = OccasionDate.end.op('AT TIME ZONE')(literal('UTC'))
         end = end.op('AT TIME ZONE')(OccasionDate.timezone)
 
-        qd = session.query(OccasionDate)
-        qd = qd.with_entities(OccasionDate.occasion_id)
+        bq = session.query(OccasionDate)
+        qd = bq.with_entities(OccasionDate.occasion_id)
         qd = qd.filter(or_(
             func.date_trunc('day', start) < mindate,
             func.date_trunc('day', start) > maxdate,
@@ -498,10 +498,11 @@ class PeriodForm(Form):
             func.date_trunc('day', end) > maxdate
         ))
 
-        q = session.query(OccasionDate).join(Occasion)
-        q = q.with_entities(distinct(Occasion.activity_id))
+        bq = session.query(OccasionDate).join(Occasion)
+        q = bq.with_entities(Occasion.activity_id)
         q = q.filter(Occasion.period == self.model)
         q = q.filter(Occasion.id.in_(qd.scalar_subquery()))
+        q = q.distinct()
 
         return tuple(
             session.query(Activity).filter(Activity.id.in_(q.scalar_subquery()))

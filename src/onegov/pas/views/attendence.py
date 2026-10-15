@@ -2,7 +2,7 @@ from collections import defaultdict
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import distinct, false
+from sqlalchemy import false
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
@@ -33,8 +33,7 @@ from onegov.pas.models import SettlementRun
 from onegov.pas.models.attendence import TYPES
 from onegov.pas.models.commission_membership import PASCommissionMembership
 from onegov.pas.utils import (
-    get_active_kantonsrat_parliamentarians,
-    is_active_kantonsrat_member,
+    get_attendance_parliamentarians,
 )
 from onegov.user import User
 from uuid import UUID
@@ -162,11 +161,11 @@ def view_attendences(
 
     plenary_filters: list[Link] = []
     if request.is_admin:
-        plenary_dates = (
-            request.session.query(distinct(Attendence.date))
+        plenary_dates_query = (
+            request.session.query(Attendence.date)
             .filter(Attendence.type == 'plenary')
             .order_by(Attendence.date.desc())
-            .all()
+            .distinct()
         )
         plenary_filters = [
             Link(
@@ -186,7 +185,7 @@ def view_attendences(
                 ),
             )
         ]
-        for (d,) in plenary_dates:
+        for d, in plenary_dates_query:
             plenary_filters.append(
                 Link(
                     text=layout.format_date(d, 'date'),
@@ -488,7 +487,7 @@ def edit_plenary_bulk_attendence(
         return request.redirect(request.class_link(AttendenceCollection))
 
     all_parliamentarians = [
-        str(p.id) for p in get_active_kantonsrat_parliamentarians(request.app)
+        str(p.id) for p in get_attendance_parliamentarians(request)
     ]
 
     if form.submitted(request):
@@ -620,16 +619,19 @@ def edit_commission_bulk_attendence(
         if raw_parl_ids := request.POST.getall('parliamentarian_id'):
             data.pop('parliamentarian_id', None)
             collection = AttendenceCollection(request.session)
-            memberships = request.session.query(
-                PASCommissionMembership
-            ).filter(
-                PASCommissionMembership.commission_id
-                == form.commission_id.data
-            ).all()
+            memberships = (
+                request.session.query(PASCommissionMembership)
+                .filter(
+                    PASCommissionMembership.commission_id
+                    == form.commission_id.data
+                )
+                .all()
+            )
+            eligible = {p.id for p in get_attendance_parliamentarians(request)}
             commission_parliamentarians = [
                 str(membership.parliamentarian_id)
                 for membership in memberships
-                if is_active_kantonsrat_member(membership.parliamentarian)
+                if membership.parliamentarian_id in eligible
             ]
             unselected_parliamentarians = [
                 pid for pid in commission_parliamentarians

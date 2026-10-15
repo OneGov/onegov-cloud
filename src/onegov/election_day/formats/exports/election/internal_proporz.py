@@ -110,7 +110,7 @@ def export_election_internal_proporz(
     # We need to collect the panachage results per list
     list_ids_q = session.query(List.id, List.list_id)
     list_ids_q = list_ids_q.filter(List.election_id == election.id)
-    list_ids: dict[UUID | None, str] = dict(list_ids_q.tuples())
+    list_ids: dict[UUID | None, str] = dict(list_ids_q)
     list_ids[None] = '999'
     list_panachage_results = session.query(ListPanachageResult)
     list_panachage_results = list_panachage_results.filter(
@@ -128,7 +128,7 @@ def export_election_internal_proporz(
     candidate_ids_q = candidate_ids_q.filter(
         Candidate.election_id == election.id
     )
-    candidate_ids = dict(candidate_ids_q.tuples())
+    candidate_ids = dict(candidate_ids_q)
     candidate_panachage_results = session.query(
         CandidatePanachageResult.target_id,
         CandidatePanachageResult.source_id,

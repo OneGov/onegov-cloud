@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 type MembershipRole = Literal[
     'guest',
     'member',
+    'substitute_member',
     'extended_member',
     'president',
 ]
@@ -25,6 +26,7 @@ type MembershipRole = Literal[
 ROLES: dict[MembershipRole, str] = {
     'guest': _('Guest'),
     'member': _('Member'),
+    'substitute_member': _('Substitute Member'),
     'extended_member': _('Extended Member'),
     'president': _('President')
 }

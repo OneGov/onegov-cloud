@@ -58,8 +58,7 @@ class TAN(Base, TimestampMixin, ContentMixin):
 
     @is_active.expression  # type:ignore[no-redef]
     def is_active(
-        cls,
-        expires_after: timedelta | None = DEFAULT_EXPIRES_AFTER
+        cls: type[TAN], expires_after: timedelta | None = DEFAULT_EXPIRES_AFTER
     ) -> ColumnElement[bool]:
 
         now = cls.timestamp()

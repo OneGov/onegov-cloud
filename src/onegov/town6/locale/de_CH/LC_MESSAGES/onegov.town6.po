@@ -2342,6 +2342,9 @@ msgstr "Information"
 msgid "Business Type"
 msgstr "Geschäftsart"
 
+msgid "Chronology"
+msgstr "Chronologie"
+
 msgid "Submission/publication date"
 msgstr "Einreichungs-/Publikationsdatum"
 

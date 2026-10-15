@@ -9,7 +9,7 @@ from onegov.ticket import handlers as global_handlers
 from onegov.ticket.models.invoice import TicketInvoice
 from onegov.ticket.models.invoice_item import TicketInvoiceItem
 from onegov.ticket.models.ticket import Ticket
-from sqlalchemy import and_, cast, desc, func, or_, UUID as UUIDType
+from sqlalchemy import and_, cast, func, or_, UUID as UUIDType
 from sqlalchemy.orm import contains_eager, joinedload, selectinload, undefer
 from uuid import UUID
 
@@ -91,7 +91,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
 
     def subset(self) -> Query[Ticket]:
         query = self.query()
-        query = query.order_by(desc(Ticket.created))
+        query = query.order_by(Ticket.created.desc())
         query = query.options(joinedload(Ticket.user))
         query = query.options(undefer(Ticket.created))
 
@@ -169,10 +169,10 @@ class TicketCollectionPagination(Pagination[Ticket]):
         )
 
     def groups_by_handler_code(self) -> Query[tuple[str, Sequence[str]]]:
-        return self.query().with_entities(
+        return self.query().with_entities(  # type: ignore[return-value]
             Ticket.handler_code,
             func.array_agg(Ticket.group.distinct())
-        ).group_by(Ticket.handler_code).tuples()
+        ).group_by(Ticket.handler_code)
 
 
 @msgpack.make_serializable(tag=60)
@@ -293,7 +293,7 @@ class TicketCollection(TicketCollectionPagination):
 
         query = query.group_by(Ticket.state)
 
-        return TicketCount(**dict(query.tuples()))
+        return TicketCount(**dict(query))
 
     def by_handler_data_id(
         self,
@@ -494,12 +494,8 @@ class TicketInvoiceCollection(
         if not self.batch:
             return {}
         from onegov.reservation import Reservation
-        return {
-            invoice_id: (
-                sedate.to_timezone(start, self.tzinfo).date(),
-                sedate.to_timezone(end, self.tzinfo).date()
-            )
-            for invoice_id, start, end in self.session.query(Reservation)
+        query: Query[tuple[UUID, datetime, datetime]] = (
+            self.session.query(Reservation)
             .join(
                 Ticket,
                 cast(Ticket.handler_id, UUIDType) == Reservation.token
@@ -511,6 +507,13 @@ class TicketInvoiceCollection(
                 func.min(Reservation.start),
                 func.max(Reservation.end)
             )
+        )
+        return {
+            invoice_id: (
+                sedate.to_timezone(start, self.tzinfo).date(),
+                sedate.to_timezone(end, self.tzinfo).date()
+            )
+            for invoice_id, start, end in query
         }
 
     def __eq__(self, other: object) -> bool:

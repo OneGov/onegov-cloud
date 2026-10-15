@@ -9,7 +9,7 @@ from itertools import chain
 from onegov.core import LEVELS
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.mixins import TimestampMixin
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, Enum, Text
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.orm import load_only, mapped_column, Mapped
 from sqlalchemy.pool import StaticPool
@@ -20,7 +20,7 @@ from typing import cast, overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import (
-        Callable, Collection, Iterable, Iterator, Mapping, Sequence)
+        Callable, Collection, Generator, Iterable, Iterator, Mapping, Sequence)
     from sqlalchemy import Column
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
@@ -517,26 +517,39 @@ class UpgradeContext:
         )
         return {value for (value,) in result}
 
-    def update_enum_values(
+    def update_enum_columns(
         self,
         enum_name: str,
-        enum_values: Iterable[str]
+        enum_values: Iterable[str],
+        table_columns: Mapping[str, Collection[str]]
     ) -> bool:
+        enum_values = set(enum_values)
         existing = self.get_enum_values(enum_name)
-        missing = set(enum_values) - existing
+        missing = enum_values - existing
         if not missing:
             return False
 
-        # HACK: ALTER TYPE has to be run outside transaction
-        self.operations.execute(text('COMMIT'))
-        for value in missing:
-            # NOTE: This should be safe just by virtue of naming
-            #       restrictions on classes and enum members
-            self.operations.execute(text(
-                f"ALTER TYPE {enum_name} ADD VALUE '{value}'"
-            ))
-        # start a new transaction
-        self.operations.execute(text('BEGIN'))
+        for table, columns in table_columns.items():
+            if not self.has_table(table):
+                continue
+            for column in columns:
+                self.operations.alter_column(table, column, type_=Text)
+
+        self.operations.execute(text(f'DROP TYPE IF EXISTS {enum_name}'))
+
+        enum_type = Enum(*enum_values, name=enum_name)
+        enum_type.create(self.operations.get_bind())
+
+        for table, columns in table_columns.items():
+            if not self.has_table(table):
+                continue
+            for column in columns:
+                self.operations.alter_column(
+                    table,
+                    column,
+                    type_=enum_name,
+                    postgresl_using=f'"{column}"::text::{enum_name}'
+                )
         return True
 
     def models(self, table: str) -> Iterator[Any]:
@@ -573,7 +586,7 @@ class UpgradeContext:
             yield from filter_columns(model, self.session.query(model))
 
     @contextmanager
-    def stop_search_updates(self) -> Iterator[None]:
+    def stop_search_updates(self) -> Generator[None]:
         # XXX this would be better handled with a more general approach
         # that doesn't require knowledge of onegov.search
         if hasattr(self.app, 'fts_orm_events'):

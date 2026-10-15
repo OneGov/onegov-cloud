@@ -184,12 +184,16 @@ class OrmCacheApp:
     def orm_cache_descriptors(self) -> Iterator[OrmCacheDescriptor[Any]]:
         """ All orm cache descriptors installed on the class. """
 
-        for member_name, member in inspect.getmembers(self.__class__):
+        for member_name, member in inspect.getmembers_static(
+            self.__class__
+        ):
             if isinstance(member, OrmCacheDescriptor):
                 yield member
 
         # some descriptors are installed on the linked request instead
-        for member_name, member in inspect.getmembers(self.request_class):
+        for member_name, member in inspect.getmembers_static(
+            self.request_class
+        ):
             if isinstance(member, OrmCacheDescriptor):
                 yield member
 

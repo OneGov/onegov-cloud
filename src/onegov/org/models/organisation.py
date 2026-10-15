@@ -323,6 +323,7 @@ class Organisation(Base, TimestampMixin):
     # data retention policy
     auto_archive_timespan: dict_property[int] = meta_property(default=0)
     auto_delete_timespan: dict_property[int] = meta_property(default=0)
+    audit_trail_delete_timespan: dict_property[int] = meta_property(default=0)
 
     # vat
     vat_rate: dict_property[float | None] = meta_property(default=0.0)

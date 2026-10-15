@@ -10,6 +10,7 @@ from onegov.form.validators import (
     MIME_TYPES_IMAGE,
     ValidPhoneNumber
 )
+from onegov.form.widgets import CropperUploadWidget
 from onegov.org import _
 from onegov.parliament.models.parliamentarian import GENDERS
 from wtforms.fields import DateField
@@ -54,6 +55,12 @@ class ParliamentarianForm(NamedFileForm):
         fieldset=_('Basic properties'),
         validators=[ImageSizeLimit(max_dimensions=IMAGE_MAX_SIZE)],
         allowed_mimetypes=MIME_TYPES_IMAGE,
+        widget=CropperUploadWidget(),
+        render_kw={
+            'data-initial-aspect-ratio': '1:1',
+            'data-fixed-aspect-ratio': 'true',
+            'data-circular': 'true',
+        }
     )
 
     party = StringField(
