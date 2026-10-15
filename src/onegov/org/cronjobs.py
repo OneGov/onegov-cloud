@@ -624,7 +624,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         (r.id.hex, f'{r.group or default_group} - {r.title}')
         for r in all_resources
     )
-    virtual_ids = {r.id: r.virtual_id for r in all_resources}
+    virtual_ids = {r.id: Resource.get_virtual_id(r.id) for r in all_resources}
 
     # get the reservations of this day
     start = align_date_to_day(today, 'Europe/Zurich', 'down')

@@ -242,6 +242,24 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         ),
     )
 
+    # NOTE: These relationships only exist so deletion of resources cascade
+    #       and also deletes related allocations, since there is no foreign key
+    #       on the allocations table that could do that cascade for us
+    #       this also ensures we get an integrity error if we try to
+    #       delete a resource that still has reservations.
+    _allocations: Mapped[list[Allocation]] = relationship(
+        cascade='all, delete-orphan',
+        primaryjoin='Allocation.resource == Resource.id',
+        foreign_keys='Allocation.resource',
+        overlaps='_virtual_allocations',
+    )
+    _virtual_allocations: Mapped[list[Allocation]] = relationship(
+        cascade='all, delete-orphan',
+        primaryjoin='Allocation.resource == Resource.virtual_id',
+        foreign_keys='Allocation.resource',
+        overlaps='_allocations',
+    )
+
     parents: Mapped[list[Resource]] = relationship(
         secondary=blocking_resources_table,
         primaryjoin=id == blocking_resources_table.c.child_id,
@@ -318,6 +336,11 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         self.content['deadline'] = value
 
+    @staticmethod
+    def get_virtual_id(resource_id: UUID) -> UUID:
+        assert resource_id.version != 5
+        return uuid5(resource_id, 'virtual')
+
     @hybrid_property
     def virtual_id(self) -> UUID:
         """ The resource's secondary virtual id.
@@ -331,7 +354,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         to fit any reservations
         """
         assert self.id, 'the id needs to be set'
-        result = self.__dict__['virtual_id'] = uuid5(self.id, 'virtual')
+        result = self.__dict__['virtual_id'] = self.get_virtual_id(self.id)
         return result
 
     @virtual_id.inplace.expression

@@ -892,7 +892,7 @@ def test_extensions_schema(postgres_dsn: str) -> None:
         assert obj.data['schema'] == schema
 
     assert mgr.created_extensions == {
-        'btree_gist', 'hstore', 'intarray', 'unaccent'
+        'btree_gist', 'hstore', 'intarray', 'unaccent', 'uuid-osp'
     }
 
 
