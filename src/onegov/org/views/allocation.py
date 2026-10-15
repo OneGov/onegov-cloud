@@ -270,6 +270,11 @@ def handle_edit_allocation(
 ) -> RenderData | Response:
     """ Handles edit allocation for differing form classes. """
 
+    # virtual allocations should not be edited
+    # since they're managed automatically
+    if self.is_virtual:
+        raise exc.HTTPNotFound()
+
     resources = ResourceCollection(request.app.libres_context)
     resource = resources.by_id(self.resource)
     assert resource is not None
@@ -335,6 +340,12 @@ def handle_delete_allocation(self: Allocation, request: OrgRequest) -> None:
     reservations associated with it).
 
     """
+
+    # virtual allocations should not be edited
+    # since they're managed automatically
+    if self.is_virtual:
+        raise exc.HTTPNotFound()
+
     request.assert_valid_csrf_token()
 
     resource = request.app.libres_resources.by_allocation(self)
