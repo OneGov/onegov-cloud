@@ -43,7 +43,7 @@
                                     Ticket updates by e-mail
                                 </span>
 
-                                <a tal:condition="is_manager" class="btn btn-outline-light btn-sm mb-sm" href="${request.link(ticket, 'mute')}">
+                                <a tal:condition="is_manager" class="btn btn-light btn-sm mb-sm" href="${request.link(ticket, 'mute')}">
                                     <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
                                     <span i18n:translate>Disable E-Mails</span>
                                 </a>
@@ -57,14 +57,14 @@
                                 </span>
 
                                 <tal:b condition="not event_source">
-                                    <a tal:condition="is_manager" class="btn btn-outline-light btn-sm" href="${request.link(ticket, 'unmute')}">
+                                    <a tal:condition="is_manager" class="btn btn-light btn-sm" href="${request.link(ticket, 'unmute')}">
                                         <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
                                         <span i18n:translate>Enable E-Mails</span>
                                     </a>
                                 </tal:b>
 
                                 <tal:b condition="event_source">
-                                    <a tal:condition="is_manager" class="btn btn-outline-light btn-sm confirm disabled"
+                                    <a tal:condition="is_manager" class="btn btn-light btn-sm confirm disabled"
                                     data-confirm="E-Mails can not be sent for tickets of imported events"
                                         data-confirm-no="Cancel"
                                     i18n:attributes="data-confirm;data-confirm-no"
@@ -225,7 +225,7 @@
                 </tal:b>
 
 
-                <tal:b metal:use-macro="layout.macros['side_panel_card']">
+                <tal:b metal:use-macro="layout.macros['side_panel_card']" tal:condition="related_tickets">
                     <tal:b metal:fill-slot="panel-title">
                         <tal:b i18n:translate>Related Tickets</tal:b>
                         <tal:b tal:condition="not all(t.muted for t in related_tickets)" tal:define="event_source all(t.handler.data.get('source') for t in related_tickets)">
@@ -305,7 +305,7 @@
                         </tal:b>
                         <hr>
                     </div>
-                    <div class="ticket-summary" id="summary">
+                    <div class="ticket-summary mb-xl" id="summary">
                         <tal:b replace="summary" />
                     </div>
 

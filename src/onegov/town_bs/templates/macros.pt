@@ -845,7 +845,7 @@
                     </div>
                 </tal:b>
                 <br tal:condition="coordinates and contact" />
-                <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br tal:condition="location">
+                <div tal:condition="coordinates" class="marker-map rounded-3" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div><br tal:condition="location">
                 <div class="location" tal:condition="location">${location}</div>
             </tal:b>
         </tal:b>
@@ -1062,7 +1062,7 @@
 
 <metal:display_form define-macro="display_form" i18n:domain="onegov.town6">
 
-    <div tal:condition="form" tal:repeat="fieldset form.fieldsets">
+    <div class="mb-xl" tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:b define="fields fieldset.non_empty_fields" condition="fields">
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
         </tal:b>
@@ -1108,61 +1108,62 @@
             rendered_fields = None
     ?>
     <h2 tal:condition="fieldset.is_visible and rendered_fields|nothing">${fieldset.label}</h2>
-
-    <dl class="field-display" tal:repeat="(field, rendered) rendered_fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
-        <dt tal:condition="layout.show_label(field)">${field.label.text}</dt>
-        <dd>
-            <tal:b tal:switch="field.type" condition="allow_downloads or allow_views">
-                <tal:b tal:case="'UploadField'">
-                    <tal:b tal:define="url layout.field_download_link(field)">
-                        <a href="${url}" tal:condition="not allow_views or not field.is_image">
-                            ${rendered}
-                        </a>
-                        <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="allow_views and field.is_image">
-                            <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
-                            <div class="photoswipe" tal:define="image layout.field_file(field)" tal:condition="image and as_thumbnail">
-                                <p class="has-img thumbnail">
-                                    <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
-                                </p>
+    <dl>
+        <tal:b tal:repeat="(field, rendered) rendered_fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
+            <dt tal:condition="layout.show_label(field)">${field.label.text}</dt>
+            <dd>
+                <tal:b tal:switch="field.type" condition="allow_downloads or allow_views">
+                    <tal:b tal:case="'UploadField'">
+                        <tal:b tal:define="url layout.field_download_link(field)">
+                            <a href="${url}" tal:condition="not allow_views or not field.is_image">
+                                ${rendered}
+                            </a>
+                            <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="allow_views and field.is_image">
+                                <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
+                                <div class="photoswipe" tal:define="image layout.field_file(field)" tal:condition="image and as_thumbnail">
+                                    <p class="has-img thumbnail">
+                                        <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                                    </p>
+                                </div>
+                                <tal:b metal:use-macro="layout.macros.photoswipe" />
                             </div>
-                            <tal:b metal:use-macro="layout.macros.photoswipe" />
-                        </div>
+                        </tal:b>
                     </tal:b>
-                </tal:b>
-                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter sorted(zip(field, rendered.split(Markup('<br>'))), key=lambda i: i[1])">
-                    <tal:b tal:define="subfield iter[0];
-                                       rendered iter[1];
-                                       url layout.field_download_link(subfield);
-                                       show_image allow_views and subfield.is_image">
-                        <a href="${url}" tal:condition="not show_image">
-                            ${rendered}
-                        </a>
-                        <br tal:condition="not show_image and not repeat.iter.end" />
-                        <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="show_image">
-                            <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
-                            <div class="photoswipe" tal:define="image layout.field_file(subfield)" tal:condition="image and as_thumbnail">
-                                <p class="has-img thumbnail">
-                                    <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
-                                </p>
+                    <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter sorted(zip(field, rendered.split(Markup('<br>'))), key=lambda i: i[1])">
+                        <tal:b tal:define="subfield iter[0];
+                                        rendered iter[1];
+                                        url layout.field_download_link(subfield);
+                                        show_image allow_views and subfield.is_image">
+                            <a href="${url}" tal:condition="not show_image">
+                                ${rendered}
+                            </a>
+                            <br tal:condition="not show_image and not repeat.iter.end" />
+                            <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="show_image">
+                                <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
+                                <div class="photoswipe" tal:define="image layout.field_file(subfield)" tal:condition="image and as_thumbnail">
+                                    <p class="has-img thumbnail">
+                                        <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                                    </p>
+                                </div>
+                                <tal:b metal:use-macro="layout.macros.photoswipe" />
                             </div>
-                            <tal:b metal:use-macro="layout.macros.photoswipe" />
-                        </div>
 
+                        </tal:b>
                     </tal:b>
                 </tal:b>
-            </tal:b>
-            <tal:b condition="not (allow_downloads or allow_views) or field.type not in ('UploadField', 'UploadMultipleField')" >
-                <tal:b tal:condition="field.pricing|nothing">
-                    <tal:b tal:define="is_value field.type in ('IntegerField', 'FloatField', 'DecimalField')">
-                        ${rendered} <span tal:condition="is_value" i18n:translate="">Item(s)</span>
+                <tal:b condition="not (allow_downloads or allow_views) or field.type not in ('UploadField', 'UploadMultipleField')" >
+                    <tal:b tal:condition="field.pricing|nothing">
+                        <tal:b tal:define="is_value field.type in ('IntegerField', 'FloatField', 'DecimalField')">
+                            ${rendered} <span tal:condition="is_value" i18n:translate="">Item(s)</span>
+                        </tal:b>
+                    </tal:b>
+                    <tal:b tal:condition="not: field.pricing|nothing" tal:switch="linkify_display|False">
+                        <tal:b tal:case="True" replace="layout.linkify_field(field, rendered)" />
+                        <tal:b tal:case="False" replace="rendered" />
                     </tal:b>
                 </tal:b>
-                <tal:b tal:condition="not: field.pricing|nothing" tal:switch="linkify_display|False">
-                    <tal:b tal:case="True" replace="layout.linkify_field(field, rendered)" />
-                    <tal:b tal:case="False" replace="rendered" />
-                </tal:b>
-            </tal:b>
-        </dd>
+            </dd>
+        </tal:b >
     </dl>
 </metal:display_field>
 
@@ -1424,21 +1425,22 @@
 
 <metal:ticket_status define-macro="ticket_status" i18n:domain="onegov.town6"
     tal:define="
+    classes classes|None;
     open_classes open_classes|None;
     pending_classes pending_classes|None;
     closed_classes closed_classes|None;
     archived_classes archived_classes|None;
 ">
-    <div i18n:translate tal:condition="ticket.state == 'open'" class="badge ${open_classes if open_classes else 'badge-light'}">
+    <div i18n:translate tal:condition="ticket.state == 'open'" class="badge ${classes} ${open_classes if open_classes else 'badge-light'}">
         Open
     </div>
-    <div i18n:translate tal:condition="ticket.state == 'pending'" class="badge ${pending_classes if pending_classes else 'badge-info'}">
+    <div i18n:translate tal:condition="ticket.state == 'pending'" class="badge ${classes} ${pending_classes if pending_classes else 'badge-info'}">
         Pending
     </div>
-    <div i18n:translate tal:condition="ticket.state == 'closed'" class="badge ${closed_classes if closed_classes else 'badge-success'}">
+    <div i18n:translate tal:condition="ticket.state == 'closed'" class="badge ${classes} ${closed_classes if closed_classes else 'badge-success'}">
         Closed
     </div>
-    <div i18n:translate tal:condition="ticket.state == 'archived'" class="badge ${archived_classes if archived_classes else 'badge-warning'}">
+    <div i18n:translate tal:condition="ticket.state == 'archived'" class="badge ${classes} ${archived_classes if archived_classes else 'badge-warning'}">
         Archived
     </div>
 </metal:ticket_status>
@@ -1644,7 +1646,7 @@
         <tal:b condition="event.coordinates">
             <dt i18n:translate>Map</dt>
             <dd>
-                <div class="marker-map" data-map-type="thumbnail" data-lat="${event.coordinates.lat}" data-lon="${event.coordinates.lon}" data-zoom="${event.coordinates.zoom}"></div>
+                <div class="marker-map rounded-3 ratio ratio-16x9 max-width-600px" data-map-type="thumbnail" data-lat="${event.coordinates.lat}" data-lon="${event.coordinates.lon}" data-zoom="${event.coordinates.zoom}"></div>
             </dd>
         </tal:b>
 
@@ -3476,7 +3478,7 @@
               ${layout.format_date(ticket.created, 'datetime')}
           </td>
           <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
-              <a class="ticket-accept ticket-button button small success" href="${request.link(ticket, 'accept')}" i18n:translate>
+              <a class="ticket-accept ticket-button btn btn-sm btn-outline-primary" href="${request.link(ticket, 'accept')}" i18n:translate>
                   Accept
               </a>
           </td>
@@ -3498,7 +3500,7 @@
           </td>
         </tal:block>
         <td tal:condition="archive_tickets" class="archive-tickets">
-            <input tal:condition="has_access" type="checkbox">
+            <input class="form-check-input" tal:condition="has_access" type="checkbox">
        </td>
     </tr>
 </metal:tickets_table_row>
@@ -3576,8 +3578,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 tal:condition="modal_title|False" class="modal-title fs-5" id="exampleModalLabel">
-                    ${modal_title}
+                <h1 class="modal-title fs-lg" id="exampleModalLabel">
+                    <tal:block metal:define-slot="modal_title"></tal:block>
                 </h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

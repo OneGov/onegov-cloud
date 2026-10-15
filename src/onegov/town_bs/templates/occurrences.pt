@@ -21,7 +21,7 @@
 
             <div metal:use-macro="layout.macros['offcanvas_filters']">
                 <tal:b metal:fill-slot="filters-body">
-                    <div class="side-panel" tal:condition="filters">
+                <div class="side-panel" tal:condition="filters">
                     <div tal:repeat="filter filters" class="filter-periods">
                         <h3 class="filter-title">${filter.title}</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
@@ -108,7 +108,7 @@
                             </li>
                         </ul>
                     </div>
-                                        </div>
+                </div>
                 </tal:b>
             </div>
 

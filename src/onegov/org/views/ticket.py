@@ -1645,7 +1645,8 @@ def get_handlers(
             tuple(get_groups(self, request, groups, id))
             if id != 'ALL' else ()
         )
-        css_class = id + '-link is-parent' if grouplinks else id + '-link'
+        css_class = (
+            id + '-link is-parent fw-bold' if grouplinks else id + '-link')
 
         yield Link(
             text=text,
