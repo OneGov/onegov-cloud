@@ -45,7 +45,11 @@ $success: #00bf63;
 $warning: #ffb744;
 $info: #448aff;
 
+// Keep white button text on lighter backgrounds
+$min-contrast-ratio: 2;
+
 $btn-border-width: 2px;
+
 $enable-negative-margins: true;
 
 $standard-transition: .2s linear;

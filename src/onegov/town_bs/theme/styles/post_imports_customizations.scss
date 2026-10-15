@@ -30,6 +30,10 @@ $container-selectors: ".container, .container-fluid";
 }
 
 // Accordion
+.accordion-header {
+  margin-bottom: 0 !important;
+}
+
 .accordion-item {
   margin-bottom: $s-md;
   overflow: hidden;

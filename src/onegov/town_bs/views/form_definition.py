@@ -1,18 +1,22 @@
+
 from __future__ import annotations
+
+import morepath
 
 from onegov.core.security import Public
 from onegov.core.templates import render_macro
 from onegov.form import FormCollection, FormDefinition
 from onegov.org.views.form_definition import (
-    handle_defined_form)
+    get_hints)
+from onegov.town6 import _
 
 from onegov.town_bs import TownBsApp
 from onegov.town6.layout import FormSubmissionLayout
-from webob import Response
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from webob import Response
     from onegov.core.types import RenderData
     from onegov.form import Form
     from onegov.town6.request import TownRequest
@@ -49,10 +53,39 @@ def view_form_modal(
     form: Form,
     layout: FormSubmissionLayout | None = None
 ) -> str | Response:
-    result = handle_defined_form(self, request, form, layout)
-    if isinstance(result, Response):
-        return result
-    result['full_page_width'] = True
+    collection = FormCollection(request.session)
+
+    if not self.current_registration_window:
+        spots = 0
+        enabled = True
+    else:
+        spots = 1
+        enabled = self.current_registration_window.accepts_submissions(spots)
+
+    if enabled and request.POST:
+        submission = collection.submissions.add(
+            self.name, form, state='pending', spots=spots)
+
+        return morepath.redirect(request.link(submission, 'modal'))
+
+    layout = layout or FormSubmissionLayout(self, request)
+
+    result = {
+        'layout': layout,
+        'title': self.title,
+        'form': enabled and form,
+        'definition': self,
+        'form_width': 'small',
+        'lead': layout.linkify(self.meta.get('lead')),
+        'text': self.text,
+        'people': getattr(self, 'people', None),
+        'files': getattr(self, 'files', None),
+        'contact': getattr(self, 'contact_html', None),
+        'hints': tuple(get_hints(layout, self.current_registration_window)),
+        'hints_callout': not enabled,
+        'button_text': _('Continue')
+    }
+
     result['layout'] = FormSubmissionLayout(self, request)
     return render_macro(
-        result['layout'].macros['form-modal-definition'], request, result)
+        layout.macros['form-modal-definition'], request, result)

@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var params = new URLSearchParams(window.location.search);
     var formName = params.get('form');
 
+    // Open modal if form name is in parameters
     if (formName) {
         var link = document.querySelector(
             '.list-link[data-form-name="' + CSS.escape(formName) + '"]'
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Delete form parameter when modal is being closed
     var formModal = document.getElementById('form-modal');
     formModal.addEventListener('hidden.bs.modal', function() {
         var url = new URL(window.location.href);
