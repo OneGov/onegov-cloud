@@ -1,0 +1,219 @@
+.styled-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+    margin-top: -$s-md;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: $s-md;
+        border-bottom: 2px solid $light-subtle;
+        transition: border $standard-transition;
+
+        * {
+            transition: all $standard-transition;
+        }
+
+        // TODO: Replace ">" with the real icon as soon as the icon library is known
+        &::after {
+            content: ">";
+            flex-shrink: 0;
+            color: $primary;
+            padding-right: $s-sm;
+            transition: transform $standard-transition;
+        }
+
+        .styled-list-link {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-rows: repeat(3, auto);
+            align-items: center;
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: $s-md 0;
+            text-decoration: none;
+            color: $body-color;
+
+            .styled-list-title {
+                grid-column: 1;
+                grid-row: 1;
+                display: block;
+                margin-bottom: 0;
+                font-size: $fs-md;
+            }
+
+            .styled-list-lead {
+                grid-column: 1;
+                grid-row: 2;
+                margin-bottom: 0;
+                padding-top: $s-sm;
+            }
+
+            .list-hint {
+                grid-column: 1;
+                grid-row: 3;
+                margin-top: $s-sm;
+            }
+
+            > i {
+                grid-column: 2;
+                grid-row: 1 / span 3;
+                align-self: center;
+                margin-left: $s-md;
+            }
+        }
+
+        .edit-link {
+            flex-shrink: 0;
+        }
+
+        &:hover {
+            border-bottom-color: $primary;
+
+            .styled-list-link {
+                color: $primary;
+            }
+
+            &::after {
+                transform: translateX($s-sm);
+            }
+        }
+    }
+}
+
+.styled-dl {
+    .styled-dl-entry {
+        border-left: 2px solid $primary;
+        padding: 0 $s-lg;
+        height: calc(5 * $s-lg);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        dt {
+            font-size: $fs-xs;
+            font-weight: normal;
+        }
+
+        dd {
+            font-size: $fs-lg;
+            font-weight: bold;
+        }
+    }
+}
+
+// Step sequence
+$step-indicator-size: $s-2xl;
+$step-border-width: 2px;
+
+.steps {
+    .steps-list {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .step {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: $s-md;
+        padding-bottom: $s-xl;
+
+        // Connector line between two indicators
+        &:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: $step-indicator-size + $s-sm;
+            bottom: $s-sm;
+            left: calc(#{$step-indicator-size} / 2 - #{$step-border-width} / 2);
+            border-left: $step-border-width solid var(--step-line-color);
+        }
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    .step-indicator {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: $step-indicator-size;
+        height: $step-indicator-size;
+        border: $step-border-width solid var(--step-border-color);
+        border-radius: 50%;
+        color: var(--step-color);
+        background-color: var(--step-bg);
+        font-weight: bold;
+    }
+
+    .step-label {
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        min-height: $step-indicator-size;
+        color: var(--step-label-color);
+    }
+}
+
+// Variant for a primary colored background
+.steps-primary {
+    color: $white;
+
+    .step {
+        --step-line-color: #{rgba($white, .5)};
+        --step-label-color: #{$white};
+    }
+
+    .step-complete,
+    .step-current {
+        --step-color: #{$primary};
+        --step-bg: #{$white};
+        --step-border-color: #{$white};
+    }
+
+    .step-upcoming {
+        --step-color: #{$white};
+        --step-bg: #{$primary};
+        --step-border-color: #{$white};
+
+        .step-indicator {
+            opacity: .75;
+        }
+    }
+}
+
+// Variant for a white background
+.steps-white {
+    .step {
+        --step-line-color: #{$light};
+        --step-label-color: #{$light};
+    }
+
+    .step-current {
+        --step-label-color: #{$body-color};
+    }
+
+    .step-complete {
+        --step-color: #{$white};
+        --step-bg: #{$primary};
+        --step-border-color: #{$primary};
+    }
+
+    .step-current {
+        --step-color: #{$white};
+        --step-bg: #{$primary};
+        --step-border-color: #{$primary};
+    }
+
+    .step-upcoming {
+        --step-color: #{$light};
+        --step-bg: #{$white};
+        --step-border-color: #{$light};
+    }
+}

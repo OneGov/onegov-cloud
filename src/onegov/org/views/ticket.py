@@ -242,7 +242,7 @@ def delete_ticket(
 def manual_payment_button(
     payment: Payment,
     layout: Layout,
-    css_class: str = 'secondary'
+    css_class: str = 'secondary btn-outline-light'
 ) -> Link:
 
     if payment.state == 'open':
@@ -251,7 +251,7 @@ def manual_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'mark-as-paid'),
             ),
-            attrs={'class': f'mark-as-paid button {css_class}'},
+            attrs={'class': f'mark-as-paid button btn btn-sm {css_class}'},
             traits=(
                 Intercooler(
                     request_method='POST',
@@ -279,7 +279,7 @@ def manual_payment_button(
 def online_payment_button(
     payment: Payment,
     layout: Layout,
-    css_class: str = 'secondary'
+    css_class: str = 'secondary btn-outline-light'
 ) -> Link | None:
 
     if payment.state == 'open':
@@ -288,7 +288,7 @@ def online_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'capture')
             ),
-            attrs={'class': f'payment-capture button {css_class}'},
+            attrs={'class': f'payment-capture button btn btn-sm {css_class}'},
             traits=(
                 Confirm(
                     _('Do you really want capture the payment?'),
@@ -315,7 +315,7 @@ def online_payment_button(
             url=layout.csrf_protected_url(
                 layout.request.link(payment, 'refund')
             ),
-            attrs={'class': f'payment-refund button {css_class}'},
+            attrs={'class': f'payment-refund button btn btn-sm {css_class}'},
             traits=(
                 Confirm(
                     _('Do you really want to refund ${amount}?', mapping={
@@ -1645,7 +1645,8 @@ def get_handlers(
             tuple(get_groups(self, request, groups, id))
             if id != 'ALL' else ()
         )
-        css_class = id + '-link is-parent' if grouplinks else id + '-link'
+        css_class = (
+            id + '-link is-parent fw-bold' if grouplinks else id + '-link')
 
         yield Link(
             text=text,

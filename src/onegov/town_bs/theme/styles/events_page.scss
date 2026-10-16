@@ -1,0 +1,24 @@
+.occurrence .card {
+  min-height: 13rem; // auf die Höhe im Hover-Zustand abstimmen
+  transition: background-color $standard-transition;
+
+  * {
+    transition: color $standard-transition;
+  }
+
+  .date-place {
+    @include hover-reveal-collapsed;
+  }
+
+  &:hover {
+    background-color: $primary !important;
+
+    * {
+      color: $white !important;
+    }
+
+    .date-place {
+      @include hover-reveal-expanded;
+    }
+  }
+}

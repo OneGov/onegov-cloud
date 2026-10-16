@@ -1,0 +1,78 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content"
+                   tal:define="
+                    lead layout.linkify(entry.lead);
+                    text None;
+                    people None;
+                    contact entry.contact;
+                    coordinates entry.directory.enable_map in ('everywhere', 'entry') and entry.coordinates;
+                    show_hash python:(request.is_manager or request.active_mtan_session) and entry.content_hash;
+                    show_side_panel python:(layout.model.directory.enable_change_requests or show_hash);
+                    ">
+
+            <div metal:fill-slot="before-lead">
+                <metal:b use-macro="layout.macros['before_directory_entry_lead']" />
+            </div>
+
+            <div metal:fill-slot="after-lead">
+                <div class="directory-fields">
+                    <metal:b
+                        use-macro="layout.macros['display_fields']"
+                        tal:define="
+                            fields entry.content_fields;
+                            allow_downloads True;
+                            allow_views True;
+                            form entry.directory.form_obj;
+                            linkify_display True;
+                        "
+                    />
+                    <dl class="field-display" tal:condition="request.is_manager and entry.internal_notes">
+                        <dt i18n:translate>Internal Notes</dt>
+                        <dd>${entry.internal_notes}</dd>
+                    </dl>
+                </div>
+
+                <dl tal:define="link entry.external_link_visible and entry.external_link" tal:condition="link" class="field-display">
+                    <dt i18n:translate>External link</dt>
+                    <dd>
+                        <a href="${link}">
+                            <tal:b condition="entry.external_link_title">${entry.external_link_title}</tal:b>
+                            <tal:b i18n:translate condition="not:entry.external_link_title">More information</tal:b>
+                        </a>
+                    </dd>
+                </dl>
+            </div>
+
+            <div metal:fill-slot="after-panels">
+                <div class="side-panel" tal:condition="layout.model.directory.enable_change_requests|nothing">
+                    <h3 i18n:translate>Actions</h3>
+                    <div class="side-panel-with-bg">
+                        <ul class="more-list">
+                            <li class="icon-item" tal:condition="layout.model.directory.enable_change_requests|nothing">
+                                <a class="list-link" href="${request.link(layout.model, 'change-request')}">
+                                    <i class="fa fa-folder-open"></i>
+                                    <span class="list-title" i18n:translate>Propose a change to this entry</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="side-panel" tal:condition="show_hash">
+                    <h3 title="Fingerprint of the entry's content. Changes whenever the entry data is modified." i18n:translate i18n:attributes="title">Hash</h3>
+                    <div class="side-panel-with-bg">
+                        <div>
+                            <i class="fa fa-fw fa-key" aria-hidden="true"></i>
+                            <span class="directory-entry-hash">${entry.content_hash}</span>
+                            <br/>
+                            <small>${layout.format_date(entry.last_change, 'datetime')}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tal:b>
+    </tal:b>
+</div>

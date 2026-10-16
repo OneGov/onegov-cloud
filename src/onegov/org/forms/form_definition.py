@@ -50,7 +50,7 @@ class FormDefinitionBaseForm(Form):
         render_kw={'readonly': True},
         validators=[Optional()],
         text='https://docs.admin.digital/module/formulare',
-        kind='panel',
+        kind='',
         hide_label=False
     )
 

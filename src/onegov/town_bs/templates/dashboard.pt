@@ -1,0 +1,46 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="boardlet-group row row-cols-1 row-cols-md-2 row-cols-lg-3 g-lg justify-content-center mb-lg"
+             tal:repeat="group model.boardlets()">
+            <tal:b tal:repeat="boardlet group">
+                <div class="col" tal:condition="boardlet.is_available">
+                    <div class="card h-100 boardlet boardlet-${boardlet.state} ${boardlet.name}">
+                        <div class="card-body p-2xl">
+                            <h2 class="h3 pb-xl card-title">
+                                <a href="${boardlet.url}" tal:omit-tag="not:boardlet.url">
+                                    <span>${boardlet.number|''}</span><br tal:condition="exists:boardlet.number"><span class="title">${boardlet.title}</span>
+                                </a>
+                            </h2>
+                            <table class="facts table table-striped table-borderless table-lg mb-0 fs-sm">
+                                <tr tal:repeat="fact boardlet.facts"
+                                    class="${fact.css_class} small ${'none' if not (fact.number or fact.icon) else ''}">
+                                    <td tal:condition="fact.icon" class="fact-icon">
+                                        <span><i class="${fact.icon}" aria-hidden="true"></i></span>
+                                    </td>
+                                    <td tal:condition="fact.number is not None" class="fact-number">
+                                        <span>${layout.format_number(fact.number) or '-'}</span>
+                                    </td>
+                                    <td tal:condition="not:(fact.number is not None or fact.icon)" class="fact-number">
+                                        -
+                                    </td>
+                                    <td class="fact-text">
+                                        ${fact.text}
+                                        <span tal:condition="fact.link">
+                                            <a href="${fact.link[0]}">${fact.link[1]}</a>
+                                        </span>
+                                        <span tal:condition="fact.visibility_icon" class="fact-visibility-icon fa-xs">
+                                            <i class="${fact.visibility_icon}" tal:attributes="title fact.icon_title|None"></i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </tal:b>
+        </div>
+    </tal:b>
+</div>

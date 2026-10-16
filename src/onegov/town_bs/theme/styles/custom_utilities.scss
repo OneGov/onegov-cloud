@@ -1,0 +1,74 @@
+
+// Badge
+@each $name, $value in $theme-colors {
+    .badge-#{$name} {
+        color: map-get($theme-colors, $name);
+        background-color: map-get($theme-colors-bg-subtle, $name);
+    }
+}
+
+.badge-light {
+  color: $light-text-emphasis
+}
+
+// Other utilities
+@each $key, $value in $spacers {
+  .square-#{$key} {
+    width: $value !important;
+    height: $value !important;
+  }
+}
+
+.black-gradient{
+  background: linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.black-transparent-bg {
+  background: rgba(0,0,0,.5);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+.border-hover {
+    transition: border $standard-transition;
+
+    &:hover {
+        border-color: $primary;
+    }
+}
+
+.list-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $s-sm;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.icon-circle {
+  background: $primary;
+  color: white;
+  border-radius: 50%;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.max-width-600px {
+  max-width: 600px;
+}

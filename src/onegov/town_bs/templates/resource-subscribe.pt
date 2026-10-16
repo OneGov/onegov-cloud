@@ -1,0 +1,48 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b tal:define="item resource|nothing">
+            <metal:hint use-macro="layout.macros['access_hint_long']"/>
+        </tal:b>
+
+        <div tal:define="key_code_url key_code_url|None; blocking_url blocking_url|None" class="panel limit-line-width">
+            <p i18n:translate>
+                The following link can be used to subscribe to the reservations
+                of this calendar. It can be used by anyone that knows the link
+                in multiple calendar applications.
+            </p>
+
+            <p i18n:translate>
+                Note that we have no control over how often calendar applications
+                update the calendars they are subscribed to (if they update at all).
+                Therefore the information shown in the calendar may be wrong or
+                out of date. Use it at your own risk.
+            </p>
+
+            <p tal:omit-tag="not key_code_url and not blocking_url">
+                <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${url}" style="word-break:break-all">${url}</a></b>
+            </p>
+
+            <tal:b tal:condition="blocking_url">
+                <p i18n:translate>
+                    If you want reservations from parent and/or child resources to be included, then use this link instead. Keep in mind that you may end up with duplicate events in your calendar, if you subscribe to multiple related resources with this setting.
+                </p>
+
+                <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${blocking_url}" style="word-break:break-all">${blocking_url}</a></b>
+            </tal:b>
+
+            <tal:b tal:condition="key_code_url">
+                <p i18n:translate>
+                    If you want key codes to be included in the event's description
+                    then you may use the following link instead. Please note
+                    however that anyone you share this link with will have
+                    permanent access to this information.
+                </p>
+
+                <i class="fa fa-link" aria-hidden="true"></i> <b><a href="${key_code_url}" style="word-break:break-all">${key_code_url}</a></b>
+            </tal:b>
+        </div>
+    </tal:b>
+</div>

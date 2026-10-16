@@ -74,6 +74,8 @@ class Layout:
     weekday_long_format = 'EEEE'
     weekday_short_format = 'E'
     month_long_format = 'MMMM'
+    day_short_format = 'd'
+    month_short_format = 'MMM'
 
     custom_body_attributes: dict[str, Any]
     custom_html_attributes: dict[str, Any]

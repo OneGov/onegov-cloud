@@ -185,6 +185,10 @@ class QrCodeLink(BaseLink):
         attrs['data-open'] = attrs['data-reveal-id']
         attrs['data-image-parent'] = f"qr-{attrs['data-reveal-id']}"
 
+        # Bootstrap 5
+        attrs['data-bs-toggle'] = 'modal'
+        attrs['data-bs-target'] = f"#{attrs['data-reveal-id']}"
+
         super().__init__(text, '#', attrs, traits, **props)
         self.title = title
 
@@ -326,6 +330,11 @@ class IFrameLink(BaseLink):
         # Foundation 6 Compatibility
         attrs['data-open'] = attrs['data-reveal-id']
         attrs['data-image-parent'] = f"iframe-{attrs['data-reveal-id']}"
+
+        # Bootstrap 5
+        attrs['data-bs-toggle'] = 'modal'
+        attrs['data-bs-target'] = f"#{attrs['data-reveal-id']}"
+
 
         super().__init__(text, '#', attrs, traits, **props)
         self.title = title
