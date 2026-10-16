@@ -138,7 +138,8 @@ class RoadworkClient:
         curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_NTLM)
         curl.setopt(pycurl.USERPWD, f'{self.username}:{self.password}')
         curl.setopt(pycurl.HTTPHEADER, [f'HOST: {self.hostname}'])
-        curl.setopt(pycurl.VERBOSE, True)
+        curl.setopt(pycurl.CONNECTTIMEOUT, 5)
+        curl.setopt(pycurl.TIMEOUT, 15)
         # This is is not really a good idea as it disables TLS certificate
         # validation!
         curl.setopt(pycurl.SSL_VERIFYPEER, 0)
@@ -196,6 +197,13 @@ class RoadworkClient:
                 })
 
                 return body
+
+            # gateway errors and the like mean the backend is unavailable
+            if status >= 500:
+                log.warning(f'{path} returned {status}')
+                raise RoadworkConnectionError(
+                    f'Could not connect to {self.hostname}'
+                )
 
             raise RoadworkError(f'{path} returned {status}')
 
