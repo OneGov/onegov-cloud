@@ -1237,7 +1237,7 @@ def accept_reservation(
             )
 
             for res in q:
-                if self.resource.hex in res.content[
+                if resource.id.hex in res.content[
                     'resources'
                 ] and res.content.get('new_reservations', False):
                     yield res.address
@@ -1513,7 +1513,7 @@ def _remove_reservation(
 
         for res in q:
             if (
-                self.resource.hex in res.content['resources']
+                resource.id.hex in res.content['resources']
                 and res.content.get('rejected_reservations', {})
             ):
                 yield res.address

@@ -459,6 +459,7 @@ def send_chat_message_email_if_enabled(
     handler = ticket.handler
     if not isinstance(handler, ReservationHandler) or not handler.resource:
         return
+    resource = handler.resource
 
     if thread is None:
         thread = tuple(reversed(list(generate_thread())))
@@ -473,7 +474,7 @@ def send_chat_message_email_if_enabled(
             if r.address == receiver:
                 # don't send two notifications to this address
                 continue
-            if handler.reservations[0].resource.hex in r.content[
+            if resource.id.hex in r.content[
                 'resources'
             ] and r.content.get('customer_messages', False):
                 yield r.address
@@ -483,7 +484,7 @@ def send_chat_message_email_if_enabled(
             '${org} New Customer Message in Reservation for ${resource_title}',
             mapping={
                 'org': request.app.org.title,
-                'resource_title': handler.resource.title,
+                'resource_title': resource.title,
             },
         )
     )
@@ -495,7 +496,7 @@ def send_chat_message_email_if_enabled(
             'layout': DefaultMailLayout(object(), request),
             'title': title,
             'model': ticket,
-            'resource': handler.resource,
+            'resource': resource,
             'message': message,
             'thread': thread,
             'ticket_reference': ticket.reference(request),
@@ -535,6 +536,7 @@ def send_new_note_notification(
 
     if not isinstance(handler, ReservationHandler) or not handler.resource:
         return
+    resource = handler.resource
 
     def recipients_which_have_registered_for_mail() -> Iterator[str]:
         q = ResourceRecipientCollection(request.session).query()
@@ -543,7 +545,7 @@ def send_new_note_notification(
         q = q.with_entities(ResourceRecipient.address,
                             ResourceRecipient.content)
         for r in q:
-            if handler.reservations[0].resource.hex in r.content[
+            if resource.id.hex in r.content[
                 'resources'
             ] and r.content.get('internal_notes', False):
                 yield r.address
@@ -553,7 +555,7 @@ def send_new_note_notification(
             '${org} New Note in Reservation for ${resource_title}',
             mapping={
                 'org': request.app.org.title,
-                'resource_title': handler.resource.title,
+                'resource_title': resource.title,
             },
         )
     )
@@ -566,7 +568,7 @@ def send_new_note_notification(
             'title': title,
             'form': form,
             'model': ticket,
-            'resource': handler.resource,
+            'resource': resource,
             'show_submission': True,
             'reservations': handler.reservations,
             'message': note,

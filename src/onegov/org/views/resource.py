@@ -1981,7 +1981,10 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
     if blocking_resources:
         resources = self.blocking_resources()
     else:
-        resources = {}
+        # even if we exclude blocking resources we want to include our
+        # virtual resource, since those reservations still apply to the
+        # same physical resource
+        resources = {self.virtual_id: self}
     resources[self.id] = self
 
     all_ical_fields = {
@@ -2018,10 +2021,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         .filter(Reservation.start >= start)
         .filter(Reservation.start <= end)
     )
-    if len(resources) > 1:
-        query = query.filter(Reservation.resource.in_(resources.keys()))
-    else:
-        query = query.filter(Reservation.resource == self.id)
+    query = query.filter(Reservation.resource.in_(resources.keys()))
     if all_ical_fields:
         query = query.outerjoin(
             FormSubmission,

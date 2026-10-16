@@ -469,10 +469,16 @@ class AllocationEventInfo:
         request: OrgRequest,
         resource: Resource,
         start: datetime,
-        end: datetime
+        end: datetime,
+        *,
+        virtual: bool = False
     ) -> list[Self]:
 
-        scheduler = resource.scheduler
+        if virtual:
+            scheduler = resource.virtual_scheduler
+        else:
+            scheduler = resource.scheduler
+
         allocations = scheduler.allocations_with_availability_by_range(
             start,
             end

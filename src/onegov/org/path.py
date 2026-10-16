@@ -635,7 +635,11 @@ def get_allocation(app: OrgApp, resource: UUID, id: int) -> Allocation | None:
     res = app.libres_resources.by_id(resource)
 
     if res is not None:
-        allocation = res.scheduler.allocations_by_ids((id, )).first()
+        if resource == res.virtual_id:
+            scheduler = res.virtual_scheduler
+        else:
+            scheduler = res.scheduler
+        allocation = scheduler.allocations_by_ids((id, )).first()
 
         # always get the master, even if another id is requested
         return allocation and allocation.get_master()  # type:ignore
@@ -653,7 +657,11 @@ def get_reservation(
     res = app.libres_resources.by_id(resource)
 
     if res is not None:
-        query = res.scheduler.managed_reservations()
+        if resource == res.virtual_id:
+            scheduler = res.virtual_scheduler
+        else:
+            scheduler = res.scheduler
+        query = scheduler.managed_reservations()
         query = query.filter(Reservation.id == id)
 
         return query.first()  # type:ignore[return-value]
@@ -674,7 +682,11 @@ def get_reservation_blocker(
     res = app.libres_resources.by_id(resource)
 
     if res is not None:
-        query = res.scheduler.managed_blockers()
+        if resource == res.virtual_id:
+            scheduler = res.virtual_scheduler
+        else:
+            scheduler = res.scheduler
+        query = scheduler.managed_blockers()
         query = query.filter(ReservationBlocker.id == id)
 
         return query.first()
