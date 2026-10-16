@@ -1,4 +1,5 @@
 from onegov.core.security import Public, Private
+from onegov.form import FormCollection
 from onegov.form.models.submission import SurveySubmission
 from onegov.org.models.ticket import (
     DirectoryEntryTicket,
@@ -67,9 +68,17 @@ def town_handle_pending_submission_modal(
     else:
         assert self.form is not None
         title = self.form.title
+    assert self.form is not None
     return handle_pending_submission(
         self, request, FormSubmissionLayout(self, request, title),
-        view_name='modal')
+        view_name='modal',
+        push_url=request.class_link(
+            FormCollection,
+            query_params={
+                'form': self.form.name,
+                'submission': request.path_qs
+            }
+        ))
 
 
 @TownBsApp.html(model=DirectoryEntryTicket, template='submission.pt',

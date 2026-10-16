@@ -23,7 +23,6 @@
                                     hx-get= "${edit_link}"
                                     hx-target="#form-modal-body"
                                     hx-select="#content > *"
-                                    hx-push-url="${edit_link}"
                                     i18n:translate="">
                                     Edit
                                 </a>

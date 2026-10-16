@@ -83,6 +83,7 @@ def handle_pending_submission(
     layout: FormSubmissionLayout | TicketLayout | None = None,
     ticket: Ticket | None = None,
     view_name: str | None = None,
+    push_url: str | None = None,
 ) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
@@ -225,7 +226,7 @@ def handle_pending_submission(
 
     @request.after
     def set_push_url(response: Response) -> None:
-        response.headers['HX-Push-Url'] = self_url
+        response.headers['HX-Push-Url'] = push_url or self_url
 
     return {
         'layout': layout or FormSubmissionLayout(self, request, title),
