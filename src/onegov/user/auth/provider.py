@@ -271,7 +271,7 @@ def ensure_user(
     role: str,
     force_role: bool = True,
     realname: str | None = None,
-    force_active: bool = False
+    force_active: bool = False,
 ) -> User | None:
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
@@ -300,18 +300,14 @@ def ensure_user(
         role=role,
         realname=realname,
         force_role=force_role,
-        force_active=force_active
+        force_active=force_active,
     )
     if result is not True:
         return result
 
     if not user:
         log.info(f'Adding user {username} from {source}:{source_id}')
-        user = users.add(
-            username=username,
-            password=random_token(),
-            role=role
-        )
+        user = users.add(username=username, password=random_token(), role=role)
     elif force_active and not user.active:
         user.active = True
 

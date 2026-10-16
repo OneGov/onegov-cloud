@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from onegov.core.orm.audit import AuditEntry, AuditOperation
 from onegov.page import Page, PageCollection
+from onegov.user import User
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 
 
@@ -15,6 +16,49 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .conftest import Client
+
+
+def test_audit_trail_records_new_user(client: Client) -> None:
+    client.login_admin()
+    client.app.enable_yubikey = False
+    new = client.get('/usermanagement').click('Benutzer', href='new')
+    new.form['username'] = 'audited-user@example.org'
+    new.form['role'] = 'admin'
+    new.form['send_activation_email'] = False
+    new.form.submit()
+
+    session = client.app.session()
+    user = (
+        session.query(User)
+        .filter_by(username='audited-user@example.org')
+        .one()
+    )
+    entry = (
+        session.query(AuditEntry)
+        .filter_by(
+            target_table='users',
+            target_id=str(user.id),
+            operation='insert',
+        )
+        .one()
+    )
+    assert entry.snapshot['role'] == 'admin'
+    assert entry.username == 'admin@example.org'
+    assert entry.user_id is not None
+
+    trail = client.get('/audit-trail')
+    assert (
+        'audited-user@example.org'
+        in trail.pyquery('.audit-trail-target-title').text()
+    )
+    detail = trail.click('Ansicht', index=0)
+    assert (
+        'audited-user@example.org'
+        in detail.pyquery('.audit-entry-heading').text()
+    )
+    snapshot = json.loads(detail.pyquery('#audit-snapshot').text())
+    assert snapshot['username'] == 'audited-user@example.org'
+    assert 'password_hash' not in snapshot
 
 
 @pytest.mark.parametrize('retention', [0, None, 182])
@@ -47,7 +91,13 @@ def test_delete_old_audit_entries(
         job.app = client.app
         client.get(get_cronjob_url(job))
 
-        entries = client.app.session().query(AuditEntry).all()
+        entries = (
+            client.app.session()
+            .query(AuditEntry)
+            .filter_by(target_table='pages')
+            .filter(AuditEntry.target_id.in_(['181', '182', '183']))
+            .all()
+        )
         assert len(entries) == (3 if retention else 9)
         if retention:
             assert {entry.target_id for entry in entries} == {'181'}

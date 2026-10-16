@@ -66,9 +66,7 @@
                             </td>
                             <td class="audit-trail-target-title">
                                 <strong>
-                                    ${entry.snapshot.get(
-                                        'title', entry.target_table
-                                    )}
+                                    ${entry_titles[entry.id]}
                                 </strong>
                                 <small class="audit-record-id">
                                     ${entry.target_table} #${entry.target_id}
