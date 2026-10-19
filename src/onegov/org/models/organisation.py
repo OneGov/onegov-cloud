@@ -336,6 +336,12 @@ class Organisation(Base, TimestampMixin):
     ris_main_url: dict_property[str | None] = meta_property(default=None)
     ris_interest_tie_categories: dict_property[list[str] | None] = (
         meta_property(default=None))
+    ris_parliamentarian_singular: dict_property[str | None] = meta_property(
+        default=None
+    )
+    ris_parliamentarian_plural: dict_property[str | None] = meta_property(
+        default=None
+    )
 
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()

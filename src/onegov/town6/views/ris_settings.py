@@ -34,7 +34,10 @@ def view_ris_settings(
     shortcuts = [
         {
             'name': 'parliamentarians',
-            'title': _('Parliamentarians'),
+            'title': (
+                request.app.org.ris_parliamentarian_plural
+                or _('Parliamentarians')
+            ),
             'link': request.class_link(RISParliamentarianCollection),
             'icon': 'fa-user-tie'
         },

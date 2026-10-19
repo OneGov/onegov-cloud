@@ -295,6 +295,16 @@ class ChatSettingsForm(Form):
 
 class RISSettingsForm(Form):
 
+    ris_parliamentarian_singular = StringField(
+        label=_('Singular name for parliamentarians'),
+        default='Parlamentsmitglied',
+    )
+
+    ris_parliamentarian_plural = StringField(
+        label=_('Plural name for parliamentarians'),
+        default='Parlamentsmitglieder',
+    )
+
     # the url breadcrumbs shall point to for non-logged-in users
     ris_main_url = StringField(
         label=_('URL path for the RIS main page'),
