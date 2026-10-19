@@ -32,9 +32,7 @@
                 <input class="input-group-field form-control" id="search" data-typeahead-subject type="search" name="q" value="${layout.model.q}" autocomplete="off" autocorrect="off" autofocus />
             </div>
 
-            <div class="typeahead">
-                <div data-typeahead-container></div>
-            </div>
+            <metal:b use-macro="layout.macros['typeahead_container']"/>
 
             </form>
 

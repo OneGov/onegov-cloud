@@ -1954,38 +1954,39 @@
             </div>
         </div>
 
-        <div class="homepage-searchbox-wrapper ${searchbox_position|''}"
-             tal:condition="not searchbox == 'false'|True">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 col-md-6 col-lg-5">
-                        <form class="searchbox" action="${layout.search_url}" method="GET"
-                              data-typeahead="on"
-                              data-typeahead-source="${layout.suggestions_url}"
-                              data-typeahead-target="${layout.search_url}">
-                            <div class="position-relative">
-                                <input class="form-control rounded-pill py-lg px-lg" type="search" id="search"
-                                       data-typeahead-subject name="q" autocomplete="off" autocorrect="off"
-                                       required maxlength="200" placeholder="What are you searching for?"
-                                       i18n:attributes="placeholder">
+        <metal:b use-macro="layout.macros['homepage_searchbox_wrapper']"/>
+    </div>
+</metal:autoplay_video>
 
-                                <button class="square-4xl btn btn-primary rounded-circle position-absolute top-50 end-0 translate-middle-y me-xs p-0 icon-circle"
-                                        type="submit">
-                                    <i class="fa fa-search"></i>
-                                </button>
+<metal:searchbox_wrapper define-macro="homepage_searchbox_wrapper">
+    <div class="homepage-searchbox-wrapper"
+        tal:condition="not searchbox == 'false'|True">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-7">
+                    <form class="searchbox" action="${layout.search_url}" method="GET"
+                            data-typeahead="on"
+                            data-typeahead-source="${layout.suggestions_url}"
+                            data-typeahead-target="${layout.search_url}">
+                        <div class="position-relative">
+                            <input class="form-control rounded-pill p-md ps-xl fs-md" type="search" id="search"
+                                    data-typeahead-subject name="q" autocomplete="off" autocorrect="off"
+                                    required maxlength="200" placeholder="What are you searching for?"
+                                    i18n:attributes="placeholder">
 
-                                <div class="typeahead position-absolute top-100 start-0 mt-2 z-3 bg-white rounded-3 shadow-sm overflow-hidden">
-                                    <div class="cell col-12" data-typeahead-container></div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                            <button class="square-4xl btn btn-primary position-absolute top-50 end-0 translate-middle-y me-xs icon-circle"
+                                    type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+
+                            <metal:b use-macro="layout.macros['typeahead_container']"/>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
     </div>
-</metal:autoplay_video>
+</metal:searchbox_wrapper>
 
 <metal:testimonial define-macro="testimonial" i18n:domain="onegov.town6">
     <div class="testimonial grid-x grid-padding-x" data-aos="fade" condition="description and image and quote">
@@ -2062,38 +2063,7 @@
             </button>
         </div>
 
-        <div class="homepage-searchbox-wrapper"
-             tal:condition="len(images) and not searchbox == 'false'|True">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 col-md-6 col-lg-5">
-                        <form class="searchbox" action="${layout.search_url}" method="GET"
-                            data-typeahead="on"
-                            data-typeahead-source="${layout.suggestions_url}"
-                            data-typeahead-target="${layout.search_url}">
-
-                            <div class="position-relative">
-
-                                <input class="form-control rounded-pill py-lg px-lg" type="search" id="search"
-                                    data-typeahead-subject name="q" autocomplete="off" autocorrect="off"
-                                    required maxlength="200" placeholder="What are you searching for?"
-                                    i18n:attributes="placeholder">
-
-                                <button class="square-4xl btn btn-primary rounded-circle position-absolute top-50 end-0 translate-middle-y me-xs p-0 d-flex align-items-center justify-content-center"
-                                        type="submit">
-                                    <i class="fa fa-search"></i>
-                                </button>
-
-                                <div class="typeahead position-absolute top-100 start-0 mt-2 z-3 bg-white rounded-3 shadow-sm overflow-hidden">
-                                    <div class="cell col-12" data-typeahead-container></div>
-                                </div>
-
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <metal:b use-macro="layout.macros['homepage_searchbox_wrapper']"/>
 
     </div>
 
@@ -3981,6 +3951,12 @@
         </div>
     </form>
 </metal:inline_search>
+
+<metal:typeahead define-macro="typeahead_container">
+    <div class="typeahead position-absolute top-100 start-0 mt-2 z-3 bg-white rounded-2 shadow-sm overflow-hidden">
+        <div data-typeahead-container></div>
+    </div>
+</metal:typeahead>
 
 <metal:offcanvas_filters define-macro="offcanvas_filters">
     <div class="d-flex align-items-end flex-column mb-lg">

@@ -1,3 +1,7 @@
+input::placeholder {
+  color: $light !important;
+}
+
 #content {
 
     .page-image {
@@ -64,7 +68,6 @@
 
 .typeahead {
     width: 100%;
-    max-width: 400px;
 }
 
 .alert p:last-child {

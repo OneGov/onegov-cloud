@@ -57,10 +57,7 @@
                                 <i class="fa fa-search"></i>
                             </button>
                         </div>
-                        <div class="typeahead">
-                            <div class="cell small-12" data-typeahead-container>
-                            </div>
-                        </div>
+                        <metal:b use-macro="layout.macros['typeahead_container']"/>
                     </form>
                 </div>
             </div>

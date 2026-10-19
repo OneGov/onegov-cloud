@@ -45,16 +45,20 @@ var TypeaheadList = React.createClass({
         var target = this.props.target;
 
         return (
-            <ul>
-                {results.map(function(result) {
-                    return (
-                        <li key={result} className={active === result ? 'active' : ''}>
-                            <a href={getSearchUrl(target, result)}>{result}</a>
-                        </li>
-                    );
-                })}
-                <li className="dots"><button type="submit">…</button></li>
-            </ul>
+            <div>
+                <ul className="styled-list p-lg mt-0">
+                    {results.map(function(result) {
+                        return (
+                            <li key={result} className={active === result ? 'active' : ''}>
+                                <a className="styled-list-link py-md" href={getSearchUrl(target, result)}>
+                                    <span className="styled-list-title fs-sm">{result}</span>
+                                </a>
+                            </li>
+                        );
+                    })}
+                </ul>
+                <button className="btn btn-primary m-lg mt-0" type="submit">All results</button>
+            </div>
         );
     },
     enter: function() {

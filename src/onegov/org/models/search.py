@@ -411,7 +411,7 @@ class Search(Pagination[Any]):
         if not self.query:
             return ()
 
-        number_of_suggestions = 15
+        number_of_suggestions = 7
 
         if self.query.startswith('#'):  # hashtag search
             q = self.query.lstrip('#').lower()
