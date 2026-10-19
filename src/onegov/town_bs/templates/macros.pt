@@ -3,7 +3,7 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      i18n:domain="onegov.town6">
+      i18n:domain="onegov.town_bs">
 <body>
 
 <metal:favicon define-macro="favicon">
@@ -30,7 +30,7 @@
     <!--! To be override by other applications -->
 </metal:b>
 
-<metal:b define-macro="consume_messages" i18n:domain="onegov.town6">
+<metal:b define-macro="consume_messages" i18n:domain="onegov.town_bs">
     <div tal:repeat="message request.consume_messages()"  class="alert alert-${message.bs_type} alert-dismissible fade show mt-md" role="alert">
         ${message.text}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -254,7 +254,7 @@
     </tal:b>
 </metal:footer_custom_links>
 
-<metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
+<metal:footer_links define-macro="footer_links" i18n:domain="onegov.town_bs">
 <div class="d-flex justify-content-center footer-links pb-md">
     <div class="footer-links">
         <tal:b condition="not request.app.org.hide_onegov_footer|True">
@@ -292,7 +292,7 @@
 </div>
 </metal:footer_links>
 
-<metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town6">
+<metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town_bs">
     <h5 class="text-primary fs-xs fw-bold" i18n:translate tal:condition="contact or contact_url">Contact</h5>
     <div tal:content="layout.org.contact_html" />
     <a class="footer-link" tal:condition="contact_url" tal:attributes="href contact_url">
@@ -303,7 +303,7 @@
     </a>
 </metal:footer_contact>
 
-<metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town6">
+<metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town_bs">
     <h5 class="text-primary fs-xs fw-bold" i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h5>
     <div tal:content="opening_hours" />
     <a class="footer-link" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">
@@ -381,7 +381,7 @@
     </div>
 </metal:partners>
 
-<metal:partners define-macro="partner-cards" i18n:domain="onegov.town6" tal:define="subpage subpage|False">
+<metal:partners define-macro="partner-cards" i18n:domain="onegov.town_bs" tal:define="subpage subpage|False">
     <div class="partners row row-cols-4 row-cols-lg-6 g-3 justify-content-center">
         <div class="col" tal:repeat="item partners">
             <metal:b use-macro="layout.macros['partner-card']" />
@@ -591,7 +591,7 @@
     </tal:b>
 </metal:single_field>
 
-<metal:upload define-macro="upload" i18n:domain="onegov.town6">
+<metal:upload define-macro="upload" i18n:domain="onegov.town_bs">
     <form action="${upload_url}" class="upload" method="POST" enctype="multipart/form-data">
         <div class="upload-dropzone dropzone">
             <input type="file" id="fileElem" class="hidden" multiple>
@@ -611,7 +611,7 @@
     </form>
 </metal:upload>
 
-<metal:newslist define-macro="news-item-card-full-width" i18n:domain="onegov.town6">
+<metal:newslist define-macro="news-item-card-full-width" i18n:domain="onegov.town_bs">
     <div class="card h-100 news-card" tal:define="url request.link(item)">
         <div class="card-body p-0 row">
             <div class="col-12 col-lg-4 d-lg-flex flex-column">
@@ -632,7 +632,7 @@
     </div>
 </metal:newslist>
 
-<metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
+<metal:newslist define-macro="news-item-card" i18n:domain="onegov.town_bs">
     <div class="news-card card h-100" tal:define="url request.link(item)">
         <div class="card-body d-flex flex-column p-0">
             <metal:b use-macro="layout.macros['news-card-date']" />
@@ -649,14 +649,14 @@
     </div>
 </metal:newslist>
 
-<metal:newslist define-macro="news-card-date" i18n:domain="onegov.town6">
+<metal:newslist define-macro="news-card-date" i18n:domain="onegov.town_bs">
     <p tal:condition="not:hide_date|False" class="subheader m-2xl">
         <b>${layout.format_date(item.published_or_created, 'day_short')}</b>
         ${layout.format_date(item.published_or_created, 'month_short')}
     </p>
 </metal:newslist>
 
-<metal:newslist define-macro="news-card-image" i18n:domain="onegov.town6">
+<metal:newslist define-macro="news-card-image" i18n:domain="onegov.town_bs">
     <a class="text-decoration-none position-relative d-block" href="${url}"
         tal:define="show_image item.page_image and item.show_preview_image">
         <div tal:condition="show_image" class="ratio ratio-16x9">
@@ -675,7 +675,7 @@
 </metal:newslist>
 
 
-<metal:newslist define-macro="news-item-full" i18n:domain="onegov.town6">
+<metal:newslist define-macro="news-item-full" i18n:domain="onegov.town_bs">
     <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
         <hr>
         <a class="text-decoration-none" href="${url}">
@@ -690,7 +690,7 @@
 </metal:newslist>
 
 
-<metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
+<metal:newslist define-macro="newslist" i18n:domain="onegov.town_bs">
 
     <div tal:condition="newsletter.show_only_previews|True and news" class="newslist row g-md" >
         <tal:b tal:condition="first_wide|False" tal:define="rest news[1:]">
@@ -716,7 +716,7 @@
 
 </metal:newslist>
 
-<metal:newsletter define-macro="newsletter_signup" i18n:domain="onegov.town6">
+<metal:newsletter define-macro="newsletter_signup" i18n:domain="onegov.town_bs">
 
     <metal:b define-slot="pre_form"></metal:b>
 
@@ -751,7 +751,7 @@
 
 </metal:newsletter>
 
-<metal:access_hint define-macro="access_hint" i18n:domain="onegov.town6">
+<metal:access_hint define-macro="access_hint" i18n:domain="onegov.town_bs">
     <tal:b tal:switch="item.access|False">
         <tal:b case="'private'">
             <i title="This site is private" i18n:attributes="title" class="private-hint fas fa-lock"></i>
@@ -771,13 +771,13 @@
     </tal:b>
 </metal:access_hint>
 
-<metal:publication_hint define-macro="publication_hint" i18n:domain="onegov.town6">
+<metal:publication_hint define-macro="publication_hint" i18n:domain="onegov.town_bs">
     <tal:b condition="not: item.published">
         <i title="This site is not published." i18n:attributes="title" class="unpublished-hint"></i>
     </tal:b>
 </metal:publication_hint>
 
-<metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
+<metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town_bs">
     <tal:b tal:switch="item.access|False">
         <tal:b tal:case="'private'">
             <div class="alert alert-warning">
@@ -792,7 +792,7 @@
     </tal:b>
 </metal:access_hint_long>
 
-<metal:publication_hint_long define-macro="publication_hint_long" i18n:domain="onegov.town6">
+<metal:publication_hint_long define-macro="publication_hint_long" i18n:domain="onegov.town_bs">
     <tal:b condition="not: item.published">
         <div class="alert alert-warning">
             <p i18n:translate>This site is not published.</p>
@@ -800,7 +800,7 @@
     </tal:b>
 </metal:publication_hint_long>
 
-<metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.town6">
+<metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.town_bs">
     <tal:b condition="not item.lead and request.is_manager|nothing">
         <div class="alert alert-warning">
             <p i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
@@ -808,7 +808,7 @@
     </tal:b>
 </metal:empty_lead_hint>
 
-<metal:page_content define-macro="side_panel_card" i18n:domain="onegov.town6">
+<metal:page_content define-macro="side_panel_card" i18n:domain="onegov.town_bs">
     <div class="card me-md-2xl side_panel_card mb-md border-1 side-panel ${extra_class|''}"
             tal:attributes="data-toc-level data_toc_level|nothing">
         <div class="card-body">
@@ -818,7 +818,7 @@
     </div>
 </metal:page_content>
 
-<metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
+<metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town_bs">
     <div class="page-sidebar-content col-12 col-md-4 col-lg-3 sidebar ${'filter-panel' if filter_panel else ''}"
             tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <tal:b metal:define-slot="before-panels"></tal:b>
@@ -970,7 +970,7 @@
     </div>
 </metal:page_content>
 
-<metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
+<metal:page_content define-macro="page_content" i18n:domain="onegov.town_bs">
     <div class="row"
     tal:define="
             requested_side_panel show_side_panel|False;
@@ -1060,7 +1060,7 @@
     </div>
 </metal:page_content>
 
-<metal:display_form define-macro="display_form" i18n:domain="onegov.town6">
+<metal:display_form define-macro="display_form" i18n:domain="onegov.town_bs">
 
     <div class="mb-xl" tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:b define="fields fieldset.non_empty_fields" condition="fields">
@@ -1080,7 +1080,7 @@
 </metal:display_form>
 
 
-<metal:display_chat define-macro="display_chat" i18n:domain="onegov.town6">
+<metal:display_chat define-macro="display_chat" i18n:domain="onegov.town_bs">
     <div class="chat ticket-chat">
         <h3  i18n:translate>Chat History</h3>
         <div id="message-area">
@@ -1097,7 +1097,7 @@
     </div>
 </metal:display_chat>
 
-<metal:display_field define-macro="display_fields" i18n:domain="onegov.town6">
+<metal:display_field define-macro="display_fields" i18n:domain="onegov.town_bs">
     <?python
         if fields:
             rendered_fields = ((f, form.render_display(f)) for f in fields)
@@ -1167,7 +1167,7 @@
     </dl>
 </metal:display_field>
 
-<metal:directory_entry_submission define-macro="directory_entry_submission" i18n:domain="onegov.town6">
+<metal:directory_entry_submission define-macro="directory_entry_submission" i18n:domain="onegov.town_bs">
     <h2 tal:condition="handler.kind == 'change-request'" i18n:translate>
         Change request
     </h2>
@@ -1206,7 +1206,7 @@
     </tal:b>
 </metal:price>
 
-<metal:payment define-macro="payment" i18n:domain="onegov.town6">
+<metal:payment define-macro="payment" i18n:domain="onegov.town_bs">
     <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
         <h2 i18n:translate>Payment</h2>
         <dl class="field-display">
@@ -1253,7 +1253,7 @@
     </a>
 </metal:person_card>
 
-<metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
+<metal:person_card define-macro="person_list_card" i18n:domain="onegov.town_bs">
     <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request); url (person.picture_url and layout.thumbnail_url(person.picture_url))">
         <div class="card-body" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
             <div class="row mb-lg">
@@ -1325,7 +1325,7 @@
     </div>
 </metal:person_card>
 
-<metal:person_card define-macro="person_card" i18n:domain="onegov.town6">
+<metal:person_card define-macro="person_card" i18n:domain="onegov.town_bs">
     <div class="person-card person-single-item" tal:define="exclude request.app.org.excluded_person_fields(request)">
         <div class="grid-x" tal:define="url person.picture_url">
             <div class="cell small-12 medium-5 large-4" tal:condition="url" >
@@ -1399,7 +1399,7 @@
     </div>
 </metal:person_card>
 
-<metal:sidebar define-macro="sidebar" i18n:domain="onegov.town6">
+<metal:sidebar define-macro="sidebar" i18n:domain="onegov.town_bs">
     <nav role="navigation">
         <ul class="side-nav" data-sortable data-sortable-url="${layout.sortable_url_template}">
             <tal:b repeat="link layout.sidebar_links">
@@ -1423,7 +1423,7 @@
     </nav>
 </metal:sidebar>
 
-<metal:ticket_status define-macro="ticket_status" i18n:domain="onegov.town6"
+<metal:ticket_status define-macro="ticket_status" i18n:domain="onegov.town_bs"
     tal:define="
     classes classes|None;
     open_classes open_classes|None;
@@ -1445,7 +1445,7 @@
     </div>
 </metal:ticket_status>
 
-<metal:payment_status define-macro="payment_status" i18n:domain="onegov.town6">
+<metal:payment_status define-macro="payment_status" i18n:domain="onegov.town_bs">
     <div i18n:translate tal:condition="payment.state == 'open'" class="payment-state payment-state-open">
         Open
     </div>
@@ -1463,7 +1463,7 @@
     </div>
 </metal:payment_status>
 
-<metal:payment_source define-macro="payment_source" i18n:domain="onegov.town6">
+<metal:payment_source define-macro="payment_source" i18n:domain="onegov.town_bs">
     <div i18n:translate tal:condition="payment.source == 'manual'">
         Manual
     </div>
@@ -1484,14 +1484,14 @@
     </div>
 </metal:payment_source>
 
-<metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.town6">
+<metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.town_bs">
     <div tal:condition="ticket">
         <h3 i18n:translate>Ticket</h3>
             <div class="ticket-number side-panel-with-bg"><a href="${request.link(ticket)}">${ticket.number}</a></div>
     </div>
 </metal:ticket_callout>
 
-<metal:pagination define-macro="pagination" i18n:domain="onegov.town6">
+<metal:pagination define-macro="pagination" i18n:domain="onegov.town_bs">
     <nav aria-label="Pagination" i18n:attributes="aria-label"
         tal:define="centered pagination_centered|False; name collection.name_of_view"
         tal:condition="collection.pages_count > 1">
@@ -1534,7 +1534,7 @@
 
 </metal:pagination>
 
-<metal:reservations define-macro="reservation_infos" i18n:domain="onegov.town6">
+<metal:reservations define-macro="reservation_infos" i18n:domain="onegov.town_bs">
     <div tal:condition="reservation_infos" tal:define="failed failed_reservations|set()" class="reservation-selection large">
         <div class="reservation-selection-inner" tal:define="blocked blocked|set()">
             <ul>
@@ -1567,7 +1567,7 @@
     </div>
 </metal:reservations>
 
-<metal:reservations define-macro="reservations" i18n:domain="onegov.town6">
+<metal:reservations define-macro="reservations" i18n:domain="onegov.town_bs">
     <ul tal:condition="reservations" tal:define="get_links get_links|None; get_occupancy_url get_occupancy_url|None" class="reservations list-group list-group-flush">
         <li tal:repeat="reservation reservations" class="list-group-item ${'reservation' if get_links else ''}">
             <tal:b define="start reservation.display_start(); end reservation.display_end(); links get_links(reservation, request) if get_links else []; url get_occupancy_url(reservation, request) if get_occupancy_url else None">
@@ -1595,7 +1595,7 @@
     </ul>
 </metal:reservations>
 
-<metal:display_event define-macro="display_event" i18n:domain="onegov.town6">
+<metal:display_event define-macro="display_event" i18n:domain="onegov.town_bs">
     <dl>
         <tal:b condition="request.is_manager">
             <dt i18n:translate>State</dt>
@@ -1708,7 +1708,7 @@
     </dl>
 </metal:display_event>
 
-<metal:atoz define-macro="atoz" i18n:domain="onegov.town6">
+<metal:atoz define-macro="atoz" i18n:domain="onegov.town_bs">
     <div class="atoz-block row mb-3xl" tal:repeat="item items">
         <div class="col-12 col-sm-6 col-md-3">
             <h2 class="fs-2xl text-primary sticky-top">${item[0]}</h2>
@@ -1728,13 +1728,13 @@
     </div>
 </metal:atoz>
 
-<metal:calendar_day define-macro="calendar-day" i18n:domain="onegov.town6">
+<metal:calendar_day define-macro="calendar-day" i18n:domain="onegov.town_bs">
     <h2 class="calendar-day">
         <metal:b use-macro="layout.macros['calendar-day-content']" />
     </h2>
 </metal:calendar_day>
 
-<metal:calendar_day_content define-macro="calendar-day-content" i18n:domain="onegov.town6">
+<metal:calendar_day_content define-macro="calendar-day-content" i18n:domain="onegov.town_bs">
     <a href="${link|nothing}" tal:condition="image|nothing"
         class="calendar-day-thumbnail"
         style="background-image: url(${request.link(image, name='thumbnail')});">
@@ -1756,7 +1756,7 @@
     </div>
 </metal:calendar_day_content>
 
-<metal:occurrences define-macro="occurrences" i18n:domain="onegov.town6">
+<metal:occurrences define-macro="occurrences" i18n:domain="onegov.town_bs">
         <div class="row g-md events" >
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
@@ -1768,7 +1768,7 @@
     </tal:b>
 </metal:occurrences>
 
-<metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
+<metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town_bs">
     <div class="occurrence col-12 col-xl-6" tal:define="use_links use_links|True">
         <div class="card bg-light-subtle border-0 h-100">
             <a class="d-flex flex-column justify-content-center flex-grow-1 text-decoration-none"
@@ -1797,7 +1797,7 @@
     </div>
 </metal:occurrence_list_view>
 
-<metal:date_range_selector define-macro="date-range-selector" i18n:domain="onegov.town6">
+<metal:date_range_selector define-macro="date-range-selector" i18n:domain="onegov.town_bs">
     <div class="date-range-selector">
         <form action="" method="GET">
             <div metal:define-slot="before-date-range"></div>
@@ -1829,7 +1829,7 @@
     </div>
 </metal:date_range_selector>
 
-<metal:role_singular define-macro="role-singular" i18n:domain="onegov.town6">
+<metal:role_singular define-macro="role-singular" i18n:domain="onegov.town_bs">
     <tal:b switch="role">
         <tal:b case="'admin'" i18n:translate>Administrator</tal:b>
         <tal:b case="'editor'" i18n:translate>Editor</tal:b>
@@ -1838,7 +1838,7 @@
     </tal:b>
 </metal:role_singular>
 
-<metal:role_plural define-macro="role-plural" i18n:domain="onegov.town6">
+<metal:role_plural define-macro="role-plural" i18n:domain="onegov.town_bs">
     <tal:b switch="role">
         <tal:b case="'admin'" i18n:translate>Administrators</tal:b>
         <tal:b case="'editor'" i18n:translate>Editors</tal:b>
@@ -1847,7 +1847,7 @@
     </tal:b>
 </metal:role_plural>
 
-<metal:user_source define-macro="user-source" i18n:domain="onegov.town6">
+<metal:user_source define-macro="user-source" i18n:domain="onegov.town_bs">
     <tal:b switch="source">
         <tal:b case="'msal'">AzureAD</tal:b>
         <tal:b case="'ldap'">LDAP</tal:b>
@@ -1856,7 +1856,7 @@
     </tal:b>
 </metal:user_source>
 
-<metal:identicon define-macro="identicon" i18n:domain="onegov.town6">
+<metal:identicon define-macro="identicon" i18n:domain="onegov.town_bs">
     <tal:b define="identicon_size size|'small'">
         <span class="user-initials-${identicon_size}" style="background-color: ${layout.get_extension_color(username)}" title="${username}">
             ${initials}
@@ -1864,7 +1864,7 @@
     </tal:b>
 </metal:identicon>
 
-<metal:photoswipe define-macro="photoswipe" i18n:domain="onegov.town6">
+<metal:photoswipe define-macro="photoswipe" i18n:domain="onegov.town_bs">
     <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="pswp__bg"></div>
         <div class="pswp__scroll-wrap">
@@ -1914,7 +1914,7 @@
     </div>
 </metal:photoswipe>
 
-<metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6"
+<metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town_bs"
                       tal:define="searchbox searchbox|'true';">
     <div class="homepage-video-container">
 
@@ -1989,7 +1989,7 @@
     </div>
 </metal:searchbox_wrapper>
 
-<metal:testimonial define-macro="testimonial" i18n:domain="onegov.town6">
+<metal:testimonial define-macro="testimonial" i18n:domain="onegov.town_bs">
     <div class="testimonial grid-x grid-padding-x" data-aos="fade" condition="description and image and quote">
         <div class="small-4 medium-2 cell">
             <div class="square-container">
@@ -2011,7 +2011,7 @@
     </div>
 </metal:testimonial>
 
-<metal:icon_links define-macro="icon_link" i18n:domain="onegov.town6">
+<metal:icon_links define-macro="icon_link" i18n:domain="onegov.town_bs">
         <div tal:condition="title and icon" class="icon-link card border-hover h-100 w-100 inverted-${str(invert).lower()}" data-aos="fade">
             <a class="card-body d-flex flex-column text-decoration-none" href="${link}">
                 <i class="square-3xl icon-circle fa ${icon} icon"></i>
@@ -2025,7 +2025,7 @@
         </div>
 </metal:icon_links>
 
-<metal:slider define-macro="slider" i18n:domain="onegov.town6" tal:define="searchbox searchbox|'true';">
+<metal:slider define-macro="slider" i18n:domain="onegov.town_bs" tal:define="searchbox searchbox|'true';">
 
     <div class="homepage-image-slider">
 
@@ -2079,7 +2079,7 @@
 
 </metal:slider>
 
-<metal:testimonial_slider define-macro="testimonial_slider" i18n:domain="onegov.town6">
+<metal:testimonial_slider define-macro="testimonial_slider" i18n:domain="onegov.town_bs">
 <tal:b tal:condition="description_1 and image_1 and quote_1">
     <div class="orbit slider testimonial-slider" role="region" aria-label="Homepage Testimonal Slider" data-orbit data-timer-delay="7200">
         <div class="orbit-wrapper">
@@ -2139,7 +2139,7 @@
 </tal:b>
 </metal:testimonial_slider>
 
-<metal:bullets define-macro="orbit-bullets" i18n:domain="onegov.town6">
+<metal:bullets define-macro="orbit-bullets" i18n:domain="onegov.town_bs">
     <div class="orbit-bullet-wrapper show-for-medium">
         <nav class="orbit-bullets">
             <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
@@ -2150,7 +2150,7 @@
     </div>
 </metal:bullets>
 
-<metal:search_results define-macro="search_results" i18n:domain="onegov.town6">
+<metal:search_results define-macro="search_results" i18n:domain="onegov.town_bs">
     <ul class="list-group list-group-flush search-results">
         <tal:b repeat="result model.load_batch_results">
             <li class="search-result-${result.__tablename__} list-group-item" tal:condition="result">
@@ -2163,7 +2163,7 @@
     </ul>
 </metal:search_results>
 
-<metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town6">
+<metal:search_breadcrumbs define-macro="search_breadcrumbs" i18n:domain="onegov.town_bs">
     <div tal:condition="result_layout and len(result_layout.breadcrumbs) > 1" tal:define="links result_layout.breadcrumbs">
         <ul class="search-breadcrumbs breadcrumb fs-2xs mb-0 mt-sm">
             <tal:b repeat="link links">
@@ -2184,7 +2184,7 @@
     <metal:b use-macro="layout.macros['search_breadcrumbs']" />
 </metal:search_result_template>
 
-<metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
+<metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']"
              tal:define="link request.return_here(request.link(result)); result_layout request.get_layout(result)">
         <tal:b metal:fill-slot="list-title">
@@ -2196,7 +2196,7 @@
     </metal:b>
 </metal:search_result_users>
 
-<metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.town6">
+<metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']"
              tal:define="link request.return_here(request.link(result)); result_layout request.get_layout(result)">
         <tal:b metal:fill-slot="list-title">
@@ -2219,7 +2219,7 @@
     </metal:b>
 </metal:search_result_files>
 
-<metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town6">
+<metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
         <tal:b metal:fill-slot="list-title">
             ${result.number}
@@ -2233,7 +2233,7 @@
     </metal:b>
 </metal:search_result_tickets>
 
-<metal:search_result_events define-macro="search_result_events" i18n:domain="onegov.town6">
+<metal:search_result_events define-macro="search_result_events" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result, 'latest'); result_layout request.get_layout(result.latest_occurrence)">
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
@@ -2281,7 +2281,7 @@
 </metal:search_result_events>
 
 
-<metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.town6">
+<metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
@@ -2296,7 +2296,7 @@
 </metal:search_result_people>
 
 
-<metal:search_result_par_parliamentarians define-macro="search_result_par_parliamentarians" i18n:domain="onegov.town6">
+<metal:search_result_par_parliamentarians define-macro="search_result_par_parliamentarians" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
@@ -2322,7 +2322,7 @@
 </metal:search_result_par_parliamentarians>
 
 
-<metal:search_result_par_political_businesses define-macro="search_result_par_political_businesses" i18n:domain="onegov.town6">
+<metal:search_result_par_political_businesses define-macro="search_result_par_political_businesses" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
@@ -2345,7 +2345,7 @@
 </metal:search_result_par_political_businesses>
 
 
-<metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
+<metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']" tal:define="link result.url; result_layout request.get_layout(result)">
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
@@ -2360,7 +2360,7 @@
 </metal:search_result_external_links>
 
 
-<metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.town6">
+<metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['search_result_template']" tal:define="link request.link(result); result_layout request.get_layout(result)">
         <tal:b metal:fill-slot="list-title">
             ${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" />
@@ -2372,7 +2372,7 @@
 </metal:search_result_default>
 
 
-<metal:ticket_status_page_message define-macro="ticket_status_page_message" i18n:domain="onegov.town6" tal:define="mute_all request.app.org.mute_all_tickets; skip request.app.org.tickets_skip_opening_email or []">
+<metal:ticket_status_page_message define-macro="ticket_status_page_message" i18n:domain="onegov.town_bs" tal:define="mute_all request.app.org.mute_all_tickets; skip request.app.org.tickets_skip_opening_email or []">
     <tal:b tal:condition="ticket.state == 'open'">
         <p class="fs-md" >
             <tal:b tal:switch="not mute_all and ticket.handler_code in skip">
@@ -2396,7 +2396,7 @@
 </metal:ticket_status_page_message>
 
 
-<metal:checkout_form define-macro="checkout_form" i18n:domain="onegov.town6">
+<metal:checkout_form define-macro="checkout_form" i18n:domain="onegov.town_bs">
     <form action="${complete_link}" method="POST" class="checkout">
         <dl class="field-display" tal:condition="show_privacy_settings|nothing">
             <dt i18n:translate>Privacy</dt>
@@ -2479,7 +2479,7 @@
     </ul>
 </metal:filters>
 
-<metal:generic_message define-macro="generic_message" i18n:domain="onegov.town6">
+<metal:generic_message define-macro="generic_message" i18n:domain="onegov.town_bs">
     <div class="title">
         <metal:b define-slot="title" />
     </div>
@@ -2514,7 +2514,7 @@
     </div>
 </metal:generic_message>
 
-<metal:payments define-macro="payments" i18n:domain="onegov.town6">
+<metal:payments define-macro="payments" i18n:domain="onegov.town_bs">
     <table class="payments-table" tal:condition="payments">
         <thead>
             <tr>
@@ -2603,7 +2603,7 @@
     </table>
 </metal:payments>
 
-<metal:invoices define-macro="invoices" i18n:domain="onegov.town6">
+<metal:invoices define-macro="invoices" i18n:domain="onegov.town_bs">
     <table class="invoices-table" tal:condition="invoices">
         <thead>
             <tr>
@@ -2689,7 +2689,7 @@
     </table>
 </metal:invoices>
 
-<metal:directory_error define-macro="directory_error" i18n:domain="onegov.town6">
+<metal:directory_error define-macro="directory_error" i18n:domain="onegov.town_bs">
     <ul class="dense">
         <li tal:repeat="(field_id, messages) error.errors.items()">
             <div tal:condition="error.link|nothing">
@@ -2705,7 +2705,7 @@
     </ul>
 </metal:directory_error>
 
-<metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.town6">
+<metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.town_bs">
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
         <a id="${group}"></a>
         <div class="group-title align-justify">
@@ -2722,7 +2722,7 @@
     </tal:b>
 </metal:group_by_column>
 
-<metal:group_record define-macro="group_record" i18n:domain="onegov.town6">
+<metal:group_record define-macro="group_record" i18n:domain="onegov.town_bs">
     <li tal:define="link edit_link(record)|nothing">
         <a class="list-link" tal:attributes="href link_func(record); target link">
                 <p class="h5 list-title">${record.title}</p>
@@ -2736,7 +2736,7 @@
     </li>
 </metal:group_record>
 
-<metal:group_by_column_forms define-macro="accordion_grouped_by_column" i18n:domain="onegov.town6">
+<metal:group_by_column_forms define-macro="accordion_grouped_by_column" i18n:domain="onegov.town_bs">
     <tal:b tal:condition="len(grouped) == 1" tal:repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
         <ul class="forms-list styled-list">
             <tal:b tal:repeat="record grouped[group]">
@@ -2776,7 +2776,7 @@
     </div>
 </metal:group_by_column_forms>
 
-<metal:group_record_form_link define-macro="group_record_form_link" i18n:domain="onegov.town6">
+<metal:group_record_form_link define-macro="group_record_form_link" i18n:domain="onegov.town_bs">
     <li tal:define="link edit_link(record)|nothing;
                      modal_href request.link(record, 'modal')|nothing;
                          form_href form_url(record);
@@ -2803,7 +2803,7 @@
     </li>
 </metal:group_record_form_link>
 
-<metal:group_record_form_link define-macro="form-modal" i18n:domain="onegov.town6">
+<metal:group_record_form_link define-macro="form-modal" i18n:domain="onegov.town_bs">
     <div class="row g-0 h-100 bg-primary">
 
         <!-- Sidebar: Steps -->
@@ -2855,7 +2855,7 @@
     </div>
 </metal:group_record_form_link>
 
-<metal:group_record_form_link define-macro="form-modal-definition" i18n:domain="onegov.town6">
+<metal:group_record_form_link define-macro="form-modal-definition" i18n:domain="onegov.town_bs">
     <tal:b metal:use-macro="layout.macros['form-modal']">
         <tal:b metal:fill-slot="modal-page-main-content">
             <div tal:define="form_id 'main-form'">
@@ -2917,7 +2917,7 @@
             </a>
             </div>
             <tal:b condition="not: button_text|nothing">
-            <input type="submit" value="weiter" class="btn btn-dark rounded-pill px-4" i18n:attributes="value">
+            <input type="submit" value="Continue" class="btn btn-dark rounded-pill px-4" i18n:attributes="value">
             </tal:b>
             <tal:b condition="button_text|nothing">
             <input type="submit" value="${button_text}" class="btn btn-dark rounded-pill px-4" role="button">
@@ -2927,7 +2927,7 @@
 
 </metal:form>
 
-<metal:progress_indicator define-macro="progress_indicator" i18n:domain="onegov.town6">
+<metal:progress_indicator define-macro="progress_indicator" i18n:domain="onegov.town_bs">
 <tal:b tal:define="steps layout.get_step_sequence()|nothing; bg_primary bg_primary|False">
     <div tal:condition="steps"
          class="steps ${'steps-primary' if bg_primary else 'steps-white'}">
@@ -2953,7 +2953,7 @@
 </tal:b>
 </metal:progress_indicator>
 
-<metal:resource_groups define-macro="resource_groups" i18n:domain="onegov.town6">
+<metal:resource_groups define-macro="resource_groups" i18n:domain="onegov.town_bs">
     <tal:b repeat="group resources" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
         <a class="category-anchor" id="${group.title}"></a>
         <div class="group-title align-justify">
@@ -2974,7 +2974,7 @@
     </tal:b>
 </metal:resource_groups>
 
-<metal:resource_subgroup define-macro="resource_subgroup" i18n:domain="onegov.town6">
+<metal:resource_subgroup define-macro="resource_subgroup" i18n:domain="onegov.town_bs">
     <tal:b tal:define="pageref_id f'{group.title}-{subgroup.title}'">
         <a class="category-anchor" id="${pageref_id}"></a>
         <div class="subgroup-title align-justify">
@@ -2992,7 +2992,7 @@
     </tal:b>
 </metal:resource_subgroup>
 
-<metal:file_details define-macro="file-details" i18n:domain="onegov.town6">
+<metal:file_details define-macro="file-details" i18n:domain="onegov.town_bs">
     <div class="file-details">
         <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
             <img class="pdf-preview" src="${request.link(file, name='medium')}">
@@ -3221,7 +3221,7 @@
     </div>
 </metal:file_details>
 
-<metal:file_links define-macro="file-links" i18n:domain="onegov.town6">
+<metal:file_links define-macro="file-links" i18n:domain="onegov.town_bs">
     <ul class="more-list">
         <tal:b repeat="result file.links">
             <li class="search-result-${result.__tablename__}" tal:condition="result">
@@ -3234,12 +3234,12 @@
     </ul>
 </metal:file_links>
 
-<metal:sign_result define-macro="sign_result" i18n:domain="onegov.town6">
+<metal:sign_result define-macro="sign_result" i18n:domain="onegov.town_bs">
     <metal:b use-macro="layout.macros['consume_messages']" />
     <metal:b use-macro="layout.macros['signature_status']" />
 </metal:sign_result>
 
-<metal:signature_status define-macro="signature_status" i18n:domain="onegov.town6">
+<metal:signature_status define-macro="signature_status" i18n:domain="onegov.town_bs">
     <tal:b condition="file.reference.content_type == 'application/pdf'" define="may_sign request.app.enable_yubikey and request.is_admin">
         <div tal:condition="file.signed" class="is-signed signature-status">
             <i class="fa fa-fw fa-lock" aria-hidden="true"></i>
@@ -3293,7 +3293,7 @@
     </tal:b>
 </metal:signature_status>
 
-<metal:file_info define-macro="file-info" i18n:domain="onegov.town6">
+<metal:file_info define-macro="file-info" i18n:domain="onegov.town_bs">
     <tal:b define="
         file_upload file.upload_date|file.created;
         file_publish_end file.publish_end_date|None;
@@ -3331,7 +3331,7 @@
     </tal:b>
 </metal:file_info>
 
-<metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.town6">
+<metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.town_bs">
     <div id="image-${index}" class="image-container">
         <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
             <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />
@@ -3348,7 +3348,7 @@
     </div>
 </metal:uploaded_image>
 
-<metal:digest_result define-macro="digest_result" i18n:domain="onegov.town6">
+<metal:digest_result define-macro="digest_result" i18n:domain="onegov.town_bs">
     <div class="digest-result digest-${is_known and 'is-known' or 'is-not-known'}" tal:switch="is_known">
         <tal:b case="True">
             <div>
@@ -3372,7 +3372,7 @@
     </div>
 </metal:digest_result>
 
-<metal:publication define-macro="publication" i18n:domain="onegov.town6">
+<metal:publication define-macro="publication" i18n:domain="onegov.town_bs">
     <div tal:define="file_link link(publication)" class="publication-item">
         <a class="file-preview" href="${file_link}">
             <img class="pdf-preview lazyload" data-no-alt data-src="${link(publication, name='medium')}">
@@ -3402,7 +3402,7 @@
     </div>
 </metal:publication>
 
-<metal:holidays define-macro="holidays" i18n:domain="onegov.town6">
+<metal:holidays define-macro="holidays" i18n:domain="onegov.town_bs">
     <ul class="holidays">
         <li tal:repeat="(holiday, descriptions) holidays.all(year)">
             ${layout.format_date(holiday, 'date')} - ${', '.join(descriptions)}
@@ -3410,7 +3410,7 @@
     </ul>
 </metal:holidays>
 
-<metal:tickets_table_row define-macro="tickets_table_row" i18n:domain="onegov.town6">
+<metal:tickets_table_row define-macro="tickets_table_row" i18n:domain="onegov.town_bs">
     <tr tal:define="ticket_url request.link(ticket); has_access request.is_manager_for_model(ticket)"
             class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}" tal:attributes="data-url action_link(ticket) if has_access else nothing">
         <tal:block tal:condition="has_access">
@@ -3460,11 +3460,11 @@
     </tr>
 </metal:tickets_table_row>
 
-<metal:focus define-macro="focus-title" i18n:domain="onegov.town6">
+<metal:focus define-macro="focus-title" i18n:domain="onegov.town_bs">
     <tal:b i18n:translate="">Focus</tal:b>
 </metal:focus>
 
-<metal:focus define-macro="focus-panel" i18n:domain="onegov.town6">
+<metal:focus define-macro="focus-panel" i18n:domain="onegov.town_bs">
         <div class="focus-image" tal:condition="image_src">
             <div style="width: 100%; padding-bottom: 55%; background-image: url(${image_src}); background-size: cover;"></div>
             <tal:block tal:condition="text_on_image|False and title">
@@ -3493,7 +3493,7 @@
         </div>
 </metal:focus>
 
-<metal:chat define-macro="chat" i18n:domain="onegov.town6">
+<metal:chat define-macro="chat" i18n:domain="onegov.town_bs">
     <tal:b define="enable_chat layout.org.meta.get('enable_chat', 'disabled')">
         <div tal:condition="enable_chat == 'chatbot' or enable_chat == 'people_chat' and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
             <div class="grid-container">
@@ -3537,7 +3537,7 @@
 </div>
 </metal:modal>
 
-<metal:pageref define-macro="pageref" i18n:domain="onegov.town6">
+<metal:pageref define-macro="pageref" i18n:domain="onegov.town_bs">
     <div
         class="pageref"
         title="Copy to clipboard"
@@ -3821,7 +3821,7 @@
     </tal:b>
 </metal:b>
 
-<metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.town6">
+<metal:invoice_items define-macro="invoice_items" i18n:domain="onegov.town_bs">
     <table class="invoice-items table w-auto" tal:define="total_amount total_amount|None; total_vat total_vat|None; total_paid total_paid|False; show_cost_object any(item.cost_object for items in invoice_items.values() for item in items); show_vat total_vat or any(item.vat for items in invoice_items.values() for item in items); show_quantity any(item.quantity != 1.0 for items in invoice_items.values() for item in items); item_actions item_actions|None; show_payment_state show_payment_state|False">
         <thead>
             <tr>

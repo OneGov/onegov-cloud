@@ -121,6 +121,7 @@ def get_i18n_used_locales() -> set[str]:
 @TownBsApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     return [
+        module_path('onegov.town_bs', 'locale'),
         module_path('onegov.town6', 'locale'),
         *get_org_i18n_localedirs()
     ]

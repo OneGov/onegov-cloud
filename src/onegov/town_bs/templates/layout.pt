@@ -7,7 +7,7 @@
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     xmlns:metal="http://xml.zope.org/namespaces/metal"
     xmlns:tal="http://xml.zope.org/namespaces/tal"
-    i18n:domain="onegov.town6"
+    i18n:domain="onegov.town_bs"
     metal:define-macro="layout">
 <head>
     <meta charset="utf-8" />
@@ -132,7 +132,7 @@
                                     <i class="fa fa-search"></i>
                                 </a>
                                 <a tal:condition="request.app.has_forms" href="${layout.online_counter_url}" class="btn btn-primary" i18n:translate="">
-                                    Online counter
+                                    Online Counter
                                 </a>
                                 <a tal:condition="top_navigation|layout.top_navigation" data-bs-toggle="offcanvas" href="#offCanvasMainMenu" role="button" aria-controls="offCanvasMainMenu">
                                     <i class="fa fa-bars"></i>

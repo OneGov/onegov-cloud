@@ -1,4 +1,4 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town6" xmlns="http://www.w3.org/1999/html">
+<div metal:use-macro="layout.base" i18n:domain="onegov.town_bs" xmlns="http://www.w3.org/1999/html">
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>

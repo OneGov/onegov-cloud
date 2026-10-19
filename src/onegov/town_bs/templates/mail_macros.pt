@@ -3,10 +3,10 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      i18n:domain="onegov.town6">
+      i18n:domain="onegov.town_bs">
 <body>
 
-<metal:reservations define-macro="reservations" i18n:domain="onegov.town6">
+<metal:reservations define-macro="reservations" i18n:domain="onegov.town_bs">
     <tal:b condition="reservations">
         <tal:b repeat="reservation reservations">
             <tal:b define="start reservation.display_start(); end reservation.display_end(); quota reservation.quota; accepted reservation.data and reservation.data.get('accepted')">
@@ -18,7 +18,7 @@
     </tal:b>
 </metal:reservations>
 
-<metal:reservation define-macro="reservation" i18n:domain="onegov.town6">
+<metal:reservation define-macro="reservation" i18n:domain="onegov.town_bs">
     <span>
         ${layout.format_date(start, 'weekday_long')},
         ${layout.format_date(start, 'date_long')}
@@ -40,7 +40,7 @@
     </tal:b>
 </metal:reservation>
 
-<metal:event define-macro="event" i18n:domain="onegov.town6">
+<metal:event define-macro="event" i18n:domain="onegov.town_bs">
     <p><b>${model.title}</b></p>
     <p tal:condition="model.description" tal:content="escape(model.description).replace('\n', Markup('<br />'))" />
 
@@ -60,7 +60,7 @@
     </p>
 </metal:event>
 
-<metal:display_form define-macro="display_form" i18n:domain="onegov.town6">
+<metal:display_form define-macro="display_form" i18n:domain="onegov.town_bs">
     <p tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:b define="fields fieldset.non_empty_fields" condition="fields">
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()" />
@@ -75,7 +75,7 @@
     </p>
 </metal:display_form>
 
-<metal:display_field define-macro="display_fields" i18n:domain="onegov.town6">
+<metal:display_field define-macro="display_fields" i18n:domain="onegov.town_bs">
     <?python
         if fields:
             rendered_fields = ((f, form.render_display(f)) for f in fields)
@@ -96,7 +96,7 @@
     </table>
 </metal:display_field>
 
-<metal:price define-macro="price" i18n:domain="onegov.town6">
+<metal:price define-macro="price" i18n:domain="onegov.town_bs">
     <tal:b tal:define="show_fee show_fee|False; show_vat show_vat|False">
         ${layout.format_number(price.net_amount)} ${price.currency}
         <tal:b condition="show_fee and price.fee">
@@ -109,7 +109,7 @@
     </tal:b>
 </metal:price>
 
-<metal:payment define-macro="payment" i18n:domain="onegov.town6">
+<metal:payment define-macro="payment" i18n:domain="onegov.town_bs">
     <tal:b tal:define="show_fee show_fee|False" tal:condition="payment|nothing">
         <p><b i18n:translate>Payment</b></p>
         <p>
@@ -169,7 +169,7 @@
     </tal:b>
 </metal:payment>
 
-<metal:directory_entry_notification_details define-macro="directory_entry_notification_details" i18n:domain="onegov.town6">
+<metal:directory_entry_notification_details define-macro="directory_entry_notification_details" i18n:domain="onegov.town_bs">
     <p><u i18n:translate="">Publication</u></p>
     <p tal:define="form python: directory.form_class(data=entry.values)">
         <tal:b tal:repeat="field form._fields.values()">

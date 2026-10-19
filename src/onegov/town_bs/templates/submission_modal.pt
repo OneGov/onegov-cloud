@@ -1,4 +1,4 @@
-<tal:b i18n:domain="onegov.town6">
+<tal:b i18n:domain="onegov.town_bs">
     <div id="content">
         <tal:b tal:condition="not:completable">
                 <div metal:use-macro="layout.macros['form-modal-definition']" />
