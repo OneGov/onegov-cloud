@@ -1967,7 +1967,8 @@
                     <form class="searchbox" action="${layout.search_url}" method="GET"
                             data-typeahead="on"
                             data-typeahead-source="${layout.suggestions_url}"
-                            data-typeahead-target="${layout.search_url}">
+                            data-typeahead-target="${layout.search_url}"
+                             data-typeahead-all-results="All results" i18n:attributes="data-typeahead-all-results">
                         <div class="position-relative">
                             <input class="form-control rounded-pill p-md ps-xl fs-md" type="search" id="search"
                                     data-typeahead-subject name="q" autocomplete="off" autocorrect="off"

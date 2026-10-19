@@ -66,6 +66,10 @@ input::placeholder {
     display: none !important;
 }
 
+.form-control:not(:focus) + button + .typeahead:not(:hover) {
+    display: none;
+}
+
 .typeahead {
     width: 100%;
 }

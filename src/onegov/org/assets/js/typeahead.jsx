@@ -44,9 +44,10 @@ var TypeaheadList = React.createClass({
         var results = this.props.results;
         var target = this.props.target;
 
+
         return (
             <div>
-                <ul className="styled-list p-lg mt-0">
+                <ul className="styled-list p-lg pb-0 mt-0">
                     {results.map(function(result) {
                         return (
                             <li key={result} className={active === result ? 'active' : ''}>
@@ -57,7 +58,7 @@ var TypeaheadList = React.createClass({
                         );
                     })}
                 </ul>
-                <button className="btn btn-primary m-lg mt-0" type="submit">All results</button>
+                <button className="btn btn-primary m-lg" type="submit">{this.props.allResultsLabel}</button>
             </div>
         );
     },
@@ -111,7 +112,11 @@ var TypeAhead = function(form) {
         container.append(el);
 
         typeahead = ReactDOM.render(
-            <TypeaheadList results={results} target={target} />, el.get(0)
+            <TypeaheadList
+                results={results}
+                target={target}
+                allResultsLabel={form.attr('data-typeahead-all-results')}
+            />, el.get(0)
         );
     };
 
