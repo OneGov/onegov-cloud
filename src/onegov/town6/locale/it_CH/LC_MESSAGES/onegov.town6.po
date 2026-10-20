@@ -183,11 +183,20 @@ msgstr "Sa"
 msgid "Su"
 msgstr "Do"
 
-msgid "Singular name for parliamentarians"
-msgstr "Membro del consiglio comunale"
+msgid "Designation for parliamentarians"
+msgstr "Denominazione dei membri del parlamento"
 
-msgid "Plural name for parliamentarians"
+msgid ""
+"This designation is used for parliamentarians throughout the RIS pages and "
+"menus."
+msgstr "Questa denominazione viene usata per i membri del parlamento nelle"
+"pagine e nei menu RIS."
+
+msgid "Town council members"
 msgstr "Membri del consiglio comunale"
+
+msgid "Town council member"
+msgstr "Membro del consiglio comunale"
 
 msgid "URL path for the RIS main page"
 msgstr "Percorso URL per la pagina principale RIS"

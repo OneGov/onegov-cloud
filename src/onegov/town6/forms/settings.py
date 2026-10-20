@@ -295,14 +295,17 @@ class ChatSettingsForm(Form):
 
 class RISSettingsForm(Form):
 
-    ris_parliamentarian_singular = StringField(
-        label=_('Singular name for parliamentarians'),
-        default='Parlamentsmitglied',
-    )
-
-    ris_parliamentarian_plural = StringField(
-        label=_('Plural name for parliamentarians'),
-        default='Parlamentsmitglieder',
+    ris_parliamentarian_term = ChosenSelectField(
+        label=_('Designation for parliamentarians'),
+        description=_(
+            'This designation is used for parliamentarians throughout the '
+            'RIS pages and menus.'
+        ),
+        choices=(
+            ('parliamentarians', _('Parliamentarians')),
+            ('residents_council_members', _('Town council members')),
+        ),
+        default='parliamentarians',
     )
 
     # the url breadcrumbs shall point to for non-logged-in users

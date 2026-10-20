@@ -1277,17 +1277,19 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
 
     @property
     def parliamentarian_singular(self) -> str:
-        return (
-            self.request.app.org.ris_parliamentarian_singular
-            or self.request.translate(_('Parliamentarian'))
-        )
+        if self.request.app.org.ris_parliamentarian_term == (
+            'residents_council_members'
+        ):
+            return self.request.translate(_('Town council member'))
+        return self.request.translate(_('Parliamentarian'))
 
     @property
     def parliamentarian_plural(self) -> str:
-        return (
-            self.request.app.org.ris_parliamentarian_plural
-            or self.request.translate(_('Parliamentarians'))
-        )
+        if self.request.app.org.ris_parliamentarian_term == (
+            'residents_council_members'
+        ):
+            return self.request.translate(_('Town council members'))
+        return self.request.translate(_('Parliamentarians'))
 
     @cached_property
     def title(self) -> str:
@@ -1328,10 +1330,11 @@ class RISParliamentarianLayout(DefaultLayout):
 
     @property
     def parliamentarian_plural(self) -> str:
-        return (
-            self.request.app.org.ris_parliamentarian_plural
-            or self.request.translate(_('Parliamentarians'))
-        )
+        if self.request.app.org.ris_parliamentarian_term == (
+            'residents_council_members'
+        ):
+            return self.request.translate(_('Town council members'))
+        return self.request.translate(_('Parliamentarians'))
 
     @cached_property
     def collection(self) -> RISParliamentarianCollection:
