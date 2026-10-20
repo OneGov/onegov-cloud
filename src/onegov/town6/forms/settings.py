@@ -308,6 +308,18 @@ class RISSettingsForm(Form):
         default='parliamentarians',
     )
 
+    def on_request(self) -> None:
+        self.ris_parliamentarian_term.choices = [
+            (
+                'parliamentarians',
+                self.request.translate(_('Parliamentarians')),
+            ),
+            (
+                'residents_council_members',
+                self.request.translate(_('Town council members')),
+            ),
+        ]
+
     # the url breadcrumbs shall point to for non-logged-in users
     ris_main_url = StringField(
         label=_('URL path for the RIS main page'),
