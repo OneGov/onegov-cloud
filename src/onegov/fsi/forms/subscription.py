@@ -1,12 +1,11 @@
-from sqlalchemy import desc
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.fsi import _
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.models import CourseEvent, CourseSubscription
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
-from onegov.fsi.models import CourseEvent, CourseSubscription
 
 
 from typing import TYPE_CHECKING
@@ -164,7 +163,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
                 last_subscribed_event = self.request.session.query(
                     CourseEvent).join(CourseSubscription).filter(
                     CourseSubscription.attendee_id == self.attendee_id.data
-                    ).order_by(desc(CourseEvent.start)).first()
+                    ).order_by(CourseEvent.start.desc()).first()
                 assert last_subscribed_event is not None
                 assert isinstance(self.course_event_id.errors, list)
                 self.course_event_id.errors.append(

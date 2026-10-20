@@ -181,17 +181,13 @@ def postgres_dsn(
 
     """
     if pytestconfig.getoption('nopg'):
-        yield 'postgresql+psycopg://postgres:postgres@127.0.0.1:55432/postgres'
+        yield 'postgresql://postgres:postgres@127.0.0.1:55432/postgres'
         return
 
     assert postgres is not None
     postgres.reset_snapshots()
 
-    # HACK: We rewrite the DSN so that SQLAlchemy picks the correct backend
-    postgres_dsn = postgres.url().replace(
-        'postgresql://',
-        'postgresql+psycopg://'
-    )
+    postgres_dsn = postgres.url()
 
     yield postgres_dsn
 
