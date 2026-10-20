@@ -208,7 +208,7 @@
                 <!-- Without sidebar, narrow page width only title in intro -->
                 <div id="narrow" tal:condition="narrow_page" class="page-container my-5xl container">
                     <div class="row justify-content-center">
-                        <div class="col-lg-10 col-xl-8">
+                        <div class="col-lg-10 col-xl-10">
                             <div id="intro">
                                 <h1 class="main-title text-primary fs-2xl mb-3xl">
                                     <tal:b metal:define-slot="title"></tal:b>
