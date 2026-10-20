@@ -183,6 +183,12 @@ msgstr "Sa"
 msgid "Su"
 msgstr "Do"
 
+msgid "Singular name for parliamentarians"
+msgstr "Membro del consiglio comunale"
+
+msgid "Plural name for parliamentarians"
+msgstr "Membri del consiglio comunale"
+
 msgid "URL path for the RIS main page"
 msgstr "Percorso URL per la pagina principale RIS"
 
