@@ -192,7 +192,7 @@ msgstr "Bezeichnung der Parlamentsmitglieder"
 msgid ""
 "This designation is used for parliamentarians throughout the RIS pages and "
 "menus."
-msgstr "Diese Bezeichnung wird auf RIS-Seiten und in Menüs für"
+msgstr "Diese Bezeichnung wird auf RIS-Seiten und in Menüs für "
 "Parlamentsmitglieder verwendet."
 
 msgid "Town council members"
