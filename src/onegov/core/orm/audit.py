@@ -143,6 +143,8 @@ def write_audit_entry(
 
     username = session_manager.current_username
     if not isinstance(username, str):
+        # CLI commands, background jobs and login callbacks may have no
+        # authenticated actor. Keep the audit entry even without attribution.
         username = 'unknown'
 
     session.connection().execute(
