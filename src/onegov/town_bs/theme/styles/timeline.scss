@@ -113,8 +113,9 @@
             padding: $s-xs $s-sm;
 
             a::before {
+                // TODO: Replace with new icon
                 content: '\f0c6';
-                font-family: 'Font Awesome 6 Free';
+                font-family: 'Font Awesome 5 Free';
                 font-weight: 900;
                 margin-right: .5ex;
             }

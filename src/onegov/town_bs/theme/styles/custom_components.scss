@@ -18,6 +18,9 @@
         // TODO: Replace ">" with the real icon as soon as the icon library is known
         &::after {
             content: ">";
+            content: '\f061';
+            font-weight: bold;
+            font-family: 'Font Awesome 5 Free';
             flex-shrink: 0;
             color: $primary;
             padding-right: $s-sm;

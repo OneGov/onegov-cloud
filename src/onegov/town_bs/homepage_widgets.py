@@ -8,8 +8,7 @@ from onegov.org.elements import Link, LinkGroup
 
 from onegov.org.homepage_widgets import (
     NewsWidget as OrgNewsWidget,
-    DirectoriesWidget as OrgDirectoriesWidget,
-    get_lead)
+    DirectoriesWidget as OrgDirectoriesWidget)
 from onegov.org.models import PublicationCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
@@ -187,31 +186,8 @@ class EventsWidget:
         occurrences = OccurrenceCollection(layout.app.session()).query()
         occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
-        event_links = [
-            EventCard(
-                text=o.title,
-                url=layout.request.link(o),
-                subtitle=(
-                    layout.format_date(
-                        o.localized_start, 'event_short').title() + ', '
-                    + layout.format_event_time_range(
-                        o.localized_start, o.localized_end).title()),
-                image_url=(
-                    layout.request.link(o.event.image)
-                    if o.event.image else None
-                ),
-                location=o.location,
-                lead=get_lead(o.event.title)
-            ) for o in occurrences
-        ]
-
-        latest_events = LinkGroup(
-            title=_('Events'),
-            links=event_links,  # type:ignore[arg-type]
-        ) if event_links else None
-
         return {
-            'event_panel': latest_events,
+            'occurrences': occurrences,
             'all_events_link': Link(
                 text=_('All events'),
                 url=layout.events_url,

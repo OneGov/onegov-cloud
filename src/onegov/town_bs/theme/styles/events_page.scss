@@ -1,24 +1,84 @@
-.occurrence .card {
-  min-height: 13rem; // auf die Höhe im Hover-Zustand abstimmen
-  transition: background-color $standard-transition;
-
-  * {
-    transition: color $standard-transition;
-  }
-
-  .date-place {
-    @include hover-reveal-collapsed;
-  }
-
-  &:hover {
-    background-color: $primary !important;
+// Active state: red card with white text and revealed date/place
+@mixin occurrence-active {
+    background-color: $primary;
 
     * {
-      color: $white !important;
+        color: $white;
     }
 
     .date-place {
-      @include hover-reveal-expanded;
+        @include hover-reveal-expanded;
     }
-  }
+}
+
+.occurrence {
+    .occurrence-card {
+        // Match the height of the hover state
+        min-height: 13rem;
+        height: 100%;
+        border: 0;
+        background-color: $light;
+        transition: background-color $standard-transition;
+
+        * {
+            transition: color $standard-transition;
+        }
+
+        .date-place {
+            @include hover-reveal-collapsed;
+        }
+
+        &:hover {
+            @include occurrence-active;
+        }
+    }
+
+    .occurrence-link {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: center;
+        color: $primary;
+        text-decoration: none;
+    }
+
+    .occurrence-body {
+        display: flex;
+        flex-grow: 0;
+    }
+
+    .occurrence-date {
+        flex-shrink: 0;
+        padding: $s-2xl $s-md $s-2xl $s-2xl;
+        white-space: nowrap;
+
+        p {
+            margin-bottom: 0;
+        }
+    }
+
+    .occurrence-content {
+        padding: $s-2xl $s-2xl $s-2xl $s-md;
+    }
+
+    .occurrence-title {
+        margin-bottom: 0;
+        font-weight: bold;
+    }
+}
+
+// Primary variant: red card with white text from the start
+.occurrence-primary {
+    .occurrence-card {
+        background-color: $primary;
+
+        * {
+            color: $white;
+        }
+
+        // Keep the reveal animation, the colors do not change on hover
+        &:hover .date-place {
+            @include hover-reveal-expanded;
+        }
+    }
 }
