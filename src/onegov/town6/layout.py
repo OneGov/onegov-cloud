@@ -1273,6 +1273,14 @@ class MeetingItemLayout(DefaultLayout):
         ]
 
 
+def parliamentarian_plural_label(request: TownRequest) -> str:
+    if request.app.org.ris_parliamentarian_term == (
+        'residents_council_members'
+    ):
+        return request.translate(_('Town council members'))
+    return request.translate(_('Parliamentarians'))
+
+
 class RISParliamentarianCollectionLayout(DefaultLayout):
 
     @property
@@ -1285,11 +1293,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
 
     @property
     def parliamentarian_plural(self) -> str:
-        if self.request.app.org.ris_parliamentarian_term == (
-            'residents_council_members'
-        ):
-            return self.request.translate(_('Town council members'))
-        return self.request.translate(_('Parliamentarians'))
+        return parliamentarian_plural_label(self.request)
 
     @cached_property
     def title(self) -> str:
@@ -1330,11 +1334,7 @@ class RISParliamentarianLayout(DefaultLayout):
 
     @property
     def parliamentarian_plural(self) -> str:
-        if self.request.app.org.ris_parliamentarian_term == (
-            'residents_council_members'
-        ):
-            return self.request.translate(_('Town council members'))
-        return self.request.translate(_('Parliamentarians'))
+        return parliamentarian_plural_label(self.request)
 
     @cached_property
     def collection(self) -> RISParliamentarianCollection:

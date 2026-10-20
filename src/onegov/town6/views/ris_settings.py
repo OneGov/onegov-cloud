@@ -10,6 +10,7 @@ from onegov.org.models import (
 from onegov.town6 import _
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
+from onegov.town6.layout import parliamentarian_plural_label
 
 
 from typing import TYPE_CHECKING
@@ -34,10 +35,7 @@ def view_ris_settings(
     shortcuts = [
         {
             'name': 'parliamentarians',
-            'title': (
-                request.app.org.ris_parliamentarian_plural
-                or _('Parliamentarians')
-            ),
+            'title': parliamentarian_plural_label(request),
             'link': request.class_link(RISParliamentarianCollection),
             'icon': 'fa-user-tie'
         },
