@@ -786,7 +786,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town_bs">
-    <div class="page-sidebar-content col-12 col-md-4 col-lg-3 sidebar ${'filter-panel' if filter_panel else ''}"
+    <div class="page-sidebar-content order-lg-1 col-12 col-md-6 col-lg-3 mt-xl mt-lg-0 sidebar ${'filter-panel' if filter_panel else ''}"
             tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False; sidepanel_contact page.sidepanel_contact|None;">
         <tal:b metal:define-slot="before-panels"></tal:b>
 
@@ -985,11 +985,9 @@
 
             <tal:b case="True">
             <!-- With sidebar -->
-                <tal:b tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False">
-                    <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
-                </tal:b>
 
-                <div class="col-12 col-md-8 col-lg-9 page-main-content">
+                <!-- Page content comes first on mobile, second on desktop -->
+                <div class="col-12 order-lg-2 col-lg-9 page-main-content">
                     <img class="page-image img-fluid" tal:condition="show_page_image and page.page_image and (as_content or news)" src="${page.page_image}">
                     <tal:b metal:define-slot="before-lead"></tal:b>
                     <tal:b metal:define-slot="after-lead"><tal:b>
@@ -1021,6 +1019,10 @@
                         </ul>
                     </div>
                 </div>
+                <!-- Sidebar, second on mobile, first on desktop -->
+                <tal:b tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False">
+                    <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False; no_sidebar_offset no_sidebar_offset|False;" />
+                </tal:b>
             </tal:b>
         </tal:b>
 
@@ -2430,10 +2432,8 @@
 
 <metal:tags define-macro="tags">
     <ul class="tags" >
-        <li tal:repeat="link tags" class="click-through">
-            <span tal:content="link(layout)"
-                class="${link.active and 'active' or ''} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
-            />
+       <li tal:repeat="link tags">
+            <tal:b replace="link(layout, ('btn', link.active and 'btn-primary' or 'btn-light', 'btn-sm'))" />
         </li>
     </ul>
 </metal:tags>
