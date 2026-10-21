@@ -174,6 +174,14 @@ def test_parliamentarians(client: Client) -> None:
         assert 'Ersatzmitglied' in parliamentarian
         assert 'Verkehrskommission' in parliamentarian
 
+        commission_page = client.get('/commissions').click(
+            'Verkehrskommission'
+        )
+        assert 'Zum Hinzufügen eines Mitglieds' in commission_page
+        edit_membership = commission_page.click('Mitgliedschaft bearbeiten')
+        assert edit_membership.form is not None
+        assert 'Ersatzmitglied' in edit_membership
+
         # add another parliamentarian
         new = client.get('/parliamentarians/new')
         new.form['first_name'] = 'Old'
