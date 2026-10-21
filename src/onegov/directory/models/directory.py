@@ -315,6 +315,8 @@ class Directory(Base, ContentMixin, TimestampMixin,
                             f = session.query(File).filter_by(
                                 id=file_id
                             ).first()
+                            if f and f in entry.files:
+                                f.note = f'{field.id}:{idx}'
                             if f and f.type != 'directory':
                                 new = DirectoryFile(
                                     id=random_token(),
