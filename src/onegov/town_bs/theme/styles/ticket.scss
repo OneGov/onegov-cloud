@@ -1,0 +1,56 @@
+
+a.mute {
+    display: inline-block;
+
+    .fa-microphone-slash {
+        display: none;
+    }
+    .fa-microphone {
+        display: inline;
+    }
+
+    &:hover {
+        color: $red;
+
+        .fa-microphone-slash {
+            display: inline;
+        }
+        .fa-microphone {
+            display: none;
+        }
+    }
+}
+
+a.unmute {
+    display: inline-block;
+
+    .fa-microphone-slash {
+        display: inline;
+    }
+    .fa-microphone {
+        display: none;
+    }
+
+    &:hover {
+        color: #333;
+
+        .fa-microphone-slash {
+            display: none;
+        }
+        .fa-microphone {
+            display: inline;
+        }
+
+        &.disabled {
+            color: $red;
+            cursor: disabled;
+
+            .fa-microphone-slash {
+                display: inline;
+            }
+            .fa-microphone {
+                display: none;
+            }
+        }
+    }
+}

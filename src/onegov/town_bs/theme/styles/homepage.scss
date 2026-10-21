@@ -1,0 +1,126 @@
+#homepage {
+    &> .container,
+    &> .container-fluid {
+        padding-top: $s-3xl;
+        padding-bottom: $s-3xl;
+    }
+
+    .homepage-image-slider,
+    .homepage-video-container {
+    position: relative;
+
+    .caption-overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+
+        .spacer {
+        height: 40%;
+        }
+
+        .black-gradient {
+        height: 30%;
+        }
+
+        .black-transparent-bg {
+        height: 30%;
+        }
+    }
+
+    .text-container {
+        font-size: $fs-3xl;
+        text-shadow: rgba(1, 1, 1, .4) 1px 0 10px;
+        bottom: $s-4xl * 3;
+        left: 0;
+        padding: 0;
+        right: 0;
+        text-align: left;
+        z-index: 2;
+    }
+
+    .homepage-searchbox-wrapper {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin-bottom: $s-4xl;
+        z-index: 2;
+    }
+    }
+
+    .homepage-image-slider {
+        .carousel-item,
+        .carousel-image {
+            height: 100%;
+        }
+
+        .carousel-image {
+            background-position: center;
+            background-size: cover;
+        }
+
+    }
+
+    .homepage-video-container {
+        .homepage-video {
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+
+            video {
+            height: 100%;
+            left: 0;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            }
+        }
+
+        .text-container {
+            color: $white;
+            position: absolute;
+        }
+    }
+
+    .container-fluid {
+        &.gray {
+            background-color: $light-subtle;
+        }
+        &.primary {
+            background-color: $primary;
+        }
+        &.gray {
+            background-color: $light-subtle;
+        }
+    }
+
+.icon-link {
+  min-height: 14rem; // match the height of the hover state
+
+  .icon-circle {
+    transition: transform $standard-transition;
+  }
+
+  .hover-reveal {
+    @include hover-reveal-collapsed;
+  }
+
+  &:hover {
+    @media (hover: hover) {
+    .icon-circle {
+      transform: translateY($s-xs);
+    }
+    }
+
+    .hover-reveal {
+      @include hover-reveal-expanded;
+    }
+  }
+}
+
+}

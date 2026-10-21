@@ -1,0 +1,23 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town_bs">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content"
+                 tal:define="lead None; text None; people None; coordinates None; contact layout.org.contact_html|None">
+            <tal:b metal:fill-slot="main-content">
+                <p tal:condition="not:directories" i18n:translate="">No directories defined yet.</p>
+                <ul tal:condition="directories" class="styled-list directory-list">
+                    <li tal:repeat="directory directories">
+                        <a class="styled-list-link" tal:attributes="href link(directory)">
+                            <span class="styled-list-title">${directory.title}</span>
+                            <metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
+                            <div class="styled-list-lead" tal:content="layout.linkify(directory.lead)" />
+                        </a>
+                    </li>
+                </ul>
+            </tal:b>
+        </tal:b>
+
+    </tal:b>
+</div>

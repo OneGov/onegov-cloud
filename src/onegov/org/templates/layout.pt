@@ -134,7 +134,7 @@
             </div>
             <div class="small-12 medium-4 columns">
               <!--! The org's site search -->
-              <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+              <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}" data-typeahead-all-results="All results" i18n:attributes="data-typeahead-all-results">
                 <div class="row collapse">
                     <div class="columns small-10">
                         <label for="search" class="show-for-sr" i18n:translate>Search</label>

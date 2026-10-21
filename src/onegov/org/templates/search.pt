@@ -12,7 +12,7 @@
 
         <div class="row" tal:condition="connection">
             <div class="columns small-12 medium-8">
-                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${request.link(model, name='suggest')}" data-typeahead-target="${request.link(model)}" data-typeahead-filter-params='["type"${form.start and form.end and ",\"start\",\"end\""|""}]'>
+                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${request.link(model, name='suggest')}" data-typeahead-target="${request.link(model)}" data-typeahead-filter-params='["type"${form.start and form.end and ",\"start\",\"end\""|""}]' data-typeahead-all-results="All results" i18n:attributes="data-typeahead-all-results">
                 <div class="row collapse">
                     <div class="two-columns" tal:condition="form.type">${form.type()}</div>
                     <div class="two-columns" tal:condition="form.start and form.end|nothing">
