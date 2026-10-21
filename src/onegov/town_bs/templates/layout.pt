@@ -54,7 +54,7 @@
                         <div class="input-group">
                             <input id="search" class="form-control" type="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
                             <button class="btn btn-primary" type="submit">
-                                <i class="fa fa-search"></i>
+                                <i class="fa fa-search fa-lg"></i>
                             </button>
                         </div>
                         <metal:b use-macro="layout.macros['typeahead_container']"/>
@@ -129,13 +129,13 @@
 
                             <div class="d-flex align-items-center gap-3">
                                 <a href="#" class="" data-bs-toggle="modal" data-bs-target="#searchModal">
-                                    <i class="fa fa-search"></i>
+                                    <i class="fa fa-search fa-lg"></i>
                                 </a>
                                 <a tal:condition="request.app.has_forms" href="${layout.online_counter_url}" class="btn btn-primary" i18n:translate="">
                                     Online Counter
                                 </a>
                                 <a tal:condition="top_navigation|layout.top_navigation" data-bs-toggle="offcanvas" href="#offCanvasMainMenu" role="button" aria-controls="offCanvasMainMenu">
-                                    <i class="fa fa-bars"></i>
+                                    <i class="fa fa-bars fa-lg"></i>
                                 </a>
 
                             </div>

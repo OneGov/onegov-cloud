@@ -19,6 +19,16 @@
   }
 }
 
+@each $key, $value in $spacers {
+  .max-height-#{$key} {
+    max-height: calc(6 * $value) !important;
+  }
+}
+
+.max-width-600px {
+  max-width: 600px;
+}
+
 .black-gradient{
   background: linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, 0) 100%);
 }
@@ -67,8 +77,4 @@
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-}
-
-.max-width-600px {
-  max-width: 600px;
 }

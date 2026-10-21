@@ -61,7 +61,7 @@
                                     <div class="list-title"  tal:case="True">
                                         <div class="gradient"></div><span class="h5">${title}</span>
                                     </div>
-                                    <span class="h5 styled-list-title" tal:case="False">${title}</span>
+                                    <span class="styled-list-title" tal:case="False">${title}</span>
                                 </tal:block>
                             </a>
                             <a href="${url}" tal:condition="lead and not children_images">

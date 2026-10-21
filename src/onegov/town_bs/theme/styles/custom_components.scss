@@ -2,7 +2,6 @@
     list-style: none;
     padding-left: 0;
     margin-bottom: 0;
-    margin-top: -$s-md;
 
     li {
         display: flex;
@@ -17,7 +16,6 @@
 
         // TODO: Replace ">" with the real icon as soon as the icon library is known
         &::after {
-            content: ">";
             content: '\f061';
             font-weight: bold;
             font-family: 'Font Awesome 5 Free';
@@ -80,6 +78,28 @@
 
             &::after {
                 transform: translateX($s-sm);
+            }
+        }
+    }
+
+    // Small variant
+    &.styled-list-sm {
+        .styled-list-link {
+            padding: $s-sm 0;
+
+            .styled-list-title {
+                font-size: $fs-sm;
+            }
+        }
+    }
+
+    // Small variant
+    &.styled-list-xs {
+        .styled-list-link {
+            padding: $s-xs 0;
+
+            .styled-list-title {
+                font-size: $fs-xs;
             }
         }
     }

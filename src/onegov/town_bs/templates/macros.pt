@@ -779,7 +779,7 @@
     <div class="card me-md-2xl side_panel_card mb-md border-1 side-panel ${extra_class|''}"
             tal:attributes="data-toc-level data_toc_level|nothing">
         <div class="card-body">
-            <h3><metal:b define-slot="panel-title"></metal:b></h3>
+            <h3 class="mb-md"><metal:b define-slot="panel-title"></metal:b></h3>
             <metal:b define-slot="panel-content"></metal:b>
         </div>
     </div>
@@ -847,16 +847,16 @@
             </tal:b>
         </tal:b>
 
-        <tal:b metal:use-macro="layout.macros['side_panel_card']"
-                tal:condition="files and page.show_file_links_in_sidebar|True"
-                tal:define="extra_class 'files-panel'">
-            <tal:b metal:fill-slot="panel-title" i18n:translate>Documents</tal:b>
+        <tal:b metal:use-macro="layout.macros['side_panel_card']" tal:condition="files and directory.show_file_links_in_sidebar|True">
+            <tal:b metal:fill-slot="panel-title">
+                <tal:b i18n:translate>Documents</tal:b>
+            </tal:b>
             <tal:b metal:fill-slot="panel-content">
-                <ul class="more-list">
+                <ul class="styled-list styled-list-xs">
                     <li tal:repeat="file python: sorted(files, key=lambda f: f.name)">
-                        <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                        <a class="styled-list-link" title="${file.name}" href="${request.link(file)}">
                             <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
-                            <span class="list-title">${layout.get_filename_without_extension(file.name)}</span>
+                            <span class="styled-list-title">${layout.get_filename_without_extension(file.name)}</span>
                         </a>
                     </li>
                 </ul>
