@@ -1562,6 +1562,7 @@
             </tal:b>
         </li>
     </ul>
+    <hr>
 </metal:reservations>
 
 <metal:display_event define-macro="display_event" i18n:domain="onegov.town_bs">

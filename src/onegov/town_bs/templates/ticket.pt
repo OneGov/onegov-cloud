@@ -286,12 +286,12 @@
             </tal:b>
 
             <tal:b metal:fill-slot="main-content">
-                    <div tal:condition="deleted" class="callout warning" i18n:translate>
+                    <div tal:condition="deleted" class="alert alert-warning" i18n:translate>
                         The record behind this ticket was removed. The following information
                         is a snapshot kept for future reference.
                     </div>
                     <div class="ticket-cancellation-request" tal:condition="handler.data.get('cancellation_requested', False)">
-                        <div class="callout warning" i18n:translate>
+                        <div class="alert alert-warning" i18n:translate>
                             A cancellation has been requested for this reservation.
                         </div>
                         <tal:b
