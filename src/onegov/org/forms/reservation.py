@@ -25,7 +25,7 @@ from onegov.org.forms.util import WEEKDAYS
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Iterable, Sequence
+    from collections.abc import Callable, Generator, Iterable, Sequence
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
     from .allocation import DateContainer
@@ -175,6 +175,15 @@ class AddReservationForm(Form):
         default=1,
     )
 
+    internal = RadioField(
+        label=_('Internal'),
+        description=_('Internal reservations ignore availability periods'),
+        choices=(
+            ('yes', _('Yes')),
+            ('no', _('No'))
+        ),
+        default='no')
+
     def apply_resource(self, resource: Resource) -> None:
         if resource.type == 'room':
             self.delete_field('quota_other')
@@ -183,6 +192,7 @@ class AddReservationForm(Form):
             self.delete_field('end_time')
             self.delete_field('whole_day')
             self.delete_field('quota_room')
+            self.delete_field('internal')
 
     @property
     def quota(self) -> IntegerField:
@@ -301,6 +311,15 @@ class FindYourSpotForm(Form):
         ),
         default='no')
 
+    internal = RadioField(
+        label=_('Internal'),
+        description=_('Internal reservations ignore availability periods'),
+        choices=(
+            ('yes', _('Yes')),
+            ('no', _('No'))
+        ),
+        default='no')
+
     auto_reserve_available_slots = RadioField(
         label=_('Automatically reserve the first available slot'),
         description=_('You will be able to change individual choices'),
@@ -318,6 +337,8 @@ class FindYourSpotForm(Form):
             self.delete_field('on_holidays')
         if not self.request.app.org.has_school_holidays:
             self.delete_field('during_school_holidays')
+        if not self.request.is_manager:
+            self.delete_field('internal')
         if not self.request.POST:
             # by default search one week from now
             self.start.data = date.today()
@@ -383,6 +404,35 @@ class FindYourSpotForm(Form):
                     ))
         return None
 
+    def ensure_limited_number_of_candidates(self) -> bool | None:
+        if self.start.data is None or self.end.data is None:
+            return None
+
+        if hasattr(self, 'request'):
+            is_manager = self.request.is_manager
+        else:
+            is_manager = False
+
+        if not is_manager and (self.end.data - self.start.data).days > 731:
+            assert isinstance(self.end.errors, list)
+            self.end.errors.append(_(
+                'The end can be at most two years from the start'
+            ))
+            return False
+
+        num_candidates = len(self.included_dates)
+        if self.rooms:
+            num_candidates *= len(self.rooms.data or ())
+
+        if num_candidates > 750:
+            assert isinstance(self.end.errors, list)
+            self.end.errors.append(_(
+                'The number of possible reservation dates is too large. '
+                'Either lower the end date, or select fewer rooms / weekdays.'
+            ))
+            return False
+        return None
+
     @cached_property
     def exceptions(self) -> DateContainer:
         if not hasattr(self, 'request'):
@@ -420,6 +470,19 @@ class FindYourSpotForm(Form):
             if start <= date <= end:
                 return True
         return False
+
+    @cached_property
+    def included_dates(self) -> Sequence[date]:
+        def iter_dates(start: date, end: date) -> Generator[date]:
+            current = start
+            while current <= end:
+                if not self.is_excluded(current):
+                    yield current
+                current += timedelta(days=1)
+
+        assert self.start.data is not None
+        assert self.end.data is not None
+        return list(iter_dates(self.start.data, self.end.data))
 
 
 class ExportToExcelWorksheets(Form):
