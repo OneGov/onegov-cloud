@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-09-18 10:37+0200\n"
+"POT-Creation-Date: 2026-10-20 16:23+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -188,6 +188,19 @@ msgstr "Sa"
 msgid "Su"
 msgstr "Di"
 
+msgid "Designation for parliamentarians"
+msgstr "Désignation des membres du parlement"
+
+msgid ""
+"This designation is used for parliamentarians throughout the RIS pages and "
+"menus."
+msgstr ""
+"Cette désignation est utilisée pour les membres du parlement dans les pages "
+"et menus RIS."
+
+msgid "Town council members"
+msgstr "Membres du conseil communal"
+
 msgid "URL path for the RIS main page"
 msgstr "Chemin URL pour la page principale RIS"
 
@@ -353,6 +366,9 @@ msgstr "Cela ne peut être effectué."
 msgid "Delete meeting"
 msgstr "Supprimer la réunion"
 
+msgid "Town council member"
+msgstr "Membre du conseil communal"
+
 msgid "Parliamentarian"
 msgstr "Parlementaire"
 
@@ -496,8 +512,8 @@ msgstr "Aucun chat actif."
 msgid "Commission members"
 msgstr "Membres de la commission"
 
-msgid "Contact"
-msgstr "Contact"
+msgid "Description"
+msgstr "Description"
 
 msgid "Filters"
 msgstr "Filtres"
@@ -835,6 +851,9 @@ msgstr "Connexion client"
 msgid "About"
 msgstr "Impressum"
 
+msgid "Contact"
+msgstr "Contact"
+
 msgid "more"
 msgstr "plus"
 
@@ -1036,9 +1055,6 @@ msgstr "Retiré"
 
 msgid "Title"
 msgstr "Titre"
-
-msgid "Description"
-msgstr "Description"
 
 msgid "List Preview"
 msgstr "Aperçu de la liste"
@@ -1554,8 +1570,8 @@ msgstr ""
 msgid "New customer message in Ticket ${link}"
 msgstr "Nouveau message du client dans le ticket ${link}"
 
-#. Canonical text for ${link} is: "visit the request page"
 #. Canonical text for ${link} is: "visit the request status page"
+#. Canonical text for ${link} is: "visit the request page"
 msgid "Please ${link} to reply."
 msgstr "Veuillez vous rendre sur ${link} pour répondre."
 
@@ -2231,8 +2247,8 @@ msgstr "Numéro de personnel"
 msgid "Contract number"
 msgstr "Numéro de contrat"
 
-msgid "Private address"
-msgstr "Adresse privée"
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Place of residence"
 msgstr "Lieu de résidence"
@@ -2347,11 +2363,11 @@ msgstr "Information"
 msgid "Business Type"
 msgstr "Type d'activité"
 
-msgid "Chronology"
-msgstr "Chronologie"
-
 msgid "Submission/publication date"
 msgstr "Date de soumission/publication"
+
+msgid "Chronology"
+msgstr "Chronologie"
 
 msgid "Participants"
 msgstr "Participants"
@@ -2517,8 +2533,7 @@ msgstr ""
 "changer."
 
 msgid "You are viewing a limited summary of your confirmed reservations."
-msgstr ""
-"Vous consultez un résumé limité de vos réservations confirmées."
+msgstr "Vous consultez un résumé limité de vos réservations confirmées."
 
 msgid "Log in for full details"
 msgstr "Se connecter pour tous les détails"
@@ -3043,11 +3058,11 @@ msgid "Data Retention Policy"
 msgstr "Politique de Conservation des Données"
 
 msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Procédez avec prudence. Les billets et les données qu'ils contiennent "
-"peuvent être irrévocablement supprimés."
+"Proceed with caution. Tickets and the data they contain, as well as audit "
+"trail entries, may be irreversibly deleted."
+msgstr "Procédez avec prudence. Les tickets et les données qu'ils contiennent, "
+"ainsi que les entrées du journal d'audit, peuvent être supprimés de manière "
+"irréversible."
 
 msgid "Prices"
 msgstr "Prix"
@@ -3099,6 +3114,16 @@ msgstr "Vue d'ensemble des notifications push"
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Private address"
+#~ msgstr "Adresse privée"
+
+#~ msgid ""
+#~ "Proceed with caution. Tickets and the data they contain may be "
+#~ "irrevocable deleted."
+#~ msgstr ""
+#~ "Procédez avec prudence. Les billets et les données qu'ils contiennent "
+#~ "peuvent être irrévocablement supprimés."
 
 #~ msgid "Reminder: your upcoming reservations"
 #~ msgstr "Rappel : vos prochaines réservations"
