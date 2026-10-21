@@ -78,8 +78,17 @@ class TicketBasePdf(OrgPdf):
                             self.strip(item.inner_xml), self.style.bold)
                         data.append([p, ''])
                     if item.tag == 'dd':
-                        data[-1][1] = MarkupParagraph(
-                            self.strip(item.inner_xml))
+                        text = self.strip(item.inner_xml)
+                        # FIXME: This isn't super reliable, especially if
+                        #        we happen to break in the middle of a tag
+                        #        ideally we would implement our own flowable
+                        #        for these kind of tables that is capable of
+                        #        splitting a value cell across multiple pages
+                        #        when the cell doesn't fit into a single page
+                        #        the same applies to the ticket timeline
+                        if len(text) > 2000:
+                            text = text[:2000] + '...'
+                        data[-1][1] = MarkupParagraph(text)
                 if data:
                     self.table(data, 'even')
             elif element.tag == 'h2':
