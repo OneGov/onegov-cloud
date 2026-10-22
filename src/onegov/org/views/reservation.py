@@ -2290,7 +2290,7 @@ def add_reservation(
         return show_form()
 
     savepoint = transaction.savepoint()
-    if form.internal and form.internal.data == 'yes':
+    if 'internal' in form and form.internal.data == 'yes':
         scheduler = resource.virtual_scheduler
 
         # if the allocation for this day does not yet exist, create it
@@ -2316,7 +2316,7 @@ def add_reservation(
         # if the matched allocation isn't partly available expand it to the
         # whole allocation for a better user experience, but don't ever shrink
         # it, since that's most certainly not what they want to have happen.
-        for allocation in resource.scheduler.allocations_in_range(start, end):
+        for allocation in scheduler.allocations_in_range(start, end):
             if not allocation.overlaps(start, end):
                 continue
 
@@ -2346,8 +2346,8 @@ def add_reservation(
             quota=form.quota.data
         )
     except LibresError as e:
-        request.alert(utils.get_libres_error(e, request))
         savepoint.rollback()
+        request.alert(utils.get_libres_error(e, request))
         return show_form()
 
     reservation: Reservation = (

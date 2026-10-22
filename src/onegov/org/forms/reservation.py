@@ -154,15 +154,25 @@ class AddReservationForm(Form):
         depends_on=('whole_day', 'no')
     )
 
+    internal = RadioField(
+        label=_('Internal'),
+        description=_('Internal reservations ignore availability periods'),
+        fieldset=_('Options'),
+        choices=(
+            ('yes', _('Yes')),
+            ('no', _('No'))
+        ),
+        default='no')
+
     quota_room = IntegerField(
         label=_('Quota'),
         validators=[
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_('Time'),
+        fieldset=_('Options'),
         default=1,
-        depends_on=('whole_day', 'no')
+        depends_on=('whole_day', 'no', 'internal', 'no')
     )
 
     quota_other = IntegerField(
@@ -171,18 +181,9 @@ class AddReservationForm(Form):
             InputRequired(),
             NumberRange(1, 999)
         ],
-        fieldset=_('Time'),
+        fieldset=_('Options'),
         default=1,
     )
-
-    internal = RadioField(
-        label=_('Internal'),
-        description=_('Internal reservations ignore availability periods'),
-        choices=(
-            ('yes', _('Yes')),
-            ('no', _('No'))
-        ),
-        default='no')
 
     def apply_resource(self, resource: Resource) -> None:
         if resource.type == 'room':
@@ -191,8 +192,8 @@ class AddReservationForm(Form):
             self.delete_field('start_time')
             self.delete_field('end_time')
             self.delete_field('whole_day')
-            self.delete_field('quota_room')
             self.delete_field('internal')
+            self.delete_field('quota_room')
 
     @property
     def quota(self) -> IntegerField:

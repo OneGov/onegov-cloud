@@ -419,7 +419,7 @@ def test_find_your_spot_form_single_room() -> None:
         ('on_holidays', 'yes'),
         ('during_school_holidays', 'yes'),
         ('auto_reserve_available_slots', 'no'),
-    ]))
+    ]), is_manager=False)
     form = FindYourSpotForm(request.POST)
     form.request = request
     form.apply_rooms([Bunch(  # type: ignore[list-item]
@@ -473,7 +473,7 @@ def test_find_your_spot_form_multiple_rooms() -> None:
         ('on_holidays', 'yes'),
         ('during_school_holidays', 'yes'),
         ('auto_reserve_available_slots', 'for_every_room'),
-    ]))
+    ]), is_manager=False)
     form = FindYourSpotForm(request.POST)
     form.request = request
     form.apply_rooms(rooms)
