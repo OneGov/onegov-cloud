@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import StripWhitespaceMixin
 from onegov.fsi.i18n import _
 from onegov.search import ORMSearchable
 from sedate import utcnow
-from sqlalchemy import Text, ForeignKey, ARRAY, desc
+from sqlalchemy import Text, ForeignKey, ARRAY
 from sqlalchemy.orm import backref, mapped_column, object_session, relationship
 from sqlalchemy.orm import DynamicMapped, Mapped
 from uuid import uuid4, UUID
@@ -257,7 +257,7 @@ class CourseAttendee(Base, StripWhitespaceMixin, ORMSearchable):
         last_subscribed_event = session.query(
             CourseEvent).join(CourseSubscription).filter(
             CourseSubscription.attendee_id == self.id).order_by(
-            desc(CourseEvent.start)).first()
+            CourseEvent.start.desc()).first()
 
         result = session.query(CourseEvent).filter(CourseEvent.id.notin_(excl))
         result = result.filter(CourseEvent.start > utcnow())
@@ -275,5 +275,5 @@ class CourseAttendee(Base, StripWhitespaceMixin, ORMSearchable):
             result = result.filter(
                 CourseEvent.locked_for_subscriptions == False)
 
-        result = result.order_by(desc(CourseEvent.start))
+        result = result.order_by(CourseEvent.start.desc())
         return result

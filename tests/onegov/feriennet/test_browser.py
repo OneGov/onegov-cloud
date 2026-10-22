@@ -6,7 +6,6 @@ from datetime import date, datetime
 from pathlib import Path
 from datetime import timedelta
 from onegov.activity.types import BoundedIntegerRange
-from pytest import mark
 
 
 from typing import TYPE_CHECKING
@@ -17,6 +16,7 @@ if TYPE_CHECKING:
     from .conftest import Client, TestApp
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_browse_matching(
     browser: ExtendedBrowser,
     scenario: Scenario
@@ -97,7 +97,8 @@ def test_browse_matching(
     assert 'finished prebooking' in browser.html
 
 
-@mark.skip('Causes too many requests, skip for now')
+@pytest.mark.skip('Causes too many requests, skip for now')
+@pytest.mark.xdist_group(name="browser")
 def test_browse_billing(
     browser: ExtendedBrowser,
     scenario: Scenario,
@@ -269,6 +270,7 @@ def test_browse_billing(
     ('confirmed', 'Bestätigt'),
     ('cancelled', 'Abgelehnt'),
 ])
+@pytest.mark.xdist_group(name="browser")
 def test_volunteers_export(
     browser: ExtendedBrowser,
     scenario: Scenario,
@@ -321,6 +323,7 @@ def test_volunteers_export(
     assert volunteer['Bestätigte Helfer'] == (1 if state == 'confirmed' else 0)
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_volunteer_subscription(
     browser: ExtendedBrowser,
     scenario: Scenario,

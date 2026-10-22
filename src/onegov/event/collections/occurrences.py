@@ -11,8 +11,7 @@ from lxml import etree, objectify
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
-from sqlalchemy import distinct, func
-from sqlalchemy import and_, or_, text
+from sqlalchemy import and_, or_, func, text
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
@@ -445,7 +444,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         """ All timezones used by the occurrences. """
 
         return [
-            tz for tz, in self.session.query(distinct(Occurrence.timezone))
+            tz for tz, in self.session.query(Occurrence.timezone).distinct()
         ]
 
     @cached_property
@@ -457,7 +456,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
             for source, in self.apply_common_filters(
                 self.session.query(Occurrence)
                 .join(Event)
-                .with_entities(distinct(Event.meta['source'].astext))
+                .with_entities(Event.meta['source'].astext)
+                .distinct()
             )
             if source
         })
@@ -712,6 +712,11 @@ class OccurrenceCollection(Pagination[Occurrence]):
                     Occurrence.location.op('~')(
                         rf'\y{re.escape(loc.translate(_clean_search_term))}\y'
                     )
+                    if loc.lower() != 'null'
+                    else or_(
+                        Occurrence.location == '',
+                        Occurrence.location.is_(None)
+                    )
                     for loc in self.locations
                 ])
             )
@@ -719,6 +724,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
         if self.sources:
             query = query.filter(or_(*(
                 Event.source.astext.startswith(f'{source}-')
+                if source.lower() != 'null'
+                else Event.source.is_(None)
                 for source in self.sources
             )))
 

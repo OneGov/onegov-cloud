@@ -14,13 +14,11 @@ from onegov.election_day.models import Vote
 from onegov.election_day.utils import replace_url
 from sedate import as_datetime
 from sqlalchemy import cast
-from sqlalchemy import Enum as SAEnum
-from sqlalchemy import desc
-from sqlalchemy import distinct
 from sqlalchemy import extract
 from sqlalchemy import func
-from sqlalchemy import Integer
 from sqlalchemy import or_
+from sqlalchemy import Enum as SAEnum
+from sqlalchemy import Integer
 from sqlalchemy.sql.expression import case
 from time import mktime
 from time import strptime
@@ -122,10 +120,10 @@ class ArchivedResultCollection:
         """ Returns a list of available years. """
 
         year = cast(extract('year', ArchivedResult.date), Integer)
-        query = self.session.query(distinct(year))
-        query = query.order_by(desc(year))
+        query = self.session.query(year)
+        query = query.order_by(year.desc())
 
-        return [year for year, in query]
+        return [year for year, in query.distinct()]
 
     def group_items(
         self,
@@ -589,14 +587,14 @@ class MunicipalityArchivedResultCollection(ArchivedResultCollection):
 
     def get_years(self) -> list[int]:
         year_col = cast(extract('year', ArchivedResult.date), Integer)
-        query = self.session.query(distinct(year_col))
+        query = self.session.query(year_col)
         query = query.filter(ArchivedResult.domain == 'municipality')
         if self.municipality:
             query = query.filter(
                 ArchivedResult.domain_segment == self.municipality
             )
-        query = query.order_by(desc(year_col))
-        return [y for y, in query]
+        query = query.order_by(year_col.desc())
+        return [y for y, in query.distinct()]
 
     def _municipality_query(
         self,

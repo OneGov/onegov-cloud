@@ -4,7 +4,7 @@ from uuid import UUID, uuid4
 from onegov.core.collection import Pagination
 from onegov.core.orm import Base, SessionManager
 from sedate import utcnow
-from sqlalchemy import desc, Enum, Index, insert, inspect, select
+from sqlalchemy import Enum, Index, insert, inspect, select
 from sqlalchemy.orm import mapped_column, Mapped, object_session, Session
 
 
@@ -115,8 +115,8 @@ def latest_snapshot(
             AuditEntry.target_id == str(instance.id),
         )
         .order_by(
-            desc(AuditEntry.created),
-            desc(AuditEntry.id),
+            AuditEntry.created.desc(),
+            AuditEntry.id.desc(),
         )
         .limit(1)
     ).scalar_one_or_none()
@@ -244,8 +244,8 @@ class AuditEntryCollection(Pagination[AuditEntry]):
 
     def subset(self) -> Query[AuditEntry]:
         query = self.query().order_by(
-            desc(AuditEntry.created),
-            desc(AuditEntry.id),
+            AuditEntry.created.desc(),
+            AuditEntry.id.desc(),
         )
         if self.operation is not None:
             query = query.filter(AuditEntry.operation == self.operation)

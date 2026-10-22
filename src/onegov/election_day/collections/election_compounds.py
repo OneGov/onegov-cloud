@@ -1,8 +1,6 @@
 from onegov.core.collection import Pagination
 from onegov.election_day.models import ElectionCompound
 from sqlalchemy import cast
-from sqlalchemy import desc
-from sqlalchemy import distinct
 from sqlalchemy import extract
 from sqlalchemy import Integer
 
@@ -37,7 +35,7 @@ class ElectionCompoundCollection(Pagination[ElectionCompound]):
     def subset(self) -> Query[ElectionCompound]:
         query = self.query()
         query = query.order_by(
-            desc(ElectionCompound.date),
+            ElectionCompound.date.desc(),
             ElectionCompound.shortcode,
             ElectionCompound.title
         )
@@ -65,7 +63,7 @@ class ElectionCompoundCollection(Pagination[ElectionCompound]):
         """ Returns the election compounds with the latest date. """
 
         latest_date = self.query().with_entities(ElectionCompound.date)
-        latest_date = latest_date.order_by(desc(ElectionCompound.date))
+        latest_date = latest_date.order_by(ElectionCompound.date.desc())
         latest_date = latest_date.limit(1).scalar()
         return self.by_date(latest_date) if latest_date else None
 
@@ -75,10 +73,10 @@ class ElectionCompoundCollection(Pagination[ElectionCompound]):
         """
 
         year = cast(extract('year', ElectionCompound.date), Integer)
-        query = self.session.query(distinct(year))
-        query = query.order_by(desc(year))
+        query = self.session.query(year)
+        query = query.order_by(year.desc())
 
-        return [year for year, in query]
+        return [year for year, in query.distinct()]
 
     def by_date(self, date: date) -> list[ElectionCompound]:
         """ Returns the election compounds on the given date. """

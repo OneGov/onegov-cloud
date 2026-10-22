@@ -213,7 +213,7 @@ class UserCollection:
     def sources(self) -> tuple[str, ...]:
         """ All available sources. """
 
-        records = self.session.query(User.source)
+        records: Query[tuple[str]] = self.session.query(User.source)
         records = records.filter(User.source.isnot(None))
         records = records.order_by(User.source).distinct()
 
