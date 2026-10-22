@@ -77,7 +77,7 @@ $.fn.reservationList = function(options) {
                     }
                 }
                 if (event.internal) {
-                    rl.internal_reserve(
+                    rl.internalReserve(
                         list,
                         event.reserveurl,
                         event.start.format('YYYYMMDD'),
@@ -148,7 +148,7 @@ rl.reserve = function(list, url, start, end, quota, wholeDay, considerBlocking) 
     rl.post(list, url.toString());
 };
 
-rl.internal_reserve = function(list, url, date, start, end, wholeDay, considerBlocking) {
+rl.internalReserve = function(list, url, date, start, end, wholeDay, considerBlocking) {
     url = new Url(url);
     url.query.date = date;
     url.query.start = start;
@@ -178,7 +178,7 @@ rl.showActionsPopup = function(list, element, event, singleSelect) {
             }
         }
         if (event.internal) {
-            rl.internal_reserve(
+            rl.internalReserve(
                 list,
                 event.reserveurl,
                 event.start.format('YYYYMMDD'),
