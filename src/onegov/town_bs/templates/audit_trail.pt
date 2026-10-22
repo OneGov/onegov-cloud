@@ -30,7 +30,7 @@
 
             <div class="audit-trail-table-wrapper"
                  tal:condition="entries">
-                <table class="audit-trail stack table table-hover">
+                <table class="audit-trail stack table align-middle table-lg table-striped table-hover">
                     <thead>
                         <tr>
                             <th scope="col" i18n:translate>When</th>
@@ -45,7 +45,7 @@
                     </thead>
                     <tbody>
                         <tr tal:repeat="entry entries">
-                            <td class="audit-trail-date">
+                            <td class="audit-trail-date text-body-tertiary">
                                 <i class="far fa-clock"
                                    aria-hidden="true"></i>
                                 ${layout.format_date(
@@ -55,24 +55,24 @@
                             <td>
                                 <span class="audit-operation
                                              audit-${entry.operation}">
-                                    <span tal:condition="
-                                              entry.operation == 'insert'"
-                                          i18n:translate>Created</span>
-                                    <span tal:condition="
-                                              entry.operation == 'update'"
-                                          i18n:translate>Changed</span>
-                                    <span tal:condition="
-                                              entry.operation == 'delete'"
-                                          i18n:translate>Deleted</span>
+                                    <span tal:condition="entry.operation == 'insert'"
+                                        class="badge badge-primary"
+                                        i18n:translate>Created</span>
+                                    <span tal:condition="entry.operation == 'update'"
+                                        class="badge badge-primary"
+                                        i18n:translate>Changed</span>
+                                    <span tal:condition="entry.operation == 'delete'"
+                                            class="badge badge-primary"
+                                        i18n:translate>Deleted</span>
                                 </span>
                             </td>
                             <td class="audit-trail-target-title">
-                                <strong>
+                                <strong class="d-block">
                                     ${entry.snapshot.get(
                                         'title', entry.target_table
                                     )}
                                 </strong>
-                                <small class="audit-record-id">
+                                <small class="audit-record-id text-body-tertiary">
                                     ${entry.target_table} #${entry.target_id}
                                 </small>
                                 <small class="audit-entry-fact"
@@ -81,17 +81,15 @@
                                     ${fact.label}: ${fact.value}
                                 </small>
                             </td>
-                            <td class="audit-trail-user">
+                            <td class="audit-trail-user text-body-tertiary">
                                 <i class="far fa-user"
                                    aria-hidden="true"></i>
                                 ${entry.username}
                             </td>
                             <td class="audit-trail-action">
-                                <a class="button clear small"
+                                <a class="btn btn-sm btn-ghost btn-arrow"
                                    href="${request.link(entry)}">
                                     <span i18n:translate>View</span>
-                                    <i class="fa fa-chevron-right"
-                                       aria-hidden="true"></i>
                                 </a>
                             </td>
                         </tr>

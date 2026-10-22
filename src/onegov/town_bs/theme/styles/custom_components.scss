@@ -240,3 +240,25 @@ $step-border-width: 2px;
         --step-border-color: #{$light};
     }
 }
+
+.btn-arrow {
+    // TODO: Replace with the real icon as soon as the icon library is known
+    &::after {
+        content: '\f061';
+        font-weight: bold;
+        font-family: 'Font Awesome 5 Free';
+        margin-left: $s-md;
+        display: inline-block;
+        transition: transform $standard-transition;
+    }
+
+    &:hover::after {
+        transform: translateX($s-xs);
+    }
+}
+
+.btn-ghost {
+    color: $primary;
+    padding-left: 0;
+    padding-right: 0;
+}

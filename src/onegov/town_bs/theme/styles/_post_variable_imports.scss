@@ -103,3 +103,10 @@ $modal-dialog-margin-y-sm-up: 200px;
 
 // Form inputs
 $form-check-input-border: 1px solid $light;
+
+// Striped rows
+$table-striped-bg:    tint-color($light-bg-subtle, 50%); // default: rgba(var(--bs-emphasis-color-rgb), .05)
+$table-striped-color: $table-color;      // text color of striped rows
+$table-striped-order: odd;               // "odd" or "even"
+
+$table-hover-bg: $light-bg-subtle;
