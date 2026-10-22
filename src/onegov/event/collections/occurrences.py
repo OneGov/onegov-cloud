@@ -712,8 +712,11 @@ class OccurrenceCollection(Pagination[Occurrence]):
                     Occurrence.location.op('~')(
                         rf'\y{re.escape(loc.translate(_clean_search_term))}\y'
                     )
-                    if loc != 'null'
-                    else Occurrence.location.is_(None)
+                    if loc.lower() != 'null'
+                    else or_(
+                        Occurrence.location == '',
+                        Occurrence.location.is_(None)
+                    )
                     for loc in self.locations
                 ])
             )
