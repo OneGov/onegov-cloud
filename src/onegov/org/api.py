@@ -263,6 +263,10 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
     @cached_property
     def filters(self) -> Mapping[str, Collection[str] | str | None]:
         collection = self._base_collection
+
+        possible_sources = sorted(collection.used_sources)
+        possible_sources.append('null')
+
         filters: dict[str, Collection[str] | str | None] = {
             'search': 'Performs a full-text search for the given term',
             'start': 'Earliest event date '
@@ -270,7 +274,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
             'end': 'Latest event date (ISO-8601 encoded date: YYYY-MM-DD)',
             'locations': 'Can be specified multiple times, use "null" for '
                          'events with no location',
-            'sources': [*sorted(collection.used_sources), 'null'],
+            'sources': possible_sources,
             'syndicate': ('true', 'false'),
             'highlight': ('true', 'false'),
         }
@@ -428,7 +432,7 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
             'price': item.event.price,
             'start': item.start.isoformat(),
             'end': item.end.isoformat(),
-            'location': item.location,
+            'location': item.location or None,
             'source': source,
             'coordinates': get_geo_location(item),
         }
