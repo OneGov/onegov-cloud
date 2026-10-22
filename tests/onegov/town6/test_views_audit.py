@@ -168,6 +168,7 @@ def test_view_audit_trail(client: Client) -> None:
             target_table='pages',
             target_id=str(page_id),
             operation='update',
+            username='editor@example.org',
         )
         .one()
     )
@@ -261,6 +262,7 @@ def test_audit_trail_records_page_description_update(client: Client) -> None:
             target_table='pages',
             target_id=str(page_id),
             operation='update',
+            username='admin@example.org',
         )
         .one()
     )
