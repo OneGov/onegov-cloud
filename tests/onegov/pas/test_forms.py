@@ -19,12 +19,14 @@ from onegov.pas.forms import AttendenceForm
 from onegov.pas.forms import PASParliamentarianRoleForm
 from onegov.pas.forms import RateSetForm
 from onegov.pas.forms import SettlementRunForm
+from onegov.pas.forms.attendence import AttendenceCommissionBulkEditForm
 from onegov.pas.models import Attendence
 from onegov.pas.models import PASParliamentarian
 from onegov.pas.models import RateSet
 from onegov.pas.models import SettlementRun
 from pytest import fixture
 from tests.onegov.pas.conftest import DummyApp
+from uuid import uuid4
 
 
 from typing import Any, TYPE_CHECKING
@@ -48,6 +50,7 @@ class DummyPostData(DummyPostDataBase):
 @fixture(scope='function')
 def dummy_request(session: Session) -> Any:
     return Bunch(
+        params={},
         app=Bunch(
             org=Bunch(
                 geo_provider=None,
@@ -73,6 +76,7 @@ def dummy_request(session: Session) -> Any:
 @fixture(scope='function')
 def dummy_admin_request(session: Session) -> Any:
     return Bunch(
+        params={},
         app=Bunch(
             org=Bunch(
                 geo_provider=None,
@@ -98,6 +102,12 @@ def dummy_admin_request(session: Session) -> Any:
 
 @freeze_time('2024-01-01')
 def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
+    settlement_run = SettlementRunCollection(session).add(
+        name='2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 12, 31),
+        active=True,
+    )
     app: Any = DummyApp(session=session)
     parliamentarians = PASParliamentarianCollection(app)
     parliamentarian = parliamentarians.add(
@@ -161,6 +171,7 @@ def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
     assert obj.commission_id is None
 
     # ensure date
+    settlement_run.active = False
     form = AttendenceForm(DummyPostData({'date': '2024-01-01'}))
     form.request = dummy_admin_request
     form.on_request()
@@ -173,13 +184,7 @@ def test_attendence_forms(session: Session, dummy_admin_request: Any) -> None:
     assert not form.validate()
     assert form.date.errors[0] == 'No within an active settlement run.'
 
-    settlement_runs = SettlementRunCollection(session)
-    settlement_run = settlement_runs.add(
-        name='2024',
-        start=date(2024, 1, 1),
-        end=date(2024, 12, 31),
-        active=True
-    )
+    settlement_run.active = True
 
     assert not form.validate()
     assert 'date' not in form.errors
@@ -230,7 +235,12 @@ def test_add_plenary_attendence_form(
     session: Session,
     dummy_request: Any
 ) -> None:
-
+    settlement_run = SettlementRunCollection(session).add(
+        name='2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 12, 31),
+        active=True,
+    )
     app: Any = DummyApp(session=session)
     parliamentarians = PASParliamentarianCollection(app)
     parliamentarian = parliamentarians.add(first_name='a', last_name='b')
@@ -256,10 +266,66 @@ def test_add_plenary_attendence_form(
     assert form.get_useful_data()['duration'] == 120
 
     # ensure date (full test above)
+    settlement_run.active = False
     form2 = AttendenceAddCommissionForm(DummyPostData({'date': '2024-01-01'}))
     form2.request = dummy_request
     assert not form2.validate()
     assert form2.date.errors[0] == 'No within an active settlement run.'
+
+
+@freeze_time('2024-01-01')
+def test_edit_commission_bulk_unique_parliamentarians(
+    session: Session, dummy_request: Any
+) -> None:
+    SettlementRunCollection(session).add(
+        name='2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 12, 31),
+        active=True,
+    )
+    app: Any = DummyApp(session=session)
+    parliamentarians = PASParliamentarianCollection(app)
+    selected = parliamentarians.add(first_name='Anna', last_name='Muster')
+    unselected = parliamentarians.add(first_name='Anna', last_name='Muster')
+    commission = PASCommissionCollection(session).add(name='Gesundheit')
+    roles = PASParliamentarianRoleCollection(session)
+    memberships = PASCommissionMembershipCollection(session)
+    for person in (selected, unselected):
+        roles.add(
+            parliamentarian_id=person.id,
+            start=date(2024, 1, 1),
+            meta={'org_type': 'Kantonsrat'},
+        )
+        for role in ('member', 'president'):
+            memberships.add(
+                commission_id=commission.id,
+                parliamentarian_id=person.id,
+                role=role,
+                start=date(2024, 1, 1),
+            )
+    attendance = Attendence(
+        parliamentarian=selected,
+        commission=commission,
+        date=date(2024, 1, 1),
+        duration=Decimal('180'),
+        type='commission',
+        bulk_edit_id=uuid4(),
+    )
+    session.add(attendance)
+    session.flush()
+
+    form = AttendenceCommissionBulkEditForm()
+    form.request = dummy_request
+    form.on_request()
+    form.process_obj(attendance)
+
+    choices = form.parliamentarian_id.choices
+    assert len(choices) == 2
+    assert set(choices) == {
+        (str(selected.id), selected.title),
+        (str(unselected.id), unselected.title),
+    }
+    assert form.parliamentarian_id.data == [str(selected.id)]
 
 
 @freeze_time('2024-01-01')
@@ -565,3 +631,9 @@ def test_duration_survives_the_edit_round_trip(session: Session) -> None:
         assert attendence.duration == minutes
         edit_form = AttendenceForm(obj=attendence)
         assert edit_form.duration.data == entered
+
+
+def test_attendence_duration_must_not_be_negative() -> None:
+    for duration, valid in (('0', True), ('-0.01', False)):
+        form = AttendenceForm(DummyPostData({'duration': duration}))
+        assert form.duration.validate(form) is valid

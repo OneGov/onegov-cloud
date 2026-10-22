@@ -148,7 +148,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
             assert session is not None
             query = session.query(Screen.number, Screen)
             query = query.filter_by(group=self.group).order_by(Screen.number)
-            screens = OrderedDict(query.tuples().all())
+            screens = OrderedDict(query)
             if len(screens) > 1:
                 keys = tuple(screens.keys())
                 index = (keys.index(self.number) + 1) % len(screens)

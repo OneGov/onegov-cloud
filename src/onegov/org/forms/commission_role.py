@@ -1,4 +1,3 @@
-from datetime import date
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import TranslatedSelectField
@@ -32,8 +31,7 @@ class ParliamentarianCommissionRoleForm(Form):
 
     start = DateField(
         label=_('Start'),
-        validators=[InputRequired()],
-        default=date.today
+        validators=[Optional()],
     )
 
     end = DateField(

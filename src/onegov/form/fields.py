@@ -353,7 +353,7 @@ class UploadField(FileField):
                 or getattr(self, 'action', None) == 'keep'
             )
 
-            return truthy  # type:ignore[return-value]
+            return truthy
 
         return getattr(self, '_data', None)
 

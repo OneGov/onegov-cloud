@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-09-29 13:50+0200\n"
+"POT-Creation-Date: 2026-10-14 16:03+0200\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1789,6 +1789,9 @@ msgstr "Statut"
 msgid "Submission/publication date"
 msgstr "Date de soumission/publication"
 
+msgid "Chronology"
+msgstr "Chronologie"
+
 msgid "Parliamentary Group(s)"
 msgstr "Groupe(s) parlementaire(s)"
 
@@ -3103,6 +3106,11 @@ msgstr "Durée entre l'ouverture d'un ticket et son archivage automatique"
 msgid "Duration from archived state until deleted automatically"
 msgstr "Durée de l'état archivé jusqu'à la suppression automatique"
 
+msgid "Duration from audit trail entry creation until deleted automatically"
+msgstr ""
+"Durée entre la création d'une entrée du journal d'audit et sa suppression "
+"automatique"
+
 msgid "Firebase adminsdk credentials (JSON)"
 msgstr "Informations d'identification du kit d'administration Firebase (JSON)"
 
@@ -4052,6 +4060,9 @@ msgstr "Sélectionnez une personne supplémentaire"
 msgid "List this function in the page of this person"
 msgstr "Afficher cette fonction sur la page de cette personne"
 
+msgid "Show pictures of people"
+msgstr "Afficher les photos des personnes"
+
 msgid "Use Western ordered names"
 msgstr "Utiliser des noms occidentaux ordonnés"
 
@@ -4714,6 +4725,9 @@ msgstr "Propriétaire :"
 msgid "Kind:"
 msgstr "Type :"
 
+msgid "Changes"
+msgstr "Modifications"
+
 msgid "Before update"
 msgstr "Avant modification"
 
@@ -4723,11 +4737,11 @@ msgstr "Copier le JSON"
 msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"
 
-msgid "After update"
-msgstr "Après modification"
-
 msgid "JSON Snapshot"
 msgstr "Instantané JSON"
+
+msgid "After update"
+msgstr "Après modification"
 
 msgid ""
 "The audit trail shows when and by whom records were created, changed or "
@@ -8189,11 +8203,11 @@ msgid "Data Retention Policy"
 msgstr "Politique de Conservation des Données"
 
 msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
+"Proceed with caution. Tickets and the data they contain, as well as audit "
+"trail entries, may be irreversibly deleted."
 msgstr ""
-"Procédez avec prudence. Les billets et les données qu'ils contiennent "
-"peuvent être irrévocablement supprimés."
+"Procédez avec prudence. Les tickets et les données qu'ils contiennent, ainsi "
+"que les entrées du journal d'audit, peuvent être supprimés irréversiblement."
 
 msgid "Access (mTAN)"
 msgstr "Accès (mTAN)"
@@ -8612,6 +8626,13 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Veuillez saisir votre adresse e-mail pour continuer"
+
+#~ msgid ""
+#~ "Proceed with caution. Tickets and the data they contain may be "
+#~ "irrevocable deleted."
+#~ msgstr ""
+#~ "Procédez avec prudence. Les billets et les données qu'ils contiennent "
+#~ "peuvent être irrévocablement supprimés."
 
 #~ msgid "Target table"
 #~ msgstr "Table cible"

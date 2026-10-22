@@ -542,6 +542,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     def include_editor(self) -> None:
         self.request.include('redactor')
+        self.request.include('cropper')
         self.request.include('editor')
 
     def include_code_editor(self) -> None:

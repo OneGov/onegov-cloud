@@ -11,7 +11,7 @@ from uuid import UUID
 def test_date_converter() -> None:
     converter = extended_date_converter
 
-    assert converter.encode(None) == ['']
+    assert converter.encode(None) == ['']  # type: ignore[arg-type]
     assert converter.encode('') == ['']  # type: ignore[arg-type]
     assert converter.encode(date(2008, 12, 30)) == ['2008-12-30']
 
@@ -23,7 +23,7 @@ def test_date_converter() -> None:
 def test_datetime_converter() -> None:
     converter = datetime_converter
 
-    assert converter.encode(None) == ['']
+    assert converter.encode(None) == ['']  # type: ignore[arg-type]
     assert converter.encode('') == ['']  # type: ignore[arg-type]
     assert converter.encode(datetime(2008, 12, 30)) == ['2008-12-30T00:00:00']
 
@@ -36,7 +36,7 @@ def test_datetime_converter() -> None:
 def test_uuid_converter() -> None:
     converter = uuid_converter
 
-    assert converter.encode(None) == ['']
+    assert converter.encode(None) == ['']  # type: ignore[arg-type]
     assert converter.encode('') == ['']  # type: ignore[arg-type]
     assert converter.encode(UUID('930a8bf4-e532-4b39-bf64-bd05e81acf01')) == [
     '930a8bf4e5324b39bf64bd05e81acf01']
@@ -50,7 +50,7 @@ def test_uuid_converter() -> None:
 def test_literal_converter() -> None:
     converter = LiteralConverter(Literal['asc', 'desc'])
     assert converter.allowed_values == {'asc', 'desc'}
-    assert converter.encode(None) == ['']
+    assert converter.encode(None) == ['']  # type: ignore[arg-type]
     # NOTE: we allow bogus values to be encoded so we can e.g. build
     #       url patterns, we only filter values on decode
     assert converter.encode('bogus') == ['bogus']

@@ -23,7 +23,8 @@ from webob.multidict import MultiDict
 
 from typing import TYPE_CHECKING, Any, ClassVar, NoReturn, Self, overload
 if TYPE_CHECKING:
-    from collections.abc import Callable, Collection, Iterator, Mapping
+    from collections.abc import (
+        Callable, Collection, Generator, Iterator, Mapping)
     from onegov.core import Framework
     from onegov.core.collection import PKType
     from onegov.core.request import CoreRequest
@@ -94,7 +95,7 @@ class ApiException(Exception):
         default_status_code: int = 500,
         headers: dict[str, str] | None = None,
         exception_type: type[Exception] = Exception,
-    ) -> Iterator[None]:
+    ) -> Generator[None]:
         try:
             yield
         except exception_type as exc:

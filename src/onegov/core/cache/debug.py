@@ -7,7 +7,7 @@ from redis.client import Pipeline
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
 
 
 def _decode(value: Any) -> str:
@@ -26,7 +26,7 @@ def _describe(args: tuple[Any, ...]) -> tuple[str, str]:
 @contextmanager
 def analyze_cache_queries(
     report: Literal['summary', 'redundant', 'all'] = 'summary'
-) -> Iterator[None]:
+) -> Generator[None]:
     """ Analyzes the redis commands executed during its context.
     Mirrors :func:`onegov.core.orm.debug.analyze_sql_queries`. There are
     three levels of information (report argument):

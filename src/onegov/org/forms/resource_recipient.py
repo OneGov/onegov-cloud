@@ -168,6 +168,5 @@ class ResourceRecipientForm(Form):
                 ResourceCollection(self.request.app.libres_context).query()
                 .with_entities(Resource.group, Resource.title, Resource.id)
                 .order_by(Resource.group, Resource.name)
-                .tuples()
             )
         ]

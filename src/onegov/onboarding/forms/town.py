@@ -65,7 +65,11 @@ class TownForm(Form):
 
     def ensure_valid_name(self) -> bool:
         name = self.name.data
-        assert name is not None
+        if not name:
+            # Validation should already fail based on InputRequired, but
+            # let's also fail here just in case.
+            return False
+
         if not re.match(r'^[A-Za-z\s]+$', name) or not name.strip():
             assert isinstance(self.name.errors, list)
             self.name.errors.append(

@@ -76,7 +76,6 @@ def get_accountant_ticket_count(
             )
         )
         .group_by(Ticket.state)
-        .tuples()
     )
 
     return TicketCount(**dict(query))

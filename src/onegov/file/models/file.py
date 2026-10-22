@@ -37,7 +37,7 @@ from time import monotonic
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
-    from collections.abc import Iterator
+    from collections.abc import Generator
     from depot.io.utils import FileIntent
     from onegov.file import FileSet
     from onegov.file.types import FileStats, SignatureMetadata
@@ -400,7 +400,7 @@ class File(Base, Associable, TimestampMixin):
 def metadata_lock(
     metadata_path: StrPath,
     timeout: float = 0.0,
-) -> Iterator[bool]:
+) -> Generator[bool]:
     """ Locks the metadata from a ``filedepot.io.local.LocalStoredFile``.
     Tries to acquire the lock repeatedly in a spin lock until timeout
     expires, it will return whether or not it managed to acquire the lock

@@ -9,10 +9,9 @@ from onegov.page import Page, PageCollection
 from onegov.user import User
 from sedate import utcnow
 from sqlalchemy import inspect
-from sqlalchemy.orm import noload
 
 
-from typing import Any, NamedTuple, TYPE_CHECKING
+from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from onegov.core.analytics import AnalyticsProvider
@@ -20,6 +19,9 @@ if TYPE_CHECKING:
     from onegov.org.app import OrgApp
     from onegov.org.layout import DefaultLayout
     from onegov.ticket import Ticket
+
+
+AppT = TypeVar('AppT', bound='OrgApp', default='OrgApp', covariant=True)
 
 
 @msgpack.make_serializable(tag=20)
@@ -50,10 +52,7 @@ class PageMeta(NamedTuple):
         )
 
 
-class OrgRequest(CoreRequest):
-
-    if TYPE_CHECKING:
-        app: OrgApp
+class OrgRequest(CoreRequest[AppT]):
 
     @cached_property
     def is_manager(self) -> bool:
@@ -221,11 +220,6 @@ class OrgRequest(CoreRequest):
 
         """
         query = PageCollection(self.session).query(ordered=False)
-        query = query.options(
-            # we populate these relationship ourselves
-            noload(Page.parent),
-            noload(Page.children),
-        )
         query = query.order_by(Page.order)
 
         # first we build a map from parent_ids to their children

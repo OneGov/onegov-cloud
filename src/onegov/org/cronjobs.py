@@ -13,6 +13,7 @@ from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.core.orm import find_models
 from onegov.core.orm.abstract import AdjacencyList
+from onegov.core.orm.audit import AuditEntry
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.directory import DirectoryEntry
@@ -892,6 +893,18 @@ def delete_old_tickets(request: OrgRequest) -> None:
     delete_tickets_and_related_data(request, query)
 
 
+@OrgApp.cronjob(hour=5, minute=45, timezone='Europe/Zurich')
+def delete_old_audit_entries(request: OrgRequest) -> None:
+    delete_timespan = request.app.org.audit_trail_delete_timespan
+    if not delete_timespan:
+        return
+
+    cutoff_date = utcnow() - timedelta(days=delete_timespan)
+    request.session.query(AuditEntry).filter(
+        AuditEntry.created <= cutoff_date
+    ).delete(synchronize_session=False)
+
+
 @OrgApp.cronjob(hour=9, minute=30, timezone='Europe/Zurich')
 def send_monthly_mtan_statistics(request: OrgRequest) -> None:
 
@@ -968,7 +981,7 @@ def send_monthly_signing_service_statistics(request: OrgRequest) -> None:
     ).filter(and_(
         func.extract('year', SigningRequest.created) == year,
         func.extract('month', SigningRequest.created) == month,
-    )).group_by(SigningRequest.service_name).tuples())
+    )).group_by(SigningRequest.service_name))
     if not signing_request_counts:
         # don't send a mail if we generated no mTANs
         return

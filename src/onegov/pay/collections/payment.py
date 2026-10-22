@@ -272,13 +272,8 @@ class PaymentCollection(
         if not self.batch:
             return {}
         from onegov.reservation import Reservation
-        session = self.session
-        return {
-            payment_id: (
-                sedate.to_timezone(start_date, self.tzinfo).date(),
-                sedate.to_timezone(end_date, self.tzinfo).date()
-            )
-            for payment_id, start_date, end_date in session.query(Reservation)
+        query: Query[tuple[UUID, datetime, datetime]] = (
+            self.session.query(Reservation)
             .join(Reservation.payment)
             .filter(Payment.id.in_([el.id for el in self.batch]))
             .group_by(Payment.id)
@@ -287,6 +282,13 @@ class PaymentCollection(
                 func.min(Reservation.start),
                 func.max(Reservation.end)
             )
+        )
+        return {
+            payment_id: (
+                sedate.to_timezone(start_date, self.tzinfo).date(),
+                sedate.to_timezone(end_date, self.tzinfo).date()
+            )
+            for payment_id, start_date, end_date in query
         }
 
     def payment_links_for(

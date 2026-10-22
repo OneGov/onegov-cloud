@@ -128,7 +128,8 @@ class QrCodeWidget:
     tag = 'qr-code'
     template = """
         <xsl:template match="qr-code">
-            <tal:block tal:define="url '{@url}'; src qr_code(url)">
+            <tal:block tal:define="url {ogc:safe-string(@url)};
+                                   src qr_code(url)">
                 <img tal:attributes="src src"
                      class="{@class}"
                      />

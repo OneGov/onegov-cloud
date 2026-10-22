@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2026-09-29 13:50+0200\n"
+"POT-Creation-Date: 2026-10-14 16:03+0200\n"
 "PO-Revision-Date: 2026-08-14 12:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1789,6 +1789,9 @@ msgstr "Status"
 msgid "Submission/publication date"
 msgstr "Einreichungs-/Publikationsdatum"
 
+msgid "Chronology"
+msgstr "Chronologie"
+
 msgid "Parliamentary Group(s)"
 msgstr "Fraktion(en)"
 
@@ -3095,6 +3098,10 @@ msgstr ""
 msgid "Duration from archived state until deleted automatically"
 msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
 
+msgid "Duration from audit trail entry creation until deleted automatically"
+msgstr ""
+"Dauer vom Erstellen eines Audit-Trail-Eintrags bis zum automatischen Löschen"
+
 msgid "Firebase adminsdk credentials (JSON)"
 msgstr "Firebase adminsdk Zugangsdaten (JSON)"
 
@@ -4041,6 +4048,9 @@ msgstr "Zusätzliche Person auswählen"
 msgid "List this function in the page of this person"
 msgstr "Diese Funktion anzeigen auf der Seite von dieser Person"
 
+msgid "Show pictures of people"
+msgstr "Fotos der Personen anzeigen"
+
 msgid "Use Western ordered names"
 msgstr "Westlich geordnete Namen verwenden"
 
@@ -4709,6 +4719,9 @@ msgstr "Besitzer:"
 msgid "Kind:"
 msgstr "Art:"
 
+msgid "Changes"
+msgstr "Änderungen"
+
 msgid "Before update"
 msgstr "Vor der Änderung"
 
@@ -4718,11 +4731,11 @@ msgstr "JSON kopieren"
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
 
-msgid "After update"
-msgstr "Nach der Änderung"
-
 msgid "JSON Snapshot"
 msgstr "JSON-Snapshot"
+
+msgid "After update"
+msgstr "Nach der Änderung"
 
 msgid ""
 "The audit trail shows when and by whom records were created, changed or "
@@ -8178,11 +8191,11 @@ msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"
 
 msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
+"Proceed with caution. Tickets and the data they contain, as well as audit "
+"trail entries, may be irreversibly deleted."
 msgstr ""
-"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
-"unwiderruflich gelöscht werden."
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten sowie "
+"Audit-Trail-Einträge können unwiderruflich gelöscht werden."
 
 msgid "Access (mTAN)"
 msgstr "Zugang (mTAN)"
@@ -8603,6 +8616,13 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
+
+#~ msgid ""
+#~ "Proceed with caution. Tickets and the data they contain may be "
+#~ "irrevocable deleted."
+#~ msgstr ""
+#~ "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten "
+#~ "können unwiderruflich gelöscht werden."
 
 #~ msgid "Target table"
 #~ msgstr "Zieltabelle"

@@ -23,8 +23,7 @@ from onegov.newsletter import Newsletter
 from onegov.org import log
 from onegov.org.models import (
     Organisation, Topic, News, ExtendedDirectory, PushNotification)
-from onegov.org.models.political_business import (
-    POLITICAL_BUSINESS_STATUS, POLITICAL_BUSINESS_TYPE)
+from onegov.org.models.political_business import POLITICAL_BUSINESS_TYPE
 from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.people import Person
@@ -606,22 +605,6 @@ def migrate_kaba_config_to_new_format(context: UpgradeContext) -> None:
         """), {'site_id': site_id})
 
 
-@upgrade_task('Update political business enum values')
-def update_political_business_enum_values(
-    context: UpgradeContext
-) -> None:
-    if context.has_enum('par_political_business_type'):
-        context.update_enum_values(
-            'par_political_business_type',
-            POLITICAL_BUSINESS_TYPE.keys()
-        )
-    if context.has_enum('par_political_business_status'):
-        context.update_enum_values(
-            'par_political_business_status',
-            POLITICAL_BUSINESS_STATUS.keys()
-        )
-
-
 @upgrade_task('Change political business participation type column type')
 def change_political_business_participation_type_column_type(
     context: UpgradeContext
@@ -667,6 +650,22 @@ def make_political_business_participation_type_column_nullable(
             'participant_type',
             nullable=True,
         )
+
+
+@upgrade_task('Add publication dates to political businesses')
+def add_publication_dates_to_political_businesses(
+    context: UpgradeContext,
+) -> None:
+    table = 'par_political_businesses'
+    if not context.has_table(table):
+        return
+
+    for column in ('publication_start', 'publication_end'):
+        if not context.has_column(table, column):
+            context.operations.add_column(
+                table,
+                Column(column, UTCDateTime, nullable=True),
+            )
 
 
 @upgrade_task('Update political business type enum values')

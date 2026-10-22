@@ -323,6 +323,7 @@ class Organisation(Base, TimestampMixin):
     # data retention policy
     auto_archive_timespan: dict_property[int] = meta_property(default=0)
     auto_delete_timespan: dict_property[int] = meta_property(default=0)
+    audit_trail_delete_timespan: dict_property[int] = meta_property(default=0)
 
     # vat
     vat_rate: dict_property[float | None] = meta_property(default=0.0)
@@ -335,6 +336,9 @@ class Organisation(Base, TimestampMixin):
     ris_main_url: dict_property[str | None] = meta_property(default=None)
     ris_interest_tie_categories: dict_property[list[str] | None] = (
         meta_property(default=None))
+    ris_parliamentarian_term: dict_property[str | None] = meta_property(
+        default='parliamentarians'
+    )
 
     # MTAN Settings
     mtan_access_window_seconds: dict_property[int | None] = meta_property()

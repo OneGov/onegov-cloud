@@ -1614,7 +1614,7 @@ def signing_service_statistics(
         ).filter(and_(
             func.extract('year', SigningRequest.created) == year,
             func.extract('month', SigningRequest.created) == month,
-        )).group_by(SigningRequest.service_name).tuples())
+        )).group_by(SigningRequest.service_name))
         if signing_request_counts:
             org_name = app.org.name if hasattr(app, 'org') else None
             title = f'{org_name} ({app.schema})' if org_name else app.schema
@@ -3298,12 +3298,12 @@ def fix_custom_event_tags(
         used_tags: set[str] = {
             tag
             for tag, in request.session.query(
-                func.skeys(Event._tags).distinct()
+                func.skeys(Event._tags)
             ).union_all(
                 request.session.query(
-                    func.skeys(Occurrence._tags).distinct()
+                    func.skeys(Occurrence._tags)
                 )
-            )
+            ).distinct()
         }
         old_tags = used_tags - custom_tags
         if not old_tags:

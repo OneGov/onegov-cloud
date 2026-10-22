@@ -1,5 +1,7 @@
 from onegov.search import ORMSearchable, Searchable, SearchableContent
 from onegov.search import utils
+from onegov.core.orm import Base
+from onegov.directory.models.directory import DirectoryFile
 from sqlalchemy.orm import mapped_column, registry, DeclarativeBase, Mapped
 
 
@@ -31,6 +33,13 @@ def test_get_searchable_sqlalchemy_models() -> None:
 
     assert list(utils.searchable_sqlalchemy_models(Foo)) == [B]
     assert list(utils.searchable_sqlalchemy_models(Bar)) == [D]
+
+
+def test_directory_files_are_not_searchable() -> None:
+    searchable_model_names = {
+        model.__name__ for model in utils.searchable_sqlalchemy_models(Base)
+    }
+    assert DirectoryFile.__name__ not in searchable_model_names
 
 
 def test_get_searchable_sqlalchemy_models_inheritance() -> None:

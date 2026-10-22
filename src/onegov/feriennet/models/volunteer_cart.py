@@ -3,19 +3,19 @@ from onegov.activity import OccasionNeed
 from onegov.core.orm.sql import as_selectable_from_path
 from onegov.core.utils import module_path
 from onegov.feriennet import _
+from operator import attrgetter
 from sedate import overlaps
 from sqlalchemy import select
 
 
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Sequence
+    from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
     from onegov.core.browser_session import BrowserSession
     from onegov.core.types import JSON_ro, RenderData
     from onegov.feriennet.layout import DefaultLayout
     from onegov.feriennet.request import FeriennetRequest
-    from sqlalchemy.engine import Result
     from sqlalchemy.orm import Session
     from typing import NamedTuple
     from typing import Self
@@ -76,7 +76,7 @@ class VolunteerCart:
     def card_items(
         self,
         need_id: UUID | None = None
-    ) -> Result[CardItemRow]:
+    ) -> Iterable[CardItemRow]:
         stmt = as_selectable_from_path(
             module_path('onegov.feriennet', 'queries/card_items.sql'))
 
@@ -86,7 +86,7 @@ class VolunteerCart:
             need_ids = (need_id, )
 
         query = select(*stmt.c).where(stmt.c.need_id.in_(need_ids))
-        return self.session.execute(query)
+        return self.session.execute(query)  # type: ignore[return-value]
 
     def overlaps(self, need_id: UUID) -> bool:
         need = self.session.query(OccasionNeed).filter_by(id=need_id).first()
@@ -107,7 +107,7 @@ class VolunteerCart:
         localize: bool = True
     ) -> Iterator[RenderData]:
 
-        grouped = groupby(self.card_items().tuples(), key=lambda i: i.need_id)
+        grouped = groupby(self.card_items(), key=attrgetter('need_id'))
 
         def date(record: CardItemRow) -> str:
             start = record.start
