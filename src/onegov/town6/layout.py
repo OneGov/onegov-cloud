@@ -1658,6 +1658,10 @@ class RISCommissionLayout(DefaultLayout):
         return RISCommissionCollection(self.request.session)
 
     @cached_property
+    def parliamentarian_collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
+
+    @cached_property
     def title(self) -> str:
         return self.model.name
 

@@ -512,6 +512,12 @@ msgstr "Aucun chat actif."
 msgid "Commission members"
 msgstr "Membres de la commission"
 
+msgid "To add a member, open the parliamentarian and select “New commission function”."
+msgstr "Pour ajouter un membre, ouvrez son profil et choisissez « Nouvelle fonction de commission »."
+
+msgid "Edit membership"
+msgstr "Modifier l’appartenance"
+
 msgid "Description"
 msgstr "Description"
 
