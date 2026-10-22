@@ -469,9 +469,10 @@ class AllocationEventInfo:
         request: OrgRequest,
         resource: Resource,
         start: datetime,
-        end: datetime
+        end: datetime,
     ) -> list[Self]:
 
+        # NOTE: We never want to display virtual allocations here
         scheduler = resource.scheduler
         allocations = scheduler.allocations_with_availability_by_range(
             start,
@@ -1267,11 +1268,12 @@ class MyReservationEventInfo:
 
 class FindYourSpotEventInfo:
 
-    __slots__ = ('allocation', 'slot_time', 'availability', 'quota_left',
-                 'request', 'translate', 'adjustable')
+    __slots__ = ('resource', 'allocation', 'slot_time', 'availability',
+                 'quota_left', 'request', 'translate', 'adjustable')
 
     def __init__(
         self,
+        resource: Resource,
         allocation: Allocation,
         slot_time: DateRange | None,
         availability: float,
@@ -1281,6 +1283,7 @@ class FindYourSpotEventInfo:
         adjustable: bool = False
     ) -> None:
 
+        self.resource = resource
         self.allocation = allocation
         self.slot_time = slot_time
         self.availability = availability
@@ -1320,7 +1323,11 @@ class FindYourSpotEventInfo:
 
     @property
     def whole_day(self) -> str:
-        if self.allocation.whole_day:
+        if (
+            sedate.is_whole_day(*self.slot_time, self.resource.timezone)
+            if self.slot_time
+            else self.allocation.whole_day
+        ):
             return 'true'
         else:
             return 'false'
@@ -1387,7 +1394,13 @@ class FindYourSpotEventInfo:
         return ' '.join(self.event_classes)
 
     @property
+    def internal(self) -> bool:
+        return self.allocation.is_virtual
+
+    @property
     def reserveurl(self) -> str:
+        if self.internal:
+            return self.request.link(self.resource, 'internal-reserve')
         return self.request.link(self.allocation, 'reserve')
 
 

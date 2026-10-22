@@ -20,7 +20,7 @@
             data-reservationform="${request.link(resource, name='form')}"
             data-type="${resource.type}"
             data-editable="${request.is_manager and 'true' or 'false'}"
-            data-select-url="${request.link(resource, name='new-rule')}"
+            data-internal-reserve-url="${request.link(resource, name='internal-reserve')}"
             data-view="${resource.view or resource.default_view or 'timeGridWeek'}"
             data-date="${resource.date and resource.date.isoformat() or ''}"
             data-highlights-min="${resource.highlights_min or ''}"

@@ -94,7 +94,11 @@ class ResourceCollection:
         ensure_type: str | any_type_t = any_type
     ) -> Resource | None:
 
-        query = self.query().filter(Resource.id == id)
+        query = self.query().filter(
+            # NOTE: We automatically detect whether were given a virtual
+            #       resource id and apply the correct filter
+            Resource.virtual_id == id if id.version == 5 else Resource.id == id
+        )
 
         if ensure_type is not any_type:
             query = query.filter(Resource.type == ensure_type)
@@ -136,20 +140,31 @@ class ResourceCollection:
     ) -> None:
 
         scheduler = resource.get_scheduler(self.libres_context)
+        virtual_scheduler = resource.get_scheduler(
+            self.libres_context,
+            virtual=True
+        )
 
         session_manager = self.libres_context.get_service('session_provider')
         if not including_reservations:
             assert not scheduler.managed_reserved_slots().first()
             assert not scheduler.managed_reservations().first()
+            assert not scheduler.managed_blockers().first()
+            assert not virtual_scheduler.managed_reserved_slots().first()
+            assert not virtual_scheduler.managed_reservations().first()
+            assert not virtual_scheduler.managed_blockers().first()
 
             with session_manager.ignore_bulk_deletes():
                 scheduler.managed_allocations().delete('fetch')
+                virtual_scheduler.managed_allocations().delete('fetch')
         else:
             if callable(handle_linked_objects):
                 handle_linked_objects(scheduler, self.session)
+                handle_linked_objects(virtual_scheduler, self.session)
 
             with session_manager.ignore_bulk_deletes():
                 scheduler.extinguish_managed_records()
+                virtual_scheduler.extinguish_managed_records()
 
         if resource.files:
             # unlink any linked files

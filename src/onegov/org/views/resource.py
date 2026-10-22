@@ -44,7 +44,7 @@ from onegov.ticket import Ticket, TicketInvoice
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
-from sqlalchemy import and_, cast as sa_cast, func, or_, select
+from sqlalchemy import and_, cast as sa_cast, delete, func, or_, select
 from sqlalchemy import Boolean, UUID as UUIDType
 from sqlalchemy.orm import undefer, joinedload, Session
 from webob import exc
@@ -408,22 +408,15 @@ def view_find_your_spot(
             if duration.total_seconds() < 600
             else duration
         )
+        internal = form.internal.data == 'yes' if form.internal else False
 
         if form.rooms:
             assert form.rooms.data is not None
             # filter rooms according to the form selection
             rooms = [room for room in rooms if room.id in form.rooms.data]
 
-        def included_dates() -> Iterator[date_t]:
-            # yields all the dates that should be part of our result set
-            current = start.date()
-            max_date = end.date()
-            while current <= max_date:
-                if not form.is_excluded(current):
-                    yield current
-                current += timedelta(days=1)
-
         def spot_infos_for_free_slots(
+            resource: Resource,
             allocation: Allocation,
             free: list[tuple[datetime, datetime]],
             target_range: timedelta,
@@ -443,6 +436,7 @@ def view_find_your_spot(
                     availability = (slot_end - slot_start) / target_range
                     availability *= 100.0
                     yield utils.FindYourSpotEventInfo(
+                        resource,
                         allocation,
                         (sedate.to_timezone(
                             slot_start, allocation.timezone),
@@ -462,6 +456,7 @@ def view_find_your_spot(
             availability = (slot_end - slot_start) / target_range
             availability *= 100.0
             yield utils.FindYourSpotEventInfo(
+                resource,
                 allocation,
                 (sedate.to_timezone(slot_start, allocation.timezone),
                  sedate.to_timezone(slot_end, allocation.timezone)),
@@ -474,18 +469,57 @@ def view_find_your_spot(
         # initialize the room slots with all the included dates and rooms
         room_slots = {
             d: {room.id: [] for room in rooms}
-            for d in included_dates()
+            for d in form.included_dates
         }
+        temporary_allocation_ids: set[int] = set()
         for room in rooms:
             room.bind_to_libres_context(request.app.libres_context)
-            scheduler = room.scheduler
-            allocations = request.exclude_invisible(
-                scheduler.search_allocations(
+            if internal:
+                scheduler = room.virtual_scheduler
+                allocations = scheduler.search_allocations(
                     start, end, days=form.weekdays.data, strict=True
                 )
-            )
-            if not allocations:
-                continue
+                existing_dates = {
+                    allocation.display_start().date()
+                    for allocation in allocations
+                }
+                # any virtual allocations for included dates that don't
+                # exist need to be created at least temporarily
+                allocation_dates = [
+                    sedate.align_range_to_day(
+                        dt := sedate.replace_timezone(
+                            sedate.as_datetime(date),
+                            room.timezone
+                        ),
+                        dt,
+                        room.timezone
+                    )
+                    for date in form.included_dates
+                    if date not in existing_dates
+                ]
+                if allocation_dates:
+                    new_allocations = scheduler.allocate(
+                        allocation_dates,
+                        partly_available=True,
+                        whole_day=True,
+                        quota=1,
+                        quota_limit=1,
+                    )
+                    temporary_allocation_ids.update(
+                        allocation.id
+                        for allocation in new_allocations
+                    )
+                    allocations.extend(new_allocations)
+                    allocations.sort(key=attrgetter('_start'))
+            else:
+                scheduler = room.scheduler
+                allocations = request.exclude_invisible(
+                    scheduler.search_allocations(
+                        start, end, days=form.weekdays.data, strict=True
+                    )
+                )
+                if not allocations:
+                    continue
 
             reserved, blocked = scheduler.reserved_slots_by_range(
                 min(a._start for a in allocations),
@@ -535,6 +569,7 @@ def view_find_your_spot(
                             availability = 100.0
 
                     slots.append(utils.FindYourSpotEventInfo(
+                        room,
                         allocation,
                         None,
                         availability if quota_left else 0.0,
@@ -583,6 +618,7 @@ def view_find_your_spot(
                             # render an unavailable slot
                             added_slots += 1
                             slots.append(utils.FindYourSpotEventInfo(
+                                room,
                                 allocation,
                                 (
                                     max(
@@ -607,6 +643,7 @@ def view_find_your_spot(
                         continue
 
                     spot_infos = list(spot_infos_for_free_slots(
+                        room,
                         allocation,
                         free,
                         target_slot_end - target_slot_start
@@ -621,6 +658,7 @@ def view_find_your_spot(
                         )
                         # render a partially available slot
                         slots.append(utils.FindYourSpotEventInfo(
+                            room,
                             allocation,
                             (
                                 max(
@@ -669,6 +707,7 @@ def view_find_your_spot(
                 slots.extend(
                     slot
                     for slot in spot_infos_for_free_slots(
+                        room,
                         allocation,
                         # we want to render the entire available time
                         # span, as long as it overlaps with our target
@@ -703,7 +742,10 @@ def view_find_your_spot(
         if auto_reserve != 'no':
             rooms_dict = {room.id: room for room in rooms}
             reservations: dict[UUID, list[Reservation]] = {
-                room.id: room.bound_reservations(request).all()  # type: ignore[attr-defined]
+                room.id: room.bound_reservations(  # type: ignore[attr-defined]
+                    request,
+                    with_virtual=request.is_manager
+                ).all()
                 for room in rooms
             }
             skipped_due_to_existing_reservation = {
@@ -774,7 +816,11 @@ def view_find_your_spot(
                             try:
                                 room = rooms_dict[room_id]
                                 assert hasattr(room, 'bound_session_id')
-                                room.scheduler.reserve(
+                                if internal:
+                                    scheduler = room.virtual_scheduler
+                                else:
+                                    scheduler = room.scheduler
+                                scheduler.reserve(
                                     email='0xdeadbeef@example.org',
                                     dates=slot.slot_time or (
                                         slot.allocation.display_start(),
@@ -791,6 +837,8 @@ def view_find_your_spot(
                                 continue
                             else:
                                 # we managed to reserve a slot
+                                # so the allocation can no longer be temporary
+                                temporary_allocation_ids.discard(slot.allocation.id)
                                 break
                     else:
                         # no slot reserved, move on to the next room
@@ -825,6 +873,12 @@ def view_find_your_spot(
                 for date in room_slots.keys()
                 if len(room_ids := reserved_dates.get(date, set())) < wanted
             } if auto_reserve != 'for_first_day' else {}
+
+        if temporary_allocation_ids:
+            # emit a bulk delete for all temporary allocations
+            request.session.execute(delete(Allocation).where(
+                Allocation.id.in_(temporary_allocation_ids)
+            ))
 
     holidays: dict[date_t, list[str]] = {}
     if room_slots:
@@ -880,7 +934,10 @@ def get_find_your_spot_reservations(
             # FIXME: Maybe we should move bound_reservations to the base
             #        Resource class?
             if hasattr(resource, 'bound_reservations')
-            for reservation in resource.bound_reservations(request)),
+            for reservation in resource.bound_reservations(
+                request,
+                with_virtual=request.is_manager
+            )),
         key=itemgetter('date', 'title')
     )
 
@@ -915,6 +972,8 @@ def delete_all_find_your_spot_reservations(
     if request.is_logged_in:
         request.assert_valid_csrf_token()
 
+    with_virtual = request.is_manager
+
     # TODO: We might be able to make this a lot more efficient by taking
     #       advantage of the fact that we use a single shared token for
     #       all reservations in the same session (although that might
@@ -924,12 +983,35 @@ def delete_all_find_your_spot_reservations(
         # FIXME: Maybe we should move bound_reservations to the base
         #        Resource class?
         assert hasattr(resource, 'bound_reservations')
-        for reservation in resource.bound_reservations(request):
+        cleanup_virtual_allocations: bool = False
+        min_date = max_date = None
+        for reservation in resource.bound_reservations(
+            request,
+            with_virtual=with_virtual
+        ):
+            if reservation.is_virtual:
+                assert with_virtual is True
+                scheduler = resource.virtual_scheduler
+                cleanup_virtual_allocations = True
+                if min_date is None or reservation.start < min_date:
+                    min_date = reservation.start
+                if max_date is None or reservation.end > max_date:
+                    max_date = reservation.end
+            else:
+                scheduler = resource.scheduler
             # these shouldn't have a ticket yet, so we don't need
             # to worry about it
-            resource.scheduler.remove_reservation(
+            scheduler.remove_reservation(
                 reservation.token,
                 reservation.id
+            )
+
+        if cleanup_virtual_allocations:
+            assert with_virtual and min_date and max_date
+            request.session.flush()
+            resource.virtual_scheduler.remove_unused_allocations(
+                min_date,
+                max_date
             )
 
     return {
@@ -1260,6 +1342,11 @@ def handle_cleanup_allocations(
         assert start is not None and end is not None
         count = self.scheduler.remove_unused_allocations(start, end, days=days)
 
+        # we also sneakily clean up the virtual allocations in the same
+        # time range, ignoring the week day restrictions, we don't need
+        # to report these cleanups since they're supposed to be invisible
+        self.virtual_scheduler.remove_unused_allocations(start, end)
+
         request.success(
             _('Successfully removed ${count} unused allocations', mapping={
                 'count': count
@@ -1329,7 +1416,10 @@ def get_reservations(self: Resource, request: OrgRequest) -> RenderData:
     # FIXME: Maybe we should move bound_reservations to the base
     #        Resource class?
     assert hasattr(self, 'bound_reservations')
-    reservations = tuple(self.bound_reservations(request))
+    reservations = tuple(self.bound_reservations(
+        request,
+        with_virtual=request.is_manager
+    ))
     prediction = predict_next_reservation(self, request, reservations)
 
     return {
@@ -1402,6 +1492,9 @@ def view_occupancy_json(self: Resource, request: OrgRequest) -> JSON_ro:
     if not (start and end):
         return ()
 
+    # NOTE: Since we include all visible reservations/blockers we don't need
+    #       to worry about virtual vs. regular scheduler, either one will
+    #       include everything we want to display.
     scheduler = self.scheduler
 
     # get all reservations and tickets
@@ -1981,7 +2074,10 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
     if blocking_resources:
         resources = self.blocking_resources()
     else:
-        resources = {}
+        # even if we exclude blocking resources we want to include our
+        # virtual resource, since those reservations still apply to the
+        # same physical resource
+        resources = {self.virtual_id: self}
     resources[self.id] = self
 
     all_ical_fields = {
@@ -2018,10 +2114,7 @@ def view_ical(self: Resource, request: OrgRequest) -> Response:
         .filter(Reservation.start >= start)
         .filter(Reservation.start <= end)
     )
-    if len(resources) > 1:
-        query = query.filter(Reservation.resource.in_(resources.keys()))
-    else:
-        query = query.filter(Reservation.resource == self.id)
+    query = query.filter(Reservation.resource.in_(resources.keys()))
     if all_ical_fields:
         query = query.outerjoin(
             FormSubmission,
@@ -2236,7 +2329,10 @@ def run_export(
     start, end = sedate.align_range_to_day(start, end, resource.timezone)
 
     query: Query[ReservationExportRow]
-    query = resource.reservations_with_tickets_query(start, end)  # type:ignore
+    query = resource.reservations_with_tickets_query(  # type: ignore[attr-defined]
+        start, end,
+        include_virtual=True
+    )
     # FormSubmission is optional
     query = query.outerjoin(
         FormSubmission, Reservation.token == FormSubmission.id
