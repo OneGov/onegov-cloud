@@ -304,6 +304,16 @@ table.audit-trail {
         .diff_chg {
             background: rgba($warning-color, .2);
         }
+
+        .diff-word-removed {
+            background: rgba($alert-color, .3);
+            text-decoration: line-through;
+        }
+
+        .diff-word-added {
+            background: rgba($success-color, .3);
+            text-decoration: none;
+        }
     }
 }
 

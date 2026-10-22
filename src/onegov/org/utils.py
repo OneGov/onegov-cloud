@@ -30,7 +30,7 @@ from onegov.reservation import Resource
 from onegov.ticket import Ticket, TicketCollection, TicketPermission
 from onegov.user import Auth, User, UserGroup
 from operator import add
-from sqlalchemy import case, nullsfirst
+from sqlalchemy import case
 from webob.exc import HTTPBadRequest
 
 
@@ -270,7 +270,6 @@ def set_image_sizes(
             collection.query()
             .with_entities(model_class.id, model_class.reference)
             .filter(model_class.id.in_(images_dict))
-            .tuples()
         )
 
         for image_id, image in images_dict.items():
@@ -1704,7 +1703,7 @@ def group_by_column[T, SortT: SupportsRichComparison](
 
     default_group = default_group or request.translate(_('General'))
 
-    query = query.order_by(nullsfirst(group_column))
+    query = query.order_by(group_column.nullsfirst())
     records = request.exclude_invisible(query)
 
     grouped = OrderedDict()

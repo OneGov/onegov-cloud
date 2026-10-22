@@ -47,7 +47,7 @@ def count_political_businesses_by_type(
         func.count(PoliticalBusiness.id).label('count'),
     ).group_by(PoliticalBusiness.political_business_type)
 
-    return dict(counts.tuples())
+    return dict(counts)
 
 
 def count_political_businesses_by_status(
@@ -59,7 +59,7 @@ def count_political_businesses_by_status(
         func.count(PoliticalBusiness.id).label('count'),
     ).group_by(PoliticalBusiness.status)
 
-    return dict(counts.tuples())
+    return dict(counts)
 
 
 def count_political_businesses_by_year(

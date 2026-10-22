@@ -180,8 +180,8 @@ class ExtendedPersonCollection(
         """ All distinct first letters of people's last names. """
         letter = func.left(ExtendedPerson.last_name, 1)
         letter = func.upper(func.unaccent(letter))
-        query = self.session.query(letter.distinct().label('letter'))
-        query = query.order_by(letter)
+        query = self.session.query(letter.label('letter'))
+        query = query.order_by(letter).distinct()
         return [letter for letter, in query]
 
     @cached_property

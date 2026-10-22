@@ -28,7 +28,7 @@ from onegov.org.observer import observes
 from onegov.page import Page, PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
-from sqlalchemy import desc, inspect
+from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
 from turbohtml.clean import LinkDetector
@@ -443,6 +443,7 @@ class PersonLinkExtension(ContentExtension):
     """
 
     western_name_order: dict_property[bool] = content_property(default=False)
+    show_people_pictures: dict_property[bool] = content_property(default=True)
 
     @property
     def people(self) -> list[PersonWithFunction] | None:
@@ -675,6 +676,11 @@ class PersonLinkExtension(ContentExtension):
             )
 
         class PeoplePageForm(form_class):  # type:ignore
+
+            show_people_pictures = BooleanField(
+                label=_('Show pictures of people'),
+                fieldset=_('People'),
+            )
 
             western_name_order = BooleanField(
                 label=_('Use Western ordered names'),
@@ -1271,9 +1277,9 @@ class InlinePhotoAlbumExtension(ContentExtension):
 
         from onegov.org.models import ImageSetCollection
         from onegov.org.models import ImageSet
-        albums: list[ImageSet] = (  # noqa: TC201
+        albums: list[ImageSet] = (
             ImageSetCollection(request.session).query().order_by(
-                desc(ImageSet.last_change), ImageSet.title).all())
+                ImageSet.last_change.desc(), ImageSet.title).all())
         if not albums:
             return form_class
 

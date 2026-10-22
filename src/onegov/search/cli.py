@@ -34,7 +34,7 @@ def psql_index_status(
     index_counts = dict(session.query(
         SearchIndex.owner_tablename,
         func.count(SearchIndex.id)
-    ).group_by(SearchIndex.owner_tablename).tuples())
+    ).group_by(SearchIndex.owner_tablename))
 
     header_printed = False
 

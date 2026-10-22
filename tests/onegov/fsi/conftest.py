@@ -14,7 +14,6 @@ from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
 from sedate import utcnow
-from sqlalchemy import desc
 from sqlalchemy.orm.session import close_all_sessions
 from tests.onegov.fsi.common import (
     global_password, admin_factory,
@@ -469,7 +468,7 @@ class FsiScenario(BaseScenario):
 
     def first_user(self, role: str = 'admin') -> User | None:
         return self.session.query(User).filter_by(
-            role=role).order_by(desc(User.created)).first()
+            role=role).order_by(User.created.desc()).first()
 
     @property
     def latest_attendee(self) -> CourseAttendee:

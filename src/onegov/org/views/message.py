@@ -106,7 +106,7 @@ def view_messages_feed(
                 general if hide_personal_email else username,
                 realname
             )
-            for username, realname in query.tuples()
+            for username, realname in query
         }
         owners.update({
             username: Owner(

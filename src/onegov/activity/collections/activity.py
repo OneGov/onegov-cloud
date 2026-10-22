@@ -622,4 +622,4 @@ class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):
 
         ages = self.session.execute(query).first()
 
-        return ages._tuple() if ages else None
+        return ages if ages else None

@@ -6,7 +6,7 @@ from functools import cached_property
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from sedate import utcnow, to_timezone
-from sqlalchemy import desc, or_, and_, Enum, ForeignKey, SmallInteger
+from sqlalchemy import or_, and_, Enum, ForeignKey, SmallInteger
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, object_session, relationship
 from sqlalchemy.orm import DynamicMapped, Mapped
@@ -500,7 +500,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         last_subscribed_event = request.session.query(
             CourseEvent).join(CourseSubscription).filter(
             CourseSubscription.attendee_id == attendee_id
-            ).order_by(desc(CourseEvent.start)).first()
+            ).order_by(CourseEvent.start.desc()).first()
 
         if last_subscribed_event is None:
             return True

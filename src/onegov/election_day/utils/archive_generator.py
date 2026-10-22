@@ -11,7 +11,6 @@ from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import ProporzElection
 from onegov.election_day.models import Vote
-from sqlalchemy import desc
 from shutil import copy2, make_archive
 from tempfile import TemporaryDirectory
 
@@ -155,11 +154,11 @@ class ArchiveGenerator:
         return self.archive_path
 
     def all_counted_votes_with_results(self) -> list[Vote]:
-        query = self.session.query(Vote).order_by(desc(Vote.date))
+        query = self.session.query(Vote).order_by(Vote.date.desc())
         return self.filter_by_final_results(query)
 
     def all_counted_election_with_results(self) -> list[Election]:
-        query = self.session.query(Election).order_by(desc(Election.date))
+        query = self.session.query(Election).order_by(Election.date.desc())
         return self.filter_by_final_results(query)
 
     def all_counted_election_compounds_with_results(
@@ -168,7 +167,7 @@ class ArchiveGenerator:
 
         query = (
             self.session.query(ElectionCompound)
-            .order_by(desc(ElectionCompound.date))
+            .order_by(ElectionCompound.date.desc())
         )
         return self.filter_by_final_results(query)
 

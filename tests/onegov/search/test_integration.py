@@ -1210,7 +1210,7 @@ def test_date_decay(postgres_dsn: str) -> None:
     session.add(one)
     session.add(two)
 
-    def search(title: str) -> list[int]:
+    def search(title: str) -> list[int | None]:
         transaction.commit()
 
         search = session.query(SearchIndex.owner_id_int)

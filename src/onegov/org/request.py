@@ -9,7 +9,6 @@ from onegov.page import Page, PageCollection
 from onegov.user import User
 from sedate import utcnow
 from sqlalchemy import inspect
-from sqlalchemy.orm import noload
 
 
 from typing import Any, NamedTuple, TypeVar, TYPE_CHECKING
@@ -221,11 +220,6 @@ class OrgRequest(CoreRequest[AppT]):
 
         """
         query = PageCollection(self.session).query(ordered=False)
-        query = query.options(
-            # we populate these relationship ourselves
-            noload(Page.parent),
-            noload(Page.children),
-        )
         query = query.order_by(Page.order)
 
         # first we build a map from parent_ids to their children

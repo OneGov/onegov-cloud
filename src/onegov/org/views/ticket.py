@@ -1701,9 +1701,10 @@ def get_submitters(
         all_submitters.request = self.request  # type: ignore[union-attr]
     query = (
         all_submitters.subset()
-        .with_entities(Ticket.ticket_email.distinct())
+        .with_entities(Ticket.ticket_email)
         .order_by(None)
         .order_by(Ticket.ticket_email)
+        .distinct()
     )
 
     yield Link(

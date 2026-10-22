@@ -3,9 +3,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 # pragma: exclude file
-from sqlalchemy import text
 from sqlalchemy import Column
-from sqlalchemy import Enum
 from sqlalchemy import JSON
 from sqlalchemy import Text
 from sqlalchemy import UUID
@@ -317,17 +315,8 @@ def add_external_kub_id_to_roles_and_memberships(
 def add_substitute_member_commission_role(context: UpgradeContext) -> None:
     enum_name = 'pas_commission_membership_role'
     if context.has_enum(enum_name):
-        context.operations.execute(text("""
-            ALTER TABLE par_commission_memberships
-            ALTER COLUMN role TYPE Text;
-            DROP TYPE pas_commission_membership_role
-        """))
-        Enum(
-            *ROLES.keys(),
-            name=enum_name
-        ).create(context.operations.get_bind())
-        context.operations.execute(text("""
-            ALTER TABLE par_commission_memberships
-            ALTER COLUMN role TYPE pas_commission_membership_role
-            USING role::text::pas_commission_membership_role
-        """))
+        context.update_enum_columns(
+            enum_name,
+            ROLES.keys(),
+            {'par_commission_memberships': ['role']}
+        )

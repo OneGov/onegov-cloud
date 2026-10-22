@@ -22,7 +22,6 @@ from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone, utcnow
 from sqlalchemy import and_
-from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -321,7 +320,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         past = base.filter(
             Occurrence.end <= now
-        ).order_by(desc(Occurrence.start))
+        ).order_by(Occurrence.start.desc())
 
         return current.union_all(future, past).first()
 
