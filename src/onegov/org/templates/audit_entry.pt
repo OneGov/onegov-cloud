@@ -12,16 +12,12 @@
                     <strong>
                         <a tal:condition="current_page"
                            href="${request.link(current_page)}">
-                            ${entry.snapshot.get(
-                                'title', entry.target_table
-                            )}
+                            ${entry_title}
                             <i class="fa fa-external-link-alt"
                                aria-hidden="true"></i>
                         </a>
                         <tal:b tal:condition="not:current_page">
-                            ${entry.snapshot.get(
-                                'title', entry.target_table
-                            )}
+                            ${entry_title}
                         </tal:b>
                     </strong>
                     <small class="audit-entry-details">

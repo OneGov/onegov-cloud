@@ -50,10 +50,12 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
     )
 
     #: the role is relevant for security in onegov.core
-    role: Mapped[str]
+    role: Mapped[str] = mapped_column(active_history=True)
 
     #: the id of the group this mapping belongs to
-    group_id: Mapped[UUID | None] = mapped_column(ForeignKey(UserGroup.id))
+    group_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey(UserGroup.id), active_history=True
+    )
 
     #: the group this mapping belongs to
     group: Mapped[UserGroup | None] = relationship(
@@ -62,14 +64,14 @@ class RoleMapping(Base, ContentMixin, TimestampMixin):
 
     #: the username of the user this mapping belongs to
     username: Mapped[str | None] = mapped_column(
-        ForeignKey(User.username, onupdate='CASCADE')
+        ForeignKey(User.username, onupdate='CASCADE'), active_history=True
     )
 
     #: the user this mapping belongs to
     user: Mapped[User | None] = relationship(back_populates='role_mappings')
 
     #: the content this mapping belongs to
-    content_id: Mapped[str]
+    content_id: Mapped[str] = mapped_column(active_history=True)
 
     #: the content type (table name) this mapping belongs to
-    content_type: Mapped[str]
+    content_type: Mapped[str] = mapped_column(active_history=True)
