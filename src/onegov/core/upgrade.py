@@ -523,9 +523,9 @@ class UpgradeContext:
         enum_values: Iterable[str],
         table_columns: Mapping[str, Collection[str]]
     ) -> bool:
-        enum_values = set(enum_values)
+        enum_values = list(dict.fromkeys(enum_values))
         existing = self.get_enum_values(enum_name)
-        missing = enum_values - existing
+        missing = set(enum_values) - existing
         if not missing:
             return False
 
@@ -547,8 +547,8 @@ class UpgradeContext:
                 self.operations.alter_column(
                     table,
                     column,
-                    type_=enum_name,
-                    postgresl_using=f'"{column}"::text::{enum_name}'
+                    type_=enum_type,
+                    postgresql_using=f'"{column}"::text::{enum_name}'
                 )
         return True
 
