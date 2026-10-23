@@ -117,3 +117,12 @@ $button-font-color: $primary-fg-color;
     $crumb-font-color: scale-color($crumb-font-color, $lightness: -45%, $saturation: 10%);
     $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -45%, $saturation: 10%);
 }
+
+/*
+    White background for offCanvas
+*/
+$off-canvas-bg: #fff;
+$off-canvas-link-color: #333;
+$off-canvas-label-color: #333;
+$off-canvas-label-bg: #f5f5f5;
+$off-canvas-border-color: #e5e5e5;
