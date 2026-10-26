@@ -59,10 +59,10 @@
                                         class="badge badge-primary"
                                         i18n:translate>Created</span>
                                     <span tal:condition="entry.operation == 'update'"
-                                        class="badge badge-primary"
+                                        class="badge badge-info"
                                         i18n:translate>Changed</span>
                                     <span tal:condition="entry.operation == 'delete'"
-                                            class="badge badge-primary"
+                                            class="badge badge-danger"
                                         i18n:translate>Deleted</span>
                                 </span>
                             </td>

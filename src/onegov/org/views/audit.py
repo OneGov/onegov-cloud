@@ -156,8 +156,9 @@ def audit_snapshot_diff(
             rows.append(
                 Markup(
                     '<tr><th scope="row">{}</th>'
-                    '<td class="diff_sub"><pre>{}</pre></td>'
-                    '<td class="diff_add"><pre>{}</pre></td></tr>'
+                    '<td class="diff_sub bg-success-subtle"><pre>{}</pre></td>'
+                    '<td class="diff_add bg-danger-subtle"><pre>{}</pre></td>'
+                    '</tr>'
                 ).format(
                     ' / '.join(path),
                     previous_diff,
@@ -167,7 +168,7 @@ def audit_snapshot_diff(
         return rows
 
     return Markup(
-        '<table class="diff"><thead><tr><td></td>'
+        '<table class="diff table"><thead><tr><td></td>'
         '<th scope="col">{}</th><th scope="col">{}</th>'
         '</tr></thead><tbody>{}</tbody></table>'
     ).format(
