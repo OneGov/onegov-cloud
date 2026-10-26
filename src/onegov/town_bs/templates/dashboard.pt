@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="boardlet-group row row-cols-1 row-cols-md-2 row-cols-lg-3 g-lg justify-content-center mb-lg"
+        <div class="boardlet-group row row-cols-1 row-cols-md-md row-cols-lg-3 g-lg justify-content-center mb-lg"
              tal:repeat="group model.boardlets()">
             <tal:b tal:repeat="boardlet group">
                 <div class="col" tal:condition="boardlet.is_available">

@@ -113,3 +113,9 @@ input::placeholder {
         }
     }
 }
+
+.diff pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}

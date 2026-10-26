@@ -115,17 +115,15 @@ def audit_snapshot_diff(
                 current_parts.extend(Markup.escape(word) for word in new)
                 continue
             if old:
-                previous_parts.append(
-                    Markup('<del class="diff-word-removed">{}</del>').format(
-                        ''.join(old)
-                    )
-                )
+                previous_parts.append(Markup(
+                    '<del class="diff-word-removed bg-danger bg-opacity-25">'
+                    '{}</del>').format(''.join(old)
+                ))
             if new:
-                current_parts.append(
-                    Markup('<ins class="diff-word-added">{}</ins>').format(
-                        ''.join(new)
-                    )
-                )
+                current_parts.append(Markup(
+                    '<ins class="diff-word-added bg-success bg-opacity-25">'
+                    '{}</ins>').format(''.join(new)
+                ))
 
         return Markup('').join(previous_parts), Markup('').join(current_parts)
 
@@ -156,8 +154,10 @@ def audit_snapshot_diff(
             rows.append(
                 Markup(
                     '<tr><th scope="row">{}</th>'
-                    '<td class="diff_sub bg-success-subtle"><pre>{}</pre></td>'
-                    '<td class="diff_add bg-danger-subtle"><pre>{}</pre></td>'
+                    '<td class="diff_sub bg-light-subtle text-break">'
+                    '<pre>{}</pre></td>'
+                    '<td class="diff_add bg-light-subtle text-break">'
+                    '<pre>{}</pre></td>'
                     '</tr>'
                 ).format(
                     ' / '.join(path),

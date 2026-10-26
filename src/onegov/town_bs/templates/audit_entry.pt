@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="audit-entry">
-        <div class="audit-entry-summary d-flex align-items-center gap-lg pb-xl mb-xl border-bottom">
+        <div class="audit-entry-summary d-flex align-items-center gap-lg ">
         <span class="audit-operation audit-${entry.operation} badge ${ {'insert': 'badge-primary', 'update': 'badge-info', 'delete': 'badge-danger'}.get(entry.operation, 'badge-light') } flex-shrink-0">
             ${operation}
         </span>
@@ -39,54 +39,86 @@
             </div>
         </div>
 
-            <section class="audit-diff-panel" tal:condition="diff">
+        <div class="card my-md">
+            <section class="audit-diff-panel card-body" tal:condition="diff">
                 <div class="audit-snapshot-heading">
-                    <h2 i18n:translate>Changes</h2>
+                    <h2 class="mb-md" i18n:translate>Changes</h2>
                 </div>
                 <div class="audit-diff">${diff}</div>
             </section>
+        </div>
 
-            <details class="audit-snapshot-panel"
-                tal:condition="previous_snapshot">
-                <summary i18n:translate>Before update</summary>
-                <div class="audit-snapshot-heading">
-                    <h2 i18n:translate>Before update</h2>
-                    <button class="audit-copy btn btn-link"
-                        type="button"
-                        data-clipboard-action="copy"
-                        data-clipboard-target="#audit-previous-snapshot"
-                        title="Copy JSON"
-                        aria-label="Copy JSON"
-                        data-copy-success-label="Copied to Clipboard!"
-                        i18n:attributes="title;aria-label;data-copy-success-label">
-                        <i class="far fa-copy" aria-hidden="true"></i>
-                    </button>
+            <div class="accordion" id="audit-snapshots">
+                <div class="audit-snapshot-panel accordion-item"
+                    tal:condition="previous_snapshot">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#audit-previous-snapshot-panel"
+                            aria-expanded="false"
+                            aria-controls="audit-previous-snapshot-panel"
+                            i18n:translate>Before update</button>
+                    </h2>
+                    <div id="audit-previous-snapshot-panel"
+                        class="accordion-collapse collapse"
+                        data-bs-parent="#audit-snapshots">
+                        <div class="accordion-body p-md">
+                            <div class="audit-snapshot-heading d-flex justify-content-between">
+                                <h2 i18n:translate>Before update</h2>
+                                <button class="audit-copy btn btn-sm btn-ghost"
+                                    type="button"
+                                    data-clipboard-action="copy"
+                                    data-clipboard-target="#audit-previous-snapshot"
+                                    title="Copy JSON"
+                                    aria-label="Copy JSON"
+                                    data-copy-success-label="Copied to Clipboard!"
+                                    i18n:attributes="title;aria-label;data-copy-success-label">
+                                    <i class="far fa-copy" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <pre id="audit-previous-snapshot"
+                                class="audit-snapshot mb-0">${previous_snapshot}</pre>
+                        </div>
+                    </div>
                 </div>
-                <pre id="audit-previous-snapshot"
-                    class="audit-snapshot">${previous_snapshot}</pre>
-            </details>
 
-            <details class="audit-snapshot-panel">
-                <summary i18n:translate>JSON Snapshot</summary>
-                <div class="audit-snapshot-heading">
-                    <h2 tal:condition="previous_snapshot"
-                        i18n:translate>After update</h2>
-                    <h2 tal:condition="not:previous_snapshot"
-                        i18n:translate>JSON Snapshot</h2>
-                    <button class="audit-copy btn btn-link"
-                        type="button"
-                        data-clipboard-action="copy"
-                        data-clipboard-target="#audit-snapshot"
-                        title="Copy JSON"
-                        aria-label="Copy JSON"
-                        data-copy-success-label="Copied to Clipboard!"
-                        i18n:attributes="title;aria-label;data-copy-success-label">
-                        <i class="far fa-copy" aria-hidden="true"></i>
-                    </button>
+                <div class="audit-snapshot-panel accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#audit-snapshot-panel"
+                            aria-expanded="false"
+                            aria-controls="audit-snapshot-panel"
+                            i18n:translate>JSON Snapshot</button>
+                    </h2>
+                    <div id="audit-snapshot-panel"
+                        class="accordion-collapse collapse"
+                        data-bs-parent="#audit-snapshots">
+                        <div class="accordion-body p-md">
+                            <div class="audit-snapshot-heading d-flex justify-content-between">
+                                <h2 tal:condition="previous_snapshot"
+                                    i18n:translate>After update</h2>
+                                <h2 tal:condition="not:previous_snapshot"
+                                    i18n:translate>JSON Snapshot</h2>
+                                <button class="audit-copy btn btn-sm btn-ghost"
+                                    type="button"
+                                    data-clipboard-action="copy"
+                                    data-clipboard-target="#audit-snapshot"
+                                    title="Copy JSON"
+                                    aria-label="Copy JSON"
+                                    data-copy-success-label="Copied to Clipboard!"
+                                    i18n:attributes="title;aria-label;data-copy-success-label">
+                                    <i class="far fa-copy" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <pre id="audit-snapshot"
+                                class="audit-snapshot mb-0">${snapshot}</pre>
+                        </div>
+                    </div>
                 </div>
-                <pre id="audit-snapshot"
-                    class="audit-snapshot">${snapshot}</pre>
-            </details>
+            </div>
         </div>
     </tal:b>
-</div>  
+</div>
