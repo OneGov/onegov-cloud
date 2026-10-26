@@ -712,6 +712,11 @@ class OccurrenceCollection(Pagination[Occurrence]):
                     Occurrence.location.op('~')(
                         rf'\y{re.escape(loc.translate(_clean_search_term))}\y'
                     )
+                    if loc.lower() != 'null'
+                    else or_(
+                        Occurrence.location == '',
+                        Occurrence.location.is_(None)
+                    )
                     for loc in self.locations
                 ])
             )
@@ -719,6 +724,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
         if self.sources:
             query = query.filter(or_(*(
                 Event.source.astext.startswith(f'{source}-')
+                if source.lower() != 'null'
+                else Event.source.is_(None)
                 for source in self.sources
             )))
 

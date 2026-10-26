@@ -1,0 +1,255 @@
+// Mobile sidebar (Foundation 5 off-canvas)
+
+$offcanvas-sidebar-width: unquote("min(20rem, 85vw)");
+$offcanvas-sidebar-padding: 1.25rem;
+$offcanvas-accent-color: $primary-color;
+$offcanvas-search-height: 3.5rem;
+$offcanvas-search-button-size: 2.75rem;
+$offcanvas-toggler-size: 3.5rem;
+
+.right-off-canvas-menu {
+    width: $offcanvas-sidebar-width;
+    box-sizing: border-box;
+    padding: $offcanvas-sidebar-padding;
+    background: #fff;
+    color: #333;
+    box-shadow: -2px 0 12px rgba(0, 0, 0, 0.15);
+    // Keep scrolling inside the menu from scrolling the page
+    overscroll-behavior: contain;
+}
+
+.move-left > .inner-wrap {
+    transform: translate3d(calc(-1 * #{$offcanvas-sidebar-width}), 0, 0);
+}
+
+.move-left .exit-off-canvas {
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: none;
+}
+
+// Floating toggle button; .is-available is added by sidebar_mobile.js
+.sidebar-toggler {
+    display: none;
+    position: fixed;
+    right: 1rem;
+    bottom: 1.5rem;
+    z-index: 1003;
+    width: $offcanvas-toggler-size;
+    height: $offcanvas-toggler-size;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50% !important;
+    background: $primary-color;
+    color: #fff;
+    font-size: 1.25rem;
+    line-height: 1;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: background 200ms ease, transform 200ms ease;
+
+    &.is-available {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &:hover,
+    &:focus {
+        background: darken($primary-color, 8%);
+        color: #fff;
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    @media #{$medium-up} {
+        &.is-available {
+            display: none;
+        }
+    }
+}
+
+// Hide the button while the menu is open
+.off-canvas-wrap.move-left ~ .sidebar-toggler.is-available {
+    display: none;
+}
+
+// Close button, stays visible while the menu scrolls
+.offcanvas-sidebar-header {
+    position: sticky;
+    top: -$offcanvas-sidebar-padding;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    margin: (-$offcanvas-sidebar-padding) (-$offcanvas-sidebar-padding) 0;
+    padding: 0.75rem;
+    background: #fff;
+}
+
+.offcanvas-sidebar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #eee;
+    color: #333;
+    font-size: 1.125rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease;
+
+    &:hover,
+    &:focus {
+        background: $primary-color;
+        color: #fff;
+    }
+}
+
+// Class is added by sidebar_mobile.js
+.offcanvas-sidebar-content {
+
+    .row,
+    .grid-x {
+        width: auto;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .columns,
+    .column,
+    .cell {
+        float: none;
+        width: 100%;
+        max-width: none;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        max-width: 100%;
+    }
+
+    .borderless-side-panel,
+    .filter-panel,
+    .side-panel,
+    .submit-yours {
+        margin-bottom: 1.5rem;
+    }
+
+    .borderless-side-panel:last-child,
+    .submit-yours:last-child {
+        margin-bottom: 0;
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+
+    // Search: pill-shaped input with the button inside, as on desktop
+    .borderless-side-panel form {
+
+        .row,
+        .input-group {
+            display: block;
+            position: relative;
+        }
+
+        .input-group-field,
+        .input-group-button {
+            display: block;
+            width: 100%;
+        }
+
+        input[type="search"],
+        input[type="text"] {
+            height: $offcanvas-search-height;
+            margin: 0;
+            padding: 0 ($offcanvas-search-button-size + 1.25rem) 0 1.25rem;
+            border: 0;
+            border-radius: 999px !important;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        button[type="submit"],
+        .button {
+            position: absolute;
+            top: 50%;
+            right: 0.5rem;
+            width: $offcanvas-search-button-size;
+            height: $offcanvas-search-button-size;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: #eee;
+            color: $offcanvas-accent-color;
+            box-shadow: none;
+            transform: translateY(-50%);
+
+            &:hover,
+            &:focus {
+                background: darken(#eee, 5%);
+                color: $offcanvas-accent-color;
+            }
+        }
+
+        .reset-button {
+            display: none;
+        }
+    }
+
+    ul.tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            margin: 0;
+        }
+    }
+
+    // Date range: "from" and "to" stacked
+    .date-filters form {
+
+        div,
+        label {
+            display: block;
+            float: none;
+            width: 100%;
+        }
+
+        label {
+            margin: 1rem 0 0;
+        }
+
+        input[type="date"] {
+            display: block;
+            width: 100%;
+            margin: 0.25rem 0 0;
+        }
+    }
+
+    .submit-yours {
+        padding: 1rem;
+
+        dl,
+        dd {
+            margin: 0;
+        }
+    }
+}
