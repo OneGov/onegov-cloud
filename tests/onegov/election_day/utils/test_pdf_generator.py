@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import timedelta
+from freezegun import freeze_time
 from onegov.election_day.models import BallotResult
 from onegov.election_day.models import Vote
 from onegov.election_day.utils.pdf_generator import PdfGenerator
@@ -211,9 +212,10 @@ def test_create_pdfs(election_day_app_zg: TestApp) -> None:
     generator.create_pdfs()
     assert fs.listdir('pdf') == []
 
-    majorz_election = add_majorz_election(session)
-    proporz_election = add_proporz_election(session)
-    vote = add_vote(session, 'complex')
+    with freeze_time('2020-01-01 12:00'):
+        majorz_election = add_majorz_election(session)
+        proporz_election = add_proporz_election(session)
+        vote = add_vote(session, 'complex')
     assert majorz_election.last_result_change is None  # used later
 
     # create
