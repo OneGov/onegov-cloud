@@ -1,6 +1,7 @@
 """ Provides commands used to initialize org websites. """
 import base64
 import click
+import difflib
 import html
 import isodate
 import json
@@ -20,6 +21,7 @@ from datetime import date, datetime, timedelta
 from io import BytesIO
 from libres.modules.errors import (InvalidEmailAddress, AlreadyReservedError,
                                    TimerangeTooLong)
+from lxml import etree
 from markupsafe import Markup
 from onegov.chat import MessageCollection
 from onegov.core.cli import command_group, pass_group_context, abort
@@ -98,6 +100,7 @@ if TYPE_CHECKING:
     from bs4 import Tag
     from collections.abc import Callable, Iterator, Sequence
     from depot.fields.upload import UploadedFile
+    from lxml.etree import _Element
     from onegov.core.cli.core import GroupContext
     from onegov.core.csv import DefaultRow
     from onegov.core.upgrade import UpgradeContext
@@ -114,6 +117,359 @@ if TYPE_CHECKING:
     )
 
 cli = command_group()
+
+
+_BREAKPOINTS = {
+    'small': '',
+    'medium': 'md-',
+    'large': 'lg-',
+    'xlarge': 'xl-',
+    'xxlarge': 'xxl-',
+}
+
+# Foundation classes which are dropped without replacement
+_FOUNDATION_REMOVED_CLASSES = frozenset(('cell', 'columns', 'column'))
+
+# direct Foundation to Bootstrap replacements, gutters use the defined spacers
+_FOUNDATION_CLASS_MAP: dict[str, tuple[str, ...]] = {
+    'grid-x': ('row',),
+    'grid-y': ('d-flex', 'flex-column'),
+    'grid-margin-x': ('gx-lg',),
+    'grid-padding-x': ('gx-lg',),
+    'grid-margin-y': ('gy-lg',),
+    'grid-padding-y': ('gy-lg',),
+    'align-center': ('justify-content-center',),
+    'align-left': ('justify-content-start',),
+    'align-right': ('justify-content-end',),
+    'align-justify': ('justify-content-between',),
+    'align-spaced': ('justify-content-around',),
+    'align-top': ('align-items-start',),
+    'align-middle': ('align-items-center',),
+    'align-bottom': ('align-items-end',),
+    'align-stretch': ('align-items-stretch',),
+    'auto': ('col',),
+    'shrink': ('col-auto',),
+    'text-left': ('text-start',),
+    'text-right': ('text-end',),
+    'float-left': ('float-start',),
+    'float-right': ('float-end',),
+    'show-for-medium': ('d-none', 'd-md-block'),
+    'show-for-large': ('d-none', 'd-lg-block'),
+    'hide-for-medium': ('d-md-none',),
+    'hide-for-large': ('d-lg-none',),
+    'show-for-small-only': ('d-md-none',),
+    'hide-for-small-only': ('d-none', 'd-md-block'),
+}
+
+_BOOTSTRAP_BREAKPOINT = r'(?:-(?:sm|md|lg|xl|xxl))?'
+_BOOTSTRAP_CLASS = re.compile(
+    r'row|col|container(?:-fluid)?'
+    r'|(?:col|row-cols|offset|order|g|gx|gy|[mp][tbsexy]?|d|float|text'
+    rf'|fs|fw){_BOOTSTRAP_BREAKPOINT}-[\w-]+'
+    r'|(?:justify-content|align-(?:items|self|content))'
+    rf'{_BOOTSTRAP_BREAKPOINT}-\w+'
+    r'|flex-[\w-]+|bg-[\w-]+'
+)
+
+_INDENT = '    '
+_ROW_TAGS = ('row', 'row-wide')
+_TITLED_WIDGETS = ('events', 'news', 'homepage-tiles', 'directories')
+
+
+def _is_bootstrap_class(class_name: str) -> bool:
+    return _BOOTSTRAP_CLASS.fullmatch(class_name) is not None
+
+
+def _merge_classes(*values: str) -> str:
+    """ Merges class values, own classes first, Bootstrap classes last. """
+
+    classes: list[str] = []
+    for value in values:
+        for class_name in value.split():
+            if class_name not in classes:
+                classes.append(class_name)
+
+    # sorting is stable, so the original order within each group is kept
+    classes.sort(key=_is_bootstrap_class)
+    return ' '.join(classes)
+
+
+def _migrate_responsive_class(class_name: str) -> str:
+    match = re.fullmatch(
+        r'(?P<breakpoint>small|medium|large|xlarge|xxlarge)-'
+        r'(?:(?P<kind>up|offset|order)-)?(?P<value>\d+|auto|shrink)',
+        class_name
+    )
+    if match is None:
+        return class_name
+
+    prefix = _BREAKPOINTS[match['breakpoint']]
+    kind = match['kind']
+    value = match['value']
+
+    if kind == 'up':
+        return f'row-cols-{prefix}{value}'
+    if kind in ('offset', 'order'):
+        return f'{kind}-{prefix}{value}'
+    if value == 'auto':
+        return f'col-{prefix}'.rstrip('-')
+    if value == 'shrink':
+        return f'col-{prefix}auto'
+    return f'col-{prefix}{value}'
+
+
+def _migrate_foundation_class_value(value: str) -> str:
+    """ Replaces Foundation classes in a single class attribute value. """
+
+    foundation_classes = value.split()
+    fluid = (
+        'grid-container' in foundation_classes
+        and 'fluid' in foundation_classes
+    )
+
+    classes: list[str] = []
+    for class_name in foundation_classes:
+        if class_name in _FOUNDATION_REMOVED_CLASSES:
+            continue
+        if fluid and class_name == 'fluid':
+            continue
+
+        replacements: tuple[str, ...]
+        if class_name == 'grid-container':
+            replacements = ('container-fluid' if fluid else 'container',)
+        elif class_name in _FOUNDATION_CLASS_MAP:
+            replacements = _FOUNDATION_CLASS_MAP[class_name]
+        else:
+            replacements = (_migrate_responsive_class(class_name),)
+
+        classes.extend(replacements)
+
+    return _merge_classes(' '.join(classes))
+
+
+def _migrate_foundation_grid_classes(structure: str) -> str:
+    """Replace Foundation grid classes with Bootstrap classes."""
+
+    def migrate_classes(match: re.Match[str]) -> str:
+        quote = match.group('quote')
+        value = _migrate_foundation_class_value(match.group('value'))
+        return f'{match.group("prefix")}{quote}{value}{quote}'
+
+    return re.sub(
+        r'(?P<prefix>(?<![\w:-])class\s*=\s*)(?P<quote>["\'])'
+        r'(?P<value>[^"\']*)(?P=quote)',
+        migrate_classes,
+        structure
+    )
+
+
+def _migrate_attributes(root: _Element) -> None:
+    """ Strips attribute values and migrates Foundation classes. """
+
+    for element in root.iter():
+        if element is root or not isinstance(element.tag, str):
+            continue
+
+        for key, value in list(element.attrib.items()):
+            # also removes line breaks which ended up in urls
+            value = value.strip()
+            if key == 'class':
+                value = _migrate_foundation_class_value(value)
+                if not value:
+                    del element.attrib[key]
+                    continue
+            element.set(key, value)
+
+
+def _redundant_inner_row(outer: _Element) -> _Element | None:
+    """ Returns the inner row if the outer row only wraps it in a single
+    full width column.
+
+    """
+    if (outer.text or '').strip() or len(outer) != 1:
+        return None
+
+    column = outer[0]
+    if column.tag != 'column':
+        return None
+    if set(column.attrib) - {'span'}:
+        return None
+    if column.get('span', '12') != '12':
+        return None
+    if (column.text or '').strip() or len(column) != 1:
+        return None
+    if (column[0].tail or '').strip():
+        return None
+
+    inner = column[0]
+    return inner if inner.tag in _ROW_TAGS else None
+
+
+def _collapse_nested_rows(root: _Element) -> list[str]:
+    """ Resolves row > column > row nestings into a single row. The
+    attributes of the outer row (e.g. bgcolor) are moved to the inner row.
+
+    """
+    warnings: list[str] = []
+    changed = True
+
+    while changed:
+        changed = False
+        for outer in root.iter(*_ROW_TAGS):
+            inner = _redundant_inner_row(outer)
+            if inner is None:
+                continue
+
+            for key, value in outer.attrib.items():
+                if key == 'class':
+                    inner.set('class', _merge_classes(
+                        value, inner.get('class', '')
+                    ))
+                elif key not in inner.attrib:
+                    inner.set(key, value)
+                elif inner.get(key) != value:
+                    warnings.append(
+                        f'Kept {key}="{inner.get(key)}" of the inner row, '
+                        f'dropped {key}="{value}" of the outer row'
+                    )
+
+            parent = outer.getparent()
+            assert parent is not None
+            inner.tail = outer.tail
+            parent.replace(outer, inner)
+
+            # the tree changed, restart the iteration
+            changed = True
+            break
+
+    return warnings
+
+
+def _add_column_classes(root: _Element) -> None:
+    """ Columns inside a row with row-cols-* need the col class. """
+
+    for row in root.iter(*_ROW_TAGS):
+        row_classes = row.get('class', '').split()
+        if not any(c.startswith('row-cols-') for c in row_classes):
+            continue
+
+        for column in row.iterchildren('column'):
+            if column.get('span'):
+                continue
+
+            classes = column.get('class', '').split()
+            if not any(c == 'col' or c.startswith('col-') for c in classes):
+                column.set('class', _merge_classes(*classes, 'col'))
+
+
+def _move_titles_into_widgets(root: _Element) -> list[str]:
+    """ Moves a <title> directly before a widget into its title
+    attribute.
+
+    """
+    warnings: list[str] = []
+
+    for widget in list(root.iter(*_TITLED_WIDGETS)):
+        # narrows the tag type for mypy, iter() only yields these widgets
+        if not isinstance(widget.tag, str):
+            continue
+
+        previous = widget.getprevious()
+        if previous is None or previous.tag != 'title':
+            continue
+        if (previous.tail or '').strip():
+            continue
+
+        title = ' '.join(''.join(previous.itertext()).split())
+        if not title:
+            continue
+
+        existing = widget.get('title')
+        if existing and existing != title:
+            warnings.append(
+                f'Replaced title="{existing}" of <{widget.tag}> '
+                f'with "{title}"'
+            )
+
+        widget.set('title', title)
+        parent = previous.getparent()
+        assert parent is not None
+        parent.remove(previous)
+
+    return warnings
+
+
+def _format_attribute(key: str, value: str) -> str:
+    return f'{key}="{html.escape(value)}"'
+
+
+def _serialize_node(node: _Element, depth: int) -> str:
+    indent = _INDENT * depth
+
+    if not isinstance(node.tag, str):
+        # comments and processing instructions are kept as they are
+        return indent + etree.tostring(
+            node, encoding='unicode', with_tail=False
+        )
+
+    children = list(node)
+    text = (node.text or '').strip()
+    mixed = (text and children) or any(
+        (child.tail or '').strip() for child in children
+    )
+    if mixed:
+        # mixed content is kept as it is to avoid breaking inline markup
+        return indent + etree.tostring(
+            node, encoding='unicode', with_tail=False
+        )
+
+    attributes = [
+        _format_attribute(key, value) for key, value in node.attrib.items()
+    ]
+    empty = not children and not text
+
+    if len(attributes) > 2:
+        # one attribute per line for widgets with many attributes
+        opening = '\n'.join((
+            f'{indent}<{node.tag}',
+            *(f'{indent}{_INDENT}{attribute}' for attribute in attributes)
+        ))
+        if empty:
+            return f'{opening}\n{indent}/>'
+    else:
+        opening = ' '.join((f'{indent}<{node.tag}', *attributes))
+        if empty:
+            return f'{opening} />'
+
+    if text:
+        return f'{opening}>{html.escape(text, quote=False)}</{node.tag}>'
+
+    inner = '\n'.join(_serialize_node(child, depth + 1) for child in children)
+    return f'{opening}>\n{inner}\n{indent}</{node.tag}>'
+
+
+def _migrate_homepage_structure(structure: str) -> tuple[str, list[str]]:
+    """ Migrates a Foundation homepage structure to Bootstrap.
+
+    Returns the new structure and a list of warnings.
+
+    """
+    parser = etree.XMLParser(strip_cdata=False)
+    root = etree.fromstring(f'<xml>{structure}</xml>', parser)
+
+    if (root.text or '').strip() or any(
+        (child.tail or '').strip() for child in root
+    ):
+        raise ValueError('Found text outside of the widgets')
+
+    _migrate_attributes(root)
+    warnings = _collapse_nested_rows(root)
+    _add_column_classes(root)
+    warnings.extend(_move_titles_into_widgets(root))
+
+    # top level widgets are separated by an empty line
+    migrated = '\n\n'.join(_serialize_node(child, 0) for child in root)
+    return migrated, warnings
 
 
 @cli.command(context_settings={'singular': True})
@@ -3674,3 +4030,73 @@ def migrate_agency(
         """)
 
     return migrate_to_new_agency
+
+
+@cli.command(name='migrate-homepage-structure-to-bootstrap')
+@click.option('--dry-run', is_flag=True, default=False,
+              help='Show the changes without saving them.')
+def migrate_homepage_structure_to_bootstrap(
+    dry_run: bool
+) -> Callable[[OrgRequest, OrgApp], None]:
+    r""" Migrates the homepage structure from Foundation to Bootstrap.
+
+    - Replaces Foundation classes with Bootstrap classes
+    - Resolves row > column > row nestings, attributes like bgcolor
+      are moved to the remaining row
+    - Moves a <title> in front of events, news, homepage-tiles and
+      directories into their title attribute
+    - Reformats the structure with an indentation of 4 spaces
+
+    Example:
+    .. code-block:: bash
+
+        onegov-org --select /onegov_town6/meggen \
+            migrate-homepage-structure-to-bootstrap --dry-run
+
+    """
+
+    def migrate(request: OrgRequest, app: OrgApp) -> None:
+        org = request.session.query(Organisation).first()
+        if org is None:
+            click.secho(f'{app.schema}: No organisation found', fg='yellow')
+            return
+
+        structure = org.meta.get('homepage_structure')
+        if not structure:
+            click.secho(f'{app.schema}: No homepage structure', fg='yellow')
+            return
+
+        try:
+            migrated, warnings = _migrate_homepage_structure(structure)
+        except (etree.XMLSyntaxError, ValueError) as error:
+            click.secho(
+                f'{app.schema}: Could not migrate homepage structure: '
+                f'{error}',
+                fg='red'
+            )
+            return
+
+        for warning in warnings:
+            click.secho(f'{app.schema}: {warning}', fg='yellow')
+
+        if migrated == structure:
+            click.secho(f'{app.schema}: No changes necessary', fg='green')
+            return
+
+        diff = difflib.unified_diff(
+            structure.splitlines(),
+            migrated.splitlines(),
+            fromfile='before',
+            tofile='after',
+            lineterm=''
+        )
+        click.echo('\n'.join(diff))
+
+        if dry_run:
+            click.secho(f'{app.schema}: Dry run, nothing saved', fg='yellow')
+            return
+
+        org.meta['homepage_structure'] = migrated
+        click.secho(f'{app.schema}: Homepage structure migrated', fg='green')
+
+    return migrate

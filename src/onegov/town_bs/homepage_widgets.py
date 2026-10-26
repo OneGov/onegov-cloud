@@ -157,7 +157,8 @@ class NewsWidget(OrgNewsWidget):
     template = """
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
-                tal:define="heading 'h5'; show_all_news_link True;
+                tal:define="widget_title '{@title}';
+                heading 'h5'; show_all_news_link True;
                 hide_date False"
             />
         </xsl:template>
@@ -178,7 +179,7 @@ class EventsWidget:
     template = """
         <xsl:template match="events">
             <metal:block use-macro="layout.macros['event-cards']"
-            tal:define="with_lead True" />
+            tal:define="widget_title '{@title}'; with_lead True" />
         </xsl:template>
     """
 
@@ -371,7 +372,8 @@ class ContactsAndAlbumsWidget:
 class DirectoriesWidget(OrgDirectoriesWidget):
     template = """
         <xsl:template match="directories">
-            <metal:block use-macro="layout.macros['directories-list']" />
+            <metal:block use-macro="layout.macros['directories-list']"
+            tal:define="widget_title '{@title}'"/>
         </xsl:template>
     """
 
