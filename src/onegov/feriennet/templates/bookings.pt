@@ -119,10 +119,6 @@
                                                         <tal:b i18n:translate>Open</tal:b>
                                                         <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
                                                     </h4>
-                                                    <h4 tal:case="'blocked'">
-                                                        <tal:b i18n:translate>Blocked</tal:b>
-                                                        <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
-                                                    </h4>
                                                     <h4 tal:case="'accepted'">
                                                         <tal:b i18n:translate>Booked</tal:b>
                                                         <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
@@ -141,14 +137,6 @@
 
                                             <ul class="${'' if toggled else 'hidden'}">
                                                 <li tal:repeat="booking grouped_bookings[attendee][state]" id="booking-${booking.id}">
-                                                    <div class="panel" tal:condition="repeat.booking.index == 0 and state in ('blocked', 'denied')">
-                                                        <tal:b condition="state == 'blocked'" i18n:translate>
-                                                            These wishes overlap accepted bookings and are therefore blocked.
-                                                        </tal:b>
-                                                        <tal:b condition="state == 'denied'" i18n:translate>
-                                                            Unfortunately, these wishes could not be fulfilled.
-                                                        </tal:b>
-                                                    </div>
                                                     <div class="booking">
                                                         <div class="star" tal:condition="period.wishlist_phase">
                                                             <a ic-post-to="${request.link(booking, 'toggle-star')}">

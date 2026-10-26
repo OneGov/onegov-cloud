@@ -119,7 +119,7 @@ def test_wwf_fixed_pass_system(client: Client, scenario: Scenario) -> None:
         page = member.get('/my-bookings')
         assert 'Die Buchungsphase ist jetzt bis am' in page
         assert 'Gebucht (1)' in page
-        assert 'Blockiert (1)' in page
+        assert 'Abgelehnt (1)' in page
 
 
 def test_view_permissions() -> None:
@@ -1284,7 +1284,6 @@ def test_confirmed_booking_view(client: Client, scenario: Scenario) -> None:
     states: list[tuple[BookingState, str]] = [
         ('cancelled', "Storniert"),
         ('denied', "Abgelehnt"),
-        ('blocked', "Blockiert")
     ]
 
     for state, text in states:
