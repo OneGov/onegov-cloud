@@ -659,6 +659,9 @@
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town_bs">
 
+    <div class="newslist mb-2xl" condition="show_all_news_link|nothing">
+        <a href="${layout.news_url}" class="news-all-entries btn btn-ghost p-0 btn-arrow"><span i18n:translate="">All posts</span></a>
+    </div>
     <div tal:condition="newsletter.show_only_previews|True and news" class="newslist row g-md" >
         <tal:b tal:condition="first_wide|False" tal:define="rest news[1:]">
             <div class="news-list-item col-12" data-aos="fade" data-aos-duration="800">
@@ -669,16 +672,13 @@
             </div>
         </tal:b>
         <tal:b tal:condition="not: first_wide|False">
-            <div class="news-list-item col-12 col-md-4"  data-aos="fade" data-aos-duration="800" tal:repeat="item news">
+            <div class="news-list-item col-12 col-md-6 col-xl-4"  data-aos="fade" data-aos-duration="800" tal:repeat="item news">
                 <metal:newlist use-macro="layout.macros['news-item-card']" />
             </div>
         </tal:b>
     </div>
     <div tal:condition="not: newsletter.show_only_previews|True" class="newslist" tal:repeat="item news">
         <metal:newlist use-macro="layout.macros['news-item-full']" />
-    </div>
-    <div class="newslist my-lg">
-        <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All posts</span></a>
     </div>
 
 </metal:newslist>
@@ -1983,7 +1983,7 @@
 
 <metal:icon_links define-macro="icon_link" i18n:domain="onegov.town_bs">
         <div tal:condition="title and icon" class="icon-link card border-hover h-100 w-100 inverted-${str(invert).lower()}" data-aos="fade">
-            <a class="card-body d-flex flex-column text-decoration-none" href="${link}">
+            <a class="card-body d-flex flex-column text-decoration-none w-100" href="${link}">
                 <i class="square-3xl icon-circle fa ${icon} icon"></i>
                 <h5 class="title mt-auto mb-0 fs-md line-clamp-2"> <span>${title}</span></h5>
                 <div class="hover-reveal" tal:condition="text">

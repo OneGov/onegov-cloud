@@ -66,9 +66,9 @@ class ColumnWidget:
 class TitleWidget:
     template = """
         <xsl:template match="title">
-            <h3 class="{@class}">
+            <h2 class="fs-xl text-primary {@class}">
                 <xsl:apply-templates select="node()"/>
-            </h3>
+            </h2>
         </xsl:template>
     """
 

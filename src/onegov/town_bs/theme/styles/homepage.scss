@@ -87,40 +87,31 @@
         }
     }
 
-    .container-fluid {
-        &.gray {
-            background-color: $light-subtle;
+    .icon-link-card {
+        min-height: 14rem; // match the height of the hover state
+        overflow: hidden; // keep collapsed content inside the card's hit area
+
+        .icon-circle {
+            transition: transform $standard-transition;
         }
-        &.primary {
-            background-color: $primary;
+
+        .hover-reveal {
+            @include hover-reveal-collapsed;
+            pointer-events: none; // collapsed content must never trigger :hover
         }
-        &.gray {
-            background-color: $light-subtle;
+
+        &:hover,
+        &:focus-within {
+            @media (hover: hover) {
+                .icon-circle {
+                    transform: translateY($s-xs);
+                }
+            }
+
+            .hover-reveal {
+                @include hover-reveal-expanded;
+                pointer-events: auto;
+            }
         }
     }
-
-.icon-link {
-  min-height: 14rem; // match the height of the hover state
-
-  .icon-circle {
-    transition: transform $standard-transition;
-  }
-
-  .hover-reveal {
-    @include hover-reveal-collapsed;
-  }
-
-  &:hover {
-    @media (hover: hover) {
-    .icon-circle {
-      transform: translateY($s-xs);
-    }
-    }
-
-    .hover-reveal {
-      @include hover-reveal-expanded;
-    }
-  }
-}
-
 }
