@@ -82,6 +82,8 @@ def handle_pending_submission(
     request: OrgRequest,
     layout: FormSubmissionLayout | TicketLayout | None = None,
     ticket: Ticket | None = None,
+    view_name: str | None = None,
+    push_url: str | None = None,
 ) -> RenderData | Response:
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
@@ -102,7 +104,10 @@ def handle_pending_submission(
     collection = FormCollection(request.session)
 
     if ticket is None:
-        self_url = request.link(self)
+        self_url = (
+            request.link(self, name=view_name)
+            if view_name else request.link(self)
+        )
     else:
         self_url = request.link(ticket, 'submission')
 
@@ -218,6 +223,11 @@ def handle_pending_submission(
         checkout_button = None
 
     show_vat = getattr(self.form, 'show_vat', False)
+
+    @request.after
+    def set_push_url(response: Response) -> None:
+        response.headers['HX-Push-Url'] = push_url or self_url
+
     return {
         'layout': layout or FormSubmissionLayout(self, request, title),
         'title': title,

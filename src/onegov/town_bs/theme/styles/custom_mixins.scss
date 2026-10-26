@@ -1,0 +1,25 @@
+// Content is collapsed by default and revealed on hover.
+// Only applied on devices with hover support, so the content stays visible on touch devices.
+// Expected structure: .element > div > content
+// Note: no overflow clipping on purpose, the content is faded in via opacity only.
+@mixin hover-reveal-collapsed {
+  @media (hover: hover) {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows $standard-transition,
+      opacity $standard-transition;
+
+    > div {
+      min-height: 0;
+    }
+  }
+}
+
+@mixin hover-reveal-expanded {
+  @media (hover: hover) {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}

@@ -1,0 +1,120 @@
+input::placeholder {
+  color: $light !important;
+}
+
+#content {
+
+    .page-image {
+        margin-bottom: $s-3xl;
+    }
+
+    img {
+        border-radius: $border-radius-lg;
+        max-width: 100%;
+    }
+
+    dd {
+        margin-bottom: $s-md;
+    }
+
+    .page-main-content{
+        h2, h3, h4, h5, h6 {
+            margin-top: $s-xl;
+            margin-bottom: $s-md;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+
+        .has-img {
+            margin: $s-xl 0;
+
+            img {
+                height: auto;
+            }
+
+            .alt-text {
+                @include font-size($fs-xs);
+                display: block;
+                margin-top: $s-md;
+                color: $body-secondary-color;
+            }
+        }
+    }
+
+    .anchor-link {
+        color: $light-subtle;
+        display: inline !important;
+        font-size: 80%;
+        opacity: 0;
+        margin-left: .5rem;
+        position: absolute !important;
+        transition: opacity $standard-transition;
+    }
+
+    .anchor-link-heading {
+        position: relative;
+
+        // &:hover .anchor-link {
+        //     opacity: 1;
+        // }
+    }
+}
+
+.anchor-link {
+    display: none !important;
+}
+
+.form-control:not(:focus) + button + .typeahead:not(:hover) {
+    display: none;
+}
+
+.typeahead {
+    width: 100%;
+}
+
+.alert p:last-child {
+    margin-bottom: 0;
+}
+
+.user-initials-small {
+    @include font-size($fs-2xs);
+    color: white;
+    font-weight: bold;
+    display:flex;
+    width: $s-xl;
+    height: $s-xl;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-pill;
+}
+
+.news-list-item {
+    * {
+        transition: all $standard-transition;
+    }
+
+    .card {
+        background: $light-subtle;
+        border: 0;
+        color: $primary;
+
+        &:hover {
+            background: $primary;
+            * {
+                color: $white;
+            }
+
+            .read-more-link .rounded-circle * {
+                transition: all $standard-transition;
+                transform: translateX($s-xs);
+            }
+        }
+    }
+}
+
+.diff pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
