@@ -119,10 +119,6 @@
                                                         <tal:b i18n:translate>Open</tal:b>
                                                         <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
                                                     </h4>
-                                                    <h4 tal:case="'blocked'">
-                                                        <tal:b i18n:translate>Blocked</tal:b>
-                                                        <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
-                                                    </h4>
                                                     <h4 tal:case="'accepted'">
                                                         <tal:b i18n:translate>Booked</tal:b>
                                                         <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
