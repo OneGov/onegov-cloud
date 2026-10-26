@@ -35,7 +35,7 @@ input::placeholder {
             }
 
             .alt-text {
-                font-size: $fs-xs;
+                @include font-size($fs-xs);
                 display: block;
                 margin-top: $s-md;
                 color: $body-secondary-color;
@@ -79,7 +79,7 @@ input::placeholder {
 }
 
 .user-initials-small {
-    font-size: $fs-2xs;
+    @include font-size($fs-2xs);
     color: white;
     font-weight: bold;
     display:flex;
@@ -116,6 +116,6 @@ input::placeholder {
 
 .diff pre {
     white-space: pre-wrap;
-    word-break: break-word;
+    word-break: break-all;
     overflow-wrap: anywhere;
 }

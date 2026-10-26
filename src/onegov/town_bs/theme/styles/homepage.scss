@@ -31,7 +31,7 @@
     }
 
     .text-container {
-        font-size: $fs-3xl;
+        @include font-size($fs-3xl);
         text-shadow: rgba(1, 1, 1, .4) 1px 0 10px;
         bottom: $s-4xl * 3;
         left: 0;

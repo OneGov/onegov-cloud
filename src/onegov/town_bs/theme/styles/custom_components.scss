@@ -41,7 +41,7 @@
                 grid-row: 1;
                 display: block;
                 margin-bottom: 0;
-                font-size: $fs-md;
+                @include font-size($fs-md);
             }
 
             .styled-list-lead {
@@ -88,7 +88,7 @@
             padding: $s-sm 0;
 
             .styled-list-title {
-                font-size: $fs-sm;
+                @include font-size($fs-sm);
             }
         }
     }
@@ -99,7 +99,7 @@
             padding: $s-xs 0;
 
             .styled-list-title {
-                font-size: $fs-xs;
+                @include font-size($fs-xs);
             }
         }
     }
@@ -115,12 +115,12 @@
         justify-content: space-between;
 
         dt {
-            font-size: $fs-xs;
+            @include font-size($fs-xs);
             font-weight: normal;
         }
 
         dd {
-            font-size: $fs-lg;
+            @include font-size($fs-lg);
             font-weight: bold;
         }
     }
