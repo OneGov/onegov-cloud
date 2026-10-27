@@ -1,4 +1,4 @@
-from onegov.core.orm.audit import latest_snapshot, register_audit_model
+from onegov.core.orm.audit import register_audit_model
 from onegov.user.models import RoleMapping, User, UserGroup
 from onegov.user.models.group import group_association_table
 from sqlalchemy import inspect, select
@@ -104,12 +104,10 @@ def group_changed(_session: Session, group: UserGroup) -> bool:
 
 
 def group_delete_snapshot(
-    session: Session,
+    _session: Session,
     group: UserGroup,
 ) -> dict[str, Any]:
-    data = latest_snapshot(session, group) or {}
-    data['name'] = group.name
-    return data
+    return group_snapshot(group)
 
 
 def role_mapping_snapshot(mapping: RoleMapping) -> dict[str, Any]:
@@ -163,6 +161,7 @@ def register_user_auditing() -> None:
         previous_snapshot=group_previous_snapshot,
         changed=group_changed,
         delete_snapshot=group_delete_snapshot,
+        capture_before_delete=True,
     )
     register_audit_model(
         RoleMapping,

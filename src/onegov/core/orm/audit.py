@@ -27,6 +27,7 @@ class AuditModelConfig(NamedTuple):
     previous_snapshot: PreviousSnapshot
     changed: Changed
     delete_snapshot: DeleteSnapshot | None
+    capture_before_delete: bool
 
 
 AUDIT_MODELS: dict[type[Any], AuditModelConfig] = {}
@@ -38,12 +39,19 @@ def register_audit_model(
     previous_snapshot: PreviousSnapshot,
     changed: Changed,
     delete_snapshot: DeleteSnapshot | None = None,
+    capture_before_delete: bool = False,
 ) -> None:
+    """Register snapshot behavior for an audited model.
+
+    Capture before delete when cascades may remove snapshot data, such as
+    group membership rows when a user group is deleted.
+    """
     AUDIT_MODELS[model] = AuditModelConfig(
         snapshot,
         previous_snapshot,
         changed,
         delete_snapshot,
+        capture_before_delete,
     )
 
 
@@ -156,7 +164,6 @@ def write_audit_entry(
             previous_snapshot=previous_snapshot or {},
             user_id=session_manager.current_user_id,
             username=username,
-            created=utcnow(),
         )
     )
 
@@ -195,6 +202,20 @@ def audit_update(_schema: str, obj: object) -> None:
     )
 
 
+def audit_before_delete(
+    _schema: str,
+    session: Session,
+    obj: object,
+) -> None:
+    config = audit_config(obj)
+    if config is None or not config.capture_before_delete:
+        return
+    assert config.delete_snapshot is not None
+    state = inspect(obj)
+    assert state is not None
+    state.info['audit_delete_snapshot'] = config.delete_snapshot(session, obj)
+
+
 def audit_delete(
     _schema: str,
     session: Session,
@@ -204,7 +225,11 @@ def audit_delete(
     if config is None:
         return
 
-    if config.delete_snapshot is not None:
+    if config.capture_before_delete:
+        state = inspect(obj)
+        assert state is not None
+        snapshot = state.info.pop('audit_delete_snapshot')
+    elif config.delete_snapshot is not None:
         snapshot = config.delete_snapshot(session, obj)
     else:
         snapshot = config.snapshot(obj)
@@ -217,6 +242,7 @@ def register_audit_handlers(session_manager: SessionManager) -> None:
     session_manager.on_insert.connect(audit_insert)
     session_manager.on_update.connect(audit_update)
     session_manager.on_delete.connect(audit_delete)
+    session_manager.on_before_delete.connect(audit_before_delete)
 
 
 class AuditEntryCollection(Pagination[AuditEntry]):

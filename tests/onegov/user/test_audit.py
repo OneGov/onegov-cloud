@@ -290,3 +290,34 @@ def test_role_mapping_audit(
     assert entries[2].snapshot == entries[1].snapshot
     assert entries[2].snapshot['content_id'] == '42'
     assert all(entry.username == 'unknown' for entry in entries)
+
+
+@pytest.mark.parametrize('history', [False, True])
+def test_group_delete_captures_current_members(
+    session: Session,
+    history: bool,
+) -> None:
+    users = UserCollection(session)
+    member = users.add('member@example.org', 'password', 'member')
+    removed = users.add('removed@example.org', 'password', 'member')
+    groups = UserGroupCollection(session)
+    group = groups.add(name='Editors')
+    group.users = [member, removed]
+    session.flush()
+    if not history:
+        session.query(AuditEntry).filter_by(target_table='groups').delete()
+    session.query(User).filter_by(id=removed.id).delete()
+    session.flush()
+
+    session.delete(group)
+    session.flush()
+
+    entry = (
+        session.query(AuditEntry)
+        .filter_by(target_table='groups', operation='delete')
+        .one()
+    )
+    assert entry.snapshot == {
+        'name': 'Editors',
+        'user_ids': [str(member.id)],
+    }

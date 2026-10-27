@@ -314,6 +314,7 @@ class SessionManager:
         self.on_insert = Signal()
         self.on_update = Signal()
         self.on_delete = Signal()
+        self.on_before_delete = Signal()
 
         # onegov.core creates extensions that it requires in a separate schema
         # in the future, this might become something we can configure through
@@ -601,6 +602,20 @@ class SessionManager:
             # HACK: This attribute needs to be present
             result.rowcount = rowcount  # type: ignore[attr-defined]
             return result
+
+        @event.listens_for(session, 'before_flush')
+        def on_before_flush(
+            session: Session,
+            flush_context: Any,
+            instances: Any,
+        ) -> None:
+            if self._change_signals_disabled:
+                return
+            # Capture delete snapshots before ORM and database cascades run.
+            for obj in session.deleted:
+                self.on_before_delete.send(
+                    self.current_schema, session=session, obj=obj
+                )
 
         @event.listens_for(session, 'after_flush')
         def on_after_flush(
