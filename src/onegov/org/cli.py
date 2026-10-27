@@ -36,7 +36,6 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event
 from onegov.event import Occurrence
 from onegov.event import EventCollection
-from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file.collection import FileCollection
 from onegov.file.models import File, SigningRequest
@@ -3391,9 +3390,8 @@ def fix_custom_event_tags(
         if not dry_run and not click.confirm('Does that look okay?'):
             return
 
-        events = EventCollection(request.session).query()
-        occurrences = OccurrenceCollection(request.session).query()
-
+        events = request.session.query(Event)
+        occurrences = request.session.query(Occurrence)
         rewritten_count = 0
         deleted_set = set()
         deleted_count = 0
