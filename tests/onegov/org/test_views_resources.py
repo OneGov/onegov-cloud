@@ -1261,22 +1261,71 @@ def test_blocker_views(client: Client) -> None:
     assert resource is not None
     resource.definition = 'Note = ___'
     resource.pick_up = 'You can pick it up at the counter'
-    scheduler = resource.get_scheduler(client.app.libres_context)
-
-    allocations = scheduler.allocate(
-        dates=(datetime(2015, 8, 29), datetime(2015, 8, 29)),
-        whole_day=True,
-        partly_available=True,
-    )
-
-    add_blocker = client.bound_add_blocker(allocations[0])
     transaction.commit()
+
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context, virtual=True)
+
+    add_blocker = client.bound_add_blocker(resource)
 
     client.login_admin()
 
     # create a blocker
-    result = add_blocker(whole_day=True, reason='Cleaning')
+    result = add_blocker('2015-08-29', whole_day=True, reason='Cleaning')
     assert result.json == {'success': True}
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.reason == 'Cleaning'
+
+    # change the reason
+    client.post(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}/set-reason'
+        f'?blocker-id={blocker.id}&reason=No+reason'
+        f'&csrf-token={client.csrf_token}'
+    )
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.reason == 'No reason'
+
+    # adjust the time
+    new_start = blocker.display_start() + timedelta(hours=1)
+    new_end = blocker.display_end() - timedelta(hours=1)
+    result = client.post(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}/adjust'
+        f'?blocker-id={blocker.id}&start={quote(new_start.isoformat())}'
+        f'&end={quote(new_end.isoformat())}&csrf-token={client.csrf_token}'
+    )
+    assert result.json == {'success': True}
+
+    blocker = scheduler.managed_blockers().one()
+    assert blocker.display_start() == new_start
+    assert blocker.display_end() == new_end
+
+    # delete the blocker
+    client.delete(
+        f'/reservation-blocker/{blocker.resource}/{blocker.id}'
+        f'?csrf-token={client.csrf_token}'
+    )
+    assert scheduler.managed_blockers().one_or_none() is None
+
+
+    # test legacy blockers
+    # (blockers that were not created on the virtual resource)
+    transaction.begin()
+    resource = resources.by_name('tageskarte')
+    assert resource is not None
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    scheduler.allocate(
+        dates=(datetime(2015, 8, 30), datetime(2015, 8, 30)),
+        whole_day=True,
+        partly_available=True,
+    )
+    scheduler.add_blocker(
+        dates=(datetime(2015, 8, 30), datetime(2015, 8, 30, 23, 59)),
+        reason='Cleaning'
+    )
+    transaction.commit()
 
     blocker = scheduler.managed_blockers().one()
     assert blocker.reason == 'Cleaning'

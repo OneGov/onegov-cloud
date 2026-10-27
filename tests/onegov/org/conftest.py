@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from onegov.form import FormDefinition, FormRegistrationWindow
     from onegov.org.models import ExtendedDirectory
     from onegov.org.request import OrgRequest
-    from onegov.reservation import Reservation
+    from onegov.reservation import Reservation, Resource
     from onegov.ticket import Ticket
     from onegov.ticket.handler import HandlerRegistry
     from sqlalchemy.orm import Session
@@ -62,6 +62,7 @@ if TYPE_CHECKING:
     class _AddBlockerFunc(Protocol):
         def __call__(
             self,
+            date: str,
             start: str = ...,
             end: str = ...,
             whole_day: bool = ...,
@@ -197,23 +198,23 @@ class Client[AppT: OrgApp = TestOrgApp](BaseClient[AppT]):
 
         return reserve
 
-    def bound_add_blocker(self, allocation: Allocation) -> _AddBlockerFunc:
+    def bound_add_blocker(self, resource: Resource) -> _AddBlockerFunc:
 
-        default_start = f'{allocation.start:%H:%M}'
-        default_end = f'{allocation.end:%H:%M}'
-        default_whole_day = allocation.whole_day
-        resource = allocation.resource
-        allocation_id = allocation.id
+        default_start = '00:00'
+        default_end = '23:59'
+        default_whole_day = False
 
         def add_blocker(
+            date: str,
             start: str = default_start,
             end: str = default_end,
             whole_day: bool = default_whole_day,
             reason: str | None = None,
         ) -> ExtendedResponse:
+            date = date.replace('-', '')
             return self.post(
-                f'/allocation/{resource}/{allocation_id}/add-blocker'
-                f'?start={start}&end={end}&reason={reason or ""}'
+                f'/resource/{resource.name}/add-blocker?date={date}'
+                f'&start={start}&end={end}&reason={reason or ""}'
                 f'&whole_day={whole_day and "1" or "0"}'
                 f'&csrf-token={self.csrf_token}'
             )

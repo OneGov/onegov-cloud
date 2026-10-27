@@ -278,8 +278,17 @@ def set_reason(
     else:
         raise exc.HTTPNotFound()
 
+    if self.resource.version == 5:
+        scheduler = resource.virtual_scheduler
+    else:
+        # NOTE: Only legacy blockers should be on the real resource
+        #       eventually we can probably remove this check and do
+        #       a migration to remove all legacy blockers, once they
+        #       are all well in the past.
+        scheduler = resource.scheduler
+
     blocker: ReservationBlocker | None = (
-        resource.scheduler.blockers_by_token(token)
+        scheduler.blockers_by_token(token)
         .filter(ReservationBlocker.id == blocker_id)
         .one_or_none()
     )
@@ -289,5 +298,5 @@ def set_reason(
             _('Blocker no longer exists')
         )
 
-    resource.scheduler.change_blocker_reason(token, new_reason)
+    scheduler.change_blocker_reason(token, new_reason)
     return respond_with_success(request)
