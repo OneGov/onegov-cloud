@@ -191,7 +191,7 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
         // open internal reservation form on selection
         fcOptions.select = function(info) {
             var calendar = info.view.calendar;
-            var element = $(calendar.el).find('.fc-highlight').get(0) || $(calendar.el).find('[data-date="'+ moment(info.start).format('YYYY-MM-DD') +'"]').get(0) || calendar.el;
+            var element = $(calendar.el).find('.fc-highlight').get(0) || $(calendar.el).find('[data-date="' + moment(info.start).format('YYYY-MM-DD') + '"]').get(0) || calendar.el;
             var wrapper = $('<div class="reservation-actions">');
             $('<h3 />').text(locale('Internal reservation')).appendTo(wrapper);
             var reservation = $('<div class="reservation-form">').appendTo(wrapper);
@@ -226,7 +226,7 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
                 return !start.isBefore(Date.now(), 'day') && start.isSame(end.subtract(1, 'days'), 'day');
             }
             return start.isAfter(Date.now()) && start.isSame(end, 'day');
-        }
+        };
 
         // add button for adding internal reservations to date headers
         fcOptions.dayHeaderDidMount = function(info) {
@@ -237,7 +237,7 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
 
             var button = $('<button type="button" class="fc-button fc-button-primary add-reservation" aria-pressed="false"></button>');
             button.attr('title', locale('Internal reservation'));
-            button.html('<span class="fa fa-plus"/>')
+            button.html('<span class="fa fa-plus"/>');
             button.click(function() {
                 var calendar = info.view.calendar;
                 var wrapper = $('<div class="reservation-actions">');
@@ -265,7 +265,7 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
                 rc.showPopup(calendar, info.el, wrapper);
             });
             button.appendTo($(info.el).find('a').eq(0).parent());
-        }
+        };
 
         // edit events on drag&drop, resize
         fcOptions.eventDrop = fcOptions.eventResize = function(info) {
@@ -850,9 +850,9 @@ rc.renderPartitions = function(event, element, view) {
     _.each(event_partitions, function(partition) {
         var reserved = partition[1];
         if (reserved === false) {
-            partitions += '<div style="height:'+partition[0]+'%;" class="partition-free"></div>';
+            partitions += '<div style="height:' + partition[0] + '%;" class="partition-free"></div>';
         } else {
-            partitions += '<div style="height:'+partition[0]+'%;" class="partition-occupied"></div>';
+            partitions += '<div style="height:' + partition[0] + '%;" class="partition-occupied"></div>';
         }
     });
 
@@ -1376,14 +1376,14 @@ ReservationForm.renderInternal = function(element, start, end, previousReservati
 
     ReactDOM.render(
         <ReservationForm
-            partlyAvailable={true}
+            partlyAvailable
             quota={1}
             quotaLeft={1}
             start={moment(start)}
             end={moment(end)}
-            wholeDay={true}
+            wholeDay
             fullyAvailable={false}
-            internal={true}
+            internal
             previousReservationState={previousReservationState}
             onSubmit={onSubmit}
         />,

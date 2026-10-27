@@ -808,18 +808,7 @@ class AvailabilityEventInfo:
     def event_end(self) -> str:
         return self.allocation.display_end().isoformat()
 
-    @property
-    def blockable(self) -> bool:
-        if not self.request.is_manager:
-            return False
-        if self.allocation.quota == 1:
-            if self.allocation.partly_available:
-                return self.allocation.availability > 0.0
-            return not self.allocation.reserved_slots
-        return self.allocation.quota_left == self.allocation.quota
-
     def as_dict(self) -> dict[str, Any]:
-        blockable = self.blockable
         return {
             'id': self.allocation.id,
             'start': self.event_start,
@@ -828,17 +817,6 @@ class AvailabilityEventInfo:
             'editable': False,
             'display': 'background',
             # extended properties
-            'blockable': blockable,
-            'blockurl': self.request.csrf_protected_url(
-                self.request.link(self.allocation, name='add-blocker')
-            ) if blockable else None,
-            'partlyAvailable': self.allocation.partly_available,
-            'fullyAvailable': isclose(
-                self.allocation.availability,
-                100.0,
-                abs_tol=.005
-            ),
-            'wholeDay': self.allocation.whole_day,
             # NOTE: We can switch to `resourceId`if we decide to include
             #       premium features
             'resource': str(self.allocation.mirror_of),

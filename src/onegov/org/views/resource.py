@@ -1618,6 +1618,9 @@ def view_occupancy(
         'resource': self,
         'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='occupancy-json'),
+        'block_url': request.csrf_protected_url(
+            request.link(self, 'add-blocker')
+        ) if request.is_manager else None,
         'stats_url': request.link(self, name='occupancy-stats'),
         'resources_url': request.class_link(
             ResourceCollection,

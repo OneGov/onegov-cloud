@@ -32,6 +32,23 @@ oc.defaultOptions = {
     showHolidays: false,
 
     /*
+        Url called for adding blockers. For example:
+
+            blockUrl: https://example.org/block
+
+        Will be called like this:
+
+            https://example.org/block
+                ?date=20160204
+                &start=22:00
+                &end=23:00
+                &whole_day=no
+
+        Only possible when editable is true
+    */
+    blockUrl: null,
+
+    /*
         Url which returns all available resources in the following format:
         {
             'group': [
@@ -69,20 +86,18 @@ oc.defaultOptions = {
     /*
         Base url for calculating the stats for the current date range
     */
-    stats_url: null,
+    statsUrl: null,
 
     /*
         Base url for exporting the current date range as a PDF
     */
-    pdf_url: null
+    pdfUrl: null
 };
 
 oc.events = [
     'oc-reservation-error',
     'oc-reservations-changed'
 ];
-
-oc.overlappingEvents = {};
 
 oc.popupOpen = false;
 
@@ -180,59 +195,37 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         fcOptions.selectMirror = true;
         fcOptions.unselectCancel = '.popup';
         fcOptions.selectOverlap = function(event) {
-            if (event.extendedProps.kind === 'holiday') {
-                return true;
-            }
-            if (event.display === 'background') {
-                oc.overlappingEvents[event.id] = event;
-                return true;
-            } else {
-                oc.overlappingEvents = {};
-                return false;
-            }
+            // we only allow overlap with holidays and background events
+            // unlike with the moving of events we know that blockers cannot
+            // overlap any of the other blocking events
+            return event.extendedProps.kind === 'holiday' || event.display === 'background';
+
         };
         fcOptions.selectAllow = function(info) {
-            if (info.allDay) {
+            if (oc.popupOpen || ocOptions.blockurl === null) {
                 return false;
             }
-            // we only know what to do if we overlap a single valid allocation
+            // the allDay slot is only there for holidays, not for blockers
             // we only allow to add blockers in the future
-            var keys = Object.keys(oc.overlappingEvents);
-            if (
-                keys.length === 1 &&
-                oc.overlappingEvents[keys[0]].extendedProps.blockable &&
-                oc.overlappingEvents[keys[0]].extendedProps.blockurl &&
-                info.start >= Date.now()
-            ) {
-                return true;
-            } else {
-                oc.overlappingEvents = {};
-                return false;
-            }
+            // blockers cannot span multiple days
+            var start = moment(info.start);
+            var end = moment(info.end);
+            return !info.allDay && start.isAfter(Date.now()) && start.isSame(end, 'day');
         };
         // add blockers on selection
         fcOptions.select = function(info) {
-            if (oc.popupOpen) {
+            if (oc.popupOpen || ocOptions.blockurl === null) {
                 return;
             }
-            var keys = Object.keys(oc.overlappingEvents);
-            if (keys.length !== 1) {
-                // this shouldn't happen, but when it does just cancel
-                oc.overlappingEvents = {};
-                info.view.calendar.unselect();
-                return;
-            }
-            var event = oc.overlappingEvents[keys[0]];
-            oc.overlappingEvents = {};
             var view = info.view;
+            var calendar = view.calendar;
+            var element = $(calendar.el).find('.fc-highlight').get(0) || $(calendar.el).find('[data-date="' + moment(info.start).format('YYYY-MM-DD') + '"]').get(0) || calendar.el;
             var start = moment(info.start);
             var end = moment(info.end);
-            var wholeDay = false;
             if (view.type === "dayGridMonth" || view.type === "multiMonthYear") {
                 end = end.subtract(1, 'days');
-                wholeDay = true;
             }
-            oc.showBlockerPopup(view.calendar, $(view.calendar.el).find('.event-' + event.id).get(0) || view.calendar.el, start, end, wholeDay, event);
+            oc.showBlockerPopup(calendar, ocOptions.blockUrl, element, start, end);
         };
 
         // edit blocker reason on click
@@ -257,9 +250,9 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         };
 
         // disallow dropping events into the allDay slot
-        fcOptions.eventAllow = function(dropInfo, draggedEvent) {
+        fcOptions.eventAllow = function(dropInfo, _draggedEvent) {
             return !dropInfo.allDay;
-        }
+        };
 
         fcOptions.eventDrop = fcOptions.eventResize = function(info) {
             var event = info.event;
@@ -346,7 +339,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](info.view, $(info.el));
         }
-        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.stats_url, ocOptions.pdf_url);
+        oc.setupViewNavigation(info.view.calendar, $(info.view.calendar.el), views, ocOptions.statsUrl, ocOptions.pdfUrl);
         return null;
     };
 
@@ -358,6 +351,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         for (var i = 0; i < events.length; i++) {
             var event = events[i];
             if (event.extendedProps.kind === 'holiday') {
+                // eslint-disable-next-line no-continue
                 continue;
             }
             // snap to the start of the hour
@@ -471,7 +465,7 @@ oc.getGranularity = function(view_name) {
     return view_name.toLowerCase();
 };
 
-oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) {
+oc.setupViewNavigation = function(calendar, element, views, statsUrl, pdfUrl) {
     var chunk = $(element).find('.fc-header-toolbar .fc-toolbar-chunk:last-child');
     var i18n = calendar.currentData.availableRawLocales[calendar.getOption('locale')];
     var granularity_group = $('<div class="fc-button-group"></div>');
@@ -549,7 +543,7 @@ oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) 
     });
     list_btn.appendTo(view_group);
 
-    if (pdf_url) {
+    if (pdfUrl) {
         var pdf_btn = $('<button class="fc-button fc-button-primary"></button');
         pdf_btn.attr('aria-pressed', 'false');
         pdf_btn.html('<span class="fa fa-file-pdf-o fa-file-pdf"></span>');
@@ -565,7 +559,7 @@ oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) 
                 locale("Export as PDF"),
                 locale("Download"),
                 function(state) {
-                    var url = new Url(pdf_url || '/');
+                    var url = new Url(pdfUrl || '/');
                     url.query.start = state.start;
                     url.query.end = state.end;
                     if (state.accepted) {
@@ -589,7 +583,7 @@ oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) 
     granularity_group.appendTo(chunk);
     view_group.appendTo(chunk);
 
-    if (stats_url) {
+    if (statsUrl) {
         var stats_btn = $('<button class="fc-button fc-button-primary"></button');
         stats_btn.attr('aria-pressed', 'false');
         stats_btn.html('<span class="fa fa-bar-chart fa-chart-bar"></span>');
@@ -606,7 +600,7 @@ oc.setupViewNavigation = function(calendar, element, views, stats_url, pdf_url) 
                 locale("Utilization"),
                 locale("Select"),
                 function(state) {
-                    var url = new Url(stats_url || '/');
+                    var url = new Url(statsUrl || '/');
                     url.query.start = state.start;
                     url.query.end = state.end;
                     $(this).closest('.popup').popup('hide');
@@ -730,8 +724,9 @@ oc.post = function(calendar, url, onerror) {
     oc.request(calendar, url, 'ic-post-to', onerror);
 };
 
-oc.add_blocker = function(calendar, event, url, start, end, reason, wholeDay) {
+oc.add_blocker = function(calendar, element, url, date, start, end, reason, wholeDay) {
     url = new Url(url);
+    url.query.date = date;
     url.query.start = start;
     url.query.end = end;
     if (reason) {
@@ -740,7 +735,7 @@ oc.add_blocker = function(calendar, event, url, start, end, reason, wholeDay) {
     url.query.whole_day = wholeDay && '1' || '0';
 
     oc.post(calendar, url.toString(), function(_evt, _elt, _status, str, _xhr) {
-        oc.showErrorPopup(calendar, $('.event-' + event.id), str);
+        oc.showErrorPopup(calendar, element, str);
     });
 };
 
@@ -754,7 +749,7 @@ oc.edit_blocker = function(calendar, event, url, reason) {
 };
 
 // popup handler implementation
-oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
+oc.showBlockerPopup = function(calendar, blockUrl, element, start, end) {
     var wrapper = $('<div class="reservation-actions">');
     var form_el = $('<div class="reservation-form">').appendTo(wrapper);
 
@@ -764,14 +759,12 @@ oc.showBlockerPopup = function(calendar, element, start, end, wholeDay, event) {
         form_el.get(0),
         start,
         end,
-        wholeDay,
-        event,
         function(state) {
-            oc.targetEvent = $(element);
             oc.add_blocker(
                 calendar,
-                event,
-                event.extendedProps.blockurl,
+                $(calendar.el).find('[data-date="' + start.format('YYYY-MM-DD') + '"]').get(0) || calendar.el,
+                blockUrl,
+                start.format('YYYYMMDD'),
                 state.start,
                 state.end,
                 state.reason,
@@ -794,7 +787,6 @@ oc.showBlockerEditPopup = function(calendar, element, event) {
         form.get(0),
         event,
         function(state) {
-            oc.targetEvent = $(element);
             oc.edit_blocker(
                 calendar,
                 event,
@@ -1020,18 +1012,13 @@ oc.setupResourceSwitch = function(options, resourcesUrl, active) {
 */
 oc.BlockerForm = React.createClass({
     getInitialState: function() {
-        var state = {reason: null};
-        if (this.props.wholeDay && this.props.wholeDayDefault && this.props.fullyAvailable) {
-            state.start = "";
-            state.end = "";
-            state.wholeDay = true;
-        } else {
-            state.start = this.props.start.format('HH:mm');
-            state.end = this.props.end.format('HH:mm');
-            state.wholeDay = false;
-        }
-
-        state.end = state.end === '00:00' && '24:00' || state.end;
+        var state = {
+            reason: null,
+            start: this.props.start.format('HH:mm'),
+            end: this.props.end.format('HH:mm'),
+            wholeDay: false
+        };
+        state.end = state.end === '00:00' && '23:59' || state.end;
 
         return state;
     },
@@ -1040,18 +1027,10 @@ oc.BlockerForm = React.createClass({
             return;
         }
 
-        var sel = {};
-        if (!this.props.partlyAvailable) {
-            sel.start = this.props.start.toDate();
-            sel.end = this.props.end.toDate();
-        } else if (this.props.wholeDay && this.state.wholeDay) {
-            sel.start = this.props.minStart.toDate();
-            sel.end = this.props.maxEnd.toDate();
-        } else {
-            sel.start = this.parseTime(this.props.start.clone(), this.state.start).toDate();
-            sel.end = this.parseTime(this.props.end.clone(), this.state.end).toDate();
-        }
-        this.props.calendar.select(sel);
+        this.props.calendar.select({
+            start: this.parseTime(this.props.start.clone(), this.state.start).toDate(),
+            end: this.parseTime(this.props.end.clone(), this.state.end).toDate()
+        });
     },
     componentDidMount: function() {
         var node = $(ReactDOM.findDOMNode(this));
@@ -1078,7 +1057,7 @@ oc.BlockerForm = React.createClass({
                 setTimeout(this.updateSelection, 100);
                 break;
             case 'end':
-                state.end = e.target.value === '00:00' && '24:00' || e.target.value;
+                state.end = e.target.value === '00:00' && '23:59' || e.target.value;
                 // setState is asynchronous so we slightly delay this
                 setTimeout(this.updateSelection, 100);
                 break;
@@ -1147,50 +1126,43 @@ oc.BlockerForm = React.createClass({
     },
     isValidStart: function(start) {
         var startdate = this.parseTime(this.props.start.clone(), start);
-        return startdate !== null && this.props.minStart <= startdate;
+        return startdate !== null;
     },
     isValidEnd: function(end) {
         var enddate = this.parseTime(this.props.start.clone(), end);
-        return enddate !== null && enddate <= this.props.maxEnd;
+        return enddate !== null;
     },
     isValidState: function() {
-        if (!this.props.partlyAvailable || (this.props.wholeDay && this.state.wholeDay)) {
-            return true;
-        } else {
-            return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
-        }
+        return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
     },
     // eslint-disable-next-line complexity
     render: function() {
         var buttonEnabled = this.isValidState();
-        var showWholeDay = this.props.partlyAvailable && this.props.wholeDay;
-        var showTimeRange = this.props.partlyAvailable && (!this.props.wholeDay || !this.state.wholeDay);
+        var showTimeRange = !this.state.wholeDay;
 
         return (
             <form>
                 <h3>{locale("Blocker")}</h3>
-                {showWholeDay && (
-                    <div className="field">
-                        <span className="label-text">{locale("Whole day")}</span>
+                <div className="field">
+                    <span className="label-text">{locale("Whole day")}</span>
 
-                        <input id="reserve-whole-day-yes"
-                            name="reserve-whole-day"
-                            type="radio"
-                            value="yes"
-                            checked={this.state.wholeDay}
-                            onChange={this.handleInputChange}
-                        />
-                        <label htmlFor="reserve-whole-day-yes">{locale("Yes")}</label>
-                        <input id="reserve-whole-day-no"
-                            name="reserve-whole-day"
-                            type="radio"
-                            value="no"
-                            checked={!this.state.wholeDay}
-                            onChange={this.handleInputChange}
-                        />
-                        <label htmlFor="reserve-whole-day-no">{locale("No")}</label>
-                    </div>
-                )}
+                    <input id="reserve-whole-day-yes"
+                        name="reserve-whole-day"
+                        type="radio"
+                        value="yes"
+                        checked={this.state.wholeDay}
+                        onChange={this.handleInputChange}
+                    />
+                    <label htmlFor="reserve-whole-day-yes">{locale("Yes")}</label>
+                    <input id="reserve-whole-day-no"
+                        name="reserve-whole-day"
+                        type="radio"
+                        value="no"
+                        checked={!this.state.wholeDay}
+                        onChange={this.handleInputChange}
+                    />
+                    <label htmlFor="reserve-whole-day-no">{locale("No")}</label>
+                </div>
 
                 {showTimeRange && (
                     <div className="field split">
@@ -1236,25 +1208,13 @@ oc.BlockerForm = React.createClass({
     }
 });
 
-oc.BlockerForm.render = function(calendar, element, start, end, wholeDay, event, onSubmit) {
-
-    var partlyAvailable = event.extendedProps.partlyAvailable;
-    var fullyAvailable = event.extendedProps.fullyAvailable;
-    var minStart = moment.max(moment(event.start), moment());
-    var maxEnd = moment(event.end);
-    var wholeRange = !partlyAvailable || wholeDay;
+oc.BlockerForm.render = function(calendar, element, start, end, onSubmit) {
 
     return ReactDOM.render(
         <oc.BlockerForm
             calendar={calendar}
-            partlyAvailable={partlyAvailable}
-            fullyAvailable={fullyAvailable}
-            start={wholeRange && minStart || moment.max(start, minStart)}
-            end={wholeRange && maxEnd || moment.min(end, maxEnd)}
-            minStart={minStart}
-            maxEnd={maxEnd}
-            wholeDay={event.extendedProps.wholeDay}
-            wholeDayDefault={wholeDay}
+            start={start}
+            end={end}
             onSubmit={onSubmit}
         />,
         element
