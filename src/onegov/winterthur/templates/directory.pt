@@ -20,7 +20,6 @@
         <div class="sidebar-wrapper">
             <div class="row search-widget" tal:condition="search_widget">
                 <div class="columns medium-6">
-                    <br/>
                     <tal:b replace="search_widget.html(layout)" />
                 </div>
             </div>
