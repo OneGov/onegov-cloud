@@ -1273,11 +1273,31 @@ class MeetingItemLayout(DefaultLayout):
         ]
 
 
+def parliamentarian_plural_label(request: TownRequest) -> str:
+    if request.app.org.ris_parliamentarian_term == (
+        'residents_council_members'
+    ):
+        return request.translate(_('Town council members'))
+    return request.translate(_('Parliamentarians'))
+
+
 class RISParliamentarianCollectionLayout(DefaultLayout):
+
+    @property
+    def parliamentarian_singular(self) -> str:
+        if self.request.app.org.ris_parliamentarian_term == (
+            'residents_council_members'
+        ):
+            return self.request.translate(_('Town council member'))
+        return self.request.translate(_('Parliamentarian'))
+
+    @property
+    def parliamentarian_plural(self) -> str:
+        return parliamentarian_plural_label(self.request)
 
     @cached_property
     def title(self) -> str:
-        return _('Parliamentarians')
+        return self.parliamentarian_plural
 
     @cached_property
     def og_description(self) -> str:
@@ -1299,7 +1319,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Parliamentarian'),
+                            text=self.parliamentarian_singular,
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-parliamentarian'},
                         ),
@@ -1311,6 +1331,10 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
 
 @TownApp.layout(model=RISParliamentarian)
 class RISParliamentarianLayout(DefaultLayout):
+
+    @property
+    def parliamentarian_plural(self) -> str:
+        return parliamentarian_plural_label(self.request)
 
     @cached_property
     def collection(self) -> RISParliamentarianCollection:
@@ -1330,8 +1354,7 @@ class RISParliamentarianLayout(DefaultLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('RIS Settings'), self.ris_overview_url),
             Link(
-                _('Parliamentarians'),
-                self.request.link(self.collection)
+                self.parliamentarian_plural, self.request.link(self.collection)
             ),
             Link(self.title, self.request.link(self.model))
         ]
@@ -1633,6 +1656,10 @@ class RISCommissionLayout(DefaultLayout):
     @cached_property
     def collection(self) -> RISCommissionCollection:
         return RISCommissionCollection(self.request.session)
+
+    @cached_property
+    def parliamentarian_collection(self) -> RISParliamentarianCollection:
+        return RISParliamentarianCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:

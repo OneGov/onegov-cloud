@@ -398,6 +398,12 @@ def test_occurrence_collection_query(session: Session) -> None:
         assert query(outdated=False, range='month').count() == 4
         assert query(outdated=False, range='past').count() == 1
 
+    occurrences = query(outdated=True).limit(2).all()
+    occurrences[0].location = None
+    occurrences[1].location = ''
+    session.flush()
+    assert query(outdated=True, locations=['NULL']).count() == 2
+
 
 def test_occurrence_collection_pagination(session: Session) -> None:
     occurrences = OccurrenceCollection(session)

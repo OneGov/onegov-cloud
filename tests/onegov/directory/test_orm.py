@@ -10,6 +10,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory.errors import ValidationError
 from onegov.file import File
+from onegov.form.fields import UploadMultipleField
 from onegov.form.parser import ParsedForm
 from wtforms.validators import ValidationError as WtfValidationError
 
@@ -503,6 +504,112 @@ def test_multi_files(session: Session) -> None:
     session.flush()
 
     assert session.query(File).count() == 0
+
+
+@pytest.mark.parametrize(
+    ('required', 'has_file'),
+    [
+        ('', False),
+        ('', True),
+        ('*', True),
+    ],
+)
+def test_migrate_single_to_multiple_files(
+    session: Session, required: str, has_file: bool
+) -> None:
+    directory = DirectoryCollection(session).add(
+        title='Documents',
+        structure=f'Title = ___\nDocument {required}= *.txt',
+        configuration=DirectoryConfiguration(title='Title'),
+    )
+    entry = directory.add(
+        {
+            'title': 'Example',
+            'document': (
+                Bunch(
+                    data=object(),
+                    file=BytesIO(b'original'),
+                    filename='original.txt',
+                )
+                if has_file
+                else None
+            ),
+        }
+    )
+    session.flush()
+    original = entry.values['document']
+    original_ids = {file.id for file in entry.files}
+
+    structure = f'Title = ___\nDocument {required}= *.txt (multiple)'
+    directory.structure = structure
+    session.flush()
+    session.expire_all()
+
+    assert entry.values['document'] == ([original] if has_file else [])
+    assert {file.id for file in entry.files} == original_ids
+    assert all(file.note == 'document:0' for file in entry.files)
+    form = directory.form_class()
+    form.process_obj(entry)
+    document = form['document']
+    assert isinstance(document, UploadMultipleField)
+    assert len(document) == int(has_file)
+    if has_file:
+        assert document[0].data == original
+
+    directory.update(
+        entry,
+        {
+            'title': 'Example',
+            'document': (
+                *((Bunch(data=None, action='keep'),) if has_file else ()),
+                Bunch(
+                    data=object(),
+                    file=BytesIO(b'attachment'),
+                    filename='attachment.txt',
+                ),
+            ),
+        },
+    )
+    session.flush()
+    session.expire_all()
+    assert len(entry.values['document']) == int(has_file) + 1
+    assert original_ids <= {file.id for file in entry.files}
+
+    directory.update(
+        entry,
+        {
+            'title': 'Example',
+            'document': (
+                Bunch(
+                    data=object(),
+                    file=BytesIO(b'replacement'),
+                    filename='replacement.txt',
+                ),
+                *((Bunch(data={}, action='delete'),) if has_file else ()),
+            ),
+        },
+    )
+    session.flush()
+    session.expire_all()
+    assert len(entry.values['document']) == 1
+    assert entry.values['document'][0]['filename'] == 'replacement.txt'
+    assert len(entry.files) == 1
+    assert entry.files[0].note == 'document:0'
+    assert not original_ids & {file.id for file in entry.files}
+
+    directory.update(
+        entry,
+        {'title': 'Example', 'document': (Bunch(data={}, action='delete'),)},
+    )
+    session.flush()
+    session.expire_all()
+    assert entry.values['document'] == []
+    assert entry.files == []
+    assert session.query(File).count() == 0
+    assert not directory.migration(
+        ParsedForm.from_formcode(f'Title = ___\nDocument {required}= *.txt'),
+        None,
+    ).possible
 
 
 def test_migrate_text_field(session: Session) -> None:
