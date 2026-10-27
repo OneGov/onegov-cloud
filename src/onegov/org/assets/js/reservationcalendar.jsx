@@ -188,72 +188,29 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
     // implements editing
     if (rcOptions.editable) {
 
-        // open internal reservation form on selection
-        fcOptions.select = function(info) {
-            var calendar = info.view.calendar;
-            var element = $(calendar.el).find('.fc-highlight').get(0) || $(calendar.el).find('[data-date="' + moment(info.start).format('YYYY-MM-DD') + '"]').get(0) || calendar.el;
-            var wrapper = $('<div class="reservation-actions">');
-            $('<h3 />').text(locale('Internal reservation')).appendTo(wrapper);
-            var reservation = $('<div class="reservation-form">').appendTo(wrapper);
-            ReservationForm.renderInternal(
-                reservation.get(0),
-                info.start,
-                info.end,
-                rc.previousReservationState,
-                function(state) {
-                    rc.targetEvent = $(element);
-                    rc.internalReserve(
-                        calendar,
-                        rcOptions.internalReserveUrl,
-                        moment(info.start).format('YYYYMMDD'),
-                        state.start,
-                        state.end,
-                        state.wholeDay
-                    );
-                    $(this).closest('.popup').popup('hide');
-                }
-            );
+        // internal reservations are not possible for every kind of resource
+        // so checking for editable is not enough, we need to check the url
+        // has been set as well.
+        if (rcOptions.internalReserveUrl !== null) {
 
-            rc.showPopup(calendar, element, wrapper);
-        };
-
-        // only allow selections for at most an entire day
-        // reservations cannot span multiple days and need to be in the future
-        fcOptions.selectAllow = function(info) {
-            var start = moment(info.start);
-            var end = moment(info.end);
-            if (info.allDay) {
-                return !start.isBefore(Date.now(), 'day') && start.isSame(end.subtract(1, 'days'), 'day');
-            }
-            return start.isAfter(Date.now()) && start.isSame(end, 'day');
-        };
-
-        // add button for adding internal reservations to date headers
-        fcOptions.dayHeaderDidMount = function(info) {
-            // only render a button for today and future days
-            if (!info.isToday && !info.isFuture) {
-                return;
-            }
-
-            var button = $('<button type="button" class="fc-button fc-button-primary add-reservation" aria-pressed="false"></button>');
-            button.attr('title', locale('Internal reservation'));
-            button.html('<span class="fa fa-plus"/>');
-            button.click(function() {
+            // open internal reservation form on selection
+            fcOptions.select = function(info) {
                 var calendar = info.view.calendar;
+                var element = $(calendar.el).find('.fc-highlight').get(0) || $(calendar.el).find('[data-date="' + moment(info.start).format('YYYY-MM-DD') + '"]').get(0) || calendar.el;
                 var wrapper = $('<div class="reservation-actions">');
                 $('<h3 />').text(locale('Internal reservation')).appendTo(wrapper);
                 var reservation = $('<div class="reservation-form">').appendTo(wrapper);
                 ReservationForm.renderInternal(
                     reservation.get(0),
-                    info.date,
-                    info.date,
+                    info.start,
+                    info.end,
                     rc.previousReservationState,
                     function(state) {
-                        rc.targetEvent = $(info.el);
+                        rc.targetEvent = $(element);
                         rc.internalReserve(
                             calendar,
                             rcOptions.internalReserveUrl,
-                            moment(info.date).format('YYYYMMDD'),
+                            moment(info.start).format('YYYYMMDD'),
                             state.start,
                             state.end,
                             state.wholeDay
@@ -262,10 +219,59 @@ rc.getFullcalendarOptions = function(rcExtendOptions) {
                     }
                 );
 
-                rc.showPopup(calendar, info.el, wrapper);
-            });
-            button.appendTo($(info.el).find('a').eq(0).parent());
-        };
+                rc.showPopup(calendar, element, wrapper);
+            };
+
+            // only allow selections for at most an entire day
+            // reservations cannot span multiple days and need to be in the future
+            fcOptions.selectAllow = function(info) {
+                var start = moment(info.start);
+                var end = moment(info.end);
+                if (info.allDay) {
+                    return !start.isBefore(Date.now(), 'day') && start.isSame(end.subtract(1, 'days'), 'day');
+                }
+                return start.isAfter(Date.now()) && start.isSame(end, 'day');
+            };
+
+            // add button for adding internal reservations to date headers
+            fcOptions.dayHeaderDidMount = function(info) {
+                // only render a button for today and future days
+                if (!info.isToday && !info.isFuture) {
+                    return;
+                }
+
+                var button = $('<button type="button" class="fc-button fc-button-primary add-reservation" aria-pressed="false"></button>');
+                button.attr('title', locale('Internal reservation'));
+                button.html('<span class="fa fa-plus"/>');
+                button.click(function() {
+                    var calendar = info.view.calendar;
+                    var wrapper = $('<div class="reservation-actions">');
+                    $('<h3 />').text(locale('Internal reservation')).appendTo(wrapper);
+                    var reservation = $('<div class="reservation-form">').appendTo(wrapper);
+                    ReservationForm.renderInternal(
+                        reservation.get(0),
+                        info.date,
+                        info.date,
+                        rc.previousReservationState,
+                        function(state) {
+                            rc.targetEvent = $(info.el);
+                            rc.internalReserve(
+                                calendar,
+                                rcOptions.internalReserveUrl,
+                                moment(info.date).format('YYYYMMDD'),
+                                state.start,
+                                state.end,
+                                state.wholeDay
+                            );
+                            $(this).closest('.popup').popup('hide');
+                        }
+                    );
+
+                    rc.showPopup(calendar, info.el, wrapper);
+                });
+                button.appendTo($(info.el).find('a').eq(0).parent());
+            };
+        }
 
         // edit events on drag&drop, resize
         fcOptions.eventDrop = fcOptions.eventResize = function(info) {

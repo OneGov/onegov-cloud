@@ -59,6 +59,15 @@ if TYPE_CHECKING:
             whole_day: bool = ...,
         ) -> ExtendedResponse: ...
 
+    class _InternalReserveFunc(Protocol):
+        def __call__(
+            self,
+            date: str,
+            start: str = ...,
+            end: str = ...,
+            whole_day: bool = ...,
+        ) -> ExtendedResponse: ...
+
     class _AddBlockerFunc(Protocol):
         def __call__(
             self,
@@ -197,6 +206,31 @@ class Client[AppT: OrgApp = TestOrgApp](BaseClient[AppT]):
             )
 
         return reserve
+
+    def bound_internal_reserve(
+        self,
+        resource: Resource
+    ) -> _InternalReserveFunc:
+
+        default_start = '00:00'
+        default_end = '23:59'
+        default_whole_day = False
+
+        def internal_reserve(
+            date: str,
+            start: str = default_start,
+            end: str = default_end,
+            whole_day: bool = default_whole_day
+        ) -> ExtendedResponse:
+            date = date.replace('-', '')
+            return self.post(
+                f'/resource/{resource.name}/internal-reserve?date={date}'
+                f'&start={start}&end={end}'
+                f'&whole_day={whole_day and "1" or "0"}'
+                f'&csrf-token={self.csrf_token}'
+            )
+
+        return internal_reserve
 
     def bound_add_blocker(self, resource: Resource) -> _AddBlockerFunc:
 
