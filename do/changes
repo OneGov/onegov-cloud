@@ -223,7 +223,7 @@ def format_datetime(dt: date | datetime) -> str:
 
 
 def changelog(folder: PathLike, new: str) -> None:
-    repository = git.Repo(folder, odbt=git.GitDB)
+    repository = git.Repo(folder, odbt=git.GitCmdObjectDB)
 
     tags = sorted(
         release_tags(repository),
