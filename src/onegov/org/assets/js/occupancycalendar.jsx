@@ -202,7 +202,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
 
         };
         fcOptions.selectAllow = function(info) {
-            if (oc.popupOpen || ocOptions.blockurl === null) {
+            if (oc.popupOpen || ocOptions.blockUrl === null) {
                 return false;
             }
             // the allDay slot is only there for holidays, not for blockers
@@ -214,7 +214,7 @@ oc.getFullcalendarOptions = function(ocExtendOptions) {
         };
         // add blockers on selection
         fcOptions.select = function(info) {
-            if (oc.popupOpen || ocOptions.blockurl === null) {
+            if (oc.popupOpen || ocOptions.blockUrl === null) {
                 return;
             }
             var view = info.view;

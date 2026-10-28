@@ -8,7 +8,7 @@ from libres.db.models import ReservationBlocker
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
 from onegov.core.security import Private
-from onegov.org import _, OrgApp
+from onegov.org import _, log, OrgApp
 from onegov.org import utils
 from onegov.reservation import Allocation, Resource
 from webob import exc, Response
@@ -157,19 +157,40 @@ def delete_blocker(self: ReservationBlocker, request: OrgRequest) -> JSON_ro:
 
     if self.resource.version == 5:
         scheduler = resource.virtual_scheduler
+        virtual_allocation = self.target_allocations().first()
     else:
         # NOTE: Only legacy blockers should be on the real resource
         #       eventually we can probably remove this check and do
         #       a migration to remove all legacy blockers, once they
         #       are all well in the past.
         scheduler = resource.scheduler
+        virtual_allocation = None
 
     try:
         scheduler.remove_blocker(self.token, self.id)
     except LibresError as e:
         return respond_with_error(request, utils.get_libres_error(e, request))
-    else:
-        return respond_with_success(request)
+
+    # try to delete the virtual allocation, if we no longer need it
+    if (
+        virtual_allocation
+        and len(virtual_allocation.reserved_slots) == 0
+        and virtual_allocation.pending_reservations.count() == 0
+    ):
+        savepoint = transaction.savepoint()
+        try:
+            scheduler.remove_allocation(virtual_allocation.id)
+        except LibresError:
+            # ignore the error, since it's not critical, if we're worried
+            # about polluting the table, we can run `remove_unused_allocations`
+            # inside a cronjob or add a CLI command for it
+            log.warning(
+                'Failed to clean up unused virtual allocation',
+                exc_info=True
+            )
+            savepoint.rollback()
+
+    return respond_with_success(request)
 
 
 @OrgApp.json(

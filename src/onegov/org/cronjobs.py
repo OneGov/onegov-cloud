@@ -624,7 +624,10 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
         (r.id.hex, f'{r.group or default_group} - {r.title}')
         for r in all_resources
     )
-    virtual_ids = {r.id: Resource.get_virtual_id(r.id) for r in all_resources}
+    virtual_ids: dict[UUID, UUID] = {
+        r.id: Resource.get_virtual_id(r.id)
+        for r in all_resources
+    }
 
     # get the reservations of this day
     start = align_date_to_day(today, 'Europe/Zurich', 'down')
@@ -663,7 +666,7 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
             reservation.submission = submission  # type:ignore
 
     # group the reservations by resource
-    reservations = {
+    reservations: dict[str, tuple[Reservation, ...]] = {
         resid.hex: tuple(reservations) for resid, reservations in groupby(
             all_reservations, key=attrgetter('resource')
         )
@@ -671,18 +674,18 @@ def send_daily_resource_usage_overview(request: OrgRequest) -> None:
 
     # merge reservations from virtual id into resource id
     for resource_id, virtual_id in virtual_ids.items():
-        pending = reservations.pop(virtual_id, None)
+        pending = reservations.pop(virtual_id.hex, None)
         if pending is None:
             continue
 
-        if existing := reservations.get(resource_id):
+        if existing := reservations.get(resource_id.hex):
             # when merging we need to re-sort the reservations
             merged = [*existing, *pending]
             merged.sort(key=attrgetter('start'))
-            reservations[resource_id] = tuple(merged)
+            reservations[resource_id.hex] = tuple(merged)
         else:
             # no merging required just assign it to the correct id
-            reservations[resource_id] = pending
+            reservations[resource_id.hex] = pending
 
     # send out the e-mails
     args: RenderData = {
