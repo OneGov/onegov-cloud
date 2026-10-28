@@ -3805,11 +3805,8 @@ msgstr "Des réservations existantes sont associées à cette ressource"
 msgid "Every ${days} until ${end}"
 msgstr "Tous les ${days} jusqu'à ${end}"
 
-msgid "This event can't be edited."
-msgstr "Cet événement ne peut pas être édité."
-
-msgid "Imported events can not be edited."
-msgstr "Les événements importés ne peuvent pas être édités."
+msgid "This event has been imported. Once saved, it will no longer be updated by the import."
+msgstr "Cet événement a été importé. Une fois enregistré, il ne sera plus mis à jour par l'importation."
 
 msgid "Do you really want to delete this event?"
 msgstr "Voulez-vous vraiment supprimer cet événement ?"
