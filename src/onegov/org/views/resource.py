@@ -650,7 +650,7 @@ def view_find_your_spot(
                     ))
                     if (
                         len(spot_infos) != 1
-                        or spot_infos[0].availability < 100.0
+                        or spot_infos[0].quota_left < 1
                     ):
                         total_availability = sum(
                             info.availability

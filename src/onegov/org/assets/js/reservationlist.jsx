@@ -45,7 +45,8 @@ $.fn.reservationList = function(options) {
         // handles clicks on events
         list.on('click', '.event:not(.event-unavailable)', function(e) {
             var el = $(this);
-            if (!el.hasClass('event-adjustable') && el.hasClass('selected')) {
+            var reserveurl = el.data('reserveurl') || null;
+            if (reserveurl === null | (!el.hasClass('event-adjustable') && el.hasClass('selected'))) {
                 e.preventDefault();
                 return false;
             }
@@ -58,7 +59,7 @@ $.fn.reservationList = function(options) {
                 wholeDayDefault: options.wholeDay,
                 wholeDay: el.data('whole-day'),
                 internal: el.data('internal'),
-                reserveurl: el.data('reserveurl')
+                reserveurl: reserveurl
             };
             rl.removeAllPopups();
             var singleSelect = !e.shiftKey && !e.altKey && !e.ctrlKey;
@@ -570,7 +571,7 @@ var ReservationForm = React.createClass({
             state.wholeDay = false;
         }
 
-        state.end = state.end === '00:00' && '24:00' || state.end;
+        state.end = state.end === '00:00' && '23:59' || state.end;
 
         return state;
     },
@@ -601,7 +602,7 @@ var ReservationForm = React.createClass({
                 state.start = e.target.value;
                 break;
             case 'end':
-                state.end = e.target.value === '00:00' && '24:00' || e.target.value;
+                state.end = e.target.value === '00:00' && '23:59' || e.target.value;
                 break;
             case 'count':
                 state.quota = parseInt(e.target.value, 10);

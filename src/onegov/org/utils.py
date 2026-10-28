@@ -1360,6 +1360,8 @@ class FindYourSpotEventInfo:
             ):
                 yield 'event-available'
             elif self.availability >= 5.0:
+                if not self.adjustable and self.quota_left < 1:
+                    yield 'event-unavailable'
                 yield 'event-partly-available'
             else:
                 yield 'event-unavailable'
@@ -1376,7 +1378,10 @@ class FindYourSpotEventInfo:
         return self.allocation.is_virtual
 
     @property
-    def reserveurl(self) -> str:
+    def reserveurl(self) -> str | None:
+        if not self.adjustable and self.quota_left < 1:
+            return None
+
         if self.internal:
             return self.request.link(self.resource, 'internal-reserve')
         return self.request.link(self.allocation, 'reserve')

@@ -7416,7 +7416,7 @@ a#results {
 
         .event-unavailable {
             background-color: $red;
-            cursor: not-allowed;
+            cursor: not-allowed !important;
         }
 
         .event-partly-available {

@@ -956,7 +956,7 @@ a#results {
         }
 
         .event-unavailable {
-            cursor: not-allowed;
+            cursor: not-allowed !important;
             background-color: $red;
         }
 
