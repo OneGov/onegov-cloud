@@ -8614,6 +8614,78 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
+msgid "API URL of the source organisation"
+msgstr "API-URL der Quellorganisation"
+
+msgid "e.g. https://onegov.govikon.ch/api/"
+msgstr "z.B. https://onegov.govikon.ch/api/"
+
+msgid "Source organisation API link"
+msgstr "Quellorganisation API-Verknüpfung"
+
+msgid "API link"
+msgstr "API-Verknüpfung"
+
+msgid "Add API link"
+msgstr "API-Verknüpfung hinzufügen"
+
+msgid "Added API link"
+msgstr "API-Verknüpfung hinzugefügt"
+
+msgid "Edit API link"
+msgstr "API-Verknüpfung bearbeiten"
+
+msgid "Move API link"
+msgstr "API-Verknüpfung verschieben"
+
+msgid "The API link was deleted"
+msgstr "Die API-Verknüpfung wurde gelöscht"
+
+msgid "Delete API link"
+msgstr "API-Verknüpfung löschen"
+
+msgid "Do you really want to delete the API link \"${title}\"?"
+msgstr "Möchten Sie die API-Verknüpfung \"${title}\" wirklich löschen?"
+
+msgid "Optional. If left empty, the title of the linked topic is used."
+msgstr "Optional. Bleibt das Feld leer, wird der Titel des verknüpften Themas verwendet."
+
+msgid "Linked topic"
+msgstr "Verknüpftes Thema"
+
+msgid "Selected topic"
+msgstr "Ausgewähltes Thema"
+
+msgid "No topic selected yet"
+msgstr "Noch kein Thema ausgewählt"
+
+msgid "Subpages"
+msgstr "Unterseiten"
+
+msgid "Loading..."
+msgstr "Wird geladen..."
+
+msgid "No topics found"
+msgstr "Keine Themen gefunden"
+
+msgid "Load more"
+msgstr "Mehr laden"
+
+msgid "The topics could not be loaded"
+msgstr "Die Themen konnten nicht geladen werden"
+
+msgid "No API of a source organisation is configured."
+msgstr "Es ist keine API einer Quellorganisation konfiguriert."
+
+msgid "Please select a topic."
+msgstr "Bitte wählen Sie ein Thema aus."
+
+msgid "The API of the source organisation could not be reached."
+msgstr "Die API der Quellorganisation konnte nicht erreicht werden."
+
+msgid "The selected topic is not publicly available."
+msgstr "Das ausgewählte Thema ist nicht öffentlich verfügbar."
+
 #~ msgid ""
 #~ "Proceed with caution. Tickets and the data they contain may be "
 #~ "irrevocable deleted."

@@ -2079,6 +2079,26 @@ class OneGovApiSettingsForm(Form):
     )
 
 
+class ApiSourceSettingsForm(Form):
+    """ Configures the API of another OneGov instance, whose topics may be
+    linked to topics of this instance. """
+
+    api_source_url = URLField(
+        label=_('API URL of the source organisation'),
+        description=_(
+            'e.g. https://onegov.govikon.ch/api/'),
+        default_scheme=None,
+        validators=[Optional(), URLValidator(require_tld=False)],
+    )
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        super().populate_obj(model)
+        if model.api_source_url:
+            model.api_source_url = model.api_source_url.rstrip('/') + '/'
+        else:
+            model.api_source_url = None
+
+
 class EventSettingsForm(Form):
 
     submit_events_visible = BooleanField(

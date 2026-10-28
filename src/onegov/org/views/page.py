@@ -9,6 +9,7 @@ from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
 from onegov.core.utils import append_query_param
 from onegov.org import _, OrgApp
+from onegov.org.api_source import api_source_base_url, api_topic_edit_url
 from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
@@ -48,7 +49,7 @@ def view_topic(
     layout: PageLayout | None = None
 ) -> RenderData | Response:
 
-    assert self.trait in {'link', 'page', 'iframe'}
+    assert self.trait in {'link', 'page', 'iframe', 'api'}
 
     if not request.is_manager:
 
@@ -118,7 +119,25 @@ def view_topic(
             and child.show_preview_image
             for child in children
         ),
-        'iframe': self.content['url'] if self.trait == 'link' else None
+        'iframe': self.content['url'] if self.trait == 'link' else None,
+        'api_source': api_source_info(self, request),
+    }
+
+
+def api_source_info(
+    page: Topic,
+    request: OrgRequest
+) -> dict[str, str | bool] | None:
+    """ The source of 'api' topics shown to editors. """
+    api_url = request.app.org.api_source_url
+    if page.trait != 'api' or not page.api_topic_id or not api_url:
+        return None
+
+    return {
+        'source_url': api_source_base_url(api_url),
+        'edit_url': api_topic_edit_url(api_url, page.api_topic_id),
+        'view_url': page.meta.get('api_html_url') or '',
+        'unavailable': page.api_unavailable,
     }
 
 

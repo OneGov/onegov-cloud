@@ -256,6 +256,9 @@ class Organisation(Base, TimestampMixin):
     open_files_target_blank: dict_property[bool] = meta_property(default=True)
     disable_page_refs: dict_property[bool] = meta_property(default=True)
 
+    # API source settings (topics of another instance linked via its API)
+    api_source_url: dict_property[str | None] = meta_property()
+
     # Footer column width settings
     footer_left_width: dict_property[int] = meta_property(default=3)
     footer_center_width: dict_property[int] = meta_property(default=5)

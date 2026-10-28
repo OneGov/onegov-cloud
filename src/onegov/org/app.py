@@ -5,12 +5,15 @@ import niquests
 import yaml
 
 import morepath
+import transaction
+
 from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
 from more.content_security import SELF
 from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
+from more.transaction.main import transaction_tween_factory
 from onegov.api import ApiApp
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
@@ -21,7 +24,7 @@ from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
-from onegov.org import _, directives
+from onegov.org import _, directives, log
 from onegov.org.auth import MTANAuth
 from onegov.org.exceptions import MTANAccessLimitExceeded
 from onegov.org.initial_content import create_new_organisation
@@ -766,6 +769,53 @@ def enable_iframes_tween_factory(
     return enable_iframes_tween
 
 
+@OrgApp.tween_factory(under=transaction_tween_factory)
+def sync_api_topics_tween_factory(
+    app: OrgApp,
+    handler: Callable[[OrgRequest], Response]
+) -> Callable[[OrgRequest], Response]:
+    """ Syncs the topics linked to the API of the source organisation
+    before each page view, so the topics and the search are always up to
+    date with the source.
+
+    FIXME: This is a demo! See :mod:`onegov.org.api_source`.
+
+    """
+    from onegov.org.api_source import DEMO_API_WORKER_PORTS
+    from onegov.org.api_source import sync_api_topics
+
+    worker_ports = {str(port) for port in DEMO_API_WORKER_PORTS.values()}
+
+    def is_page_view(request: OrgRequest) -> bool:
+        return (
+            request.method == 'GET'
+            and not request.is_xhr
+            and 'text/html' in (request.accept.header_value or '')
+            and not (request.path_info or '/').startswith('/api')
+            # the second worker would wait for itself
+            and request.host_port not in worker_ports
+        )
+
+    def sync_api_topics_tween(request: OrgRequest) -> Response:
+        if (
+            app.has_database_connection
+            and is_page_view(request)
+            and app.org is not None
+            and app.org.api_source_url
+        ):
+            try:
+                sync_api_topics(request.session, app.org)
+                # commit now, the search index is only updated on commit
+                transaction.commit()
+            except Exception:
+                log.exception('Failed to sync the API topics')
+                transaction.abort()
+
+        return handler(request)
+
+    return sync_api_topics_tween
+
+
 @OrgApp.webasset_path()
 def get_js_path() -> str:
     return 'assets/js'
@@ -873,6 +923,11 @@ def get_photoswipe_asset() -> Iterator[str]:
     yield 'photoswipe.js'
     yield 'photoswipe-ui.js'
     yield 'photoswipe-custom.js'
+
+
+@OrgApp.webasset('api-topic-picker')
+def get_api_topic_picker() -> Iterator[str]:
+    yield 'api-topic-picker.js'
 
 
 @OrgApp.webasset('tags-input')
