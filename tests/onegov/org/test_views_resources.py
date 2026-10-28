@@ -556,9 +556,19 @@ def test_find_your_spot(client: Client) -> None:
     assert reservation['date'].startswith('2020-01-05')
     assert reservation['time'] == '07:00 - 08:00'
 
+    # delete all of the reservations
+    result = client.delete(result['delete_link']).json
+    assert result['reservations'] == []
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert result['reservations'] == []
+
 
 @freeze_time('2020-01-01', tick=True)
 def test_find_your_spot_internal(client: Client) -> None:
+    session = client.app.session()
     client.login_admin()
 
     resources = client.get('/resources')
@@ -636,6 +646,11 @@ def test_find_your_spot_internal(client: Client) -> None:
     assert '05.01.2020' in result
     assert '06.01.2020' in result
 
+    # even though we create virtual allocations for internal reservations
+    # they should not stick around, so by this point we should have no
+    # allocations still
+    assert session.query(ResourceAllocation).count() == 0
+
     # even without any allocations, the internal reservations should work
 
     find_your_spot.form['auto_reserve_available_slots'] = 'for_first_day'
@@ -649,6 +664,8 @@ def test_find_your_spot_internal(client: Client) -> None:
     assert reservation['resource'] == 'grand-meeting-room'
     assert reservation['date'].startswith('2020-01-01')
     assert reservation['time'] == '07:00 - 08:00'
+    # only the one allocation we reserved should stick around
+    assert session.query(ResourceAllocation).count() == 1
 
     # resubmitting doesn't add a reservation or change the existing one
     result = find_your_spot.form.submit()
@@ -661,6 +678,8 @@ def test_find_your_spot_internal(client: Client) -> None:
     assert reservation['resource'] == 'grand-meeting-room'
     assert reservation['date'].startswith('2020-01-01')
     assert reservation['time'] == '07:00 - 08:00'
+    # only the one allocation we reserved should stick around
+    assert session.query(ResourceAllocation).count() == 1
 
     find_your_spot.form['auto_reserve_available_slots'] = 'for_every_day'
     result = find_your_spot.form.submit()
@@ -674,6 +693,8 @@ def test_find_your_spot_internal(client: Client) -> None:
         assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx + 1}')
         assert reservation['time'] == '07:00 - 08:00'
+    # only the six allocations we reserved should stick around
+    assert session.query(ResourceAllocation).count() == 6
 
     # resubmitting doesn't change anything
     result = find_your_spot.form.submit()
@@ -687,6 +708,8 @@ def test_find_your_spot_internal(client: Client) -> None:
         assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx + 1}')
         assert reservation['time'] == '07:00 - 08:00'
+    # only the six allocations we reserved should stick around
+    assert session.query(ResourceAllocation).count() == 6
 
     find_your_spot.form['auto_reserve_available_slots'] = 'for_every_room'
     result = find_your_spot.form.submit()
@@ -702,6 +725,8 @@ def test_find_your_spot_internal(client: Client) -> None:
         assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx + 1}')
         assert reservation['time'] == '07:00 - 08:00'
+    # only the six allocations we reserved should stick around
+    assert session.query(ResourceAllocation).count() == 6
 
     # resubmitting also doesn't change anything here
     result = find_your_spot.form.submit()
@@ -715,6 +740,19 @@ def test_find_your_spot_internal(client: Client) -> None:
         assert reservation['resource'] == 'grand-meeting-room'
         assert reservation['date'].startswith(f'2020-01-0{idx + 1}')
         assert reservation['time'] == '07:00 - 08:00'
+    # only the six allocations we reserved should stick around
+    assert session.query(ResourceAllocation).count() == 6
+
+    # delete all of the reservations
+    result = client.delete(result['delete_link']).json
+    assert result['reservations'] == []
+    # deleting the reservations should clean up the allocations
+    assert session.query(ResourceAllocation).count() == 0
+
+    result = client.get(
+        '/find-your-spot/reservations?group=Meeting+Rooms'
+    ).json
+    assert result['reservations'] == []
 
 
 @pytest.mark.parametrize('internal', [False, True])

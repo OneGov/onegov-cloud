@@ -1009,6 +1009,14 @@ def delete_all_find_your_spot_reservations(
         if cleanup_virtual_allocations:
             assert with_virtual and min_date and max_date
             request.session.flush()
+            # NOTE: Since allocations always cover the whole day
+            #       we need to align the start and end of the range
+            #       to the day
+            min_date, max_date = sedate.align_range_to_day(
+                min_date,
+                max_date,
+                resource.timezone
+            )
             resource.virtual_scheduler.remove_unused_allocations(
                 min_date,
                 max_date
