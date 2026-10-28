@@ -589,7 +589,9 @@ class EventImportForm(Form):
                 'external_event_url',
                 'event_registration_url',
             ) and isinstance(result, str):
-                result = complete_url(result.strip() or None)
+                result = result.strip()
+                if result.casefold() in ('https://', 'https://keine'):
+                    result = ''
             if attribute == 'created' and isinstance(result, datetime):
                 result = to_timezone(
                     result, occurrence.timezone or 'Europe/Zurich')
@@ -660,7 +662,11 @@ class EventImportForm(Form):
                 'event_registration_url',
             ):
                 result = result.strip() if isinstance(result, str) else None
-                result = complete_url(result or None)
+                if result and result.casefold() in (
+                    'https://',
+                    'https://keine',
+                ):
+                    result = None
             if attribute in ('start', 'end'):
                 result = parse(result, dayfirst=True)
             if attribute == 'tags':

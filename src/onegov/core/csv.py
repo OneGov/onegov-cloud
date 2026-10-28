@@ -17,6 +17,7 @@ from datetime import datetime
 from functools import lru_cache
 from io import BytesIO, StringIO, TextIOWrapper
 from itertools import permutations
+from urllib.parse import urlsplit
 from onegov.core import errors
 from ordered_set import OrderedSet
 from rapidfuzz.distance import Levenshtein
@@ -541,6 +542,26 @@ def convert_list_of_dicts_to_csv(
     return output.read()
 
 
+def is_safe_excel_url(value: str) -> bool:
+    if not value.startswith(('http://', 'https://')):
+        return True
+
+    try:
+        parsed = urlsplit(value)
+        host = parsed.hostname
+    except ValueError:
+        return False
+
+    return (
+        host is not None
+        and host.isascii()
+        and re.fullmatch(r'[A-Za-z0-9.-]+', host) is not None
+        and '%' not in parsed.netloc
+        and '@' not in parsed.netloc
+        and not any(char.isspace() for char in value)
+    )
+
+
 def convert_list_of_dicts_to_xlsx(
     rows: Iterable[dict[str, Any]],
     fields: Sequence[str] | None = None,
@@ -582,7 +603,11 @@ def convert_list_of_dicts_to_xlsx(
 
         # write the rows
         for r, row in enumerate(rows, start=1):
-            worksheet.write_row(r, 0, values(row), cellformat)
+            for c, value in enumerate(values(row)):
+                if isinstance(value, str) and not is_safe_excel_url(value):
+                    worksheet.write_string(r, c, value, cellformat)
+                else:
+                    worksheet.write(r, c, value, cellformat)
 
         # set the column widths
         for col, width in enumerate(column_widths):
