@@ -61,6 +61,7 @@
                                 data-whole-day="${slot.whole_day}"
                                 data-quota="${slot.quota}"
                                 data-quota-left="${slot.quota_left}"
+                                data-internal="${'true' if slot.internal else 'false'}"
                                 data-reserveurl="${slot.reserveurl}">
                                 ${slot.event_time}<br/>
                                 ${slot.available}

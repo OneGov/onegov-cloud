@@ -507,7 +507,8 @@ def test_monthly_ticket_statistics(
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
+@pytest.mark.parametrize('internal', [False, True])
+def test_daily_reservation_overview(client: Client, internal: bool) -> None:
     resources = ResourceCollection(client.app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
@@ -517,7 +518,12 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
         Name = ___
     """
 
-    gym_allocation = gymnasium.scheduler.allocate(
+    if internal:
+        gym_scheduler = gymnasium.virtual_scheduler
+    else:
+        gym_scheduler = gymnasium.scheduler
+
+    gym_allocation = gym_scheduler.allocate(
         (datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16)),
         partly_available=True,
     )[0]
@@ -528,7 +534,7 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
         whole_day=True
     )[0]
 
-    gym_reservation_token = gymnasium.scheduler.reserve(
+    gym_reservation_token = gym_scheduler.reserve(
         'gym-reservation@example.org',
         (gym_allocation.start, gym_allocation.end),
     )
@@ -538,7 +544,7 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
         (day_allocation.start, day_allocation.end)
     )
 
-    gymnasium.scheduler.approve_reservations(gym_reservation_token)
+    gym_scheduler.approve_reservations(gym_reservation_token)
     dailypass.scheduler.approve_reservations(day_reservation_token)
 
     submissions = FormSubmissionCollection(client.app.session())
@@ -648,7 +654,7 @@ def test_daily_reservation_overview(client: Client[TestOrgApp]) -> None:
     client.flush_email_queue()
 
     gymnasium = resources.by_name('gymnasium')  # type: ignore[assignment]
-    r = gymnasium.scheduler.reservations_by_token(gym_reservation_token)[0]
+    r = gym_scheduler.reservations_by_token(gym_reservation_token)[0]
     r.data = {'accepted': True}
 
     transaction.commit()

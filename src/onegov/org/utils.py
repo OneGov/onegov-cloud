@@ -469,9 +469,10 @@ class AllocationEventInfo:
         request: OrgRequest,
         resource: Resource,
         start: datetime,
-        end: datetime
+        end: datetime,
     ) -> list[Self]:
 
+        # NOTE: We never want to display virtual allocations here
         scheduler = resource.scheduler
         allocations = scheduler.allocations_with_availability_by_range(
             start,
@@ -807,18 +808,7 @@ class AvailabilityEventInfo:
     def event_end(self) -> str:
         return self.allocation.display_end().isoformat()
 
-    @property
-    def blockable(self) -> bool:
-        if not self.request.is_manager:
-            return False
-        if self.allocation.quota == 1:
-            if self.allocation.partly_available:
-                return self.allocation.availability > 0.0
-            return not self.allocation.reserved_slots
-        return self.allocation.quota_left == self.allocation.quota
-
     def as_dict(self) -> dict[str, Any]:
-        blockable = self.blockable
         return {
             'id': self.allocation.id,
             'start': self.event_start,
@@ -827,17 +817,6 @@ class AvailabilityEventInfo:
             'editable': False,
             'display': 'background',
             # extended properties
-            'blockable': blockable,
-            'blockurl': self.request.csrf_protected_url(
-                self.request.link(self.allocation, name='add-blocker')
-            ) if blockable else None,
-            'partlyAvailable': self.allocation.partly_available,
-            'fullyAvailable': isclose(
-                self.allocation.availability,
-                100.0,
-                abs_tol=.005
-            ),
-            'wholeDay': self.allocation.whole_day,
             # NOTE: We can switch to `resourceId`if we decide to include
             #       premium features
             'resource': str(self.allocation.mirror_of),
@@ -1267,11 +1246,12 @@ class MyReservationEventInfo:
 
 class FindYourSpotEventInfo:
 
-    __slots__ = ('allocation', 'slot_time', 'availability', 'quota_left',
-                 'request', 'translate', 'adjustable')
+    __slots__ = ('resource', 'allocation', 'slot_time', 'availability',
+                 'quota_left', 'request', 'translate', 'adjustable')
 
     def __init__(
         self,
+        resource: Resource,
         allocation: Allocation,
         slot_time: DateRange | None,
         availability: float,
@@ -1281,6 +1261,7 @@ class FindYourSpotEventInfo:
         adjustable: bool = False
     ) -> None:
 
+        self.resource = resource
         self.allocation = allocation
         self.slot_time = slot_time
         self.availability = availability
@@ -1320,7 +1301,11 @@ class FindYourSpotEventInfo:
 
     @property
     def whole_day(self) -> str:
-        if self.allocation.whole_day:
+        if (
+            sedate.is_whole_day(*self.slot_time, self.resource.timezone)
+            if self.slot_time
+            else self.allocation.whole_day
+        ):
             return 'true'
         else:
             return 'false'
@@ -1375,6 +1360,8 @@ class FindYourSpotEventInfo:
             ):
                 yield 'event-available'
             elif self.availability >= 5.0:
+                if not self.adjustable and self.quota_left < 1:
+                    yield 'event-unavailable'
                 yield 'event-partly-available'
             else:
                 yield 'event-unavailable'
@@ -1387,7 +1374,16 @@ class FindYourSpotEventInfo:
         return ' '.join(self.event_classes)
 
     @property
-    def reserveurl(self) -> str:
+    def internal(self) -> bool:
+        return self.allocation.is_virtual
+
+    @property
+    def reserveurl(self) -> str | None:
+        if not self.adjustable and self.quota_left < 1:
+            return None
+
+        if self.internal:
+            return self.request.link(self.resource, 'internal-reserve')
         return self.request.link(self.allocation, 'reserve')
 
 
