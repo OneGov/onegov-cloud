@@ -594,7 +594,7 @@ class AllocationEventInfo:
             else:
                 yield 'event-unavailable'
         else:
-            if self.availability >= 80.0:
+            if isclose(self.availability, 100.0, abs_tol=.005):
                 yield 'event-available'
             elif self.availability >= 20.0:
                 yield 'event-partly-available'
