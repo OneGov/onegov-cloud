@@ -479,6 +479,10 @@ def handle_edit_event(
     if form.submitted(request):
         form.populate_obj(self)
 
+        if self.source:
+            # protect the local changes from being overwritten by the import
+            self.locally_modified = True
+
         ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
         if view_ticket is not None and view_ticket != ticket:
             # if we're accessing through the ticket it had better be the same
@@ -506,11 +510,19 @@ def handle_edit_event(
     )
     layout.edit_mode = True
 
+    callout = None
+    if self.source:
+        callout = _(
+            'This event has been imported. Once saved, it will no longer '
+            'be updated by the import.'
+        )
+
     return {
         'layout': layout,
         'title': self.title,
         'form': form,
-        'form_width': 'large'
+        'form_width': 'large',
+        'callout': callout
     }
 
 

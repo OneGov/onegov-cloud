@@ -82,7 +82,7 @@ def all_bookings(collection: BookingCollection) -> list[Booking]:
     return query.all()
 
 
-def group_bookings(
+def group_bookings_merge_denied_and_blocked(
     period: BookingPeriod | BookingPeriodMeta,
     bookings: Iterable[Booking]
 ) -> dict[Attendee, dict[BookingState, SortedList[Booking]]]:
@@ -104,7 +104,10 @@ def group_bookings(
             return 'open'
     else:
         def state(booking: Booking) -> BookingState:
-            return booking.state
+            if booking.state in ('blocked', 'denied'):
+                return 'denied'
+            else:
+                return booking.state
 
     grouped: dict[Attendee, dict[BookingState, SortedList[Booking]]] = {}
 
@@ -366,7 +369,8 @@ def view_my_bookings(
     period = next((p for p in periods if p.id == self.period_id), None)
 
     bookings = all_bookings(self)
-    grouped_bookings = period and group_bookings(period, bookings) or {}
+    grouped_bookings = period and group_bookings_merge_denied_and_blocked(
+        period, bookings) or {}
 
     if period and period.confirmed:
         related = related_attendees(self.session, occasion_ids={

@@ -1,8 +1,38 @@
 # Changes
 
+## 2026.54
+
+`2026-10-26` | [de9f9d7cea...3bc14949ef](https://github.com/OneGov/onegov-cloud/compare/de9f9d7cea^...3bc14949ef)
+
+### Core
+
+##### Fixes `UpgradeContext.update_enum_columns`
+
+`Bugfix` | [de9f9d7cea](https://github.com/onegov/onegov-cloud/commit/de9f9d7cea9c65097d003d35ce60a2968cc6dbc9)
+
+### Election-Day
+
+##### Fixes flaky PDF generator test
+
+`Other` | [fa6921c5be](https://github.com/onegov/onegov-cloud/commit/fa6921c5be4986b971195f8a8983688ff7897d52)
+
+### Ris
+
+##### Fixes view permissions.
+
+`Bugfix` | [SEA-2102](https://linear.app/seantis/issue/SEA-2102) | [c3ea97510d](https://github.com/onegov/onegov-cloud/commit/c3ea97510d0106c4a58f22b79eafb36d81fa8e17)
+
+### Winterthur
+
+##### Filters winterthur
+
+Shows filters in winterthur in the sidebar for occurrences
+
+`Feature` | [OGC-3543](https://linear.app/onegovcloud/issue/OGC-3543) | [6b04937900](https://github.com/onegov/onegov-cloud/commit/6b049379004deddc64fac60c0194816fbf168608)
+
 ## 2026.53
 
-`2026-10-23` | [751e7a245d...31b0bfebbc](https://github.com/OneGov/onegov-cloud/compare/751e7a245d^...31b0bfebbc)
+`2026-10-23` | [751e7a245d...c2e4c36d7f](https://github.com/OneGov/onegov-cloud/compare/751e7a245d^...c2e4c36d7f)
 
 ### Api
 
@@ -5502,56 +5532,4 @@ in the loop.
 Adds an internal endpoint for retrieving the sp.xml file
 
 `Feature` | [OGC-2248](https://linear.app/onegovcloud/issue/OGC-2248) | [2736227c42](https://github.com/onegov/onegov-cloud/commit/2736227c42d2628a5bd64231576827350a177551)
-
-## 2025.25
-
-`2025-06-05` | [bd761b9a66...212a86a4eb](https://github.com/OneGov/onegov-cloud/compare/bd761b9a66^...212a86a4eb)
-
-### Form
-
-##### Fixes edge cases for priced/discounted options in form code
-
-Previously you weren't allowed to use any parantheses in the label since
-that would break the detection of the pricing information.
-
-`Bugfix` | [OGC-2286](https://linear.app/onegovcloud/issue/OGC-2286) | [a4e1f674f4](https://github.com/onegov/onegov-cloud/commit/a4e1f674f4e6abcc50bf1767e0616ab82420d4f8)
-
-### Newsletter
-
-##### List all occurrences in newsletter creation form
-
-Previously only Events without their re-occurrences were listed when creating a newsletter
-
-`Feature` | [OGC-2280](https://linear.app/onegovcloud/issue/OGC-2280) | [3445bf9a30](https://github.com/onegov/onegov-cloud/commit/3445bf9a3035292b6e4c21dc669c74e8ed3e1ace)
-
-### Org
-
-##### Wil event import: Provider url alternatively to event url
-
-`Feature` | [OGC-2184](https://linear.app/onegovcloud/issue/OGC-2184) | [23c27aca30](https://github.com/onegov/onegov-cloud/commit/23c27aca30d0f04286224efce47fa9f167c0271d)
-
-##### Replaces the occupancy list with an interactive calendar view
-
-`Feature` | [OGC-2236](https://linear.app/onegovcloud/issue/OGC-2236) | [5fc60fd943](https://github.com/onegov/onegov-cloud/commit/5fc60fd9434ee173ec7a5e202d87224cce4e86bc)
-
-##### Refreshes results summary in occupancy view when changing filters
-
-Previously we would only refresh the results list, but the summary is
-just as important.
-
-`Bugfix` | [OGC-2284](https://linear.app/onegovcloud/issue/OGC-2284) | [7d717caad1](https://github.com/onegov/onegov-cloud/commit/7d717caad17896e0b9be86294b4dac75a186e10c)
-
-##### Fixes mTAN statistics not being sent for every month
-
-`Bugfix` | [OGC-2288](https://linear.app/onegovcloud/issue/OGC-2288) | [6ff6be3419](https://github.com/onegov/onegov-cloud/commit/6ff6be3419e8a50982f06c853d4dee0a641343b6)
-
-### Reservation
-
-##### Allows prices in extra fields to count per hour or per item
-
-This used to always be a one-off price, which was probably not intended.
-The new default is to apply extra pricing per item, existing resources
-will still use the old default of "one-off".
-
-`Feature` | [OGC-2262](https://linear.app/onegovcloud/issue/OGC-2262) | [a94bdc2daf](https://github.com/onegov/onegov-cloud/commit/a94bdc2dafd2318deb21618a1613125807d20d05)
 

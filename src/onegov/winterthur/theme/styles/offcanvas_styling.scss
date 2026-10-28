@@ -172,9 +172,9 @@ $offcanvas-sidebar-padding: 1.25rem;
             width: 100%;
         }
 
-        // .reset-button {
-        //     display: none;
-        // }
+        .reset-button {
+            display: none;
+        }
     }
 
     ul.tags {
@@ -219,5 +219,4 @@ $offcanvas-sidebar-padding: 1.25rem;
             margin: 0;
         }
     }
-
 }

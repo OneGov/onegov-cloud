@@ -2820,19 +2820,17 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
+            edit_link = Link(
+                text=_('Edit'),
+                url=self.request.return_here(
+                    self.request.link(self.model.event, 'edit')
+                ),
+                attrs={'class': 'edit-link'}
+            )
+
             if self.model.event.source:
                 return [
-                    Link(
-                        text=_('Edit'),
-                        attrs={'class': 'edit-link'},
-                        traits=(
-                            Block(
-                                _("This event can't be edited."),
-                                _('Imported events can not be edited.'),
-                                _('Cancel')
-                            )
-                        )
-                    ),
+                    edit_link,
                     Link(
                         text=_('Delete'),
                         url=self.csrf_protected_url(
@@ -2853,14 +2851,6 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
                         )
                     )
                 ]
-
-            edit_link = Link(
-                text=_('Edit'),
-                url=self.request.return_here(
-                    self.request.link(self.model.event, 'edit')
-                ),
-                attrs={'class': 'edit-link'}
-            )
 
             if self.event_deletable(self.model.event):
                 delete_link = Link(
@@ -2924,20 +2914,15 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
         if not self.request.is_manager:
             return None
 
+        edit_link = Link(
+            text=_('Edit'),
+            url=self.request.link(self.model, 'edit'),
+            attrs={'class': 'edit-link'}
+        )
+
         links: list[Link | LinkGroup] = []
         if self.model.source:
-            links = [
-                Link(
-                    text=_('Edit'),
-                    attrs={'class': 'edit-link'},
-                    traits=(
-                        Block(
-                            _("This event can't be edited."),
-                            _('Imported events can not be edited.'),
-                            _('Cancel')
-                        )
-                    )
-                )]
+            links = [edit_link]
         if self.model.source and self.model.state == 'published':
             links.append(
                 Link(
@@ -2972,11 +2957,6 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
         if self.model.source:
             return links
 
-        edit_link = Link(
-            text=_('Edit'),
-            url=self.request.link(self.model, 'edit'),
-            attrs={'class': 'edit-link'}
-        )
         if self.event_deletable(self.model):
             delete_link = Link(
                 text=_('Delete'),

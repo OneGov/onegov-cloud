@@ -265,7 +265,7 @@ def ris_view_parliamentarians(
     model=RISParliamentarianCollection,
     name='new',
     template='form.pt',
-    permission=Public,
+    permission=Private,
     form=ParliamentarianForm
 )
 def ris_add_parliamentarian(

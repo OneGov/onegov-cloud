@@ -542,6 +542,35 @@ def test_api_events_no_n_plus_one(client: Client) -> None:
     assert statements == [], f'unexpected lazy queries: {statements}'
 
 
+def test_api_events_tags_filter_custom_tags(client: Client) -> None:
+    import yaml
+    from onegov.event import OccurrenceCollection
+
+    client.login_admin()  # prevent rate limit
+
+    settings = client.get('/event-settings')
+    settings.form['event_filter_type'] = 'tags'
+    settings.form.submit().follow()
+
+    fs = client.app.filestorage
+    assert fs is not None
+    with fs.open('eventsettings.yml', 'w') as f:
+        yaml.dump({'event_tags': ['Singing', 'Christmas']}, f)
+    client.app.cache.delete('custom_event_tags')
+
+    used_tags = OccurrenceCollection(client.app.session()).used_tags
+    assert used_tags
+    assert not used_tags & {'Singing', 'Christmas'}
+
+    endpoints = Collection.from_json(client.get('/api').body)
+    tags = next(
+        x.values for x in endpoints.queries[0].data if x.name == 'tags'
+    )
+    # configured tags are listed even if unused, as well as tags of
+    # future events that are not configured
+    assert tags == sorted(used_tags | {'Singing', 'Christmas'})
+
+
 def test_api_events_no_n_plus_one_cache(client: Client) -> None:
     from onegov.core.cache.redis import RedisCacheRegion
 
