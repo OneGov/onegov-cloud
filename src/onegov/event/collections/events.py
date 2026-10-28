@@ -617,8 +617,13 @@ class EventCollection(Pagination[Event]):
                 tag = find_element_text(category, 'mainCategory')
                 tags.append(tag) if tag else None
 
+            schedules = event.find('ns:schedules', namespaces=ns)
+            if schedules is None:
+                # we cannot import an event without any schedules
+                continue
+
             timezone = 'Europe/Zurich'
-            for schedule in event.find('ns:schedules', namespaces=ns):
+            for schedule in schedules:
                 schedule_id = find_element_text(schedule, 'uuid7')
                 start = parse(find_element_text(schedule, 'start'))
                 end_text = find_element_text(schedule, 'end')
