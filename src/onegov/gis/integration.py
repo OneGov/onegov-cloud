@@ -136,7 +136,9 @@ def inject_mapbox_api_token_tween_factory(
 
         response = handler(request)
 
-        if getattr(request.app, 'mapbox_token', None):
+        if response.content_type == 'text/html' and getattr(
+            request.app, 'mapbox_token', None
+        ):
             response.body = response.body.replace(
                 b'<body',
                 replacement_b,
