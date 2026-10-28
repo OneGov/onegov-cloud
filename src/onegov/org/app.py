@@ -1,10 +1,9 @@
 """ Contains the base application used by other applications. """
 import re
-
+import morepath
 import niquests
 import yaml
 
-import morepath
 from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
@@ -60,6 +59,7 @@ if TYPE_CHECKING:
 class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp, DepotApp,
              PayApp, FormApp, UserApp, WebsocketsApp, ApiApp):
 
+    localizeable = False
     serve_static_files = True
     request_class: type[OrgRequest[Self]] = OrgRequest
 

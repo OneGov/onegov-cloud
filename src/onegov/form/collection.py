@@ -401,7 +401,8 @@ class FormSubmissionCollection:
         self,
         submission: FormSubmission,
         form: Form,
-        exclude: Collection[str] | None = None
+        exclude: Collection[str] | None = None,
+        partial: bool = False,
     ) -> None:
         """ Takes a submission and a form and updates the submission data
         as well as the files stored in a separate table.
@@ -413,12 +414,16 @@ class FormSubmissionCollection:
         exclude = set(exclude) if exclude else set()
         exclude.add(form.meta.csrf_field_name)  # never include the csrf token
 
-        assert hasattr(form, '_parsed')
-        submission.parsed = form._parsed
-        submission.data = {
-            k: v for k, v in form.data.items() if k not in exclude
-        }
-        submission.update_title(form)
+        new_data = {k: v for k, v in form.data.items() if k not in exclude}
+        if partial:
+            if submission.data is None:
+                submission.data = {}  # type: ignore[unreachable]
+            submission.data.update(new_data)
+        else:
+            assert hasattr(form, '_parsed')
+            submission.parsed = form._parsed
+            submission.data = new_data
+            submission.update_title(form)
 
         # move uploaded files to a separate table
         files = {

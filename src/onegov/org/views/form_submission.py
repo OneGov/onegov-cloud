@@ -5,14 +5,13 @@ from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.submission import SurveySubmission
-from onegov.org.cli import close_ticket
-from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
     PendingFormSubmission,
     CompleteFormSubmission
 )
 from onegov.org import _, OrgApp
+from onegov.org.cli import close_ticket
 from onegov.org.layout import (
     FormSubmissionLayout,
     SurveySubmissionLayout,
@@ -32,7 +31,7 @@ from onegov.org.utils import (
     invoice_items_for_submission,
 )
 from onegov.pay import InvoiceMeta, PaymentError, Price
-from onegov.ticket import TicketInvoice
+from onegov.ticket import TicketCollection, TicketInvoice
 from purl import URL
 from uuid import uuid4
 from webob.exc import HTTPMethodNotAllowed, HTTPNotFound

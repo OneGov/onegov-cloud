@@ -30,6 +30,7 @@ class PageMeta(NamedTuple):
     type: str
     title: str
     access: str
+    locale: str | None
     published: bool
     is_visible_on_homepage: bool | None
     path: str
@@ -257,6 +258,7 @@ class OrgRequest(CoreRequest[AppT]):
                     type=page.type,
                     title=page.title,
                     access=page.meta.get('access', 'public'),
+                    locale=page.meta.get('locale', None),
                     published=published,
                     path=(subpath := extend_path(page, path)),
                     is_visible_on_homepage=page.meta.get('is_visible_on_homepage'),
