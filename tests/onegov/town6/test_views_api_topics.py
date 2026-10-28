@@ -80,8 +80,27 @@ def test_api_topic_link(
         assert api_url == API_URL
         return deepcopy(source.get(topic_id))
 
+    registered: dict[str, int] = {}
+
+    def register_api_link(
+        api_url: str,
+        topic_id: int,
+        url: str,
+        title: str,
+        dry_run: bool = False
+    ) -> None:
+        if not dry_run:
+            registered[url] = topic_id
+
+    def unregister_api_link(api_url: str, topic_id: int, url: str) -> None:
+        assert registered.pop(url) == topic_id
+
     monkeypatch.setattr(
         'onegov.org.api_source.fetch_api_topic', fetch_api_topic)
+    monkeypatch.setattr(
+        'onegov.org.api_source.register_api_link', register_api_link)
+    monkeypatch.setattr(
+        'onegov.org.views.page.unregister_api_link', unregister_api_link)
 
     client = client_with_fts
     client.login_admin()
@@ -92,8 +111,10 @@ def test_api_topic_link(
     assert 'API-Verknüpfung' not in page
 
     settings = client.get('/api-source-settings')
+    settings.form['api_link_role'] = 'child'
     settings.form['api_source_url'] = API_URL.rstrip('/')
     settings.form.submit().follow()
+    assert client.app.org.api_link_role == 'child'
     assert client.app.org.api_source_url == API_URL
 
     page = client.get('/topics/organisation').click('API-Verknüpfung')
@@ -110,6 +131,9 @@ def test_api_topic_link(
     assert 'API-Verknüpfung hinzugefügt' in page
     url = page.request.url
     assert url.endswith('/topics/organisation/energieberatung')
+
+    # the source organisation is told which page links its topic
+    assert registered == {url: 5}
 
     # editors see where the content comes from
     assert 'Gebäudehülle' in page
@@ -162,3 +186,49 @@ def test_api_topic_link(
     assert 'Gebäudehülle' in anon.get(url, headers=HTML)
     search = anon.get('/search', params={'q': 'Gebäudehülle'}, headers=HTML)
     assert '/topics/organisation/energieberatung' in search
+
+    # deleting the parent page unregisters the linked child pages as well
+    assert registered == {url: 5}
+    page = client.get('/topics/organisation')
+    client.delete(page.pyquery('a.delete-link').attr('ic-delete-from'))
+    assert registered == {}
+
+
+def test_api_topic_link_parent(client: Client) -> None:
+    session = client.app.session()
+    topic = session.query(Topic).filter_by(name='organisation').one()
+    topic_id = topic.id
+    links_url = f'/api/topics/{topic_id}/links'
+    child = 'https://onegov.meggen.ch/topics/energie'
+
+    # only parent organisations accept links
+    client.post_json(links_url, {'url': child}, status=403)
+
+    client.login_admin()
+    settings = client.get('/api-source-settings')
+    settings.form['api_link_role'] = 'parent'
+    settings.form.submit().follow()
+    assert client.app.org.api_link_role == 'parent'
+    assert client.app.org.api_source_url is None
+
+    anon = client.spawn()
+
+    anon.post_json(links_url, {'url': 'javascript:alert(1)'}, status=403)
+    anon.post_json(links_url, {'title': 'Energie'}, status=400)
+    anon.post_json('/api/topics/0/links', {'url': child}, status=404)
+
+    # a dry run doesn't store anything
+    anon.post_json(links_url, {'url': child, 'dry_run': True})
+    assert 'Energie' not in client.get('/topics/organisation')
+
+    anon.post_json(links_url, {'url': child, 'title': 'Energie'})
+    anon.post_json(links_url, {'url': child, 'title': 'Energie Meggen'})
+
+    page = client.get('/topics/organisation')
+    assert 'api-linked-by-hint' in page
+    assert 'Energie Meggen' in page
+    assert child in page
+    assert 'api-linked-by-hint' not in anon.get('/topics/organisation')
+
+    anon.delete(f'{links_url}?url={child}')
+    assert 'api-linked-by-hint' not in client.get('/topics/organisation')

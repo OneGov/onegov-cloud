@@ -8614,8 +8614,8 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 msgid "Please enter your e-mail address in order to continue"
 msgstr "Bitte geben Sie ihre E-Mail Adresse ein um fortzufahren"
 
-msgid "API URL of the source organisation"
-msgstr "API-URL der Quellorganisation"
+msgid "API URL of the parent organisation"
+msgstr "API-URL der Oberorganisation"
 
 msgid "e.g. https://onegov.govikon.ch/api/"
 msgstr "z.B. https://onegov.govikon.ch/api/"
@@ -8685,6 +8685,19 @@ msgstr "Die API der Quellorganisation konnte nicht erreicht werden."
 
 msgid "The selected topic is not publicly available."
 msgstr "Das ausgewählte Thema ist nicht öffentlich verfügbar."
+
+msgid "Parent organisation"
+msgstr "Oberorganisation"
+
+msgid "Child organisation"
+msgstr "Unterorganisation"
+
+msgid ""
+"The source organisation does not allow this organisation to link its "
+"topics."
+msgstr ""
+"Die Quellorganisation erlaubt dieser Organisation nicht, ihre Themen zu "
+"verknüpfen."
 
 #~ msgid ""
 #~ "Proceed with caution. Tickets and the data they contain may be "

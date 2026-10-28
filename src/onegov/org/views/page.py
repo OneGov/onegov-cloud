@@ -10,6 +10,7 @@ from onegov.core.security import Public, Private
 from onegov.core.utils import append_query_param
 from onegov.org import _, OrgApp
 from onegov.org.api_source import api_source_base_url, api_topic_edit_url
+from onegov.org.api_source import unregister_api_link
 from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
@@ -35,11 +36,31 @@ def delete_page(self: Topic | News, request: OrgRequest) -> None:
     if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 
+    if isinstance(self, Topic):
+        unregister_api_topics(self, request)
+
     request.session.delete(self)
     self.files = []
     request.session.flush()
     assert self.trait is not None
     request.success(self.trait_messages[self.trait]['delete_message'])
+
+
+def unregister_api_topics(page: Topic, request: OrgRequest) -> None:
+    """ Tells the source organisation that the 'api' topics of the given
+    page (and of its children, which are deleted as well) are gone. """
+
+    api_url = request.app.org.api_source_url
+    if not api_url:
+        return
+
+    pages = [page]
+    while pages:
+        topic = pages.pop()
+        pages.extend(topic.children)  # type:ignore[arg-type]
+        if topic.trait == 'api' and topic.api_topic_id:
+            unregister_api_link(
+                api_url, topic.api_topic_id, request.link(topic))
 
 
 @OrgApp.html(model=Topic, template='topic.pt', permission=Public)

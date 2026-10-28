@@ -34,6 +34,16 @@
             </p>
         </div>
 
+        <div class="panel callout api-linked-by-hint" tal:condition="page.api_linked_by and request.is_manager">
+            <p i18n:translate>This page is linked by the following pages of other organisations via the API:</p>
+            <ul>
+                <li tal:repeat="link page.api_linked_by">
+                    <a href="${link['url']}">${link['title']}</a>
+                    <small>(${link['url']})</small>
+                </li>
+            </ul>
+        </div>
+
         <tal:b condition="page.trait in ('page', 'api')">
 
 

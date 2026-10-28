@@ -85,6 +85,11 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     api_unavailable: dict_property[bool] = meta_property(default=False)
     api_previous_access: dict_property[str | None] = meta_property()
 
+    # The pages of other instances linking this topic via the API, a list of
+    # dicts with 'url' and 'title'
+    api_linked_by: dict_property[list[dict[str, str]]] = meta_property(
+        default=list)
+
     @property
     def deletable(self) -> bool:
         """ True if this page may be deleted. """

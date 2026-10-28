@@ -3116,6 +3116,13 @@ msgstr "Das verknüpfte Thema ist zurzeit nicht öffentlich verfügbar. Diese Se
 msgid "To change the content, please edit the linked topic of the source organisation:"
 msgstr "Um den Inhalt zu ändern, bearbeiten Sie bitte das verknüpfte Thema der Quellorganisation:"
 
+msgid ""
+"This page is linked by the following pages of other organisations via the "
+"API:"
+msgstr ""
+"Diese Seite wird von folgenden Seiten anderer Organisationen per "
+"API-Verknüpfung eingebunden:"
+
 #~ msgid "Private address"
 #~ msgstr "Privatadresse"
 

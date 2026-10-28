@@ -38,6 +38,10 @@ class ApiSourceError(Exception):
     """ Raised if the source API could not be reached. """
 
 
+class ApiLinkForbidden(ApiSourceError):
+    """ Raised if the source doesn't allow this instance to link a topic. """
+
+
 def api_source_base_url(api_url: str) -> str:
     """ Returns the base url of the source instance for the given API url.
 
@@ -127,6 +131,93 @@ def fetch_api_topic(api_url: str, topic_id: int) -> dict[str, Any] | None:
 
     data['html_url'] = public_url(links['html']) if links.get('html') else None
     return data
+
+
+def api_topic_links_url(api_url: str, topic_id: int) -> str:
+    return server_side_url(api_topic_url(api_url, topic_id) + '/links')
+
+
+def register_api_link(
+    api_url: str,
+    topic_id: int,
+    url: str,
+    title: str,
+    dry_run: bool = False
+) -> None:
+    """ Tells the source instance that the given page links its topic.
+
+    With ``dry_run``, the source instance only checks if the page would be
+    allowed to link the topic.
+
+    Raises :class:`ApiSourceError` if the source instance can't be reached
+    or doesn't allow the page to link its topic.
+
+    """
+    links_url = api_topic_links_url(api_url, topic_id)
+    try:
+        response = niquests.post(
+            links_url,
+            json={'url': url, 'title': title, 'dry_run': dry_run},
+            headers={'Accept': 'application/vnd.collection+json'},
+            timeout=10
+        )
+    except niquests.RequestException as exception:
+        raise ApiSourceError(str(exception)) from exception
+
+    if response.status_code == 403:
+        raise ApiLinkForbidden(f'{links_url} returned 403')
+
+    if response.status_code != 200:
+        raise ApiSourceError(f'{links_url} returned {response.status_code}')
+
+
+def unregister_api_link(api_url: str, topic_id: int, url: str) -> None:
+    """ Tells the source instance that the given page doesn't link its
+    topic anymore. Failures are only logged, the source might be gone.
+
+    """
+    links_url = api_topic_links_url(api_url, topic_id)
+    try:
+        response = niquests.delete(
+            links_url,
+            params={'url': url},
+            headers={'Accept': 'application/vnd.collection+json'},
+            timeout=10
+        )
+    except niquests.RequestException as exception:
+        log.warning(f'Could not unregister API link {url}: {exception}')
+        return
+
+    if response.status_code not in (200, 404):
+        log.warning(
+            f'Could not unregister API link {url}: '
+            f'{links_url} returned {response.status_code}')
+
+
+def accepts_api_link(org: Organisation, url: str) -> bool:
+    """ True if the given page of another instance may link the topics of
+    this instance.
+
+    """
+    if org.api_link_role != 'parent':
+        return False
+    return urlsplit(url).scheme in ('http', 'https')
+
+
+def add_api_link(topic: Topic, url: str, title: str) -> None:
+    links = [link for link in topic.api_linked_by if link['url'] != url]
+    links.append({'url': url, 'title': title})
+    links.sort(key=lambda link: link['title'].lower())
+
+    if links != topic.api_linked_by:
+        topic.api_linked_by = links
+
+
+def remove_api_link(topic: Topic, url: str) -> None:
+    links = [link for link in topic.api_linked_by if link['url'] != url]
+
+    if links != topic.api_linked_by:
+        topic.api_linked_by = links
 
 
 def absolute_links(

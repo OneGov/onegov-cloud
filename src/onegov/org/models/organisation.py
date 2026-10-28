@@ -256,7 +256,10 @@ class Organisation(Base, TimestampMixin):
     open_files_target_blank: dict_property[bool] = meta_property(default=True)
     disable_page_refs: dict_property[bool] = meta_property(default=True)
 
-    # API source settings (topics of another instance linked via its API)
+    # API link settings, see onegov.org.api_source
+    # 'parent': the topics of this instance may be linked by other instances,
+    # 'child': topics of the source instance may be linked
+    api_link_role: dict_property[str | None] = meta_property()
     api_source_url: dict_property[str | None] = meta_property()
 
     # Footer column width settings

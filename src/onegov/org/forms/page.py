@@ -263,7 +263,9 @@ class ApiTopicForm(Form):
         self.api_topic_id.render_kw['data-selected-title'] = value or ''
 
     def validate_api_topic_id(self, field: StringField) -> None:
-        from onegov.org.api_source import ApiSourceError, fetch_api_topic
+        from onegov.org.api_source import (
+            ApiLinkForbidden, ApiSourceError, fetch_api_topic,
+            register_api_link)
 
         api_url = self.request.app.org.api_source_url
         if not api_url:
@@ -284,6 +286,27 @@ class ApiTopicForm(Form):
         if data is None:
             raise ValidationError(
                 _('The selected topic is not publicly available.'))
+
+        # the page url is not known yet for new pages, the parent
+        # organisation checks if this organisation may link its topics
+        try:
+            register_api_link(
+                api_url,
+                int(field.data),
+                self.request.link(self.request.app.org).rstrip('/') + '/',
+                data['title'],
+                dry_run=True
+            )
+        except ApiLinkForbidden as exception:
+            raise ValidationError(_(
+                'The source organisation does not allow this organisation '
+                'to link its topics.'
+            )) from exception
+        except ApiSourceError as exception:
+            log.warning(f'Could not register API link: {exception}')
+            raise ValidationError(_(
+                'The API of the source organisation could not be reached.'
+            )) from exception
 
         self.api_data = data
         self.selected_title = data['title']
@@ -306,8 +329,11 @@ class ApiTopicForm(Form):
         exclude: Collection[str] | None = None,
         include: Collection[str] | None = None
     ) -> None:
-        from onegov.org.api_source import apply_api_topic
+        from onegov.org.api_source import (
+            ApiSourceError, apply_api_topic, register_api_link,
+            unregister_api_link)
 
+        previous_topic_id = obj.api_topic_id
         super().populate_obj(
             obj,
             exclude={'api_topic_id', 'title', *(exclude or ())},
@@ -321,6 +347,15 @@ class ApiTopicForm(Form):
         api_url = self.request.app.org.api_source_url
         assert api_url is not None
         apply_api_topic(obj, api_url, self.api_data)
+
+        # tell the source organisation which page links its topic
+        url = self.request.link(obj)
+        if previous_topic_id and previous_topic_id != obj.api_topic_id:
+            unregister_api_link(api_url, previous_topic_id, url)
+        try:
+            register_api_link(api_url, obj.api_topic_id, url, obj.title)
+        except ApiSourceError as exception:
+            log.warning(f'Could not register API link {url}: {exception}')
 
     def process_obj(self, obj: Topic) -> None:  # type:ignore[override]
         super().process_obj(obj)
