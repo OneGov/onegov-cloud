@@ -353,7 +353,7 @@ class UploadField(FileField):
                 or getattr(self, 'action', None) == 'keep'
             )
 
-            return truthy
+            return truthy  # type: ignore[return-value]
 
         return getattr(self, '_data', None)
 
