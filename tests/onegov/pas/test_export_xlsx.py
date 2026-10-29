@@ -96,8 +96,11 @@ def test_export_xlsx(client: Client[TestPasApp]) -> None:
             duration=60, type='study', commission=commission
         ),
         Attendence(
-            parliamentarian=parliamentarian2, date=date(2024, 2, 10),
-            duration=30, type='shortest'
+            parliamentarian=parliamentarian2,
+            date=date(2024, 2, 10),
+            duration=30,
+            type='shortest',
+            commission=commission,
         ),
     ]
     session.add_all(attendances)
@@ -168,23 +171,41 @@ def test_export_xlsx(client: Client[TestPasApp]) -> None:
     assert response.status_code == 200
     workbook = load_workbook(BytesIO(response.body), data_only=True)
     worksheet = workbook['Buchungen Abrechnungslauf']
-    assert [worksheet.cell(row=row, column=6).value for row in (2, 3)] == [
-        3.42,
-        3.42,
-    ]
     assert [worksheet.cell(row=row, column=7).value for row in (2, 3)] == [
-        100.05,
-        100.05,
+        3.42,
+        3.42,
     ]
     assert [worksheet.cell(row=row, column=8).value for row in (2, 3)] == [
+        100.05,
+        100.05,
+    ]
+    assert [worksheet.cell(row=row, column=9).value for row in (2, 3)] == [
         102.05,
         102.05,
     ]
     control_rows = list(worksheet.iter_rows(min_row=2, values_only=True))
+    assert list(worksheet.values)[0] == (
+        'Datum',
+        'Person',
+        'Partei',
+        'Wahlkreis',
+        'Art der Buchung',
+        'Kommissionsname',
+        'Wert',
+        'CHF',
+        'CHF + TZ',
+    )
+    assert [row[4:6] for row in control_rows] == [
+        ('Plenarsitzung', None),
+        ('Plenarsitzung', None),
+        ('Kommissionssitzung', 'Finance Commission'),
+        ('Aktenstudium', 'Finance Commission'),
+        ('Kürzestsitzung', 'Finance Commission'),
+    ]
     assert len(control_rows) == len(details_rows)
     assert (
         sum(
-            (Decimal(str(row[6])) for row in control_rows),
+            (Decimal(str(row[7])) for row in control_rows),
             Decimal('0'),
         )
         == details_base_total
@@ -208,6 +229,6 @@ def test_export_xlsx(client: Client[TestPasApp]) -> None:
         (Decimal(row[12]) for row in fibu_rows),
         Decimal('0'),
     ) == sum(
-        (Decimal(str(row[7])) for row in control_rows),
+        (Decimal(str(row[8])) for row in control_rows),
         Decimal('0'),
     )
