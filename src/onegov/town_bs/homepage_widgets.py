@@ -381,73 +381,27 @@ class DirectoriesWidget(OrgDirectoriesWidget):
 @TownBsApp.homepage_widget(tag='focus')
 class FocusWidget:
     template = """
-    <xsl:template match="focus">
-        <a href="{@focus-url}" class="focus-link">
-            <div class="focus-widget card" data-aos="fade">
-                <xsl:if test="@text-on-image = 'True'">
-                    <xsl:attribute name="class">focus-widget card only-title
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:variable name="apos">'</xsl:variable>
-                <xsl:variable name="image_src">
-                    <xsl:choose>
-                            <xsl:when test="@image-src">
-                            <xsl:value-of
-                            select="concat($apos, @image-src, $apos)" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'None'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <metal:block use-macro="layout.macros['focus-panel']"
-                tal:define="image_src '{@image-src}'; title '{@title}';
-                 text_on_image '{@text-on-image}'; lead '{@lead}';"
-                />
-                <xsl:choose>
-                    <xsl:when test="@text-on-image">
-                        <xsl:if test="text">
-                            <div class="card-section">
-                                <xsl:for-each select="text">
-                                    <p class="homepage-text">
-                                        <xsl:apply-templates select="node()"/>
-                                    </p>
-                                </xsl:for-each>
-                            </div>
-                        </xsl:if>
-                    </xsl:when>
-                    <xsl:otherwise>
-                    <div class="card-section">
-                        <h5>
-                            <xsl:choose>
-                                <xsl:when test="@title">
-                                    <xsl:value-of select="@title" />
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <metal:block
-                                    use-macro="layout.macros['focus-title']" />
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </h5>
-                        <xsl:choose>
-                            <xsl:when test="@lead">
-                                <p><b>
-                                    <xsl:value-of select="@lead" />
-                                </b></p>
-                            </xsl:when>
-                            <xsl:otherwise> </xsl:otherwise>
-                        </xsl:choose>
+        <xsl:template match="focus">
+            <div metal:use-macro="layout.macros['focus_widget']"
+                tal:define="
+                    focus_url {ogc:safe-string(@focus-url)};
+                    image_src {ogc:safe-string(@image-src)};
+                    title {ogc:safe-string(@title)};
+                    text_on_image {ogc:safe-string(@text-on-image)};
+                    lead {ogc:safe-string(@lead)};
+                    text_count {count(text)};
+                ">
+                <xsl:if test="text">
+                    <tal:b metal:fill-slot="text">
                         <xsl:for-each select="text">
                             <p class="homepage-text">
                                 <xsl:apply-templates select="node()"/>
                             </p>
                         </xsl:for-each>
-                    </div>
-                    </xsl:otherwise>
-                </xsl:choose>
+                    </tal:b>
+                </xsl:if>
             </div>
-        </a>
-    </xsl:template>
+        </xsl:template>
     """
 
     def get_variables(self, layout: DefaultLayout) -> RenderData:

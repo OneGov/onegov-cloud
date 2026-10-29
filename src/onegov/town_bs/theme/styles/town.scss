@@ -90,26 +90,47 @@ input::placeholder {
     border-radius: $border-radius-pill;
 }
 
-.news-list-item {
-    * {
-        transition: all $standard-transition;
-    }
+.news-item, .focus-item, .directory-item{
+    text-decoration: none !important;
+    height: 100%;
 
     .card {
+        height: 100%;
         background: $light-subtle;
         border: 0;
         color: $primary;
+        // Only the card animates, children inherit the animated color
+        transition: background-color $standard-transition, color $standard-transition;
+
+        .read-more-link .fa-arrow-right {
+            transition: transform $standard-transition;
+        }
+
+        h3, p, a, .homepage-text {
+            color: inherit;
+            text-decoration: none !important;
+            margin-left: $s-2xl;
+            margin-right: $s-2xl;
+        }
+
+        h3 {
+            font-size: map-get($font-sizes, "lg");
+            font-weight: bold;
+        }
 
         &:hover {
             background: $primary;
-            * {
-                color: $white;
-            }
+            color: $white;
 
-            .read-more-link .rounded-circle * {
-                transition: all $standard-transition;
+            .read-more-link .fa-arrow-right {
                 transform: translateX($s-xs);
             }
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .card, .card .read-more-link .fa-arrow-right {
+            transition: none;
         }
     }
 }

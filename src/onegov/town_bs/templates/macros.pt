@@ -394,7 +394,7 @@
     <div class="mb-2xl">
         <a href="${layout.events_url}" class="btn btn-ghost p-0 btn-arrow"><span i18n:translate="">All events</span></a>
     </div>
-    <div tal:condition="occurrences|nothing" class="row g-md events">
+    <div tal:condition="occurrences|nothing" class="row g-lg events">
         <tal:b tal:repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" tal:define="primary True"/>
         </tal:b>
@@ -402,14 +402,12 @@
 </metal:panel>
 
 <metal:card define-macro="directory-card">
-    <div  data-aos="fade" data-aos-duration="800" class="card">
-        <a tal:attributes="href link.url">
-        <div class="card-section">
-                <h5><i class="fa fa-list" aria-hidden="true"></i> ${link.text}</h5>
-                <p>${link.subtitle}</p>
-            </div>
-        </a>
+    <a class="directory-item" data-aos="fade" data-aos-duration="800" tal:attributes="href link.url">
+    <div class="card">
+        <h3 class="mt-2xl d-flex align-items-center"><i class="fa fa-list me-lg" aria-hidden="true"></i> ${link.text}</h3>
+        <p class="mb-2xl">${link.subtitle}</p>
     </div>
+    </a>
 </metal:card>
 
 <metal:directory define-macro="directories-list">
@@ -417,7 +415,7 @@
     <div class="mb-2xl">
         <a href="${layout.directories_url}" class="btn btn-ghost p-0 btn-arrow"><span i18n:translate="">All directories</span></a>
     </div>
-    <div class="directories-list row">
+    <div class="directories-list row g-lg">
         <tal:b tal:repeat="link directory_panel.links[0:-1]">
             <div class="col-12 col-md-6 col-lg-4">
                 <tal:b metal:use-macro="layout.macros['directory_card']" />
@@ -583,41 +581,43 @@
 </metal:upload>
 
 <metal:newslist define-macro="news-item-card-full-width" i18n:domain="onegov.town_bs">
-    <div class="card h-100 news-card" tal:define="url request.link(item)">
-        <div class="card-body p-0 row">
-            <div class="col-12 col-lg-4 d-lg-flex flex-column">
+    <a class="news-item" href="${request.link(item)}">
+        <div class="card h-100" >
+            <div class="card-body p-0 row">
+                <div class="col-12 col-lg-4 d-lg-flex flex-column">
+                    <metal:b use-macro="layout.macros['news-card-date']" />
+
+                    <div class="mt-auto">
+                        <h3 class="fs-lg-xl me-lg-0 mb-2xl">
+                            ${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" />
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-8">
+                    <div class="p-lg p-lg-2xl">
+                        <metal:b use-macro="layout.macros['news-card-image']" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+</metal:newslist>
+
+<metal:newslist define-macro="news-item-card" i18n:domain="onegov.town_bs">
+    <a class="news-item" href="${request.link(item)}">
+        <div class="card h-100">
+            <div class="card-body d-flex flex-column p-0">
                 <metal:b use-macro="layout.macros['news-card-date']" />
 
-                <a class="text-decoration-none mt-auto" href="${url}">
-                    <h5 class="fs-lg-xl fs-lg fw-bold mx-2xl me-lg-0 mb-2xl">
-                        ${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" />
-                    </h5>
-                </a>
-            </div>
-            <div class="col-12 col-lg-8">
-                <div class="p-lg p-lg-2xl">
+                <h3 class="mb-2xl">
+                    ${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" />
+                </h3>
+                <div class="p-lg mt-auto">
                     <metal:b use-macro="layout.macros['news-card-image']" />
                 </div>
             </div>
         </div>
-    </div>
-</metal:newslist>
-
-<metal:newslist define-macro="news-item-card" i18n:domain="onegov.town_bs">
-    <div class="news-card card h-100" tal:define="url request.link(item)">
-        <div class="card-body d-flex flex-column p-0">
-            <metal:b use-macro="layout.macros['news-card-date']" />
-
-            <a class="text-decoration-none" href="${url}">
-                <h5 class="fs-lg fw-bold mx-2xl mb-2xl">
-                    ${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" />
-                </h5>
-            </a>
-            <div class="p-lg mt-auto">
-                <metal:b use-macro="layout.macros['news-card-image']" />
-            </div>
-        </div>
-    </div>
+    </a>
 </metal:newslist>
 
 <metal:newslist define-macro="news-card-date" i18n:domain="onegov.town_bs">
@@ -628,23 +628,28 @@
 </metal:newslist>
 
 <metal:newslist define-macro="news-card-image" i18n:domain="onegov.town_bs">
-    <a class="text-decoration-none position-relative d-block" href="${url}"
+    <div class="position-relative d-block"
         tal:define="show_image item.page_image and item.show_preview_image">
         <div tal:condition="show_image" class="ratio ratio-16x9">
             <img src="${item.page_image}" class="object-fit-cover rounded-2">
         </div>
         <div class="position-absolute bottom-0 start-0 end-0">
             <div class="${'black-gradient' if show_image else ''} pb-3xl"></div>
-            <span class="read-more-link position-relative fs-sm ${'black-transparent-bg rounded-bottom-2 text-white' if show_image else ''} p-lg pt-md d-flex align-items-center justify-content-between gap-2">
-                <tal:b i18n:translate="">read more</tal:b>
-                <div class="bg-primary text-white square-xl d-flex align-items-center justify-content-center rounded-circle">
-                    <i class="fa fa-arrow-right"></i>
-                </div>
-            </span>
+            <metal:b use-macro="layout.macros['read-more-link']"
+                tal:define="read_more_classes ('black-transparent-bg rounded-bottom-2 text-white ' if show_image else '') + 'p-lg pt-md'" />
         </div>
-    </a>
+    </div>
 </metal:newslist>
 
+<!-- Shared "read more" link used by news cards and the focus widget -->
+<metal:readmore define-macro="read-more-link" i18n:domain="onegov.town_bs">
+    <span class="read-more-link position-relative fs-sm ${read_more_classes|''} d-flex align-items-center justify-content-between gap-sm">
+        <tal:b i18n:translate="">read more</tal:b>
+        <div class="square-xl bg-primary text-white d-flex align-items-center justify-content-center rounded-circle">
+            <i class="fa fa-arrow-right"></i>
+        </div>
+    </span>
+</metal:readmore>
 
 <metal:newslist define-macro="news-item-full" i18n:domain="onegov.town_bs">
     <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" tal:define="url request.link(item)">
@@ -666,17 +671,17 @@
     <div class="newslist mb-2xl" condition="show_all_news_link|nothing">
         <a href="${layout.news_url}" class="news-all-entries btn btn-ghost p-0 btn-arrow"><span i18n:translate="">All posts</span></a>
     </div>
-    <div tal:condition="newsletter.show_only_previews|True and news" class="newslist row g-md" >
+    <div tal:condition="newsletter.show_only_previews|True and news" class="newslist row g-lg" >
         <tal:b tal:condition="first_wide|False" tal:define="rest news[1:]">
-            <div class="news-list-item col-12" data-aos="fade" data-aos-duration="800">
+            <div class="col-12" data-aos="fade" data-aos-duration="800">
                 <metal:newlist use-macro="layout.macros['news-item-card-full-width']" tal:define="item news[0]"/>
             </div>
-            <div class="news-list-item col-12 col-lg-6 col-xl-4" data-aos="fade" data-aos-duration="800" tal:repeat="item rest">
+            <div class="col-12 col-lg-6 col-xl-4" data-aos="fade" data-aos-duration="800" tal:repeat="item rest">
                 <metal:newlist use-macro="layout.macros['news-item-card']" />
             </div>
         </tal:b>
         <tal:b tal:condition="not: first_wide|False">
-            <div class="news-list-item col-12 col-md-6 col-xl-4"  data-aos="fade" data-aos-duration="800" tal:repeat="item news">
+            <div class="col-12 col-md-6 col-xl-4"  data-aos="fade" data-aos-duration="800" tal:repeat="item news">
                 <metal:newlist use-macro="layout.macros['news-item-card']" />
             </div>
         </tal:b>
@@ -1731,7 +1736,7 @@
 </metal:calendar_day_content>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.town_bs">
-        <div class="row g-md events" >
+        <div class="row g-lg events" >
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
@@ -1986,17 +1991,19 @@
 </metal:testimonial>
 
 <metal:icon_links define-macro="icon_link" i18n:domain="onegov.town_bs">
-        <div tal:condition="title and icon" class="icon-link-card card border-hover h-100 w-100 inverted-${str(invert).lower()}" data-aos="fade">
-            <a class="card-body d-flex flex-column text-decoration-none w-100" href="${link}">
+    <a href="${link}" data-aos="fade" class="w-100 text-decoration-none">
+        <div tal:condition="title and icon" class="icon-link-card card border-hover h-100 w-100 inverted-${str(invert).lower()}">
+            <div class="card-body d-flex flex-column">
                 <i class="square-3xl icon-circle fa ${icon} icon"></i>
-                <h5 class="title mt-auto mb-0 fs-md line-clamp-2"> <span>${title}</span></h5>
+                <h5 class="title mt-auto mb-0 fs-md line-clamp-2 text-primary"> <span>${title}</span></h5>
                 <div class="hover-reveal" tal:condition="text">
                     <div>
                         <p class="fs-xs line-clamp-3 mt-sm mb-0">${text}</p>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
+    </a>
 </metal:icon_links>
 
 <metal:slider define-macro="slider" i18n:domain="onegov.town_bs" tal:define="searchbox searchbox|'true';">
@@ -3408,34 +3415,72 @@
     <tal:b i18n:translate="">Focus</tal:b>
 </metal:focus>
 
-<metal:focus define-macro="focus-panel" i18n:domain="onegov.town_bs">
-        <div class="focus-image" tal:condition="image_src">
-            <div style="width: 100%; padding-bottom: 55%; background-image: url(${image_src}); background-size: cover;"></div>
-            <tal:block tal:condition="text_on_image|False and title">
-                <div class="focus-title">
-                    <div class="gradient"></div>
-                    <div class="text-on-image">
-                        <h5>${title}</h5>
-                        <tal:block tal:condition="lead">
-                            <p class="lead">${lead}</p>
-                        </tal:block>
-                    </div>
-                </div>
-            </tal:block>
+<metal:focus define-macro="focus-panel" i18n:domain="onegov.town6">
+    <div class="focus-image ${'' if text_on_image else 'p-lg pb-2xl'}" tal:condition="image_src">
+        <div class="position-relative">
+            <div class="ratio ratio-16x9">
+                <img src="${image_src}" class="object-fit-cover rounded-2">
+                <div tal:condition="text_on_image" class="focus-image-gradient rounded-2"></div>
+            </div>
+
+            <div tal:condition="text_on_image" class="focus-title position-absolute bottom-0 start-0 end-0 p-lg">
+                <h3 class="card-title mb-0">
+                    <tal:b tal:condition="title">${title}</tal:b>
+                    <tal:b tal:condition="not:title">
+                        <metal:b use-macro="layout.macros['focus-title']" />
+                    </tal:b>
+                </h3>
+                <p tal:condition="lead" class="fw-bold mt-sm mb-0">${lead}</p>
+            </div>
         </div>
-        <div class="alert alert-info" tal:condition="python: not image_src">
-            <p i18n:translate="">Available options for the focus widget:</p>
-            <code>&lt;focus<br>
-                image-src="https://..."<br>
-                focus-url="https://on-image-click.com"<br>
-                title="..."<br>
-                lead="..."<br>
-                text-on-image="True"<br>
-                &emsp;&lt;text&gt;...&lt;/text&gt;<br>
-                &lt;/focus&gt;
-            </code>
-        </div>
+    </div>
+    <div class="panel m-lg" tal:condition="python: not image_src">
+        <p i18n:translate="">Available options for the focus widget:</p>
+        <code>&lt;focus<br>
+            image-src="https://..."<br>
+            focus-url="https://on-image-click.com"<br>
+            title="..."<br>
+            lead="..."<br>
+            text-on-image="True"<br>
+            &emsp;&lt;text&gt;...&lt;/text&gt;<br>
+            &lt;/focus&gt;
+        </code>
+    </div>
 </metal:focus>
+
+<metal:focus_widget define-macro="focus_widget" i18n:domain="onegov.town6">
+    <a href="${focus_url}" class="focus-item d-block h-100 text-decoration-none" data-aos="fade">
+        <div class="focus-widget ${text_on_image and 'only-title' or ''} card h-100">
+            <div class="card-body d-flex flex-column p-0">
+                <!-- Image with optional title and lead on top of it -->
+                <metal:b use-macro="layout.macros['focus-panel']" />
+
+                <!-- Same horizontal spacing as the title in news cards -->
+                <div class="focus-content" tal:condition="not text_on_image or text_count">
+                    <!-- Title and lead below the image -->
+                    <tal:b tal:condition="not text_on_image">
+                        <h3 class="card-title mb-sm">
+                            <tal:b tal:condition="title">${title}</tal:b>
+                            <tal:b tal:condition="not:title">
+                                <metal:b use-macro="layout.macros['focus-title']" />
+                            </tal:b>
+                        </h3>
+                        <p tal:condition="lead" class="fw-bold mb-sm">${lead}</p>
+                    </tal:b>
+
+                    <!-- Text paragraphs filled in by the widget -->
+                    <metal:b define-slot="text" />
+                </div>
+
+                <!-- Read more link pinned to the bottom of the card -->
+                <div class="mt-auto">
+                    <metal:b use-macro="layout.macros['read-more-link']"
+                        tal:define="read_more_classes 'px-2xl pt-md pb-2xl'" />
+                </div>
+            </div>
+        </div>
+    </a>
+</metal:focus_widget>
 
 <metal:chat define-macro="chat" i18n:domain="onegov.town_bs">
     <tal:b define="enable_chat layout.org.meta.get('enable_chat', 'disabled')">
@@ -3926,3 +3971,29 @@
         ${widget_title}
     </h2>
 </metal:widget_title>
+
+
+<metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
+    <div class="card h-100" data-aos="fade" data-aos-duration="800" id="homepage-tile-${item.number}" tal:condition="item.links">
+            <a tal:condition="item.page.url" class="text-decoration-none" href="${item.page.url}"><h5 class="m-lg mb-0 fs-lg">${item.page.text}</h5></a>
+            <h5 tal:condition="not item.page.url" class="m-lg mb-0 fs-lg">${item.page.text}</h5>
+        <div class="card-body p-xl">
+            <ul class="styled-list">
+                <li tal:repeat="link item.links" tal:content="link(layout, ('styled-list-link', ))" />
+            </ul>
+        </div>
+    </div>
+</metal:homepage-tiles>
+
+<metal:homepage-tiles define-macro="homepage-tiles">
+    <div>
+        <!-- Vertical gutter replaces the bottom margin Foundation adds to cards -->
+        <div class="row gy-lg justify-content-center">
+            <tal:block tal:repeat="item tiles">
+                <div class="homepage-tile col-12 col-md-6 col-lg-4" tal:condition="item.links">
+                    <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
+                </div>
+            </tal:block>
+        </div>
+    </div>
+</metal:homepage-tiles>
