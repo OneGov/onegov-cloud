@@ -67,7 +67,7 @@
             <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
         </a>
         <button tal:condition="children" class="drilldown-toggle py-md pe-sm" type="button" data-bs-toggle="drilldown" aria-label="open submenu" i18n:attributes="aria-label">
-            <i class="fas fa-arrow-right"></i>
+            <i data-lucide="arrow-right"></i>
         </button>
     </div>
 
@@ -75,7 +75,7 @@
         <ul class="drilldown-menu ${'is-active current-list' if nav_page in ancestors else ''} p-lg">
             <li class="drilldown-back-item">
                 <button type="button" class="drilldown-back fs-2xs px-0" data-bs-toggle="drilldown-back">
-                    <i class="fas fa-arrow-left"></i> ${link.text}
+                    <i data-lucide="arrow-left"></i> ${link.text}
                 </button>
             </li>
             <tal:b tal:repeat="(nav_page, sublink, c) children">
@@ -404,7 +404,7 @@
 <metal:card define-macro="directory-card">
     <a class="directory-item" data-aos="fade" data-aos-duration="800" tal:attributes="href link.url">
     <div class="card">
-        <h3 class="mt-2xl d-flex align-items-center"><i class="fa fa-list me-lg" aria-hidden="true"></i> ${link.text}</h3>
+        <h3 class="mt-2xl d-flex align-items-center"><i data-lucide="list"></i> ${link.text}</h3>
         <p class="mb-2xl">${link.subtitle}</p>
     </div>
     </a>
@@ -646,7 +646,7 @@
     <span class="read-more-link position-relative fs-sm ${read_more_classes|''} d-flex align-items-center justify-content-between gap-sm">
         <tal:b i18n:translate="">read more</tal:b>
         <div class="square-xl bg-primary text-white d-flex align-items-center justify-content-center rounded-circle">
-            <i class="fa fa-arrow-right"></i>
+            <i data-lucide="arrow-right"></i>
         </div>
     </span>
 </metal:readmore>
@@ -730,19 +730,19 @@
 <metal:access_hint define-macro="access_hint" i18n:domain="onegov.town_bs">
     <tal:b tal:switch="item.access|False">
         <tal:b case="'private'">
-            <i title="This site is private" i18n:attributes="title" class="private-hint fas fa-lock"></i>
+            <i title="This site is private" i18n:attributes="title" class="private-hint" data-lucide="lock"></i>
         </tal:b>
         <tal:b case="'member'">
-            <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint fas fa-users"></i>
+            <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint" data-lucide="users"></i>
         </tal:b>
         <tal:b case="'mtan'">
-            <i title="This site is public but requires submitting an mTAN" i18n:attributes="title" class="mtan-hint fas fa-mobile-alt"></i>
+            <i title="This site is public but requires submitting an mTAN" i18n:attributes="title" class="mtan-hint" data-lucide="smartphone"></i>
         </tal:b>
         <tal:b case="'secret'">
-            <i title="This site is secret" i18n:attributes="title" class="secret-hint fas fa-user-secret"></i>
+            <i title="This site is secret" i18n:attributes="title" class="secret-hint" data-lucide="venetian-mask"></i>
         </tal:b>
         <tal:b case="'secret_mtan'">
-            <i title="This site is secret and requires submitting an mTAN" i18n:attributes="title" class="secret-mtan-hint fas fa-mobile-alt"></i>
+            <i title="This site is secret and requires submitting an mTAN" i18n:attributes="title" class="secret-mtan-hint" data-lucide="smartphone"></i>
         </tal:b>
     </tal:b>
 </metal:access_hint>
@@ -813,7 +813,7 @@
                         <ul class="sidebar-links more-list">
                             <li tal:repeat="contact sidepanel_contact" tal:condition="contact">
                                 <a class="list-link" href="${contact[1]}">
-                                    <i class="fa fa-link" aria-hidden="true"></i>
+                                    <i data-lucide="link" aria-hidden="true"></i>
                                     <span class="list-title">${contact[0]}</span>
                                 </a>
                             </li>
@@ -880,7 +880,7 @@
                 <ul class="more-list">
                     <li tal:repeat="sl python: sorted(sidepanel_links, key=lambda sl: sl[0] if sl[0] else sl[1])">
                         <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
-                            <i class="fa fa-link" aria-hidden="true"></i>
+                            <i data-lucide="link" aria-hidden="true"></i>
                             <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
                         </a>
                     </li>
@@ -916,7 +916,7 @@
                 <ul class="more-list">
                     <li tal:condition="prev_entry">
                         <a href="${request.link(prev_entry)}" class="list-link">
-                            <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate>Previous Entry</span>
+                            <i data-lucide="chevron-left"></i><span class="list-title" i18n:translate>Previous Entry</span>
                         </a>
                         <a href="${request.link(prev_entry)}">
                             <p class="list-lead preview">${prev_entry.title}</p>
@@ -924,7 +924,7 @@
                     </li>
                     <li tal:condition="next_entry">
                         <a href="${request.link(next_entry)}" class="list-link">
-                            <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate>Next Entry</span>
+                            <i data-lucide="chevron-right"></i><span class="list-title" i18n:translate>Next Entry</span>
                         </a>
                         <a href="${request.link(next_entry)}">
                             <p class="list-lead preview">${next_entry.title}</p>
@@ -1012,7 +1012,7 @@
                                 <div>
                                     <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
                                         <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
-                                            <i class="fa fa-user" tal:condition="not:url"></i>
+                                            <i data-lucide="user" tal:condition="not:url"></i>
                                             <div class="cover-image" style='background-image: url("${url}");'></div>
                                         </div>
                                     </a>
@@ -1295,7 +1295,7 @@
 
                 <div class="col-3 align-content-end text-end">
                     <button class="btn p-0 btn-primary rounded-circle square-2xl" type="button" data-bs-toggle="collapse" data-bs-target="#personDetails${person.id}" aria-expanded="false" aria-controls="collapseExample">
-                        <i class="fa fa-plus"></i>
+                        <i data-lucide="plus"></i>
                     </button>
                 </div>
             </div>
@@ -1485,7 +1485,7 @@
                         <a class="page-link"
                         href="${request.link(previous, name)}"
                         aria-label="Previous Page" i18n:attributes="aria-label">
-                            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                            <i data-lucide="chevron-left" aria-hidden="true"></i>
                         </a>
                     </li>
 
@@ -1502,7 +1502,7 @@
                         <a class="page-link"
                         href="${request.link(next, name)}"
                         aria-label="Next Page" i18n:attributes="aria-label">
-                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                            <i data-lucide="chevron-right" aria-hidden="true"></i>
                         </a>
                     </li>
                 </tal:b>
@@ -1521,7 +1521,7 @@
                         ${layout.format_date(info.reservation.display_start(), 'weekday_long')},
                         ${layout.format_date(info.reservation.display_start(), 'date_long')}
                         <span class="reservation-warning" title="${info.warning}" tal:condition="info.warning">
-                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                            <i data-lucide="clock" aria-hidden="true"></i>
                         </span>
                     </span>
                     <span class="reservation-time">
@@ -1720,7 +1720,7 @@
     </a>
 
     <a href="${link|nothing}" tal:condition="not:image|nothing" class="calendar-day-thumbnail">
-        <i class="far fa-calendar" aria-hidden="true"></i>
+        <i data-lucide="calendar" aria-hidden="true"></i>
     </a>
 
     <div class="calendar-day-date" tal:condition="date|nothing">
@@ -1956,7 +1956,7 @@
 
                             <button class="square-4xl btn btn-primary position-absolute top-50 end-0 translate-middle-y me-xs icon-circle"
                                     type="submit">
-                                <i class="fa fa-search"></i>
+                                <i data-lucide="search"></i>
                             </button>
 
                             <metal:b use-macro="layout.macros['typeahead_container']"/>
@@ -1981,9 +1981,9 @@
                     ${description}
                 </p>
                 <p class="quote text-primary fs-xl">
-                    <i class="fas fa-angle-double-left" aria-hidden="true"></i>
+                    <i class="fw-bold fs-2xl" data-lucide="chevrons-left" aria-hidden="true"></i>
                     ${quote}
-                    <i class="fas fa-angle-double-right" aria-hidden="true"></i>
+                    <i class="fw-bold fs-2xl" data-lucide="chevrons-right" aria-hidden="true"></i>
                 </p>
             </div>
         </div>
@@ -1994,7 +1994,9 @@
     <a href="${link}" data-aos="fade" class="w-100 text-decoration-none">
         <div tal:condition="title and icon" class="icon-link-card card border-hover h-100 w-100 inverted-${str(invert).lower()}">
             <div class="card-body d-flex flex-column">
-                <i class="square-3xl icon-circle fa ${icon} icon"></i>
+                <div class="square-3xl icon-circle">
+                    <i data-lucide="${icon}" class="icon fs-md fw-light"></i>
+                </div>
                 <h5 class="title mt-auto mb-0 fs-md line-clamp-2 text-primary"> <span>${title}</span></h5>
                 <div class="hover-reveal" tal:condition="text">
                     <div>
@@ -2080,11 +2082,11 @@
             <!-- Controls are only shown if there is more than one slide -->
             <tal:b tal:condition="len(slides) > 1">
                 <button class="carousel-control-prev" type="button" data-bs-target="#testimonial-slider" data-bs-slide="prev">
-                    <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                    <i data-lucide="chevron-left" aria-hidden="true"></i>
                     <span class="visually-hidden">Previous Slide</span>
                 </button>
                 <button class="carousel-control-next" type="button" data-bs-target="#testimonial-slider" data-bs-slide="next">
-                    <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                    <i data-lucide="chevron-right" aria-hidden="true"></i>
                     <span class="visually-hidden">Next Slide</span>
                 </button>
             </tal:b>
@@ -2307,7 +2309,7 @@
             ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
         </tal:b>
         <tal:b metal:fill-slot="content">
-            <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="far fa-edit"></i></a>
+            <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i data-lucide="square-pen"></i></a>
         </tal:b>
     </metal:b>
 </metal:search_result_external_links>
@@ -2609,21 +2611,21 @@
                 <td>${'{0:.2f}'.format(invoice.total_amount)}</td>
                 <td class="invoiced-state">
                     <tal:b tal:condition="invoice.invoiced">
-                        <i class="fa fa-check-circle" aria-hidden="true" title="Invoiced" i18n:attributes="title"></i>
+                        <i data-lucide="circle-check" aria-hidden="true" title="Invoiced" i18n:attributes="title"></i>
                         <span i18n:translate class="visually-hidden">Invoiced</span>
                     </tal:b>
                     <tal:b tal:condition="not:invoice.invoiced">
-                        <i class="fa fa-times-circle" aria-hidden="true" title="Uninvoiced" i18n:attributes="title"></i>
+                        <i data-lucide="circle-x" aria-hidden="true" title="Uninvoiced" i18n:attributes="title"></i>
                         <span i18n:translate class="visually-hidden">Uninvoiced</span>
                     </tal:b>
                 </td>
                 <td class="paid-state">
                     <tal:b tal:condition="invoice.paid">
-                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <i data-lucide="circle-check" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
                         <span i18n:translate class="visually-hidden">Paid</span>
                     </tal:b>
                     <tal:b tal:condition="not:invoice.paid">
-                        <i class="fa fa-times-circle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <i data-lucide="circle-x" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
                         <span i18n:translate class="visually-hidden">Unpaid</span>
                     </tal:b>
                 </td>
@@ -2683,7 +2685,7 @@
             <p class="list-lead preview" tal:condition="lead">${lead}</p>
             <div class="list-hint hints" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
         </a>
-        <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+        <a class="edit-link" href="${link}" tal:condition="link"><i data-lucide="square-pen"></i></a>
     </li>
 </metal:group_record>
 
@@ -2749,7 +2751,7 @@
             <div class="list-hint hints alert alert-warning mb-0" tal:define="hint hint(record)|False" tal:condition="hint">${hint}</div>
         </a>
 
-        <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+        <a class="edit-link" href="${link}" tal:condition="link"><i data-lucide="square-pen"></i></a>
 
     </li>
 </metal:group_record_form_link>
@@ -2858,7 +2860,7 @@
 
         <div class="d-flex justify-content-between align-items-center mt-5" tal:condition="not: layout.edit_mode|False">
             <a tal:condition="not hide_cancel|False" class="text-muted text-decoration-none" href="#" data-back-link>
-            <i class="fas fa-arrow-left me-1"></i>
+            <i class="me-1" data-lucide="arrow-left"></i>
             <span i18n:translate="">zurück</span>
             </a>
             <div class="ms-auto" tal:condition="cancel|nothing">
@@ -2891,7 +2893,7 @@
                     tal:attributes="data-step step.position">
                     <!-- Step indicator -->
                     <span class="step-indicator">
-                        <i class="fas fa-check small" tal:condition="complete"></i>
+                        <i class="small" data-lucide="check" tal:condition="complete"></i>
                         <tal:number condition="not complete">${repeat.step.number}</tal:number>
                     </span>
 
@@ -2912,7 +2914,7 @@
                 ${group.title}
                 <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group.title" />
             </h2>
-            <a tal:condition="group.find_your_spot" tal:attributes="href link_func(group.find_your_spot)" class="button hollow narrow find-your-spot-link"><i class="fa fa-calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
+            <a tal:condition="group.find_your_spot" tal:attributes="href link_func(group.find_your_spot)" class="button hollow narrow find-your-spot-link"><i data-lucide="calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
         </div>
         <ul class="forms-list more-list">
             <tal:b tal:repeat="record group.entries" tal:switch="record.__class__.__name__">
@@ -2933,7 +2935,7 @@
                 ${subgroup.title}
                 <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" />
             </h5>
-            <a tal:condition="subgroup.find_your_spot" tal:attributes="href link_func(subgroup.find_your_spot)" class="button hollow narrow find-your-spot-link"><i class="fa fa-calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
+            <a tal:condition="subgroup.find_your_spot" tal:attributes="href link_func(subgroup.find_your_spot)" class="button hollow narrow find-your-spot-link"><i data-lucide="calendar"></i> <span i18n:translate="">Find Your Spot</span></a>
         </div>
         <ul class="forms-list more-list">
             <tal:b tal:repeat="record subgroup.entries">
@@ -2999,7 +3001,7 @@
                        ic-target="#button-${file.id}"
                        ic-success-action="change"
                        class="is-published">
-                        <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
+                        <i data-lucide="circle-check" aria-hidden="true"></i> <span i18n:translate>Public</span>
                     </a>
                 </div>
                 <div tal:condition="not:file.published" class="file-status-tag">
@@ -3007,7 +3009,7 @@
                        ic-target="#button-${file.id}"
                        ic-success-action="change"
                        class="is-not-published">
-                        <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
+                        <i data-lucide="eye-off" aria-hidden="true"></i> <span i18n:translate>Private</span>
                     </a>
                 </div>
 
@@ -3028,7 +3030,7 @@
                                     </select>
 
                                     <a ic-post-to="${post_url}&clear_start_date=1" ic-target="#button-${file.id}" ic-success-action="change">
-                                        <i class="far fa-times-circle"></i>
+                                        <i data-lucide="circle-x"></i>
                                         <span class="visually-hidden" i18n:translate>Reset</span>
                                     </a>
                                 </div>
@@ -3048,7 +3050,7 @@
                                 </select>
 
                                 <a ic-post-to="${post_url}&clear_end_date=1" ic-target="#button-${file.id}" ic-success-action="change">
-                                    <i class="far fa-times-circle"></i>
+                                    <i data-lucide="circle-x"></i>
                                     <span class="visually-hidden" i18n:translate>Reset</span>
                                 </a>
                             </div>
@@ -3068,7 +3070,7 @@
                        ic-target="#button-${file.id}"
                        ic-success-action="change"
                        class="is-a-publication">
-                        <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
+                        <i data-lucide="circle-check" aria-hidden="true"></i> <span i18n:translate>Publication</span>
                     </a>
                 </div>
 
@@ -3077,7 +3079,7 @@
                        ic-target="#button-${file.id}"
                        ic-success-action="change"
                        class="is-not-a-publication">
-                        <i class="far fa-fw fa-times-circle" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
+                        <i data-lucide="circle-x" aria-hidden="true"></i> <span i18n:translate>Not a publication</span>
                     </a>
                 </div>
             </div>
@@ -3097,24 +3099,24 @@
             <div class="file-content">
                 <div class="file-status-tag">
                     <div tal:condition="file.stats.get('pages', 0) <= 1">
-                        <i class="far fa-fw fa-file-alt" aria-hidden="true"></i>
+                        <i data-lucide="file-text" aria-hidden="true"></i>
                         <span i18n:translate>1 page</span>
                     </div>
                     <div tal:condition="file.stats.get('pages', 0) > 1">
-                        <i class="far fa-fw fa-file-alt" aria-hidden="true"></i>
+                        <i data-lucide="file-text" aria-hidden="true"></i>
                         <span i18n:translate><tal:b i18n:name="count">${file.stats.get('pages', 0)}</tal:b> pages</span>
                     </div>
                     <div tal:define="words file.stats.get('words', 0)">
                         <tal:b condition="words == 0">
-                            <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                            <i data-lucide="triangle-alert" aria-hidden="true"></i>
                             <span i18n:translate>Contains no readable text</span>
                         </tal:b>
                         <tal:b condition="words == 1">
-                            <i class="fas fa-fw fa-font" aria-hidden="true"></i>
+                            <i data-lucide="type" aria-hidden="true"></i>
                             <span i18n:translate>1 word</span>
                         </tal:b>
                         <tal:b condition="words > 1">
-                            <i class="fas fa-fw fa-font" aria-hidden="true"></i>
+                            <i data-lucide="type" aria-hidden="true"></i>
                             <span i18n:translate><tal:b i18n:name="count">${words}</tal:b> words</span>
                         </tal:b>
                     </div>
@@ -3132,7 +3134,7 @@
             data-confirm-yes="Delete File"
             data-confirm-no="Cancel"
             i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
-            <span class="fa fa-trash" aria-hidden="true"></span>
+            <span data-lucide="trash-2" aria-hidden="true"></span>
             <span i18n:translate >Delete</span>
         </a>
         <a class="button secondary rename prompt" role="button"
@@ -3146,11 +3148,11 @@
             data-prompt-name="name"
             data-prompt-value="${file.name}"
             i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel" >
-           <span class="fa fa-edit" aria-hidden="true"></span>
+           <span data-lucide="square-pen" aria-hidden="true"></span>
            <span i18n:translate>Rename</span>
         </a>
         <a class="button secondary" role="button" href="${request.link(file)}">
-            <span class="fa fa-download" aria-hidden="true"></span>
+            <span data-lucide="download" aria-hidden="true"></span>
             <span i18n:translate>Download</span>
         </a>
         <a class="button secondary" role="button"
@@ -3158,9 +3160,9 @@
            ic-target="#links-${id}"
            ic-action-target="#links-${id}-modal-opener"
            ic-success-action="click">
-            <span class="fa fa-link" aria-hidden="true"></span>
+            <span data-lucide="link" aria-hidden="true"></span>
             <span i18n:translate>Linked Pages</span>
-            <span class="ic-indicator fa fa-spinner fa-spin" style="display: none"></span>
+            <span class="ic-indicator" data-lucide="loader-circle" style="display: none"></span>
        </a>
     </div>
     <div style="display:none;">
@@ -3193,7 +3195,7 @@
 <metal:signature_status define-macro="signature_status" i18n:domain="onegov.town_bs">
     <tal:b condition="file.reference.content_type == 'application/pdf'" define="may_sign request.app.enable_yubikey and request.is_admin">
         <div tal:condition="file.signed" class="is-signed signature-status">
-            <i class="fa fa-fw fa-lock" aria-hidden="true"></i>
+            <i data-lucide="lock" aria-hidden="true"></i>
 
             <span i18n:translate>
                 Digital seal applied by <tal:b i18n:name="signee">${layout.get_user_title(file.signature_metadata['signee'])}</tal:b>
@@ -3217,7 +3219,7 @@
                 data-prompt-info="Published documents with a digital seal can be discovered through the site-search and in the list of documents with a digital seal. This action will be logged and cannot be undone."
                 i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel;data-prompt-info;data-prompt-placeholder"
             >
-                <i class="fa fa-fw fa-unlock" aria-hidden="true"></i>
+                <i data-lucide="lock-open" aria-hidden="true"></i>
 
                 <span i18n:translate class="hide-on-hover">
                     Without digital seal
@@ -3230,7 +3232,7 @@
         </tal:b>
         <tal:b condition="not file.signed and not may_sign">
             <div class="is-not-signed signature-status">
-                <i class="fa fa-fw fa-lock" aria-hidden="true"></i>
+                <i data-lucide="lock" aria-hidden="true"></i>
 
                 <span i18n:translate class="hide-on-hover">
                     Without digital seal
@@ -3255,7 +3257,7 @@
             </td>
             <td>
                 <a id="button-${file.id}" data-ogc-toggle="#details-${file.id}">
-                    <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
+                    <i class="rotate" data-lucide="chevron-down" aria-hidden="true"></i>
                 </a>
             </td>
             <td>
@@ -3295,7 +3297,7 @@
            data-confirm="Do you really want to delete the image?"
            data-confirm-yes="Delete Image"
            data-confirm-no="Cancel"
-           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
+           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i data-lucide="x" aria-hidden="true"></i></a>
     </div>
 </metal:uploaded_image>
 
@@ -3303,7 +3305,7 @@
     <div class="digest-result digest-${is_known and 'is-known' or 'is-not-known'}" tal:switch="is_known">
         <tal:b case="True">
             <div>
-                <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i>
+                <i data-lucide="circle-check" aria-hidden="true"></i>
             </div>
             <div i18n:translate>
                 <span i18n:name="name">${name}</span>
@@ -3313,7 +3315,7 @@
         </tal:b>
         <tal:b case="False">
             <div>
-                <i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i>
+                <i data-lucide="circle-alert" aria-hidden="true"></i>
             </div>
             <div i18n:translate>
                 <span i18n:name="name">${name}</span>
@@ -3340,7 +3342,7 @@
             </li>
             <li tal:define="pages publication.stats.get('pages') or 0" class="publication-stats">
                 <span>
-                    <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i>
+                    <i data-lucide="file-text" aria-hidden="true"></i>
                     <tal:b tal:condition="pages == 0 or pages > 1" i18n:translate>
                         <tal:b i18n:name="count">${pages}</tal:b> pages
                     </tal:b>
@@ -3487,10 +3489,10 @@
         <div tal:condition="enable_chat == 'chatbot' or enable_chat == 'people_chat' and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
             <div class="grid-container">
                 <a tal:condition="enable_chat == 'people_chat'" class="chat-button no-icon" href="${chat_link}">
-                    <p><i class="fas fa-comments"></i> Chat</p>
+                    <p><i data-lucide="messages-square"></i> Chat</p>
                 </a>
                 <!-- Left Bottom -->
-                <a tal:condition="enable_chat == 'chatbot'" class="chat-button no-icon"  type="button" data-toggle="example-dropdown-left-bottom"><p><i class="fas fa-comments"></i> Chat</p></a>
+                <a tal:condition="enable_chat == 'chatbot'" class="chat-button no-icon"  type="button" data-toggle="example-dropdown-left-bottom"><p><i data-lucide="messages-square"></i> Chat</p></a>
                 <div class="dropdown-pane" data-position="top" data-alignment="right" id="example-dropdown-left-bottom" data-dropdown data-auto-focus="true">
                     <!-- Close-->
                     <button class="close-button" data-close aria-label="Close" type="button">
@@ -3866,11 +3868,11 @@
                         <td class="amount">
                             ${'{:.2f}'.format(item.amount)}
                             <tal:b tal:condition="show_payment_state and paid">
-                                <i class="fa ${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                                <i data-lucide="${item.source in ('datatrans', 'stripe_connect', 'worldline_saferpay') and 'credit-card' or 'circle-check'}" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
                                 <span i18n:translate class="visually-hidden">Paid</span>
                             </tal:b>
                             <tal:b tal:condition="show_payment_state and not paid">
-                                <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                                <i data-lucide="triangle-alert" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
                                 <span i18n:translate class="visually-hidden">Unpaid</span>
                             </tal:b>
                         </td>
@@ -3896,11 +3898,11 @@
                 <td class="amount">
                     ${'{:.2f}'.format(total_amount)}
                     <tal:b tal:condition="show_payment_state and total_paid">
-                        <i class="fa fa-check-circle" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
+                        <i data-lucide="circle-check" aria-hidden="true" title="Paid" i18n:attributes="title"></i>
                         <span i18n:translate class="visually-hidden">Paid</span>
                     </tal:b>
                     <tal:b tal:condition="show_payment_state and not total_paid">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
+                        <i data-lucide="triangle-alert" aria-hidden="true" title="Unpaid" i18n:attributes="title"></i>
                         <span i18n:translate class="visually-hidden">Unpaid</span>
                     </tal:b>
                 </td>
@@ -3935,7 +3937,7 @@
             <input class="input-group-field" id="search" data-typeahead-subject type="search" name="q" value="${layout.model.q}" autocomplete="off" autocorrect="off" autofocus />
             <div class="input-group-button">
                 <button type="submit" class="button" aria-label="Search" i18n:attributes="aria-label">
-                    <i class="fa fa-fw fa-search"></i>
+                    <i data-lucide="search"></i>
                 </button>
             </div>
         </div>
@@ -3951,7 +3953,7 @@
 <metal:offcanvas_filters define-macro="offcanvas_filters">
     <div class="d-flex align-items-end flex-column mb-lg">
         <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offCanvasFilter" aria-controls="offCanvasFilter" >
-            <i class="fas fa-filter"></i> <span class="visually-hidden" i18n:translate="">Filters</span>
+            <i data-lucide="funnel"></i> <span class="visually-hidden" i18n:translate="">Filters</span>
         </button>
     </div>
 

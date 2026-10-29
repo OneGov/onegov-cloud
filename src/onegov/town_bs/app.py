@@ -306,6 +306,8 @@ def get_common_asset() -> Iterator[str]:
     yield 'ai_formcoder.js'
     yield 'htmx.min.js'
     yield 'dropdown_open_on_hover.js'
+    yield 'lucide.js'
+    yield 'lucide_init.js'
 
 
 @TownBsApp.webasset('form-modal')

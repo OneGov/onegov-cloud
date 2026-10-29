@@ -79,7 +79,7 @@
                             <div class="card border-hover">
                                 <div class="card-body">
                                     <i class="fas ${setting.icon}" aria-hidden="true"></i>
-                                    <span class="fs-sm">
+                                    <span class="ms-md fs-sm">
                                         ${setting.title}
                                     </span>
                                 </div>
