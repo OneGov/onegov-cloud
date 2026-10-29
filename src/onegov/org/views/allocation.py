@@ -5,6 +5,7 @@ import morepath
 import sedate
 
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 from itertools import batched
 from libres.db.models import Allocation as LibresAllocation
 from libres.db.models import ReservedSlot
@@ -685,6 +686,13 @@ def handle_rules_cronjob(resource: Resource, request: OrgRequest) -> None:
             and tomorrow.month == 1
             and tomorrow.day == 1
         ):
+            return True
+
+        if (
+            rule['extend'] == 'yearly_scheduled'
+            and rule['extend_on'] == tomorrow
+        ):
+            rule['extend_on'] += relativedelta(years=1)
             return True
 
         return False
