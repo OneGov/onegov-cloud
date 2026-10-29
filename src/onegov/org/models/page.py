@@ -6,7 +6,7 @@ from onegov.core.orm.mixins import (
     content_property, dict_markup_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
 from onegov.org import _
-from onegov.org.forms import LinkForm, PageForm, IframeForm
+from onegov.org.forms import ApiTopicForm, LinkForm, PageForm, IframeForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
@@ -80,6 +80,17 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     keywords: dict_property[list[str]] = meta_property(default=list)
 
+    # Topics with the 'api' trait, see onegov.org.api_source
+    api_topic_id: dict_property[int | None] = meta_property()
+    api_use_source_title: dict_property[bool] = meta_property(default=False)
+    api_unavailable: dict_property[bool] = meta_property(default=False)
+    api_previous_access: dict_property[str | None] = meta_property()
+
+    # The pages of other instances linking this topic via the API, a list of
+    # dicts with 'url' and 'title'
+    api_linked_by: dict_property[list[dict[str, str]]] = meta_property(
+        default=list)
+
     @property
     def deletable(self) -> bool:
         """ True if this page may be deleted. """
@@ -97,7 +108,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def paste_target(self) -> Topic | News:
         match self.trait:
-            case 'link' | 'iframe':
+            case 'link' | 'iframe' | 'api':
                 return self.parent or self  # type: ignore[return-value]
 
             case 'page':
@@ -109,24 +120,24 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def allowed_subtraits(self) -> tuple[str, ...]:
         match self.trait:
-            case 'link' | 'iframe':
+            case 'link' | 'iframe' | 'api':
                 return ()
 
             case 'page':
-                return ('page', 'link', 'iframe')
+                return ('page', 'link', 'iframe', 'api')
 
             case _:
                 raise NotImplementedError
 
     def is_supported_trait(self, trait: str) -> bool:
-        return trait in {'link', 'page', 'iframe'}
+        return trait in {'link', 'page', 'iframe', 'api'}
 
     def get_form_class(
         self,
         trait: str,
         action: str,
         request: OrgRequest
-    ) -> type[LinkForm | PageForm | IframeForm]:
+    ) -> type[LinkForm | PageForm | IframeForm | ApiTopicForm]:
 
         if trait == 'link':
             return self.with_content_extensions(LinkForm, request, extensions=[
@@ -148,6 +159,13 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         if trait == 'iframe':
             return self.with_content_extensions(
                 IframeForm, request, extensions=[
+                    AccessExtension,
+                    VisibleOnHomepageExtension
+                ])
+
+        if trait == 'api':
+            return self.with_content_extensions(
+                ApiTopicForm, request, extensions=[
                     AccessExtension,
                     VisibleOnHomepageExtension
                 ])
@@ -312,11 +330,14 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
         request: OrgRequest,
         page: int = 0,
         term: str | None = None,
+        parent: str | None = None,
     ):
         self.request = request
         self.session = request.session
         self.page = page
         self.term = term
+        # either 'root' or the id of the parent topic
+        self.parent = parent
 
     @property
     def q(self) -> str | None:
@@ -361,7 +382,14 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
                 func.websearch_to_tsquery(language, self.term)
             ))
 
-        topics = topics.order_by(Topic.published_or_created.desc())
+        if self.parent == 'root':
+            topics = topics.filter(Topic.parent_id.is_(None))
+            topics = topics.order_by(Topic.order)
+        elif self.parent:
+            topics = topics.filter(Topic.parent_id == int(self.parent))
+            topics = topics.order_by(Topic.order)
+        else:
+            topics = topics.order_by(Topic.published_or_created.desc())
         topics = topics.options(undefer(Topic.created))
         topics = topics.options(undefer(Topic.content))
         return topics
@@ -374,7 +402,8 @@ class TopicCollection(Pagination[Topic], AdjacencyListCollection[Topic]):
         return self.__class__(
             self.request,
             page=index,
-            term=self.term
+            term=self.term,
+            parent=self.parent
         )
 
 

@@ -3107,6 +3107,22 @@ msgstr "Übersicht Push-Benachrichtigungen"
 msgid "New Note"
 msgstr "Neue Notiz"
 
+msgid "The title, lead, text and sidebar of this page are taken from the API of another organisation (${source}) and are updated every time a page is viewed."
+msgstr "Titel, Einleitung, Text und Sidebar dieser Seite werden über die API einer anderen Organisation (${source}) übernommen und bei jedem Seitenaufruf aktualisiert."
+
+msgid "The linked topic is currently not publicly available. This page is therefore hidden from the public and from the public search."
+msgstr "Das verknüpfte Thema ist zurzeit nicht öffentlich verfügbar. Diese Seite ist deshalb für die Öffentlichkeit und in der öffentlichen Suche ausgeblendet."
+
+msgid "To change the content, please edit the linked topic of the source organisation:"
+msgstr "Um den Inhalt zu ändern, bearbeiten Sie bitte das verknüpfte Thema der Quellorganisation:"
+
+msgid ""
+"This page is linked by the following pages of other organisations via the "
+"API:"
+msgstr ""
+"Diese Seite wird von folgenden Seiten anderer Organisationen per "
+"API-Verknüpfung eingebunden:"
+
 #~ msgid "Private address"
 #~ msgstr "Privatadresse"
 

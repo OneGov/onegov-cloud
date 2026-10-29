@@ -14,9 +14,37 @@
     <tal:b metal:fill-slot="content">
         <metal:hint use-macro="layout.macros['access_hint_long']" tal:define="item page"/>
         <metal:hint use-macro="layout.macros['publication_hint_long']" tal:define="item page" />
-        <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item page"/>
+        <tal:b condition="page.trait != 'api'">
+            <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item page"/>
+        </tal:b>
 
-        <tal:b condition="page.trait == 'page'">
+        <div class="panel callout api-source-hint" tal:condition="api_source and request.is_manager">
+            <p i18n:translate>
+                The title, lead, text and sidebar of this page are taken from the
+                API of another organisation (<a i18n:name="source" href="${api_source.source_url}">${api_source.source_url}</a>)
+                and are updated every time a page is viewed.
+            </p>
+            <p tal:condition="api_source.unavailable" i18n:translate>
+                The linked topic is currently not publicly available. This page
+                is therefore hidden from the public and from the public search.
+            </p>
+            <p>
+                <tal:b i18n:translate>To change the content, please edit the linked topic of the source organisation:</tal:b>
+                <a href="${api_source.edit_url}">${api_source.edit_url}</a>
+            </p>
+        </div>
+
+        <div class="panel callout api-linked-by-hint" tal:condition="page.api_linked_by and request.is_manager">
+            <p i18n:translate>This page is linked by the following pages of other organisations via the API:</p>
+            <ul>
+                <li tal:repeat="link page.api_linked_by">
+                    <a href="${link['url']}">${link['title']}</a>
+                    <small>(${link['url']})</small>
+                </li>
+            </ul>
+        </div>
+
+        <tal:b condition="page.trait in ('page', 'api')">
 
 
             <tal:b metal:use-macro="layout.macros.page_content"

@@ -285,9 +285,18 @@ def run_debug(
     server = WsgiServer(factory, port=port, enable_tracemalloc=tracemalloc)
     server.start()
 
+    # FIXME: Demo only! The debug server handles one request at a time, so
+    # an instance can't request the API of another instance on the same
+    # server during a request. Server-side API requests to the local server
+    # are therefore sent to a second worker on port + 10 (see
+    # onegov.org.api_source, 8081 is used by smtp4dev).
+    api_server = WsgiServer(factory, port=port + 10)
+    api_server.start()
+
     observer = Observer()
-    observer.schedule(server, 'src', recursive=True)
-    observer.schedule(server, '.', recursive=False)
+    for wsgi_server in (server, api_server):
+        observer.schedule(wsgi_server, 'src', recursive=True)
+        observer.schedule(wsgi_server, '.', recursive=False)
     observer.start()
 
     while True:
@@ -296,6 +305,7 @@ def run_debug(
         except KeyboardInterrupt:
             observer.stop()
             server.stop()
+            api_server.stop()
             sys.exit(0)
 
 

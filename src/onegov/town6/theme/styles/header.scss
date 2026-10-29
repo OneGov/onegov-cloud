@@ -74,6 +74,7 @@ $qr-code-icon: '\f029';
 $results-icon: '\f682';
 $trash-restore-icon: '\f829';
 $settings-icon: '\f1de';
+$new-api-icon: '\f1e6';
 
 #header {
     background: $smoke;
@@ -611,6 +612,7 @@ $editbar-fg-color-active: $white;
     .results-link::before { @include icon-bold($results-icon); }
     .undo-link::before { @include icon-bold($trash-restore-icon); }
     .settings-link::before { @include icon-bold($settings-icon); }
+    .new-api::before { @include icon-bold($new-api-icon); }
 }
 
 
