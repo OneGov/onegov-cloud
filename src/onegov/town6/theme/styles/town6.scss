@@ -337,6 +337,50 @@ footer {
 }
 
 /*
+    API topic picker
+*/
+.api-topic-picker {
+    border: 1px solid $gray;
+    border-radius: .3rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+
+    .api-topic-picker-path {
+        margin-bottom: .5rem;
+    }
+
+    .api-topic-picker-list {
+        list-style: none;
+        margin: 0 0 .5rem;
+
+        li {
+            align-items: center;
+            border-bottom: 1px solid $light-gray;
+            display: flex;
+            gap: .5rem;
+            justify-content: space-between;
+            padding: .25rem .5rem;
+
+            &.is-selected {
+                background-color: $light-gray;
+                font-weight: bold;
+            }
+        }
+
+        .api-topic-picker-actions {
+            align-items: center;
+            display: flex;
+            flex-shrink: 0;
+            gap: 1rem;
+        }
+
+        .button.button-select{
+            margin: 0;
+        }
+    }
+}
+
+/*
     blank (uncolored) labels
 */
 .blank-label {

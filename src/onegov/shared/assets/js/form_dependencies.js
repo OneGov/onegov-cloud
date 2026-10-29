@@ -107,6 +107,7 @@ var evaluate_dependencies = function(form, input, dependencies, _handle_fieldset
         hide_label &= dependency.hide_label;
     });
 
+    var fieldset = input.closest('fieldset');
     if (visible) {
         if (handle_fieldset) {
             fieldset.toggle(true);

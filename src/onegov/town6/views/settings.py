@@ -13,7 +13,7 @@ from onegov.org.forms.settings import (
     LinkHealthCheckForm, OrganisationProfileSettingsForm, PeopleSettingsForm,
     EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
     DataRetentionPolicyForm, FirebaseSettingsForm, VATSettingsForm,
-    KabaSettingsForm, ResourceSettingsForm)
+    KabaSettingsForm, ResourceSettingsForm, ApiSourceSettingsForm)
 from onegov.org.models import Organisation
 from onegov.town6.forms.settings import (
     RISSettingsForm, ModuleActivationSettingsForm)
@@ -26,7 +26,8 @@ from onegov.org.views.settings import (
     handle_analytics_settings, handle_holiday_settings,
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
     handle_link_health_check,
-    handle_event_settings, handle_api_keys, handle_chat_settings,
+    handle_event_settings, handle_api_keys, handle_api_source_settings,
+    handle_chat_settings,
     handle_kaba_settings, handle_resource_settings)
 
 from onegov.town6.app import TownApp
@@ -451,6 +452,21 @@ def town_preview_holiday_settings(
 ) -> str:
     return preview_holiday_settings(
         self, request, form, DefaultLayout(self, request))
+
+
+@TownApp.setting_form(
+    model=Organisation, name='api-source-settings', template='form.pt',
+    permission=Secret, form=ApiSourceSettingsForm, icon='fa-plug',
+    setting=_('Source organisation API link'), order=11,
+    category=_('Advanced Settings'))
+def town_handle_api_source_settings(
+    self: Organisation,
+    request: TownRequest,
+    form: ApiSourceSettingsForm
+) -> RenderData | Response:
+    return handle_api_source_settings(
+        self, request, form, SettingsLayout(
+            self, request, _('Source organisation API link')))
 
 
 @TownApp.setting_form(

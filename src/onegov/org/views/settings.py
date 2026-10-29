@@ -27,7 +27,7 @@ from onegov.org.forms.settings import (
     LinkHealthCheckForm, OrganisationProfileSettingsForm, PeopleSettingsForm,
     GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
     VATSettingsForm, EventSettingsForm, KabaSettingsForm,
-    ResourceSettingsForm)
+    ResourceSettingsForm, ApiSourceSettingsForm)
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
 from onegov.org.management import LinkHealthCheck
@@ -843,6 +843,21 @@ def handle_link_health_check(
         'stats': stats,
         'healthcheck': healthcheck
     }
+
+
+@OrgApp.setting_form(
+    model=Organisation, name='api-source-settings', template='form.pt',
+    permission=Secret, form=ApiSourceSettingsForm,
+    setting=_('Source organisation API link'), icon='fa-plug', order=11,
+    category=_('Advanced Settings'))
+def handle_api_source_settings(
+    self: Organisation,
+    request: OrgRequest,
+    form: ApiSourceSettingsForm,
+    layout: SettingsLayout | None = None
+) -> RenderData | Response:
+    return handle_generic_settings(
+        self, request, form, _('Source organisation API link'), layout)
 
 
 @OrgApp.setting_form(

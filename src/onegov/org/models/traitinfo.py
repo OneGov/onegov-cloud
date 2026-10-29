@@ -63,6 +63,17 @@ TRAIT_MESSAGES: dict[str, dict[str, str]] = {
         'delete_button': _('Delete iFrame'),
         'delete_question': _(
             'Do you really want to delete the iFrame "${title}"?'),
+    },
+    'api': {
+        'name': _('API link'),
+        'new_page_title': _('Add API link'),
+        'new_page_added': _('Added API link'),
+        'edit_page_title': _('Edit API link'),
+        'move_page_title': _('Move API link'),
+        'delete_message': _('The API link was deleted'),
+        'delete_button': _('Delete API link'),
+        'delete_question': _(
+            'Do you really want to delete the API link "${title}"?'),
     }
 }
 
@@ -163,6 +174,10 @@ class TraitInfo:
 
         for trait in self.allowed_subtraits:
 
+            if trait == 'api' and not request.app.org.api_source_url:
+                # only available if a source organisation is configured
+                continue
+
             name = self.trait_messages[trait]['name']
 
             yield Link(
@@ -190,6 +205,7 @@ class TraitInfo:
                 )
             )
 
+        if self.editable and self.trait != 'api':
             assert request.path_info is not None
             yield Link(
                 _('Copy'),

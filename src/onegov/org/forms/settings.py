@@ -2079,6 +2079,49 @@ class OneGovApiSettingsForm(Form):
     )
 
 
+class ApiSourceSettingsForm(Form):
+    """ Configures how topics are shared with other OneGov instances.
+
+    A parent organisation allows other instances to link its topics, a child
+    organisation links the topics of its parent. An instance can't be both,
+    to avoid loops and long chains of linked topics.
+
+    """
+
+    api_link_role = RadioField(
+        label=_('Role'),
+        default='none',
+        choices=(
+            ('none', _('None')),
+            ('parent', _('Parent organisation')),
+            ('child', _('Child organisation')),
+        ),
+    )
+
+    # not an URLField, as it would add a validator rejecting IP addresses
+    # (the validators below are wrapped because of depends_on)
+    api_source_url = StringField(
+        label=_('API URL of the parent organisation'),
+        description=_(
+            'e.g. https://onegov.govikon.ch/api/'),
+        validators=[InputRequired(), URLValidator(require_tld=False)],
+        depends_on=('api_link_role', 'child'),
+    )
+
+    def process_obj(self, obj: Organisation) -> None:  # type:ignore
+        super().process_obj(obj)
+        # instances which have been set up before the roles were introduced
+        if not obj.api_link_role:
+            self.api_link_role.data = 'child' if obj.api_source_url else 'none'
+
+    def populate_obj(self, model: Organisation) -> None:  # type:ignore
+        role = self.api_link_role.data
+        model.api_link_role = role if role != 'none' else None
+
+        url = self.api_source_url.data if role == 'child' else None
+        model.api_source_url = url.rstrip('/') + '/' if url else None
+
+
 class EventSettingsForm(Form):
 
     submit_events_visible = BooleanField(

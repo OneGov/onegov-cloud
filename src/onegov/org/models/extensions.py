@@ -5,7 +5,7 @@ from collections import OrderedDict
 from functools import cached_property
 
 from markupsafe import Markup
-from onegov.core.i18n import get_translation_bound_meta
+from onegov.core.i18n import get_translation_bound_meta, SiteLocale
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
@@ -1315,3 +1315,60 @@ class InlinePhotoAlbumExtension(ContentExtension):
                 obj.photo_album_id = self.photo_album_id.data or None
 
         return PhotoAlbumForm
+
+
+class LocalizeableExtension(ContentExtension):
+
+    locale: dict_property[str | None] = meta_property()
+    alt_locale_ids: dict_property[dict[str, Any]] = meta_property(default=dict)
+
+    def localized_url(self, request: OrgRequest) -> str | None:
+        """
+        Returns the URL to the localized version of this content.
+        """
+        if self.locale is None or self.locale == request.locale:
+            return None
+
+        assert request.locale is not None
+        alt_id = self.alt_locale_ids.get(request.locale)
+        if alt_id is None:
+            return None
+
+        item = request.session.get(self.__class__, alt_id)
+        if item is None:
+            return None
+
+        target_url = request.link(item)
+        self_url = request.link(self)
+        if self_url in request.url:
+            target_url = request.url.replace(self_url, target_url)
+
+        return SiteLocale(request.locale).link(request, target_url)
+
+    def extend_form[T: Form](
+        self,
+        form_class: type[T],
+        request: OrgRequest
+    ) -> type[T]:
+
+        if not request.app.localizeable or len(request.app.locales) < 2:
+            return form_class
+
+        assert request.locale is not None
+
+        class LocalizeableForm(form_class):  # type:ignore
+
+            def populate_obj(
+                self,
+                obj: LocalizeableExtension,
+                *args: Any,
+                **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+
+                # NOTE: For now we just assume the form should have the
+                #       same locale as we do.
+                if obj.locale is None:
+                    obj.locale = request.locale
+
+        return LocalizeableForm
