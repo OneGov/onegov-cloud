@@ -987,7 +987,7 @@ def test_export_events_json_xml_csv(client: Client) -> None:
             )
 
         assert event_fields['Highlight'] in (True, 'True', 'true')
-        assert event_fields['Erstellt'] == '23.03.2026 09:00'
+        assert event_fields['Erstellt'] == '2026-03-23 09:00'
         assert event_fields['Von'] == '24.03.2026 18:00'
         assert event_fields['Bis'] == '24.03.2026 22:00'
 
