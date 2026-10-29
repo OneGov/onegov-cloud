@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-10-29 14:41+0100\n"
+"POT-Creation-Date: 2026-10-29 16:08+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -883,9 +883,6 @@ msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
 msgid "Delete Attendencess"
 msgstr "Anwesenheiten löschen"
 
-msgid "Only admins can edit attendance records."
-msgstr "Nur Administratoren können Anwesenheiten bearbeiten."
-
 #, python-format
 msgid "Edit bulk: ${type}"
 msgstr "Massenbuchung: ${type} bearbeiten"
@@ -1035,6 +1032,9 @@ msgid "Cannot delete closed settlement run. Please reopen it first."
 msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
+
+#~ msgid "Only admins can edit attendance records."
+#~ msgstr "Nur Administratoren können Anwesenheiten bearbeiten."
 
 #~ msgid "Parliamentarian:"
 #~ msgstr "Parlamentarier:in:"

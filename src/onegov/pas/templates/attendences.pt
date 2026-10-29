@@ -36,7 +36,13 @@
                                           class="bulk-badge"
                                           tal:attributes="style string:background-color: hsl(${hue}, 45%, 90%);; color: hsl(${hue}, 50%, 28%);; border-color: hsl(${hue}, 40%, 75%)">Massenbuchung</span>
                                 </tal:b></td>
-                            <td tal:condition="can_edit_attendences"><a href="${edit_links[attendence.id]}"><i class="fa fa-edit"></i></a></td>
+                            <td tal:condition="can_edit_attendences">
+                                <a tal:condition="python:
+                                    attendence.id in edit_links"
+                                    href="${edit_links[attendence.id]}">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
