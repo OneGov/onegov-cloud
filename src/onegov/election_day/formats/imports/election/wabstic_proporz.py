@@ -2,7 +2,9 @@ from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
+from onegov.election_day.formats.imports.common import get_gelfnrs
 from onegov.election_day.formats.imports.common import line_is_relevant
+from onegov.election_day.formats.imports.common import line_matches_gelfnr
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import validate_integer
 from onegov.election_day.models import Candidate
@@ -211,6 +213,17 @@ def import_election_wabstic_proporz(
     if errors:
         return errors
 
+    # Several elections may share the same SortGeschaeft, use the GeLfNr to
+    # identify the relevant lines
+    assert wpstatic_gemeinden is not None
+    gelfnrs = get_gelfnrs(wpstatic_gemeinden.lines, number, district)
+
+    def is_relevant(line: DefaultRow) -> bool:
+        return (
+            line_is_relevant(line, number)
+            and line_matches_gelfnr(line, gelfnrs)
+        )
+
     # Parse the election
 
     remaining_entities = None
@@ -219,7 +232,7 @@ def import_election_wabstic_proporz(
     for line in wp_wahl.lines:
         line_errors: list[str] = []
 
-        if not line_is_relevant(line, number):
+        if not is_relevant(line):
             continue
         try:
             remaining_entities = validate_integer(
@@ -242,7 +255,6 @@ def import_election_wabstic_proporz(
     # Parse the entities
     added_entities: dict[int, dict[str, Any]] = {}
 
-    assert wpstatic_gemeinden is not None
     for line in wpstatic_gemeinden.lines:
         line_errors = []
 
@@ -301,6 +313,9 @@ def import_election_wabstic_proporz(
     assert wp_gemeinden is not None
     for line in wp_gemeinden.lines:
         line_errors = []
+
+        if not line_matches_gelfnr(line, gelfnrs):
+            continue
 
         # Parse the id of the entity
         try:
@@ -378,7 +393,7 @@ def import_election_wabstic_proporz(
     for line in wp_listen.lines:
         line_errors = []
 
-        if not line_is_relevant(line, number):
+        if not is_relevant(line):
             continue
 
         try:
@@ -445,6 +460,9 @@ def import_election_wabstic_proporz(
 
         line_errors = []
 
+        if not line_matches_gelfnr(line, gelfnrs):
+            continue
+
         try:
             entity_id = get_entity_id(line, EXPATS)
             list_id = get_list_id(line)
@@ -499,7 +517,7 @@ def import_election_wabstic_proporz(
     for line in wpstatic_kandidaten.lines:
         line_errors = []
 
-        if not line_is_relevant(line, number):
+        if not is_relevant(line):
             continue
 
         try:
@@ -548,7 +566,7 @@ def import_election_wabstic_proporz(
     for line in wp_kandidaten.lines:
         line_errors = []
 
-        if not line_is_relevant(line, number):
+        if not is_relevant(line):
             continue
 
         try:
@@ -581,6 +599,9 @@ def import_election_wabstic_proporz(
     assert wp_kandidatengde is not None
     for line in wp_kandidatengde.lines:
         line_errors = []
+
+        if not line_matches_gelfnr(line, gelfnrs):
+            continue
 
         try:
             entity_id = get_entity_id(line, EXPATS)

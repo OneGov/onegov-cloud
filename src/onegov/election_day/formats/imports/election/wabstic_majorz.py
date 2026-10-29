@@ -2,7 +2,9 @@ from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
+from onegov.election_day.formats.imports.common import get_gelfnrs
 from onegov.election_day.formats.imports.common import line_is_relevant
+from onegov.election_day.formats.imports.common import line_matches_gelfnr
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import validate_integer
 from onegov.election_day.models import Candidate
@@ -142,6 +144,17 @@ def import_election_wabstic_majorz(
     if errors:
         return errors
 
+    # Several elections may share the same SortGeschaeft, use the GeLfNr to
+    # identify the relevant lines
+    assert wmstatic_gemeinden is not None
+    gelfnrs = get_gelfnrs(wmstatic_gemeinden.lines, number, district)
+
+    def is_relevant(line: DefaultRow) -> bool:
+        return (
+            line_is_relevant(line, number)
+            and line_matches_gelfnr(line, gelfnrs)
+        )
+
     # Parse the election
     absolute_majority = None
     remaining_entities = None
@@ -151,7 +164,7 @@ def import_election_wabstic_majorz(
     for line in wm_wahl.lines:
         line_errors = []
 
-        if not line_is_relevant(line, number):
+        if not is_relevant(line):
             continue
 
         # Parse the absolute majority, if None, 0 will be returned
@@ -189,7 +202,6 @@ def import_election_wabstic_majorz(
 
     # Parse the entities
     added_entities: dict[int, dict[str, Any]] = {}
-    assert wmstatic_gemeinden is not None
     for line in wmstatic_gemeinden.lines:
         line_errors = []
 
@@ -248,6 +260,9 @@ def import_election_wabstic_majorz(
     assert wm_gemeinden is not None
     for line in wm_gemeinden.lines:
         line_errors = []
+
+        if not line_matches_gelfnr(line, gelfnrs):
+            continue
 
         # Parse the id of the entity
         try:
@@ -325,7 +340,7 @@ def import_election_wabstic_majorz(
     for line in wm_kandidaten.lines:
         line_errors = []
 
-        if not line_is_relevant(line, number):
+        if not is_relevant(line):
             continue
 
         try:
@@ -363,7 +378,7 @@ def import_election_wabstic_majorz(
     for line in wm_kandidatengde.lines:
         line_errors = []
 
-        if not line_is_relevant(line, number):
+        if not is_relevant(line):
             continue
 
         try:
