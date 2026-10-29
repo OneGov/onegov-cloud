@@ -910,8 +910,8 @@ def test_exports_zero_bookings(
     rows = list(workbook['Buchungen Abrechnungslauf'].values)
     assert len(rows) == 4
     assert rows[1][0] == '15.01.2024'
-    assert rows[1][6:] == (0, 0)
+    assert rows[1][7:] == (0, 0)
     assert rows[2][0] == '16.01.2024'
-    assert rows[2][6:] == (100, 100)
-    assert rows[3][4] == LOHNART_ALLOWANCE_TEXT
-    assert rows[3][6:] == (0, 0)
+    assert rows[2][7:] == (100, 100)
+    assert rows[3][4:6] == ('präsidiale Zulage', None)
+    assert rows[3][7:] == (0, 0)
