@@ -101,7 +101,7 @@ def _settlement_totals(
                 continue
             name = party.name
         else:
-            name = f'{parliamentarian.first_name} {parliamentarian.last_name}'
+            name = parliamentarian.title
 
         compensation = Compensation(base=row[4], adjusted=row[5])
         total_compensations[name] = (
@@ -678,7 +678,7 @@ def _generate_settlement_html(
    """
 
     for settlement_row in settlement_data:
-        name = f'{settlement_row[1].first_name} {settlement_row[1].last_name}'
+        name = settlement_row[1].title
         html += f"""
            <tr>
                <td>{settlement_row[0].strftime('%d.%m.%Y')}</td>

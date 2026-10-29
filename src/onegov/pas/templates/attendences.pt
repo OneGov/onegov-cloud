@@ -66,7 +66,7 @@
                         <ul class="more-list">
                             <li tal:repeat="a allowances">
                                 <span class="list-title">
-                                    ${a.parliamentarian.first_name} ${a.parliamentarian.last_name}
+                                    ${a.parliamentarian.title}
                                     — <strong>CHF ${a.amount}</strong>
                                 </span>
                                 <p class="list-lead preview">

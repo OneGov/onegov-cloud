@@ -243,7 +243,7 @@ def generate_buchungen_abrechnungslauf_xlsx(
         worksheet.write(
             row_num,
             1,
-            (f'{parliamentarian.first_name} {parliamentarian.last_name}'),
+            parliamentarian.title,
             cell_format,
         )
         worksheet.write(
