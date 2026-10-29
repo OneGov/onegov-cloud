@@ -570,6 +570,8 @@ def generate_settlement_pdf(
                 )
             )
 
+    # By requirement, zero bookings appear only in the Excel control list.
+    settlement_data = [row for row in settlement_data if row[5] != 0]
     totals = _settlement_totals(
         settlement_data,
         group_by,

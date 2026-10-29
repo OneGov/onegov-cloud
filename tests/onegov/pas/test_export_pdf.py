@@ -2,6 +2,10 @@ import transaction
 
 from datetime import date
 from decimal import Decimal
+from openpyxl import load_workbook
+from onegov.pas.views.abschlussliste import (
+    generate_buchungen_abrechnungslauf_xlsx,
+)
 from onegov.pas.calculate_pay import calculate_rate
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.export_single_parliamentarian import (
@@ -800,3 +804,114 @@ def test_plenary_uses_the_kantonsrat_president_rate(session: Session) -> None:
         row[12] for row in generate_fibu_export_rows(settlement_run, request)
     )
     assert amounts == [Decimal('300'), Decimal('500')]
+
+
+def test_exports_zero_bookings(
+    session: Session,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rate_set = RateSet(
+        year=2024,
+        cost_of_living_adjustment=Decimal('0'),
+        commission_normal_member_initial=Decimal('100'),
+    )
+    run = SettlementRun(
+        name='Q1 2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 3, 31),
+        active=True,
+    )
+    person = PASParliamentarian(
+        first_name='Jane',
+        last_name='Member',
+        gender='female',
+    )
+    party = Party(name='Test Party')
+    commission = PASCommission(name='Test Commission', type='normal')
+    session.add_all(
+        [
+            rate_set,
+            run,
+            person,
+            party,
+            commission,
+            PASParliamentarianRole(
+                parliamentarian=person,
+                party=party,
+                role='member',
+                start=run.start,
+            ),
+            PASCommissionMembership(
+                parliamentarian=person,
+                commission=commission,
+                role='member',
+                start=run.start,
+            ),
+        ]
+    )
+    for day, duration in [(15, 0), (16, 60)]:
+        session.add(
+            Attendence(
+                parliamentarian=person,
+                commission=commission,
+                date=date(2024, 1, day),
+                duration=duration,
+                type='commission',
+            )
+        )
+    session.flush()
+    session.add(
+        PresidentialAllowance(
+            parliamentarian_id=person.id,
+            settlement_run_id=run.id,
+            role='president',
+            amount=0,
+        )
+    )
+    session.flush()
+
+    request = Mock(spec=TownRequest)
+    request.session = session
+    request.translate = lambda value: value
+
+    entities: tuple[
+        tuple[
+            Literal['all', 'commission', 'party'], PASCommission | Party | None
+        ],
+        ...,
+    ] = (('all', None), ('commission', commission), ('party', party))
+    for entity_type, entity in entities:
+        rendered = _settlement_pdf_html(
+            run,
+            request,
+            entity_type,
+            entity,
+            monkeypatch,
+        )
+        assert '15.01.2024' not in rendered
+        assert '16.01.2024' in rendered
+        assert LOHNART_ALLOWANCE_TEXT not in rendered
+        assert '100.00' in rendered
+
+    html_factory = Mock()
+    monkeypatch.setattr(pdf_export, 'HTML', html_factory)
+    monkeypatch.setattr(pdf_export, 'CSS', Mock())
+    monkeypatch.setattr(pdf_export, 'FontConfiguration', Mock())
+    generate_parliamentarian_settlement_pdf(run, request, person)
+    rendered = html_factory.call_args.kwargs['string']
+    assert '15.01.2024' not in rendered
+    assert '16.01.2024' in rendered
+    assert LOHNART_ALLOWANCE_TEXT not in rendered
+    assert '100.00' in rendered
+
+    workbook = load_workbook(
+        generate_buchungen_abrechnungslauf_xlsx(run, request),
+    )
+    rows = list(workbook['Buchungen Abrechnungslauf'].values)
+    assert len(rows) == 4
+    assert rows[1][0] == '15.01.2024'
+    assert rows[1][6:] == (0, 0)
+    assert rows[2][0] == '16.01.2024'
+    assert rows[2][6:] == (100, 100)
+    assert rows[3][4] == LOHNART_ALLOWANCE_TEXT
+    assert rows[3][6:] == (0, 0)
