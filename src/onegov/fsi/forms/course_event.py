@@ -2,10 +2,12 @@ import sedate
 
 from onegov.form import Form
 from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
+from onegov.form.utils import coerce_uuid
 from onegov.fsi import _
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.models.course_event import course_status_choices, CourseEvent
+from wtforms import SelectChoice
 from wtforms.fields import StringField, IntegerField, BooleanField
 from wtforms.validators import InputRequired
 
@@ -23,6 +25,7 @@ class CourseEventForm(Form):
     course_id = ChosenSelectField(
         label=_('Course'),
         choices=[],
+        coerce=coerce_uuid
     )
 
     presenter_name = StringField(
@@ -131,10 +134,12 @@ class CourseEventForm(Form):
             # FIXME: why are we not using model.course here?
             course = collection.by_id(self.model.course_id)
             assert course is not None
-            self.course_id.choices = [(str(course.id), course.name)]
+            self.course_id.choices = [
+                SelectChoice(course.id.hex, course.name)
+            ]
         else:
             self.course_id.choices = [
-                (str(c.id), c.name) for c in collection.query()
+                SelectChoice(c.id.hex, c.name) for c in collection.query()
             ]
 
         self.status.choices = course_status_choices(self.request)

@@ -26,9 +26,10 @@ from sqlalchemy import event
 from unittest.mock import MagicMock
 from uuid import UUID
 from webob.multidict import MultiDict
+from wtforms import SelectChoice
 
 
-from typing import Any, TYPE_CHECKING, cast
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
     from onegov.form import Form
@@ -433,9 +434,9 @@ def test_find_your_spot_form_single_room() -> None:
     assert form.start_time.data == time(8, 0)
     assert form.end_time.data == time(9, 0)
     assert not form.rooms
-    assert 'for_every_room' not in (  # type: ignore
-        value
-        for value, _label in form.auto_reserve_available_slots.choices
+    assert 'for_every_room' not in (
+        choice.value
+        for choice in form.auto_reserve_available_slots.choices
     )
     assert form.weekdays.data == [1, 4]
     assert form.on_holidays.data == 'yes'
@@ -814,41 +815,56 @@ def test_user_group_form(
     form = ManageUserGroupForm()
     form.model = None
     form.request = request
-    form.on_request()
 
     # choices
-    assert sorted([x[1] for x in form.users.choices]) == [
+    assert sorted(choice.label for choice in form.users.choices) == [
         'a@example.org', 'b@example.org', 'c@example.org',
     ]
-    assert ('EVN', 'EVN') in form.ticket_permissions.choices
-    assert ('FRM', 'FRM') in form.ticket_permissions.choices
-    assert ('RSV', 'RSV') in form.ticket_permissions.choices
+    assert SelectChoice('EVN') in form.ticket_permissions.choices
+    assert SelectChoice('FRM') in form.ticket_permissions.choices
+    assert SelectChoice('RSV') in form.ticket_permissions.choices
     # make sure distinct union query works
     assert isinstance(form.ticket_permissions.choices, list)
-    assert form.ticket_permissions.choices.count(('FRM-A-1', 'FRM: A-1')) == 1
-    assert ('FRM-A-2', 'FRM: A-2') in form.ticket_permissions.choices
-    assert ('PER', 'PER') in form.ticket_permissions.choices
-    assert ('DIR', 'DIR') in form.ticket_permissions.choices
-    assert ('DIR-Trainers', 'DIR: Trainers') in form.ticket_permissions.choices
-    assert ('DIR-Deleted', 'DIR: Deleted') in form.ticket_permissions.choices
-    assert ('RSV-Kitchen', 'RSV: Kitchen') in form.ticket_permissions.choices
-    assert ('RSV-Deleted', 'RSV: Deleted') in form.ticket_permissions.choices
-    assert ('EVN', 'EVN') in form.immediate_notification.choices
-    assert ('FRM', 'FRM') in form.immediate_notification.choices
-    assert ('FRM-A-1', 'FRM: A-1') in form.immediate_notification.choices
-    assert ('FRM-A-2', 'FRM: A-2') in form.immediate_notification.choices
-    assert ('PER', 'PER') in form.immediate_notification.choices
-    assert ('DIR', 'DIR') in form.immediate_notification.choices
-    assert (
+    assert form.ticket_permissions.choices.count(
+        SelectChoice('FRM-A-1', 'FRM: A-1')
+    ) == 1
+    assert SelectChoice(
+        'FRM-A-2', 'FRM: A-2'
+    ) in form.ticket_permissions.choices
+    assert SelectChoice('PER') in form.ticket_permissions.choices
+    assert SelectChoice('DIR') in form.ticket_permissions.choices
+    assert SelectChoice(
+        'DIR-Trainers', 'DIR: Trainers'
+    ) in form.ticket_permissions.choices
+    assert SelectChoice(
+        'DIR-Deleted', 'DIR: Deleted'
+    ) in form.ticket_permissions.choices
+    assert SelectChoice(
+        'RSV-Kitchen', 'RSV: Kitchen'
+    ) in form.ticket_permissions.choices
+    assert SelectChoice(
+        'RSV-Deleted', 'RSV: Deleted'
+    ) in form.ticket_permissions.choices
+    assert SelectChoice('EVN') in form.immediate_notification.choices
+    assert SelectChoice('FRM') in form.immediate_notification.choices
+    assert SelectChoice(
+        'FRM-A-1', 'FRM: A-1'
+    ) in form.immediate_notification.choices
+    assert SelectChoice(
+        'FRM-A-2', 'FRM: A-2'
+    ) in form.immediate_notification.choices
+    assert SelectChoice('PER') in form.immediate_notification.choices
+    assert SelectChoice('DIR') in form.immediate_notification.choices
+    assert SelectChoice(
         'DIR-Trainers', 'DIR: Trainers'
     ) in form.immediate_notification.choices
-    assert (
+    assert SelectChoice(
         'DIR-Deleted', 'DIR: Deleted'
     ) in form.immediate_notification.choices
-    assert (
+    assert SelectChoice(
         'RSV-Kitchen', 'RSV: Kitchen'
     ) in form.immediate_notification.choices
-    assert (
+    assert SelectChoice(
         'RSV-Deleted', 'RSV: Deleted'
     ) in form.immediate_notification.choices
 
@@ -941,8 +957,8 @@ def test_settings_ticket_permissions(session: Session) -> None:
     form.on_request()
 
     assert form.permissions.choices == [
-        (p_2.id.hex, 'FRM: ABC'),
-        (p_1.id.hex, 'PER'),
+        SelectChoice(p_2.id.hex, 'FRM: ABC'),
+        SelectChoice(p_1.id.hex, 'PER'),
     ]
     assert form.permissions.default == [p_2.id.hex, p_1.id.hex]
 
@@ -981,8 +997,7 @@ def test_ticket_assignment_form(session: Session) -> None:
         event.remove(connection, 'before_cursor_execute', count_query)
 
     assert len(statements) == 1
-    choices = cast(list[tuple[str, str]], form.user.choices)
-    names = sorted(name for _, name in choices)
+    names = sorted(choice.label for choice in form.user.choices)
     assert names == ['a (A)', 'e']
     assert form.username == 'a'
 

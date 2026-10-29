@@ -1,5 +1,6 @@
 from datetime import datetime, time
 from markupsafe import Markup
+from wtforms import SelectChoice
 
 from onegov.form import render_field
 from onegov.form.display import VideoURLFieldRenderer
@@ -8,7 +9,6 @@ from onegov.form.display import VideoURLFieldRenderer
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from wtforms import Field
-    from wtforms.fields.choices import _Choice
 else:
     Field = object
 
@@ -19,7 +19,7 @@ class MockField(Field):
         self,
         type: str,
         data: Any,
-        choices: list[_Choice] | None = None
+        choices: list[SelectChoice] | None = None
     ) -> None:
 
         self.type = type
@@ -30,9 +30,9 @@ class MockField(Field):
             self.choices = choices
         else:
             if isinstance(data, str):
-                self.choices = [(data, data)]
+                self.choices = [SelectChoice(data)]
             elif isinstance(data, list):
-                self.choices = [(c, c) for c in data]
+                self.choices = [SelectChoice(c) for c in data]
 
 
 def test_render_textfields() -> None:
@@ -97,7 +97,7 @@ def test_render_multi_checkbox_field() -> None:
         MockField('MultiCheckboxField', ['a', 'b'])
     ) == '✓ a<br>✓ b'
     assert render_field(
-        MockField('MultiCheckboxField', ['c'], [('a', 'a')])
+        MockField('MultiCheckboxField', ['c'], [SelectChoice('a')])
     ) == '✓ ? (c)'
 
 

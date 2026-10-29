@@ -20,11 +20,13 @@ from wtforms.fields import EmailField
 from wtforms.fields import FieldList
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.meta import DefaultMeta
 from wtforms.validators import InputRequired, DataRequired
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import SupportsItems
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from contextlib import AbstractContextManager as ContextManager
@@ -147,6 +149,18 @@ class Form(BaseForm):
     option will make credit card payments mandatory.
 
     """
+
+    class Meta(DefaultMeta):
+        def render_field(
+            self,
+            field: Field,
+            render_kw: SupportsItems[str, Any]
+        ) -> Markup:
+            # HACK: Make sure choices callbacks get invoked before
+            #       field.render_kw gets accessed, so these callbacks
+            #       can modify them if they want
+            getattr(field, 'choices', None)
+            return super().render_field(field, render_kw)
 
     fieldsets: list[Fieldset]
     hidden_fields: set[str]

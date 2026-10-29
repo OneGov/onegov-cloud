@@ -4,6 +4,7 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org import _
 from wtforms.validators import InputRequired
 from wtforms.fields import EmailField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from onegov.org.utils import extract_categories_and_subcategories
@@ -11,7 +12,20 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.org.app import OrgRequest
-    from wtforms.fields.choices import _Choice
+
+
+# FIXME: Would a TreeSelectField be better here?
+def organisations_multiple_choices(
+    form: PersonForm,
+    field: ChosenSelectMultipleField
+) -> list[SelectChoice]:
+    categories, subcategories = extract_categories_and_subcategories(
+        form.request.app.org.organisation_hierarchy)
+    choices: list[SelectChoice] = []
+    for cat, sub in zip(categories, subcategories):
+        choices.append(SelectChoice(cat))
+        choices.extend(SelectChoice(f'-{s}') for s in sub)
+    return choices
 
 
 class PersonForm(Form):
@@ -29,7 +43,7 @@ class PersonForm(Form):
     organisations_multiple = ChosenSelectMultipleField(
         label=_('Organisation'),
         description=_('Select the organisations this person belongs to'),
-        choices=[],
+        choices=organisations_multiple_choices,
     )
 
     email = EmailField(_('E-Mail'))
@@ -72,16 +86,5 @@ class PersonForm(Form):
     )
 
     def on_request(self) -> None:
-        choices: list[_Choice] = []
-        categories, subcategories = extract_categories_and_subcategories(
-            self.request.app.org.organisation_hierarchy)
-
-        for cat, sub in zip(categories, subcategories):
-            choices.append((cat, cat))
-            choices.extend((f'-{s}', f'- {s}') for s in sub)
-
-        if not choices:
+        if not self.organisations_multiple.choices:
             self.delete_field('organisations_multiple')
-            return
-
-        self.organisations_multiple.choices = choices

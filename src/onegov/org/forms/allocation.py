@@ -4,11 +4,12 @@ from functools import cached_property
 from datetime import date, datetime, time, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY
-from uuid import UUID, uuid4
+from uuid import uuid4
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
 
@@ -16,6 +17,7 @@ from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.filters import as_float
+from onegov.form.utils import coerce_uuid
 from onegov.form.validators import ValidDateRange
 from onegov.org import _
 from onegov.org.forms.util import WEEKDAYS
@@ -41,6 +43,38 @@ def choices_as_integer(choices: Iterable[str] | None) -> list[int] | None:
     return [int(c) for c in choices]
 
 
+def rules_choices(
+    form: BatchCopyAllocationRulesForm,
+    field: MultiCheckboxField
+) -> list[SelectChoice]:
+    rules = form.model.content.get('rules', ())
+    if not form.request.POST:
+        field.data = [rule['id'] for rule in rules]
+    return [SelectChoice(rule['id'], rule['title']) for rule in rules]
+
+
+def resources_choices(
+    form: BatchCopyAllocationRulesForm,
+    field: MultiCheckboxField
+) -> list[SelectChoice]:
+    default_group = form.request.translate(_('General'))
+    query = (
+        ResourceCollection(form.request.app.libres_context)
+        .query()
+        .with_entities(Resource.id, Resource.group, Resource.title)
+        .filter(Resource.type == form.model.type)
+        .filter(Resource.id != form.model.id)
+        .order_by(Resource.group, Resource.title)
+    )
+    return [
+        SelectChoice(
+            resource_id.hex,
+            f'{group or default_group} - {title}'
+        )
+        for resource_id, group, title in query
+    ]
+
+
 class BatchCopyAllocationRulesForm(Form):
 
     if TYPE_CHECKING:
@@ -49,38 +83,16 @@ class BatchCopyAllocationRulesForm(Form):
 
     rules = MultiCheckboxField(
         label=_('Availability periods'),
-        choices=(),
+        choices=rules_choices,
         validators=[InputRequired()],
     )
 
     resources = MultiCheckboxField(
         label=_('Target resources'),
-        choices=(),
-        coerce=lambda value: (
-            UUID(value) if isinstance(value, str) else value
-        ),
+        choices=resources_choices,
+        coerce=coerce_uuid,
         validators=[InputRequired()],
     )
-
-    def on_request(self) -> None:
-        rules = self.model.content.get('rules', ())
-        self.rules.choices = [(rule['id'], rule['title']) for rule in rules]
-        if not self.request.POST:
-            self.rules.data = [rule['id'] for rule in rules]
-
-        default_group = self.request.translate(_('General'))
-        query = (
-            ResourceCollection(self.request.app.libres_context)
-            .query()
-            .with_entities(Resource.id, Resource.group, Resource.title)
-            .filter(Resource.type == self.model.type)
-            .filter(Resource.id != self.model.id)
-            .order_by(Resource.group, Resource.title)
-        )
-        self.resources.choices = [
-            (resource_id.hex, f'{group or default_group} - {title}')
-            for resource_id, group, title in query
-        ]
 
 
 class AllocationFormHelpers:
@@ -188,7 +200,7 @@ class AllocationRuleForm(Form):
         validators=[InputRequired()],
         fieldset=_('Period'),
         default='no',
-        choices=(
+        choices=map(SelectChoice.from_input, (
             ('no', _("Don't extend this availability period automatically")),
             ('daily', _('Extend by one day at midnight')),
             ('monthly', _('Extend by one month at the end of the month')),
@@ -197,7 +209,7 @@ class AllocationRuleForm(Form):
                 'yearly_scheduled',
                 _('Extend by one year at a given date')
             )
-        ))
+        )))
 
     extend_on = DateField(
         label=_('Extend on'),
@@ -338,7 +350,10 @@ class AllocationForm(Form, AllocationFormHelpers):
 
     except_for = MultiCheckboxField(
         label=_('Except for'),
-        choices=WEEKDAYS,
+        choices=[
+            SelectChoice(str(number), label)
+            for number, label in WEEKDAYS
+        ],
         coerce=int,
         render_kw={
             'prefix_label': False,
@@ -350,8 +365,8 @@ class AllocationForm(Form, AllocationFormHelpers):
     on_holidays = RadioField(
         label=_('On holidays'),
         choices=(
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ),
         default='yes',
         fieldset=_('Date'))
@@ -359,8 +374,8 @@ class AllocationForm(Form, AllocationFormHelpers):
     during_school_holidays = RadioField(
         label=_('During school holidays'),
         choices=(
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ),
         default='yes',
         fieldset=_('Date'))
@@ -371,10 +386,10 @@ class AllocationForm(Form, AllocationFormHelpers):
         default='inherit',
         validators=[InputRequired()],
         choices=(
-            ('inherit', _('Inherit from resource')),
-            ('free', _('Free of charge')),
-            ('per_item', _('Per item')),
-            ('per_hour', _('Per hour'))
+            SelectChoice('inherit', _('Inherit from resource')),
+            SelectChoice('free', _('Free of charge')),
+            SelectChoice('per_item', _('Per item')),
+            SelectChoice('per_hour', _('Per hour'))
         )
     )
 
@@ -412,9 +427,9 @@ class AllocationForm(Form, AllocationFormHelpers):
     access = RadioField(
         label=_('Access'),
         choices=(
-            ('public', _('Public')),
-            ('private', _('Only by privileged users')),
-            ('member', _('Only by privileged users and members')),
+            SelectChoice('public', _('Public')),
+            SelectChoice('private', _('Only by privileged users')),
+            SelectChoice('member', _('Only by privileged users and members')),
         ),
         default='public',
         fieldset=_('Security')
@@ -547,10 +562,10 @@ class AllocationEditForm(Form, AllocationFormHelpers):
         default='inherit',
         validators=[InputRequired()],
         choices=(
-            ('inherit', _('Inherit from resource')),
-            ('free', _('Free of charge')),
-            ('per_item', _('Per item')),
-            ('per_hour', _('Per hour'))
+            SelectChoice('inherit', _('Inherit from resource')),
+            SelectChoice('free', _('Free of charge')),
+            SelectChoice('per_item', _('Per item')),
+            SelectChoice('per_hour', _('Per hour'))
         )
     )
 
@@ -584,9 +599,9 @@ class AllocationEditForm(Form, AllocationFormHelpers):
     access = RadioField(
         label=_('Access'),
         choices=(
-            ('public', _('Public')),
-            ('private', _('Only by privileged users')),
-            ('member', _('Only by privileged users and members')),
+            SelectChoice('public', _('Public')),
+            SelectChoice('private', _('Only by privileged users')),
+            SelectChoice('member', _('Only by privileged users and members')),
         ),
         default='public',
         fieldset=_('Security')
@@ -700,8 +715,8 @@ class RoomAllocationForm(AllocationForm):
     as_whole_day = RadioField(
         label=_('Whole day'),
         choices=[
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ],
         default='no',
         fieldset=_('Time')
@@ -726,8 +741,8 @@ class RoomAllocationForm(AllocationForm):
     is_partly_available = RadioField(
         label=_('May be partially reserved'),
         choices=[
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ],
         default='yes',
         fieldset=_('Time'),
@@ -855,8 +870,8 @@ class RoomAllocationEditForm(AllocationEditForm):
     as_whole_day = RadioField(
         label=_('Whole day'),
         choices=[
-            ('yes', _('Yes')),
-            ('no', _('No'))
+            SelectChoice('yes', _('Yes')),
+            SelectChoice('no', _('No'))
         ],
         default='yes',
         fieldset=_('Time')

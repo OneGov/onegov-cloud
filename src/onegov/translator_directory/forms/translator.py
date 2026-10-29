@@ -46,6 +46,7 @@ from wtforms.fields import EmailField
 from wtforms.fields import FloatField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -63,7 +64,6 @@ if TYPE_CHECKING:
     from onegov.translator_directory.models.language import Language
     from onegov.translator_directory.request import TranslatorAppRequest
     from sqlalchemy.orm import Query
-    from wtforms.fields.choices import _Choice
 
 
 class FormChoicesMixin:
@@ -84,21 +84,23 @@ class FormChoicesMixin:
         return translators.available_additional_professional_guilds
 
     @cached_property
-    def language_choices(self) -> list[_Choice]:
+    def language_choices(self) -> list[SelectChoice]:
         return [
-            (str(lang.id), lang.name) for lang in self.available_languages
+            SelectChoice(str(lang.id), lang.name)
+            for lang in self.available_languages
         ]
 
     @cached_property
-    def certificate_choices(self) -> list[_Choice]:
+    def certificate_choices(self) -> list[SelectChoice]:
         return [
-            (str(cert.id), cert.name) for cert in self.available_certificates
+            SelectChoice(str(cert.id), cert.name)
+            for cert in self.available_certificates
         ]
 
     @cached_property
-    def gender_choices(self) -> list[_Choice]:
+    def gender_choices(self) -> list[SelectChoice]:
         return [
-            (id_, self.request.translate(choice))
+            SelectChoice(id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
         ]
 
@@ -109,28 +111,31 @@ class FormChoicesMixin:
         ]
 
     @cached_property
-    def interpret_types_choices(self) -> list[_Choice]:
+    def interpret_types_choices(self) -> list[SelectChoice]:
         return [
-            (k, self.request.translate(v))
+            SelectChoice(k, self.request.translate(v))
             for k, v in INTERPRETING_TYPES.items()
         ]
 
     @cached_property
-    def guilds_choices(self) -> list[_Choice]:
-        result: list[_Choice] = [
-            (k, self.request.translate(v))
+    def guilds_choices(self) -> list[SelectChoice]:
+        result = [
+            SelectChoice(k, self.request.translate(v))
             for k, v in PROFESSIONAL_GUILDS.items()
         ]
-        result.extend((k, k) for k in self.available_additional_guilds)
-        return sorted(result, key=lambda x: x[1].upper())
+        result.extend(
+            SelectChoice(k)
+            for k in self.available_additional_guilds
+        )
+        result.sort(key=lambda x: x.label.upper())
+        return result
 
     @cached_property
-    def admission_choices(self) -> list[_Choice]:
-        admissions = tuple(
-            (k, self.request.translate(v))
+    def admission_choices(self) -> list[SelectChoice]:
+        return sorted((
+            SelectChoice(k, self.request.translate(v))
             for k, v in ADMISSIONS.items()
-        )
-        return sorted(admissions, key=lambda x: x[1].upper())
+        ), key=lambda x: x.label.upper())
 
     @property
     def lang_collection(self) -> LanguageCollection:
@@ -168,7 +173,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     admission = RadioField(
         label=_('Admission'),
         choices=tuple(
-            (id_, label) for id_, label in ADMISSIONS.items()
+            SelectChoice(id_, label) for id_, label in ADMISSIONS.items()
         ),
         default=next(iter(ADMISSIONS))
     )
@@ -359,7 +364,10 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     expertise_professional_guilds = MultiCheckboxField(
         label=_('Expertise by professional guild'),
-        choices=list(PROFESSIONAL_GUILDS.items())
+        choices=[
+            SelectChoice(value, label)
+            for value, label in PROFESSIONAL_GUILDS.items()
+        ]
     )
 
     expertise_professional_guilds_other = TagsField(
@@ -368,7 +376,10 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     expertise_interpreting_types = MultiCheckboxField(
         label=_('Expertise by interpreting type'),
-        choices=list(INTERPRETING_TYPES.items())
+        choices=[
+            SelectChoice(value, label)
+            for value, label in INTERPRETING_TYPES.items()
+        ]
     )
 
     proof_of_preconditions = StringField(
@@ -638,8 +649,8 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
     order_by = RadioField(
         label=_('Order by'),
         choices=(
-            (order_cols[0], _('Last name')),
-            (order_cols[1], _('Drive distance')),
+            SelectChoice(order_cols[0], _('Last name')),
+            SelectChoice(order_cols[1], _('Drive distance')),
         ),
         default=order_cols[0]
     )
@@ -647,8 +658,8 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
     order_desc = RadioField(
         label=_('Order direction'),
         choices=(
-            ('0', _('Ascending')),
-            ('1', _('Descending'))
+            SelectChoice('0', _('Ascending')),
+            SelectChoice('1', _('Descending'))
         ),
         default='0'
     )
@@ -713,14 +724,9 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 class MailTemplatesForm(Form):
     """ Defines the form for generating mail templates. """
 
-    request: TranslatorAppRequest
-
     templates = ChosenSelectField(
         label=_('Chose a mail template to generate:'),
-        choices=[]
-    )
-
-    def on_request(self) -> None:
-        self.templates.choices = [
-            (t, t) for t in self.request.app.mail_templates
+        choices=lambda form, field: [
+            SelectChoice(t) for t in form.request.app.mail_templates
         ]
+    )

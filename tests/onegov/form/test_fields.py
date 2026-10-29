@@ -26,6 +26,7 @@ from onegov.form.validators import (
     ValidPhoneNumber, WhitelistedMimeType, MIME_TYPES_JSON, MIME_TYPES_PDF)
 from pytest import raises
 from unittest.mock import patch
+from wtforms import SelectChoice
 from wtforms.validators import Optional, DataRequired
 from wtforms.validators import URL
 
@@ -438,7 +439,7 @@ def test_upload_multiple_field() -> None:
 def test_multi_checkbox_field_disabled() -> None:
     form = Form()
     field = MultiCheckboxField(
-        choices=(('a', 'b'),),
+        choices=(SelectChoice('a', 'b'),),
         render_kw={'disabled': True}
     )
     field = field.bind(form, 'choice')  # type: ignore[attr-defined]
@@ -449,14 +450,14 @@ def test_multi_checkbox_field_disabled() -> None:
 
 def test_ordered_multi_checkbox_field() -> None:
     ordinary = MultiCheckboxField(choices=[
-        ('c', 'C'),
-        ('b', 'B'),
-        ('a', 'A')
+        SelectChoice('c', 'C'),
+        SelectChoice('b', 'B'),
+        SelectChoice('a', 'A')
     ])
     ordered = OrderedMultiCheckboxField(choices=[
-        ('c', 'C'),
-        ('b', 'B'),
-        ('a', 'A')
+        SelectChoice('c', 'C'),
+        SelectChoice('b', 'B'),
+        SelectChoice('a', 'A')
     ])
     ordinary = ordinary.bind(Form(), 'choices')  # type: ignore[attr-defined]
     ordered = ordered.bind(Form(), 'choices')  # type: ignore[attr-defined]
@@ -626,7 +627,7 @@ def test_phone_number_field() -> None:
 
 def test_chosen_select_field() -> None:
     form = Form()
-    field = ChosenSelectField(choices=(('a', 'b'),))
+    field = ChosenSelectField(choices=(SelectChoice('a', 'b'),))
     field = field.bind(form, 'choice')  # type: ignore[attr-defined]
 
     field.data = ''
@@ -637,7 +638,7 @@ def test_chosen_select_field() -> None:
 
 def test_chosen_select_multiple_field() -> None:
     form = Form()
-    field = ChosenSelectMultipleField(choices=(('a', 'b'),))
+    field = ChosenSelectMultipleField(choices=(SelectChoice('a', 'b'),))
     field = field.bind(form, 'choice')  # type: ignore[attr-defined]
 
     field.data = ''
@@ -721,7 +722,7 @@ def test_translated_select_field() -> None:
     assert field()
 
     form = Form()
-    field = TranslatedSelectField(choices=[('a', 'b')])
+    field = TranslatedSelectField(choices=[SelectChoice('a', 'b')])
     field = field.bind(form, 'choice')  # type: ignore[attr-defined]
     field.data = ''
     field.meta.request = Bunch(translate=lambda x: 'xx')

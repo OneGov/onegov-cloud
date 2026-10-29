@@ -7,7 +7,8 @@ from onegov.org.forms.widgets import UploadOrLinkExistingFileWidget
 from onegov.org.forms.widgets import UploadOrSelectExistingFileWidget
 from onegov.org.forms.widgets import UploadOrSelectExistingMultipleFilesWidget
 from onegov.org.utils import annotate_html, remove_empty_paragraphs
-from operator import itemgetter
+from operator import attrgetter
+from wtforms.fields import SelectChoice
 
 
 from typing import Any, TYPE_CHECKING
@@ -34,17 +35,17 @@ class HtmlField(HtmlFieldBase):
 
 def file_choices_from_collection(
     collection: FileCollection[Any]
-) -> list[tuple[str, str]]:
+) -> list[SelectChoice]:
     model_class = collection.model_class
     return sorted(
         (
-            (file_id, name)
+            SelectChoice(file_id, name)
             for file_id, name in collection.query().with_entities(
                 model_class.id,
                 model_class.name,
             )
         ),
-        key=itemgetter(1)
+        key=attrgetter('label')
     )
 
 
@@ -159,7 +160,7 @@ class UploadOrSelectExistingFileField(UploadOrLinkExistingFileField):
         file_collection: type[FileCollection[Any]] = FileCollection,
         file_type: str = 'general',
         allow_duplicates: bool = False,
-        _choices: list[tuple[str, str]] | None = None,
+        _choices: list[SelectChoice] | None = None,
         **kwargs: Any
     ):
         super().__init__(

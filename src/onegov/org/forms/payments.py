@@ -6,7 +6,7 @@ from onegov.org import _
 from onegov.reservation import Resource
 from onegov.ticket import handlers as ticket_handlers
 from operator import itemgetter
-from wtforms import DateField, RadioField
+from wtforms import DateField, RadioField, SelectChoice
 from wtforms.validators import Optional
 
 
@@ -162,9 +162,9 @@ class TicketInvoiceSearchForm(Form):
         label=_('Status'),
         fieldset=_('Filter Invoices'),
         choices=[
-            ('None', _('All')),
-            ('False', _('Uninvoiced')),
-            ('True', _('Invoiced')),
+            SelectChoice('None', _('All')),
+            SelectChoice('False', _('Uninvoiced')),
+            SelectChoice('True', _('Invoiced')),
         ],
         coerce=coerce_optional_bool,
         default=None,
@@ -174,9 +174,9 @@ class TicketInvoiceSearchForm(Form):
         label=_('Net Amount'),
         fieldset=_('Filter Invoices'),
         choices=[
-            ('None', _('All')),
-            ('True', '> 0.00'),
-            ('False', '≤ 0.00'),
+            SelectChoice('None', _('All')),
+            SelectChoice('True', '> 0.00'),
+            SelectChoice('False', '≤ 0.00'),
         ],
         coerce=coerce_optional_bool,
         default=None,
@@ -185,7 +185,7 @@ class TicketInvoiceSearchForm(Form):
     ticket_group = TreeSelectMultipleField(
         label=_('Ticket category'),
         fieldset=_('Filter Invoices'),
-        choices=[],
+        choices=lambda form, field: get_ticket_group_choices(form.request),
     )
 
     ticket_start_date = DateField(
@@ -219,15 +219,12 @@ class TicketInvoiceSearchForm(Form):
     reservation_reference_date = RadioField(
         label=_('Reference date'),
         choices=(
-            ('final', _('Final reservation date')),
-            ('any', _('Any reservation date')),
+            SelectChoice('final', _('Final reservation date')),
+            SelectChoice('any', _('Any reservation date')),
         ),
         fieldset=_('Filter by Reservation Date'),
         default='final',
     )
-
-    def on_request(self) -> None:
-        self.ticket_group.set_choices(get_ticket_group_choices(self.request))
 
     def apply_model(self, model: TicketInvoiceCollection) -> None:
         """Populate the form fields from the model's filter values."""
@@ -264,10 +261,10 @@ class PaymentSearchForm(Form):
         label=_('Status'),
         fieldset=_('Filter Payments'),
         choices=[
-            ('', _('All')),
-            ('open', _('Open')),
-            ('paid', _('Paid')),
-            ('invoiced', _('Invoiced'))
+            SelectChoice('', _('All')),
+            SelectChoice('open', _('Open')),
+            SelectChoice('paid', _('Paid')),
+            SelectChoice('invoiced', _('Invoiced'))
         ],
         default='',
     )
@@ -276,9 +273,9 @@ class PaymentSearchForm(Form):
         label=_('Payment Type'),
         fieldset=_('Filter Payments'),
         choices=[
-            ('', _('All')),
-            ('manual', _('Manual')),
-            ('provider', _('Payment Provider'))
+            SelectChoice('', _('All')),
+            SelectChoice('manual', _('Manual')),
+            SelectChoice('provider', _('Payment Provider'))
         ],
         default='',
     )
@@ -286,7 +283,7 @@ class PaymentSearchForm(Form):
     ticket_group = TreeSelectMultipleField(
         label=_('Ticket category'),
         fieldset=_('Filter Payments'),
-        choices=[],
+        choices=lambda form, field: get_ticket_group_choices(form.request),
     )
 
     ticket_start_date = DateField(
@@ -320,8 +317,8 @@ class PaymentSearchForm(Form):
     reservation_reference_date = RadioField(
         label=_('Reference date'),
         choices=(
-            ('final', _('Final reservation date')),
-            ('any', _('Any reservation date')),
+            SelectChoice('final', _('Final reservation date')),
+            SelectChoice('any', _('Any reservation date')),
         ),
         fieldset=_('Filter by Reservation Date'),
         default='final',
@@ -351,6 +348,3 @@ class PaymentSearchForm(Form):
         model.payment_type = self.payment_type.data or None
         # Reset to the first page when filters change
         model.page = 0
-
-    def on_request(self) -> None:
-        self.ticket_group.set_choices(get_ticket_group_choices(self.request))

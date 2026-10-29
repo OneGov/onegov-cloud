@@ -3,6 +3,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.fsi import _
 from onegov.fsi.models import CourseAttendee
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectField
 from wtforms.validators import InputRequired
 
@@ -12,7 +13,6 @@ if TYPE_CHECKING:
     from onegov.fsi.collections.audit import AuditCollection
     from onegov.fsi.request import FsiRequest
     from uuid import UUID
-    from wtforms.fields.choices import _Choice
 
 
 class AuditForm(Form):
@@ -41,8 +41,8 @@ class AuditForm(Form):
     )
 
     @property
-    def none_choice(self) -> tuple[str, str]:
-        return '', self.request.translate(_('None'))
+    def none_choice(self) -> SelectChoice:
+        return SelectChoice('', self.request.translate(_('None')))
 
     @cached_property
     def distinct_organisations(self) -> tuple[str, ...]:
@@ -64,14 +64,18 @@ class AuditForm(Form):
         # NOTE: We assume that every user is a CourseAttendee
         return self.request.attendee  # type:ignore[return-value]
 
-    def get_course_choices(self) -> list[_Choice]:
+    def get_course_choices(self) -> list[SelectChoice]:
         if not self.courses:
             return [self.none_choice]
-        return [(str(course_id), name) for course_id, name in self.courses]
+        return [
+            SelectChoice(str(course_id), name)
+            for course_id, name in self.courses
+        ]
 
     def for_admins(self) -> None:
         self.organisations.choices = [
-            (e, e) for e in self.distinct_organisations] or [self.none_choice]
+            SelectChoice(e) for e in self.distinct_organisations
+        ] or [self.none_choice]
         self.organisations.validators = []
         if self.model.organisations and self.request.method == 'GET':
             self.organisations.data = self.model.organisations
@@ -79,8 +83,9 @@ class AuditForm(Form):
     def for_editors(self) -> None:
         assert self.att is not None
         permissions = self.att.permissions or []
-        self.organisations.choices = (
-            sorted((p, p) for p in permissions) or [self.none_choice])
+        self.organisations.choices = [
+            SelectChoice(p) for p in sorted(permissions)
+        ] or [self.none_choice]
 
         if self.model.organisations and self.request.method == 'GET':
             self.organisations.data = self.model.organisations
@@ -91,7 +96,7 @@ class AuditForm(Form):
         field = self[name]
         if not field.data:
             assert hasattr(field, 'choices')
-            field.data = [value for value, label in field.choices]
+            field.data = [choice.value for choice in field.choices]
 
     def on_request(self) -> None:
         self.course_id.choices = self.get_course_choices()
@@ -99,8 +104,10 @@ class AuditForm(Form):
             self.hide(self.course_id)
 
         self.hide(self.letter)
-        self.letter.choices = [(le, le) for le in self.model.used_letters]
-        self.letter.choices.insert(0, self.none_choice)
+        self.letter.choices = [
+            self.none_choice,
+            *(SelectChoice(le) for le in self.model.used_letters)
+        ]
         if self.model.letter:
             self.letter.data = self.model.letter
         else:

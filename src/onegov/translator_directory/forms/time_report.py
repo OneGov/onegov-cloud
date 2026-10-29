@@ -22,6 +22,7 @@ from sedate import replace_timezone, to_timezone
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import IntegerField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -222,27 +223,28 @@ class TranslatorTimeReportForm(Form):
             )
 
     def on_request(self) -> None:
-
         self.assignment_type.choices = [
-            (key, self.request.translate(value))
+            SelectChoice(key, self.request.translate(value))
             for key, value in TIME_REPORT_INTERPRETING_TYPES.items()
         ]
-        choices = self.assignment_location.choices = [(key, name)
+        choices = [SelectChoice(key, name)
             for key, (name, _) in ASSIGNMENT_LOCATIONS.items()
         ]
-        choices.insert(0, ('', ''))
+        choices.insert(0, SelectChoice(''))
         choices.append(
-            (
+            SelectChoice(
                 'other',
                 self.request.translate(
                     _('Other location (please enter address in next field)')
                 ),
             )
         )
-        finanzstelle_choices = self.finanzstelle.choices = [
-            (key, fs.name) for key, fs in FINANZSTELLE.items()
+        self.assignment_location.choices = choices
+        finanzstelle_choices = [
+            SelectChoice(key, fs.name) for key, fs in FINANZSTELLE.items()
         ]
-        finanzstelle_choices.insert(0, ('', ''))
+        finanzstelle_choices.insert(0, SelectChoice(''))
+        self.finanzstelle.choices = finanzstelle_choices
 
     def get_hourly_rate(self, translator: Translator) -> Decimal:
         """Determine hourly rate based on translator certification."""

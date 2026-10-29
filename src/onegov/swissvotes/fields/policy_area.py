@@ -2,6 +2,7 @@ from copy import deepcopy
 from json import dumps
 from onegov.swissvotes import _
 from onegov.swissvotes.models import PolicyArea
+from wtforms.fields import SelectChoice
 from wtforms.fields import SelectMultipleField
 from wtforms.widgets import Select
 
@@ -19,7 +20,8 @@ if TYPE_CHECKING:
     from typing import Self
     from typing import TypedDict
     from markupsafe import Markup
-    from wtforms.fields.choices import SelectFieldBase
+    from wtforms.datalist import DataList
+    from wtforms.fields.choices import Choice, SelectFieldBase
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext
     from wtforms.meta import DefaultMeta
@@ -56,9 +58,7 @@ class PolicyAreaWidget(Select):
     @classmethod
     def render_option(
         cls,
-        value: str,  # type:ignore[override]
-        label: str,
-        selected: bool,
+        choice: Choice,
         **kwargs: object
     ) -> Markup:
         """ Adds a level specific class to each option.
@@ -67,16 +67,14 @@ class PolicyAreaWidget(Select):
         javascript.
 
         """
-        kwargs['class'] = f'level-{PolicyArea(value).level}'
-        return super().render_option(value, label, selected, **kwargs)
+        kwargs['class'] = f'level-{PolicyArea(choice.value).level}'
+        return super().render_option(choice, **kwargs)
 
 
 class PolicyAreaField(SelectMultipleField):
     """ A select field with React Dropdown Tree support. """
 
     data: list[str] | None
-    choices: list[tuple[str, str]]  # type:ignore[assignment]
-
     widget = PolicyAreaWidget(multiple=True)
 
     if TYPE_CHECKING:
@@ -90,10 +88,12 @@ class PolicyAreaField(SelectMultipleField):
             description: str = '',
             id: str | None = None,
             default: object | None = None,
+            invalid_value_message: str | None = None,
             widget: Widget[Self] | None = None,
             option_widget: Widget[SelectFieldBase._Option] | None = None,
             render_kw: dict[str, Any] | None = None,
             name: str | None = None,
+            datalist: DataList | str | None = None,
             _form: BaseForm | None = None,
             _prefix: str = '',
             _translations: _SupportsGettextAndNgettext | None = None,
@@ -134,12 +134,13 @@ class PolicyAreaField(SelectMultipleField):
 
         """
         self._tree = value
+        choices = []
 
         def add_choices(item: PolicyAreaTreeNode) -> None:
-            self.choices.append((item['value'], item['label']))
+            choices.append(SelectChoice(item['value'], item['label']))
             for child in item['children']:
                 add_choices(child)
 
-        self.choices = []
         for item in value:
             add_choices(item)
+        self.choices = choices

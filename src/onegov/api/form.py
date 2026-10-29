@@ -103,7 +103,12 @@ def adapt_regexp(validator: Regexp) -> Any:
 
 @registry.validator(NumberRange)
 def adapt_number_range(validator: NumberRange) -> Any:
-    return Field(ge=validator.min, le=validator.max)
+    min, max = validator.min, validator.max
+    if callable(min):
+        min = min()
+    if callable(max):
+        max = max()
+    return Field(ge=min, le=max)
 
 
 @registry.validator(ValidDateRange)

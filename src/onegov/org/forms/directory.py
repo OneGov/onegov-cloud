@@ -23,6 +23,7 @@ from sqlalchemy.orm import object_session
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
+from wtforms.fields import SelectChoice
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
@@ -74,8 +75,8 @@ class DirectoryBaseForm(Form):
         label=_('Position'),
         fieldset=_('Further Information'),
         choices=[
-            ('above', _('Above the entries')),
-            ('below', _('Below the entries'))
+            SelectChoice('above', _('Above the entries')),
+            SelectChoice('below', _('Below the entries'))
         ],
         default='below'
     )
@@ -99,15 +100,15 @@ class DirectoryBaseForm(Form):
         label=_('Map'),
         fieldset=_('General'),
         choices=[
-            (
+            SelectChoice(
                 'no',
                 _('Do not show map')
             ),
-            (
+            SelectChoice(
                 'entry',
                 _('Show map only on entries')
             ),
-            (
+            SelectChoice(
                 'everywhere',
                 _('Show map in directory overview and on entries')
             ),
@@ -138,9 +139,9 @@ class DirectoryBaseForm(Form):
         label=_('Numbering'),
         fieldset=_('Display'),
         choices=[
-            ('none', _('None')),
-            ('standard', _('Standard')),
-            ('custom', _('Custom'))
+            SelectChoice('none', _('None')),
+            SelectChoice('standard', _('Standard')),
+            SelectChoice('custom', _('Custom'))
         ],
         default='none')
 
@@ -208,8 +209,8 @@ class DirectoryBaseForm(Form):
         fieldset=_('Address Block'),
         default='auto',
         choices=(
-            ('auto', _('The first line of the address')),
-            ('fixed', _('Static title')),
+            SelectChoice('auto', _('The first line of the address')),
+            SelectChoice('fixed', _('Static title')),
         )
     )
 
@@ -227,8 +228,8 @@ class DirectoryBaseForm(Form):
         label=_('Marker Color'),
         fieldset=_('Marker'),
         choices=[
-            ('default', _('Default')),
-            ('custom', _('Custom'))
+            SelectChoice('default', _('Default')),
+            SelectChoice('custom', _('Custom'))
         ],
         default='default')
 
@@ -241,8 +242,8 @@ class DirectoryBaseForm(Form):
         label=_('Order'),
         fieldset=_('Order'),
         choices=[
-            ('by-title', _('By title')),
-            ('by-format', _('By format'))
+            SelectChoice('by-title', _('By title')),
+            SelectChoice('by-format', _('By format'))
         ],
         default='by-title')
 
@@ -257,8 +258,8 @@ class DirectoryBaseForm(Form):
         label=_('Direction'),
         fieldset=_('Order'),
         choices=[
-            ('asc', _('Ascending')),
-            ('desc', _('Descending'))
+            SelectChoice('asc', _('Ascending')),
+            SelectChoice('desc', _('Descending'))
         ],
         default='asc')
 
@@ -306,8 +307,8 @@ class DirectoryBaseForm(Form):
         label=_('Price'),
         fieldset=_('New entries'),
         choices=[
-            ('free', _('Free of charge')),
-            ('paid', _('Paid'))
+            SelectChoice('free', _('Free of charge')),
+            SelectChoice('paid', _('Paid'))
         ],
         default='free',
         depends_on=('enable_submissions', 'y'))
@@ -385,9 +386,9 @@ class DirectoryBaseForm(Form):
     submitter_meta_fields = MultiCheckboxField(
         label=_('Information to be provided in addition to the E-mail'),
         choices=(
-            ('submitter_name', _('Name')),
-            ('submitter_address', _('Address')),
-            ('submitter_phone', _('Phone')),
+            SelectChoice('submitter_name', _('Name')),
+            SelectChoice('submitter_address', _('Address')),
+            SelectChoice('submitter_phone', _('Phone')),
         ),
         fieldset=_('Submitter')
     )
@@ -396,8 +397,8 @@ class DirectoryBaseForm(Form):
         label=_('Layout'),
         fieldset=_('Layout'),
         choices=[
-            ('default', _('Default')),
-            ('accordion', _('Accordion')),
+            SelectChoice('default', _('Default')),
+            SelectChoice('accordion', _('Accordion')),
         ],
         default='default')
 
@@ -781,8 +782,8 @@ class DirectoryImportForm(Form):
     import_config = RadioField(
         label=_('Apply directory configuration'),
         choices=(
-            ('yes', _('Yes, import configuration and entries')),
-            ('no', _('No, only import entries'))
+            SelectChoice('yes', _('Yes, import configuration and entries')),
+            SelectChoice('no', _('No, only import entries'))
         ),
         default='no',
         validators=[InputRequired()]
@@ -791,8 +792,8 @@ class DirectoryImportForm(Form):
     mode = RadioField(
         label=_('Mode'),
         choices=(
-            ('new', _('Only import new entries')),
-            ('replace', _('Replace all entries')),
+            SelectChoice('new', _('Only import new entries')),
+            SelectChoice('replace', _('Replace all entries')),
         ),
         default='new',
         validators=[InputRequired()]
