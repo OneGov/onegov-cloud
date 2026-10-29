@@ -57,7 +57,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
             Link(
                 _('Activate/deactivate modules'), request.link(
                     request.app.org, 'module-activation-settings'
-                ), attrs={'class': 'settings'}
+                ), attrs={'class': 'settings'},
+                icon='toggle-right'
             )
         )
 
@@ -66,7 +67,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
             Link(
                 _('Latest news'),
                 request.class_link(News, {'absorb': ''}),
-                attrs={'class': 'news'}
+                attrs={'class': 'news'},
+                icon='newspaper'
             )
         )
 
@@ -76,7 +78,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                     _('Newsletter'),
                     request.class_link(
                         NewsletterCollection),
-                    attrs={'class': 'newsletter'}
+                    attrs={'class': 'newsletter'},
+                    icon='mail'
                 )
             )
 
@@ -85,7 +88,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                 _('Events'),
                 request.class_link(
                     OccurrenceCollection),
-                attrs={'class': 'events'}
+                attrs={'class': 'events'},
+                icon='calendar'
             )
         )
 
@@ -94,7 +98,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                 _('Reservations'),
                 request.class_link(
                     ResourceCollection),
-                attrs={'class': 'reservations'}
+                attrs={'class': 'reservations'},
+                icon='calendar-check'
             )
         )
 
@@ -103,7 +108,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                 _('Directories'),
                 request.class_link(
                     DirectoryCollection),
-                attrs={'class': 'directories'}
+                attrs={'class': 'directories'},
+                icon='folder'
             )
         )
 
@@ -112,7 +118,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                 _('People'),
                 request.class_link(
                     PersonCollection),
-                attrs={'class': 'people'}
+                attrs={'class': 'people'},
+                icon='users'
             )
         )
 
@@ -121,7 +128,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                 _('Forms'),
                 request.class_link(
                     FormCollection),
-                attrs={'class': 'forms'}
+                attrs={'class': 'forms'},
+                icon='clipboard-list'
             )
         )
 
@@ -130,7 +138,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                 _('Surveys'),
                 request.class_link(
                     SurveyCollection),
-                attrs={'class': 'surveys'}
+                attrs={'class': 'surveys'},
+                icon='clipboard-check'
             )
         )
 
@@ -139,7 +148,8 @@ def get_modules(request: OrgRequest) -> LinkGroup:
                 _('Information architecture'),
                 request.class_link(
                     Organisation, name='information-architecture'),
-                attrs={'class': 'information-architecture'}
+                attrs={'class': 'information-architecture'},
+                icon='network'
             )
         )
 
@@ -164,13 +174,15 @@ def get_global_tools(
             Link(
                 _('User Profile'), request.link(
                     request.app.org, name='userprofile'
-                ), attrs={'class': 'profile'}
+                ), attrs={'class': 'profile'},
+                icon='user'
             ),
             Link(
                 _('Logout'), request.link(
                     Auth.from_request(
                         request, to=logout_path(request)), name='logout'
-                ), attrs={'class': 'logout'}
+                ), attrs={'class': 'logout'},
+                icon='log-out'
             ),
         ))
 
@@ -178,7 +190,8 @@ def get_global_tools(
         yield Link(
             _('Login'), request.link(
                 Auth.from_request_path(request), name='login'
-            ), attrs={'class': 'login'}
+            ), attrs={'class': 'login'},
+            icon='log-in'
         )
 
         if citizen_login_enabled and not request.authenticated_email:
@@ -196,14 +209,16 @@ def get_global_tools(
                 ), attrs={
                     'class': 'citizen-login',
                     'title': _('No registration necessary')
-                }
+                },
+                icon='key-round'
             )
 
         if request.app.enable_user_registration:
             yield Link(
                 _('Register'), request.link(
                     Auth.from_request_path(request), name='register'
-                ), attrs={'class': 'register'})
+                ), attrs={'class': 'register'},
+                icon='user-plus')
 
     # Management dropdown
     if request.is_manager:
@@ -212,14 +227,16 @@ def get_global_tools(
         links.append(
             Link(
                 _('Overview'), request.class_link(Dashboard),
-                attrs={'class': 'dashboard'}
+                attrs={'class': 'dashboard'},
+                icon='layout-dashboard'
             )
         )
 
         links.append(
             Link(
                 _('Timeline'), request.class_link(MessageCollection),
-                attrs={'class': 'timeline'}
+                attrs={'class': 'timeline'},
+                icon='history'
             )
         )
 
@@ -229,20 +246,23 @@ def get_global_tools(
                     _('Audit Trail'),
                     request.class_link(AuditEntryCollection),
                     attrs={'class': 'audit-trail'},
+                    icon='scroll-text',
                 )
             )
 
         links.append(
             Link(
                 _('Files'), request.class_link(GeneralFileCollection),
-                attrs={'class': 'files'}
+                attrs={'class': 'files'},
+                icon='folder-open'
             )
         )
 
         links.append(
             Link(
                 _('Images'), request.class_link(ImageFileCollection),
-                attrs={'class': 'images'}
+                attrs={'class': 'images'},
+                icon='images'
             )
         )
 
@@ -250,7 +270,8 @@ def get_global_tools(
             Link(
                 _('Payments'),
                 request.class_link(PaymentCollection),
-                attrs={'class': 'payment'}
+                attrs={'class': 'payment'},
+                icon='credit-card'
             )
         )
 
@@ -259,7 +280,8 @@ def get_global_tools(
                 Link(
                     _('Invoices'),
                     request.class_link(TicketInvoiceCollection),
-                    attrs={'class': 'invoice'}
+                    attrs={'class': 'invoice'},
+                    icon='receipt'
                 )
             )
 
@@ -270,14 +292,16 @@ def get_global_tools(
                         UserCollection,
                         variables={'active': '1'}
                     ),
-                    attrs={'class': 'user'}
+                    attrs={'class': 'user'},
+                    icon='user'
                 )
             )
 
             links.append(
                 Link(
                     _('User groups'), request.class_link(UserGroupCollection),
-                    attrs={'class': 'users'}
+                    attrs={'class': 'users'},
+                    icon='users'
                 )
             )
 
@@ -286,7 +310,8 @@ def get_global_tools(
                 Link(
                     _('Settings'), request.link(
                         request.app.org, 'settings'
-                    ), attrs={'class': 'settings'}
+                    ), attrs={'class': 'settings'},
+                    icon='settings'
                 )
             )
 
@@ -294,7 +319,8 @@ def get_global_tools(
                 Link(
                     _('Link Check'),
                     request.class_link(Organisation, name='link-check'),
-                    attrs={'class': 'link-check'}
+                    attrs={'class': 'link-check'},
+                    icon='link'
                 )
             )
 
@@ -329,7 +355,8 @@ def get_global_tools(
                 ),
                 attrs={
                     'class': ('my-tickets'),
-                }
+                },
+                icon='inbox'
             )
         )
 
@@ -342,7 +369,8 @@ def get_global_tools(
                 attrs={
                     'class': ('with-count', 'alert', 'open-tickets'),
                     'data-count': str(ticket_count.open)
-                }
+                },
+                icon='circle-dot'
             )
         )
 
@@ -355,7 +383,8 @@ def get_global_tools(
                 attrs={
                     'class': ('with-count', 'info', 'pending-tickets'),
                     'data-count': str(ticket_count.pending)
-                }
+                },
+                icon='clock'
             )
         )
 
@@ -368,7 +397,8 @@ def get_global_tools(
                 attrs={
                     'class': ('with-count', 'secondary', 'closed-tickets'),
                     'data-count': str(ticket_count.closed),
-                }
+                },
+                icon='circle-check'
             )
         )
 
@@ -395,13 +425,15 @@ def get_global_tools(
                     Auth.from_request(request, to=logout_path(request)),
                     name='citizen-logout'
                 ),
-                attrs={'class': 'logout'}
+                attrs={'class': 'logout'},
+                icon='log-out'
             )
 
             yield Link(
                 _('Overview'),
                 request.class_link(CitizenDashboard),
-                attrs={'class': 'dashboard'}
+                attrs={'class': 'dashboard'},
+                icon='layout-dashboard'
             )
 
         # NOTE: Only show this if we have at least one reservation
@@ -421,7 +453,8 @@ def get_global_tools(
                 ),
                 attrs={
                     'class': ('citizen-reservations'),
-                }
+                },
+                icon='calendar-check'
             )
 
         yield Link(
@@ -436,7 +469,8 @@ def get_global_tools(
             ),
             attrs={
                 'class': ('citizen-tickets'),
-            }
+            },
+            icon='ticket'
         )
 
 

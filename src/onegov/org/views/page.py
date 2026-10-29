@@ -71,18 +71,20 @@ def view_topic(
 
         layout.editbar_links.insert(
             len(layout.editbar_links) - 1,
-            Link(
+            CoreLink(
                 _('Sort'),
                 request.link(Editor('sort', self)),
-                classes=('sort-link', )
+                attrs={'class': 'sort-link'},
+                icon='arrow-up-down'
             )
         )
         layout.editbar_links.insert(
             len(layout.editbar_links) - 1,
-            Link(
+            CoreLink(
                 _('Move'),
                 request.link(Editor('move', self)),
-                classes=('move-link', )
+                attrs={'class': 'move-link'},
+                icon='move'
             )
         )
         children = self.children

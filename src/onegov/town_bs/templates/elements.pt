@@ -2,7 +2,7 @@
 
 <!--! A generic link element -->
 <metal:b define-macro="link">
-    <a tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'">
+    <a tal:attributes="e.attrs"><i class="me-sm" tal:condition="e.icon|nothing" data-lucide="${e.icon}" aria-hidden="true"></i>${e.text or ''}<tal:b condition="e.access != 'public'">
         <metal:b
             tal:define="item e.model"
             use-macro="layout.macros['access_hint']"

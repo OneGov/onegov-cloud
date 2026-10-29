@@ -1247,13 +1247,15 @@ class FormSubmissionLayout(DefaultLayout):
         edit_link = Link(
             text=_('Edit'),
             url=self.request.link(self.form, name='edit'),
-            attrs={'class': 'edit-link'}
+            attrs={'class': 'edit-link'},
+            icon='pencil'
         )
 
         qr_link = QrCodeLink(
             text=_('QR'),
             url=self.request.link(self.model),
-            attrs={'class': 'qr-code-link'}
+            attrs={'class': 'qr-code-link'},
+            icon='qr-code'
         )
 
         if not self.can_delete_form:
@@ -1269,7 +1271,8 @@ class FormSubmissionLayout(DefaultLayout):
                         ),
                         _('Cancel')
                     )
-                )
+                ),
+                icon='trash-2'
             )
 
         else:
@@ -1290,19 +1293,22 @@ class FormSubmissionLayout(DefaultLayout):
                         request_method='DELETE',
                         redirect_after=self.request.link(collection)
                     )
-                )
+                ),
+                icon='trash-2'
             )
 
         export_link = Link(
             text=_('Export'),
             url=self.request.link(self.form, name='export'),
-            attrs={'class': 'export-link'}
+            attrs={'class': 'export-link'},
+            icon='download'
         )
 
         change_url_link = Link(
             text=_('Change URL'),
             url=self.request.link(self.form, name='change-url'),
-            attrs={'class': 'internal-url'}
+            attrs={'class': 'internal-url'},
+            icon='link'
         )
 
         registration_windows_link = LinkGroup(
@@ -1313,13 +1319,15 @@ class FormSubmissionLayout(DefaultLayout):
                     url=self.request.link(
                         self.model, 'new-registration-window'
                     ),
-                    attrs={'class': 'new-registration-window'}
+                    attrs={'class': 'new-registration-window'},
+                    icon='plus'
                 ),
                 *(
                     Link(
                         text=self.format_date_range(w.start, w.end),
                         url=self.request.link(w),
-                        attrs={'class': 'view-link'}
+                        attrs={'class': 'view-link'},
+                        icon='calendar-range'
                     ) for w in self.form.registration_windows
                 )
             ]
@@ -1369,7 +1377,8 @@ class FormCollectionLayout(DefaultLayout):
                                 self.form_definitions,
                                 name='new'
                             ),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-form'},
+                            icon='clipboard-list'
                         ),
                         Link(
                             text=_('External form'),
@@ -1382,7 +1391,8 @@ class FormCollectionLayout(DefaultLayout):
                                 },
                                 name='new'
                             ),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-form'},
+                            icon='external-link'
                         ),
                         Link(
                             text=_('Document form'),
@@ -1390,7 +1400,8 @@ class FormCollectionLayout(DefaultLayout):
                                 self.document_forms,
                                 name='new'
                             ),
-                            attrs={'class': 'new-document-form'}
+                            attrs={'class': 'new-document-form'},
+                            icon='file-text'
                         ),
                     ]
                 ),
@@ -1434,7 +1445,8 @@ class SurveySubmissionWindowLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Delete'),
@@ -1455,12 +1467,14 @@ class SurveySubmissionWindowLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.model.survey)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 ),
                 QrCodeLink(
                     text=_('QR'),
                     url=self.request.link(self.model),
-                    attrs={'class': 'qr-code-link'}
+                    attrs={'class': 'qr-code-link'},
+                    icon='qr-code'
                 ),
                 Link(
                     text=_('Results'),
@@ -1468,7 +1482,8 @@ class SurveySubmissionWindowLayout(DefaultLayout):
                         self.model,
                         name='results'
                     ),
-                    attrs={'class': 'results-link'}
+                    attrs={'class': 'results-link'},
+                    icon='chart-column'
                 ),
             ]
         return None
@@ -1524,13 +1539,15 @@ class SurveySubmissionLayout(DefaultLayout):
         edit_link = Link(
             text=_('Edit'),
             url=self.request.link(self.form, name='edit'),
-            attrs={'class': 'edit-link'}
+            attrs={'class': 'edit-link'},
+            icon='pencil'
         )
 
         qr_link = QrCodeLink(
             text=_('QR'),
             url=self.request.link(self.model),
-            attrs={'class': 'qr-code-link'}
+            attrs={'class': 'qr-code-link'},
+            icon='qr-code'
         )
 
         delete_link = Link(
@@ -1551,25 +1568,29 @@ class SurveySubmissionLayout(DefaultLayout):
                     request_method='DELETE',
                     redirect_after=self.request.link(collection)
                 )
-            )
+            ),
+            icon='trash-2'
         )
 
         export_link = Link(
             text=_('Export'),
             url=self.request.link(self.form, name='export'),
-            attrs={'class': 'export-link'}
+            attrs={'class': 'export-link'},
+            icon='download'
         )
 
         change_url_link = Link(
             text=_('Change URL'),
             url=self.request.link(self.form, name='change-url'),
-            attrs={'class': 'internal-url'}
+            attrs={'class': 'internal-url'},
+            icon='link'
         )
 
         results_link = Link(
             text=_('Results'),
             url=self.request.link(self.model, name='results'),
-            attrs={'class': 'results-link'}
+            attrs={'class': 'results-link'},
+            icon='chart-column'
         )
 
         submission_windows_link = LinkGroup(
@@ -1580,14 +1601,16 @@ class SurveySubmissionLayout(DefaultLayout):
                     url=self.request.link(
                         self.model, 'new-submission-window'
                     ),
-                    attrs={'class': 'new-submission-window'}
+                    attrs={'class': 'new-submission-window'},
+                    icon='plus'
                 ),
                 *(
                     Link(
                         text=w.title if w.title else self.format_date_range(
                             w.start, w.end),
                         url=self.request.link(w),
-                        attrs={'class': 'view-link'}
+                        attrs={'class': 'view-link'},
+                        icon='calendar-range'
                     ) for w in self.form.submission_windows
                 )
             ]
@@ -1629,7 +1652,8 @@ class SurveyCollectionLayout(DefaultLayout):
                                 self.survey_definitions,
                                 name='new'
                             ),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-form'},
+                            icon='clipboard-check'
                         ),
                     ]
                 ),
@@ -1661,13 +1685,15 @@ class FormDocumentLayout(DefaultLayout):
         edit_link = Link(
             text=_('Edit'),
             url=self.request.link(self.model, name='edit'),
-            attrs={'class': 'edit-link'}
+            attrs={'class': 'edit-link'},
+            icon='pencil'
         )
 
         qr_link = QrCodeLink(
             text=_('QR'),
             url=self.request.link(self.model),
-            attrs={'class': 'qr-code-link'}
+            attrs={'class': 'qr-code-link'},
+            icon='qr-code'
         )
 
         delete_link = Link(
@@ -1687,7 +1713,8 @@ class FormDocumentLayout(DefaultLayout):
                     request_method='DELETE',
                     redirect_after=self.request.link(collection)
                 )
-            )
+            ),
+            icon='trash-2'
         )
 
         return [
@@ -1718,7 +1745,8 @@ class PersonCollectionLayout(DefaultLayout):
                         self.request.link(
                             self.request.app.org, 'people-settings')
                     ),
-                    attrs={'class': 'settings-link'}
+                    attrs={'class': 'settings-link'},
+                    icon='settings'
                 ))
 
             links.append(
@@ -1731,7 +1759,8 @@ class PersonCollectionLayout(DefaultLayout):
                                 self.model,
                                 name='new'
                             ),
-                            attrs={'class': 'new-person'}
+                            attrs={'class': 'new-person'},
+                            icon='user-plus'
                         )
                     ]
                 )
@@ -1806,7 +1835,8 @@ class PersonLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Delete'),
@@ -1825,7 +1855,8 @@ class PersonLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
@@ -1880,6 +1911,7 @@ class ArchivedTicketsLayout(DefaultLayout):
                         ),
                     ),
                     attrs={'class': 'delete-link'},
+                    icon='trash-2',
                 )
 
             )
@@ -1939,7 +1971,8 @@ class TicketLayout(DefaultLayout):
                 links.append(Link(
                     text=_('Accept ticket'),
                     url=self.request.link(self.model, 'accept'),
-                    attrs={'class': ('ticket-button', 'ticket-accept')}
+                    attrs={'class': ('ticket-button', 'ticket-accept')},
+                    icon='check'
                 ))
 
             elif self.model.state == 'pending':
@@ -1964,6 +1997,7 @@ class TicketLayout(DefaultLayout):
                             url=self.request.link(self.model, 'close'),
                             attrs={'class': ('ticket-button', 'ticket-close')},
                             traits=traits,
+                            icon='circle-check',
                         )
                     )
 
@@ -1976,6 +2010,7 @@ class TicketLayout(DefaultLayout):
                             attrs={
                                 'class': ('ticket-button', 'ticket-reopen')
                             },
+                            icon='rotate-ccw',
                         )
                     )
                 links.append(
@@ -1983,13 +2018,15 @@ class TicketLayout(DefaultLayout):
                         text=_('Archive ticket'),
                         url=self.request.link(self.model, 'archive'),
                         attrs={'class': ('ticket-button', 'ticket-archive')},
+                        icon='archive',
                     )
                 )
             elif self.model.state == 'archived':
                 links.append(Link(
                     text=_('Recover from archive'),
                     url=self.request.link(self.model, 'unarchive'),
-                    attrs={'class': ('ticket-button', 'ticket-reopen')}
+                    attrs={'class': ('ticket-button', 'ticket-reopen')},
+                    icon='archive-restore'
                 ))
                 links.append(Link(
                     text=_('Delete Ticket'),
@@ -1997,6 +2034,7 @@ class TicketLayout(DefaultLayout):
                         self.request.link(self.model, 'delete')
                     ),
                     attrs={'class': ('ticket-button', 'ticket-delete')},
+                    icon='trash-2',
                 ))
 
             if self.model.state != 'closed':
@@ -2004,6 +2042,7 @@ class TicketLayout(DefaultLayout):
                     text=_('Assign ticket'),
                     url=self.request.link(self.model, 'assign'),
                     attrs={'class': ('ticket-button', 'ticket-assign')},
+                    icon='user-check',
                 ))
 
         if self.request.is_logged_in:
@@ -2012,7 +2051,8 @@ class TicketLayout(DefaultLayout):
                 Link(
                     text=_('New Note'),
                     url=self.request.link(self.model, 'note'),
-                    attrs={'class': 'new-note'}
+                    attrs={'class': 'new-note'},
+                    icon='sticky-note'
                 )
             )
             if getattr(self.model, 'order_id', None) is not None:
@@ -2022,13 +2062,15 @@ class TicketLayout(DefaultLayout):
                         Link(
                             text=_('Only this ticket'),
                             url=self.request.link(self.model, 'pdf'),
-                            attrs={'class': 'ticket-pdf'}
+                            attrs={'class': 'ticket-pdf'},
+                            icon='file-text'
                         ),
                         Link(
                             text=_('With related tickets'),
                             url=self.request.link(
                                 self.model, 'related-tickets-pdf'),
-                            attrs={'class': 'ticket-pdf'}
+                            attrs={'class': 'ticket-pdf'},
+                            icon='files'
                         ),
                     ],
                     classes=['ticket-pdf']
@@ -2038,7 +2080,8 @@ class TicketLayout(DefaultLayout):
                     Link(
                         text=_('PDF'),
                         url=self.request.link(self.model, 'pdf'),
-                        attrs={'class': 'ticket-pdf'}
+                        attrs={'class': 'ticket-pdf'},
+                        icon='file-text'
                     )
                 )
 
@@ -2047,7 +2090,8 @@ class TicketLayout(DefaultLayout):
                 Link(
                     text=_('Download files'),
                     url=self.request.link(self.model, 'files'),
-                    attrs={'class': 'ticket-files'}
+                    attrs={'class': 'ticket-files'},
+                    icon='folder-down'
                 )
             )
 
@@ -2184,7 +2228,8 @@ class TicketInvoiceLayout(DefaultLayout):
                                 self.model,
                                 name='add-invoice-item'
                             ),
-                            attrs={'class': 'new-invoice-item'}
+                            attrs={'class': 'new-invoice-item'},
+                            icon='percent'
                         )
                     ]
                 ),
@@ -2214,7 +2259,8 @@ class TextModulesLayout(DefaultLayout):
                                 self.model,
                                 name='add'
                             ),
-                            attrs={'class': 'new-text-module'}
+                            attrs={'class': 'new-text-module'},
+                            icon='text-quote'
                         )
                     ]
                 ),
@@ -2243,7 +2289,8 @@ class TextModuleLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Delete'),
@@ -2265,7 +2312,8 @@ class TextModuleLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
@@ -2298,22 +2346,26 @@ class ResourcesLayout(DefaultLayout):
                         self.request.link(
                             self.request.app.org, 'resource-settings')
                     ),
-                    attrs={'class': 'settings-link'}
+                    attrs={'class': 'settings-link'},
+                    icon='settings'
                 ),
                 Link(
                     text=_('Recipients'),
                     url=self.request.class_link(ResourceRecipientCollection),
                     attrs={'class': 'manage-recipients'},
+                    icon='users',
                 ),
                 Link(
                     text=_('Export All'),
                     url=self.request.link(self.model, name='export-all'),
                     attrs={'class': 'export-link'},
+                    icon='download',
                 ),
                 IFrameLink(
                     text=_('iFrame'),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'},
+                    icon='code',
                 ),
                 LinkGroup(
                     title=_('Add'),
@@ -2322,6 +2374,7 @@ class ResourcesLayout(DefaultLayout):
                             text=_('Room'),
                             url=self.request.link(self.model, name='new-room'),
                             attrs={'class': 'new-room'},
+                            icon='door-open',
                         ),
                         Link(
                             text=_('Daypass'),
@@ -2329,6 +2382,7 @@ class ResourcesLayout(DefaultLayout):
                                 self.model, name='new-daypass'
                             ),
                             attrs={'class': 'new-daypass'},
+                            icon='ticket',
                         ),
                         Link(
                             text=_('Resource Item'),
@@ -2336,6 +2390,7 @@ class ResourcesLayout(DefaultLayout):
                                 self.model, name='new-daily-item'
                             ),
                             attrs={'class': 'new-daily-item'},
+                            icon='package',
                         ),
                         Link(
                             text=_('External resource link'),
@@ -2351,6 +2406,7 @@ class ResourcesLayout(DefaultLayout):
                                 name='new',
                             ),
                             attrs={'class': 'new-resource-link'},
+                            icon='external-link',
                         ),
                     ],
                 ),
@@ -2404,7 +2460,8 @@ class ResourceRecipientsLayout(DefaultLayout):
                                 self.model,
                                 name='new-recipient'
                             ),
-                            attrs={'class': 'new-recipient'}
+                            attrs={'class': 'new-recipient'},
+                            icon='mail-plus'
                         ),
                     ]
                 ),
@@ -2484,7 +2541,8 @@ class ResourceLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
 
             else:
@@ -2508,38 +2566,45 @@ class ResourceLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             return [
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Clean up'),
                     url=self.request.link(self.model, 'cleanup'),
-                    attrs={'class': ('cleanup-link', 'calendar-dependent')}
+                    attrs={'class': ('cleanup-link', 'calendar-dependent')},
+                    icon='brush'
                 ),
                 Link(
                     text=_('Occupancy'),
                     url=self.request.link(self.model, 'occupancy'),
-                    attrs={'class': ('occupancy-link', 'calendar-dependent')}
+                    attrs={'class': ('occupancy-link', 'calendar-dependent')},
+                    icon='calendar-days'
                 ),
                 Link(
                     text=_('Export'),
                     url=self.request.link(self.model, 'export'),
-                    attrs={'class': ('export-link', 'calendar-dependent')}
+                    attrs={'class': ('export-link', 'calendar-dependent')},
+                    icon='download'
                 ),
                 Link(
                     text=_('Subscribe'),
                     url=self.request.link(self.model, 'subscribe'),
-                    attrs={'class': 'subscribe-link'}
+                    attrs={'class': 'subscribe-link'},
+                    icon='rss'
                 ),
                 Link(
                     text=_('Availability periods'),
                     url=self.request.link(self.model, 'rules'),
-                    attrs={'class': 'rule-link'}
+                    attrs={'class': 'rule-link'},
+                    icon='calendar-clock'
                 ),
                 LinkGroup(
                     title=_('Advanced'),
@@ -2550,13 +2615,15 @@ class ResourceLayout(DefaultLayout):
                                 self.model,
                                 name='change-url'
                             ),
-                            attrs={'class': 'internal-url'}
+                            attrs={'class': 'internal-url'},
+                            icon='link'
                         ),
                         delete_link,
                         IFrameLink(
                             text=_('iFrame'),
                             url=self.request.link(self.model),
-                            attrs={'class': 'new-iframe'}
+                            attrs={'class': 'new-iframe'},
+                            icon='code'
                         ),
                     ],
                     right_side=False
@@ -2569,7 +2636,8 @@ class ResourceLayout(DefaultLayout):
                         text=_('Occupancy'),
                         url=self.request.link(self.model, 'occupancy'),
                         attrs={
-                            'class': ('occupancy-link', 'calendar-dependent')}
+                            'class': ('occupancy-link', 'calendar-dependent')},
+                        icon='calendar-days'
                     )
                 ]
         return None
@@ -2601,7 +2669,8 @@ class AllocationRulesLayout(ResourceLayout):
                         self.model,
                         name='new-rule'
                     ),
-                    attrs={'class': 'new-link'}
+                    attrs={'class': 'new-link'},
+                    icon='calendar-clock'
                 )
             ]
         )
@@ -2613,6 +2682,7 @@ class AllocationRulesLayout(ResourceLayout):
                     text=_('Copy availability periods'),
                     url=self.request.link(self.model, 'copy-rules'),
                     attrs={'class': 'copy-link'},
+                    icon='copy',
                 )
             )
 
@@ -2634,6 +2704,7 @@ class AllocationRulesLayout(ResourceLayout):
                             ),
                         ),
                     ),
+                    icon='clipboard-paste',
                 )
             )
         return links
@@ -2681,7 +2752,8 @@ class AllocationEditFormLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             else:
                 yield Link(
@@ -2696,7 +2768,8 @@ class AllocationEditFormLayout(DefaultLayout):
                             ),
                             _('Cancel')
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
         return list(links())
 
@@ -2766,25 +2839,29 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
                             self.request.link(self.request.app.org,
                                               'event-settings')
                         ),
-                        attrs={'class': 'edit-link'}
+                        attrs={'class': 'edit-link'},
+                        icon='settings'
                     )
 
                 yield Link(
                     text=_('Import'),
                     url=self.request.link(self.model, 'import'),
-                    attrs={'class': 'import-link'}
+                    attrs={'class': 'import-link'},
+                    icon='upload'
                 )
 
                 yield Link(
                     text=_('Export'),
                     url=self.request.link(self.model, 'export'),
-                    attrs={'class': 'export-link'}
+                    attrs={'class': 'export-link'},
+                    icon='download'
                 )
 
                 yield IFrameLink(
                     text=_('iFrame'),
                     url=self.request.link(self.model),
-                    attrs={'class': 'new-iframe'}
+                    attrs={'class': 'new-iframe'},
+                    icon='code'
                 )
 
         return list(links())
@@ -2834,7 +2911,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
                                 _('Imported events can not be edited.'),
                                 _('Cancel')
                             )
-                        )
+                        ),
+                        icon='pencil'
                     ),
                     Link(
                         text=_('Delete'),
@@ -2853,7 +2931,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
                                 request_method='POST',
                                 redirect_after=self.events_url
                             ),
-                        )
+                        ),
+                        icon='trash-2'
                     )
                 ]
 
@@ -2862,7 +2941,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
                 url=self.request.return_here(
                     self.request.link(self.model.event, 'edit')
                 ),
-                attrs={'class': 'edit-link'}
+                attrs={'class': 'edit-link'},
+                icon='pencil'
             )
 
             if self.event_deletable(self.model.event):
@@ -2883,7 +2963,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
                             request_method='DELETE',
                             redirect_after=self.events_url
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             else:
                 delete_link = Link(
@@ -2898,7 +2979,8 @@ class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
                             ),
                             _('Cancel')
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
 
             return [edit_link, delete_link]
@@ -2939,7 +3021,8 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
                             _('Imported events can not be edited.'),
                             _('Cancel')
                         )
-                    )
+                    ),
+                    icon='pencil'
                 )]
         if self.model.source and self.model.state == 'published':
             links.append(
@@ -2960,7 +3043,8 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
                             request_method='POST',
                             redirect_after=self.events_url
                         ),
-                    )
+                    ),
+                    icon='eye-off'
                 )
             )
         if self.model.source and self.model.state == 'withdrawn':
@@ -2969,7 +3053,8 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
                     text=_('Re-publish event'),
                     url=self.request.return_here(
                         self.request.link(self.model, 'publish')),
-                    attrs={'class': 'accept-link'}
+                    attrs={'class': 'accept-link'},
+                    icon='eye'
                 )
             )
         if self.model.source:
@@ -2978,7 +3063,8 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
         edit_link = Link(
             text=_('Edit'),
             url=self.request.link(self.model, 'edit'),
-            attrs={'class': 'edit-link'}
+            attrs={'class': 'edit-link'},
+            icon='pencil'
         )
         if self.event_deletable(self.model):
             delete_link = Link(
@@ -2998,7 +3084,8 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
                         request_method='DELETE',
                         redirect_after=self.events_url
                     )
-                )
+                ),
+                icon='trash-2'
             )
         else:
             delete_link = Link(
@@ -3013,7 +3100,8 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
                         ),
                         _('Cancel')
                     )
-                )
+                ),
+                icon='trash-2'
             )
 
         return [edit_link, delete_link]
@@ -3084,12 +3172,14 @@ class NewsletterLayout(DefaultLayout):
                         )
                     ),
                     attrs={'class': 'settings-link'},
+                    icon='settings',
                 ))
 
             links.append(Link(
                 text=_('Subscribers'),
                 url=self.request.link(self.recipients),
                 attrs={'class': 'manage-subscribers'},
+                icon='users',
             ))
 
             if self.request.browser_session.has('clipboard_url'):
@@ -3103,6 +3193,7 @@ class NewsletterLayout(DefaultLayout):
                             text=_('Paste'),
                             url=self.request.link(self.model, 'new-paste'),
                             attrs={'class': 'paste-link'},
+                            icon='clipboard-paste',
                         )
                     )
 
@@ -3116,7 +3207,8 @@ class NewsletterLayout(DefaultLayout):
                                 NewsletterCollection(self.app.session()),
                                 name='new'
                             ),
-                            attrs={'class': 'new-newsletter'}
+                            attrs={'class': 'new-newsletter'},
+                            icon='mail'
                         ),
                     ]
                 )
@@ -3131,17 +3223,20 @@ class NewsletterLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Schedule email delivery'),
                     url=self.request.link(self.model, 'send'),
-                    attrs={'class': 'send-link'}
+                    attrs={'class': 'send-link'},
+                    icon='send'
                 ),
                 Link(
                     text=_('Test'),
                     url=self.request.link(self.model, 'test'),
-                    attrs={'class': 'test-link'}
+                    attrs={'class': 'test-link'},
+                    icon='flask-conical'
                 ),
                 Link(
                     text=_('Copy'),
@@ -3151,6 +3246,7 @@ class NewsletterLayout(DefaultLayout):
                         )
                     ),
                     attrs={'class': 'copy-link'},
+                    icon='copy',
                 ),
                 Link(
                     text=_('Delete'),
@@ -3172,7 +3268,8 @@ class NewsletterLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
 
@@ -3198,12 +3295,14 @@ class RecipientLayout(DefaultLayout):
                     url=self.request.link(self.model,
                                           'import-newsletter-recipients'),
                     attrs={'class': 'import-link'},
+                    icon='upload',
                 ),
                 Link(
                     text=_('Export'),
                     url=self.request.link(self.model,
                                           'export-newsletter-recipients'),
                     attrs={'class': 'export-link'},
+                    icon='download',
                 ),
             ]
         return None
@@ -3227,7 +3326,8 @@ class ImageSetCollectionLayout(DefaultLayout):
                     url=self.request.link(
                         ImageFileCollection(self.request.session)
                     ),
-                    attrs={'class': 'upload'}
+                    attrs={'class': 'upload'},
+                    icon='images'
                 ),
                 LinkGroup(
                     title=_('Add'),
@@ -3238,7 +3338,8 @@ class ImageSetCollectionLayout(DefaultLayout):
                                 self.model,
                                 name='new'
                             ),
-                            attrs={'class': 'new-photo-album'}
+                            attrs={'class': 'new-photo-album'},
+                            icon='image-plus'
                         )
                     ]
                 ),
@@ -3276,12 +3377,14 @@ class ImageSetLayout(DefaultLayout):
                         self.model,
                         name='edit'
                     ),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Choose images'),
                     url=self.request.link(self.model, 'select'),
-                    attrs={'class': 'select'}
+                    attrs={'class': 'select'},
+                    icon='images'
                 ),
                 Link(
                     text=_('Delete'),
@@ -3303,7 +3406,8 @@ class ImageSetLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
@@ -3348,7 +3452,8 @@ class UserManagementLayout(DefaultLayout):
                             UserCollection,
                             name='signup-link'
                         ),
-                        attrs={'class': 'new-link'}
+                        attrs={'class': 'new-link'},
+                        icon='link'
                     )
                 )
 
@@ -3361,7 +3466,8 @@ class UserManagementLayout(DefaultLayout):
                             url=self.request.class_link(
                                 UserCollection, name='new'
                             ),
-                            attrs={'class': 'new-user'}
+                            attrs={'class': 'new-user'},
+                            icon='user-plus'
                         ),
                     )
                 )
@@ -3396,7 +3502,8 @@ class UserLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 )
             )
         if can_change_username(self.model, self.request):
@@ -3404,7 +3511,8 @@ class UserLayout(DefaultLayout):
                 Link(
                     text=_('Change username'),
                     url=self.request.link(self.model, 'change-username'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='user-pen'
                 )
             )
         return links
@@ -3432,7 +3540,8 @@ class UserGroupCollectionLayout(DefaultLayout):
                                 self.model,
                                 name='new'
                             ),
-                            attrs={'class': 'new-user'}
+                            attrs={'class': 'new-user'},
+                            icon='users'
                         )
                     ]
                 ),
@@ -3469,7 +3578,8 @@ class UserGroupLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Delete'),
@@ -3488,7 +3598,8 @@ class UserGroupLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
@@ -3522,7 +3633,8 @@ class PaymentProviderLayout(DefaultLayout):
                 Link(
                     text=_('Payments'),
                     url=self.request.class_link(PaymentCollection),
-                    attrs={'class': 'payments'}
+                    attrs={'class': 'payments'},
+                    icon='credit-card'
                 ),
                 LinkGroup(
                     title=_('Add'),
@@ -3533,7 +3645,8 @@ class PaymentProviderLayout(DefaultLayout):
                                 PaymentProviderCollection,
                                 name='new-datatrans'
                             ),
-                            attrs={'class': 'new-datatrans'}
+                            attrs={'class': 'new-datatrans'},
+                            icon='credit-card'
                         ),
                         Link(
                             text=_('Stripe Connect'),
@@ -3541,7 +3654,8 @@ class PaymentProviderLayout(DefaultLayout):
                                 PaymentProviderCollection,
                                 name='stripe-connect-oauth'
                             ),
-                            attrs={'class': 'new-stripe-connect'}
+                            attrs={'class': 'new-stripe-connect'},
+                            icon='credit-card'
                         ),
                         Link(
                             text=_('Worldline Saferpay'),
@@ -3549,7 +3663,8 @@ class PaymentProviderLayout(DefaultLayout):
                                 PaymentProviderCollection,
                                 name='new-saferpay'
                             ),
-                            attrs={'class': 'new-worldline-saferpay'}
+                            attrs={'class': 'new-worldline-saferpay'},
+                            icon='credit-card'
                         ),
                     )
                 )
@@ -3578,7 +3693,8 @@ class PaymentCollectionLayout(DefaultLayout):
                     Link(
                         text=_('Payment Provider'),
                         url=self.request.class_link(PaymentProviderCollection),
-                        attrs={'class': 'payment-provider'}
+                        attrs={'class': 'payment-provider'},
+                        icon='wallet'
                     )
                 )
 
@@ -3588,14 +3704,16 @@ class PaymentCollectionLayout(DefaultLayout):
                     url=self.request.class_link(
                         PaymentProviderCollection, name='sync'
                     ),
-                    attrs={'class': 'sync'}
+                    attrs={'class': 'sync'},
+                    icon='refresh-cw'
                 )
             )
             links.append(
                 Link(
                     text=_('Export'),
                     url=self.request.class_link(OrgExport, {'id': 'payments'}),
-                    attrs={'class': 'export-link'}
+                    attrs={'class': 'export-link'},
+                    icon='download'
                 )
             )
 
@@ -3626,7 +3744,8 @@ class TicketInvoiceCollectionLayout(DefaultLayout):
                         self.model,
                         query_params={'format': 'pdf'}
                     ),
-                    attrs={'class': 'ticket-pdf'}
+                    attrs={'class': 'ticket-pdf'},
+                    icon='file-text'
                 )
             )
 
@@ -3685,7 +3804,8 @@ class DirectoryCollectionLayout(DefaultLayout):
                                 self.model,
                                 name='+new'
                             ),
-                            attrs={'class': 'new-directory'}
+                            attrs={'class': 'new-directory'},
+                            icon='folder-plus'
                         )
                     ]
                 ),
@@ -3791,7 +3911,8 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
         export_link = Link(
             text=_('Export'),
             url=self.request.link(self.model, name='+export'),
-            attrs={'class': 'export-link'}
+            attrs={'class': 'export-link'},
+            icon='download'
         )
 
         def links() -> Iterator[Link | LinkGroup]:
@@ -3800,7 +3921,8 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                 yield Link(
                     text=_('Configure'),
                     url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='settings'
                 )
 
             if self.request.is_manager:
@@ -3813,19 +3935,22 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                             'directory_name': self.model.directory_name
                         }, name='+import'
                     ),
-                    attrs={'class': 'import-link'}
+                    attrs={'class': 'import-link'},
+                    icon='upload'
                 )
 
                 qr_link = QrCodeLink(
                     text=_('QR'),
                     url=self.request.link(self.model),
-                    attrs={'class': 'qr-code-link'}
+                    attrs={'class': 'qr-code-link'},
+                    icon='qr-code'
                 )
 
                 yield IFrameLink(
                     text=_('iFrame'),
                     url=self.request.link(self.model),
-                    attrs={'class': 'new-iframe'}
+                    attrs={'class': 'new-iframe'},
+                    icon='code'
                 )
 
             if self.request.is_admin:
@@ -3853,7 +3978,8 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                                 DirectoryCollection
                             )
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
                 yield Link(
                     text=self.request.translate(_('Change URL')),
@@ -3861,6 +3987,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                         self.model.directory,
                         'change-url'),
                     attrs={'class': 'internal-link'},
+                    icon='link',
                 )
 
             if self.request.is_manager:
@@ -3873,7 +4000,8 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                                 self.model,
                                 name='+new'
                             ),
-                            attrs={'class': 'new-directory-entry'}
+                            attrs={'class': 'new-directory-entry'},
+                            icon='plus'
                         )
                     ]
                 )
@@ -4018,7 +4146,8 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
             ]
             # keep the delete button in sync with the delete_directory_entry
@@ -4038,7 +4167,8 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
                                 'is published, to ensure proof of '
                                 'publication.'
                             )
-                        }
+                        },
+                        icon='trash-2'
                     )
                 )
             else:
@@ -4069,14 +4199,16 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
                                         self.directory)
                                 )
                             )
-                        )
+                        ),
+                        icon='trash-2'
                     )
                 )
             links.append(
                 QrCodeLink(
                     text=_('QR'),
                     url=self.request.link(self.model),
-                    attrs={'class': 'qr-code-link'}
+                    attrs={'class': 'qr-code-link'},
+                    icon='qr-code'
                 )
             )
             return links
@@ -4176,7 +4308,8 @@ class ExternalLinkLayout(DefaultLayout):
                         )
                     )
                 ),
-                attrs={'class': ('ticket-delete',)}
+                attrs={'class': ('ticket-delete',)},
+                icon='trash-2'
             )
         ]
 
@@ -4215,12 +4348,14 @@ class HomepageLayout(DefaultLayout):
                     self.request.return_here(
                         self.request.link(self.model, 'homepage-settings')
                     ),
-                    attrs={'class': ('edit-link')}
+                    attrs={'class': ('edit-link')},
+                    icon='pencil'
                 ),
                 Link(
                     _('Sort'),
                     self.request.link(self.model, 'sort'),
-                    attrs={'class': ('sort-link')}
+                    attrs={'class': ('sort-link')},
+                    icon='arrow-up-down'
                 ),
                 LinkGroup(
                     title=_('Add'),
@@ -4234,6 +4369,7 @@ class HomepageLayout(DefaultLayout):
                                 'new-page',
                                 'show-new-content-placeholder'
                             ),
+                            icon='file-plus',
                         ),
                         Link(
                             _('Link'),
@@ -4243,7 +4379,8 @@ class HomepageLayout(DefaultLayout):
                             classes=(
                                 'new-root-link',
                                 'show-new-content-placeholder'
-                            )
+                            ),
+                            icon='link'
                         )
                     )
                 ),

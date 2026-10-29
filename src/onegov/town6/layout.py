@@ -503,7 +503,8 @@ class TicketLayout(OrgTicketLayout, DefaultLayout):
                                 _('Upload Ticket'),
                                 _('Cancel')
                             )
-                        )
+                        ),
+                        icon='upload'
                     )
                 )
         return links
@@ -665,7 +666,8 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
                         Link(
                             text=_('Event'),
                             url=self.request.link(self.model, 'enter-event'),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-form'},
+                            icon='calendar-plus'
                         ),
                     ]
                 )
@@ -692,7 +694,8 @@ class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
                 Link(
                     text=_('Copy'),
                     url=copy_url,
-                    attrs={'class': 'copy-link'}
+                    attrs={'class': 'copy-link'},
+                    icon='copy'
                 )
             )
         return links
@@ -863,7 +866,8 @@ class DirectoryEntryCollectionLayout(
         export_link = Link(
             text=_('Export'),
             url=self.request.link(self.model, name='+export'),
-            attrs={'class': 'export-link'}
+            attrs={'class': 'export-link'},
+            icon='download'
         )
 
         def links() -> Iterator[Link | LinkGroup]:
@@ -872,7 +876,8 @@ class DirectoryEntryCollectionLayout(
                 yield Link(
                     text=_('Configure'),
                     url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='settings'
                 )
 
             if self.request.is_manager:
@@ -885,13 +890,15 @@ class DirectoryEntryCollectionLayout(
                             'directory_name': self.model.directory_name
                         }, name='+import'
                     ),
-                    attrs={'class': 'import-link'}
+                    attrs={'class': 'import-link'},
+                    icon='upload'
                 )
 
                 qr_link = QrCodeLink(
                     text=_('QR'),
                     url=self.request.link(self.model),
-                    attrs={'class': 'qr-code-link'}
+                    attrs={'class': 'qr-code-link'},
+                    icon='qr-code'
                 )
 
             if self.request.is_admin:
@@ -919,7 +926,8 @@ class DirectoryEntryCollectionLayout(
                                 DirectoryCollection
                             )
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
                 yield Link(
                     text=self.request.translate(_('Change URL')),
@@ -927,6 +935,7 @@ class DirectoryEntryCollectionLayout(
                         self.model.directory,
                         'change-url'),
                     attrs={'class': 'internal-url'},
+                    icon='link',
                 )
 
             if self.request.is_manager:
@@ -939,7 +948,8 @@ class DirectoryEntryCollectionLayout(
                                 self.model,
                                 name='+new'
                             ),
-                            attrs={'class': 'new-directory-entry'}
+                            attrs={'class': 'new-directory-entry'},
+                            icon='plus'
                         )
                     ]
                 )
@@ -950,7 +960,8 @@ class DirectoryEntryCollectionLayout(
                 yield IFrameLink(
                     text=_('iFrame'),
                     url=self.request.link(self.model),
-                    attrs={'class': 'new-iframe'}
+                    attrs={'class': 'new-iframe'},
+                    icon='code'
                 )
 
         return list(links())
@@ -1179,6 +1190,7 @@ class MeetingCollectionLayout(DefaultLayout):
                             text=_('Meeting'),
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-meeting'},
+                            icon='calendar-plus',
                         ),
                     ],
                 ),
@@ -1225,6 +1237,7 @@ class MeetingLayout(DefaultLayout):
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'},
+                    icon='pencil',
                 ),
                 Link(
                     text=_('Delete'),
@@ -1245,12 +1258,14 @@ class MeetingLayout(DefaultLayout):
                                 self.collection
                             )
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 ),
                 Link(
                     text=_('Export'),
                     url=self.request.link(self.model, name='+export'),
-                    attrs={'class': 'export-link'}
+                    attrs={'class': 'export-link'},
+                    icon='download'
                 )
             ]
         return None
@@ -1331,6 +1346,7 @@ class RISParliamentarianCollectionLayout(DefaultLayout):
                             text=self.parliamentarian_singular,
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-parliamentarian'},
+                            icon='user-plus',
                         ),
                     ],
                 ),
@@ -1375,7 +1391,8 @@ class RISParliamentarianLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Delete'),
@@ -1399,7 +1416,8 @@ class RISParliamentarianLayout(DefaultLayout):
                                 self.collection
                             )
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 ),
                 LinkGroup(
                     title=_('Add'),
@@ -1409,13 +1427,15 @@ class RISParliamentarianLayout(DefaultLayout):
                             url=self.request.link(
                                 self.model, 'new-role'),
                             # change to `new-group-role`
-                            attrs={'class': 'new-role'}
+                            attrs={'class': 'new-role'},
+                            icon='users'
                         ),
                         Link(
                             text=_('New commission function'),
                             url=self.request.link(
                                 self.model, 'new-commission-role'),
-                            attrs={'class': 'new-commission-role'}
+                            attrs={'class': 'new-commission-role'},
+                            icon='briefcase'
                         )
                     ],
                 ),
@@ -1460,7 +1480,8 @@ class RISParliamentarianRoleLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Remove'),
@@ -1481,7 +1502,8 @@ class RISParliamentarianRoleLayout(DefaultLayout):
                                 self.model.parliamentarian
                             )
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
@@ -1515,7 +1537,8 @@ class RISParliamentaryGroupCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Parliamentary group'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-parliamentary-group'}
+                            attrs={'class': 'new-parliamentary-group'},
+                            icon='users'
                         ),
                     ]
                 ),
@@ -1557,7 +1580,8 @@ class RISParliamentaryGroupLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Delete'),
@@ -1581,7 +1605,8 @@ class RISParliamentaryGroupLayout(DefaultLayout):
                                 self.collection
                             )
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
@@ -1616,6 +1641,7 @@ class RISPartyCollectionLayout(DefaultLayout):
                             text=_('Political Party'),
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-party'},
+                            icon='flag',
                         ),
                     ],
                 ),
@@ -1651,7 +1677,8 @@ class RISCommissionCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Commission'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-commission'}
+                            attrs={'class': 'new-commission'},
+                            icon='briefcase'
                         ),
                     ]
                 ),
@@ -1695,7 +1722,8 @@ class RISCommissionLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Delete'),
@@ -1714,7 +1742,8 @@ class RISCommissionLayout(DefaultLayout):
                             request_method='DELETE',
                             redirect_after=self.request.class_link(RISCommissionCollection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
@@ -1748,7 +1777,8 @@ class PoliticalBusinessCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Political Business'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-political-business'}
+                            attrs={'class': 'new-political-business'},
+                            icon='scale'
                         ),
                     ]
                 ),
@@ -1788,7 +1818,8 @@ class PoliticalBusinessLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Delete'),
@@ -1809,7 +1840,8 @@ class PoliticalBusinessLayout(DefaultLayout):
                             redirect_after=self.request.class_link(
                               PoliticalBusinessCollection)
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
@@ -1860,7 +1892,8 @@ class RISCommissionMembershipLayout(DefaultLayout):
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'edit-link'},
+                    icon='pencil'
                 ),
                 Link(
                     text=_('Remove'),
@@ -1884,7 +1917,8 @@ class RISCommissionMembershipLayout(DefaultLayout):
                                 self.model.commission
                             )
                         )
-                    )
+                    ),
+                    icon='trash-2'
                 )
             ]
         return None
