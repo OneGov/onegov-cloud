@@ -3,6 +3,7 @@ import json
 import transaction
 import zipfile
 from io import BytesIO
+from pdfrw import PdfReader  # type: ignore[import-untyped]
 
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import PASParliamentaryGroupCollection
@@ -1551,3 +1552,18 @@ def test_parliamentarian_pdf_zip_download(
         pdf_bytes = zf.read(name)
         assert len(pdf_bytes) > 0
         assert pdf_bytes[:4] == b'%PDF'
+
+    combined = page.click(href='all-parliamentarians-pdf')
+    assert combined.content_type == 'application/pdf'
+    assert combined.content_disposition is not None
+    assert '.pdf' in combined.content_disposition
+    combined_pages = PdfReader(fdata=combined.body).pages
+    individual_pages = [
+        pdf_page
+        for name in names
+        for pdf_page in PdfReader(fdata=zf.read(name)).pages
+    ]
+    assert len(combined_pages) == len(individual_pages)
+    for actual, expected in zip(combined_pages, individual_pages):
+        assert actual.MediaBox == expected.MediaBox
+        assert actual.Contents.stream == expected.Contents.stream

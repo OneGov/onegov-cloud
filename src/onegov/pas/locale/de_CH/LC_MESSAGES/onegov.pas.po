@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-09-17 11:49+0200\n"
+"POT-Creation-Date: 2026-10-29 14:41+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -855,8 +855,9 @@ msgid "the selected commission"
 msgstr "die ausgewählte Kommission"
 
 msgid "Cannot book attendance for the selected commission or parliamentarian."
-msgstr "Anwesenheit kann für die ausgewählte Kommission oder "
-"Parlamentarier:in nicht gebucht werden."
+msgstr ""
+"Anwesenheit kann für die ausgewählte Kommission oder Parlamentarier:in nicht "
+"gebucht werden."
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
@@ -989,6 +990,9 @@ msgstr "Abrechnungen nach Kommission"
 
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
+
+msgid "All Parliamentarians (PDF)"
+msgstr "Alle Parlamentarier:innen (PDF)"
 
 msgid "All Parliamentarians (ZIP)"
 msgstr "Alle Parlamentarier:innen (ZIP)"

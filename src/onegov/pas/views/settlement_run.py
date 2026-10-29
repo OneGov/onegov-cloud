@@ -1,4 +1,5 @@
 from io import BytesIO
+from pdfrw import PdfReader, PdfWriter  # type: ignore[import-untyped]
 from zipfile import ZipFile
 from webob import Response
 from onegov.core.utils import module_path
@@ -402,6 +403,16 @@ def view_settlement_run(
         'parliamentarians': {
             'title': _('Settlements by Parliamentarian'),
             'links': [
+                Link(
+                    _('All Parliamentarians (PDF)'),
+                    request.link(
+                        SettlementRunAllExport(
+                            settlement_run=self,
+                            category='all-parliamentarians-pdf',
+                        ),
+                        name='run-export',
+                    ),
+                ),
                 Link(
                     _('All Parliamentarians (ZIP)'),
                     request.link(
@@ -955,6 +966,29 @@ def view_settlement_run_all_export(
             csv_bytes,
             content_type='text/csv; charset=utf-8',
             content_disposition=f'attachment; filename="{filename}"'
+        )
+    elif self.category == 'all-parliamentarians-pdf':
+        parliamentarians = get_parliamentarians_with_settlements(
+            request.session,
+            self.settlement_run.start,
+            self.settlement_run.end,
+            settlement_run_id=self.settlement_run.id,
+        )
+        writer = PdfWriter()
+        for parliamentarian in parliamentarians:
+            pdf_bytes = generate_parliamentarian_settlement_pdf(
+                self.settlement_run, request, parliamentarian
+            )
+            writer.addpages(PdfReader(fdata=pdf_bytes).pages)
+
+        pdf_buffer = BytesIO()
+        writer.write(pdf_buffer)
+        run_name = normalize_for_filename(self.settlement_run.name)
+        filename = f'Parlamentarier_{run_name}.pdf'
+        return Response(
+            pdf_buffer.getvalue(),
+            content_type='application/pdf',
+            content_disposition=f'attachment; filename="{filename}"',
         )
     elif self.category == 'all-parliamentarians-zip':
         session = request.session
