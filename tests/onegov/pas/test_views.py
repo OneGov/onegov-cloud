@@ -1325,7 +1325,7 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     page.form['recipient'] = vice_value
     page = page.form.submit().follow()
     assert 'Zulage hinzugefügt' in page
-    assert 'Lisa Vizepräsidentin' in page
+    assert 'Vizepräsidentin Lisa' in page
 
     # Fill run1 to max (4): add 2 more on run1
     for val in (pres_value, vice_value):
