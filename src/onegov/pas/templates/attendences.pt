@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="medium-7 cell main-content">
+            <div class="medium-8 cell main-content">
                 <p tal:condition="python:len(attendences) == 0" i18n:translate="">No meeting defined yet.</p>
                 <table tal:condition="python:len(attendences) > 0" class="attendences hover">
                     <thead>
@@ -13,6 +13,7 @@
                             <th i18n:translate>Duration</th>
                             <th i18n:translate>Parliamentarian</th>
                             <th i18n:translate>Type</th>
+                            <th i18n:translate>Recorded by</th>
                             <th tal:condition="can_edit_attendences"></th>
                         </tr>
                     </thead>
@@ -36,12 +37,19 @@
                                           class="bulk-badge"
                                           tal:attributes="style string:background-color: hsl(${hue}, 45%, 90%);; color: hsl(${hue}, 50%, 28%);; border-color: hsl(${hue}, 40%, 75%)">Massenbuchung</span>
                                 </tal:b></td>
-                            <td tal:condition="can_edit_attendences"><a href="${edit_links[attendence.id]}"><i class="fa fa-edit"></i></a></td>
+                            <td>${creators.get(str(attendence.id), '—')}</td>
+                            <td tal:condition="can_edit_attendences">
+                                <a tal:condition="python:
+                                    attendence.id in edit_links"
+                                    href="${edit_links[attendence.id]}">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="medium-5 cell" tal:define="has_filters filters|nothing; has_bulk_edits python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups); has_allowances python:bool(allowances)" tal:condition="python:has_filters or has_bulk_edits or has_allowances">
+            <div class="medium-4 cell" tal:define="has_filters filters|nothing; has_bulk_edits python:can_edit_attendences and any(group and group[0].bulk_edit_id for group in bulk_edit_groups); has_allowances python:bool(allowances)" tal:condition="python:has_filters or has_bulk_edits or has_allowances">
                 <div class="sidebar-wrapper">
                     <div class="side-panel" tal:condition="python: filters.get('settlement_run')">
                         <h3 i18n:translate>Settlement run</h3>
@@ -60,7 +68,7 @@
                         <ul class="more-list">
                             <li tal:repeat="a allowances">
                                 <span class="list-title">
-                                    ${a.parliamentarian.first_name} ${a.parliamentarian.last_name}
+                                    ${a.parliamentarian.title}
                                     — <strong>CHF ${a.amount}</strong>
                                 </span>
                                 <p class="list-lead preview">
@@ -76,10 +84,20 @@
                         <ul class="more-list">
                             <tal:b tal:repeat="group bulk_edit_groups">
                                 <li tal:define="attendence group[0]; name 'edit-plenary-bulk-attendences' if attendence.type == 'plenary' else 'edit-commission-bulk-attendences'; has_abschluss python:all(a.abschluss for a in group)" tal:condition="attendence.bulk_edit_id">
-                                    <a class="list-link" href="${request.link(attendence, name)}">
-                                        <i class="fa fa-edit"></i>
-                                        <span class="list-title">${layout.format_date(attendence.date, 'date')}, <tal:b i18n:translate>${attendence.type_label}</tal:b></span>
-                                    </a>
+                                    <div class="bulk-edit-header">
+                                        <a class="list-link" href="${request.link(attendence, name)}">
+                                            <i class="fa fa-edit"></i>
+                                            <span class="list-title">${layout.format_date(attendence.date, 'date')}, <tal:b i18n:translate>${attendence.type_label}</tal:b></span>
+                                        </a>
+                                        <a class="bulk-pdf-link"
+                                           tal:condition="python:attendence.id in bulk_pdf_links"
+                                           href="${bulk_pdf_links[attendence.id]}"
+                                           title="PDF herunterladen"
+                                           aria-label="PDF herunterladen"
+                                           i18n:attributes="title; aria-label">
+                                            <i class="fa fa-file-pdf"></i>
+                                        </a>
+                                    </div>
                                     <a href="${request.link(attendence, name)}">
                                         <p class="list-lead preview">
                                             <tal:b tal:condition="attendence.commission">

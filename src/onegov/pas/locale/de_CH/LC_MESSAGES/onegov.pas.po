@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2026-09-17 11:49+0200\n"
+"POT-Creation-Date: 2026-10-30 16:21+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -543,6 +543,9 @@ msgstr "Noch keine Sitzung erfasst."
 msgid "Session date"
 msgstr "Sitzungsdatum"
 
+msgid "Recorded by"
+msgstr "Erfasst durch"
+
 msgid "edited"
 msgstr "bearbeitet"
 
@@ -551,6 +554,9 @@ msgstr "Filter"
 
 msgid "Bulk edits"
 msgstr "Massenbuchungen"
+
+msgid "PDF herunterladen"
+msgstr "PDF herunterladen"
 
 msgid "Timestamp"
 msgstr "Zeitpunkt"
@@ -737,6 +743,9 @@ msgstr "Noch keine Fraktionen erfasst."
 msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
 
+msgid "on"
+msgstr "vom"
+
 msgid ""
 "Flat annual allowance per § 8 of the Nebenamtsgesetz for representing the "
 "canton at events. Paid via settlement runs (max. 4 per run)."
@@ -855,8 +864,9 @@ msgid "the selected commission"
 msgstr "die ausgewählte Kommission"
 
 msgid "Cannot book attendance for the selected commission or parliamentarian."
-msgstr "Anwesenheit kann für die ausgewählte Kommission oder "
-"Parlamentarier:in nicht gebucht werden."
+msgstr ""
+"Anwesenheit kann für die ausgewählte Kommission oder Parlamentarier:in nicht "
+"gebucht werden."
 
 msgid "No parliamentarians selected"
 msgstr "Keine Parlamentarier:innen ausgewählt"
@@ -881,9 +891,6 @@ msgstr "Möchten Sie diese Massenbuchung wirklich löschen?"
 
 msgid "Delete Attendencess"
 msgstr "Anwesenheiten löschen"
-
-msgid "Only admins can edit attendance records."
-msgstr "Nur Administratoren können Anwesenheiten bearbeiten."
 
 #, python-format
 msgid "Edit bulk: ${type}"
@@ -990,6 +997,9 @@ msgstr "Abrechnungen nach Kommission"
 msgid "Settlements by Parliamentarian"
 msgstr "Abrechnungen nach Parlamentarier:in"
 
+msgid "All Parliamentarians (PDF)"
+msgstr "Alle Parlamentarier:innen (PDF)"
+
 msgid "All Parliamentarians (ZIP)"
 msgstr "Alle Parlamentarier:innen (ZIP)"
 
@@ -1031,6 +1041,9 @@ msgid "Cannot delete closed settlement run. Please reopen it first."
 msgstr ""
 "Geschlossener Abrechnungslauf kann nicht gelöscht werden. Bitte zuerst "
 "öffnen."
+
+#~ msgid "Only admins can edit attendance records."
+#~ msgstr "Nur Administratoren können Anwesenheiten bearbeiten."
 
 #~ msgid "Parliamentarian:"
 #~ msgstr "Parlamentarier:in:"

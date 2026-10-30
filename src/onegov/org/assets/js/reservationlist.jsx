@@ -45,7 +45,8 @@ $.fn.reservationList = function(options) {
         // handles clicks on events
         list.on('click', '.event:not(.event-unavailable)', function(e) {
             var el = $(this);
-            if (!el.hasClass('event-adjustable') && el.hasClass('selected')) {
+            var reserveurl = el.data('reserveurl') || null;
+            if (reserveurl === null | (!el.hasClass('event-adjustable') && el.hasClass('selected'))) {
                 e.preventDefault();
                 return false;
             }
@@ -57,7 +58,8 @@ $.fn.reservationList = function(options) {
                 end: moment(el.data('end')),
                 wholeDayDefault: options.wholeDay,
                 wholeDay: el.data('whole-day'),
-                reserveurl: el.data('reserveurl')
+                internal: el.data('internal'),
+                reserveurl: reserveurl
             };
             rl.removeAllPopups();
             var singleSelect = !e.shiftKey && !e.altKey && !e.ctrlKey;
@@ -75,15 +77,27 @@ $.fn.reservationList = function(options) {
                         });
                     }
                 }
-                rl.reserve(
-                    list,
-                    event.reserveurl,
-                    event.start.format('HH:mm'),
-                    event.end.format('HH:mm'),
-                    1,
-                    event.wholeDay,
-                    !singleSelect
-                );
+                if (event.internal) {
+                    rl.internalReserve(
+                        list,
+                        event.reserveurl,
+                        event.start.format('YYYYMMDD'),
+                        event.start.format('HH:mm'),
+                        event.end.format('HH:mm'),
+                        event.wholeDay,
+                        !singleSelect
+                    );
+                } else {
+                    rl.reserve(
+                        list,
+                        event.reserveurl,
+                        event.start.format('HH:mm'),
+                        event.end.format('HH:mm'),
+                        1,
+                        event.wholeDay,
+                        !singleSelect
+                    );
+                }
             }
             e.preventDefault();
             return false;
@@ -135,6 +149,17 @@ rl.reserve = function(list, url, start, end, quota, wholeDay, considerBlocking) 
     rl.post(list, url.toString());
 };
 
+rl.internalReserve = function(list, url, date, start, end, wholeDay, considerBlocking) {
+    url = new Url(url);
+    url.query.date = date;
+    url.query.start = start;
+    url.query.end = end;
+    url.query.whole_day = wholeDay && '1' || '0';
+    url.query.consider_blocking = considerBlocking && '1' || '0';
+
+    rl.post(list, url.toString());
+};
+
 // popup handler implementation
 rl.showActionsPopup = function(list, element, event, singleSelect) {
     var wrapper = $('<div class="reservation-actions">');
@@ -153,15 +178,27 @@ rl.showActionsPopup = function(list, element, event, singleSelect) {
                 });
             }
         }
-        rl.reserve(
-            list,
-            event.reserveurl,
-            state.start,
-            state.end,
-            state.quota,
-            state.wholeDay,
-            !singleSelect
-        );
+        if (event.internal) {
+            rl.internalReserve(
+                list,
+                event.reserveurl,
+                event.start.format('YYYYMMDD'),
+                state.start,
+                state.end,
+                state.wholeDay,
+                !singleSelect
+            );
+        } else {
+            rl.reserve(
+                list,
+                event.reserveurl,
+                state.start,
+                state.end,
+                state.quota,
+                state.wholeDay,
+                !singleSelect
+            );
+        }
         $(this).closest('.popup').popup('hide');
     });
 
@@ -534,7 +571,7 @@ var ReservationForm = React.createClass({
             state.wholeDay = false;
         }
 
-        state.end = state.end === '00:00' && '24:00' || state.end;
+        state.end = state.end === '00:00' && '23:59' || state.end;
 
         return state;
     },
@@ -565,7 +602,7 @@ var ReservationForm = React.createClass({
                 state.start = e.target.value;
                 break;
             case 'end':
-                state.end = e.target.value === '00:00' && '24:00' || e.target.value;
+                state.end = e.target.value === '00:00' && '23:59' || e.target.value;
                 break;
             case 'count':
                 state.quota = parseInt(e.target.value, 10);

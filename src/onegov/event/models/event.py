@@ -140,6 +140,10 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #: when the source of the event was last updated (if imported)
     source_updated: dict_property[str | None] = meta_property()
 
+    #: whether an imported event has been edited locally, in which case
+    #: its contents are no longer overwritten by subsequent imports
+    locally_modified: dict_property[bool] = meta_property(default=False)
+
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence: Mapped[str | None]
 

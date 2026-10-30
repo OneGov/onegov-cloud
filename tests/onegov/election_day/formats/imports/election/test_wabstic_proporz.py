@@ -1014,3 +1014,93 @@ def test_import_wabstic_proporz_regional(session: Session) -> None:
     )
     assert not errors
     assert election.progress == (1, 2)
+
+
+def test_import_wabstic_proporz_same_number(session: Session) -> None:
+    # Two elections sharing the same SortGeschaeft, distinguished only by
+    # SortWahlkreis (WPStatic_Gemeinden) and GeLfNr (all files)
+
+    def csv(lines: list[str]) -> tuple[BytesIO, str]:
+        return BytesIO('\n'.join(lines).encode('utf-8')), 'text/plain'
+
+    files = (
+        *csv([
+            'SortGeschaeft,Ausmittlungsstand,AnzPendentGde,GeLfNr',
+            '1,0,1,a',
+            '1,0,0,b',
+        ]),
+        *csv([
+            'SortWahlkreis,SortGeschaeft,BfsNrGemeinde,Stimmberechtigte,'
+            'GeLfNr',
+            '1,1,3203,1000,a',
+            '6,1,3392,2000,b',
+        ]),
+        *csv([
+            'BfsNrGemeinde,Stimmberechtigte,Sperrung,StmAbgegeben,StmLeer,'
+            'StmUngueltig,AnzWZAmtLeer,GeLfNr',
+            '3203,1000,1200,500,0,0,0,a',
+            '3392,2000,1200,800,0,0,0,b',
+        ]),
+        *csv([
+            'SortGeschaeft,ListNr,ListCode,Sitze,ListVerb,ListUntVerb,GeLfNr',
+            '1,1,Liste A,1,,,a',
+            '1,1,Liste B,1,,,b',
+        ]),
+        *csv([
+            'BfsNrGemeinde,ListNr,StimmenTotal,GeLfNr',
+            '3203,1,400,a',
+            '3392,1,700,b',
+        ]),
+        *csv([
+            'SortGeschaeft,KNR,Nachname,Vorname,GeLfNr',
+            '1,101,Muster,Anna,a',
+            '1,101,Beispiel,Bruno,b',
+        ]),
+        *csv([
+            'SortGeschaeft,KNR,Gewaehlt,GeLfNr',
+            '1,101,1,a',
+            '1,101,,b',
+        ]),
+        *csv([
+            'BfsNrGemeinde,KNR,Stimmen,GeLfNr',
+            '3203,101,300,a',
+            '3392,101,600,b',
+        ]),
+    )
+
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='none',
+            date=date(2026, 11, 29),
+            number_of_mandates=1
+        )
+    )
+    session.flush()
+    election = session.query(ProporzElection).one()
+    principal = Canton(canton='sg')
+
+    for f in files[::2]:
+        f.seek(0)
+    errors = import_election_wabstic_proporz(
+        election, principal, '1', '1', *files
+    )
+    assert not errors
+    assert election.progress == (1, 1)
+    assert [(l.name, l.votes) for l in election.lists] == [('Liste A', 400)]
+    assert [
+        (c.family_name, c.elected, c.votes) for c in election.candidates
+    ] == [('Muster', True, 300)]
+
+    for f in files[::2]:
+        f.seek(0)
+    errors = import_election_wabstic_proporz(
+        election, principal, '1', '6', *files
+    )
+    assert not errors
+    assert election.status == 'final'
+    assert election.progress == (1, 1)
+    assert [(l.name, l.votes) for l in election.lists] == [('Liste B', 700)]
+    assert [
+        (c.family_name, c.elected, c.votes) for c in election.candidates
+    ] == [('Beispiel', False, 600)]

@@ -324,7 +324,8 @@ class SessionManager:
             'btree_gist',
             'hstore',
             'intarray',
-            'unaccent'
+            'unaccent',
+            'uuid-ossp',
         }
         self.created_extensions: set[str] = set()
 

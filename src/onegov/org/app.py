@@ -910,6 +910,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'foundation.orbit.js'
     yield 'foundation.reveal.js'
     yield 'foundation.topbar.js'
+    yield 'foundation.offcanvas.js'
     yield 'intercooler.js'
     yield 'underscore.js'
     yield 'react.js'
@@ -943,6 +944,7 @@ def get_common_asset() -> Iterator[str]:
     yield 'foundation.accordion.js'
     yield 'chosen_select_hierarchy.js'
     yield 'ai_formcoder.js'
+    yield 'sidebar_mobile.js'
 
 
 @OrgApp.webasset('fontpreview')

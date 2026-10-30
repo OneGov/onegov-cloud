@@ -284,7 +284,11 @@ class EventApiEndpoint(ApiEndpoint['Occurrence', UUID]):
         filter_type = self.app.org.event_filter_type
         if filter_type in ('tags', 'tags_and_filters'):
             used_tags = collection.used_tags
-            if not self.app.custom_event_tags:
+            custom_tags = self.app.custom_event_tags
+            if custom_tags:
+                # list all configured tags, even if currently unused
+                used_tags = used_tags | set(custom_tags)
+            else:
                 # built-in tags need to be translated
                 used_tags = {
                     self.request.translate(_(tag))

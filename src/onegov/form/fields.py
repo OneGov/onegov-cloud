@@ -348,7 +348,7 @@ class UploadField(FileField):
         # give the required validators the idea that the data is there
         # when the action was to keep the current file - an evil approach
         if isinstance(caller, (DataRequired, InputRequired)):
-            truthy = (
+            truthy: Any = (
                 getattr(self, '_data', None)
                 or getattr(self, 'action', None) == 'keep'
             )

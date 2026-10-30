@@ -16,6 +16,7 @@ from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.filters import as_float
+from onegov.form.validators import ValidDateRange
 from onegov.org import _
 from onegov.org.forms.util import WEEKDAYS
 from onegov.reservation import Resource, ResourceCollection
@@ -191,8 +192,23 @@ class AllocationRuleForm(Form):
             ('no', _("Don't extend this availability period automatically")),
             ('daily', _('Extend by one day at midnight')),
             ('monthly', _('Extend by one month at the end of the month')),
-            ('yearly', _('Extend by one year at the end of the year'))
+            ('yearly', _('Extend by one year at the end of the year')),
+            (
+                'yearly_scheduled',
+                _('Extend by one year at a given date')
+            )
         ))
+
+    extend_on = DateField(
+        label=_('Extend on'),
+        validators=[
+            InputRequired(),
+            # future dates only
+            ValidDateRange(min=relativedelta(days=1))
+        ],
+        fieldset=_('Period'),
+        depends_on=('extend', 'yearly_scheduled'),
+    )
 
     @cached_property
     def rule_id(self) -> str:
@@ -212,6 +228,7 @@ class AllocationRuleForm(Form):
             'id': self.rule_id,
             'title': self.title.data,
             'extend': self.extend.data,
+            'extend_on': self.extend_on.data,
             'options': self.options,
             'iteration': self.iteration,
             'last_run': self.last_run,
@@ -228,6 +245,7 @@ class AllocationRuleForm(Form):
 
         self.title.data = value['title']
         self.extend.data = value['extend']
+        self.extend_on.data = value.get('extend_on')
 
         for k, v in value['options'].items():
             if k in self:
@@ -237,7 +255,7 @@ class AllocationRuleForm(Form):
     def options(self) -> dict[str, Any]:
         return {
             k: f.data for k, f in self._fields.items()
-            if k not in ('title', 'extend', 'csrf_token')
+            if k not in ('title', 'extend', 'extend_on', 'csrf_token')
         }
 
     def apply(self, resource: Resource) -> int:
@@ -249,7 +267,7 @@ class AllocationRuleForm(Form):
                     end_offset = relativedelta(days=self.iteration)
                 case 'monthly':
                     end_offset = relativedelta(months=self.iteration)
-                case 'yearly':
+                case 'yearly' | 'yearly_scheduled':
                     end_offset = relativedelta(years=self.iteration)
                 case _:
                     raise AssertionError('unreachable')

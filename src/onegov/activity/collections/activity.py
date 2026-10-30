@@ -185,7 +185,7 @@ class ActivityFilter:
         return self.adapt_num_ranges(values)
 
     def adapt_price_ranges(self, values: set[str]) -> set[tuple[int, int]]:
-        return self.adapt_num_ranges(values)
+        return {v for v in map(num_range_decode, values) if v}
 
     def adapt_dateranges(self, values: set[str]) -> set[tuple[date, date]]:
         return {v for v in map(date_range_decode, values) if v}
@@ -250,7 +250,7 @@ class ActivityFilter:
         return self.contains_num_range(age_range, self.age_ranges)
 
     def contains_price_range(self, price_range: tuple[int, int]) -> bool:
-        return self.contains_num_range(price_range, self.price_ranges)
+        return price_range in self.price_ranges
 
 
 class ActivityCollection[ActivityT: Activity](RangedPagination[ActivityT]):

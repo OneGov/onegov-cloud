@@ -10,6 +10,7 @@ import pytz
 import re
 import shutil
 import sys
+import tempfile
 import textwrap
 import transaction
 import yaml
@@ -31,12 +32,12 @@ from onegov.directory import (
     Directory,
     DirectoryEntry,
     DirectoryCollection,
+    DirectoryArchive,
 )
 from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event
 from onegov.event import Occurrence
 from onegov.event import EventCollection
-from onegov.event import OccurrenceCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file.collection import FileCollection
 from onegov.file.models import File, SigningRequest
@@ -80,6 +81,7 @@ from onegov.page.collection import PageCollection
 from onegov.page.restore import PageRestore
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.org.horw_laws import import_records as import_horw_law_records
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
 from onegov.town6.upgrade import migrate_theme_options
 from onegov.user.models import TAN
@@ -91,6 +93,7 @@ from sqlalchemy import func, and_, or_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.exc import StatementError
 from uuid import uuid4
+from zipfile import BadZipFile, ZipFile
 
 
 from typing import IO, Any, TypedDict, TYPE_CHECKING
@@ -114,6 +117,61 @@ if TYPE_CHECKING:
     )
 
 cli = command_group()
+
+
+@cli.command(
+    context_settings={
+        'default_selector': '/onegov_town6/horw',
+        'singular': True,
+    }
+)
+@click.argument(
+    'path',
+    default=Path(tempfile.gettempdir()) / 'horw-laws.zip',
+    type=click.Path(
+        exists=True, dir_okay=False, resolve_path=True, path_type=Path
+    ),
+)
+@click.option('--dry-run', is_flag=True, help='Validate without saving.')
+def import_horw_laws(
+    path: Path,
+    dry_run: bool,
+) -> Callable[[OrgRequest, OrgApp], None]:
+    """Import Horw's law collection from an uploaded ZIP snapshot.
+
+    Defaults to /onegov_town6/horw and PATH=/tmp/horw-laws.zip.
+    Upload a ZIP containing records.json and documents before running.
+    Existing entries are backed up before importing. Changes are committed
+    automatically unless --dry-run is given.
+    """
+
+    def import_laws(request: OrgRequest, app: OrgApp) -> None:
+        directory = (
+            request.session.query(Directory)
+            .filter_by(name='systematische-rechtssammlung')
+            .one()
+        )
+        click.echo(f'Importing into {app.schema}')
+        if not dry_run:
+            backup = path.parent / 'horw-laws-backups' / str(uuid4())
+            backup.mkdir(parents=True)
+            DirectoryArchive(backup, 'json').write(directory)
+            click.echo(f'Backup: {backup}')
+        try:
+            with ZipFile(path) as archive:
+                report = import_horw_law_records(request.session, archive)
+        except (BadZipFile, ValueError) as error:
+            raise click.ClickException(str(error)) from error
+        click.echo(
+            f'{report["created"]} created, {report["updated"]} updated, '
+            f'{report["unchanged"]} unchanged, '
+            f'{report["documents"]} documents imported.'
+        )
+        if dry_run:
+            transaction.abort()
+            click.echo('Dry run complete. No changes saved.')
+
+    return import_laws
 
 
 @cli.command(context_settings={'singular': True})
@@ -3391,9 +3449,8 @@ def fix_custom_event_tags(
         if not dry_run and not click.confirm('Does that look okay?'):
             return
 
-        events = EventCollection(request.session).query()
-        occurrences = OccurrenceCollection(request.session).query()
-
+        events = request.session.query(Event)
+        occurrences = request.session.query(Occurrence)
         rewritten_count = 0
         deleted_set = set()
         deleted_count = 0

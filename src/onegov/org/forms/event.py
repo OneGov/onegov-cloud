@@ -585,11 +585,23 @@ class EventImportForm(Form):
                 getattr(occurrence, attribute, None)
                 or getattr(occurrence.event, attribute, None)
             )
+            if attribute in (
+                'external_event_url',
+                'event_registration_url',
+            ) and isinstance(result, str):
+                result = result.strip()
+                if result.casefold() in ('https://', 'https://keine'):
+                    result = ''
             if attribute == 'created' and isinstance(result, datetime):
                 result = to_timezone(
                     result, occurrence.timezone or 'Europe/Zurich')
             if isinstance(result, datetime):
-                result = result.strftime('%d.%m.%Y %H:%M')
+                date_format = (
+                    '%Y-%m-%d %H:%M'
+                    if attribute == 'created'
+                    else '%d.%m.%Y %H:%M'
+                )
+                result = result.strftime(date_format)
             if isinstance(result, bool):
                 return result
             if attribute == 'tags':
@@ -650,6 +662,16 @@ class EventImportForm(Form):
 
         def get(line: DefaultRow, column: str, attribute: str) -> Any:
             result = getattr(line, column)
+            if attribute in (
+                'external_event_url',
+                'event_registration_url',
+            ):
+                result = result.strip() if isinstance(result, str) else None
+                if result and result.casefold() in (
+                    'https://',
+                    'https://keine',
+                ):
+                    result = None
             if attribute in ('start', 'end'):
                 result = parse(result, dayfirst=True)
             if attribute == 'tags':

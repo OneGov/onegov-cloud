@@ -5,6 +5,7 @@ from onegov.core import Framework
 from onegov.core import filters  # noqa: F401 -> registers webasset filters
 from onegov.core.utils import scan_morepath_modules
 from onegov.gis import MapboxApp
+from webob import Response
 from webtest import TestApp as Client
 
 
@@ -41,6 +42,13 @@ def test_mapbox_token_tween(temporary_directory: str, redis_url: str) -> None:
     def view_root(self: Root, request: object) -> str:
         return '<body></body>'
 
+    @App.view(model=Root, name='document')
+    def view_document(self: Root, request: object) -> Response:
+        return Response(
+            b'%PDF-1.4\n<xml><body>annotation</body></xml>\n%%EOF',
+            content_type='application/pdf',
+        )
+
     scan_morepath_modules(App)
     morepath.commit(App)
 
@@ -50,3 +58,7 @@ def test_mapbox_token_tween(temporary_directory: str, redis_url: str) -> None:
     app.set_application_id('foo/bar')
 
     assert '<body data-mapbox-token="pk.asdf"></body>' in Client(app).get('/')
+    document = Client(app).get('/document')
+    assert document.body == (
+        b'%PDF-1.4\n<xml><body>annotation</body></xml>\n%%EOF'
+    )

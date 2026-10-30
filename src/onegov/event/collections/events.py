@@ -211,6 +211,10 @@ class EventCollection(Pagination[Event]):
         Doesn't change the states of events allowing to permanently withdraw
         imported events.
 
+        Doesn't change the contents of events which have been modified
+        locally (``Event.locally_modified``). State transfers and purging
+        still apply to them.
+
         :param items:
             A list of ``EventImportItem``'s or event sources to keep
             from purging.
@@ -277,7 +281,10 @@ class EventCollection(Pagination[Event]):
                 update_state = valid_state_transfers.get(
                     existing.state) == event.state
 
-                if existing.source_updated:
+                if existing.locally_modified:
+                    # local edits take precedence over the imported contents
+                    changed = False
+                elif existing.source_updated:
                     changed = existing.source_updated != event.source_updated
                 else:
                     # No information on provided, figure it out ourselves!
@@ -322,6 +329,7 @@ class EventCollection(Pagination[Event]):
                     existing.content = event.content
                     existing.coordinates = event.coordinates
                     existing.recurrence = event.recurrence
+                    existing.source_updated = event.source_updated
                     existing.state = state
                     existing.set_image(item.image, item.image_filename)
                     existing.set_pdf(item.pdf, item.pdf_filename)
@@ -617,8 +625,13 @@ class EventCollection(Pagination[Event]):
                 tag = find_element_text(category, 'mainCategory')
                 tags.append(tag) if tag else None
 
+            schedules = event.find('ns:schedules', namespaces=ns)
+            if schedules is None:
+                # we cannot import an event without any schedules
+                continue
+
             timezone = 'Europe/Zurich'
-            for schedule in event.find('ns:schedules', namespaces=ns):
+            for schedule in schedules:
                 schedule_id = find_element_text(schedule, 'uuid7')
                 start = parse(find_element_text(schedule, 'start'))
                 end_text = find_element_text(schedule, 'end')

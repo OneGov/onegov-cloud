@@ -4,6 +4,7 @@ from io import BytesIO
 
 import xlsxwriter
 
+from onegov.pas.settlement_data import SettlementAttendanceEntry
 from onegov.pas.settlement_data import SettlementData
 from onegov.pas.settlement_data import SettlementEntry
 from onegov.pas.settlement_data import get_settlement_data
@@ -178,7 +179,8 @@ def generate_buchungen_abrechnungslauf_xlsx(
     - Person: Full name of parliamentarian
     - Partei: Party name
     - Wahlkreis: Electoral district (TODO: determine data source)
-    - BuchungsTyp: Type of attendance/booking
+    - Art der Buchung: Type of attendance/booking
+    - Kommissionsname: Commission name for commission-related bookings
     - Wert: Duration/value in hours
     - CHF: Base rate in CHF
     - CHF + TZ: Rate with cost-of-living adjustment in CHF
@@ -204,8 +206,15 @@ def generate_buchungen_abrechnungslauf_xlsx(
 
     # Write headers
     headers = [
-        'Datum', 'Person', 'Partei', 'Wahlkreis', 'BuchungsTyp',
-        'Wert', 'CHF', 'CHF + TZ'
+        'Datum',
+        'Person',
+        'Partei',
+        'Wahlkreis',
+        'Art der Buchung',
+        'Kommissionsname',
+        'Wert',
+        'CHF',
+        'CHF + TZ',
     ]
     for col, header in enumerate(headers):
         worksheet.write(0, col, header, header_format)
@@ -234,7 +243,7 @@ def generate_buchungen_abrechnungslauf_xlsx(
         worksheet.write(
             row_num,
             1,
-            (f'{parliamentarian.first_name} {parliamentarian.last_name}'),
+            parliamentarian.title,
             cell_format,
         )
         worksheet.write(
@@ -249,27 +258,39 @@ def generate_buchungen_abrechnungslauf_xlsx(
             parliamentarian.district or '',
             cell_format,
         )
+        booking_type: str = 'präsidiale Zulage'
+        commission_name: str = ''
+        if isinstance(entry, SettlementAttendanceEntry):
+            booking_type = entry.type_label
+            if entry.attendance_type != 'plenary' and entry.commission:
+                commission_name = entry.commission.name
         worksheet.write(
             row_num,
             4,
-            entry.type_description,
+            booking_type,
             cell_format,
         )
         worksheet.write(
             row_num,
             5,
-            float(entry.value),
+            commission_name,
             cell_format,
         )
         worksheet.write(
             row_num,
             6,
-            float(entry.compensation.base),
+            float(entry.value),
             cell_format,
         )
         worksheet.write(
             row_num,
             7,
+            float(entry.compensation.base),
+            cell_format,
+        )
+        worksheet.write(
+            row_num,
+            8,
             float(entry.compensation.adjusted),
             cell_format,
         )
@@ -279,10 +300,11 @@ def generate_buchungen_abrechnungslauf_xlsx(
     worksheet.set_column('B:B', 25)  # Person
     worksheet.set_column('C:C', 15)  # Party
     worksheet.set_column('D:D', 15)  # Wahlkreis
-    worksheet.set_column('E:E', 30)  # BuchungsTyp
-    worksheet.set_column('F:F', 8)   # Wert
-    worksheet.set_column('G:G', 10)  # CHF
-    worksheet.set_column('H:H', 12)  # CHF + TZ
+    worksheet.set_column('E:E', 25)  # Art der Buchung
+    worksheet.set_column('F:F', 30)  # Kommissionsname
+    worksheet.set_column('G:G', 8)  # Wert
+    worksheet.set_column('H:H', 10)  # CHF
+    worksheet.set_column('I:I', 12)  # CHF + TZ
 
     workbook.close()
     output.seek(0)
