@@ -84,10 +84,20 @@
                         <ul class="more-list">
                             <tal:b tal:repeat="group bulk_edit_groups">
                                 <li tal:define="attendence group[0]; name 'edit-plenary-bulk-attendences' if attendence.type == 'plenary' else 'edit-commission-bulk-attendences'; has_abschluss python:all(a.abschluss for a in group)" tal:condition="attendence.bulk_edit_id">
-                                    <a class="list-link" href="${request.link(attendence, name)}">
-                                        <i class="fa fa-edit"></i>
-                                        <span class="list-title">${layout.format_date(attendence.date, 'date')}, <tal:b i18n:translate>${attendence.type_label}</tal:b></span>
-                                    </a>
+                                    <div class="bulk-edit-header">
+                                        <a class="list-link" href="${request.link(attendence, name)}">
+                                            <i class="fa fa-edit"></i>
+                                            <span class="list-title">${layout.format_date(attendence.date, 'date')}, <tal:b i18n:translate>${attendence.type_label}</tal:b></span>
+                                        </a>
+                                        <a class="bulk-pdf-link"
+                                           tal:condition="python:attendence.id in bulk_pdf_links"
+                                           href="${bulk_pdf_links[attendence.id]}"
+                                           title="PDF herunterladen"
+                                           aria-label="PDF herunterladen"
+                                           i18n:attributes="title; aria-label">
+                                            <i class="fa fa-file-pdf"></i>
+                                        </a>
+                                    </div>
                                     <a href="${request.link(attendence, name)}">
                                         <p class="list-lead preview">
                                             <tal:b tal:condition="attendence.commission">

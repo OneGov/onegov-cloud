@@ -130,7 +130,7 @@ def test_models(session: Session) -> None:
     assert change.commission == commission
 
     # properties
-    assert parliamentarian.title == 'First Last'
+    assert parliamentarian.title == 'Last First'
     assert change.user == 'User (user@example.org)'
     assert change.date == date(2022, 1, 1)
 

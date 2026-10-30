@@ -281,6 +281,24 @@ pre {
     padding: 0.5rem;
 }
 
+.bulk-edit-header {
+    align-items: center;
+    display: flex;
+    gap: .75rem;
+
+    .list-link {
+        flex: 1;
+        min-width: 0;
+        width: auto;
+    }
+
+    .bulk-pdf-link {
+        flex: 0 0 auto;
+        font-size: 1.25rem;
+        padding: .5rem 0;
+    }
+}
+
 .copy-icon {
     color: #666;
     padding: 0.5rem;

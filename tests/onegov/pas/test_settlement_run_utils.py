@@ -1,6 +1,7 @@
 import transaction
 
 from datetime import date
+from uuid import uuid4
 from onegov.pas.collections.commission import PASCommissionCollection
 from onegov.pas.collections import PASParliamentarianCollection
 from onegov.pas.collections.commission_membership import (
@@ -313,6 +314,21 @@ def test_abschluss_is_scoped_to_person_commission_and_settlement_run(
     )
     assert not has_user_set_abschluss_for_commission(
         session, alice.id, finance.id, date(2025, 8, 1)
+    )
+
+
+    attendance = session.query(Attendence).one()
+    attendance.bulk_edit_id = uuid4()
+    session.flush()
+
+    assert has_user_set_abschluss_for_commission(
+        session, bob.id, finance.id, date(2024, 8, 1)
+    )
+    assert not has_user_set_abschluss_for_commission(
+        session, bob.id, education.id, date(2024, 8, 1)
+    )
+    assert not has_user_set_abschluss_for_commission(
+        session, bob.id, finance.id, date(2025, 8, 1)
     )
 
 

@@ -211,13 +211,20 @@ def get_commission_closure_status(
 
             # Check if this parliamentarian has closed attendance for this
             # commission
-            closed_attendance = session.query(Attendence).filter(
-                Attendence.parliamentarian_id == parliamentarian.id,
-                Attendence.commission_id == commission.id,
-                Attendence.date >= settlement_run.start,
-                Attendence.date <= settlement_run.end,
-                Attendence.abschluss == True
-            ).first()
+            closed_attendance = (
+                session.query(Attendence)
+                .filter(
+                    (
+                        (Attendence.parliamentarian_id == parliamentarian.id)
+                        | Attendence.bulk_edit_id.isnot(None)
+                    ),
+                    Attendence.commission_id == commission.id,
+                    Attendence.date >= settlement_run.start,
+                    Attendence.date <= settlement_run.end,
+                    Attendence.abschluss == True,
+                )
+                .first()
+            )
 
             if closed_attendance:
                 completed_members += 1
