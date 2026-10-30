@@ -1,4 +1,8 @@
-from onegov.core.orm.audit import register_audit_model
+from onegov.core.orm.audit import (
+    column_snapshot,
+    latest_snapshot,
+    register_audit_model,
+)
 from onegov.page.model import Page
 from sqlalchemy import inspect
 
@@ -77,6 +81,8 @@ def page_delete_snapshot(
     session: Session,
     page: Page,
 ) -> dict[str, Any] | None:
+    if inspect(page).detached:
+        return latest_snapshot(session, page) or column_snapshot(page)
     if page.parent in session.deleted:
         return None
     return page_tree_snapshot(page, deleted=True)
