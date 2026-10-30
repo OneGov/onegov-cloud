@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html i18n:domain="onegov.pas">
+    <head>
+        <meta charset="utf-8">
+        <style>
+            body { font-family: sans-serif; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border-bottom: 1px solid #ccc; padding: 6px; }
+            th { text-align: left; }
+        </style>
+    </head>
+    <body>
+        <h1><span i18n:translate="">Plenary session</span>
+            <span i18n:translate="">on</span>
+            ${date_label}</h1>
+        <p><span i18n:translate="">Duration</span>:
+            <span tal:content="python:format(duration / 60, '.2f')">0</span> h</p>
+        <table>
+            <thead>
+                <tr>
+                    <th i18n:translate="">Parliamentarian</th>
+                    <th i18n:translate="">Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="attendance attendances">
+                    <td>${attendance.parliamentarian.title}</td>
+                    <td tal:content="python:format(attendance.duration / 60, '.2f')">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>

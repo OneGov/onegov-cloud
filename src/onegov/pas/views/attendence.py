@@ -6,6 +6,8 @@ from sqlalchemy import false
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
+from onegov.core.templates import render_template
+from onegov.core.utils import normalize_for_filename
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (
@@ -36,7 +38,10 @@ from onegov.pas.utils import (
     get_attendance_parliamentarians,
 )
 from onegov.user import User
+from weasyprint import HTML  # type: ignore[import-untyped]
 from uuid import UUID
+from webob import Response
+from webob.exc import HTTPNotFound
 
 
 from typing import TYPE_CHECKING
@@ -44,7 +49,6 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from onegov.pas.request import PasRequest
-    from webob import Response
 
 
 @PasApp.html(
@@ -248,6 +252,11 @@ def view_attendences(
         'bulk_edit_groups': [
             group for group in bulk_edit_groups if group[0].id in edit_links
         ],
+        'bulk_pdf_links': {
+            group[0].id: request.link(group[0], name='plenary-bulk-pdf')
+            for group in bulk_edit_groups
+            if group[0].id in edit_links and group[0].type == 'plenary'
+        },
         'can_edit_attendences': bool(edit_links),
         'allowances': allowances,
         'filters': {
@@ -256,6 +265,47 @@ def view_attendences(
             'plenary_session': plenary_filters,
         },
     }
+
+
+@PasApp.view(
+    model=Attendence,
+    name='plenary-bulk-pdf',
+    permission=Private,
+    request_method='GET',
+)
+def view_plenary_bulk_pdf(
+    self: Attendence,
+    request: PasRequest,
+) -> Response:
+    if not request.is_admin or self.type != 'plenary' or not self.bulk_edit_id:
+        raise HTTPNotFound()
+
+    attendances = (
+        request.session.query(Attendence)
+        .filter(
+            Attendence.bulk_edit_id == self.bulk_edit_id,
+            Attendence.type == 'plenary',
+        )
+        .order_by(Attendence.parliamentarian_id)
+        .all()
+    )
+    date_label = self.date.strftime('%d.%m.%Y')
+    html = render_template(
+        'plenary_bulk_pdf.pt',
+        request,
+        {
+            'attendances': attendances,
+            'date_label': date_label,
+            'duration': self.duration,
+        },
+    )
+    pdf = HTML(string=str(html)).write_pdf()
+    filename = normalize_for_filename(f'Plenarsitzung_{date_label}')
+    return Response(
+        pdf,
+        content_type='application/pdf',
+        content_disposition=f'attachment; filename={filename}.pdf',
+    )
 
 
 @PasApp.form(
