@@ -689,6 +689,7 @@ def edit_commission_bulk_attendence(
                     attendence = collection.add(
                         parliamentarian_id=parliamentarian_id, **data
                     )
+                    attendence.bulk_edit_id = self.bulk_edit_id
                     Change.add(request, 'add', attendence)
                     if attendence.abschluss and notify_attendence is None:
                         notify_attendence = attendence

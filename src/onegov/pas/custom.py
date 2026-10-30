@@ -217,8 +217,8 @@ def has_user_set_abschluss_for_commission(
         attendance_date: Date to check which settlement run it belongs to
 
     Returns:
-        True if parliamentarian has an attendance with abschluss=True for the
-        commission in the settlement run containing the given date.
+        True if the person or a bulk booking has closed the commission in
+        the settlement run containing the given date.
     """
     settlement_run = (
         session.query(SettlementRun)
@@ -234,7 +234,10 @@ def has_user_set_abschluss_for_commission(
 
     has_abschluss = session.query(
         exists().where(
-            (Attendence.parliamentarian_id == parliamentarian_id)
+            (
+                (Attendence.parliamentarian_id == parliamentarian_id)
+                | Attendence.bulk_edit_id.isnot(None)
+            )
             & (Attendence.commission_id == commission_id)
             & (Attendence.date >= settlement_run.start)
             & (Attendence.date <= settlement_run.end)
