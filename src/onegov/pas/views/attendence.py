@@ -77,6 +77,21 @@ def view_attendences(
         reverse=True,
     )
 
+    attendence_ids = {str(a.id) for a in attendences_sorted}
+    creators: dict[str, str] = {}
+    if attendence_ids:
+        for change in request.session.query(Change).filter_by(
+            model='attendence', action='add'
+        ):
+            change_data = change.changes or {}
+            attendence_id = change_data.get('id')
+            if (
+                isinstance(attendence_id, str)
+                and attendence_id in attendence_ids
+                and change.user
+            ):
+                creators.setdefault(attendence_id, change.user)
+
     type_filters = [
         Link(
             text=request.translate(_('All')),
@@ -243,6 +258,7 @@ def view_attendences(
         'add_link': request.link(self, name='new'),
         'layout': layout,
         'attendences': attendences_sorted,
+        'creators': creators,
         'edit_links': edit_links,
         'title': layout.title,
         'bulk_edit_groups': [
@@ -446,7 +462,8 @@ def add_bulk_attendence(
             notify_attendence = None
             for parliamentarian_id in raw_parl_ids:
                 attendence = self.add(
-                    parliamentarian_id=parliamentarian_id, **data
+                    parliamentarian_id=parliamentarian_id,
+                    **data,
                 )
                 attendence.bulk_edit_id = bulk_edit_id
                 Change.add(request, 'add', attendence)
@@ -782,7 +799,8 @@ def add_plenary_attendence(self: AttendenceCollection,
             bulk_edit_id = uuid.uuid4()
             for parliamentarian_id in raw_parl_ids:
                 attendence = self.add(
-                    parliamentarian_id=parliamentarian_id, **data
+                    parliamentarian_id=parliamentarian_id,
+                    **data,
                 )
                 attendence.bulk_edit_id = bulk_edit_id
                 Change.add(request, 'add', attendence)
