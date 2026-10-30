@@ -543,6 +543,9 @@ msgstr "Noch keine Sitzung erfasst."
 msgid "Session date"
 msgstr "Sitzungsdatum"
 
+msgid "Recorded by"
+msgstr "Erfasst durch"
+
 msgid "edited"
 msgstr "bearbeitet"
 
