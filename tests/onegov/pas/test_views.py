@@ -133,7 +133,7 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     # Verify entities are visible
     assert 'AA' in settings.click('Parteien')
     assert 'BB' in settings.click('Fraktionen')
-    assert 'First Last' in settings.click('Parlamentarier:innen')
+    assert 'Last First' in settings.click('Parlamentarier:innen')
     assert 'CC' in settings.click('Kommissionen')
 
     # Attendences (still editable via UI)
@@ -147,7 +147,7 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     page.form['duration'] = '1'
     page.form['type'] = 'commission'
     page.form['commission_id'].select(text='CC')
-    page.form['parliamentarian_id'].select(text='First Last')
+    page.form['parliamentarian_id'].select(text='Last First')
     page = page.form.submit().follow()
     assert 'Neue Anwesenheit hinzugefügt' in page
 
@@ -159,7 +159,7 @@ def test_views_manage(client_with_fts: Client[TestPasApp]) -> None:
     page.form['duration'] = '2'
     page.form['type'] = 'study'
     page.form['commission_id'].select(text='CC')
-    page.form['parliamentarian_id'].select(text='First Last')
+    page.form['parliamentarian_id'].select(text='Last First')
     page = page.form.submit().follow()
     assert 'Neue Anwesenheit hinzugefügt' in page
 
@@ -477,7 +477,7 @@ def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
     page.form['duration'] = '1'
     page.form['type'] = 'commission'
     page.form['commission_id'].select(text='DD')
-    page.form['parliamentarian_id'].select(text='First Last')
+    page.form['parliamentarian_id'].select(text='Last First')
     page = page.form.submit().follow()
     assert 'Neue Anwesenheit hinzugefügt' in page
 
@@ -488,7 +488,7 @@ def test_simple_attendence_add(client: Client[TestPasApp]) -> None:
     page.form['duration'] = '2'
     page.form['type'] = 'study'
     page.form['commission_id'].select(text='DD')
-    page.form['parliamentarian_id'].select(text='First Last')
+    page.form['parliamentarian_id'].select(text='Last First')
     page = page.form.submit().follow()
     assert 'Neue Anwesenheit hinzugefügt' in page
 
@@ -855,7 +855,7 @@ def test_fetch_commissions_parliamentarians_json(
 
     # Verify Alice, John, and Jane are all present
     parl_titles_in_commission_a = {p['title'] for p in data3[commission1_id]}
-    assert 'Alice President' in parl_titles_in_commission_a
+    assert 'President Alice' in parl_titles_in_commission_a
     assert parl1_title in parl_titles_in_commission_a
     assert parl2_title in parl_titles_in_commission_a
 
@@ -1039,7 +1039,7 @@ def test_settlement_run_complete_translation(
     page.form['duration'] = '1'
     page.form['type'] = 'commission'
     page.form['commission_id'].select(text='TestCommission')
-    page.form['parliamentarian_id'].select(text='Test Person')
+    page.form['parliamentarian_id'].select(text='Person Test')
     page.form['abschluss'] = True
     page = page.form.submit().follow()
 
@@ -1316,7 +1316,7 @@ def test_presidential_allowance_view(client: Client[TestPasApp]) -> None:
     page.form['recipient'] = pres_value
     page = page.form.submit().follow()
     assert 'Zulage hinzugefügt' in page
-    assert 'Hans Präsident' in page
+    assert 'Präsident Hans' in page
     assert 'Q1 2026' in page
 
     # Submit allowance for vice president on run1
@@ -1424,7 +1424,7 @@ def test_abschluss_email_uses_commission_name(
     page.form['duration'] = '2'
     page.form['type'] = 'commission'
     page.form['commission_id'].select(text='Finanzkommission')
-    page.form['parliamentarian_id'].select(text='Max Muster')
+    page.form['parliamentarian_id'].select(text='Muster Max')
     page.form['abschluss'] = False
     page = page.form.submit().follow()
 
