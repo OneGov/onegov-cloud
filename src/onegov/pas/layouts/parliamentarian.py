@@ -32,7 +32,7 @@ class PASParliamentarianLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return f'{self.model.first_name} {self.model.last_name}'
+        return self.model.title
 
     @cached_property
     def og_description(self) -> str:

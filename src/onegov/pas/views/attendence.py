@@ -6,6 +6,9 @@ from sqlalchemy import false
 
 from onegov.core.elements import BackLink, Confirm, Intercooler, Link
 from onegov.core.security import Private
+from onegov.core.templates import render_template
+from onegov.core.utils import module_path
+from onegov.core.utils import normalize_for_filename
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import (
@@ -36,7 +39,13 @@ from onegov.pas.utils import (
     get_attendance_parliamentarians,
 )
 from onegov.user import User
+from weasyprint import CSS, HTML  # type: ignore[import-untyped]
 from uuid import UUID
+from webob import Response
+from webob.exc import HTTPNotFound
+from weasyprint.text.fonts import (  # type: ignore[import-untyped]
+    FontConfiguration,
+)
 
 
 from typing import TYPE_CHECKING
@@ -44,7 +53,6 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from onegov.pas.request import PasRequest
-    from webob import Response
 
 
 @PasApp.html(
@@ -248,6 +256,11 @@ def view_attendences(
         'bulk_edit_groups': [
             group for group in bulk_edit_groups if group[0].id in edit_links
         ],
+        'bulk_pdf_links': {
+            group[0].id: request.link(group[0], name='bulk-attendence-pdf')
+            for group in bulk_edit_groups
+            if group[0].id in edit_links
+        },
         'can_edit_attendences': bool(edit_links),
         'allowances': allowances,
         'filters': {
@@ -256,6 +269,69 @@ def view_attendences(
             'plenary_session': plenary_filters,
         },
     }
+
+
+@PasApp.view(
+    model=Attendence,
+    name='bulk-attendence-pdf',
+    permission=Private,
+    request_method='GET',
+)
+def view_bulk_attendence_pdf(
+    self: Attendence,
+    request: PasRequest,
+) -> Response:
+    if not self.bulk_edit_id or not request.can_edit_attendence(self):
+        raise HTTPNotFound()
+
+    attendances = (
+        request.session.query(Attendence)
+        .filter(
+            Attendence.bulk_edit_id == self.bulk_edit_id,
+            Attendence.type == self.type,
+        )
+        .order_by(Attendence.parliamentarian_id)
+        .all()
+    )
+    date_label = self.date.strftime('%d.%m.%Y')
+    html = render_template(
+        'bulk_attendence_pdf.pt',
+        request,
+        {
+            'attendances': attendances,
+            'date_label': date_label,
+            'duration': self.duration,
+            'type_label': request.translate(_(self.type_label)),
+            'commission': self.commission.title if self.commission else None,
+        },
+    )
+    font_config = FontConfiguration()
+    css_path = module_path(
+        'onegov.pas', 'views/templates/bulk_attendence_pdf.css'
+    )
+    with open(css_path) as css_file:
+        css = CSS(string=css_file.read())
+    logo_path = module_path('onegov.agency', 'static/logos/canton-zg-bw.svg')
+    logo_css = CSS(
+        string=f"""
+        @page {{
+            @top-left {{
+                content: url('file://{logo_path}');
+                width: 3cm;
+            }}
+        }}
+    """
+    )
+    pdf = HTML(string=str(html)).write_pdf(
+        stylesheets=[css, logo_css],
+        font_config=font_config,
+    )
+    filename = normalize_for_filename(f'Massenbuchung_{self.date.isoformat()}')
+    return Response(
+        pdf,
+        content_type='application/pdf',
+        content_disposition=f'attachment; filename={filename}.pdf',
+    )
 
 
 @PasApp.form(
