@@ -173,6 +173,10 @@ $step-border-width: 2px;
         color: var(--step-color);
         background-color: var(--step-bg);
         font-weight: bold;
+
+        .lucide {
+                stroke-width: $bold-stroke;
+        }
     }
 
     .step-label {
@@ -182,37 +186,7 @@ $step-border-width: 2px;
         min-height: $step-indicator-size;
         color: var(--step-label-color);
     }
-}
 
-// Variant for a primary colored background
-.steps-primary {
-    color: $white;
-
-    .step {
-        --step-line-color: #{rgba($white, .5)};
-        --step-label-color: #{$white};
-    }
-
-    .step-complete,
-    .step-current {
-        --step-color: #{$primary};
-        --step-bg: #{$white};
-        --step-border-color: #{$white};
-    }
-
-    .step-upcoming {
-        --step-color: #{$white};
-        --step-bg: #{$primary};
-        --step-border-color: #{$white};
-
-        .step-indicator {
-            opacity: .75;
-        }
-    }
-}
-
-// Variant for a white background
-.steps-white {
     .step {
         --step-line-color: #{$light};
         --step-label-color: #{$light};
@@ -238,6 +212,33 @@ $step-border-width: 2px;
         --step-color: #{$light};
         --step-bg: #{$white};
         --step-border-color: #{$light};
+    }
+}
+
+// Variant for a primary colored background
+.steps-primary-bg {
+    color: $white;
+
+    .step {
+        --step-line-color: #{rgba($white, .5)};
+        --step-label-color: #{$white};
+    }
+
+    .step-complete,
+    .step-current {
+        --step-color: #{$primary};
+        --step-bg: #{$white};
+        --step-border-color: #{$white};
+    }
+
+    .step-upcoming {
+        --step-color: #{$white};
+        --step-bg: #{$primary};
+        --step-border-color: #{$white};
+
+        .step-indicator {
+            opacity: .75;
+        }
     }
 }
 

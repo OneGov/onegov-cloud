@@ -99,6 +99,7 @@ class TownBsTheme(BootstrapBaseTheme):
         """Our scss code split into various files"""
         return [
             'custom_mixins',
+            'lucide',
             'post_imports_customizations',
             'print',
             'town',

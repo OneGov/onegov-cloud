@@ -139,30 +139,3 @@ input::placeholder {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
-
-
-// Lucide icons
-:root {
-    --icon-stroke: 2;
-}
-
-b, strong, th,
-h1, h2, h3, h4, h5, h6,
-.fw-bold, .fw-semibold {
-    --icon-stroke: 2.75;
-}
-
-.fw-light {
-    --icon-stroke: 1.5;
-}
-
-.fw-normal {
-    --icon-stroke: 2;
-}
-
-.lucide {
-    width: 1em;
-    height: 1em;
-    stroke-width: var(--icon-stroke);
-    flex-shrink: 0;
-}

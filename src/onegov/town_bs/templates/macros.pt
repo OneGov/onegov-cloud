@@ -2883,7 +2883,7 @@
 <metal:progress_indicator define-macro="progress_indicator" i18n:domain="onegov.town_bs">
 <tal:b tal:define="steps layout.get_step_sequence()|nothing; bg_primary bg_primary|False">
     <div tal:condition="steps"
-         class="steps ${'steps-primary' if bg_primary else 'steps-white'}">
+         class="steps ${'steps-primary-bg' if bg_primary else ''}">
         <ul class="steps-list">
             <tal:b tal:repeat="step steps">
                 <li class="step step-${state}"
@@ -2893,7 +2893,7 @@
                     tal:attributes="data-step step.position">
                     <!-- Step indicator -->
                     <span class="step-indicator">
-                        <i class="small" data-lucide="check" tal:condition="complete"></i>
+                        <i data-lucide="check" tal:condition="complete"></i>
                         <tal:number condition="not complete">${repeat.step.number}</tal:number>
                     </span>
 
