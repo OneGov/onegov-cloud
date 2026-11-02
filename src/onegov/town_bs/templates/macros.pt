@@ -563,9 +563,9 @@
 <metal:upload define-macro="upload" i18n:domain="onegov.town_bs">
     <form action="${upload_url}" class="upload" method="POST" enctype="multipart/form-data">
         <div class="upload-dropzone dropzone">
-            <input type="file" id="fileElem" class="hidden" multiple>
-            <label class="button" for="fileElem" i18n:translate>Select files</label>
-            <p class="show-for-medium" i18n:translate>Drop files to upload</p>
+            <input type="file" id="fileElem" class="d-none" multiple>
+            <label class="btn btn-primary" for="fileElem" i18n:translate>Select files</label>
+            <p class="show-for-medium" i18n:translate>Or drop files to upload</p>
         </div>
 
         <div class="upload-progress" metal:define-slot='upload-progress'></div>
@@ -3285,19 +3285,24 @@
 </metal:file_info>
 
 <metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.town_bs">
-    <div id="image-${index}" class="image-container">
-        <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
-            <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />
-            <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
-        </a>
-        <a class="delete confirm"
-           ic-delete-from="${request.csrf_protected_url(image.url)}"
-           ic-target="#image-${index}"
-           ic-success-action="remove"
-           data-confirm="Do you really want to delete the image?"
-           data-confirm-yes="Delete Image"
-           data-confirm-no="Cancel"
-           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i data-lucide="x" aria-hidden="true"></i></a>
+    <div id="image-${index}" class="image-container col">
+        <div class="image-container-inner position-relative">
+            <a href="${image.url}" tal:condition="image" class="editable-alt d-block" data-note-update-url="${image.extra}">
+                <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt d-block w-100 h-auto" alt="${image.alt}" width="${image.width}" height="${image.height}" />
+                <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt d-block w-100 h-auto" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}" />
+            </a>
+            <a class="delete delete-image"
+                role="button"
+                hx-delete="${request.csrf_protected_url(image.url)}"
+                hx-target="#image-${index}"
+                hx-swap="delete"
+                hx-confirm="Do you really want to delete the image?"
+                data-confirm-modal="#delete-image-modal"
+                aria-label="Delete Image"
+                i18n:attributes="hx-confirm;aria-label">
+                <i data-lucide="x" aria-hidden="true"></i>
+            </a>
+        </div>
     </div>
 </metal:uploaded_image>
 
@@ -3507,7 +3512,30 @@
     </tal:b>
 </metal:chat>
 
-<metal:modal define-macro="modal">
+<!--!
+    Bootstrap modal. Optional standard footer buttons, defined on use-macro:
+
+    show_close      render the close button (default False)
+    close_icon      lucide icon name in front of the close label
+    close_attrs     extra attributes for the close button (dict)
+    show_confirm    render the confirm button (default False)
+    confirm_icon    lucide icon name in front of the confirm label
+    confirm_attrs   extra attributes for the confirm button (dict), e.g.
+                    {'id': 'do-action-confirmed'} or {'data-confirm-yes': ''}.
+                    Set a value to None to remove a default attribute, e.g.
+                    {'data-bs-dismiss': None}.
+
+    The labels are set with the slots "close_label" (default "Cancel") and
+    "confirm_label" (default "Confirm"). Fill "modal_footer" to replace the
+    footer completely with your own buttons.
+-->
+<metal:modal define-macro="modal" i18n:domain="onegov.town_bs"
+    tal:define="show_close show_close|False;
+                close_icon close_icon|None;
+                close_attrs close_attrs|{};
+                show_confirm show_confirm|False;
+                confirm_icon confirm_icon|None;
+                confirm_attrs confirm_attrs|{}">
 <div class="modal fade" id="${modal_id}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -3521,7 +3549,16 @@
                 <tal:block metal:define-slot="modal_body"></tal:block>
             </div>
             <div class="modal-footer">
-                <tal:block metal:define-slot="modal_footer"></tal:block>
+                <tal:block metal:define-slot="modal_footer">
+                    <button tal:condition="show_close" type="button" data-bs-dismiss="modal" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-xs" tal:attributes="close_attrs">
+                        <i tal:condition="close_icon" data-lucide="${close_icon}" aria-hidden="true"></i>
+                        <tal:block metal:define-slot="close_label"><tal:b i18n:translate="">Cancel</tal:b></tal:block>
+                    </button>
+                    <button tal:condition="show_confirm" type="button" data-bs-dismiss="modal" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-xs" tal:attributes="confirm_attrs">
+                        <i tal:condition="confirm_icon" data-lucide="${confirm_icon}" aria-hidden="true"></i>
+                        <tal:block metal:define-slot="confirm_label"><tal:b i18n:translate="">Confirm</tal:b></tal:block>
+                    </button>
+                </tal:block>
             </div>
         </div>
     </div>

@@ -1,0 +1,76 @@
+// Image descriptions in the image manager, editable on click (editalttext.js)
+.editable-alt {
+    text-decoration: none;
+
+    // Paint the image (including its background) above the caption, which
+    // tucks under it with a negative margin
+    img {
+        position: relative;
+        z-index: 1;
+        // Checkerboard to make transparent areas visible
+        background: white;
+	--cb-size: 20px;
+	--cb-light: #ffffff;
+	--cb-dark: #ededed;
+
+	background: conic-gradient(
+		var(--cb-dark) 25%,
+		var(--cb-light) 0 50%,
+		var(--cb-dark) 0 75%,
+		var(--cb-light) 0
+	) 0 0 / var(--cb-size) var(--cb-size);
+
+    }
+
+    .alt-text {
+        @include font-size($fs-xs);
+        display: block;
+        padding: $s-sm $s-md;
+        background-color: $light-bg-subtle;
+        border-radius: 0 0 $border-radius-lg $border-radius-lg;
+        margin-top: calc(-1 * $s-md);
+        padding-top: $s-lg;
+        color: $body-secondary-color;
+        cursor: text;
+        transition: background-color $standard-transition;
+
+        &:hover, &[contenteditable="true"] {
+            background-color: shade-color($light-bg-subtle, 5%);
+        }
+    }
+
+    .alt-text-missing {
+        background-color: $warning-bg-subtle;
+        font-style: italic;
+    }
+
+    .alt-text-changed-success {
+        background-color: $success-bg-subtle;
+    }
+
+    .alt-text-changed-error {
+        background-color: $danger-bg-subtle;
+    }
+}
+
+.image-container .delete-image {
+    border: 4px solid white;
+    padding: $s-xs;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: $gray-400;
+    color: white;
+    text-decoration: none;
+    z-index: 2;
+    transition: background-color $standard-transition;
+
+    &:hover {
+        background-color: $gray-500;
+    }
+}

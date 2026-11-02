@@ -274,3 +274,18 @@ $step-border-width: 2px;
     color: $primary;
     padding-left: 0;
 }
+
+// Dropzones
+.upload-dropzone {
+    border: 2px dashed $light;
+    border-radius: $border-radius-lg;
+    padding: $s-lg;
+    display: flex;
+    align-items: center;
+
+    p {
+        margin-left: $s-lg;
+        color: $light;
+        margin-bottom: 0;
+    }
+}

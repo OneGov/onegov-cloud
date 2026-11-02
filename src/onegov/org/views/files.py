@@ -369,7 +369,8 @@ def view_get_image_collection(
         Link(
             text=_('Manage Photo Albums'),
             url=request.class_link(ImageSetCollection),
-            attrs={'class': 'new-photo-album'}
+            attrs={'class': 'new-photo-album'},
+            icon='images',
         )
     ]
 

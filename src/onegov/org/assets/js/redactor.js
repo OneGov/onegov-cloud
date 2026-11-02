@@ -348,10 +348,15 @@
 		codemirror: false
 	};
 
-	// Offset for toolbar for town6
+	// Offset for toolbar for town6 and town_bs
 	if (document.body.classList.contains('town-6')) {
-		var header = document.querySelector('#header .nav-bar-sticky')
-		$.Redactor.opts.toolbarFixedTopOffset = header.offsetHeight - 20;
+		// town6 uses '.nav-bar-sticky', town_bs uses '.sticky-wrapper'
+		var header = document.querySelector(
+			'#header .nav-bar-sticky, .sticky-wrapper > .sticky-top'
+		);
+		if (header) {
+			$.Redactor.opts.toolbarFixedTopOffset = header.offsetHeight - 20;
+		}
 	}
 
 	// Functionality
