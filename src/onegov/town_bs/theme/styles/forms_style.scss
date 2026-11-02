@@ -8,6 +8,11 @@
     }
 }
 
+// Bootstrap's form-floating sets a fixed height, restore sizing by rows
+.form-floating > textarea.form-control[rows] {
+    height: auto;
+}
+
 .connector-line {
     height: $s-xl;
     margin-bottom: $s-md;
@@ -15,3 +20,4 @@
     content: '';
     width: 2px;
 }
+

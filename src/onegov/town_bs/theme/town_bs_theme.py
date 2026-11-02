@@ -109,7 +109,7 @@ class TownBsTheme(BootstrapBaseTheme):
             'header',
             'navigation',
             'events_page',
-            'forms_page',
+            'forms_style',
             'search',
             'timeline',
             'ticket',
