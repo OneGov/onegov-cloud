@@ -1,8 +1,87 @@
 # Changes
 
+## 2026.56
+
+`2026-11-02` | [d8f88bbe95...0adef34fe4](https://github.com/OneGov/onegov-cloud/compare/d8f88bbe95^...0adef34fe4)
+
+### Election-Day
+
+##### Avoids error with multiple elections with the same SortGeschaeft id.
+
+`Bugfix` | [OGC-3596](https://linear.app/onegovcloud/issue/OGC-3596) | [433ec7de3e](https://github.com/onegov/onegov-cloud/commit/433ec7de3e2e87813975a5bc9cbb92571eb0e8b2)
+
+### Gis
+
+##### Restrict Mapbox token injection to HTML responses.
+
+Previously, whenever a Mapbox token was configured, it
+scanned every response body for `<body>`, including pdf
+files. In some rare cases I had pdfs that might contain
+such a `<body>` tag, causing the response body to be
+modified and the resulting PDF to become
+unreadable.
+
+`Bugfix` | [OGC-3615](https://linear.app/onegovcloud/issue/OGC-3615) | [d85482cb41](https://github.com/onegov/onegov-cloud/commit/d85482cb4196b898ba8a8e3147ced59eb90dc55b)
+
+### Org
+
+##### Turn allocations yellow as soon as there are any reserved segments
+
+`Feature` | [OGC-3556](https://linear.app/onegovcloud/issue/OGC-3556) | [ed6f6abbea](https://github.com/onegov/onegov-cloud/commit/ed6f6abbea060e6323fa391d9f5b015a3e1bac65)
+
+##### Adds import cli for horw laws.
+
+`Feature` | [OGC-3459](https://linear.app/onegovcloud/issue/OGC-3459) | [d807bc62c4](https://github.com/onegov/onegov-cloud/commit/d807bc62c486329939d8168a5841ce7ddeeff8d4)
+
+##### Changes date format in export.
+
+`Feature` | [OGC-3572](https://linear.app/onegovcloud/issue/OGC-3572) | [9c8e403daf](https://github.com/onegov/onegov-cloud/commit/9c8e403daf2d3273520e54382216e60884083736)
+
+##### Allows availability periods to be extended on a specific date (#2764)
+
+`Feature` | [OGC-3567](https://linear.app/onegovcloud/issue/OGC-3567) | [836b1d242d](https://github.com/onegov/onegov-cloud/commit/836b1d242d802802b0a4cd9011852d8a9a191fdd)
+
+##### Show opening hours link in sidebar.
+
+`Feature` | [OGC-3427](https://linear.app/onegovcloud/issue/OGC-3427) | [6bd08da8b7](https://github.com/onegov/onegov-cloud/commit/6bd08da8b7672752b4750dbfd524d567510894fc)
+
+##### Be more robust in export if no event url exists.
+
+`Bugfix` | [OGC-3569](https://linear.app/onegovcloud/issue/OGC-3569) | [30d130011e](https://github.com/onegov/onegov-cloud/commit/30d130011ec302c315ab9dd1f4df6194af312b10)
+
+### Pas
+
+##### Download all single parliamentarian pdfs concatenated.
+
+`Feature` | [OGC-3599](https://linear.app/onegovcloud/issue/OGC-3599) | [c46f74b232](https://github.com/onegov/onegov-cloud/commit/c46f74b232607fe2eb7701828858cb5c9f11eee2)
+
+##### Changes column in export according to requirement.
+
+`Feature` | [OGC-3607](https://linear.app/onegovcloud/issue/OGC-3607) | [58fad88997](https://github.com/onegov/onegov-cloud/commit/58fad88997142a908083f90c4a6bd3b8818b23cb)
+
+##### Close for all members if commission closed.
+
+`Feature` | [OGC-3605](https://linear.app/onegovcloud/issue/OGC-3605) | [c749f93b72](https://github.com/onegov/onegov-cloud/commit/c749f93b72eff9964f7fedae440808cbd2e14a49)
+
+##### Additional pdf for each bulk attendance.
+
+`Feature` | [OGC-3598](https://linear.app/onegovcloud/issue/OGC-3598) | [220fa48105](https://github.com/onegov/onegov-cloud/commit/220fa48105b37c80bc77c80440cd3563cb86c34e)
+
+##### Shows who recorded attendance.
+
+`Feature` | [OGC-3597](https://linear.app/onegovcloud/issue/OGC-3597) | [0adef34fe4](https://github.com/onegov/onegov-cloud/commit/0adef34fe45d64d34f8f52286aacf6439bd5a6b2)
+
+##### Excludes zero-duration atttendances from pdf.
+
+`Bugfix` | [OGC-3609](https://linear.app/onegovcloud/issue/OGC-3609) | [bb5b810def](https://github.com/onegov/onegov-cloud/commit/bb5b810def28d9171cf4cabe7ccf6a6ba8b7ba88)
+
+##### Allow commission presidents to edit attendance before closure.
+
+`Bugfix` | [OGC-3603](https://linear.app/onegovcloud/issue/OGC-3603) | [2d0c3f99ba](https://github.com/onegov/onegov-cloud/commit/2d0c3f99ba42ce3587edcbad53c355e5242b2eae)
+
 ## 2026.55
 
-`2026-10-28` | [8105c0efd6...e3fa6c95cd](https://github.com/OneGov/onegov-cloud/compare/8105c0efd6^...e3fa6c95cd)
+`2026-10-28` | [8105c0efd6...ba046ccdbe](https://github.com/OneGov/onegov-cloud/compare/8105c0efd6^...ba046ccdbe)
 
 ### Event
 
@@ -5436,74 +5515,4 @@ checking for `self_id` in meta.
 ##### Adds Political Business views
 
 `Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [1aafa8de9e](https://github.com/onegov/onegov-cloud/commit/1aafa8de9e7cd0e26a2607acb46e4005e4829a97)
-
-## 2025.27
-
-`2025-06-27` | [b4b7a8fd28...9c0c99df62](https://github.com/OneGov/onegov-cloud/compare/b4b7a8fd28^...9c0c99df62)
-
-### Form
-
-##### Fixes another small regression in formcode related to pricing
-
-`Bugfix` | [OGC-2349](https://linear.app/onegovcloud/issue/OGC-2349) | [fdd2ad3be7](https://github.com/onegov/onegov-cloud/commit/fdd2ad3be761dfeb7243cc3d5289969a1fa8e800)
-
-### Org
-
-##### Adds icon to date picker in calendar views to make it more obvious
-
-This also ensures picked dates are added to the browser history
-
-`Feature` | [OGC-2330](https://linear.app/onegovcloud/issue/OGC-2330) | [5abe2b07f9](https://github.com/onegov/onegov-cloud/commit/5abe2b07f931a95c67b6f2c696927af37883df4c)
-
-##### Only display VAT for forms that have it enabled
-
-This also includes a payment summary in the ticket opened/closed mails
-which replaces the price display and a payment summary in the ticket
-status page.
-
-`Feature` | [OGC-2341](https://linear.app/onegovcloud/issue/OGC-2341) | [987e72bcb6](https://github.com/onegov/onegov-cloud/commit/987e72bcb60a243582127a7add0543c3c2b3a536)
-
-##### Make it more obvious that pay later means pay by invoice
-
-`Feature` | [OGC-2340](https://linear.app/onegovcloud/issue/OGC-2340) | [c714a4aa3c](https://github.com/onegov/onegov-cloud/commit/c714a4aa3c13c5a614e2d851c788bfff3cff7deb)
-
-##### Allows setting a shared e-mail for immediate ticket notifications
-
-`Feature` | [OGC-2360](https://linear.app/onegovcloud/issue/OGC-2360) | [5d80af7c0e](https://github.com/onegov/onegov-cloud/commit/5d80af7c0e5576fb1cae0bc37774a4bcc89800ad)
-
-##### Keeps track of which tickets view was visited last
-
-This applies to the link in the breadcrumbs and where we redirect to
-after closing/deleting a ticket.
-
-This also fixes an unrelated bug with the stored ticket summary for RSV
-tickets.
-
-`Feature` | [OGC-2362](https://linear.app/onegovcloud/issue/OGC-2362) | [d239ca03bc](https://github.com/onegov/onegov-cloud/commit/d239ca03bc560105e5b079d95215f16de70474f1)
-
-##### Fixes crash in ticket PDF for Worldline Saferpay payments
-
-`Bugfix` | [OGC-2345](https://linear.app/onegovcloud/issue/OGC-2345) | [00054ff0bf](https://github.com/onegov/onegov-cloud/commit/00054ff0bf62c1d0ecc3b3dc8f8e2fb508d25f89)
-
-##### Avoid crash in latest occurrence view if there are no occurrences
-
-`Bugfix` | [d4135bb209](https://github.com/onegov/onegov-cloud/commit/d4135bb2095c10d99177ae7e15c965293ef834d6)
-
-### Pay
-
-##### Avoid logging exception for aborted Saferpay transactions
-
-`Bugfix` | [OGC-2239](https://linear.app/onegovcloud/issue/OGC-2239) | [fcba01085d](https://github.com/onegov/onegov-cloud/commit/fcba01085ddd1f274f64c5e7234ec513bb156330)
-
-### Ris
-
-##### Adding views
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [dfee5bf84f](https://github.com/onegov/onegov-cloud/commit/dfee5bf84fbff5f997a816d43a273c01673b5a2c)
-
-### User
-
-##### Fixes signature/digest configuration for SAML2 provider
-
-`Bugfix` | [OGC-2248](https://linear.app/onegovcloud/issue/OGC-2248) | [78c9317dcc](https://github.com/onegov/onegov-cloud/commit/78c9317dcc7e27824f6feafcac1e3b22eaacaca9)
 
