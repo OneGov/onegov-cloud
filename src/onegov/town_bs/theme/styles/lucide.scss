@@ -26,3 +26,16 @@ h1, h2, h3, h4, h5, h6,
     stroke-width: var(--icon-stroke);
     flex-shrink: 0;
 }
+
+@mixin lucide-icon($paths, $color: currentColor, $stroke: $normal-stroke) {
+    content: '';
+    width: 1em;
+    height: 1em;
+    background-color: $color;
+    mask: #{escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='#{$stroke}' stroke-linecap='round' stroke-linejoin='round'>#{$paths}</svg>"))} center / contain no-repeat;
+}
+
+
+// Only define icons here if you cannot use the lucide library.
+// Otherwise, define icons in the template with <i data-lucide="icon-name"></i>
+$lucide-arrow-right: "<path d='M5 12h14'/><path d='m12 5 7 7-7 7'/>";

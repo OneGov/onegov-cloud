@@ -1,4 +1,9 @@
 .styled-list {
+    --styled-list-color: #{$body-color};
+    --styled-list-border-color: #{$light-subtle};
+    --styled-list-accent-color: #{$primary};
+    --styled-list-icon-opacity: 1;
+
     list-style: none;
     padding-left: 0;
     margin-bottom: 0;
@@ -7,22 +12,20 @@
         display: flex;
         align-items: center;
         gap: $s-md;
-        border-bottom: 2px solid $light-subtle;
+        border-bottom: 2px solid var(--styled-list-border-color);
         transition: border $standard-transition;
+        @include font-size($fs-md);
 
         * {
             transition: all $standard-transition;
         }
 
-        // TODO: Replace ">" with the real icon as soon as the icon library is known
         &::after {
-            content: '\f061';
-            font-weight: bold;
-            font-family: 'Font Awesome 5 Free';
+            @include lucide-icon($lucide-arrow-right, var(--styled-list-accent-color));
             flex-shrink: 0;
-            color: $primary;
-            padding-right: $s-sm;
-            transition: transform $standard-transition;
+            margin-right: $s-sm;
+            opacity: var(--styled-list-icon-opacity);
+            transition: transform $standard-transition, opacity $standard-transition;
         }
 
         .styled-list-link {
@@ -34,14 +37,13 @@
             min-width: 0;
             padding: $s-md 0;
             text-decoration: none;
-            color: $body-color;
+            color: var(--styled-list-color);
 
             .styled-list-title {
                 grid-column: 1;
                 grid-row: 1;
                 display: block;
                 margin-bottom: 0;
-                @include font-size($fs-md);
             }
 
             .styled-list-lead {
@@ -70,14 +72,15 @@
         }
 
         &:hover {
-            border-bottom-color: $primary;
+            border-bottom-color: var(--styled-list-accent-color);
 
             .styled-list-link {
-                color: $primary;
+                color: var(--styled-list-accent-color);
             }
 
             &::after {
                 transform: translateX($s-sm);
+                opacity: 1;
             }
         }
     }
@@ -93,7 +96,7 @@
         }
     }
 
-    // Small variant
+    // Extra small variant
     &.styled-list-xs {
         .styled-list-link {
             padding: $s-xs 0;
@@ -102,6 +105,14 @@
                 @include font-size($fs-xs);
             }
         }
+    }
+
+    // Variant for a primary colored background
+    &.styled-list-primary {
+        --styled-list-color: #{$white};
+        --styled-list-border-color: #{rgba($white, .5)};
+        --styled-list-accent-color: #{$white};
+        --styled-list-icon-opacity: .7;
     }
 }
 
