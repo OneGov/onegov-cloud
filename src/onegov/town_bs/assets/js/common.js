@@ -14,13 +14,13 @@ var setupRedirectAfter = function(elements) {
 // qr code modals
 var addModalImage = function(parent, rawData, fmt) {
     var src = 'data:image/' + fmt + ';base64,' + rawData;
-    parent.append($(`<img class="qr" src="${src}">`));
+    parent.append($(`<img class="qr img-fluid d-block mb-md" src="${src}">`));
 };
 
 var addModalDownload = function(parent, rawData, fmt) {
     var src = 'data:image/' + fmt + ';base64,' + rawData;
     var title = window.document.title;
-    parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
+    parent.append($(`<a class="qr btn btn-primary" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
 };
 
 // sets up the given nodes with the functionality provided by common.js
@@ -46,7 +46,7 @@ var processCommonNodes = function(elements, out_of_band) {
     });
 
     // back links
-    targets.find('a[data-back-link], .button[data-back-link]').on('click', function() {
+    targets.find('a[data-back-link], .btn[data-back-link]').on('click', function() {
         if (document.referrer) {
             window.open(document.referrer, '_self');
         } else {
@@ -66,7 +66,7 @@ var processCommonNodes = function(elements, out_of_band) {
     });
 
     // submitting a targetted form based on the specified selector
-    targets.find('.button[data-submits-form]').on('click', function() {
+    targets.find('.btn[data-submits-form]').on('click', function() {
         $($(this).data('submits-form')).submit();
     });
 
@@ -216,16 +216,32 @@ $(document).on('process-common-nodes', function(_e, elements) {
     highlightTags(elements);
 });
 
+// map legacy foundation alert types to bootstrap contextual classes
+var alertTypes = {
+    alert: 'danger',
+    error: 'danger',
+    success: 'success',
+    warning: 'warning',
+    info: 'info',
+    primary: 'primary',
+    secondary: 'secondary'
+};
+
 // A generic error messages handler
 function showAlertMessage(message, type, target) {
-    type = type || 'alert';
+    type = alertTypes[type] || type || 'danger';
     target = target || '#alert-boxes';
 
     var alert = $('<div />')
-        .attr('data-closable', '')
-        .attr('class', 'alert-box callout ' + (type || 'alert'))
+        .attr('class', 'alert alert-' + type + ' alert-dismissible fade show')
+        .attr('role', 'alert')
         .text(message);
-    $(target || '#alert-boxes').append(alert);
+
+    var closeButton = $('<button type="button" class="btn-close" data-bs-dismiss="alert"></button>')
+        .attr('aria-label', locale('Close'));
+
+    alert.append(closeButton);
+    $(target).append(alert);
 }
 
 $(document).on('show-alert', function(_, data) {
@@ -328,17 +344,20 @@ page_refs.on('success', function(e) {
 
     // var success_msg = e.trigger.getAttribute('data-on-success');
     var msgContainer = $('#clipboard-copy');
-    msgContainer.toggleClass('hidden');
+    msgContainer.toggleClass('d-none');
     setTimeout(
-        function() { msgContainer.toggleClass('hidden'); },
+        function() { msgContainer.toggleClass('d-none'); },
         1500
     );
     e.clearSelection();
 });
 
-// Allow custom reveal widths
-$('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
-    this.style.width = this.dataset.revealWidth;
+// Allow custom modal widths
+$('.modal[data-modal-width]').on('show.bs.modal', function() {
+    var dialog = this.querySelector('.modal-dialog');
+    if (dialog) {
+        dialog.style.maxWidth = this.dataset.modalWidth;
+    }
 });
 
 // Page edit form style adjustments
@@ -347,7 +366,7 @@ $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
         formField.style.width = '90%';
     }
     var divWrapper = formField.parentElement.parentElement;
-    divWrapper.style.marginLeft = '1.55rem';
+    divWrapper.classList.add('ms-lg');
 });
 
 // Height of header images
@@ -424,12 +443,8 @@ if (level !== 'none' && $('.sidebar-wrapper').length) {
     }
 }
 
-$('.is-accordion-submenu-parent a span').on('click', function(e) {
-    e.stopPropagation();
-});
-
-$('.page-main-content table, .page-main-content table').each(function() {
-    if ($(this).width() > $('.page-main-content').width() || $(this).width() > $('.page-main-content').width()) {
+$('.page-main-content table').each(function() {
+    if ($(this).width() > $('.page-main-content').width()) {
         const $table = $(this);
         const $container = $('<div class="table-container"></div>');
         const $gradient = $('<div class="scroll-gradient"></div>');

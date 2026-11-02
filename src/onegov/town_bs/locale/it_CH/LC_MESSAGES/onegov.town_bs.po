@@ -427,6 +427,9 @@ msgstr ""
 "Per modificare le descrizioni delle immagini, fai clic su una di esse, "
 "inserisci la descrizione e premi Invio. Per interrompere premere Esc."
 
+msgid "Select image"
+msgstr "Seleziona immagine"
+
 msgid "No images uploaded yet"
 msgstr "Nessuna immagine caricata"
 

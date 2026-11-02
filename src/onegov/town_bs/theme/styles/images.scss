@@ -1,36 +1,38 @@
-// Image descriptions in the image manager, editable on click (editalttext.js)
+@mixin image-caption {
+    @include font-size($fs-xs);
+    display: block;
+    padding: $s-sm $s-md;
+    background-color: $light-bg-subtle;
+    border-radius: 0 0 $border-radius-lg $border-radius-lg;
+    margin-top: calc(-1 * $s-md);
+    padding-top: $s-lg;
+    color: $body-secondary-color;
+}
+
 .editable-alt {
     text-decoration: none;
 
-    // Paint the image (including its background) above the caption, which
-    // tucks under it with a negative margin
     img {
         position: relative;
         z-index: 1;
         // Checkerboard to make transparent areas visible
         background: white;
-	--cb-size: 20px;
-	--cb-light: #ffffff;
-	--cb-dark: #ededed;
 
-	background: conic-gradient(
-		var(--cb-dark) 25%,
-		var(--cb-light) 0 50%,
-		var(--cb-dark) 0 75%,
-		var(--cb-light) 0
-	) 0 0 / var(--cb-size) var(--cb-size);
+        --cb-size: 20px;
+        --cb-light: white;
+        --cb-dark: #ededed;
+
+        background: conic-gradient(
+            var(--cb-dark) 25%,
+            var(--cb-light) 0 50%,
+            var(--cb-dark) 0 75%,
+            var(--cb-light) 0
+        ) 0 0 / var(--cb-size) var(--cb-size);
 
     }
 
     .alt-text {
-        @include font-size($fs-xs);
-        display: block;
-        padding: $s-sm $s-md;
-        background-color: $light-bg-subtle;
-        border-radius: 0 0 $border-radius-lg $border-radius-lg;
-        margin-top: calc(-1 * $s-md);
-        padding-top: $s-lg;
-        color: $body-secondary-color;
+        @include image-caption;
         cursor: text;
         transition: background-color $standard-transition;
 
@@ -72,5 +74,51 @@
 
     &:hover {
         background-color: $gray-500;
+    }
+}
+
+.grid-imageset,
+.image-select {
+    img {
+        position: relative;
+        z-index: 1;
+    }
+
+    .alt-text {
+        @include image-caption;
+    }
+}
+
+.image-select {
+    .image-container {
+        img {
+            filter: grayscale(100%);
+            transition: box-shadow $standard-transition, filter $standard-transition;
+        }
+
+        &:hover img {
+            box-shadow: 0 0 0 3px $gray-300;
+        }
+
+        &.selected img {
+            filter: none;
+            box-shadow: 0 0 0 3px $primary;
+        }
+
+        &:has(input[type="checkbox"]:focus-visible) img {
+            outline: 2px solid $primary;
+            outline-offset: 5px;
+        }
+
+        input[type="checkbox"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
     }
 }

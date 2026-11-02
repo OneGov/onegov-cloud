@@ -427,6 +427,9 @@ msgstr ""
 "Klicken Sie auf die Beschreibung um diese zu ändern. Zum Bestätigen drücken "
 "Sie die Eingabe-, zum Abbrechen die Esc-Taste."
 
+msgid "Select image"
+msgstr "Bild auswählen"
+
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
 

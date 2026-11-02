@@ -430,6 +430,9 @@ msgstr ""
 "votre description et appuyez sur retour. Pour interrompre, appuyez sur "
 "sortir."
 
+msgid "Select image"
+msgstr "Sélectionner l'image"
+
 msgid "No images uploaded yet"
 msgstr "Aucune image téléchargée pour le moment"
 

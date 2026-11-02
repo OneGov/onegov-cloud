@@ -3,42 +3,43 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="grid-x">
-            <div class="small-12 cell">
+        <tal:b metal:use-macro="layout.macros.page_content">
+            <tal:b metal:fill-slot="main-content">
                 <form id="main-form" action="${action}" method="POST" enctype="multipart/form-data">
-                    <div class="alert alert-info">
-                        <p i18n:translate="">
+                    <div class="alert alert-info mb-xl">
+                        <p class="mb-0" i18n:translate="">
                             Select the images that should be shown inside this album.
                         </p>
                     </div>
 
                     <tal:b tal:repeat="group images">
-                        <h3 i18n:translate="">${group['group']}</h3>
-                            <ul class="image-grid image-select">
-                                <li tal:repeat="image group['images']" id="image-${repeat.image.index}" class="image-container ${image.selected and 'selected' or ''}">
-                                    <img data-src="${image.src}" class="lazyload" />
+                        <h2 i18n:translate="">${group['group']}</h2>
+                        <ul class="image-grid image-select list-unstyled row row-cols-1 row-cols-sm-3 row-cols-lg-5 g-lg align-items-start mb-xl">
+                            <li tal:repeat="image group['images']" id="image-${repeat.image.index}" class="image-container col ${image.selected and 'selected' or ''}">
+                                <div class="image-container-inner position-relative">
+                                    <img data-src="${image.src}" class="lazyload d-block w-100 h-auto" />
                                     <tal:b condition="image.selected">
-                                        <input type="checkbox" class="checkbox" name="${image.id}" checked />
+                                        <input type="checkbox" class="checkbox" name="${image.id}" aria-label="Select image" i18n:attributes="aria-label" checked />
                                     </tal:b>
 
                                     <tal:b condition="not:image.selected">
-                                        <input type="checkbox" class="checkbox" name="${image.id}" />
+                                        <input type="checkbox" class="checkbox" name="${image.id}" aria-label="Select image" i18n:attributes="aria-label" />
                                     </tal:b>
-                                </li>
-                            </ul>
+                                </div>
+                            </li>
+                        </ul>
                     </tal:b>
 
-                    <div class="alert alert-info">
-                        <p i18n:translate="">
+                    <div class="alert alert-info" tal:condition="images">
+                        <p class="mb-0" i18n:translate="">
                             Select the images that should be shown inside this album.
                         </p>
                     </div>
-
                 </form>
                 <tal:b condition="not:images">
                     <p i18n:translate="">No images uploaded yet</p>
                 </tal:b>
-            </div>
-        </div>
+            </tal:b>
+        </tal:b>
     </tal:b>
 </div>

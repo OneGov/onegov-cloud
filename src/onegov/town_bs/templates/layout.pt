@@ -147,7 +147,7 @@
                 <div metal:use-macro="layout.macros['editbar']"></div>
             </div>
 
-            <div class="container" id="alert-boxes">
+            <div class="container mt-md" id="alert-boxes">
             <div tal:condition="form.errors|nothing" class="alert alert-warning alert-dismissible fade show mt-md" role="alert">
                 <tal:b i18n:translate>The form contains errors. Please check the fields marked in red.</tal:b>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
