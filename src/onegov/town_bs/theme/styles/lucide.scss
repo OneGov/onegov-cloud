@@ -1,0 +1,28 @@
+$normal-stroke: 2;
+$light-stroke: 1.5;
+$bold-stroke: 3;
+
+:root {
+    --icon-stroke: #{$normal-stroke};
+}
+
+b, strong, th,
+h1, h2, h3, h4, h5, h6,
+.fw-bold, .fw-semibold {
+    --icon-stroke: #{$bold-stroke};
+}
+
+.fw-light {
+    --icon-stroke: #{$light-stroke};
+}
+
+.fw-normal {
+    --icon-stroke: #{$normal-stroke};
+}
+
+.lucide {
+    width: 1em;
+    height: 1em;
+    stroke-width: var(--icon-stroke);
+    flex-shrink: 0;
+}
