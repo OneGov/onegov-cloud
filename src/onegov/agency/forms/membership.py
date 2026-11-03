@@ -55,7 +55,7 @@ def person_id_choices(
         return person.title
 
     return [
-        SelectChoice(str(p.id), title(p))
+        SelectChoice(p.id.hex, title(p))
         for p in ExtendedPersonCollection(form.request.session).query()
     ]
 

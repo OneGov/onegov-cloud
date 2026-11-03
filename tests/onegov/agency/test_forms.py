@@ -231,7 +231,6 @@ def test_move_agency_form(session: Session) -> None:
         SelectChoice('5', 'f')
     ]
 
-    form.parent_id._choices_stale = True
     form.apply_model(agency_a_2)
     assert form.parent_id.choices == [
         SelectChoice('root', '- Root -'),
@@ -240,7 +239,6 @@ def test_move_agency_form(session: Session) -> None:
         SelectChoice('5', 'f')
     ]
 
-    form.parent_id._choices_stale = True
     form.apply_model(agency_a_2_1)
     assert form.parent_id.choices == [
         SelectChoice('root', '- Root -'),
@@ -250,7 +248,6 @@ def test_move_agency_form(session: Session) -> None:
         SelectChoice('5', 'f')
     ]
 
-    form.parent_id._choices_stale = True
     form.apply_model(agency_f)
     assert form.parent_id.choices == [
         SelectChoice('1', 'a'),
@@ -295,11 +292,11 @@ def test_membership_form(session: Session) -> None:
     form = MembershipForm()
     form.request = request
     assert form.person_id.choices == [
-        SelectChoice(str(doctor.id), 'Rivera Nick')
+        SelectChoice(doctor.id.hex, 'Rivera Nick')
     ]
 
     form = MembershipForm(DummyPostData({
-        'person_id': str(doctor.id),
+        'person_id': doctor.id.hex,
         'title': "Doctor",
         'since': "2000",
         'addition': "Surgery",
@@ -307,7 +304,7 @@ def test_membership_form(session: Session) -> None:
         'prefix': "*",
     }))
     assert form.get_useful_data() == {
-        'person_id': str(doctor.id),
+        'person_id': doctor.id,
         'title': "Doctor",
         'addition': "Surgery",
         'note': "Retired",
@@ -541,7 +538,7 @@ def test_user_group_form(session: Session) -> None:
 
     form.apply_model(group)
     assert form.name.data == 'A/B'
-    assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
+    assert set(form.users.data) == {user_a.id, user_b.id}
     assert set(form.agencies.data) == {str(agency_a.id), str(agency_b.id)}
     assert form.immediate_notification.data == 'yes'
 
@@ -550,7 +547,7 @@ def test_user_group_form(session: Session) -> None:
     user_c.logout_all_sessions.reset_mock()
 
     form.name.data = 'A.1'
-    form.users.data = [str(user_c.id)]
+    form.users.data = [user_c.id]
     form.agencies.data = [str(agency_a_1.id)]
     form.immediate_notification.data = 'no'
     form.update_model(group)

@@ -30,6 +30,7 @@ from typing import cast
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Callable, Collection
     from webob.request import _FieldStorageWithFile
 
 
@@ -211,10 +212,18 @@ class ExtendedAgencyForm(Form):
 
     def reorder_export_fields(self) -> None:
         chosen = self.export_fields.data or []
+
+        # sort the chosen values in the same order they were chosen in
+        # the rest of the values go at the end
+        def sort_key(choice: SelectChoice) -> float:
+            for idx, c in enumerate(chosen):
+                if c == choice.value:
+                    return idx
+            return float('Inf')
+
         self.export_fields.choices = sorted(
             self.export_fields.choices,
-            # we want the chosen ones first False (0) comes before True (1)
-            key=lambda choice: choice.value not in chosen
+            key=sort_key,
         )
 
     def apply_model(self, model: ExtendedAgency) -> None:
@@ -249,23 +258,31 @@ class ExtendedAgencyForm(Form):
         self.reorder_export_fields()
 
 
-def parent_id_choices(
-    form: MoveAgencyForm,
-    field: ChosenSelectField
-) -> list[SelectChoice]:
-    agencies = ExtendedAgencyCollection(form.request.session)
-    choices = [
-        SelectChoice(str(agency.id), agency.title)
-        for agency in agencies.query().order_by(None).order_by(
-            func.unaccent(ExtendedAgency.title)
-        )
-        if form.request.has_permission(agency, Private)
-    ]
-    if form.request.has_permission(agencies, Private):
-        choices.insert(
-            0, SelectChoice('root', form.request.translate(_('- Root -')))
-        )
-    return choices
+def get_parent_id_choices_callback(
+    excluded: Collection[str] = ()
+) -> Callable[[MoveAgencyForm, ChosenSelectField], list[SelectChoice]]:
+    def parent_id_choices(
+        form: MoveAgencyForm,
+        field: ChosenSelectField
+    ) -> list[SelectChoice]:
+        agencies = ExtendedAgencyCollection(form.request.session)
+        choices = [
+            SelectChoice(str(agency.id), agency.title)
+            for agency in agencies.query().order_by(None).order_by(
+                func.unaccent(ExtendedAgency.title)
+            )
+            if form.request.has_permission(agency, Private)
+            if str(agency.id) not in excluded
+        ]
+        if (
+            form.request.has_permission(agencies, Private)
+            and 'root' not in excluded
+        ):
+            choices.insert(
+                0, SelectChoice('root', form.request.translate(_('- Root -')))
+            )
+        return choices
+    return parent_id_choices
 
 
 class MoveAgencyForm(Form):
@@ -273,7 +290,7 @@ class MoveAgencyForm(Form):
 
     parent_id = ChosenSelectField(
         label=_('Destination'),
-        choices=parent_id_choices,
+        choices=get_parent_id_choices_callback(),
         validators=[
             InputRequired()
         ]
@@ -310,12 +327,10 @@ class MoveAgencyForm(Form):
         model.parent_id = new_parent_id
 
     def apply_model(self, model: ExtendedAgency) -> None:
+        removed: set[str] = set()
+
         def remove(item: ExtendedAgency) -> None:
-            self.parent_id.choices = [
-                choice
-                for choice in self.parent_id.choices
-                if choice.value != str(item.id)
-            ]
+            removed.add(str(item.id))
 
         def remove_with_children(item: ExtendedAgency) -> None:
             remove(item)
@@ -325,5 +340,7 @@ class MoveAgencyForm(Form):
         if model.parent:
             remove(model.parent)
         else:
-            self.parent_id.choices = self.parent_id.choices[1:]
+            removed.add('root')
         remove_with_children(model)
+
+        self.parent_id.choices = get_parent_id_choices_callback(removed)

@@ -508,8 +508,10 @@ def test_event_form_update_apply(session: Session) -> None:
     ]))
     form.request = Bunch(  # type: ignore[assignment]
         session=session,
+        translate=lambda txt: txt,
         app=Bunch(
-            org=Bunch(event_filter_type='tags')
+            org=Bunch(event_filter_type='tags'),
+            custom_event_tags=None
         )
     )
     assert form.validate()
@@ -522,7 +524,8 @@ def test_event_form_update_apply(session: Session) -> None:
         translate=lambda txt: txt,
         include=lambda src: None,
         app=Bunch(
-            org=Bunch(event_filter_type='tags')
+            org=Bunch(event_filter_type='tags'),
+            custom_event_tags=None,
         )
     )
     form.process(obj=event)
@@ -553,7 +556,7 @@ def test_event_form_update_after_midnight(session: Session) -> None:
     form.request = Bunch(  # type: ignore[assignment]
         session=session,
         app=Bunch(
-            org=Bunch(event_filter_type='tags')
+            org=Bunch(event_filter_type='tags', custom_event_tags=None)
         )
     )
     assert form.validate()
@@ -880,7 +883,7 @@ def test_user_group_form(
 
     form.name.data = 'A/B'
     form.name.raw_data = ['A/B']
-    form.users.data = [str(user_a.id), str(user_b.id)]
+    form.users.data = [user_a.id, user_b.id]
     form.ticket_permissions.data = ['EVN', 'FRM-A-1', 'RSV-Kitchen']
     form.immediate_notification.data = ['EVN', 'DIR-Trainers']
     assert form.validate()
@@ -895,7 +898,7 @@ def test_user_group_form(
 
     form.apply_model(group)
     assert form.name.data == 'A/B'
-    assert set(form.users.data) == {str(user_a.id), str(user_b.id)}
+    assert set(form.users.data) == {user_a.id, user_b.id}
     assert set(form.ticket_permissions.data) == {
         'EVN', 'FRM-A-1', 'RSV-Kitchen'
     }
@@ -911,7 +914,7 @@ def test_user_group_form(
 
     form.name.data = 'A.1'
     form.name.raw_data = ['A.1']
-    form.users.data = [str(user_c.id)]
+    form.users.data = [user_c.id]
     form.ticket_permissions.data = ['PER']
     form.immediate_notification.data = ['EVN', 'PER']
     assert form.validate()

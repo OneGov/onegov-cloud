@@ -94,6 +94,10 @@ class BatchCopyAllocationRulesForm(Form):
         validators=[InputRequired()],
     )
 
+    def on_request(self) -> None:
+        if not self.request.POST:
+            self.rules.data = [c.value for c in self.rules.choices]
+
 
 class AllocationFormHelpers:
 
@@ -200,16 +204,28 @@ class AllocationRuleForm(Form):
         validators=[InputRequired()],
         fieldset=_('Period'),
         default='no',
-        choices=map(SelectChoice.from_input, (
-            ('no', _("Don't extend this availability period automatically")),
-            ('daily', _('Extend by one day at midnight')),
-            ('monthly', _('Extend by one month at the end of the month')),
-            ('yearly', _('Extend by one year at the end of the year')),
-            (
+        choices=(
+            SelectChoice(
+                'no',
+                _("Don't extend this availability period automatically")
+            ),
+            SelectChoice(
+                'daily',
+                _('Extend by one day at midnight')
+            ),
+            SelectChoice(
+                'monthly',
+                _('Extend by one month at the end of the month')
+            ),
+            SelectChoice(
+                'yearly',
+                _('Extend by one year at the end of the year')
+            ),
+            SelectChoice(
                 'yearly_scheduled',
                 _('Extend by one year at a given date')
             )
-        )))
+        ))
 
     extend_on = DateField(
         label=_('Extend on'),

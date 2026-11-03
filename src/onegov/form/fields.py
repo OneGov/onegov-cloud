@@ -774,7 +774,7 @@ class HtmlField(TextAreaField):
         def __init__(self, *args: Any, **kwargs: Any):
             self.form = kwargs.get('_form')
 
-            if (render_kw := kwargs.get('render_kw', {})).get('class_'):
+            if not (render_kw := kwargs.get('render_kw', {})).get('class_'):
                 render_kw['class_'] = 'editor'
                 kwargs['render_kw'] = render_kw
 
@@ -1037,7 +1037,7 @@ class _TreeSelectMixin(_TreeSelectMixinBase):
             self.render_kw = {}
 
         self.render_kw['data-choices'] = json.dumps(choices)
-        self.choices = self.flatten_choices(choices)
+        self.choices = list(self.flatten_choices(choices))
 
 
 class TreeSelectField(_TreeSelectMixin, SelectField):

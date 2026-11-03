@@ -105,8 +105,8 @@ class PolicyAreaField(SelectMultipleField):
         ) -> None: ...
     else:
         def __init__(self, *args, **kwargs):
-            self.tree = kwargs.pop('tree', [])
             super().__init__(*args, **kwargs)
+            self.tree = kwargs.pop('tree', [])
 
     @property
     def tree(self) -> list[PolicyAreaTreeNode]:

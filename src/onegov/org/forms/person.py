@@ -24,7 +24,7 @@ def organisations_multiple_choices(
     choices: list[SelectChoice] = []
     for cat, sub in zip(categories, subcategories):
         choices.append(SelectChoice(cat))
-        choices.extend(SelectChoice(f'-{s}') for s in sub)
+        choices.extend(SelectChoice(f'-{s}', f'- {s}') for s in sub)
     return choices
 
 

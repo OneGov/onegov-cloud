@@ -1190,10 +1190,10 @@ def test_abschluss_blocks_bulk_add_only_for_same_commission(
             )
         )
 
-    commission_id = str(commission.id)
-    other_commission_id = str(other_commission.id)
-    bob_id = str(bob.id)
-    alice_id = str(alice.id)
+    commission_id = commission.id.hex
+    other_commission_id = other_commission.id.hex
+    bob_id = bob.id.hex
+    alice_id = alice.id.hex
 
     users = UserCollection(session)
     president_user = users.by_username('zgalice')
@@ -1604,8 +1604,8 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
                 role='member',
             )
         )
-    alice_id, bob_id = str(alice.id), str(bob.id)
-    commission_id = str(commission.id)
+    alice_id, bob_id = alice.id.hex, bob.id.hex
+    commission_id = commission.id.hex
     session.flush()
     transaction.commit()
 
@@ -1617,17 +1617,17 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     page.form['parliamentarian_id'] = [alice_id]
     page.form.submit().follow()
 
-    attendance = client.app.session().query(Attendence).one()
+    attendance = session.query(Attendence).one()
     group_id = attendance.bulk_edit_id
     edit_url = f'/attendence/{attendance.id}/edit-commission-bulk-attendences'
     page = client.get(edit_url)
     page.form['parliamentarian_id'] = [alice_id, bob_id]
     page.form.submit().follow()
 
-    records = client.app.session().query(Attendence).all()
+    records = session.query(Attendence).all()
     assert len(records) == 2
     assert {record.bulk_edit_id for record in records} == {group_id}
-    assert {str(record.parliamentarian_id) for record in records} == {
+    assert {record.parliamentarian_id.hex for record in records} == {
         alice_id,
         bob_id,
     }
@@ -1648,5 +1648,5 @@ def test_commission_bulk_edit_keeps_added_members_in_group(
     page.form['parliamentarian_id'] = [alice_id]
     page.form.submit().follow()
     remaining = client.app.session().query(Attendence).one()
-    assert str(remaining.parliamentarian_id) == alice_id
+    assert remaining.parliamentarian_id.hex == alice_id
     assert remaining.bulk_edit_id == group_id

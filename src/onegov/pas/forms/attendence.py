@@ -25,7 +25,6 @@ from wtforms.fields import RadioField
 from wtforms.fields import SelectChoice
 from wtforms.validators import InputRequired, NumberRange, ValidationError
 from onegov.user import User
-from uuid import UUID
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -34,6 +33,7 @@ if TYPE_CHECKING:
     from onegov.pas.models import Attendence
     from onegov.pas.request import PasRequest
     from typing import Any
+    from uuid import UUID
 
 
 class SettlementRunBoundMixin:
@@ -127,7 +127,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
     )
 
     def _can_edit_parliamentarian(
-        self, parliamentarian_id: str
+        self, parliamentarian_id: UUID
     ) -> tuple[bool, str | None]:
         """Check if current user can edit attendance for given parl ID.
 
@@ -151,7 +151,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
         if not user or not user.parliamentarian:  # type: ignore[attr-defined]
             return (False, _('User has no parliamentarian record.'))
 
-        user_parl_id = str(user.parliamentarian.id)  # type: ignore[attr-defined]
+        user_parl_id = user.parliamentarian.id  # type: ignore[attr-defined]
 
         if parliamentarian_id == user_parl_id:
             return (True, None)
@@ -160,7 +160,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             return (False, _('You can only edit your own attendance.'))
 
         target_parl = PASParliamentarianCollection(self.request.app).by_id(
-            UUID(parliamentarian_id)
+            parliamentarian_id
         )
         if not target_parl:
             return (False, _('Target parliamentarian not found.'))
@@ -204,11 +204,10 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
             collection = PASParliamentarianCollection(self.request.app)
             parliamentarian = collection.by_id(self.parliamentarian_id.data)
             if parliamentarian:
-                commission_ids = [
-                    str(membership.commission_id)
+                if self.commission_id.data not in (
+                    membership.commission_id
                     for membership in parliamentarian.commission_memberships
-                ]
-                if self.commission_id.data not in commission_ids:
+                ):
                     assert isinstance(self.commission_id.errors, list)
                     self.commission_id.errors.append(
                         _('Parliamentarian is not in this commission.')
@@ -671,7 +670,7 @@ class AttendenceCommissionBulkEditForm(AttendenceEditBulkForm):
             SelectChoice(obj.commission.id.hex, obj.commission.title)
         ]
 
-        self.commission_id.data = str(obj.commission_id)
+        self.commission_id.data = obj.commission_id
 
         self.parliamentarian_id.data = [
             attendence.parliamentarian_id for attendence in attendences
@@ -700,12 +699,6 @@ class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
                 self.request.session).query().filter_by(
                     bulk_edit_id=obj.bulk_edit_id
                 )
-        selected_parliamentarians = [
-            (
-                str(attendence.parliamentarian.id),
-                attendence.parliamentarian.title
-            ) for attendence in attendences
-        ]
 
         self.parliamentarian_id.choices = [
             SelectChoice(p.id.hex, p.title)
@@ -713,7 +706,8 @@ class AttendencePlenaryBulkEditForm(AttendenceEditBulkForm):
         ]
 
         self.parliamentarian_id.data = [
-            choice[0] for choice in selected_parliamentarians
+            attendence.parliamentarian.id
+            for attendence in attendences
         ]
 
     def on_request(self) -> None:

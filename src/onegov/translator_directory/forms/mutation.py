@@ -1,3 +1,4 @@
+from copy import deepcopy
 from depot.io.utils import FileIntent
 from functools import cached_property
 from io import BytesIO
@@ -90,11 +91,11 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         self.request.include('tags-input')
         self.locale = self.request.locale if self.request.locale else 'de_CH'
 
-        self.mother_tongues.choices = self.language_choices.copy()
-        self.spoken_languages.choices = self.language_choices.copy()
-        self.written_languages.choices = self.language_choices.copy()
-        self.monitoring_languages.choices = self.language_choices.copy()
-        self.certificates.choices = self.certificate_choices.copy()
+        self.mother_tongues.choices = deepcopy(self.language_choices)
+        self.spoken_languages.choices = deepcopy(self.language_choices)
+        self.written_languages.choices = deepcopy(self.language_choices)
+        self.monitoring_languages.choices = deepcopy(self.language_choices)
+        self.certificates.choices = deepcopy(self.certificate_choices)
         self.nationalities.choices = nationality_choices(self.request.locale)
 
         self.hide(self.drive_distance)
@@ -111,7 +112,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                     choice.label = self.request.translate(choice.label)
 
                 choice_lookup = {c.value: c.label for c in field.choices}
-                field.choices = [SelectChoice(''), *field.choices]
+                field.choices = [SelectChoice('', '_'), *field.choices]
                 field.long_description = choice_lookup.get(  # type:ignore
                     str(value), ''
                 )
@@ -120,7 +121,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                     choice.label = self.request.translate(choice.label)
 
                 choice_lookup = {c.value: c.label for c in field.choices}
-                field.choices = [SelectChoice(''), *field.choices]
+                field.choices = [SelectChoice('', '_'), *field.choices]
                 field.long_description = ', '.join(  # type:ignore
                     choice_lookup.get(str(getattr(v, 'id', v)), '')
                     for v in value

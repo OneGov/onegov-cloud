@@ -152,7 +152,7 @@ class SearchForm(Form):
 
         remove = remove or []
         field.choices = [
-            SelectChoice('code', text)
+            SelectChoice(str(code), text)
             # NOTE: This assumes we don't pass a custom name to the field
             for code, text in SwissVote.codes(field.name).items()
             if code not in remove
