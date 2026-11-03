@@ -373,19 +373,19 @@
 </metal:footer_locales>
 
 <metal:partners define-macro="partner-card">
-    <div data-aos="fade" data-aos-duration="800" class="card" tal:condition="item.image_url">
+    <div data-aos="fade" data-aos-duration="800" class="card p-md" tal:condition="item.image_url">
         <a tal:attributes="href item.url">
-            <img src="${item.image_url}" alt="${item.lead or ''}">
+            <img class="rounded-2 img-fluid" src="${item.image_url}" alt="${item.lead or ''}">
         </a>
         <div tal:condition="item.lead" class="card-section visually-hidden">${item.lead}</div>
     </div>
 </metal:partners>
 
 <metal:partners define-macro="partner-cards" i18n:domain="onegov.town_bs" tal:define="subpage subpage|False">
-    <div class="partners row row-cols-4 row-cols-lg-6 g-3 justify-content-center">
-        <div class="col" tal:repeat="item partners">
+    <div class="partners d-flex flex-wrap justify-content-center gap-md">
+        <tal:b tal:repeat="item partners">
             <metal:b use-macro="layout.macros['partner-card']" />
-        </div>
+        </tal:b>
     </div>
 </metal:partners>
 
@@ -404,7 +404,7 @@
 <metal:card define-macro="directory-card">
     <a class="directory-item" data-aos="fade" data-aos-duration="800" tal:attributes="href link.url">
     <div class="card">
-        <h3 class="mt-2xl d-flex align-items-center"><i data-lucide="list"></i> ${link.text}</h3>
+        <h3 class="mt-2xl d-flex align-items-center"><i class="me-md" data-lucide="list"></i> ${link.text}</h3>
         <p class="mb-2xl">${link.subtitle}</p>
     </div>
     </a>
@@ -2079,17 +2079,11 @@
                 </div>
             </div>
 
-            <!-- Controls are only shown if there is more than one slide -->
-            <tal:b tal:condition="len(slides) > 1">
-                <button class="carousel-control-prev" type="button" data-bs-target="#testimonial-slider" data-bs-slide="prev">
-                    <i data-lucide="chevron-left" aria-hidden="true"></i>
-                    <span class="visually-hidden">Previous Slide</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#testimonial-slider" data-bs-slide="next">
-                    <i data-lucide="chevron-right" aria-hidden="true"></i>
-                    <span class="visually-hidden">Next Slide</span>
-                </button>
-            </tal:b>
+            <div class="carousel-indicators mb-nsm">
+                <button type="button" data-bs-target="#testimonial-slider" data-bs-slide-to="0" class="active bg-light-subtle" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#testimonial-slider" data-bs-slide-to="1" class="bg-light-subtle" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#testimonial-slider" data-bs-slide-to="2" class="bg-light-subtle" aria-label="Slide 3"></button>
+            </div>
         </div>
     </tal:b>
 </metal:testimonial_slider>

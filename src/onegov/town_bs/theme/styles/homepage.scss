@@ -115,3 +115,39 @@
         }
     }
 }
+
+.testimonial-slider {
+    .testimonial-slider-controls {
+        display: flex;
+        justify-content: center;
+        gap: $s-xs;
+        margin-top: $s-md;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        position: static;
+        width: auto;
+        color: $primary;
+        opacity: 1;
+        @include font-size($fs-2xl);
+
+        &:hover,
+        &:focus {
+            color: shade-color($primary, 20%);
+        }
+    }
+}
+
+
+.partners .card {
+    max-width: calc(10 * $s-xl);
+    min-width: calc(6 * $s-xl);
+    justify-content: center;
+
+    img {
+        max-height: calc(6 * $s-xl - 2 * $s-md);
+        width: auto;
+        object-fit: contain;
+    }
+}
