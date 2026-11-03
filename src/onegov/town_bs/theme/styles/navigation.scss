@@ -69,9 +69,7 @@
     }
 }
 
-// Bridge the gap between toggle and menu to keep the hover state.
-// Values are in inset order (top right bottom left): the strip starts
-// at the wrapper edge the menu opens to and extends $s-xs beyond it.
+// Global tools, dropdowns
 $dropdown-bridges: (
     "dropdown": 100% 0 (-$s-xs) 0,
     "dropup": (-$s-xs) 0 100% 0,
@@ -84,5 +82,23 @@ $dropdown-bridges: (
         content: "";
         position: absolute;
         inset: $inset;
+    }
+}
+
+.nav-link.dropdown-item {
+    transition: none;
+}
+
+#navbarEditbar, #globals {
+    .nav-link {
+        border-radius: $border-radius;
+
+        &:hover {
+                background: $gray-500 ;
+        }
+    }
+
+    .dropdown-menu .nav-link:hover {
+        background: $gray-300;
     }
 }
