@@ -638,7 +638,7 @@ def test_attendance_choices_use_selected_settlement(
         ('Future', datetime.date(2024, 10, 1), None),
     ):
         person = people.add(first_name=name, last_name='Test')
-        ids[name] = str(person.id)
+        ids[name] = person.id.hex
         session.add(
             PASParliamentarianRole(
                 parliamentarian_id=person.id,
@@ -659,7 +659,7 @@ def test_attendance_choices_use_selected_settlement(
         )
     session.flush()
     run_id = str(run.id)
-    commission_id = str(commission.id)
+    commission_id = commission.id.hex
     session.flush()
     transaction.commit()
 
@@ -1104,9 +1104,9 @@ def test_commission_president_bulk_add(
         )
     )
 
-    commission_id = str(commission.id)
-    bob_id = str(bob.id)
-    alice_id = str(alice.id)
+    commission_id = commission.id.hex
+    bob_id = bob.id.hex
+    alice_id = alice.id.hex
 
     users = UserCollection(session)
     president_user = users.by_username('zgalice')

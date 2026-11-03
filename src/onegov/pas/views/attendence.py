@@ -585,7 +585,7 @@ def edit_plenary_bulk_attendence(
         return request.redirect(request.class_link(AttendenceCollection))
 
     all_parliamentarians = [
-        str(p.id) for p in get_attendance_parliamentarians(request)
+        p.id for p in get_attendance_parliamentarians(request)
     ]
 
     if form.submitted(request):
@@ -603,13 +603,12 @@ def edit_plenary_bulk_attendence(
                 }
 
         data = form.get_useful_data()
-        raw_parl_ids = request.POST.getall('parliamentarian_id')
-        data.pop('parliamentarian_id', None)
+        parl_ids = data.pop('parliamentarian_id', ())
         collection = AttendenceCollection(request.session)
 
         unselected_parliamentarians = [
             pid for pid in all_parliamentarians
-            if pid not in raw_parl_ids
+            if pid not in parl_ids
         ]
         for parliamentarian in unselected_parliamentarians:
             if attendence := collection.query().filter(
@@ -619,7 +618,7 @@ def edit_plenary_bulk_attendence(
                 Change.add(request, 'delete', attendence)
                 collection.delete(attendence)
 
-        for parliamentarian_id in raw_parl_ids:
+        for parliamentarian_id in parl_ids:
             attendence = collection.query().filter(
                     Attendence.parliamentarian_id == parliamentarian_id,
                     Attendence.bulk_edit_id == form.bulk_edit_id.data,
@@ -705,7 +704,7 @@ def edit_commission_bulk_attendence(
             assert form.date.data is not None
             if (
                 form.bulk_edit_id.data != str(self.bulk_edit_id)
-                or form.commission_id.data != str(self.commission_id)
+                or form.commission_id.data != self.commission_id
                 or not all(
                     request.can_edit_commission_attendance(
                         form.date.data, self.commission_id, person_id
@@ -942,8 +941,8 @@ def edit_attendence(
             assert form.date.data is not None
             if (
                 form.type.data == 'plenary'
-                or form.commission_id.data != str(self.commission_id)
-                or form.parliamentarian_id.data != str(self.parliamentarian_id)
+                or form.commission_id.data != self.commission_id
+                or form.parliamentarian_id.data != self.parliamentarian_id
                 or not request.can_edit_commission_attendance(
                     form.date.data,
                     self.commission_id,

@@ -361,9 +361,9 @@ class IntegerFieldAdapter(BaseAdapter):
 class RadioFieldAdapter(BaseAdapter):
     def __call__(self, field: WTField) -> Generator[Any]:
         yield from self.handle_scalar_field_type(Literal[*(  # type: ignore[arg-type]
-            value
-            for value, _ in field.choices  # type: ignore[attr-defined]
-            if value
+            choice.value
+            for choice in field.choices  # type: ignore[attr-defined]
+            if choice.value
         )], field)
         yield from self.adapt_validators(field.validators)
 
@@ -372,9 +372,9 @@ class RadioFieldAdapter(BaseAdapter):
 class MultiCheckboxFieldAdapter(BaseAdapter):
     def __call__(self, field: WTField) -> Generator[Any]:
         yield from self.handle_sequence_field_type(Literal[*(  # type: ignore[arg-type]
-            value
-            for value, _ in field.choices  # type: ignore[attr-defined]
-            if value
+            choice.value
+            for choice in field.choices  # type: ignore[attr-defined]
+            if choice.value
         )], field)
         yield from self.adapt_validators(field.validators)
 

@@ -322,10 +322,10 @@ def test_edit_commission_bulk_unique_parliamentarians(
 
     choices = form.parliamentarian_id.choices
     assert len(choices) == 2
-    assert set(choices) == {
+    assert sorted(choices, key=lambda c: c.value) == sorted((
         SelectChoice(selected.id.hex, selected.title),
         SelectChoice(unselected.id.hex, unselected.title),
-    }
+    ), key=lambda c: c.value)
     assert form.parliamentarian_id.data == [selected.id]
 
 

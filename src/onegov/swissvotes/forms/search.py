@@ -172,7 +172,10 @@ class SearchForm(Form):
 
     def select_all(self, field: SelectMultipleField) -> None:
         if not field.data:
-            field.data = [choice.value for choice in field.choices]
+            field.data = [
+                field.coerce(choice.value)
+                for choice in field.choices
+            ]
 
     def apply_model(self, model: SwissVoteCollection) -> None:
         self.from_date.data = model.from_date
