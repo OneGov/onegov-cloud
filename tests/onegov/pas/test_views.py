@@ -757,12 +757,12 @@ def test_fetch_commissions_parliamentarians_json(
     memberships.add(commission_id=commission2.id, parliamentarian_id=parl3.id)
 
     session.flush()
-    commission1_id = str(commission1.id)
-    commission2_id = str(commission2.id)
+    commission1_id = commission1.id.hex
+    commission2_id = commission2.id.hex
     parl1_title = parl1.title
     parl2_title = parl2.title
     parl3_title = parl3.title
-    parl3_id = str(parl3.id)
+    parl3_id = parl3.id.hex
     transaction.commit()
 
     client.login_admin()
@@ -801,7 +801,7 @@ def test_fetch_commissions_parliamentarians_json(
     commissions = PASCommissionCollection(session)
     commission3 = commissions.add(name='Empty Commission')
     session.flush()
-    commission3_id = str(commission3.id)
+    commission3_id = commission3.id.hex
 
     response2 = client.get('/commissions/commissions-parliamentarians-json')
     data2 = response2.json
