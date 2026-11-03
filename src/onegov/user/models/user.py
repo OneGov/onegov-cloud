@@ -94,14 +94,15 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the username may be any string, but will usually be an email address
     username: Mapped[str] = mapped_column(
         LowercaseText,
-        unique=True
+        unique=True,
+        active_history=True,
     )
 
     #: the password is stored with the hashing algorithm defined by onegov.core
     password_hash: Mapped[str]
 
     #: the role is relevant for security in onegov.core
-    role: Mapped[str]
+    role: Mapped[str] = mapped_column(active_history=True)
 
     #: the group this user belongs to
     groups: Mapped[list[UserGroup]] = relationship(
@@ -112,7 +113,7 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the real name of the user for display (use the :attr:`name` property
     #: to automatically get the name or the username)
-    realname: Mapped[str | None]
+    realname: Mapped[str | None] = mapped_column(active_history=True)
 
     #: extra data that may be stored with this user, the format and content
     #: of this data is defined by the consumer of onegov.user
@@ -148,16 +149,16 @@ class User(Base, TimestampMixin, ORMSearchable):
     #
     #: A user can technically come from changing providers - the source refers
     #: to the last provider he used.
-    source: Mapped[str | None]
+    source: Mapped[str | None] = mapped_column(active_history=True)
 
     #: A string describing the user id on the source, which is an id that is
     #: supposed never change (unlike the username, which may change).
     #:
     #: If set, the source_id is unique per source.
-    source_id: Mapped[str | None]
+    source_id: Mapped[str | None] = mapped_column(active_history=True)
 
     #: true if the user is active
-    active: Mapped[bool] = mapped_column(default=True)
+    active: Mapped[bool] = mapped_column(default=True, active_history=True)
 
     #: timestamp of the last successful login
     last_login: Mapped[datetime | None]

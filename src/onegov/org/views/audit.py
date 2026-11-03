@@ -21,8 +21,26 @@ if TYPE_CHECKING:
 
 
 class AuditEntryFact(NamedTuple):
+    """A labelled detail shown beneath an audit entry's target title."""
+
     label: str
     value: object
+
+
+def audit_entry_title(entry: AuditEntry) -> str:
+    snapshot = entry.snapshot
+    if entry.target_table == 'role_mappings':
+        subject = snapshot.get('username') or snapshot.get('group_id')
+        return (
+            f'{subject}: {snapshot.get("role")} '
+            f'({snapshot.get("content_type")} #{snapshot.get("content_id")})'
+        )
+    return str(
+        snapshot.get('title')
+        or snapshot.get('username')
+        or snapshot.get('name')
+        or entry.target_table
+    )
 
 
 def page_snapshot_subpage_count(
@@ -60,6 +78,8 @@ def page_audit_entry_facts(
     )
 
 
+# Optional display details by table; this does not control audit recording.
+# Only pages currently add a detail: the number of contained subpages.
 AUDIT_ENTRY_FACTORIES: dict[
     str,
     Callable[[AuditEntry, OrgRequest], tuple[AuditEntryFact, ...]],
@@ -214,6 +234,9 @@ def view_audit_trail(
         'layout': layout or AuditTrailLayout(self, request),
         'title': _('Audit Trail'),
         'entries': entries,
+        'entry_titles': {
+            entry.id: audit_entry_title(entry) for entry in entries
+        },
         'filters': filters,
         'entry_facts': {
             entry.id: audit_entry_facts(entry, request) for entry in entries
@@ -247,6 +270,7 @@ def view_audit_entry(
         'layout': layout,
         'title': _('Audit Trail Entry'),
         'entry': self,
+        'entry_title': audit_entry_title(self),
         'operation': operation,
         'current_page': current_page,
         'diff': (

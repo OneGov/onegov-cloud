@@ -61,7 +61,7 @@ def test_page_audit_entries(
     assert all(entry.created is not None for entry in entries)
 
 
-def test_page_audit_requires_user(
+def test_page_audit_without_identity(
     session: Session,
     session_manager: SessionManager,
 ) -> None:
@@ -78,7 +78,14 @@ def test_page_audit_requires_user(
             session.flush()
             pages.delete(page)
 
-    assert session.query(AuditEntry).count() == 0
+    entries = session.query(AuditEntry).order_by(AuditEntry.created).all()
+    assert [entry.operation for entry in entries] == [
+        'insert',
+        'update',
+        'delete',
+    ]
+    assert all(entry.username == 'unknown' for entry in entries)
+    assert all(entry.user_id is None for entry in entries)
 
 
 def test_page_audit_retains_user_identity(
