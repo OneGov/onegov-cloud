@@ -16,6 +16,9 @@ class MatchForm(Form):
 
     prefer_organiser = BooleanField(
         label=_('Children of organisers'),
+        description=_(
+            'Only individuals who offer at least one event during the current '
+            'period are considered organizers.'),
         fieldset=_('Prefer the following children:'),
         default=False)
 
