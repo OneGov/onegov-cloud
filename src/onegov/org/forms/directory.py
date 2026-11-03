@@ -91,7 +91,8 @@ class DirectoryBaseForm(Form):
         #        are further below. But maybe we just always
         #        reserve those fields, regardless of configuration...
         require_email_field=False,
-        require_title_fields=True
+        require_title_fields=True,
+        validators=[InputRequired()]
     )
 
     enable_map = RadioField(
