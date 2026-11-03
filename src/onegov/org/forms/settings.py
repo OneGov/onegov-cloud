@@ -857,7 +857,10 @@ class MapSettingsForm(Form):
             SelectChoice('geo-admin', _('Swisstopo (Default)')),
             SelectChoice('geo-admin-aerial', _('Swisstopo Aerial')),
             SelectChoice('geo-mapbox', 'Mapbox'),
-            SelectChoice('geo-vermessungsamt-winterthur', 'Vermessungsamt Winterthur'),
+            SelectChoice(
+                'geo-vermessungsamt-winterthur',
+                'Vermessungsamt Winterthur'
+            ),
             SelectChoice('geo-zugmap-basisplan', 'ZugMap Basisplan Farbig'),
             SelectChoice('geo-zugmap-orthofoto', 'ZugMap Orthofoto'),
             SelectChoice('geo-bs', 'Geoportal Basel-Stadt'),

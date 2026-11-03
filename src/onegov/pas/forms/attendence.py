@@ -406,7 +406,9 @@ class AttendenceAddForm(AttendenceForm):
                             if member.id in seen:
                                 continue
                             seen.add(member.id)
-                            choices.append(SelectChoice(member.id.hex, member.title))
+                            choices.append(
+                                SelectChoice(member.id.hex, member.title)
+                            )
 
                 self.parliamentarian_id.choices = choices
             else:
