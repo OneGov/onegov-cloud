@@ -378,7 +378,7 @@ class Search(Pagination[Any]):
                 #       since been removed.
                 continue
 
-            primary_key, = inspect(base_model).primary_key  # type: ignore[union-attr]
+            primary_key, = inspect(base_model).primary_key
 
             results_by_id.update(
                 self.request.session.query(primary_key, base_model)
