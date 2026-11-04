@@ -9,7 +9,7 @@ from onegov.search.utils import language_from_locale
 from markupsafe import Markup
 from operator import itemgetter
 from sedate import align_date_to_day, as_datetime, replace_timezone, utcnow
-from sqlalchemy import func, inspect, type_coerce
+from sqlalchemy import func, inspect, or_, type_coerce
 from sqlalchemy_utils import escape_like
 from wtforms import SelectChoice
 
@@ -272,6 +272,12 @@ class Search(Pagination[Any]):
             end = replace_timezone(as_datetime(self.end), 'Europe/Zurich')
             end = align_date_to_day(end, 'Europe/Zurich', 'up')
             query = query.filter(SearchIndex.last_change <= end)
+
+        if self.language != 'simple':
+            query.filter(or_(
+                SearchIndex.language == self.language,
+                SearchIndex.language.is_(None)
+            ))
 
         return query
 

@@ -69,6 +69,10 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     def fts_skip(self) -> bool:
         return self.meta.get('trait') == 'link'  # do not index links
 
+    @property
+    def fts_language(self) -> str:
+        return language_from_locale(self.locale, 'auto')
+
     lead: dict_property[str | None] = content_property()
     text = dict_markup_property('content')
     url: dict_property[str | None] = content_property()

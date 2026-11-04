@@ -145,10 +145,13 @@ class Indexer:
                 owner_id_column = _owner_id_column
 
             detected_language = task['language']
+            target_language: str | None = detected_language
             if language_from_locale(detected_language) == 'simple':
                 detected_language = 'simple'
+                target_language = None
 
             if detected_language not in self.languages:
+                target_language = None
                 if len(self.languages) == 1:
                     language = next(iter(self.languages))
                 else:
@@ -173,6 +176,7 @@ class Indexer:
                 '_owner_tablename': tablename,
                 '_public': task['public'],
                 '_access': task.get('access', 'public'),
+                '_language': target_language,
                 '_last_change': task['last_change'],
                 '_rank_modifier': task['rank_modifier'],
                 '_tags': _tags,
@@ -258,6 +262,7 @@ class Indexer:
                     bindparam('_publication_end'),
                 SearchIndex.public: bindparam('_public'),
                 SearchIndex.access: bindparam('_access'),
+                SearchIndex.language: bindparam('_language'),
                 SearchIndex.last_change: bindparam('_last_change'),
                 SearchIndex.rank_modifier: bindparam('_rank_modifier'),
                 SearchIndex._tags:
@@ -281,6 +286,7 @@ class Indexer:
                 'publication_end': stmt.excluded.publication_end,
                 'public': stmt.excluded.public,
                 'access': stmt.excluded.access,
+                'language': stmt.excluded.language,
                 'last_change': stmt.excluded.last_change,
                 'rank_modifier': stmt.excluded.rank_modifier,
                 'tags': stmt.excluded.tags,
