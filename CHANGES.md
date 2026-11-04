@@ -1,8 +1,57 @@
 # Changes
 
+## 2026.57
+
+`2026-11-04` | [2717e89354...6ba2b3fc56](https://github.com/OneGov/onegov-cloud/compare/2717e89354^...6ba2b3fc56)
+
+### Core
+
+##### Upgrades to WTForms 3.3
+
+`Feature` | [OGC-3589](https://linear.app/onegovcloud/issue/OGC-3589) | [aaa985a81e](https://github.com/onegov/onegov-cloud/commit/aaa985a81ea017c66fd124fd5c1e3c1698e0a97c)
+
+### Feriennet
+
+##### Add info in matching for organizer children
+
+Add a description for what counts as an organizer.
+
+`Feature` | [OGC-1535](https://linear.app/onegovcloud/issue/OGC-1535) | [e31d0ff3d7](https://github.com/onegov/onegov-cloud/commit/e31d0ff3d7adb9d1b1b6eaf2519e603f3a827a8a)
+
+##### Ensures billing reset deletes the invoice items
+
+This also enforces that none of the invoice items have been paid for
+
+`Bugfix` | [ONEGOV-CLOUD-60N](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-60N) | [28005eff73](https://github.com/onegov/onegov-cloud/commit/28005eff73b616a9d9c19cdbb521512bde8df6a3)
+
+### Org
+
+##### Ensures the formcode input is required on directory definitions
+
+The old implementation was implicitly required, through the formcode
+validator, which required an explicit `Optional` in order to make the
+field optional. The new `FormcodeField` can be optional without this
+validator.
+
+`Bugfix` | [ONEGOV-CLOUD-60Q](https://seantis-gmbh.sentry.io/issues/?query=ONEGOV-CLOUD-60Q) | [e51b72d214](https://github.com/onegov/onegov-cloud/commit/e51b72d21480f93e5e01392c09733d748b0c7489)
+
+##### Adds rel=newfollow attribute to (tag) event and directory filters
+
+Filters as links creates a crawl trap as crawlers follow all filter
+combination links.
+
+`Bugfix` | [SEA-2017](https://linear.app/seantis/issue/SEA-2017) | [7d6e883be8](https://github.com/onegov/onegov-cloud/commit/7d6e883be8804256c3d5b5b9a9a17aaf4d5f3763)
+
+##### Excludes mTAN protected entries from public directory exports
+
+This also makes sure that the file is only stored to the browser's
+private cache for logged in users.
+
+`Bugfix` | [OGC-3618](https://linear.app/onegovcloud/issue/OGC-3618) | [6ba2b3fc56](https://github.com/onegov/onegov-cloud/commit/6ba2b3fc567cd4b1ba5580db23094fed1ced886e)
+
 ## 2026.56
 
-`2026-11-02` | [d8f88bbe95...0adef34fe4](https://github.com/OneGov/onegov-cloud/compare/d8f88bbe95^...0adef34fe4)
+`2026-11-02` | [d8f88bbe95...bb467b21d6](https://github.com/OneGov/onegov-cloud/compare/d8f88bbe95^...bb467b21d6)
 
 ### Election-Day
 
@@ -5493,26 +5542,4 @@ checking for `self_id` in meta.
 ##### Filter meetings to only show those with items.
 
 `Bugfix` | [OGC-2388](https://linear.app/onegovcloud/issue/OGC-2388) | [581e5260e4](https://github.com/onegov/onegov-cloud/commit/581e5260e463218b752a24a6469678ba91bac88f)
-
-## 2025.28
-
-`2025-06-30` | [61c47ca6f9...d352e57dcf](https://github.com/OneGov/onegov-cloud/compare/61c47ca6f9^...d352e57dcf)
-
-### Ris
-
-##### Adds missing translations and fixes address import
-
-`Feature` | [OGC-2375](https://linear.app/onegovcloud/issue/OGC-2375) | [61c47ca6f9](https://github.com/onegov/onegov-cloud/commit/61c47ca6f9a3c2684b1e666a27354f6ba28a379a)
-
-##### Link to membership only for managers
-
-`Feature` | [OGC-2377](https://linear.app/onegovcloud/issue/OGC-2377) | [33cc1983c5](https://github.com/onegov/onegov-cloud/commit/33cc1983c5460942caf00b17e4c0c29bf07f5c57)
-
-##### Display iterest table for parliamentarians
-
-`Feature` | [OGC-2300](https://linear.app/onegovcloud/issue/OGC-2300) | [3e48eda4c4](https://github.com/onegov/onegov-cloud/commit/3e48eda4c4b1aa0ead39c579998ff3e6311c8af9)
-
-##### Adds Political Business views
-
-`Feature` | [OGC-2245](https://linear.app/onegovcloud/issue/OGC-2245) | [1aafa8de9e](https://github.com/onegov/onegov-cloud/commit/1aafa8de9e7cd0e26a2607acb46e4005e4829a97)
 
